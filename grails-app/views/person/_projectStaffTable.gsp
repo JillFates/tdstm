@@ -19,17 +19,17 @@
 		<g:each in="${staffList}" status="i" var="projectStaff">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" >
 				<td nowrap="nowrap" class="js-staffFullName">
-					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
+					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="Person.showPersonDialog(this.id,'generalInfoShow')">
 						${projectStaff?.fullName}
 					</span>
 				</td>
 				<td class="js-staffCompany">
-					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
+					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="Person.showPersonDialog(this.id,'generalInfoShow')">
 						${projectStaff?.company}
 					</span>
 				</td>
 				<td id="roleColumnId" class="js-staffRole" nowrap="nowrap">
-					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
+					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="Person.showPersonDialog(this.id,'generalInfoShow')">
 						${projectStaff?.team}
 					</span>
 				</td>

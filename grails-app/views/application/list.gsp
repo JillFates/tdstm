@@ -36,7 +36,6 @@
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
-				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#filterPane").draggable()
 
 				// JqGrid implementations 
@@ -180,7 +179,6 @@
 			<div id="createStaffDialog" style="display:none;" class="static-dialog">
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
-			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 		</div>
             <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>

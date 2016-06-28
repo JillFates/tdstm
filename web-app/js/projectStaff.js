@@ -245,84 +245,6 @@ function unCheckAll() {
 	$("#allPhase").attr('checked', false);
 	loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), scope.orderBy != 'asc' ? 'asc' :'desc');
 }
-/*
- * To open person's general info , Availabilty and TDS utility dialog
- */
-function loadPersonDiv(personId,renderPage,redirectTo){
-	var currentFirstName;
-	var currentLastName;
-	jQuery.ajax({
-		url : contextPath+'/person/loadGeneral',
-		data : {
-			'personId' : personId,'tab':renderPage
-		},
-		type : 'POST',
-		success : function(data) {
-			if(redirectTo == 'edit'){
-				currentTabShow = currentTabShow.replace('Show','Edit')
-				currentHeaderShow = currentHeaderShow.replace('Show','Edit')
-			}
-				$("#personGeneralViewId").html(data)
-				$("#personGeneralViewId").dialog('option', 'width', '420px')
-				$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
-				$("#personGeneralViewId").dialog('option', 'modal', 'true');
-				if(currentTabShow == "generalInfoShowId")
-				{
-					$("#personGeneralViewId").dialog('option', 'title', 'Manage Staff - ' + $('span[id="firstNameId"]').text() + ' ' + $('span[id="middleNameId"]').text() + ' ' + $('span[id="lastNameId"]').text());
-				}
-				$("#"+currentTabShow).show()
-				
-				$(".mobmenu").removeClass("mobselect")
-				if(currentTabShow != "generalInfoEditId")
-				{
-					$('#generalInfoEditId').hide();
-				}
-				$("#"+currentHeaderShow).addClass("mobselect")
-				$("#personGeneralViewId").dialog('open');
-				
-		},
-		error : function (response) {
-			tdsCommon.displayWsError(response, "Error retrieving person information.", false);
-		}
-	});
-}
-function switchTab(id,divId,header){
-	$(".person").hide()
-	currentTabShow = divId
-	currentHeaderShow = header
-	$(".mobmenu").removeClass("mobselect")
-	$("#"+currentHeaderShow).addClass("mobselect")
-	$("#"+currentTabShow).show()
-}
-
-/*
- * to make a Ajax call to update person info.
- */
-function updatePerson(tab,form){
-	var validate = validatePersonForm(form)
-	if(validate) {
-		var params = $('#'+form).serialize()
-		params+= "&tab=" + tab;
-		jQuery.ajax({
-			url:$('#'+form).attr('action'),
-			data: params,
-			type:'POST',
-			success: function(data) {
-				$('#personGeneralViewId').html(data)
-				currentTabShow = currentTabShow.replace('Edit','Show')
-				currentHeaderShow = currentHeaderShow.replace('Edit','Show')
-				$(".person").hide()
-				$("#"+currentTabShow).show()
-				$(".mobmenu").removeClass("mobselect")
-				$("#"+currentHeaderShow).addClass("mobselect")
-				$("#personGeneralViewId").dialog('option', 'title', 'Manage Staff - ' + $('span[id="firstNameId"]').text() + ' ' + $('span[id="middleNameId"]').text() + ' ' + $('span[id="lastNameId"]').text());
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				tdsCommon.displayWsError(jqXHR, "An unexpected error occurred while attempting to update Person.", false);
-			}
-		});
-	}
-}
 
 /*
  * to Add roles for person
@@ -554,15 +476,6 @@ function togEvtStaff(source, personId, projectId, eventId, teamCode) {
 function toggleChangedStyle (source) {
 	var cssClass = $(source).is(':checked') ? 'checkedStaffTemp' : 'uncheckedStaff';
 	$(source).parent().addClass(cssClass);
-}
-
-/*
- * To Close dialog and set global variable again on default.
- */
-function closePersonDiv(divId){
-	currentTabShow = "generalInfoShowId";
-	currentHeaderShow = "generalShowHeadId";
-	$('#'+divId).dialog('close');
 }
 
 /**

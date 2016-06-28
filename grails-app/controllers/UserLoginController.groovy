@@ -160,7 +160,7 @@ class UserLoginController {
 		def results = userLoginInstanceList?.collect {
 			[ cell: [ [id:it.userLoginId, username:it.username, lockedOutUntil:it.locked, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts:it.failedAttempts], 
 			'<a href="'+HtmlUtil.createLink([controller:'userLogin', action:'show', id:"${it.userLoginId}"])+'">'+it.username+'</a>',
-			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>', 
+			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>', 
 			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate ], id: it.userLoginId ]}
 			
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]

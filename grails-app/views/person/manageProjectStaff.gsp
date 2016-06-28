@@ -22,10 +22,10 @@
 		<g:javascript src="projectStaff.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-		<title>Project Staff</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+		<title>Project Staff</title>
 
 
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
@@ -46,71 +46,69 @@
 			<h1>Project Staff</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<div id="staffSelectId" >
-			<table id="staffFilterId" style="border: 0px;width: 100%;" >
-				<tr>
-					<td>
-						<span><b id="teamLabel">Team</b></span><br/>
-						<label for="role">
-							<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" 
-								onChange="loadFilteredStaff('lastName','staff')"
-								noSelection="${['0':'All']}">
-							</g:select>
-						</label>
-					</td>
-					<td>
-						<span><b id="onlyClientStaffLabel">Only Client Staff</b></span>
-						<br/>
-						<input type="checkbox" name="clientStaff" id="clientStaffId" 
-							onChange="this.value = this.checked ? 1 : 0; loadFilteredStaff('lastName','staff');"
-							${onlyClientStaff=='1'? 'checked="checked" value="1"'  : 'value="0"'}
-						/>
-					</td>
-					<td>
-						<span><b id="onlyAssignedLabel">Only Assigned</b></span>
-						<br/>
-							<input type="checkbox" name="assigned" id="assignedId"  
+				<table id="staffFilterId" style="border: 0px;width: 100%;" >
+					<tr>
+						<td>
+							<span><b id="teamLabel">Team</b></span><br/>
+							<label for="role">
+								<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" 
+									onChange="loadFilteredStaff('lastName','staff')"
+									noSelection="${['0':'All']}">
+								</g:select>
+							</label>
+						</td>
+						<td>
+							<span><b id="onlyClientStaffLabel">Only Client Staff</b></span>
+							<br/>
+							<input type="checkbox" name="clientStaff" id="clientStaffId" 
 								onChange="this.value = this.checked ? 1 : 0; loadFilteredStaff('lastName','staff');"
-								${assigned=='1'? 'checked="checked" value="1"' : 'value="0"'}
+								${onlyClientStaff=='1'? 'checked="checked" value="1"'  : 'value="0"'}
 							/>
-					</td>
-					<td>
-						<span><b id="projectLabel">Project</b></span><br/>
-						<label for="project">
-							<select id="project" name="project" ng-model="selectedProject" onChange="loadFilteredStaff('fullNameName','staff')" ng-init="selectedProject=${projectId}">
-								<g:each in="${projects}" var="project">
-									<option value="${project.id}">
-										${project.name}
-									</option>
-								</g:each>
+						</td>
+						<td>
+							<span><b id="onlyAssignedLabel">Only Assigned</b></span>
+							<br/>
+								<input type="checkbox" name="assigned" id="assignedId"  
+									onChange="this.value = this.checked ? 1 : 0; loadFilteredStaff('lastName','staff');"
+									${assigned=='1'? 'checked="checked" value="1"' : 'value="0"'}
+								/>
+						</td>
+						<td>
+							<span><b id="projectLabel">Project</b></span><br/>
+							<label for="project">
+								<select id="project" name="project" ng-model="selectedProject" onChange="loadFilteredStaff('fullNameName','staff')" ng-init="selectedProject=${projectId}">
+									<g:each in="${projects}" var="project">
+										<option value="${project.id}">
+											${project.name}
+										</option>
+									</g:each>
+								</select>
+							</label>
+						</td>
+						<td>
+							<span><b>Events Option</b></span><br/>
+							<select id="eventsOption" name="eventsOption" onChange="loadFilteredStaff('fullNameName','staff')">
+								<option value="A">Active</option>
+								<option value="X">All</option>
+								<option value="C">Completed</option>
 							</select>
-						</label>
-					</td>
-					<td>
-						<span><b>Events Option</b></span><br/>
-						<select id="eventsOption" name="eventsOption" onChange="loadFilteredStaff('fullNameName','staff')">
-							<option value="A">Active</option>
-							<option value="X">All</option>
-							<option value="C">Completed</option>
-						</select>
-
-						<span id="spinner" class="spinner" style="margin-left:10px; position:inherit;">
-							<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-						</span>
-					</td>
-				</tr>
-			</table>
-			<br/>
-			<input type="hidden" id="manageStaff" value="manageStaff" />
-			<div id="projectStaffTableId">
-				<% // <g:render template="projectStaffTable"></g:render> %>
+							
+							<span id="spinner" class="spinner" style="margin-left:10px; position:inherit;">
+								<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+							</span>
+						</td>
+					</tr>
+				</table>
+				<br/>
+				<input type="hidden" id="manageStaff" value="manageStaff" />
+				<div id="projectStaffTableId">
+					<% // <g:render template="projectStaffTable"></g:render> %>
+				</div>
 			</div>
-			</div>
-			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 		</div>
 
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$("#personGeneralViewId").dialog({ autoOpen: false });
 				loadFilteredStaff('lastName','staff');
 				
 				// handle the scrolling header
@@ -135,9 +133,9 @@
 				});
 
 				$("#unselectDialog").dialog({
-      				autoOpen: false,
-    			});
-    			
+      				autoOpen: false
+				});
+				
 			});
 			
 			function handleHeader (eventType) {
@@ -178,9 +176,9 @@
 			</div>
 		</div>
 
-	 <script>
+	<script>
 		 $('.menu-projects-project-staff').addClass('active');
 		 $('.menu-parent-projects').addClass('active');
-	 </script>
-	 </body>
+	</script>
+	</body>
  </html>

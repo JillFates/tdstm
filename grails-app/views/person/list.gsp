@@ -15,7 +15,6 @@
 
 		<jqgrid:resources />
 		<g:javascript src="projectStaff.js" />
-		<g:javascript src="person.js" />
 		<g:javascript src="jqgrid-support.js" />
 
 		<style>
@@ -48,7 +47,6 @@
 		</script>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				$("#showOrMergeId").dialog({ autoOpen: false })
 				$('.cbox').change(function() {
@@ -146,8 +144,6 @@
 			<jqgrid:wrapper id="personId" />
 		</div>
 	</div>
-	
-	<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 	
 	<div id="createStaffDialog" title="Create Staff" style="display:none;" class="static-dialog">
 		<g:render template="createStaff" model="[forWhom:'person']"></g:render>

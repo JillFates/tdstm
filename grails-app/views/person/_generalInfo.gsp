@@ -1,12 +1,15 @@
 <div class="menu4">
 	<ul>
-		<li><a href="#" id="generalEditHeadId" class="mobmenu mobselect"
-			onclick="switchTab(${person.id},'generalInfoEditId','generalEditHeadId')">Person/Contact</a></li>
-		<li><a href="#" id="availEditHeadId" class="mobmenu"
-			onclick="switchTab(${person.id},'availabilityEditId','availEditHeadId')">Availability</a></li>
+		<li>
+			<a href="#" id="generalEditHeadId" class="mobmenu mobselect" onclick="Person.switchTab('generalInfoEditId','generalEditHeadId')">Person/Contact</a>
+		</li>
+		<li>
+			<a href="#" id="availEditHeadId" class="mobmenu" onclick="Person.switchTab('availabilityEditId','availEditHeadId')">Availability</a>
+		</li>
 		<tds:hasPermission permission='EditTDSPerson'>
-			<li><a href="#" id="tdsEditHeadId" class="mobmenu"
-				onclick="switchTab(${person.id},'tdsUtilityEditId','tdsEditHeadId')">Misc</a></li>
+			<li>
+				<a href="#" id="tdsEditHeadId" class="mobmenu" onclick="Person.switchTab('tdsUtilityEditId','tdsEditHeadId')">Misc</a>
+			</li>
 		</tds:hasPermission>
 	</ul>
 </div>
@@ -18,13 +21,14 @@
 				<tbody>
 
 					<tr class="prop">
-	                   <td valign="top" class="name">
-	                       <label>Company:</label>
-	                   </td>
-	                   <td valign="top" class="value" colspan="2"><span
-								class="personShow" id="companyId">
-									${company}
-							</span></td>
+						<td valign="top" class="name">
+							<label>Company:</label>
+						</td>
+						<td valign="top" class="value" colspan="2">
+							<span class="personShow" id="companyId">
+								${company}
+							</span>
+						</td>
 					</tr> 
 
 
@@ -155,9 +159,9 @@
 				</tbody>
 
 			</table>
-			<input type="hidden" id="maxSize" value="${sizeOfassigned }">
+			<input type="hidden" id="maxSize" value="${sizeOfassigned }" />
 
-			<input type="hidden" id="manageFuncsId" name="manageFuncs" value="0">
+			<input type="hidden" id="manageFuncsId" name="manageFuncs" value="0" />
 
 
 			<div id="availableFuncsId" style="display: none">
@@ -270,7 +274,7 @@
 </g:form>
 <tds:hasPermission permission='PersonEditView'>
 	<div class="buttons buttonsToUpdate">
-		<input class="save" type="button" id="updateBId" value="Update" onClick="updatePerson('generalInfoShow','personDialogForm')" />
-		<input class="cancel" type="button" id="cancelBId" value="Cancel" onClick="closePersonDiv('personGeneralViewId');loadPersonDiv(${person.id}, 'generalInfoShow')" />
+		<input class="save" type="button" id="updateBId" value="Update" onClick="Person.updatePerson('generalInfoShow','personDialogForm')" />
+		<input class="cancel" type="button" id="cancelBId" value="Cancel" onClick="Person.closePersonDiv('personGeneralViewId');Person.showPersonDialog(${person.id}, 'generalInfoShow')" />
 	</div>
 </tds:hasPermission>

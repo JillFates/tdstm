@@ -48,7 +48,7 @@
 						<tr class="prop">
 							<td valign="top" class="name">Person:</td>
 							<td nowrap="nowrap" valign="top" class="value">
-								<a href="javascript:loadPersonDiv(${userLoginInstance?.person?.id},'generalInfoShow')">
+								<a href="javascript:Person.showPersonDialog(${userLoginInstance?.person?.id},'generalInfoShow')">
 									${userLoginInstance?.person?.encodeAsHTML()}
 								</a>
 							</td>
@@ -141,23 +141,17 @@
 						
 						<tr class="prop">
 							<td valign="top" class="name">Created Date:</td>
-							
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" /></td>
-							
 						</tr>
 						
 						<tr class="prop">
 							<td valign="top" class="name">Last Modified:</td>
-							
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastModified}" /></td>
-							
 						</tr>
 						
 						<tr class="prop">
 							<td valign="top" class="name">Last Login:</td>
-							
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" /></td>
-							
 						</tr>
 						
 					</tbody>
@@ -198,7 +192,7 @@
 				$("#unlockUserDialog").dialog({
       				autoOpen: false,
       				modal: true
-    			});
+				});
 
 				$("#resetPassword").click(function(){
 					$(this).prop('disabled', true)
@@ -223,7 +217,7 @@
 				})
 			});
 		</script>
-				<div id="unlockUserDialog" title="Unlock User Login">
-				</div>
+		
+		<div id="unlockUserDialog" title="Unlock User Login"></div>
 	</body>
 </html>

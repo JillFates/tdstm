@@ -175,9 +175,9 @@ def test = {
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = personInstanceList?.collect {
-			[ cell: ['<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.firstname+'</a>', 
-			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.middlename+'</a>', 
-			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.lastname+'</a>', 
+			[ cell: ['<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.firstname+'</a>', 
+			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.middlename+'</a>', 
+			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.lastname+'</a>', 
 			genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, addUserIconUrl, it), 
 			it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
@@ -711,11 +711,11 @@ def test = {
 			// TODO : JPM 5/2015 : Change the way that the delete is occurring
 			def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
 			prePreference.each{ preference->
-			  	def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
-				 	// When clearing preference, the RefreshMyTasks should be the same.
-				  	if(preferenceInstance.preferenceCode != 'RefreshMyTasks') {
+				def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
+					// When clearing preference, the RefreshMyTasks should be the same.
+					if(preferenceInstance.preferenceCode != 'RefreshMyTasks') {
 						preferenceInstance.delete()
-				  	}
+					}
 			}
 
 			userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )

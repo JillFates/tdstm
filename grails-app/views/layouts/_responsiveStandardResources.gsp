@@ -78,6 +78,7 @@
         <g:javascript src="tds-common.js" />
         <g:javascript src="timezone/jquery.maphilight.min.js" />
         <g:javascript src="timezone/jquery.timezone-picker.min.js" />
+        <g:javascript src="person.js"/>
 
 
         <% // What is this for?  %>

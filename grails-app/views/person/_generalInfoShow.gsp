@@ -1,12 +1,15 @@
 <div class="menu4">
 	<ul>
-		<li><a href="#" id="generalShowHeadId" class="mobmenu mobselect"
-			onclick="switchTab(${person.id},'generalInfoShowId','generalShowHeadId')">Person/Contact</a></li>
-		<li><a href="#" id="availShowHeadId" class="mobmenu"
-			onclick="switchTab(${person.id},'availabilityShowId','availShowHeadId')">Availability</a></li>
+		<li>
+			<a href="#" id="generalShowHeadId" class="mobmenu mobselect" onclick="Person.switchTab('generalInfoShowId','generalShowHeadId')">Person/Contact</a>
+		</li>
+		<li>
+			<a href="#" id="availShowHeadId" class="mobmenu" onclick="Person.switchTab('availabilityShowId','availShowHeadId')">Availability</a>
+		</li>
 		<tds:hasPermission permission='EditTDSPerson'>
-			<li><a href="#" id="tdsShowHeadId" class="mobmenu"
-				onclick="switchTab(${person.id},'tdsUtilityShowId','tdsShowHeadId')">Misc</a></li>
+			<li>
+				<a href="#" id="tdsShowHeadId" class="mobmenu" onclick="Person.switchTab('tdsUtilityShowId','tdsShowHeadId')">Misc</a>
+			</li>
 		</tds:hasPermission>
 	</ul>
 </div>
@@ -19,101 +22,85 @@
 					<tbody>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label for="company">Company:</label>
+							<td valign="top" class="name"><label for="company">Company:</label></td>
+							<td valign="top" class="value" colspan="2">
+								<span class="personShow" id="companyId">${company}</span>
 							</td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="companyId">
-									${company}
-							</span></td>
 						</tr>
 						
 						<tr class="prop">
-							<td valign="top" class="name"><label for="firstName">First
-										Name:&nbsp;
-								</label></td>
-							<td valign="top" class="value" style="width: 40px"><span
-								class="personShow" id="firstNameId"
-								class="asset_details_block_task">
+							<td valign="top" class="name">
+								<label for="firstName">First Name:&nbsp;</label>
+							</td>
+							<td valign="top" class="value" style="width: 40px">
+								<span class="personShow" id="firstNameId" class="asset_details_block_task">
 									${person.firstName}
-							</span></td>
-							<td rowspan="2"><g:if test="${person.personImageURL==null}">
-									<img src="${resource(dir:'images',file:'blankPerson.jpg')}" alt="Smiley face"
-										height="60" width="60">
-								</g:if> <g:else>
-									<img src="${person.personImageURL}" height="60" width="60">
-								</g:else></td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name"><label for="middleName">Middle
-									Name:</label></td>
-							<td valign="top" class="value" colspan="2" width="50%"><span
-								class="personShow" id="middleNameId"> ${person.middleName}
-							</span></td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name"><label for="lastName">Last
-									Name:</label></td>
-							<td valign="top" class="value" colspan="2" width="50%"><span
-								class="personShow" id="lastNameId"> ${person.lastName}
-							</span></td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name"><label for="title">Title:</label>
+								</span>
 							</td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="titleId">
-									${person.title}
-							</span></td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name"><label for="email">Email:</label>
+							<td rowspan="2">
+								<g:if test="${person.personImageURL==null}">
+									<img src="${resource(dir:'images',file:'blankPerson.jpg')}" alt="Smiley face" height="60" width="60" />
+								</g:if>
+								<g:else>
+									<img src="${person.personImageURL}" height="60" width="60" />
+								</g:else>
 							</td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="emailId">
-									${person.email}
-							</span></td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name"><label for="nickName">Work
-									Phone:</label></td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="workPhoneId">
-									${person.workPhone}
-							</span></td>
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label for="nickName">Mobile
-									Phone:</label></td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="mobilePhoneId">
-									${person.mobilePhone}
-							</span></td>
+							<td valign="top" class="name"><label for="middleName">Middle Name:</label></td>
+							<td valign="top" class="value" colspan="2" width="50%">
+								<span class="personShow" id="middleNameId">${person.middleName}</span>
+							</td>
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label for="nickName">City/State/Zip
-									:</label></td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="locationId">
-									${person.location}
-							</span> <span class="personShow" id="stateProvId">
-									${person.stateProv}
-							</span> <span class="personShow" id="countryId">
-									${person.country}
-							</span></td>
+							<td valign="top" class="name"><label for="lastName">Last Name:</label></td>
+							<td valign="top" class="value" colspan="2" width="50%">
+								<span class="personShow" id="lastNameId">${person.lastName}</span>
+							</td>
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label for="active">Active
-									:</label></td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="activeId">
-									${person.active}
-							</span></td>
+							<td valign="top" class="name"><label for="title">Title:</label></td>
+							<td valign="top" class="value" colspan="2">
+								<span class="personShow" id="titleId">${person.title}</span>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label for="email">Email:</label></td>
+							<td valign="top" class="value" colspan="2">
+								<span class="personShow" id="emailId">${person.email}</span>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label for="nickName">Work Phone:</label></td>
+							<td valign="top" class="value" colspan="2">
+								<span class="personShow" id="workPhoneId">${person.workPhone}</span>
+							</td>
+						</tr>
+
+						<tr class="prop">
+							<td valign="top" class="name"><label for="nickName">Mobile Phone:</label></td>
+							<td valign="top" class="value" colspan="2">
+								<span class="personShow" id="mobilePhoneId">${person.mobilePhone}</span>
+							</td>
+						</tr>
+
+						<tr class="prop">
+							<td valign="top" class="name"><label for="nickName">City/State/Zip:</label></td>
+							<td valign="top" class="value" colspan="2">
+								<span class="personShow" id="locationId">${person.location}</span>
+								<span class="personShow" id="stateProvId">${person.stateProv}</span>
+								<span class="personShow" id="countryId">${person.country}</span>
+							</td>
+						</tr>
+
+						<tr class="prop">
+							<td valign="top" class="name"><label for="active">Active:</label></td>
+							<td valign="top" class="value" colspan="2">
+								<span class="personShow" id="activeId">${person.active}</span>
+							</td>
 						</tr>
 
 						<tr class="prop">
@@ -123,9 +110,12 @@
 									<tbody id="funcsTbodyId">
 										<g:each in="${personFunctions}" status="i" var="function">
 											<tr id="funcTrId_${i}">
-												<td><span class="personShow">
+												<td>
+													<span class="personShow">
 														${function.description.substring(function.description.lastIndexOf(':') +1).trim()}
-												</span><br /></td>
+													</span>
+													<br />
+												</td>
 											</tr>
 										</g:each>
 									</tbody>
@@ -150,7 +140,8 @@
 				</tr>
 				<g:each in="${blackOutdays}" var="blackOutDay">
 					<tr>
-						<td><span class="personShow">
+						<td>
+							<span class="personShow">
 								<tds:convertDate date="${blackOutDay.exceptionDay}" />
 							</span>
 						</td>
@@ -218,7 +209,7 @@
 </div>
 <tds:hasPermission permission='PersonEditView'>
 <div class="buttons">
-	<input class="edit" type="button" id="edtBId" value="Edit" onClick="loadPersonDiv(${person.id},'generalInfo','edit')" />
-	<input class="cancel" type="button" id="cancelBId" value="Cancel" onClick="closePersonDiv('personGeneralViewId')"/>
+	<input class="edit" type="button" id="edtBId" value="Edit" onClick="Person.showPersonDialog(${person.id},'generalInfo','edit')" />
+	<input class="cancel" type="button" id="cancelBId" value="Cancel" onClick="Person.closePersonDiv('personGeneralViewId')"/>
 </div>
  </tds:hasPermission>

@@ -1,12 +1,27 @@
 div.ui-dialog
-  /*z-index: 1060*/
+  z-index: 1060
   padding: 0px
   -webkit-border-radius: 0px
   -moz-border-radius: 0px
   border-radius: 0px
   border: 0px
   top: 30px
+  -webkit-box-sizing: content-box
+  -moz-box-sizing: content-box
+  box-sizing: content-box
   background-color: $white
+  background: $white
+  > div
+    -webkit-box-sizing: content-box
+    -moz-box-sizing: content-box
+    box-sizing: content-box
+  div.ui-dialog-content
+    background-color: $white
+    border: 0px !important
+    padding-left: 15px
+    padding-right: 15px
+    padding-top: 6px
+    padding-bottom: 1px
   div.dialog
     background-color: $white
     border: 0px !important
@@ -27,7 +42,6 @@ div.ui-dialog
     -webkit-border-radius: 0px
     -moz-border-radius: 0px
     border-radius: 0px
-    height: 39px
     padding-top: 7px
     font-size: 16px
     button.ui-dialog-titlebar-close

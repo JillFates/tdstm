@@ -1969,7 +1969,7 @@ class AssetEntityController {
 			def notes = []
 			noteList.each {
 				def dateCreated = it.dateCreated ? TimeUtil.formatDateTime(getSession(), it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3) : ''
-				notes << [ dateCreated , it.createdBy.toString() ,it.note]
+				notes << [ dateCreated , it.createdBy?.toString() ,it.note, it.createdBy?.id]
 			}
 			
 			// Get the name of the User Role by Name to display

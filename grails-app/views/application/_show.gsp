@@ -23,7 +23,7 @@
 			<td class="valueNW ${config.appVendor}">${applicationInstance.appVendor}</td>
 			<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
 			<td class="valueNW ${config.sme}">
-				<span class="clickableText" onClick="loadPersonDiv(${applicationInstance.sme?.id},'generalInfoShow')">
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
 				</span>
 			</td>
@@ -37,7 +37,7 @@
 			<td class="valueNW ${config.appVersion}">${applicationInstance.appVersion}</td>
 			<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 			<td class="valueNW ${config.sme2}">
-				<span class="clickableText" onClick="loadPersonDiv(${applicationInstance.sme2?.id},'generalInfoShow')">
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
 				</span>
 			</td>
@@ -51,7 +51,7 @@
 			<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
 			<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 			<td class="valueNW ${config.appOwner}">
-				<span class="clickableText" onClick="loadPersonDiv(${applicationInstance.appOwner?.id},'generalInfoShow')">
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
 				</span>
 			</td>
@@ -74,9 +74,9 @@
 			<td class="label ${config.license} ${highlightMap.license?:''}" nowrap="nowrap"><label for="license">License</label></td>
 			<td class="valueNW ${config.license}">${applicationInstance.license}</td>
 			<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}" nowrap="nowrap"><label for="retireDate">Retire</label></td>
-			<td class="${config.retireDate}"><tds:convertDate
-					date="${applicationInstance?.retireDate}"
-			/></td>
+			<td class="${config.retireDate}">
+				<tds:convertDate date="${applicationInstance?.retireDate}" />
+			</td>
 			<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label></td>
 			<td class="${config.validation}">${applicationInstance.validation}</td>
 			<td class="label ${config.testProc} ${highlightMap.testProc?:''}" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
@@ -86,9 +86,8 @@
 			<td></td>
 			<td></td>
 			<td class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}" nowrap="nowrap"><label for="maintExpDate">Maint Exp.</label></td>
-			<td class="valueNW ${config.maintExpDate}"><tds:convertDate
-					date="${applicationInstance?.maintExpDate}" format="12hrs"
-					 />
+			<td class="valueNW ${config.maintExpDate}">
+				<tds:convertDate date="${applicationInstance?.maintExpDate}" format="12hrs" />
 			</td>
 			<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label></td>
 			<td class="valueNW ${config.latency}">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>
@@ -107,13 +106,13 @@
 				${shutdownBy}
 			</g:if>
 			<g:else>
-				<span class="clickableText" onClick="loadPersonDiv(${shutdownById},'generalInfoShow')">
+				<span class="clickableText" onClick="Person.showPersonDialog(${shutdownById},'generalInfoShow')">
 					${shutdownBy}
 				</span>
 			</g:else>
 			<g:if test="${applicationInstance.shutdownFixed ==1 }">
 				<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed" checked="checked"/>
-					<label for="shutdownFixedId" >Fixed</label>
+				<label for="shutdownFixedId" >Fixed</label>
 			</g:if>
 			</td>
 			<td class="label ${config.shutdownDuration}  ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration</label></td>
@@ -126,14 +125,13 @@
 				${startupBy}
 			</g:if>
 			<g:else>
-				<span class="clickableText" onClick="loadPersonDiv(${startupById},'generalInfoShow')">
+				<span class="clickableText" onClick="Person.showPersonDialog(${startupById},'generalInfoShow')">
 					${startupBy}
 				</span>
 			</g:else>
 			<g:if test="${applicationInstance.startupFixed ==1 }">
-				<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${applicationInstance.startupFixed}" 
-						checked="checked"/>
-					<label for="startupFixedId" >Fixed</label>
+				<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${applicationInstance.startupFixed}" checked="checked"/>
+				<label for="startupFixedId" >Fixed</label>
 			</g:if>
 			</td>
 			<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Startup Duration</label></td>
@@ -144,14 +142,14 @@
 				${testingBy}
 			</g:if>
 			<g:else>
-				<span class="clickableText" onClick="loadPersonDiv(${testingById},'generalInfoShow')">
+				<span class="clickableText" onClick="Person.showPersonDialog(${testingById},'generalInfoShow')">
 					${testingBy}
 				</span>
 			</g:else>
-			  <g:if test="${applicationInstance.testingFixed ==1 }">
+			<g:if test="${applicationInstance.testingFixed ==1 }">
 				<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
-					<label for="testingFixedId" >Fixed</label>
-			  </g:if>
+				<label for="testingFixedId" >Fixed</label>
+			</g:if>
 			</td>
 			<td class="label ${config.testingDuration} ${highlightMap.testingDuration?:''}" nowrap="nowrap"><label for="testingDuration">Testing Duration</label></td>
 			<td class="valueNW ${config.testingDuration}" nowrap="nowrap">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>

@@ -179,8 +179,6 @@
         <div id="relatedEntitiesId"></div>
 
         <g:render template="../assetEntity/initAssetEntityData"/>
-
-        <div id="personGeneralViewId" style="display: none;" title="User Details"></div>
     </div>
     <script type="text/javascript">
 
@@ -671,16 +669,7 @@
 
         }
 
-        function switchTab(id, divId, header) {
-            $(".person").hide()
-            currentTabShow = divId
-            currentHeaderShow = header
-            $(".mobmenu").removeClass("mobselect")
-            $("#" + currentHeaderShow).addClass("mobselect")
-            $("#" + currentTabShow).show()
-        }
-
-
+	  
         function loadAll(id) {
             loadRelatedEntities(id)
             loadEventTable(id);

@@ -175,7 +175,7 @@
                 <input type="hidden" id="fieldName" name="fieldName" />
                 <input class="save" type="button" value="Save" onClick="createPersonDetails()"/>
            	</g:else>
-            	<input class="delete" type="button" id="cancelBId" value="Cancel" onClick="closePersonDiv('createStaffDialog')"/>
+            	<input class="delete" type="button" id="cancelBId" value="Cancel" onClick="Person.closePersonDiv('createStaffDialog')"/>
 			</span>
           </div>
         </g:form>
