@@ -41,6 +41,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 	var PENDING='Pending';
 	var STARTED='In progress';
 	var PAUSED='Paused';
+	var CANCELLED='Cancelled';
 
 	var STALLED_RETRIES=10;
 	
@@ -159,6 +160,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 								}
 								break;
 
+							case CANCELLED:
 							case FAILED:
 								if (data.detail) {
 									showDetail=true;
