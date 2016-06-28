@@ -1340,14 +1340,16 @@ class AssetEntityService {
 		def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 
 		def validationType = assetEntity.validation
+
+		def projectAttributes = projectService.getAttributes(type)
 		
-		def configMap = getConfig(type, validationType)
+		def configMap = getConfig(type, validationType, projectAttributes)
 
 		def dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by a.dependent.assetType, a.dependent.assetName asc",[assetEntity])
 		
 		def supportAssets = AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType, a.asset.assetName asc",[assetEntity])
 
-		def highlightMap = getHighlightedInfo(type, assetEntity, configMap)
+		def highlightMap = getHighlightedInfo(type, assetEntity, configMap, projectAttributes)
 
 		def prefValue = userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 		
@@ -1583,12 +1585,13 @@ class AssetEntityService {
 	/**
 	 * This method is used to get config by entityType and validation
 	 * @param type,validation
+	 * @param projectAttributes
 	 * @return
 	 */
-	def getConfig (def type, def validation) {
+	def getConfig (def type, def validation, projectAttributes = null) {
 		def project = securityService.getUserCurrentProject()
 		def allconfig = projectService.getConfigByEntity(type)
-		def fields = projectService.getFields(type) + projectService.getCustoms()
+		def fields = projectService.getFields(type, projectAttributes) + projectService.getCustoms(projectAttributes)
 		def config = [:]
 		def validationType
 		def valList=ValidationType.getValuesAsMap()
@@ -2045,10 +2048,11 @@ class AssetEntityService {
 	 * @param forWhom
 	 * @param assetEntity
 	 * @param configMap
+	 * @param projectAttributes
 	 * @return
 	 */
-	def getHighlightedInfo( forWhom, assetEntity, configMap){
-		def fields = projectService.getFields(forWhom) + projectService.getCustoms()
+	def getHighlightedInfo( forWhom, assetEntity, configMap, projectAttributes = null){
+		def fields = projectService.getFields(forWhom, projectAttributes) + projectService.getCustoms(projectAttributes)
 		def highlightMap = [:]
 		fields.each{f->
 			def configMaps=configMap.config
