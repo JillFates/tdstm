@@ -725,6 +725,7 @@ class AccountImportExportService {
 					accounts[i].errors << error
 				} else if (userChanged) {
 					if (isNewUser) {
+						personService.addToProject(byWhom, "${project.id}", "${person.id}")
 						results.userLoginCreated++
 					} else {
 						updateUserAndOrSecurity = true
