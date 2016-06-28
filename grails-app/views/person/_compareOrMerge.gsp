@@ -20,11 +20,11 @@
 							<td class="col_${person.id} compareColumn">
 								<input type="radio"
 									class="merge" name="mergeRadio" id="merge_${person.id}"
-									${j==0 ? 'checked="checked"' : '' }  onclick="switchTarget(${person.id})"/>
+									${j==0 ? 'checked="checked"' : '' }  onclick="Person.switchTarget(${person.id})"/>
 							</td>
 								<g:if test="${j==0}">
 									<script type="text/javascript" charset="utf-8">
-										switchTarget(${person.id})
+										Person.switchTarget(${person.id})
 									</script>
 								</g:if>
 						</g:if>
@@ -102,7 +102,7 @@
 		</table>
 		
 		<div class="buttons">
-			<input type="button" id="mergeModelId" class="save" value="Merge" onclick="mergePerson()" />
+			<input type="button" id="mergeModelId" class="save" value="Merge" onclick="Person.mergePerson()" />
 			<input type="button" class="cancel" value="Cancel" id="processData" onclick="jQuery('#showOrMergeId').dialog('close')" /> 
 		</div>
 	</div>
