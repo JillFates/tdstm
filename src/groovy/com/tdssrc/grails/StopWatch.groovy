@@ -18,77 +18,32 @@ import org.apache.log4j.Logger
  * 	  sw.endDuration('tag') //return the duration from the set of the tag 'begin(tag)' and removes the mark
  * @author @tavo_luna
  */
-class StopWatch{
-	private static Logger log = Logger.getLogger(StopWatch.class)
+class StopWatch {
+	static private final Logger log = Logger.getLogger(StopWatch.class);
 
-	private Date startTime
-	private Date lastLapTime
 	private tags = [:]
 
-	private TimeDuration lap = new TimeDuration(0,0,0,0)
-
-	public StopWatch(){
-		start()
+	/** 
+	 * Constructor
+	 */
+	public StopWatch() {
+		start('')
 	}
 
 	/**
 	 * Restart the time of the chronometer
 	 */
-	public Date start(){
-		startTime = new Date()
-		lastLapTime = startTime
-		return startTime
+	public Date start(String tag='') {
+		begin(tag)
 	}
 
 	/**
-	 * set a Lapse between the last call to lap or start, time lapse between lap() calls
-	 */
-	public TimeDuration lap(){
-		Date currentDate = new Date()
-		use (TimeCategory) {
-			lap = currentDate - lastLapTime
-		}
-		lastLapTime = currentDate
-		return lap
-	}
-
-	/**
-	 * Get last Time duration of the last lap() call
-	 */
-	public TimeDuration getLastLap(){
-		return lap
-	}
-
-	/**
-	 * get Duration between the start of the chronometer and the last call to lap()
-	 */
-	public TimeDuration getSinceStart(){
-		use (TimeCategory) {
-			return (new Date()) - startTime
-		}
-	}
-
-	/**
-	 * Time when the StopWatch was created or the las tall to start()
-	 */
-	public Date getStartTime(){
-		return startTime
-	}
-
-	/**
-	 * date of the last call to lap() or 'startTime' in case of never been called.
-	 */
-	public Date getLastLapTime(){
-		return lastLapTime
-	}
-
-	/**
-	 * set a tag mark to Begin
+	 * Set a tag mark to Begin
 	 * Every time that this function is called the time mark is reset tho the calltime
 	 */
-	public Date begin(String tag){
+	public Date begin(String tag) {
 		Date begin = new Date()
-		tags[tag] = [ begin:begin, lapTime:begin, lastLap:new TimeDuration(0,0,0,0)]
+		tags[tag] = [ begin:begin, lapTime:begin, lastLap:new TimeDuration(0,0,0,0) ]
 		return begin
 	}
 
@@ -97,64 +52,95 @@ class StopWatch{
 	 * You should call a begin(TAG) to start the profiling block before calling this function
 	 * NOTE: if this is call before invoking begin(TAG) a Warning message will be logged and a profiling block will be created.
 	 */
-	public TimeDuration lap(String tag){
-		Date currentDate = new Date()
-
-		def conf = tags[tag]
-		if(conf == null){
-			log.warn("lap('$tag') was called before creating the Profile block, please call begin('$tag') beforehand to avoid this message")
-			begin(tag)
-			conf = tags[tag]
-		}
-		Date lastLapTime = conf.lapTime
-
-		def lap = use (TimeCategory) {
-			return currentDate - lastLapTime
-		}
-
-		if(conf) {
-			conf.lapTime = currentDate
-			conf.lastLap = lap
-		}
-
-		return lap
+	public TimeDuration lap(String tag='') {
+		Date currentTime = new Date()
+		Map clock = getClock(tag)
+		clock.lastLap = elapsed(clock.lapTime, currentTime)
+		clock.lapTime = currentTime
+		return clock.lastLap
 	}
 	
 	/**
-	 * date of the last call to lap(TAG) or 'startTime' if no begin(TAG) has been called.
+	 * Get last Time duration of the last lap() call for a named Stopwatch
 	 */
-	public Date getLastLapTime(String tag) {
-		Date lastLapTime = tags[tag]?.lapTime
-		if (lastLapTime == null) {
-			lastLapTime = startTime
-		}
-		return lastLapTime
+	public TimeDuration getLastLap(String tag='') {
+		Map clock = getClock(tag)
+		return clock.lastLap
 	}
 
 	/**
-	 * Get last Time duration of the last lap() call
+	 * date of the last call to lap(TAG) or 'startTime' if no begin(TAG) has been called.
 	 */
-	public TimeDuration getLastLap(String tag){
-		Date lastLap = tags[tag]?.lastLap
-		if (lastLap == null) {
-			lastLap = new TimeDuration(0,0,0,0)
-		}
-		return lastLap
+	public Date getLastLapTime(String tag='') {
+		Map clock = getClock(tag)
+		return clock.lastLapTime
+	}
+
+	/**
+	 * get the duration between the start of a named chronometer and the last call to lap()
+	 */
+	public TimeDuration getSinceStart(String tag='') {
+		Map clock = getClock(tag)
+		return elapsed(clock.begin)
+	}
+
+	/**
+	 * Time when the StopWatch was created
+	 */
+	public Date getStartTime(String tag='') {
+		Map clock = getClock(tag)
+		return clock.begin
 	}
 
 	/**
 	 * remove tag mark ang get duration
 	 */
-	public TimeDuration endDuration(String tag){
-		Date end = new Date()
-		Date begin = tags[tag]?.begin
-		if(begin == null){
-			begin = startTime
-		}else{
-			tags.remove(tag)
-		}
+	public TimeDuration endDuration(String tag='') {
+		Map clock = getClock(tag)
+		TimeDuration elapsed = elapsed(clock.begin)
+		tags.remove(tag)
+		return elapsed
+	}
+
+	// ----------------------------------
+	// Private methods
+	// ----------------------------------
+
+	/**
+	 * get Duration between the start of the chronometer and the currentTime parameter
+	 * @param startTime - the time of the chronometer started
+	 * @param currentTime - the time that the chronometer was stopped, defaults to now
+	 * @return the time elapsed between the two times
+	 */
+	private TimeDuration elapsed(Date startTime, Date currentTime=new Date()) {
+		TimeDuration e
 		use (TimeCategory) {
-			return end - begin
+			e = (currentTime - startTime)
 		}
+		return e
+	}
+
+	/**
+	 * Used to retrieve a tag object which will recreate it if it was not properly created originally
+	 * @param tag - the label used to reference the particular lap
+	 * @return the tag object
+	 */
+	private Map getClock(String tag) {
+		Map conf = tags[tag]
+		if (conf == null) {
+			log.warn("Called StopWatch with tag ($tag) before initializing it with a begin call. Initialization was graciously performed for you.")
+			begin(tag)
+			conf = tags[tag]
+		}
+		return conf
+	}
+
+	/**
+	 * Used for testing to determine if a tag exists
+	 * @param tag - the tag to validate exists
+	 * @return true if exists else false
+	 */
+	protected boolean hasTag(String tag='') {
+		return (tags[tag] != null)
 	}
 }

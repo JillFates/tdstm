@@ -274,12 +274,14 @@ public class Profiler  {
 
 	private void lap(LOG_TYPE ltype, String tag, String msg, ArrayList args){
 		TimeDuration duration;
-		String text = "[";
-		if(tag!=null){
-			text += tag;
+		StringBuffer sb = new StringBuffer("[");
+		if (tag != null) {
+			sb.append(tag);
+			// text += tag;
 			duration = stopWatch.lap(tag);
-		}else{
-			text += "ROOT";
+		} else {
+			sb.append("ROOT");
+			// text += "ROOT";
 			duration = stopWatch.lap();
 		}
 
@@ -289,11 +291,14 @@ public class Profiler  {
 			duraStr += " msec";
 		}
 
-		text += "] (" + duraStr + ")";
+		// text += "] (" + duraStr + ")";
+		sb.append("] (" + duraStr + ")");
 		if(StringUtils.isNotBlank(msg)) {
-			text += ": " + msg;
+			// text += ": " + msg;
+			sb.append(": " + msg);
 		}
-		logPrefix(ltype, "LAP", text, args);
+		// logPrefix(ltype, "LAP", text, args);
+		logPrefix(ltype, "LAP", sb.toString(), args);
 	}
 
 	/** 
@@ -460,6 +465,19 @@ public class Profiler  {
 	}
 
 	/**
+	 * Used to get the TimeDuration of when a given clock (tag) was started
+	 * @param tag - the tag to look up
+	 * @return the TimeDuration since the timer was started
+	 */
+	public TimeDuration getSinceStart(String tag) {
+		return stopWatch.getSinceStart(tag);
+	}
+
+	public TimeDuration getSinceStart() {
+		return stopWatch.getSinceStart();
+	}
+
+	/**
 	 * get the Lap duration of the ROOT of the Profiler
 	 * @return Duration since the last call of ROOT
 	 */
@@ -489,7 +507,7 @@ public class Profiler  {
 	 * @param tag Tag that flags a Begin/End Block
 	 * @return Duration of the last call of lap(tag)
 	 */
-	public TimeDuration getLastLapDuration(String tag){
+	public TimeDuration getLastLapDuration(String tag) {
 		return (tag!=null) ? stopWatch.getLastLap(tag) : stopWatch.getLastLap();
 	}
 

@@ -2192,7 +2192,9 @@ class AssetEntityService {
 
 		boolean profilerEnabled = params[Profiler.KEY_NAME]==Profiler.KEY_NAME
 		Profiler profiler = Profiler.create(profilerEnabled, key)
-		profiler.beginInfo "EXPORT"
+
+		final String mainProfTag = 'EXPORT'
+		profiler.beginInfo(mainProfTag)
 
 		// Helper closure that returns the size of an object or zero (0) if it is null
 		def sizeOf = { obj -> (obj ? obj.size : 0)}
@@ -2322,7 +2324,7 @@ class AssetEntityService {
 
 			}
 
-			profiler.lapInfo 'Initial loading'
+			profiler.lap(mainProfTag, 'Initial loading')
 
 			def countRows = { q, qParams ->
 				def tmpQueryStr = "SELECT COUNT(*) " + q
@@ -2376,10 +2378,10 @@ class AssetEntityService {
 
 			if (doComment) {
 				commentSize = AssetComment.executeQuery("SELECT COUNT(*) FROM AssetComment WHERE project = ? AND commentType = 'comment' AND assetEntity IS NOT NULL", [project])[0]
-				progressTotal += commentSize
+				prgressTotal += commentSize
 			}
 
-			profiler.lapInfo "Getting row counts"
+			profiler.lap(mainProfTag, 'Got row counts')
 
 			// This variable is used to determine when to call the updateProgress
 			float updateOnPercent = 0.01
@@ -2409,7 +2411,7 @@ class AssetEntityService {
 			def currDate = TimeUtil.nowGMT()
 			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 
-			profiler.lapInfo "Loading DTAMaps"
+			profiler.lap(mainProfTag, 'Loaded DTAMaps')
 
 			String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
 			List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
@@ -2417,14 +2419,14 @@ class AssetEntityService {
 			assetDepBundleList.each {
 				assetDepBundleMap.put(it[0].toString(), it[1])
 			}			
-			profiler.lapInfo "Creating asset dep bundles"
+			profiler.lap(mainProfTag, 'Created asset dep bundles')
 
 			//create book and sheet
 			//get template Excel
 			FileInputStream fileInputStream = new FileInputStream( file )
 			def book = WorkbookFactory.create(fileInputStream)
 
-			profiler.lapInfo "Creating workbook"
+			profiler.lap(mainProfTag, 'Loaded workbook template')
 
 			// Helper closure used to retrieve the sheet
 			def getWorksheet = { sheetName ->
@@ -2515,7 +2517,7 @@ class AssetEntityService {
 				}
 			}
 
-			profiler.lapInfo "Validating columns"
+			profiler.lap(mainProfTag, 'Read Spreadsheet Tabs')
 
 			// Helper closure to create a text list from an array for debugging
 			def xportList = { list ->
@@ -2530,6 +2532,9 @@ class AssetEntityService {
 			def appCheckCol = checkHeader( appColumnNameList, appSheetColumnNames, missingHeader )
 			def dbCheckCol = checkHeader( dbColumnNameList, dbSheetColumnNames, missingHeader )
 			def filesCheckCol = checkHeader( fileColumnNameList, storageSheetColumnNames, missingHeader )
+
+			profiler.lap(mainProfTag, 'Validated headers')
+
 			// Statement to check Headers if header are not found it will return Error message
 			if ( serverCheckCol == false || appCheckCol == false || dbCheckCol == false || filesCheckCol == false) {
 				missingHeader = missingHeader.replaceFirst(",","")
@@ -2555,9 +2560,9 @@ class AssetEntityService {
 
 					WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
 				}
+				profiler.lap(mainProfTag, 'Updated title sheet')
 
-				//update data from Asset Entity table to EXCEL
-				
+				//update data from Asset Entity table to EXCEL				
 				
 				def serverColumnNameListSize = sizeOf(serverColumnNameList)
 				def appcolumnNameListSize = sizeOf(appColumnNameList)
@@ -2570,7 +2575,7 @@ class AssetEntityService {
 				updateColumnHeaders(dbSheet, dbDTAMap, dbSheetColumnNames, project)
 				updateColumnHeaders(storageSheet, fileDTAMap, storageSheetColumnNames, project)
 
-				profiler.lapInfo "Updating spreadsheet headers"
+				profiler.lap(mainProfTag, 'Updating spreadsheet headers')
 
 				def validationSheet = getWorksheet("Validation")
 
@@ -2623,9 +2628,10 @@ class AssetEntityService {
 
 				// The threshold (milliseconds) to warning on when the processing time is exceeded for a row
 				Map profileRowThresholds = [
-					(AssetClass.DEVICE): 300,
-					(AssetClass.APPLICATION): 80
+					(AssetClass.DEVICE): 10,
+					(AssetClass.APPLICATION): 50
 				]
+
 				// The maximum # of violations to log
 				final int profileThresholdLogLimit = 100 	
 				final String thresholdWarnMsg = 'A total of %d row(s) exceeded the duration threshold of %d ms'
@@ -2634,11 +2640,15 @@ class AssetEntityService {
 				//
 				// Counter used to count the number of threshold violations
 				int profileThresholdViolations 
+				int profileHighwaterMark = 0
 				int profileSampleQty
 				int profileSampleModulus
 				int profileSamplingTics
 				long lapDuration
 				boolean profilingRow
+				Map durationMatrix = [:]
+
+				profiler.log(Profiler.LOG_TYPE.INFO, 'Initialization took (%s)', [profiler.getSinceStart(mainProfTag)])
 
 				//
 				// Device Export
@@ -2667,6 +2677,7 @@ class AssetEntityService {
 
 					profiler.lap('Devices', 'Entering while loop')
 					asset = getAssetList(deviceQuery, queryParams)
+
 					asset.each { currentAsset ->
 
 						profiler.beginSilent(silentTag)
@@ -2776,21 +2787,35 @@ class AssetEntityService {
 
 						}
 						if (profilingRow) {
-							profiler.end 'Device Row'
-						}
-
-						if (profilingRow) {
-							profiler.lap 'Devices', 'Flushed Session'
+							profiler.end('Device Row')
 						}
 
 						if (profilerEnabled) {
 							// If the row duration exceeds the threshold we'll report it
 							lapDuration = profiler.getLapDuration(silentTag).toMilliseconds()
 							if (lapDuration > profileRowThresholds[(AssetClass.DEVICE)]) {
- 								if ( profileThresholdLogLimit > profileThresholdViolations++) {
-									profiler.log(Profiler.LOG_TYPE.WARN, "Processing asset ${currentAsset.id} ($lapDuration msec) exceeded threshold") 
+								profileThresholdViolations++
+								if ( lapDuration > profileHighwaterMark ) {
+									// Log each row that bumps up the highwater mark
+									profileHighwaterMark = lapDuration
+									profiler.log(Profiler.LOG_TYPE.WARN, "Processing asset '${currentAsset.assetName}' (id:${currentAsset.id}) hit highwater mark ($lapDuration msec)") 
 								}
 							}
+
+							// Compute the Duration Matrix to categorize all of the rows
+							String durationGroup = "${((int)Math.floor(lapDuration/100))*100}"
+							if (! durationMatrix.containsKey(durationGroup)) {
+								durationMatrix[durationGroup] = [
+									count: 1,
+									duration: lapDuration,
+									average: lapDuration
+								]
+							} else {
+								durationMatrix[durationGroup].count++
+								durationMatrix[durationGroup].duration += lapDuration
+								durationMatrix[durationGroup].average = (int)(durationMatrix[durationGroup].duration / durationMatrix[durationGroup].count)
+							}
+ 
 						}
 						profiler.endSilent(silentTag)
 					} // asset.each
@@ -2798,6 +2823,16 @@ class AssetEntityService {
 					profiler.endInfo("Devices", "processed %d rows", [assetSize])
 					if (profileThresholdViolations > 0) {
 						profiler.log(Profiler.LOG_TYPE.WARN, thresholdWarnMsg, [profileThresholdViolations, profileRowThresholds[(AssetClass.DEVICE)]])
+					}
+
+					if (profilerEnabled) {
+						int durSum = durationMatrix.values().sum { it.duration }
+						if (durSum > 0) {
+							durationMatrix.each {k,v -> 
+								durationMatrix[k].perc = Math.round(v.duration/durSum*100)
+							}
+						}
+						profiler.log(Profiler.LOG_TYPE.INFO, "Duration Matrix: $durationMatrix")
 					}
 				}
 
@@ -3299,7 +3334,7 @@ class AssetEntityService {
 			//
 			// Wrap up the process
 			// 
-			profiler.lap("EXPORT", "sheets all populated")
+			profiler.lap(mainProfTag, 'All sheets populated')
 
 			profiler.begin("RECALCULATE_FORMULAS")
 			book.setForceFormulaRecalculation(true)
@@ -3329,14 +3364,14 @@ class AssetEntityService {
 			progressService.updateData(key, 'header', 'attachment; filename="' + filename + '"')
 			progressService.update(key, 100, 'Completed')
 
-			profiler.lap("EXPORT", "streamed spreadsheet to browser")
+			profiler.lap(mainProfTag, "Streamed spreadsheet to browser")
 		} catch( Exception exportExp ) {
 			log.error("Error: ${exportExp.message}", exportExp)
 			progressService.update(key, 100, 'Cancelled', "An unexpected exception occurred while exporting to Excel")
 
 			return
 		} finally {
-			profiler.endInfo("EXPORT", "Finished Export")
+			profiler.endInfo(mainProfTag, "FINISHED")
 		}
 	}
 
