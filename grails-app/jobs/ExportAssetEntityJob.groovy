@@ -10,6 +10,8 @@ class ExportAssetEntityJob {
 
 	// IOC services
 	def assetEntityService
+	def progressService
+
 
 	/**
 	 * executes the AssetEntityController.basicExport
