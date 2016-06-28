@@ -292,32 +292,12 @@ class WorkbookUtil {
 
 	}
 
-	/* *
-	 * This method adds data validation to a given range of cells.
-	 *
-	 * @param sheet
-	 * @param values data validation array.
-	 * @param firstRow
-	 * @param lastRow
-	 * @param firstColumn
-	 * @param lastColumn
-	 * /
-	public static void addCellValidation(sheet, values, firstRow, lastRow, firstColumn, lastColumn){
-		if(sheet && values && firstRow >= 0 && firstRow <= lastRow && firstColumn >= 0 && firstColumn <= lastColumn ){
-			CellRangeAddressList addressList = new CellRangeAddressList(firstRow, lastRow, firstColumn, lastColumn);
-	  		DVConstraint dvConstraint = DVConstraint.createExplicitListConstraint(values);
-	  		DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint);
-	  		dataValidation.setSuppressDropDownArrow(false);
-	  		sheet.addValidationData(dataValidation);	
-		}
-		
-	}*/
 
 	/**
 	 * Adds Range Validation based on a validation sheet.
 	 *
-	 * @param targetSheet - sheet where the validation is to be added.
 	 * @param validationSheet - sheet containing the validation values.
+	 * @param targetSheet - sheet where the validation is to be added.
 	 * @param validationColumn - column in validationSheet where the values are listed.
 	 * @param firstValidationRow - first data validation value.
 	 * @param lastValidationRow - last data validation value.
@@ -325,36 +305,29 @@ class WorkbookUtil {
 	 * @param firstTargetRow - first row where validation is to be added.
 	 * @param lastTargetRow - last row where data validation is to be added.
 	 */
-	 public static void addRangeCellValidation(Workbook workbook, Sheet targetSheet, Sheet validationSheet,
-	 				validationColumn,firstValidationRow, lastValidationRow,
-	 				targetColumn, firstTargetRow, lastTargetRow){
-
+	public static void addCellValidation(Sheet validationSheet, Sheet targetSheet, int validationColumn, int firstValidationRow, int lastValidationRow, int targetColumn, int firstTargetRow, int lastTargetRow){
 
 		def createFormulaString = {
 			String validationColumnCode = columnCode(validationColumn)
-			String sheetName = validationSheet.getSheetName()
-			return new StringBuffer("'$sheetName'!")
+			String formula = new StringBuffer("'${validationSheet.getSheetName()}'!")
 					.append("\$$validationColumnCode\$$firstValidationRow:")
 					.append("\$$validationColumnCode\$$lastValidationRow")
 					.toString()
+			return formula
 		}
 
-		String sheetName = targetSheet.getSheetName()
-	 	String name = "list_${sheetName}_${validationColumn}"
-	 	
-	 	//DVConstraint dvConstraint = DVConstraint.createFormulaListConstraint(name);
-
-		Name namedRange = workbook.createName()
-  		namedRange.setNameName(name)
-  		namedRange.setRefersToFormula(createFormulaString())
-
 		DataValidationHelper dvHelper = targetSheet.getDataValidationHelper()
-		DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint(name)
-		CellRangeAddressList addressList = new CellRangeAddressList(0, 0, 0, 0)
+  		CellRangeAddressList addressList = new CellRangeAddressList(firstTargetRow, lastTargetRow, targetColumn, targetColumn)
 
-	 	DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
-
-	 	//DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint)
+  		Name namedRange = validationSheet.getWorkbook().createName()
+  		String name = "list_${targetSheet.getSheetName()}_${validationColumn}"
+  		namedRange.setNameName(name);
+  		namedRange.setRefersToFormula(createFormulaString());
+  		def dvConstraint = dvHelper.createFormulaListConstraint(name);
+  		
+  		DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
+  		
+  		//DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint)
 		// Note the check on the actual type of the DataValidation object.
 		// If it is an instance of the XSSFDataValidation class then the
 		// boolean value 'false' must be passed to the setSuppressDropDownArrow()
@@ -370,7 +343,27 @@ class WorkbookUtil {
 			dataValidation.setSuppressDropDownArrow(true)
 		}
 
-	  	targetSheet.addValidationData(dataValidation)
 
-	 }
+  		targetSheet.addValidationData(dataValidation)
+
+
+	}
+
+
+	/**
+	 * This method makes a sheet read-only.
+	 *
+	 * @param sheet
+	 */
+	public static void makeSheetReadOnly(Sheet sheet){
+
+		sheet.enableLocking()
+		sheet.lockDeleteColumns(true)
+    	sheet.lockDeleteRows(true)
+    	sheet.lockFormatCells(true)
+    	sheet.lockFormatColumns(true)
+    	sheet.lockFormatRows(true)
+    	sheet.lockInsertColumns(true)
+    	sheet.lockInsertRows(true)
+	}
 }

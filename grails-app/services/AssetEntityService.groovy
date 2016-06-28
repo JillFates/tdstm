@@ -2597,10 +2597,11 @@ class AssetEntityService {
 					writeValidationColumn(getAssetPlanStatusOptions(), col++, "PlanStatus")
 					writeValidationColumn(getDependencyTypes(), col++, "DepType")
 					writeValidationColumn(getDependencyStatuses(), col, "DepStatus")
-
+					WorkbookUtil.makeSheetReadOnly(validationSheet)
 					profiler.lap("Validations", "Finished exporting Validation values")
 					profiler.endInfo("Validations", "Finished writing validation values to sheet.")	
 				}
+
 
 				writeValidationSheet()
 			
@@ -2660,9 +2661,10 @@ class AssetEntityService {
 
 					profiler.lap("Devices", "Devices Started")
 
-					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,0, 1, optionsSize["Environment"], serverMap["Environment"], 1, assetSize)
-					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,1, 1, optionsSize["Priority"], serverMap["Priority"], 1, assetSize)
-					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,2, 1, optionsSize["PlanStatus"], serverMap["PlanStatus"], 1, assetSize)
+					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap["Environment"], 1, assetSize)
+					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 1, 1, optionsSize["Priority"], serverMap["Priority"], 1, assetSize)
+					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 2, 1, optionsSize["PlanStatus"], serverMap["PlanStatus"], 1, assetSize)
+
 					profiler.lap("Devices", "Validations added")
 
 					exportedEntity += 'S'
@@ -2840,6 +2842,11 @@ class AssetEntityService {
 						}
 						profiler.log(Profiler.LOG_TYPE.INFO, "Duration Matrix: $durationMatrix")
 					}
+				}else{
+					// Add validations for the first row (which is blank)
+					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap["Environment"], 1, 1)
+					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 1, 1, optionsSize["Priority"], serverMap["Priority"], 1, 1)
+					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 2, 1, optionsSize["PlanStatus"], serverMap["PlanStatus"], 1, 1)
 				}
 
 				//
@@ -2851,9 +2858,10 @@ class AssetEntityService {
 					profiler.beginInfo "Applications"
 
 					profiler.lap("Applications", "Adding Validations")
-					WorkbookUtil.addRangeCellValidation(book, appSheet, validationSheet,0, 1, optionsSize["Environment"], appSheetColumnNames["Environment"], 1, appSize)
-					//WorkbookUtil.addRangeCellValidation(book, appSheet, validationSheet,1, 1, optionsSize["Priority"], appSheetColumnNames["Priority"], 1, appSize)
-					WorkbookUtil.addRangeCellValidation(book, appSheet, validationSheet,2, 1, optionsSize["PlanStatus"], appSheetColumnNames["PlanStatus"], 1, appSize)
+
+					WorkbookUtil.addCellValidation(validationSheet, appSheet, 0, 1, optionsSize["Environment"], appSheetColumnNames["Environment"], 1, appSize)
+					WorkbookUtil.addCellValidation(validationSheet, appSheet, 2, 1, optionsSize["PlanStatus"], appSheetColumnNames["PlanStatus"], 1, appSize)
+
 					profiler.lap("Applications", "Validations added.")
 
 					exportedEntity += 'A'
@@ -2953,6 +2961,10 @@ class AssetEntityService {
 					profiler.endInfo("Applications", "processed %d rows", [appSize])
 
 
+				}else{
+					// Add validation for the first row
+					WorkbookUtil.addCellValidation(validationSheet, appSheet, 0, 1, optionsSize["Environment"], appSheetColumnNames["Environment"], 1, 1)
+					WorkbookUtil.addCellValidation(validationSheet, appSheet, 2, 1, optionsSize["PlanStatus"], appSheetColumnNames["PlanStatus"], 1, 1)
 				}
 				// profiler.lapInfo("EXPORT")
 
@@ -2963,9 +2975,10 @@ class AssetEntityService {
 					profiler.beginInfo "Databases"
 
 					profiler.lap("Databases", "Adding Validations")
-					WorkbookUtil.addRangeCellValidation(book, dbSheet, validationSheet,0, 1, optionsSize["Environment"], dbMap["Environment"], 1, dbSize)
-					//WorkbookUtil.addRangeCellValidation(book, dbSheet, validationSheet,1, 1, optionsSize["Priority"], dbMap["Priority"], 1, dbSize)
-					WorkbookUtil.addRangeCellValidation(book, dbSheet, validationSheet,2, 1, optionsSize["PlanStatus"], dbMap["PlanStatus"], 1, dbSize)
+
+					WorkbookUtil.addCellValidation(validationSheet, dbSheet, 0, 1, optionsSize["Environment"], dbMap["Environment"], 1, dbSize)
+					WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap["PlanStatus"], 1, dbSize)
+
 					profiler.lap("Databases", "Validations added.")
 
 
@@ -3013,6 +3026,10 @@ class AssetEntityService {
 						
 					}
 					profiler.endInfo("Databases", "processed %d rows", [dbSize])
+				}else{
+					// Adds validation to just the first row
+					WorkbookUtil.addCellValidation(validationSheet, dbSheet, 0, 1, optionsSize["Environment"], dbMap["Environment"], 1, 1)
+					WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap["PlanStatus"], 1, 1)
 				}
 
 				//
@@ -3022,9 +3039,10 @@ class AssetEntityService {
 					profiler.beginInfo "Logical Storage"
 
 					profiler.lap("Logical Storage", "Adding Validations")
-					WorkbookUtil.addRangeCellValidation(book, storageSheet, validationSheet,0, 1, optionsSize["Environment"], fileMap["Environment"], 1, fileSize)
-					//WorkbookUtil.addRangeCellValidation(book, storageSheet, validationSheet,1, 1, optionsSize["Priority"], fileMap["Priority"], 1, fileSize)
-					WorkbookUtil.addRangeCellValidation(book, storageSheet, validationSheet,2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, fileSize)
+
+					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap["Environment"], 1, fileSize)
+					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, fileSize)
+
 					profiler.lap("Logical Storage", "Validations added.")
 
 					exportedEntity += "F"
@@ -3069,18 +3087,17 @@ class AssetEntityService {
 						
 					}
 					profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
+				}else{
+					// Adds validations to the first row
+					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap["Environment"], 1, 1)
+					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, 1)
 				}
 				
 				//
 				// Dependencies
 				//
-				if ( doDependency ) {
-					profiler.beginInfo "Dependencies"
-					exportedEntity += "X"
-					def dependencySheet = getWorksheet('Dependencies')
-
-					
-					List projectionFields = [
+				def dependencySheet = getWorksheet('Dependencies')
+				List depProjectionFields = [
 							"id",
 							"asset.id",
 							"a.assetName",
@@ -3098,10 +3115,15 @@ class AssetEntityService {
 							"c3",
 							"c4"
 					]
+				if ( doDependency ) {
+					profiler.beginInfo "Dependencies"
+					exportedEntity += "X"
+		
+					
 
 					profiler.lap("Dependencies", "Adding Validations")
-					WorkbookUtil.addRangeCellValidation(book, dependencySheet, validationSheet,0, 1, optionsSize["DepType"], projectionFields.indexOf("type"), 1, dependencySize)
-					WorkbookUtil.addRangeCellValidation(book, dependencySheet, validationSheet,2, 1, optionsSize["DepStatus"], projectionFields.indexOf("status"), 1, dependencySize)
+					WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 3, 1, optionsSize["DepType"],  depProjectionFields.indexOf("type"), 1, dependencySize)
+					WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 4, 1, optionsSize["DepStatus"],  depProjectionFields.indexOf("status"), 1, dependencySize)
 					profiler.lap("Dependencies", "Validations added.")
 
 					List results = AssetDependency.createCriteria().list{
@@ -3111,7 +3133,7 @@ class AssetEntityService {
 							eq("a.project", project)
 						}
 						projections{
-							projectionFields.each{
+							depProjectionFields.each{
 								property(it)
 							}
 						}
@@ -3124,12 +3146,16 @@ class AssetEntityService {
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
-						for(int i = 0; i < projectionFields.size(); i++){
+						for(int i = 0; i < depProjectionFields.size(); i++){
 							addCell(dependencySheet, r + 1, i, dependency[i])
 						}
 					
 					}
 					profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
+				}else{
+					// Adds validations to the first dependency row
+					WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 3, 1, optionsSize["DepType"],  depProjectionFields.indexOf("type"), 1, 1)
+					WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 4, 1, optionsSize["DepStatus"],  depProjectionFields.indexOf("status"), 1, 1)
 				}
 
 				//
