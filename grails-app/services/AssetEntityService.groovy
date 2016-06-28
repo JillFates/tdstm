@@ -2378,7 +2378,7 @@ class AssetEntityService {
 
 			if (doComment) {
 				commentSize = AssetComment.executeQuery("SELECT COUNT(*) FROM AssetComment WHERE project = ? AND commentType = 'comment' AND assetEntity IS NOT NULL", [project])[0]
-				prgressTotal += commentSize
+				progressTotal += commentSize
 			}
 
 			profiler.lap(mainProfTag, 'Got row counts')
