@@ -2589,7 +2589,7 @@ class AssetEntityService {
 					assetOptions.eachWithIndex{ option, idx ->
 			 			WorkbookUtil.addCell(validationSheet, col, idx+1, "${option.value}")
 			 		}
-			 		optionsSize[optionKey] = assetOptions.size()
+			 		optionsSize[optionKey] = assetOptions.size() + 1 // +1 because of the header.
 				}
 
 				def writeValidationSheet = {
