@@ -107,9 +107,7 @@ class HtmlUtil {
 		
 		// Now try and figure out the IP 
 		def remoteIp = request.getHeader("X-Forwarded-For")
-		if (remoteIp) {
-			remoteIp = "X-Forwarded-For: ${remoteIp}"
-		} else {
+		if (! remoteIp) {
 			remoteIp = request.getRemoteAddr()
 		}
 		
