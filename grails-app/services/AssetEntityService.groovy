@@ -3045,12 +3045,13 @@ class AssetEntityService {
 					profiler.lap("Logical Storage", "Adding Validations")
 
 					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap["Environment"], 1, fileSize)
-					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, fileSize)
+					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, fileSize)
 
 					profiler.lap("Logical Storage", "Validations added.")
 
 					exportedEntity += "F"
 					files = getAssetList(filesQuery, queryParams)
+					
 					//for ( int r = 1; r <= fileSize; r++ ) {
 					int filesCount = 0
 					files.each{currentFile ->
