@@ -8,8 +8,9 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 
 import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.TimeUtil
 
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
@@ -34,6 +35,10 @@ class TestCaseController {
 
 	// def messageSource
 	
+	def remoteAddr() {
+		render "Your address is ${HtmlUtil.getRemoteIp()}"
+	}
+
 	def shouldUpdatePerson() {
 		Map opt = [(accountImportExportService.IMPORT_OPTION_PARAM_NAME): accountImportExportService.IMPORT_OPTION_PERSON ]
 		render (accountImportExportService.shouldUpdatePerson(opt) ? 'shouldUpdatePerson=TRUE' : 'shouldUpdatePerson=FALSE FAILED!!!!')

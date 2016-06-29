@@ -93,24 +93,31 @@ class HtmlUtil {
 	}
 	
 	/**
-	 * Access the remote IP address from the web request or the X-Forwarded-For header content
-	 * @param request
+	 * Access the remote IP address from the web request or the X-Forwarded-For header content. If the request is 
+	 * unavailible then 'IP.Unknown' is returned.
+	 * @param request - the HttpRequest object which if null is then attempted to be looked up
 	 * @return String The remote IP address that made the web request
 	 */
  	public static String getRemoteIp(request = null) {
- 		if(!request){
+		def remoteIp
+
+ 		if (!request) {
  			def webUtils = WebUtils.retrieveGrailsWebRequest()
  			//Getting the Request object
-			request = webUtils.getCurrentRequest()	
+			request = webUtils?.getCurrentRequest()	
  		}
-		
-		
-		// Now try and figure out the IP 
-		def remoteIp = request.getHeader("X-Forwarded-For")
-		if (! remoteIp) {
-			remoteIp = request.getRemoteAddr()
+
+		if (request) {
+			// Now try and figure out the IP 
+			remoteIp = request.getHeader("X-Forwarded-For")
+			if (! remoteIp) {
+				remoteIp = request.getRemoteAddr()
+			}
+		} else {
+			remoteIp = 'IP.Unknown'
+
 		}
-		
+
 		return remoteIp.toString()
 	}
 

@@ -44,8 +44,8 @@ class AuditService {
 			params = filterParams(params)
 			String paramsMsg = params.size() ? "$params " : ''
 			String user = (subject && subject.principal) ? subject.principal : 'ANONYMOUS_USER'
-			String remoteIp = HtmlUtil.getRemoteIp(request).toString()
-			log.info "USER_ACTIVITY: $user invoked $request.method $auditUri ${paramsMsg}from ${remoteIp}"
+			String remoteIp = HtmlUtil.getRemoteIp(request)
+			log.info "USER_ACTIVITY: $user invoked $request.method $auditUri ${paramsMsg}${remoteIp}"
 		}
 	}
 
