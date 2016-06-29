@@ -2633,13 +2633,15 @@ class AssetEntityService {
 
 				// The threshold (milliseconds) to warning on when the processing time is exceeded for a row
 				Map profileRowThresholds = [
-					(AssetClass.DEVICE): 20,
-					(AssetClass.APPLICATION): 50
+					(AssetClass.DEVICE): 30,
+					(AssetClass.APPLICATION): 30
 				]
 
-				// The maximum # of violations to log
-				final int profileThresholdLogLimit = 100 	
-				final int profileThresholdSettingField = 5
+				// The maximum # of row level threshold violations to log
+				final int profileThresholdLogLimit = 1000 
+
+				// Will log if setting a field exceeds this threadhold (msec)
+				final int profileThresholdSettingField = 2
 
 				final String thresholdWarnMsg = 'A total of %d row(s) exceeded the duration threshold of %d ms'
 
@@ -2648,6 +2650,7 @@ class AssetEntityService {
 				// Counter used to count the number of threshold violations
 				int profileThresholdViolations 
 				int profileHighwaterMark = 0
+				String profileHighwaterAsset = ''
 				int profileSampleQty
 				int profileSampleModulus
 				int profileSamplingTics
@@ -2723,6 +2726,7 @@ class AssetEntityService {
 
 						if (profilingRow) {
 							profiler.lap('Devices', 'Update Progress')
+							profiler.begin('Device Fields')
 						}
 
 						for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
@@ -2790,7 +2794,7 @@ class AssetEntityService {
 
 							if (profilingRow) {
 								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
-								if (lapDuration > 3) {
+								if (lapDuration > 2) {
 									profiler.log(Profiler.LOG_TYPE.INFO, 'Set CELL %s (%s msec)', [colName, lapDuration.toString()])
 								} else {
 									profiler.lapReset('Devices')
@@ -2798,7 +2802,9 @@ class AssetEntityService {
 							}
 
 						}
+
 						if (profilingRow) {
+							profiler.end('Device Fields')
 							profiler.end('Device Row')
 						}
 
@@ -2807,15 +2813,16 @@ class AssetEntityService {
 							lapDuration = profiler.getLapDuration(silentTag).toMilliseconds()
 							if (lapDuration > profileRowThresholds[(AssetClass.DEVICE)]) {
 								profileThresholdViolations++
+								profiler.log(Profiler.LOG_TYPE.WARN, "Asset '${currentAsset.assetName}' (id:${currentAsset.id}) exceeded duration threshold ($lapDuration msec)") 
 								if ( lapDuration > profileHighwaterMark ) {
 									// Log each row that bumps up the highwater mark
 									profileHighwaterMark = lapDuration
-									profiler.log(Profiler.LOG_TYPE.WARN, "Processing asset '${currentAsset.assetName}' (id:${currentAsset.id}) hit highwater mark ($lapDuration msec)") 
+									profileHighwaterAsset = "${currentAsset.assetName} (id:${currentAsset.id})"
 								}
 							}
 
 							// Compute the Duration Matrix to categorize all of the rows
-							String durationGroup = "${((int)Math.floor(lapDuration/100))*100}"
+							String durationGroup = "${((int)Math.floor(lapDuration/10))*10}"
 							if (! durationMatrix.containsKey(durationGroup)) {
 								durationMatrix[durationGroup] = [
 									count: 1,
@@ -2827,7 +2834,6 @@ class AssetEntityService {
 								durationMatrix[durationGroup].duration += lapDuration
 								durationMatrix[durationGroup].average = (int)(durationMatrix[durationGroup].duration / durationMatrix[durationGroup].count)
 							}
- 
 						}
 						profiler.endSilent(silentTag)
 					} // asset.each
@@ -2838,6 +2844,10 @@ class AssetEntityService {
 					}
 
 					if (profilerEnabled) {
+						if (profileHighwaterAsset) {
+							profiler.log(Profiler.LOG_TYPE.WARN, "Asset $profileHighwaterAsset set the highwater mark ($profileHighwaterMark msec)")
+						}
+
 						int durSum = durationMatrix.values().sum { it.duration }
 						if (durSum > 0) {
 							durationMatrix.each {k,v -> 
@@ -2846,6 +2856,7 @@ class AssetEntityService {
 						}
 						profiler.log(Profiler.LOG_TYPE.INFO, "Duration Matrix: $durationMatrix")
 					}
+					
 				}else{
 					// Add validations for the first row (which is blank)
 					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap["Environment"], 1, 1)
@@ -2956,11 +2967,6 @@ class AssetEntityService {
 						}
 						
 					}
-					/*
-					if(profiler.getLapDuration("Applications").toMilliseconds() > 10000L){
-						log.warn("Application Export is taking to long!!")
-					}
-					*/
 
 					profiler.endInfo("Applications", "processed %d rows", [appSize])
 
