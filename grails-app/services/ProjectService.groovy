@@ -257,25 +257,32 @@ class ProjectService {
 	
 	/**
 	 * This action is used to get the fields, splitted fields in to two to handle common customs.
-	 *@param : entityType type of entity.
+	 * @param : entityType type of entity.
+	 * @param projectAttributes
 	 *@return 
 	 */
-	def getFields(def entityType){
+	def getFields(def entityType, projectAttributes = null){
 		def project = securityService.getUserCurrentProject()
-		def attributes = getAttributes(entityType)
-		def returnMap = attributes.findAll{!(it.attributeCode.contains('custom'))}.collect{ p->
+		if(!projectAttributes){
+			projectAttributes = getAttributes(entityType)
+		}
+		
+		def returnMap = projectAttributes.findAll{!(it.attributeCode.contains('custom'))}.collect{ p->
 			return ['id':p.frontendLabel, 'label':p.attributeCode]
 		}
 		return returnMap
 	}
 	/**
 	 * This action is used to get the custom fields
+	 * @param projectAttributes
 	 *@return 
 	 */
-	def getCustoms(){
+	def getCustoms(def projectAttributes = null){
 		def project = securityService.getUserCurrentProject()
-		def attributes = getAttributes('Application')
-		def returnMap = attributes.findAll{it.attributeCode.contains('custom')}.collect{ p->
+		if(!projectAttributes){
+			projectAttributes = getAttributes('Application')
+		}
+		def returnMap = projectAttributes.findAll{it.attributeCode.contains('custom')}.collect{ p->
 			return ['id':project[p.attributeCode] ?: p.frontendLabel, 'label':p.attributeCode]
 		}
 	}
@@ -331,7 +338,8 @@ class ProjectService {
 	 * @return
 	 */
 	def updateConfigForMissingFields(parseData, type){
-		def fields = getFields(type) + getCustoms()
+		def projectAttributes = getAttributes(type)
+		def fields = getFields(type, projectAttributes) + getCustoms(projectAttributes)
 		def phases = ValidationType.getListAsMap().keySet()
 		fields.each{f->
 		if(!parseData[f.label]){
@@ -354,11 +362,20 @@ class ProjectService {
 	def getAttributes(entityType){
 		def eavEntityType = EavEntityType.findByDomainName(entityType)
 		def attributes = EavAttribute.findAllByEntityType( eavEntityType ,[sort:'frontendLabel'])
-		(1..Project.CUSTOM_FIELD_COUNT).each {i->
-		    def attribute = attributes.find{it.frontendLabel == "Custom"+i}
-			attributes.remove(attribute)
-			attributes.add(attribute)
-		}
+
+		def firstCustom = attributes.indexOf{it.frontendLabel == "Custom1"}
+		def lastCustom = attributes.indexOf{it.frontendLabel == "Custom${Project.CUSTOM_FIELD_COUNT}"}
+		def w = attributes[firstCustom..lastCustom]
+		def firsts = attributes[0..firstCustom - 1]
+		def lasts = attributes[lastCustom + 1..attributes.size() - 1]
+		def nonCustoms = firsts + lasts
+		def customs = attributes[firstCustom..lastCustom]
+		def oneDigitCustoms = customs.findAll{it.frontendLabel.size() == 7}
+		customs.removeAll(oneDigitCustoms)
+		customs
+
+		attributes = nonCustoms + oneDigitCustoms + customs
+
 		return attributes
 	}
 	
