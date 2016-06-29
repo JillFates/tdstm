@@ -1,5 +1,7 @@
 package com.tdsops.common.security
 
+import com.tdssrc.grails.HtmlUtil
+
 import javax.servlet.http.HttpSession
 import javax.servlet.http.HttpSessionAttributeListener
 import javax.servlet.http.HttpSessionBindingEvent
@@ -24,7 +26,10 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 			if (!log.debugEnabled) return
 
 			HttpSession session = event.session
-			log.debug LOGGER_PREFIX + 'Created; id: ' + session.id + ', at ' + session.creationTime
+
+			String ipAddr = HtmlUtil.getRemoteIp()
+
+			log.debug LOGGER_PREFIX + 'Created; id: ' + session.id + ' @ '+ipAddr+' at ' + session.creationTime
 		}
 		catch (ignored) {}
 	}
@@ -35,8 +40,10 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 
 			HttpSession session = event.session
 
+			String ipAddr = HtmlUtil.getRemoteIp()
+
 			StringBuilder sb = new StringBuilder(LOGGER_PREFIX + 'Destroyed; ')
-			sb << 'id:' << session.id << ', created at ' << session.creationTime
+			sb << 'id:' << session.id << ' @ ' << ipAddr << ' created at ' << session.creationTime
 			sb << ' (age: ' << (System.currentTimeMillis() - session.creationTime) << '), '
 			sb << 'lastAccessed at ' << session.lastAccessedTime
 			sb << ' (' + (System.currentTimeMillis() - session.lastAccessedTime) + ' ms ago), '
