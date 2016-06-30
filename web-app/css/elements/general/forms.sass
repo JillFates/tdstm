@@ -4,26 +4,33 @@ div.box-body
     form
       &.medium-size
         max-width: 500px
-      div.box-body
-        margin-top: 5px
+      &.form-inline /* Applicable when the Form is Horizontal */
         div.form-group
           margin-left: 10px
-          input[type=file], div#progressbar
-            width: 100%
-          div.checkboxGroup
-            margin-top: 10px
-          ul.list-group
-            &.sub-set
-              margin-left: 10px
-              label
-                font-weight: normal
-              label.sub-set-title
-                font-weight: 700
-          ul.sub-set
-            .list-group-item
-              border: none
-          label
-            /*font-weight: normal !important*/
+          .form-control
+            height: 26px
+            padding: 0px 0px 0px 4px
+      div.box-body
+        margin-top: 5px
+      div.form-group /* Applicable when the Form is Vertical */
+        margin-left: 10px
+        input[type=file], div#progressbar
+          width: 100%
+        div.checkboxGroup
+          margin-top: 10px
+        ul.list-group
+          &.sub-set
+            margin-left: 10px
+            label
+              font-weight: normal
+            label.sub-set-title
+              font-weight: 700
+        ul.sub-set
+          .list-group-item
+            padding: 7px 15px
+            border: none
+        label
+          /*font-weight: normal !important*/
       div.box-footer
         div.box-footer-url-right
           margin-top: 9px

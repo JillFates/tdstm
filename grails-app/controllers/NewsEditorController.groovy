@@ -160,7 +160,7 @@ class NewsEditorController {
 		assetCommentsQuery.append(" and ac.comment_type = 'news' ")
 			
 		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery.toString())
-		
+
 		queryForCommentsList.append("order by $sortIndex $sortOrder ")
 		def totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
 		
@@ -177,6 +177,83 @@ class NewsEditorController {
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON
+	}
+
+	/**
+	 *
+	 *
+	 */
+	def getEventNewsList() {
+
+		def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
+		def projectInstance = Project.findById( projectId )
+		def bundleId = params.moveBundle
+		def viewFilter = params.viewFilter
+		def moveBundleInstance = null
+		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		def moveEvent = MoveEvent.read(params.moveEvent)
+		if(bundleId){
+			moveBundleInstance = MoveBundle.findById(bundleId)
+		}
+
+		def assetCommentsQuery = new StringBuffer( """select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption,
+									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
+									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
+									from asset_comment ac
+									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
+									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
+									left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
+									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """ )
+
+		def moveEventNewsQuery = new StringBuffer( """select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption,
+											CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
+											'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity
+											from move_event_news mn
+											left join move_event me on ( me.move_event_id = mn.move_event_id )
+											left join project p on (p.project_id = me.project_id) left join person p1 on (p1.person_id = mn.created_by)
+											left join person p2 on (p2.person_id = mn.archived_by) where """ )
+
+
+		if(moveBundleInstance != null){
+			assetCommentsQuery.append(" mb.move_bundle_id = ${moveBundleInstance.id}  ")
+		} else {
+			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id} )")
+		}
+
+		if(moveEvent){
+			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent?.id}  and p.project_id = ${projectInstance.id} ")
+		} else {
+			moveEventNewsQuery.append(" p.project_id = ${projectInstance.id} ")
+		}
+
+		if(viewFilter == "active"){
+			assetCommentsQuery.append(" and ac.is_resolved = 0 ")
+			moveEventNewsQuery.append(" and mn.is_archived = 0 ")
+		} else if(viewFilter == "archived"){
+			assetCommentsQuery.append(" and ac.is_resolved = 1 ")
+			moveEventNewsQuery.append(" and mn.is_archived = 1 ")
+		}
+
+		assetCommentsQuery.append(" and ac.comment_type = 'news' ")
+
+		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery.toString())
+
+		def totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
+
+		def result = totalComments?.collect {
+			[
+			  createdAt: it.createdAt ? TimeUtil.formatDate(getSession(), it.createdAt):'',
+			  createdBy: it.createdBy,
+			  commentType: it.commentType,
+			  comment: it.comment,
+			  resolution: it.resolution,
+			  resolvedAt: it.resolvedAt ? TimeUtil.formatDate(getSession(), it.resolvedAt):'',
+			  resolvedBy: it.resolvedBy,
+			  newsId: it.id
+			]
+		}
+
+		render result as JSON
 	}
 	/*-------------------------------------------------------------------
 	 * @author : Lokanada Reddy
