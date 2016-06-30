@@ -1608,11 +1608,14 @@ class AssetEntityService {
 		//used to hide the customs whose fieldImportance is "H"
 		def customs = []
 		def hiddenConfig = []
-		(1..(project.customFieldsShown)).each{i->
-			customs << i
-			if(config.('custom'+i)=='H')
-			hiddenConfig << i
+		if(project.customFieldsShown > 0){
+			(1..(project.customFieldsShown)).each{i->
+				customs << i
+				if(config.('custom'+i)=='H')
+				hiddenConfig << i
+			}	
 		}
+		
 		customs.removeAll(hiddenConfig)
 		
 		return [project:project, config:config, customs:customs]
