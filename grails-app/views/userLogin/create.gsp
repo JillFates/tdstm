@@ -136,7 +136,7 @@
 								</td>
 							</tr>
 							
-							<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength]}" />
+							<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength, fromDialog:true]}" />
 							
 							<tr class="prop">
 								<td valign="top" class="name">
