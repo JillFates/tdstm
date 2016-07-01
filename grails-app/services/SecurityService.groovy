@@ -818,6 +818,18 @@ class SecurityService implements InitializingBean {
 			isLocal: true
 		*/
 
+		def isCurrentUserLogin = (byWhom.id == userLogin.id)
+		if (!isCurrentUserLogin && !StringUtil.isBlank(params.username) && !userLogin.username.equals(params.username)) {
+			def newUserNameUserLogin = UserLogin.findByUsername(params.username)
+			if (newUserNameUserLogin != null) {
+				throw new InvalidParamException("The username you is selected is already in use.")
+			} else {
+				userLogin.username = params.username
+			}
+		}
+
+		userLogin.active = params.active
+
 		// Before checking other password flags, Attempt to set the password if it was set
 		if (params.password) {
 			setUserLoginPassword(userLogin, params.password, isNewUser)
@@ -865,18 +877,6 @@ class SecurityService implements InitializingBean {
 		} catch (e) {
 			throw new InvalidParamException("The $dateFile field has invalid format")
 		}
-
-		def isCurrentUserLogin = (byWhom.id == userLogin.id)
-		if (!isCurrentUserLogin && !StringUtil.isBlank(params.username) && !userLogin.username.equals(params.username)) {
-			def newUserNameUserLogin = UserLogin.findByUsername(params.username)
-			if (newUserNameUserLogin != null) {
-				throw new InvalidParamException("The username you is selected is already in use.")
-			} else {
-				userLogin.username = params.username
-			}
-		}
-
-		userLogin.active = params.active
 
 		// Try to save the user changes
 		if (! userLogin.save(flush:true) ) {
