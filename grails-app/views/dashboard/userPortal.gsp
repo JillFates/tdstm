@@ -147,7 +147,7 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Project:&nbsp;<g:select id="userProjectId" name="projectId" from="${projects}" optionKey="id" optionValue="name" value="${projectInstance.id}"/>
+                    Project:&nbsp;<g:select id="userProjectId" name="projectId" from="${projects}" optionKey="id" optionValue="name" value="${projectInstance.id}" style="width: 250px;"/>
                 </div>
 
                 <div class="panel-body">
