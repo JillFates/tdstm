@@ -1,6 +1,9 @@
+import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 
 import org.apache.commons.lang.math.NumberUtils
+
+import java.text.DateFormat
 import java.util.regex.Matcher
 // import org.apache.shiro.SecurityUtils
 
@@ -153,6 +156,83 @@ class DataTransferBatchController {
 			render ServiceResults.errors(error) as JSON
 		else
 			render ServiceResults.success([results:results]) as JSON
+	}
+
+	/**
+	 * Used to generate the List for Manage Asset Import Batches using Kendo Grid.
+	 * @return : list of batches process as JSON
+	 */
+	def retrieveManageBatchList() {
+		def project = securityService.getUserCurrentProject();
+
+		def result = new ArrayList()
+
+		if (!project) {
+			flash.message = "Please select project to view Manage Batches"
+		}
+
+		if( !params.max ) {
+			params.max = 25
+		}
+
+		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", [sort:"dateCreated", order:"desc", max:params.max,offset:params.offset ? params.offset : 0] )
+
+		dataTransferBatchList.each{ entry ->
+
+			def domainName
+			def className
+			def assetClassMap = [ AssetEntity:'device', Application:'app', Database:'db', Files:'files' ]
+
+			if(entry.eavEntityType.domainName) {
+				if(entry.eavEntityType.domainName == 'Files'){
+					domainName = 'Logical Storage'
+				} else if(entry.eavEntityType.domainName == 'AssetEntity'){
+					domainName = 'Device'
+				} else {
+					domainName = entry.eavEntityType.domainName
+				}
+
+				className = assetClassMap[entry.eavEntityType.domainName]
+			}
+
+			def DateFormat formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE_TIME)
+
+			result.add([
+					batchId: entry.id,
+					importedAt: (entry.dateCreated)?  TimeUtil.formatDateTime(session, entry.dateCreated, formatter)  : '',
+					importedBy: ((entry.userLogin)? (entry.userLogin.person)? entry.userLogin.person.firstName + ' ' + entry.userLogin.person.lastName  : ''  : ''),
+					attributeSet: (entry.dataTransferSet)? entry.dataTransferSet.title : '',
+					class: domainName,
+					assets: DataTransferValue.executeQuery('select count(d.id) from DataTransferValue d where d.dataTransferBatch = '+ entry.id +' group by rowId' ).size(),
+					status: fieldValue(bean:entry, field:'statusCode'),
+					action: '',
+					className: className,
+					hasErrors: entry.hasErrors,
+					importResults: entry.importResults.length() > 0
+			])
+
+		}
+
+		/*def project = securityService.getUserCurrentProject()
+
+		def bundleList = MoveBundle.findAll("from MoveBundle where project =:project ",[project:project])
+
+		def result = new ArrayList()
+
+		bundleList.each{ entry ->
+			result.add([
+					bundleId: entry.id,
+					name: entry.name,
+					description: entry.description,
+					planning: entry.useForPlanning,
+					assetqty: entry.getAssetQty(),
+					startDate: entry.startTime,
+					completion: entry.completionTime
+			])
+
+		}*/
+
+		render result as JSON
 	}
 
 	/**
