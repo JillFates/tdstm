@@ -363,8 +363,42 @@ tdsCommon.autoClearDialogOnClose();
  * TDS User Preference utils
  */
 
- var UserPreference = function() {
-
+var UserPreference = function() {
+	
+	// opens the edit user date and timezone dialog
+	var editDateAndTimezone = function () {
+		new Ajax.Request('/tdstm/person/editTimezone',{
+			asynchronous:true,
+			evalScripts:true,
+			onSuccess:function(e){
+				var prefDialog = $("#userTimezoneDivId")
+				prefDialog.html(e.responseText)
+				prefDialog.dialog('option', 'width', 'auto')
+				prefDialog.dialog('option', 'modal', true)
+				prefDialog.dialog("open")
+			}
+		})	
+	}
+	
+	// opens the edit user preferences dialog
+	var editPreference = function () {
+		new Ajax.Request('/tdstm/person/editPreference',{
+			asynchronous:true,
+			evalScripts:true,
+			onSuccess:function(e){
+				var prefDialog = $("#userPrefDivId")
+				var pageHeight = Math.max($(window).outerHeight(), 200)
+				prefDialog.html(e.responseText)
+				prefDialog.dialog('option', 'width', 'auto')
+				prefDialog.dialog('option', 'maxHeight', pageHeight)
+				prefDialog.dialog('option', 'containment', 'body')
+				prefDialog.dialog('option', 'modal', true)
+				prefDialog.dialog("open")
+			}
+		})
+	}
+	
+	// saves the new preference values
  	var savePreferences = function(formId) {
 		var data = $('#' + formId).serialize();
 		$.post(tdsCommon.createAppURL('/person/savePreferences'), data, function() {
@@ -375,8 +409,52 @@ tdsCommon.autoClearDialogOnClose();
 		});
  	}
 
-	return {
-		savePreferences: savePreferences
+	// resets the user's preferences to their default values
+	var resetPreference = function (user, dateTimezoneOnly) {
+		var params = {'user':user}
+		if (dateTimezoneOnly)
+			params.dateTimezoneOnly = true
+		new Ajax.Request('/tdstm/person/resetPreferences',{
+			asynchronous:true,
+			evalScripts:true,
+			onSuccess:function(e){
+				changeResetMessage(e)
+			},
+			parameters:params
+		})
 	}
 
- }();
+	// resets the user's preferences to their default values
+	var resetTimezonePrefs = function (user) {
+		resetPreference(user, true)
+	}
+	
+	// closes the preference dialog then refreshes the page
+	var changeResetMessage = function (e) {
+		var prefDialog = $("#userPrefDivId")
+		prefDialog.html("")
+		prefDialog.dialog('close')
+		window.location.reload()
+	}
+	
+	// removes the specified preference for the current user
+	var removeUserPrefs = function (prefCode) {
+		new Ajax.Request('/tdstm/person/removeUserPreference?prefCode='+prefCode,{
+			asynchronous:true,
+			evalScripts:true,
+			onSuccess:function(e){
+				$("#pref_"+prefCode).remove()
+			}
+		})
+	}
+	
+	return {
+		editDateAndTimezone: editDateAndTimezone,
+		editPreference: editPreference,
+		savePreferences: savePreferences,
+		resetPreference: resetPreference,
+		changeResetMessage: changeResetMessage,
+		removeUserPrefs: removeUserPrefs,
+		resetTimezonePrefs: resetTimezonePrefs
+	}
+}();

@@ -507,7 +507,8 @@
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul>
 					<li><g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(XMLHttpRequest)">Account Details...</g:remoteLink></li>
-					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="editPreference()">Edit preferences</a></li>
+					<li><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${user}" onclick="UserPreference.editDateAndTimezone()">Date and Timezone</a></li>
+					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="UserPreference.editPreference()">Edit preferences</a></li>
 					<li><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>
 					<g:if test="${person?.modelScore}">
 					<li><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc">Model Score: ${person?.modelScore}</a></li>
@@ -560,5 +561,8 @@
  
 		<%-- DIV for editing User Preferences --%>
 		<div id="userPrefDivId" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
+		
+		<%-- DIV for editing User date and timezone --%>
+		<div id="userTimezoneForm" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Date and Timezone"></div>
 	</body>
 </html>

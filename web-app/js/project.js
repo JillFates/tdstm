@@ -187,9 +187,10 @@
 	var showTimeZoneSelect = function(timezoneId) {
 		new Ajax.Request(tdsCommon.createAppURL('/project/showTimeZoneSelect?timezone=' + $("#" + timezoneId).val()), {asynchronous:true,evalScripts:true,
 			onSuccess:function(e){
-				$("#timeZoneSelectPopup").html(e.responseText)
-				$("#timeZoneSelectPopup").dialog('option', 'width', 'auto')
-				$("#timeZoneSelectPopup").dialog("open")
+				var timeZonePopup = $("#timeZoneSelectPopup")
+				timeZonePopup.html(e.responseText)
+				timeZonePopup.dialog('option', 'width', 'auto')
+				timeZonePopup.dialog("open")
 			}
 		})
 	}

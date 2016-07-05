@@ -708,23 +708,31 @@ def test = {
 				return 
 			}
 			
-			// TODO : JPM 5/2015 : Change the way that the delete is occurring
-			def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-			prePreference.each{ preference->
-				def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
-					// When clearing preference, the RefreshMyTasks should be the same.
-					if(preferenceInstance.preferenceCode != 'RefreshMyTasks') {
-						preferenceInstance.delete()
-					}
-			}
+			// if dateTimezoneOnly is specified, only reset the timezone and date format preferences if they exist
+			if (params.dateTimezoneOnly) {
+				userPreferenceService.removePreference(TimeUtil.TIMEZONE_ATTR)
+				userPreferenceService.removePreference(TimeUtil.DATE_TIME_FORMAT_ATTR)
+				
+			// else reset all preferences
+			} else {
+				// TODO : JPM 5/2015 : Change the way that the delete is occurring
+				def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
+				prePreference.each{ preference->
+					def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
+						// When clearing preference, the RefreshMyTasks should be the same.
+						if(preferenceInstance.preferenceCode != 'RefreshMyTasks') {
+							preferenceInstance.delete()
+						}
+				}
 
-			userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
+				userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
+			}
+			
 			// Is there any reason to return an object? can't be just a POST/UPDATE -no return- operation?
 			render person
 		} catch (e) {
 			ServiceResults.respondWithError(response, e.getMessage())
 		}
-
 	}
 
 	/*
@@ -1319,6 +1327,21 @@ def test = {
 		
 		render(template:"showPreference",model:[prefMap:prefMap.sort{it.value}, areas: areas, 
 				timezones: timezones, currTimeZone: currTimeZone, currDateTimeFormat: currDateTimeFormat])
+	}
+	
+	/**
+	 * This action is used to display the edit form for the current logged user's date format and timezone Preferences
+	 * @param N/A : 
+	 * @return : A Map containing key as preference code and value as map'svalue.
+	 */
+	def editTimezone () {
+		def timezones = Timezone.findAll()
+		def areas = userPreferenceService.timezonePickerAreas()
+		
+		def currTimeZone = userPreferenceService.getPreference(TimeUtil.TIMEZONE_ATTR) ?: TimeUtil.defaultTimeZone
+		def currDateTimeFormat = userPreferenceService.getPreference(TimeUtil.DATE_TIME_FORMAT_ATTR) ?: TimeUtil.dateTimeFormatTypes[0]
+		
+		render(template:"../project/showTimeZoneSelect",model:[areas: areas, timezones: timezones, currTimeZone: currTimeZone, currDateTimeFormat: currDateTimeFormat, userPref:true])
 	}
 	
 	/**

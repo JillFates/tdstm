@@ -18,10 +18,11 @@
     <g:javascript src="tdsmenu.js" />
     <g:javascript src="PasswordValidation.js" />
 
-    <script type="text/javascript">
-        $(document).ready(function() {
+    <script type="text/javascript"> 
+	$(document).ready(function() {
             $("#personDialog").dialog({ autoOpen: false });
             $("#userPrefDivId").dialog({ autoOpen: false });
+            $("#userTimezoneDivId").dialog({ autoOpen: false });
 
             // Due to some issue with textarea overriding the value at intial load
             $('textarea').each(function(){
@@ -491,7 +492,8 @@
                                     <li class="user-body">
                                         <ul class="list-group">
                                             <li class="list-group-item"><g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink></li>
-                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit preferences</a></li>
+                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${user}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
+                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit preferences</a></li>
                                         <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
                                             <g:if test="${person?.modelScore}">
                                                 <li class="list-group-item"><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc"><span class="glyphicon glyphicon-info-sign user-menu-icon-badge"></span> Model Score <span class="badge">${person?.modelScore}</span></a></li>
@@ -554,7 +556,10 @@
     <g:render template="../person/personEdit" model="[user:user, minPasswordLength:minPasswordLength]" />
 
     <%-- DIV for editing User Preferences --%>
-    <div id="userPrefDivId" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
+    <div id="userPrefDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
+		
+	<%-- DIV for editing User date and timezone --%>
+	<div id="userTimezoneDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Date and Timezone"></div>
 
 </body>
 </html>

@@ -744,7 +744,7 @@ class ProjectController {
 		def timezones = Timezone.findAll()
 		def areas = userPreferenceService.timezonePickerAreas()
 
-		render(template:"showTimeZoneSelect",model:[areas: areas, timezones: timezones, currTimeZone: timezone])
+		render(template:"showTimeZoneSelect",model:[areas: areas, timezones: timezones, currTimeZone: timezone, userPref:false])
 	}
 
 	def showImportanceFields() {
