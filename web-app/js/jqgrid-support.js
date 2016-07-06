@@ -131,7 +131,7 @@ function freezeHeaderGeneral (header, top, left, eventType) {
 		clone.css('left', Math.floor(left) + 'px');
 		header.children().each(function (a, b) {
 			if (clone.children().size() > a) {
-				var newWidth = b.scrollWidth - ($(b).innerWidth() - $(b).width());
+				var newWidth = b.scrollWidth /*- ($(b).innerWidth() - $(b).width())*/;
 				$(clone.children()[a]).width(newWidth);
 				$(clone.children()[a]).on('click', function () {
 					b.click();

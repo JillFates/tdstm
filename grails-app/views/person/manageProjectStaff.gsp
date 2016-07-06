@@ -128,7 +128,7 @@
 				});
 
 				$(window).scroll(function() {
-					var position = 16 - $(this).scrollLeft();
+					var position = 31 - $(this).scrollLeft();
 					$('.floatingHeader').css('left', position + "px");
 				});
 
