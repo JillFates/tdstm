@@ -117,7 +117,7 @@ class WorkflowController {
 			def workflowInstance = new Workflow( process : process, 
 										dateCreated : dateNow,
 										lastUpdated : dateNow,
-										updateBy : userLogin.person
+										updatedBy : userLogin.person
 										)
 			if ( ! workflowInstance.validate() || ! workflowInstance.save(insert : true, flush:true) ) {
 				message =  "Workfolw \"${workflowInstance}\" should be unique"
@@ -189,7 +189,7 @@ def updateWorkflowSteps() {
 			 flash.message = ""
 			workflow = Workflow.get( workflowId )
 			// update the workflow updated by
-			workflow.updateBy = UserLogin.findByUsername( principal )?.person
+			workflow.updatedBy = UserLogin.findByUsername( principal )?.person
 			if ( workflow.validate() && workflow.save(insert : true, flush:true) ) {
 				log.debug("Workfolw \"${workflow}\" updated")
 			}	
@@ -335,6 +335,10 @@ def updateWorkflowSteps() {
 	 *---------------------------------------------*/
 	def deleteTransitionFromWorkflow() {
 		def workflowId = params.workflow
+		def workflow = Workflow.get(workflowId)
+		def principal = SecurityUtils.subject.principal
+		workflow.updatedBy = UserLogin.findByUsername( principal )?.person
+		workflow.save(flush:true)
 		def transitionId = params.id
 		if(transitionId){
 			def workflowTransition = WorkflowTransition.get( transitionId )

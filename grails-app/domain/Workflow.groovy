@@ -4,7 +4,7 @@ class Workflow {
 	String process
 	Date dateCreated
 	Date lastUpdated
-	Person updateBy
+	Person updatedBy
 	
 	static hasMany  = [ WorkflowTransition, WorkflowTransitionMap, Swimlane ]
 	
@@ -12,14 +12,14 @@ class Workflow {
 		process( blank:false, nullable:false, unique:true)
 		dateCreated( nullable:true  )
 		lastUpdated( nullable:true  )
-		updateBy( nullable:true  )
+		updatedBy( nullable:true  )
     }
 	
 	static mapping  = {
 		version false
 		autoTimestamp false
 		id column:'workflow_id'
-		updateBy column: 'updated_by'
+		updatedBy column: 'updated_by'
 	}
 	/*
 	 * Date to insert in GMT

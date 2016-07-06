@@ -25,7 +25,7 @@
 
                     <g:sortableColumn property="lastUpdated" title="Updatated On"/>
 
-                    <g:sortableColumn property="updateBy" title="Updated By"/>
+                    <g:sortableColumn property="updatedBy" title="Updated By"/>
 
                 </tr>
                 </thead>
@@ -42,7 +42,7 @@
                             <tds:convertDateTime date="${workflows?.lastUpdated}"/>
                         </td>
 
-                        <td nowrap="nowrap">${workflows?.updateBy}</td>
+                        <td nowrap="nowrap">${workflows?.updatedBy}</td>
                     </tr>
                 </g:each>
                 </tbody>

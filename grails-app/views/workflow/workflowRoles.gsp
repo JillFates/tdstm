@@ -9,7 +9,7 @@
 <div class="body">
 <g:form name="myForm" action="updateWorkflowRoles" >
 <div class="steps_table" style="text-align: left;">
-	<span class="span"><b>Workflow Roles</b></span>
+	<span class="span"><b>Workflow Rolesssssssssssssss</b></span>
 
 <div class="buttons" style="margin-left: 10px;margin-right: 10px;text-align: left;"> 
 	<input type="hidden" name="workflow" value="${workflow?.id}" />
@@ -33,7 +33,7 @@
 	</tr>
 	<tr class="prop">
 		<td valign="top"  class="name">Updated By:</td>
-		<td valign="top"  class="value">${workflow?.updateBy}</td>
+		<td valign="top"  class="value">${workflow?.updatedBy}</td>
 	</tr>
 	<tr class="prop">
 		<td valign="top"  class="name">Used On:</td>

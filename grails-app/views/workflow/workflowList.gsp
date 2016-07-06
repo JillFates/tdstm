@@ -58,7 +58,7 @@
 	</tr>
 	<tr class="prop">
 		<td valign="top"  class="name">Updated By:</td>
-		<td valign="top"  class="value">${workflow?.updateBy}</td>
+		<td valign="top"  class="value">${workflow?.updatedBy}</td>
 	</tr>
 	<tr class="prop">
 		<td valign="top"  class="name">Used On:</td>
