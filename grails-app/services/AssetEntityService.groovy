@@ -1778,8 +1778,9 @@ class AssetEntityService {
 	 * @param progressCount
 	 * @param progressTotal
 	 * @param updateOnPercent
+	 * @param session
 	 */
-	def cablingReportData( assetCablesList, cablingSheet, progressCount, progressTotal, updateOnPercent, key){
+	def cablingReportData( assetCablesList, cablingSheet, progressCount, progressTotal, updateOnPercent, key, session){
 
 		assetCablesList.eachWithIndex{ cabling, idx ->
 			def currentCabling = cabling.get(Criteria.ROOT_ALIAS)
@@ -1807,8 +1808,9 @@ class AssetEntityService {
 			}
 			addCell(cablingSheet, idx + 2, 10, String.valueOf(currentCabling.cableStatus?:"" ))
 			addCell(cablingSheet, idx + 2, 11, String.valueOf(currentCabling.assetLoc?: "" ))
-
+			//GormUtil.flushAndClearSession(session, progressCount)
 		}
+
 	}
 
 	/**
@@ -2752,48 +2754,49 @@ class AssetEntityService {
 									profiler.lapReset('Devices')
 								}
 							}
+							
+							def propValue = a.(serverDTAMap.eavAttribute.attributeCode[coll])
+							// (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null )
+							if (!(attribute && (propValue == null || ( (propValue instanceof String) && propValue.size() == 0 )))){
+								switch(colName) {
+									case 'DepGroup':
+										// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
+										addCell(serverSheet, deviceCount, colNum, assetDepBundleMap[a.id.toString()])
+										break
+									case ~/usize|SourcePos|TargetPos/:
+										def pos = a[attribute] ?: 0
+										// Don't bother populating position if it is a zero
+										if (pos == 0) 
+											continue
+										addCell(serverSheet, deviceCount, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
+										break
 
-							if (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
-								// Skip populating the cell if the value is null
-								continue
+									case ~/Retire|MaintExp/:
+										addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDate(userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
+										break
+
+									case ~/Modified Date/:
+										if (a[attribute]) {
+											addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_2))
+										}
+										break
+
+									case ~/Source Blade|Target Blade/:
+										def chassis = a[attribute]
+										def value = ""
+										if (chassis) {
+											value = "id:" + chassis.id + " " + chassis.assetName
+										}
+										addCell(serverSheet, deviceCount, colNum, value)
+										break
+
+									default:
+										def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
+										addCell(serverSheet, deviceCount, colNum, value)
+								}
 							}
 
-							switch(colName) {
-								case 'DepGroup':
-									// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
-									addCell(serverSheet, deviceCount, colNum, assetDepBundleMap[a.id.toString()])
-									break
-								case ~/usize|SourcePos|TargetPos/:
-									def pos = a[attribute] ?: 0
-									// Don't bother populating position if it is a zero
-									if (pos == 0) 
-										continue
-									addCell(serverSheet, deviceCount, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
-									break
-
-								case ~/Retire|MaintExp/:
-									addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDate(userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
-									break
-
-								case ~/Modified Date/:
-									if (a[attribute]) {
-										addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_2))
-									}
-									break
-
-								case ~/Source Blade|Target Blade/:
-									def chassis = a[attribute]
-									def value = ""
-									if (chassis) {
-										value = "id:" + chassis.id + " " + chassis.assetName
-									}
-									addCell(serverSheet, deviceCount, colNum, value)
-									break
-
-								default:
-									def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
-									addCell(serverSheet, deviceCount, colNum, value)
-							}
+							
 
 							if (profilingRow) {
 								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
@@ -2838,9 +2841,10 @@ class AssetEntityService {
 								durationMatrix[durationGroup].average = (int)(durationMatrix[durationGroup].duration / durationMatrix[durationGroup].count)
 							}
 						}
+						GormUtil.flushAndClearSession(session, progressCount)
 						profiler.endSilent(silentTag)
 					} // asset.each
-
+					asset = null
 					profiler.endInfo("Devices", "processed %d rows", [assetSize])
 					if (profileThresholdViolations > 0) {
 						profiler.log(Profiler.LOG_TYPE.WARN, thresholdWarnMsg, [profileThresholdViolations, profileRowThresholds[(AssetClass.DEVICE)]])
@@ -2915,6 +2919,7 @@ class AssetEntityService {
 						for (int i=0; i < appColumnNameList.size(); i++) {
 							def colName = appColumnNameList[i]
 
+
 							// If the column isn't in the spreadsheet we'll skip over it
 							if ( ! appSheetColumnNames.containsKey(colName)) {
 								log.info "export() : skipping column $colName that is not in spreadsheet"
@@ -2956,8 +2961,7 @@ class AssetEntityService {
 									colVal = app[assetColName]
 							}
 
-							if ( colVal != null) {
-
+							if (!(colVal == null || ( (colVal instanceof String) && colVal.size() == 0 ))) {
 								if (colVal?.class.name == 'Person') {
 									colVal = colVal.toString()
 								}
@@ -2968,9 +2972,9 @@ class AssetEntityService {
 									addCell(appSheet, applicationCount, colNum, colVal.toString())
 							}
 						}
-						
+						//GormUtil.flushAndClearSession(session, progressCount)
 					}
-
+					application = null
 					profiler.endInfo("Applications", "processed %d rows", [appSize])
 
 
@@ -3026,18 +3030,21 @@ class AssetEntityService {
 									dateValue =''
 								}
 								addCell(dbSheet, databaseCount, dbMap[colName], dateValue)
-							} else if ( currentDatabase[attribute] == null ) {
-								addCell(dbSheet, databaseCount, dbMap[colName], "")
-							} else {
-								if ( bundleMoveAndClientTeams.contains(dbDTAMap.eavAttribute.attributeCode[coll]) ) {
-									addCell(dbSheet, databaseCount, dbMap[colName], String.valueOf(currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode))
-								} else {
-									addCell(dbSheet, databaseCount, dbMap[colName], String.valueOf(currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll])))
+							} else { 
+								def prop = currentDatabase[attribute]
+								if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
+									if ( bundleMoveAndClientTeams.contains(attribute) ) {
+										addCell(dbSheet, databaseCount, dbMap[colName], String.valueOf(currentDatabase[attribute].teamCode))
+									} else {
+										addCell(dbSheet, databaseCount, dbMap[colName], String.valueOf(currentDatabase[attribute]))
+									}
 								}
 							}
 						}
+						//GormUtil.flushAndClearSession(session, progressCount)
 						
 					}
+					database = null
 					profiler.endInfo("Databases", "processed %d rows", [dbSize])
 				}else{
 					// Adds validation to just the first row
@@ -3091,15 +3098,19 @@ class AssetEntityService {
 									dateValue =''
 								}
 								addCell(storageSheet, filesCount, fileMap[colName], dateValue)
-							} else if ( currentFile[attribute] == null ) {
-								addCell(storageSheet, filesCount, fileMap[colName], "")
-							} else {
-								addCell(storageSheet, filesCount, fileMap[colName], String.valueOf(currentFile.(fileDTAMap.eavAttribute.attributeCode[coll])))
+							} else{
+								def prop = currentFile[attribute]
+								if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
+									addCell(storageSheet, filesCount, fileMap[colName], String.valueOf(prop))
+								}
 							}
 
 						}
+
+						//GormUtil.flushAndClearSession(session, progressCount)
 						
 					}
+					files = null
 					profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
 				}else{
 					// Adds validations to the first row
@@ -3161,10 +3172,15 @@ class AssetEntityService {
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
 						for(int i = 0; i < depProjectionFields.size(); i++){
-							addCell(dependencySheet, r + 1, i, dependency[i])
+							def prop = dependency[i]
+							if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
+								addCell(dependencySheet, r + 1, i, dependency[i])
+							}
+							
 						}
-					
+						//GormUtil.flushAndClearSession(session, progressCount)
 					}
+					results = null
 					profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
 				}else{
 					// Adds validations to the first dependency row
@@ -3225,7 +3241,11 @@ class AssetEntityService {
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						// Export most fields.
 						regularFields.each{ col ->
-							addCell(roomSheet, r + 1, col, String.valueOf(room[col]?:""))
+							def prop = room[col]
+							if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
+								addCell(roomSheet, r + 1, col, String.valueOf(prop?:""))
+							}
+							
 						}
 						// Export date fields using the user's TZ.
 						dateFields.each{ col->
@@ -3233,8 +3253,10 @@ class AssetEntityService {
 						}
 						// Export 'source' or 'target' accordingly.
 						addCell(roomSheet, r, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
+						//GormUtil.flushAndClearSession(session, progressCount)
 					}
 					profiler.endInfo("Rooms", "processed %d rows", [roomSize])
+					results = null	
 				}
 				
 				//
@@ -3279,14 +3301,20 @@ class AssetEntityService {
 							if(column == 'rackId'){
 								addCell(rackSheet, idx + 1, 0, (racks[idx].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
-								 if(column =="Source")
-									addCell(rackSheet, idx + 1, i, String.valueOf(currentRack."${rackMap[column]}" == 1 ? "Source" : "Target" ))
-								 else
-									addCell(rackSheet, idx + 1, i, String.valueOf(currentRack."${rackMap[column]}"?: "" ))
+								def prop = currentRack[rackMap[column]]
+								if(column =="Source")
+									addCell(rackSheet, idx + 1, i, String.valueOf(prop == 1 ? "Source" : "Target" ))
+								else{
+									if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
+										addCell(rackSheet, idx + 1, i, String.valueOf(prop))
+									}
+									
+								}
 							}
 						}
-						
+						//GormUtil.flushAndClearSession(session, progressCount)
 					}
+					racks = null
 					profiler.endInfo("Racks", "processed %d rows", [rackSize])
 
 				}
@@ -3316,8 +3344,9 @@ class AssetEntityService {
 
 					log.debug("export() Cabling found ${sizeOf(cablingList)} mappings")
 
-					cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key)
+					cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key, session)
 					progressCount += cablingSize
+					cablingList = null
 				}
 				profiler.endInfo("Cabling", "processed %d rows", [cablingSize])
 			}
@@ -3339,39 +3368,45 @@ class AssetEntityService {
 							eq('project', project)
 							eq('commentType', 'comment')
 							isNotNull('assetEntity')
-							setReadOnly true
-							fetchSize 1000
-						} 
-					}
-
-					if (commentList.size() > 0) {
-						def assetId
-						def createdDate
-						def createdBy
-						def commentId
-						def category
-						def comment
-						for(int cr=1 ; cr<=commentList.size() ; cr++){
-							progressCount++
-							updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
-							def dateCommentCreated = ''
-							if (commentList[cr-1].dateCreated) {
-								dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, commentList[cr-1].dateCreated, TimeUtil.FORMAT_DATE)
-							} 
-
-							addCell(commentSheet, cr, 0, String.valueOf(commentList[cr-1].id))
-
-							addCell(commentSheet, cr, 1, commentList[cr-1].assetEntity.id, Cell.CELL_TYPE_NUMERIC)
-
-							addCell(commentSheet, cr, 2, String.valueOf(commentList[cr-1].category))
-
-							addCell(commentSheet, cr, 3, String.valueOf(dateCommentCreated))
-
-							addCell(commentSheet, cr, 4, String.valueOf(commentList[cr-1].createdBy))
-
-							addCell(commentSheet, cr, 5, String.valueOf(commentList[cr-1].comment))
+							
 						}
+						resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+						setReadOnly true
+						fetchSize 1000
 					}
+
+					def assetId
+					def createdDate
+					def createdBy
+					def commentId
+					def category
+					def comment
+					
+					commentList.eachWithIndex{ comm, idx ->
+					def currentComment = comm.get(Criteria.ROOT_ALIAS)
+						progressCount++
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
+						def dateCommentCreated = ''
+						if (currentComment.dateCreated) {
+							dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentComment.dateCreated, TimeUtil.FORMAT_DATE)
+						} 
+
+						addCell(commentSheet, idx, 0, String.valueOf(currentComment.id))
+
+						addCell(commentSheet, idx, 1, currentComment.assetEntity.id, Cell.CELL_TYPE_NUMERIC)
+
+						addCell(commentSheet, idx, 2, String.valueOf(currentComment.category))
+
+						addCell(commentSheet, idx, 3, String.valueOf(dateCommentCreated))
+
+						addCell(commentSheet, idx, 4, String.valueOf(currentComment.createdBy))
+
+						addCell(commentSheet, idx, 5, String.valueOf(currentComment.comment))
+
+						//GormUtil.flushAndClearSession(session, progressCount)
+					}
+
+					commentList = null
 				}
 
 				profiler.endInfo("Comments", "processed %d rows", [commentSize])
