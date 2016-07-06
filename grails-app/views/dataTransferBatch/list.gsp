@@ -35,16 +35,16 @@
                 <li class="active">Manage Batches</li>
             </ol>
         </section>
-
+        <g:if test="${flash.message}">
             <div class="margin">
                 <div class="callout callout-info" style="margin-bottom: 0!important;">
                     <h3 class="icon"><i class="fa fa-info"></i></h3>
                     <div class="info-content-msg">
-                        DataTransferBatch 1597 deleted <!-- ${flash.message}-->
+                        ${flash.message}
                     </div>
                 </div>
             </div>
-
+        </g:if>
     <div>
         <div id="messageId" class="message" style="display:none">test</div>
         <div id="progressbar" style="margin-bottom:4px; display: none;" class="centered"></div>
