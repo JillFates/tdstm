@@ -21,6 +21,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 		and: "dependencyType contains 'Runs On'"
 			findAssetOptionInList(data['dependencyType'], 'Runs On')
+
 		and: "dependencyStatus contains 'Validated'"
 			findAssetOptionInList(data['dependencyStatus'], 'Validated')
 	}
