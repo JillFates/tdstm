@@ -300,7 +300,8 @@
                         field: "action",
                         title: "Action",
                         filterable: false,
-                        template: kendo.template($("#actionButtonsTemplate").html())
+                        template: kendo.template($("#actionButtonsTemplate").html()),
+                        width: 150
                     },
                     {
                         field: "className",
