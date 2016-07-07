@@ -357,7 +357,8 @@ class AssetComment {
 			 'dateCreated':'Date Created', 'dateResolved':'Date Resolved', 'displayOption':'Display Option', 'duration':'Duration', 'durationScale':'Duration Scale',
 			 'estFinish':'Estimated Finish:', 'estStart':'Estimated Start', 'hardAssigned':'Hard Assignement', 'isPublished':'Is Published', 'sendNotification':'Send Notification',
 			 'isResolved':'Is Resolved', 'priority':'Priority', 'resolution':'Resolution', 'resolvedBy':'Resolved By', 
-			 'role':'Team', 'statusUpdated':'Status Updated', 'assetName':'Asset Name', 'assetType':'Asset Type','instructionsLink':'instructionsLink']
+			 'role':'Team', 'statusUpdated':'Status Updated', 'assetName':'Asset Name', 'assetType':'Asset Type','instructionsLink':'instructionsLink',
+			 "moveEvent" : "Move Event"]
 		return assetCommentFields
 	}
 }
