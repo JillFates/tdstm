@@ -301,7 +301,7 @@
                         title: "Action",
                         filterable: false,
                         template: kendo.template($("#actionButtonsTemplate").html()),
-                        width: 150
+                        width: 200
                     },
                     {
                         field: "className",
