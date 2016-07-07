@@ -358,7 +358,7 @@ class AssetComment {
 			 'estFinish':'Estimated Finish:', 'estStart':'Estimated Start', 'hardAssigned':'Hard Assignement', 'isPublished':'Is Published', 'sendNotification':'Send Notification',
 			 'isResolved':'Is Resolved', 'priority':'Priority', 'resolution':'Resolution', 'resolvedBy':'Resolved By', 
 			 'role':'Team', 'statusUpdated':'Status Updated', 'assetName':'Asset Name', 'assetType':'Asset Type','instructionsLink':'instructionsLink',
-			 "moveEvent" : "Move Event"]
+			 "event" : "Move Event", "bundle" : "Move Bundle"]
 		return assetCommentFields
 	}
 }
