@@ -442,60 +442,7 @@ class UserPreferenceService {
 		 
 		return assignedRoles
 	}
-		
-	/*
-	 * Set user preferred columns for For PMO dashboard.
-	 * @param: four columns which has to set into preferences  
-	 * @return : Preferred columns and Frountend Labels as Map.
-	 */
-	def setAssetTrackingPreference( def attribute1, def attribute2, def attribute3, def attribute4 ){
-		
-		def column1 = getPreference("PMO_COLUMN1")
-		def column2 = getPreference("PMO_COLUMN2")
-		def column3 = getPreference("PMO_COLUMN3")
-		def column4 = getPreference("PMO_COLUMN4")
-		
-		column1 = column1 ? column1 : "application"
-		column2 = column2 ? column2 : "appOwner"
-		column3 = column3 ? column3 : "appSme"
-		column4 = column4 ? column4 : "assetName"
-		
-		attribute1 = attribute1 ? attribute1 : column1
-		attribute2 = attribute2 ? attribute2 : column2
-		attribute3 = attribute3 ? attribute3 : column3
-		attribute4 = attribute4 ? attribute4 : column4
-		
-		setPreference("PMO_COLUMN1", attribute1)
-		setPreference("PMO_COLUMN2", attribute2)
-		setPreference("PMO_COLUMN3", attribute3)
-		setPreference("PMO_COLUMN4", attribute4)
-		
-		def attributeLabel1 = EavAttribute.findByAttributeCode( attribute1 ).frontendLabel
-		def attributeLabel2 = EavAttribute.findByAttributeCode( attribute2 ).frontendLabel
-		def attributeLabel3 = EavAttribute.findByAttributeCode( attribute3 ).frontendLabel
-		def attributeLabel4 = EavAttribute.findByAttributeCode( attribute4 ).frontendLabel
-		
-		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
-		def project = Project.findById( projectId )
-		
-		if( customLabels.contains( attributeLabel1 ) )
-			attributeLabel1 = project[attribute1] ? project[attribute1] : attributeLabel1 
-		
-		if( customLabels.contains( attributeLabel2 ) )
-			attributeLabel2 = project[attribute2] ? project[attribute2] : attributeLabel2
-		
-		if( customLabels.contains( attributeLabel3 ) )
-			attributeLabel3 = project[attribute3] ? project[attribute3] : attributeLabel3
 
-		if( customLabels.contains( attributeLabel4 ) )
-			attributeLabel4 = project[attribute4] ? project[attribute4] : attributeLabel4
-		
-
-		
-		def columns = [column1:[label:attributeLabel1, field:attribute1], column2:[label:attributeLabel2, field:attribute2], 
-					   column3:[label:attributeLabel3, field:attribute3], column4:[label:attributeLabel4, field:attribute4]]
-		return columns;
-	}
 	/**
 	 * Set the preference for the given user and code.
 	 * @param userLogin
