@@ -1,28 +1,16 @@
-import javax.servlet.http.HttpSession
-
+import com.tdsops.common.validation.ConstraintsValidator
+import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
 import org.apache.shiro.SecurityUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.web.context.request.RequestContextHolder
 
+import javax.servlet.http.HttpSession
 // TODO : JPM 6/2015 : Why are all of these packages being loaded???
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
-import com.tdssrc.eav.*
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
-import com.tds.asset.AssetDependencyBundle
-import com.tdsops.tm.enums.domain.AssetCableStatus
-import com.tds.asset.FieldImportance
-import com.tdsops.common.validation.ConstraintsValidator
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import grails.converters.JSON
-
 class UserPreferenceService {
 
 	static transactional = true
-	def auditService
 	def securityService
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
@@ -99,7 +87,8 @@ class UserPreferenceService {
 	 * Return current session object
 	 */
 	def HttpSession getSession() {
-		return RequestContextHolder.currentRequestAttributes().getSession()
+		return WebUtils.retrieveGrailsWebRequest().session
+		//return RequestContextHolder.currentRequestAttributes().getSession()
 	}
 
 	/*
