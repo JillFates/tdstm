@@ -28,7 +28,6 @@ class ModelController {
 	def assetEntityAttributeLoaderService 
     def sessionFactory
 	def securityService
-	def userPreferenceService
 	def modelService
 	def assetEntityService
 	

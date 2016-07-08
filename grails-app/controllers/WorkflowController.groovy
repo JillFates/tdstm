@@ -15,7 +15,6 @@ class WorkflowController {
 	/* Initialize the services */
 	def stateEngineService
 	def jdbcTemplate
-	def userPreferenceService
     def partyRelationshipService
 	def projectService
 	def securityService

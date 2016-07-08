@@ -4,6 +4,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetComment
 import com.tds.asset.Application
 import com.tds.asset.AssetType
+import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.transaction.annotation.Transactional
 import com.tdssrc.grails.TimeUtil
 
@@ -16,7 +17,6 @@ class ReportsService {
 	def securityService
 	def runbookService
 	def taskService
-	def userPreferenceService
 
 	static transactional = true
 
@@ -444,8 +444,8 @@ class ReportsService {
 	* @return time,moveEventInstance,errorForEventTime,newsBarModeError,userLoginError,clientAccess,list
 	*/
 	def getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList) {
-		
-		def session = userPreferenceService.getSession()
+
+		def session = WebUtils.retrieveGrailsWebRequest().session
 		def date = new Date()
 		String time = TimeUtil.formatDateTime(session, date, TimeUtil.FORMAT_DATE_TIME_8)
 		def errorForEventTime = ""

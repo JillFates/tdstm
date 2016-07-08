@@ -29,7 +29,6 @@ class TestCaseController {
 	def taskService	
 	def securityService
 	def serviceHelperService
-	def userPreferenceService
 	def userService
 	def accountImportExportService
 

@@ -11,7 +11,6 @@ class ManufacturerController {
 	def jdbcTemplate
 	def sessionFactory
 	def securityService
-	def userPreferenceService
 	
 	def index() { redirect(action:"list",params:params) }
 	

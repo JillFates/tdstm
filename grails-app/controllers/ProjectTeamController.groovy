@@ -3,7 +3,6 @@ import com.tds.asset.AssetEntity;
 class ProjectTeamController {
     
 	def partyRelationshipService
-	def userPreferenceService
 	
     def index() { redirect(action:"list",params:params) }
 

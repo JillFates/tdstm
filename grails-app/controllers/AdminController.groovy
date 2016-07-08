@@ -22,7 +22,6 @@ class AdminController {
 	def partyRelationshipService
 	def projectService
 	def securityService
-	def userPreferenceService
 	def userService
 
 	private static String DEFAULT_ROLE = 'USER'
