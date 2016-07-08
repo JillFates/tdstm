@@ -6,14 +6,14 @@ import org.codehaus.groovy.grails.web.util.WebUtils
 
 import javax.servlet.http.HttpSession
 
+/**
+ * The Service is transactional (http://docs.grails.org/2.3.11/guide/services.html#declarativeTransactions)
+ */
 class UserPreferenceService {
-
 	static transactional = true
 	def grailsApplication
 	def securityService
-	
-	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
-	
+
 	// defaults holds global defaults for certain values 
 	// TODO - load these from application settings
 	protected static defaults = ['CURR_TZ':'GMT']
