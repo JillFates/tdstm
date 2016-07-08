@@ -1,4 +1,3 @@
-import com.tds.asset.AssetOptions
 import grails.test.spock.IntegrationSpec
 
 class AssetEntityServiceTests extends IntegrationSpec {
@@ -12,7 +11,6 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 		when:
 			def data = assetEntityService.entityInfo(project)
-			log.info "data = $data"
 
 		then: "keys exists in results and contains assets"
 			keys.each {
@@ -29,8 +27,6 @@ class AssetEntityServiceTests extends IntegrationSpec {
 	void "test get dependency types"(){
 		when:
 			def data = assetEntityService.getDependencyTypes()
-
-			log.info "data = $data"
 
 		then:
 			data.size() > 1
