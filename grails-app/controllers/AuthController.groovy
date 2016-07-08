@@ -1,22 +1,19 @@
-import org.apache.shiro.authc.AuthenticationException
-import org.apache.shiro.authc.UsernamePasswordToken
-import org.apache.shiro.authc.LockedAccountException
-import org.apache.shiro.authc.DisabledAccountException
+import com.tdsops.common.builder.UserAuditBuilder
+import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.shiro.MissingCredentialsException
-import org.apache.shiro.SecurityUtils
-import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.EmailDispatchOrigin
+import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.StringUtil
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.common.exceptions.ServiceException
-import com.tdsops.common.builder.UserAuditBuilder
-import com.tdsops.tm.enums.domain.PasswordResetStatus
-import com.tdsops.tm.enums.domain.PasswordResetType
-import com.tdsops.tm.enums.domain.EmailDispatchOrigin
-import net.transitionmanager.PasswordReset
-import net.transitionmanager.EmailDispatch
 import grails.converters.JSON
+import net.transitionmanager.PasswordReset
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authc.AuthenticationException
+import org.apache.shiro.authc.DisabledAccountException
+import org.apache.shiro.authc.LockedAccountException
+import org.apache.shiro.authc.UsernamePasswordToken
+import UserPreferenceEnum as PREF
 
 class AuthController {
 	
@@ -130,9 +127,9 @@ class AuthController {
 
 					def targetUri = params.targetUri ?: "/"
 					
-					userPreferenceService.loadPreferences("CURR_PROJ")
-					userPreferenceService.loadPreferences("CURR_BUNDLE")
-					userPreferenceService.loadPreferences("MOVE_EVENT")
+					userPreferenceService.loadPreferences(PREF.CURR_PROJ)
+					userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
+					userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
 					userPreferenceService.loadPreferences(TimeUtil.TIMEZONE_ATTR)
 					userPreferenceService.loadPreferences(TimeUtil.DATE_TIME_FORMAT_ATTR)
 
@@ -206,9 +203,9 @@ class AuthController {
 	}
 
 	private def redirectToPrefPage() {
-		def startPage = userPreferenceService.getPreference('START_PAGE')
+		def startPage = userPreferenceService.getPreference(PREF.START_PAGE)
 
-		if (userPreferenceService.getPreference('CURR_PROJ')) {
+		if (userPreferenceService.getPreference(PREF.CURR_PROJ)) {
 			if (startPage =='Project Settings') {
 				redirect(uri:'/projectUtil')
 			} else if(startPage=='Current Dashboard') {

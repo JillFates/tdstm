@@ -1,33 +1,20 @@
-import com.tdssrc.grails.ExportUtil
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-
-import grails.converters.JSON
-import grails.converters.*
-
-import java.io.*
-
-import org.apache.poi.*
-import org.apache.poi.hssf.usermodel.HSSFSheet
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.hssf.usermodel.HSSFCellStyle
-import org.apache.poi.ss.usermodel.Font
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.IndexedColors
-
-import org.hibernate.criterion.Order
-
-import org.apache.commons.lang.StringUtils
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
+import grails.converters.JSON
+import org.apache.commons.lang.StringUtils
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.hibernate.criterion.Order
+import UserPreferenceEnum as PREF
 
 class MoveEventController {
 	
@@ -101,15 +88,15 @@ class MoveEventController {
 	 * @return : MoveEvent details  
 	 */
     def show() {
-		userPreferenceService.loadPreferences("MOVE_EVENT")
+		userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
 		def moveEventId = params.id
 		if(moveEventId){
-			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEventId}" )
 			def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
 			if(moveBundleId){
 				def moveBundle = MoveBundle.get( moveBundleId )
 				if(moveBundle?.moveEvent?.id != Integer.parseInt(moveEventId)){
-					userPreferenceService.removePreference( "CURR_BUNDLE" )
+					userPreferenceService.removePreference(PREF.CURR_BUNDLE)
 				}
 			}
 		} else {
@@ -500,7 +487,7 @@ class MoveEventController {
 		}
 		def moveEventList = MoveEvent.findAllByProject(project)
 		
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		
 		return [moveEventList:moveEventList, viewUnpublished:(viewUnpublished ? '1' : '0')]
 	}
@@ -530,12 +517,12 @@ class MoveEventController {
 		
 		if (params.containsKey('viewUnpublished')) {
 			if (params.viewUnpublished == '1')
-				userPreferenceService.setPreference("viewUnpublished", 'true')
+				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'true')
 			else
-				userPreferenceService.setPreference("viewUnpublished", 'false')
+				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'false')
 		}
 		
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		def publishedValues = [true]
 		if (viewUnpublished)
 			publishedValues = [true, false]
@@ -596,7 +583,7 @@ class MoveEventController {
 		def preMoveIssue = []
 		def postMoveIssue = []
 		
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		def publishedValues = [true]
 		if (viewUnpublished)
 			publishedValues = [true, false]

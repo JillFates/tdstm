@@ -1,15 +1,13 @@
-import grails.converters.JSON
-
-import org.hibernate.SessionFactory
-import org.apache.commons.lang.math.NumberUtils 
-
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
+import org.hibernate.SessionFactory
+import UserPreferenceEnum as PREF
 
 class RoomController {
 
@@ -98,10 +96,10 @@ class RoomController {
 		session.removeAttribute("RACK_ID")
 		def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		userPreferenceService.setPreference( "CURR_ROOM", "${roomInstance?.id}" )
+		userPreferenceService.setPreference(PREF.CURR_ROOM, "${roomInstance?.id}" )
 		def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad") ?:request.getHeader("User-Agent").toLowerCase().contains("mobile")
 		if (!roomInstance) {
-			userPreferenceService.removePreference("CURR_ROOM")
+			userPreferenceService.removePreference(PREF.CURR_ROOM)
 			flash.message = "Current Room not found"
 			redirect(action: "list", params:[viewType : "list"])
 		}
@@ -109,9 +107,9 @@ class RoomController {
 			def auditView 
 			if(params.containsKey("auditView")){
 				auditView = params.auditView
-				userPreferenceService.setPreference("AUDIT_VIEW", params.auditView)
+				userPreferenceService.setPreference(PREF.AUDIT_VIEW, params.auditView)
 			} else {
-				auditView = session.AUDIT_VIEW?.AUDIT_VIEW ?:(userPreferenceService.getPreference("AUDIT_VIEW")?:0 )
+				auditView = session.AUDIT_VIEW?.AUDIT_VIEW ?:(userPreferenceService.getPreference(PREF.AUDIT_VIEW)?:0 )
 			}
 			def project = Project.findById( projectId )
 			def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
@@ -126,7 +124,7 @@ class RoomController {
 			bundleLists.addFirst(['taskReady', 'Active Tasks'])
 			def statusList = [:]
 			if(moveBundleId && !moveBundleId.contains("all") && !moveBundleId.contains("taskReady")){
-					userPreferenceService.removePreference("highlightTasks")
+					userPreferenceService.removePreference(PREF.HIGHLIGHT_TASKS)
 					def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
 					moveBundleList = MoveBundle.findAllByIdInList(bundles)
 					moveBundleList.each{ moveBundle->
@@ -140,10 +138,10 @@ class RoomController {
 						}
 					}
 			} else if ( moveBundleId?.contains("all") ) {
-				userPreferenceService.removePreference("highlightTasks")
+				userPreferenceService.removePreference(PREF.HIGHLIGHT_TASKS)
 				racksList = Rack.findAllByRoom(roomInstance)
 				moveBundleList = [id:'all']
-			} else if( userPreferenceService.getPreference("highlightTasks") || moveBundleId?.contains("taskReady") ) {
+			} else if( userPreferenceService.getPreference(PREF.HIGHLIGHT_TASKS) || moveBundleId?.contains("taskReady") ) {
 					def roomAssets =  roomInstance.sourceAssets + roomInstance.targetAssets
 					Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,
 										[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
@@ -154,7 +152,7 @@ class RoomController {
 						def statusCss = statuses.contains("Hold") ? "task_hold" : (statuses.contains("Started") ? "task_started" : "task_ready")
 						statusList << [(it.id) : statusCss]
 					}
-					userPreferenceService.setPreference("highlightTasks", moveBundleId)
+					userPreferenceService.setPreference(PREF.HIGHLIGHT_TASKS, moveBundleId)
 					moveBundleId = 'taskReady'
 			}
 			
@@ -169,7 +167,7 @@ class RoomController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
-		def prefVal = userPreferenceService.getPreference("roomTableShowAll")?: 'FALSE'
+		def prefVal = userPreferenceService.getPreference(PREF.ROOM_TABLE_SHOW_ALL)?: 'FALSE'
 		def modelList = Model.findAllByRoomObjectAndAssetType(true, 'Rack');		
 		def newRacks = []
 		for(int i = 50000 ; i<50051; i++ ){
@@ -222,7 +220,7 @@ class RoomController {
 			msg = roomService.updateRoomAndRacksInfo(project, user, roomId, rackIds, params, powerType)
 
 			// Set user preference for Show All (TODO - this should NOT be here)
-			userPreferenceService.setPreference("roomTableShowAll", params.showAll=='1' ? 'TRUE' : 'FALSE')
+			userPreferenceService.setPreference(PREF.ROOM_TABLE_SHOW_ALL, params.showAll=='1' ? 'TRUE' : 'FALSE')
 
 		} catch (e) {
 			e.printStackTrace()
@@ -789,7 +787,7 @@ class RoomController {
 	
 	def setDraggableRackPref() {
 		def prefVal = params.prefVal
-		userPreferenceService.setPreference("DraggableRack",prefVal)
+		userPreferenceService.setPreference(PREF.DRAGGABLE_RACK, prefVal)
 		render 'success'
 	}
 	

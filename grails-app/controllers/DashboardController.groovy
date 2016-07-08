@@ -1,17 +1,13 @@
-import org.apache.shiro.SecurityUtils
-import grails.converters.JSON
-
-import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
-import com.tdssrc.grails.GormUtil
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
-import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.common.lang.ExceptionUtil
+import grails.converters.JSON
+import org.apache.shiro.SecurityUtils
 
 import java.text.DateFormat
+import UserPreferenceEnum as PREF
 
 class DashboardController {
 	
@@ -44,7 +40,8 @@ class DashboardController {
 		} 
 
 		if (! moveEvent) {
-			userPreferenceService.loadPreferences("MOVE_EVENT")
+			//TODO: OLB remove reloading of Map
+			userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
 			def defaultEvent = getSession().getAttribute("MOVE_EVENT")
 			if (defaultEvent.MOVE_EVENT) {
 				// Try finding the event in the user's preferences
@@ -61,24 +58,22 @@ class DashboardController {
 			redirect(controller:"moveEvent",action:"list")
 		} else {
 			// Save the user's preference for the current move event
-			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEvent.id}" )
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEvent.id}" )
 
 			// Start getting the data to build the data model
 			def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
 			def projectLogo = ProjectLogo.findByProject(project)
-			userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
+			userPreferenceService.loadPreferences(PREF.DASHBOARD_REFRESH)
 			def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
 			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
 		
 			// handle the view unpublished tasks checkbox
 			if (params.containsKey('viewUnpublished')) {
-				if (params.viewUnpublished == '1')
-					userPreferenceService.setPreference("viewUnpublished", 'true')
-				else
-					userPreferenceService.setPreference("viewUnpublished", 'false')
+				def unpublishVal = (params.viewUnpublished == '1')?'true':'false'
+				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, unpublishVal)
 			}
 			
-			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 
 			def model = [:]
 			model.project = project
@@ -138,7 +133,7 @@ class DashboardController {
 		
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 
 		try {
 			def model = dashboardService.getTaskSummaryModel(id, loginUser, currentProject, 6, viewUnpublished)
@@ -178,7 +173,7 @@ class DashboardController {
 	def retrieveEventsList() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		if(projectInstance!='All'){
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 		}
 
 		def result = new ArrayList()
@@ -208,7 +203,7 @@ class DashboardController {
 	def retrieveEvents() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		if(projectInstance!='All'){
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 		}
 		render (template :'events', model:[ upcomingEvents:userService.getEventDetails(projectInstance), project:projectInstance,
 			staffRoles:taskService.getTeamRolesForTasks()])
@@ -234,7 +229,7 @@ class DashboardController {
 			projectOrAll = Project.get(projectId)
 			if (projectOrAll) {
 				// TODO : JPM 6/2016 : SECURITY : Should be checking if user has access to project
-				userPreferenceService.setPreference( "CURR_PROJ", "${projectId}" )
+				userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectId}" )
 			} else { 
 				projectId = -1
 			}
@@ -256,7 +251,7 @@ class DashboardController {
 
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		if (projectInstance != 'All') {
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 		}
 		*/
 		List result = new ArrayList()
@@ -351,7 +346,7 @@ class DashboardController {
 	def retrieveApplicationsList() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		if(projectInstance!='All'){
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 		}
 
 		def result = new ArrayList()
@@ -395,7 +390,7 @@ class DashboardController {
 	def retrieveActivePeopleList() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		if(projectInstance!='All'){
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 		}
 
 		def result = new ArrayList()

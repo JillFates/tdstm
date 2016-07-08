@@ -1,20 +1,11 @@
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdsops.tm.enums.domain.AssetClass
-
-import javax.servlet.http.HttpSession
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
-
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
-import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.common.exceptions.ServiceException
-
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import org.springframework.web.context.request.RequestContextHolder
+import UserPreferenceEnum as PREF
 
 /**
  * A set of methods used to support common functionality used in the Controllers
@@ -374,8 +365,8 @@ class ControllerService {
 		def userLogin = securityService.getUserLogin()
 		if (project.id != newProject.id) {
 			if (personService.hasAccessToProject(userLogin.person, newProject)) {
-				userPreferenceService.setPreference("CURR_PROJ", "${newProject.id}")
-				userPreferenceService.loadPreferences("CURR_PROJ")
+				userPreferenceService.setPreference(PREF.CURR_PROJ, "${newProject.id}")
+				userPreferenceService.loadPreferences(PREF.CURR_PROJ)
 			} else {
 				auditService.logSecurityViolation(userLogin.toString(), "Try to acccess project ${newProject.projectCode}")
 			}

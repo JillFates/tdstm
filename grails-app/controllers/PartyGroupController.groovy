@@ -1,6 +1,7 @@
 import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
+import UserPreferenceEnum as PREF
 
 class PartyGroupController {
 	
@@ -88,7 +89,7 @@ class PartyGroupController {
 
 	def show() {
 		def partyGroupInstance = PartyGroup.get( params.id )
-		userPreferenceService.setPreference( "PARTYGROUP", "${partyGroupInstance?.id}" )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${partyGroupInstance?.id}" )
 
 		if(!partyGroupInstance) {
 			flash.message = "PartyGroup not found with id ${params.id}"
@@ -128,7 +129,7 @@ class PartyGroupController {
 
 	def edit() {
 		def partyGroupInstance = PartyGroup.get( params.id )
-		userPreferenceService.setPreference( "PARTYGROUP", "${partyGroupInstance?.id}" )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${partyGroupInstance?.id}" )
 		if(!partyGroupInstance) {
 			flash.message = "PartyGroup not found with id ${params.id}"
 			redirect(action:"list")

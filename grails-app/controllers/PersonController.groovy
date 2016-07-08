@@ -1,22 +1,11 @@
-import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
-import org.apache.commons.lang3.StringUtils
-import grails.validation.ValidationException
-import com.tds.asset.Application
-import com.tds.asset.AssetComment
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.tm.enums.domain.SortOrder
-import com.tdsops.common.security.SecurityUtil
-import com.tdsops.common.exceptions.ServiceException
+import com.tdssrc.grails.*
+import grails.converters.JSON
+import grails.validation.ValidationException
+import org.apache.shiro.SecurityUtils
+
+import UserPreferenceEnum as PREF
 
 class PersonController {
 	
@@ -81,7 +70,7 @@ def test = {
 		else
 			company = currentCompany
 		
-		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, companyId.toString() )
 
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 		//used to show roles in addTeam select
@@ -624,7 +613,7 @@ def test = {
 				log.debug "updatePerson() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			}
 
-			userPreferenceService.loadPreferences("CURR_TZ")
+			userPreferenceService.loadPreferences(PREF.CURR_TZ)
 
 			ServiceResults.respondWithError(response, e.getMessage())
 
@@ -725,7 +714,7 @@ def test = {
 						}
 				}
 
-				userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
+				userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard" )
 			}
 			
 			// Is there any reason to return an object? can't be just a POST/UPDATE -no return- operation?
@@ -762,13 +751,13 @@ def test = {
 		
 		// set the defaults for the checkboxes
 
-		def assigned = userPreferenceService.getPreference("ShowAssignedStaff") ?: '1'
-		def onlyClientStaff = userPreferenceService.getPreference("ShowClientStaff") ?: '1'
+		def assigned = userPreferenceService.getPreference(PREF.SHOW_ASSIGNED_STAFF) ?: '1'
+		def onlyClientStaff = userPreferenceService.getPreference(PREF.SHOW_CLIENT_STAFF) ?: '1'
 		
-		def currRole = params.role ? params.role : (userPreferenceService.getPreference("StaffingRole")?:"0")
-		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
-		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
-		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
+		def currRole = params.role ? params.role : (userPreferenceService.getPreference(PREF.STAFFING_ROLE)?:"0")
+		def currLoc = userPreferenceService.getPreference(PREF.STAFFING_LOCATION)?:"All"
+		def currPhase = userPreferenceService.getPreference(PREF.STAFFING_PHASES)?:"All"
+		def currScale = userPreferenceService.getPreference(PREF.STAFFING_SCALE)?:"6"
 		def moveEvents
 		def projectId = Project.findById( project.id) ? project.id : 0
 		def reqProjects = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectsPerm, ProjectStatus.ACTIVE)

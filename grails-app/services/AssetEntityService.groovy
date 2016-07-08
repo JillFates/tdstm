@@ -7,20 +7,17 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.*
 import grails.converters.JSON
-import net.transitionmanager.utils.ExcelDocumentConverter
+import net.transitionmanager.utils.Profiler
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.hibernate.Criteria
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.transaction.annotation.Transactional
-import net.transitionmanager.utils.Profiler
-import groovy.time.TimeDuration
+import UserPreferenceEnum as PREF
 
 import java.util.regex.Matcher
 // Used to wire up bindData
@@ -1130,7 +1127,7 @@ class AssetEntityService {
 	 */
 	String getAssetListSizePref() {
 		// TODO - JPM 08/2014 - seems like we could convert the values to Integer (improvement)
-		return ( userPreferenceService.getPreference("assetListSize") ?: '25' )
+		return ( userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE) ?: '25' )
 	}
 
 	/**
@@ -1145,7 +1142,7 @@ class AssetEntityService {
 		def bundle = project.defaultBundle
 
 		if (!bundle) {
-			def bundleId = userPreferenceService.get('MOVE_BUNDLE')
+			def bundleId = userPreferenceService.get(PREF.MOVE_BUNDLE)
 			if (bundleId) {
 				bundle = MoveBundle.read(bundleId)
 			}
@@ -1351,9 +1348,9 @@ class AssetEntityService {
 
 		def highlightMap = getHighlightedInfo(type, assetEntity, configMap, projectAttributes)
 
-		def prefValue = userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		
-		def viewUnpublishedValue = userPreferenceService.getPreference("viewUnpublished") ?: 'false'
+		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		
 		def hasPublishPermission = RolePermissions.hasPermission("PublishTasks")
 
@@ -1403,7 +1400,7 @@ class AssetEntityService {
 			fixedFilter: (params.filter ? true : false),
 			filter: params.filter,
 			hasPerm: RolePermissions.hasPermission("AssetEdit"),
-			justPlanning: userPreferenceService.getPreference("assetJustPlanning") ?: 'true',
+			justPlanning: userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true',
 			modelPref: null,		// Set below
 			moveBundleId: params.moveBundleId, 
 			moveBundle: filters?.moveBundleFilter ?: '', 
@@ -3592,7 +3589,7 @@ class AssetEntityService {
 		// This is used by the JQ-Grid some how
 		session.AE = [:]
 
-		userPreferenceService.setPreference("assetListSize", "${maxRows}")
+		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, "${maxRows}")
 		
 		if (params.event && params.event.isNumber()) {
 			def moveEvent = MoveEvent.read( params.event )
@@ -3729,7 +3726,7 @@ class AssetEntityService {
 		//
 		query.append("\nWHERE ae.project_id = ${project.id}\nAND ae.asset_class = '${AssetClass.DEVICE}'")
 
-		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
+		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
 		/*
 		// This was being added to correct the issue when coming from the Planning Dashboard but there are some ill-effects still
 		if (params.justPlanning)

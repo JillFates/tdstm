@@ -11,6 +11,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import org.apache.commons.lang.math.NumberUtils
+import UserPreferenceEnum as PREF
 
 class RackLayoutsController {
 	def assetEntityService
@@ -58,7 +59,7 @@ class RackLayoutsController {
 		}
 		
 		List moveBundleList = MoveBundle.findAllByProject( project )
-		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		boolean isCurrentBundle=true
 		if (!currentBundle){
@@ -367,7 +368,7 @@ class RackLayoutsController {
 			rackLayout << [ assetDetails: assetDetails, rack: rack.tag , room: rack.room,
 				frontViewRows: frontViewRows, backViewRows: backViewRows , rackId: rack.id]
 		}
-		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
+		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
 
 		model.putAll( [
 			rackLayout: rackLayout, 
@@ -417,7 +418,7 @@ class RackLayoutsController {
 		def rowspan = 1
 		def cssClass = "empty"
 		def rackStyle = ""
-		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
+		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
 		
 		def rackLayoutsHasPermission = paramsMap.rackLayoutsHasPermission
 		def asset = paramsMap.assetDetails
@@ -656,7 +657,7 @@ class RackLayoutsController {
 		def bundles = bladeLayoutMap.bundle
 		boolean printView = bladeLayoutMap.printView
 		
-		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
+		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
 		StringBuffer bladeTable = new StringBuffer('<table class="bladeTable"><tr>')
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
 		def tdHeight = rowspan * 6
@@ -806,7 +807,7 @@ class RackLayoutsController {
 		
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject( project )
-		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		/* set first bundle as default if user pref not exist */
 		def isCurrentBundle = true

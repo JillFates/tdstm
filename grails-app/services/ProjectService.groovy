@@ -1,34 +1,15 @@
-import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-
-import com.tds.asset.AssetType
-import com.tds.asset.FieldImportance
-import com.tdsops.tm.enums.domain.PasswordResetType
-import com.tdsops.tm.enums.domain.ProjectSortProperty
-import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.tm.enums.domain.SortOrder
-import com.tdsops.tm.enums.domain.ValidationType
-import com.tdsops.tm.enums.domain.AssetClass
+import com.tds.asset.*
+import com.tdsops.tm.enums.domain.*
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
-import com.tdsops.tm.enums.domain.AssetCableStatus
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.AssetDependencyBundle
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.TimeUtil
+import grails.converters.JSON
 import net.transitionmanager.ProjectDailyMetric
-import java.text.DateFormat
-import net.transitionmanager.PasswordReset
-
-import org.hibernate.criterion.CriteriaSpecification
+import org.codehaus.groovy.grails.web.util.WebUtils
+import UserPreferenceEnum as PREF
 
 class ProjectService {
 
@@ -480,12 +461,13 @@ class ProjectService {
 	 * This method used to get all clients,patners,managers and workflowcodes for action edit.
 	 */
 	def getprojectEditDetails(projectInstance,prevParam){
-		def currProj = userPreferenceService.getSession().getAttribute("CURR_PROJ");
+		def session = WebUtils.retrieveGrailsWebRequest().session
+		def currProj = session.getAttribute("CURR_PROJ");
 		def currProjectInstance = Project.get( currProj.CURR_PROJ )
 		def loginPerson = securityService.getUserLoginPerson()
 		def userCompany = loginPerson.company
 
-		userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${userCompany?.id}" )
 		
 		def projectLogo
 		if (currProjectInstance) {
@@ -495,7 +477,7 @@ class ProjectService {
 		if (projectLogo) {
 			imageId = projectLogo.id
 		}
-		userPreferenceService.getSession().setAttribute("setImage",imageId)
+		session.setAttribute("setImage",imageId)
 		def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
 		def partnerStaff
 		def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
@@ -904,7 +886,7 @@ class ProjectService {
 			}
 			
 			// set the projectInstance as CURR_PROJ
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 			//Will create a bundle name TBD and set it as default bundle for project   
 			projectInstance.getProjectDefaultBundle()
 			

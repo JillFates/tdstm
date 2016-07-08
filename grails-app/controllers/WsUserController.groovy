@@ -1,10 +1,6 @@
 import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller;
-import grails.validation.ValidationException;
-
-
+import grails.validation.ValidationException
+import org.springframework.stereotype.Controller
 /**
  * {@link Controller} for handling WS calls of the {@link UserService}
  * 

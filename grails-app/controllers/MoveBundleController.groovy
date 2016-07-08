@@ -1,25 +1,13 @@
-import grails.converters.JSON
-
-import org.apache.commons.lang.StringUtils
-import org.quartz.SimpleTrigger
-import org.quartz.impl.triggers.SimpleTriggerImpl
-import org.quartz.Trigger
-
-import org.hibernate.criterion.Order
-
-import com.tds.asset.Application
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
-import com.tds.asset.Database
-import com.tds.asset.Files
+import com.tds.asset.*
 import com.tdsops.tm.enums.domain.*
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import com.tds.asset.AssetType
+import grails.converters.JSON
+import org.hibernate.criterion.Order
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
+import UserPreferenceEnum as PREF
 
 class MoveBundleController {
 
@@ -136,7 +124,7 @@ class MoveBundleController {
 			return
 		}
 
-		userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
+		userPreferenceService.setPreference(PREF.CURR_BUNDLE, "${moveBundleInstance.id}" )
 		def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
 		def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" )
 
@@ -870,10 +858,10 @@ class MoveBundleController {
 			return
 
 		Date start = new Date()
-		def assignedGroup = params.assinedGroup ?: userPreferenceService.getPreference("AssignedGroup") 
+		def assignedGroup = params.assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP)
 		if(!assignedGroup)
 			assignedGroup = "1"
-		userPreferenceService.setPreference( "AssignedGroup", assignedGroup)
+		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP, assignedGroup)
 		def map = moveBundleService.dependencyConsoleMap(project.id, params.bundle, assignedGroup, null)
 		
 		//log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
@@ -889,7 +877,7 @@ class MoveBundleController {
 			return
 
 		// Now get the model and display results
-		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
+		def isAssigned = userPreferenceService.getPreference(PREF.ASSIGNED_GROUP)?: "1"
 		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(project.id, params.bundle, isAssigned, null) )
 	}
 

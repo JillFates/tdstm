@@ -1,18 +1,17 @@
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
-
+import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tds.asset.Application
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
-import grails.validation.ValidationException
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.common.security.SecurityUtil
-import com.tdsops.common.builder.UserAuditBuilder
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
+import org.apache.commons.lang.StringUtils
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.web.util.WebUtils
+import UserPreferenceEnum as PREF
 
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
@@ -1609,7 +1608,7 @@ class PersonService {
 	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false) 
 		throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
 		Person person = validatePersonAccess(params.id, byWhom)
-		def session = userPreferenceService.getSession()
+		def session = WebUtils.retrieveGrailsWebRequest().session
 		if(!isAssociatedTo(byWhom, person.company)){
 			throw new UnauthorizedException("You do not have permission to manage staffing for the user's company")
 		}
@@ -1702,17 +1701,17 @@ class PersonService {
 		if (! byAdmin) {
 			// Save some preferences
 			if (params.timeZone) {
-				userPreferenceService.setPreference("CURR_TZ", params.timeZone)
-				userPreferenceService.loadPreferences("CURR_TZ")
+				userPreferenceService.setPreference(PREF.CURR_TZ, params.timeZone)
+				userPreferenceService.loadPreferences(PREF.CURR_TZ)
 			}
 
 			if (params.powerType) {
-				userPreferenceService.setPreference("CURR_POWER_TYPE", params.powerType)
+				userPreferenceService.setPreference(PREF.CURR_POWER_TYPE, params.powerType)
 			}
 
 			if (params.startPage) {
-				userPreferenceService.setPreference("START_PAGE", params.startPage)
-				userPreferenceService.loadPreferences("START_PAGE")
+				userPreferenceService.setPreference(PREF.START_PAGE, params.startPage)
+				userPreferenceService.loadPreferences(PREF.START_PAGE)
 			}
 		}
 

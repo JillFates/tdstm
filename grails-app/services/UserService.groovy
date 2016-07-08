@@ -4,23 +4,19 @@
  *
  */
 
-import com.tdsops.tm.enums.domain.RoleTypeGroup
-import com.tdssrc.grails.GormUtil
+
+import com.tds.asset.Application
 import com.tdsops.common.exceptions.ConfigurationException
-import org.apache.shiro.authc.AccountException
+import com.tdsops.common.security.SecurityConfigParser
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import org.apache.shiro.SecurityUtils;
-import org.apache.commons.lang.math.NumberUtils
-import com.tds.asset.AssetComment
-import com.tds.asset.Application
-import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.common.security.SecurityConfigParser
-import org.springframework.beans.factory.InitializingBean
-import org.springframework.context.ApplicationContext
 import grails.util.Holders
-import org.springframework.web.context.request.RequestContextHolder
+import org.apache.shiro.authc.AccountException
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.transaction.TransactionDefinition
+import UserPreferenceEnum as PREF
 
 class UserService implements InitializingBean {
 	
@@ -296,18 +292,18 @@ class UserService implements InitializingBean {
 		//
 		// Now setup their preferences if there is no or that they are a new user
 		//
-		def pref = userPreferenceService.getPreferenceByUserAndCode(userLogin, 'CURR_PROJ')
+		def pref = userPreferenceService.getPreferenceByUserAndCode(userLogin, PREF.CURR_PROJ)
 		if (createUser || ! pref) {
 			// Set their default project preference
-			userPreferenceService.setPreference(userLogin, 'CURR_PROJ', project.id.toString() )
+			userPreferenceService.setPreference(userLogin, PREF.CURR_PROJ, project.id.toString() )
 			if (debug)
 				log.debug "$mn set default project preference to ${project}"
 		}
 		if (defaultTimezone)
 			// Set their TZ preference
-			pref = userPreferenceService.getPreferenceByUserAndCode(userLogin, 'CURR_TZ')
+			pref = userPreferenceService.getPreferenceByUserAndCode(userLogin, PREF.CURR_TZ)
 			if (createUser || ! pref) {
-				userPreferenceService.setPreference(userLogin, 'CURR_TZ', defaultTimezone )
+				userPreferenceService.setPreference(userLogin, PREF.CURR_TZ, defaultTimezone )
 				if (debug)
 					log.debug "$mn: set timezone preference $defaultTimezone"
 			}
@@ -705,10 +701,10 @@ class UserService implements InitializingBean {
 		def contextUpdated = false
 		def projectInstance = Project.read(projectId)
 		if(projectService.hasAccessToProject(user, projectInstance)){
-			userPreferenceService.setPreference("CURR_PROJ", "${projectId}")
-			userPreferenceService.removePreference("MOVE_EVENT")
-			userPreferenceService.removePreference("CURR_BUNDLE")
-			userPreferenceService.removePreference("CURR_ROOM")		
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectId}")
+			userPreferenceService.removePreference(PREF.MOVE_EVENT)
+			userPreferenceService.removePreference(PREF.CURR_BUNDLE)
+			userPreferenceService.removePreference(PREF.CURR_ROOM)
 			contextUpdated = true
 		}else{
 			securityService.reportViolation("Attempted to access unavailable project $projectId", user)

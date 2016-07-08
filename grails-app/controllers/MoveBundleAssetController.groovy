@@ -1,8 +1,7 @@
+import com.tds.asset.AssetEntity
 import grails.converters.JSON
-import org.apache.shiro.SecurityUtils
 
-import com.tds.asset.AssetEntity;
-import com.tdssrc.grails.GormUtil
+import UserPreferenceEnum as PREF
 
 class MoveBundleAssetController {
 	def partyRelationshipService
@@ -360,7 +359,7 @@ class MoveBundleAssetController {
     	def sourceGroup = "group by source_location, source_rack, source_room"
     	def targetGroup = "group by target_location, target_rack, target_room"
     	if(bundleId){
-    		userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+    		userPreferenceService.setPreference(PREF.CURR_BUNDLE, "${bundleId}" )
     		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "and move_bundle_id = $bundleId " + sourceGroup )
     		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "and move_bundle_id = $bundleId " + targetGroup)
     	} else if(bundleId == ""){

@@ -1,20 +1,19 @@
 import com.tds.asset.AssetComment
-import com.tds.asset.TaskDependency
 import com.tds.asset.AssetDependency
+import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-
-import java.text.DateFormat
 import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
+import UserPreferenceEnum as PREF
+
+import java.text.DateFormat
 
 class TaskController {
 	
@@ -343,7 +342,7 @@ class TaskController {
 			}
 
 			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
-			userPreferenceService.setPreference("viewUnpublished", viewUnpublished.toString())
+			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished.toString())
 			
 			// check if the specified task is unpubublished and the user shouldn't see it			
 			if (!viewUnpublished && !rootTask.isPublished) {
@@ -542,8 +541,8 @@ digraph runbook {
 			def projectId = project.id
 			
 			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
-			userPreferenceService.setPreference("viewUnpublished", viewUnpublished.toString())
-			userPreferenceService.setPreference("MOVE_EVENT", moveEventId)
+			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished.toString())
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, moveEventId)
 			
 			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
 
@@ -730,7 +729,7 @@ digraph runbook {
 				MoveEvent me = MoveEvent.get(meId)
 				if (me) {
 					if (me.project.id == project.id) {
-						userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+						userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
 					} else {
 						securityService.reportViolation("Attempt to reference event id ($meId) not associated with project ${project.projectCode}", user)
 						meId = 0
@@ -739,16 +738,16 @@ digraph runbook {
 			}
 		}
 
-		String viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
+		String viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
 
 		List eventList = MoveEvent.findAllByProject(project)
 		def selectedEventId = 0
 
-		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
+		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
 		if (eventPref != '0' && eventPref != meId && ! eventList.find {it.id == eventPref}) {
 			// The user preference references an invalid event so we should clear it out
 			eventPref = "0"
-			userPreferenceService.removePreference("MOVE_EVENT")
+			userPreferenceService.removePreference(PREF.MOVE_EVENT)
 		}
 
 		// Determine what the Selected Event should be with the following rules
@@ -872,15 +871,15 @@ digraph runbook {
 
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
-			userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
 
 		// handle move events
 		def moveEvents = MoveEvent.findAllByProject(project)
-		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
+		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
 		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
 		
 		// handle the view unpublished checkbox
-		def viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
+		def viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
 		
 		return [moveEvents:moveEvents, selectedEventId:selectedEventId, viewUnpublished:viewUnpublished]
 	}
@@ -899,10 +898,10 @@ digraph runbook {
 		// handle the view unpublished checkbox
 		if (params.viewUnpublished && params.viewUnpublished in ['0', '1']) {
 			def viewUnpublishedBoolean = (params.viewUnpublished == '1')
-			userPreferenceService.setPreference("viewUnpublished", viewUnpublishedBoolean.toString())
+			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublishedBoolean.toString())
 		}
 		
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		def publishedValues = [true]
 		if (viewUnpublished)
 			publishedValues = [true, false]
@@ -913,11 +912,11 @@ digraph runbook {
 
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
-			userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
 
 		// handle move events
 		def moveEvents = MoveEvent.findAllByProject(Project.get(projectId))
-		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
+		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
 		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
 		if (selectedEventId == 0) {
 			render ([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
@@ -1280,10 +1279,10 @@ digraph runbook {
 
 		if (params.event) {
 			def eventP = params.event.equals('null') ? "_null" : params.event;
-			userPreferenceService.setPreference("MYTASKS_MOVE_EVENT_ID", eventP)
+			userPreferenceService.setPreference(PREF.MYTASKS_MOVE_EVENT_ID, eventP)
 		}
 		
-		def moveEventId = userPreferenceService.getPreference("MYTASKS_MOVE_EVENT_ID")
+		def moveEventId = userPreferenceService.getPreference(PREF.MYTASKS_MOVE_EVENT_ID)
 		if (moveEventId.equals("_null")) {
 			moveEventId = null
 		}
@@ -1319,7 +1318,7 @@ digraph runbook {
 			def css = taskService.getCssClassForStatus( task.status )
 			issueList << ['item':task,'css':css]
 		}
-		def timeToRefresh =  userPreferenceService.getPreference("MYTASKS_REFRESH")
+		def timeToRefresh =  userPreferenceService.getPreference(PREF.MYTASKS_REFRESH)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 		
@@ -1491,8 +1490,8 @@ function goBack() { window.history.back() }
 	
 		def view = isCleaner ? '_showCleanerTask' : 'showIssue'
 		if(isCleaner){
-			def lblQty= session.getAttribute('printLabelQuantity') ?: userPreferenceService.getPreference( "printLabelQuantity" )
-			def printerName=session.getAttribute('PRINTER_NAME') ?: userPreferenceService.getPreference( "PRINTER_NAME" )
+			def lblQty= session.getAttribute('printLabelQuantity') ?: userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY)
+			def printerName=session.getAttribute('PRINTER_NAME') ?: userPreferenceService.getPreference( PREF.PRINTER_NAME )
 			model << [lblQty:lblQty, prefPrinter:printerName]
 		}
 		render (view:view,model:model)

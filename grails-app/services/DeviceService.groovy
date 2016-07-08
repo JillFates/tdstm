@@ -2,7 +2,6 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale
-import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityAttribute
@@ -10,6 +9,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
+import UserPreferenceEnum as PREF
 
 import org.springframework.transaction.annotation.Transactional
 
@@ -352,9 +352,9 @@ class DeviceService {
 	private void saveUserPreferencesForDevice(AssetEntity device) {
 		// Set some preferences if we were successful
 		if (device.manufacturer)
-			userPreferenceService.setPreference("lastManufacturer", device.manufacturer.name)
+			userPreferenceService.setPreference(PREF.LAST_MANUFACTURER, device.manufacturer.name)
 		if (device.model) 
-			userPreferenceService.setPreference("lastType", device.model.assetType)
+			userPreferenceService.setPreference(PREF.LAST_TYPE, device.model.assetType)
 	}
 
 }

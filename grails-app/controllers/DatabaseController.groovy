@@ -1,32 +1,13 @@
-import grails.converters.JSON
-
-import com.tds.asset.Application
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
-import com.tds.asset.AssetType
 import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.grails.ApplicationConstants
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-
-import com.tdsops.common.sql.SqlUtil
-
-import org.apache.commons.lang.StringEscapeUtils
+import grails.converters.JSON
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
+import UserPreferenceEnum as PREF
 
 class DatabaseController {
 	
@@ -81,7 +62,7 @@ class DatabaseController {
 		def moveBundleList
 		session.DB = [:]
 		
-		userPreferenceService.setPreference("assetListSize", "${maxRows}")
+		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, "${maxRows}")
 		
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
@@ -101,7 +82,7 @@ class DatabaseController {
 				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
-		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
+		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
 		//TODO:need to move the code to AssetEntityService 
 		def temp=""
 		def joinQuery =""

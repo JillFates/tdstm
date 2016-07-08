@@ -1,8 +1,7 @@
+import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import groovy.time.TimeCategory
-
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
+import UserPreferenceEnum as PREF
 
 class WsDashboardController {
 	
@@ -26,7 +25,7 @@ class WsDashboardController {
 		def moveEvent
 		def moveBundle
 		
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		
 		// Validate that the user is legitly accessing the proper move event
 		if (! moveEventId.isNumber() ) {

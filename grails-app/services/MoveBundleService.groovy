@@ -1,28 +1,14 @@
-import org.springframework.dao.IncorrectResultSizeDataAccessException
-
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.AssetType
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.WorkbookUtil
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.StringUtil
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
+import com.tds.asset.*
+import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
+import com.tdssrc.grails.*
 import grails.converters.JSON
-import com.tdsops.tm.asset.graph.*
 import org.apache.poi.ss.usermodel.Cell
-
+import org.codehaus.groovy.grails.web.util.WebUtils
+import UserPreferenceEnum as PREF
 
 class MoveBundleService {
 	
@@ -97,7 +83,7 @@ class MoveBundleService {
 		if( !moveBundleStep ){	
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId)
 		}
-		def session = userPreferenceService.getSession()
+		def session = WebUtils.retrieveGrailsWebRequest().session
 		moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
 		moveBundleStep.planStartTime = TimeUtil.parseDateTime(session, params["startTime_"+transitionId])
@@ -335,7 +321,7 @@ class MoveBundleService {
 			WHERE adb.project_id=${projectId}""")
 			
 			if (dependencyBundle) {
-				def depGroups = JSON.parse(userPreferenceService.getSession().getAttribute('Dep_Groups'))
+				def depGroups = JSON.parse(WebUtils.retrieveGrailsWebRequest().session.getAttribute('Dep_Groups'))
 				if (depGroups.size() == 0) {
 					depGroups = [-1]
 				}
@@ -357,7 +343,7 @@ class MoveBundleService {
 		dependList.removeAll([null])
 		def groups = dependList.dependencyBundle
 		if (dependencyBundle == null)
-			userPreferenceService.getSession().setAttribute( 'Dep_Groups', (groups as JSON).toString() )
+			WebUtils.retrieveGrailsWebRequest().session.setAttribute( 'Dep_Groups', (groups as JSON).toString() )
 	
 		dependList.each { group ->
 			def depGroupsDone = group.statusAssigned + group.statusMoved
@@ -422,10 +408,10 @@ class MoveBundleService {
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 		 
 		def depGrpCrt = projectInstance.depConsoleCriteria ? JSON.parse( projectInstance.depConsoleCriteria ) : [:]
-		def session = userPreferenceService.getSession()
+		def session = WebUtils.retrieveGrailsWebRequest().session
 		def generatedDate = depGrpCrt.modifiedDate ? TimeUtil.formatDateTime(session, depGrpCrt.modifiedDate):''
 		def staffRoles = taskService.getRolesForStaff()
-		def compactPref = userPreferenceService.getPreference('depConsoleCompact')
+		def compactPref = userPreferenceService.getPreference(PREF.DEP_CONSOLE_COMPACT)
 		def map = [ 
 			company:projectInstance.client,
 			asset:'apps',

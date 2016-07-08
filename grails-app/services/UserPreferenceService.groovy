@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession
  * The Service is transactional (http://docs.grails.org/2.3.11/guide/services.html#declarativeTransactions)
  */
 class UserPreferenceService {
+
 	static transactional = true
 	def grailsApplication
 	def securityService
@@ -85,19 +86,30 @@ class UserPreferenceService {
 	/*
 	 * Return current session object
 	 */
-	def HttpSession getSession() {
+	private HttpSession getSession() {
 		return WebUtils.retrieveGrailsWebRequest().session
 	}
 
-	/*
+	/**
 	 * Method to read all of the user's preferences into a MAP and 
 	 * saved into the user's session
+	 *
+	 * @deprecated To Be Removed!!!
 	 */
 	def loadPreferences(String preferenceCode) {
 		def userLogin = securityService.getUserLogin()
 		if (userLogin) {
 			loadPreferences( userLogin, preferenceCode)
 		}
+	}
+
+	/**
+	 * Method to read all of the user's preferences into a MAP and
+	 * saved into the user's session
+	 * THIS METHOD SHOULD BE REMOVED!!! the preferences should be stateless
+	 */
+	def loadPreferences(UserPreferenceEnum preference) {
+		loadPreferences(preference.toString())
 	}
 
 	/*
@@ -186,6 +198,7 @@ class UserPreferenceService {
 	 * the getPreference()
 	 * @param String preferenceCode
 	 * @return String the user's saved preference or null if not found
+	 * @deprecated
 	 */
 	def String getPreference( String preferenceCode ) {
 		loadPreferences(preferenceCode)
@@ -195,6 +208,17 @@ class UserPreferenceService {
 			prefValue = currProj[preferenceCode]
 		}
 		return prefValue
+	}
+
+	/*
+	 * Reads the preference stored in the database for a user instead of the mess that is going on with
+	 * the getPreference()
+	 * @param String preferenceCode
+	 * @return String the user's saved preference or null if not found
+	 * @deprecated
+	 */
+	def String getPreference( UserPreferenceEnum preference ) {
+		return getPreference(preference.toString())
 	}
 
 	/* 
@@ -248,10 +272,10 @@ class UserPreferenceService {
 		return getPreferencesMap(prefKeys)
 	}
 	
-	/*
+	/**
 	 * Method will remove the user preference record for selected preferenceCode and loginUser
+	 * @deprecated
 	 */
-   
 	def removePreference( String preferenceCode ) {
 		def principal = SecurityUtils.subject.principal
 		def userLogin = UserLogin.findByUsername( principal )
@@ -262,15 +286,33 @@ class UserPreferenceService {
 	}
 
 	/**
+	 * Method will remove the user preference record for selected preferenceCode and loginUser
+	 */
+	def removePreference(UserPreferenceEnum preference ) {
+		removePreference(preference.toString())
+	}
+
+	/**
 	 * Used to set the user permission where the user account is looked up through the security service
 	 * @param preferenceCode - the code to set
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
+	 * @deprecated you should rather use setPreference( UserPreferenceEnum, String)
 	 */
 	Boolean setPreference( String preferenceCode, String value ) {
 		def principal = SecurityUtils.subject.principal
 		def userLogin = UserLogin.findByUsername( principal )
 		return setPreference(userLogin, preferenceCode, value)
+	}
+
+	/**
+	 * Used to set the user permission where the user account is looked up through the security service
+	 * @param preferenceCode - the code to set using an ENUM
+	 * @param value - the value to set for the preference
+	 * @return true if the set was successful
+	 */
+	Boolean setPreference( UserPreferenceEnum preferenceCode, String value ) {
+		return setPreference(preferenceCode.toString(), value)
 	}
 
 	/**
@@ -282,6 +324,21 @@ class UserPreferenceService {
 	 * @param preferenceCode - the code to set
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
+	 */
+	Boolean setPreference(UserLogin userLogin, UserPreferenceEnum preference, String value ) {
+		return setPreference(userLogin, preference.toString(), value)
+	}
+
+	/**
+	 * Used to set the user permission for the user account passed into the method.
+	 * Note that if it is setting CURR_PROJ to a new value it will automatically call removeProjectAssociatedPreferences
+	 * to clear out project specific settings.
+	 *
+	 * @param userLogin - the user to set the preference for
+	 * @param preferenceCode - the code to set
+	 * @param value - the value to set for the preference
+	 * @return true if the set was successful
+	 * @deprecated
 	 */
 	Boolean setPreference( UserLogin userLogin, String preferenceCode, String value ) {
 		def saved = false
@@ -461,10 +518,21 @@ class UserPreferenceService {
 	 * @param userLogin
 	 * @param preference
 	 * @return
+	 * @deprecated
 	 */
 	def getPreferenceByUserAndCode(def userLogin, def preference){
 		def userPreference = UserPreference.findByUserLoginAndPreferenceCode(userLogin, preference)
 		return userPreference?.value
+	}
+
+	/**
+	 * get the preference for the given user and preferenceCode
+	 * @param userLogin
+	 * @param preference
+	 * @return
+	 */
+	def getPreferenceByUserAndCode(def userLogin, UserPreferenceEnum preference){
+		return getPreferenceByUserAndCode(userLogin, preference.toString())
 	}
 
 	def deleteSecurityRoles(person) {

@@ -1,36 +1,21 @@
-import groovy.json.JsonSlurper
-
-import java.util.List;
-import java.util.Map;
-
+import com.tds.asset.FieldImportance
+import com.tdsops.common.builder.UserAuditBuilder
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
-
-import com.tds.asset.FieldImportance;
-
-import grails.converters.JSON
-
-import org.codehaus.groovy.grails.web.json.JSONObject
-
-import com.tds.asset.FieldImportance
-import com.tdsops.tm.enums.domain.EntityType
-import com.tdsops.tm.enums.domain.ValidationType
-import com.tdsops.common.builder.UserAuditBuilder
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import org.apache.commons.lang.math.NumberUtils
-import com.tdsops.common.lang.ExceptionUtil
-
-import org.quartz.SimpleTrigger
-import org.quartz.impl.triggers.SimpleTriggerImpl
-import org.quartz.Trigger
-
+import grails.converters.JSON
+import groovy.json.JsonSlurper
 import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang.math.NumberUtils
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
+import UserPreferenceEnum as PREF
 
 class ProjectController {
 	def userPreferenceService
@@ -117,15 +102,15 @@ class ProjectController {
 		def userCompany = loginPerson.company
 
 		// Save and load various user preferences
-		userPreferenceService.setPreference( "CURR_PROJ", "${currProjectInstance.id}" )
-		userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
-		userPreferenceService.loadPreferences("CURR_TZ")
-		userPreferenceService.loadPreferences("CURR_BUNDLE")
-		userPreferenceService.loadPreferences("MOVE_EVENT")
+		userPreferenceService.setPreference(PREF.CURR_PROJ, "${currProjectInstance.id}" )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${userCompany?.id}" )
+		userPreferenceService.loadPreferences(PREF.CURR_TZ)
+		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
+		userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
 
 		def currPowerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
 		if(!currPowerType){
-			userPreferenceService.setPreference( "CURR_POWER_TYPE", "Watts" )
+			userPreferenceService.setPreference(PREF.CURR_POWER_TYPE, "Watts" )
 		}
 
 		def imageId
@@ -422,7 +407,7 @@ class ProjectController {
 			}
 			
 			// Set the projectInstance as CURR_PROJ
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
+			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 
 			// Will create a bundle name TBD and set it as default bundle for project   
 			projectInstance.getProjectDefaultBundle(params["defaultBundleName"])
@@ -601,7 +586,7 @@ class ProjectController {
 	*/
 	def setPower() {
 		def power = params.p
-		userPreferenceService.setPreference( "CURR_POWER_TYPE", power )
+		userPreferenceService.setPreference(PREF.CURR_POWER_TYPE, power )
 		render power
 	}
 	

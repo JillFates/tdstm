@@ -1,18 +1,12 @@
-import org.apache.shiro.SecurityUtils
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.common.security.SecurityUtil
-import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.builder.UserAuditBuilder
-import com.tdsops.tm.enums.domain.ProjectSortProperty
-import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.tm.enums.domain.SortOrder
-import grails.converters.JSON
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.PasswordResetType
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.TimeUtil
+import grails.converters.JSON
+import org.apache.shiro.SecurityUtils
+import UserPreferenceEnum as PREF
 
 class UserLoginController {
 	
@@ -223,7 +217,7 @@ class UserLoginController {
 			def assignedRoles = userPreferenceService.getAssignedRoles( person )
 			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
 			def projectList = personService.getAvailableProjects(person, null, false, new Date() - 30)
-			def projectId = userPreferenceService.getPreferenceByUserAndCode(userLoginInstance, "CURR_PROJ")
+			def projectId = userPreferenceService.getPreferenceByUserAndCode(userLoginInstance, PREF.CURR_PROJ)
 			def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level
 			def isCurrentUserLogin = (currentUser.id == userLoginInstance.id)
 			return [ userLoginInstance : userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId, roleList:roleList,

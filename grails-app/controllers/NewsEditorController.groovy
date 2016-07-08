@@ -1,13 +1,12 @@
 
-import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.converters.JSON
+import org.apache.shiro.SecurityUtils
+import UserPreferenceEnum as PREF
 
 class NewsEditorController {
 	
@@ -40,10 +39,10 @@ class NewsEditorController {
 		def moveEventId = params.moveEvent
 		def moveEvent
 		if(moveEventId){
-			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEventId}" )
 			moveEvent = MoveEvent.findById(moveEventId)
 		} else {
-			userPreferenceService.loadPreferences("MOVE_EVENT")
+			userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
 			def defaultEvent = getSession().getAttribute("MOVE_EVENT")
 			if(defaultEvent?.MOVE_EVENT){
 				moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
@@ -78,7 +77,7 @@ class NewsEditorController {
 		def assetCommentsList
 		def moveEventNewsList
 		def offset = params.offset
-		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 		def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
 		def moveEventsList = MoveEvent.findAllByProject(projectInstance)
 		def moveEvent = MoveEvent.read(params.moveEvent)
@@ -190,7 +189,7 @@ class NewsEditorController {
 		def bundleId = params.moveBundle
 		def viewFilter = params.viewFilter
 		def moveBundleInstance = null
-		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 		def moveEvent = MoveEvent.read(params.moveEvent)
 		if(bundleId){
 			moveBundleInstance = MoveBundle.findById(bundleId)

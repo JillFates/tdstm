@@ -68,6 +68,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import com.tdsops.tm.asset.graph.AssetClassUtil
+import UserPreferenceEnum as PREF
 
 class AssetEntityController {
 
@@ -163,7 +164,7 @@ class AssetEntityController {
 	def filter() {
 		if (params.rowVal) {
 			if (!params.max) params.max = params.rowVal
-			userPreferenceService.setPreference( "MAX_ASSET_LIST", "${params.rowVal}" )
+			userPreferenceService.setPreference(PREF.MAX_ASSET_LIST, "${params.rowVal}" )
 		} else {
 			def userMax = getSession().getAttribute("MAX_ASSET_LIST")
 			if ( userMax.MAX_ASSET_LIST ) {
@@ -1917,7 +1918,7 @@ class AssetEntityController {
 		def assetCommentsList = []
 		def today = new Date()
 		def css //= 'white'
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		assetCommentsInstance.each {
 			css = it.dueDate < today ? 'Lightpink' : 'White'
 
@@ -2333,7 +2334,7 @@ class AssetEntityController {
 	def retrieveManufacturersList() {
 		def assetType = params.assetType
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
-		def prefVal =  userPreferenceService.getPreference("lastManufacturer")
+		def prefVal =  userPreferenceService.getPreference(PREF.LAST_MANUFACTURER)
 		def selectedManu = prefVal ? Manufacturer.findByName( prefVal )?.id : null
 		render (view :'manufacturerView' , model:[manufacturers : manufacturers, selectedManu:selectedManu,forWhom:params.forWhom ])
 	}
@@ -2342,7 +2343,7 @@ class AssetEntityController {
 	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
 	 */
 	def setShowAllPreference() {
-		userPreferenceService.setPreference("showAllAssetTasks", params.selected=='1' ? 'TRUE' : 'FALSE')
+		userPreferenceService.setPreference(PREF.SHOW_ALL_ASSET_TASKS, params.selected=='1' ? 'TRUE' : 'FALSE')
 		render true
 	}
 	
@@ -2350,7 +2351,7 @@ class AssetEntityController {
 	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
 	 */
 	def setViewUnpublishedPreference () {
-		userPreferenceService.setPreference("viewUnpublished", (params.viewUnpublished == '1' || params.viewUnpublished == 'true') ? ('true') : ('false'))
+		userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, (params.viewUnpublished == '1' || params.viewUnpublished == 'true') ? ('true') : ('false'))
 		render true
 	}
 	
@@ -2387,7 +2388,7 @@ class AssetEntityController {
 			
 			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {
 				def viewUnpublishedBoolean = (params.viewUnpublished == '1')
-				userPreferenceService.setPreference("viewUnpublished", viewUnpublishedBoolean.toString())
+				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublishedBoolean.toString())
 			}
 			
 			params.commentType = AssetCommentType.TASK
@@ -2419,7 +2420,7 @@ class AssetEntityController {
 			def moveEvent
 			
 			if (params.containsKey("justRemaining")) {
-				userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
+				userPreferenceService.setPreference(PREF.JUST_REMAINING, params.justRemaining)
 			}
 			if ( params.moveEvent?.size() > 0) {
 				// zero (0) = All events
@@ -2432,7 +2433,7 @@ class AssetEntityController {
 				}
 			} else {
 				// Try getting the move Event from the user's session
-				def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
+				def moveEventId = userPreferenceService.getPreference(PREF.MOVE_EVENT)
 				// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
 				if (moveEventId) {
 					moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
@@ -2440,16 +2441,16 @@ class AssetEntityController {
 			}
 			if (moveEvent && params.section != 'dashBoard') {
 				// Add filter to SQL statement and update the user's preferences
-				userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
+				userPreferenceService.setPreference( PREF.MOVE_EVENT, "${moveEvent.id}" )
 				filterEvent = moveEvent.id
 			} else {
-				userPreferenceService.removePreference( 'MOVE_EVENT' );
+				userPreferenceService.removePreference(PREF.MOVE_EVENT);
 			}
-			def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
+			def justRemaining = userPreferenceService.getPreference(PREF.JUST_REMAINING) ?: "1"
 			// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 			def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-			def viewUnpublished = (userPreferenceService.getPreference("viewUnpublished") == 'true') ? '1' : '0'
-			def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
+			def viewUnpublished = (userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true') ? '1' : '0'
+			def timeToRefresh = userPreferenceService.getPreference(PREF.TASKMGR_REFRESH)
 			def entities = assetEntityService.entityInfo( project )
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 			def companiesList = partyRelationshipService.getCompaniesList()
@@ -2461,7 +2462,7 @@ class AssetEntityController {
 					category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList, viewUnpublished : viewUnpublished,
 					staffRoles:taskService.getTeamRolesForTasks(), taskPref:taskPref, attributesList: assetCommentFields.keySet().sort{it}, modelPref:modelPref,
 					//staffRoles:taskService.getRolesForStaff(), 
-					sizePref:userPreferenceService.getPreference("assetListSize")?: '25',
+					sizePref:userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE)?: '25',
 					partyGroupList: companiesList,
 					company: project.client]
 		} catch (RuntimeException uex) {
@@ -2560,7 +2561,7 @@ class AssetEntityController {
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		
-		userPreferenceService.setPreference("assetListSize", "${maxRows}")
+		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, "${maxRows}")
 
 		def project = securityService.getUserCurrentProject()
 		def person = securityService.getUserLoginPerson()
@@ -2578,14 +2579,14 @@ class AssetEntityController {
 			}
 		} else {
 			// Try getting the move Event from the user's session
-			def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
+			def moveEventId = userPreferenceService.getPreference(PREF.MOVE_EVENT)
 			// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
 			if (moveEventId) {
 				moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
 			}
 		}
 		if (moveEvent) {
-			userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEvent.id}" )
 		}
 		
 		def assetType = params.filter  ? ApplicationConstants.assetFilters[ params.filter ] : []
@@ -2599,7 +2600,7 @@ class AssetEntityController {
 		def durations = params.duration ? AssetComment.findAll("from AssetComment where project =:project \
 			and duration like '%${params.duration}%'",[project:project])?.duration : []
 			
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 
 		// TODO TM-2515 - SHOULD NOT need ANY of these queries as they should be implemented directly into the criteria
 		def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%${params.dueDate}%' ",[project:project])?.dueDate : []
@@ -3232,7 +3233,7 @@ class AssetEntityController {
 				moveEventList.sort{it?.name}
 				
 				def defaultPrefs = ['colorBy':'group', 'appLbl':'true', 'maxEdgeCount':'4']
-				def graphPrefs = userPreferenceService.getPreference('depGraph', loginUser)
+				def graphPrefs = userPreferenceService.getPreference(PREF.DEP_GRAPH, loginUser)
 				def prefsObject = [:]
 				if (graphPrefs)
 					prefsObject = JSON.parse(graphPrefs)
@@ -4588,7 +4589,7 @@ class AssetEntityController {
 		assetClassesForSelect.put('ALL', 'All Classes');
 		
 		def defaultPrefs = ['levelsUp':'0', 'levelsDown':'3', 'showCycles':true, 'appLbl':true, 'labelOffset':'2', 'assetClasses':'ALL']
-		def graphPrefs = userPreferenceService.getPreference('archGraph', loginUser)
+		def graphPrefs = userPreferenceService.getPreference(PREF.ARCH_GRAPH, loginUser)
 		def prefsObject = [:]
 		if (graphPrefs)
 			prefsObject = JSON.parse(graphPrefs)

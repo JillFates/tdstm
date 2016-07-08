@@ -5,6 +5,7 @@ import com.tds.asset.AssetEntity
 
 import org.apache.commons.lang.math.NumberUtils 
 import org.apache.commons.lang.StringUtils
+import UserPreferenceEnum as PREF
 
 class RoomService {
 	
@@ -206,7 +207,7 @@ class RoomService {
 		}
 
 		def skippedRooms = []
-		def userPrefRoom = userPreferenceService.getPreference("CURR_ROOM")
+		def userPrefRoom = userPreferenceService.getPreference(PREF.CURR_ROOM)
 		if (! roomIds instanceof List)
 			roomIds = [ roomIds ]
 
@@ -253,7 +254,7 @@ class RoomService {
 				// Clear out the user's room preference if it was deleted
 				// TODO : JPM 9/2014 : Should delete ALL users CURR_ROOM preference when deleting a room if they exist for the room. Add to Preference service.
 				if (roomId == userPrefRoom)
-					userPreferenceService.removePreference("CURR_ROOM")
+					userPreferenceService.removePreference(PREF.CURR_ROOM)
 
 			} catch (org.springframework.dao.DataIntegrityViolationException e) {
 				log.info "Unable to delete room ($room) due to integrity violation : ${e.getMessage()}"

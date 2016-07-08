@@ -1,22 +1,15 @@
-import java.util.Date
-
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
-
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
-
 import com.tds.asset.*
-import com.tds.asset.AssetComment
-import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
-
-import org.quartz.SimpleTrigger
-import org.quartz.impl.triggers.SimpleTriggerImpl
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
+import org.codehaus.groovy.grails.web.util.WebUtils
 import org.quartz.Trigger
-import org.quartz.JobDetail
+import org.quartz.impl.triggers.SimpleTriggerImpl
+import UserPreferenceEnum as PREF
 
 /**
  * CommentService class contains methods used to manage comments/tasks
@@ -528,7 +521,7 @@ class CommentService {
 		log.info "sendTaskEMail: taskId=${taskId} to=${assignedTo.id}/${assignedTo.email}"
 		
 		if(assignedTo?.userLogin){
-			def dateFormat = userPreferenceService.getPreferenceByUserAndCode(assignedTo?.userLogin, "CURR_DT_FORMAT")
+			def dateFormat = userPreferenceService.getPreferenceByUserAndCode(assignedTo?.userLogin, PREF.CURR_DT_FORMAT)
 			if(dateFormat){
 				userDTFormat = dateFormat
 			}
@@ -636,7 +629,7 @@ class CommentService {
 		def dtCreated
 		def dtResolved
 		def project = securityService.getUserCurrentProject()
-		def session = userPreferenceService.getSession()
+		def session = WebUtils.retrieveGrailsWebRequest().session
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment){
 			if(assetComment.createdBy){

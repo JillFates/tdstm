@@ -1,4 +1,3 @@
-import java.util.Date
 
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
@@ -8,6 +7,7 @@ import org.apache.shiro.SecurityUtils
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import UserPreferenceEnum as PREF
 
 class ProjectUtilController {
 
@@ -29,7 +29,7 @@ class ProjectUtilController {
 			if (projectInstance) {
 				redirect( controller:"project", action:"show")
 			} else {
-				userPreferenceService.removePreference("CURR_PROJ")
+				userPreferenceService.removePreference(PREF.CURR_PROJ)
 				if (params.message) {
 					flash.message = params.message
 				}
@@ -78,7 +78,7 @@ class ProjectUtilController {
 
 		def projectInstance = Project.findByProjectCode(params.selectProject)
 
-		userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		userPreferenceService.setPreference( PREF.CURR_PROJ, "${projectInstance.id}" )
 
 		redirect(controller:'project', action:"show", id: projectInstance.id )
 	}
@@ -202,7 +202,7 @@ class ProjectUtilController {
 					}
 				}
 
-				userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+				userPreferenceService.setPreference( PREF.CURR_PROJ, "${projectInstance.id}" )
 				redirect(controller:'project', action:'show', id: projectInstance.id)
 
 			} else {

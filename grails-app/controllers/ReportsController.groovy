@@ -1,41 +1,22 @@
-import grails.converters.JSON
-import groovy.time.TimeCategory
-
-import java.io.*
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.poi.*
-import org.apache.poi.hssf.usermodel.HSSFSheet
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.hssf.usermodel.HSSFCellStyle
-import org.apache.poi.ss.usermodel.Font
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.IndexedColors
-
-import org.apache.commons.lang.math.NumberUtils
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.apache.commons.lang.math.NumberUtils
-
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.*
+import com.tds.util.workbook.*
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
-import com.tdssrc.grails.NumberUtil
-import com.tds.util.workbook.*
-import com.tdsops.common.lang.ExceptionUtil
+import grails.converters.JSON
+import groovy.time.TimeCategory
+import org.apache.commons.lang.math.NumberUtils
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Font
+import org.apache.shiro.SecurityUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import UserPreferenceEnum as PREF
 
 class ReportsController {
 	
@@ -81,7 +62,7 @@ class ReportsController {
 				break
 			case "Task Report":
 					def moveEventInstanceList  = MoveEvent.findAllByProject(projectInstance,[sort:'name'])
-					def viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
+					def viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
 				render( view:'taskReport',
 					model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance, viewUnpublished:viewUnpublished])
 				break
@@ -758,7 +739,7 @@ class ReportsController {
 			return
 		}
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		/* set first bundle as default if user pref not exist */
 		def isCurrentBundle = true
@@ -949,7 +930,7 @@ class ReportsController {
 				log.warn "generateCheckList: User tried to access moveEvent ${moveEventId} that was not found in project : ${project}"
 			} else {
 				errorMsg = ""
-				userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+				userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEventId}" )
 				moveEventInstance = MoveEvent.get(moveEventId)
 				return reportsService.generatePreMoveCheckList(project.id, moveEventInstance)
 			}
@@ -1085,7 +1066,7 @@ class ReportsController {
 			} else {
 				assetComment = "blank"
 			}
-			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+			def prefValue= userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)	
 			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
 			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
@@ -1134,7 +1115,7 @@ class ReportsController {
 				log.warn "generateCheckList: User tried to access moveBundle ${moveBundleId} that was not found in project : ${project}"
 			} else {
 				errorMsg = ""
-				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
+				userPreferenceService.setPreference(PREF.MOVE_BUNDLE, "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				//def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList)
 				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, false, appOwner, assetCap)//.add(['time':])
@@ -1185,9 +1166,9 @@ class ReportsController {
 			
 			// handle unpublished tasks
 			if (params.viewUnpublished)
-				userPreferenceService.setPreference("viewUnpublished", 'true')
+				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'true')
 			else
-				userPreferenceService.setPreference("viewUnpublished", 'false')
+				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'false')
 			
 			def viewUnpublished = RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished
 			if (!viewUnpublished) {
@@ -1245,7 +1226,7 @@ class ReportsController {
 			'estStart','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
 			'dueDate', 'dateCreated', 'createdBy', 'moveEvent']
 					
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, userDTFormat, 7, viewUnpublished)
 		
 		book.write(response.getOutputStream())
@@ -1261,7 +1242,7 @@ class ReportsController {
 	def exportTaskReportPdf(taskList, tzId, project){
 		def currDate = new Date()
 		def reportFields = []
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		taskList.each{task ->
 			
 			def visibleDependencies = []
@@ -1347,7 +1328,7 @@ class ReportsController {
 				log.warn "generateCheckList: User tried to access moveBundle ${moveBundleId} that was not found in project : ${project}"
 			} else {
 				errorMsg = ""
-				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
+				userPreferenceService.setPreference(PREF.MOVE_BUNDLE, "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, false, params, assetCap))
 				
@@ -1496,7 +1477,7 @@ class ReportsController {
 				log.warn "generateCheckList: User tried to access moveBundle ${moveBundleId} that was not found in project : ${project}"
 			} else {
 				errorMsg = ""
-				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
+				userPreferenceService.setPreference(PREF.MOVE_BUNDLE, "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, false, assetCap)
 				
