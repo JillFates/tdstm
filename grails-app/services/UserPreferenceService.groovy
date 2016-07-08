@@ -2,15 +2,14 @@ import com.tdsops.common.validation.ConstraintsValidator
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.web.util.WebUtils
-import org.springframework.web.context.request.RequestContextHolder
 
 import javax.servlet.http.HttpSession
-// TODO : JPM 6/2015 : Why are all of these packages being loaded???
+
 class UserPreferenceService {
 
 	static transactional = true
+	def grailsApplication
 	def securityService
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
@@ -88,7 +87,6 @@ class UserPreferenceService {
 	 */
 	def HttpSession getSession() {
 		return WebUtils.retrieveGrailsWebRequest().session
-		//return RequestContextHolder.currentRequestAttributes().getSession()
 	}
 
 	/*
@@ -497,13 +495,11 @@ class UserPreferenceService {
 		return true
 	}
 	/**
-	 * 
+	 * Return the File Stored Timezones
 	 */
 	def timezonePickerAreas() {
-		File worldMapAreasFile = ApplicationHolder.application.parentContext.getResource( "/templates/timezone/world_map_areas.json" ).getFile()
-
+		File worldMapAreasFile = grailsApplication.parentContext.getResource( "/templates/timezone/world_map_areas.json" ).getFile()
 		def timezones = JSON.parse(worldMapAreasFile.text)
-
 		return timezones
 	}
 
