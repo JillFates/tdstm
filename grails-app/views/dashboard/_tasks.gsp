@@ -69,7 +69,7 @@
 	</table>
 </div>
 <span class="leftFloated effort">
-	<g:if test="${taskList.size() = 0}">
+	<g:if test="${taskList.size() == 0}">
 		No active tasks were found.
 	</g:if>
 	<g:else>
