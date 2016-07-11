@@ -619,7 +619,8 @@
                             fields: {
                                 personId: { type: "string" },
                                 projectName: { type: "string" },
-                                personName: { type: "string" }
+                                personName: { type: "string" },
+                                lastActivity: { type: "string" }
                             }
                         }
                     }
@@ -636,6 +637,10 @@
                     {
                         field: "personName",
                         title: "Name"
+                    },
+                    {
+                        field: "lastActivity",
+                        title: "Latest Activity"
                     }
                 ],
                 selectable: "row",

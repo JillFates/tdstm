@@ -400,7 +400,8 @@ class DashboardController {
 					[
 							personId: login.personId,
 							projectName: login.projectName,
-							personName: login.personName
+							personName: login.personName,
+							lastActivity: login.lastActivity,
 					])
 		}
 

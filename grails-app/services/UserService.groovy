@@ -524,7 +524,7 @@ class UserService implements InitializingBean {
 	 */
 	def getTaskSummary ( project ){
 		
-		def timeInMin =0
+		def timeInMin = 0
 		def issueList = []
 		def person = securityService.getUserLoginPerson()
 		
@@ -542,7 +542,7 @@ class UserService implements InitializingBean {
 				}
 			}
 		}
-		if(project=="All"){
+		if (project == "All") {
 			issueList:issueList.sort{it.item.score}
 		}
 		def dueTaskCount = issueList.item.findAll {it.duedate && it.duedate < TimeUtil.nowGMT()}.size()
@@ -597,7 +597,7 @@ class UserService implements InitializingBean {
 		}
 		def projectIdsAsValue = projectIds.join(",")
 
-		def query = new StringBuffer("SELECT p.person_id, ul.user_login_id, p.first_name, p.last_name, p.middle_name, proj.project_id, pg.name AS project_name")
+		def query = new StringBuffer("SELECT p.person_id, ul.user_login_id, p.first_name, p.last_name, p.middle_name, proj.project_id, pg.name AS project_name, ul.last_page AS lastPage")
 			.append(" FROM (")
 			.append("     SELECT user_login_id, CAST(value AS UNSIGNED INTEGER) AS project_id")
 			.append("     FROM user_preference")
@@ -614,8 +614,9 @@ class UserService implements InitializingBean {
 
 		if (users.size() > 0) {
 			users.each{ r ->
+				def person = Person.get(r.person_id)
 				personName = ( r.last_name ? "${r.last_name}, ": '' ) + r.first_name + ( r.middle_name ? " $r.middle_name" : '' )
-				recentLogin << ['personId': r.person_id, 'projectName': r.project_name, 'personName': personName]
+				recentLogin << ['personId': r.person_id, 'projectName': r.project_name, 'personName': person.toString(), 'lastActivity':r.lastPage]
 			}
 		}
 
