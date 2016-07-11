@@ -645,7 +645,7 @@
             function onChange() {
                 if(this.select) {
                     var selectedItem = $("#gridActivePeople").data("kendoGrid").dataItem(this.select());
-                    getUserDetails(selectedItem.personId);
+                    Person.showPersonDialog(selectedItem.personId,'generalInfoShow');
                 }
             }
         }
