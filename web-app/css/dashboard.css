@@ -182,32 +182,10 @@ Css for client dashboard
 	color:#000;
 	line-height:26px;
 }
-#bodytop{
-	min-height:175px;
-	margin-left: 8%;
-}
 
 #bodytopl{
 	float:left;
 	}
-
-#topindleft{
-	float:left;
-	margin-top:-1px;
-	text-align:center;
-	font-size:18px;
-	font-weight:bold;
-	}
-
-.topleftcontent{
-	float:left;
-	text-align:center;
-	width:300px;
-	margin-top:6px;
-	font-size:13px;
-	line-height:24px;
-	}
-
 #bodytopr{
 	float:right;
 	}
@@ -735,13 +713,7 @@ list-style-type:none;
 	padding-right: 5px;
 	font-weight: bold;
 }
-input, select, textarea {
-	background-color:#FCFCFC;
-	border:1px solid #CCCCCC;
-	font:11px arial,helvetica,sans-serif;
-	margin:2px 0;
-	padding:2px 4px;
-}
+
 .Arrowcursor{
 	cursor:pointer;
 }

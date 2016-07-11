@@ -11,237 +11,238 @@
 	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="TimerBar.js" />
+	<style>
+		/*TODO: REMOVE ON COMPLETE MIGRATION */
+		div.content-wrapper {
+			background-color: #ecf0f5 !important;
+		}
+	</style>
 </head>
 <body>
-<div class="body_bg">
-	<input type="hidden" id="timeBarValueId" value="0"/>
-	<div class="taskTimebar hide" id="issueTimebar"  style="float: none !important;">
-		<div id="issueTimebarId"></div>
-	</div>
-	<a name="page_up"></a>
-	<div id="doc">
-		<div id="bodycontent">
-			<div id="header">
-				<div style="float: left; padding-top: 2px;">
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		Event Dashboard
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#">Dashboards</a></li>
+		<li><a href="#">Live</a></li>
+		<li class="active">Event</li>
+	</ol>
+</section>
+<!-- Main content -->
+<section class="dashboard-event-wrapper">
+	<div>
+		<div class="box-body">
+			<div class="box box-primary">
+				<div class="box-header with-border">
 					<g:form action="index" controller="dashboard" name="dashboardForm">
-						<span>
-							<label for="moveEvent"><b>Event:</b></label>&nbsp;
-							<select id="moveEvent" name="moveEvent" onchange="submitForm();">
-								<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
-									<option value="${moveEventInstance?.id}">
-										${moveEventInstance?.name}
-									</option>
-								</g:each>
-							</select>
-							<tds:hasPermission permission="PublishTasks">
-								<span class="checkboxContainer">
-									&nbsp;&nbsp;
-									<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="toggleUnpublished(event)"/><!--
+						<div style="float: left; padding-top: 2px;">
+							<span>
+								<label for="moveEvent"><b>Event:</b></label>&nbsp;
+								<select id="moveEvent" name="moveEvent" onchange="submitForm();">
+									<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
+										<option value="${moveEventInstance?.id}">
+											${moveEventInstance?.name}
+										</option>
+									</g:each>
+								</select>
+								<tds:hasPermission permission="PublishTasks">
+									<span class="checkboxContainer">
+										&nbsp;&nbsp;
+										<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="toggleUnpublished(event)"/><!--
 									--><label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
-								</span>
-							</tds:hasPermission>
-						</span>
+									</span>
+								</tds:hasPermission>
+							</span>
+						</div>
+						<div style="float: right; width: 150px; padding-top: 2px;">
+							<div style="float: right;">
+								<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
+							</div>
+							<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
+						</div>
+						<input type="hidden" id="typeId" value="${params.type}">
+						<input type="hidden" id="stateId" value="${params.state}">
+						<input type="hidden" id="maxLenId" value="${params.maxLen}">
+						<input type="hidden" id="sortId" value="${params.sort}">
+						<g:set value="${project?.runbookOn}" var="runbookOn"></g:set>
 					</g:form>
-				</div>
-				<div style="float: right; width: 150px; padding-top: 2px;">
-					<div style="float: right;">
-						<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
+				</div><!-- /.box-header -->
+				<div>
+					<input type="hidden" id="timeBarValueId" value="0"/>
+					<div class="taskTimebar hide" id="issueTimebar"  style="float: none !important;">
+						<div id="issueTimebarId"></div>
 					</div>
-					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
-				</div>
-				<input type="hidden" id="typeId" value="${params.type}"> 
-				<input type="hidden" id="stateId" value="${params.state}"> 
-				<input type="hidden" id="maxLenId" value="${params.maxLen}"> 
-				<input type="hidden" id="sortId" value="${params.sort}">
-				<g:set value="${project?.runbookOn}" var="runbookOn"></g:set>
-			</div>
-			<!-- Header Ends here-->
-			<div id="bodytop">
-				<div id="plan_summary">
-					<div id="topindleft">
-						<div id="summary_gauge_div" align="center">
-							<g:if test="${manualOverrideViewPermission}">
-								<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();"> 
-									<img id="summary_gauge" alt="Event Summary" src="${resource(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
-								</a>
-							</g:if>
-							<g:else>
-								<img id="summary_gauge" alt="Event Summary" src="${resource(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
-							</g:else>
-						</div>
-						Event Status vs. Plan <br /> 
-						<span id="manualSumStatusSpan" style="display: none; width: 10px;"> 
-							<input type="hidden" name="manual" value="M" id="checkBoxId" /> 
-							<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3"
-								onblur="validateManulaSummary(this.value)" />&nbsp; 
-							<input type="button" value="Save" onclick="changeEventSummary()" />
-						</span>
-					</div>
-					<div class="topleftcontent">
-						<!--Planned Completion<br>
-						12/12: 07:00 AM EST&#13;
-						<span id="spanPlanned"></span><br>-->
-						<span id="eventDescription" style="text-align: center;font-size: 1.5em;"></span><br />
-						<span id="eventStringId"></span><br />
-						<span id="plannedStart" style="text-align: center;font-size: 3em;"></span><br />
-						<i><span style=" margin-left: 2%;">days</span><span style=" margin-left: 7%;">hours</span><span style=" margin-left: 9%;">mins</span></i><br />
-						 <br /><b>Runbook Status:</b>&nbsp;<span id="eventRunbook"></span>
-					</div>
-				</div>
-				<div id="newstop">
-					<div id="newsheading"></div>
-					<div id="newsmenu">
-						<ul id="newstabs" class="shadetabs">
-							<li>
-								<a href="#" rel="news_live_div" class="selected">Event News</a>
-							</li>
-							<li>
-								<a href="#" rel="news_archived_div" onmouseup="javascript:setCrossobjTop()">Archive</a>
-							</li>
-						</ul>
-					</div>
-					<div style="float: left; margin-left: 5px; margin-top:4px;">
-						<input class="Arrowcursor" type="button" value="Add News" onclick="opencreateNews()">
-					</div>
-				</div>
-				<div style="clear: both"></div>
-				<div id="newsblock">
-					<div id="newsbox">
-						<div id="container" style="position: absolute; width: 50%; height: 120px; overflow: hidden; border: 0px solid grey">
-							<div id="content" style="position: relative; width: 70%; left: 0px; top: -5px">
-								<div id="news_live_div" class="tabcontent">
-									<ul id="news_live" class="newscroll"></ul>
-								</div>
-								<div id="news_archived_div" class="tabcontent">
-									<ul id="news_archived" class="newscroll"></ul>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div id="newsarrows">
-						<div id="toparrow">
-							<a href="javascript:moveup()">
-								<img src="${resource(dir:'images',file:'up_arrow.png')}" alt="scroll up" width="10" height="6" border="0" />
-							</a>
-						</div>
-						<div id="bottomarrow">
-							<a href="javascript:movedown()">
-								<img src="${resource(dir:'images',file:'down_arrow.png')}" alt="scroll down" width="10" height="6" border="0" />
-							</a>
-						</div>
-					</div>
-				</div>
-				<!-- Removed revised_summary section -->
-			</div>
-			<!-- News section starts here-->
-			<div id="newssection">
-				<div id="taskSummary">
-					<g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration, teamTaskMap:teamTaskMap, roles:roles]"></g:render>
-				</div>
-			</div>
-			<!-- News section ends here-->
-			<!-- Bundle Sections starts here-->
-			<div id="bdlsection">
-				<div id="bdltabs">
-	 				<span style="line-height: 28px;">&nbsp;</span>
-					<g:each in="${moveBundleList}" status="i" var="moveBundle">
-						<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="updateDash(${moveBundle.id})">
-							${moveBundle.name}
-						</span>&nbsp;&nbsp;
-					</g:each>
-				</div>
-				<div id="leftcol">
-					<ul id="btitle">
-						<li>Step</li>
-						<li>&nbsp;</li>
-						<g:if test="${runbookOn == 1 }">
-							<li><span class="percentage">Tasks</span></li>
-						</g:if>
-						
-						<li>Planned Start</li>
-						<li>Planned&nbsp;Completion</li>
-						<li>Actual Start</li>
-						<li>Actual&nbsp;Completion</li>
-					</ul>
-				</div>
-				<div id="leftarrow">
-					<a href="javascript:void(0);" id="move-left">
-						<img src="${resource(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
-					</a>
-				</div>
-				<div class="mod">
-					<div id="themes">
-						<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}" id="defaultBundleId">
-						<g:each in="${moveBundleList}" status="i" var="moveBundle">
-							<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
-								<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}"
-									status="j" var="moveBundleStep">
-									<div style="float: left; width: 130px;">
-										<ul class="bdetails">
-											<li class="heading" title="${moveBundleStep.label}">
-												<g:if test="${moveBundleStep.label.length()>10}">
-														${moveBundleStep.label.substring(0,11)}..
-												</g:if>
-												<g:else>
-														${moveBundleStep.label}
-												</g:else>
-											</li>
-											<li id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}"></li>
-											<g:if test="${runbookOn == 1 }">
-												 <li class="tasks" id="tasks_${moveBundle.id}_${moveBundleStep.transitionId}">&nbsp</li>
-											</g:if>
-											<li class="schstart">
-												<span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
-											</li>
-											<li class="schfinish">
-												<span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
-											</li>
-											<li class="actstart" id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}">
-												 <span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
-											</li>
-											<li class="actfinish" id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}">
-												 <span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
-											</li>
-										</ul>
-										<!-- <div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
-											<tds:hasPermission permission='ViewPacingMeters'>
-												<img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
-													src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
-											</tds:hasPermission>
-										</div> -->
+					<div class="general-event-info-wrapper">
+						<div class="row">
+							<div class="col-md-3">
+								<div class="gauge-graph-wrapper">
+									<div id="summary_gauge_div" align="center">
+										<g:if test="${manualOverrideViewPermission}">
+											<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();">
+												<img id="summary_gauge" alt="Event Summary" src="${resource(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
+											</a>
+										</g:if>
+										<g:else>
+											<img id="summary_gauge" alt="Event Summary" src="${resource(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
+										</g:else>
 									</div>
-								</g:each>
+									Event Status vs. Plan <br />
+									<span id="manualSumStatusSpan" style="display: none; width: 10px;">
+										<input type="hidden" name="manual" value="M" id="checkBoxId" />
+										<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3"
+											onblur="validateManulaSummary(this.value)" />&nbsp;
+										<input type="button" value="Save" onclick="changeEventSummary()" />
+									</span>
+								</div>
 							</div>
-						</g:each>
+							<div class="col-md-4">
+								<div class="elapsed-time-wrapper">
+									<span id="eventDescription" style="text-align: center;font-size: 1.5em;"></span><br />
+									<span id="eventStringId"></span><br />
+									<span id="plannedStart" style="text-align: center;font-size: 3em;"></span><br />
+									<i><span style=" margin-left: 2%;">days</span><span style=" margin-left: 7%;">hours</span><span style=" margin-left: 9%;">mins</span></i><br />
+									 <br /><b>Runbook Status:</b>&nbsp;<span id="eventRunbook"></span>
+								</div>
+							</div>
+							<!-- START TABAS FOR EVENT, ARCHIVE, ADD NEWS -->
+							<div class="col-md-5">
+								<div class="tab-items-wrapper">
+									<!-- Nav tabs -->
+									<ul class="nav nav-tabs" role="tablist">
+										<li role="presentation" class="active"><a href="#eventNews" aria-controls="eventNews" role="tab" data-toggle="tab">Event News</a></li>
+										<li role="presentation"><a href="#archive" aria-controls="archive" role="tab" data-toggle="tab">Archive</a></li>
+										<li role="presentation"><button type="button" class="btn-add-news btn btn-primary" onclick="opencreateNews()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add News</button></li>
+									</ul>
+
+									<!-- Tab panes -->
+									<div class="tab-content">
+										<div role="tabpanel" class="tab-pane active" id="eventNews">
+											<ul id="news_live" class="newscroll"></ul>
+										</div>
+										<div role="tabpanel" class="tab-pane" id="archive">
+											<ul id="news_archived" class="newscroll"></ul>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- ENDS TABS FOR EVENT, ARCHIVE, ADD NEWS -->
+						</div>
 					</div>
 				</div>
-				<div id="rightarrow">
-					<a href="javascript:void(0);" id="move-right">
-						<img src="${resource(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
-					</a>
-				</div>
-			</div>
-			<div style="text-align: right; padding: 4px 0px;">
-				<%--<a href="#page_up" class="nav_button" style="nowrap:nowrap;">Page Up</a> --%>
 			</div>
 		</div>
-		
-		<!-- Bundle Sections ends here-->
-		
-		<!-- Footer starts here-->
-		<div style="clear: both"></div>
-		<!--<div id="crawler">
-		<div id="mycrawler"><div id="mycrawlerId" style="width: 900px;margin-top: -6px;" >.</div></div>
-	</div>-->
-		<!-- Footer Ends here-->
-		<!-- Body Ends here-->
-		<a name="page_down"></a>
+		<!-- /.box-body -->
 	</div>
-	
-	<div id="createNews" title="Create News" style="display: none;" class="static-dialog">
-		<form id="createNewsForm">
-			<input type="hidden" name="mode" value="ajax">
-			<input type="hidden" name="moveEvent.id" value="${moveEvent?.id}" id="moveEventId">
+</section>
+<section class="dashboard-task-summary-wrapper">
+	<div>
+		<div class="box-body">
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">Task Summary</h3>
+				</div><!-- /.box-header -->
+			<!-- News section starts here-->
+				<div id="newssection">
+					<div id="taskSummary">
+						<g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration, teamTaskMap:teamTaskMap, roles:roles]"></g:render>
+					</div>
+				</div>
+				<!-- News section ends here-->
+				<!-- Bundle Sections starts here-->
+				<div id="bdlsection">
+					<div id="bdltabs">
+						<span>&nbsp;</span>
+						<g:each in="${moveBundleList}" status="i" var="moveBundle">
+							<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="updateDash(${moveBundle.id})">
+								${moveBundle.name}
+							</span>&nbsp;&nbsp;
+						</g:each>
+					</div>
+					<div id="leftcol">
+						<ul id="btitle">
+							<li>Step</li>
+							<li>&nbsp;</li>
+							<g:if test="${runbookOn == 1 }">
+								<li><span class="percentage">Tasks</span></li>
+							</g:if>
+
+							<li>Planned Start</li>
+							<li>Planned&nbsp;Completion</li>
+							<li>Actual Start</li>
+							<li>Actual&nbsp;Completion</li>
+						</ul>
+					</div>
+					<div id="leftarrow">
+						<a href="javascript:void(0);" id="move-left">
+							<img src="${resource(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
+						</a>
+					</div>
+					<div class="mod">
+						<div id="themes">
+							<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}" id="defaultBundleId">
+							<g:each in="${moveBundleList}" status="i" var="moveBundle">
+								<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
+									<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}"
+											status="j" var="moveBundleStep">
+										<div style="float: left; width: 130px;">
+											<ul class="bdetails">
+												<li class="heading" title="${moveBundleStep.label}">
+													<g:if test="${moveBundleStep.label.length()>10}">
+														${moveBundleStep.label.substring(0,11)}..
+													</g:if>
+													<g:else>
+														${moveBundleStep.label}
+													</g:else>
+												</li>
+												<li id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}"></li>
+												<g:if test="${runbookOn == 1 }">
+													<li class="tasks" id="tasks_${moveBundle.id}_${moveBundleStep.transitionId}">&nbsp</li>
+												</g:if>
+												<li class="schstart">
+													<span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+												</li>
+												<li class="schfinish">
+													<span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+												</li>
+												<li class="actstart" id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}">
+													<span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+												</li>
+												<li class="actfinish" id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}">
+													<span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+												</li>
+											</ul>
+											<!-- <div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
+															<tds:hasPermission permission='ViewPacingMeters'>
+												<img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
+																	src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
+											</tds:hasPermission>
+														</div> -->
+										</div>
+									</g:each>
+								</div>
+							</g:each>
+						</div>
+					</div>
+					<div id="rightarrow">
+						<a href="javascript:void(0);" id="move-right">
+							<img src="${resource(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
+						</a>
+					</div>
+				</div>
+				<div style="text-align: right; padding: 4px 0px;">
+					<%--<a href="#page_up" class="nav_button" style="nowrap:nowrap;">Page Up</a> --%>
+				</div>
+			</div>
+		</div>
+		<!-- /.box-body -->
+	</div>
+</section>
+<div id="createNews" title="Create News" style="display: none;" class="static-dialog">
+	<form id="createNewsForm">
+		<input type="hidden" name="mode" value="ajax">
+		<input type="hidden" name="moveEvent.id" value="${moveEvent?.id}" id="moveEventId">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 			<table id="createCommentTable" style="border: 0px">
 				<tr>
@@ -253,13 +254,13 @@
 					</td>
 					<td valign="top" class="value">
 						<select disabled="disabled">
-								<option>News</option>
+							<option>News</option>
 						</select>
 					</td>
 				</tr>
 				<tr class="prop">
 					<td valign="top" class="name">
-						<label for="messageId">
+						<label for="messageNews">
 							<b>Message:&nbsp;
 								<span style="color: red">*</span>
 							</b>
@@ -267,17 +268,17 @@
 					</td>
 					<td valign="top" class="value">
 						<textarea cols="80" rows="5"
-							id="messageNews" name="message"
-							onkeydown="textCounter(this.id,255)"
-							onkeyup="textCounter(this.id,255)"></textarea>
+								  id="messageNews" name="message"
+								  onkeydown="textCounter(this.id,255)"
+								  onkeyup="textCounter(this.id,255)"></textarea>
 					</td>
 				</tr>
 				<tr class="prop">
 					<td valign="top" class="name" nowrap="nowrap">
-						<label for="isArchiveId">Resolved / Archived:</label>
+						<label for="archivedTdId">Resolved / Archived:</label>
 					</td>
 					<td valign="top" class="value" id="archivedTdId">
-						<input type="checkbox" id="isArchivedId" value="0" onclick="updateHidden('isArchivedId','isArchivedHiddenId')" /> 
+						<input type="checkbox" id="isArchivedId" value="0" onclick="updateHidden('isArchivedId','isArchivedHiddenId')" />
 						<input type="hidden" name="isArchived" value="0" id="isArchivedHiddenId" />
 					</td>
 				</tr>
@@ -287,13 +288,12 @@
 					</td>
 					<td valign="top" class="value">
 						<textarea cols="80" rows="5"
-							id="resolutionNews" name="resolution"
-							onkeydown="textCounter(this.id,255)"
-							onkeyup="textCounter(this.id,255)"></textarea>
+								  id="resolutionNews" name="resolution"
+								  onkeydown="textCounter(this.id,255)"
+								  onkeyup="textCounter(this.id,255)"></textarea>
 					</td>
 				</tr>
 			</table>
-			</form>
 		</div>
 		<div class="buttons">
 			<span class="button">
@@ -303,25 +303,26 @@
 				<input class="cancel" type="button" value="Cancel" onclick="resetCreateNewsForm();" />
 			</span>
 		</div>
-	</div>
-	
-	<div id="showEditCommentDialog" title="Edit News" style="display: none;" class="static-dialog">
-		<form id="editNewsForm">
-			<input type="hidden" name="id" value="" id="commentId">
-			<input type="hidden" name="mode" value="ajax">
+	</form>
+</div>
+
+<div id="showEditCommentDialog" title="Edit News" style="display: none;" class="static-dialog">
+	<form id="editNewsForm">
+		<input type="hidden" name="id" value="" id="commentId">
+		<input type="hidden" name="mode" value="ajax">
 
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 			<div>
 				<table id="showCommentTable" style="border: 0px">
 					<tr>
 						<td valign="top" class="name">
-							<label for="dateCreated">Created At:</label>
+							<label for="dateCreatedId">Created At:</label>
 						</td>
 						<td valign="top" class="value" id="dateCreatedId"></td>
 					</tr>
 					<tr>
 						<td valign="top" class="name">
-							<label for="createdBy">Created By:</label>
+							<label for="createdById">Created By:</label>
 						</td>
 						<td valign="top" class="value" id="createdById"></td>
 					</tr>
@@ -336,9 +337,8 @@
 						</td>
 					</tr>
 					<tr id="displayOptionTr">
-						
 						<td valign="top" class="name" nowrap="nowrap">
-							<label for="category">User / Generic Cmt:</label>
+							<label for="displayOption">User / Generic Cmt:</label>
 						</td>
 						<td valign="top" class="value" id="displayOption">
 							<input type="radio" name="displayOption" value="U" checked="checked" id="displayOptionUid" />&nbsp;
@@ -357,18 +357,18 @@
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name">
-							<label for="comment">Message:</label>
+							<label for="commentTdId">Message:</label>
 						</td>
 						<td valign="top" class="value">
 							<textarea cols="80" rows="5"
-								id="commentTdId" name="message"
-								onkeydown="textCounter(this.id,255)"
-								onkeyup="textCounter(this.id,255)"></textarea>
+									  id="commentTdId" name="message"
+									  onkeydown="textCounter(this.id,255)"
+									  onkeyup="textCounter(this.id,255)"></textarea>
 						</td>
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name" nowrap="nowrap">
-							<label for="isResolved">Resolved / Archived:</label>
+							<label for="resolveTdId">Resolved / Archived:</label>
 						</td>
 						<td valign="top" class="value" id="resolveTdId">
 							<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')" />
@@ -377,46 +377,44 @@
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name">
-							<label for="resolution">Resolution:</label>
+							<label for="resolutionId">Resolution:</label>
 						</td>
 						<td valign="top" class="value">
 							<textarea cols="80" rows="5"
-								id="resolutionId" name="resolution"
-								onkeydown="textCounter(this.id,255)"
-								onkeyup="textCounter(this.id,255)"></textarea>
+									  id="resolutionId" name="resolution"
+									  onkeydown="textCounter(this.id,255)"
+									  onkeyup="textCounter(this.id,255)"></textarea>
 						</td>
 					</tr>
 					<tr>
 						<td valign="top" class="name">
-							<label for="dateResolved">Resolved At:</label>
+							<label for="dateResolvedId">Resolved At:</label>
 						</td>
 						<td valign="top" class="value" id="dateResolvedId"></td>
 					</tr>
 					<tr>
 						<td valign="top" class="name">
-							<label for="resolvedBy">Resolved By:</label>
+							<label for="resolvedById">Resolved By:</label>
 						</td>
 						<td valign="top" class="value" id="resolvedById"></td>
 					</tr>
-					
 				</table>
 			</div>
 			<div class="buttons">
 				<span class="button">
-					<input class="save" type="button" value="Update" onclick="return submitUpdateNewsForm()" /> 
+					<input class="save" type="button" value="Update" onclick="return submitUpdateNewsForm()" />
 				</span>
 				<span class="button">
-					<input class="delete" type="button" value="Delete" onclick="return submitDeleteNewsForm()" /> 
+					<input class="delete" type="button" value="Delete" onclick="return submitDeleteNewsForm()" />
 				</span>
 				<span>
 					<input type="button" class="cancel" value="Cancel" onclick="$('#showEditCommentDialog').dialog('close');">
 				</span>
 			</div>
-			</form>
 		</div>
-	</div>
-	</div>
-	<script type="text/javascript">
+	</form>
+</div>
+<script type="text/javascript">
 	var eventType = "load"
 	var hasTimedOut = false;
 	var modWidth
@@ -424,14 +422,14 @@
 	var stepWidth = 130;
 	var totalSteps = $('div.show_bundle_step').children().size();
 	var timerBar;
-	
+
 	$(document).ready(function() {
 		timerBar = new TimerBar(60, 'RefreshEventDB', refreshDashboard);
-		
+
 		$("#showEditCommentDialog").dialog({autoOpen: false});
 		$("#createNews").dialog({autoOpen: false});
 		setStepsWidth();
-		
+
 		$(window).resize(function() {
 			if (hasTimedOut != false) {
 				clearTimeout(hasTimedOut);
@@ -446,14 +444,14 @@
 		getMoveEventNewsDetails($('#moveEvent').val());
 		moveDataSteps();
 	})
-	
+
 	function refreshDashboard () {
 		getMoveEventNewsDetails($('#moveEvent').val());
 		updateTaskSummary();
 		if (typeof timerBar !== 'undefined')
 			timerBar.resetTimer();
 	}
-	
+
 	function submitForm (event) {
 		if ($('#viewUnpublishedId').is(':checked')) {
 			$('#viewUnpublishedId').attr('value', '1');
@@ -466,14 +464,14 @@
 			$('#viewUnpublishedId').removeAttr('checked');
 		}
 	}
-	
+
 	function toggleUnpublished (e) {
 		var checkedValue = $(e.srcElement).is(':checked');
 		setUserPreference('viewUnpublished', checkedValue, function () {
 			refreshDashboard();
 		});
 	}
-	
+
 	// recalculates the width of the container holding the step columns
 	function setStepsWidth () {
 		totalSteps = $('div.show_bundle_step').children().size();
@@ -485,7 +483,7 @@
 		$(".mod").css("width", modWidth * 130 + "px");
 		checkArrowStatus();
 	}
-	
+
 	// greys out the arrows if they cannot be used
 	function checkArrowStatus () {
 		var themes = $('div#themes');
@@ -498,7 +496,7 @@
 			leftArrow.addClass('disabled');
 		else
 			leftArrow.removeClass('disabled');
-		
+
 		// check right arrow
 		if(typeof lastStep.offset() != 'undefined' ){
 			if (lastStep.offset().left + lastStep.outerWidth() - rightArrow.offset().left < 10)
@@ -507,7 +505,7 @@
 				rightArrow.removeClass('disabled');
 		}
 	}
-	
+
 	if (tz) {
 		$("#timezone option:contains(" + tz + ")").attr("selected","selected");
 	} else {
@@ -520,32 +518,28 @@
 	var timer
 	var errorCode = '200'
 	var dialReload = true;
-	var countries = new ddtabcontent("newstabs")
-	countries.setpersist(true)
-	countries.setselectedClassTarget("link") //"link" or "linkparent"
-	countries.init()
-	
+
 	/*---------------------------------------------------
-	* Script to load the marquee to scroll the live news
-	*--------------------------------------------------*/
+	 * Script to load the marquee to scroll the live news
+	 *--------------------------------------------------*/
 	<%-- marqueeInit({
-		uniqueid: 'mycrawler',
-		inc: 8, //speed - pixel increment for each iteration of this marquee's movement
-		mouse: 'cursor driven', //mouseover behavior ('pause' 'cursor driven' or false)
-		moveatleast: 4,
-		neutral: 150,
-		savedirection: false
-	}); --%>
-	
+        uniqueid: 'mycrawler',
+        inc: 8, //speed - pixel increment for each iteration of this marquee's movement
+        mouse: 'cursor driven', //mouseover behavior ('pause' 'cursor driven' or false)
+        moveatleast: 4,
+        neutral: 150,
+        savedirection: false
+    }); --%>
+
 	/*-----------------------------------------------
-	* function to move the data steps to right / left
-	*----------------------------------------------*/
+	 * function to move the data steps to right / left
+	 *----------------------------------------------*/
 	var AditionalFrames = 1;
 	var stepCount = 1;
 	var defaultBundle = $("#defaultBundleId").val();
 	function moveDataSteps () {
 		YAHOO.example = function() {
-			
+
 			var $D = YAHOO.util.Dom;
 			var $E = YAHOO.util.Event;
 			var $A = YAHOO.util.Anim;
@@ -554,7 +548,7 @@
 			var $ = $D.get;
 			var x = 1;
 			var bundle = defaultBundle;
-			
+
 			return {
 				init : function() {
 					$E.on(['move-left','move-right'], 'click', this.move);
@@ -576,7 +570,7 @@
 								}
 							};
 							stepCount--;
-						break;
+							break;
 						case 'move-right':
 							if ( stepCount == AditionalFrames ) {
 								return;
@@ -587,7 +581,7 @@
 								}
 							};
 							stepCount++;
-						break;
+							break;
 					};
 					var anim = new $M('themes', attributes, 0.1, YAHOO.util.Easing.easeOut);
 					anim.onComplete.subscribe(checkArrowStatus);
@@ -597,13 +591,13 @@
 		}();
 		YAHOO.util.Event.onAvailable('doc',YAHOO.example.init, YAHOO.example, true);
 	}
-	
+
 	/* script to assign the event value*/
 	var moveEvent = "${moveEvent?.id}"
 	if (moveEvent) {
 		$("#moveEvent").val(moveEvent)
 	}
-	
+
 	/* Function to load the data for a particular MoveEvent */
 	function getMoveEventNewsDetails (moveEvent) {
 		$("#createNews").dialog("close");
@@ -613,9 +607,9 @@
 		$('#isResolvedId').attr("checked",false)
 		$("#showEditCommentDialog").dialog("close");
 		updateDash( $("#defaultBundleId").val() );
-/*		<%--	if(dialReload && doUpdate){
-			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
-		}--%>*/
+		/*		<%--	if(dialReload && doUpdate){
+							timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
+						}--%>*/
 		if (moveEvent) {
 			jQuery.ajax({
 				type:"GET",
@@ -632,13 +626,13 @@
 					} else {
 						errorCode =  xhr.status;
 					}
-				}	 
+				}
 			});
 		}
 	}
 	/* Update the news once ajax call success*/
 	function updateMoveEventNews (news) {
-		
+
 		var newsLength = news.length;
 		var live = "";
 		var archived = "";
@@ -657,9 +651,9 @@
 		$("#news_live").html(live);
 		$("#news_archived").html(archived);
 		$("#head_mycrawlerId").html(scrollText)
-		
+
 	}
-	
+
 	function updateTaskSummary () {
 		jQuery.ajax({
 			type:"POST",
@@ -675,11 +669,11 @@
 					$("#update").css("color","red")
 					if( xhr.status == "403"){
 						alert("403 Forbidden occurred, user don't have permission to load the current project data.");
-					}   
+					}
 				} else {
-					errorCode =  xhr.status ; 
+					errorCode =  xhr.status ;
 				}
-			}	
+			}
 		});
 	}
 
@@ -689,52 +683,46 @@
 	}
 	var speed = 10
 	var crossobjTop = $("#content").css("top")
-	
+
 	function movedown () {
-		
+
 		var crossobj = $("#content")
 		var contentheight = crossobj.height()
 		if ( parseInt(crossobj.css("top")) >= (contentheight - 60)*(-1) ){
 			crossobj.css("top",parseInt(crossobj.css("top"))-speed+"px")
 		}
 	}
-	
+
 	function moveup () {
-		
+
 		var crossobj = $("#content")
 		var contentheight = crossobj.height()
 		if (parseInt(crossobj.css("top"))<=-15) {
 			crossobj.css("top",parseInt(crossobj.css("top"))+speed+"px")
 		}
 	}
-	function setCrossobjTop () {
-		$("#content").css("top",crossobjTop);
-		if (navigator.appName == "Microsoft Internet Explorer") {
-			$("#content").css("top",0)
-		}
-	}
-	
+
 	/*-----------------------------------------------------------
 	 * functions to convert Date & Time into respective timezones
 	 *-----------------------------------------------------------*/
-	
+
 	/* display bundle tab and call updateDash method to load the appropriate data*/
 	function displayBundleTab (Id) {
-		 $(".mbhactive").attr("class","mbhinactive");
-		 $("#spnBundle"+Id).attr("class","mbhactive");
-		 $(".show_bundle_step").attr("class","hide_bundle_step");
-		 $("#bundlediv"+Id).attr("class","show_bundle_step");
-		 $("#defaultBundleId").val(Id)
-	 }
+		$(".mbhactive").attr("class","mbhinactive tab-item");
+		$("#spnBundle"+Id).attr("class","mbhactive tab-item");
+		$(".show_bundle_step").attr("class","hide_bundle_step");
+		$("#bundlediv"+Id).attr("class","show_bundle_step");
+		$("#defaultBundleId").val(Id)
+	}
 	/*----------------------------------------
-	 * 
+	 *
 	 *--------------------------------------*/
-	 
-	 function updateDash (bundleId) {
+
+	function updateDash (bundleId) {
 		var moveEvent = $("#moveEvent").val()
 		if (moveEvent) {
-		 	displayBundleTab( bundleId )
-		 	jQuery.ajax({
+			displayBundleTab( bundleId )
+			jQuery.ajax({
 				type:"GET",
 				async : true,
 				cache: false,
@@ -744,19 +732,26 @@
 				error:function (xhr, ajaxOptions, thrownError){
 					if (errorCode ==  xhr.status ) {
 						if (xhr.status == "403") {
-					 		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
-						}	
+							alert("403 Forbidden occurred, user don't have permission to load the current project data.");
+						}
 					} else {
 						errorCode = xhr.status;
 					}
-		 		}
+				}
 			});
 		}
 		setStepsWidth();
-	 }
+	}
 
-	 /* update bundle data once ajax call success */
-	
+	function onEvenNewstHeaderLoad(e) {
+		var newsAndStatus = JSON.parse(e.responseText);
+		$("#head_mycrawlerId").html(newsAndStatus[0].news);
+		$("#head_crawler").addClass(newsAndStatus[0].cssClass)
+		$("#moveEventStatus").html(newsAndStatus[0].status)
+	}
+
+	/* update bundle data once ajax call success */
+
 	function updateMoveBundleSteps (bundleMap) {
 		try {
 			var snapshot = bundleMap.snapshot;
@@ -798,7 +793,7 @@
 			$("#eventDescription").html(planSum.eventDescription)
 			$("#eventStringId").html(planSum.eventString)
 			$("#eventRunbook").html(planSum.eventRunbook)
-			
+
 			for( i = 0; i < steps.length; i++ ) {
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
@@ -849,12 +844,12 @@
 				}
 			}
 			//Append recent changes to status bar
-			${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'updateEventHeader(XMLHttpRequest)')}
+			${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'onEvenNewstHeaderLoad(XMLHttpRequest)')}
 			setStepsWidth();
-			
+			$("#bdltabs").css("width",$(".mod").css("width"));
 		} catch (ex) {
 		}
-		
+
 	}
 
 	/* function to render the dials */
@@ -863,7 +858,7 @@
 		var src = "../i/dials/dial-"+dInd+"sm.png";
 		$("#"+divId).attr("src", src);
 		$("#"+divId).attr("title", dialInd);
-		
+
 	}
 	function updateSummaryGauge( divId, dialInd ){
 		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
@@ -871,17 +866,18 @@
 		$("#"+divId).attr("src", src);
 		$("#"+divId).attr("title", dialInd);
 		<%--//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
-		updateChartXML(divId, summaryDialData( dialInd ) );
-		//myChart.setDataXML( xmlData );
-	 	//myChart.render(divId);--%>
+        updateChartXML(divId, summaryDialData( dialInd ) );
+        //myChart.setDataXML( xmlData );
+        //myChart.render(divId);--%>
 	}
 	/*
-	will popup the dialog to create news
-	*/
+	 will popup the dialog to create news
+	 */
 	function opencreateNews(){
 		timerBar.resetTimer();
 		$("#createNews").dialog('option', 'width', 'auto');
 		$("#createNews").dialog('option', 'position', ['center','top']);
+		$("#createNews").dialog('option', 'modal', 'auto');
 		$("#showEditCommentDialog").dialog("close");
 		$('#createNews').dialog('open');
 	}
@@ -895,14 +891,14 @@
 	}
 
 	/*
-	* Used to validate the create news form and submit to
-	*/
+	 * Used to validate the create news form and submit to
+	 */
 	function submitCreateNewsForm() {
 		var moveEvent = $("#moveEventId").val();
 		var resolveBoo = $("#isResolvedId").is(':checked');
 		var resolveVal = $("#resolutionNews").val();
 		var news = $("#messageNews").val()
-		
+
 		var validate = false;
 		if (moveEvent) {
 			if (resolveBoo && resolveVal == "") {
@@ -938,11 +934,11 @@
 			} else {
 				console.log('Error: Unable to locate createNewsForm in submitCreateNewsForm');
 			}
-/*
-			${remoteFunction(controller:'newsEditor',action:'saveNews', 
-					params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNews\').val()+\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()', 
-					onComplete:'getMoveEventNewsDetails(moveEvent)')}
-*/
+			/*
+			${remoteFunction(controller:'newsEditor',action:'saveNews',
+									params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNews\').val()+\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()',
+									onComplete:'getMoveEventNewsDetails(moveEvent)')}
+			 */
 		}
 	}
 
@@ -961,7 +957,7 @@
 	function openEditNewsDialog( newsId ){
 		var idArray = newsId.split("_")
 		var type = idArray [0]
-		var id = idArray [1] 
+		var id = idArray [1]
 		${remoteFunction(controller:'newsEditor', action:'retrieveCommetOrNewsData',params:'\'id=\' + id +\'&commentType=\'+type', onComplete:'showEditNewsForm( XMLHttpRequest )')}
 	}
 
@@ -973,7 +969,7 @@
 		timerBar.resetTimer();
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
-			
+
 			$('#commentId').val(assetComments[0].commentObject.id)
 			$('#assetTdId').val(assetComments[0].assetName)
 			$('#dateCreatedId').html(assetComments[0].dtCreated);
@@ -985,7 +981,7 @@
 			}
 			$('#createdById').html(assetComments[0].personCreateObj);
 			$('#resolutionId').val(assetComments[0].commentObject.resolution);
-			
+
 			if (assetComments[0].commentObject.commentType != 'issue') {
 
 				$('#commentTypeId').val("news")
@@ -1026,11 +1022,12 @@
 				$("#commentTypeOption").html("<option>Issue</option>");
 				$("#assetTrId").show();
 				$("#showEditCommentDialog").dialog('option','title','Edit Issues Comment');
-				
+
 			}
-		 	
+
 			$("#showEditCommentDialog").dialog('option', 'width', 'auto');
 			$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
+			$("#showEditCommentDialog").dialog('option', 'modal', 'auto');
 			$("#showEditCommentDialog").dialog("open");
 			$("#createNews").dialog("close");
 		}
@@ -1072,7 +1069,7 @@
 	function submitDeleteNewsForm() {
 		var id = $("#commentId").val();
 		var moveEvent = $("#moveEventId").val();	// Note that this comes from separate field
-		
+
 		var form = $('#editNewsForm');
 		if (form.length) {
 			jQuery.ajax({
@@ -1122,16 +1119,9 @@
 			$("#manualSumStatusSpan").hide();
 		}
 	}
-	// FUNCTION TO SET THE STEP DIV WIDTH.
-	function getStepDivWidth() {
-		var viewPort = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-		var modWidth = parseInt((viewPort-210) / 130)
-		$(".mod").css("width",(modWidth * 130 )+"px");
-		return modWidth;
-	}
 	/*
 	 * validate the text area size
-	*/
+	 */
 	function textCounter(fieldId, maxlimit) {
 		var value = $("#"+fieldId).val()
 		if (value.length > maxlimit) { // if too long...trim it!
@@ -1141,12 +1131,12 @@
 			return true;
 		}
 	}
-	</script>
+</script>
 <script>
 	currentMenuId = "#dashboardMenu";
 	$(".menu-parent-dashboard-event-dashboard").addClass('active');
 	$(".menu-parent-dashboard").addClass('active');
 </script>
-	<g:render template="../layouts/error"/>
+<g:render template="../layouts/error"/>
 </body>
 </html>

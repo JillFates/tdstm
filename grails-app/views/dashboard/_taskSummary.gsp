@@ -19,7 +19,7 @@ $(document).ready(function() {
 
 <div class="toprightcontent">
 	<div class="taskSummaryDiv">
-			<h3 style="margin-top:4px; margin-bottom:20px;">Task Summary</h3><br>
+			<h3 style="margin-top:4px; margin-bottom:20px;"></h3><br>
 			<span class="taskCountSpan">${remainTaskCountFormat}</span>
 			<h5 style="margin-top:12px;">Tasks Remaining</h5>
 	</div>
