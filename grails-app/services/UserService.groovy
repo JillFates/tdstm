@@ -546,7 +546,8 @@ class UserService implements InitializingBean {
 			issueList:issueList.sort{it.item.score}
 		}
 		def dueTaskCount = issueList.item.findAll {it.duedate && it.duedate < TimeUtil.nowGMT()}.size()
-		return [taskList:issueList, timeInMin:timeInMin, dueTaskCount:dueTaskCount, personId:person.id]
+		def totalDuration = TimeUtil.createProperDuration(0,0,timeInMin,0)
+		return [taskList:issueList, totalDuration:totalDuration, dueTaskCount:dueTaskCount, personId:person.id]
 	}
 	
 	/**

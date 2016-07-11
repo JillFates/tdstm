@@ -69,5 +69,10 @@
 	</table>
 </div>
 <span class="leftFloated effort">
-		${taskList.size()} assigned tasks with ${timeInMin} minutes of effort. ${ dueTaskCount ? '(' +  dueTaskCount +'  are over due.)' : ''}
+	<g:if test="${taskList.size() = 0}">
+		No active tasks were found.
+	</g:if>
+	<g:else>
+		${taskList.size()} assigned tasks with ${TimeUtil.ago(totalDuration, TimeUtil.SHORT)} minutes of duration ${ dueTaskCount ? '(' +  dueTaskCount +'  are over due)' : ''}.
+	</g:else>
 </span>

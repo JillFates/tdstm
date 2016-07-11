@@ -311,16 +311,21 @@ class DashboardController {
 							dueEstFinish: TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, (task.item.estFinish != null? task.item.estFinish : new Date()), formatter),
 							status: task.item.status
 					])
+
 		}
 
-		def timeInMin = taskSummary.timeInMin
+		def totalDuration = TimeUtil.ago(taskSummary.totalDuration, TimeUtil.SHORT)
 		def dueTaskCount = taskSummary.dueTaskCount
-
+		
+		def summaryDetail = 'No active tasks were found.'
+		if (taskSummary.taskList.size() > 0)
+			summaryDetail = taskSummary.taskList.size() + ' assigned tasks with ' + totalDuration + ' of duration' + (dueTaskCount ? ' (' +  dueTaskCount + ' are over due).' : '.')
+		
 		Map data = [
 				taskList: result,
-				summaryDetail: taskSummary.taskList.size() + ' assigned tasks with ' + timeInMin + ' minutes of effort. (' +  dueTaskCount + '  are over due.)'
+				summaryDetail: summaryDetail
 		]
-
+		
 		render data as JSON
 	}
 	
@@ -333,7 +338,7 @@ class DashboardController {
 	def retrieveTaskSummary() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		def taskSummary = userService.getTaskSummary(projectInstance)
-		render (template :'tasks', model:[ taskList:taskSummary.taskList, timeInMin:taskSummary.timeInMin, project:projectInstance,
+		render (template :'tasks', model:[ taskList:taskSummary.taskList, totalDuration:taskSummary.totalDuration, project:projectInstance,
 			dueTaskCount:taskSummary.dueTaskCount, personId:taskSummary.personId])
 	}
 

@@ -481,7 +481,7 @@ class TimeUtil {
 	 * For dates (without time) is not required to applied a timezone.
 	 * @param dateValue the date to format
 	 * @param session the session information (to get timezone and format type)
-	 * @return The date
+ * @return The date
 	 **/
 	public static Date parseDate(session, dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
@@ -819,5 +819,31 @@ class TimeUtil {
 		
 		return result
 	}
-
+	
+	
+	/**
+	 * Creates a properly denominated TimeDuration object for the given time quantities
+	 * @param seconds - the number of seconds in the duration
+	 * @param minues - the number of minutes in the duration
+	 * @param hours - the number of hours in the duration
+	 * @param days - the number of days in the duration
+	 * @return TimeDuration object representing the combination of the given time denominations
+	 */
+	public static TimeDuration createProperDuration (int days = 0, int hours = 0, int minutes = 0, int seconds = 0) {
+		log.info "day = ${days}"
+		log.info "hours = ${hours}"
+		log.info "minutes = ${minutes}"
+		log.info "seconds = ${seconds}"
+		minutes += seconds / 60
+		hours += minutes / 60
+		days += hours / 24
+		seconds %= 60
+		minutes %= 60
+		hours %= 24
+		log.info "day = ${days}"
+		log.info "hours = ${hours}"
+		log.info "minutes = ${minutes}"
+		log.info "seconds = ${seconds}"
+		return new TimeDuration(days, hours, minutes, seconds, 0)
+	}
 }
