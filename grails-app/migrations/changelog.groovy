@@ -126,4 +126,5 @@ databaseChangeLog = {
 	include file: '20160428-remove-orphan-staffing-party-references.groovy'
 	include file: '20160601-drop-nonnull-on-UserLogin-passwordChangedDate.groovy'
 	include file: '20160607-delete-orphan-parties.groovy'
+	include file: '20160711-remove-ContactMech-domain.groovy'
 }
