@@ -760,11 +760,6 @@ list-style-type:none;
 .statusTaskEffort.toprightcontent {
 	width: 330px;
 }
-.statusTaskEffort td {
-	padding: 2px;
-	white-space: nowrap;
-	vertical-align: middle !important;
-}
 .teamBreakdown.toprightcontent {
 	width: 423px;
 }
