@@ -24,13 +24,14 @@ class AssetCommentCategory {
 	static final String BUILDOUT='buildout'
 	static final String TRANSPORT='transport'
 	static final String CLOSEOUT='closeout'
+	static final String LEARNING='learning'
 
 	static final getList() {
-		return [GENERAL, DISCOVERY, PLANNING, WALKTHRU, PREMOVE, MOVEDAY, SHUTDOWN, PHYSICAL, STARTUP, POSTMOVE, VERIFY, ANALYSIS, DESIGN, BUILDOUT, TRANSPORT, CLOSEOUT]
+		return [GENERAL, DISCOVERY, PLANNING, WALKTHRU, PREMOVE, MOVEDAY, SHUTDOWN, PHYSICAL, STARTUP, POSTMOVE, VERIFY, ANALYSIS, DESIGN, BUILDOUT, TRANSPORT, CLOSEOUT, LEARNING]
 	}
 
 	static final getPreMoveCategories() {
-		return [GENERAL,DISCOVERY,VERIFY,ANALYSIS,PLANNING,DESIGN,BUILDOUT,WALKTHRU,PREMOVE]
+		return [GENERAL,DISCOVERY,VERIFY,ANALYSIS,PLANNING,DESIGN,BUILDOUT,WALKTHRU,PREMOVE,LEARNING]
 	}
 
 	static final getMoveDayCategories() {
@@ -38,11 +39,11 @@ class AssetCommentCategory {
 	}
 
 	static final getPostMoveCategories() {
-		return [POSTMOVE,CLOSEOUT]
+		return [POSTMOVE,CLOSEOUT,LEARNING]
 	}
 
 	static final getDiscoveryCategories() {
-		return [DISCOVERY,VERIFY]
+		return [DISCOVERY,VERIFY,LEARNING]
 	}
 
 	static final getPlanningCategories() {
