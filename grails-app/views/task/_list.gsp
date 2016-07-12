@@ -22,7 +22,7 @@
                     </tr>
                 </thead>
                 <tbody id="listCommentsTbodyId">
-                    <tr class="comments-table-row" ng-repeat="comment in commentsData" id="commentTr_{{comment.commentInstance.id}}" ng-style="rowColor(comment)">
+                    <tr class="comments-table-row" ng-repeat="comment in commentsData" id="commentTr_{{comment.commentInstance.id}}">
                         <td><a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" name="205873"><img src="${resource(dir:'icons',file:'table_edit.png')}" border="0"></a></td>
                         <td id="comment_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{truncate(comment.commentInstance.comment)}}</td>
                         <td id="type_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{comment.commentInstance.commentType}}</td>
