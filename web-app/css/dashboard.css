@@ -340,7 +340,6 @@ line-height:24px;
 .mbhactive{
 	font-size:12px;
 	font-weight:bold;
-	color:#FFFFFF;
 	text-decoration: none;
 	display: inline-block;
 	position: relative;
@@ -350,7 +349,6 @@ line-height:24px;
 	line-height:28px;
 	width:123px;
 	cursor:pointer;
-	background: white url(../images/button-on.png) top left repeat-x;
 	}
 .mbhinactive{
 	font-size:12px;
@@ -760,7 +758,7 @@ list-style-type:none;
 	margin-left: 5px; 
 }
 .statusTaskEffort.toprightcontent {
-	width: 380px;
+	width: 330px;
 }
 .statusTaskEffort td {
 	padding: 2px;
@@ -768,11 +766,11 @@ list-style-type:none;
 	vertical-align: middle !important;
 }
 .teamBreakdown.toprightcontent {
-	width: 500px;
+	width: 423px;
 }
 .teamBreakdown {
 	margin-top:5px;
-	margin-left: 30px; 
+	margin-left: 15px;
 	overflow: auto;
 }
 .taskSummaryDiv {

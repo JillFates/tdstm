@@ -109,6 +109,8 @@
 <script src="${resource(dir: 'dist/js/vendors/jquery-slimscroll', file: 'jquery.slimscroll.min.js')}"></script>
 <!-- FastClick -->
 <script src="${resource(dir: 'dist/js/vendors/fastclick/lib', file: 'fastclick.js')}"></script>
+<!-- ProgressBar.js -->
+<script src="${resource(dir: 'dist/js/vendors/progressbar.js/dist', file: 'progressbar.js')}"></script>
 
 <!-- TDSTMLayout App -->
 <script src="${resource(dir: 'dist/js', file: 'TDSTMLayout.min.js')}"></script>

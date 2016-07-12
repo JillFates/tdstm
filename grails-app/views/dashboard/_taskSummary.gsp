@@ -105,7 +105,6 @@ $(document).ready(function() {
 						<img src="${resource(dir:'images',file:'checked-icon.png')}" />
 					</g:else>
 				</td>
-				<td></td>
 			</g:each>
 			</tr>
 		</g:each>

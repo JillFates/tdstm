@@ -56,11 +56,8 @@
 								</tds:hasPermission>
 							</span>
 						</div>
-						<div style="float: right; width: 150px; padding-top: 2px;">
-							<div style="float: right;">
-								<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
-							</div>
-							<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
+						<div style="float: right;">
+							<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
 						</div>
 						<input type="hidden" id="typeId" value="${params.type}">
 						<input type="hidden" id="stateId" value="${params.state}">
@@ -415,7 +412,7 @@
 	</form>
 </div>
 <script type="text/javascript">
-	var eventType = "load"
+	var eventType = "load";
 	var hasTimedOut = false;
 	var modWidth
 	var tz = '${session.getAttribute('CURR_TZ')?.CURR_TZ}'
@@ -475,7 +472,7 @@
 	// recalculates the width of the container holding the step columns
 	function setStepsWidth () {
 		totalSteps = $('div.show_bundle_step').children().size();
-		var maxWidth = $('div#bdltabs').outerWidth();
+		var maxWidth = $('div#bdlsection').outerWidth();
 		var labelsWidth = $('div#leftcol').outerWidth();
 		var arrowWidth = $('div#leftarrow').outerWidth();
 		var baseWidth = maxWidth - labelsWidth - arrowWidth * 2;
@@ -1132,6 +1129,20 @@
 			return true;
 		}
 	}
+
+	var bar = new ProgressBar.Circle('.progress-bar-svg', {
+		strokeWidth: 50,
+		duration: 10400,
+		color: '#3c8dbc',
+		trailColor: '#eee',
+		trailWidth: 0,
+		svgStyle: null,
+		step: function(state, bar, attachment) {
+			/*console.log(bar)*/
+		}
+	});
+
+	bar.animate(1.0);  // Number from 0.0 to 1.0
 </script>
 <script>
 	currentMenuId = "#dashboardMenu";
