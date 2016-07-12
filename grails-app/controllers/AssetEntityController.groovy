@@ -3233,7 +3233,7 @@ class AssetEntityController {
 				moveEventList.sort{it?.name}
 				
 				def defaultPrefs = ['colorBy':'group', 'appLbl':'true', 'maxEdgeCount':'4']
-				def graphPrefs = userPreferenceService.getPreference(PREF.DEP_GRAPH, loginUser)
+				def graphPrefs = userPreferenceService.getPreference(PREF.DEP_GRAPH)
 				def prefsObject = [:]
 				if (graphPrefs)
 					prefsObject = JSON.parse(graphPrefs)
