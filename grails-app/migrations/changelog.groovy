@@ -127,4 +127,5 @@ databaseChangeLog = {
 	include file: '20160601-drop-nonnull-on-UserLogin-passwordChangedDate.groovy'
 	include file: '20160607-delete-orphan-parties.groovy'
 	include file: '20160711-remove-ContactMech-domain.groovy'
+	include file: '20160712-add-additional-Application-criticality-options.groovy'
 }
