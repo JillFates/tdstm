@@ -3039,8 +3039,7 @@ class AssetEntityController {
 	def retrieveLists() {
 		def start = new Date()
 		session.removeAttribute('assetDependentlist')
-		
-		def loginUser = securityService.getUserLogin()
+
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		
@@ -4589,7 +4588,7 @@ class AssetEntityController {
 		assetClassesForSelect.put('ALL', 'All Classes');
 		
 		def defaultPrefs = ['levelsUp':'0', 'levelsDown':'3', 'showCycles':true, 'appLbl':true, 'labelOffset':'2', 'assetClasses':'ALL']
-		def graphPrefs = userPreferenceService.getPreference(PREF.ARCH_GRAPH, loginUser)
+		def graphPrefs = userPreferenceService.getPreference(PREF.ARCH_GRAPH)
 		def prefsObject = [:]
 		if (graphPrefs)
 			prefsObject = JSON.parse(graphPrefs)
