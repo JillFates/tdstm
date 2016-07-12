@@ -793,7 +793,8 @@
 			$("#eventDescription").html(planSum.eventDescription)
 			$("#eventStringId").html(planSum.eventString)
 			$("#eventRunbook").html(planSum.eventRunbook)
-
+			
+			// handle the calculations for each step
 			for( i = 0; i < steps.length; i++ ) {
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
@@ -813,7 +814,7 @@
 				}
 				var actStartFormatted = tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].actStart)
 				if (startDelta > 0) {
-					actStartFormatted += ": ("+ startDelta +"m)"
+					actStartFormatted += ": ("+ steps[i].startOverdueDuration +")"
 				}
 				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(actStartFormatted);
 				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M" && ${runbookOn} != 1) {
@@ -828,7 +829,7 @@
 					}
 					var actCompFormatted = tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].actComp)
 					if (actDelta > 0) {
-						actCompFormatted += ": ("+ actDelta +"m)"
+						actCompFormatted += ": ("+ steps[i].startOverdueDuration +")"
 					}
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(actCompFormatted);
 				}

@@ -166,6 +166,17 @@ class WsDashboardController {
 				data.put( "statColor", "red" )
 			}
 			
+			def startOverdueDuration = 0
+			def compOverdueDuration = 0
+			
+			// if the step has been started, calculate the elapsed times for indicating overdue time
+			if (data.actStart) {
+				startOverdueDuration = TimeUtil.ago(data.planStart, data.actStart)
+				compOverdueDuration = TimeUtil.ago(data.planComp, TimeUtil.nowGMT())
+				if (data.actComp)
+					compOverdueDuration = TimeUtil.ago(data.planComp, data.actComp)
+			}
+			
 			if ( !data.actComp ) {
 				// 59s is added to planCompletion to consider the minutes instead of seconds 
 				if ( sysTimeInMs > planCompTime+59 && data.tskComp < data.tskTot) {
@@ -212,6 +223,8 @@ class WsDashboardController {
 			def dialIndicator = taskService.calcStepDialIndicator ( moveBundle.startTime, moveBundle.completionTime, 
 				data.actStart, data.actFinish, (data.tskTot ? data.tskTot : 0), data.tskComp)
 			data.put('dialInd', dialIndicator)
+			data.put('startOverdueDuration', startOverdueDuration)
+			data.put('compOverdueDuration', compOverdueDuration)
 		}
 		
 		def planSumCompTime
@@ -275,6 +288,8 @@ class WsDashboardController {
 				'runbookOn':project.runbookOn,
 			] 
 		]
+		
+		
 		render bundleMap as JSON
 	
 	}

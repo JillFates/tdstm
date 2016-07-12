@@ -829,21 +829,13 @@ class TimeUtil {
 	 * @param days - the number of days in the duration
 	 * @return TimeDuration object representing the combination of the given time denominations
 	 */
-	public static TimeDuration createProperDuration (int days = 0, int hours = 0, int minutes = 0, int seconds = 0) {
-		log.info "day = ${days}"
-		log.info "hours = ${hours}"
-		log.info "minutes = ${minutes}"
-		log.info "seconds = ${seconds}"
+	public static TimeDuration createProperDuration (long days = 0, long hours = 0, long minutes = 0, long seconds = 0) {
 		minutes += seconds / 60
 		hours += minutes / 60
 		days += hours / 24
 		seconds %= 60
 		minutes %= 60
 		hours %= 24
-		log.info "day = ${days}"
-		log.info "hours = ${hours}"
-		log.info "minutes = ${minutes}"
-		log.info "seconds = ${seconds}"
-		return new TimeDuration(days, hours, minutes, seconds, 0)
+		return new TimeDuration((int)days, (int)hours, (int)minutes, (int)seconds, 0)
 	}
 }
