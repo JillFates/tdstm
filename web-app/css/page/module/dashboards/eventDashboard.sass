@@ -43,11 +43,20 @@ div.content-wrapper
         background: none
         border: none
         div#bdltabs
-          border-bottom: 1px solid #ddd
           height: 32px
+          border-bottom: 1px solid $grey
           span.tab-item
-            border: 1px solid #ddd
-            color: $black
-            background: none
+          span:first-child
+            margin-left: 5px
+          span.tab-item.mbhinactive:hover
+            background: $c_white1
+            border: 1px solid $grey
+            border-color: #eee #eee #ddd
             border-radius: 4px 4px 0 0
-            border-bottom: 0
+          span.tab-item.mbhactive
+            border: 1px solid $grey
+            color: $black
+            border-radius: 4px 4px 0 0
+            cursor: default
+            background-color: $white
+            border-bottom-color: transparent

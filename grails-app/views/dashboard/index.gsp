@@ -149,12 +149,11 @@
 				<!-- News section ends here-->
 				<!-- Bundle Sections starts here-->
 				<div id="bdlsection">
-					<div id="bdltabs">
-						<span>&nbsp;</span>
+					<div id="bdltabs" style="width: ${moveBundleList.size * 130}px;">
 						<g:each in="${moveBundleList}" status="i" var="moveBundle">
-							<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="updateDash(${moveBundle.id})">
+							<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' } tab-item" onClick="updateDash(${moveBundle.id})">
 								${moveBundle.name}
-							</span>&nbsp;&nbsp;
+							</span>
 						</g:each>
 					</div>
 					<div id="leftcol">
@@ -440,6 +439,20 @@
 		// used to call the function once page loaded
 		getMoveEventNewsDetails($('#moveEvent').val());
 		moveDataSteps();
+
+		var bar = new ProgressBar.Circle('.progress-bar-svg', {
+			strokeWidth: 50,
+			duration: 10400,
+			color: '#3c8dbc',
+			trailColor: '#eee',
+			trailWidth: 0,
+			svgStyle: null,
+			step: function(state, bar, attachment) {
+				/*console.log(bar)*/
+			}
+		});
+
+		bar.animate(1.0);  // Number from 0.0 to 1.0
 	})
 
 	function refreshDashboard () {
@@ -709,7 +722,7 @@
 		$("#spnBundle"+Id).attr("class","mbhactive tab-item");
 		$(".show_bundle_step").attr("class","hide_bundle_step");
 		$("#bundlediv"+Id).attr("class","show_bundle_step");
-		$("#defaultBundleId").val(Id)
+		$("#defaultBundleId").val(Id);
 	}
 	/*----------------------------------------
 	 *
@@ -844,7 +857,7 @@
 			//Append recent changes to status bar
 			${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'onEvenNewstHeaderLoad(XMLHttpRequest)')}
 			setStepsWidth();
-			$("#bdltabs").css("width",$(".mod").css("width"));
+			//$("#bdltabs").css("width",$(".mod").css("width"));
 		} catch (ex) {
 		}
 
@@ -1129,20 +1142,6 @@
 			return true;
 		}
 	}
-
-	var bar = new ProgressBar.Circle('.progress-bar-svg', {
-		strokeWidth: 50,
-		duration: 10400,
-		color: '#3c8dbc',
-		trailColor: '#eee',
-		trailWidth: 0,
-		svgStyle: null,
-		step: function(state, bar, attachment) {
-			/*console.log(bar)*/
-		}
-	});
-
-	bar.animate(1.0);  // Number from 0.0 to 1.0
 </script>
 <script>
 	currentMenuId = "#dashboardMenu";

@@ -346,6 +346,7 @@ line-height:24px;
 	text-align:center;
 	padding-left: 4px;
 	margin-right: 0px;
+	margin-left: 0px;
 	line-height:28px;
 	width:123px;
 	cursor:pointer;
@@ -358,12 +359,12 @@ line-height:24px;
 	position: relative;
 	text-align:center;
 	padding-left: 4px;
-	margin-right: 3px;
+	margin-right: 0px;
+	margin-left: 0px;
 	line-height:28px;
 	width:123px;
 	cursor:pointer;
-	background: white url(../images/button-off.png) top left repeat-x;
-	}
+}
 	
 #leftcol{
 width:129px;
