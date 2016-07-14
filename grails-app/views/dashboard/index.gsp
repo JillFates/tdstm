@@ -10,7 +10,7 @@
 	<g:javascript src="yahoo.ui.dashboard.js" />
 	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:javascript src="TimerBar.js" />
+	<g:javascript src="ProgressTimer.js" />
 	<style>
 		/*TODO: REMOVE ON COMPLETE MIGRATION */
 		div.content-wrapper {
@@ -57,7 +57,7 @@
 							</span>
 						</div>
 						<div style="float: right;">
-							<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
+							<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
 						</div>
 						<input type="hidden" id="typeId" value="${params.type}">
 						<input type="hidden" id="stateId" value="${params.state}">
@@ -417,10 +417,10 @@
 	var tz = '${session.getAttribute('CURR_TZ')?.CURR_TZ}'
 	var stepWidth = 130;
 	var totalSteps = $('div.show_bundle_step').children().size();
-	var timerBar;
+	var progressTimer;
 
 	$(document).ready(function() {
-		timerBar = new TimerBar(60, 'RefreshEventDB', refreshDashboard);
+		progressTimer = new ProgressTimer(60, 'RefreshEventDB', refreshDashboard);
 
 		$("#showEditCommentDialog").dialog({autoOpen: false});
 		$("#createNews").dialog({autoOpen: false});
@@ -440,26 +440,14 @@
 		getMoveEventNewsDetails($('#moveEvent').val());
 		moveDataSteps();
 
-		var bar = new ProgressBar.Circle('.progress-bar-svg', {
-			strokeWidth: 50,
-			duration: 10400,
-			color: '#3c8dbc',
-			trailColor: '#eee',
-			trailWidth: 0,
-			svgStyle: null,
-			step: function(state, bar, attachment) {
-				/*console.log(bar)*/
-			}
-		});
 
-		bar.animate(1.0);  // Number from 0.0 to 1.0
 	})
 
 	function refreshDashboard () {
 		getMoveEventNewsDetails($('#moveEvent').val());
 		updateTaskSummary();
-		if (typeof timerBar !== 'undefined')
-			timerBar.resetTimer();
+		if (typeof progressTimer !== 'undefined')
+			progressTimer.resetTimer();
 	}
 
 	function submitForm (event) {
@@ -885,7 +873,7 @@
 	 will popup the dialog to create news
 	 */
 	function opencreateNews(){
-		timerBar.resetTimer();
+		progressTimer.resetTimer();
 		$("#createNews").dialog('option', 'width', 'auto');
 		$("#createNews").dialog('option', 'position', ['center','top']);
 		$("#createNews").dialog('option', 'modal', 'auto');
@@ -977,7 +965,7 @@
 	 * @param  Ajax/JSON response object
 	 */
 	function showEditNewsForm( e ){
-		timerBar.resetTimer();
+		progressTimer.resetTimer();
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
 

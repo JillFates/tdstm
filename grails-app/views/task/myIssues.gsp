@@ -52,7 +52,7 @@
 			</g:if>
 			<li>
 				<span style="float: right;margin-right: 10px;">
-					<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 180, 240, 300]]}"/>
+					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[30, 60, 120, 180, 240, 300]]}"/>
 				</span>
 			</li>
 		</ul>

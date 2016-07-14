@@ -1,8 +1,8 @@
 <div class="row progress-bar-container">
-	<div class="col-xs-4 item-wrapper refresh-button">
-		<input type="button" class="pointer" value="Refresh" onclick="timerBar.refreshFunction()"/>
+	<div class="col-xs-4 item-wrapper refresh-button" onclick="if(typeof progressTimer !== 'undefined'){ progressTimer.refreshFunction()} else { timerBar.refreshFunction() }">
+		<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 	</div>
-	<div class="col-xs-4 item-wrapper">
+	<div class="col-xs-4 item-wrapper select-timer">
 		<select id="selectTimedBarId">
 			<option value="0" selected="selected">Manual</option>
 			<g:each in="${timerValues}" var="it">

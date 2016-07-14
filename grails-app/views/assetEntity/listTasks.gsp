@@ -231,7 +231,7 @@
 
 						<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
 					</span>
-					<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 				</span>
 			</span>
 			<jqgrid:wrapper id="taskListId" />

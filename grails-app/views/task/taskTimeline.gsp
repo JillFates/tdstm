@@ -56,7 +56,7 @@
 							--></span><!--
 							--><span class="controlSpan"><!--
 								--><span style="float:right;"><!--
-									--><g:render template="../assetEntity/timerBarControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/><!--
+									--><g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/><!--
 								--></span><!--
 							--></span>
 						</div>
