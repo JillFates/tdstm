@@ -1,4 +1,4 @@
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.GormUtil
 import org.apache.shiro.SecurityUtils
 import org.apache.commons.logging.Log
@@ -18,6 +18,8 @@ class WorkflowController {
     def partyRelationshipService
 	def projectService
 	def securityService
+	def grailsApplication
+
 	/*-----------------------------------------------
 	 * Index method for default action
 	 *---------------------------------------------*/
@@ -430,7 +432,7 @@ def updateWorkflowSteps() {
 			}
 			svgHeaderFile.append("' stroke = '#FFFFFF' stroke-width = '1'/>")
 			svgHeaderFile.append("</svg>")
-			def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg_workflow.svg").getFile()
+			def f =  grailsApplication.parentContext.getResource("templates/headerSvg_workflow.svg").getFile()
 			def fop=new FileOutputStream(f)
 			if(f.exists()){
 				fop.write(svgHeaderFile.toString().getBytes())
