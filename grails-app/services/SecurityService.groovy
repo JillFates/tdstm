@@ -2,9 +2,6 @@
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
 
-
-import org.apache.log4j.Logger
-
 import javax.servlet.http.HttpSession
 import org.apache.shiro.SecurityUtils
 
@@ -705,7 +702,7 @@ class SecurityService implements InitializingBean {
 		String encryptedPassword = userLogin.applyPassword(unencryptedPassword)
 
 		if (currentPassword.equals(encryptedPassword)) {
-			throw new InvalidParamException('New password must be different from the existing password')
+			throw new InvalidParamException('New password must be different from the existing one')
  		}
 
 		if (!isNewUser && ! verifyPasswordHistory(userLogin, encryptedPassword)) {
