@@ -40,12 +40,13 @@ $(document).ready(function() {
 		<tr>
 			<td class="task_bar_label" rowspan="2"># of<br>Tasks</td>
 			<td class="task_bar_base">
-				<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 0%;"></div>
+				<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 0%;">
+					<%-- Display the perc done once enough is done that the text will be in blue --%>
+					<div class="prog_bar_text" id="taskDoneText">${(percTaskDone<5)? '' : percTaskDone+'%'}</div>
+				</div>
 				<div class="task_started task_bar_graph" id="tasksStartBar" style="width: 0%;"></div>
 				<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 0%;"></div>
 				<div class="task_Hold task_bar_graph" id="tasksHoldBar" style="width: 0%;"></div>
-				<%-- Display the perc done once enough is done that the text will be in blue --%>
-				 <div class="prog_bar_text" id="taskDoneText">${(percTaskDone<5)? '' : percTaskDone+'%'}</div>
 			</td>
 		</tr>
 		<tr>
@@ -61,11 +62,12 @@ $(document).ready(function() {
 		<tr>
 			<td class="task_bar_label" rowspan="2">Level<br>of Effort</td>
 			<td class="task_bar_base">
-				<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 0%;"></div>
+				<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 0%;">
+					<div class="prog_bar_text" id="effortDoneText">${(percDurationDone<5)? '' : percDurationDone+'%'}</div>
+				</div>
 				<div class="task_started task_bar_graph" id="effortStartBar" style="width: 0%;"></div>
 				<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 0%;"></div>
 				<div class="task_hold task_bar_graph" id="effortHoldBar" style="width: 0%;"></div>
-				<div class="prog_bar_text" id="effortDoneText">${(percDurationDone<5)? '' : percDurationDone+'%'}</div>
 			</td>
 		</tr>
 		<tr>
