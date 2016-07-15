@@ -10,7 +10,7 @@
 	<g:javascript src="yahoo.ui.dashboard.js" />
 	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:javascript src="ProgressTimer.js" />
+	<g:javascript src="progressTimer.js" />
 	<style>
 		/*TODO: REMOVE ON COMPLETE MIGRATION */
 		div.content-wrapper {
