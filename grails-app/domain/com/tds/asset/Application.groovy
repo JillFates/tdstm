@@ -1,7 +1,7 @@
 package com.tds.asset
 
-import Person
-import Project
+//import Person
+//import Project
 
 //import org.codehaus.groovy.grails.orm.hibernate.cfg.IdentityEnumType
 
