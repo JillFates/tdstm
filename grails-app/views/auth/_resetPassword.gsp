@@ -5,9 +5,7 @@
 <title>Reset Password</title>
 <link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
 <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-<link rel="shortcut icon"
-	href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
-
+	<tds:favicon />
 <meta name="viewport" content="height=device-height,width=device-width" />
 
 <g:javascript src="jquery-1.9.1.js"/>

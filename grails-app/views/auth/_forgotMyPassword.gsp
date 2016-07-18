@@ -22,7 +22,7 @@
 	<!-- General Template Style -->
 	<link rel="stylesheet" href="${resource(dir:'css',file:'style.css')}">
 
-	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+	<tds:favicon />
 
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 

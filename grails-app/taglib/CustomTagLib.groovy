@@ -8,9 +8,11 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
-
+import groovy.transform.Synchronized
+ 
 class CustomTagLib {
-	static namespace = 'tds'
+	static String namespace = 'tds'
+	static String faviconStr
 	
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
@@ -435,5 +437,26 @@ class CustomTagLib {
 		}
 
 		out << urlGenerated
+	}
+
+	@Synchronized
+    private void initializeFavicon() {
+    	if (faviconStr == null) {
+    		faviconStr = g.external( uri:'/images/favicon.ico' )
+    		faviconStr = faviconStr.replace('/>', ' type="image/x-icon"/>')
+    		faviconStr = faviconStr[0..-3]
+    	}
+    }
+
+	/**
+	 * Used to generate the link for including the favicon.ico file into a page
+	 * @usage: <tds:favicon />
+	 */
+	def favicon = { attrs -> 
+		if (faviconStr == null) {
+			initializeFavicon()
+		}
+
+		out << faviconStr
 	}
 }

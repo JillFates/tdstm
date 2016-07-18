@@ -180,4 +180,13 @@ class CustomTagLibTests extends Specification {
 		applyTemplate('<tds:appURL controller="${controller}" fragment="list" />', [controller: "task", fragment: "list"]).contains('/tdstm/app#task/list')
 	}
 
+	void testFaviconTag() {
+		setup:
+			String faviconStr = '<link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"/>'
+
+		expect: 
+			applyTemplate('<tds:favicon />') == faviconStr
+
+	}
+
 }

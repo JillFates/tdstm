@@ -5,7 +5,6 @@
 	<title>Event Dashboard</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tabcontent.css')}" />
-	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="yahoo.ui.dashboard.js" />
 	<g:render template="../layouts/responsiveAngularResources" />

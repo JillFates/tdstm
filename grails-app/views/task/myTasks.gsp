@@ -7,7 +7,7 @@
 	<title>My Tasks</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+    <tds:favicon />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />

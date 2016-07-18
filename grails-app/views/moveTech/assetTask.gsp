@@ -5,10 +5,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-<%--<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
-	 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
-	 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />--%>
-<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+	<tds:favicon />
 <meta name="viewport" content="height=device-height,width=220" />
 	
 	<%--

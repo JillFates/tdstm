@@ -2,7 +2,7 @@
   -- This is the standard include of CSS and Javascript files necessary throughout the TM application
 --%>
 
-<link rel="shortcut icon" type="image/x-icon" href="${resource(dir:'images',file:'favicon.ico')}" />
+<tds:favicon />
 
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'main.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'tds.css')}"/>

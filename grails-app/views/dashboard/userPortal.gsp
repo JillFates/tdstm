@@ -14,8 +14,6 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'userPortal.css')}"/>
     <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'ui.datepicker.css')}"/>
 
-    <link rel="shortcut icon" href="${resource(dir: 'images', file: 'favicon.ico')}" type="image/x-icon"/>
-
     <script src="${resource(dir: '/dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
     <g:javascript src="asset.comment.js"/>
     <g:javascript src="asset.tranman.js"/>
