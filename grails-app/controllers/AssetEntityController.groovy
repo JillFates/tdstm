@@ -2867,10 +2867,10 @@ class AssetEntityController {
 				result = task[value] ? TimeUtil.formatDate(getSession(), task[value]) : ''
 			break;
 			case "event":
-				result = task.moveEvent.name
+				result = task.moveEvent?.name
 				break
 			case "bundle":
-				result = task.assetEntity.moveBundle.name
+				result = task.assetEntity?.moveBundle?.name
 				break
 			default :
 				result= task[value]
