@@ -1756,7 +1756,7 @@ class PersonService {
 			}
 
 			if (person != null) {
-				throw new DomainUpdateException('A person with that name already exists')
+				throw new DomainUpdateException("A person with that name already exists. Person Id:${person.id}")
 			} else {
 				// Create the person and relationship appropriately
 				def reducedParams = new HashMap(params)

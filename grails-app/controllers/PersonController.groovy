@@ -368,9 +368,17 @@ def test = {
 		try {
 			Person byWhom = user.person
 			person = personService.savePerson(params, byWhom, companyId, project, true)
+		}catch (DomainUpdateException e){
+			def exceptionMsg = e.getMessage()
+			log.error(exceptionMsg)
+			// The line below is a hack to avoid querying the database.
+			def personId = exceptionMsg.substring(exceptionMsg.indexOf(":") + 1).toInteger()
+			errMsg = "A person with the same name already exists. Click"
+			errMsg += "<a href=\"javascript:Person.showPersonDialog(${personId},'generalInfoShow')\"> here </a>"//e.getMessage()
+			errMsg += "to view the person."
 		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			errMsg = e.getMessage()
+			
 		}		
 
 		if (isAjaxCall) {
