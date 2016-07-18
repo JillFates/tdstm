@@ -116,7 +116,7 @@ class AssetComment {
 		dateResolved( nullable:true )
 		dueDate( nullable:true)
 		commentCode( blank:true, nullable:true, size:0..255 )
-		category( blank:false, nullable:false, size:0..64,	inList:preMoveCategories + moveDayCategories + postMoveCategories )
+		category( blank:false, nullable:false, size:0..64, inList:AssetCommentCategory.getList() )
 		displayOption( blank:false, size:0..1, inList: ['G','U'] ) // Generic or User
 		attribute( blank:true, nullable:true, size:0..255 )
 		commentKey( blank:true, nullable:true, size:0..255 )
