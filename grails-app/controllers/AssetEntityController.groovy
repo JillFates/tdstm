@@ -2685,13 +2685,26 @@ class AssetEntityController {
 				'in'('createdBy',resolvedBy)
 			if (assigned )
 				'in'('assignedTo' , assigned)
+
 			
 			if(sortIndex && sortOrder){
-				if(sortIndex  =='assetName' || sortIndex  =='assetType'){
-					order(new Order('assetEntity.' + sortIndex, sortOrder=='asc').ignoreCase())
-				}else{
-					order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
+				def sortIdx = null
+				switch(sortIndex){
+					case "assetName":
+					case "assetType":
+						sortIdx = "assetEntity." + sortIndex
+						break;
+					case "bundle":
+						sortIdx = "moveBundle.name"
+						break;
+					case "event":
+						sortIdx = "moveEvent.name"
+						break;
+					default:
+						break;
 				}
+				order(new Order(sortIdx, sortOrder=='asc').ignoreCase())
+
 			} else {
 				and{
 					order('score','desc')
