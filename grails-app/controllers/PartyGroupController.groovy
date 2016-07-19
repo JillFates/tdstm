@@ -200,6 +200,13 @@ class PartyGroupController {
         	
 	        	def companyParty = whom.company
 	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroup, "CLIENT" )
+
+	        	if (params.partner && params.partner == "Y" ) {
+					def company = partyRelationshipService.getCompanyOfStaff( securityService.getUserLogin().person )
+					if (company) {
+						partyRelationshipService.savePartyRelationship( "PARTNERS", company, "COMPANY", partyGroup, "PARTNER" )
+					}
+				}
         	}
             flash.message = "PartyGroup ${partyGroup} created"
             redirect(action:'show',id:partyGroup.id)
