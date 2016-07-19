@@ -14,6 +14,7 @@
 			}
 		}
         </g:javascript>
+        <r:layoutResources />
     </head>
     <body>
         <div class="body">
@@ -22,7 +23,7 @@
 				<div class="message">${flash.message}</div>
             </g:if>
 
-            <g:form action="save" method="post" >
+            <g:form action="save" method="post" name="editpartyGroup" >
                 <div class="dialog">
                     <table>
                         <tbody>
@@ -106,5 +107,6 @@
     $('.menu-parent-admin').addClass('active');
 
 </script>
+<r:layoutResources />
     </body>
 </html>
