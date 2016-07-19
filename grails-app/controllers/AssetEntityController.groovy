@@ -2701,6 +2701,7 @@ class AssetEntityController {
 						sortIdx = "moveEvent.name"
 						break;
 					default:
+						sortIdx = sortIndex
 						break;
 				}
 				order(new Order(sortIdx, sortOrder=='asc').ignoreCase())
