@@ -980,7 +980,7 @@ span.checkboxContainer * {
 span.checkboxContainer input {
 	margin-top: 0px;
 }
-span.checkboxContainer:hover input {
+.checkboxContainer:hover input {
 	filter: brightness(90%);
 	-webkit-filter: brightness(90%);
 }

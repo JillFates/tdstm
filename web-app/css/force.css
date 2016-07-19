@@ -60,6 +60,22 @@ use.node.sourceAsset {
 	stroke: #00aa00;
 	color: #00aa00;
 }
+use.node.hl {
+	stroke-width: 5px;
+}
+use.node.nohl {
+	opacity: 0.4 !important;
+}
+
+g.hl {
+	font-size: large !important;
+}
+line.hl {
+	opacity: 0.4 !important;
+}
+.nohl {
+	opacity: 0.4 !important;
+}
 
 circle.cutShadow {
 	opacity: 0.4;
@@ -157,6 +173,9 @@ line.link.selected {
 }
 
 /* Graph Labels */
+g.label {
+	font: 11px Tahoma, Arial, san-serif;
+}
 g.label text {
 	cursor: default;
 	fill: #000000;
@@ -200,31 +219,6 @@ g.label.filtered text {
 }
 .ui-resizable-se {
 	background: none !important;
-}
-
-
-/* Shapes */
-#databaseShapeForegroundId {
-	fill: currentColor;
-	stroke: currentColor;
-}
-#databaseShapeId path {
-	stroke-width: 1px !important;
-}
-#databaseShapeId circle {
-	stroke-width: 1px !important;
-	cx: 25px !important;
-	r: 1 !important;
-	fill: currentColor;
-	stroke: currentColor;
-}
-#deviceShapeId path {
-	stroke-width: 1px !important;
-}
-#deviceShapeId circle {
-	stroke-width: 1px !important;
-	cx: 25px !important;
-	r: 1 !important;
 }
 
 /* Custom right click context menu for graphs */
@@ -383,7 +377,7 @@ img.pointer {
 	padding-left: 4px;
 }
 #controlPanel .labelToggleRow input {
-	margin-top: 4px;
+	margin-top: 0px;
 }
 
 #controlPanel .labelToggleRow div.checkboxContainer svg {
@@ -453,11 +447,11 @@ div.graphPanel.openPanel {
 	margin-bottom: -1px;
 	padding: 0px;
 }
-#mapReferenceId div {
+#mapReferenceId > div {
 	border: 1px solid green;
 	display: inline-block;
 }
-#mapReferenceId div:not(.spacer) {
+#mapReferenceId > div:not(.spacer) {
 	border-left: 1px solid green;
 	border-right: 1px solid green;
 	text-align: center;
@@ -703,3 +697,29 @@ defs svg {
 #svgTranslatorId svg.chart {
 	overflow: visible !important;
 }
+
+/* styles for the search highlighting elements */
+#searchBoxId::-ms-clear {
+	display: none;
+}
+#controlPanel form#taskSearchFormId {
+	display: inline-block !important;
+	position: relative;
+}
+#controlPanel span#filterClearId {
+	position: absolute !important;
+	display: inline !important;
+	margin-top: 4px !important;
+	cursor: pointer !important;
+	opacity: 1 !important;
+	right: 8px;
+}
+#controlPanel span#filterClearId.disabled {
+	opacity: 0.3 !important;
+	cursor: auto !important;
+}
+
+.checkboxContainer input[type="radio"] {
+	border-width: 0px !important;
+}
+

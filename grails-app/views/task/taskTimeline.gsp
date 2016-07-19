@@ -79,7 +79,7 @@
 								<tr title="Sets the hight of an individual task">
 									<td colspan="3" style="padding-left :0px">
 										<span>
-											<input type="text" id="mainHeightFieldId" value="30" size="3" style="width:20px;" /><!--
+											<input type="text" id="mainHeightFieldId" value="30" size="3" style="width:25px;" /><!--
 											--><label for="mainHeightFieldId" class="pointer">&nbsp;Task Size (pixels)</label>
 										</span>
 									</td>

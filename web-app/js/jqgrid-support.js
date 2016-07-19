@@ -34,9 +34,9 @@ function freezeHeader () {
 	$('.jqgfirstrow').height(header.height());
 	// The childrens' widths must be set explicitly for IOS compatibility
 	header.children('.ui-jqgrid-labels').children().each(function(a,b){
-		$(b).css( 'max-width', $(b).width() );
+		$(b).css( 'width', $(b).width() );
 	})
-	header.css( 'max-width', header.css('width') );
+	header.css( 'width', header.css('width') );
 	header.css('position','fixed');
 	header.css('top','0px');
 }

@@ -3298,7 +3298,7 @@ class AssetEntityController {
 						moveBundleId:it.moveBundleId, moveEventId:moveEventId, hasMoveEvent:hasMoveEvent,
 						shape:shape, size:size, title:it.assetName, 
 						color:color, dependsOn:[], supports:[],
-						assetClass:it.assetClass, cutGroup:0
+						assetClass:it.assetClass, cutGroup:-1
 					]
 				}
 				

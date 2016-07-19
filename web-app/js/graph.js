@@ -13,6 +13,7 @@ var GraphUtil = (function ($) {
 	public.linkBindings = null;
 	public.labelBindings = null;
 	public.labelTextBindings = null;
+	public.labelTextBackgroundBindings = null;
 	public.shapeOffset = -20;
 	public.labelShapeOffset = -8
 	public.GPUNodeThreshold = 500
@@ -270,7 +271,8 @@ var GraphUtil = (function ($) {
 				+ ((public.isConflictsEnabled() && ! d.hasMoveEvent) ? ' noEvent' : '')
 				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
 				+ ((d.sourceAsset) ? ' sourceAsset' : '')
-				+ ((public.isBlackBackground()) ? ' blackBackground' : '');
+				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
+				+ public.getFilteredClass(d)
 		});
 	}
 	public.updateLinkClasses = function () {
@@ -284,17 +286,24 @@ var GraphUtil = (function ($) {
 				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
 				+ ((public.isHighlightCyclesEnabled() && d.partOfCycle) ? ' cyclical' : '')
-				+ ((public.isBlackBackground()) ? ' blackBackground' : '');
+				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
+				+ public.getFilteredClass(d)
 		});
 	}
 	public.updateLabelClasses = function () {
 		var bundle = public.getFilteredBundle();
 		public.labelBindings.attr("class", function(d) {
+			
+			if (d.highlighted == 'y')
+				$(this).children().attr('dy', '0.36em')
+			else
+				$(this).children().attr('dy', '0.35em')
 			return 'label'
 				+ ((d.selected > 0) ? ' selected' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
 				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
-				+ ((! d.showLabel) ? ' hidden' : '');
+				+ ((! d.showLabel) ? ' hidden' : '')
+				+ public.getFilteredClass(d)
 		});
 	}
 
@@ -577,8 +586,11 @@ var GraphUtil = (function ($) {
 	// Gets the list of types to show labels for
 	public.getExpanededLabels = function () {
 		var labelsList = {};
-		$('table.labelTree input[type="checkbox"]').each(function(i, o) {
-			$(o.classList).each(function(i, c) {
+		$('table.labelTree tr.labelToggleRow input[type="checkbox"]').each(function(i, o) {
+			var classList = o.classList
+			if (classList == null)
+				classList = o.className.split(' ')
+			$(classList).each(function(i, c) {
 				labelsList[c] = $(o).is(':checked');
 			});
 		});
@@ -615,16 +627,29 @@ var GraphUtil = (function ($) {
 	// creates the round shadows for nodes after suggesting splits
 	public.createCutShadows = function (color) {
 		public.force.nodes().each(function (o, i) {
-			if (o.cutShadow)
-				$(o.cutShadow).remove();
-
-			var cutShadow = vis.append('circle')
-				.attr('id', 'cutShadow-' + o.id)
-				.attr('class', 'cutShadow')
-				.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
-				.style('fill', color(o.cutGroup))
-				.attr('r', 22);
-			o.cutShadow = cutShadow[0][0];
+			// get the cut shadow object (create it if it doesn't exist)
+			var cutShadow = o.cutShadow
+			if (cutShadow == null) {
+				cutShadow = vis.append('circle')
+					.attr('id', 'cutShadow-' + o.id)
+					.attr('class', 'cutShadow')
+					.attr('r', 22)
+				o.cutShadow = cutShadow[0][0]
+			} else {
+				cutShadow = d3.select(o.cutShadow)
+			}
+			
+			// syle it based on highlighting and cut group
+			cutShadow.style('opacity', null)
+			if (o.highlighted == 'y')
+				cutShadow.style('fill', '#d62728')
+			else if (o.highlighted == 'n' || o.cutGroup == -1)
+				cutShadow.style('opacity', 0)
+			else
+				cutShadow.style('fill', color(o.cutGroup))
+			
+			// apply the basic attributes
+			cutShadow.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
 		});
 		public.reorderDOM();
 	}
@@ -632,14 +657,14 @@ var GraphUtil = (function ($) {
 	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
 	public.reorderDOM = function () {
 		var selection = d3.selectAll('svg.chart > g g g').filter(':not(.selected)').filter('.selected');
-		selection[0] = selection[0]
-			.concat(d3.selectAll('svg.chart > g g circle.cutShadow')[0])
-			.concat(d3.selectAll('svg.chart > g g line').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg.chart > g g use').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg.chart > g g g').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg.chart > g g line').filter('.selected')[0])
-			.concat(d3.selectAll('svg.chart > g g use').filter('.selected')[0])
-			.concat(d3.selectAll('svg.chart > g g g').filter('.selected')[0]);
+
+		var lines = d3.selectAll('svg.chart > g g line')
+		var nodes = d3.selectAll('svg.chart > g g use')
+		var labels = d3.selectAll('svg.chart > g g g')
+		var groups = [lines, nodes, labels]
+		var filters = [':not(.hl):not(.selected)', ':not(.hl).selected', '.hl:not(.selected)', '.hl.selected']
+
+		selection[0] = selection[0].concat(d3.selectAll('svg.chart > g g circle.cutShadow')[0])
 		selection.order();
 	};
 
@@ -660,13 +685,15 @@ var GraphUtil = (function ($) {
 	};
 
 	public.transformElement = function (element, x, y, scale) {
+		var transform = 'translate(' + x + 'px, ' + y + 'px)' + ' scale(' + scale + ')'
 		if (public.force && public.force.nodes().size() > public.GPUNodeThreshold)
-			element[0][0].style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)' + ' scale3d(' + scale + ', ' + scale + ', 1)'
-		else
-			element[0][0].style.transform = 'translate(' + x + 'px, ' + y + 'px)' + ' scale(' + scale + ')'
+			transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)' + ' scale3d(' + scale + ', ' + scale + ', 1)'
 		
-		if (public.isIE())
-			vis.style('line-height', Math.random())
+		element[0][0].style.transform = transform
+		if (public.isIE()) {
+			element[0][0].style['-ms-transform'] = transform
+			public.forceReflow(vis)
+		}
 		
 	}
 	
@@ -707,6 +734,29 @@ var GraphUtil = (function ($) {
 		performZoom('out')
 	}
 	
+	public.getFilteredClass = function (obj) {
+		if (obj.linkElement) {
+			if (obj.source.highlighted == 'y' || obj.target.highlighted == 'y')
+				return ' hl'
+			else if (obj.source.highlighted == 'n' || obj.target.highlighted == 'n')
+				return ' nohl'
+			else
+				return ''
+		} else {
+			if (obj.highlighted == 'y')
+				return ' hl'
+			else if (obj.highlighted == 'n')
+				return ' nohl'
+			else
+				return ''
+		}
+	}
+	
+	// forces a browser reflow on the specified element
+	public.forceReflow = function (element) {
+		element.style('line-height', Math.random())
+	}
+
 	// return the public object to make the public functions accessable
 	return public;
 

@@ -176,18 +176,18 @@ function buildGraph (response, status) {
 		.attr('class', 'chart unselectable');
 
 	// create the defs section
-	chart.append('defs')
-		.append('clipPath')
+	chart.append('svg:defs')
+		.append('svg:clipPath')
 		.attr('id', 'clip')
-		.append('rect')
+		.append('svg:rect')
 		.attr('width', width)
 		.attr('height', mainHeight);
 
 	// construct the darkening filter for critical path highlighting
 	chart.select('defs')
-		.append('filter')
+		.append('svg:filter')
 		.attr('id', 'criticalFilterId')
-		.append('feColorMatrix')
+		.append('svg:feColorMatrix')
 		.attr('type', 'matrix')
 		.attr('values', '\
 				0.7 0   0   0   0\
@@ -197,9 +197,9 @@ function buildGraph (response, status) {
 
 	// construct the light filter for hovering over tasks
 	chart.select('defs')
-		.append('filter')
+		.append('svg:filter')
 		.attr('id', 'hoverFilterId')
-		.append('feColorMatrix')
+		.append('svg:feColorMatrix')
 		.attr('type', 'matrix')
 		.attr('values', '\
 				1.2 0   0   0   0\
@@ -208,7 +208,7 @@ function buildGraph (response, status) {
 				0   0   0   1   0');
 
 	// construct the mini graph
-	var mini = chart.append('g')
+	var mini = chart.append('svg:g')
 		.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 		.attr('width', width)
 		.attr('class', 'mini')
@@ -229,9 +229,9 @@ function buildGraph (response, status) {
 
 		tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
 
-		if ( (d3.event.isLeftClick()) && (x.invert(tempBrushXInitial) > brush.extent()[1] || x.invert(tempBrushXInitial) < brush.extent()[0]) ) {
+		if ( isLeftClick() && (x.invert(tempBrushXInitial) > brush.extent()[1] || x.invert(tempBrushXInitial) < brush.extent()[0]) ) {
 			drawing = 1;
-			tempBrush = brushContainer.append('rect')
+			tempBrush = brushContainer.append('svg:rect')
 				.attr('class', 'tempBrush hidden')
 				.attr('width', 0)
 				.attr('height', miniHeight)
@@ -264,9 +264,13 @@ function buildGraph (response, status) {
 	// handle panning and time selection behavior on the mini graph
 	function drawEnd () {
 		if (drawing == 1) {
-			var xa = Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left);
+			var xStart = tempBrushXInitial
+			var xEnd =  d3.mouse(chart.node())[0] - margin.left
+			var xa = Math.min(xStart, xEnd);
+			var xb = Math.max(xStart, xEnd);
 			var brushEndInMin = getTimeLinePercent(x.domain()[0], x.domain()[1], 5) / 60000;
-			var xb = Math.floor(x(x.invert(xa).getTime() + brushEndInMin * 60000 ));
+			var xbMin = Math.floor(x(x.invert(xa).getTime() + brushEndInMin * 60000 ));
+			xb = Math.max(xb, xbMin)
 			brush.extent([x.invert(xa), x.invert(xb)]);
 
 			tempBrush.remove();
@@ -279,6 +283,13 @@ function buildGraph (response, status) {
 		display(false, false);
 		chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 1000000) + ')';
 	}
+	
+	// returns true if the event was a left click, return false if it was a different kind of click
+	function isLeftClick () {
+		if (d3.event.isLeftClick == undefined)
+			return d3.event.button == 0
+		return d3.event.isLeftClick()
+	}
 
 	// Sets the custom dragging behavior
 	var panBehavior = d3.behavior.drag()
@@ -287,12 +298,12 @@ function buildGraph (response, status) {
 		.on("dragend", dragEnd);
 
 	// construct the main graph
-	var main = chart.append('g')
+	var main = chart.append('svg:g')
 		.attr('transform', 'translate(' + margin.left + ',' + (miniHeight + 60) + ')')
 		.attr('width', width)
 		.attr('height', mainHeight)
 		.attr('class', 'main')
-		.append('g')
+		.append('svg:g')
 		.attr('class', 'mainContent')
 		.call(panBehavior)
 
@@ -306,7 +317,7 @@ function buildGraph (response, status) {
 		if (d3.event.sourceEvent.shiftKey) {
 			selectingMain = true;
 			mainSelectionXInitial = d3.mouse(chart.node())[0] - margin.left;
-			mainSelection = main.append('rect')
+			mainSelection = main.append('svg:rect')
 				.attr('class', 'tempBrush')
 				.attr('width', 0)
 				.attr('height', mainHeight)
@@ -368,7 +379,7 @@ function buildGraph (response, status) {
 	}
 
 	// construct the area behind the objects
-	var background = main.append('rect')
+	var background = main.append('svg:rect')
 		.attr('width', width)
 		.attr('height', mainHeight)
 		.attr('class', 'background')
@@ -377,7 +388,7 @@ function buildGraph (response, status) {
 	var arrowheadNames = ["arrowhead", "arrowheadSelected", "arrowheadCritical", "arrowheadRedundant", "arrowheadCyclical"];
 	for (var i = 0; i < arrowheadNames.size(); ++i)
 		chart.select("defs")
-			.append("marker")
+			.append("svg:marker")
 			.attr("id", arrowheadNames[i])
 			.attr("viewBox", "0 -5 10 10")
 			.attr("refX", 10)
@@ -385,7 +396,7 @@ function buildGraph (response, status) {
 			.attr("markerWidth", 6)
 			.attr("markerHeight", 6)
 			.attr("orient", "auto")
-			.append("path")
+			.append("svg:path")
 			.attr("d", "M0,-5L10,0L0,5");
 
 	// handle events from the task height text box
@@ -423,44 +434,44 @@ function buildGraph (response, status) {
 		.tickFormat(d3Linear.format)
 		.tickSize(6, 0, 0);
 
-	var mainMinuteAxis = main.append('g')
+	var mainMinuteAxis = main.append('svg:g')
 		.attr('transform', 'translate(0,0.5)')
 		.attr('class', 'main axis minute')
 		.call(x1MainGraphAxis);
 
 
-	var miniMinuteAxis = mini.append('g')
+	var miniMinuteAxis = mini.append('svg:g')
 		.attr('transform', 'translate(0,' + miniHeight + ')')
 		.attr('class', 'axis minute')
 		.call(xMinuteAxis);
 
-	var miniHourAxis = mini.append('g')
+	var miniHourAxis = mini.append('svg:g')
 		.attr('transform', 'translate(0,0.5)')
 		.attr('class', 'axis hour')
 		.call(xHourAxis)
 
 	// construct the container for the task polygons
-	var itemPolys = main.append('g')
+	var itemPolys = main.append('svg:g')
 
 	// construct the container for the dependency lines
-	var itemArrows = main.append('g')
+	var itemArrows = main.append('svg:g')
 
 	// construct the container for the task labels
-	var itemLabels = main.append('g')
+	var itemLabels = main.append('svg:g')
 
 	// construct the polys in the mini graph
-	var miniPolys = mini.append('g')
+	var miniPolys = mini.append('svg:g')
 		.attr('class', 'miniItems')
 		.selectAll('polygon')
 		.data(items, function (d) { return d.id; })
 		.enter()
-		.append('polygon')
+		.append('svg:polygon')
 		.attr('id', function(d) { return 'mini-' + d.id; })
 		.attr('class', 'miniItem')
 		.attr('points', function(d) { return getPointsMini(d); });
 
 	// invisible hit area to move around the selection window
-	mini.append('rect')
+	mini.append('svg:rect')
 		.attr('pointer-events', 'painted')
 		.attr('width', width)
 		.attr('height', miniHeight)
@@ -478,10 +489,10 @@ function buildGraph (response, status) {
 	zoomScale = extentWidth / width;
 	x1.range([0, width / zoomScale]);
 
-	brushContainer = mini.append('g')
+	brushContainer = mini.append('svg:g')
 		.attr('class', 'brushContainer');
 
-	brushContainer.append('g')
+	brushContainer.append('svg:g')
 		.attr('class', 'x brush')
 		.call(brush)
 		.on("mousedown", function () {return})
@@ -493,12 +504,12 @@ function buildGraph (response, status) {
 	mini.selectAll('rect.background').remove();
 
 	// construct the line representing the current time
-	var mainNowLine = main.append('line')
+	var mainNowLine = main.append('svg:line')
 		.attr('y1', 0)
 		.attr('y2', mainHeight)
 		.attr('class', 'main todayLine')
 
-	var miniNowLine = mini.append('line')
+	var miniNowLine = mini.append('svg:line')
 		.attr('x1', x(now()) + 0.5)
 		.attr('y1', 0)
 		.attr('x2', x(now()) + 0.5)
@@ -617,7 +628,7 @@ function buildGraph (response, status) {
 
 		// add any task polys in the new domain extents
 		polys.enter()
-			.append('polygon')
+			.append('svg:polygon')
 			.attr('points', function(d) {
 				var p = d.points;
 				return p.x + ',' + p.y + ' '
@@ -634,7 +645,7 @@ function buildGraph (response, status) {
 			.on("dblclick", function(d) {
 				showAssetComment(d.id, 'show');
 			})
-			.append('title')
+			.append('svg:title')
 			.html(function(d) {
 				return d.number
 					+ ': ' + d.name
@@ -670,7 +681,7 @@ function buildGraph (response, status) {
 		lines.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
 
 		// add any dependency lines in the new domain extents
-		lines.enter().insert('line')
+		lines.enter().insert('svg:line')
 			.attr('x1', function(d) {
 				var start = x1(d.predecessor.start);
 				var end = x1(d.predecessor.end);
@@ -688,60 +699,105 @@ function buildGraph (response, status) {
 			.attr('id', function(d) { return 'dep-' + d.predecessor.id + '-' + d.successor.id; })
 			.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
 
-
+		
 		// move any selected lines to the top of the DOM
 		if (taskSelected != null)
 			lines.sort(function (a, b) { return a.selected - b.selected; });
 		lines.exit().remove();
+		
+		if (scaled || resized)
+			GraphUtil.forceReflow(itemArrows)
 
-		// update the item labels
-		labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
-			.data(visItems, function (d) { return d.id; });
 
-		if (scaled)
-			labels
+		if (GraphUtil.isIE()) {
+
+			// update the item labels
+			labels = itemLabels.selectAll('text')
+				.data(visItems, function (d) { return d.id; });
+
+			if (scaled)
+				labels
+					.attr('x', function(d) { return d.points.x; })
+					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); });
+
+			if (resized)
+				labels
+					.attr('y', function(d) { return d.points.y2 + 3; })
+					.attr('height', function(d) { return d.points.h; })
+			labels.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
+
+			// update the item labels' children
+			itemLabels.selectAll('text')
+
+			// add any labels in the new domain extents
+			labels.enter()
+				.append('svg:g')
+				.attr('class', 'itemLabel')
+				.append('text')
+				.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
+				.attr('id', function(d) { return 'label-' + d.id; })
 				.attr('x', function(d) { return d.points.x; })
-				.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); });
-
-		if (resized)
-			labels
-				.attr('y', function(d) { return d.points.y; })
+				.attr('y', function(d) { return d.points.y2 + 3; })
+				.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
 				.attr('height', function(d) { return d.points.h; })
-		labels.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
+				.text(function (d) { return d.number + ': ' + d.name; });
 
-		// update the item labels' children
-		itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
-			.select(':first-child')
-			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
-			.select(':first-child')
-			.select(':first-child')
-			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; });
 
-		// add any labels in the new domain extents
-		labels.enter()
-			.append('g')
-			.attr('class', 'itemLabel')
-			.append('foreignObject')
-			.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
-			.attr('id', function(d) { return 'label-' + d.id; })
-			.attr('x', function(d) { return d.points.x; })
-			.attr('y', function(d) { return d.points.y; })
-			.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
-			.attr('height', function(d) { return d.points.h; })
-			.append('xhtml:body')
-			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
-			.attr('class', 'itemLabel')
-			.append('div')
-			.attr('class', 'itemLabel')
-			.attr('align', 'center')
-			.append('p')
-			.attr('class', 'itemLabel')
-			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
-			.append('span')
-			.attr('class', 'itemLabel')
-			.html(function (d) { return d.number + ': ' + d.name; });
+			if (scaled || resized)
+				GraphUtil.forceReflow(itemLabels)
+			
+			labels.exit().remove();
+		} else {
+			
+			// update the item labels
+			labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
+				.data(visItems, function (d) { return d.id; });
 
-		labels.exit().remove();
+			if (scaled)
+				labels
+					.attr('x', function(d) { return d.points.x; })
+					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); });
+
+			if (resized)
+				labels
+					.attr('y', function(d) { return d.points.y; })
+					.attr('height', function(d) { return d.points.h; })
+			labels.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
+
+			// update the item labels' children
+			itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
+				.select(':first-child')
+				.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+				.select(':first-child')
+				.select(':first-child')
+				.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; });
+
+			// add any labels in the new domain extents
+			labels.enter()
+				.append('svg:g')
+				.attr('class', 'itemLabel')
+				.append('svg:foreignObject')
+				.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
+				.attr('id', function(d) { return 'label-' + d.id; })
+				.attr('x', function(d) { return d.points.x; })
+				.attr('y', function(d) { return d.points.y; })
+				.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
+				.attr('height', function(d) { return d.points.h; })
+				.append('xhtml:body')
+				.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+				.attr('class', 'itemLabel')
+				.append('div')
+				.attr('class', 'itemLabel')
+				.attr('align', 'center')
+				.append('p')
+				.attr('class', 'itemLabel')
+				.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+				.append('span')
+				.attr('class', 'itemLabel')
+				.html(function (d) { return d.number + ': ' + d.name; });
+
+			labels.exit().remove();
+		}
 
 		if (scaled) {
 			calculateLabelOffsets();
@@ -761,7 +817,10 @@ function buildGraph (response, status) {
 	function fullRedraw () {
 		itemPolys.selectAll('polygon').remove();
 		itemArrows.selectAll('line').remove();
-		itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); }).remove();
+		if (GraphUtil.isIE())
+			itemLabels.selectAll('g').remove();
+		else
+			itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); }).remove();
 		miniPolys.attr('points', function(d) { return getPointsMini(d); });
 		display(true, true);
 	}
@@ -769,11 +828,15 @@ function buildGraph (response, status) {
 	function calculateLabelOffsets () {
 		var pageOffset = x1(brush.extent()[0]);
 		var svgOffset = $(chart[0][0]).offset().left;
-		$('span.itemLabel').each(function (i, o) {
-			var pageX1 = $(o).offset().left - svgOffset;
-			var pageX2 = pageX1 + $(o).width();
-			o.__data__.labelStart = pageX1 + pageOffset;
-			o.__data__.labelEnd = pageX2 + pageOffset;
+		var labelElements = $('span.itemLabel')
+		if (GraphUtil.isIE())
+			labelElements = $('text.itemLabel')
+
+		labelElements.each(function (i, o) {
+			var d = o.__data__
+			var labelWidth = o.getBoundingClientRect().width
+			d.labelStart = d.points.x + (d.points.w / 2) - (labelWidth / 2)
+			d.labelEnd = d.points.x + (d.points.w / 2) + (labelWidth / 2)
 		});
 	}
 	debug.calculateLabelOffsets = calculateLabelOffsets;
@@ -783,8 +846,12 @@ function buildGraph (response, status) {
 
 		var visStart = x1(brush.extent()[0]);
 		var visEnd = x1(brush.extent()[1]);
+
 		labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
-			.data(items, function (d) { return d.id; });
+		if (GraphUtil.isIE())
+			labels = itemLabels.selectAll('g')
+		
+		labels.data(items, function (d) { return d.id; });
 
 		labels[0].each( function (o,i) {
 
@@ -794,6 +861,7 @@ function buildGraph (response, status) {
 
 			var newX = d.points.x;
 			var newW = Math.max(0, d.points.w - anchorOffset);
+			d.useOffset = true;
 
 			// check if the task is visible
 			if (x1(d.end) > visStart && x1(d.start) < visEnd) {
@@ -815,15 +883,24 @@ function buildGraph (response, status) {
 
 			o.__data__.labelX = newX;
 			o.__data__.labelW = newW;
-
-			d3.select(o)
-				.attr('x', newX)
-				.attr('width', newW)
-				.select(':first-child')
-				.attr('style', function(d) { return 'height: ' + o.__data__.points.h + 'px !important;max-width: ' + newW + 'px !important;'; })
-				.select(':first-child')
-				.select(':first-child')
-				.attr('style', function(d) { return 'width: ' + newW + 'px !important;max-width: ' + newW + 'px !important;'; });
+			
+			if (GraphUtil.isIE())
+				d3.select(o)
+					.select(':first-child')
+					.attr('x', function () {
+						if (d.useOffset)
+							return newX
+						return d.labelStart
+					})
+			else
+				d3.select(o)
+					.attr('x', newX)
+					.attr('width', newW)
+					.select(':first-child')
+					.attr('style', function(d) { return 'height: ' + o.__data__.points.h + 'px !important;max-width: ' + newW + 'px !important;'; })
+					.select(':first-child')
+					.select(':first-child')
+					.attr('style', function(d) { return 'width: ' + newW + 'px !important;max-width: ' + newW + 'px !important;'; });
 
 		});
 	}
@@ -955,8 +1032,10 @@ function buildGraph (response, status) {
 		if ( ! selecting )
 			taskSelected = null;
 
-		if ( ! skipRepaint )
+		if ( ! skipRepaint ) {
 			display(false, false, true);
+			correctLabelPositions()
+		}
 	}
 
 	// moves the brush to the selected location

@@ -366,10 +366,8 @@ function createSVGBindings (nodes, links) {
 				return getEntityDetails('planningConsole', 'Server', d.id);
 			})
 			.attr("id", function(d) { return 'node-'+d.index })
-			.style('cursor', 'default')
-			.style('pointer-events', 'none !important')
-			.style("fill", function(d) {
-				return GraphUtil.getFillColor(d, fill, fillMode);
+			.attr("style", function(d) {
+				return "cursor:default; fill:" + GraphUtil.getFillColor(d, fill, fillMode) + ";";
 			})
 			.attr("cx", 0)
 			.attr("cy", 0)
@@ -389,7 +387,7 @@ function createSVGBindings (nodes, links) {
 	GraphUtil.labelBindings.attr("class", "label")
 	
 	// Create the label backgrounds
-	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+	GraphUtil.labelTextBackgroundBindings = GraphUtil.labelBindings.append("svg:text")
 		.attr("id", function (d) {
 			return "label2-" + d.id;
 		})
@@ -401,7 +399,7 @@ function createSVGBindings (nodes, links) {
 		})
 	
 	// Create the label foregrounds
-	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text")
 		.attr("id", function (d) {
 			return "label-" + d.id;
 		})
@@ -486,7 +484,6 @@ function createBehaviorHandler (zoomBehavior, dragBehavior) {
 	// Rescales the contents of the svg. Called when the user scrolls.
 	function zooming (e) {
 		if (!dragging) {
-			console.log(d3.event)
 			if (d3.event.sourceEvent) {
 				d3.event.sourceEvent.stopPropagation()
 				d3.event.sourceEvent.preventDefault()
@@ -495,7 +492,6 @@ function createBehaviorHandler (zoomBehavior, dragBehavior) {
 			var offset = canvasSize / 2
 			var x = d3.event.translate[0] - offset
 			var y = d3.event.translate[1] - offset
-			console.log(x + ', ' + y)
 			GraphUtil.transformElement(svgTranslator, x, y, d3.event.scale)
 		}
 	}
@@ -627,6 +623,7 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 	var blackBackground = GraphUtil.isBlackBackground()
 	backgroundColor = blackBackground ? '#000000' : '#ffffff'
 	svgContainer.style('background-color', backgroundColor)
+	GraphUtil.forceReflow(svgContainer)
 	
 	// Create the force layout
 	if (linkSize)
@@ -949,7 +946,6 @@ function cutAndRemove () {
 		return;
 	}
 	
-	
 	var progressBar = displayProgressBar();
 	var edges = [];
 	var bestDifference = 9999;
@@ -1004,6 +1000,8 @@ function cutAndRemove () {
 			// reset any nodes that were cut previously
 			$(nodes).each(function (i, n) {
 				n.cut = 0;
+				if (n.cutGroup == -1)
+					n.cutGroup = 0;
 			});
 			
 			// find which nodes were cut and put them in a new group
@@ -1041,7 +1039,18 @@ function cutAndRemove () {
 
 // the logic required to undo the cuts was too complicated, so just reload the graph
 function undoCuts () {
-	resetMap();
+	GraphUtil.force.nodes().each(function (node) {
+		console.log(node)
+		node.cutGroup = -1
+		node.cut = 0
+	})
+	GraphUtil.force.links().each(function (link) {
+		link.cut = null
+	})
+	
+	GraphUtil.createCutShadows(fill)
+	
+	rebuildMap(true, false, parseInt($('#linkSizeId').val()), false, false);
 }
 
 
@@ -1203,6 +1212,5 @@ function setGraphDimensions (width, height) {
 		.attr("width", width)
 		.attr("height", height)
 }
-
 </script>
 </div>
