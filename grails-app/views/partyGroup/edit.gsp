@@ -4,6 +4,17 @@
         <meta name="layout" content="topNav" />
         <title>Edit Company</title>
 
+        <g:javascript>
+        function textCounter(field, maxlimit){
+            if (field.value.length > maxlimit){ // if too long...trim it!
+                field.value = field.value.substring(0, maxlimit);
+                return false;
+            } else {
+                return true;
+            }
+        }
+        </g:javascript>
+        <r:layoutResources />
     </head>
     <body>
 
@@ -85,5 +96,6 @@
     $('.menu-list-companies').addClass('active');
     $('.menu-parent-admin').addClass('active');
 </script>
+<r:layoutResources />
     </body>
 </html>
