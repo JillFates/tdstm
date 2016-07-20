@@ -108,7 +108,7 @@
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h1 class="modal-title" id="myModalLabel">Bulk Delete</h1>
+	        <h4 class="modal-title" id="myModalLabel">Bulk Delete</h4>
 	      </div>
 	      <div class="modal-body">
 	      	<p>
