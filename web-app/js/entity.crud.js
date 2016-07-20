@@ -1102,6 +1102,7 @@ var EntityCrud = ( function($) {
 			if (!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
 
+			$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 			$('[data-toggle="popover"]').popover();
 
 			return true;
