@@ -51,11 +51,21 @@ $(document).ready(function() {
 		</tr>
 		<tr>
 		<td class="task_bar_legend">
-			<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: ${legendWidth};" align="center">Done<br />${countDone}</div>
-			<div class="task_started task_bar_graph" id="tasksStartBar" style="width: ${legendWidth};" align="center">Started<br />${countStarted}</div>
-			<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: ${legendWidth};" align="center">Ready<br />${countReady}</div>
-			<div class="task_hold task_bar_graph" id="tasksHoldBar" style="width: ${legendHoldWidth};" align="center">Hold<br />${countHold}</div>
+			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Done'])}">
+				<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: ${legendWidth};" align="center">Done<br />${countDone}</div>
+			</a>
+			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Started'])}">
+				<div class="task_started task_bar_graph" id="tasksStartBar" style="width: ${legendWidth};" align="center">Started<br />${countStarted}</div>
+			</a>
+			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Ready'])}">
+				<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: ${legendWidth};" align="center">Ready<br />${countReady}</div>
+			</a>
+			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Hold'])}">
+				<div class="task_hold task_bar_graph" id="tasksHoldBar" style="width: ${legendHoldWidth};" align="center">Hold<br />${countHold}</div>
+			</a>
+			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Pending'])}">
 			<div class="task_pending task_bar_graph" id="tasksPendingBar" style="width: ${legendWidth};" align="center">Pending<br />${countPending}</div>
+			</a>
 		</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
@@ -93,8 +103,13 @@ $(document).ready(function() {
 			<tr>
 			<g:each var="c" in="${r}">
 				<g:set var="team" value="${c}" />
-				<td class="teamcol" nowrap><b>${team.role.description}</b></td>
-				<td class="teamcountcolumn"><b>${team.teamTaskCount}</b></td>
+					<td class="teamcol" nowrap>
+						<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[role:team.role.id])}" style="display:block">${team.role.description}</a>
+					</td>
+				
+				<td class="teamcountcolumn">
+					<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[role:team.role.id])}" style="display:block">${team.teamTaskCount}</a>
+				</td>
 				<td class="teambarcolumn" nowrap>
 					<g:set var="remainingTeamTask" value="${team.teamTaskCount - team.teamDoneCount}" />
 					<g:if test="${team.percDone < 100}" >

@@ -791,11 +791,25 @@
 			$("#eventStringId").html(planSum.eventString)
 			$("#eventRunbook").html(planSum.eventRunbook)
 			
+			var taskManagerUrl = contextPath + "/assetEntity/listTasks?bundle=" + moveBundleId + "&justRemaining="
 			// handle the calculations for each step
 			for( i = 0; i < steps.length; i++ ) {
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
-				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? "0 (of 0)" : steps[i].tskComp+" (of "+steps[i].tskTot+")");
+
+
+				var remainingTasksNumber = 0
+				var totalTasksNumber = 0
+				if(!isNaN(steps[i].tskComp / steps[i].tskTot)){
+					remainingTasksNumber = steps[i].tskComp
+					totalTasksNumber = steps[i].tskTot
+				}
+				var firstUrl = taskManagerUrl + "1&step=" +steps[i].wfTranId
+				var secondUrl = taskManagerUrl + "0&step=" +steps[i].wfTranId
+				var linksHtml = "<a href=\""+ firstUrl +"\">" + remainingTasksNumber + "</a> (of <a href=\"" + secondUrl+ "\">" + totalTasksNumber + "</a>)"
+
+				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(linksHtml);
+			
 				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planStart));
 				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planComp));
 				var startDelta = 0

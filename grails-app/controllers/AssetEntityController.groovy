@@ -2454,18 +2454,20 @@ class AssetEntityController {
 			def entities = assetEntityService.entityInfo( project )
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 			def companiesList = partyRelationshipService.getCompaniesList()
+			def role = filters?.role ?:(params.role ?: '')
 			return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
 					files:entities.files,networks:entities.networks, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 					moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 					comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
-					dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
+					dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: role,
 					category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList, viewUnpublished : viewUnpublished,
 					staffRoles:taskService.getTeamRolesForTasks(), taskPref:taskPref, attributesList: assetCommentFields.keySet().sort{it}, modelPref:modelPref,
 					//staffRoles:taskService.getRolesForStaff(), 
 					sizePref:userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE)?: '25',
 					partyGroupList: companiesList,
-					company: project.client]
+					company: project.client, status:params.status, step:params.step]
 		} catch (RuntimeException uex) {
+			uex.printStackTrace()
 			log.error uex.getMessage()
 			response.sendError( 401, "Unauthorized Error")
 		}
@@ -2621,6 +2623,10 @@ class AssetEntityController {
 			createAlias('assetEntity', 'assetEntity', CriteriaSpecification.LEFT_JOIN)
 			createAlias("moveEvent", "moveEvent", CriteriaSpecification.LEFT_JOIN)
 			createAlias("assetEntity.moveBundle", "moveBundle", CriteriaSpecification.LEFT_JOIN)
+			if(params.step){
+				createAlias("workflowTransition", "workflowTransition", CriteriaSpecification.LEFT_JOIN)
+				eq("workflowTransition.id", params.step.toLong())
+			}
 			if (!viewUnpublished)
 				eq("isPublished", true)
 			if (params.assetType)

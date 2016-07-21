@@ -64,10 +64,14 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
+			var status = '${status}'
+			var step = "${step}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
+			var taskManagerUrl = "/assetEntity/listTasks"
 			var listCaption ="Tasks: \
 				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
-				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>"
+				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>\
+				<tdsactionbutton id='clearFilters' icon='' label='Clear Filters' link='" + taskManagerUrl + "'></tdsactionbutton>"
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
@@ -92,7 +96,7 @@
 				scrollOffset="0"
 				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
-					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
+					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, step:step }"
 				showPager="true">
 				<jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
 				<jqgrid:navigation id="taskListId" add="false" edit="false" del="false" search="false" refresh="false" />
