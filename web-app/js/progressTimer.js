@@ -41,6 +41,13 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 		});
 	};
 
+	public.showState = function(state, bar, attachment) {
+		// When is completed 1 = 100%
+		if(bar.value() == 1){
+			public.refreshFunction();
+		}
+	}
+
 	public.Start = function (sec) {
 
 		if(public.progressTimer) {
@@ -54,12 +61,7 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 			trailColor: '#eee',
 			trailWidth: 0,
 			svgStyle: null,
-			step: (state, bar, attachment) => {
-				// When is completed 1 = 100%
-				if(bar.value() == 1){
-					public.refreshFunction();
-				}
-			}
+			step: public.showState
 		});
 
 		public.progressTimer.animate(1.0)
