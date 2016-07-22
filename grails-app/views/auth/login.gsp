@@ -21,8 +21,16 @@
 
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
 
+
 	<!-- jQuery -->
+	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.dialog.css')}"/>
+	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'jquery-ui-smoothness.css')}"/>
+	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css"
+		  href="${resource(dir: 'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness', file: 'jquery-ui-1.8.15.custom.css')}"/>
+
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
+	<g:javascript src="jquery-1.9.1.js"/>
+	<g:javascript src="jquery-1.9.1-ui.js"/>
 
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -32,7 +40,6 @@
 	<script src="${resource(dir:'dist/js/vendors/respond/dest',file:'respond.min.js')}"></script>
 	<![endif]-->
 	<script language="javascript" type="text/javascript">
-		// Let's keep this until migrate the login into angularjs.
 
 		function setFieldFocus() {
 			<g:if test="${loginConfig.authorityPrompt in ['select', 'prompt']}">
@@ -54,6 +61,63 @@
 				var form = $("form")[0];
 				form.submit();
 			});
+
+			$('#openSupportedBrowsers').click(function(event){
+				event.preventDefault();
+				$( "#dialog" ).dialog(
+					{
+						modal: true,
+						minHeight: 360,
+						minWidth: 500,
+						resizable: false
+					});
+				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span>');
+			});
+
+			/**
+			 * detect IE
+			 * returns version of IE or false, if browser is not Internet Explorer
+			 */
+			function detectIE() {
+				var ua = window.navigator.userAgent,
+					browserElement = {
+						version: 0,
+						vendor: ''
+					};
+
+				var msie = ua.indexOf('MSIE ');
+				if (msie > 0) {
+					// IE 10 or older => return version number
+					browserElement.vendor = 'IE';
+					browserElement.version = parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+					return browserElement;
+				}
+
+				var trident = ua.indexOf('Trident/');
+				if (trident > 0) {
+					// IE 11 => return version number
+					var rv = ua.indexOf('rv:');
+					browserElement.vendor = 'TRIDENT';
+					browserElement.version = parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+					return browserElement;
+				}
+
+				var edge = ua.indexOf('Edge/');
+				if (edge > 0) {
+					// Edge (IE 12+) => return version number
+					browserElement.vendor = 'EDGE';
+					browserElement.version = parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+					return browserElement;
+				}
+				
+				return browserElement;
+			}
+
+			var browserDected = detectIE();
+
+			if(browserDected.vendor === 'IE' && browserDected.version <= 9) {
+				$('.loginErrorMsg').show();
+			}
 		});
 
 	</script>
@@ -109,15 +173,12 @@
 			</div>
 		</g:form>
 
-		<div class="loginErrorMsg">
-			<g:if test="${request.getHeader('User-Agent')}">
-				<g:if test="${request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
-					<div class="message" >Warning: This site no longer supports version of Internet Explorer before version 9. We recommend that you use a newer browser for this site.</div>
-				</g:if>
-			</g:if>
-			<g:else>
-				<div class="alert alert-warning"><strong>Warning!</strong> Unable to determine your browser type and therefore unable to guarantee the site will work properly.</div>
-			</g:else>
+		<div class="loginErrorMsg" style="display: none;">
+			<div class="message">
+				<p><label>Warning:</label> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
+				<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
+				<p>Click <a href="#" id="openSupportedBrowsers">here</a> for supported browsers.</p>
+			</div>
 		</div>
 		<div class="loginIframe">
 			<pre><g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link></pre>
@@ -125,6 +186,32 @@
 		<div class="buildInfo">${buildInfo}</div>
 	</div>
 	<!-- /.login-box-body -->
+
+	<div id="dialog" title="Browser Upgrade Recommended" style="display: none;">
+		<p><label>Warning:</label> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
+		<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
+		<div class="row" style="margin-top: 28px; margin-left: 0px; font-size: 14px; text-align: justify;">
+			<div class="col-xs-3">
+				<img src="${resource(dir:'icons/png',file:'internet_explorer.png')}" border="0" />
+				Internet Explorer 10+
+			</div>
+			<div class="col-xs-3">
+				<img src="${resource(dir:'icons/png',file:'firefox.png')}" border="0" />
+				Fire Fox 45+
+			</div>
+			<div class="col-xs-3">
+				<img src="${resource(dir:'icons/png',file:'chrome.png')}" border="0" />
+				Chrome 50+
+			</div>
+			<div class="col-xs-3">
+				<img src="${resource(dir:'icons/png',file:'safari.png')}" border="0" />
+				Safari 8+
+			</div>
+		</div>
+		<br />
+		<a style="float: right; color: #337ab7; font-weight: 600;" href="http://browsehappy.com/?locale=en" target="_blank">Get Latest Versions</a>
+	</div>
+
 </div>
 <!-- /.login-box -->
 
