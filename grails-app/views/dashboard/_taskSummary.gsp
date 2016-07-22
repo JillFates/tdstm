@@ -51,7 +51,7 @@ $(document).ready(function() {
 		</tr>
 		<tr>
 		<td class="task_bar_legend">
-			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Done'])}">
+			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Completed'])}">
 				<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: ${legendWidth};" align="center">Done<br />${countDone}</div>
 			</a>
 			<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[status:'Started'])}">
