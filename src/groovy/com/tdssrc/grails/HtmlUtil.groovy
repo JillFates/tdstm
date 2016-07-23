@@ -114,8 +114,7 @@ class HtmlUtil {
 				remoteIp = request.getRemoteAddr()
 			}
 		} else {
-			remoteIp = 'IP.Unknown'
-
+			remoteIp = 'Unknown'
 		}
 
 		return remoteIp.toString()

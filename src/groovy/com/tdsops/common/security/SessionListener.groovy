@@ -12,6 +12,8 @@ import org.apache.log4j.Logger
 import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.support.DefaultSubjectContext
 
+import com.tdssrc.grails.HtmlUtil
+
 class SessionListener implements HttpSessionListener, HttpSessionAttributeListener {
 
 	private static final String SHIRO_KEY = DefaultSubjectContext.PRINCIPALS_SESSION_KEY
@@ -27,9 +29,8 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 
 			HttpSession session = event.session
 
-			String ipAddr = HtmlUtil.getRemoteIp()
-
-			log.debug LOGGER_PREFIX + 'Created; id: ' + session.id + ' @ '+ipAddr+' at ' + session.creationTime
+			log.debug LOGGER_PREFIX + 'Created; id: ' + session.id + ', at ' + session.creationTime +
+				', ip: ' + HtmlUtil.getRemoteIp()
 		}
 		catch (ignored) {}
 	}
@@ -54,9 +55,11 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 					// boolean added = false
 					if (name == SHIRO_KEY) {
 						PrincipalCollection principals = session.getAttribute(name)
-						sb << 'Shiro principal found in session: ' << principals.primaryPrincipal << ', '
+						sb << 'Shiro principal found in session: ' << principals.primaryPrincipal 
 						// added = true
 					}
+
+					sb << ', ip: ' + HTMLUtil.getRemoteIp()
 					/*
 					if (name == LOGIN_PERSON) {
 						if (added) sb << ', '
@@ -132,6 +135,8 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 		//}
 		
 		if (added) {
+			sb << ', ip: ' + HtmlUtil.getRemoteIp()
+			
 			log.debug sb.toString()
 		}
 	}
