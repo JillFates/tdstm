@@ -439,20 +439,23 @@ class CustomTagLib {
 		out << urlGenerated
 	}
 
+	/** 
+	 * Used internally to initialize the URL for the favicon one time since it is referenced often
+	 */
 	@Synchronized
-    private void initializeFavicon() {
-    	if (faviconStr == null) {
-    		faviconStr = g.external( uri:'/images/favicon.ico' )
-    		faviconStr = faviconStr.replace('/>', ' type="image/x-icon"/>')
-    		faviconStr = faviconStr[0..-3]
-    	}
-    }
+	private void initializeFavicon() {
+		if (faviconStr == null) {
+			faviconStr = '<link href="' + resource( dir:'/images', file:'favicon.ico' ) +
+				'" rel="shortcut icon" type="image/x-icon"/>'
+		}
+	}
 
 	/**
 	 * Used to generate the link for including the favicon.ico file into a page
 	 * @usage: <tds:favicon />
 	 */
 	def favicon = { attrs -> 
+
 		if (faviconStr == null) {
 			initializeFavicon()
 		}
