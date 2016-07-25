@@ -1,37 +1,46 @@
 <%@page import="com.tds.asset.AssetType;"%>
+
 <tds:hasPermission permission='AssetEdit'>
-	<span class="button"><input type="button" class="edit" value="Edit" onclick="EntityCrud.showAssetEditView('${assetEntity.assetClass}', ${assetEntity?.id});" /> </span>
+    <button class="btn btn-default" type="button" onclick="EntityCrud.showAssetEditView('${assetEntity.assetClass}', ${assetEntity?.id});">
+        <img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px"/> Edit
+    </button>
 </tds:hasPermission>
+
 <tds:hasPermission permission='AssetDelete'>
 	<g:if test="${deleteChassisWarning}">
-		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('This chassis has blades assigned to it. Deleting the chassis will ' +
-		  'clear the reference for all associated blades. Click OK to continue otherwise click Cancel.');" value="Delete" /> </span>
+        <button class="btn btn-default" type="submit" onclick="return confirm('This chassis has blades assigned to it. Deleting the chassis will clear the reference for all associated blades. Click OK to continue otherwise click Cancel.');">
+            <img src="${resource(dir:'icons',file:'database_delete.png')}" border="0px"/> Delete
+        </button>
 	</g:if>
 	<g:else>
-		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>	
+        <button class="btn btn-default" type="submit" onclick="return confirm('Are you sure?');">
+            <img src="${resource(dir:'icons',file:'database_delete.png')}" border="0px"/> Delete
+        </button>
 	</g:else>
-	
+
 </tds:hasPermission>
 
-<a href="javascript:createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
-	<img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
-</a>
+<button class="btn btn-default" type="button" onclick="createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
+    <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px"/> Add Task
+</button>
 
 <tds:hasPermission permission="AssetEdit">
-	<a href="javascript:createIssue('${escapedName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
-		<img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
-	</a>
+    <button class="btn btn-default" type="button" onclick="createIssue('${escapedName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
+        <img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px"/> Add Comment
+    </button>
 </tds:hasPermission>
 
 <%-- TODO : JPM 10/2014 : Refactor logic for cable button test to be in domain --%>
 <g:if test="${assetEntity && assetEntity?.assetType in AssetType.getPhysicalServerTypes() && assetEntity?.model && assetEntity.isCableExist()}">
-	<span class="button"><input type="button" id="cableId" name="cableId" class="cableedit" value="Cable" onclick="openCablingDiv(${assetEntity?.id},'S')" /> </span>
+    <button class="btn btn-default" type="button" onclick="openCablingDiv(${assetEntity?.id},'S')">
+        <img src="${resource(dir:'icons',file:'disconnect.png')}" border="0px"/> Cable
+    </button>
 </g:if>
 
 <tds:hasPermission permission='ArchitectureView'>
-<span class="button">
-	<g:link controller="assetEntity" action="architectureViewer" params="[assetId:assetEntity?.id, level:2]">
-		<input type="button" class="architectureGraph" value="Arch Graph" />
-	</g:link>
-</span>
+
+<g:link controller="assetEntity" action="architectureViewer" params="[assetId:assetEntity?.id, level:2]" class="btn btn-default" role="button">
+    <input type="button" class="architectureGraph" value="Arch Graph" />
+</g:link>
+
 </tds:hasPermission>
