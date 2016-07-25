@@ -146,7 +146,7 @@ function buildGraph (response, status) {
 			return 0;
 	});
 
-
+	
 	var x = d3.time.scale().domain([parseStartDate(data.startDate), items[items.length-1].end]).range([0, $(window).width() - $('div.body h1').offset().left * 2 - 10]);
 
 	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length-1].end);
@@ -268,11 +268,15 @@ function buildGraph (response, status) {
 			var xEnd =  d3.mouse(chart.node())[0] - margin.left
 			var xa = Math.min(xStart, xEnd);
 			var xb = Math.max(xStart, xEnd);
-			var brushEndInMin = getTimeLinePercent(x.domain()[0], x.domain()[1], 5) / 60000;
-			var xbMin = Math.floor(x(x.invert(xa).getTime() + brushEndInMin * 60000 ));
-			xb = Math.max(xb, xbMin)
-			brush.extent([x.invert(xa), x.invert(xb)]);
+			
+			// if the user clicked, move the current brush to that position
+			if (xb - xa < 6) {
+				var width = x(brush.extent()[1]) - x(brush.extent()[0])
+				xa = xa - width / 2
+				xb = xa + width
+			}
 
+			brush.extent([x.invert(xa), x.invert(xb)]);
 			tempBrush.remove();
 			tempBrush = null;
 			tempBrushXInitial = 0;
@@ -2526,7 +2530,7 @@ function getTimeFormatToDraw(startDate, endDate, increasePer) {
 				}
 			}
 
-			scale.zoomTime = getTimeLinePercent(startDate, endDate, 5);
+			scale.zoomTime = getTimeLinePercent(startDate, endDate, 10);
 
 			break;
 		}
