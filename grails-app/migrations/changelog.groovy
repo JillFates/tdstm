@@ -128,4 +128,5 @@ databaseChangeLog = {
 	include file: '20160607-delete-orphan-parties.groovy'
 	include file: '20160711-remove-ContactMech-domain.groovy'
 	include file: '20160712-add-additional-Application-criticality-options.groovy'
+	include file: "20160725-change-engine-to-InnoDB-for-MyISAM-tables.groovy"
 }
