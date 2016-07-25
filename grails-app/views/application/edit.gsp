@@ -191,12 +191,8 @@
 								</td>
 								<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}"><label for="retireDate">Retire Date:</label>
 								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
-								    <script type="text/javascript" charset="utf-8">
-										jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-									</script>
-									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
+								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
+									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="26"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}"  />" > 
 								</td>
 								<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label>
@@ -213,15 +209,13 @@
 							    <td></td>
 							    <td></td>
 							    <td  class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
-								<td valign="top"
-										class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
+								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
-										jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 									</script>
 									<input type="text" class="dateRange ${config.maintExpDate}" 
-										size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="27"
-										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />" 
-									>
+										size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" tabindex="27"
+										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">
 								</td>
 								<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>
