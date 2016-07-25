@@ -276,20 +276,28 @@ class PersonService {
 
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType='STAFF' " +
 			"and PR.roleTypeCodeFrom='COMPANY' and PR.roleTypeCodeTo='STAFF' and PR.partyIdFrom IN (:companies)"
-		String where = " and P.firstName=:firstName and P.middleName=:middleName and P.lastName=:lastName"
-		String lastName = lastNameWithSuffix(nameMap)
 		List companies = [project.client]
+		
+		String where = " and P.firstName=:firstName"
+		String lastName = lastNameWithSuffix(nameMap)
+		Map queryParams = [ 
+			companies: companies,
+			firstName: nameMap.first
+		]
+
+		if(lastName){
+			where += " AND P.lastName=:lastName"
+			queryParams["lastName"] = lastName
+		}
+		if(nameMap.middle){
+			where += " AND P.middleName=:middleName"
+			queryParams["middleName"] = nameMap.middle
+		}
+
 		if (! clientStaffOnly) {
 			companies << projectService.getOwner(project)
 			companies.addAll( projectService.getPartners(project) )
 		}
-
-		Map queryParams = [ 
-			companies: companies,
-			firstName: nameMap.first,
-			middleName: nameMap.middle,
-			lastName: lastName 
-		]
 
 		// Try finding the person with an exact match
 		List persons = Person.findAll(hql+where, queryParams)
