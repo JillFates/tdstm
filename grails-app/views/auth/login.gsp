@@ -62,61 +62,61 @@
 				form.submit();
 			});
 
-			$('#openSupportedBrowsers').click(function(event){
+			$('.openSupportedBrowsers').click(function(event){
 				event.preventDefault();
 				$( "#dialog" ).dialog(
 					{
 						modal: true,
 						minHeight: 360,
-						minWidth: 500,
+						minWidth: 520,
 						resizable: false
 					});
 				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span>');
 			});
 
-			/**
-			 * detect IE
-			 * returns version of IE or false, if browser is not Internet Explorer
-			 */
+			// This functions search for the real version and detects if is or not in compatiblity Mode for IE
 			function detectIE() {
-				var ua = window.navigator.userAgent,
-					browserElement = {
-						version: 0,
-						vendor: ''
-					};
+				//Set defaults
+				var value = {
+					isIE: false,
+					trueVersion: 0,
+					actingVersion: 0,
+					compatibilityMode: false
+				};
 
-				var msie = ua.indexOf('MSIE ');
-				if (msie > 0) {
-					// IE 10 or older => return version number
-					browserElement.vendor = 'IE';
-					browserElement.version = parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-					return browserElement;
+				//Try to find the Trident version number
+				var trident = navigator.userAgent.match(/Trident\/(\d+)/);
+				if (trident) {
+					value.isIE = true;
+					//Convert from the Trident version number to the IE version number
+					value.trueVersion = parseInt(trident[1], 10) + 4;
 				}
 
-				var trident = ua.indexOf('Trident/');
-				if (trident > 0) {
-					// IE 11 => return version number
-					var rv = ua.indexOf('rv:');
-					browserElement.vendor = 'TRIDENT';
-					browserElement.version = parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-					return browserElement;
+				//Try to find the MSIE number
+				var msie = navigator.userAgent.match(/MSIE (\d+)/);
+				if (msie) {
+					value.isIE = true;
+					//Find the IE version number from the user agent string
+					value.actingVersion = parseInt(msie[1]);
+				} else {
+					//Must be IE 11 in "edge" mode
+					value.actingVersion = value.trueVersion;
 				}
 
-				var edge = ua.indexOf('Edge/');
-				if (edge > 0) {
-					// Edge (IE 12+) => return version number
-					browserElement.vendor = 'EDGE';
-					browserElement.version = parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-					return browserElement;
+				//If we have both a Trident and MSIE version number, see if they're different
+				if (value.isIE && value.trueVersion > 0 && value.actingVersion > 0) {
+					//In compatibility mode if the trident number doesn't match up with the MSIE number
+					value.compatibilityMode = value.trueVersion != value.actingVersion;
 				}
-				
-				return browserElement;
+				return value;
 			}
 
-			var browserDected = detectIE();
 
-			if(browserDected.vendor === 'IE' && browserDected.version <= 9) {
-				$('.loginErrorMsg').show();
+			var browserValue = detectIE();
+			if(browserValue.isIE && browserValue.compatibilityMode) {
+				$('.compatibility-mode').show();
+			} else if(browserValue.isIE && browserValue.trueVersion <= 8) {
+				$('.unsopported').show();
 			}
 		});
 
@@ -173,11 +173,16 @@
 			</div>
 		</g:form>
 
-		<div class="loginErrorMsg" style="display: none;">
-			<div class="message">
+		<div class="loginErrorMsg">
+			<div class="message unsopported" style="display: none;">
 				<p><label>Warning:</label> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
 				<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
-				<p>Click <a href="#" id="openSupportedBrowsers">here</a> for supported browsers.</p>
+				<p>Click <a href="#" class="openSupportedBrowsers">here</a> for supported browsers.</p>
+			</div>
+
+			<div class="message compatibility-mode" style="display: none;">
+				<p>Internet Explorer is configured to use Compatibility Mode that may cause erratic behavior in the application therefore it is recommended to disable or use a supported browser.</p>
+				<p>Click <a href="#" class="openSupportedBrowsers">here</a> for more information</p>
 			</div>
 		</div>
 		<div class="loginIframe">
@@ -187,25 +192,25 @@
 	</div>
 	<!-- /.login-box-body -->
 
-	<div id="dialog" title="Browser Upgrade Recommended" style="display: none;">
+	<div id="dialog" title="Browser Upgrade Recommended" style="display: none; text-align: justify;">
 		<p><label>Warning:</label> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
 		<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
 		<div class="row" style="margin-top: 28px; margin-left: 0px; font-size: 14px; text-align: justify;">
 			<div class="col-xs-3">
 				<img src="${resource(dir:'icons/png',file:'internet_explorer.png')}" border="0" />
-				Internet Explorer 10+
+				<span style="font-size: 13px;">Internet Explorer 9+</span>
 			</div>
 			<div class="col-xs-3">
 				<img src="${resource(dir:'icons/png',file:'firefox.png')}" border="0" />
-				Fire Fox 45+
+				<span style="font-size: 13px;">FireFox 42+</span>
 			</div>
 			<div class="col-xs-3">
 				<img src="${resource(dir:'icons/png',file:'chrome.png')}" border="0" />
-				Chrome 50+
+				<span style="font-size: 13px;">Chrome 44+</span>
 			</div>
 			<div class="col-xs-3">
 				<img src="${resource(dir:'icons/png',file:'safari.png')}" border="0" />
-				Safari 8+
+				<span style="font-size: 13px;">Safari 8+ <br /> (Only Mac)</span>
 			</div>
 		</div>
 		<br />
