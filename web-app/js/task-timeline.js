@@ -206,6 +206,12 @@ function buildGraph (response, status) {
 				0   1.2 0   0   0\
 				0   0   1.2 0   0\
 				0   0   0   1   0');
+	
+	// Sets the custom dragging behavior
+	var miniDragBehavior = d3.behavior.drag()
+		.on("dragstart", drawStart)
+		.on("drag", drawMove)
+		.on("dragend", drawEnd);
 
 	// construct the mini graph
 	var mini = chart.append('svg:g')
@@ -213,23 +219,21 @@ function buildGraph (response, status) {
 		.attr('width', width)
 		.attr('class', 'mini')
 		.attr('height', miniHeight)
-		.on('mousedown', drawStart)
-		.on('mousemove', drawMove)
-		.on('mouseup', drawEnd)
-	//.on('mouseleave', drawEnd);
-
+		.call(miniDragBehavior)
+	
+	
 	var brushContainer;
-
+	
 	var tempBrush = null;
 	var tempBrushXInitial = 0;
 	var drawing = 0;
 
 	// handle panning and time selection behavior on the mini graph
 	function drawStart () {
-
 		tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
 
-		if ( isLeftClick() && (x.invert(tempBrushXInitial) > brush.extent()[1] || x.invert(tempBrushXInitial) < brush.extent()[0]) ) {
+		// if we are outside the brush, we are drawing a new region or setting a new brush position
+		if ( (d3.event.sourceEvent.which == 1) && (x.invert(tempBrushXInitial + 4) < brush.extent()[0] || x.invert(tempBrushXInitial - 4) > brush.extent()[1]) ) {
 			drawing = 1;
 			tempBrush = brushContainer.append('svg:rect')
 				.attr('class', 'tempBrush hidden')
@@ -237,7 +241,10 @@ function buildGraph (response, status) {
 				.attr('height', miniHeight)
 				.attr('x', d3.mouse(chart.node())[0] - margin.left)
 				.attr('y', 0);
+
+		// otherwise we are panning the brush
 		} else {
+			mini.classed('brushMoving', true)
 			tempBrushXInitial = 0;
 			drawing = 0;
 		}
@@ -282,6 +289,7 @@ function buildGraph (response, status) {
 			tempBrushXInitial = 0;
 			display(true, true);
 		}
+		mini.classed('brushMoving', false)
 		drawing = 0;
 		chart.classed('resizing', false);
 		display(false, false);
@@ -371,15 +379,14 @@ function buildGraph (response, status) {
 			display(true, true);
 		} else {
 			display(false, false);
+			if (GraphUtil.isIE()) {
+				calculateLabelVisWidths();
+			}
 			correctLabelPositions();
 			chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 100000) + ')';
 		}
 		chart.classed('dragging', false);
 		chart.classed('resizing', false);
-	}
-
-	function getViewWidth () {
-
 	}
 
 	// construct the area behind the objects
@@ -476,6 +483,7 @@ function buildGraph (response, status) {
 
 	// invisible hit area to move around the selection window
 	mini.append('svg:rect')
+		.attr('id', 'miniBackgroundId')
 		.attr('pointer-events', 'painted')
 		.attr('width', width)
 		.attr('height', miniHeight)
@@ -536,6 +544,7 @@ function buildGraph (response, status) {
 	$('#spinnerId').css('display', 'none');
 	var offsetInitial =  -1 * x(brush.extent()[0]);
 	ready = true;
+	display(true, true);
 	display(true, true);
 
 
@@ -717,12 +726,12 @@ function buildGraph (response, status) {
 
 			// update the item labels
 			labels = itemLabels.selectAll('text')
-				.data(visItems, function (d) { return d.id; });
+				.data(visItems, function (d) { return d.id; })
 
 			if (scaled)
 				labels
 					.attr('x', function(d) { return d.points.x; })
-					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); });
+					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
 
 			if (resized)
 				labels
@@ -804,6 +813,11 @@ function buildGraph (response, status) {
 		}
 
 		if (scaled) {
+			if (GraphUtil.isIE()) {
+				calculateLabelMaxWidths();
+				calculateLabelBoundedWidths();
+				calculateLabelVisWidths();
+			}
 			calculateLabelOffsets();
 			correctLabelPositions();
 		}
@@ -828,17 +842,49 @@ function buildGraph (response, status) {
 		miniPolys.attr('points', function(d) { return getPointsMini(d); });
 		display(true, true);
 	}
+	
+	// calculate the full widths of the labels
+	function calculateLabelMaxWidths () {
+		$('text.itemLabel').each(function (i, o) {
+			var d = o.__data__
+			if (d.labelWidth == null)
+				d.labelWidth = o.getBoundingClientRect().width
+		});
+	}
+	
+	// calculate the widths of the labels bounded by the box of their task
+	function calculateLabelBoundedWidths () {
+		$('text.itemLabel').each(function (i, o) {
+			var d = o.__data__
+			var boundWidth = Math.max(0, d.points.x2 - d.points.x)
+			d.boundedWidth = Math.min(d.labelWidth, boundWidth)
+		});
+	}
+	
+	// calculate the widths of the labels bounded by the current view
+	function calculateLabelVisWidths () {
+		$('text.itemLabel').each(function (i, o) {
+			var d = o.__data__
+			var leftX = Math.max(x1(brush.extent()[0]), d.points.x)
+			var rightX = Math.max(x1(brush.extent()[0]), Math.min(x1(brush.extent()[1]), d.points.x2))
+			var boundWidth = Math.max(0, rightX - leftX)
+			d.visWidth = Math.min(d.labelWidth, boundWidth)
+		});
+	}
 
 	function calculateLabelOffsets () {
 		var pageOffset = x1(brush.extent()[0]);
 		var svgOffset = $(chart[0][0]).offset().left;
 		var labelElements = $('span.itemLabel')
-		if (GraphUtil.isIE())
+		var isIE = GraphUtil.isIE()
+		if (isIE)
 			labelElements = $('text.itemLabel')
 
 		labelElements.each(function (i, o) {
 			var d = o.__data__
 			var labelWidth = o.getBoundingClientRect().width
+			if (isIE)
+				labelWidth = d.boundedWidth
 			d.labelStart = d.points.x + (d.points.w / 2) - (labelWidth / 2)
 			d.labelEnd = d.points.x + (d.points.w / 2) + (labelWidth / 2)
 		});
@@ -895,6 +941,11 @@ function buildGraph (response, status) {
 						if (d.useOffset)
 							return newX
 						return d.labelStart
+					})
+					.attr('textLength', function(d) { 
+						if (d.visWidth < d.labelWidth)
+							return Math.max(d.visWidth, 0.01)
+						return ''
 					})
 			else
 				d3.select(o)
@@ -965,6 +1016,7 @@ function buildGraph (response, status) {
 		return {x:x, y:y, x2:x2, y2:y2, w:w, h:h};
 	}
 
+
 	// gets the points string for mini polygons
 	function getPointsMini (d) {
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
@@ -1011,8 +1063,7 @@ function buildGraph (response, status) {
 			toggleTaskSelection(taskSelected, true) // if another task is selected, deselect that one first
 			taskSelected = taskObject;
 		}
-
-
+		
 		// recursively style all tasks and dependencies connected to this task
 		function styleDependencies (task, direction) {
 			if (selecting != task.selected) {
