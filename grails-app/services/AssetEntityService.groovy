@@ -2751,10 +2751,13 @@ class AssetEntityService {
 									profiler.lapReset('Devices')
 								}
 							}
-							
-							def propValue = a.(serverDTAMap.eavAttribute.attributeCode[coll])
+
+							def propValue = null
+							if(attribute){
+								propValue = a.(serverDTAMap.eavAttribute.attributeCode[coll])
+							} 
 							// (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null )
-							if (!(attribute && (propValue == null || ( (propValue instanceof String) && propValue.size() == 0 )))){
+							if (!(propValue == null || ( (propValue instanceof String) && propValue.size() == 0 ))){
 								switch(colName) {
 									case 'DepGroup':
 										// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
@@ -2838,7 +2841,7 @@ class AssetEntityService {
 								durationMatrix[durationGroup].average = (int)(durationMatrix[durationGroup].duration / durationMatrix[durationGroup].count)
 							}
 						}
-						GormUtil.flushAndClearSession(session, progressCount)
+						
 						profiler.endSilent(silentTag)
 					} // asset.each
 					asset = null

@@ -317,6 +317,10 @@ class WorkbookUtil {
 		}
 
 		DataValidationHelper dvHelper = targetSheet.getDataValidationHelper()
+		// This is for cases of empty sheets.
+		if(lastTargetRow < firstTargetRow){
+			lastTargetRow = firstTargetRow
+		}
   		CellRangeAddressList addressList = new CellRangeAddressList(firstTargetRow, lastTargetRow, targetColumn, targetColumn)
 
   		Name namedRange = validationSheet.getWorkbook().createName()
