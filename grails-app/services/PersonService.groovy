@@ -1629,6 +1629,20 @@ class PersonService {
 		// TODO : JPM 8/31/2015 : Replace person.properties = params with proper field assignments
 		person.properties = params
 
+		def project = securityService.getUserCurrentProject()
+
+		def isPersonAmbiguous = { personInstance ->
+			Map nameMap = [first: personInstance.firstName, middle: personInstance.middleName, last: personInstance.lastName]
+			Map findPersonInfo = findPerson(nameMap, project, null, false)
+			boolean isPersonAmbiguous = findPersonInfo.isAmbiguous && findPersonInfo.person?.id != personInstance.id
+			return isPersonAmbiguous
+		}
+
+		if(isPersonAmbiguous(person)){
+			log.error "updatePerson() unable to save $person because of conflicting name."
+			throw new DomainUpdateException("The name of the person is ambiguous.")
+		}
+
 		if ( ! person.save(flush:true) ) {
 			log.error "updatePerson() unable to save $person : " + GormUtil.allErrorsString(person)
 			throw new DomainUpdateException('An error occurred while attempting to save person changes')

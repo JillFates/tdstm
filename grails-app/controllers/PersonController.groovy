@@ -616,7 +616,6 @@ def test = {
 				render results as JSON
 			}		
 		} catch (e) {
-			e.printStackTrace()
 			if (log.isDebugEnabled()) {
 				log.debug "updatePerson() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			}
