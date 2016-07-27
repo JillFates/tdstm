@@ -32,7 +32,6 @@
 	<g:javascript src="jquery-1.9.1.js"/>
 	<g:javascript src="jquery-1.9.1-ui.js"/>
 
-
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
@@ -118,6 +117,11 @@
 			} else if(browserValue.isIE && browserValue.trueVersion <= 8) {
 				$('.unsopported').show();
 			}
+
+			if(browserValue.isIE && browserValue.actingVersion <= 7){
+				$('#dialog div.col-xs-3').css('width','90px');
+				$('#dialog a.get-latest-version').css('margin-top','30px');
+			}
 		});
 
 	</script>
@@ -193,28 +197,29 @@
 	<!-- /.login-box-body -->
 
 	<div id="dialog" title="Browser Upgrade Recommended" style="display: none; text-align: justify;">
-		<p><label>Warning:</label> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
+		<p><strong>Warning:</strong> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
 		<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
 		<div class="row" style="margin-top: 28px; margin-left: 0px; font-size: 14px; text-align: justify;">
 			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'internet_explorer.png')}" border="0" />
+				<img src="${resource(dir:'icons/png',file:'internet_explorer.png')}" border="0" /><br />
 				<span style="font-size: 13px;">Internet Explorer 9+</span>
 			</div>
 			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'firefox.png')}" border="0" />
+				<img src="${resource(dir:'icons/png',file:'firefox.png')}" border="0" /><br />
 				<span style="font-size: 13px;">FireFox 42+</span>
 			</div>
-			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'chrome.png')}" border="0" />
+			<div class="col-xs-3" >
+				<img src="${resource(dir:'icons/png',file:'chrome.png')}" border="0" /><br />
 				<span style="font-size: 13px;">Chrome 44+</span>
 			</div>
-			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'safari.png')}" border="0" />
+			<div class="col-xs-3" >
+				<img src="${resource(dir:'icons/png',file:'safari.png')}" border="0" /><br />
 				<span style="font-size: 13px;">Safari 8+ <br /> (Only Mac)</span>
 			</div>
+			<br />
 		</div>
 		<br />
-		<a style="float: right; color: #337ab7; font-weight: 600;" href="http://browsehappy.com/?locale=en" target="_blank">Get Latest Versions</a>
+		<a class="get-latest-version" style="float: right; color: #337ab7; font-weight: 600;" href="http://browsehappy.com/?locale=en" target="_blank">Get Latest Versions</a>
 	</div>
 
 </div>
