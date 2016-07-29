@@ -46,10 +46,11 @@
 					gridComplete="function(){bindResize('dependencyGridId')}"
 					onSelectRow="validateMergeCount"
 					showPager="true">
-					<jqgrid:filterToolbar id="dependencyGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="dependencyGridId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="dependencyGridId" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('dependencyGridId');
+
 				<g:each var="key" in="['1','2']">
 					var depPref= '${depPref[key]}';
 

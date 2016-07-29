@@ -91,10 +91,12 @@
 					postData="{filter: filter, event:event, latencys:latencys, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
 						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, 
 						toValidate:toValidate,runbook:runbook, unassigned:unassigned}">
-					<jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
 					<jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="applicationId" />
 				</jqgrid:grid>
+
+				TDS.jqGridFilterToolbar('applicationId');
+
 				populateFilter();
 				
 				$("#del_applicationIdGrid").click(function(){

@@ -79,10 +79,11 @@
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
 						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, size:size,toValidate:toValidate, unassigned:unassigned}"
 					showPager="true">
-					<jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
 					<jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>
 					<jqgrid:refreshButton id="storageId" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('storageId');
+
 				populateFilter();
 
 				<g:each var="key" in="['1','2','3','4','5']">

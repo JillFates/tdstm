@@ -25,10 +25,11 @@
 				caption="listCaption"
 				gridComplete="function(){bindResize('companyId')}"
 				showPager="true">
-				<jqgrid:filterToolbar id="companyId" searchOnEnter="false" />
 				<jqgrid:navigation id="companyId" add="false" edit="false" del="false" search="false"/>
 				<jqgrid:refreshButton id="companyId" />
 			</jqgrid:grid>
+			TDS.jqGridFilterToolbar('companyId');
+
 			$.jgrid.formatter.integer.thousandsSeparator='';			
 		});
 		</script>

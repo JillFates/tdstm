@@ -93,9 +93,10 @@
 					showPager="true"
 					loadComplete="initCheck"
 					onSelectRow="validateMergeCount">
-					<jqgrid:filterToolbar id="personId" searchOnEnter="false" />
 					<jqgrid:navigation id="personId" add="false" edit="false" del="false" search="false" refresh="true" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('personId');
+
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				
 			})

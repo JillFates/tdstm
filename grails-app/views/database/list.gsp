@@ -81,11 +81,11 @@
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
 						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat, toValidate:toValidate, unassigned:unassigned}"
 					showPager="true">
-					<jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
 					<jqgrid:navigation id="databaseId" add="false" edit="false" del="false" search="false" refresh="false" afterSubmit="deleteMessage"/>
 					<jqgrid:resize id="databaseId" resizeOffset="-2" />
 					<jqgrid:refreshButton id="databaseId" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('databaseId');
 
 				jQuery("#databaseId").jqGrid('navButtonAdd','#pcolch',{ caption: "Columns", title: "Reorder Columns", onClickButton : function (){ jQuery("#colch").jqGrid('columnChooser'); } });
 				populateFilter();

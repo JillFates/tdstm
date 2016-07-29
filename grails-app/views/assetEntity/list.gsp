@@ -111,10 +111,11 @@
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
 						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
-					<jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
 					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="assetListId" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('assetListId');
+
 				populateFilter();
 				$("#del_assetListIdGrid").click(function() {
 					$("#assetListId").jqGrid("editGridRow","new",

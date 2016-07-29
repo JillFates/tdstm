@@ -34,10 +34,11 @@
 					postData="{isActive:isActive}"
 					gridComplete="function(){bindResize('projectGridId')}"
 					showPager="true">
-					<jqgrid:filterToolbar id="projectGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="projectGridId" add="false" edit="false" del="false" search="false"/>
 					<jqgrid:refreshButton id="projectGridId" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('projectGridId');
+
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''

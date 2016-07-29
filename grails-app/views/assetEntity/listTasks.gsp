@@ -98,10 +98,10 @@
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, step:step }"
 				showPager="true">
-				<jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
 				<jqgrid:navigation id="taskListId" add="false" edit="false" del="false" search="false" refresh="false" />
 				<jqgrid:refreshButton id="taskListId" />
 			</jqgrid:grid>
+			TDS.jqGridFilterToolbar('taskListId');
 
 			populateFilter();
 

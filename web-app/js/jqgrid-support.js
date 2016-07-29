@@ -160,3 +160,43 @@ function processTaskSafariColumns() {
 function unfreezeHeaderGeneral (header) {
 	$('.floatingHeader').remove();
 }
+
+/**
+ * @author: Octavio Luna
+ * @date: 2016-07-28
+ * Create a package Domain for TDS (as a global scope)
+ *
+ * Custom filter toolbar to select the default bounce timeout
+ * Created to replace the Grails Tag:
+ *    <jqgrid:filterToolbar /> //remove this if exist in your code
+ *
+ * @param id id of the grails jqgrid (beware that the id is the one used in the *grails tag* that is different from the actual id set in the HTML by grails plugin)
+ * @param debounce buffer time to wait for keystrokes, defaults to 700ms
+ * Usage: add after declaring the jqGrid
+ *   TDS.jqGridFilterToolbar(id) //defaults to 700
+ *   TDS.jqGridFilterToolbar(id, 800)
+ */
+window.TDS = Object.assign(window.TDS || {},{
+	jqGridFilterToolbar: function(id, debounce) {
+		var VK_ENTER = 13;
+		debounce = typeof debounce !== 'undefined' ? debounce : 700;
+		var gridSelector = '#' + id + 'Grid';
+		//Avoid internal filtering
+		$(gridSelector).filterToolbar({
+			autosearch: false,
+			searchOnEnter: false
+		});
+
+		var triggerToolBar = $(gridSelector)[0].triggerToolbar;
+		var timeoutHnd;
+		$('#' + id + 'Wrapper .ui-search-toolbar .ui-th-column input').on("input", function(e) {
+			if(timeoutHnd) { clearTimeout(timeoutHnd); }
+			var key = e.which;
+			if(key == VK_ENTER){ //ENTER
+				triggerToolBar();
+			}else{
+				timeoutHnd = setTimeout(function(){triggerToolBar();}, debounce);
+			}
+		});
+	}
+});

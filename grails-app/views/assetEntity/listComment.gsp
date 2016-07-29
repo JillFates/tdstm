@@ -58,10 +58,11 @@
 					caption="'Asset Comment:'"
 					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper');}"
 					showPager="true">
-					<jqgrid:filterToolbar id="listCommentGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="listCommentGridId" add="false" edit="false" del="false" search="false"/>
 					<jqgrid:refreshButton id="listCommentGridId" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('listCommentGridId');
+
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? _.escape(cellvalue) : ''

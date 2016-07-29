@@ -68,9 +68,10 @@
 					caption="listCaption"
 					gridComplete="function(){bindResize('userLoginId');recompileDOM('userLoginIdWrapper', angular.element(\$('div.body')[0]).scope())}"
 					showPager="true">
-					<jqgrid:filterToolbar id="userLoginId" searchOnEnter="false" />
 					<jqgrid:navigation id="userLoginId" add="false" edit="false" del="false" search="false" refresh="true" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('userLoginId');
+
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				
 				function actionFormatter (cellVal, options, rowObject) {

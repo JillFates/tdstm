@@ -40,10 +40,10 @@
 					loadComplete="initModelCheck"
 					gridComplete="function(){bindResize('modelId')}"
 					onSelectRow="validateModelCount">
-					<jqgrid:filterToolbar id="modelId" searchOnEnter="false" />
 					<jqgrid:navigation id="modelId" add="false" edit="false" del="false" search="false"/>
 					<jqgrid:refreshButton id="modelId" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('modelId');
 				
 				<g:each var="key" in="['1','2','3','4']">
 					var modelPref= '${modelPref[key]}';

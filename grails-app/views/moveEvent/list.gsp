@@ -22,9 +22,9 @@
 					width="'100%'"
 					gridComplete="function(){bindResize('moveEventListId')}"
 					showPager="true">
-					<jqgrid:filterToolbar id="moveEventListId" searchOnEnter="false" />
 					<jqgrid:navigation id="moveEventListId" add="false" edit="false" del="false" search="false" refresh="true" />
 				</jqgrid:grid>
+				TDS.jqGridFilterToolbar('moveEventListId');
 				
 			})
 			

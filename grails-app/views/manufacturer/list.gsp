@@ -36,9 +36,10 @@
 				caption="listCaption"
 				gridComplete="function(){bindResize('manufacturerId')}"
 				showPager="true">
-				<jqgrid:filterToolbar id="manufacturerId" searchOnEnter="false" />
 				<jqgrid:navigation id="manufacturerId" add="false" edit="false" del="false" search="false" refresh="true" />
 			</jqgrid:grid>
+			TDS.jqGridFilterToolbar('manufacturerId');
+
 			$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObjcet) {
 				var value = cellvalue ? cellvalue : ''
