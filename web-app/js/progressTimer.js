@@ -82,10 +82,6 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 			public.setUserPreference(element.value);
 		});
 
-		$(window).resize(function() {
-			public.resetTimer();
-		});
-
 		$('div[role=dialog]').on('dialogclose', function () {
 			public.attemptResume();
 		});
