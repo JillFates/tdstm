@@ -106,9 +106,9 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 
 		if (newTime != 0) {
 			public.Start(newTime);
-			$(public.container).removeClass('hide');
+			$(public.container).parent().show();
 		} else {
-			$(public.container).addClass('hide');
+			$(public.container).parent().hide();
 		}
 	}
 

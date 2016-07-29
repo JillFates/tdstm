@@ -55,7 +55,7 @@
 								</tds:hasPermission>
 							</span>
 						</div>
-						<div style="float: right;">
+						<div>
 							<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
 						</div>
 						<input type="hidden" id="typeId" value="${params.type}">
