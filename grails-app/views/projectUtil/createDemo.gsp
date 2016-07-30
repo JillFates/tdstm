@@ -63,10 +63,10 @@
 				<td valign="top" class="value">
 				<script type="text/javascript" charset="utf-8">
 				$(document).ready(function(){
-                    $("#cleanupDateId").datetimepicker();
+					$("#cleanupDateId").kendoDatePicker({ animation: false });
                   });
                 </script> 
-                <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;"  id="cleanupDateId"	name="cleanupDate" value="${cleanupDate}"/>
+                <input type="text" class="dateRange" size="15" style="width: 138px;"  id="cleanupDateId"	name="cleanupDate" value="${cleanupDate}"/>
 				</td>
 			</tr>
 
