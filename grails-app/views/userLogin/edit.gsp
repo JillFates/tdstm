@@ -151,7 +151,8 @@
 							<td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'expiryDate', 'errors')}">
 								<script type="text/javascript">
 									$(document).ready(function(){
-										$("#expiryDate").datetimepicker();
+
+										$("#expiryDate").kendoDateTimePicker();
 									});
 								</script>
 								<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
