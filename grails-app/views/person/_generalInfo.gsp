@@ -176,10 +176,9 @@
 	<div id="availabilityEditId" class="person" style="display: none;">
 		<div>
 			<script type="text/javascript" charset="utf-8">
-				jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-				
+				jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 				function showCalender(id){
-					jQuery(function($){$(id).datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+					jQuery(function($){ $(id).kendoDatePicker({ animation: false }); });
 				}
 			</script>
 			<table class="personTable" >
@@ -190,7 +189,7 @@
 					<g:each in="${blackOutdays}" var="blackOutDay" status="i">
 						<tr id="dateTrId_${i}">
 							<td align="center"><input type="text" class="dateRange"
-								size="15" style="width: 112px; height: 14px;"
+								size="15" style="width: 138px;"
 								name="availability" id="availabilityId_${i}"
 								value='<tds:convertDate date="${blackOutDay.exceptionDay}" />' />
 								
@@ -207,7 +206,7 @@
 			<input type="hidden" id="availableId" value="1">
 
 			<div id="dateDivId" style="display: none">
-				<input type="text" size="15" style="width: 112px; height: 14px;" name="available" id="availId" />
+				<input type="text" size="15" style="width: 138px;" name="available" id="availId" />
 			</div>
 		</div>
 	</div>
