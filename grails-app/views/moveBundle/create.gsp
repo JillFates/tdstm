@@ -6,6 +6,11 @@
     <meta name="layout" content="topNav" />
     <title>Create Bundle</title>
 
+    <style>
+      .dialog select {
+        width: 180px;
+      }
+    </style>
     <script type="text/javascript">
       function initialize(){
 
@@ -113,9 +118,9 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#startTime").datetimepicker();
+                      $("#startTime").kendoDateTimePicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="startTime" name="startTime"
+                  </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="startTime" name="startTime"
                                    value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" format="12hrs" />" 
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="startTime">
@@ -133,9 +138,9 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#completionTime").datetimepicker();
+                      $("#completionTime").kendoDateTimePicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="completionTime" name="completionTime"
+                  </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="completionTime" name="completionTime"
                                    value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" format="12hrs" />" 
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="completionTime">

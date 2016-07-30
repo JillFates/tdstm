@@ -38,7 +38,7 @@
 					<label>&nbsp;&nbsp;&nbsp;&nbsp;<b>Start Date:<span style="color: red;">*</span> </b></label>
 				</td>
 				<td style="width:auto;">
-					<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDate" tabindex="26"
+					<input type="text" class="dateRange" size="15" style="width: 138px;" name="startDate" id="startDate" tabindex="26"
 						value="<tds:convertDate date="${startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /> 
 				</td>
 			</tr>
@@ -47,7 +47,7 @@
 					<label>&nbsp;&nbsp;&nbsp;&nbsp;<b>End Date:<span style="color: red;">*</span> </b></label>
 				</td>
 				<td style="width:auto;">
-					<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="endDate" id="endDate" tabindex="26"
+					<input type="text" class="dateRange" size="15" style="width: 138px;" name="endDate" id="endDate" tabindex="26"
 						value="<tds:convertDate date="${endDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /> 
 				</td>
 			</tr>
@@ -77,8 +77,7 @@
 </div>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() {
-	$('#startDate').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true});
-	$('#endDate').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true});
+	$(".dateRange").kendoDatePicker({ animation: false });
 })
 $('.menu-reports-activity-metrics').addClass('active');
 $('.menu-parent-reports').addClass('active');
