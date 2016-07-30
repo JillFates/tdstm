@@ -220,9 +220,9 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 								</script>
-								<input type="text" class="dateRange" tabindex="160" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
+								<input type="text" class="dateRange" tabindex="160" size="15" style="width: 138px;" name="startDate" id="startDateId"
 									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" /> 
 								<g:hasErrors bean="${projectInstance}" field="startDate">
 									<div class="errors">
@@ -237,9 +237,9 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+
 								</script>
-								<input type="text" class="dateRange" tabindex="170" size="15" style="width: 112px; height: 14px;" id="completionDateId"	
+								<input type="text" class="dateRange" tabindex="170" size="15" style="width: 138px;" id="completionDateId"
 									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" />" onchange="isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>

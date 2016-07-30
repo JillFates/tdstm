@@ -100,9 +100,9 @@
 			<td valign="top" class="name"><label for="endOfLifeDate">End of Life Date:</label></td>
 			<td valign="top" class="value ${hasErrors(bean:modelInstance,field:'endOfLifeDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
-                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+					jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 				</script>
-				<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="endOfLifeDate" id="endOfLifeDateId"
+				<input type="text" class="dateRange" size="15" style="width:138px;" name="endOfLifeDate" id="endOfLifeDateId"
                    value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" />" />
 				<g:hasErrors bean="${projectInstance}" field="startDate">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeDate" /></div>

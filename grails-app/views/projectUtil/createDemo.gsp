@@ -48,10 +48,10 @@
 				<td valign="top" class="value">
 					<script type="text/javascript" charset="utf-8">
 					 $(document).ready(function(){
-	                      $("#startDateId").datetimepicker();
+						  $("#startDateId").kendoDatePicker({ animation: false });
 	                    });
                   	</script> 
-                  	<input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;"  name="startDate" id="startDateId" value="${startDate}"/> 
+                  	<input type="text" class="dateRange" size="15" style="width: 138px;"  name="startDate" id="startDateId" value="${startDate}"/>
                   	<g:if test="${startDateError}">
 						<div class="errors">${startDateError}</div>
 					</g:if> 
