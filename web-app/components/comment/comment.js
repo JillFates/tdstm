@@ -603,7 +603,9 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		if(invalid){
 			alert("You must fill in all the required fields.")
 		}else{
-
+			if($scope.ac.dueDate){
+				$scope.ac.dueDate = moment($scope.ac.dueDate).format('MM/DD/YYYY');
+			}
 			$scope.ac.id = $scope.ac.commentId;
 			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
 
