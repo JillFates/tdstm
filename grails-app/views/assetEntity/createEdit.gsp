@@ -362,12 +362,12 @@
 							</td>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 								</script>
 								<input type="text" id="retireDate" name="retireDate"
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
 									class="dateRange ${config.retireDate}"
-									size="15" style="width: 112px; height: 14px;"
+									size="15" style="width: 138px;"
 									tabindex="230"
 								/>
 							</td>
@@ -407,13 +407,10 @@
 								<label for="maintExpDate">Maint Exp.</label>
 							</td>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
-								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-								</script>
 								<input type="text" id="maintExpDate" name="maintExpDate"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" />"
 									class="dateRange ${config.maintExpDate}"
-									size="15" style="width: 112px; height: 14px;"
+									size="15" style="width: 138px;"
 									tabindex="235"
 								/>
 							</td>

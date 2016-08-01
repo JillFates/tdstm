@@ -37,7 +37,7 @@
 <body>
 
   <g:form method="post" >
-    <div class="body" style="width: 350px;">
+    <div class="body" style="width: 442px;">
 		<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
 		</div>
@@ -116,9 +116,9 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#startTime").datetimepicker();
+						$("#startTime").kendoDateTimePicker({ animation: false });
                     });
-                  </script><span><input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="startTime" name="startTime"
+                  </script><span><input type="text" class="dateRange" size="15" style="width: 200px;" id="startTime" name="startTime"
         					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  format="12hrs" />" 
         					onchange="isValidDate(this.value, this.id,'startTimeImg')"/></span>
         					<span id="startTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
@@ -137,9 +137,9 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#completionTime").datetimepicker();
+						$("#completionTime").kendoDateTimePicker({ animation: false });
                     });
-                  </script> <span><input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" 
+                  </script> <span><input type="text" class="dateRange" size="15" style="width: 200px;"
                   			id="completionTime" name="completionTime"
 				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  format="12hrs" />" 
 				        onchange="isValidDate(this.value, this.id, 'completionTimeImg')"/></span>
