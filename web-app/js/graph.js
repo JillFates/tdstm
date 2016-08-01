@@ -673,7 +673,7 @@ var GraphUtil = (function ($) {
 		for (var g = 0; g < groups.length; ++g)
 			for (var f = 0; f < filters.length; ++f)
 				selection[0] = selection[0].concat(groups[g].filter(filters[f])[0])
-		
+
 		selection.order();
 	};
 
@@ -742,13 +742,14 @@ var GraphUtil = (function ($) {
 	public.zoomOut = function () {
 		performZoom('out')
 	}
-	
 
 	public.getFilteredClass = function (obj) {
 		if (obj.linkElement) {
-			if (obj.source.highlighted == 'y' || obj.target.highlighted == 'y')
+			var parent = obj.source ? obj.source : obj.parent
+			var child = obj.target ? obj.target : obj.child
+			if (parent.highlighted == 'y' || child.highlighted == 'y')
 				return ' hl'
-			else if (obj.source.highlighted == 'n' || obj.target.highlighted == 'n')
+			else if (parent.highlighted == 'n' || child.highlighted == 'n')
 				return ' nohl'
 			else
 				return ''
@@ -766,7 +767,7 @@ var GraphUtil = (function ($) {
 	public.forceReflow = function (element) {
 		element.style('line-height', Math.random())
 	}
-
+	
 	// return the public object to make the public functions accessable
 	return public;
 
