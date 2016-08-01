@@ -140,6 +140,8 @@
 		<script type="text/javascript">
 			// Used to track ajax requests and abort them when needed
 			var ajaxRequest;
+			// Used to keep track of Color By on the dependency map
+			var currentColorBy;
 			
 			function getList(value,dependencyBundle, force, distance, labels) {
 				$('#moveBundleSelectId').dialog("close")

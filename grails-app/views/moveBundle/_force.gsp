@@ -153,6 +153,9 @@ function buildMap () {
 	widthCurrent = config.width
 	heightCurrent = config.height
 	
+	if (currentColorBy)
+		GraphUtil.setFillMode(currentColorBy)
+	
 	// set the base SVG size
 	setGraphDimensions(config.width, config.height)
 	
@@ -299,18 +302,8 @@ function createGraph (config) {
 	getLabelWidths()
 	
 	// bind the "color by" radio buttons
-	$('#colorByFormId').children().unbind('change').on('change', function (e) {
-		fillMode = GraphUtil.getFillMode()
-		GraphUtil.nodeBindings.style("fill", function(d) {
-			return GraphUtil.getFillColor(d, fill, fillMode)
-		});
-		if (fillMode == 'group')
-			GraphUtil.updateLegendColorKey(depBundles, fill, fillMode)
-		else if (fillMode == 'bundle')
-			GraphUtil.updateLegendColorKey(moveBundles, fill, fillMode)
-		else
-			GraphUtil.updateLegendColorKey(moveEvents, fill, fillMode)
-	});
+	$('#colorByFormId').children().unbind('change').on('change', setColorBy)
+	setColorBy()
 	
 	// bind the show budle conflicts checkbox
 	$('#bundleConflictsId').unbind('change').on('change', function (e) {
@@ -1192,6 +1185,21 @@ function getForceConfig () {
 		'width': width,
 		'height': height
 	}
+}
+
+// sets the Color By value for the map using the checked option on the control panel
+function setColorBy () {
+	fillMode = GraphUtil.getFillMode()
+	currentColorBy = fillMode
+	GraphUtil.nodeBindings.style("fill", function(d) {
+		return GraphUtil.getFillColor(d, fill, fillMode)
+	});
+	if (fillMode == 'group')
+		GraphUtil.updateLegendColorKey(depBundles, fill, fillMode)
+	else if (fillMode == 'bundle')
+		GraphUtil.updateLegendColorKey(moveBundles, fill, fillMode)
+	else
+		GraphUtil.updateLegendColorKey(moveEvents, fill, fillMode)
 }
 
 // function for debugging performance

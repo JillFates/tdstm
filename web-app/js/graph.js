@@ -224,6 +224,11 @@ var GraphUtil = (function ($) {
 		return 'event';
 	}
 
+	public.setFillMode = function (fillMode) {
+		$('#colorByFormId input:checked').attr('checked', null)
+		$('#colorByFormId input[value="' + fillMode + '"]').attr('checked', '')
+	}
+
 	public.getFillColor = function (node, colors, fillMode) {
 		if (fillMode == 'group') {
 			return colors(node.depBundleIndex);
@@ -642,7 +647,7 @@ var GraphUtil = (function ($) {
 			// syle it based on highlighting and cut group
 			cutShadow.style('opacity', null)
 			if (o.highlighted == 'y')
-				cutShadow.style('fill', '#d62728')
+				cutShadow.style('fill', '#ff0000')
 			else if (o.highlighted == 'n' || o.cutGroup == -1)
 				cutShadow.style('opacity', 0)
 			else
@@ -658,13 +663,17 @@ var GraphUtil = (function ($) {
 	public.reorderDOM = function () {
 		var selection = d3.selectAll('svg.chart > g g g').filter(':not(.selected)').filter('.selected');
 
+		var cutShadows = d3.selectAll('svg.chart > g g circle.cutShadow')
 		var lines = d3.selectAll('svg.chart > g g line')
 		var nodes = d3.selectAll('svg.chart > g g use')
 		var labels = d3.selectAll('svg.chart > g g g')
-		var groups = [lines, nodes, labels]
+		var groups = [cutShadows, lines, nodes, labels]
 		var filters = [':not(.hl):not(.selected)', ':not(.hl).selected', '.hl:not(.selected)', '.hl.selected']
-
-		selection[0] = selection[0].concat(d3.selectAll('svg.chart > g g circle.cutShadow')[0])
+		
+		for (var g = 0; g < groups.length; ++g)
+			for (var f = 0; f < filters.length; ++f)
+				selection[0] = selection[0].concat(groups[g].filter(filters[f])[0])
+		
 		selection.order();
 	};
 
@@ -734,6 +743,7 @@ var GraphUtil = (function ($) {
 		performZoom('out')
 	}
 	
+
 	public.getFilteredClass = function (obj) {
 		if (obj.linkElement) {
 			if (obj.source.highlighted == 'y' || obj.target.highlighted == 'y')
