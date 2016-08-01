@@ -4,7 +4,7 @@
  */
 databaseChangeLog = {
 	
-	changeSet(author: "arecordon", id: "20160727 TM-4888-1") {
+	changeSet(author: "arecordon", id: "20160727 TM-4888-2") {
 		comment('Deletes orphaned persons using personService.bulkDelete.')
 		grailsChange{
 			change{
@@ -17,10 +17,13 @@ databaseChangeLog = {
 						where pr.party_relationship_type_id is null and first_name <> 'Automated' and last_name <> 'Task'; 
 						""")
 				List ids = orphans.collect{it.person_id.toString()}
+
 				Person.withNewSession{
-					ctx.getBean("personService").bulkDelete(ids, false)	
+					def personService = ctx.getBean("personService")
+					ids.each{
+						personService.deletePerson(Person.get(it), true, true)
+					}	
 				}
-				
 			}
 		}
 	}

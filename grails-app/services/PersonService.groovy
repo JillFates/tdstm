@@ -756,11 +756,28 @@ class PersonService {
 	 * @return boolean value that indicates if a relationship exist
 	 */
 	boolean haveRelationship(Person person) {
+
+		def existingRelationship = PERSON_DOMAIN_RELATIONSHIP_MAP.find{key, value ->
+			return value.find{prop ->
+				if (!checkRelationshipException(key, prop)) {
+					def result = jdbcTemplate.queryForList("SELECT count(*) AS count FROM ${key} WHERE ${prop} = '${person.id}'")
+					if (result[0].count > 0) {
+						log.info "Found relationship for '${person.firstName}, ${person.lastName}' on table: '${key}' over field: '${prop}'"
+						return true
+					}
+				}
+				return false
+			}
+
+		}
+
+/*
+
 		def existRelationship = false
 		def result
 
 		PERSON_DOMAIN_RELATIONSHIP_MAP.each{ key, value ->
-			value.each{ prop ->
+			value.find{ prop ->
 				if (!checkRelationshipException(key, prop)) {
 					result = jdbcTemplate.queryForList("SELECT count(*) AS count FROM ${key} WHERE ${prop} = '${person.id}'")
 					if (result[0].count > 0) {
@@ -771,7 +788,7 @@ class PersonService {
 			}
 		}
 
-		return existRelationship
+		return existRelationship*/
 	}
 
 	/**
