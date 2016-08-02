@@ -18,6 +18,9 @@ svg {
 	border: 1px solid rgb(0, 128, 0);
 	overflow: hidden;
 }
+div.fullscreen #svgContainerId {
+	border: none !important;
+}
 
 /* Graph Nodes */
 .root {
@@ -292,7 +295,6 @@ img.pointer {
 .graphContainer {
 	background-color: none;
 	position: relative;
-	z-index: 85;
 }
 .graphContainer.fullscreen {
 	background-color: #ffffff;
@@ -306,7 +308,6 @@ img.pointer {
 	display: block;
 	position: relative;
 	padding: 0px;
-	z-index: 86;
 }
 .graphContainer.fullscreen #toolsContainerId {
 	top: 0px;
@@ -430,7 +431,7 @@ div.graphPanel.openPanel {
 	background-color: white;
 	position: absolute;
 	padding-top: 10px;
-	z-index: 81 !important;
+	z-index: 1;
 }
 #legendDivId {
 	min-width: 140px;
@@ -446,6 +447,7 @@ div.graphPanel.openPanel {
 	border-width: 0px;
 	margin-bottom: -1px;
 	padding: 0px;
+	font-size: 0;
 }
 #mapReferenceId > div {
 	border: 1px solid green;
@@ -472,7 +474,6 @@ div.graphPanel.openPanel {
 	margin-left: 10px;
 	display: inline-block;
 	position: relative;
-	z-index: 101;
 	vertical-align: top;
 }
 .graphContainer .graphButton:hover {
@@ -508,10 +509,12 @@ div.graphPanel.openPanel {
 
 #mapReferenceId div.graphPanelTab:not(.activeTab) {
 	background-color: #dddddd;
+	border-bottom: 1px solid green;
 }
 #mapReferenceId div.graphPanelTab.activeTab {
 	background-color: #ffffff;
-	padding-bottom: 6px;
+	border-bottom: 1px solid white;
+	z-index: 2;
 }
 #mapReferenceId div.graphPanelTab.activeTab h4 {
 	text-shadow: 0px 0px 0.25px black;
@@ -532,9 +535,7 @@ div.graphPanel.openPanel {
 	padding-bottom: 5px;
 	position: relative;
 }
-#mapReferenceId div.graphPanelTab.activeTab:nth-last-child(n) {
-	z-index: 82 !important;
-}
+
 .graphContainer.fullscreen #mapReferenceId div.graphPanelTab:not(.activeTab) {
 	border-bottom: 1px solid green;
 }
@@ -701,22 +702,6 @@ defs svg {
 /* styles for the search highlighting elements */
 #searchBoxId::-ms-clear {
 	display: none;
-}
-#controlPanel form#taskSearchFormId {
-	display: inline-block !important;
-	position: relative;
-}
-#controlPanel span#filterClearId {
-	position: absolute !important;
-	display: inline !important;
-	margin-top: 4px !important;
-	cursor: pointer !important;
-	opacity: 1 !important;
-	right: 8px;
-}
-#controlPanel span#filterClearId.disabled {
-	opacity: 0.3 !important;
-	cursor: auto !important;
 }
 
 .checkboxContainer input[type="radio"] {

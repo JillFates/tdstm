@@ -970,12 +970,14 @@ br.page-break-after {
 span.checkboxContainer {
 	display: inline;
 	vertical-align: middle;
+	font-size: 0;
 }
 span.checkboxContainer label {
 	display: inline;
 }
 span.checkboxContainer * {
 	vertical-align: middle;
+	font-size: 12px;
 }
 span.checkboxContainer input {
 	margin-top: 0px;
