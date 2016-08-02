@@ -99,7 +99,7 @@
 				<td valign="top" class="name"><label for="dueDateCreateId">Due Date:</label></td>
 				<td>
 					<script type="text/javascript" charset="utf-8">
-					jQuery(function($){$('.dateEditRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+						jQuery(function($){ $(".dateEditRange").kendoDatePicker({ animation: false }); });
             		</script>
 	          		<input type="text" class="dateEditRange" size="15" style="" name="dueDateCreateId" id="dueDateCreateId"
 							value="${dueDate}" />
