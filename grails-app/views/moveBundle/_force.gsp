@@ -36,6 +36,7 @@ line.link.selected {
 </style>
 <script type="text/javascript">
 
+// store all the JSON server parameters into an object
 var serverParams = {
 	'maxCutAttempts': ${defaults.maxCutAttempts},
 	'defaults': ${defaultsJson},
@@ -45,9 +46,8 @@ var serverParams = {
 	'assetTypes': ${assetTypesJson},
 	'links': ${links},
 	'nodes': ${nodes},
-	'depBundles': ${depBundleMap},
-	'moveBundles': ${moveBundleMap},
-	'moveEvents': ${moveEventMap},
+	'colorByGroups': ${colorByGroups},
+	'colorByGroupLabels': ${colorByGroupLabelsJson},
 	'gravity': ${multiple ? 0.05 : 0}
 }
 
@@ -102,9 +102,8 @@ var selectedBundle = serverParams.selectedBundle
 var assetTypes = serverParams.assetTypes
 var links = serverParams.links
 var nodes = serverParams.nodes
-var depBundles = serverParams.depBundles
-var moveBundles = serverParams.moveBundles
-var moveEvents = serverParams.moveEvents
+var colorByGroups = serverParams.colorByGroups
+var colorByGroupLabels = serverParams.colorByGroupLabels
 
 var cutLinks = []
 var cutNodes = []
@@ -180,7 +179,7 @@ function buildMap () {
 
 // creates the d3 force layout and fully initializes it
 function createForceLayout (config) {
-
+	
 	// Start each node near the center of the map
 	$.each(nodes, function() {
 		this.x = (config.width / 2) + (10 * Math.random())
@@ -302,17 +301,15 @@ function createGraph (config) {
 	getLabelWidths()
 	
 	// bind the "color by" radio buttons
-	$('#colorByFormId').children().unbind('change').on('change', setColorBy)
+	$('#colorBySelectId').unbind('change').on('change', setColorBy)
 	setColorBy()
+	GraphUtil.correctBothPanelSizes()
 	
 	// bind the show budle conflicts checkbox
 	$('#bundleConflictsId').unbind('change').on('change', function (e) {
 		GraphUtil.updateLinkClasses()
 		GraphUtil.updateNodeClasses()
 	});
-	
-	// Load the move bundles into the legend
-	$('#colorByFormId').children(':checked').trigger('change')
 }
 
 // creates the SVG elements for the nodes, labels, and edges
@@ -1194,12 +1191,7 @@ function setColorBy () {
 	GraphUtil.nodeBindings.style("fill", function(d) {
 		return GraphUtil.getFillColor(d, fill, fillMode)
 	});
-	if (fillMode == 'group')
-		GraphUtil.updateLegendColorKey(depBundles, fill, fillMode)
-	else if (fillMode == 'bundle')
-		GraphUtil.updateLegendColorKey(moveBundles, fill, fillMode)
-	else
-		GraphUtil.updateLegendColorKey(moveEvents, fill, fillMode)
+	GraphUtil.updateLegendColorKey(colorByGroups[fillMode], fill, fillMode)
 }
 
 // function for debugging performance

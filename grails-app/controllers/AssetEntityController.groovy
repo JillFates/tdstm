@@ -3095,8 +3095,10 @@ class AssetEntityController {
 		}
 		def queryFordepsList = """
 			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, mb.move_bundle_id AS moveBundleId, mb.name AS moveBundleName, 
-			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality,
-			IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus
+			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality, ae.environment as environment, 
+			IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus, 
+			srcr.location AS sourceLocation, srcr.room_name AS sourceRoomName, srcr.room_id as sourceRoomId, 
+			tarr.location AS targetLocation, tarr.room_name AS targetRoomName, tarr.room_id as targetRoomId
 			FROM ( 
 				SELECT * FROM tdstm.asset_dependency_bundle 
 				WHERE project_id=${projectId} ${nodesQuery} 
@@ -3108,6 +3110,8 @@ class AssetEntityController {
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
+			LEFT OUTER JOIN room srcr ON srcr.room_id = ae.room_source_id
+			LEFT OUTER JOIN room tarr ON tarr.room_id = ae.room_target_id
 			"""
 			
 			
@@ -3259,7 +3263,15 @@ class AssetEntityController {
 				else
 					prefsObject = defaultPrefs
 				
+				// front end labels for the Color By groups
+				def colorByGroupLabels = ['group': 'Group', 'bundle': 'Bundle', 'event': 'Event', 'environment': 'Environment', 'sourceLocation': 'Source Location', 'targetLocation': 'Target Location']
 				
+				// contains all the subgroups found in the Color By groups of this dependency group
+				def colorByGroups = [:]
+
+				// define a map of all the options for asset types
+				def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
+								
 				// Create the Nodes
 				def graphNodes = []
 				def name = ''
@@ -3271,69 +3283,64 @@ class AssetEntityController {
 				def assetType = ''
 				def assetClass = ''
 				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':325, 'Critical':500]
-				TreeMap<Long, String> dependencyBundleMap = new TreeMap<Long, String>();
-				TreeMap<Long, String> moveBundleMap = new TreeMap<Long, String>();
-				TreeMap<Long, String> moveEventMap = new TreeMap<Long, String>();
 				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				
 				assetDependentlist.each {
 					assetType = it.model?.assetType?:it.type
 					assetClass = it.assetClass
-					size = 150
-					
 					type = assetClassUtil.getImageName(assetClass, assetType)
+					
+					// application icon size should be based on criticality
+					size = 150
 					if (type == AssetType.APPLICATION.toString())
 						size = it.criticality ? criticalitySizes[it.criticality] : 200
 					
-					if (! dependencyBundleMap.containsKey(it.bundle))
-						dependencyBundleMap.put(it.bundle, 'Group ' + it.bundle);
-					if (! moveBundleMap.containsKey(it.moveBundleId))
-						moveBundleMap.put(it.moveBundleId, it.moveBundleName);
-					
-					def moveEventName = it.eventName ?: 'No Event'
-					color = it.eventName ? 'grey' : 'red'
-					def moveEventId = it.moveEvent ?: (long)0.0
+					// calculate properties based on the move event
 					def hasMoveEvent = it.eventName ? true : false
+					def moveEventName = it.eventName ?: 'No Event'
+					def moveEventId = it.moveEvent ?: (long)0.0
+					color = it.eventName ? 'grey' : 'red'
 					
-					if (! moveEventMap.containsKey(moveEventId))
-						moveEventMap.put(moveEventId, moveEventName);
+					// get the label for this node's environment					
+					def environment = it.environment
+					if (environment == null || environment == '')
+						environment = 'Unassigned'
 					
+					// get the id and label for the target room
+					def targetRoomId = it.targetRoomId ?: (long) 0
+					def targetLocationName = 'Unassigned'
+					if (targetRoomId != 0)
+						targetLocationName = it.targetLocation + ' / ' + it.targetRoomName
+					
+					// get the id and label for the source room
+					def sourceRoomId = it.sourceRoomId ?: (long) 0
+					def sourceLocationName = 'Unassigned'
+					if (sourceRoomId != 0)
+						sourceLocationName = it.sourceLocation + ' / ' + it.sourceRoomName
+					
+					// map the query parameters to the ids and names of the Color By groups
+					def colorByGroupIds = [group: it.bundle, bundle: it.moveBundleId, event: moveEventId, environment: environment, sourceLocation: sourceRoomId, targetLocation: targetRoomId]
+					def colorByGroupNames = [group: 'Group ' + it.bundle, bundle: it.moveBundleName, event: moveEventName, environment: environment, sourceLocation: sourceLocationName, targetLocation: targetLocationName]
+					
+					// add these groups to the master group set
+					colorByGroupLabels.each {
+						// create this group category if it doesn't exist in the master set yet
+						def prop = it.getKey()
+						if (colorByGroups[prop] == null)
+							colorByGroups[prop] = [:]
+						
+						// add this group to the master set
+						def id = colorByGroupIds[prop]
+						colorByGroups[prop][id] = colorByGroupNames[prop]
+					}
+					
+					// add a new node to the list using these properties
 					graphNodes << [
-						id:it.assetId, name:it.assetName, 
-						type:type, depBundleId:it.bundle, 
-						moveBundleId:it.moveBundleId, moveEventId:moveEventId, hasMoveEvent:hasMoveEvent,
-						shape:shape, size:size, title:it.assetName, 
-						color:color, dependsOn:[], supports:[],
-						assetClass:it.assetClass, cutGroup:-1
+						id:it.assetId, name:it.assetName, type:type, depBundleId:it.bundle,
+						shape:shape, size:size, title:it.assetName, color:color, dependsOn:[], supports:[],
+						assetClass:it.assetClass, cutGroup:-1, colorByProperties: colorByGroupIds
 					]
 				}
-				
-				// set the dep bundle, move bundle, and move event properties to indices
-				def sortedDepBundles = new ArrayList<Long>(dependencyBundleMap.keySet())
-				def sortedMoveBundles = new ArrayList<Long>(moveBundleMap.keySet())
-				def sortedMoveEvents = new ArrayList<Long>(moveEventMap.keySet())
-				def dependencyGroupIndexMap = [:]
-				def moveBundleIndexMap = [:]
-				def moveEventIndexMap = [:]
-				graphNodes.each {
-					def mbid = it.depBundleId
-					def index = sortedDepBundles.indexOf(mbid)
-					it.depBundleIndex = index
-					dependencyGroupIndexMap[index] = dependencyBundleMap[mbid]
-					
-					mbid = it.moveBundleId
-					index = sortedMoveBundles.indexOf(mbid)
-					it.moveBundleIndex = index
-					moveBundleIndexMap[index] = moveBundleMap[mbid]
-					
-					mbid = it.moveEventId
-					index = sortedMoveEvents.indexOf(mbid)
-					it.moveEventIndex = index
-					moveEventIndexMap[index] = moveEventMap[mbid]
-				}
-				
-				// Define a map of all the options for asset types
-				def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
 				
 				// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
 				def nodeIds = []
@@ -3362,7 +3369,9 @@ class AssetEntityController {
 				def assetDependencies = AssetDependency.executeQuery("""
 					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future, 
 						ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
-						(CASE WHEN (ad.asset.moveBundle != ad.dependent.moveBundle AND ad.status in (${WebUtil.listAsMultiValueString(["'"+AssetDependencyStatus.UNKNOWN+"'", "'"+AssetDependencyStatus.VALIDATED+"'", "'"+AssetDependencyStatus.QUESTIONED+"'"])})) THEN (true) ELSE (false) END) AS bundleConflict)
+						(CASE WHEN (ad.asset.moveBundle != ad.dependent.moveBundle AND ad.status in 
+							(${WebUtil.listAsMultiValueString(["'"+AssetDependencyStatus.UNKNOWN+"'", "'"+AssetDependencyStatus.VALIDATED+"'", "'"+AssetDependencyStatus.QUESTIONED+"'"])})) 
+						THEN (true) ELSE (false) END) AS bundleConflict)
 					FROM AssetDependency ad, AssetDependencyBundle adb1, AssetDependencyBundle adb2, Project p
 					WHERE ad.asset = adb1.asset
 						AND ad.dependent = adb2.asset
@@ -3373,9 +3382,6 @@ class AssetEntityController {
 						AND p.id = ${projectId}
 					GROUP BY ad.id
 				""")
-				
-				def multiCheck = new Date()
-				
 				
 				// Create the links
 				def graphLinks = []
@@ -3406,8 +3412,11 @@ class AssetEntityController {
 						linkTable[sourceIndex][targetIndex] = true
 						def duplicate = (linkTable[targetIndex] && linkTable[targetIndex][sourceIndex])
 						
-						graphLinks << ["id":i, "source":sourceIndex, "target":targetIndex, "value":2, "statusColor":statusColor, "opacity":opacity, "unresolved":!it.resolved, "notApplicable":notApplicable, "future":future, "bundleConflict":it.bundleConflict, "duplicate":duplicate]
-						i++
+						graphLinks << ["id":i, "source":sourceIndex, "target":targetIndex, "value":2, 
+							"statusColor":statusColor, "opacity":opacity, "unresolved":!it.resolved, 
+							"notApplicable":notApplicable, "future":future, "bundleConflict":it.bundleConflict, "duplicate":duplicate]
+						
+						++i
 					}
 				}
 				
@@ -3431,9 +3440,9 @@ class AssetEntityController {
 				model.multiple = multiple
 				model.assetTypes = assetTypes
 				model.assetTypesJson = assetTypes as JSON
-				model.depBundleMap = dependencyGroupIndexMap as JSON
-				model.moveBundleMap = moveBundleIndexMap as JSON
-				model.moveEventMap = moveEventIndexMap as JSON
+				model.colorByGroups = colorByGroups as JSON
+				model.colorByGroupLabels = colorByGroupLabels
+				model.colorByGroupLabelsJson = colorByGroupLabels as JSON
 				model.depGroup = params.dependencyBundle
 				
 				// Render dependency graph

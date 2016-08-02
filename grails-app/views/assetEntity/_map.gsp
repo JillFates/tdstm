@@ -1,12 +1,12 @@
 <div id="toolsContainerId">
 	<span id="panelLink" colspan="2" class="noPadding">
 		<div id="mapReferenceId">
-			<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
-			--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div><!--
-			--><div id="fullscreenButtonId" class="graphButton graphTabButton" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div><!--
-			--><div id="zoomInButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomIn()" title="Zoom in"></div><!--
-			--><div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div><!--
-			--><div id="refreshButtonId" class="graphButton graphTabButton" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4>Refresh</h4></div>
+			<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
+			<div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
+			<div id="fullscreenButtonId" class="graphButton graphTabButton" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+			<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomIn()" title="Zoom in"></div>
+			<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div>
+			<div id="refreshButtonId" class="graphButton graphTabButton" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4>Refresh</h4></div>
 		</div>
 	</span>
 	<div id="controlPanel" class="graphPanel">
@@ -28,8 +28,9 @@
 				<!-- Suggest splits controls -->
 				<tr>
 					<td colspan="3" class="noPadding" >
-						<input type="button" id="minCutButtonId" value="Suggest Splits" class="pointer halfButton graphButton" onclick="cutAndRemove()" title="Each time clicked will present a suggested division of the group by least number of cuts">&nbsp;<!--
-						--><input type="button" value="Undo Splits" class="pointer halfButton graphButton" onclick="undoCuts()" title="Undoes any previous cuts">
+						<!-- The comments between lines prevents the browser from trying to evaluate the whitespace between these divs as a space character -->
+						<input type="button" id="minCutButtonId" value="Suggest Splits" class="pointer halfButton graphButton" onclick="cutAndRemove()" title="Each time clicked will present a suggested division of the group by least number of cuts"><!--
+						-->&nbsp;<input type="button" value="Undo Splits" class="pointer halfButton graphButton" onclick="undoCuts()" title="Undoes any previous cuts">
 					</td>
 				</tr>
 				<tr title="Maximum number of edges that can be cut at once">
@@ -38,37 +39,26 @@
 						--><label for="maxEdgeCountId" style="vertical-align: text-top;">&nbsp;Max dependencies cut</label>
 					</td>
 				</tr>
+
 				
-				<tr>
-					<td colspan="3" class="noPadding">
-						<br />
-					</td>
-				</tr>
+				<!-- Spacer -->
+				<tr><td colspan="3" class="noPadding"><br /></td></tr>
+
 				
 				<tr title="Sets the criteria used to determine node fill color">
 					<td colspan="3" style="padding-left :0px">
-						<label>Color By:</label>
-						<div id="colorByFormId"><!--
-							--><span class="checkboxContainer pointer"><!--
-								--><input type="radio" id="colorByDepGroupId" name="colorBy" class="pointer" value="group" onchange="rebuildMap(false);" ${(graphPrefs.colorBy == 'group')?('checked="checked"'):('')}><!--
-								--><label for="colorByDepGroupId" class="pointer">&nbsp;Group</label><!--
-							--></span><!--
-							--><span class="checkboxContainer pointer">
-								<input type="radio" id="colorByMoveBundleId" name="colorBy" class="pointer" value="bundle" onchange="rebuildMap(false);" ${(graphPrefs.colorBy == 'bundle')?('checked="checked"'):('')}><!--
-								--><label for="colorByMoveBundleId" class="pointer">&nbsp;Bundle</label><!--
-							--></span><!--
-							--><span class="checkboxContainer pointer">
-								<input type="radio" id="colorByMoveEventId" name="colorBy" class="pointer" value="event" onchange="rebuildMap(false);" ${(graphPrefs.colorBy == 'event')?('checked="checked"'):('')}><!--
-								--><label for="colorByMoveEventId" class="pointer">&nbsp;Event</label>
-							</span>
-						</div>
+						<span class="checkboxContainer">
+							<g:select name="colorBy" id="colorBySelectId" from="${colorByGroupLabels.values()}" keys="${colorByGroupLabels.keySet()}" value="${graphPrefs.colorBy ? graphPrefs.colorBy : defaultPrefs.colorBy}"></g:select>
+							<label for="colorBySelectId">&nbsp;Color By</label>
+						</span>
 					</td>
 				</tr>
+
 				<tr title="If checked, bundle conflicts will be highlighted">
 					<td colspan="3" style="padding-left :0px">
 						<span class="checkboxContainer">
-							<input type="checkbox" id="bundleConflictsId" name="bundleConflicts" class="pointer" value="true" ${(graphPrefs.bundleConflicts) ? 'checked' : ''}><!--
-							--><label for="bundleConflictsId" class="pointer">&nbsp;Show Bundle Conflicts</label>
+							<input type="checkbox" id="bundleConflictsId" name="bundleConflicts" class="pointer" value="true" ${(graphPrefs.bundleConflicts) ? 'checked' : ''}>
+							<label for="bundleConflictsId" class="pointer">&nbsp;Show Bundle Conflicts</label>
 						</span>
 						
 					</td>
@@ -76,26 +66,23 @@
 				<tr title="Sets the color of the background to black">
 					<td colspan="3" style="padding-left :0px">
 						<span class="checkboxContainer">
-							<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)"><!--
-							--><label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
+							<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)">
+							<label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
 						</span>
 					</td>
 				</tr>
 				
-				
-				
-				<tr>
-					<td colspan="3" class="noPadding">
-						<br />
-					</td>
-				</tr>
+
+				<!-- Spacer -->
+				<tr><td colspan="3" class="noPadding"><br /></td></tr>
+
 				
 				<!-- Label checkboxes -->
 				<tr id="twistieRowId">
 					<td colspan="3" class="noPadding">
 						<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="labelControlContainerId">
-							Show Labels:&nbsp;<!--
-							--><svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+							Show Labels:
+							<svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 						</span>
 					</td>
 				</tr>
@@ -110,8 +97,8 @@
 							<td colspan="3" class="labelToggleCol">
 								<div style="padding:0px;">
 									<div class="checkboxContainer">
-										<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
-										--><label for="${type}CheckboxId" class="pointer">
+										<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" />
+										<label for="${type}CheckboxId" class="pointer">
 											<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
 											${names.labelText ?: names.frontEndName}
 										</label>
@@ -134,8 +121,8 @@
 				<tr id="twistieRowId">
 					<td colspan="3" class="noPadding">
 						<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="layoutControlContainerId">
-							Layout:&nbsp;<!--
-							--><svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId" class=""><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+							Layout:
+							<svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId" class=""><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 						</span>
 					</td>
 				</tr>
@@ -183,11 +170,7 @@
 		<!-- Preference controls -->
 		<table class="labelTree" cellpadding="0" cellspacing="0">
 				
-			<tr>
-				<td colspan="3" class="noPadding">
-					<br />
-				</td>
-			</tr>
+			<tr><td colspan="3" class="noPadding"><br /></td></tr>
 			
 			<tr>
 				<td colspan="3" class="noPadding">

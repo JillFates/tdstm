@@ -967,6 +967,7 @@ br.page-break-after {
 	color:gray;
 }
 
+/* handles basic styles for a checkbox + label pair */
 span.checkboxContainer {
 	display: inline;
 	vertical-align: middle;

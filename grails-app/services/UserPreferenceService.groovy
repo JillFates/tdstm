@@ -51,7 +51,7 @@ class UserPreferenceService {
 				def prefs = JSON.parse(it)	
 				def checkboxLabels = ['bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 				
-				if ( ! (prefs.colorBy in ['group', 'bundle', 'event']) )
+				if ( ! (prefs.colorBy in ['group', 'bundle', 'event', 'environment', 'sourceLocation', 'targetLocation']) )
 					return false
 				
 				checkboxLabels.each { label ->

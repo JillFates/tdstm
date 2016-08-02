@@ -195,7 +195,10 @@ var GraphUtil = (function ($) {
 	public.updateLegendColorKey = function (dataMap, colors, fillMode) {
 		var template = $('#colorKeyTemplateId');
 		$('.colorKey').remove();
-		$(Object.keys(dataMap)).each(function (i, o) {
+		var dataList = Object.keys(dataMap)
+		//if (dataList.length == undefined)
+		//	dataList = Object.keys(dataMap)
+		$(dataList).each(function (i, o) {
 			var newRow = template.clone();
 			newRow
 				.addClass('colorKey')
@@ -207,36 +210,23 @@ var GraphUtil = (function ($) {
 			$('#legendId').append(newRow);
 		});
 		$('#colorKeyLabelId').removeClass('hidden')
-		if (fillMode == 'group')
-			$('#colorKeyLabelId h4').html('Dependency Groups');
-		else if (fillMode == 'bundle')
-			$('#colorKeyLabelId h4').html('Move Bundles');
-		else
-			$('#colorKeyLabelId h4').html('Move Events');
+		$('#colorKeyLabelId h4').html(colorByGroupLabels[fillMode] + 's');
 	}
 
 	public.getFillMode = function () {
-		var checkedRadio = $('#colorByFormId input:checked');
-		if (checkedRadio.attr('id') == 'colorByDepGroupId')
-			return 'group';
-		if (checkedRadio.attr('id') == 'colorByMoveBundleId')
-			return 'bundle';
-		return 'event';
+		return $('#colorBySelectId').val();
 	}
 
 	public.setFillMode = function (fillMode) {
-		$('#colorByFormId input:checked').attr('checked', null)
-		$('#colorByFormId input[value="' + fillMode + '"]').attr('checked', '')
+		$('#colorBySelectId').val(fillMode);
 	}
 
 	public.getFillColor = function (node, colors, fillMode) {
-		if (fillMode == 'group') {
-			return colors(node.depBundleIndex);
-		} else if (fillMode == 'bundle') {
-			return colors(node.moveBundleIndex);
-		} else {
-			return colors(node.moveEventIndex);
-		}
+		colors(0) // I have no idea why but for some reason including this line prevents the colors from being assigned incorrectly
+		var group = Object.keys(colorByGroups[fillMode])
+		var nodeVal = node.colorByProperties[fillMode].toString()
+		var groupIndex = group.indexOf(nodeVal)
+		return colors(groupIndex)
 	}
 
 	public.settleGraph = function (force, simpleTick, normalTick) {
@@ -673,7 +663,6 @@ var GraphUtil = (function ($) {
 		for (var g = 0; g < groups.length; ++g)
 			for (var f = 0; f < filters.length; ++f)
 				selection[0] = selection[0].concat(groups[g].filter(filters[f])[0])
-
 		selection.order();
 	};
 
@@ -742,7 +731,7 @@ var GraphUtil = (function ($) {
 	public.zoomOut = function () {
 		performZoom('out')
 	}
-
+	
 	public.getFilteredClass = function (obj) {
 		if (obj.linkElement) {
 			var parent = obj.source ? obj.source : obj.parent
@@ -767,7 +756,7 @@ var GraphUtil = (function ($) {
 	public.forceReflow = function (element) {
 		element.style('line-height', Math.random())
 	}
-	
+
 	// return the public object to make the public functions accessable
 	return public;
 

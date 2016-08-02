@@ -339,6 +339,9 @@ img.pointer {
 #controlPanel * {
 	vertical-align: middle;
 }
+#controlPanel select:hover {
+	background-color: #eeeeee;
+}
 #controlPanel table.labelTree {
 	border-width: 0px;
 }

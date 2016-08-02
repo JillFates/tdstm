@@ -215,17 +215,19 @@
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
 				<span class="checkboxContainer">
-					<input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" /><!--
-					--><label for="justRemainingCB" class="pointer"><b>&nbsp;Just Remaining</b></label>&nbsp;&nbsp;
+					<input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" />
+					<label for="justRemainingCB" class="pointer"><b>&nbsp;Just Remaining</b></label>
 				</span>
+				&nbsp;&nbsp;
 				<span class="checkboxContainer">
-					<input type="checkbox" id="justMyTasksCB" class="pointer" ${ (justMyTasks=='1' ? 'checked="checked"' : '') } onclick="reloadGrid()"/><!--
-					--><label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>&nbsp;&nbsp;
+					<input type="checkbox" id="justMyTasksCB" class="pointer" ${ (justMyTasks=='1' ? 'checked="checked"' : '') } onclick="reloadGrid()"/>
+					<label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>
 				</span>
+				&nbsp;&nbsp;
 				<tds:hasPermission permission="PublishTasks">
 					<span class="checkboxContainer">
-						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/><!--
-						--><label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>&nbsp;&nbsp;
+						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/>
+						<label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>
 					</span>
 				</tds:hasPermission>
 
