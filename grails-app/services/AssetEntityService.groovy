@@ -3434,7 +3434,7 @@ class AssetEntityService {
 			//    - Letters symbolizing each of the tabs that were exported 
 			//    - The date that the spreadsheet was exported
 			//	  - The file extension to use
-			String filename = project.getOwner().toString() + '-' + 
+			String filename = project.client.name + '-' + 
 				( project.name ?: project.id ) + 
 				"-${bundleNameList}-${exportedEntity}-${exportDate}.${fileExtension}"
 
