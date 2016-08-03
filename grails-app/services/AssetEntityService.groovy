@@ -2269,7 +2269,6 @@ class AssetEntityService {
 			def storageSheetNameMap = [:]
 			def fileDataTransferAttributeMapSheetName
 
-
 			// Flags to indicate which tabs to export based on which checkboxes selected in the UI
 			boolean doDevice = params.asset=='asset'
 			boolean doApp = params.application=='application'
@@ -2286,8 +2285,6 @@ class AssetEntityService {
 			String applicationQuery = null
 			String databaseQuery = null
 			String filesQuery = null
-
-
 
 			//
 			// Load the asset lists and property map files based on ALL or selected bundles for the classes selected for export
@@ -2739,9 +2736,6 @@ class AssetEntityService {
 							def colNum = serverMap[colName]
 							def a = currentAsset
 
-							//if (deviceCount == 1)
-							//	log.debug "Device Export - attribute=$attribute, colName=$colName, colNum=$colNum"
-
 							if (profilingRow) {
 								// log.debug "SET VAR TIME = " + profiler.getLapDuration('Devices').toMilliseconds()
 								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
@@ -2752,52 +2746,49 @@ class AssetEntityService {
 								}
 							}
 
-							def propValue = null
-							if(attribute){
-								propValue = a.(serverDTAMap.eavAttribute.attributeCode[coll])
-							} 
-							// (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null )
-							if (!(propValue == null || ( (propValue instanceof String) && propValue.size() == 0 ))){
-								switch(colName) {
-									case 'DepGroup':
-										// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
-										addCell(serverSheet, deviceCount, colNum, assetDepBundleMap[a.id.toString()])
-										break
-									case ~/usize|SourcePos|TargetPos/:
-										def pos = a[attribute] ?: 0
-										// Don't bother populating position if it is a zero
-										if (pos == 0) 
-											continue
-										addCell(serverSheet, deviceCount, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
-										break
+							if (attribute) {
+								def propValue = a.(serverDTAMap.eavAttribute.attributeCode[coll])
 
-									case ~/Retire|MaintExp/:
-										addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDate(userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
-										break
+								// Only update if value is not null or if a string is not blank
+								if ( ! ( propValue == null || ( (propValue instanceof String) && propValue.size() == 0 ))){
+									switch(colName) {
+										case 'DepGroup':
+											addCell(serverSheet, deviceCount, colNum, assetDepBundleMap[a.id.toString()])
+											break
+										case ~/usize|SourcePos|TargetPos/:
+											def pos = a[attribute] ?: 0
+											// Don't bother populating position if it is a zero
+											if (pos == 0) 
+												continue
+											addCell(serverSheet, deviceCount, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
+											break
 
-									case ~/Modified Date/:
-										if (a[attribute]) {
-											addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_2))
-										}
-										break
+										case ~/Retire|MaintExp/:
+											addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDate(userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
+											break
 
-									case ~/Source Blade|Target Blade/:
-										def chassis = a[attribute]
-										def value = ""
-										if (chassis) {
-											value = "id:" + chassis.id + " " + chassis.assetName
-										}
-										addCell(serverSheet, deviceCount, colNum, value)
-										break
+										case ~/Modified Date/:
+											if (a[attribute]) {
+												addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_2))
+											}
+											break
 
-									default:
-										def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
-										addCell(serverSheet, deviceCount, colNum, value)
+										case ~/Source Blade|Target Blade/:
+											def chassis = a[attribute]
+											def value = ""
+											if (chassis) {
+												value = "id:" + chassis.id + " " + chassis.assetName
+											}
+											addCell(serverSheet, deviceCount, colNum, value)
+											break
+
+										default:
+											def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
+											addCell(serverSheet, deviceCount, colNum, value)
+									}
 								}
 							}
-
 							
-
 							if (profilingRow) {
 								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
 								if (lapDuration > 2) {
@@ -2899,17 +2890,11 @@ class AssetEntityService {
 					
 					int applicationCount = 0
 					//application.each { app ->
-					application.each{app ->
+					application.each{ app ->
 						progressCount++
-						/*
-						if(progressCount < 10){
-							profiler.lap("Applications", "applications %d of %d", [progressCount, progressTotal])
-						}
-						*/
 
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						applicationCount++
-
 
 						// Add the appId column to column 0 if it exists
 						if (hasIdCol) {
@@ -2918,7 +2903,6 @@ class AssetEntityService {
 
 						for (int i=0; i < appColumnNameList.size(); i++) {
 							def colName = appColumnNameList[i]
-
 
 							// If the column isn't in the spreadsheet we'll skip over it
 							if ( ! appSheetColumnNames.containsKey(colName)) {
@@ -2978,7 +2962,7 @@ class AssetEntityService {
 					profiler.endInfo("Applications", "processed %d rows", [appSize])
 
 
-				}else{
+				} else {
 					// Add validation for the first row
 					WorkbookUtil.addCellValidation(validationSheet, appSheet, 0, 1, optionsSize["Environment"], appSheetColumnNames["Environment"], 1, 1)
 					WorkbookUtil.addCellValidation(validationSheet, appSheet, 2, 1, optionsSize["PlanStatus"], appSheetColumnNames["PlanStatus"], 1, 1)
@@ -3046,7 +3030,7 @@ class AssetEntityService {
 					}
 					database = null
 					profiler.endInfo("Databases", "processed %d rows", [dbSize])
-				}else{
+				} else {
 					// Adds validation to just the first row
 					WorkbookUtil.addCellValidation(validationSheet, dbSheet, 0, 1, optionsSize["Environment"], dbMap["Environment"], 1, 1)
 					WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap["PlanStatus"], 1, 1)
@@ -3112,7 +3096,7 @@ class AssetEntityService {
 					}
 					files = null
 					profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
-				}else{
+				} else {
 					// Adds validations to the first row
 					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap["Environment"], 1, 1)
 					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, 1)
@@ -3123,28 +3107,27 @@ class AssetEntityService {
 				//
 				def dependencySheet = getWorksheet('Dependencies')
 				List depProjectionFields = [
-							"id",
-							"asset.id",
-							"a.assetName",
-							"a.assetType",
-							"d.id",
-							"d.assetName",
-							"d.assetType",
-							"type",
-							"dataFlowFreq",
-							"dataFlowDirection",
-							"status",
-							"comment",
-							"c1",
-							"c2",
-							"c3",
-							"c4"
-					]
+					'id',
+					'asset.id',
+					'a.assetName',
+					'a.assetType',
+					'd.id',
+					'd.assetName',
+					'd.assetType',
+					'type',
+					'dataFlowFreq',
+					'dataFlowDirection',
+					'status',
+					'comment',
+					'c1',
+					'c2',
+					'c3',
+					'c4'
+				]
+
 				if ( doDependency ) {
 					profiler.beginInfo "Dependencies"
 					exportedEntity += "X"
-		
-					
 
 					profiler.lap("Dependencies", "Adding Validations")
 					WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 3, 1, optionsSize["DepType"],  depProjectionFields.indexOf("type"), 1, dependencySize)
