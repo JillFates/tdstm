@@ -16,7 +16,13 @@
 	<g:javascript src="model.manufacturer.js"/>
 	<jqgrid:resources />
 	<g:javascript src="jqgrid-support.js" />
-	<g:javascript src="TimerBar.js" />
+	<g:javascript src="progressTimer.js" />
+	<style>
+		/*TODO: REMOVE ON COMPLETE MIGRATION */
+		div.content-wrapper {
+			background-color: #ecf0f5 !important;
+		}
+	</style>
 
 	<g:render template="../layouts/responsiveAngularResources" />
 
@@ -25,13 +31,13 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 
 	<script type="text/javascript">
-		var timerBar;
+		var progressTimer;
 		
 		$(document).ready(function() {
-		
-			timerBar = new TimerBar(0, 'RefreshTaskMgr', function () {
+
+			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
 				reloadGrid();
-				timerBar.resetTimer();
+				progressTimer.resetTimer();
 			});
 			
 			$('#assetMenu').show();
@@ -174,7 +180,7 @@
 		$(document).keyup(function(e) {
 			// esc to stop timer
 			if (e.keyCode == 27) {
-				timerBar.resetTimer();
+				progressTimer.resetTimer();
 			}
 		});
 		
@@ -188,14 +194,23 @@
 	</script>
 </head>
 <body>
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		Task Manager
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#">Task</a></li>
+		<li><a href="#">List</a></li>
+	</ol>
+</section><br />
 	<input type="hidden" id="timeBarValueId" value="0"/>
 	<div id="outerBodyId" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<input type="hidden" id="timeBarValueId" value="0"/>
 		<div class="taskTimebar hide" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
 		</div>
-		<div class="body fluid">
-			<h1>Task Manager</h1>
+		<div class="body fluid task-manager-wrapper">
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>

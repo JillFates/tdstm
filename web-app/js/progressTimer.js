@@ -7,6 +7,7 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 	public.init = function () {
 		public.container = '.progress-bar-svg';
 		public.timerValue = null;
+		public.pausedValue = 0;
 		public.bindListeners();
 		public.getUserPreference();
 
@@ -30,6 +31,12 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 
 		public.setTimerValue(time);
 	};
+
+	// pauses the timer at the specified value
+	public.Pause = function () {
+		public.pausedValue = public.progressTimer.value();
+		public.progressTimer.stop();
+	}
 
 	public.getUserPreference = function () {
 		jQuery.ajax({
@@ -65,12 +72,40 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 		});
 
 		public.progressTimer.animate(1.0)
+	};
+
+	public.areActionBarsOpen = function () {
+		var taskActionBars = $('#actionBarId').size();
+		if (taskActionBars > 0)
+			return true;
+		var taskRows = $('tr.taskDetailsRow');
+		for (var i = 0; i < taskRows.size(); i++)
+			if ($(taskRows[i]).css('display') != 'none')
+				return true;
+		return false;
 	}
 
+	// resumes the timer if no modals are open
+	public.attemptResume = function () {
+		if ( ! public.areActionBarsOpen() )
+			public.Resume();
+	}
+
+	public.Resume = function() {
+		public.Restart();
+	};
+
 	public.Restart = function () {
-		var second = public.timerValue;
-		$('#timeBarValueId').val(second);
-		public.Start(second);
+		// if a temp values was assigned, then restart the graph and clean the pasued value
+		if(public.pausedValue != 0) {
+			public.progressTimer.set(public.pausedValue);
+			public.progressTimer.animate(1.0)
+			public.pausedValue = 0;
+		} else {
+			var second = public.timerValue;
+			$('#timeBarValueId').val(second);
+			public.Start(second);
+		}
 	}
 
 	public.bindListeners = function () {

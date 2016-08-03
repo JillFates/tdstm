@@ -379,6 +379,9 @@ tds.comments.controller.ShowCommentDialogController = function($window, $scope, 
 		if (typeof timerBar !== 'undefined')
 			timerBar.Pause();
 
+		if (typeof progressTimer !== 'undefined')
+			progressTimer.Pause();
+
 		if (data && data[0]) {
 			if (data[0].error) {
 				alerts.addAlertMsg(data[0].error);
@@ -440,6 +443,8 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		$timeout(function() {
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
+			if (typeof progressTimer !== 'undefined')
+				progressTimer.Pause();
 			$scope.removePopupOpenedListener();
 			$scope.$emit('newActivePopup', 'editComment');
 			if ($scope.isEdit) {
@@ -465,6 +470,9 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		commentUtils.closePopup($scope, 'editComment');
 		if (typeof timerBar !== 'undefined')
 			timerBar.attemptResume();
+
+		if (typeof progressTimer !== 'undefined')
+			progressTimer.attemptResume();
 	};
 
 	$scope.$on('forceDialogClose', function(evt, types) {
