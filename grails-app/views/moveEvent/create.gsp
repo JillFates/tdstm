@@ -142,11 +142,10 @@
 				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estStartTime','errors')}">
 				                  <script type="text/javascript">
 				                    $(document).ready(function(){
-				                      $("#estStartTime").datetimepicker();
+				                      $("#estStartTime").kendoDateTimePicker({ animation: false });
 				                    });
-				                  </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="estStartTime" name="estStartTime"
-				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" format="12hrs" />" 
-				                                   onchange="isValidDate(this.value)"/>
+				                  </script> <input type="text" class="dateRange" size="15" style="width: 210px;" id="estStartTime" name="estStartTime"
+				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" format="12hrs" />" />
 				                                   <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="estStartTime"/>
