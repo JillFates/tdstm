@@ -160,7 +160,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 		scope.$broadcast('forceDialogClose', ['crud']);
 		var view = (commentTO.commentType == 'comment') ? '/comment/editComment' : '/task/editTask';
 
-		modal.open({
+		var modalInstance = modal.open({
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.EditCommentDialogController,
 			scope: scope,
@@ -177,6 +177,12 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 					return commentTO;
 				}
 			}
+		});
+
+		modalInstance.result.then(function() {
+			$('.daterangepicker').hide();
+		}, function (result) {
+			$('.daterangepicker').hide()
 		});
 	}
 
@@ -500,6 +506,11 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 			var endDate = startDate.add('ms', $scope.acData.durationTime);
 			$scope.ac.estFinish = utils.date.formatDateTime(endDate);
 		}
+	}
+
+	$scope.onPickerOpen = function() {
+		$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
+		$(window).resize(function(){ $('.cancelBtn').click(); });
 	}
 
 	$scope.updateDuration = function() {
@@ -1119,7 +1130,11 @@ tds.comments.service.CommentService = function(utils, http, q) {
 tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 	var closePopup = function(scope, type) {
 		if (!scope.closed) {
-			scope.$close('close');
+			try {
+				scope.$close('close');
+			}
+			catch(err) { }
+
 			scope.$emit('popupClosed', type);
 			scope.closed = true;
 		}

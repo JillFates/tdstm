@@ -183,7 +183,7 @@
 				progressTimer.resetTimer();
 			}
 		});
-		
+
 		function reloadGrid () {
 			var postData = $('#taskListIdGrid').jqGrid('getGridParam', 'postData');
 			postData.justRemaining = $('#justRemainingCB').is(':checked') ? 1 : 0;
