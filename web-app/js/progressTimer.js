@@ -34,8 +34,10 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 
 	// pauses the timer at the specified value
 	public.Pause = function () {
-		public.pausedValue = public.progressTimer.value();
-		public.progressTimer.stop();
+		if(!public.isManual) {
+			public.pausedValue = public.progressTimer.value();
+			public.progressTimer.stop();
+		}
 	}
 
 	public.getUserPreference = function () {
