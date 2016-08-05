@@ -1305,12 +1305,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * Used to retrieve the Person object that represent the person that completes automated tasks
 	 * @return Person
 	 */
-	def getAutomaticPerson() {
-		def auto = Person.findByLastNameAndFirstName('Task', 'Automated')
-		if (! auto) {
-			log.error 'Unable to find Automated Task Person as expected'
-		} 
-		return auto
+	Person getAutomaticPerson() {
+		return Person.getAutomaticPerson()
 	}
 
 	/**

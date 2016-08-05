@@ -1,7 +1,13 @@
 class Person extends Party {
+	//COMPANION
+	// Data of Special Person Required by the System
+	private static SYSTEM_USER_AT = [
+			lastName:'Task',
+			firstName: 'Automated'
+	]
 
+	//INSTANCE
 	def partyRelationshipService
-
 
 	String firstName
 	String middleName = ""
@@ -213,7 +219,33 @@ class Person extends Party {
 	String getLastNameFirstAndTitle(){
 		return lastNameFirst+ ( title ? " - $title" : '' )
 	}
-	
+
+	/**
+	 * Retrieve special Person required by the System.
+	 * Used to retrieve the Person object that represent the person that completes automated tasks
+	 * @return
+	 */
+	Person getAutomaticPerson() {
+		def auto = Person.findByLastNameAndFirstName(SYSTEM_USER_AT.lastName, SYSTEM_USER_AT.firstName)
+		if (! auto) {
+			log.error 'Unable to find Automated Task Person as expected'
+		}
+		return auto
+	}
+
+	/**
+	 * Check if the Person instance is deleteable
+	 * i.e. AutomaticPerson shouldn't be deleted
+	 * @return
+	 */
+	boolean isSystemUser(){
+		if(SYSTEM_USER_AT.firstName == firstName && SYSTEM_USER_AT.lastName == lastName){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	String toString(){
 		firstName + ( middleName ? " $middleName" : '' ) + ( lastName ? " $lastName" : '' )
 	}
@@ -227,4 +259,11 @@ class Person extends Party {
 		}
 	}
 
+	transient beforeDelete = {
+		if(isSystemUser()){
+			def msg = "${this}: is a System User and can't be Deleted"
+			log.warn(msg)
+			throw new UnsupportedOperationException(msg)
+		}
+	}
 }

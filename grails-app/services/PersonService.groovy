@@ -580,7 +580,7 @@ class PersonService {
 		String messages = []
 		def userLogin = UserLogin.find("from UserLogin ul where ul.person = ${person.id}")
 
-		boolean isDeletable = !haveRelationship(person) && !(!deleteIfUserLogin && userLogin)
+		boolean isDeletable = !person.isSystemUser() && !haveRelationship(person) && !(!deleteIfUserLogin && userLogin)
 		if(isDeletable){
 
 			Person.withTransaction { trxStatus ->

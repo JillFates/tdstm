@@ -1126,6 +1126,11 @@ def test = {
 		log.debug "loadGeneral() class: ${params.personId.class} value: ${params.personId}"
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
+
+		if(person.isSystemUser()){ //This person can't be managed because is part of the system
+			render(text: "<div>This is a System User and can't be Administer</div>", contentType: "text/html", encoding: "UTF-8")
+			return;
+		}
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
 		def company = person.company
@@ -1357,10 +1362,15 @@ def test = {
 		ids.each{
 			def id = it.isLong()?Long.parseLong(it):null
 			def person = id?Person.get(id):null
+
 			if(person){
-				personsMap << [(person) : person.company.id]
-				def userLogin = UserLogin.findByPerson(person)
-				userLogins << userLogin
+				if(person.isSystemUser()){ //This person can't be managed because is part of the system
+					log.warn("${person}: is a System User and can't be Changed")
+				}else {
+					personsMap << [(person): person.company.id]
+					def userLogin = UserLogin.findByPerson(person)
+					userLogins << userLogin
+				}
 			}
 		}
 		
@@ -1397,6 +1407,14 @@ def test = {
 
 		def toPerson = Person.get(params.toId)
 		def fromPersons = params.list("fromId[]")
+
+		if(toPerson.isSystemUser() || fromPerson.isSystemUser()){ //This person can't be managed because is part of the system
+			def msg = "${toPerson} or ${fromPerson}: is a System User and can't be Changed"
+			log.warn(msg)
+			render msg
+			return;
+		}
+
 		def personMerged = []
 		def msg = ""
 		
