@@ -242,3 +242,9 @@ grails.mime.types = [
 		xls : 'application/vnd.ms-excel',
 		xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 ]
+
+
+// The following line prevents empty strings to be converted to null.
+grails.databinding.convertEmptyStringsToNull = false
+// Automatically trim all strings.
+grails.databinding.trimStrings = true
