@@ -1375,7 +1375,7 @@ def test = {
 		}
 		
 		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label for Person .
-		def columnList =  [ 'Merge To':'','First Name': 'firstName', 'Last Name': 'lastName', 'Nick Name': 'nickName' , 'Active':'active','Title':'title',
+		def columnList =  [ 'Merge To':'','First Name': 'firstName', 'Middle Name': 'middleName', 'Last Name': 'lastName', 'Nick Name': 'nickName' , 'Active':'active','Title':'title',
 							'Email':'email', 'Department':'department', 'Location':'location', 'State Prov':'stateProv',
 							'Country':'country', 'Work Phone':'workPhone','Mobile Phone':'mobilePhone',
 							'Model Score':'modelScore','Model Score Bonus':'modelScoreBonus', 'Person Image URL':'personImageURL', 
