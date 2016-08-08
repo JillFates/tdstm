@@ -577,7 +577,7 @@ class PersonService {
 	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets){
 		int cleared = 0
 		boolean deleted = false
-		String messages = []
+		def messages = []
 		def userLogin = UserLogin.find("from UserLogin ul where ul.person = ${person.id}")
 
 		boolean isDeletable = !person.isSystemUser() && !haveRelationship(person) && !(!deleteIfUserLogin && userLogin)
@@ -638,7 +638,16 @@ class PersonService {
 				}		
 			}		
 		}else{
-			messages << "Staff '${person.firstName}, ${person.lastName}' unable to be deleted due to associations with existing elements in one or more Projects. Please use Person Merge functionality if applicable."
+			String msg
+			if(person.isSystemUser()){
+				msg = "Staff '${person.firstName}, ${person.lastName}' is a USER required by the SYSTEM and can't be deleted"
+			}else if(haveRelationship(person)){
+				msg = "Staff '${person.firstName}, ${person.lastName}' unable to be deleted due to associations with existing elements in one or more Projects. Please use Person Merge functionality if applicable."
+			}else (!deleteIfUserLogin && userLogin){
+				msg = "Staff '${person.firstName}, ${person.lastName}' as a user associated and you're not allowed to delete it"
+			}
+
+			messages << msg
 		}
 
 		return [messages: messages, cleared: cleared, deleted: deleted]
@@ -843,7 +852,8 @@ class PersonService {
 						}else{
 							skipped++
 						}
-						messages = messages + deleteResultMap["messages"]
+						log.info("MEssages: ${deleteResultMap["messages"]}")
+						messages << deleteResultMap["messages"]
 
 
 						/*

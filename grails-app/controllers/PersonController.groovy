@@ -1128,7 +1128,7 @@ def test = {
 		def person = Person.get(params.personId)
 
 		if(person.isSystemUser()){ //This person can't be managed because is part of the system
-			render(text: "<div>This is a System User and can't be Administer</div>", contentType: "text/html", encoding: "UTF-8")
+			render(text: "<div>This is a System User and can't be Managed</div>", contentType: "text/html", encoding: "UTF-8")
 			return;
 		}
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
@@ -1406,10 +1406,20 @@ def test = {
 		}
 
 		def toPerson = Person.get(params.toId)
-		def fromPersons = params.list("fromId[]")
+		def fromPersonIds = params.list("fromId[]")
 
-		if(toPerson.isSystemUser() || fromPerson.isSystemUser()){ //This person can't be managed because is part of the system
-			def msg = "${toPerson} or ${fromPerson}: is a System User and can't be Changed"
+		def fromPersons = fromPersonIds.collect { id ->
+			return Person.get(id)
+		}
+
+		def foundSystemUser = toPerson.isSystemUser()
+		if(!foundSystemUser){
+			foundSystemUser = ( (fromPersons.find{ it.isSystemUser() }) != null)
+		}
+
+
+		if(foundSystemUser){ //This person can't be managed because is part of the system
+			def msg = "one of the users in the merge is a System User and can't be Changed"
 			log.warn(msg)
 			render msg
 			return;
@@ -1423,8 +1433,7 @@ def test = {
 		if (!toPerson.save(flush:true)) {
 			toPerson.errors.allErrors.each{ println it }
 		}
-		fromPersons.each {
-			def fromPerson = Person.get(it)
+		fromPersons.each { fromPerson ->
 			personMerged += personService.mergePerson(fromPerson, toPerson)
 		}
 		msg += "${personMerged.size() ? WebUtil.listAsMultiValueString(personMerged) : 'None of Person '} Merged to ${toPerson}"
