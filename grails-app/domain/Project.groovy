@@ -6,15 +6,19 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 
 class Project extends PartyGroup {
-
+	//COMPANION
+	// Data of Special Project Required by the System
+	//Todo: Review, Can we guarantee that "TM DEFAULT PROJECT" will always have the ID(2)???
 	def static final DEFAULT_PROJECT_ID = 2
 	def static final CUSTOM_FIELD_COUNT = 96
+
+	//INSTANCE
 	def projectService
 	def partyRelationshipService
 	
 	static isDefaultProject(aProjectRef) {
 		if (aProjectRef instanceof Project) {
-			return aProjectRef.id == DEFAULT_PROJECT_ID
+			return aProjectRef.isDefaultProject()
 		} else {
 			return aProjectRef == DEFAULT_PROJECT_ID
 		}
@@ -349,6 +353,14 @@ class Project extends PartyGroup {
 	 */
 	String getStatus() {
 		isActive()?'active':'completed'
+	}
+
+	transient beforeDelete = {
+		if(isDefaultProject()){
+			def msg = "${this}: project is Required by the system and can't be Deleted"
+			log.warn(msg)
+			throw new UnsupportedOperationException(msg)
+		}
 	}
 
 }

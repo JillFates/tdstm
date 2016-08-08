@@ -11,7 +11,7 @@ databaseChangeLog = {
 		
 		grailsChange {
 			change {
-				def defaultProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
+				def defaultProject = Project.getDefaultProject()
 
 				def entityTypes = ["Application", "AssetEntity", "Database", "Files"]
 				def phases = ValidationType.getListAsMap().keySet()

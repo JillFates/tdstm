@@ -129,7 +129,8 @@ class ProjectController {
 			projectInstance: currProjectInstance, 
 			projectPartners: projectPartners, 
 			projectManagers: projectManagers,
-			projectLogoForProject: projectLogoForProject 
+			projectLogoForProject: projectLogoForProject,
+			isDeleteable: !currProjectInstance.isDefaultProject()
 		]
 	}
 

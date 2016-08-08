@@ -290,7 +290,7 @@ class ProjectService {
 	 * @return
 	 */
 	def generateDefaultConfig(def type){
-		def defaultProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
+		def defaultProject = Project.getDefaultProject()
 		def returnMap = [:]
 		def data = FieldImportance.findByProjectAndEntityType(defaultProject,type)?.config
 		def phases = ValidationType.getListAsMap().keySet()
