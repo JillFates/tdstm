@@ -10,7 +10,7 @@
 		<g:javascript src="d3/d3.js"/>
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
-		<g:javascript src="TimerBar.js" />
+		<g:javascript src="progressTimer.js" />
 
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
@@ -53,12 +53,10 @@
 							--><span class="controlSpan checkboxContainer"><!--
 								--><input type="checkbox" id="highlightCriticalPathId" class="pointer" checked="checked"/><!--
 								--><label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label><!--
-							--></span><!--
-							--><span class="controlSpan"><!--
-								--><span style="float:right;"><!--
-									--><g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/><!--
-								--></span><!--
 							--></span>
+							<div style="float: right;" class="task-timeline-progress-wrapper">
+								<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+							</div>
 						</div>
 					</span>
 					<div id="controlPanel" class="graphPanel">
@@ -123,11 +121,11 @@
 			</div>
 		</div>
 		<script type="text/javascript">
-			var timerBar;
+			var progressTimer;
 			$(document).ready(function() {
-				timerBar = new TimerBar(0, 'RefreshTimeline', function () {
+				progressTimer = new ProgressTimer(0, 'RefreshTimeline', function () {
 					reloadGraph();
-					timerBar.resetTimer();
+					progressTimer.resetTimer();
 				});
 			})
 
