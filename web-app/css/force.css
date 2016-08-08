@@ -436,12 +436,61 @@ div.graphPanel.openPanel {
 	padding-top: 10px;
 	z-index: 1;
 }
-#legendDivId {
-	min-width: 140px;
-}
 #controlPanel {
 	min-width: 150px;
 }
+#legendDivId {
+	min-width: 152px;
+}
+#legendDivId table {
+	margin-left: 5px;
+	border: 0px;
+}
+#legendDivId p {
+	display: inline-block;
+}
+#legendDivId svg {
+	border-width: 0px;
+}
+#legendDivId #dependencyTypeContainerId svg {
+	width: 34px;
+	height: 16px;
+}
+#legendDivId #assetClassesContainerId svg {
+	width: 35px;
+	height: 35px;
+}
+#legendDivId #colorGroupingContainerId svg {
+	width: 35px;
+	height: 35px;
+}
+#legendDivId #dependencyGroupContainerId td {
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+#legendDivId #dependencyGroupContainerId span {
+	display: inline-block;
+	padding: 4px;
+}
+#legendDivId #dependencyGroupContainerId span.depLabel {
+	width: 100px;
+}
+#legendDivId #dependencyGroupContainerId span.toolTipButton {
+	background-image: url("../icons/help.png");
+	background-repeat: no-repeat;
+	background-position: 0px 1px;
+	width: 16px;
+	height: 20px;
+	padding: 0px;
+	cursor: pointer;
+}
+#legendDivId #dependencyGroupContainerId .popover {
+	width: 300px;
+}
+#legendDivId #colorGroupingTableId td:first-child {
+	width: 40px;
+}
+
 
 /* Panel Tabs */
 #mapReferenceId {
@@ -616,6 +665,9 @@ div.graphPanel.openPanel {
 #twistieRowId svg {
 	vertical-align: bottom;
 	background-color: #ffffff;
+	width: 12px;
+	height: 12px;
+	border-width: 0px;
 }
 #twistieSpanId:hover svg {
 	background-color: #cccccc;
@@ -637,7 +689,7 @@ div.graphPanel.openPanel {
 #dependencyDivId.floating {
 	position: fixed;
 	top: 0px;
-	left: 430px;
+	left: 670px;
 	z-index: 110;
 	margin-left: 0px;
 	border: 1px solid green;

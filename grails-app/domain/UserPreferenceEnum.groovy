@@ -11,6 +11,7 @@ enum UserPreferenceEnum {
 	TASKMGR_REFRESH("TASKMGR_REFRESH"),
 	DEP_GRAPH("depGraph"),
 	ARCH_GRAPH('archGraph'),
+	LEGEND_TWISTIE_STATE("legendTwistieState"),
 	CURR_PROJ("CURR_PROJ"),
 	CURR_TZ("CURR_TZ"),
 	CURR_BUNDLE("CURR_BUNDLE"),

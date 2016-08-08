@@ -3263,6 +3263,8 @@ class AssetEntityController {
 				else
 					prefsObject = defaultPrefs
 				
+				def legendTwistiePref = userPreferenceService.getPreference(PREF.LEGEND_TWISTIE_STATE) ?: '1111'
+				
 				// front end labels for the Color By groups
 				def colorByGroupLabels = ['group': 'Group', 'bundle': 'Bundle', 'event': 'Event', 'environment': 'Environment', 'sourceLocation': 'Source Location', 'targetLocation': 'Target Location']
 				
@@ -3404,6 +3406,7 @@ class AssetEntityController {
 					
 					def sourceIndex = nodeIds.indexOf(it.assetId)
 					def targetIndex = nodeIds.indexOf(it.dependentId)
+
 					if (sourceIndex != -1 && targetIndex != -1) {
 						
 						// check if this link is the 2nd part of a 2-way dependency
@@ -3433,6 +3436,7 @@ class AssetEntityController {
 				model.defaultsJson = defaults as JSON
 				model.defaultPrefs = defaultPrefs as JSON
 				model.graphPrefs = prefsObject
+				model.legendTwistiePref = legendTwistiePref
 				model.showControls = params.showControls
 				model.fullscreen = params.fullscreen ?: false
 				model.nodes = graphNodes as JSON

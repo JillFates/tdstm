@@ -3,10 +3,13 @@ var parameterPrecision = {'force':${multiple?10:100}, 'linkSize':10, 'friction':
 var parameterRanges = {'force':[${multiple?-500:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1]};
 
 $(document).ready(function() {
+	
+	// handle detecting whether this graph is being opened in the fullscreen state
 	var fullscreen = ${fullscreen};
 	if (fullscreen)
 		GraphUtil.enableFullscreen();
 	
+	// figure out which panel should be opened initially
 	var showControls = '${showControls ?: ''}';
 	GraphUtil.togglePanel('hide');
 	if (showControls == 'controls')
@@ -14,12 +17,29 @@ $(document).ready(function() {
 	else if (showControls == 'legend')
 		GraphUtil.togglePanel('legend');
 	
+	// if the browser doesn't support svg display a message instead of the graph
 	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
 		$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.');
 	
+	// initially close the control panel twisties
 	$('#layoutControlContainerId').slideUp(0);
 	$('#labelControlContainerId').slideUp(0);
 	GraphUtil.checkForDisabledButtons(parameterRanges);
+	
+	// enable the bootstrap popover tooltips in the legend
+	$('.toolTipButton').popover()
+	
+	// handle applying the legend twistie preferences
+	var legendTwistiePref = '${legendTwistiePref}'
+	var twisties = $('#legendDivId #twistieSpanId')
+	var twistieDivs = $('#legendDivId .twistieControlledDiv')
+	for (var i = 0; i < legendTwistiePref.length; ++i) {
+		var pref = legendTwistiePref[i]
+		if (pref == '0' && twisties.length > i) {
+			$(twisties[i]).addClass('closed').removeClass('open')
+			$(twistieDivs[i]).css('display','none')
+		}
+	}
 });
 
 // Called when the user clicks the + or - buttons on the control panel

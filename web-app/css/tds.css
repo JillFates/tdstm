@@ -952,9 +952,12 @@ td .label_sm {
 	padding: 5px;
 
 }
+.tabInner div.popover * {
+	padding: initial;
+}
 
 
-div#dependencyDivId tr.odd td {
+div#dependencyDivId tr.odd td, #dependencyGroupContainerId .depGroupPending {
 	background-color: #e0e0e0;
 }
 div#dependencyDivId tr.even td {
@@ -964,13 +967,13 @@ div#dependencyDivId tr.odd td.depGroup {
 	cursor: pointer;
 	color: grey;
 }
-div#dependencyDivId tr.odd td.depGroupConflict {
+div#dependencyDivId tr.odd td.depGroupConflict, #dependencyGroupContainerId .depGroupConflict {
 	background-color: yellow;
 }
-div#dependencyDivId tr.odd td.depGroupReady {
+div#dependencyDivId tr.odd td.depGroupReady, #dependencyGroupContainerId .depGroupReady {
 	background-color: lightgreen;
 }
-div#dependencyDivId tr.odd td.depGroupDone {
+div#dependencyDivId tr.odd td.depGroupDone, #dependencyGroupContainerId .depGroupDone {
 	background-color: #5f9fcf;
 }
 #dependencyDivId.floating {

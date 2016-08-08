@@ -80,6 +80,21 @@ class UserPreferenceService {
 				
 				return true
 			}
+		],
+		legendTwistieState: [
+			type: 'string',
+			validator: {
+				def prefs = it.toCharArray()
+				prefs.each { pref ->
+					if (pref != '0' && pref != '1')
+						return false
+				}
+				
+				if (prefs.length > 4)
+					return false
+				
+				return true
+			}
 		]
 	]
 	

@@ -1,4 +1,5 @@
 <div id="toolsContainerId">
+	<!-- The top bar with various buttons and controls on it -->
 	<span id="panelLink" colspan="2" class="noPadding">
 		<div id="mapReferenceId">
 			<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
@@ -9,6 +10,7 @@
 			<div id="refreshButtonId" class="graphButton graphTabButton" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4>Refresh</h4></div>
 		</div>
 	</span>
+	<!-- The control panel div containing graph controls and settings -->
 	<div id="controlPanel" class="graphPanel">
 		<form id="preferencesformId">
 			<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
@@ -16,7 +18,7 @@
 				<!-- Miscellaneous settings and controls -->
 				<tr>
 					<td colspan="3" class="noPadding">
-						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="pointer fullButton graphButton" onclick="GraphUtil.toggleFreeze()">
+						<input id="playPauseButtonId" type="button" value="Freeze Graph${legendTwistiePref}" class="pointer fullButton graphButton" onclick="GraphUtil.toggleFreeze()">
 					</td>
 				</tr>
 				<tr>
@@ -39,12 +41,13 @@
 						--><label for="maxEdgeCountId" style="vertical-align: text-top;">&nbsp;Max dependencies cut</label>
 					</td>
 				</tr>
-
+				
 				
 				<!-- Spacer -->
 				<tr><td colspan="3" class="noPadding"><br /></td></tr>
-
 				
+				
+				<!-- Color By grouping selector -->
 				<tr title="Sets the criteria used to determine node fill color">
 					<td colspan="3" style="padding-left :0px">
 						<span class="checkboxContainer">
@@ -53,7 +56,8 @@
 						</span>
 					</td>
 				</tr>
-
+				
+				<!-- More display controls -->
 				<tr title="If checked, bundle conflicts will be highlighted">
 					<td colspan="3" style="padding-left :0px">
 						<span class="checkboxContainer">
@@ -77,7 +81,7 @@
 				<tr><td colspan="3" class="noPadding"><br /></td></tr>
 
 				
-				<!-- Label checkboxes -->
+				<!-- The twistie for the hide/show graph labels section -->
 				<tr id="twistieRowId">
 					<td colspan="3" class="noPadding">
 						<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="labelControlContainerId">
@@ -87,6 +91,7 @@
 					</td>
 				</tr>
 			</table>
+			<!-- Label checkboxes -->
 			<div id="labelControlContainerId">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
 					<g:each in="${assetTypes}" var="entry" status="i">
@@ -112,17 +117,15 @@
 			</div>
 			
 			<table class="labelTree" cellpadding="0" cellspacing="0">
-				<tr>
-					<td colspan="3" class="noPadding">
-						<br />
-					</td>
-				</tr>
+				<!-- Spacer -->
+				<tr><td colspan="3" class="noPadding"><br /></td></tr>
 				
+				<!-- The twistie for the force layout settings section -->
 				<tr id="twistieRowId">
 					<td colspan="3" class="noPadding">
 						<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="layoutControlContainerId">
 							Layout:
-							<svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId" class=""><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+							<svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 						</span>
 					</td>
 				</tr>
@@ -170,13 +173,16 @@
 		<!-- Preference controls -->
 		<table class="labelTree" cellpadding="0" cellspacing="0">
 				
+			<!-- Spacer -->
 			<tr><td colspan="3" class="noPadding"><br /></td></tr>
 			
+			<!-- Save preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
 					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton graphButton" onclick="GraphUtil.updateUserPrefs('depGraph')">
 				</td>
 			</tr>
+			<!-- Reset preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
 					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton graphButton" onclick="GraphUtil.resetToDefaults('depGraph')">
@@ -184,10 +190,15 @@
 			</tr>
 		</table>
 	</div>
-	<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:false, displayCycles:false, displayBundleConflicts:true, arrowheadOffset:true, displayCuts:true]}" />
+	<!-- The legend div containing information about the shapes and colors used in the graph -->
+	<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:false, displayCycles:false, displayBundleConflicts:true, arrowheadOffset:true, displayCuts:true, legendTwistiePref:legendTwistiePref, showDependencyGroupColors:true]}" />
+	
 </div>
+
+<!-- Include the graph itself -->
 <g:render template="../moveBundle/force" model="${pageScope.variables}"/>
 
+<!-- Call the main graph function as soon as this template is added to the DOM -->
 <script type="text/javascript">
 	buildMap();
 </script>

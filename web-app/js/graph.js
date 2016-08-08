@@ -207,10 +207,10 @@ var GraphUtil = (function ($) {
 			node.css('fill', colors(i));
 			var label = newRow.children('.bundleNameLabel');
 			label.html(dataMap[o]);
-			$('#legendId').append(newRow);
+			$('#colorGroupingTableId').append(newRow);
 		});
 		$('#colorKeyLabelId').removeClass('hidden')
-		$('#colorKeyLabelId h4').html(colorByGroupLabels[fillMode] + 's');
+		$('#colorKeyLabelId p').html(colorByGroupLabels[fillMode] + 's');
 	}
 
 	public.getFillMode = function () {
@@ -254,6 +254,24 @@ var GraphUtil = (function ($) {
 				public.correctControlPanelSize();
 			});
 		}
+		
+		// update the legend twistie preference if applicable
+		if (twistieSpan.parents('#legendDivId').length > 0 && twistieSpan.parents('.tabInner').length > 0) {
+			var prefValue = public.serializeLegendTwistiePrefs();
+			setUserPreference('legendTwistieState', prefValue);
+		}
+	}
+	
+	// generates the prefernce value for the current legend twistie state
+	public.serializeLegendTwistiePrefs = function () {
+		var twisties = $('#legendDivId #twistieSpanId')
+		var pref = ''
+		for (var i = 0; i < twisties.length; ++i)
+			if ($(twisties[i]).hasClass('open'))
+				pref = pref + '1'
+			else
+				pref = pref + '0'
+		return pref
 	}
 
 	public.updateNodeClasses = function () {
