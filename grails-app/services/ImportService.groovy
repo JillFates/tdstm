@@ -728,6 +728,9 @@ class ImportService {
 
 		def eavAttributeSet = data.eavAttributeSet
 		def staffList = data.staffList
+
+		def teams = partyRelationshipService.getStaffingRoles()*.id
+
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		assetCount = dataTransferValueRowList.size()
 
@@ -827,6 +830,48 @@ class ImportService {
 
 					case ~/shutdownBy|startupBy|testingBy/:
 						if (it.importValue.size()) {
+
+							if (it.importValue[0] in ['@', '#']) {
+								partyRelationshipService.assignWhomToAsset(application, attribName, it.importValue, staffList, teams, project)
+							}else{
+								String existingName = application[attribName] ? application[attribName].toString() : ''
+								if (existingName && existingName == it.importValue) {
+									// The name hasn't changed so we can skip this task
+									log.debug "processApplicationImport() $attribName name was unchanged ${it.importValue}"
+									break
+								}else{
+									Map assignMap = partyRelationshipService.assignWhomToAsset(application, attribName, it.importValue, staffList, teams, project)
+									if(!assignMap.whom && !assignMap.isAmbiguous && assignMap.notExists){
+										def resultMap
+										try{
+											resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
+										} catch (e) {
+											warnMsg = "Failed to find or create $attribName (${it.importValue}) on row $rowNum - ${e.getMessage()}"
+										}
+
+										if ( ! warnMsg && resultMap?.person) {
+											application[attribName] = resultMap.person.id
+
+											// Now check for warnings
+											if (resultMap.isAmbiguous) {
+												warnMsg = "Ambiguous name for $attribName (${it.importValue}) in application ${application.assetName} on row $rowNum. Name set to ${resultMap.person}"
+											}
+
+											if (resultMap.isNew) 
+												personsAdded++
+
+										} else if ( resultMap?.error ) {
+											warnMsg = "Person assignment to $attribName for App ${application.assetName} on row $rowNum failed. ${resultMap.error}"
+										}
+									}else{
+										warnMsg = assignMap.errMsg
+									}
+								}
+							}
+
+
+
+/*
 							if (it.importValue[0] in ['@', '#']) {
 								// TODO : JPM 5/2016 : TM-4889 processApplicationImport needs to validate By @ and # imports
 								application[attribName] = it.importValue
@@ -861,7 +906,7 @@ class ImportService {
 									warnMsg = "Person assignment to $attribName for App ${application.assetName} on row $rowNum failed. ${resultMap.error}"
 								}
 
-							}
+							}*/
 						}
 						break
 

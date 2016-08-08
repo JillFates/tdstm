@@ -1308,4 +1308,182 @@ class PartyRelationshipService {
 		return companies
 	}
 
+
+
+	/**
+	 * This method attempts to assign a person/team to an asset's property.
+	 *
+	 * It supports:
+	 *				Person's Id 		=> value = "123456"
+	 *				Person's Email 		=> value = "example@mail.com"
+	 *				Person's Name 		=> value = "John Doe"
+	 *				Team Code 			=> value = "@APP_COORD"
+	 *				Property Reference 	=> value = "#prop"
+	 *
+	 * @param asset 		- asset being updated.
+	 * @param property 		- which asset's property is to be given a value.
+	 * @param value 		- value to be assigned.
+	 * @param projectStaff 	- List of staff assigned to the project.
+	 * @param staffingRoles - List of team codes.
+	 * @param project
+	 *
+	 * @return Map => Keys: errMsg, isAmbiguous, notExists, whom.
+	 */
+	Map assignWhomToAsset(asset, String property, String value, List projectStaff, List staffingRoles, Project project){
+		def whom = null
+		String errMsg = null
+
+		boolean isAmbiguous = false
+		boolean notExists = false
+
+
+		def assignTeam = {
+			def team = value[1..-1]
+			if(staffingRoles.contains(team)){
+				whom = team
+			}else{
+				errMsg = "Unknown team ($team) indirectly referenced."
+				notExists = true
+			}
+			
+		}
+
+
+		def assignByPersonId = { personId ->
+			def whomId = NumberUtil.toLong(personId)
+			whom = projectStaff.find { it.id == whomId }
+			if (!whom) {
+				// Look if the person exists
+				def person = Person.get(whomId)
+				if (person){
+					errMsg = "Person $person ($value) is not in project staff, asset name: ${asset?.assetName}."
+				} else {
+					errMsg = "Person id $person doesn't exist, asset name: ${asset?.assetName}."
+					notExists = true
+				}
+			}
+		}
+
+
+		def assignByPropertyName = {
+			def personId = getIndirectPropertyRef(task.assetEntity, value)
+			if ( personId?.isNumber() ) {
+				assignByPersonId(personId)
+			} else if (! whom || whom.size() == 0 ) {
+				errMsg = "Unable to resolve indirect whom reference (${value}), asset name: ${asset?.assetName}."
+			}
+		}
+
+
+		/*
+		 * This closure looks up a person by name.
+		 */
+		def assignByName = {
+			def map = personService.findPerson(value, project, projectStaff)
+			def personMap = personService.findPersonByFullName(value)
+						
+			if (!map.person && personMap.person ) {
+				errMsg = "Person by name ($whom) found but it is NOT a staff"
+			} else if ( map.isAmbiguous ) {
+				errMsg = "Staff referenced by name ($value) was ambiguous"
+				isAmbiguous = true
+			} else if (personMap.person) {
+				whom = personMap.person
+			} else {
+				errMsg = "Person by name ($whom) NOT found"
+				notExists = true
+			}
+
+		}
+
+		switch(value){
+			// Team reference.
+		    case ~/@.*/:
+		        assignTeam()
+		        break
+		    // Property reference
+		    case ~/#.*/:
+				assignByPropertyName()
+		        break
+		    // Person's Id    
+		    case ~/\d+/:
+		        assignByPersonId(value)
+		        break
+		    // Person's email address.
+		    case ~/.*@.*/:
+		    	whom = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
+		    	if(!whom){
+		    		errMsg = "Staff referenced by email ($value) not associated with project."
+		    	}
+		    	break
+		   	// Person's name
+		    default:
+		    	assignByName()
+		        
+		}
+
+		if(whom){
+			asset[property] = whom
+		}else{
+			errMsg = "Invalid value: $value for property: $property given for $asset."
+			log.error(errMsg)
+		}
+
+		return [whom: whom, notExists: notExists, isAmbiguous: isAmbiguous, errMsg: errMsg]
+	}
+
+	/**
+	 * Helper method lookup indirect property references that will recurse once if necessary
+	 * This supports two situations:
+	 *    1) taskSpec whom:'#prop' and asset.prop contains name/email
+	 *    2) taskSpec whom:'#prop' and asset.prop contains #prop2 reference (indirect reference)
+	 * @param AssetComment 
+	 * @param String propName
+	 * @return String - the string (name or email) from the referenced or indirect referenced property
+	 * @throws RuntimeException if a reference is made to an invalid fieldname
+	 */
+	private Object getIndirectPropertyRef( asset, propertyRef, depth=0) {
+		log.info "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
+
+		def value
+		def property = propertyRef	// Want to hold onto the original value for the exception message
+		if (property[0] == '#') {
+			// strip off the #
+			property = property[1..-1]
+		}	
+
+		// Deal with propery name inconsistency
+		def crossRef = [ sme1:'sme', sme2:'sme2', owner:'appOwner' ]
+
+		if ( crossRef.containsKey( property.toLowerCase() ) ) {
+			property = crossRef.getAt( property.toLowerCase() )
+		}
+
+		// Check to make sure that the asset has the field referenced
+		if (! asset.metaClass.hasProperty( asset.getClass(), property) ) {
+			throw new RuntimeException("Invalid property name ($propertyRef) used in name lookup in asset $asset")
+		}
+
+		// TODO : Need to see if we can eliminate the multiple if statements by determining the asset type upfront
+		def type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.getName()
+		if (type == 'java.lang.String') {			
+			// Check to see if we're referencing a person object vs a string
+			log.debug "getIndirectPropertyRef() $property of type $type has value (${asset[property]})"
+			if ( asset[property]?.size() && asset[property][0] == '#' ) {
+				if (++depth < 3)  {
+					value = getIndirectPropertyRef( asset, asset[property], depth)
+				} else {
+					throw new RuntimeException("Multiple nested indirection unsupported (${property}..${asset[property][0]}) of asset ($asset), depth=$depth")
+				}
+			} else {
+				value = asset[property]
+			}
+		} else {
+			log.debug "getIndirectPropertyRef() indirect references property $property of type $type"
+			value = asset[property]
+		}
+
+		return value
+	}
+
 }
