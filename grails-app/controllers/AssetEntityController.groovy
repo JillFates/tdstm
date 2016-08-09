@@ -3281,7 +3281,7 @@ class AssetEntityController {
 
 				// define a map of all the options for asset types
 				def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
-								
+				
 				// Create the Nodes
 				def graphNodes = []
 				def name = ''
@@ -3304,7 +3304,7 @@ class AssetEntityController {
 					size = 150
 					if (type == AssetType.APPLICATION.toString())
 						size = it.criticality ? criticalitySizes[it.criticality] : 200
-					
+
 					// calculate properties based on the move event
 					def hasMoveEvent = it.eventName ? true : false
 					def moveEventName = it.eventName ?: 'No Event'
@@ -3351,7 +3351,7 @@ class AssetEntityController {
 						assetClass:it.assetClass, cutGroup:-1, colorByProperties: colorByGroupIds
 					]
 				}
-				
+
 				// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
 				def nodeIds = []
 				graphNodes.each {
@@ -3470,7 +3470,77 @@ class AssetEntityController {
 		userPreferenceService.removePreference(preferenceName)
 		render true
 	}
-
+	
+	// gets the list of people used to populate the person highlighting combobox on the dependency analyzer graph
+	def getDepGraphFilterPeople () {
+		// validate the parameters
+		def depGroup = NumberUtil.isLong(params.depGroup) ? NumberUtil.toInteger(params.depGroup) : (params.depGroup == 'onePlus' ? 'onePlus' : null)
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		
+		// build the query
+		def filterPersonQuery = """
+			SELECT DISTINCT p.person_id AS personId, 
+			CONCAT(CONCAT( IF(p.first_name = null, '', p.first_name), IF(STRCMP(' ', CONCAT(' ', p.middle_name)) = 0, '', CONCAT(' ', p.middle_name)) ), 
+				IF(STRCMP(' ', CONCAT(' ', p.last_name)) = 0, '', CONCAT(' ', p.last_name))) AS name
+			FROM tdstm.asset_dependency_bundle adb
+			LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = adb.asset_id 
+			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
+			RIGHT OUTER JOIN person p ON p.person_id = app.sme_id OR p.person_id = app.sme2_id
+			WHERE adb.project_id = ${projectId}
+		"""
+		if (depGroup == 'onePlus')
+			filterPersonQuery = filterPersonQuery + 'AND adb.dependency_bundle > 0'
+		else if (depGroup != null)
+			filterPersonQuery = filterPersonQuery + 'AND adb.dependency_bundle = ' + depGroup
+		
+		// execute the query and return it as JSON
+		def personData = jdbcTemplate.queryForList(filterPersonQuery)
+		render personData as JSON
+	}
+	
+	// gets the list of the ids of the assets that should be highlighted by the given filter
+	def getFilteredDepGraph () {
+		// validate the parameters
+		def depGroup = NumberUtil.isLong(params.depGroup) ? NumberUtil.toInteger(params.depGroup) : (params.depGroup == 'onePlus' ? 'onePlus' : null)
+		def nameFilter = params.nameFilter ?: ''
+		def personFilter = NumberUtil.isLong(params.personFilter) ? NumberUtil.toInteger(params.personFilter) : null
+		def isRegex = (params.isRegex == 'true') ? (true) : (false)
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		
+		// build the query
+		def groupAssetsQuery = """
+			SELECT DISTINCT ae.asset_entity_id AS assetId, ae.asset_name AS assetName FROM asset_entity ae
+			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
+			INNER JOIN asset_dependency_bundle adb ON adb.asset_id = ae.asset_entity_id
+			LEFT OUTER JOIN person p ON p.person_id IN (app.sme_id, app.sme2_id, ae.app_owner_id)
+			WHERE adb.project_id = ${projectId}
+		"""
+		if (depGroup == 'onePlus')
+			groupAssetsQuery = groupAssetsQuery + 'AND adb.dependency_bundle > 0'
+		else if (depGroup != null)
+			groupAssetsQuery = groupAssetsQuery + 'AND adb.dependency_bundle = ' + depGroup
+		if (personFilter)
+			groupAssetsQuery = groupAssetsQuery + ' AND p.person_id = ' + personFilter
+		
+		// execute the query
+		def groupAssets = jdbcTemplate.queryForList(groupAssetsQuery)
+		
+		// filter on asset name
+		def highlightList = []
+		def nameRegex = ~"${nameFilter}"
+		groupAssets.each {
+			if (isRegex && it.assetName.matches(nameRegex))
+				highlightList.push(it.assetId)
+			else if (!isRegex && it.assetName.toUpperCase().contains(nameFilter.toUpperCase()))
+				highlightList.push(it.assetId)
+		}
+		
+		// send the results back to the client as JSON
+		render highlightList as JSON
+	}
+	
 	/**
 	* Delete multiple  Assets, Apps, Databases and files .
 	* @param : assetLists[]  : list of ids for which assets are requested to deleted

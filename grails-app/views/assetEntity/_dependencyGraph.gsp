@@ -40,6 +40,47 @@ $(document).ready(function() {
 			$(twistieDivs[i]).css('display','none')
 		}
 	}
+	
+	// add bindings to the filtering selects to set their corresponding radio buttons when clicked on
+	$('#filterOptionsMenuId .optionRow select').click(function () {
+		$(this).parent().parent().children('input').attr('checked', true)
+	})
+	
+	// define the parameters for the kendo combobox
+	var comboBoxParams = {
+		animation: {
+			close: { duration: 100 },
+			open: { duration: 100 }
+		},
+		dataTextField: "name",
+		dataValueField: "personId",
+		dataSource: {
+			transport: {
+				read: {
+					url: "/tdstm/assetEntity/getDepGraphFilterPeople",
+					dataType: "json",
+					data: {
+						depGroup: '${depGroup}'
+					}
+				}
+			}
+		},
+		delay: 0,
+		filter: "contains",
+		height: 400,
+		placeholder: 'Select Person',
+		change: function () {
+			GraphUtil.performSearch()
+		}
+	};
+	
+	// create the combobox
+	var comboBox = $('#personHighlightSelectId').kendoComboBox(comboBoxParams).data("kendoComboBox");
+	
+	// bind focussing on the combobox to openning the dropdown
+	$('#highlightPersonId input.k-input').focus(function () {
+		comboBox.open();
+	});
 });
 
 // Called when the user clicks the + or - buttons on the control panel

@@ -15,34 +15,35 @@ var GraphUtil = (function ($) {
 	public.labelTextBindings = null;
 	public.labelTextBackgroundBindings = null;
 	public.shapeOffset = -20;
-	public.labelShapeOffset = -8
-	public.GPUNodeThreshold = 500
+	public.labelShapeOffset = -8;
+	public.GPUNodeThreshold = 500;
 	public.labelHeightDefault = 15; // Modify if the size of the text from the rect is different.
 	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.defaultDimensions = {'width': 28, 'height': 28};
-
+	public.lastHighlightSearch = null;
+	
 	// returns true if the graph is loaded
 	public.graphExists = function () {
 		return ($('#svgContainerId svg').size() > 0)
 	}
-
+	
 	// returns true if the graph is in fullscreen mode
 	public.isFullscreen = function () {
 		return $('#item1').hasClass('fullscreen');
 	}
-
+	
 	public.isBlackBackground = function () {
 		return $('#blackBackgroundId').is(':checked');
 	}
-
+	
 	public.isConflictsEnabled = function () {
 		return $('#bundleConflictsId').is(':checked');
 	}
-
+	
 	public.isHighlightCyclesEnabled = function () {
 		return $('#highlightCyclicalCheckBoxId').is(':checked');
 	}
-
+	
 	// resets the graph to the proper size
 	public.getProperGraphDimensions = function () {
 		var width = getStandardWidth();
@@ -53,7 +54,7 @@ var GraphUtil = (function ($) {
 		}
 		return {width:width, height:height};
 	}
-
+	
 	// resets the graph to the proper size
 	public.resetGraphSize = function () {
 		if (public.graphExists()) {
@@ -62,7 +63,7 @@ var GraphUtil = (function ($) {
 			public.correctBothPanelSizes();
 		}
 	}
-
+	
 	// toggles full screen mode for any graph
 	public.toggleFullscreen = function () {
 		if (public.graphExists()) {
@@ -72,7 +73,7 @@ var GraphUtil = (function ($) {
 				public.enableFullscreen();
 		}
 	}
-
+	
 	// changes the graph to fullscreen mode
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
@@ -83,7 +84,7 @@ var GraphUtil = (function ($) {
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
-
+	
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
@@ -91,17 +92,17 @@ var GraphUtil = (function ($) {
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
-
+	
 	// sets the size of the legend so that it can scroll when longer than the user's window
 	public.correctLegendSize = function () {
 		public.correctPanelSize('legendDivId');
 	}
-
+	
 	// sets the size of the control panel so that it can scroll when longer than the user's window
 	public.correctControlPanelSize = function () {
 		public.correctPanelSize('controlPanel');
 	}
-
+	
 	// sets the size of the legend and control panel so that they can scroll when longer than the user's window
 	public.correctBothPanelSizes = function () {
 		public.correctLegendSize();
@@ -750,6 +751,118 @@ var GraphUtil = (function ($) {
 		performZoom('out')
 	}
 	
+	// searches only when the user presses enter in the search box
+	public.handleSearchKeyEvent = function (e) {
+		if (e.keyCode == 13)
+			window.setTimeout(public.performSearch, 1)
+	}
+	
+	// highlight tasks matching the user's regex
+	public.performSearch = function () {
+		
+		// read the filter settings from the DOM
+		var personFilter = $('#personHighlightSelectId').data('kendoComboBox').value();
+		var nameFilter = $('#searchBoxId').val();
+		var hasSlashes = (nameFilter.length > 0) && (nameFilter.charAt(0) == '/' && nameFilter.charAt(nameFilter.length-1) == '/');
+		var isRegex = false;
+		
+		// if the current filter set is identical to the previous one, don't perform a search
+		var highlightObject = personFilter + '_' + nameFilter;
+		if (highlightObject == public.lastHighlightSearch)
+			return;
+		else
+			public.lastHighlightSearch = highlightObject;
+		
+		// determine whether the "clear filter" icons should be usable
+		if (nameFilter != '')
+			$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
+		else
+			$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
+		if (personFilter != '')
+			$('#clearPersonFilterId').removeClass('disabled');
+		else
+			$('#clearPersonFilterId').addClass('disabled');
+		
+		// if there is no filter, unhighlight everything
+		if (personFilter == '' && nameFilter == '') {
+			public.applyHighlights(null);
+			return;
+		}
+		
+		// check if the user entered an invalid regex
+		var regex = /.*/
+		if (hasSlashes) {
+			try {
+				nameFilter = nameFilter.substring(1, nameFilter.length-1);
+				regex = new RegExp(nameFilter);
+				isRegex = _.isRegExp(regex);
+			} catch (e) {
+				alert(e);
+				nameFilter = '';
+			}
+		}
+		
+		if (personFilter != '') {
+			// get the list of assets to highlight from the server
+			$.ajax({
+				url: '/tdstm/assetEntity/getFilteredDepGraph',
+				asynchronous: true,
+				data: {'nameFilter':nameFilter, 'isRegex':isRegex, 'personFilter':personFilter},
+				complete: function (response) {
+					var highlightList = JSON.parse(response.responseText);
+					public.applyHighlights(highlightList);
+				}
+			});
+		} else {
+			// highlight using locally stored data
+			var highlightList = [];
+			for (var i = 0; i < nodes.length; ++i) {
+				var node = nodes[i];
+				var name = node.name;
+				
+				var nameMatches = false;
+				if (isRegex && name.match(regex) != null)
+					nameMatches = true;
+				else if (!isRegex && name.toLowerCase().indexOf(nameFilter.toLowerCase()) != -1)
+					nameMatches = true;
+				
+				if (nameMatches)
+					highlightList.push(node.id);
+			}
+			
+			public.applyHighlights(highlightList);
+		}
+		
+		return false;
+	}
+	
+	// update the DOM according to a given a list of assets to highlight
+	public.applyHighlights = function (highlightAssets) {
+		var nodes = public.force.nodes();
+		for (var i = 0; i < nodes.length; ++i) {
+			var node = nodes[i];
+			if (highlightAssets == null)
+				node.highlighted = 'x'
+			else if (highlightAssets.indexOf(node.id) != -1)
+				node.highlighted = 'y'
+			else
+				node.highlighted = 'n'
+			
+		}
+		public.updateAllClasses();
+		public.createCutShadows(fill);
+	}
+	
+	// removes the value in the source filter field and performs a new search
+	public.clearFilter = function (source) {
+		if (source == 'text' || source == 'all')
+			$('#searchBoxId').val('');
+		if (source == 'person' || source == 'all')
+			$('#personHighlightSelectId').data("kendoComboBox").select(-1);
+		public.performSearch();
+	}
+	
+	// gets the highlight class for this object based on its properties
 	public.getFilteredClass = function (obj) {
 		if (obj.linkElement) {
 			var parent = obj.source ? obj.source : obj.parent
@@ -768,6 +881,12 @@ var GraphUtil = (function ($) {
 			else
 				return ''
 		}
+	}
+	
+	// opens or closes the submenu for the highlighting feature
+	public.toggleHighlightDropdown = function () {
+		$('#filterOptionsMenuId').toggleClass('open')
+		$('#filterOptionsButtonId').toggleClass('open')
 	}
 	
 	// forces a browser reflow on the specified element

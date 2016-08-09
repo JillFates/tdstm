@@ -72,6 +72,7 @@ use.node.nohl {
 
 g.hl {
 	font-size: large !important;
+	display: inline !important;
 }
 line.hl {
 	opacity: 0.4 !important;
@@ -501,16 +502,18 @@ div.graphPanel.openPanel {
 	padding: 0px;
 	font-size: 0;
 }
-#mapReferenceId > div {
+#mapReferenceId > div.hasBorders {
 	border: 1px solid green;
 	display: inline-block;
 }
 #mapReferenceId > div:not(.spacer) {
-	border-left: 1px solid green;
-	border-right: 1px solid green;
 	text-align: center;
 	width: auto;
 	cursor: pointer;
+}
+#mapReferenceId > div:not(.spacer).hasBorders {
+	border-left: 1px solid green;
+	border-right: 1px solid green;
 }
 .graphContainer .graphButton {
 	background-color: #ffffff;
@@ -523,10 +526,15 @@ div.graphPanel.openPanel {
 	padding-bottom: 3px;
 	padding-right: 8px;
 	margin-bottom: 4px;
-	margin-left: 10px;
 	display: inline-block;
 	position: relative;
 	vertical-align: top;
+}
+.graphContainer .graphTabButton.hasMargin {
+	margin-left: 30px;
+}
+.graphContainer .graphTabButton.hasBorders:not(.hasMargin) {
+	margin-left: 10px;
 }
 .graphContainer .graphButton:hover {
 	background-color: #eeeeee;
@@ -689,7 +697,7 @@ div.graphPanel.openPanel {
 #dependencyDivId.floating {
 	position: fixed;
 	top: 0px;
-	left: 670px;
+	left: 740px;
 	z-index: 110;
 	margin-left: 0px;
 	border: 1px solid green;
@@ -758,8 +766,36 @@ defs svg {
 #searchBoxId::-ms-clear {
 	display: none;
 }
-
-.checkboxContainer input[type="radio"] {
-	border-width: 0px !important;
+#item1 form#taskSearchFormId {
+	display: inline-block !important;
+	position: relative;
+}
+#item1 div#HighlightFormId {
+	z-index: 2;
+	position: relative;
+	margin-bottom: 4px !important;
+	border-bottom: 0px;
+}
+#item1 input#searchBoxId {
+	height: 20px;
+	margin: 0px !important;
+	border: 0px;
+	border-bottom: 1px solid green;
+}
+#item1 span#filterClearId {
+	position: absolute !important;
+	display: inline !important;
+	margin-top: 1px !important;
+	cursor: pointer !important;
+	opacity: 1 !important;
+	right: 23px;
+}
+#item1 span#filterClearId.disabled {
+	opacity: 0.1 !important;
+	cursor: auto !important;
+	pointer-events: none;
 }
 
+#personHighlightSelectId_listbox * {
+	cursor: pointer;
+}
