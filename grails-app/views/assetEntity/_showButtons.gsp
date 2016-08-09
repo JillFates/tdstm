@@ -13,9 +13,7 @@
         </button>
 	</g:if>
 	<g:else>
-        <button class="btn btn-default" type="submit" onclick="return confirm('Are you sure?');">
-            <img src="${resource(dir:'icons',file:'database_delete.png')}" border="0px"/> Delete
-        </button>
+         <span class="button"><g:actionSubmit class="delete" onclick=" return confirm('You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel');" value="Delete" /> </span>
 	</g:else>
 
 </tds:hasPermission>
