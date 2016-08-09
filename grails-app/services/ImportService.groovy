@@ -788,47 +788,8 @@ class ImportService {
 				warnMsg = ''
 
 				switch (attribName) {
-					case ~/sme|sme2|appOwner/:
-						if (it.importValue) {
 
-							// Substitute owner for appOwner
-							def propName = attribName 
-
-							// First check to see if the app property (person) is already set to the name specified in the spreadsheet. If the names are
-							// the same we can skip a lot of expensive computations.
-							String existingName = application[propName] ? application[propName].toString() : ''
-							if (existingName && existingName == it.importValue) {
-								// The name hasn't changed so we can skip this task
-								log.debug "processApplicationImport() $attribName name was unchanged ${it.importValue}"
-								break
-							}
-
-							def results
-							try {
-								results = personService.findOrCreatePerson(it.importValue, project, staffList)
-							} catch (e) {
-								warnMsg = "Failed to find or create $attribName (${it.importValue}) on row $rowNum - ${e.getMessage()}"
-							}
-
-							if (!warnMsg && results?.person) {
-								application[propName] = results.person
-
-								// Now check for warnings
-								if (results.isAmbiguous) {
-									warnMsg = "Ambiguous name for $attribName (${it.importValue}) in application ${application.assetName} on row $rowNum. Name set to ${results.person}"
-								}
-
-								if (results.isNew) 
-									personsAdded++
-
-							} else if ( results?.error ) {
-								warnMsg = "Person assignment to $attribName for App ${application.assetName} on row $rowNum failed. ${results.error}"
-							}
-
-						}
-						break
-
-					case ~/shutdownBy|startupBy|testingBy/:
+					case ~/shutdownBy|startupBy|testingBy|sme|sme2|appOwner/:
 						if (it.importValue.size()) {
 
 							if (it.importValue[0] in ['@', '#']) {
@@ -869,44 +830,6 @@ class ImportService {
 								}
 							}
 
-
-
-/*
-							if (it.importValue[0] in ['@', '#']) {
-								// TODO : JPM 5/2016 : TM-4889 processApplicationImport needs to validate By @ and # imports
-								application[attribName] = it.importValue
-							} else {
-
-								String existingName = application[attribName] ? application[attribName].toString() : ''
-								if (existingName && existingName == it.importValue) {
-									// The name hasn't changed so we can skip this task
-									log.debug "processApplicationImport() $attribName name was unchanged ${it.importValue}"
-									break
-								}
-
-								def resultMap
-								try {
-									resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
-								} catch (e) {
-									warnMsg = "Failed to find or create $attribName (${it.importValue}) on row $rowNum - ${e.getMessage()}"
-								}
-
-								if ( ! warnMsg && resultMap?.person) {
-									application[attribName] = resultMap.person.id
-
-									// Now check for warnings
-									if (resultMap.isAmbiguous) {
-										warnMsg = "Ambiguous name for $attribName (${it.importValue}) in application ${application.assetName} on row $rowNum. Name set to ${resultMap.person}"
-									}
-
-									if (resultMap.isNew) 
-										personsAdded++
-
-								} else if ( resultMap?.error ) {
-									warnMsg = "Person assignment to $attribName for App ${application.assetName} on row $rowNum failed. ${resultMap.error}"
-								}
-
-							}*/
 						}
 						break
 
