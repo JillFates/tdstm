@@ -32,7 +32,11 @@
 					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td><input type="submit" class="submit" value="Generate" onclick="return verifyEvent();"/></td>
+						<td>
+							<button type="submit" class="btn btn-default" onclick="return verifyEvent();">
+								Generate
+								<span class="uploadIcon glyphicon glyphicon-check" aria-hidden="true"></span>
+							</button>
 					</tds:hasPermission>
 					</tr>
 				</tbody>
