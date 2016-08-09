@@ -1379,6 +1379,7 @@ class PartyRelationshipService {
 		 * This closure looks up a person by name.
 		 */
 		def assignByName = {
+			def personService = serviceHelperService.getService("person")
 			def map = personService.findPerson(value, project, projectStaff)
 			def personMap = personService.findPersonByFullName(value)
 						
