@@ -1260,6 +1260,14 @@ class AssetEntityController {
 						}
 
 						assetDep.comment = depComment
+						String[] dirtyPropertiesChanged = []
+						for(int i = 1; i <=4; i++){
+							def cellValue =  WorkbookUtil.getStringCellValue(dependencySheet, 11 + i, r , "").replace("'","\\'")
+							if(cellValue && assetDep["c$i"] && cellValue != assetDep["c$i"]){
+								assetDep["c$i"] = cellValue
+								dirtyPropertiesChanged << "c$i"
+							}
+						}
 						assetDep.c1 = WorkbookUtil.getStringCellValue(dependencySheet, 12, r , "").replace("'","\\'")
 						assetDep.c2 = WorkbookUtil.getStringCellValue(dependencySheet, 13, r , "").replace("'","\\'")
 						assetDep.c3 = WorkbookUtil.getStringCellValue(dependencySheet,14, r , "").replace("'","\\'")
@@ -1272,12 +1280,12 @@ class AssetEntityController {
 							continue
 						} 
 
-						if (! isNew && ! assetDep.dirtyPropertyNames) {
+						if (! isNew && ! dirtyPropertiesChanged) {
 							dependencyUnchanged++
 							dependencySkipped--
 							continue
 						} else {
-							if (! isNew && assetDep.dirtyPropertyNames) {
+							if (! isNew && dirtyPropertiesChanged) {
 								log.info "upload() Changed fields ${assetDep.dirtyPropertyNames} of Dependency ${assetDep.id}"
 							}
 						}
