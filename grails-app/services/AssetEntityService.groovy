@@ -1780,31 +1780,32 @@ class AssetEntityService {
 	def cablingReportData( assetCablesList, cablingSheet, progressCount, progressTotal, updateOnPercent, key, session){
 
 		assetCablesList.eachWithIndex{ cabling, idx ->
+			def rowNum = idx + 2 //Header Offset
 			def currentCabling = cabling.get(Criteria.ROOT_ALIAS)
 			progressCount++
 			updateProgress(key, progressCount, progressTotal, 'In progress', 0.01)
-			addCell(cablingSheet, idx + 2, 0, String.valueOf(currentCabling.assetFromPort?.type ))
-			addCell(cablingSheet, idx + 2, 1, currentCabling.assetFrom ? currentCabling.assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, idx + 2, 2, String.valueOf(currentCabling.assetFrom ? currentCabling.assetFrom.assetName : "" ))
-			addCell(cablingSheet, idx + 2, 3, String.valueOf(currentCabling.assetFromPort?.label ))
-			addCell(cablingSheet, idx + 2, 4, currentCabling.assetTo ? currentCabling.assetTo?.id : "" , Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, idx + 2, 5, String.valueOf(currentCabling.assetTo ? currentCabling.assetTo?.assetName :"" ))
+			addCell(cablingSheet, rowNum, 0, String.valueOf(currentCabling.assetFromPort?.type ))
+			addCell(cablingSheet, rowNum, 1, currentCabling.assetFrom ? currentCabling.assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
+			addCell(cablingSheet, rowNum, 2, String.valueOf(currentCabling.assetFrom ? currentCabling.assetFrom.assetName : "" ))
+			addCell(cablingSheet, rowNum, 3, String.valueOf(currentCabling.assetFromPort?.label ))
+			addCell(cablingSheet, rowNum, 4, currentCabling.assetTo ? currentCabling.assetTo?.id : "" , Cell.CELL_TYPE_NUMERIC)
+			addCell(cablingSheet, rowNum, 5, String.valueOf(currentCabling.assetTo ? currentCabling.assetTo?.assetName :"" ))
 			if(currentCabling.assetFromPort && currentCabling.assetFromPort.type && currentCabling.assetFromPort.type !='Power'){
-				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.assetToPort ? currentCabling.assetToPort?.label :"" ))
+				addCell(cablingSheet, rowNum, 6, String.valueOf(currentCabling.assetToPort ? currentCabling.assetToPort?.label :"" ))
 			}else{
-				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.toPower?:"" ))
+				addCell(cablingSheet, rowNum, 6, String.valueOf(currentCabling.toPower?:"" ))
 			}
-			addCell(cablingSheet, idx + 2, 7, String.valueOf(currentCabling.cableComment?:"" ))
-			addCell(cablingSheet, idx + 2, 8, String.valueOf(currentCabling.cableColor?:"" ))
+			addCell(cablingSheet, rowNum, 7, String.valueOf(currentCabling.cableComment?:"" ))
+			addCell(cablingSheet, rowNum, 8, String.valueOf(currentCabling.cableColor?:"" ))
 			if(currentCabling.assetFrom?.sourceRoom){
-				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom?.rackSource?.location+"/"+currentCabling.assetFrom?.sourceRoom+"/"+currentCabling.assetFrom?.sourceRack ))
+				addCell(cablingSheet, rowNum, 9, String.valueOf(currentCabling.assetFrom?.rackSource?.location+"/"+currentCabling.assetFrom?.sourceRoom+"/"+currentCabling.assetFrom?.sourceRack ))
 			}else if(currentCabling.assetFrom?.targetRoom){
-				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom?.rackTarget?.location+"/"+currentCabling.assetFrom?.targetRoom+"/"+currentCabling.assetFrom?.targetRack ))
+				addCell(cablingSheet, rowNum, 9, String.valueOf(currentCabling.assetFrom?.rackTarget?.location+"/"+currentCabling.assetFrom?.targetRoom+"/"+currentCabling.assetFrom?.targetRack ))
 			}else{
-				addCell(cablingSheet, idx + 2, 9, '')
+				addCell(cablingSheet, rowNum, 9, '')
 			}
-			addCell(cablingSheet, idx + 2, 10, String.valueOf(currentCabling.cableStatus?:"" ))
-			addCell(cablingSheet, idx + 2, 11, String.valueOf(currentCabling.assetLoc?: "" ))
+			addCell(cablingSheet, rowNum, 10, String.valueOf(currentCabling.cableStatus?:"" ))
+			addCell(cablingSheet, rowNum, 11, String.valueOf(currentCabling.assetLoc?: "" ))
 			//GormUtil.flushAndClearSession(session, progressCount)
 		}
 
@@ -2764,12 +2765,12 @@ class AssetEntityService {
 											break
 
 										case ~/Retire|MaintExp/:
-											addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDate(userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
+											addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDate(userDTFormat, a[attribute], TimeUtil.FORMAT_DATE))
 											break
 
 										case ~/Modified Date/:
 											if (a[attribute]) {
-												addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_2))
+												addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME))
 											}
 											break
 
@@ -2936,10 +2937,10 @@ class AssetEntityService {
 									//log.info "export() : field class type=$app[assetColName].className()}"
 									break
 								case ~/Retire|MaintExp/:
-									colVal = app[assetColName] ? TimeUtil.formatDate(userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_12) : ''
+									colVal = app[assetColName] ? TimeUtil.formatDate(userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE) : ''
 									break
 								case ~/Modified Date/:
-									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_2) : ''
+									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME) : ''
 									break
 								default:
 									colVal = app[assetColName]
@@ -3006,9 +3007,9 @@ class AssetEntityService {
 								def dateValue = currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
 									if (attribute == 'lastUpdated') {
-										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
+										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME)
 									} else {
-										dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
+										dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE)
 									}
 								} else {
 									dateValue =''
@@ -3074,9 +3075,9 @@ class AssetEntityService {
 								def dateValue = currentFile.(fileDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
 									if (attribute == 'lastUpdated') {
-										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
+										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME)
 									} else {
-										dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
+										dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE)
 									}
 								} else {
 									dateValue =''
@@ -3220,22 +3221,23 @@ class AssetEntityService {
 					}
 
 					results.eachWithIndex{ room, r ->
+						def rowNum = r + 1 //Header Offset
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						// Export most fields.
 						regularFields.each{ col ->
 							def prop = room[col]
 							if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-								addCell(roomSheet, r + 1, col, String.valueOf(prop?:""))
+								addCell(roomSheet, rowNum, col, String.valueOf(prop?:""))
 							}
 							
 						}
 						// Export date fields using the user's TZ.
 						dateFields.each{ col->
-							addCell(roomSheet, r, col, room[col] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, room[col], TimeUtil.FORMAT_DATE) : "")
+							addCell(roomSheet, rowNum, col, room[col] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, room[col], TimeUtil.FORMAT_DATE_TIME) : "")
 						}
 						// Export 'source' or 'target' accordingly.
-						addCell(roomSheet, r, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
+						addCell(roomSheet, rowNum, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
 						//GormUtil.flushAndClearSession(session, progressCount)
 					}
 					profiler.endInfo("Rooms", "processed %d rows", [roomSize])
@@ -3275,21 +3277,21 @@ class AssetEntityService {
 					}
 
 					racks.eachWithIndex{ rack, idx ->
+						def rowNum = idx + 1 //Header Offset
 						def currentRack = rack.get(Criteria.ROOT_ALIAS)
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
 						rackSheetColumns.eachWithIndex{column, i->
-							def addContentToSheet
 							if(column == 'rackId'){
-								addCell(rackSheet, idx + 1, 0, (racks[idx].id), Cell.CELL_TYPE_NUMERIC)
+								addCell(rackSheet, rowNum, 0, (racks[idx].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
 								def prop = currentRack[rackMap[column]]
 								if(column =="Source")
-									addCell(rackSheet, idx + 1, i, String.valueOf(prop == 1 ? "Source" : "Target" ))
+									addCell(rackSheet, rowNum, i, String.valueOf(prop == 1 ? "Source" : "Target" ))
 								else{
 									if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-										addCell(rackSheet, idx + 1, i, String.valueOf(prop))
+										addCell(rackSheet, rowNum, i, String.valueOf(prop))
 									}
 									
 								}
@@ -3366,25 +3368,26 @@ class AssetEntityService {
 					def comment
 					
 					commentList.eachWithIndex{ comm, idx ->
-					def currentComment = comm.get(Criteria.ROOT_ALIAS)
+						def rowNum = idx + 1 //HEADER Offset
+						def currentComment = comm.get(Criteria.ROOT_ALIAS)
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						def dateCommentCreated = ''
 						if (currentComment.dateCreated) {
-							dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentComment.dateCreated, TimeUtil.FORMAT_DATE)
+							dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
 						} 
 
-						addCell(commentSheet, idx, 0, String.valueOf(currentComment.id))
+						addCell(commentSheet, rowNum, 0, String.valueOf(currentComment.id))
 
-						addCell(commentSheet, idx, 1, currentComment.assetEntity.id, Cell.CELL_TYPE_NUMERIC)
+						addCell(commentSheet, rowNum, 1, currentComment.assetEntity.id, Cell.CELL_TYPE_NUMERIC)
 
-						addCell(commentSheet, idx, 2, String.valueOf(currentComment.category))
+						addCell(commentSheet, rowNum, 2, String.valueOf(currentComment.category))
 
-						addCell(commentSheet, idx, 3, String.valueOf(dateCommentCreated))
+						addCell(commentSheet, rowNum, 3, String.valueOf(dateCommentCreated))
 
-						addCell(commentSheet, idx, 4, String.valueOf(currentComment.createdBy))
+						addCell(commentSheet, rowNum, 4, String.valueOf(currentComment.createdBy))
 
-						addCell(commentSheet, idx, 5, String.valueOf(currentComment.comment))
+						addCell(commentSheet, rowNum, 5, String.valueOf(currentComment.comment))
 
 						//GormUtil.flushAndClearSession(session, progressCount)
 					}

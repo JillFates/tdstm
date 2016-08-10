@@ -1,5 +1,4 @@
 import com.tds.asset.*
-import com.tds.util.workbook.*
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -15,12 +14,10 @@ import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
 import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import UserPreferenceEnum as PREF
 
 class ReportsController {
-	
-	def assetEntityAttributeLoaderService
+
 	def assetEntityService
 	def controllerService
 	def jdbcTemplate
@@ -30,9 +27,9 @@ class ReportsController {
 	def projectService
 	def reportsService
 	def securityService
-	def supervisorConsoleService 
 	def userPreferenceService
 	def sessionFactory
+	def grailsApplication
 
 	def index() { 
 		render(view:'index')
@@ -341,7 +338,7 @@ class ReportsController {
 							params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
 				} else { // Generate XLS report
 					try {
-						File file =  ApplicationHolder.application.parentContext.getResource( "/templates/IssueReport.xls" ).getFile()
+						File file =  grailsApplication.parentContext.getResource( "/templates/IssueReport.xls" ).getFile()
 
 						//set MIME TYPE as Excel
 						response.setContentType( "application/vnd.ms-excel" )
@@ -703,7 +700,7 @@ class ReportsController {
 					flash.message = "No data found for the selected filter"
 					redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
 				} else {
-					File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()					
+					File file =  grailsApplication.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()
 
 					response.setContentType( "application/vnd.ms-excel" )
 					def filename = 	"CablingData-${projectInstance.name}-${bundleName}.xls"
@@ -867,7 +864,7 @@ class ReportsController {
 			}
 			if(params.output == "excel"){
 				try {
-					File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Power_Report.xls" ).getFile()
+					File file =  grailsApplication.parentContext.getResource( "/templates/Power_Report.xls" ).getFile()
 
 					//set MIME TYPE as Excel
 					response.setContentType( "application/vnd.ms-excel" )
@@ -1212,7 +1209,7 @@ class ReportsController {
 	 * @return : will generate a XLS file having task task list
 	 */
 	def exportTaskReportExcel(taskList, tzId, userDTFormat, project){
-		File file =  ApplicationHolder.application.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
+		File file =  grailsApplication.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
 		def filename = "${project.name}-TaskReport"
 
 		//set MIME TYPE as Excel
@@ -1585,7 +1582,7 @@ class ReportsController {
 	 * @return : will generate a XLS file
 	 */
 	private def exportProjectActivityMetricsExcel(activityMetrics, includeNonPlanning) {
-		File file =  ApplicationHolder.application.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
+		File file =  grailsApplication.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
 		def fileDate = TimeUtil.formatDateTime(getSession(), TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_TIME_6)
 		def filename = "ActivityMetrics-${fileDate}-Report"
 
