@@ -1222,9 +1222,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Now morph the list into a list of name: Role names
 		def list = []
 		projectStaff.each {
+			def roleTypeName = "${it.role}"
+
 			list << [ id:it.staff.id, 
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.toString()}",
-				sortOn:"${it.role.description.split(':')[1]?.trim()},${it.staff.firstName} ${it.staff.lastName}"
+				nameRole:"${roleTypeName}: ${it.staff.toString()}",
+				sortOn:"${roleTypeName},${it.staff.firstName} ${it.staff.lastName}"
 			]
 		}
 		list.sort { it.sortOn }
