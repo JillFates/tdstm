@@ -19,7 +19,7 @@
 	<div class="taskTimebar hide" id="issueTimebar" >
 		<div id="issueTimebarId"></div>
 	</div>
-	<div class="menu4">
+	<div class="menu4 my-task-container">
 		<g:if test="${isOnIE && isCleaner}">
 			<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
 				CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
@@ -65,7 +65,7 @@
 				<input type="hidden" name="tab" id="tabId" value="${tab}" />
 				<input type="hidden" id="myPage" value="mytask" />
 				<span style="color: white;">Event : 
-					<g:select name='event' value="${moveEvent?.id}"
+					<g:select name='event' value="${moveEvent?.id}" class="slc-event"
 						noSelection="${['null':'All Events']}"
 						from='${moveEventList}'
 						optionKey="id" 
