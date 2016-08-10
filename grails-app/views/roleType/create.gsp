@@ -22,7 +22,7 @@
 				</tr>
 
               <tr class="prop">
-                  <td valign="top" class="name"><label for="id"><b>Code:&nbsp;<span style="color: red">*</span></b></label></td>
+                  <td valign="top" class="name"><label for="id"><b>Type:&nbsp;<span style="color: red">*</span></b></label></td>
                   <td>
                     <g:select id="type" name="type" 
                       from="${roleTypeInstance.constraints.type.inList}" value="${roleTypeInstance.type}"  
@@ -32,7 +32,7 @@
               </tr>
 
               <tr class="prop" id="levelRow">
-                <td valign="top" class="name"><label for="id"><b>Level:&nbsp;<span style="color: red">*</span></b></label></td>
+                <td valign="top" class="name"><label for="id"><b>Level:</b></label></td>
                 <td valign="top"
                     class="value ${hasErrors(bean:roleTypeInstance,field:'level','errors')}">
                   <input type="text" id="level" name="level"
@@ -91,8 +91,9 @@
       var type = $("#type").val()
       if(type == "SECURITY"){
         $("#levelRow").css("display", "")
-      }else{
         $("#level").val("")
+      }else{
+        $("#level").val("0")
         $("#levelRow").css("display", "none")
       }
     }

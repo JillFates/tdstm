@@ -77,26 +77,30 @@ class RoleTypeController {
     }
     // return create form
     def create() {
+
         def roleTypeInstance = new RoleType()
         roleTypeInstance.properties = params
         return ['roleTypeInstance':roleTypeInstance]
     }
     // save RoleType details 
     def save() {
-        def roleTypeInstance = new RoleType(params)
+        RoleType roleTypeInstance = new RoleType(params)
         roleTypeInstance.id = params.id
         def role = RoleType.findById(params.id)
         // condition to check the id
         if ( role != null ) {
             flash.message = "Role Type ${role.id} already exist "
             idCheck = 1;
+        }else{
+            roleTypeInstance.level = 1
+            println("params: $params")
+            println("properties: ${roleTypeInstance.properties}")
+            if(!roleTypeInstance.hasErrors() && idCheck != 1 && roleTypeInstance.save(insert:true) ) {
+                flash.message = "RoleType ${roleTypeInstance.id} created"
+                redirect( action:"list")
+            }
         }
-        if(!roleTypeInstance.hasErrors() && idCheck != 1 && roleTypeInstance.save(insert:true) ) {
-            flash.message = "RoleType ${roleTypeInstance.id} created"
-            redirect( action:"list")
-        }
-        else {
-            render( view:'create', model:[roleTypeInstance:roleTypeInstance] )
-        }
+    
+        render( view:'create', model:[roleTypeInstance:roleTypeInstance] )
     }
 }

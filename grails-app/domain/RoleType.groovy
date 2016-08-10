@@ -31,7 +31,7 @@ class RoleType {
 		description (blank:true, nullable:true, size: 0..255)
 		help (blank:true, nullable:true, size: 0..255)
 		type (nullable:false, inList:[SECURITY, TEAM, PROJECT, PARTY, APP])
-		level (nullable:false, range:0..100)
+		level (range:0..100)
 	}
 
 	static mapping  = {
