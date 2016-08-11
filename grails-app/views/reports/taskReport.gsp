@@ -56,9 +56,18 @@
 			</tds:hasPermission>
 			<tr>
 			<td colspan="2" class="buttonR">
-				<g:actionSubmit type="submit"  value="Generate Web" action="tasksReport" />
-				<g:actionSubmit type="submit"  value="Generate Xls" action="tasksReport"/>
-				<g:actionSubmit type="submit"  value="Generate Pdf" action="tasksReport"/>
+				<button type="submit" class="btn btn-default" name="_action_tasksReport" value="Generate Web">
+					Generate Web
+					<span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span>
+				</button>
+				<button type="submit" class="btn btn-default" name="_action_tasksReport" value="Generate Xls">
+					Generate Xls
+					<span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+				</button>
+				<button type="submit" class="btn btn-default" name="_action_tasksReport" value="Generate Pdf">
+					Generate Pdf
+					<span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+				</button>
 			</td>
 		</tr>
 		</tbody>
