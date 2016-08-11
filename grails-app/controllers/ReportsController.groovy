@@ -1220,8 +1220,8 @@ class ReportsController {
 
 		def tasksSheet = book.getSheet("tasks")
 		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
-			'estStart','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
-			'dueDate', 'dateCreated', 'createdBy', 'moveEvent']
+			'datePlanned','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
+			'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 					
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, userDTFormat, 7, viewUnpublished)

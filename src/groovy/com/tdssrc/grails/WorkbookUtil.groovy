@@ -26,18 +26,29 @@ class WorkbookUtil {
 		return result;
 	}
 
-	public static addCell(sheet, columnIdx, rowIdx, value, type=null) {
+	public static addCell(Sheet sheet, int columnIdx, int rowIdx, value, type=null) {
 		//println "columnIdx=$columnIdx, rowIdx=$rowIdx, value=$value, rowIdx isa ${rowIdx.getClass().getName()}, sheet isa ${sheet.getClass().getName()}"
-		def row = sheet.getRow((int)rowIdx)
+		def row = sheet.getRow(rowIdx)
 		if (!row) {
-			row = sheet.createRow((int)rowIdx)
+			row = sheet.createRow(rowIdx)
 		}
-		def cell = row.getCell(columnIdx)
+		Cell cell = row.getCell(columnIdx)
 		if (!cell) {
 			cell = row.createCell(columnIdx)
 		}
-		if (type) {
+		if (type != null) {
 			cell.setCellType(type)
+			if(type == Cell.CELL_TYPE_NUMERIC) { // This resolves to a Numeric no decimal spaces Value
+				//Set Cell Type to allow Type Number
+				Workbook wb = sheet.getWorkbook()
+
+				CellStyle style = wb.createCellStyle()
+				String binFormat = BuiltinFormats.getBuiltinFormat(1) //this is "0" mask format
+				def df = wb.createDataFormat().getFormat(binFormat)
+				style.setDataFormat(df)
+
+				cell.setCellStyle(style)
+			}
 		}
 		cell.setCellValue(value)
 	}
@@ -93,8 +104,7 @@ class WorkbookUtil {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_NUMERIC:
 					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
-					result = cell.getDateCellValue()					
-					// result = TimeUtil.moveDateToTZ(result, session)
+					result = cell.getDateCellValue()
 					break
 				case Cell.CELL_TYPE_STRING:
 					String cellVal = cell.getStringCellValue()
