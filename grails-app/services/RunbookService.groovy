@@ -11,6 +11,8 @@ import com.tds.asset.TaskDependency
 import com.tdssrc.grails.TimeUtil
 
 class RunbookService {
+
+	def sessionFactory
 	
 	/** 
 	 * Used to load all runbook related tasks associated with an event
@@ -39,6 +41,46 @@ class RunbookService {
 			}
 		}
 		return dependencies
+	}
+
+	/**
+	 * This method returns a map containing all the tasks and their dependencies
+	 * for a given move event.
+	 *
+	 * @param moveEvent
+	 * @param onlyPublished - flag to filter only published tasks or not.
+	 *
+	 * @return map - [tasks: List<AssetComment>, dependencies: List<TaskDependency>]
+	 */
+	Map getTasksAndDependenciesForEvent(MoveEvent moveEvent, boolean onlyPublished = false){
+		def session = sessionFactory.currentSession
+		String published = onlyPublished? "AND is_published = 1" : ""
+		String sql = """SELECT {task.*}, {dep.*} FROM
+						(SELECT * FROM asset_comment WHERE move_event_id=:moveEvent $published) task
+						LEFT OUTER JOIN task_dependency dep ON (task.asset_comment_id=dep.asset_comment_id)
+						ORDER BY task.asset_comment_id
+						"""
+		def query = session.createSQLQuery(sql)
+		query = query.addEntity("task", AssetComment.class)
+		query = query.addEntity("dep", TaskDependency.class)
+		query = query.setParameter("moveEvent", moveEvent.id)
+		List tasks = []
+		List dependencies = []
+		List<Object[]> results = query.list()
+		def taskId = -1
+		results.each{ row ->
+			def task = (AssetComment) row[0]
+			def dep = (TaskDependency) row[1]
+			if(taskId != task.id){
+				tasks << task
+				taskId = task.id
+			}
+			if(dep){
+				dependencies << dep	
+			}
+			
+		}
+		return [tasks: tasks, dependencies: dependencies]
 	}
 	
 	/**

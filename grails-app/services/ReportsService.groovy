@@ -875,12 +875,16 @@ class ReportsService {
 		StringBuilder sinksRef = new StringBuilder()
 		StringBuilder cyclicalsRef = new StringBuilder()
 		
+		boolean onlyPublished = true
 		def publishedValues = [true]
-		if (viewUnpublished)
+		if (viewUnpublished){
+			onlyPublished = false
 			publishedValues = [true, false]
+		}
 		
-		def tasks = runbookService.getEventTasks(moveEventInstance).findAll{it.isPublished in publishedValues}
-		def deps = runbookService.getTaskDependencies(tasks)
+		Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me ,onlyPublished)
+		def tasks = tasksAndDependencies.tasks
+		def deps = tasksAndDependencies.dependencies
 		def tmp = runbookService.createTempObject(tasks, deps)
 		
 		try {

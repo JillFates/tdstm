@@ -12,7 +12,6 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import org.apache.commons.lang.math.NumberUtils
 import UserPreferenceEnum as PREF
-
 import java.text.DateFormat
 
 class TaskController {
@@ -886,7 +885,6 @@ digraph runbook {
 	
 	// gets the JSON object used to populate the task graph timeline
 	def taskTimelineData() {
-		
 		// handle project
 		long projectId = securityService.getUserCurrentProject().id
 		if ( ! projectId ) {
@@ -902,9 +900,12 @@ digraph runbook {
 		}
 		
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
+		boolean onlyPublished = true
 		def publishedValues = [true]
-		if (viewUnpublished)
+		if (viewUnpublished){
+			onlyPublished = false
 			publishedValues = [true, false]
+		}
 
 		// Define default data
 		def defaultEstStart = TimeUtil.nowGMT()
@@ -929,8 +930,10 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
-		def deps = runbookService.getTaskDependencies(tasks)
+		
+		Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me ,onlyPublished)
+		def tasks = tasksAndDependencies.tasks
+		def deps = tasksAndDependencies.dependencies
 		
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
@@ -1077,8 +1080,9 @@ digraph runbook {
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $me</h1>")
 
 		try {
-			tasks = runbookService.getEventTasks(me)
-			deps = runbookService.getTaskDependencies(tasks)
+			Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me)
+			def tasks = tasksAndDependencies.tasks
+			def deps = tasksAndDependencies.dependencies
 			def tmp = runbookService.createTempObject(tasks, deps)
 
 			dfsMap = runbookService.processDFS( tasks, deps, tmp )
