@@ -2165,7 +2165,7 @@ $(document).click(function(e){
 	if(!customizeCount)
 		customizeCount = 5;
 	
-	for(var i=1;i<customizeCount;i++){
+	for(var i=1;i<=customizeCount;i++){
 		if($(".columnDiv_"+i+":visible").length){
 		    if (!$(e.target).is(".editSelectimage_"+i)) {
 		    	$(".columnDiv_"+i).hide();
