@@ -1081,8 +1081,8 @@ digraph runbook {
 
 		try {
 			Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me)
-			def tasks = tasksAndDependencies.tasks
-			def deps = tasksAndDependencies.dependencies
+			tasks = tasksAndDependencies.tasks
+			deps = tasksAndDependencies.dependencies
 			def tmp = runbookService.createTempObject(tasks, deps)
 
 			dfsMap = runbookService.processDFS( tasks, deps, tmp )
