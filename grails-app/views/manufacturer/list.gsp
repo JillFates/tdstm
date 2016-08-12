@@ -52,9 +52,6 @@
 		<div class="body fluid" ng-app="tdsManufacturers" ng-controller="tds.manufacturers.controller.MainController as manufacturers">
 			<h1>Manufacturer List</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
-			<g:if test="${flash.message}">
-				<div id="messageDivId" class="message">${flash.message}</div>
-			</g:if>
 			<div >
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
