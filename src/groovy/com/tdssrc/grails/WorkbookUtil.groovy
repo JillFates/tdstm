@@ -1,10 +1,12 @@
 package com.tdssrc.grails
 
 import org.apache.commons.logging.LogFactory
+import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddressList
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFDataValidation
+import org.apache.poi.xssf.usermodel.XSSFSheet
 
 import java.text.DateFormat
 /**
@@ -370,14 +372,21 @@ class WorkbookUtil {
 	 * @param sheet
 	 */
 	public static void makeSheetReadOnly(Sheet sheet){
-
-		sheet.enableLocking()
-		sheet.lockDeleteColumns(true)
-    	sheet.lockDeleteRows(true)
-    	sheet.lockFormatCells(true)
-    	sheet.lockFormatColumns(true)
-    	sheet.lockFormatRows(true)
-    	sheet.lockInsertColumns(true)
-    	sheet.lockInsertRows(true)
+		if(sheet instanceof XSSFSheet) {
+			XSSFSheet xsheet = (XSSFSheet)sheet
+			xsheet.enableLocking()
+			xsheet.lockDeleteColumns(true)
+			xsheet.lockDeleteRows(true)
+			xsheet.lockFormatCells(true)
+			xsheet.lockFormatColumns(true)
+			xsheet.lockFormatRows(true)
+			xsheet.lockInsertColumns(true)
+			xsheet.lockInsertRows(true)
+		}else if(sheet instanceof HSSFSheet){
+			HSSFSheet hsheet = (HSSFSheet)sheet
+			hsheet.protectSheet("")
+		}else {
+			log.error("makeSheetReadOnly: Operation Not Supported on object of type ${sheet.class}")
+		}
 	}
 }
