@@ -799,3 +799,7 @@ defs svg {
 #personHighlightSelectId_listbox * {
 	cursor: pointer;
 }
+
+#svgContainerId:focus {
+	outline: 0;
+}

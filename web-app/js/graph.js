@@ -3,7 +3,17 @@
  */
 
 var GraphUtil = (function ($) {
-
+	
+	// private constants
+	const KEY_CODES = {
+		LEFT: 37,
+		UP: 38,
+		RIGHT: 39,
+		DOWN: 40,
+		MINUS: 189,
+		PLUS: 187
+	}
+	
 	// public functions
 	var public = {};
 
@@ -18,6 +28,7 @@ var GraphUtil = (function ($) {
 	public.labelShapeOffset = -8;
 	public.GPUNodeThreshold = 500;
 	public.labelHeightDefault = 15; // Modify if the size of the text from the rect is different.
+	public.translateDist = 200;
 	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.defaultDimensions = {'width': 28, 'height': 28};
 	public.lastHighlightSearch = null;
@@ -724,24 +735,26 @@ var GraphUtil = (function ($) {
 	}
 	
 	// zooms in or out depending on direction
-	performZoom = function (direction) {
+	performZoom = function (direction, modifier) {
 		if (zoomBehavior && svgContainer) {
+			modifier = (modifier != null) ? modifier : 1
 			var screenModifier = -0.5
-			var modifier = 0.5
+			var zoomMultiplier = 0.5 / modifier
 			if (direction == 'in') {
-				screenModifier = 1
-				modifier = 2
+				screenModifier = 1 * modifier
+				zoomMultiplier = 1 / zoomMultiplier
 			}
 			
-			var newX = zoomBehavior.translate()[0] * modifier - (widthCurrent / 2) * screenModifier
-			var newY = zoomBehavior.translate()[1] * modifier - (heightCurrent / 2) * screenModifier
+			var newX = zoomBehavior.translate()[0] * zoomMultiplier - (widthCurrent / 2) * screenModifier
+			var newY = zoomBehavior.translate()[1] * zoomMultiplier - (heightCurrent / 2) * screenModifier
 			var newTranslate = [newX, newY]
-			var newScale = zoomBehavior.scale() * modifier
+			var newScale = zoomBehavior.scale() * zoomMultiplier
 			
-			zoomBehavior
+			var selection = svgContainer.transition().duration(50)
+			var zoomEvent = zoomBehavior
 				.scale(newScale)
 				.translate(newTranslate)
-				.event(svgContainer)
+				.event(selection)
 		}
 	}
 	public.zoomIn = function () {
@@ -749,6 +762,62 @@ var GraphUtil = (function ($) {
 	}
 	public.zoomOut = function () {
 		performZoom('out')
+	}
+	
+	// translates the view by the specified x and y
+	performTranslate = function (x, y) {
+		var newTranslate = zoomBehavior.translate()
+		newTranslate[0] += x
+		newTranslate[1] += y
+		
+		var selection = svgContainer.transition().duration(50)
+		zoomBehavior.translate(newTranslate)
+				.event(selection)
+	}
+	public.translateLeft = function (modifier) {
+		modifier = (modifier != null) ? modifier : 1
+		performTranslate(public.translateDist * modifier, 0)
+	}
+	public.translateRight = function (modifier) {
+		modifier = (modifier != null) ? modifier : 1
+		performTranslate(-1 * public.translateDist * modifier, 0)
+	}
+	public.translateUp = function (modifier) {
+		modifier = (modifier != null) ? modifier : 1
+		performTranslate(0, public.translateDist * modifier)
+	}
+	public.translateDown = function (modifier) {
+		modifier = (modifier != null) ? modifier : 1
+		performTranslate(0, -1 * public.translateDist * modifier)
+	}
+	
+	// add key listeners for zooming and panning
+	public.addKeyListeners = function (graph) {
+		graph.on('keydown', function (e) {
+			var key = e.keyCode
+			var modifier = 1
+			
+			// handle modifier keys
+			if (e.shiftKey)
+				modifier = 2
+			if (e.ctrlKey)
+				modifier = 0.5
+			
+			// perform action based on key code
+			if (key == KEY_CODES.LEFT) {
+				public.translateLeft(modifier)
+			} else if (key == KEY_CODES.RIGHT) {
+				public.translateRight(modifier)
+			} else if (key == KEY_CODES.UP) {
+				public.translateUp(modifier)
+			} else if (key == KEY_CODES.DOWN) {
+				public.translateDown(modifier)
+			} else if (key == KEY_CODES.PLUS) {
+				performZoom('in', modifier)
+			} else if (key == KEY_CODES.MINUS) {
+				performZoom('out', modifier)
+			}
+		}).focus()
 	}
 	
 	// searches only when the user presses enter in the search box

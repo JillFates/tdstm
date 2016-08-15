@@ -60,6 +60,7 @@ GraphUtil.force = d3.layout.force()
 var svgContainer = d3.select("div#item1")
 	.append("div")
 	.attr('id','svgContainerId')
+	.attr('tabindex','1')
 	.style('background-color','#ffffff')
 var svgTranslator = svgContainer
 	.attr('class','containsSpinner')
@@ -269,6 +270,9 @@ function createGraph (config) {
 		.attr("style", graphstyle)
 		.style('cursor', 'default')
 		.on("dblclick.zoom", null)
+	
+	// add key listeners to the graph
+	GraphUtil.addKeyListeners($(svgContainer[0][0]))
 	
 	// transform the canvas
 	GraphUtil.transformElement(svgTranslator, -canvasSize/2, -canvasSize/2, 1)
