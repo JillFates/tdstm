@@ -10323,8 +10323,10 @@ $.widget( "ui.dialog", {
 					this.document.bind( "focusin.dialog", function( event ) {
 						if ( !that._allowInteraction( event ) ) {
 							event.preventDefault();
-							$(".ui-dialog:visible:last .ui-dialog-content")
-								.data( widgetFullName )._focusTabbable();
+							var lastTabbableToFocus = $(".ui-dialog:visible:last .ui-dialog-content").data(widgetFullName);
+							if(lastTabbableToFocus) {
+								lastTabbableToFocus._focusTabbable();
+							}
 						}
 					});
 				}
