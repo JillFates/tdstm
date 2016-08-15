@@ -2083,11 +2083,11 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 	return {
 		restrict: 'E',
 		scope: {
-			assetId: '@assetId',
-			prefValue: '@prefValue',
-			viewUnpublishedValue: '@viewUnpublishedValue',
-			hasPublishPermission: '@hasPublishPermission',
-			canEditComments: '@canEditComments'
+			assetId: '@',
+			prefValue: '@',
+			viewUnpublishedValue: '@',
+			hasPublishPermission: '@',
+			canEditComments: '@'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/comments-inner-list-template.html'),
 		link: function(scope, element, attrs) {
@@ -2114,12 +2114,12 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 			}
 			scope.commentFilter = function(comment) {
 				if (scope.showAll == '1') {
-					return (scope.viewUnpublishedValue == '1' || comment.commentInstance.isPublished);
+					return (scope.viewUnpublishedValue == 'true' || comment.commentInstance.isPublished);
 				} else {
 					return (
 						((comment.commentInstance.commentType == 'issue') && (comment.commentInstance.status != 'Completed'))
 						|| ((comment.commentInstance.commentType == 'comment') && (!comment.commentInstance.isResolved))
-					) && (scope.viewUnpublishedValue == '1' || comment.commentInstance.isPublished);
+					) && (scope.viewUnpublishedValue == 'true' || comment.commentInstance.isPublished);
 				}
 			}
 			scope.$on('commentChanged', function(evt, eventTO) {
