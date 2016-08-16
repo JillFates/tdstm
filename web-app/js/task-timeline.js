@@ -41,69 +41,35 @@ function displayWarningOrErrorMsg(isCyclical) {
  * @param status
  */
 function buildGraph (response, status) {
-
+	
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
-
+	
 	// restore export button
 	$('#exportCriticalPathButton').removeClass('disabledLabel');
-
+	
 	// check for errors in the ajax call
 	if (status == 'error') {
 		displayWarningOrErrorMsg(response.responseText == 'cyclical')
 		return;
 	}
-
+	
+	// parse the data received from the server
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
 	var ready = false;
-
+	
+	// if the event has no tasks show an error message and exit
 	if (data.items.size() == 0) {
 		displayWarningOrErrorMsg(false)
 		return;
 	}
-
-	// populate the Team select
-	var teamSelect = $("#teamSelectId")
-	teamSelect.children().remove();
-	teamSelect.append('<option value="ALL">All Teams</option>');
-	teamSelect.append('<option value="NONE">No Team Assignment</option>');
-	teamSelect.append('<option disabled>──────────</option>');
-
-	$.each(data.roles, function (index, team) {
-		teamSelect.append('<option value="' + team + '">' + team + '</option>');
-	});
-
-	teamSelect.val('ALL');
-	teamSelect.on('change', function () {
-		display(true, true);
-	});
-
-	// handle the checkbox to toggle hiding of redundant dependencies
-	var hideRedundant = $('#hideRedundantCheckBoxId').is(':checked');
-	$('#hideRedundantCheckBoxId').on('change', function (a, b) {
-		hideRedundant = $(this).is(':checked');
-		fullRedraw();
-	});
-
-	// handle the checkbox to toggle highlighting of critical path tasks
-	var highlightCritical = $('#highlightCriticalPathId').is(':checked');
-	$('#highlightCriticalPathId').on('change', function (a, b) {
-		highlightCritical = $(this).is(':checked');
-		display(false, true);
-	});
-
-	// handle the checkbox to toggle using task heights
-	var useHeights = $('#useHeightCheckBoxId').is(':checked');
-	$('#useHeightCheckBoxId').on('change', function (a, b) {
-		useHeights = $(this).is(':checked');
-		fullRedraw();
-	});
-
-	// graph defaults
+	
+	// graph default config
 	var miniRectStroke = 1.0;
 	var miniRectHeight = 7 - miniRectStroke;
 	var mainRectHeight = 30;
+	var backgroundExtraHeight = 200;
 	var initialExtent = 1000000;
 	var anchorOffset = 10; // the length of the "point" at the end of task polygons
 	var margin = {top: 20, right: 0, bottom: 15, left: 0};
@@ -111,6 +77,8 @@ function buildGraph (response, status) {
 	var labelFloatOffset = 1;
 	var labelPadding = 10;
 	var scrollingLabelsPerformanceCutoff = 50;
+	
+	// data received from the server
 	var items = data.items;
 	var starts = data.starts;
 	var dependencies = [];
@@ -119,9 +87,16 @@ function buildGraph (response, status) {
 	var parsedHeight = parseInt($('#mainHeightFieldId').val());
 	if (! isNaN(parsedHeight))
 		mainRectHeight = parsedHeight;
-
+	
+	// data from current user config
+	var hideRedundant = $('#hideRedundantCheckBoxId').is(':checked');
+	var highlightCritical = $('#highlightCriticalPathId').is(':checked');
+	var useHeights = $('#useHeightCheckBoxId').is(':checked');
+	var taskSelected = null;
+	
+	// perform all necesary precalculations on the data
 	sanitizeData(items, dependencies);
-
+	
 	// sort the tasks chronologically for the stacking algorithm
 	items.sort( function (a,b) {
 		var t1 = a.start ? (new Date(a.start)).getTime() : 0;
@@ -145,30 +120,208 @@ function buildGraph (response, status) {
 		else
 			return 0;
 	});
-
 	
-	var x = d3.time.scale().domain([parseStartDate(data.startDate), items[items.length-1].end]).range([0, $(window).width() - $('div.body h1').offset().left * 2 - 10]);
-
-	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length-1].end);
-
-	var maxStack = calculateStacks();
-	var miniHeight = ((maxStack+1)*miniRectHeight) + miniRectStroke;
-	if(miniHeight <= 10) {
-		miniHeight = miniRectHeight =100;
-	}
-	var mainHeight = ((maxStack+1)*mainRectHeight*1.5);
-
-	var width = x.range()[1];
-	var height = mainHeight + miniHeight + margin.top + margin.bottom;
+	// set up the ranges for the mini and main graphs
 	var zoomScale = 2;
-	var x1 = d3.time.scale().domain(x.domain()).range([0, width*zoomScale]);
+	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length-1].end);
+	var x = d3.time.scale()
+		.domain([parseStartDate(data.startDate), items[items.length-1].end])
+		.range([0, $(window).width() - $('div.body h1').offset().left * 2 - 10]);
+	var x1 = d3.time.scale()
+		.domain(x.domain())
+		.range([0, x.range()[1] * zoomScale]);
+	
+	// perform the stacking layout algorithm then determine the width and height of the graphs
+	var maxStack = calculateStacks();
+	var mainHeight = ((maxStack+1)*mainRectHeight*1.5);
+	var miniHeight = ((maxStack+1)*miniRectHeight) + miniRectStroke;
+	if (miniHeight <= 10) {
+		miniHeight = 100;
+		miniRectHeight = 100;
+	}
+	var height = mainHeight + miniHeight + margin.top + margin.bottom;
+	var width = x.range()[1];
+	
+	// predeclarations of graph elements
+	var svgContainer = null;
+	var chart = null;
+	var main = null;
+	var mini = null;
+	var brushContainer = null;
+	
+	// populate the Team select
+	var teamSelect = null;
+	populateTeamSelect();
+	
+	
+	// stores data and functions used for dragging on the mini graph
+	var miniDrag = {
+		tempBrush: null,
+		tempBrushXInitial: 0,
+		drawing: 0,
+		
+		// handle panning and time selection behavior on the mini graph
+		drawStart: function () {
+			miniDrag.tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
 
-	var taskSelected = null;
-	var xPrev = 0;
-	var dragging = false;
+			// if we are outside the brush, we are drawing a new region or setting a new brush position
+			if ( (d3.event.sourceEvent.which == 1) && (x.invert(miniDrag.tempBrushXInitial + 4) < brush.extent()[0] || x.invert(miniDrag.tempBrushXInitial - 4) > brush.extent()[1]) ) {
+				miniDrag.drawing = 1;
+				miniDrag.tempBrush = brushContainer.append('svg:rect')
+					.attr('class', 'tempBrush hidden')
+					.attr('width', 0)
+					.attr('height', miniHeight)
+					.attr('x', d3.mouse(chart.node())[0] - margin.left)
+					.attr('y', 0);
 
+			// otherwise we are panning the brush
+			} else {
+				mini.classed('brushMoving', true)
+				miniDrag.tempBrushXInitial = 0;
+				miniDrag.drawing = 0;
+			}
+		},
+
+		// handle panning and time selection behavior on the mini graph
+		drawMove: function () {
+			if (miniDrag.drawing == 1) {
+				miniDrag.tempBrush.classed('hidden', false);
+				miniDrag.tempBrush
+					.attr( 'x', Math.min(miniDrag.tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left) )
+					.attr( 'width', Math.abs(miniDrag.tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
+				display(false, false);
+				chart.classed('resizing', true);
+			} else {
+				if (miniDrag.tempBrush != null)
+					miniDrag.tempBrush.remove();
+				miniDrag.tempBrush = null;
+				miniDrag.tempBrushXInitial = 0;
+				chart.classed('resizing', false);
+			}
+		},
+
+		// handle panning and time selection behavior on the mini graph
+		drawEnd: function () {
+			if (miniDrag.drawing == 1) {
+				var xStart = miniDrag.tempBrushXInitial
+				var xEnd =  d3.mouse(chart.node())[0] - margin.left
+				var xa = Math.min(xStart, xEnd);
+				var xb = Math.max(xStart, xEnd);
+				
+				// if the user clicked, move the current brush to that position
+				if (xb - xa < 6) {
+					var width = x(brush.extent()[1]) - x(brush.extent()[0])
+					xa = xa - width / 2
+					xb = xa + width
+				}
+
+				brush.extent([x.invert(xa), x.invert(xb)]);
+				miniDrag.tempBrush.remove();
+				miniDrag.tempBrush = null;
+				miniDrag.tempBrushXInitial = 0;
+				display(true, true);
+			}
+			mini.classed('brushMoving', false)
+			miniDrag.drawing = 0;
+			chart.classed('resizing', false);
+			display(false, false);
+			chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 1000000) + ')';
+		}
+	}
+	
+	// Sets the custom dragging behavior
+	miniDrag.behavior = d3.behavior.drag()
+		.on("dragstart", miniDrag.drawStart)
+		.on("drag", miniDrag.drawMove)
+		.on("dragend", miniDrag.drawEnd);
+	
+	// stores data and functions used for dragging on the main graph
+	var mainDrag = {
+		mainSelection: null,
+		mainSelectionXInitial: 0,
+		selectingMain: false,
+		dragging: false,
+		
+		// handle panning and time selection behavior on the main graph
+		dragStart: function () {
+			mainDrag.dragging = false;
+			if (d3.event.sourceEvent.shiftKey) {
+				mainDrag.selectingMain = true;
+				mainDrag.mainSelectionXInitial = d3.mouse(chart.node())[0] - margin.left;
+				mainDrag.mainSelection = main.append('svg:rect')
+					.attr('class', 'tempBrush')
+					.attr('width', 0)
+					.attr('height', mainHeight)
+					.attr('x', mainDrag.mainSelectionXInitial)
+					.attr('y', 0);
+			}
+		},
+
+		// handle panning and time selection behavior on the main graph
+		dragMove: function () {
+			if (Math.abs(d3.event.dx) > 1)
+				mainDrag.dragging = true;
+			if (mainDrag.selectingMain) {
+				mainDrag.mainSelection
+					.attr( 'x', Math.min(mainDrag.mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left) )
+					.attr( 'width', Math.abs(mainDrag.mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
+				if (mainDrag.dragging)
+					chart.classed('resizing', true);
+			} else {
+				var minExtent = brush.extent()[0];
+				var maxExtent = brush.extent()[1];
+				var timeShift = (maxExtent - minExtent) * (d3.event.dx / width);
+				brush.extent([new Date(minExtent-timeShift), new Date(maxExtent-timeShift)]);
+				display(false, false);
+				if (mainDrag.dragging)
+					chart.classed('dragging', true);
+			}
+		},
+
+		// handle panning and time selection behavior on the main graph
+		dragEnd: function () {
+			if (mainDrag.selectingMain) {
+				var a = Math.min(mainDrag.mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left);
+				var b = Math.abs(mainDrag.mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) + Math.min(mainDrag.mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left);
+				var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
+				var width = x.range()[1];
+				var xa = x(brush.extent()[0]) + (a/width)*extentWidth;
+				var xb = x(brush.extent()[0]) + (b/width)*extentWidth;
+				brush.extent([x.invert(xa), x.invert(xb)]);
+
+				mainDrag.selectingMain = false;
+
+				mainDrag.mainSelection.remove();
+				mainDrag.mainSelection = null;
+				mainDrag.mainSelectionXInitial = 0;
+				display(true, true);
+				display(true, true);
+			} else {
+				display(false, false);
+				if (GraphUtil.isIE()) {
+					calculateLabelVisWidths();
+				}
+				correctLabelPositions();
+				chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 100000) + ')';
+			}
+			chart.classed('dragging', false);
+			chart.classed('resizing', false);
+		}
+	}
+	
+	// Sets the custom dragging behavior
+	mainDrag.behavior = d3.behavior.drag()
+		.on("dragstart", mainDrag.dragStart)
+		.on("drag", mainDrag.dragMove)
+		.on("dragend", mainDrag.dragEnd);
+	
+	
+	// gets the container that will hold the svg
+	svgContainer = d3.select('div#svgContainerId')
+		.style('display', null)
+	
 	// construct the SVG
-	var chart = d3.select('div.body')
+	chart = svgContainer
 		.append('svg:svg')
 		.attr('id', 'timelineSVGId')
 		.attr('width', width + margin.right + margin.left)
@@ -190,10 +343,10 @@ function buildGraph (response, status) {
 		.append('svg:feColorMatrix')
 		.attr('type', 'matrix')
 		.attr('values', '\
-				0.7 0   0   0   0\
-				0   0.7 0   0   0\
-				0   0   0.7 0   0\
-				0   0   0   1   0');
+			0.7 0   0   0   0\
+			0   0.7 0   0   0\
+			0   0   0.7 0   0\
+			0   0   0   1   0');
 
 	// construct the light filter for hovering over tasks
 	chart.select('defs')
@@ -202,198 +355,44 @@ function buildGraph (response, status) {
 		.append('svg:feColorMatrix')
 		.attr('type', 'matrix')
 		.attr('values', '\
-				1.2 0   0   0   0\
-				0   1.2 0   0   0\
-				0   0   1.2 0   0\
-				0   0   0   1   0');
+			1.2 0   0   0   0\
+			0   1.2 0   0   0\
+			0   0   1.2 0   0\
+			0   0   0   1   0');
 	
-	// Sets the custom dragging behavior
-	var miniDragBehavior = d3.behavior.drag()
-		.on("dragstart", drawStart)
-		.on("drag", drawMove)
-		.on("dragend", drawEnd);
+	
+	
 
 	// construct the mini graph
-	var mini = chart.append('svg:g')
+	mini = chart.append('svg:g')
 		.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 		.attr('width', width)
 		.attr('class', 'mini')
 		.attr('height', miniHeight)
-		.call(miniDragBehavior)
+		.call(miniDrag.behavior)
 	
-	
-	var brushContainer;
-	
-	var tempBrush = null;
-	var tempBrushXInitial = 0;
-	var drawing = 0;
-
-	// handle panning and time selection behavior on the mini graph
-	function drawStart () {
-		tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
-
-		// if we are outside the brush, we are drawing a new region or setting a new brush position
-		if ( (d3.event.sourceEvent.which == 1) && (x.invert(tempBrushXInitial + 4) < brush.extent()[0] || x.invert(tempBrushXInitial - 4) > brush.extent()[1]) ) {
-			drawing = 1;
-			tempBrush = brushContainer.append('svg:rect')
-				.attr('class', 'tempBrush hidden')
-				.attr('width', 0)
-				.attr('height', miniHeight)
-				.attr('x', d3.mouse(chart.node())[0] - margin.left)
-				.attr('y', 0);
-
-		// otherwise we are panning the brush
-		} else {
-			mini.classed('brushMoving', true)
-			tempBrushXInitial = 0;
-			drawing = 0;
-		}
-	}
-
-	// handle panning and time selection behavior on the mini graph
-	function drawMove () {
-		if (drawing == 1) {
-			tempBrush.classed('hidden', false);
-			tempBrush
-				.attr( 'x', Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left) )
-				.attr( 'width', Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
-			display(false, false);
-			chart.classed('resizing', true);
-		} else {
-			if (tempBrush != null)
-				tempBrush.remove();
-			tempBrush = null;
-			tempBrushXInitial = 0;
-			chart.classed('resizing', false);
-		}
-	}
-
-	// handle panning and time selection behavior on the mini graph
-	function drawEnd () {
-		if (drawing == 1) {
-			var xStart = tempBrushXInitial
-			var xEnd =  d3.mouse(chart.node())[0] - margin.left
-			var xa = Math.min(xStart, xEnd);
-			var xb = Math.max(xStart, xEnd);
-			
-			// if the user clicked, move the current brush to that position
-			if (xb - xa < 6) {
-				var width = x(brush.extent()[1]) - x(brush.extent()[0])
-				xa = xa - width / 2
-				xb = xa + width
-			}
-
-			brush.extent([x.invert(xa), x.invert(xb)]);
-			tempBrush.remove();
-			tempBrush = null;
-			tempBrushXInitial = 0;
-			display(true, true);
-		}
-		mini.classed('brushMoving', false)
-		drawing = 0;
-		chart.classed('resizing', false);
-		display(false, false);
-		chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 1000000) + ')';
-	}
-	
-	// returns true if the event was a left click, return false if it was a different kind of click
-	function isLeftClick () {
-		if (d3.event.isLeftClick == undefined)
-			return d3.event.button == 0
-		return d3.event.isLeftClick()
-	}
-
-	// Sets the custom dragging behavior
-	var panBehavior = d3.behavior.drag()
-		.on("dragstart", dragStart)
-		.on("drag", dragMove)
-		.on("dragend", dragEnd);
-
 	// construct the main graph
-	var main = chart.append('svg:g')
+	main = chart.append('svg:g')
 		.attr('transform', 'translate(' + margin.left + ',' + (miniHeight + 60) + ')')
 		.attr('width', width)
 		.attr('height', mainHeight)
 		.attr('class', 'main')
 		.append('svg:g')
 		.attr('class', 'mainContent')
-		.call(panBehavior)
-
-	var mainSelection = null;
-	var mainSelectionXInitial = 0;
-	var selectingMain = false;
-
-	// handle panning and time selection behavior on the main graph
-	function dragStart () {
-		dragging = false;
-		if (d3.event.sourceEvent.shiftKey) {
-			selectingMain = true;
-			mainSelectionXInitial = d3.mouse(chart.node())[0] - margin.left;
-			mainSelection = main.append('svg:rect')
-				.attr('class', 'tempBrush')
-				.attr('width', 0)
-				.attr('height', mainHeight)
-				.attr('x', mainSelectionXInitial)
-				.attr('y', 0);
-		}
-	}
-
-	// handle panning and time selection behavior on the main graph
-	function dragMove () {
-		if (Math.abs(d3.event.dx) > 1)
-			dragging = true;
-		if (selectingMain) {
-			mainSelection
-				.attr( 'x', Math.min(mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left) )
-				.attr( 'width', Math.abs(mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
-			if (dragging)
-				chart.classed('resizing', true);
-		} else {
-			var minExtent = brush.extent()[0];
-			var maxExtent = brush.extent()[1];
-			var timeShift = (maxExtent - minExtent) * (d3.event.dx / width);
-			brush.extent([new Date(minExtent-timeShift), new Date(maxExtent-timeShift)]);
-			display(false, false);
-			if (dragging)
-				chart.classed('dragging', true);
-		}
-	}
-
-	// handle panning and time selection behavior on the main graph
-	function dragEnd () {
-		if (selectingMain) {
-			var a = Math.min(mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left);
-			var b = Math.abs(mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) + Math.min(mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left);
-			var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
-			var width = x.range()[1];
-			var xa = x(brush.extent()[0]) + (a/width)*extentWidth;
-			var xb = x(brush.extent()[0]) + (b/width)*extentWidth;
-			brush.extent([x.invert(xa), x.invert(xb)]);
-
-			selectingMain = false;
-
-			mainSelection.remove();
-			mainSelection = null;
-			mainSelectionXInitial = 0;
-			display(true, true);
-			display(true, true);
-		} else {
-			display(false, false);
-			if (GraphUtil.isIE()) {
-				calculateLabelVisWidths();
-			}
-			correctLabelPositions();
-			chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 100000) + ')';
-		}
-		chart.classed('dragging', false);
-		chart.classed('resizing', false);
-	}
-
-	// construct the area behind the objects
+		.call(mainDrag.behavior)
+		
+	// construct the area behind the objects in the main graph
 	var background = main.append('svg:rect')
 		.attr('width', width)
-		.attr('height', mainHeight)
+		.attr('height', mainHeight + backgroundExtraHeight)
 		.attr('class', 'background')
+		
+	// construct the main graph translator
+	mainTranslator = main.append('svg:g')
+		.attr('transform', 'translate(' + 0 + ',' + 0 + ')')
+		.attr('id', 'mainTranslatorId')
+	
+	
 
 	// define the arrowhead marker used for marking dependencies
 	var arrowheadNames = ["arrowhead", "arrowheadSelected", "arrowheadCritical", "arrowheadRedundant", "arrowheadCyclical"];
@@ -410,66 +409,87 @@ function buildGraph (response, status) {
 			.append("svg:path")
 			.attr("d", "M0,-5L10,0L0,5");
 
-	// handle events from the task height text box
-	$('#mainHeightFieldId').on('change', function () {
-		var parsedHeight = parseInt($(this).val());
-		if (parsedHeight != mainRectHeight)
-			setupHeights(parsedHeight);
-	})
-	$('#mainHeightFieldId').on('keyup', function (e) {
-		var parsedHeight = parseInt($(this).val());
-		if ( (e.keyCode == 13) && (parsedHeight != mainRectHeight) )
-			setupHeights(parsedHeight);
-	})
-
-	// construct the minutes axis for the main graph
-	var xMinuteAxis = d3.svg.axis()
-		.scale(x)
-		.orient('bottom')
-		.ticks(d3Linear.time, d3Linear.tick)
-		.tickFormat(d3Linear.format)
-		.tickSize(6, 0, 0);
-
-	var x1MainGraphAxis = d3.svg.axis()
-		.scale(x1)
-		.orient('top')
-		.ticks(d3Linear.time, d3Linear.tick)
-		.tickFormat(d3Linear.format)
-		.tickSize(6, 0, 0);
-
-	// construct the hours axis for the main graph
-	var xHourAxis = d3.svg.axis()
-		.scale(x)
-		.orient('top')
-		.ticks(d3Linear.time, d3Linear.tick)
-		.tickFormat(d3Linear.format)
-		.tickSize(6, 0, 0);
-
-	var mainMinuteAxis = main.append('svg:g')
-		.attr('transform', 'translate(0,0.5)')
-		.attr('class', 'main axis minute')
-		.call(x1MainGraphAxis);
-
-
-	var miniMinuteAxis = mini.append('svg:g')
-		.attr('transform', 'translate(0,' + miniHeight + ')')
-		.attr('class', 'axis minute')
-		.call(xMinuteAxis);
-
-	var miniHourAxis = mini.append('svg:g')
-		.attr('transform', 'translate(0,0.5)')
-		.attr('class', 'axis hour')
-		.call(xHourAxis)
-
+	
+	
+	
+	// stores the internal d3 definitions for the axis
+	var axisDefs = {
+		// construct the minutes axis for the mini graph
+		xMinuteAxis: d3.svg.axis()
+			.scale(x)
+			.orient('bottom')
+			.ticks(d3Linear.time, d3Linear.tick)
+			.tickFormat(d3Linear.format)
+			.tickSize(6, 0, 0),
+		
+		// construct the hours axis for the mini graph
+		xHourAxis: d3.svg.axis()
+			.scale(x)
+			.orient('top')
+			.ticks(d3Linear.time, d3Linear.tick)
+			.tickFormat(d3Linear.format)
+			.tickSize(6, 0, 0),
+		
+		// construct the hours axis for the main graph
+		x1MainGraphAxis: d3.svg.axis()
+			.scale(x1)
+			.orient('top')
+			.ticks(d3Linear.time, d3Linear.tick)
+			.tickFormat(d3Linear.format)
+			.tickSize(6, 0, 0)
+	}
+	
+	// stores the svg elements for the graph axis
+	var axisElements = {
+		mainMinuteAxis: mainTranslator.append('svg:g')
+			.attr('transform', 'translate(0,0.5)')
+			.attr('class', 'main axis minute')
+			.call(axisDefs.x1MainGraphAxis),
+		
+		miniMinuteAxis: mini.append('svg:g')
+			.attr('transform', 'translate(0,' + miniHeight + ')')
+			.attr('class', 'axis minute')
+			.call(axisDefs.xMinuteAxis),
+		
+		miniHourAxis: mini.append('svg:g')
+			.attr('transform', 'translate(0,0.5)')
+			.attr('class', 'axis hour')
+			.call(axisDefs.xHourAxis)
+	}
+	
+	
+	// construct the line representing the current time
+	var mainNowLine = mainTranslator.append('svg:line')
+		.attr('y1', 0)
+		.attr('y2', mainHeight)
+		.attr('class', 'main todayLine')
+	
+	var miniNowLine = mini.append('svg:line')
+		.attr('x1', x(now()) + 0.5)
+		.attr('y1', 0)
+		.attr('x2', x(now()) + 0.5)
+		.attr('y2', miniHeight)
+		.attr('class', 'todayLine');
+	
+	// shift the today line every 3000 miliseconds
+	d3.timer(function () {
+		mainNowLine
+			.attr('x1', x1(now()) + 0.5)
+			.attr('x2', x1(now()) + 0.5);
+		miniNowLine
+			.attr('x1', x(now()) + 0.5)
+			.attr('x2', x(now()) + 0.5);
+	}, 3000);
+	
 	// construct the container for the task polygons
-	var itemPolys = main.append('svg:g')
+	var itemPolys = mainTranslator.append('svg:g')
 
 	// construct the container for the dependency lines
-	var itemArrows = main.append('svg:g')
+	var itemArrows = mainTranslator.append('svg:g')
 
 	// construct the container for the task labels
-	var itemLabels = main.append('svg:g')
-
+	var itemLabels = mainTranslator.append('svg:g')
+	
 	// construct the polys in the mini graph
 	var miniPolys = mini.append('svg:g')
 		.attr('class', 'miniItems')
@@ -480,7 +500,8 @@ function buildGraph (response, status) {
 		.attr('id', function(d) { return 'mini-' + d.id; })
 		.attr('class', 'miniItem')
 		.attr('points', function(d) { return getPointsMini(d); });
-
+	
+	
 	// invisible hit area to move around the selection window
 	mini.append('svg:rect')
 		.attr('id', 'miniBackgroundId')
@@ -489,21 +510,24 @@ function buildGraph (response, status) {
 		.attr('height', miniHeight)
 		.attr('visibility', 'hidden')
 		.on('mouseup', moveBrush);
-
+	
+	
 	// draw the selection area
 	var brush = d3.svg.brush()
 		.x(x)
 		.on("brush", brushed)
 		.on("brushend", brushedEnd)
 		.extent([parseStartDate(data.startDate), new Date( Math.min( parseStartDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime() ) )])
-
+	
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 	zoomScale = extentWidth / width;
 	x1.range([0, width / zoomScale]);
-
+	
+	// construct the container for the brush
 	brushContainer = mini.append('svg:g')
 		.attr('class', 'brushContainer');
-
+	
+	// construct the mini graph brush
 	brushContainer.append('svg:g')
 		.attr('class', 'x brush')
 		.call(brush)
@@ -512,42 +536,37 @@ function buildGraph (response, status) {
 		.selectAll('rect')
 		.attr('y', 1)
 		.attr('height', miniHeight - 1);
-
-	mini.selectAll('rect.background').remove();
-
-	// construct the line representing the current time
-	var mainNowLine = main.append('svg:line')
-		.attr('y1', 0)
-		.attr('y2', mainHeight)
-		.attr('class', 'main todayLine')
-
-	var miniNowLine = mini.append('svg:line')
-		.attr('x1', x(now()) + 0.5)
-		.attr('y1', 0)
-		.attr('x2', x(now()) + 0.5)
-		.attr('y2', miniHeight)
-		.attr('class', 'todayLine');
-
-	// shift the today line every 3000 miliseconds
-	d3.timer(function () {
-		mainNowLine
-			.attr('x1', x1(now()) + 0.5)
-			.attr('x2', x1(now()) + 0.5);
-		miniNowLine
-			.attr('x1', x(now()) + 0.5)
-			.attr('x2', x(now()) + 0.5);
-	}, 3000);
-
+	
+	mini.selectAll('rect.background').remove()
+	
+	
+	
 	// setup all the heights to fit to the rect height
 	setupHeights(mainRectHeight);
-
+	
 	$('#spinnerId').css('display', 'none');
 	var offsetInitial =  -1 * x(brush.extent()[0]);
 	ready = true;
 	display(true, true);
 	display(true, true);
-
-
+	
+	// add the key listeners to the graph
+	addKeyBindings();
+	GraphUtil.addTimelineKeyListeners($(svgContainer[0][0]), brush, x1, mainTranslator, function (resize) {
+		display(false, resize, true);
+		if (GraphUtil.isIE())
+			calculateLabelVisWidths();
+		correctLabelPositions();
+		display(false, resize, true);
+	});
+	window.scrollTo(window);
+	
+	// add references to internal values to the debug object
+	debug.x = x
+	debug.x1 = x1
+	debug.brush = brush
+	
+	
 	/* define the global accessor functions */
 	getData = function () {
 		return data;
@@ -555,6 +574,74 @@ function buildGraph (response, status) {
 
 	forceDisplay = function () {
 		display(false, true);
+	}
+	
+	function addKeyBindings () {
+		// handle events from the task height text box
+		$('#mainHeightFieldId').on('change', function () {
+			var parsedHeight = parseInt($(this).val());
+			if (parsedHeight != mainRectHeight)
+				setupHeights(parsedHeight);
+		})
+		$('#mainHeightFieldId').on('keyup', function (e) {
+			var parsedHeight = parseInt($(this).val());
+			if ( (e.keyCode == 13) && (parsedHeight != mainRectHeight) )
+				setupHeights(parsedHeight);
+		})
+		
+		// handle the checkbox to toggle hiding of redundant dependencies
+		$('#hideRedundantCheckBoxId').on('change', function (a, b) {
+			hideRedundant = $(this).is(':checked');
+			fullRedraw();
+		});
+
+		// handle the checkbox to toggle highlighting of critical path tasks
+		$('#highlightCriticalPathId').on('change', function (a, b) {
+			highlightCritical = $(this).is(':checked');
+			display(false, true);
+		});
+
+		// handle the checkbox to toggle using task heights
+		$('#useHeightCheckBoxId').on('change', function (a, b) {
+			useHeights = $(this).is(':checked');
+			fullRedraw();
+		});
+		
+		// handle when the user changes the team filtering select
+		teamSelect.on('change', function () {
+			display(true, true);
+		});
+		
+		// bind the zoom button listeners
+		$('#zoomInButtonId').on('click', function () {
+			GraphUtil.timelineZoom(brush, 'in', zoomCallback)
+		})
+		$('#zoomOutButtonId').on('click', function () {
+			GraphUtil.timelineZoom(brush, 'out', zoomCallback)
+		})
+		
+		function zoomCallback () {
+			if (GraphUtil.isIE())
+				calculateLabelVisWidths();
+			correctLabelPositions();
+			display(false, true, true);
+			display(false, true, true);
+		}
+	}
+
+	// populate the team select
+	function populateTeamSelect () {
+		teamSelect = $("#teamSelectId")
+		teamSelect.children().remove();
+		teamSelect.append('<option value="ALL">All Teams</option>');
+		teamSelect.append('<option value="NONE">No Team Assignment</option>');
+		teamSelect.append('<option disabled>──────────</option>');
+		
+		$.each(data.roles, function (index, team) {
+			teamSelect.append('<option value="' + team + '">' + team + '</option>');
+		});
+		
+		teamSelect.val('ALL');
 	}
 
 	// called when the brush is dragged
@@ -564,7 +651,7 @@ function buildGraph (response, status) {
 		if (brushRange < minRange)
 			brush.extent([brush.extent()[0], new Date(brush.extent()[0].getTime() + minRange)]);
 
-		drawing = -1;
+		miniDrag.drawing = -1;
 		if (d3.event.mode == "move") {
 			display(false, false);
 		} else {
@@ -595,13 +682,9 @@ function buildGraph (response, status) {
 
 		mini.select('.brush').call(brush.extent([minExtent, maxExtent]));
 		var offset = -1 * x1(brush.extent()[0]) - offsetInitial;
-		itemPolys.attr('transform', 'translate(' + offset + ', 0)');
-		itemArrows.attr('transform', 'translate(' + offset + ', 0)');
-		itemLabels.attr('transform', 'translate(' + offset + ', 0)');
-		mainNowLine.attr('transform', 'translate(' + offset + ', 0)');
-
-		mainMinuteAxis.attr('transform', 'translate(' + offset + ', ' + 0 + ')');
-
+		
+		mainTranslator.attr('transform', 'translate(' + offset + ', 0)');
+		
 		if ( (! scaled) && (! repainting) )
 			return;
 
@@ -613,11 +696,11 @@ function buildGraph (response, status) {
 			// update the scales for the axis
 
 			var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]), true);
-			x1MainGraphAxis.ticks(innerTimeLine.time, innerTimeLine.tick);
-			x1MainGraphAxis.tickFormat(innerTimeLine.format);
+			axisDefs.x1MainGraphAxis.ticks(innerTimeLine.time, innerTimeLine.tick);
+			axisDefs.x1MainGraphAxis.tickFormat(innerTimeLine.format);
 
-			x1MainGraphAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
-			mainMinuteAxis.call(x1MainGraphAxis);
+			axisDefs.x1MainGraphAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
+			axisElements.mainMinuteAxis.call(axisDefs.x1MainGraphAxis);
 
 			$.each(items, function (i, d) {
 				d.points = getPoints(d);
@@ -969,7 +1052,7 @@ function buildGraph (response, status) {
 		$('.main').height(mainHeight);
 		$('clippath rect').height(mainHeight);
 		chart.attr('height', height + margin.top + margin.bottom + 20);
-		background.attr('height', mainHeight);
+		background.attr('height', mainHeight + backgroundExtraHeight);
 		mainNowLine.attr('y2', mainHeight);
 		fullRedraw();
 	}
@@ -1047,7 +1130,7 @@ function buildGraph (response, status) {
 	// Toggles selection of a task
 	function toggleTaskSelection(taskObject, skipRepaint) {
 
-		if (dragging)
+		if (mainDrag.dragging)
 			return;
 
 		var selecting = true;
@@ -2316,10 +2399,18 @@ function buildGraph (response, status) {
 				return false;
 		return true
 	}
+
+	// returns true if the event was a left click, return false if it was a different kind of click
+	function isLeftClick () {
+		if (d3.event.isLeftClick == undefined)
+			return d3.event.button == 0
+		return d3.event.isLeftClick()
+	}
 }
 
 function submitForm () {
 	$('.chart').remove();
+	d3.select('#svgContainerId').style('display', 'none')
 	generateGraph($('#moveEventId').val());
 }
 

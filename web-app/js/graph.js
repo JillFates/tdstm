@@ -13,6 +13,8 @@ var GraphUtil = (function ($) {
 		MINUS: 189,
 		PLUS: 187
 	}
+	const DIRECTIONS = [KEY_CODES.LEFT, KEY_CODES.UP, KEY_CODES.RIGHT, KEY_CODES.DOWN]
+	const ZOOM_KEYS = [KEY_CODES.MINUS, KEY_CODES.PLUS]
 	
 	// public functions
 	var public = {};
@@ -126,7 +128,7 @@ var GraphUtil = (function ($) {
 		panel.css('height', '');
 		panel.css('overflow-y', '');
 		var svgContainer = $('#svgContainerId');
-		if (panel.size() == 0 || svgContainer.size() == 0)
+		if (panel.size() == 0 || svgContainer.size() == 0 || svgContainer.children().size() == 0)
 			return false;
 
 		var bottom = panel.offset().top + panel.height();
@@ -787,17 +789,20 @@ var GraphUtil = (function ($) {
 	public.translateDown = function (modifier) {
 		modifier = (modifier != null) ? modifier : 1
 		performTranslate(0, -1 * public.translateDist * modifier)
-	}	
-	public.animateTransform = function (transform, scale) {
+	}
+	public.animateTransform = function (transform, scale, transformElement) {
 		transform = (transform != null) ? transform : zoomBehavior.transform()
 		scale = (scale != null) ? scale : zoomBehavior.scale()
-		if (transformContainer[0][0].tagName == 'DIV')
-			transformContainer.style('transform', 'translate(' + transform[0] + 'px,' + transform[1] + 'px) scale(' + scale + ')')
+		transformElement = (transformElement != null) ? transformElement : transformContainer
+		if (transformElement[0][0].tagName == 'DIV')
+			transformElement.style('transform', 'translate(' + transform[0] + 'px,' + transform[1] + 'px) scale(' + scale + ')')
 		else
-			transformContainer
+			transformElement
 				.transition()
 				.duration(100)
-				.ease(function (t) {return t})
+				.ease(function (t) {
+					return Math.min(t, 1)
+				})
 				.attr('transform', 'translate(' + transform[0] + ',' + transform[1] + ')scale(' + scale + ')')
 	}
 	
@@ -806,6 +811,7 @@ var GraphUtil = (function ($) {
 		modifier = (modifier != null) ? modifier : 1
 		graph.on('keydown', function (e) {
 			var key = e.keyCode
+			console.log('KEYDOWN - ' + key)
 			
 			// handle modifier keys
 			if (e.shiftKey)
@@ -827,6 +833,63 @@ var GraphUtil = (function ($) {
 			} else if (key == KEY_CODES.MINUS) {
 				performZoom('out', modifier)
 			}
+		}).focus()
+	}
+	
+	// add key listeners for zooming and panning
+	public.timelineZoom = function (brush, direction, displayCallback) {
+		var t1 = brush.extent()[0].getTime()
+		var t2 = brush.extent()[1].getTime()
+		var rangeSize = t2 - t1
+		var offset = (rangeSize / 4)
+		var newRange = [t1 - (offset * 2), t2 + (offset * 2)]
+		if (direction == 'in')
+			newRange = [t1 + offset, t2 - offset]
+		
+		brush.extent([new Date(newRange[0]), new Date(newRange[1])]);
+		displayCallback(true)
+	}
+	
+	// add key listeners for zooming and panning
+	public.addTimelineKeyListeners = function (graph, brush, x1, mainTranslator, displayCallback) {
+		var modifier = 1
+		graph.on('keydown', function (e) {
+			var key = e.keyCode
+			
+			// handle modifier keys
+			if (e.shiftKey)
+				modifier = 2
+			if (e.ctrlKey)
+				modifier = 0.5
+			
+			var t1 = brush.extent()[0].getTime()
+			var t2 = brush.extent()[1].getTime()
+			var rangeSize = t2 - t1
+			var offset = (rangeSize / 4) * modifier
+			var newRange = [t1, t2]
+			
+			// perform action based on key code
+			if (DIRECTIONS.contains(key)) {
+				if (key == KEY_CODES.LEFT)
+					newRange = [t1 - offset, t2 - offset]
+				if (key == KEY_CODES.RIGHT)
+					newRange = [t1 + offset, t2 + offset]
+				
+				brush.extent([new Date(newRange[0]), new Date(newRange[1])]);
+				var xTranslate = -1 * x1(new Date(newRange[0]))
+				public.animateTransform([xTranslate, 0], 1, mainTranslator)
+				window.setTimeout(displayCallback, 150, true)
+			} else {
+				if (key == KEY_CODES.PLUS)
+					newRange = [t1 + offset, t2 - offset]
+				if (key == KEY_CODES.MINUS)
+					newRange = [t1 - (offset * 2), t2 + (offset * 2)]
+				
+				brush.extent([new Date(newRange[0]), new Date(newRange[1])]);
+				displayCallback(true)
+			}
+			
+			
 		}).focus()
 	}
 	
