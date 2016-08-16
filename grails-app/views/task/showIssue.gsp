@@ -180,10 +180,10 @@
 			</g:if>
 			<tr>
 			    <td class="buttonR" >
-					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
+					<button type="button" class="btn btn-default save"  onclick="cancelButton(${assetComment.id})"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 				</td>
 				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
-					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+					<button type="button" class="btn btn-default save"  onclick="validateComment(${assetComment.id})"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Update Task</button>
 				</td>
 			</tr>	
 		</table>
