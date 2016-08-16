@@ -308,7 +308,6 @@ class PersonService {
 		int s = persons.size()
 		if (s > 1) {
 			persons.each { person -> log.debug "person ${person.id} $person"}
-			results.person = persons[0]
 			results.isAmbiguous=true
 		} else if (s == 1) {
 			results.person = persons[0]

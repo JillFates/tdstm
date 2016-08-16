@@ -49,13 +49,13 @@ class PersonServiceTests extends Specification {
 	def "3. Test finding persons by their name using a string that must be parsed "() {
 		// Know person for the project
 		when:
-			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin'])
-			Map results = personService.findPerson("Robin Banks", project)
+			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Lantern', firstName:'Green'])
+			Map results = personService.findPerson("Green Lantern", project)
 		then:
 			! results.isAmbiguous
 			results.person != null
-			results.person.firstName == 'Robin'
-			results.person.lastName == 'Banks'
+			results.person.firstName == 'Green'
+			results.person.lastName == 'Lantern'
 
 		// Known person not on the project
 		when:
@@ -71,8 +71,8 @@ class PersonServiceTests extends Specification {
 
 		// Create a 2nd person that will cause ambiguous lookup
 		when:
-			Person secondPerson = personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin', middleName: 'T'])
-			results = personService.findPerson("Robin", project)
+			Person secondPerson = personHelper.createPerson(adminPerson, project.client, null, [lastName:'Lantern', firstName:'Green', middleName: 'H'])
+			results = personService.findPerson("Green", project)
 		then:
 			results.isAmbiguous
 			results.person == null
