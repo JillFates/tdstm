@@ -363,19 +363,26 @@ def updateWorkflowSteps() {
 	def deleteWorkflow() {
 		def workflowId = params.id
 		if(workflowId){
-			def workflow = Workflow.get( workflowId )
-			def process = workflow.process
-			def workflowProjects = Project.findAllByWorkflowCode(workflow?.process)
+			Workflow workflow = Workflow.get( workflowId )
+			String process = workflow.process
+			List<Project> workflowProjects = Project.findAllByWorkflowCode(workflow?.process)
 			try {
-				workflowProjects.each{ project ->
-					projectService.deleteProject(project.id, false)
+				if(!workflowProjects) { //No dependencies, delete workflow
+					WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?", [workflow])
+					WorkflowTransition.executeUpdate("delete from WorkflowTransition wt where wt.workflow = ?", [workflow])
+					Swimlane.executeUpdate("delete from Swimlane s where s.workflow = ?", [workflow])
+					workflow.delete()
+					//	load transitions details into application memory.
+					stateEngineService.loadWorkflowTransitionsIntoMap(process, 'workflow')
+				}else{
+					/* OLD code to delete Project dependencies, Warning this was BAD!
+					workflowProjects.each { project ->
+						projectService.deleteProject(project.id, false)
+					}
+					*/
+					def stringList = workflowProjects.join(", ")
+					throw new Exception("Workflow '${workflow}' is associated with project(s) (${stringList}), therefore can not be deleted.");
 				}
-				WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?",[workflow])
-				WorkflowTransition.executeUpdate("delete from WorkflowTransition wt where wt.workflow = ?",[workflow])
-				Swimlane.executeUpdate("delete from Swimlane s where s.workflow = ?",[workflow])
-				workflow.delete()
-				//	load transitions details into application memory.
-				stateEngineService.loadWorkflowTransitionsIntoMap( process, 'workflow')
 			} catch (Exception ex) {
 				flash.message = ex.getMessage()
 			}
