@@ -811,7 +811,7 @@ class ImportService {
 										}
 
 										if ( ! warnMsg && resultMap?.person) {
-											application[attribName] = resultMap.person.id
+											application[attribName] = resultMap.person
 
 											// Now check for warnings
 											if (resultMap.isAmbiguous) {
