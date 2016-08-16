@@ -1,0 +1,41 @@
+div.content-wrapper
+  div.container
+    div.body
+      position: static
+      div#graphToolbarId
+        font-size: 0px
+        height: 28px
+        span.controlWrapper
+          margin-right: 8px
+          font-size: 0px
+          label
+            margin-right: 4px
+            font-size: 12px
+        #filterClearId
+          position: absolute
+          display: inline
+          margin-top: 4px
+          cursor: pointer
+          opacity: 1
+          &.disabled
+            opacity: 0.1
+            pointer-events: none
+        #SubmitButtonId
+          margin-left: 4px
+        div.zoomButton
+          margin-bottom: 5px
+          vertical-align: bottom
+        div#zoomInButtonId
+          margin-left: 20px
+        span.checkboxContainer
+          margin-bottom: 9px
+          display: inline-block
+          margin-left: 10px
+      div#svgContainerDivId
+        &:focus
+          outline: 0
+        border: 1px solid green
+        overflow: hidden
+        svg
+          g.node a
+            cursor: pointer
