@@ -338,24 +338,17 @@ class ProjectService {
 	/**
 	 *This method used to get attributes from eavAttribute based on EntityType.
 	 * @param entityType
-	 * @return
+	 * @return List of attributes.
 	 */
 	def getAttributes(entityType){
 		def eavEntityType = EavEntityType.findByDomainName(entityType)
 		def attributes = EavAttribute.findAllByEntityType( eavEntityType ,[sort:'frontendLabel'])
-
-		def firstCustom = attributes.indexOf{it.frontendLabel == "Custom1"}
-		def lastCustom = attributes.indexOf{it.frontendLabel == "Custom${Project.CUSTOM_FIELD_COUNT}"}
-		def w = attributes[firstCustom..lastCustom]
-		def firsts = attributes[0..firstCustom - 1]
-		def lasts = attributes[lastCustom + 1..attributes.size() - 1]
-		def nonCustoms = firsts + lasts
-		def customs = attributes[firstCustom..lastCustom]
-		def oneDigitCustoms = customs.findAll{it.frontendLabel.size() == 7}
+		def customs =  attributes.findAll{ it.attributeCode =~ /^custom.*/}
+		attributes.removeAll(customs)
+		def oneDigitCustoms = customs.findAll{it.attributeCode.size() == 7}
 		customs.removeAll(oneDigitCustoms)
-		customs
-
-		attributes = nonCustoms + oneDigitCustoms + customs
+		customs = oneDigitCustoms + customs
+		attributes = attributes + customs
 
 		return attributes
 	}
