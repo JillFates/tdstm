@@ -62,11 +62,11 @@ var svgContainer = d3.select("div#item1")
 	.attr('id','svgContainerId')
 	.attr('tabindex','1')
 	.style('background-color','#ffffff')
-var svgTranslator = svgContainer
+var transformContainer = svgContainer
 	.attr('class','containsSpinner')
 	.append("div")
 	.attr('id','svgTranslatorId')
-var canvas = svgTranslator
+var canvas = transformContainer
 	.append("svg:svg")
 	.attr('class','chart')
 
@@ -275,7 +275,7 @@ function createGraph (config) {
 	GraphUtil.addKeyListeners($(svgContainer[0][0]))
 	
 	// transform the canvas
-	GraphUtil.transformElement(svgTranslator, -canvasSize/2, -canvasSize/2, 1)
+	GraphUtil.transformElement(transformContainer, -canvasSize/2, -canvasSize/2, 1)
 	GraphUtil.transformElement(canvas, canvasSize/2, canvasSize/2, 1)
 	
 	// create the main group in the SVG
@@ -486,7 +486,7 @@ function createBehaviorHandler (zoomBehavior, dragBehavior) {
 			var offset = canvasSize / 2
 			var x = d3.event.translate[0] - offset
 			var y = d3.event.translate[1] - offset
-			GraphUtil.transformElement(svgTranslator, x, y, d3.event.scale)
+			GraphUtil.transformElement(transformContainer, x, y, d3.event.scale)
 		}
 	}
 }

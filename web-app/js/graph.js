@@ -736,7 +736,7 @@ var GraphUtil = (function ($) {
 	
 	// zooms in or out depending on direction
 	performZoom = function (direction, modifier) {
-		if (zoomBehavior && svgContainer) {
+		if (zoomBehavior && transformContainer) {
 			modifier = (modifier != null) ? modifier : 1
 			var screenModifier = -0.5
 			var zoomMultiplier = 0.5 / modifier
@@ -750,11 +750,10 @@ var GraphUtil = (function ($) {
 			var newTranslate = [newX, newY]
 			var newScale = zoomBehavior.scale() * zoomMultiplier
 			
-			var selection = svgContainer.transition().duration(50)
 			var zoomEvent = zoomBehavior
 				.scale(newScale)
 				.translate(newTranslate)
-				.event(selection)
+			public.animateTransform(newTranslate, newScale)
 		}
 	}
 	public.zoomIn = function () {
@@ -770,9 +769,8 @@ var GraphUtil = (function ($) {
 		newTranslate[0] += x
 		newTranslate[1] += y
 		
-		var selection = svgContainer.transition().duration(50)
 		zoomBehavior.translate(newTranslate)
-				.event(selection)
+		public.animateTransform(newTranslate)
 	}
 	public.translateLeft = function (modifier) {
 		modifier = (modifier != null) ? modifier : 1
@@ -789,13 +787,25 @@ var GraphUtil = (function ($) {
 	public.translateDown = function (modifier) {
 		modifier = (modifier != null) ? modifier : 1
 		performTranslate(0, -1 * public.translateDist * modifier)
+	}	
+	public.animateTransform = function (transform, scale) {
+		transform = (transform != null) ? transform : zoomBehavior.transform()
+		scale = (scale != null) ? scale : zoomBehavior.scale()
+		if (transformContainer[0][0].tagName == 'DIV')
+			transformContainer.style('transform', 'translate(' + transform[0] + 'px,' + transform[1] + 'px) scale(' + scale + ')')
+		else
+			transformContainer
+				.transition()
+				.duration(100)
+				.ease(function (t) {return t})
+				.attr('transform', 'translate(' + transform[0] + ',' + transform[1] + ')scale(' + scale + ')')
 	}
 	
 	// add key listeners for zooming and panning
-	public.addKeyListeners = function (graph) {
+	public.addKeyListeners = function (graph, modifier) {
+		modifier = (modifier != null) ? modifier : 1
 		graph.on('keydown', function (e) {
 			var key = e.keyCode
-			var modifier = 1
 			
 			// handle modifier keys
 			if (e.shiftKey)

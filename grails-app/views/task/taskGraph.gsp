@@ -5,12 +5,14 @@
 		<meta name="layout" content="topNav" />
 		
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 		
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="d3/d3.js"/>
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="TimerBar.js" />
+		<g:javascript src="graph.js" />
 		
 		<g:javascript src="asset.tranman.js" />
 
@@ -31,17 +33,6 @@
 			}
 			form#taskSearchFormId {
 				display: inline-block !important;
-			}
-			span#filterClearId {
-				position: absolute !important;
-				display: inline !important;
-				margin-top: 4px !important;
-				cursor: pointer !important;
-				opacity: 1 !important;
-			}
-			span#filterClearId.disabled {
-				opacity: 0.3 !important;
-				cursor: auto !important;
 			}
 		</style>
 		
@@ -74,9 +65,10 @@
 		var svg = null;
 		var neighborhoodTaskId = ${neighborhoodTaskId};
 		var background = null;
-		var width = 0;
-		var height = 0;
-		var zoom;
+		var transformContainer = null;
+		var widthCurrent = 0;
+		var heightCurrent = 0;
+		var zoomBehavior = null;
 		var tasks = [];
 		
 		function buildGraph (response, status) {
@@ -117,7 +109,8 @@
 			
 			var svgData = d3.select('div.body')
 				.append('div')
-				.attr('id', 'svgContainerDivId');
+				.attr('id', 'svgContainerDivId')
+				.attr('tabindex', '1');
 			
 			
 			svgData.html(data.svgText);
@@ -137,8 +130,7 @@
 				.attr('opacity', 0)
 				.attr('class', 'background-rect')
 				.on('dblclick', function () {
-					zoom.translate([0, 0]).scale(1);
-					graph.attr('transform', 'translate(0, 0) scale(1)');
+					getDefaultPosition()
 				});
 			
 			graph = d3.select('#graph0');
@@ -146,11 +138,6 @@
 			
 			$('#containerId')[0].appendChild(graph0);
 			
-			var transform = graph0.transform.animVal;
-			for (var i = 0; i < transform.numberOfItems; ++i)
-				if (transform.getItem(i).type == 2)
-					container.attr('transform', 'translate(' + transform.getItem(i).matrix.e + ' ' + transform.getItem(i).matrix.f + ') scale(1)');
-					
 			graph.attr('transform', 'translate(0 0) scale(1)');
 			
 			$('g').children('a')
@@ -165,7 +152,13 @@
 				});
 			
 			
+			transformContainer = graph;
+			var outerContainer = $('#svgContainerDivId')
+			var modifier = 1
+			GraphUtil.addKeyListeners(outerContainer, modifier);
+			
 			addBindings();
+			getDefaultPosition();
 			performSearch();
 			$('#exitNeighborhoodId').removeAttr('disabled');
 		}
@@ -174,31 +167,32 @@
 			if ($('#svgContainerDivId').size() > 0) {
 			
 				var padding = $('#svgContainerDivId').offset().left;
-				height = $(window).innerHeight() - $('#svgContainerDivId').offset().top - padding;
-				width = $(window).innerWidth() - padding * 2;
+				heightCurrent = $(window).innerHeight() - $('#svgContainerDivId').offset().top - padding;
+				widthCurrent = $(window).innerWidth() - padding * 2;
 				
 				
 				d3.select('div.body')
-					.attr('style', 'width:' + width + 'px !important; height:' + height + 'px !important;');
+					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;');
 				d3.select('#svgContainerDivId')
-					.attr('style', 'width:' + width + 'px !important; height:' + height + 'px !important;');
+					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;');
 			
 				svg = d3.select('#svgContainerDivId svg')
-					.attr('style', 'width:' + width + 'px !important; height:' + height + 'px !important;')
-					.attr('width', width)
-					.attr('height', height);
+					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;')
+					.attr('viewBox', null)
+					.attr('width', widthCurrent)
+					.attr('height', heightCurrent);
 			}
 		}
 		
 		// binds d3 zooming behavior to the svg
 		function addBindings () {
-			zoom = d3.behavior.zoom()
+			zoomBehavior = d3.behavior.zoom()
 				.on("zoom", zooming)
 				
-			background.call(zoom);
+			background.call(zoomBehavior);
 
 			background.on("dblclick.zoom", null);
-			
+
 			function zooming () {
 				graph.attr('transform', 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')');
 			}
@@ -258,6 +252,18 @@
 					type:'GET',
 					complete: buildGraph
 				});
+		}
+		
+		// fits the graph into the centered position where everything is visible
+		function getDefaultPosition () {
+			zoomBehavior.translate([0, 0]).scale(1).event(background)
+			var graphBounds = graph0.getBoundingClientRect();
+			var newScale = widthCurrent / graphBounds.width;
+			var newTop = (heightCurrent / 2) - (newScale * graphBounds.height / 2) + 270;
+			zoomBehavior
+				.translate([0, newTop])
+				.scale(newScale)
+				.event(background)
 		}
 		
 		// highlight tasks matching the user's regex
@@ -346,29 +352,38 @@
 		<div class="taskTimebar hide" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
 		</div>
-		<div class="body" style="width:100%">
+		<div class="body graphContainer" style="width:100%">
 			<h1 id="pageHeadingId">Task Graph</h1>
-			<g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
-			</g:if>
-			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
-			&nbsp; Highlight: <select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
-			<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
-			<form onsubmit="return performSearch()" id="taskSearchFormId">
-				&nbsp;<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
-				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
-				&nbsp;<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer" value="Highlight" />
-			</form>
-			<tds:hasPermission permission="PublishTasks">
-				<span class="checkboxContainer">
-					&nbsp;<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } /><!--
-					--><label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
+			<div id="graphToolbarId">
+				<g:if test="${flash.message}">
+					<div class="message">${flash.message}</div>
+				</g:if>
+				<span class="controlWrapper">
+					<label for="moveEventId">Event:</label>
+					<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
 				</span>
-			</tds:hasPermission>
-			<span style="float:right;">
-				<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
-			</span>
-			<br>
+				<span class="controlWrapper">
+					<label for="teamSelectId">Highlight:</label>
+					<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
+				</span>
+				<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
+				<form onsubmit="return performSearch()" id="taskSearchFormId">
+					<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
+					<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
+					<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer" value="Highlight" />
+				</form>
+				<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin"></div>
+				<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer"></div>
+				<tds:hasPermission permission="PublishTasks">
+					<span class="checkboxContainer">
+						<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } />
+						<label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
+					</span>
+				</tds:hasPermission>
+				<span style="float:right;">
+					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+				</span>
+			</div>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		</div>
 		<g:render template="../layouts/error"/>
