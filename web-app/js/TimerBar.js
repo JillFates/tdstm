@@ -9,12 +9,17 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 		public.max = $('#issueTimebar').width();
 		public.to = null;
 		public.timerValue = null;
+		public.modeModal = null;
 		
 		if (refreshCallback)
 			public.refreshFunction = refreshCallback;
 		else
 			public.refreshFunction = function () {
+				if(public.modeModal && public.modeModal === 'viewMode'){
+					public.modeModal = null; // restart the status
+				} else {
 				window.location.reload();
+				}
 			};
 			
 		public.bindListeners();
@@ -117,6 +122,11 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 		});
 		
 		$('div[role=dialog]').on('dialogclose', function () {
+			public.modeModal = null; // restart the status
+			var viewElementModal = $(this).find('.viewMode');
+			if(viewElementModal && viewElementModal.length > 0) {
+				public.modeModal = 'viewMode';
+			}
 			public.attemptResume();
 		});
 	}

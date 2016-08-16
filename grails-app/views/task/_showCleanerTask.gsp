@@ -1,19 +1,5 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Task Details</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-    <tds:favicon />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 	<g:javascript src="tech_teams.js" />
 	<g:javascript src="asset.comment.js" />
-
-</head>
-<body>
-	<a name="top"></a>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" id="mainbody">
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
@@ -21,20 +7,20 @@
 			</g:if> 
 		</div>
 		<g:if test="${canPrint == false}">
-			<div style="color: red;">
+	<div class="printViewError">
 				<ul>
-					<li>Please note that in order to print barcode labels you will need the to use Windows Internet Explorer browser.</li>
+			<li>Please note that in order to print barcode labels you will need the to use a Java (1.7+) Applet enabled Browser like FireFox or IE/Edge and the plugin to allow Applets to run in the browser. <a href="https://java.com/en/download/help/enable_browser.xml" target="_blank"> More ... </a></li>
 				</ul>
 			</div>
 		</g:if>
 	<g:form name="issueUpdateForm" controller="task" action="update">
 		<a name="comments"></a>
+		<span id="opened-detail-${assetComment.id}" style="display: none;"></span>
 		<input type="hidden" name="id" id="issueId" value="${assetComment.id}" />
 		<input type="hidden" name="redirectTo" id="redirectTo" value="taskList" />
 		<input type="hidden" name="FormName" id="FormName" />
 		<input type="hidden" name="PrinterName" id="PrinterName" />
 		<input type="hidden" name="RepPath" id="RepPath" />
-		<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="racking_label.tff" absolute="true"/>" />
 		<input type="hidden" name="model" id="model" value="${assetEntity?.model}" />
 		<input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" />
 		<input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" />
@@ -159,19 +145,17 @@
 					</td>
 				</tr> 
 			</g:if>
-			<tr class="prop">
-					<td valign="top" class="name"><label for="resolution">Printers :</label></td>
+			<tr class="prop printView">
+					<td valign="top" class="name"><label for="resolution">Label Settings:</label></td>
 					<td nowrap="nowrap">
-						<select type="hidden" id="Printers" name="Printers"	${canPrint ? '' : 'disabled="disabled"' } onChange="startprintjob();">
-							<option value="Zebra (ZPL-II)" >Zebra (ZPL-II)</option>
-							<g:each in="${session.getAttribute( 'PRINTERS' )}" var="printer">
-								<option value="${printer}" ${prefPrinter==printer ? 'selected="selected"' : ''}>
-									${printer}
-								</option>
-							</g:each>
+						<select id="printers" ${canPrint ? '' : 'disabled="disabled"' }>
 						</select> 
 						<b>Quantity: </b>
-						<g:select  name="labels" id="labelQuantity" from="${1..9}" value="${lblQty}" onchange="${remoteFunction(controller:'task', action:'setLabelQuantityPref',params:'\'selected=\'+ this.value+\'&prefFor=printLabelQuantity\'')}"/>
+						<select id="printTimes" ${canPrint ? '' : 'disabled="disabled"' }>
+							<g:each in="${1..9}">
+								<option value="${it}">${it}</option>
+							</g:each>
+						</select>
 					</td>
 			</tr>
 			<tr>
@@ -183,13 +167,17 @@
 						<input type="button" value="Update Task" disabled="disabled" />
 					</g:else>
 				</td>
-				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
-					<input type="button" id="printButton" value="Print" ${canPrint ? '': 'disabled="disabled"' } onclick="startprintjob();"  />
-					<input type="button" id="printAndDoneButton" value="Print And Done"  
-							onclick="printAndMarkDone(${assetComment.id}, 'Completed', '${assetComment.status}');"  />
+				<td class="buttonR printView" style="text-align:right;padding: 5px 3px;">
+					<input type="button" id="printButton" value="P)rint" ${canPrint ? '': 'disabled="disabled"' } onclick="startprintjob();"  />
+					<g:if test="${assetComment.status == "Started" || assetComment.status == "Ready"}">
+						<input type="button" id="printAndDoneButton" value="Print And D)one" onclick="printAndMarkDone(${assetComment.id}, 'Completed', '${assetComment.status}');"  />
+					</g:if>
+					<g:else>
+						<input type="button" id="printAndDoneButton" value="Print And D)one" disabled="disabled"/>
+					</g:else>
 				</td>
 				<td class="buttonR" colspan="2" style="text-align:right;padding: 5px 3px;">
-					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
+					<input type="button" value="Cancel" onclick="clearSearch()" />
 				</td>
 			</tr>	
 		</table>
@@ -197,40 +185,7 @@
 		 <input type="hidden" name ="assetTag" id="assetTag" value="${assetComment?.assetEntity?.assetTag}">
 </g:form>
 
-		<%--<div class="clear" style="margin:4px;"></div>
-		<a name="detail"></a>
-	 	<div>
-
-			<table style="width:420px;">
-			<tr>
-				<td class="heading"><a href="#detail">Asset Details</a></td>
-				<td><span style="float:right;"><a href="#top">Top</a></span></td>
-			</tr>
-			<tr><td colspan=2>
-
-				<dl>
-				<dt>Comment:</dt><dd>&nbsp;${assetComment.comment}</dd>
-				<dt>Assigned to:</dt><dd>&nbsp;${assetComment?.assignedTo}</dd>
-				<dt>Due Date:</dt><dd>&nbsp;<tds:convertDate date="${assetComment?.dueDate}" /></dd>
-				<dt>Created by:</dt><dd>&nbsp;${assetComment?.createdBy} at ${assetComment?.dateCreated} </dd>
-				<dt>Comment Type:</dt><dd>&nbsp;${assetComment?.commentType}</dd>
-		   		<dt>Category:</dt><dd>&nbsp;${assetComment?.category}</dd>
-		   		<g:if test="${assetComment.assetEntity}">
-		   		  <dt>Asset Entity:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-		   		</g:if>
-		   		<g:if test="${assetComment.moveEvent}">
-		   		  <dt>Move Event:</dt><dd>&nbsp;${assetComment?.moveEvent.name}</dd>
-		   		</g:if>
-		   		<dt>Status:</dt><dd>&nbsp;${assetComment?.status}</dd>
-		   		<dt>Resolution:</dt><dd>&nbsp;${assetComment?.resolution}</dd>
-		   		<dt>Resolved At:</dt><dd>&nbsp;${assetComment?.dateResolved}</dd>
-				<dt>Resolved By:</dt><dd>&nbsp;${assetComment?.resolvedBy}</dd>  			   	
-			
-				</dl>
-		</tr>
-		</table>
-		</div>
-		--%><div class="clear" style="margin:4px;"></div>
+	<div class="clear" style="margin:4px;"></div>
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
 		 	<div style="float: left;width: 100%">
@@ -282,12 +237,11 @@
 				</dl>
 			</tr>
 			</table>
-			
 			</div>
 		</g:if>
 </div>
 <script type="text/javascript">
-$( function() {
+	$(function() {
 	if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
 		$('#noteId_'+${assetComment.id}).hide()
 		$('#resolutionId_'+${assetComment.id}).show()
@@ -304,31 +258,75 @@ function showResolve() {
 		$('#resolutionId_'+${assetComment.id}).hide()
 	}
 }
+
 function keyCheck( e ) {
-	var currentFocus = document.activeElement.id
+		var keyStrokesFlag = $('.keyStrokesHandler').attr('status')
+		if(keyStrokesFlag && keyStrokesFlag === 'enable' ) {
+			var currentFocus = document.activeElement.id;
 	var focusId = currentFocus.substring(0,currentFocus.indexOf("_"))
 	if (currentFocus != 'search' && focusId != 'editComment' && focusId != 'noteEditId' ) {
 		if (!e && window.event) e=window.event;
 		var keyID = e.keyCode;
-		if (keyID == 13) {
+
+				<g:if test="${assetComment.status == "Started" || assetComment.status == "Ready"}">
+					if (keyID == KeyEvent.DOM_VK_RETURN || keyID == KeyEvent.DOM_VK_D || keyID == KeyEvent.DOM_VK_NUMPAD4) {
 			$("#printAndDoneButton").click()
 			return;
-		} else if (keyID == 80) {
+					} else if (keyID == KeyEvent.DOM_VK_P) {
 			startprintjob();
 		}
-		var labelQty = keyID - 48 
+				</g:if>
+				// Input is a numeric value from normal keyboard or extended numeric pad
+				if((keyID >= KeyEvent.DOM_VK_0 && keyID <= KeyEvent.DOM_VK_9) || (keyID >= KeyEvent.DOM_VK_NUMPAD0 && keyID <= KeyEvent.DOM_VK_NUMPAD9)){
+
+					var labelQty = 0;
+					if(keyID >= KeyEvent.DOM_VK_0 && keyID <= KeyEvent.DOM_VK_9) {
+						labelQty = keyID - KeyEvent.DOM_VK_0;
+					}
+
+					if(keyID >= KeyEvent.DOM_VK_NUMPAD0 && keyID <= KeyEvent.DOM_VK_NUMPAD9) {
+						labelQty = keyID - KeyEvent.DOM_VK_NUMPAD0;
+					}
+
 		if (labelQty > 0 && labelQty < 10) {
-			$('#labelQuantity').focus()
+						var printTimesSelector = $('#printTimes');
+						printTimesSelector.focus();
 			if ($("input:focus").length < 1) {
-				$('#labelQuantity').val(labelQty);
+							printTimesSelector.val(labelQty);
+							printTimesSelector.change();
 			}
 		}
 	}
-}
 
+				//Increment or decrement pages using '-' or '+' keys
+				if(keyID == KeyEvent.DOM_VK_PLUS || keyID == KeyEvent.DOM_VK_HYPHEN_MINUS){
+					var inc = (keyID == KeyEvent.DOM_VK_PLUS)? 1 : -1;
+					var printTimesSelector = $('#printTimes');
+					printTimesSelector.focus();
+					if ($("input:focus").length < 1) {
+						var value =  parseInt(printTimesSelector.val());
+						value += inc;
+
+						if(value > 0 && value < 10) {
+							printTimesSelector.val(value);
+							printTimesSelector.change();
+}
+					}
+				}
+
+				// On Press C,c or Q, q  or ESC hide the details row
+				if(keyID == KeyEvent.DOM_VK_C || keyID == KeyEvent.DOM_VK_NUMPAD3 || keyID == KeyEvent.DOM_VK_Q || keyID == KeyEvent.DOM_VK_F2 || keyID ==  KeyEvent.DOM_VK_ESCAPE) {
+					//$('.taskDetailsRow').hide();
+					//$('#search').focus();
+					clearSearch();
+				}
+			}
+		}
+	}
 
 function printAndMarkDone(id, status, currentStatus) {
-	startprintjob();
+		startprintjob({
+			onSuccess: function(){
 	jQuery.ajax({
 		url: '../task/update',
 		data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
@@ -337,27 +335,32 @@ function printAndMarkDone(id, status, currentStatus) {
 			if (typeof data.error !== 'undefined') {
 				alert(data.error);
 			} else {
-				hideStatus(id, status)
-				$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
-				if (status=='Started') {
-					$('#started_'+id).hide()
-				}
-				$("#search").focus()
+							$("#myIssueList").replaceWith(data);
+							$("#search").focus();
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while attempting to update task/comment")
+					}
+				});
 		}
 	});
 }
  
 function validateComment(objId){
 	var status = $('#statusEditId_'+${assetComment.id}).val()
-	var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
-		'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
-		'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
-		'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
+		var params = {
+			'comment':$('#editComment_'+objId).val(),
+			'resolution':$('#resolutionEditId_'+objId).val(), 
+			'category':$('#categoryEditId_'+objId).val(), 
+			'assignedTo':$('#assignedToEditId_'+objId).val(),
+			'status':$('#statusEditId_'+objId).val(),
+			'currentStatus':$('#currentStatus_'+objId).val(), 
+			'note':$('#noteEditId_'+objId).val(),
+			'id':objId,'view':'myTask',
+			'tab': $('#tabId').val()
 	}
+
 	jQuery.ajax({
 		url: '../task/update',
 		data: params,
@@ -384,6 +387,7 @@ function validateComment(objId){
 		}
 	});
 }
+
 function truncate( text ){
 	var trunc = text
 	if(text){
@@ -400,89 +404,77 @@ function hideStatus(id,status){
 	$('#detailTdId_'+id).css('display','none')
 	timerBar.Start();
 }
-
  </script>
-<script type="text/javascript" language="javascript">
 
-var sHint = "C:\\temp\\output";
+<script type="text/javascript" language="javascript">
 //=============================================================================
 // PRINT HERE
 //=============================================================================
 
+	function startprintjob(opts) {
+		//debugger; // This code is injected dynamically, let's force the debugger to stop into the VM compilation at runtime
+		var printerName = $('#printers').val();
+		var printerCopies = $("#printTimes").val();
 
-function startprintjob() {
-	var selectval=  $("#Printers").val();
+		//Save Printer Preference
+		window.PREFS.PRINTER_NAME   = printerName;
+		window.PREFS.PRINTER_COPIES = parseInt(printerCopies);
+
 	jQuery.ajax({
-		url: '../task/setLabelQuantityPref',
-		data:{'selected':selectval, 'prefFor':'PRINTER_NAME'},
-		type:'POST'
+			url: "${createLink(controller:'assetEntity', action: 'setImportPerferences')}",
+			data: JSON.stringify({
+				"PRINTER_NAME":printerName,
+				"PRINTER_COPIES":printerCopies
+			}),
+			type: 'POST',
+			contentType: "application/json; charset=utf-8",
+			dataType: 'json'
 	});
-	/*
-	alert('model:' + $("#model").val());
-	alert(", cart: " + $("#cart").val());
-	alert(", shelf: " + $("#shelf").val());
-	alert(", room: " + $("#room").val());
-	alert('first time2');
-	alert(", rack: " + $("#rack").val());
-	alert(", upos: " + $("#upos").val());
-    alert(", urlPath: " + $("#urlPath").val());
-    alert('first time3');
-    */
 
-	try {
-		var tform = window.TF;
-		if (typeof tform == 'undefined') {
-			alert("Sorry but the necessary TFORMer ActiveX needed for label printing wasn't loaded.");
-			return;
-		}
-		var job = tform.CreateJob();
-		var jobdata = job.NewJobDataRecordSet();
-	    var labelsCount = $('#labelQuantity').val();
-	
-		// var form = window.document.issueUpdateForm;
-	    job.RepositoryName = $("#urlPath").val();  
-	    job.FormName = $('#FormName').val();
-	    job.PrinterName = $('#PrinterName').val();
-	   
-	    jobdata.ClearRecords();
+		opts = opts || {};
+		var NOP = function(){};
+		var onSuccess = opts.onSuccess || NOP;
+		var onFail = opts.onFail || NOP;
+		var onDone = opts.onDone || NOP;
 	    
-	    for(var label = 0; label < labelsCount; label++) {
-		    jobdata.AddNewRecord();
-		    jobdata.SetDataField('serverName', $("#assetName").val());
-		    jobdata.SetDataField('assetTag', $("#assetTag").val());
+		window.QZObj.print(
+			{
+				printerName: printerName,
+				data:{
+					assetName : $("#assetName").val(),
+					assetTag  : $("#assetTag").val(),
+					modelName : $("#model").val(),
+					cart      : $("#cart").val(),
+					shelf     : $("#shelf").val(),
+					roomTarget: $("#room").val(),
+					rackTarget: $("#rack").val(),
+					targetRackPosition: $("#upos").val(),
+					printTimes: printerCopies
+				},
+				onSuccess:function(qz){
+					window.NOTIFICATION.show({
+						title: String(qz.getPrinter()),
+						message: 'Labels sent to printer'
+					}, "success");
 		    
-            jobdata.SetDataField('model', $("#model").val());     
-            jobdata.SetDataField('cart', $("#cart").val());           
-            jobdata.SetDataField('shelf', $("#shelf").val());
-            jobdata.SetDataField('room', $("#room").val());
-            jobdata.SetDataField('rack', $("#rack").val());
-            jobdata.SetDataField('upos', $("#upos").val());
-            jobdata.SetDataField('cartQty', $("#cartQty").val());
-	    }
-	    // now we print one copy of the label with default settings
-	    try {
-	    	job.PrintForm();
-	    } catch (e) {
-			if (e.message!="Error: The operation was canceled by the user. ") { 
-		    	alert ("TFORMer returned an error!" + e +
-		           "\nError description: " + e.description + 
-		           "\nError name: " + e.name + 
-		           "\nError number: " + e.number + 
-		           "\nError message: " + e.message);
-			}
-	    }
-	}catch(ex){
-		alert("It appears that your security settings are preventing printing. Please add this site to your Trusted Sites in setup." + 
-		   "\nException was:" + ex.message);
+					onSuccess(qz);
+				},
+				onFail: function(error, qz){
+					window.NOTIFICATION.show({
+						title: "Error",
+						message: error
+					}, "error");
+					onFail(error, qz);
+				},
+				onDone : onDone
 	}
-
+		);
 }
 
 //=============================================================================
 // Add a new option to select element
 //=============================================================================
-function AddOption (selElement, text, value)
-{
+	function AddOption (selElement, text, value){
   opt = new Option(text, value, false, true);
 //selElement.options[0] = opt;
 }
@@ -490,65 +482,35 @@ function AddOption (selElement, text, value)
 //=============================================================================
 // Set default data for TFORMer Runtime Properties
 //=============================================================================
-function InitData()
-{
-	//To check the Instructions for enable the Clean Button
-	var printButton = $('#printButton');
-	if(!printButton.disabled){ 
-		printButton.focus();
+	function InitData(){
+		//Nothing here yet
 	}
-	var form = window.document.issueUpdateForm;
-	var path = window.location.href;
-	var i = -1;
-	// the following code evaluates the path to the demo repository
-	for (n=1; n<=3; n++)
-	{
-		i = path.lastIndexOf('/');
-		if (i != -1)
-		{
-			path = path.substring(0,i)                              // one directory level up
+
+	function focusOnPrintAndDone(){
+		//To check the Instructions for enable the Clean Button
+		if(!$('#printAndDoneButton').is(':disabled')){
+			//push to the bottom of the event queue
+			setTimeout(function() {
+				$('#printAndDoneButton').focus();
+			}, 0);
 		}
 	}
-	if (path.substr (0, 8) == "file:///")			                  // do not use URL-style for Repository file name - remove file:///
-	    path = path.substr (8);
-    path=unescape(path);	
-    form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  // repository name
-    form.FormName.value = 'BarcodeLabels';											// form name
-    form.PrinterName.value = ''																	// use default printer
-	// get list of installed printers
-	var dropdown = document.issueUpdateForm.Printers;
-	AddOption (dropdown, "Zebra (ZPL-II)", "ZPL:" + sHint + ".ZPL");
-	
-	retrieve_field(document.issueUpdateForm.Printers)
-	
-	mySelect(dropdown);
-	
-}
-
-//=============================================================================
-// Handle Browse Button
-//=============================================================================
-function FileFind_onchange()
-{
-var form = window.document.issueUpdateForm;
-
-  form.RepPath.value = form.FileFind.value;
-}
-
-//=============================================================================
-// The selected dprinter has changed
-//=============================================================================
-function mySelect(x)
-{
-	$('#PrinterName').val( x.options[x.selectedIndex].value );
-	
-}
-
 </script>
 <script type="text/javascript">
 	currentMenuId = "#teamMenuId";
-	$("#teamMenuId a").css('background-color','#003366')
-	InitData();
+	$("#teamMenuId a").css('background-color','#003366');
+	
+	if(window.QZObj && window.QZObj.isActive()){
+		var prefPrinterCopies = window.PREFS.PRINTER_COPIES;
+
+		$(".printView").show();
+
+		$('#printTimes').val(prefPrinterCopies);
+		if(window.QZObj.loadPrinters) {
+			window.QZObj.loadPrinters();
+}
+	}else{
+		$(".printViewError").show();
+}
+
 </script>
-</body>
-</html>

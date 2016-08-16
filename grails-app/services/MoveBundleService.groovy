@@ -484,88 +484,87 @@ class MoveBundleService {
 	 * @param sheet : sheet-name
 	 * @return void
 	 */
-	def issueExport (def exportList, def columnList, def sheet, def tzId, userDTFormat, def startRow = 0, def viewUnpublished = false) {
+	def issueExport (Collection exportList, def columnList, def sheet, def tzId, userDTFormat, def startRow = 0, def viewUnpublished = false) {
+		//Just in case that we get a NULL list
+		exportList = exportList ?: []
+
 		def dateFormatter = TimeUtil.createFormatterForType(userDTFormat, TimeUtil.FORMAT_DATE)
 
 		def formatDateTimeForExport = { dateValue ->
 			return (dateValue ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue) : '')
 		}
 
-		for ( int r = startRow; r < (exportList.size() + startRow); r++ ) {
-			for (int c = 0; c < columnList.size(); ++c){
+		exportList.eachWithIndex{ assetComment, r ->
+			columnList.eachWithIndex{ attribName, col ->
 				def cellValue
-				def attribName = columnList[c]
-				int rowIdx = r - startRow
+
 				boolean isNumber=false
 				// log.debug "*** attribName isa ${attribName.getClass().getName()} ${ (it instanceof Closure) }"
 				switch (attribName) {
 					case { it instanceof Closure }:
-						cellValue = attribName.call( exportList[rowIdx] )
+						cellValue = attribName.call( assetComment )
 						break
 					case "taskDependencies":
 						if (viewUnpublished){
-							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
+							cellValue = WebUtil.listAsPipeSepratedString(assetComment[attribName].collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
 						}else{
-							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".findAll{it.predecessor?.isPublished}.collect({ e -> (e.predecessor == null ? '' : e.predecessor.taskNumber) + ' ' + e.predecessor.comment?.toString()}))
+							cellValue = WebUtil.listAsPipeSepratedString(assetComment[attribName].findAll{it.predecessor?.isPublished}.collect({ e -> (e.predecessor == null ? '' : e.predecessor.taskNumber) + ' ' + e.predecessor.comment?.toString()}))
 						}
 						cellValue = StringUtil.ellipsis(cellValue, 32767)
 						break
 					case 'taskNumber':
-						cellValue = exportList[rowIdx].taskNumber
+						cellValue = assetComment.taskNumber
 						isNumber = true
 						break
 					case "assetEntity":
-						cellValue = exportList[rowIdx]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[rowIdx]."${columnList[c]}"?.assetName) : ''
+						cellValue = assetComment[attribName]?.assetType == "Application" ?  String.valueOf(assetComment[attribName]?.assetName) : ''
 						break
 					case "commentAssetEntity":
-						cellValue = exportList[rowIdx].assetEntity ?  String.valueOf(exportList[rowIdx].assetEntity?.assetName) : ''
+						cellValue = assetComment.assetEntity ?  String.valueOf(assetComment.assetEntity?.assetName) : ''
 						break
 					case "notes":
-						cellValue = exportList[rowIdx].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[rowIdx].notes)) : ''
+						cellValue = assetComment.notes ?  String.valueOf(WebUtil.listAsMultiValueString(assetComment.notes)) : ''
 						break
 					case "instructionsLink":
-						cellValue = exportList[r-startRow].instructionsLink ?  String.valueOf(exportList[r-startRow].instructionsLink) : ''
+						cellValue = assetComment.instructionsLink ?  String.valueOf(assetComment.instructionsLink) : ''
 						break;
 					case "workflow":
-						cellValue = exportList[rowIdx].workflowTransition ? String.valueOf(exportList[rowIdx].workflowTransition?.name) : ''
+						cellValue = assetComment.workflowTransition ? String.valueOf(assetComment.workflowTransition?.name) : ''
 						 break
-					/*	 
-					case "estStart":
-						 cellValue = formatDateForExport(exportList[rowIdx].estStart)
-						 break
-					case "estFinish":
-						 cellValue = formatDateForExport(exportList[rowIdx].estFinish)
-						 break
-					case "actStart":
-						 cellValue = formatDateForExport(exportList[rowIdx].actStart)
-						 break
-					case "actFinish":
-						 cellValue = formatDateForExport(exportList[rowIdx].actFinish)
-						 break
-					*/
-					case ~/actStart|dateResolved|dateCreated|estStart/:
-						cellValue = formatDateTimeForExport( exportList[rowIdx].("$attribName") )
+
+					case ~/actStart|actFinish|dateResolved|dateCreated|estStart|estFinish/:
+						cellValue = formatDateTimeForExport( assetComment[attribName] )
 						break
 
+					case "datePlanned":
+						 cellValue = assetComment.estStart ? TimeUtil.formatDate(assetComment.estStart, dateFormatter) : ''
+						 break
 					case "dueDate":
-						 cellValue = exportList[rowIdx].dueDate ? TimeUtil.formatDate(exportList[rowIdx].dueDate, dateFormatter) : ''
+						 cellValue = assetComment.dueDate ? TimeUtil.formatDate(assetComment.dueDate, dateFormatter) : ''
 						 break
 					case "duration":
-						 def duration = exportList[rowIdx].duration
-						 cellValue = duration? String.valueOf(duration):"0"
+						 def duration = assetComment.duration
+						 cellValue = duration ?: 0
+						 isNumber = true
+						 break
+					case "taskBatchId":
+						 cellValue = (assetComment.taskBatch?.id) ?: ""
+						 isNumber = true
 						 break
 					case "":
 						cellValue = ""
 						break
 					default:
-						cellValue = String.valueOf(exportList[rowIdx]?."${columnList[c]}" ?:'')
+						cellValue = String.valueOf(assetComment[attribName] ?: '')
 						break
 				}
 
+				//write to row Num + startRow
+				def rowToWrite = r + startRow
 				if (isNumber) {
-					WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
+					WorkbookUtil.addCell(sheet, col, rowToWrite, cellValue, Cell.CELL_TYPE_NUMERIC)
 				} else {
-					WorkbookUtil.addCell(sheet, c, r, cellValue)
+					WorkbookUtil.addCell(sheet, col, rowToWrite, cellValue)
 				}
 			}
 		}

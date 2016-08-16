@@ -4053,16 +4053,26 @@ class AssetEntityController {
 	/**
 	 * This method is used to set Import perferences.(ImportApplication,ImportServer,ImportDatabase,
 	 * ImportStorage,ImportRoom,ImportRack,ImportDependency)
+	 * This function can get the bosy as a Json object for multiple preferences set or as a Form with Preference, Value
+	 * @param body as JSON
+	 * OR
 	 * @param preference
 	 * @param value
 	 */
 	def setImportPerferences() {
-		def key = params.preference
-		def value = params.value
-		if (value) {
-			userPreferenceService.setPreference( key, value )
-			session.setAttribute(key,value)
+		def json = request.JSON
+
+		if(!json){ // No json request, we expect params, lets build JSON
+			json[params.preference] = params.value
 		}
+
+		json.each{ k, v -> 
+			if(v) {
+				userPreferenceService.setPreference( k, v )
+				session.setAttribute(k,v)
+		}
+		}
+
 		render true
 	}
 

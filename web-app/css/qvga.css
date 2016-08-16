@@ -77,13 +77,11 @@ text-align: center;
 padding: 2px 8px;
 }
 a.mobselect {
-	color: yellow; 
+	color: yellow !important;
 	font-weight: bold;
-	border:2px solid #507028; 
-	border-top-color: #444; 
+	border:1px solid #507028;
 	border-left-color: #444; 
 	border-right-color: #507028;
-	border-bottom-width: 6px;
 	background:#507028;
 	padding: 0px;
 }
@@ -131,5 +129,23 @@ a.mobselect {
 }
 
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
-a.task_action span.task_icon{position: absolute; top: 0}
+a.task_action span.task_icon{position: absolute;}
 a.task_action span.task_button{ float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px;}
+
+.printView{
+	display: none;
+}
+.printViewError{
+	display: none;
+	color: red;
+	font-weight: bold;
+	background-color: #ffe599;
+}
+
+/*
+Glow button on focus (for firefox to act like chrome
+*/
+input[type=button]:focus {
+	box-shadow: 0 0 6px rgba(81, 203, 238, 1);
+	border: 1px solid rgba(81, 203, 238, 1);
+}

@@ -68,7 +68,7 @@ class HtmlUtil {
 		def name = label.toLowerCase().replace(' ', '').replace('.','')
 		def buttonId = name + "_button_" + id
 		def labelId = name + "_text_" + id
-		return """<a id="${buttonId}" href="${href}" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+		return """<a id="${buttonId}" href="${href}" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action btn_${name}"
 			onclick="${onclick}">
 			<span class="ui-button-icon-primary ui-icon ${icon} task_icon"></span>
 			<span id="${labelId}" class="ui-button-text task_button">${label}</span>

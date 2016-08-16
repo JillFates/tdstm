@@ -1,5 +1,4 @@
 <%@page import="com.tdssrc.grails.TimeUtil" %>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -7,6 +6,8 @@
 	<meta name="layout" content="topNav" />
 	<title>My Tasks</title>
     <tds:favicon />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+	<g:javascript src="keyevent_constants.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
@@ -15,16 +16,58 @@
 	<g:javascript src="TimerBar.js" />
 </head>
 <body>
+	<script type="text/javascript">
+		//Some Preferences
+		window.PREFS = {
+			PRINTER_NAME : "${prefPrinter}",
+			PRINTER_COPIES : ${prefPrinterCopies}
+		}
+	</script>
+<%-- BEGIN: NOTIFICATIONS SCRIPT --%>
+	<span id="notification" style="display:none;"></span>
+	<script id="successTemplate" type="text/x-kendo-template">
+		<div class="upload-success" style="width:240px;padding:20px 30px;line-height:1.5em;">
+			<!--img src="../content/web/notification/success-icon.png" /-->
+			<h3>#= title #</h3>
+			<p>#= message #</p>
+		</div>
+	</script>
+	<script id="errorTemplate" type="text/x-kendo-template">
+		<div class="wrong-pass">
+			<!--img src="../content/web/notification/error-icon.png" /-->
+			<h3>#= title #</h3>
+			<p>#= message #</p>
+		</div>
+	</script>
+	<script type="application/javascript">
+		$(function(){
+			//Init Notifications
+			window.NOTIFICATION = $("#notification").kendoNotification({
+				position: {
+					pinned: true,
+					top: 30,
+					right: 30
+				},
+				autoHideAfter: 4000,
+				stacking: "down",
+				templates: [{
+					type: "success",
+					template: $("#successTemplate").html()
+				}, {
+					type: "error",
+					template: $("#errorTemplate").html()
+				}]
+
+			}).data("kendoNotification");
+		});		
+	</script>
+<%-- END: NOTIFICATIONS SCRIPT --%>
 	<input type="hidden" id="timeBarValueId" value="0"/>
+	
 	<div class="taskTimebar hide" id="issueTimebar" >
 		<div id="issueTimebarId"></div>
 	</div>
 	<div class="menu4 my-task-container">
-		<g:if test="${isOnIE && isCleaner}">
-			<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
-				CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
-				style="height: 1px;"></OBJECT>
-		</g:if>
 		<ul>
 			<g:if test="${tab && tab == 'todo'}">
 				<li onclick="setTab('todo')">
@@ -57,13 +100,15 @@
 			</li>
 		</ul>
 		<div class="tab_search">
-			<g:form method="post" name="issueAssetForm" action="showIssue">
-				<input type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off"
+			<g:form method="post" id="issueAssetForm" name="issueAssetForm" action="showIssue">
+				<input type="hidden" id="oldSearchValue" value="${search}"/>
+				<input size="12" value="${search}" id="search" name="search" placeholder="Asset Tag" class="clearable" autocomplete="off" autocorrect="off" autocapitalize="off"
 					onfocus="changeAction()" onblur="retainAction()" />
 				<input type="hidden" name="sort" value="${sort}" />
 				<input type="hidden" name="order" value="${order}" />
 				<input type="hidden" name="tab" id="tabId" value="${tab}" />
 				<input type="hidden" id="myPage" value="mytask" />
+				<input type="hidden" id="searchExecuted" value="true" />
 				<span style="color: white;">Event : 
 					<g:select name='event' value="${moveEvent?.id}" class="slc-event"
 						noSelection="${['null':'All Events']}"
@@ -80,6 +125,7 @@
 	<div id="detailId" style="display: none; position: absolute; width: 420px; margin-top: 40px;"></div>
 	<div class="mainbody">
 		<div id="myTaskList">
+			<span class="keyStrokesHandler" status="enable"></span>
 			<g:render template="tasks"/>
 		</div>
 	</div>
@@ -155,21 +201,24 @@
 	</div>
 
 <script type="text/javascript">
-/*	<g:if test="${isOnIE && isCleaner}">*/
-    /*
-     * To load the installed printers into session by initializing TFORMer
-     */
-	$(function() {
-		window.TF.RefreshOSPrinters();
-		var def = "";
-		var dropdown = new Array();
-		for (i = 0; i < window.TF.GetOSPrintersCount(); i++){
-			dropdown.push(window.TF.GetOSPrinter(i))
-		}
-		${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
-		
+	jQuery(function($) {
+		//////////////////////////
+		// CLEARABLE INPUT
+		function tog(v){return v?'addClass':'removeClass';}
+		$(document).on('input', '.clearable', function(){
+			$(this)[tog(this.value)]('x');
+		}).on('mousemove', '.x', function( e ){
+			$(this)[tog(this.offsetWidth-18 < e.clientX-this.getBoundingClientRect().left)]('onX');
+		}).on('touchstart click', '.onX', function( ev ){
+			ev.preventDefault();
+			$(this).removeClass('x onX').val('').change();
+			pageSubmit(); //clear and submit
 	});
-/*	</g:if>*/
+		$(".clearable").each(function(){
+			$(this)[tog(this.value)]('x');
+		})
+	});
+
 	$(function() {
 		var searchedAssetId = '${searchedAssetId}'
 		var searchedAssetStatus = '${searchedAssetStatus}'
@@ -179,6 +228,14 @@
 	});
 
 	$(".actionBar").die().live('click',function(){
+		//debugger;
+		var openedDetail = $('#opened-detail-'+$(this).attr('data-itemId'));
+		if(openedDetail && openedDetail.length > 0) {
+			$('#detailTdId_'+$(this).attr('data-itemId')).hide();
+			$('#detailId_'+$(this).attr('data-itemId')).html('');
+			return;
+		}
+
 		var id = $(this).attr('data-itemId');
 		var status = $(this).attr('data-status');
 		var showStatusTr = $('#showStatusId_'+id);
@@ -197,17 +254,21 @@
 	});
 	
 	function setFocus() {
-		$("#search").val('').focus();
+		$("#search").focus();
 	}
+
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
-		if (typeof timerBar !== 'undefined')
+		if (typeof timerBar !== 'undefined') {
 			timerBar.Pause();
+		}
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/task/showIssue'),
 			data: {'issueId':id},
 			type:'POST',
 			success: function(data) {
+				$('tr.taskDetailsRow').hide();
+				$('div.task-details').empty();
 				$('#showStatusId_'+id).css('display','none')
 				//$('#issueTr_'+id).attr('onClick','cancelButton('+id+',"'+status+'")');
 				$('#detailId_'+id).html(data)
@@ -276,30 +337,72 @@
 		$('#dependencyBox').css("display","none");
 	}
 	function cancelButton(id,status) {
+		$('#search').val('');
+		pageSubmit();
+/*
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
 		$('#showStatusId_'+id).css('display','table-row')
 		//$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
-		if (typeof timerBar !== 'undefined')
+		if (typeof timerBar !== 'undefined'){
 			timerBar.attemptResume();
+	}
+		*/
 	}
 
 function changeAction(){
 	document.issueAssetForm.action = 'listUserTasks'
 }
 
-function retainAction(){
-	document.issueAssetForm.action = 'showIssue'
+function hasSearchValue() {
+	return $('#search').val().trim() !== $('#oldSearchValue').val().trim();
 }
-function pageRefresh(){
-	document.issueAssetForm.action = 'listUserTasks'
-	document.issueAssetForm.submit()
+
+function retainAction(){
+	if(hasSearchValue()) {
+		$('#issueAssetForm').submit();
+		return false;
+}
+	document.issueAssetForm.action = 'showIssue';
+}
+
+function pageSubmit(){
+	document.issueAssetForm.action = 'listUserTasks';
+	document.issueAssetForm.submit();
+	//var form = $('#issueAssetForm');
+	//form.action = 'listUserTasks';
+	//form.submit();
+}
+
+function pageSubmitIfValidSearch(){
+	if(hasSearchValue()) {
+		pageSubmit();
+		/*
+		var form = $('#issueAssetForm');
+		form.action = 'listUserTasks';
+		form.submit();
+		*/
+	}
+}
+
+function clearSearch() {
+	$('#search').val('');
+	pageSubmit();
 }
 
 function setTab(tab){
 	$("#tabId").val(tab)
 }
+
+$('#search').keyup(function(event) {
+	if (event.keyCode == KeyEvent.DOM_VK_RETURN) {
+		pageSubmit();
+		return false;
+	}
+}).on("focus", function(){
+	$(this).select();
+});
 
 setFocus();
 </script>
@@ -322,10 +425,60 @@ setFocus();
 		<g:if test="${selectedTaskId}">
 		setTimeout(function(){ issueDetails(${selectedTaskId}); }, 500);
 		</g:if>
+
+		$('div.ui-dialog-content').on('dialogopen', function(event) {
+			$('.keyStrokesHandler').attr('status', 'disabled');
 	});
 
-	$(".menu-parent-tasks-my-tasks").addClass('active');
-	$(".menu-parent-tasks").addClass('active');
+		$('div.ui-dialog-content').on('dialogclose', function(event) {
+			$('.keyStrokesHandler').attr('status', 'enable');
+		});
+	});
+</script>
+<script type="text/javascript" src="${resource(dir:'js/qz-print/js',file:'deployJava.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'js/qz-print',file:'qzShowCleanerTasks.js')}"></script>
+<script type="text/javascript">
+	jQuery(function(){
+		function loadPrinters(){
+			var printersEL = $("#printers");
+			if(printersEL && printersEL.val() === null) {
+				var prefPrinter = window.PREFS.PRINTER_NAME;
+				window.QZObj.findPrinters(function (printers) {
+					console.log("QZObj.findPrinters: " + printers);
+					printersEL.empty();
+					$.each(printers, function (key, value) {
+						var attrs = {value: value};
+						if (value == prefPrinter) {
+							attrs.selected = "selected";
+						}
+						printersEL.append($("<option>", attrs).text(value));
+					});
+
+					//if is Defined focus on Print and Done
+					if(typeof focusOnPrintAndDone === "function"){
+						focusOnPrintAndDone();
+					}
+				});
+			}
+		}
+
+
+		QZ({
+			codebase: "${resource(dir:'js/qz-print')}",
+			onSuccess: function () {
+				$(".printView").show();
+				$(".printViewError").hide();
+				window.QZObj.loadPrinters = loadPrinters;
+				console.log("load Print");
+				loadPrinters();
+			},
+			onFail: function (error) {
+				if (error) {
+					alert(error);
+				}
+			}
+		});
+	});
 </script>
 	<g:render template="../assetEntity/initAssetEntityData"/>
 	<g:render template="../layouts/error"/>

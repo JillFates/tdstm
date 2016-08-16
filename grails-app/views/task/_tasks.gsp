@@ -2,7 +2,6 @@
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
-
 <g:set var="now" value="${TimeUtil.nowGMT()}" />
 <%--
 /*
@@ -42,7 +41,7 @@
 			<tbody>
 				<g:each status="i" in="${taskList}" var="issue">
 					<g:set var="item" value="${issue?.item}"/>
-					<tr id="issueTrId_${item?.id}" class="${issue.css}" style="cursor: pointer;">
+					<tr id="issueTrId_${item?.id}" class="${issue.css} task-row-item" style="cursor: pointer;">
 						<td id="comment_${item?.id}" class="actionBar asset_details_block_task"
 							data-itemId="${item?.id}" data-status="${item?.status}">
 							${item?.taskNumber?item?.taskNumber+' - ' : ''}
@@ -128,7 +127,7 @@
 					
 					<tr id="detailTdId_${item?.id}" class="taskDetailsRow" style="display: none">
 						<td colspan="6">
-							<div id="detailId_${item?.id}" style="width: 100%"></div>
+							<div id="detailId_${item?.id}" class="task-details" style="width: 100%"></div>
 						</td>
 					</tr>
 				</g:each>

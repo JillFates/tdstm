@@ -269,9 +269,14 @@ class TaskService implements InitializingBean {
 			AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) ")
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
+
 		if (search) {
 			// Join on the AssetEntity and embed the search criteria
+			if(search.isNumber()) {
+				sql.append('AND (a.asset_tag=:search OR t.task_number=:search ) ')
+			} else {
 			sql.append('AND a.asset_tag=:search ')
+			}
 			// Add the search param to the sql params
 			sqlParams << [ search:search ]
 		}

@@ -1294,10 +1294,13 @@ digraph runbook {
 		
 		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
 		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search, moveEvent)
+		// Use the taskService.getUserTasks(countOnly:true, search=null) service to get counters of tasks and to-do
+		def tasksCounters = taskService.getUserTasks(person, project, true, 7, params.sort, params.order, "", moveEvent)
+
 		
 		// Get the size of the lists
-		def todoSize = tasks['todo'].size()
-		def allSize = tasks['all'].size()
+		def todoSize = tasksCounters['todo']
+		def allSize = tasksCounters['all']
 
 		// Based on which tab the user is viewing we'll set taskList to the appropriate list to be returned to the user
 		if (params.tab=='none' && params.id != null) {
@@ -1359,9 +1362,13 @@ digraph runbook {
 		}
 		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		model << [timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH]
-		if ( request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
+		if ( request.getHeader ( "User-Agent" ).contains ( "Mozilla" ) ) {
 			model.isOnIE= true
 		}
+
+		//Get Prefered Printer
+		model.prefPrinter = userPreferenceService.get("PRINTER_NAME")
+		model.prefPrinterCopies = userPreferenceService.get("PRINTER_COPIES")
 
 		log.debug "listUserTasks: View is $view"
 		
@@ -1442,7 +1449,9 @@ function goBack() { window.history.back() }
 		}
 			
 		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
-		def canPrint = request.getHeader ( "User-Agent" ).contains ( "MSIE" ) && isCleaner
+		def canPrint = request.getHeader ( "User-Agent" ).contains ( "Mozilla" ) && isCleaner
+		// Print the current support, seems that Chrome prints all of them
+		log.info request.getHeader ( "User-Agent" )
 		
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
