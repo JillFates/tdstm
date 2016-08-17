@@ -184,6 +184,8 @@ var deployJava = function() {
     }
   }
 
+  /*
+   @Octavio: We shouldn't use this code for this project
   // GetJava page
   function constructGetJavaURL(query) {
     var getJavaURL = 'http://java.com/dt-redirect';
@@ -195,6 +197,7 @@ var deployJava = function() {
     }
     return getJavaURL + '?'+  query;
   }
+  */
 
   function arHas(ar, attr) {
     var len = ar.length;
@@ -484,14 +487,14 @@ var deployJava = function() {
           // in progress now, when complete it may go to return page
           return false;
         } else {
+          //OLB Don't Redirect, we are sending our own message
+          /*
           if (browser == 'MSIE') {
             return this.IEInstall();
           } else if ((browser == 'Netscape Family') &&
           (platform.indexOf('win32') != -1)) {
             return this.FFInstall();
           } else {
-            //OLB Don't Redirect, we are sending our own message
-            /*
             location.href = constructGetJavaURL(
             ((this.returnPage != null) ?
             ('&returnPage=' + this.returnPage) : '') +
@@ -499,8 +502,8 @@ var deployJava = function() {
             ('&locale=' + this.locale) : '') +
             ((this.brand != null) ?
             ('&brand=' + this.brand) : ''));
-            */
           }
+          */
           // we have to return false although there may be an install
           // in progress now, when complete it may go to return page
           return false;
