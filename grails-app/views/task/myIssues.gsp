@@ -13,7 +13,7 @@
 	<g:javascript src="entity.crud.js" />
 	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:javascript src="TimerBar.js" />
+	<g:javascript src="progressTimer.js" />
 </head>
 <body>
 	<script type="text/javascript">
@@ -259,8 +259,8 @@
 
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
-		if (typeof timerBar !== 'undefined') {
-			timerBar.Pause();
+		if (typeof progressTimer !== 'undefined') {
+			progressTimer.Pause();
 		}
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/task/showIssue'),
@@ -301,8 +301,8 @@
 	}
 	function showAssetCommentMyTasks(id) {
 		$('#dependencyBox').css('display','table');
-		if (typeof timerBar !== 'undefined')
-			timerBar.Pause();
+		if (typeof progressTimer !== 'undefined')
+			progressTimer.Pause();
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/assetEntity/showComment'),
 			data: {'id':id},
@@ -339,16 +339,6 @@
 	function cancelButton(id,status) {
 		$('#search').val('');
 		pageSubmit();
-/*
-		//$('#myIssueList').css('display','block')
-		$('#detailTdId_'+id).css('display','none')
-		$('#taskLinkId').addClass('mobselect')
-		$('#showStatusId_'+id).css('display','table-row')
-		//$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
-		if (typeof timerBar !== 'undefined'){
-			timerBar.attemptResume();
-	}
-		*/
 	}
 
 function changeAction(){
@@ -408,10 +398,10 @@ setFocus();
 </script>
 <script>
 	currentMenuId = "#teamMenuId";
-	var timerBar;
+	var progressTimer;
 	
 	$(document).ready(function() {
-		timerBar = new TimerBar(60, 'RefreshMyTasks', null);
+		progressTimer = new ProgressTimer(40, 'RefreshMyTasks', null);
 		
 		$("#showEntityView").dialog({ autoOpen: false })
 		$("#createEntityView").dialog({ autoOpen: false })
