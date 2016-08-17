@@ -7,7 +7,7 @@ div.content-wrapper
           position: initial !important
     
     div#item1
-      &.fullscreen div#filterOptionsMenuId
+      &.fullscreen div#filterOptionsMenuId.open
         left: 297px
         top: 20px
       div#filterOptionsMenuId
@@ -19,7 +19,7 @@ div.content-wrapper
         &.open
           display: block !important
           position: absolute
-          left: 297px
+          left: 284px
           top: 21px
           background-color: #ffffff
           cursor: auto !important
@@ -29,6 +29,8 @@ div.content-wrapper
             padding: 0px
             padding-left: 20px
             height: 28px
+            span#highlightPersonId > span
+              width: 180px
             span.clearFilterIcon
               display: inline-block
               height: 20px
@@ -46,11 +48,9 @@ div.content-wrapper
           display: inline-block
           height: 20px
           width: 20px
-          border-right: 1px solid green
           padding-top: 3px
           border-bottom: 1px solid green
           &.open
-            border-bottom: 1px solid white
             svg
               transform: rotate(0deg)
           svg
@@ -62,7 +62,6 @@ div.content-wrapper
           display: inline-block
           height: 20px
           width: 20px
-          border-left: 1px solid green
           border-bottom: 1px solid green
           background-image: url(../icons/find.png)
           background-position: 2px 2px !important

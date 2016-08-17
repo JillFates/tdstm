@@ -68,7 +68,7 @@ $(document).ready(function() {
 		delay: 0,
 		filter: "contains",
 		height: 400,
-		placeholder: 'Select Person',
+		placeholder: 'Select SME/App Owner',
 		change: function () {
 			GraphUtil.performSearch()
 		}
