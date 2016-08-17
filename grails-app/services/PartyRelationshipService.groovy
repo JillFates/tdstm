@@ -1366,7 +1366,7 @@ class PartyRelationshipService {
 
 
 		def assignByPropertyName = {
-			def personId = getIndirectPropertyRef(task.assetEntity, value)
+			def personId = getIndirectPropertyRef(asset, value)
 			if ( personId?.isNumber() ) {
 				assignByPersonId(personId)
 			} else if (! whom || whom.size() == 0 ) {
