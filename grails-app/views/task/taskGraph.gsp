@@ -11,7 +11,7 @@
 		<g:javascript src="d3/d3.js"/>
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
-		<g:javascript src="TimerBar.js" />
+		<g:javascript src="progressTimer.js" />
 		<g:javascript src="graph.js" />
 		
 		<g:javascript src="asset.tranman.js" />
@@ -38,14 +38,14 @@
 		
 		<script type="text/javascript">
 		
-		var timerBar;
+		var progressTimer;
 		
 		$(document).ready(function () {
 		
 			// refresh timer initialization
-			timerBar = new TimerBar(0, 'RefreshTaskGraph', function () {
+			progressTimer = new ProgressTimer(0, 'RefreshTaskGraph', function () {
 				generateGraph($('#moveEventId').val());
-				timerBar.resetTimer();
+				progressTimer.resetTimer();
 			});
 			
 			// set the view unpublished checkbox to be checked if the parameter was passed as true
@@ -380,7 +380,7 @@
 						<label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
 					</span>
 				</tds:hasPermission>
-				<span style="float:right;">
+				<span style="float:right; margin-right: 12px;">
 					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 				</span>
 			</div>
