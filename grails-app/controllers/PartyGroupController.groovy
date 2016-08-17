@@ -2,6 +2,7 @@ import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import UserPreferenceEnum as PREF
+import org.apache.commons.lang.StringUtils
 
 class PartyGroupController {
 	
@@ -100,34 +101,50 @@ class PartyGroupController {
 	}
 
 	def delete() {
-		try{
-			def partyGroupInstance = PartyGroup.get( params.id )
-			if(partyGroupInstance) {
-				PartyGroup.withNewSession { s -> 
-					def parties
-					parties = PartyRelationship.findAllByPartyIdFrom(partyGroupInstance)
-					parties*.delete()
-					parties = PartyRelationship.findAllByPartyIdTo(partyGroupInstance)
-					parties*.delete()
-					s.flush()
-					s.clear()
-				}
-
-				partyGroupInstance.delete(flush:true)
-				flash.message = "PartyGroup ${partyGroupInstance} deleted"
-				redirect(action:"list")
-			}
-			else {
-				flash.message = "PartyGroup not found with id ${params.id}"
-				redirect(action:"list")
-			}
-		} catch(Exception ex){
-			flash.message = ex
-			redirect(action:"list")
+		if (!controllerService.checkPermission(this, 'CompanyDelete')) {
+			return;
 		}
+
+		PartyGroup partyGroupInstance = PartyGroup.get(params.id)
+		if (partyGroupInstance) {
+			List<Project> projects = partyRelationshipService.getProjectsDependentOfParty(partyGroupInstance)
+			if (projects) {
+				String strProjectList = projects.join(", ")
+				strProjectList = StringUtils.abbreviate(strProjectList, 100)
+
+				flash.message = "<strong>PartyGroup ${partyGroupInstance} has ${projects.size()} project depenents:</strong> ${strProjectList}"
+			} else {
+				try {
+					PartyGroup.withNewSession { s ->
+						def parties
+						parties = PartyRelationship.findAllByPartyIdFrom(partyGroupInstance)
+						parties*.delete()
+						parties = PartyRelationship.findAllByPartyIdTo(partyGroupInstance)
+						parties*.delete()
+						s.flush()
+						s.clear()
+					}
+
+					partyGroupInstance.delete(flush: true)
+					flash.message = "PartyGroup ${partyGroupInstance} deleted"
+
+				} catch (Exception ex) {
+					flash.message = ex
+				}
+			}
+		} else {
+			flash.message = "PartyGroup not found with id ${params.id}"
+		}
+		redirect(action:"list")
+
 	}
 
 	def edit() {
+		/* TODO: OLB: Should we enable this?
+		if (!controllerService.checkPermission(this, 'CompanyEdit')) {
+			return;
+		}*/
+
 		def partyGroupInstance = PartyGroup.get( params.id )
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${partyGroupInstance?.id}" )
 		if(!partyGroupInstance) {
@@ -168,6 +185,12 @@ class PartyGroupController {
 	}
 
     def create() {
+		/* TODO: OLB: Should we enable this?
+		if (!controllerService.checkPermission(this, 'CompanyCreate')) {
+			return;
+		}
+		*/
+
     	log.debug "**** Got to the create() method"
         def partyGroupInstance = new PartyGroup()
         partyGroupInstance.properties = params
@@ -197,7 +220,7 @@ class PartyGroupController {
         if (!partyGroup.hasErrors() && partyGroup.save()) {
         	//	Statements to create CLIENT PartyRelationship with the user's Company
         	if ( partyType.id == "COMPANY" ){
-        	
+
 	        	def companyParty = whom.company
 	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroup, "CLIENT" )
 

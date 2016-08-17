@@ -132,4 +132,5 @@ databaseChangeLog = {
 	include file: "20160725-change-engine-to-InnoDB-for-MyISAM-tables.groovy"
  	include file: "20160727-delete-orphaned-persons.groovy"
  	include file: "20160805-update-person-middle-and-last-name-default-value.groovy"
+	include file: "20160815-add-permission-company-crud-admin.groovy"
 }

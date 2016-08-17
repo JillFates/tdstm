@@ -164,6 +164,22 @@ class PartyRelationshipService {
 		return result
 	}
 
+	List<Project> getProjectsDependentOfParty(Party party){
+		def query = "\
+			from PartyRelationship p \
+			where \
+				p.partyRelationshipType = 'PROJ_PARTNER' and \
+				p.partyIdTo = :party and \
+				p.roleTypeCodeFrom = 'PROJECT' and \
+				p.roleTypeCodeTo = 'PARTNER'\
+		"
+
+		def dependents = PartyRelationship.findAll( query, [party:party] )
+		List<Project> projects = dependents.collect{ it.partyIdFrom }
+
+		return projects
+	}
+
 	/**
 	 * Used to retrieve the a PartyGroup for a given Party and Type
 	 * @param Party - a party object to get the Company PartyGroup
