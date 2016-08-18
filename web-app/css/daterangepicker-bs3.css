@@ -15,7 +15,8 @@
   left: 20px;
   padding: 4px;
   margin-top: 1px;
-  border-radius: 4px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(0,0,0,.15);
 }
 
 .daterangepicker.opensleft:before {
@@ -127,7 +128,8 @@
 
 .daterangepicker .ranges {
   margin: 4px;
-  text-align: left;
+  float: none;
+  text-align: right
 }
 
 .daterangepicker .calendar {

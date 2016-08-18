@@ -814,7 +814,8 @@ tds.core.directive.DurationPicker = function(utils) {
 			duration: '=duration',
 			scale: '=scale',
 			scales: '=scales',
-			ngModel: '=ngModel'
+			ngModel: '=ngModel',
+			disabled: '='
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
 
