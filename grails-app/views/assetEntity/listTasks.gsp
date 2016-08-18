@@ -145,7 +145,7 @@
 			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? _.escape(cellVal) :"") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
 		}
 		function statusFormatter(cellVal,options,rowObject){
 			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
