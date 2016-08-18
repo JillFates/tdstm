@@ -70,10 +70,11 @@ class CommonController {
 				}
 				attributes.each{ k ->
 					def keyMap = keysMap[k]
+					def val = helpText[k]
 					if (!keyMap) {
-						keyMap = new KeyValue( project:project ,category:category, key:k, value:helpText.("$k"))
+						keyMap = new KeyValue( project:project ,category:category, key:k, value:val)
 					}
-					keyMap.value = helpText.("$k")
+					keyMap.value = val
 					if(!keyMap.validate() || !keyMap.save(flush:true)){
 						def etext = "tooltipsUpdate Unable to create HelpText"+GormUtil.allErrorsString( keyMap )
 						log.error( etext )

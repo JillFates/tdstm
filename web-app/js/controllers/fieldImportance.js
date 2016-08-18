@@ -221,7 +221,8 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			data:{'jsonString':$scope.help[type], 'entityType':type, 'fields':$scope.fields['customs']}
 		}).success (function(resp) {
 			if (resp.status != "success") {
-				alert("An Unexpected error while saving asset fields.")
+				console.log(resp.data);
+				alert("An unexpected error while updating asset tooltips.")
 			}
 		}).error(function(resp, status, headers, config) {
 			alert("An Unexpected error while saving asset fields.")

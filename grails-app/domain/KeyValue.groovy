@@ -31,7 +31,15 @@ class KeyValue  implements Serializable {
 	static transients = [ 'getCategoryList' ]
 
 	String toString(){
-		value
+		return value
+	}
+
+	/**
+	 * Prevent null values
+	 * @param value
+	 */
+	void setValue(String value){
+		this.value = value ?: ""
 	}
 
 	/**
