@@ -23,7 +23,10 @@
 			</tr>
 			<tr>
 			<td colspan="2" class="buttonR" style="text-align: center;">
-				<input type="button"  value="Generate Web" onclick="generateProjectSummary()" />
+				<button type="button" class="btn btn-default" onclick="generateProjectSummary()" value="Generate Web">
+					Generate Web
+					<span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span>
+				</button>
 			</td>
 		</tr>
 		</tbody>
