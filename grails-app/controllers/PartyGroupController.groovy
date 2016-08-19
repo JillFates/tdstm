@@ -140,10 +140,9 @@ class PartyGroupController {
 	}
 
 	def edit() {
-		/* TODO: OLB: Should we enable this?
 		if (!controllerService.checkPermission(this, 'CompanyEdit')) {
 			return;
-		}*/
+		}
 
 		def partyGroupInstance = PartyGroup.get( params.id )
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${partyGroupInstance?.id}" )
@@ -185,11 +184,9 @@ class PartyGroupController {
 	}
 
     def create() {
-		/* TODO: OLB: Should we enable this?
 		if (!controllerService.checkPermission(this, 'CompanyCreate')) {
 			return;
 		}
-		*/
 
     	log.debug "**** Got to the create() method"
         def partyGroupInstance = new PartyGroup()
