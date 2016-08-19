@@ -69,7 +69,7 @@
 			<tr id="twistieRowId">
 				<td class="noPadding">
 					<span id="twistieSpanId" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="dependencyGroupContainerId">
-						Dependency Group Colors
+						Dependency Group Status
 						<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 					</span>
 				</td>

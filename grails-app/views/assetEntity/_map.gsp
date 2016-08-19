@@ -101,10 +101,10 @@
 					</td>
 				</tr>
 				
-
+				
 				<!-- Spacer -->
 				<tr><td colspan="3" class="noPadding"><br /></td></tr>
-
+				
 				
 				<!-- The twistie for the hide/show graph labels section -->
 				<tr id="twistieRowId">

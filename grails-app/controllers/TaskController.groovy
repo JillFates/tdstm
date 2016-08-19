@@ -36,7 +36,7 @@ class TaskController {
 	def update() {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
 
-		if (params.view == 'myTask') {		
+		if (params.view == 'myTask') {
 			if (map.error) {
 				flash.message = map.error
 			}
@@ -51,7 +51,7 @@ class TaskController {
 			if (params.status == AssetCommentStatus.DONE) {
 				redirParams << [sync:1]
 			}
-			forward(controller:'task', action:'listUserTasks', params:redirParams)			
+			forward(controller:'task', action:'listUserTasks', params:redirParams)
 		} else {
 			// Coming from the Task Manager
 			render map as JSON
@@ -703,7 +703,7 @@ digraph runbook {
 			// Bounce them if they don't have a project or no perms for this controller
 			return
 		}
-
+		
 		// Lookup a neighborhood task and adjust accordingly if the user passed a valid id
 		AssetComment neighborTask
 		def neighborhoodTaskId = NumberUtil.toPositiveLong(params.neighborhoodTaskId, -1)
@@ -718,7 +718,7 @@ digraph runbook {
 				}
 			}
 		}
-
+		
 		// if user used the event selector on the page, update their preferences with the new event
 		// TODO : JPM 2/2016 Refactor this into a method
 		Long meId 
@@ -736,19 +736,21 @@ digraph runbook {
 				}
 			}
 		}
-
+		
 		String viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
-
+		
 		List eventList = MoveEvent.findAllByProject(project)
 		def selectedEventId = 0
-
+		
 		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
-		if (eventPref != '0' && eventPref != meId && ! eventList.find {it.id == eventPref}) {
+		def eventPrefLong = NumberUtil.toLong(eventPref)
+		
+		if (eventPref != '0' && eventPref != meId && ! eventList.find {it.id == eventPrefLong}) {
 			// The user preference references an invalid event so we should clear it out
 			eventPref = "0"
 			userPreferenceService.removePreference(PREF.MOVE_EVENT)
 		}
-
+		
 		// Determine what the Selected Event should be with the following rules
 		//    1. If user clicked on a neighborhood task, get the event from that task. If the task is not assigned to an event - try next
 		//    2. Otherwise if the user specified an event use it 
@@ -759,6 +761,7 @@ digraph runbook {
 		if (! selectedEventId) {
 			selectedEventId = meId ?: eventPref
 		}
+		
 		
 		return [
 			moveEvents: eventList, 
@@ -867,11 +870,11 @@ digraph runbook {
 			redirect(controller:"project", action:"list")
 			return
 		}
-
+		
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
-
+		
 		// handle move events
 		def moveEvents = MoveEvent.findAllByProject(project)
 		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
@@ -906,15 +909,15 @@ digraph runbook {
 			onlyPublished = false
 			publishedValues = [true, false]
 		}
-
+		
 		// Define default data
 		def defaultEstStart = TimeUtil.nowGMT()
 		def data = [items:[], sinks:[], starts:[], roles:[], startDate:defaultEstStart, cyclicals:[:]]
-
+		
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
-
+		
 		// handle move events
 		def moveEvents = MoveEvent.findAllByProject(Project.get(projectId))
 		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
@@ -947,12 +950,12 @@ digraph runbook {
 		}
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def startTime = 0
-
+		
 		if (tasks.size() == 0 || deps.size() == 0) {
 			render ([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
 			return
 		}
-
+		
 		// generate optimized schedule based on this data
 		def dfsMap = runbookService.processDFS(tasks, deps, tmp)
 		def durMap = runbookService.processDurations(tasks, deps, dfsMap.sinks, tmp)
@@ -991,7 +994,7 @@ digraph runbook {
 				role:role, 
 			] )
 		}
-
+		
 		// Sort the roles aka teams
 		roles.sort()
 		
@@ -1013,22 +1016,22 @@ digraph runbook {
 		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
 		render returnMap
 	}
-
+	
 	def editTask() {
 		render( view: "_editTask", model: [])
 	}
-
+	
 	
 	def showTask() {
 		//def instructionsLink = AssetComment.read(params.taskId)?.instructionsLink
 		//log.error instructionsLink
 		render( view: "_showTask", model: [])
 	}
-
+	
 	def list() {
 		render( view: "_list", model: [])
 	}
-
+	
 	/**
 	 * Get task roles
 	 */
@@ -1040,7 +1043,7 @@ digraph runbook {
 		}
 		try {
 			def result = taskService.getRolesForStaff()
-
+			
 			render(ServiceResults.success(result) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
@@ -1052,44 +1055,44 @@ digraph runbook {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-
+	
 	/**
 	 * Simply a test page for the runbook optimization
 	 * @param params.eventId - the event id to generate the data for or default to the user's current event
 	 * @param params.showAll - flag to indicate including all columns of just the planning ones (true|false)
 	 */
 	def eventTimelineResults() {
-
+		
 		// Get the form parameters
 		Boolean showAll = (params.showAll == 'true')
 		String meId = params.eventId	
-
+		
 		def (project, user) = controllerService.getProjectAndUserForPage( this, 'CriticalPathExport' )
 		if (! project) 
 			return
-
+		
 		MoveEvent me = controllerService.getEventForPage(this, project, user, meId) 
 		if (! me) {
 			render "Unable to find event $meId"
 			return
 		}
-
+		
 		def startTime = 0
 		def tasks, deps, dfsMap, durMap, graphs,estFinish
-
+		
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $me</h1>")
-
+		
 		try {
 			Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me)
 			tasks = tasksAndDependencies.tasks
 			deps = tasksAndDependencies.dependencies
 			def tmp = runbookService.createTempObject(tasks, deps)
-
+			
 			dfsMap = runbookService.processDFS( tasks, deps, tmp )
 			durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
 			graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 			estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
-
+			
 			results.append("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
 			results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
 			results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
@@ -1121,9 +1124,9 @@ digraph runbook {
 			results.append('<br/>')
 			results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
 			results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
-
+			
 			results.append("<b>Estimated Runbook Duration: ${estFinish} for Move Event: $me</b><br/>")
-
+			
 			/*
 			results.append("<h1>Edges data</h1><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
 			deps.each { dep ->
@@ -1131,7 +1134,7 @@ digraph runbook {
 			}
 			results.append('</table>')
 			*/
-
+			
 			def durationExtra = ''
 			def timesExtra = ''
 			def tailExtra = ''

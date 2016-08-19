@@ -11,6 +11,8 @@ div.content-wrapper
           label
             margin-right: 4px
             font-size: 12px
+        form#taskSearchFormId
+          display: inline-block !important
         #filterClearId
           position: absolute
           display: inline
@@ -31,11 +33,25 @@ div.content-wrapper
           margin-bottom: 9px
           display: inline-block
           margin-left: 10px
+        input#exitNeighborhoodId
+          margin-right: 8px
       div#svgContainerDivId
         &:focus
           outline: 0
         border: 1px solid green
         overflow: hidden
-        svg
-          g.node a
-            cursor: pointer
+        a
+          pointer-events: auto !important
+        svg        
+          g#graph0
+            pointer-events: none
+            g.node a
+              cursor: pointer            
+            g.node.unselected g a
+              path,polygon
+                stroke-width: 1px !important
+                stroke: #000000 !important
+            g.node.selected g a 
+              path,polygon
+                stroke-width: 6px !important
+                stroke: #ff0000 !important

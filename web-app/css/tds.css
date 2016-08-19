@@ -970,7 +970,7 @@ div#dependencyDivId tr.odd td.depGroup {
 div#dependencyDivId tr.odd td.depGroupConflict, #dependencyGroupContainerId .depGroupConflict {
 	background-color: yellow;
 }
-div#dependencyDivId tr.odd td.depGroupReady {
+div#dependencyDivId tr.odd td.depGroupReady, #dependencyGroupContainerId .depGroupReady {
 	background-color: lightgreen;
 }
 div#dependencyDivId tr.odd td.depGroupDone, #dependencyGroupContainerId .depGroupDone {

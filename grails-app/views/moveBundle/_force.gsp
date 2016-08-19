@@ -272,7 +272,7 @@ function createGraph (config) {
 		.on("dblclick.zoom", null)
 	
 	// add key listeners to the graph
-	GraphUtil.addKeyListeners($(svgContainer[0][0]))
+	GraphUtil.addKeyListeners()
 	
 	// transform the canvas
 	GraphUtil.transformElement(transformContainer, -canvasSize/2, -canvasSize/2, 1)
@@ -447,7 +447,7 @@ function createBehaviorHandler (zoomBehavior, dragBehavior) {
 			
 			if (d.cutShadow)
 				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
-
+			
 			d.fix = true
 			d.fixed = true
 			clicked = false

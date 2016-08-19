@@ -15,26 +15,6 @@
 		<g:javascript src="graph.js" />
 		
 		<g:javascript src="asset.tranman.js" />
-
-		<style type="text/css">
-			g#graph0 {
-				pointer-events: none;
-			}
-			a {
-				pointer-events: auto !important;
-			}
-			g.node.unselected g a path,g.node.unselected g a polygon {
-				stroke-width: 1px !important;
-				stroke: #000000 !important;
-			}
-			g.node.selected g a path,g.node.selected g a polygon {
-				stroke-width: 6px !important;
-				stroke: #ff0000 !important;
-			}
-			form#taskSearchFormId {
-				display: inline-block !important;
-			}
-		</style>
 		
 		<script type="text/javascript">
 		
@@ -71,6 +51,7 @@
 		var zoomBehavior = null;
 		var tasks = [];
 		
+		// builds the graph from the server's response
 		function buildGraph (response, status) {
 			
 			// hide the loading spinner
@@ -78,7 +59,6 @@
 			
 			// check for errors in the ajax call
 			$('#errorMessageDiv').remove();
-			//if (status != 'success') {
 			if (response.status != 200) {
 				var message = d3.select('div.body')
 					.append('div')
@@ -89,39 +69,34 @@
 				return;
 			}
 			
-			
+			// parse the data from the server
 			var data = $.parseJSON(response.responseText);
 			tasks = data.tasks;
 			
 			// populate the Team select
-			var teamSelect = $("#teamSelectId")
-			teamSelect.children().remove();
-			teamSelect.append('<option value="ALL">All Teams</option>');
-			teamSelect.append('<option value="NONE">No Team Assignment</option>');
-			teamSelect.append('<option disabled>──────────</option>');
-			$.each(data.roles, function (index, team) {
-				teamSelect.append('<option value="' + team + '">' + team + '</option>');
-			});
-			teamSelect.val('ALL');
+			var teamSelect = GraphUtil.populateTeamSelect(data);
 			teamSelect.on('change', function () {
 				performSearch();
 			});
 			
+			// construct the svg container
 			var svgData = d3.select('div.body')
 				.append('div')
 				.attr('id', 'svgContainerDivId')
 				.attr('tabindex', '1');
 			
-			
+			// add the prerendered svg data into the container
 			svgData.html(data.svgText);
 			
+			// calculate the graph size if it hasn't been done already
 			if (height == 0)
 				calculateSize();
-				
+			
+			// construct the svg container
 			container = svg.append('g')
 				.attr('id', 'containerId');
 			
-			
+			// construct the background
 			background = container.append('rect')
 				.attr('x', -500000)
 				.attr('y', -500000)
@@ -133,13 +108,12 @@
 					getDefaultPosition()
 				});
 			
-			graph = d3.select('#graph0');
+			// wrap the main graph group tag in a container group tag
+			graph = d3.select('#graph0').attr('transform', GraphUtil.NO_TRANSFORM);
 			var graph0 = graph[0][0];
-			
 			$('#containerId')[0].appendChild(graph0);
 			
-			graph.attr('transform', 'translate(0 0) scale(1)');
-			
+			// bind the click handlers for the nodes
 			$('g').children('a')
 				.removeAttr('xlink:href')
 				.on('click', function (a, b) {
@@ -151,31 +125,34 @@
 					}
 				});
 			
-			
+			// add the key listeners for the graph
 			transformContainer = graph;
-			var outerContainer = $('#svgContainerDivId')
-			var modifier = 1
-			GraphUtil.addKeyListeners(outerContainer, modifier);
+			GraphUtil.addKeyListeners();
 			
+			// set up the zooming and panning mouse behavior
 			addBindings();
+			
+			// center the graph in the container
 			getDefaultPosition();
+			
+			// finish initialization and exit
 			performSearch();
 			$('#exitNeighborhoodId').removeAttr('disabled');
 		}
 		
+		// sets the proper width and height for the graph
 		function calculateSize () {
 			if ($('#svgContainerDivId').size() > 0) {
-			
-				var padding = $('#svgContainerDivId').offset().left;
-				heightCurrent = $(window).innerHeight() - $('#svgContainerDivId').offset().top - padding;
-				widthCurrent = $(window).innerWidth() - padding * 2;
 				
+				var padding = $('#svgContainerDivId').offset().left;
+				heightCurrent = $(window).innerHeight() - $('#svgContainerDivId').offset().top - (padding / 2) - GraphUtil.getFooterHeight();
+				widthCurrent = $(window).innerWidth() - padding * 2;
 				
 				d3.select('div.body')
 					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;');
 				d3.select('#svgContainerDivId')
 					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;');
-			
+				
 				svg = d3.select('#svgContainerDivId svg')
 					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;')
 					.attr('viewBox', null)
@@ -190,19 +167,21 @@
 				.on("zoom", zooming)
 				
 			background.call(zoomBehavior);
-
+			
 			background.on("dblclick.zoom", null);
-
+			
 			function zooming () {
 				graph.attr('transform', 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')');
 			}
 		}
 		
+		// exits the neighborhood and generates the graph for the selected event
 		function submitForm () {
 			neighborhoodTaskId = -1;
 			generateGraph($('#moveEventId').val());
 		}
-
+		
+		// gets the given event's graph data from the server and then renders it
 		function generateGraph (event) {
 			
 			$('#svgContainerDivId').remove();
@@ -256,12 +235,20 @@
 		
 		// fits the graph into the centered position where everything is visible
 		function getDefaultPosition () {
+			// temporarily get rid of the scale and translate to simplify calculations
 			zoomBehavior.translate([0, 0]).scale(1).event(background)
-			var graphBounds = graph0.getBoundingClientRect();
-			var newScale = widthCurrent / graphBounds.width;
-			var newTop = (heightCurrent / 2) - (newScale * graphBounds.height / 2) + 270;
+			
+			// determine new scale and translate based on the graph size and canvas size
+			var graphBounds = graph0.getBoundingClientRect()
+			var xScale = widthCurrent / graphBounds.width
+			var yScale = heightCurrent / graphBounds.height
+			var newScale = Math.min(xScale, yScale)
+			var newTop = (heightCurrent / 2) + (newScale * graphBounds.height / 2)
+			var newLeft = (widthCurrent / 2) - (newScale * graphBounds.width / 2)
+			
+			// set the new scale and translate
 			zoomBehavior
-				.translate([0, newTop])
+				.translate([newLeft, newTop])
 				.scale(newScale)
 				.event(background)
 		}
@@ -337,14 +324,16 @@
 			return false;
 		}
 		
+		// clears the highlighting filter and removes all highlighting
 		function clearFilter () {
 			$('#searchBoxId').val('');
 			performSearch();
 		}
-
+		
+		// specifies which menu options are active
 		$(".menu-parent-tasks-task-graph").addClass('active');
 		$(".menu-parent-tasks").addClass('active');
-
+		
 		</script>
 	</head>
 	<body>
@@ -355,31 +344,46 @@
 		<div class="body graphContainer" style="width:100%">
 			<h1 id="pageHeadingId">Task Graph</h1>
 			<div id="graphToolbarId">
+				<!-- Flash message -->
 				<g:if test="${flash.message}">
 					<div class="message">${flash.message}</div>
 				</g:if>
+				
+				<!-- Event select -->
 				<span class="controlWrapper">
 					<label for="moveEventId">Event:</label>
 					<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
 				</span>
+				
+				<!-- Team highlighting select -->
 				<span class="controlWrapper">
 					<label for="teamSelectId">Highlight:</label>
 					<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
 				</span>
+				
+				<!-- Exit Neighborhood button -->
 				<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
+				
+				<!-- Highlight filter controls -->
 				<form onsubmit="return performSearch()" id="taskSearchFormId">
 					<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
 					<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
 					<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer" value="Highlight" />
 				</form>
-				<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin"></div>
-				<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer"></div>
+				
+				<!-- Zoom buttons -->
+				<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin" onclick="GraphUtil.zoomIn()"></div>
+				<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer" onclick="GraphUtil.zoomOut()"></div>
+				
+				<!-- View unpublished checkbox (if the user has permission) -->
 				<tds:hasPermission permission="PublishTasks">
 					<span class="checkboxContainer">
 						<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } />
 						<label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
 					</span>
 				</tds:hasPermission>
+
+				<!-- Refresh timer -->
 				<span style="float:right; margin-right: 12px;">
 					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 				</span>

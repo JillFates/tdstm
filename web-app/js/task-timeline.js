@@ -552,7 +552,7 @@ function buildGraph (response, status) {
 	
 	// add the key listeners to the graph
 	addKeyBindings();
-	GraphUtil.addTimelineKeyListeners($(svgContainer[0][0]), brush, x1, mainTranslator, function (resize) {
+	GraphUtil.addTimelineKeyListeners(brush, x1, mainTranslator, function (resize) {
 		display(false, resize, true);
 		if (GraphUtil.isIE())
 			calculateLabelVisWidths();

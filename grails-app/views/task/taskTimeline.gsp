@@ -11,7 +11,7 @@
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="progressTimer.js" />
-
+		
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
@@ -104,7 +104,7 @@
 										</span>
 									</td>
 								</tr>
-
+								
 								<tds:hasPermission permission='CriticalPathExport'>
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
@@ -114,7 +114,7 @@
 									</td>
 								</tr>
 								</tds:hasPermission>
-
+								
 							</table>
 						</form>
 					</div>
@@ -133,11 +133,11 @@
 					progressTimer.resetTimer();
 				});
 			})
-
+			
 			function reloadGraph () {
 				submitForm();
 			}
-
+			
 			$(".menu-parent-tasks-task-timeline").addClass('active');
 			$(".menu-parent-tasks").addClass('active');
 		</script>
