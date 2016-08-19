@@ -6,10 +6,10 @@
 				<div style="color: red; font-size:15px"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>
-		<g:if test="${canPrint == false}">
-	<div class="printViewError">
+		<g:if test="${canPrint}">
+			<div class="printViewError">
 				<ul>
-			<li>Please note that in order to print barcode labels you will need the to use a Java (1.7+) Applet enabled Browser like FireFox or IE/Edge and the plugin to allow Applets to run in the browser. <a href="https://java.com/en/download/help/enable_browser.xml" target="_blank"> More ... </a></li>
+					<li>Please note that in order to print barcode labels you will need the to use a Java (1.7+) Applet enabled Browser like FireFox or IE/Edge and the plugin to allow Applets to run in the browser. <a href="https://java.com/en/download/help/enable_browser.xml" target="_blank"> More ... </a></li>
 				</ul>
 			</div>
 		</g:if>
@@ -508,9 +508,10 @@ function hideStatus(id,status){
 		$('#printTimes').val(prefPrinterCopies);
 		if(window.QZObj.loadPrinters) {
 			window.QZObj.loadPrinters();
-}
+		}
 	}else{
+		console.log("ShowError");
 		$(".printViewError").show();
-}
+	}
 
 </script>
