@@ -141,6 +141,9 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 			public.Start(newTime);
 			$(public.container).parent().show();
 		} else {
+			if(public.progressTimer){
+				public.progressTimer.stop();
+			}
 			$(public.container).parent().hide();
 		}
 	}
