@@ -1383,10 +1383,14 @@ class PartyRelationshipService {
 
 
 		def assignByPropertyName = {
-			def personId = getIndirectPropertyRef(asset, value)
-			if ( personId?.isNumber() ) {
-				assignByPersonId(personId)
-			} else if (! whom || whom.size() == 0 ) {
+			def propReference = getIndirectPropertyRef(asset, value)
+			if (propReference){
+				if(propReference instanceof Party){
+					whom = propReference
+				}else{
+					assignByPersonId(propReference)
+				}
+			}else{
 				errMsg = "Unable to resolve indirect whom reference (${value}), asset name: ${asset?.assetName}."
 			}
 		}
