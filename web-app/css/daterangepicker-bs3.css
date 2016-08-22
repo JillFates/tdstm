@@ -239,6 +239,11 @@
   color: #ccc;
 }
 
+.daterangepicker .input-mini.active {
+  border: 1px solid #5f9fcf;
+  border-radius: 4px;
+}
+
 .daterangepicker select.monthselect, .daterangepicker select.yearselect {
   font-size: 12px;
   padding: 1px;

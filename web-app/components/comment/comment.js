@@ -508,7 +508,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		}
 	}
 
-	$scope.onPickerOpen = function() {
+	$scope.onPickerOpen = function($event) {
 		$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
 		$(window).resize(function(){ $('.cancelBtn').click(); });
 	}
@@ -518,7 +518,10 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		var endDate =utils.date.createDateTimeFromString($scope.ac.estFinish);
 		if (startDate.isValid() && endDate.isValid()) {
 			var diff = startDate.diff(endDate);
-			$scope.acData.durationTime = (diff.valueOf() * -1);
+			if(diff != 0){
+				diff = (diff.valueOf() * -1);
+			}
+			$scope.acData.durationTime = diff;
 			if(!$scope.$$phase) {
 				$scope.$apply();
 			}

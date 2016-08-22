@@ -711,8 +711,8 @@ tds.core.directive.RangePicker = function(utils) {
 		restrict: 'A',
 		require: 'ngModel',
 		scope: {
-			dateBegin: '=dateBegin',
-			dateEnd: '=dateEnd',
+			dateBegin: '=',
+			dateEnd: '=',
 			ngModel: '=ngModel'
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
@@ -722,7 +722,6 @@ tds.core.directive.RangePicker = function(utils) {
 				var valid = true;
 				var range = element.val();
 				ngModelCtrl.$setViewValue(range);
-				scope.$apply();
 
 				if (range.length == 0) {
 					scope.dateBegin = '',
@@ -751,11 +750,17 @@ tds.core.directive.RangePicker = function(utils) {
 				ngModelCtrl.$setValidity('dateRange', valid);
 
 				if (valid) {
-					scope.$apply();
-					var expression = attrs['ngChange'];
-					if (expression) {
-						scope.$parent.$eval(expression);
+					if (scope.$root.$$phase != '$apply' && scope.$root.$$phase != '$digest') {
+						scope.$apply();
 					}
+					executeParentUpdate();
+				}
+			}
+
+			var executeParentUpdate = function() {
+				var expression = attrs['ngChange'];
+				if (expression) {
+					scope.$parent.$eval(expression);
 				}
 			}
 
@@ -767,31 +772,43 @@ tds.core.directive.RangePicker = function(utils) {
 
 			scope.$watch('dateBegin', function(nVal, oVal) {
 				if (nVal && (nVal != oVal)) {
-					updateView();
+					element.data('daterangepicker').setStartDate(scope.dateBegin);
 				}
 			});
 
 			scope.$watch('dateEnd', function(nVal, oVal) {
 				if (nVal && (nVal != oVal)) {
-					updateView();
+					element.data('daterangepicker').setEndDate(scope.dateEnd);
+					executeParentUpdate();
 				}
 			});
 
 			jQuery(
 				function($) {
-					element.daterangepicker({ 
-						timePicker: true, 
+					element.daterangepicker({
+						timePicker: true,
 						timePickerIncrement: 1,
 						locale: {
 							format: tdsCommon.defaultDateTimeFormat(),
-						}, 
+						},
 						showDropdowns: false,
-						startDate: moment().hours(0).minutes(0).seconds(0),
-						endDate: moment().add('d', 1).hours(0).minutes(0).seconds(0)
+						startDate: scope.dateBegin,
+						endDate: scope.dateEnd
+					});
+
+					element.on('show.daterangepicker', function(ev, picker) {
+
+						if(scope.dateBegin == "" && scope.dateEnd == "") {
+							element.data('daterangepicker').setStartDate(moment().hours(0).minutes(0).seconds(0));
+							element.data('daterangepicker').setEndDate(moment().add('d', 1).hours(0).minutes(0).seconds(0));
+							element.data('daterangepicker').updateView();
+						}
+
 					});
 					element.on('apply.daterangepicker', function(ev, picker) {
 						updateModel();
 					});
+
 					element.on('change', function() {
 						updateModel();
 					});
@@ -829,7 +846,7 @@ tds.core.directive.DurationPicker = function(utils) {
 
 			var updateView = function() {
 				//check with current scale, if not go with a lower one
-				var offset = moment(0).add(scope.scale.toLowerCase(), 1);
+				var offset = moment(0).add(1, scope.scale.toLowerCase());
 				var tentativeDuration = parseInt((scope.ngModel / offset.valueOf()), 10)
 				if ((tentativeDuration * offset.valueOf()) ==  scope.ngModel) {
 					scope.duration = tentativeDuration
@@ -859,7 +876,7 @@ tds.core.directive.DurationPicker = function(utils) {
 			});
 
 			scope.$watch('ngModel', function(nVal, oVal) {
-				if (nVal && (nVal != oVal)) {
+				if (!isNaN(nVal) && (nVal != oVal)) {
 					updateView();
 				}
 			});
