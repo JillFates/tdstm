@@ -50,6 +50,9 @@
         this.autoUpdateInput = true;
         this.alwaysShowCalendars = false;
         this.ranges = {};
+        this.duration = null;
+        this.scales = [];
+        this.parseDateTimeString = options.parseDateTimeString;
 
         this.opens = 'right';
         if (this.element.hasClass('pull-right'))
@@ -118,6 +121,10 @@
                 '</div>' +
                 '<div class="ranges">' +
                 '<div class="range_inputs">' +
+                '<div class="duration_inputs">' +
+                '<label>Duration: </label> <input type="value" name="daterangepicker_duration" value="" size="3" >' +
+                '<select><option value="m" selected="selected">M</option><option value="h">H</option><option value="d">D</option><option value="w">W</option></select>' +
+                '</div>' +
                 '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
                 '<button class="cancelBtn" type="button"></button>' +
                 '</div>' +
@@ -421,6 +428,8 @@
             .on('change.daterangepicker', '.daterangepicker_input input', $.proxy(this.formInputsChanged, this));
 
         this.container.find('.ranges')
+            .on('keyup.daterangepicker', '.duration_inputs input', $.proxy(this.durationInputChanged, this))
+            .on('change.daterangepicker', '.duration_inputs select', $.proxy(this.durationInputChanged, this))
             .on('click.daterangepicker', 'button.applyBtn', $.proxy(this.clickApply, this))
             .on('click.daterangepicker', 'button.cancelBtn', $.proxy(this.clickCancel, this))
             .on('click.daterangepicker', 'li', $.proxy(this.clickRange, this))
@@ -515,6 +524,15 @@
                 this.updateElement();
 
             this.updateMonthsInView();
+
+        },
+
+        setDuration: function(duration) {
+            this.duration = duration;
+            this.container.find('.ranges .duration_inputs input')[0].value = this.duration;
+        },
+
+        setScale: function() {
         },
 
         isInvalidDate: function() {
@@ -556,6 +574,7 @@
                     &&
                     (this.endDate.format('YYYY-MM') == this.leftCalendar.month.format('YYYY-MM') || this.endDate.format('YYYY-MM') == this.rightCalendar.month.format('YYYY-MM'))
                 ) {
+                    this.calculateDuration();
                     return;
                 }
 
@@ -566,11 +585,14 @@
                     this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
                 }
 
+
+
             } else {
                 if (this.leftCalendar.month.format('YYYY-MM') != this.startDate.format('YYYY-MM') && this.rightCalendar.month.format('YYYY-MM') != this.startDate.format('YYYY-MM')) {
                     this.leftCalendar.month = this.startDate.clone().date(2);
                     this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
                 }
+                this.setDuration(0);
             }
             if (this.maxDate && this.linkedCalendars && !this.singleDatePicker && this.rightCalendar.month > this.maxDate) {
                 this.rightCalendar.month = this.maxDate.clone().date(2);
@@ -1512,6 +1534,45 @@
             }
 
             this.updateView();
+        },
+
+        calculateDuration: function(e) {
+            var scale = this.container.find('.ranges .duration_inputs select')[0].value;
+            var startDate = this.parseDateTimeString(this.startDate, this.locale.format);
+            var endDate = this.parseDateTimeString(this.endDate, this.locale.format);
+            if (startDate.isValid() && endDate.isValid()) {
+                var diff = startDate.diff(endDate);
+                if(diff != 0){
+                    diff = (diff.valueOf() * -1);
+                }
+            }
+
+
+            var offset = moment(0).add(1, scale);
+            var tentativeDuration = parseInt((diff / offset.valueOf()), 10)
+            if ((tentativeDuration * offset.valueOf()) ==  diff) {
+                this.setDuration(tentativeDuration);
+            }
+
+        },
+
+        durationInputChanged: function(e) {
+            var duration = this.container.find('.ranges .duration_inputs input')[0].value;
+            var scale = this.container.find('.ranges .duration_inputs select')[0].value;
+            duration = parseInt(duration, 10);
+            var offset = moment(0).add(scale, duration);
+
+
+            var startDate = this.parseDateTimeString(this.startDate, this.locale.format);
+            if (startDate.isValid() && duration != '') {
+                var endDate = startDate.add('ms', offset.valueOf());
+
+                var end = moment(endDate, this.locale.format);
+                if (end.isValid()) {
+                    this.setEndDate(end);
+                    this.updateView();
+                }
+            }
         },
 
         formInputsFocused: function(e) {

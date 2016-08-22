@@ -506,12 +506,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 			var endDate = startDate.add('ms', $scope.acData.durationTime);
 			$scope.ac.estFinish = utils.date.formatDateTime(endDate);
 		}
-	}
-
-	$scope.onPickerOpen = function($event) {
-		$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
-		$(window).resize(function(){ $('.cancelBtn').click(); });
-	}
+	};
 
 	$scope.updateDuration = function() {
 		var startDate = utils.date.createDateTimeFromString($scope.ac.estStart);

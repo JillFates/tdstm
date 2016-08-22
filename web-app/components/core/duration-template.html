@@ -1,2 +1,2 @@
-<input type="value" ng-model="duration" id="duration" name="duration" value="" size="3" ng-disabled="disabled">
-<select style="width:50px;" ng-model="scale" ng-options="item.id as item.name for item in scales"></select>
+<input type="value" ng-model="duration" id="duration" name="duration" value="" size="3" ng-readonly="readonly" ng-click="onDurationClick()">
+<select style="width:50px;" ng-model="scale" ng-options="item.id as item.name for item in scales" ng-disabled="readonly"></select>

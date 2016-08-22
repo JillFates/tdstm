@@ -713,6 +713,8 @@ tds.core.directive.RangePicker = function(utils) {
 		scope: {
 			dateBegin: '=',
 			dateEnd: '=',
+			duration: '=',
+			scales: '=',
 			ngModel: '=ngModel'
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
@@ -793,17 +795,26 @@ tds.core.directive.RangePicker = function(utils) {
 						},
 						showDropdowns: false,
 						startDate: scope.dateBegin,
-						endDate: scope.dateEnd
+						endDate: scope.dateEnd,
+						duration: scope.duration,
+						scales: scope.scales,
+						parseDateTimeString: tdsCommon.parseDateTimeString
 					});
 
 					element.on('show.daterangepicker', function(ev, picker) {
+
+						$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
+						$(window).resize(function(){ $('.cancelBtn').click(); });
+
+						if(scope.duration != "") {
+							element.data('daterangepicker').setDuration(scope.duration);
+						}
 
 						if(scope.dateBegin == "" && scope.dateEnd == "") {
 							element.data('daterangepicker').setStartDate(moment().hours(0).minutes(0).seconds(0));
 							element.data('daterangepicker').setEndDate(moment().add('d', 1).hours(0).minutes(0).seconds(0));
 							element.data('daterangepicker').updateView();
 						}
-
 					});
 					element.on('apply.daterangepicker', function(ev, picker) {
 						updateModel();
@@ -832,7 +843,7 @@ tds.core.directive.DurationPicker = function(utils) {
 			scale: '=scale',
 			scales: '=scales',
 			ngModel: '=ngModel',
-			disabled: '='
+			readonly: '='
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
 
@@ -861,6 +872,10 @@ tds.core.directive.DurationPicker = function(utils) {
 						}
 					}
 				}
+			}
+
+			scope.onDurationClick = function() {
+				$('#estRange').data('daterangepicker').toggle();
 			}
 
 			scope.$watch('duration', function(nVal, oVal) {

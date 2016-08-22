@@ -77,7 +77,7 @@
 					<tr class="prop" id="durationEditId">
 						<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
 						<td valign="top" class="value" colspan="4">
-							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" ng-change="updateEstFinish()"></tdsdurationpicker>
+							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" ng-change="updateEstFinish()" readonly="true" ></tdsdurationpicker>
 							&nbsp;&nbsp;
 							<span id="priorityEditSpanId">
 							<label for="priority">Priority:</label>
@@ -94,7 +94,7 @@
 					<tr class="prop" id="estStartEditTrId">
 						<td valign="top" class="name"><label for="estStartTrId">Estimated Start/Finish:</label></td>
 						<td valign="top" class="value" nowrap="nowrap">
-							<input type="text" date-begin="ac.estStart" date-end="ac.estFinish" ng-model="acData.estRange" ng-click="onPickerOpen($event)" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
+							<input type="text" duration="ac.duration" scales="ds.durationScales" date-begin="ac.estStart" date-end="ac.estFinish" ng-model="acData.estRange" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
 							<span class="error-msg" ng-show="form.estRange.$error.dateRange">Invalid range.</span>
 						</td>
 					</tr>

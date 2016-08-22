@@ -313,6 +313,26 @@
   color: #ccc;
   cursor: not-allowed;
 }
+/* Duration Picker */
+
+.daterangepicker  .duration_inputs {
+  float: left;
+  margin-top: 6px;
+}
+
+.daterangepicker .duration_inputs input {
+  width: 54px;
+  height: 23px;
+}
+
+.daterangepicker .duration_inputs label {
+  font-size: 13px
+}
+
+.daterangepicker .duration_inputs select {
+  width: 50px;
+  margin-left: 5px;
+}
 
 /* Predefined Ranges */
 
