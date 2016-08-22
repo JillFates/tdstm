@@ -6,15 +6,19 @@ var GraphUtil = (function ($) {
 	
 	// private constants
 	const KEY_CODES = {
-		LEFT: 37,
-		UP: 38,
-		RIGHT: 39,
-		DOWN: 40,
-		MINUS: 189,
-		PLUS: 187
+		LEFT: KeyEvent.DOM_VK_LEFT,
+		UP: KeyEvent.DOM_VK_UP,
+		RIGHT: KeyEvent.DOM_VK_RIGHT,
+		DOWN: KeyEvent.DOM_VK_DOWN,
+		MINUS: KeyEvent.DOM_VK_DASH,
+		PLUS: KeyEvent.DOM_VK_EQUALS,
+		RETURN: KeyEvent.DOM_VK_RETURN,
+		ENTER: KeyEvent.DOM_VK_ENTER
 	}
-	const DIRECTIONS = [KEY_CODES.LEFT, KEY_CODES.UP, KEY_CODES.RIGHT, KEY_CODES.DOWN]
+	const ARROW_KEYS = [KEY_CODES.LEFT, KEY_CODES.UP, KEY_CODES.RIGHT, KEY_CODES.DOWN]
 	const ZOOM_KEYS = [KEY_CODES.MINUS, KEY_CODES.PLUS]
+	const SUBMIT_TEXT_KEYS = [KEY_CODES.RETURN, KEY_CODES.ENTER]
+	const IGNORE_KEY_EVENT_TAGS = ['INPUT', 'TEXTAREA']
 	
 	// public functions
 	var public = {};
@@ -129,7 +133,7 @@ var GraphUtil = (function ($) {
 	
 	// sets the size of the control panel so that it can scroll when longer than the user's window
 	public.correctControlPanelSize = function () {
-		public.correctPanelSize('controlPanel');
+		public.correctPanelSize('controlPanelId');
 	}
 	
 	// sets the size of the legend and control panel so that they can scroll when longer than the user's window
@@ -241,7 +245,7 @@ var GraphUtil = (function ($) {
 	// hides the specified panel ('control' or 'legend')
 	public.hidePanel = function (panel) {
 		if (panel == 'control') {
-			$('#controlPanel').removeClass('openPanel');
+			$('#controlPanelId').removeClass('openPanel');
 			$('#controlPanelTabId').removeClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').removeClass('openPanel');
@@ -252,7 +256,7 @@ var GraphUtil = (function ($) {
 	// opens the specified panel ('control' or 'legend')
 	public.openPanel = function (panel) {
 		if (panel == 'control') {
-			$('#controlPanel').addClass('openPanel');
+			$('#controlPanelId').addClass('openPanel');
 			$('#controlPanelTabId').addClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').addClass('openPanel');
@@ -871,7 +875,33 @@ var GraphUtil = (function ($) {
 	// add key listeners for zooming and panning
 	public.addKeyListeners = function (modifier) {
 		$(window).on('keydown', function (e) {
-			if (e.target.tagName == 'INPUT') {
+			// ignore keystrokes while the user is typing in an text field
+			if ( ! IGNORE_KEY_EVENT_TAGS.contains(e.target.tagName) ) {
+				// handle modifier keys
+				var modifier = 1
+				if (e.shiftKey)
+					modifier = 2
+				if (e.ctrlKey)
+					modifier = 0.5
+				
+				// perform action based on key code
+				switch (e.keyCode) {
+					case KEY_CODES.LEFT:  public.translateLeft(modifier); break;
+					case KEY_CODES.RIGHT: public.translateRight(modifier); break;
+					case KEY_CODES.UP:    public.translateUp(modifier); break;
+					case KEY_CODES.DOWN:  public.translateDown(modifier); break;
+					case KEY_CODES.PLUS:  performZoom('in', modifier); break;
+					case KEY_CODES.MINUS: performZoom('out', modifier); break;
+				}
+			}
+		})
+	}
+	
+	// add key listeners for zooming and panning
+	public.addTimelineKeyListeners = function (brush, x1, mainTranslator, displayCallback) {
+		$(window).on('keydown', function (e) {
+			// ignore keystrokes while the user is typing in an text field
+			if ( ! IGNORE_KEY_EVENT_TAGS.contains(e.target.tagName) ) {
 				var key = e.keyCode
 				
 				// handle modifier keys
@@ -881,73 +911,46 @@ var GraphUtil = (function ($) {
 				if (e.ctrlKey)
 					modifier = 0.5
 				
+				var t1 = brush.extent()[0].getTime()
+				var t2 = brush.extent()[1].getTime()
+				var rangeSize = t2 - t1
+				var offset = (rangeSize / 4) * modifier
+				var newRange = [t1, t2]
+				
 				// perform action based on key code
-				if (key == KEY_CODES.LEFT) {
-					public.translateLeft(modifier)
-				} else if (key == KEY_CODES.RIGHT) {
-					public.translateRight(modifier)
-				} else if (key == KEY_CODES.UP) {
-					public.translateUp(modifier)
-				} else if (key == KEY_CODES.DOWN) {
-					public.translateDown(modifier)
-				} else if (key == KEY_CODES.PLUS) {
-					performZoom('in', modifier)
-				} else if (key == KEY_CODES.MINUS) {
-					performZoom('out', modifier)
+				switch (key) {
+					case KEY_CODES.LEFT:  newRange = [t1 - offset, t2 - offset]; break;
+					case KEY_CODES.RIGHT: newRange = [t1 + offset, t2 + offset]; break;
+					case KEY_CODES.PLUS:  newRange = [t1 + offset, t2 - offset]; break;
+					case KEY_CODES.MINUS: newRange = [t1 - (offset * 2), t2 + (offset * 2)]; break;
 				}
+				
+				var delay = 0
+				brush.extent([new Date(newRange[0]), new Date(newRange[1])])
+				
+				// if we are translating perform an animated transition
+				if (ARROW_KEYS.contains(key)) {
+					var xTranslate = -1 * x1(new Date(newRange[0]))
+					public.animateTransform([xTranslate, 0], 1, mainTranslator)
+					delay = 150
+				}
+				
+				// call the display callback function (after a delay if translating to allow the animation time to play)
+				window.setTimeout(displayCallback, delay, true)
 			}
 		})
-	}
-	
-	// add key listeners for zooming and panning
-	public.addTimelineKeyListeners = function (brush, x1, mainTranslator, displayCallback) {
-		var modifier = 1
-		$(window).on('keydown', function (e) {
-			var key = e.keyCode
-			
-			// handle modifier keys
-			if (e.shiftKey)
-				modifier = 2
-			if (e.ctrlKey)
-				modifier = 0.5
-			
-			var t1 = brush.extent()[0].getTime()
-			var t2 = brush.extent()[1].getTime()
-			var rangeSize = t2 - t1
-			var offset = (rangeSize / 4) * modifier
-			var newRange = [t1, t2]
-			
-			// perform action based on key code
-			if (DIRECTIONS.contains(key)) {
-				if (key == KEY_CODES.LEFT)
-					newRange = [t1 - offset, t2 - offset]
-				if (key == KEY_CODES.RIGHT)
-					newRange = [t1 + offset, t2 + offset]
-				
-				brush.extent([new Date(newRange[0]), new Date(newRange[1])]);
-				var xTranslate = -1 * x1(new Date(newRange[0]))
-				public.animateTransform([xTranslate, 0], 1, mainTranslator)
-				window.setTimeout(displayCallback, 150, true)
-			} else {
-				if (key == KEY_CODES.PLUS)
-					newRange = [t1 + offset, t2 - offset]
-				if (key == KEY_CODES.MINUS)
-					newRange = [t1 - (offset * 2), t2 + (offset * 2)]
-				
-				brush.extent([new Date(newRange[0]), new Date(newRange[1])]);
-				displayCallback(true)
-			}
-			
-			
-		}).focus()
 	}
 	
 	// ############################################################## filter highlighting functions ############################################################## 
 	
 	// searches only when the user presses enter in the search box
-	public.handleSearchKeyEvent = function (e) {
-		if (e.keyCode == 13)
-			window.setTimeout(public.performSearch, 1)
+	public.handleSearchKeyEvent = function (e, searchFunction) {
+		if (SUBMIT_TEXT_KEYS.contains(e.keyCode)) {
+			if (searchFunction)
+				window.setTimeout(searchFunction, 1)
+			else
+				window.setTimeout(public.performSearch, 1)
+		}
 	}
 	
 	// highlight tasks matching the user's regex

@@ -17,8 +17,9 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'task-timeline.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
-		<g:javascript src="task-timeline.js" />
+		<g:javascript src="keyevent_constants.js" />
 		<g:javascript src="graph.js" />
+		<g:javascript src="task-timeline.js" />
 	</head>
 	<body>
 		<input type="hidden" id="timeBarValueId" value="0"/>
@@ -30,40 +31,38 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<div class="graphContainer">
+			<div id="taskTimelineGraphId" class="graphContainer">
 				<div id="toolsContainerId">
 					<!-- controls toolbar -->
-					<span id="panelLink" colspan="2" class="noPadding">
-						<div id="mapReferenceId" style="width: 100%;">
-							<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
-							<span class="controlSpan">
-								<label for="moveEventId">Event:</label>
-								<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
-							</span>
-							<span class="controlSpan">
-								<label for="teamSelectId">Highlight:</label>
-								<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
-							</span>
-							<span class="controlSpan">
-								<form onsubmit="return performSearch()" id="taskSearchFormId">
-									<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24" />
-									<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
-									<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer graphButton" value="Highlight" />
-								</form>
-							</span>
-							<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin"></div>
-							<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer"></div>
-							<span class="controlSpan checkboxContainer">
-								<input type="checkbox" id="highlightCriticalPathId" class="pointer" checked="checked"/>
-								<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
-							</span>
-							<div style="float: right;" class="task-timeline-progress-wrapper">
-								<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
-							</div>
+					<div id="graphToolbarId" style="width: 100%;">
+						<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
+						<span class="controlSpan">
+							<label for="moveEventId">Event:</label>
+							<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
+						</span>
+						<span class="controlSpan">
+							<label for="teamSelectId">Highlight:</label>
+							<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
+						</span>
+						<span class="controlSpan">
+							<form onsubmit="return performSearch()" id="highlightFormId">
+								<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24" />
+								<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
+								<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer graphButton" value="Highlight" />
+							</form>
+						</span>
+						<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin"></div>
+						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer"></div>
+						<span class="controlSpan checkboxContainer">
+							<input type="checkbox" id="highlightCriticalPathId" class="pointer" checked="checked"/>
+							<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
+						</span>
+						<div style="float: right;" class="task-timeline-progress-wrapper">
+							<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 						</div>
-					</span>
+					</div>
 					<!-- control panel -->
-					<div id="controlPanel" class="graphPanel">
+					<div id="controlPanelId" class="graphPanel">
 						<form id="preferencesformId">
 							<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
 								
@@ -122,7 +121,7 @@
 				<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 				<g:render template="../assetEntity/initAssetEntityData"/>
 				<g:render template="../layouts/error"/>
-				<div id="svgContainerId" style="display: none;" tabindex="1"></div>
+				<div id="svgContainerId" style="display: none;"></div>
 			</div>
 		</div>
 		<script type="text/javascript">

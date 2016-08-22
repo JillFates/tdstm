@@ -7,16 +7,17 @@
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="projectStaff.js" />
-
+	
 	<g:render template="../layouts/responsiveAngularResources" />
-
+	
 	<g:javascript src="asset.comment.js" />
-
+	
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 	<g:javascript src="d3/d3.js" />
 	<g:javascript src="lodash/lodash.min.js" />
 	<g:javascript src="svg.js"/>
 	<g:javascript src="load.shapes.js"/>
+	<g:javascript src="keyevent_constants.js" />
 	<g:javascript src="graph.js" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 </head>
@@ -26,18 +27,16 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-
+	
 	<div id="item1" class="graphContainer">
 		<div id="toolsContainerId">
-			<span id="panelLink" class="noPadding">
-				<div id="mapReferenceId">
-					<div id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
-					--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div><!--
-				--><div id="fullscreenButtonId" class="showMenu graphButton graphTabButton hasMargin hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
-				</div>
-			</span>
-
-			<div id="controlPanel" class="graphPanel openPanel">
+			<div id="graphToolbarId">
+				<div id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
+				--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div><!--
+			--><div id="fullscreenButtonId" class="showMenu graphButton graphTabButton hasMargin hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+			</div>
+			
+			<div id="controlPanelId" class="graphPanel openPanel">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
 						<td class="controlPanelControl" colspan="3">
@@ -89,7 +88,7 @@
 								<br />
 							</td>
 						</tr>
-
+						
 						<!-- Label checkboxes -->
 						<tr id="twistieRowId">
 							<td colspan="3" class="noPadding">
@@ -99,7 +98,7 @@
 								</span>
 							</td>
 						</tr>
-
+						
 					</table>
 					<div id="labelControlContainerId">
 						<table class="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
@@ -125,13 +124,13 @@
 						</table>
 					</div>
 					<table class="labelTree" cellpadding="0" cellspacing="0">
-
+						
 						<tr>
 							<td colspan="3" class="noPadding">
 								<br />
 							</td>
 						</tr>
-
+						
 						<tr title="Sets the distance between nodes">
 							<td class="controlPanelControl" colspan="3">
 								<img src="${resource(dir:'icons',file:'arrow_in.png')}" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
@@ -139,19 +138,19 @@
 							-->Spacing
 							</td>
 						</tr>
-
+						
 					</table>
 				</form>
-
+				
 				<!-- Preference controls -->
 				<table class="labelTree" cellpadding="0" cellspacing="0">
-
+					
 					<tr>
 						<td colspan="3" class="noPadding">
 							<br />
 						</td>
 					</tr>
-
+					
 					<tr title="Reloads the graph">
 						<td colspan="3" class="noPadding">
 							<input type="button" name="Submit Button" id="graphSubmitButtonId" class="pointer fullButton" value="Regenerate Graph">
@@ -169,13 +168,13 @@
 					</tr>
 				</table>
 			</div>
-
+			
 			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:true]}" />
 		</div>
 		<div id="svgContainerId"></div>
 		<div id="spinnerDivId" style="display: none"></div>
 	</div>
-
+	
 	<g:render template="../assetEntity/modelDialog"/>
 	<g:render template="../assetEntity/entityCrudDivs" />
 	<g:render template="../assetEntity/dependentAdd" />
@@ -193,28 +192,28 @@
 	var parameterRanges = {'levelsUp':[0, 10], 'levelsDown':[0, 10]};
 	var defaultPrefs = ${defaultPrefs};
 	var assetSelectWidth = 172;
-
+	
 	// Used to track ajax requests and abort them when needed
 	var ajaxRequest;
-
+	
 	$(document).ready(function () {
 		// close the labels twistie by default
 		$('#labelControlContainerId').slideUp(0);
-
-
+		
+		
 		// define the select2 for assets
 		if (!isIE7OrLesser) {
 			EntityCrud.assetNameSelect2( $(".scrollSelect") );
 			$("#select2-chosen-1").html('Select an Asset');
 			filterSelect2( $(".filterScrollSelect"), ${assetClassesForSelect2} );
 		}
-
+		
 		// bind the custom submit behavior for the control panel
 		$('#graphSubmitButtonId').on('click', function (event) {
 			generateGraph();
 			event.preventDefault();
 		});
-
+		
 		// bind changing the asset or level to regenerating the graph automatically
 		$('#assetSelectId').on('change', function (event) {
 			generateGraph();
@@ -230,10 +229,10 @@
 		$('#levelsDownId').on('change', function (event) {
 			generateGraph();
 		});
-
+		
 		// disable any plus/minus icons that should be initially disabled
 		GraphUtil.checkForDisabledButtons(parameterRanges);
-
+		
 		// if the page was loaded with an assetId, show the graph for it
 		if (! isNaN(initialAssetId)){
 			generateGraph();
@@ -241,22 +240,22 @@
 				$('#s2id_assetSelectId').find("a").removeClass("select2-default");
 			}
 		}
-
+		
 		// set the width for the asset select2
 		$('#s2id_assetSelectId').css('width', assetSelectWidth + 'px');
-
+		
 		generateGraph();
 	});
-
+	
 	// makes an ajax call to get the graph data, then loads it into the DOM
 	function generateGraph () {
-
+		
 		$('#graphSubmitButtonId').attr('disabled', 'disabled');
-
+		
 		// abort the last ajax request if it still hasn't completed
 		if (ajaxRequest)
 			ajaxRequest.abort();
-
+		
 		// get the params to use for the request
 		var params = {};
 		if ($('#assetSelectId').val() != '') {
@@ -269,7 +268,7 @@
 		params.levelsUp = $('#levelsUpId').val();
 		params.levelsDown = $('#levelsDownId').val();
 		params.mode = 'assetId';
-
+		
 		// make the ajax request for the graph data
 		ajaxRequest = jQuery.ajax({
 			dataType: 'json',
@@ -278,7 +277,7 @@
 			type:'GET',
 			complete: loadGraph
 		});
-
+		
 		var svgElement = d3.select('#graphSvgId');
 		if (svgElement.size() == 0) {
 			var spinnerDiv = $('#spinnerDivId').clone().css('display','block');
@@ -287,21 +286,21 @@
 			svgElement.attr('class', 'loading');
 		}
 	}
-
+	
 	// loads the graph code into the DOM
 	function loadGraph (response) {
 		ajaxRequest = null;
 		$('#svgContainerId').html(response.responseText);
 	}
-
+	
 	function modifyParameter (action, element) {
 		var input = $('#' + element);
 		var ids = ['levelsUpId', 'levelsDownId'];
 		var oldValue = parseInt($('#' + input.attr('id')).val());
 		var plusButton = input.parent().children('.plus');
 		var minusButton = input.parent().children('.minus');
-
-
+		
+		
 		if (action == 'add') {
 			if (plusButton.hasClass('disabled'))
 				return;
@@ -323,26 +322,26 @@
 			plusButton.removeClass('disabled');
 		input.trigger('change');
 	}
-
+	
 	// Asset is on the entity.crud.js because is generic, the filter On is only used here.
 	function filterSelect2(element, data) {
 		element.select2( {
 			minimumInputLength: 0,
 			width: assetSelectWidth,
-
+			
 			placeholder: "Filter: All Classes",
 			data: data
 		} );
 	}
-
+	
 	$(document).ready(function () {
 		// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
 		$('#graphSVGContainer').append(appSVGShapes.getAll());
 	});
-
+	
 	$(".menu-parent-assets-architecture-graph").addClass('active');
 	$(".menu-parent-assets").addClass('active');
-
+	
 </script>
 <div style="display: none;" id="graphSVGContainer"></div>
 </body>

@@ -122,3 +122,7 @@ if (typeof KeyEvent == "undefined") {
     DOM_VK_META: 224
   };
 }
+
+// add nonstandard key codes to the map
+KeyEvent.DOM_VK_EQUALS = 187
+KeyEvent.DOM_VK_DASH = 189

@@ -17,12 +17,13 @@
 		<g:javascript src="projectStaff.js" />
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="progressBar.js" />
-
+		
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.js"/>
 		<g:javascript src="svg.js"/>
 		<g:javascript src="load.shapes.js"/>
+		<g:javascript src="keyevent_constants.js" />
 		<g:javascript src="graph.js" />
 		<g:javascript src="generator/runtime.js" />
 		<g:javascript src="generator/generator.js" />
@@ -39,7 +40,7 @@
 					</g:link>
 				</div>
 			</div>
-
+			
 			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
 				<div id="checkBoxDivId">
 					<g:form name="checkBoxForm"> 
@@ -74,14 +75,14 @@
 					</g:form>
 				</div> 
 			</div>
-
-
+			
+			
 			<div style="clear: both;"></div>
-
+			
 			<div id = "dependencyBundleDetailsId" >
 				<g:render template="dependencyBundleDetails" />
 			</div>
-
+			
 			<div style="clear: both;"></div>
 			
 			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
@@ -129,8 +130,8 @@
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">
-			  <g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
-			  <g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
+				<g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
+				<g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
 			<g:render template="../assetEntity/dependentAdd" />
 			<g:render template="../assetEntity/initAssetEntityData"/>
@@ -161,7 +162,7 @@
 				$('#vm_'+id).addClass('vm_count').addClass('selectedGroup')
 				$('#db_'+id).addClass('db_count').addClass('selectedGroup')
 				$('#file_'+id).addClass('file_count').addClass('selectedGroup')
-
+				
 				$('.tabs li').removeClass('active');
 				var fullscreen = GraphUtil.isFullscreen();
 				
@@ -189,12 +190,17 @@
 						var labelsList = "Application"
 						var bundle = $("#planningBundleSelectId").val()
 						var showControls = 'hide'
-						if ($('#controlPanel').css('display') == 'block')
+						if ($('#controlPanelId').css('display') == 'block')
 							showControls = 'controls'
 						if ($('#legendDivId').css('display') == 'block')
 							showControls = 'legend'
 						compressList();
-						ajaxRequest = ${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'"entity=" + value + "&dependencyBundle=" + dependencyBundle + "&showControls=" + showControls + "&bundle=" + bundle + "&fullscreen=" + fullscreen', onComplete:'listUpdate(XMLHttpRequest)') }
+						ajaxRequest = ${remoteFunction(
+							controller:'assetEntity',
+							action:'retrieveLists',
+							params:'"entity=" + value + "&dependencyBundle=" + dependencyBundle + "&showControls=" + showControls + "&bundle=" + bundle + "&fullscreen=" + fullscreen',
+							onComplete:'listUpdate(XMLHttpRequest)'
+						)}
 						$('#graphli').addClass('active');
 						break;
 				}
@@ -213,12 +219,12 @@
 					}
 					$('#items1 .tabInner').html(spinnerDiv);
 				} else {
-
+					
 					var svgElement = $('#svgContainerId');
 					if (svgElement.size() > 0) {
 						var leftPosition = svgElement.offset().left,
 							topPosition = svgElement.offset().top;
-
+						
 						if (fullscreen) {
 							spinnerDiv.css('background-color', '#ffffff');
 							leftPosition = $('#toolsContainerId').offset().left;
@@ -291,29 +297,29 @@
 				var dependencyDiv = $('#dependencyDivId')
 				var rightOffset = dependencyDiv.parent().offset().left;
 				var leftOffset = dependencyDiv.offset().left;
-				var extraOffset = $('#mapReferenceId').outerWidth() ? $('#mapReferenceId').outerWidth() : 0;
+				var extraOffset = $('#graphToolbarId').outerWidth() ? $('#graphToolbarId').outerWidth() : 0;
 				if (dependencyDiv.hasClass('floating'))
 					dependencyDiv.css('max-width', (windowWidth - extraOffset - ((leftOffset - extraOffset) * 2)) + 'px');
 				else
 					dependencyDiv.css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
 			}
-
+			
 			$(document).ready(function () {
 				// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
 				$('#graphSVGContainer').append(appSVGShapes.getAll());
 			});
 			
 		</script>
-
+		
 		<script type="text/javascript">
 			
 			( function($) {
 				
 				$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
-
+				
 				$("#moveBundleSelectId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
-
+				
 				currentMenuId = "#assetMenu";
 				$(".menu-parent-assets-dependency-analyzer").addClass('active');
 				$(".menu-parent-assets").addClass('active');
@@ -321,9 +327,9 @@
 				$(window).resize(function() {
 					setGroupTablePosition();
 				});
-			})(jQuery);		
+			})(jQuery);
 			
 		</script>
-<div style="display: none;" id="graphSVGContainer"></div>
+		<div style="display: none;" id="graphSVGContainer"></div>
 	</body>
 </html>

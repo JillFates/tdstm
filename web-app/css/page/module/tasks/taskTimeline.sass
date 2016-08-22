@@ -1,34 +1,33 @@
 div.content-wrapper
   div.container
     div.task-timeline-container
-      div.graphContainer
+      div#taskTimelineGraphId.graphContainer
         z-index: 70 !important
         div#toolsContainerId
-          span#panelLink
-            div#mapReferenceId
-              display: block
-              height: 30px
-              div#controlPanelTabId
-                display: inline-block
-                margin-top: 2px
-              span.controlSpan
-                display: inline-block
-                margin-bottom: 3px
-                vertical-align: bottom
-              div.zoomButton
-                margin-bottom: 5px
-                vertical-align: bottom
-              div#zoomInButtonId
-                margin-left: 20px
-              label
-                font-size: 12px
-              span.checkboxContainer
-                margin-bottom: 9px
-              div.task-timeline-progress-wrapper
-                border: inherit
-                text-align: inherit
-                position: relative
-                top: -3px
+          div#graphToolbarId
+            display: block
+            height: 30px
+            div#controlPanelTabId
+              display: inline-block
+              margin-top: 2px
+            span.controlSpan
+              display: inline-block
+              margin-bottom: 3px
+              vertical-align: bottom
+            div.zoomButton
+              margin-bottom: 5px
+              vertical-align: bottom
+            div#zoomInButtonId
+              margin-left: 20px
+            label
+              font-size: 12px
+            span.checkboxContainer
+              margin-bottom: 9px
+            div.task-timeline-progress-wrapper
+              border: inherit
+              text-align: inherit
+              position: relative
+              top: -3px
       svg#timelineSVGId
         g.mini:not(.brushMoving)
           rect#miniBackgroundId

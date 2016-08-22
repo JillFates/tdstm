@@ -12,6 +12,7 @@
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="progressTimer.js" />
+		<g:javascript src="keyevent_constants.js" />
 		<g:javascript src="graph.js" />
 		
 		<g:javascript src="asset.tranman.js" />
@@ -60,7 +61,7 @@
 			// check for errors in the ajax call
 			$('#errorMessageDiv').remove();
 			if (response.status != 200) {
-				var message = d3.select('div.body')
+				var message = d3.select('div#taskGraphId')
 					.append('div')
 					.attr('id','errorMessageDiv');
 				message.html('<br />' + response.responseText);
@@ -80,10 +81,9 @@
 			});
 			
 			// construct the svg container
-			var svgData = d3.select('div.body')
+			var svgData = d3.select('div#taskGraphId')
 				.append('div')
-				.attr('id', 'svgContainerDivId')
-				.attr('tabindex', '1');
+				.attr('id', 'svgContainerDivId');
 			
 			// add the prerendered svg data into the container
 			svgData.html(data.svgText);
@@ -148,7 +148,7 @@
 				heightCurrent = $(window).innerHeight() - $('#svgContainerDivId').offset().top - (padding / 2) - GraphUtil.getFooterHeight();
 				widthCurrent = $(window).innerWidth() - padding * 2;
 				
-				d3.select('div.body')
+				d3.select('div#taskGraphId')
 					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;');
 				d3.select('#svgContainerDivId')
 					.attr('style', 'width:' + widthCurrent + 'px !important; height:' + heightCurrent + 'px !important;');
@@ -209,11 +209,6 @@
 			
 			// show the loading spinner
 			$('#spinnerId').css('display', 'block');
-			
-			// calculate the position for the filter clear button
-			$('#filterClearId').css('left', function () {
-				return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
-			});
 			
 			if (neighborhoodTaskId == -1)
 				jQuery.ajax({
@@ -341,54 +336,58 @@
 		<div class="taskTimebar hide" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
 		</div>
-		<div class="body graphContainer" style="width:100%">
+		<div class="body" style="width:100%">
 			<h1 id="pageHeadingId">Task Graph</h1>
-			<div id="graphToolbarId">
-				<!-- Flash message -->
-				<g:if test="${flash.message}">
-					<div class="message">${flash.message}</div>
-				</g:if>
-				
-				<!-- Event select -->
-				<span class="controlWrapper">
-					<label for="moveEventId">Event:</label>
-					<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
-				</span>
-				
-				<!-- Team highlighting select -->
-				<span class="controlWrapper">
-					<label for="teamSelectId">Highlight:</label>
-					<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
-				</span>
-				
-				<!-- Exit Neighborhood button -->
-				<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
-				
-				<!-- Highlight filter controls -->
-				<form onsubmit="return performSearch()" id="taskSearchFormId">
-					<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
-					<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
-					<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer" value="Highlight" />
-				</form>
-				
-				<!-- Zoom buttons -->
-				<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin" onclick="GraphUtil.zoomIn()"></div>
-				<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer" onclick="GraphUtil.zoomOut()"></div>
-				
-				<!-- View unpublished checkbox (if the user has permission) -->
-				<tds:hasPermission permission="PublishTasks">
-					<span class="checkboxContainer">
-						<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } />
-						<label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
-					</span>
-				</tds:hasPermission>
-
-				<!-- Refresh timer -->
-				<span style="float:right; margin-right: 12px;">
-					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
-				</span>
+			<div id="taskGraphId" class="graphContainer" style="width:100%">
+				<div id="toolsContainerId">
+					<div id="graphToolbarId">
+						<!-- Flash message -->
+						<g:if test="${flash.message}">
+							<div class="message">${flash.message}</div>
+						</g:if>
+						
+						<!-- Event select -->
+						<span class="controlWrapper">
+							<label for="moveEventId">Event:</label>
+							<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
+						</span>
+						
+						<!-- Team highlighting select -->
+						<span class="controlWrapper">
+							<label for="teamSelectId">Highlight:</label>
+							<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
+						</span>
+						
+						<!-- Exit Neighborhood button -->
+						<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
+						
+						<!-- Highlight filter controls -->
+						<div id="highlightFormId" class="newHighlightForm">
+							<input type="text" id="searchBoxId" name="Search Box" class="fullButton" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event, performSearch)"/>
+							<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
+							<span id="filterSubmitButtonId" class="graphButton" onclick="performSearch()" title="Applies the selected filtering options to the graph"></span>
+						</div>
+						
+						<!-- Zoom buttons -->
+						<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin" onclick="GraphUtil.zoomIn()"></div>
+						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer" onclick="GraphUtil.zoomOut()"></div>
+						
+						<!-- View unpublished checkbox (if the user has permission) -->
+						<tds:hasPermission permission="PublishTasks">
+							<span class="checkboxContainer">
+								<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } />
+								<label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
+							</span>
+						</tds:hasPermission>
+						
+						<!-- Refresh timer -->
+						<span style="float:right; margin-right: 12px;">
+							<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+						</span>
+					</div>
+				</div>
+				<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			</div>
-			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		</div>
 		<g:render template="../layouts/error"/>
 		<script>

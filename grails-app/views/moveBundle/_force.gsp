@@ -60,7 +60,6 @@ GraphUtil.force = d3.layout.force()
 var svgContainer = d3.select("div#item1")
 	.append("div")
 	.attr('id','svgContainerId')
-	.attr('tabindex','1')
 	.style('background-color','#ffffff')
 var transformContainer = svgContainer
 	.attr('class','containsSpinner')

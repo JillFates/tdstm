@@ -242,7 +242,7 @@ polygon.highlighted.miniItem {
 }
 
 /* for the task search box */
-form#taskSearchFormId {
+form#highlightFormId {
 	display: inline-block !important;
 }
 span#filterClearId {

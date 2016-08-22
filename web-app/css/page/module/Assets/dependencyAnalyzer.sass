@@ -1,15 +1,38 @@
 div.content-wrapper
   div.container
+    // dependency group table styles
     div#DependencyGroupsTableId
       div#dependencyDivId
         margin-left: 0px !important
-        td.labelColumn
-          position: initial !important
+        table#dependencyTableId
+          position: static
+          td.labelColumn
+            position: initial !important
+        &.floating
+          position: fixed
+          top: 0px
+          left: 740px
+          z-index: 110
+          margin-left: 0px
+          border: 1px solid green
+          border-top-width: 0px
+          #dependencyTableId tr
+            display: none
+            &#dependencyGroupsRowId
+              display: block
+            td.labelColumn
+              display: none
     
+    // graph styles
     div#item1
       &.fullscreen div#filterOptionsMenuId.open
         left: 297px
         top: 20px
+      
+      div#graphToolbarId
+        height: 26px
+      
+      // highlighting dropdown menu styles
       div#filterOptionsMenuId
         z-index: 1
         display: none !important
@@ -40,14 +63,14 @@ div.content-wrapper
               &.disabled
                 opacity: 0.1
                 pointer-events: none;
-              
-      div#HighlightFormId
+      
+      // highlighting form styles
+      div#highlightFormId
         span#filterOptionsButtonId
           display: inline-block
           height: 20px
           width: 20px
           padding-top: 3px
-          border-bottom: 1px solid green
           &.open
             svg
               transform: rotate(0deg)
@@ -56,11 +79,24 @@ div.content-wrapper
             transform-origin: 6px 6px
             height: 12px
             width: 12px
-        span#filterSubmitButtonId
-          display: inline-block
-          height: 20px
-          width: 20px
-          border-bottom: 1px solid green
-          background-image: url(../icons/find.png)
-          background-position: 2px 2px !important
-          background-repeat: no-repeat
+      
+      #svgTranslatorId
+        padding: 0px !important
+        margin: 0px !important
+        width: 0px
+        height: 0px
+        svg.chart
+          overflow: visible !important
+    
+    .containsSpinner
+      background-image: url(../images/spinner.gif)
+      background-position: center
+      background-repeat: no-repeat
+      background-size: 32px 32px
+      border: 1px solid green
+      & > *
+        opacity: 0
+
+// styles the person highlighting kendo listbox
+#personHighlightSelectId_listbox *
+  cursor: pointer

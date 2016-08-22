@@ -1,42 +1,40 @@
 <div id="toolsContainerId">
 	<!-- The top bar with various buttons and controls on it -->
-	<span id="panelLink" colspan="2" class="noPadding">
-		<div id="mapReferenceId">
-			<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
-			<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
-			<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
-			<div id="HighlightFormId" class="noPadding graphTabButton hasBorders hasMargin">
-				<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
-					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
-				</span>
-				<input type="text" id="searchBoxId" name="Search Box" class="fullButton" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
-				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
-				<span id="filterSubmitButtonId" class="graphButton" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"></span>
-			</div>
-			<div id="filterOptionsMenuId" class="hasBorders">
-				<table>
-					<tr>
-						<td colspan="3">
-							Options for highlighting in the graph
-						</td>
-					</tr>
-					<tr title="Highlights assets by SME or app owner" class="optionRow">
-						<td colspan="3">
-							<span id="highlightPersonId" class="noPadding">
-								<select kendo-drop-down-list id="personHighlightSelectId"></select>
-								<span id="clearPersonFilterId" class="clearFilterIcon pointer disabled" onclick="GraphUtil.clearFilter('person')" title="Clears the current person filter"></span>
-							</span>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton hasMargin" onclick="GraphUtil.zoomIn()" title="Zoom in"></div>
-			<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div>
-			<div id="refreshButtonId" class="graphButton graphTabButton hasBorders hasMargin" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4>Refresh</h4></div>
+	<div id="graphToolbarId">
+		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
+		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
+		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
+			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
+				<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+			</span>
+			<input type="text" id="searchBoxId" name="Search Box" class="fullButton" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
+			<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
+			<span id="filterSubmitButtonId" class="graphButton" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"></span>
 		</div>
-	</span>
+		<div id="filterOptionsMenuId" class="hasBorders">
+			<table>
+				<tr>
+					<td colspan="3">
+						Options for highlighting in the graph
+					</td>
+				</tr>
+				<tr title="Highlights assets by SME or app owner" class="optionRow">
+					<td colspan="3">
+						<span id="highlightPersonId" class="noPadding">
+							<select kendo-drop-down-list id="personHighlightSelectId"></select>
+							<span id="clearPersonFilterId" class="clearFilterIcon pointer disabled" onclick="GraphUtil.clearFilter('person')" title="Clears the current person filter"></span>
+						</span>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton hasMargin" onclick="GraphUtil.zoomIn()" title="Zoom in"></div>
+		<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div>
+		<div id="refreshButtonId" class="graphButton graphTabButton hasBorders hasMargin" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4>Refresh</h4></div>
+	</div>
 	<!-- The control panel div containing graph controls and settings -->
-	<div id="controlPanel" class="graphPanel">
+	<div id="controlPanelId" class="graphPanel">
 		<form id="preferencesformId">
 			<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
 				
