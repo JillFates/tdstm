@@ -6,6 +6,7 @@ import com.tdssrc.grails.StringUtil
 import com.tds.asset.AssetComment
 import com.tdsops.common.lang.ExceptionUtil
 import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 class PartyRelationshipService {
 
