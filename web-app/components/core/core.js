@@ -714,6 +714,7 @@ tds.core.directive.RangePicker = function(utils) {
 			dateBegin: '=',
 			dateEnd: '=',
 			duration: '=',
+			scale: '=',
 			scales: '=',
 			ngModel: '=ngModel'
 		},
@@ -723,7 +724,6 @@ tds.core.directive.RangePicker = function(utils) {
 			var updateModel = function() {
 				var valid = true;
 				var range = element.val();
-				ngModelCtrl.$setViewValue(range);
 
 				if (range.length == 0) {
 					scope.dateBegin = '',
@@ -766,12 +766,6 @@ tds.core.directive.RangePicker = function(utils) {
 				}
 			}
 
-			var updateView = function() {
-				element.data('daterangepicker').setStartDate(scope.dateBegin);
-				element.data('daterangepicker').setEndDate(scope.dateEnd);
-				element.data('daterangepicker').updateInputText();
-			}
-
 			scope.$watch('dateBegin', function(nVal, oVal) {
 				if (nVal && (nVal != oVal)) {
 					element.data('daterangepicker').setStartDate(scope.dateBegin);
@@ -793,21 +787,21 @@ tds.core.directive.RangePicker = function(utils) {
 						locale: {
 							format: tdsCommon.defaultDateTimeFormat(),
 						},
-						showDropdowns: false,
+						showDropdowns: true,
 						startDate: scope.dateBegin,
 						endDate: scope.dateEnd,
 						duration: scope.duration,
-						scales: scope.scales,
 						parseDateTimeString: tdsCommon.parseDateTimeString
 					});
 
 					element.on('show.daterangepicker', function(ev, picker) {
 
+						element.data('daterangepicker').hidePickerTime();
+
 						$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
 						$(window).resize(function(){ $('.cancelBtn').click(); });
-
 						if(scope.duration != "") {
-							element.data('daterangepicker').setDuration(scope.duration);
+							element.data('daterangepicker').hidePickerTime(scope.duration);
 						}
 
 						if(scope.dateBegin == "" && scope.dateEnd == "") {
@@ -842,14 +836,36 @@ tds.core.directive.DurationPicker = function(utils) {
 			duration: '=duration',
 			scale: '=scale',
 			scales: '=scales',
-			ngModel: '=ngModel',
-			readonly: '='
+			ngModel: '=ngModel'
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
+			scope.durationpicker = {
+				day: 0,
+				hour: 0,
+				minutes: 0
+			};
 
+			/**
+			 * Modify the view
+			 */
 			var updateModel = function() {
+
+				if(!scope.scale){
+					scope.scale = 'M';
+				}
+
 				var duration = parseInt(scope.duration, 10);
+
 				if (duration) {
+					var startDate = moment().startOf('day');
+					var endDate = moment().startOf('day');
+					endDate.add(scope.scale.toLowerCase(), duration);
+
+					var duration = moment.duration(endDate.diff(startDate));
+					scope.durationpicker.day = parseInt(duration.asDays());
+					scope.durationpicker.hour = parseInt(duration.hours());
+					scope.durationpicker.minutes = parseInt(duration.minutes());
+
 					var offset = moment(0).add(scope.scale.toLowerCase(), duration);
 					ngModelCtrl.$setViewValue(offset.valueOf());
 				}
@@ -874,17 +890,27 @@ tds.core.directive.DurationPicker = function(utils) {
 				}
 			}
 
-			scope.onDurationClick = function() {
-				$('#estRange').data('daterangepicker').toggle();
-			}
+			scope.$watch('durationpicker', function(nVal, oVal) {
+				if (nVal && (nVal != oVal)) {
+					var startDate = moment().startOf('day');
+					var endDate = moment(startDate); // clone instance to not affect origin
+					if(scope.durationpicker.day && scope.durationpicker.day !== "" && scope.durationpicker.day > 0) {
+						endDate = endDate.add('d', parseInt(scope.durationpicker.day));
+					}
+					if(scope.durationpicker.hour && scope.durationpicker.hour !== "" && scope.durationpicker.hour > 0) {
+						endDate = endDate.add('h', parseInt(scope.durationpicker.hour));
+					}
+					if(scope.durationpicker.minutes && scope.durationpicker.minutes !== "" && scope.durationpicker.minutes > 0) {
+						endDate = endDate.add('m', parseInt(scope.durationpicker.minutes));
+					}
+
+					var duration = moment.duration(endDate.diff(startDate));
+					var offset = moment(0).add(scope.scale.toLowerCase(), duration);
+					ngModelCtrl.$setViewValue(offset.valueOf());
+				}
+			}, true);
 
 			scope.$watch('duration', function(nVal, oVal) {
-				if (nVal && (nVal != oVal)) {
-					updateModel();
-				}
-			});
-
-			scope.$watch('scale', function(nVal, oVal) {
 				if (nVal && (nVal != oVal)) {
 					updateModel();
 				}

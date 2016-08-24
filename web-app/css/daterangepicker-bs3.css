@@ -157,6 +157,7 @@
   padding: 4px;
   border-radius: 4px;
   background: #fff;
+  height: 306px;
 }
 
 .daterangepicker .calendar.left .calendar-table {
@@ -203,6 +204,16 @@
   background: #fff;
 }
 
+.daterangepicker td.start-date {
+  background: #2EB57B !important;
+  color: white !important;
+}
+
+.daterangepicker td.end-date {
+  background: #3572AC !important;
+  color: white !important;
+}
+
 .daterangepicker td.disabled, .daterangepicker option.disabled {
   color: #999;
 }
@@ -240,9 +251,19 @@
 }
 
 .daterangepicker .input-mini.active {
-  border: 1px solid #5f9fcf;
-  border-radius: 4px;
+  border: 2px solid #5f9fcf;
+  border-radius: 0px;
 }
+
+.daterangepicker .left .input-mini.active {
+  border: 2px solid #2EB57B !important;
+}
+
+.daterangepicker .right .input-mini.active {
+  border: 2px solid #3572AC !important;
+}
+
+
 
 .daterangepicker select.monthselect, .daterangepicker select.yearselect {
   font-size: 12px;
@@ -255,10 +276,14 @@
 .daterangepicker select.monthselect {
   margin-right: 2%;
   width: 56%;
+  background-color: #3f51b5;
+  border: none
 }
 
 .daterangepicker select.yearselect {
   width: 40%;
+  background-color: #3f51b5;
+  border: none
 }
 
 .daterangepicker select.hourselect, .daterangepicker select.minuteselect, .daterangepicker select.secondselect, .daterangepicker select.ampmselect {
@@ -313,15 +338,35 @@
   color: #ccc;
   cursor: not-allowed;
 }
+
 /* Duration Picker */
 
-.daterangepicker  .duration_inputs {
-  float: left;
-  margin-top: 6px;
+.daterangepicker  .daterangepicker-container {
+  background: #5f9fcf 50% 50% repeat-x !important;
+  border-color: #5f9fcf !important;
+  height: 32px;
+  color: white
+}
+
+.daterangepicker .daterangepicker-container label.daterangepicker-title {
+  margin-top: 8px;
+  font-size: 14px;
+  margin-left: 15px;
+}
+
+.daterangepicker .duration_inputs {
+  position: relative;
+  top: -41px;
+  left: 2%;
+  height: 20px;
+}
+
+.daterangepicker .duration_inputs label.duration_label {
+
 }
 
 .daterangepicker .duration_inputs input {
-  width: 54px;
+  width: 30px;
   height: 23px;
 }
 
@@ -329,15 +374,30 @@
   font-size: 13px
 }
 
-.daterangepicker .duration_inputs select {
+.daterangepicker .duration_inputs .input_duration_days {
   width: 50px;
-  margin-left: 5px;
+  margin-left: 8px;
+  text-align: right;
 }
+
+.daterangepicker .duration_inputs .input_duration_hours {
+  width: 50px;
+  margin-left: 8px;
+  text-align: right;
+}
+
+.daterangepicker .duration_inputs .input_duration_minutes {
+  width: 50px;
+  margin-left: 8px;
+  text-align: right;
+}
+
 
 /* Predefined Ranges */
 
 .daterangepicker .ranges {
   font-size: 11px;
+  margin-bottom: 8px;
 }
 
 .daterangepicker .ranges ul {

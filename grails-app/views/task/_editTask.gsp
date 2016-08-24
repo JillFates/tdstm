@@ -71,31 +71,33 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<td> <label for="instructionsLink">Instructions Link:</td>
+						<td><label for="instructionsLink">Instructions Link:</label></td>
 						<td> <tm-linkable-url> </tm-linkable-url></td>
 					</tr>
 					<tr class="prop" id="durationEditId">
-						<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
-						<td valign="top" class="value" colspan="4">
-							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" ng-change="updateEstFinish()" readonly="true" ></tdsdurationpicker>
-							&nbsp;&nbsp;
-							<span id="priorityEditSpanId">
-							<label for="priority">Priority:</label>
-							<tds:select ng-model="ac.priority" datasource="ds.priorities" id="priority" class="ynselect" name="priority" from="${1..5}">
-							</tds:select>
-							</span> &nbsp;&nbsp;&nbsp;
-							<span id="dueDateEditSpanId">
-							<label for="dueDateEditId">Due Date:</label>
-							<input kendo-date-picker class="dateEditRange" name="dueDate" id="dueDate" k-ng-model="ac.dueDate"  k-format="'MM/dd/yyyy'" k-parse-formats ="['MM/dd/yyyy']" />
-							<span class="error-msg" ng-show="form.dueDate.$error.date">Invalid date.</span>
-							</span>
+						<td valign="top" class="name" style="vertical-align: middle"><label for="durationEdit">Estimated Duration:</label></td>
+						<td valign="top" class="value">
+							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" ng-change="updateEstFinish()"></tdsdurationpicker>
 						</td>
 					</tr>
 					<tr class="prop" id="estStartEditTrId">
 						<td valign="top" class="name"><label for="estStartTrId">Estimated Start/Finish:</label></td>
 						<td valign="top" class="value" nowrap="nowrap">
-							<input type="text" duration="ac.duration" scales="ds.durationScales" date-begin="ac.estStart" date-end="ac.estFinish" ng-model="acData.estRange" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
+							<input type="text" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" date-begin="ac.estStart" date-end="ac.estFinish" ng-model="acData.estRange" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
 							<span class="error-msg" ng-show="form.estRange.$error.dateRange">Invalid range.</span>
+						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name" style="vertical-align: middle"><label for="priority ">Priority:</label></td>
+						<td valign="top" class="value" colspan="4">
+							<span id="priorityEditSpanId">	<tds:select ng-model="ac.priority" datasource="ds.priorities" id="priority" class="ynselect" name="priority" from="${1..5}">
+								</tds:select>
+							</span> &nbsp;&nbsp;&nbsp;
+							<span id="dueDateEditSpanId">
+								<label for="dueDateEditId">Due Date:</label>
+								<input kendo-date-picker class="dateEditRange" name="dueDate" id="dueDate" k-ng-model="ac.dueDate"  k-format="'MM/dd/yyyy'" k-parse-formats ="['MM/dd/yyyy']" />
+								<span class="error-msg" ng-show="form.dueDate.$error.date">Invalid date.</span>
+							</span>
 						</td>
 					</tr>
 					<tr class="prop" id="actStartShow" ng-show="isEdit">

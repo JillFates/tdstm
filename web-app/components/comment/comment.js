@@ -510,7 +510,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.updateDuration = function() {
 		var startDate = utils.date.createDateTimeFromString($scope.ac.estStart);
-		var endDate =utils.date.createDateTimeFromString($scope.ac.estFinish);
+		var endDate = utils.date.createDateTimeFromString($scope.ac.estFinish);
 		if (startDate.isValid() && endDate.isValid()) {
 			var diff = startDate.diff(endDate);
 			if(diff != 0){

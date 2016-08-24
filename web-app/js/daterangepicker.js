@@ -51,6 +51,7 @@
         this.alwaysShowCalendars = false;
         this.ranges = {};
         this.duration = null;
+        this.scale = 'm';
         this.scales = [];
         this.parseDateTimeString = options.parseDateTimeString;
 
@@ -63,7 +64,7 @@
             this.drops = 'up';
 
         this.buttonClasses = 'btn btn-sm';
-        this.applyClass = 'btn-success';
+        this.applyClass = 'btn-default';
         this.cancelClass = 'btn-default';
 
         this.locale = {
@@ -96,7 +97,11 @@
 
         //html template for the picker UI
         if (typeof options.template !== 'string' && !(options.template instanceof $))
-            options.template = '<div class="daterangepicker dropdown-menu">' +
+            options.template = '<div class="daterangepicker dropdown-menu" style="border-radius: 0px; padding: 0px;">' +
+                '<div class="daterangepicker-container">' +
+                '<label class="daterangepicker-title">Please select a range date</label>' +
+                '</div>' +
+                '<div style="height: 348px;">' +
                 '<div class="calendar left">' +
                 '<div class="daterangepicker_input">' +
                 '<input class="input-mini form-control" type="text" name="daterangepicker_start" value="" />' +
@@ -119,12 +124,15 @@
                 '</div>' +
                 '<div class="calendar-table"></div>' +
                 '</div>' +
+                '<div class="duration_inputs">' +
+                '<label>Estimated Duration</label>' +
+                '<input type="number" min="0" step="1" class="input_duration_days" name="daterangepicker_day" value="" size="3" >&nbsp;<label class="duration_days duration_label">Days</label>' +
+                '<input type="number" min="0" step="1" class="input_duration_hours" name="daterangepicker_hour" value="" size="3" >&nbsp;<label class="duration_hours duration_label">Hours</label>' +
+                '<input type="number" min="0" step="1" class="input_duration_minutes" name="daterangepicker_minutes" value="" size="3" >&nbsp;<label class="duration_minutes duration_label">Minutes</label>' +
+                '</div>' +
+                '</div>' +
                 '<div class="ranges">' +
                 '<div class="range_inputs">' +
-                '<div class="duration_inputs">' +
-                '<label>Duration: </label> <input type="value" name="daterangepicker_duration" value="" size="3" >' +
-                '<select><option value="m" selected="selected">M</option><option value="h">H</option><option value="d">D</option><option value="w">W</option></select>' +
-                '</div>' +
                 '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
                 '<button class="cancelBtn" type="button"></button>' +
                 '</div>' +
@@ -406,8 +414,8 @@
             this.container.find('.applyBtn').addClass(this.applyClass);
         if (this.cancelClass.length)
             this.container.find('.cancelBtn').addClass(this.cancelClass);
-        this.container.find('.applyBtn').html(this.locale.applyLabel);
-        this.container.find('.cancelBtn').html(this.locale.cancelLabel);
+        this.container.find('.applyBtn').html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> ' + this.locale.applyLabel);
+        this.container.find('.cancelBtn').html('<span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> ' + this.locale.cancelLabel);
 
         //
         // event listeners
@@ -428,13 +436,14 @@
             .on('change.daterangepicker', '.daterangepicker_input input', $.proxy(this.formInputsChanged, this));
 
         this.container.find('.ranges')
-            .on('keyup.daterangepicker', '.duration_inputs input', $.proxy(this.durationInputChanged, this))
-            .on('change.daterangepicker', '.duration_inputs select', $.proxy(this.durationInputChanged, this))
             .on('click.daterangepicker', 'button.applyBtn', $.proxy(this.clickApply, this))
             .on('click.daterangepicker', 'button.cancelBtn', $.proxy(this.clickCancel, this))
             .on('click.daterangepicker', 'li', $.proxy(this.clickRange, this))
             .on('mouseenter.daterangepicker', 'li', $.proxy(this.hoverRange, this))
             .on('mouseleave.daterangepicker', 'li', $.proxy(this.updateFormInputs, this));
+
+        this.container.find('.duration_inputs')
+            .on('keyup.daterangepicker', 'input', $.proxy(this.durationInputChanged, this));
 
         if (this.element.is('input') || this.element.is('button')) {
             this.element.on({
@@ -527,12 +536,13 @@
 
         },
 
-        setDuration: function(duration) {
-            this.duration = duration;
-            this.container.find('.ranges .duration_inputs input')[0].value = this.duration;
+        hidePickerTime: function(duration) {
+            this.container.find('.calendar-time').hide();
         },
 
-        setScale: function() {
+        setDuration: function(duration) {
+            //this.duration = duration;
+            //this.container.find('.ranges .duration_inputs input')[0].value = this.duration;
         },
 
         isInvalidDate: function() {
@@ -592,12 +602,14 @@
                     this.leftCalendar.month = this.startDate.clone().date(2);
                     this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
                 }
-                this.setDuration(0);
+
             }
             if (this.maxDate && this.linkedCalendars && !this.singleDatePicker && this.rightCalendar.month > this.maxDate) {
                 this.rightCalendar.month = this.maxDate.clone().date(2);
                 this.leftCalendar.month = this.maxDate.clone().date(2).subtract(1, 'month');
             }
+
+            this.calculateDuration();
         },
 
         updateCalendars: function() {
@@ -1537,35 +1549,42 @@
         },
 
         calculateDuration: function(e) {
-            var scale = this.container.find('.ranges .duration_inputs select')[0].value;
             var startDate = this.parseDateTimeString(this.startDate, this.locale.format);
             var endDate = this.parseDateTimeString(this.endDate, this.locale.format);
+            var days = 0;
+            var hours = 0;
+            var minutes = 0;
             if (startDate.isValid() && endDate.isValid()) {
-                var diff = startDate.diff(endDate);
-                if(diff != 0){
-                    diff = (diff.valueOf() * -1);
-                }
+                var duration = moment.duration(endDate.diff(startDate));
+                days = parseInt(duration.asDays());
+                hours = parseInt(duration.hours());
+                minutes = parseInt(duration.minutes());
             }
 
 
-            var offset = moment(0).add(1, scale);
-            var tentativeDuration = parseInt((diff / offset.valueOf()), 10)
-            if ((tentativeDuration * offset.valueOf()) ==  diff) {
-                this.setDuration(tentativeDuration);
-            }
-
+            this.container.find('.duration_inputs input[name="daterangepicker_day"]').val(days);
+            this.container.find('.duration_inputs input[name="daterangepicker_hour"]').val(hours);
+            this.container.find('.duration_inputs input[name="daterangepicker_minutes"]').val(minutes);
         },
 
         durationInputChanged: function(e) {
-            var duration = this.container.find('.ranges .duration_inputs input')[0].value;
-            var scale = this.container.find('.ranges .duration_inputs select')[0].value;
-            duration = parseInt(duration, 10);
-            var offset = moment(0).add(scale, duration);
 
+            var days = this.container.find('.duration_inputs input[name="daterangepicker_day"]').val();
+            var hours = this.container.find('.duration_inputs input[name="daterangepicker_hour"]').val();
+            var minutes = this.container.find('.duration_inputs input[name="daterangepicker_minutes"]').val();
 
             var startDate = this.parseDateTimeString(this.startDate, this.locale.format);
-            if (startDate.isValid() && duration != '') {
-                var endDate = startDate.add('ms', offset.valueOf());
+            if (startDate.isValid()) {
+                var endDate = moment(startDate); // clone instance to not affect origin
+                if(days && days !== "" && days > 0) {
+                    endDate = endDate.add('d', parseInt(days));
+                }
+                if(hours && hours !== "" && hours > 0) {
+                    endDate = endDate.add('h', parseInt(hours));
+                }
+                if(minutes && minutes !== "" && minutes > 0) {
+                    endDate = endDate.add('m', parseInt(minutes));
+                }
 
                 var end = moment(endDate, this.locale.format);
                 if (end.isValid()) {
