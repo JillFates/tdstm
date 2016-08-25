@@ -83,7 +83,7 @@
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
 					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
-					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
+					{name:'taskNumber', formatter:myLinkFormatter, width:60, fixed:true},
 					{name:'comment', width:680, formatter:taskFormatter},
 					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
 					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
@@ -165,6 +165,12 @@
 		function instructionsLinkFormatter(cellVal,options,rowObject){
 			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[19]+'" instructions-link="'+rowObject[7]+'">' + cellVal + '</span>';
 		}
+
+
+		function myLinkFormatter (cellvalue, options, rowObject) {
+				var value = cellvalue ? _.escape(cellvalue) : ''
+				return "<a href=\"javascript:showAssetComment(" + options.rowId + ", 'show' );\">" + value + "</a>"
+			}
 		
 		function populateFilter(){
 			$("#gs_comment").val('${comment}')
