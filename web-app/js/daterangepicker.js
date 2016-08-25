@@ -443,7 +443,8 @@
             .on('mouseleave.daterangepicker', 'li', $.proxy(this.updateFormInputs, this));
 
         this.container.find('.duration_inputs')
-            .on('keyup.daterangepicker', 'input', $.proxy(this.durationInputChanged, this));
+            .on('keyup.daterangepicker', 'input', $.proxy(this.durationInputChanged, this))
+            .on('change.daterangepicker', 'input', $.proxy(this.durationInputChanged, this));
 
         if (this.element.is('input') || this.element.is('button')) {
             this.element.on({

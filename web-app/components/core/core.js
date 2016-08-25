@@ -839,6 +839,7 @@ tds.core.directive.DurationPicker = function(utils) {
 			ngModel: '=ngModel'
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
+
 			scope.durationpicker = {
 				day: 0,
 				hour: 0,
@@ -862,12 +863,13 @@ tds.core.directive.DurationPicker = function(utils) {
 					endDate.add(scope.scale.toLowerCase(), duration);
 
 					var duration = moment.duration(endDate.diff(startDate));
+
 					scope.durationpicker.day = parseInt(duration.asDays());
 					scope.durationpicker.hour = parseInt(duration.hours());
 					scope.durationpicker.minutes = parseInt(duration.minutes());
 
-					var offset = moment(0).add(scope.scale.toLowerCase(), duration);
-					ngModelCtrl.$setViewValue(offset.valueOf());
+					ngModelCtrl.$setViewValue((scope.durationpicker.day * 8.64e+7) + (scope.durationpicker.hour * 3.6e+6) + (scope.durationpicker.minutes * 60000));
+
 				}
 			}
 
@@ -891,23 +893,10 @@ tds.core.directive.DurationPicker = function(utils) {
 			}
 
 			scope.$watch('durationpicker', function(nVal, oVal) {
-				if (nVal && (nVal != oVal)) {
-					var startDate = moment().startOf('day');
-					var endDate = moment(startDate); // clone instance to not affect origin
-					if(scope.durationpicker.day && scope.durationpicker.day !== "" && scope.durationpicker.day > 0) {
-						endDate = endDate.add('d', parseInt(scope.durationpicker.day));
-					}
-					if(scope.durationpicker.hour && scope.durationpicker.hour !== "" && scope.durationpicker.hour > 0) {
-						endDate = endDate.add('h', parseInt(scope.durationpicker.hour));
-					}
-					if(scope.durationpicker.minutes && scope.durationpicker.minutes !== "" && scope.durationpicker.minutes > 0) {
-						endDate = endDate.add('m', parseInt(scope.durationpicker.minutes));
-					}
-
-					var duration = moment.duration(endDate.diff(startDate));
-					var offset = moment(0).add(scope.scale.toLowerCase(), duration);
-					ngModelCtrl.$setViewValue(offset.valueOf());
+				if (nVal && (nVal != oVal) ) {
+					ngModelCtrl.$setViewValue((scope.durationpicker.day * 8.64e+7) + (scope.durationpicker.hour * 3.6e+6) + (scope.durationpicker.minutes * 60000));
 				}
+
 			}, true);
 
 			scope.$watch('duration', function(nVal, oVal) {
