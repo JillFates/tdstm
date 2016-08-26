@@ -1,3 +1,4 @@
+import com.tdsops.tm.enums.domain.ProjectStatus
 import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -108,47 +109,54 @@ class PartyGroupController {
 
 		PartyGroup partyGroupInstance = PartyGroup.get(params.id)
 		if (partyGroupInstance) {
-			List<Project> projects = partyRelationshipService.getProjectsDependentOfParty(partyGroupInstance)
-			List<Project> projectsClient = projectService.getProjectsWhereClient(partyGroupInstance)
+			/*
+			   We check for different PartyGroup Dependencies that will prevent this party from being deleted
+			   if we hit any of them we send a message back to the user, this is done one by one to avoid unnecesary hits to the DB
+			 */
 			List<Project> projectsOwned = projectService.getProjectsWhereOwner(partyGroupInstance)
-			if (projects || projectsClient || projectsOwned) {
-				String message = ""
-				if(projectsOwned) {
-					String strProjectList = projectsOwned.join(", ")
-					strProjectList = StringUtils.abbreviate(strProjectList, 100)
-					message += "owns ${projects.size()} projects: ${strProjectList}<br/>"
+			if(projectsOwned){
+				String strProjectList = projectsOwned.join(", ")
+				strProjectList = StringUtils.abbreviate(strProjectList, 100)
+				flash.message = "\"<strong>PartyGroup ${partyGroupInstance} can't be deleted, owns ${projectsOwned.size()} projects: ${strProjectList}"
+				redirect(action:"list")
+				return
+			}
+
+			List<Project> projectsClient = projectService.getProjectsWhereClient(partyGroupInstance, ProjectStatus.ANY)
+			if(projectsClient){
+				String strProjectList = projectsClient.join(", ")
+				strProjectList = StringUtils.abbreviate(strProjectList, 100)
+				flash.message = "\"<strong>PartyGroup ${partyGroupInstance} can't be deleted, is Client in ${projectsClient.size()} projects: ${strProjectList}<br/>"
+				redirect(action:"list")
+				return
+			}
+
+			List<Project> projects = partyRelationshipService.getProjectsDependentOfParty(partyGroupInstance)
+			if(projects) {
+				String strProjectList = projects.join(", ")
+				strProjectList = StringUtils.abbreviate(strProjectList, 100)
+				flash.message = "\"<strong>PartyGroup ${partyGroupInstance} can't be deleted, has ${projects.size()} project depenents: ${strProjectList}"
+				redirect(action:"list")
+				return
+			}
+
+
+			try {
+				PartyGroup.withNewSession { s ->
+					def parties
+					parties = PartyRelationship.findAllByPartyIdFrom(partyGroupInstance)
+					parties*.delete()
+					parties = PartyRelationship.findAllByPartyIdTo(partyGroupInstance)
+					parties*.delete()
+					s.flush()
+					s.clear()
 				}
 
-				if(projectsClient){
-					String strProjectList = projectsClient.join(", ")
-					strProjectList = StringUtils.abbreviate(strProjectList, 100)
-					message += "is Client in ${projectsClient.size()} projects: ${strProjectList}<br/>"
-				}
+				partyGroupInstance.delete(flush: true)
+				flash.message = "PartyGroup ${partyGroupInstance} deleted"
 
-				if(projects) {
-					String strProjectList = projects.join(", ")
-					strProjectList = StringUtils.abbreviate(strProjectList, 100)
-					message += "has ${projects.size()} project depenents: ${strProjectList}"
-				}
-				flash.message = "<strong>PartyGroup ${partyGroupInstance} can't be deleted, $message"
-			} else {
-				try {
-					PartyGroup.withNewSession { s ->
-						def parties
-						parties = PartyRelationship.findAllByPartyIdFrom(partyGroupInstance)
-						parties*.delete()
-						parties = PartyRelationship.findAllByPartyIdTo(partyGroupInstance)
-						parties*.delete()
-						s.flush()
-						s.clear()
-					}
-
-					partyGroupInstance.delete(flush: true)
-					flash.message = "PartyGroup ${partyGroupInstance} deleted"
-
-				} catch (Exception ex) {
-					flash.message = ex
-				}
+			} catch (Exception ex) {
+				flash.message = ex
 			}
 		} else {
 			flash.message = "PartyGroup not found with id ${params.id}"
