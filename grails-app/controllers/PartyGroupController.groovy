@@ -10,6 +10,7 @@ class PartyGroupController {
 	def partyRelationshipService
     def securityService
     def userPreferenceService
+	def projectService
 	def jdbcTemplate
 
 	def index() { redirect(action:"list",params:params) }
@@ -108,11 +109,28 @@ class PartyGroupController {
 		PartyGroup partyGroupInstance = PartyGroup.get(params.id)
 		if (partyGroupInstance) {
 			List<Project> projects = partyRelationshipService.getProjectsDependentOfParty(partyGroupInstance)
-			if (projects) {
-				String strProjectList = projects.join(", ")
-				strProjectList = StringUtils.abbreviate(strProjectList, 100)
+			List<Project> projectsClient = projectService.getProjectsWhereClient(partyGroupInstance)
+			List<Project> projectsOwned = projectService.getProjectsWhereOwner(partyGroupInstance)
+			if (projects || projectsClient || projectsOwned) {
+				String message = ""
+				if(projectsOwned) {
+					String strProjectList = projectsOwned.join(", ")
+					strProjectList = StringUtils.abbreviate(strProjectList, 100)
+					message += "owns ${projects.size()} projects: ${strProjectList}<br/>"
+				}
 
-				flash.message = "<strong>PartyGroup ${partyGroupInstance} has ${projects.size()} project depenents:</strong> ${strProjectList}"
+				if(projectsClient){
+					String strProjectList = projectsClient.join(", ")
+					strProjectList = StringUtils.abbreviate(strProjectList, 100)
+					message += "is Client in ${projectsClient.size()} projects: ${strProjectList}<br/>"
+				}
+
+				if(projects) {
+					String strProjectList = projects.join(", ")
+					strProjectList = StringUtils.abbreviate(strProjectList, 100)
+					message += "has ${projects.size()} project depenents: ${strProjectList}"
+				}
+				flash.message = "<strong>PartyGroup ${partyGroupInstance} can't be deleted, $message"
 			} else {
 				try {
 					PartyGroup.withNewSession { s ->
