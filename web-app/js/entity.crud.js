@@ -1986,7 +1986,7 @@ function populateModelSelect(e,rackId){
 }*/
 
 function showDependencyControlDiv(){
-	$("#checkBoxDiv").dialog('option', 'width', '350px')
+	$("#checkBoxDiv").dialog('option', 'width', '480px')
 	$("#checkBoxDiv").dialog('option', 'modal', 'true');
 	$("#checkBoxDiv").dialog('option', 'position', ['center','top']);
 	$("#checkBoxDiv").dialog('open')

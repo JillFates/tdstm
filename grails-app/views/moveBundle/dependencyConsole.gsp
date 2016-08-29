@@ -43,37 +43,39 @@
 			
 			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
 				<div id="checkBoxDivId">
-					<g:form name="checkBoxForm"> 
-						<div style="float: left; margin-left:18px;">
-							<fieldset>
-								<legend>Connection Type:</legend>
-								<g:each in="${dependencyType}" var="dependency">
-									<input type="checkbox" id="${dependency}"
-										name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
+					<g:form name="checkBoxForm">
+						<div class="row">
+							<div class="col-sm-6">
+								<h3>Connection Type</h3>
+								<div class="checkboxdiv_control">
+									<g:each in="${dependencyType}" var="dependency">
+										<input type="checkbox" id="${dependency}"
+											   name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
 										<span id="dependecy_${dependency}"> ${dependency}</span>
-									<br />
-								</g:each>
-							</fieldset>
-						</div>
-						&nbsp;
-						<div style="float: left;margin-left: 10px;" id="connectionStatusOptions">
-							<fieldset>
-								<legend>Connection Status:</legend>
-								<g:each in="${dependencyStatus}" var="dependencyStatusInst">
-									<input type="checkbox" id="${dependencyStatusInst}"
-										name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
+										<br />
+									</g:each>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<h3>Connection Status</h3>
+								<div class="checkboxdiv_control">
+									<g:each in="${dependencyStatus}" var="dependencyStatusInst">
+										<input type="checkbox" id="${dependencyStatusInst}"
+											   name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
 										<span id="dependecy_${dependencyStatusInst}"> ${dependencyStatusInst} </span>
-									<br />
-								</g:each>
-							</fieldset>
-							<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-									&nbsp;&nbsp; <span>Save as defaults</span>
+										<br />
+									</g:each>
+								</div>
+							</div>
+						</div>
+						<div class="row checkboxdiv_default">
+							<div class="col-sm-12"><input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>&nbsp;&nbsp; <span>Save as defaults</span></div>
 						</div>
 						<div class="buttonR">
 							<button type="button" class="btn btn-default submit" value="Generate" id="generateId" onclick="submitCheckBox()"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Generate</button>
 						</div>
 					</g:form>
-				</div> 
+				</div>
 			</div>
 			
 			
