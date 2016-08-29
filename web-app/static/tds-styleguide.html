@@ -169,95 +169,25 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assets<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
                                     <li class="menu-parent-item">Assets</li>
-                                    <li class="menu-child-item menu-parent-assets-summary-table">
-                                        <a href="#"><image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/static/icons/svg/application.svg"></image>Summary Table</a>
-                                        <g:link class="mmlink" controller="assetEntity" action="assetSummary">
-                                            <g:img uri="/icons/application_view_columns.png" width="16" height="16"/>
-                                            <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/static/icons/svg/application.svg"></image>
-                                            Summary Table
-                                        </g:link>
+                                    <li class="menu-child-item menu-parent-assets-summary-table"><a href="#">Summary Table</a></li>
+                                    <li class="menu-child-item menu-parent-assets-application-list"><a href="#">Applications</a></li>
+                                    <li class="menu-child-item menu-parent-assets-server-list"><a href="#">Servers</a>
                                     </li>
-                                    <li class="menu-child-item menu-parent-assets-application-list">
-                                        <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <tds:svgIcon name="application" width="16" height="16" />
-                                            Applications
-                                        </g:link>
-                                    </li>
-                                    <li class="menu-child-item menu-parent-assets-server-list">
-                                        <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'server']" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <tds:svgIcon name="serverPhysical" width="16" height="16" />
-                                            Servers
-                                        </g:link>
-                                    </li>
-                                    <li class="menu-child-item menu-parent-assets-all-list" >
-                                        <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <tds:svgIcon name="other" width="16" height="16" />
-                                            All Devices
-                                        </g:link>
-                                    </li>
-                                    <li class="menu-child-item menu-parent-assets-database-list">
-                                        <g:link class="mmlink" controller="database"    action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <tds:svgIcon name="database" width="16" height="16" />
-                                            Databases
-                                        </g:link>
-                                    </li>
-                                    <li class="menu-child-item menu-parent-assets-storage-list">
-                                        <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <tds:svgIcon name="storagePhysical" width="16" height="16" />
-                                            Storage-Devices
-                                        </g:link>
-                                    </li>
-                                    <li class="menu-child-item menu-parent-assets-storage-logical-list">
-                                        <g:link class="mmlink" controller="files"       action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <tds:svgIcon name="storageLogical" width="16" height="16" />
-                                            Storage-Logical
-                                        </g:link>
-                                    </li>
-                                    <li class="menu-child-item menu-parent-assets-comments-list">
-                                        <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <g:img uri="/icons/comments.png" width="16" height="16"/>
-                                            Comments
-                                        </g:link>
-                                    </li>
-                                    <li class="menu-child-item menu-parent-assets-dependencies-list">
-                                        <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
-                                            <g:img uri="/icons/bricks.png" width="16" height="16"/>
-                                            Dependencies
-                                        </g:link>
-                                    </li>
-                                    <tds:hasPermission permission='DepAnalyzerView'>
-                                        <li class="menu-child-item menu-parent-assets-dependency-analyzer">
-                                            <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <g:img uri="/icons//brick_magnify.png" width="16" height="16"/>
-                                                Dependency Analyzer
-                                            </g:link>
-                                        </li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='ArchitectureView'>
-                                        <li class="menu-child-item menu-parent-assets-architecture-graph">
-                                            <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <g:img uri="/icons/chart_organisation.png" width="16" height="16"/>
-                                                Architecture Graph
-                                            </g:link>
-                                        </li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='HelpMenuView'>
-                                        <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');">help</a></li>
-                                    </tds:hasPermission>
+                                    <li class="menu-child-item menu-parent-assets-all-list" ><a href="#">All Devices</a></li>
+                                    <li class="menu-child-item menu-parent-assets-database-list"><a href="#">Databases</a></li>
+                                    <li class="menu-child-item menu-parent-assets-storage-list"><a href="#">Storage-Devices</a></li>
+                                    <li class="menu-child-item menu-parent-assets-storage-logical-list"><a href="#">Storage-Logical</a></li>
+                                    <li class="menu-child-item menu-parent-assets-comments-list"><a href="#">Comments</a></li>
+                                    <li class="menu-child-item menu-parent-assets-dependencies-list"><a href="#">Dependencies</a></li>
+                                    <li class="menu-child-item menu-parent-assets-dependency-analyzer"><a href="#">Dependency Analyzer</a></li>
+                                    <li class="menu-child-item menu-parent-assets-architecture-graph"><a href="#">Architecture Graph</a></li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');">help</a></li>
                                     <li class="divider"></li>
                                     <li class="menu-parent-item">Manage Data</li>
-                                    <tds:hasPermission permission='Import'>
-                                        <li class="menu-child-item menu-parent-assets-import-assets"><g:link controller="assetEntity" action="assetImport" >Import Assets</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='Import'>
-                                        <li class="menu-child-item menu-parent-assets-manage-batches"><g:link controller="dataTransferBatch" action="index" >Manage Batches</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='Export'>
-                                        <li class="menu-child-item menu-parent-assets-export-assets"><g:link controller="assetEntity" action="exportAssets" >Export Assets</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='HelpMenuView'>
-                                        <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a></li>
-                                    </tds:hasPermission>
+                                    <li class="menu-child-item menu-parent-assets-import-assets"><a href="#">Import Assets</a></li>
+                                    <li class="menu-child-item menu-parent-assets-manage-batches"><a href="#">Manage Batches</a></li>
+                                    <li class="menu-child-item menu-parent-assets-export-assets"><a href="#">Export Assets</a></li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a></li>
                                 </ul>
                             </li>
 
@@ -265,56 +195,32 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
                                     <li class="menu-parent-item">Events</li>
-                                    <li class="menu-child-item menu-parent-planning-event-list"><g:link controller="moveEvent" action="list" >List Events</g:link> </li>
-                                    <g:if test="${currProjObj && moveEvent}">
-                                        <li class="menu-child-item menu-parent-planning-event-detail-list"><g:link controller="moveEvent" action="show" id="${moveEventId}">${moveEventName} Event Details</g:link></li>
-                                    </g:if>
-                                    <tds:hasPermission permission='ShowListNews'>
-                                        <li class="menu-child-item menu-parent-planning-event-news"><g:link controller="newsEditor" >List Event News</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission="ShowMovePrep">
-                                        <li class="menu-child-item"><g:link controller="reports" action="preMoveCheckList" >Pre-event Checklist</g:link></li>
-                                    </tds:hasPermission>
-                                    <li class="menu-child-item menu-parent-planning-export-runbook"><g:link controller="moveEvent" action="exportRunbook">Export Runbook</g:link></li>
-                                    <tds:hasPermission permission='HelpMenuView'>
-                                        <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMEvents?cover=print','help');" >help</a></li>
-                                    </tds:hasPermission>
+                                    <li class="menu-child-item menu-parent-planning-event-list"><a href="#">List Events</a> </li>
+                                    <li class="menu-child-item menu-parent-planning-event-detail-list"><a href="#"> Event Details</a></li>
+                                    <li class="menu-child-item menu-parent-planning-event-news"><a href="#">List Event News</a></li>
+                                    <li class="menu-child-item"><a href="#">Pre-event Checklist</a></li>
+                                    <li class="menu-child-item menu-parent-planning-export-runbook"><a href="#">Export Runbook</a></li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMEvents?cover=print','help');" >help</a></li>
                                     <li class="divider"></li>
                                     <li class="menu-parent-item">Bundles</li>
-                                    <li class="menu-child-item menu-parent-planning-list-bundles"><g:link controller="moveBundle" action="list">List Bundles</g:link> </li>
-                                    <g:if test="${currProjObj && moveBundleId}">
-                                        <li class="menu-child-item menu-parent-planning-selected-bundle"><g:link controller="moveBundle" action="show">${moveBundleName} Bundle Details</g:link></li>
-                                        <li class="menu-child-item menu-parent-planning-bundled-assets"><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]">Bundled Assets</g:link> </li>
-                                    </g:if>
-                                    <tds:hasPermission permission='HelpMenuView'>
-                                        <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a></li>
-                                    </tds:hasPermission>
+                                    <li class="menu-child-item menu-parent-planning-list-bundles"><a href="#">List Bundles</a> </li>
+                                    <li class="menu-child-item menu-parent-planning-selected-bundle"><a href="#">Bundle Details</a></li>
+                                    <li class="menu-child-item menu-parent-planning-bundled-assets"><a href="#">Bundled Assets</a> </li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a></li>
                                 </ul>
                             </li>
 
                             <li class="dropdown menu-parent-tasks">
-                                <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
                                     <li class="menu-parent-item">Tasks</li>
                                     <li class="menu-child-item menu-parent-tasks-my-tasks"><a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a></li>
-                                    <tds:hasPermission permission='ViewTaskManager'>
-                                        <li class="menu-child-item menu-parent-tasks-task-manager"><g:link controller="assetEntity" action="listTasks"  params="[initSession:true]">Task Manager</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='ViewTaskGraph'>
-                                        <li class="menu-child-item menu-parent-tasks-task-graph"><g:link controller="task" action="taskGraph"  params="[initSession:true]" >Task Graph</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='ViewTaskTimeline'>
-                                        <li class="menu-child-item menu-parent-tasks-task-timeline"><g:link controller="task" action="taskTimeline">Task Timeline</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission="ViewRecipe">
-                                        <li class="menu-child-item menu-parent-tasks-cookbook"><g:link controller="cookbook" action="index">Cookbook</g:link></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission="GenerateTasks">
-                                        <li class="menu-child-item menu-parent-tasks-generation-history"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='HelpMenuView'>
-                                        <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a></li>
-                                    </tds:hasPermission>
+                                    <li class="menu-child-item menu-parent-tasks-task-manager"><a href="#">Task Manager</a></li>
+                                    <li class="menu-child-item menu-parent-tasks-task-graph"><a href="#">Task Graph</a></li>
+                                    <li class="menu-child-item menu-parent-tasks-task-timeline"><a href="#">Task Timeline</a></li>
+                                    <li class="menu-child-item menu-parent-tasks-cookbook"><a href="#">Cookbook</a></li>
+                                    <li class="menu-child-item menu-parent-tasks-generation-history"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a></li>
                                 </ul>
                             </li>
 
@@ -322,94 +228,45 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
                                     <li class="menu-parent-item">Live Dashboards</li>
-                                    <li class="menu-child-item menu-parent-dashboard-user-dashboard"><g:link controller="dashboard" action="userPortal" >User Dashboard</g:link></li>
-                                    <tds:hasPermission permission='ShowPlanning'>
-                                        <li class="menu-child-item menu-parent-dashboard-planning-dashboard"><g:link controller="moveBundle" action="planningStats" >Planning Dashboard</g:link></li>
-                                    </tds:hasPermission>
-                                    <li class="menu-child-item menu-parent-dashboard-event-dashboard"><g:link controller="dashboard">Event Dashboard</g:link></li>
-                                    <!-- <%-- Removed until this report will be implemented using tasks
-                                            <tds:hasPermission permission='ShowCartTracker'>
-                                                <li class="menu-child-item"><g:link controller="cartTracking" action="cartTracking" >Cart Tracker</g:link></li>
-                                            </tds:hasPermission>
-                                        --%> -->
-                                    <tds:hasPermission permission='HelpMenuView'>
-                                        <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');" >help</a></li>
-                                    </tds:hasPermission>
+                                    <li class="menu-child-item menu-parent-dashboard-user-dashboard"><a href="#">User Dashboard</a></li>
+                                    <li class="menu-child-item menu-parent-dashboard-planning-dashboard"><a href="#">Planning Dashboard</a></li>
+                                    <li class="menu-child-item menu-parent-dashboard-event-dashboard"><a href="#">Event Dashboard</a></li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');" >help</a></li>
                                 </ul>
                             </li>
 
                             <li class="dropdown menu-parent-reports">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
-                                    <tds:hasPermission permission='ShowDiscovery'>
-                                        <li class="menu-parent-item">Discovery</li>
-                                        <li class="menu-child-item menu-reports-cabling-conflict"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" >Cabling Conflict</a> </li>
-                                        <li class="menu-child-item menu-reports-cabling-data"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a> </li>
-                                        <li class="menu-child-item menu-reports-power"><a href="/tdstm/reports/powerReport">Power</a> </li>
-                                        <tds:hasPermission permission='HelpMenuView'>
-                                            <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-                                        </tds:hasPermission>
-                                    </tds:hasPermission>
+                                    <li class="menu-parent-item">Discovery</li>
+                                    <li class="menu-child-item menu-reports-cabling-conflict"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" >Cabling Conflict</a> </li>
+                                    <li class="menu-child-item menu-reports-cabling-data"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a> </li>
+                                    <li class="menu-child-item menu-reports-power"><a href="/tdstm/reports/powerReport">Power</a> </li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
                                     <li class="divider"></li>
                                     <li class="menu-parent-item">Planning</li>
                                     <li class="menu-child-item menu-reports-application-profiles"><a href="/tdstm/reports/applicationProfiles">Application Profiles</a> </li>
                                     <li class="menu-child-item menu-reports-application-conflicts"><a href="/tdstm/reports/applicationConflicts">Application Conflicts</a> </li>
                                     <li class="menu-child-item menu-reports-server-conflicts"><a href="/tdstm/reports/serverConflicts">Server Conflicts</a> </li>
                                     <li class="menu-child-item menu-reports-database-conflicts"><a href="/tdstm/reports/databaseConflicts" >Database Conflicts</a> </li>
-                                    <tds:hasPermission permission='ShowPlanning'>
-                                        <li class="menu-child-item menu-reports-task-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
-                                    </tds:hasPermission>
-                                    <li class="menu-child-item menu-reports-report-summary"><g:link controller="reports" params="[projectId:currProjObj?.id]">Report Summary</g:link></li>
-                                    <tds:hasPermission permission='ShowProjectDailyMetrics'>
-                                        <li class="menu-child-item menu-reports-activity-metrics"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='ShowMovePrep'>
-                                        <li class="divider"></li>
-                                        <li class="menu-parent-item">Event Prep</li>
-                                        <tds:hasPermission permission="ShowMovePrep">
-                                            <li class="menu-child-item menu-reports-pre-checklist"><a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a> </li>
-                                        </tds:hasPermission>
-                                        <li class="menu-child-item menu-reports-login-badges"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges">Login Badges</a> </li>
-                                        <li class="menu-child-item menu-reports-asset-tags"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a> </li>
-                                        <li class="menu-child-item menu-reports-transport-worksheets"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List">Transport Worksheets</a></li>
-                                        <tds:hasPermission permission='HelpMenuView'>
-                                            <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-                                        </tds:hasPermission>
-                                    </tds:hasPermission>
-                                    <tds:hasPermission permission='ShowMoveDay'>
-                                        <li class="divider"></li>
-                                        <li class="menu-parent-item">Event Day</li>
-                                        <li class="menu-child-item menu-reports-application-migration"><a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
-                                        <li class="menu-child-item menu-reports-issue-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" >Issue Report</a> </li>
-                                        <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA">Cabling QA</a> </li>
-                                        <tds:hasPermission permission='HelpMenuView'>
-                                            <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-                                        </tds:hasPermission>
-                                    </tds:hasPermission>
+                                    <li class="menu-child-item menu-reports-task-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
+                                    <li class="menu-child-item menu-reports-report-summary"><a href="#">Report Summary</a></li>
+                                    <li class="menu-child-item menu-reports-activity-metrics"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
+                                    <li class="divider"></li>
+                                    <li class="menu-parent-item">Event Prep</li>
+                                    <li class="menu-child-item menu-reports-pre-checklist"><a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a> </li>
+                                    <li class="menu-child-item menu-reports-login-badges"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges">Login Badges</a> </li>
+                                    <li class="menu-child-item menu-reports-asset-tags"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a> </li>
+                                    <li class="menu-child-item menu-reports-transport-worksheets"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List">Transport Worksheets</a></li><li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+                                    <li class="divider"></li>
+                                    <li class="menu-parent-item">Event Day</li>
+                                    <li class="menu-child-item menu-reports-application-migration"><a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
+                                    <li class="menu-child-item menu-reports-issue-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" >Issue Report</a> </li>
+                                    <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA">Cabling QA</a> </li>
+                                    <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
                                 </ul>
                             </li>
                         </ul>
-                        <g:if test="${currProjObj?.runbookOn && moveEvent && (moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime))}">
-                            <g:if test="${moveEvent?.newsBarMode == 'auto'}">
-                                <g:if test="${moveEvent?.estStartTime.getTime() < new Date().getTime()}">
-                                    <g:set var="showNewsBar" value="true" />
-                                </g:if>
-                            </g:if>
-                            <g:elseif test="moveEvent?.newsBarMode == 'on'">
-                                <g:set var="showNewsBar" value="true" />
-                            </g:elseif>
-
-                            <g:if test="${showNewsBar && false}">
-                                <div class="menu3" id="head_crawler" >
-                                    <div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
-                                    <div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
-                                </div>
-                                <script type="text/javascript">
-                                    ${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
-                                </script>
-                            </g:if>
-
-                        </g:if>
                 </div><!-- /.navbar-collapse -->
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
@@ -418,43 +275,35 @@
                         <li class="dropdown notifications-menu">
                             <!-- Menu toggle button -->
                             <a href="#" id="nav-project-name" class="dropdown-toggle" data-toggle="dropdown">
-                                <g:if test="${currProjObj}"> ${currProjObj.name} </g:if>
-                                <g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
-                                <g:if test="${moveBundleId}"> : ${moveBundleName}</g:if>
+                                Template Style Guide
                             </a>
                         </li>
-                        <shiro:isLoggedIn>
-                            <!-- User Account Menu -->
-                            <li class="dropdown user user-menu">
-                                <!-- Menu Toggle Button -->
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <!-- The user image in the navbar-->
-                                    <img src="${resource(dir:'images',file:'personIcon.png')}" class="user-image" alt="User Image">
-                                    <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                                    <span class="hidden-xs user-name">${session.getAttribute("LOGIN_PERSON").name }</span>
-                                </a>
-                                <ul class="dropdown-menu user-dialog-dropdown-menu">
-                                    <!-- Menu Body -->
-                                    <li class="user-body">
-                                        <ul class="list-group">
-                                            <li class="list-group-item"><g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink></li>
-                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${user}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
-                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit preferences</a></li>
-                                            <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
-                                            <g:if test="${person?.modelScore}">
-                                                <li class="list-group-item"><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc"><span class="glyphicon glyphicon-info-sign user-menu-icon-badge"></span> Model Score <span class="badge">${person?.modelScore}</span></a></li>
-                                            </g:if>
-                                        </ul>
-                                    </li>
-                                    <!-- Menu Footer-->
-                                    <li class="user-footer">
-                                        <div class="pull-right">
-                                            <g:link controller="auth" action="signOut" class="btn btn-default btn-flat"><span class="glyphicon glyphicon-log-out user-menu-icon-badge"></span> Sign Out</g:link>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
-                        </shiro:isLoggedIn>
+                        <!-- User Account Menu -->
+                        <li class="dropdown user user-menu">
+                            <!-- Menu Toggle Button -->
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="../images/personIcon.png" class="user-image" alt="User Image">
+                                <span class="hidden-xs user-name">TDS</span>
+                            </a>
+                            <ul class="dropdown-menu user-dialog-dropdown-menu">
+                                <!-- Menu Body -->
+                                <li class="user-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</li>
+                                        <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${user}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
+                                        <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit preferences</a></li>
+                                        <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
+                                        <li class="list-group-item"><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc"><span class="glyphicon glyphicon-info-sign user-menu-icon-badge"></span> Model Score <span class="badge">0</span></a></li>
+                                    </ul>
+                                </li>
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-right">
+                                        <a href="#" class="btn btn-default btn-flat"><span class="glyphicon glyphicon-log-out user-menu-icon-badge"></span> Sign Out</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                 </div><!-- /.navbar-custom-menu -->
             </div><!-- /.container-fluid -->
@@ -463,24 +312,6 @@
     <!-- Full Width Column -->
     <div class="content-wrapper">
         <div class="container">
-            <!-- // Content Header (Page header)
-                <section class="content-header">
-                    <h1>
-                        Top Navigation
-                        <small>Example 2.0</small>
-                    </h1>
-                    <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li><a href="#">Layout</a></li>
-                        <li class="active">Top Navigation</li>
-                    </ol>
-                </section>
-                //Main content
-                <section class="content">
-                    <div id="messageDiv" class="message" style="display:none"></div>
-                    //.box
-                </section> -->
-
             <g:layoutBody />
         </div>
         <!-- /.container -->
@@ -497,15 +328,6 @@
         <!-- /.container -->
     </footer>
 </div>
-
-<%-- DIV for editing User Profile --%>
-<g:render template="../person/personEdit" model="[user:user, minPasswordLength:minPasswordLength]" />
-
-<%-- DIV for editing User Preferences --%>
-<div id="userPrefDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
-
-<%-- DIV for editing User date and timezone --%>
-<div id="userTimezoneDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Date and Timezone"></div>
 
 </body>
 </html>
