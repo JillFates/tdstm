@@ -151,7 +151,10 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <input type="submit" class="submit" value="Generate"/>
+                                            <button type="submit" class="btn btn-default" value="Generate">
+                                                Generate
+                                                <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                                            </button>
                                         </td>
                                      </tr>
                                  </table>
