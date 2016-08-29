@@ -9,7 +9,7 @@ module.exports = {
   test2:[
     '../components/assets/devices/createServer.spec.js',
     '../components/assets/databases/createDatabase.spec.js',
-    '../components/projects/deleteProject.spec.js'   
+    '../components/projects/deleteProject.spec.js'
   ],
   projects:[
     '../components/projects/listProjects.spec.js',
@@ -48,22 +48,22 @@ module.exports = {
     '../components/dataCenters/rackElevations.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
-    ], 
-    tasks:[
+  ],
+  tasks:[
     '../components/tasks/myTasks.spec.js',
     '../components/tasks/taskManager.spec.js',
     '../components/tasks/taskGraph.spec.js',
     '../components/tasks/timeline.spec.js',
     '../components/tasks/cookbook.spec.js'
-    ],
-    dashboards:[
+  ],
+  dashboards:[
     '../components/dashboards/eventDashboard.spec.js'
-    ],
-    planning:[
+  ],
+  planning:[
     '../components/planning/listBundles.spec.js',
     '../components/planning/listEventNews.spec.js'
-    ],
-    reports:[
+  ],
+  reports:[
     '../components/reports/applicationProfiles.spec.js',
     '../components/reports/cablingConflict.spec.js',
     '../components/reports/cablingData.spec.js',
@@ -79,8 +79,8 @@ module.exports = {
     '../components/reports/applicationMigration.spec.js',
     '../components/reports/issueReport.spec.js',
     '../components/reports/cablingQA.spec.js'
-    ],
-    assets:[
+  ],
+  assets:[
     '../components/assets/applications/applicationList.spec.js',
     '../components/assets/databases/dbList.spec.js',
     '../components/assets/devices/serverList.spec.js',
@@ -89,10 +89,23 @@ module.exports = {
     '../components/assets/storage/storageList.spec.js',
     '../components/assets/devices/devices.spec.js',
     '../components/assets/dependencyAnalyzer.spec.js'
-    ],
-    importExport:[     // Phantomjd does not support file download yet 
+  ],
+  importExport:[     // Phantomjd does not support file download yet
     '../components/assets/importExport/impExp-devices-bladeChassis.spec.js',
-    // '../components/assets/importExport/exportEmpty.spec.js',    
+    // '../components/assets/importExport/exportEmpty.spec.js',
     // '../components/assets/importExport/impExp-devices.spec.js'
-    ]
+	],
+	cw:[
+		'../components/menu/adminMenu.spec.js',
+		'../components/menu/projectsMenu.spec.js',
+		'../components/menu/dataCentersMenu.spec.js',
+		'../components/menu/assetsMenu.spec.js',
+		'../components/menu/planningMenu.spec.js',
+		'../components/menu/tasksMenu.spec.js',
+		'../components/menu/dashboardsMenu.spec.js',
+		'../components/menu/reportsMenu.spec.js',
+		'../components/userMenu/userMenu.spec.js',
+		'../components/login/login.spec.js',
+		'../components/userMenu/signOut.spec.js'
+	]
 };
