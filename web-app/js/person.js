@@ -182,7 +182,8 @@ var Person = function () {
 			type:'POST',
 			success: function(data) {
 				$("#showOrMergeId").html(data)
-				$("#showOrMergeId").dialog('option', 'width', 'auto')
+				$("#showOrMergeId").dialog('option', 'width', 'auto');
+				$("#showOrMergeId").dialog('option', 'modal', 'true');
 				$("#showOrMergeId").dialog('option', 'position', ['center','top']);
 				$("#showOrMergeId").dialog('open')
 			},
