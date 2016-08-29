@@ -375,6 +375,7 @@ function addStep( type ){
  * Copy workflow to anther workflow
  ***************************************/
 function openWorkflowDialog(){
+	$('#copyWorkflowDialog').dialog('option', 'modal', 'auto');
 	$('#copyWorkflowDialog').dialog('open');
 }
 function checkInputData(){
