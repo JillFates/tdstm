@@ -216,7 +216,9 @@ class UserLoginController {
 			def availableRoles = userPreferenceService.getAvailableRoles( person )
 			def assignedRoles = userPreferenceService.getAssignedRoles( person )
 			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-			def projectList = personService.getAvailableProjects(person, null, false, new Date() - 30)
+			//def projectList = personService.getAvailableProjects(person, null, false, new Date() - 30)
+			PartyGroup company = userLoginInstance.person.getCompany()
+			def projectList = projectService.getProjectsForCompany(company)
 			def projectId = userPreferenceService.getPreferenceByUserAndCode(userLoginInstance, PREF.CURR_PROJ)
 			def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level
 			def isCurrentUserLogin = (currentUser.id == userLoginInstance.id)

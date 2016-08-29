@@ -1632,4 +1632,28 @@ class ProjectService {
 	 	return hasAccessToProject(userLogin, project)
 	 }
 
+
+	/**
+	 * Retrieves a list of all the project the company is either the
+	 * owner, a client or a partner.
+	 *
+	 * @param company - PartyGroup instance
+	 * @return list of projects.
+	 */
+	List<Project> getProjectsForCompany(PartyGroup company){
+
+		List ownerOf = getProjectsWhereOwner(company)
+		List clientOf = getProjectsWhereClient(company)
+	 	List partnerOf = partyRelationshipService.getProjectsDependentOfParty()
+
+	 	List projects = ownerOf + clientOf + partnerOf
+
+	 	projects.unique{projA, projB -> projA.id <=> projB.id}
+
+	 	projects.sort{it.name}
+
+	 	return projects
+
+	 }
+
 }
