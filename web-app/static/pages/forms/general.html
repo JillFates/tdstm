@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <title>Style Guide</title>
+
+  <!-- START - This is being uncluded in the TOP NAV (responsiveStandardResources.gsp)  section -->
+  <link rel="shortcut icon" type="image/x-icon" href="../../../images/favicon.ico"/>
+
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="../../../dist/js/vendors/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../../../dist/css/fontawesome/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../../../dist/css/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../../../dist/css/TDSTMLayout.min.css">
+  <!-- General Template Style -->
+  <link rel="stylesheet" href="../../../css/style.css">
+
+  <!-- Blue Skin -->
+  <link rel="stylesheet" href="../../../dist/css/skins/skin-blue.min.css">
+
+  <!-- Kendo UI Material Theme -->
+  <link rel="stylesheet" href="../../../dist/css/kendo/kendo.common-material.min.css">
+  <link rel="stylesheet" href="../../../dist/css/kendo/kendo.material.min.css">
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="../../../dist/js/vendors/html5shiv/dist/html5shiv.min.js"></script>
+  <script src="../../../dist/js/vendors/respond/dest/respond.min.js"></script>
+  <![endif]-->
+
+  <!-- jQuery -->
+  <script src="../../../dist/js/vendors/jquery/dist/jquery.min.js"></script>
+
+
+  <!-- LEGACY CODE START -->
+
+  <link rel="stylesheet" type="text/css" href="../../../css/main.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/tds.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/ui.core.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/ui.dialog.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/ui.theme.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/ui.datetimepicker.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/jquery-ui-smoothness.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/combox.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/select2.css"/>
+  <link rel="stylesheet" type="text/css" href="../../../css/combox.css"/>
+
+  <link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="../../../plugins/jquery-ui-1.8.15/web-app/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css"/>
+
+  <script src="../../../js/prototype/prototype.js"></script>
+  <script src="../../../js/jquery-1.9.1.js"></script>
+  <script src="../../../js/jquery-1.9.1-ui.js"></script>
+  <script src="../../../js/datetimepicker.js"></script>
+  <script src="../../../js/jquery-migrate-1.0.0.js"></script>
+
+  <!-- Migration Scripts -->
+  <script src="../../../dist/js/migrateScript/jqueryDeprecated.js"></script>
+
+  <!-- We need to remove this for sure -->
+  <script src="../../../js/crawler.js"></script>
+
+  <script src="../../../js/select2.js"></script>
+  <script src="../../../js/jquery.combox.js"></script>
+  <script src="../../../js/moment.min.js"></script>
+  <script src="../../../js/moment-timezone-with-data.min.js"></script>
+  <script src="../../../js/daterangepicker.js"></script>
+  <script src="../../../js/lodash/lodash.min.js"></script>
+  <script src="../../../js/tds-common.js"></script>
+  <script src="../../../js/timezone/jquery.maphilight.min.js"></script>
+  <script src="../../../js/timezone/jquery.timezone-picker.min.js"></script>
+  <script src="../../../js/person.js"></script>
+
+  <!-- Kendo Directives -->
+  <script src="../../../dist/js/vendors/kendo/kendo.all.min.js"></script>
+  <!-- Boosttrap -->
+  <script src="../../../dist/js/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+  <!-- SlimScroll -->
+  <script src="../../../dist/js/vendors/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+  <!-- FastClick -->
+  <script src="../../../dist/js/vendors/fastclick/lib/fastclick.js"></script>
+  <!-- ProgressBar.js -->
+  <script src="../../../dist/js/vendors/progressbar.js/dist/progressbar.js"></script>
+
+  <!-- TDSTMLayout App -->
+  <script src="../../../dist/js/TDSTMLayout.min.js"></script>
+
+  <!-- END - This is being uncluded in the TOP NAV (responsiveStandardResources.gsp)  section -->
+
+  <!-- START - This is being uncluded in the TOP NAV (topNav.gsp)  section -->
+  <link type="text/css" rel="stylesheet" href="../../../css/dropDown.css" />
+  <link type="text/css" rel="stylesheet" href="../../../css/daterangepicker-bs3.css" />
+
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="hold-transition skin-blue">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container menu-top-container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+          <img id="logo-header" src="../../../images/TMHeaderLogo.png" border="0" />
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left navbar-ul-container" id="navbar-collapse">
+
+          <ul class="nav navbar-nav">
+            <li class="dropdown menu-parent-admin">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-parent-item">Administration</li>
+                <li class="menu-child-item menu-admin-portal"><a href="#">Admin Portal</a></li>
+                <li class="menu-child-item menu-admin-role"><a href="#">Role Permissions</a></li>
+                <li class="menu-child-item menu-admin-asset-options"><a href="#">Asset Options</a></li>
+                <li class="menu-child-item"><a href="#">help</a></li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Manage Clients</li>
+                <li class="menu-child-item menu-list-companies"><a href="#">List Companies</a></li>
+                <li class="menu-child-item menu-list-staff"><a href="#">List Staff</a></li>
+                <li class="menu-child-item menu-list-users"><a href="#">List Users</a></li>
+                <li class="menu-child-item menu-client-import-accounts"><a href="#">Import Accounts</a></li>
+                <li class="menu-child-item menu-client-export-accounts"><a href="#">Export Accounts</a></li>
+                <li class="menu-child-item"><a href="#">help</a></li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Manage Workflows</li>
+                <li class="menu-child-item menu-list-workflows"><a href="#">List Workflows</a></li>
+                <li class="menu-child-item"><a href="#">help</a></li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Manage Model Library</li>
+                <li class="menu-child-item menu-list-manufacturers"><a href="#">List Manufacturers</a></li>
+                <li class="menu-child-item menu-list-models"><a href="#">List Models</a></li>
+                <li class="menu-child-item menu-sync-libraries"><a href="#">Sync Libraries</a></li>
+                <li class="menu-child-item"><a href="#">help</a></li>
+              </ul>
+            </li>
+            <li class="dropdown menu-parent-projects">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-child-item menu-projects-active-projects"><a href="#">Active Projects</a></li>
+                <li class="menu-child-item menu-projects-current-project"><a href="#">#### Details</a></li>
+                <li class="menu-child-item menu-projects-project-staff"><a href="#">Project Staff</a></li>
+                <li class="menu-child-item menu-projects-user-activation"><a href="#">User Activation Emails</a></li>
+                <li class="menu-child-item menu-projects-field-settings"><a href="#">Field Settings</a></li>
+                <li class="menu-child-warn">No Project Selected</li>
+                <li class="menu-child-item"><a href="#">help</a></li>
+              </ul>
+            </li>
+            <li class="dropdown menu-parent-data-centers">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Centers<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-parent-item">Rooms and Racks</li>
+                <li class="menu-child-item menu-parent-data-centers-list-rooms"><a href="#">List Rooms</a></li>
+                <li class="menu-child-item menu-parent-data-centers-selected-center"><a href="#">Room ##</a></li>
+                <li class="menu-child-item menu-parent-data-centers-rack-elevation"><a href="#">Rack Elevations</a></li>
+                <li class="menu-child-item"><a href="#">help</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown menu-parent-assets">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assets<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-parent-item">Assets</li>
+                <li class="menu-child-item menu-parent-assets-summary-table"><a href="#">Summary Table</a></li>
+                <li class="menu-child-item menu-parent-assets-application-list"><a href="#">Applications</a></li>
+                <li class="menu-child-item menu-parent-assets-server-list"><a href="#">Servers</a>
+                </li>
+                <li class="menu-child-item menu-parent-assets-all-list" ><a href="#">All Devices</a></li>
+                <li class="menu-child-item menu-parent-assets-database-list"><a href="#">Databases</a></li>
+                <li class="menu-child-item menu-parent-assets-storage-list"><a href="#">Storage-Devices</a></li>
+                <li class="menu-child-item menu-parent-assets-storage-logical-list"><a href="#">Storage-Logical</a></li>
+                <li class="menu-child-item menu-parent-assets-comments-list"><a href="#">Comments</a></li>
+                <li class="menu-child-item menu-parent-assets-dependencies-list"><a href="#">Dependencies</a></li>
+                <li class="menu-child-item menu-parent-assets-dependency-analyzer"><a href="#">Dependency Analyzer</a></li>
+                <li class="menu-child-item menu-parent-assets-architecture-graph"><a href="#">Architecture Graph</a></li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');">help</a></li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Manage Data</li>
+                <li class="menu-child-item menu-parent-assets-import-assets"><a href="#">Import Assets</a></li>
+                <li class="menu-child-item menu-parent-assets-manage-batches"><a href="#">Manage Batches</a></li>
+                <li class="menu-child-item menu-parent-assets-export-assets"><a href="#">Export Assets</a></li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown menu-parent-planning">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-parent-item">Events</li>
+                <li class="menu-child-item menu-parent-planning-event-list"><a href="#">List Events</a> </li>
+                <li class="menu-child-item menu-parent-planning-event-detail-list"><a href="#"> Event Details</a></li>
+                <li class="menu-child-item menu-parent-planning-event-news"><a href="#">List Event News</a></li>
+                <li class="menu-child-item"><a href="#">Pre-event Checklist</a></li>
+                <li class="menu-child-item menu-parent-planning-export-runbook"><a href="#">Export Runbook</a></li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMEvents?cover=print','help');" >help</a></li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Bundles</li>
+                <li class="menu-child-item menu-parent-planning-list-bundles"><a href="#">List Bundles</a> </li>
+                <li class="menu-child-item menu-parent-planning-selected-bundle"><a href="#">Bundle Details</a></li>
+                <li class="menu-child-item menu-parent-planning-bundled-assets"><a href="#">Bundled Assets</a> </li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown menu-parent-tasks">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-parent-item">Tasks</li>
+                <li class="menu-child-item menu-parent-tasks-my-tasks"><a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a></li>
+                <li class="menu-child-item menu-parent-tasks-task-manager"><a href="#">Task Manager</a></li>
+                <li class="menu-child-item menu-parent-tasks-task-graph"><a href="#">Task Graph</a></li>
+                <li class="menu-child-item menu-parent-tasks-task-timeline"><a href="#">Task Timeline</a></li>
+                <li class="menu-child-item menu-parent-tasks-cookbook"><a href="#">Cookbook</a></li>
+                <li class="menu-child-item menu-parent-tasks-generation-history"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown menu-parent-dashboard">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-parent-item">Live Dashboards</li>
+                <li class="menu-child-item menu-parent-dashboard-user-dashboard"><a href="#">User Dashboard</a></li>
+                <li class="menu-child-item menu-parent-dashboard-planning-dashboard"><a href="#">Planning Dashboard</a></li>
+                <li class="menu-child-item menu-parent-dashboard-event-dashboard"><a href="#">Event Dashboard</a></li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');" >help</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown menu-parent-reports">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-item-expand" role="menu">
+                <li class="menu-parent-item">Discovery</li>
+                <li class="menu-child-item menu-reports-cabling-conflict"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" >Cabling Conflict</a> </li>
+                <li class="menu-child-item menu-reports-cabling-data"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a> </li>
+                <li class="menu-child-item menu-reports-power"><a href="/tdstm/reports/powerReport">Power</a> </li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Planning</li>
+                <li class="menu-child-item menu-reports-application-profiles"><a href="/tdstm/reports/applicationProfiles">Application Profiles</a> </li>
+                <li class="menu-child-item menu-reports-application-conflicts"><a href="/tdstm/reports/applicationConflicts">Application Conflicts</a> </li>
+                <li class="menu-child-item menu-reports-server-conflicts"><a href="/tdstm/reports/serverConflicts">Server Conflicts</a> </li>
+                <li class="menu-child-item menu-reports-database-conflicts"><a href="/tdstm/reports/databaseConflicts" >Database Conflicts</a> </li>
+                <li class="menu-child-item menu-reports-task-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
+                <li class="menu-child-item menu-reports-report-summary"><a href="#">Report Summary</a></li>
+                <li class="menu-child-item menu-reports-activity-metrics"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Event Prep</li>
+                <li class="menu-child-item menu-reports-pre-checklist"><a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a> </li>
+                <li class="menu-child-item menu-reports-login-badges"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges">Login Badges</a> </li>
+                <li class="menu-child-item menu-reports-asset-tags"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a> </li>
+                <li class="menu-child-item menu-reports-transport-worksheets"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List">Transport Worksheets</a></li><li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+                <li class="divider"></li>
+                <li class="menu-parent-item">Event Day</li>
+                <li class="menu-child-item menu-reports-application-migration"><a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
+                <li class="menu-child-item menu-reports-issue-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" >Issue Report</a> </li>
+                <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA">Cabling QA</a> </li>
+                <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+        <div class="navbar-custom-menu">
+          <ul class="nav navbar-nav">
+            <!-- Notifications Menu -->
+            <li class="dropdown notifications-menu">
+              <!-- Menu toggle button -->
+              <a href="#" id="nav-project-name" class="dropdown-toggle" data-toggle="dropdown">
+                Template Style Guide
+              </a>
+            </li>
+            <!-- User Account Menu -->
+            <li class="dropdown user user-menu">
+              <!-- Menu Toggle Button -->
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <img src="../../../images/personIcon.png" class="user-image" alt="User Image">
+                <span class="hidden-xs user-name">TDS</span>
+              </a>
+              <ul class="dropdown-menu user-dialog-dropdown-menu">
+                <!-- Menu Body -->
+                <li class="user-body">
+                  <ul class="list-group">
+                    <li class="list-group-item"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</li>
+                    <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${user}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
+                    <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit preferences</a></li>
+                    <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
+                    <li class="list-group-item"><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc"><span class="glyphicon glyphicon-info-sign user-menu-icon-badge"></span> Model Score <span class="badge">0</span></a></li>
+                  </ul>
+                </li>
+                <!-- Menu Footer-->
+                <li class="user-footer">
+                  <div class="pull-right">
+                    <a href="#" class="btn btn-default btn-flat"><span class="glyphicon glyphicon-log-out user-menu-icon-badge"></span> Sign Out</a>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-custom-menu -->
+      </div><!-- /.container-fluid -->
+    </nav>
+  </header>
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <!-- sidebar menu: : style can be found in sidebar.less -->
+      <ul class="sidebar-menu">
+        <li class="header">MAIN NAVIGATION</li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-laptop"></i>
+            <span>UI Elements</span>
+            <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="#"><i class="fa fa-circle-o"></i> General</a></li>
+            <li><a href="#"><i class="fa fa-circle-o"></i> Icons</a></li>
+            <li><a href="#"><i class="fa fa-circle-o"></i> Buttons</a></li>
+            <li><a href="#"><i class="fa fa-circle-o"></i> Sliders</a></li>
+            <li><a href="#"><i class="fa fa-circle-o"></i> Timeline</a></li>
+            <li><a href="#"><i class="fa fa-circle-o"></i> Modals</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-edit"></i> <span>Forms</span>
+            <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="general.html"><i class="fa fa-circle-o"></i> General Elements</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-table"></i> <span>Tables</span>
+            <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="pages/tables/simple.html"><i class="fa fa-circle-o"></i> Simple tables</a></li>
+            <li><a href="pages/tables/data.html"><i class="fa fa-circle-o"></i> Data tables</a></li>
+          </ul>
+        </li>
+        <li><a href="../../documentation/index.html"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
+      </ul>
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    <div class="container">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          General Form Elements
+          <small>Preview</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+          <li><a href="#">Forms</a></li>
+          <li class="active">General Elements</li>
+        </ol>
+      </section>
+
+      <section class="content">
+        <div class="row">
+          <!-- left column -->
+          <div class="col-md-6">
+            <!-- general form elements -->
+            <div class="box box-primary">
+              <div class="box-header with-border">
+                <h3 class="box-title">Quick Example</h3>
+              </div><!-- /.box-header -->
+              <!-- form start -->
+              <form role="form">
+                <div class="box-body">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputFile">File input</label>
+                    <input type="file" id="exampleInputFile">
+                    <p class="help-block">Example block-level help text here.</p>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox"> Check me out
+                    </label>
+                  </div>
+                </div><!-- /.box-body -->
+
+                <div class="box-footer">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+            </div><!-- /.box -->
+
+            <!-- Form Element sizes -->
+            <div class="box box-success">
+              <div class="box-header with-border">
+                <h3 class="box-title">Different Height</h3>
+              </div>
+              <div class="box-body">
+                <input class="form-control input-lg" type="text" placeholder=".input-lg">
+                <br>
+                <input class="form-control" type="text" placeholder="Default input">
+                <br>
+                <input class="form-control input-sm" type="text" placeholder=".input-sm">
+              </div><!-- /.box-body -->
+            </div><!-- /.box -->
+
+            <div class="box box-danger">
+              <div class="box-header with-border">
+                <h3 class="box-title">Different Width</h3>
+              </div>
+              <div class="box-body">
+                <div class="row">
+                  <div class="col-xs-3">
+                    <input type="text" class="form-control" placeholder=".col-xs-3">
+                  </div>
+                  <div class="col-xs-4">
+                    <input type="text" class="form-control" placeholder=".col-xs-4">
+                  </div>
+                  <div class="col-xs-5">
+                    <input type="text" class="form-control" placeholder=".col-xs-5">
+                  </div>
+                </div>
+              </div><!-- /.box-body -->
+            </div><!-- /.box -->
+
+          </div><!--/.col (left) -->
+          <!-- right column -->
+          <div class="col-md-6">
+            <!-- Horizontal Form -->
+            <div class="box box-info">
+              <div class="box-header with-border">
+                <h3 class="box-title">Horizontal Form</h3>
+              </div><!-- /.box-header -->
+              <!-- form start -->
+              <form class="form-horizontal">
+                <div class="box-body">
+                  <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+                    <div class="col-sm-10">
+                      <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+                    <div class="col-sm-10">
+                      <input type="password" class="form-control" id="inputPassword3" placeholder="Password">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <div class="checkbox">
+                        <label>
+                          <input type="checkbox"> Remember me
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /.box-body -->
+                <div class="box-footer">
+                  <button type="submit" class="btn btn-default">Cancel</button>
+                  <button type="submit" class="btn btn-info pull-right">Sign in</button>
+                </div><!-- /.box-footer -->
+              </form>
+            </div><!-- /.box -->
+            <!-- general form elements disabled -->
+            <div class="box box-warning">
+              <div class="box-header with-border">
+                <h3 class="box-title">General Elements</h3>
+              </div><!-- /.box-header -->
+              <div class="box-body">
+                <form role="form">
+                  <!-- text input -->
+                  <div class="form-group">
+                    <label>Text</label>
+                    <input type="text" class="form-control" placeholder="Enter ...">
+                  </div>
+                  <div class="form-group">
+                    <label>Text Disabled</label>
+                    <input type="text" class="form-control" placeholder="Enter ..." disabled>
+                  </div>
+
+                  <!-- textarea -->
+                  <div class="form-group">
+                    <label>Textarea</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Textarea Disabled</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter ..." disabled></textarea>
+                  </div>
+
+                  <!-- input states -->
+                  <div class="form-group has-success">
+                    <label class="control-label" for="inputSuccess"><i class="fa fa-check"></i> Input with success</label>
+                    <input type="text" class="form-control" id="inputSuccess" placeholder="Enter ...">
+                  </div>
+                  <div class="form-group has-warning">
+                    <label class="control-label" for="inputWarning"><i class="fa fa-bell-o"></i> Input with warning</label>
+                    <input type="text" class="form-control" id="inputWarning" placeholder="Enter ...">
+                  </div>
+                  <div class="form-group has-error">
+                    <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i> Input with error</label>
+                    <input type="text" class="form-control" id="inputError" placeholder="Enter ...">
+                  </div>
+
+                  <!-- checkbox -->
+                  <div class="form-group">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox">
+                        Checkbox 1
+                      </label>
+                    </div>
+
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox">
+                        Checkbox 2
+                      </label>
+                    </div>
+
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" disabled>
+                        Checkbox disabled
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- radio -->
+                  <div class="form-group">
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                        Option one is this and that&mdash;be sure to include why it's great
+                      </label>
+                    </div>
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                        Option two can be something else and selecting it will deselect option one
+                      </label>
+                    </div>
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3" disabled>
+                        Option three is disabled
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- select -->
+                  <div class="form-group">
+                    <label>Select</label>
+                    <select class="form-control">
+                      <option>option 1</option>
+                      <option>option 2</option>
+                      <option>option 3</option>
+                      <option>option 4</option>
+                      <option>option 5</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Select Disabled</label>
+                    <select class="form-control" disabled>
+                      <option>option 1</option>
+                      <option>option 2</option>
+                      <option>option 3</option>
+                      <option>option 4</option>
+                      <option>option 5</option>
+                    </select>
+                  </div>
+
+                  <!-- Select multiple-->
+                  <div class="form-group">
+                    <label>Select Multiple</label>
+                    <select multiple class="form-control">
+                      <option>option 1</option>
+                      <option>option 2</option>
+                      <option>option 3</option>
+                      <option>option 4</option>
+                      <option>option 5</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Select Multiple Disabled</label>
+                    <select multiple class="form-control" disabled>
+                      <option>option 1</option>
+                      <option>option 2</option>
+                      <option>option 3</option>
+                      <option>option 4</option>
+                      <option>option 5</option>
+                    </select>
+                  </div>
+
+                </form>
+              </div><!-- /.box-body -->
+            </div><!-- /.box -->
+          </div><!--/.col (right) -->
+        </div>   <!-- /.row -->
+      </section><!-- /.content -->
+    </div>
+    <!-- /.container -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="pull-right hidden-xs">
+        <b></b>
+      </div>
+      <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2015-2016 .</strong> All
+      rights reserved.
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+
+</body>
+</html>
