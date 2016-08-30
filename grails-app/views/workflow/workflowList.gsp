@@ -245,7 +245,7 @@
 		<span class="button"><input type="submit" class="cancel" onclick="return confirm('Are you sure?')" value="Cancel" /></span>
 	</g:form>
 </div>
-<div id="copyWorkflowDialog" title="Copy Workflow" style="display:none;">
+<div id="copyWorkflowDialog" class="static-dialog" title="Copy Workflow" style="display:none;">
 	<g:form action="createWorkflow" onsubmit="return checkInputData()">
 		<input type="hidden" name="workflow" value="${workflow?.id}" />
           <div class="dialog">
