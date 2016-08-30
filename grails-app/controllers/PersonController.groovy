@@ -159,7 +159,7 @@ def test = {
 		def map = [controller:'person', action:'listJson', id:"${params.companyId}"]
 		def listJsonUrl = HtmlUtil.createLink(map)
 		def createUrl = HtmlUtil.createLink([controller:'userLogin', action:'create'])
-		def editUrl = HtmlUtil.createLink([controller:'userLogin', action:'edit'])
+		def showUrl = HtmlUtil.createLink([controller:'userLogin', action:'show'])
 		def addUserIconUrl = HtmlUtil.resource([dir: 'icons', file: 'user_add.png', absolute: false])
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
@@ -167,7 +167,7 @@ def test = {
 			[ cell: ['<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.firstname+'</a>', 
 			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.middlename+'</a>', 
 			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.lastname+'</a>', 
-			genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, addUserIconUrl, it), 
+			genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, showUrl, addUserIconUrl, it), 
 			it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
@@ -180,14 +180,14 @@ def test = {
 	 * @param haveCreateUserLoginPerm boolean value that indicates if the user have CreateUserLoginPerm
 	 * @param haveEditUserLoginPerm boolean value that indicates if the user have EditUserLoginPerm
 	 * @param createUrl url used to create a new login for the current person
-	 * @param editUrl url used to edit login configuration for the current person
+	 * @param showUrl url used to edit login configuration for the current person
 	 * @param person person object to be displayed
 	 */
-	private def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, addUserIconUrl, person) {
+	private def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, showUrl, addUserIconUrl, person) {
 		def element = ""
 		if (person.userLoginId) {
 			if (haveEditUserLoginPerm) {
-				element = '<a href="' + editUrl + '/' + person.userLoginId + '">' + person.userLogin + '</a>'
+				element = '<a href="' + showUrl + '/' + person.userLoginId + '">' + person.userLogin + '</a>'
 			} else {
 				element = person.userLogin
 			}
