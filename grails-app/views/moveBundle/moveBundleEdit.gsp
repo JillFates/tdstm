@@ -21,21 +21,6 @@
 
       }
 
-      function saveMoveBundleSourceTeamAsset(val){
-
-      var moveBundleId = val.value +","+ val.name
-
-      ${remoteFunction(action:'addMoveBundleSourceAsset', params:'\'moveBundleId=\' + moveBundleId' )}
-
-      }
-
-      function saveMoveBundleTargetTeamAsset(val){
-
-      var moveBundleId = val.value +","+ val.name
-
-      ${remoteFunction(action:'addMoveBundleTargetAsset', params:'\'moveBundleId=\' + moveBundleId' )}
-
-      }
 
     </g:javascript>
 
@@ -159,10 +144,6 @@
 
                   <th>Bundle</th>
 
-                  <th>Source Team</th>
-
-                  <th>Target Team</th>
-
                   <th>Priority</th>
 
                   <th></th>
@@ -189,10 +170,6 @@
 
                       </select>
                     </td>
-
-                    <td><g:select optionKey="id" from="${ProjectTeam.list()}" name="${moveBundleAssetEditInstance?.id}" value="${moveBundleAssetEditInstance?.sourceTeamMt?.id}" onchange="saveMoveBundleSourceTeamAsset(this);"></g:select></td>
-
-                    <td><g:select optionKey="id" from="${ProjectTeam.list()}" name="${moveBundleAssetEditInstance?.id}" value="${moveBundleAssetEditInstance?.targetTeamMt?.id}" onchange="saveMoveBundleTargetTeamAsset(this);"></g:select></td>
 
                     <td><g:checkBox name="myCheckbox" value="${true}" /></td>
 

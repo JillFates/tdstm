@@ -25,10 +25,6 @@
 
                    	        <th>Asset</th>
 
-                   	        <th>Source Team</th>
-
-                   	        <th>Target Team</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -40,10 +36,6 @@
                             <td>${fieldValue(bean:moveBundleAssetInstance, field:'moveBundle')}</td>
 
                             <td>${fieldValue(bean:moveBundleAssetInstance, field:'asset.assetName')}</td>
-
-                            <td>${fieldValue(bean:moveBundleAssetInstance, field:'sourceTeamMt')}</td>
-
-                            <td>${fieldValue(bean:moveBundleAssetInstance, field:'targetTeamMt')}</td>
 
                         </tr>
                     </g:each>

@@ -44,24 +44,6 @@
                 </td>
               </tr>
 
-              <tr class="prop">
-                <td valign="top" class="name">
-                  <label for="sourceTeamMt">Source Team:</label>
-                </td>
-                <td valign="top" class="value ${hasErrors(bean:moveBundleAssetInstance,field:'sourceTeamMt','errors')}">
-                  <g:select optionKey="id" from="${ProjectTeam.list()}" name="sourceTeamMt.id" value="${moveBundleAssetInstance?.sourceTeamMt?.id}" ></g:select>
-                </td>
-              </tr>
-
-              <tr class="prop">
-                <td valign="top" class="name">
-                  <label for="targetTeamMt">Target Team:</label>
-                </td>
-                <td valign="top" class="value ${hasErrors(bean:moveBundleAssetInstance,field:'targetTeamMt','errors')}">
-                  <g:select optionKey="id" from="${ProjectTeam.list()}" name="targetTeamMt.id" value="${moveBundleAssetInstance?.targetTeamMt?.id}" ></g:select>
-                </td>
-              </tr>
-
             </tbody>
           </table>
         </div>

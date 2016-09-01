@@ -43,20 +43,6 @@
 
             </tr>
 
-            <tr class="prop">
-              <td valign="top" class="name">Source Team:</td>
-
-              <td valign="top" class="value"><g:link controller="projectTeam" action="show" id="${moveBundleAssetInstance?.sourceTeamMt?.id}">${moveBundleAssetInstance?.sourceTeamMt?.encodeAsHTML()}</g:link></td>
-
-            </tr>
-
-            <tr class="prop">
-              <td valign="top" class="name">Target Team:</td>
-
-              <td valign="top" class="value"><g:link controller="projectTeam" action="show" id="${moveBundleAssetInstance?.targetTeam?.id}">${moveBundleAssetInstance?.targetTeam?.encodeAsHTML()}</g:link></td>
-
-            </tr>
-
           </tbody>
         </table>
       </div>

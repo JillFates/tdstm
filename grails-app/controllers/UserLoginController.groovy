@@ -216,7 +216,6 @@ class UserLoginController {
 			def availableRoles = userPreferenceService.getAvailableRoles( person )
 			def assignedRoles = userPreferenceService.getAssignedRoles( person )
 			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-			//def projectList = personService.getAvailableProjects(person, null, false, new Date() - 30)
 			PartyGroup company = userLoginInstance.person.getCompany()
 			def projectList = projectService.getProjectsForCompany(company)
 			def projectId = userPreferenceService.getPreferenceByUserAndCode(userLoginInstance, PREF.CURR_PROJ)
@@ -307,7 +306,8 @@ class UserLoginController {
 		def project = securityService.getUserCurrentProject()
 
 		def currentUser = securityService.getUserLogin()
-		def projectList = personService.getAvailableProjects(person?person:currentUser.person, null, false, new Date() - 30)
+		PartyGroup company = userLoginInstance.person.getCompany()
+		def projectList = projectService.getProjectsForCompany(company)
 		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
 		def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level 
 		return ['userLoginInstance':userLoginInstance, personInstance:person, companyId:companyId, roleList:roleList, projectList:projectList,

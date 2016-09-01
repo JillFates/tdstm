@@ -54,10 +54,10 @@ environments {
 	test {
 		dataSource {
 			dbCreate = "create"
-			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
+			url = "jdbc:mysql://localhost/relo?autoReconnect=true"
 			driverClassName = "com.mysql.jdbc.Driver"
-			username = "tdstmapp"
-			password = "tdstmpswd"
+			username = "tdstm"
+			password = "tdstm"
 			dbCreate = ''
 			logSql = false
 		}

@@ -6,8 +6,6 @@ import org.apache.shiro.SecurityUtils;
 class SupervisorConsoleService {
 	def stateEngineService
     boolean transactional = true
-	protected static targetTeamType = ['MOVE_TECH':'target_team_id', 'CLEANER':'target_team_log_id','SYS_ADMIN':'target_team_sa_id',"DB_ADMIN":'target_team_dba_id']
-	protected static sourceTeamType = ['MOVE_TECH':'source_team_id', 'CLEANER':'source_team_log_id','SYS_ADMIN':'source_team_sa_id',"DB_ADMIN":'source_team_dba_id']
 	
 	/*----------------------------------------
      * @author : Lokanath Reddy
