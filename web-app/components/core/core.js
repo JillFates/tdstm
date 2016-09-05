@@ -749,9 +749,12 @@ tds.core.directive.RangePicker = function(utils) {
 					}
 				}
 
-				ngModelCtrl.$setValidity('dateRange', valid);
+				if(scope.ngModel != null && scope.ngModel != '') {
+					ngModelCtrl.$setValidity('dateRange', valid);
+				}
 
 				if (valid) {
+					ngModelCtrl.$setValidity('dateRange', valid);
 					if (scope.$root.$$phase != '$apply' && scope.$root.$$phase != '$digest') {
 						scope.$apply();
 					}
@@ -784,6 +787,7 @@ tds.core.directive.RangePicker = function(utils) {
 					element.daterangepicker({
 						timePicker: true,
 						timePickerIncrement: 1,
+						initialStartEndDate: false,
 						locale: {
 							format: tdsCommon.defaultDateTimeFormat(),
 						},
@@ -796,18 +800,20 @@ tds.core.directive.RangePicker = function(utils) {
 
 					element.on('show.daterangepicker', function(ev, picker) {
 
+						element.data('daterangepicker').changeInitialStartEndDate(false);
 						element.data('daterangepicker').hidePickerTime();
 
 						$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
 						$(window).resize(function(){ $('.cancelBtn').click(); });
 						if(scope.duration != "") {
-							element.data('daterangepicker').hidePickerTime(scope.duration);
+							element.data('daterangepicker').hidePickerTime();
+							element.data('daterangepicker').setDuration(scope.duration);
 						}
 
 						if(scope.dateBegin == "" && scope.dateEnd == "") {
-							element.data('daterangepicker').setStartDate(moment().hours(0).minutes(0).seconds(0));
+							/*element.data('daterangepicker').setStartDate(moment().hours(0).minutes(0).seconds(0));
 							element.data('daterangepicker').setEndDate(moment().add('d', 1).hours(0).minutes(0).seconds(0));
-							element.data('daterangepicker').updateView();
+							element.data('daterangepicker').updateView();*/
 						}
 					});
 					element.on('apply.daterangepicker', function(ev, picker) {

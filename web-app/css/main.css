@@ -482,16 +482,6 @@ td.buttonR .powerIcon {
 	clear:both;
 }
 
-.clear_filter {
-	font-size: 14px;
-	color: #B80000;
-	vertical-align: baseline;
-}
-
-span.clear_filter {
-	cursor: pointer;
-}
-
 .menuButton a.save {
 	background: transparent url(../icons/database_save.png) 5px 50% no-repeat;
 	color: #333;

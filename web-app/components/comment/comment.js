@@ -523,6 +523,13 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		}
 	}
 
+	$scope.clearDateRangePickerValue = function(dateRangePicker) {
+		$scope.acData.estRange = null;
+		$scope.ac.estStart = null;
+		$scope.ac.estFinish = null;
+		$('#'+dateRangePicker).val('');
+	}
+
 	/* ********************************************************************* */
 
 	$scope.commentInfo = []
