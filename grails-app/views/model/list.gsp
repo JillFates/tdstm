@@ -73,10 +73,25 @@
 				}
 			});
 		</script>
+		<style>
+		/*TODO: REMOVE ON COMPLETE MIGRATION */
+		div.content-wrapper {
+			background-color: #ecf0f5 !important;
+		}
+		</style>
 	</head>
 	<body>
+		<!-- Content Header (Page header) -->
+		<section class="content-header">
+			<h1>
+				Model List
+			</h1>
+			<ol class="breadcrumb">
+				<li><a href="#">Admin</a></li>
+				<li><a href="#">Models</a></li>
+			</ol>
+		</section><br />
 		<div class="body fluid">
-			<h1>Model List</h1>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message" >${flash.message}</div>
 			</g:if>

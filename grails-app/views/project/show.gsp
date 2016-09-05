@@ -20,7 +20,7 @@
 		<div class="body">
 			<h1>Project Details</h1>
 					
-				<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+				<div class="nav" style="border: 1px solid #CCCCCC; height: 20px">
 					<tds:hasPermission permission='MoveBundleEditView'>
 						<span class="menuButton"><g:link class="create" controller="moveBundle" action="planningStats">Planning Dashboard</g:link></span>
 					</tds:hasPermission>

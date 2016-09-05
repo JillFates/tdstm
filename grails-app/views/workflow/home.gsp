@@ -3,17 +3,31 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav"/>
     <title>Workflows</title>
+    <style>
+        /*TODO: REMOVE ON COMPLETE MIGRATION */
+        div.content-wrapper {
+            background-color: #ecf0f5 !important;
+        }
+    </style>
 </head>
 
 <body>
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Workflows
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#">Admin</a></li>
+        <li><a href="#">Workflow</a></li>
+    </ol>
+</section><br />
 <div class="body">
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
-    <div class="steps_table">
-        <span class="span"><b>Workflows</b></span>
 
-        <div class="list" style="border: 1px solid #5F9FCF; margin-left: 10px;margin-right: 10px;">
+        <div class="list" style="margin-left: 10px; margin-right: 10px;">
             <table>
                 <thead>
                 <tr>
@@ -54,7 +68,7 @@
                 <input type="hidden" name="workflow" id="workflowId">
             </g:form>
         </div>
-    </div>
+
     <script type="text/javascript">
         function showWorkflowList(workflowId) {
             $("#workflowId").val(workflowId);

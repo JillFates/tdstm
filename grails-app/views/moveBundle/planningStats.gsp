@@ -48,7 +48,7 @@ $(document).ready(function() {
 </script>
 <g:javascript src="entity.crud.js" /></head>
 <body>
-	<div class="container-full">
+
 		<div class="execution-phase-wrapper">
 				<!-- Full-width content -->
 
@@ -585,6 +585,6 @@ $(document).ready(function() {
 			</div>
 
 		</div>
-	</div>
+
 </body>
 </html>

@@ -1,5 +1,5 @@
 html * {
-	margin: 0;
+	/*margin: 0;*/
 	/*padding: 0; SELECT NOT DISPLAYED CORRECTLY IN FIREFOX */
 }
 
@@ -14,7 +14,7 @@ html * {
 body {
 	background: #fff;
 	color: #333;
-	font: 12px helvetica, arial, sans-serif;
+	/*font: 12px helvetica, arial, sans-serif;*/
 }
 
 a:link, a:visited, a:hover {
@@ -37,7 +37,7 @@ h1 {
 	margin: .8em 0 .3em 0 !important;
 }
 h4 {
-	font: 12px helvetica,arial,sans-serif !important;
+	/*font: 12px helvetica,arial,sans-serif !important;*/
 }
 .heading {
 	color: #63a242;
@@ -390,16 +390,6 @@ tr#applicationDependentId td.class-wrap-depend {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-.container-full {
-	margin: 0 auto;
-	width: 100%;
-	overflow-x: hidden;
-}
-
-.container-full .execution-phase-wrapper {
-	margin-left: 20px;
 }
 
 /* ACTION BUTTONS */
