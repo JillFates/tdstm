@@ -863,7 +863,7 @@ tds.core.directive.DurationPicker = function(utils) {
 
 				var duration = parseInt(scope.duration, 10);
 
-				if (duration) {
+				if (duration || duration == 0) {
 					var startDate = moment().startOf('day');
 					var endDate = moment().startOf('day');
 					endDate.add(scope.scale.toLowerCase(), duration);
@@ -906,16 +906,16 @@ tds.core.directive.DurationPicker = function(utils) {
 			}, true);
 
 			scope.$watch('duration', function(nVal, oVal) {
-				if (nVal && (nVal != oVal)) {
+				if (!isNaN(nVal) && (nVal !== oVal)) {
 					updateModel();
 				}
-			});
+			}, true);
 
 			scope.$watch('ngModel', function(nVal, oVal) {
-				if (!isNaN(nVal) && (nVal != oVal)) {
+				if (!isNaN(nVal) && (nVal !== oVal)) {
 					updateView();
 				}
-			});
+			}, true);
 
 		}
 	}
