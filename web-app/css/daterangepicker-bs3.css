@@ -214,6 +214,10 @@
   color: white !important;
 }
 
+.daterangepicker td.start-date.end-date {
+  background: linear-gradient(90deg, #2EB57B 50%, #357ebd 50%) !important;
+}
+
 .daterangepicker td.disabled, .daterangepicker option.disabled {
   color: #999;
 }
