@@ -59,7 +59,7 @@
 
 <g:include view="/layouts/_error.gsp" />
 
-	<div class="body" style="position: relative" id="cookbookRecipesEditor" ng-app="tdsCookbook" ng-controller="tds.cookbook.controller.MainController">
+	<div class="body cookbook_recipes_editor" style="position: relative" id="cookbookRecipesEditor" ng-app="tdsCookbook" ng-controller="tds.cookbook.controller.MainController">
 
 		<div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
 			<button type="button" class="close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>

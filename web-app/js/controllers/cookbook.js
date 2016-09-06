@@ -454,6 +454,8 @@ tds.cookbook.controller.RecipesController.$inject = ['$scope', '$rootScope', '$t
  * Recipe detail controller
  */
 tds.cookbook.controller.RecipeDetailController = function(scope, state, stateParams, log, utils, cookbookService, recipeManager, alerts) {
+	// To test alert msg directly
+	//alerts.addAlert({type: 'success', msg: 'Could not save the recipe'});
 
 	scope.recipeId = stateParams.recipeId;
 
