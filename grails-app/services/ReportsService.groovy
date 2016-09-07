@@ -882,7 +882,7 @@ class ReportsService {
 			publishedValues = [true, false]
 		}
 		
-		Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me ,onlyPublished)
+		Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(moveEventInstance ,onlyPublished)
 		def tasks = tasksAndDependencies.tasks
 		def deps = tasksAndDependencies.dependencies
 		def tmp = runbookService.createTempObject(tasks, deps)
