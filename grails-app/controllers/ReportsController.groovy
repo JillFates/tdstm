@@ -1182,7 +1182,7 @@ class ReportsController {
 			//Generating XLS Sheet
 			switch(params._action_tasksReport){
 				case "Generate Xls" :
-					  exportTaskReportExcel(taskList, tzId, userDTFormat, project)
+					  exportTaskReportExcel(taskList, tzId, userDTFormat, project, reqEvents)
 					  break;
 					  
 				case "Generate Pdf" :
@@ -1206,11 +1206,24 @@ class ReportsController {
 	 * @param taskList : list of tasks 
 	 * @param tzId : timezone
 	 * @param project : project instance
+	 * @param reqEvents : list of requested events.
 	 * @return : will generate a XLS file having task task list
 	 */
-	def exportTaskReportExcel(taskList, tzId, userDTFormat, project){
+	def exportTaskReportExcel(taskList, tzId, userDTFormat, project, reqEvents){
 		File file =  grailsApplication.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
-		def filename = "${project.name}-TaskReport"
+		def currDate = TimeUtil.nowGMT()
+		String events = "ALL-"
+		if(reqEvents.size() > 1 || reqEvents[0] != "all"){
+			def moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+			String eventNames = ""
+			moveEvents.each{
+				eventNames += "${it.name}-"
+			}
+			events = eventNames
+
+		}
+		def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
+		String filename = project.client.name + '-' + ( project.name ?: project.id ) + "-${events}${exportDate}"
 
 		//set MIME TYPE as Excel
 		response.setContentType( "application/vnd.ms-excel" )
