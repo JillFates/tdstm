@@ -1232,7 +1232,7 @@ class ReportsController {
 		def book = new HSSFWorkbook(new FileInputStream( file ));
 
 		def tasksSheet = book.getSheet("tasks")
-		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
+		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
 			'datePlanned','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
 			'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 					

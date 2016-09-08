@@ -519,6 +519,12 @@ class MoveBundleService {
 					case "assetEntity":
 						cellValue = assetComment[attribName]?.assetType == "Application" ?  String.valueOf(assetComment[attribName]?.assetName) : ''
 						break
+					case "assetClass":
+						cellValue = assetComment["assetEntity"]? String.valueOf(assetComment["assetEntity"]?.assetType) : ''
+						break
+					case "assetId":
+						cellValue = assetComment["assetEntity"]? String.valueOf(assetComment["assetEntity"]?.id) : ''
+						break
 					case "commentAssetEntity":
 						cellValue = assetComment.assetEntity ?  String.valueOf(assetComment.assetEntity?.assetName) : ''
 						break
