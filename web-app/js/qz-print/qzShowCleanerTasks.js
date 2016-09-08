@@ -152,14 +152,17 @@ QZ = function(opts){
 
         var data = opts.data;
         qz.append('\nN\n');
-        qz.append('A'+offset1+',20,0,4,1,1,N,"' + data.assetName + '"\n');
-        qz.append('A'+offset1+',47,0,3,1,1,N,"' + data.modelName + '"\n');
-        qz.append('A'+offset1+',74,0,3,1,1,N,"Cart: ' + data.cart + '"\n');
-        qz.append('A'+offset2+',74,0,3,1,1,N,"Shelf: ' + data.shelf + '"\n');
-        qz.append('A'+offset1+',101,0,3,1,1,N,"Room: ' + data.roomTarget + '"\n');
-        qz.append('A'+offset1+',128,0,3,1,1,N,"Rack: ' + data.rackTarget + '"\n');
-        qz.append('A'+offset2+',128,0,3,1,1,N,"UPos: ' + data.targetRackPosition + '"\n');
-        qz.append('B'+offset1+',150,0,1,3,5,60,B,"' + data.assetTag + '"\n');
+        qz.append('\nR0,0\n');  // Reset coordinates
+        qz.append('\nQ254\n');  // Set label height 1.25"
+        qz.append('\nD7\n');    // Density 
+        qz.append('A'+offset1+',0,0,4,1,1,N,"' + data.assetName + '"\n');
+        qz.append('A'+offset1+',27,0,3,1,1,N,"' + data.modelName + '"\n');
+        qz.append('A'+offset1+',54,0,3,1,1,N,"Cart: ' + data.cart + '"\n');
+        qz.append('A'+offset2+',54,0,3,1,1,N,"Shelf: ' + data.shelf + '"\n');
+        qz.append('A'+offset1+',81,0,3,1,1,N,"Room: ' + data.roomTarget + '"\n');
+        qz.append('A'+offset1+',108,0,3,1,1,N,"Rack: ' + data.rackTarget + '"\n');
+        qz.append('A'+offset2+',108,0,3,1,1,N,"UPos: ' + data.targetRackPosition + '"\n');
+        qz.append('B'+offset1+',130,0,1,3,5,60,B,"' + data.assetTag + '"\n');
         qz.append('P' + data.printTimes + ',1\n');
 
         qz.print();
