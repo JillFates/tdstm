@@ -803,8 +803,8 @@ tds.core.directive.RangePicker = function(utils) {
 						element.data('daterangepicker').changeInitialStartEndDate(false);
 						element.data('daterangepicker').hidePickerTime();
 
-						//$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
-						$(window).resize(function(){ $('.cancelBtn').click(); });
+						$('.modal').on('scroll', function(){ element.data('daterangepicker').move(); });
+						$(window).resize(function(){ element.data('daterangepicker').move();  });
 						if(scope.duration !== "") {
 							element.data('daterangepicker').hidePickerTime();
 							element.data('daterangepicker').setDuration(scope.duration);
