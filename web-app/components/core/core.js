@@ -803,26 +803,24 @@ tds.core.directive.RangePicker = function(utils) {
 						element.data('daterangepicker').changeInitialStartEndDate(false);
 						element.data('daterangepicker').hidePickerTime();
 
-						$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
+						//$('.modal').on('scroll', function(){ $('.cancelBtn').click(); });
 						$(window).resize(function(){ $('.cancelBtn').click(); });
-						if(scope.duration != "") {
+						if(scope.duration !== "") {
 							element.data('daterangepicker').hidePickerTime();
 							element.data('daterangepicker').setDuration(scope.duration);
 						}
 
-						if(scope.dateBegin == "" && scope.dateEnd == "") {
-							/*element.data('daterangepicker').setStartDate(moment().hours(0).minutes(0).seconds(0));
-							element.data('daterangepicker').setEndDate(moment().add('d', 1).hours(0).minutes(0).seconds(0));
-							element.data('daterangepicker').updateView();*/
+						if((scope.dateBegin !== "" && scope.dateBegin != null) && (scope.dateEnd !== "" && scope.dateEnd != null)) {
+							element.data('daterangepicker').setStartDate(scope.dateBegin);
+							element.data('daterangepicker').setEndDate(scope.dateEnd);
+							element.data('daterangepicker').updateView();
 						}
+
 					});
 					element.on('apply.daterangepicker', function(ev, picker) {
 						updateModel();
 					});
 
-					element.on('change', function() {
-						updateModel();
-					});
 				}
 			);
 

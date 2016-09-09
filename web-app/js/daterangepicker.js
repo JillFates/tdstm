@@ -547,6 +547,12 @@
         },
 
         changeInitialStartEndDate: function(status) {
+            if(!status) {
+                this.container.find('input[name=daterangepicker_start]').val('');
+                this.container.find('input[name=daterangepicker_end]').val('');
+                this.container.find('div.calendar-table table.table-condensed tr td.active, div.calendar-table table.table-condensed tr td.in-range').removeClass('in-range').removeClass('active').removeClass('start-date').removeClass('end-date');
+                this.container.find('button.applyBtn').prop('disabled', true);
+            }
             this.initialStartEndDate = status;
         },
 
@@ -1197,7 +1203,11 @@
                 this.callback(this.startDate, this.endDate, this.chosenLabel);
 
             //if picker is attached to a text input, update it
-            this.updateElement();
+            if(this.allowUpdateView) {
+                this.updateElement();
+            }
+
+            this.allowUpdateView = true;
 
             $(document).off('.daterangepicker');
             $(window).off('.daterangepicker');
@@ -1225,6 +1235,7 @@
             target.closest(this.container).length ||
             target.closest('.calendar-table').length
             ) return;
+            this.allowUpdateView = false;
             this.hide();
             this.element.trigger('outsideClick.daterangepicker', this);
         },
@@ -1454,6 +1465,7 @@
         },
 
         clickApply: function(e) {
+            this.allowUpdateView = true;
             this.hide();
             this.element.trigger('apply.daterangepicker', this);
         },
@@ -1461,6 +1473,7 @@
         clickCancel: function(e) {
             this.startDate = this.oldStartDate;
             this.endDate = this.oldEndDate;
+            this.allowUpdateView = false;
             this.hide();
             this.element.trigger('cancel.daterangepicker', this);
         },
