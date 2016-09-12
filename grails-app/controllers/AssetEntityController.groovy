@@ -2065,7 +2065,8 @@ class AssetEntityController {
 				successorList: successorList,
 				instructionsLinkURL: instructionsLinkURL ?: "",
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
-				canEdit: canEdit 
+				canEdit: canEdit,
+				durationLocked: assetComment.durationLocked
 			]
 		} else {
 		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "

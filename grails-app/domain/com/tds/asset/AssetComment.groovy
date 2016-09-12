@@ -67,7 +67,8 @@ class AssetComment {
 	Integer recipe
 	Integer taskSpec				// The taskSpec id # within the receipe that caused this task to be created
 	String instructionsLink
-	
+	Boolean durationLocked
+
 	static hasMany = [ 
 		notes : CommentNote,
 		taskDependencies : TaskDependency 
@@ -146,6 +147,7 @@ class AssetComment {
 		taskSpec(nullable:true)
 		taskBatch(nullable:true)
 		instructionsLink(blank:true, nullable:true, size:0..255)
+		durationLocked(nullable:false)
 	}
 
 	static mapping  = {	
@@ -157,6 +159,7 @@ class AssetComment {
 		instructionsLink column: 'instructions_link'
 		resolvedBy column: 'resolved_by'
 		createdBy column: 'created_by'
+		durationLocked column: "duration_locked"
 		columns {
 			comment sqltype: 'text'
 			mustVerify sqltype: 'tinyint'
