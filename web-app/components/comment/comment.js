@@ -112,6 +112,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.EditCommentDialogController,
 			scope: scope,
+			keyboard: false,
 			windowClass: ((commentType == 'comment') ? 'modal-comment' : 'modal-task'),
 			backdrop : 'static',
 			resolve: {
@@ -164,6 +165,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.EditCommentDialogController,
 			scope: scope,
+			keyboard: false,
 			windowClass: ((commentTO.commentType == 'comment') ? 'modal-comment' : 'modal-task'),
 			backdrop : 'static',
 			resolve: {
@@ -1207,9 +1209,11 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 			taskDependency: "",
 			taskSuccessor: "",
 			workflowTransition: '',
-			canEdit: true
+			canEdit: true,
+			durationLocked: false
 		};
 	};
+
 
 	var commentTemplateFromEditResponse = function(response) {
 		return commentTemplateFromCreateResponse(response, response.assetId, response.assetType);
@@ -1243,6 +1247,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		temp.taskNumber = ac.taskNumber;
 		temp.workflowTransition = ac.workflowTransition ? ac.workflowTransition.id.toString() : '';
 		temp.canEdit = response.canEdit;
+		temp.durationLocked = response.assetComment.durationLocked;
 
 		return temp;
 	};

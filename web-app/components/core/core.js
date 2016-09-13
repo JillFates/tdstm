@@ -716,6 +716,7 @@ tds.core.directive.RangePicker = function(utils) {
 			duration: '=',
 			scale: '=',
 			scales: '=',
+			durationLocked: '=durationLocked',
 			ngModel: '=ngModel'
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
@@ -799,7 +800,7 @@ tds.core.directive.RangePicker = function(utils) {
 					});
 
 					element.on('show.daterangepicker', function(ev, picker) {
-
+						element.data('daterangepicker').changeDurationLocked(scope.durationLocked);
 						element.data('daterangepicker').changeInitialStartEndDate(false);
 						element.data('daterangepicker').hidePickerTime();
 
@@ -818,6 +819,7 @@ tds.core.directive.RangePicker = function(utils) {
 
 					});
 					element.on('apply.daterangepicker', function(ev, picker) {
+						scope.durationLocked = element.data('daterangepicker').getDurationLocked();
 						updateModel();
 					});
 
@@ -840,6 +842,7 @@ tds.core.directive.DurationPicker = function(utils) {
 			duration: '=duration',
 			scale: '=scale',
 			scales: '=scales',
+			durationLocked: '=durationLocked',
 			ngModel: '=ngModel'
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
@@ -849,6 +852,9 @@ tds.core.directive.DurationPicker = function(utils) {
 				hour: 0,
 				minutes: 0
 			};
+
+			// This control if the Lock Duration needs to be updated
+			var modifyLockDuration = true;
 
 			/**
 			 * Modify the view
@@ -871,6 +877,8 @@ tds.core.directive.DurationPicker = function(utils) {
 					scope.durationpicker.day = parseInt(duration.asDays());
 					scope.durationpicker.hour = parseInt(duration.hours());
 					scope.durationpicker.minutes = parseInt(duration.minutes());
+
+					modifyLockDuration = false;
 
 					ngModelCtrl.$setViewValue((scope.durationpicker.day * 8.64e+7) + (scope.durationpicker.hour * 3.6e+6) + (scope.durationpicker.minutes * 60000));
 
@@ -899,6 +907,10 @@ tds.core.directive.DurationPicker = function(utils) {
 			scope.$watch('durationpicker', function(nVal, oVal) {
 				if (nVal && (nVal != oVal) ) {
 					ngModelCtrl.$setViewValue((scope.durationpicker.day * 8.64e+7) + (scope.durationpicker.hour * 3.6e+6) + (scope.durationpicker.minutes * 60000));
+					if(modifyLockDuration) {
+						scope.durationLocked = true;
+					}
+					modifyLockDuration = true;
 				}
 
 			}, true);

@@ -61,17 +61,27 @@
 							<span ng-hide="acData.instructionsLinkURL.length > 0">{{ac.instructionsLink}}</span>
 						</td>
 					</tr>
-					<tr id="workFlowShow">
-						<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
+					<tr id="workFlowShow1">
+						<td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
+						<td valign="top" class="value"colspan="3" nowrap="nowrap">
+							<span id="priorityShowId"><b ng-show="ac.priority == 1 || ac.priority == 2">{{ac.priority}}</b><span ng-show="!(ac.priority == 1 || ac.priority == 2)">{{ac.priority}}</span></span>
+						</td>
+					</tr>
+					<tr id="workFlowShow2">
+						<td valign="top" class="name"><label for="dueDateShowId">Due Date:</label></td>
+						<td valign="top" class="value"colspan="3" nowrap="nowrap">
+							<span id="dueDateShowId">{{ac.dueDate}}</span>
+						</td>
+					</tr>
+					<tr id="workFlowShow3">
+						<td valign="top" class="name"><label for="durationShowId">Estimated Duration:</label></td>
 						<td valign="top" class="value"colspan="3" nowrap="nowrap">
 							<span id="durationShowId" >{{ac.duration}}</span>
 							<span id="durationScale" >{{ac.durationScale}}</span>
-							&nbsp;&nbsp;&nbsp;&nbsp;
-							<span ><label for="priorityShowId">Priority:</label></span>
-							<span id="priorityShowId"><b ng-show="ac.priority == 1 || ac.priority == 2">{{ac.priority}}</b><span ng-show="!(ac.priority == 1 || ac.priority == 2)">{{ac.priority}}</span></span>
-							&nbsp;&nbsp;&nbsp;&nbsp;
-							<span ><label for="dueDateShowId">Due Date:</label></span>
-							<span id="dueDateShowId">{{ac.dueDate}}</span>
+							<div class="daterangepicker_action daterangepicker_lock_show">
+								<i ng-if="!acData.durationLocked" class="fa fa-fw fa-unlock"></i>
+								<i ng-if="acData.durationLocked" class="fa fa-fw fa-lock"></i>
+							</div>
 						</td>
 					</tr>
 					<tr id="estStartShow">
