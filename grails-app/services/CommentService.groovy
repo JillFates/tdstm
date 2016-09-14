@@ -202,7 +202,7 @@ class CommentService {
 			// Assign the general params for all types.  Was having an issue with the above binding, which was 
 			// setting the assignedTo automatically with a blank Person object even though it was excluded.
 			// TODO : should only set properties base on the commentType
-			if (params.durationLocked != null)  assetComment.durationLocked = params.durationLocked
+			if (params.durationLocked != null)  assetComment.durationLocked = params.durationLocked.toBoolean()
 			if (params.commentType) assetComment.commentType = params.commentType
 			if (params.comment) assetComment.comment = params.comment
 			if (params.category) assetComment.category = params.category
