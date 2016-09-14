@@ -57,6 +57,7 @@
         this.scales = [];
         this.parseDateTimeString = options.parseDateTimeString;
         this.allowUpdateView = true;
+        this.isStartDateBeforeOriginalDay = false
 
         this.opens = 'right';
         if (this.element.hasClass('pull-right'))
@@ -488,6 +489,15 @@
         constructor: DateRangePicker,
 
         setStartDate: function(startDate) {
+
+            if(this.startDate != null && startDate != null && startDate != '' ) {
+                this.isStartDateBeforeOriginalDay = moment(startDate).isBefore(this.startDate);
+            }
+
+            if(this.durationLocked) {
+                this.isStartDateBeforeOriginalDay = false;
+            }
+
             if (typeof startDate === 'string')
                 this.startDate = moment(startDate, this.locale.format);
 
@@ -665,13 +675,16 @@
                     this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
                 }
 
-                if(this.duration && this.duration != '' || this.durationLocked){
+                if((this.duration && this.duration != '' || this.durationLocked) && !this.isStartDateBeforeOriginalDay){
                     var endDate = moment(this.startDate, this.locale.format);
                     endDate.add('m', this.duration);
                     if(endDate.isValid()) {
                         this.allowUpdateView = false;
                         this.setEndDate(endDate);
                     }
+                } else if((this.duration && this.duration != '' || this.durationLocked) && this.isStartDateBeforeOriginalDay){
+                    this.allowUpdateView = false;
+                    this.setEndDate(this.previousEndDate);
                 }
             }
             if (this.maxDate && this.linkedCalendars && !this.singleDatePicker && this.rightCalendar.month > this.maxDate) {
@@ -1442,6 +1455,7 @@
                     var second = this.timePickerSeconds ? parseInt(this.container.find('.left .secondselect').val(), 10) : 0;
                     date = date.clone().hour(hour).minute(minute).second(second);
                 }
+                this.previousEndDate = this.endDate.clone();
                 this.endDate = null;
                 this.setStartDate(date.clone());
             } else if (!this.endDate && date.isBefore(this.startDate)) {
@@ -1719,6 +1733,7 @@
                 this.updateView();
                 this.container.find('.daterangepicker-title').html('Select a Finish date')
             } else {
+                this.allowUpdateView = true;
                 this.container.find('.daterangepicker-title').html('Select a Start date')
             }
 
