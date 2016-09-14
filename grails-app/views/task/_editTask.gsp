@@ -95,6 +95,10 @@
 						<td valign="top" class="name" style="vertical-align: middle"><label for="durationEdit">Estimated Duration:</label></td>
 						<td valign="top" class="value">
 							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" duration-locked="ac.durationLocked" ng-change="updateEstFinish()"></tdsdurationpicker>
+							<div class="daterangepicker_action daterangepicker_lock_icon" data-toggle="tooltip" title="Click to toggle locking the Duration">
+								<i ng-if="!ac.durationLocked" class="fa fa-fw fa-unlock" ng-click="ac.durationLocked = true"></i>
+								<i ng-if="ac.durationLocked" class="fa fa-fw fa-lock" ng-click="ac.durationLocked = false"></i>
+							</div>
 						</td>
 					</tr>
 					<tr class="prop" id="estStartEditTrId">
@@ -102,10 +106,6 @@
 						<td valign="top" class="value" nowrap="nowrap">
 							<input type="text" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" date-begin="ac.estStart" date-end="ac.estFinish" duration-locked="ac.durationLocked" ng-model="acData.estRange" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
 							<div class="daterangepicker_action daterangepicker_clear_filter" ng-click="clearDateRangePickerValue('estRange')"><span class="clear_filter">×</span></div>
-							<div class="daterangepicker_action daterangepicker_lock_icon" data-toggle="tooltip" title="Click to toggle locking the Duration">
-								<i ng-if="!ac.durationLocked" class="fa fa-fw fa-unlock" ng-click="ac.durationLocked = true"></i>
-								<i ng-if="ac.durationLocked" class="fa fa-fw fa-lock" ng-click="ac.durationLocked = false"></i>
-							</div>
 							<span class="error-msg" ng-show="form.estRange.$error.dateRange">Invalid range.</span>
 						</td>
 					</tr>
