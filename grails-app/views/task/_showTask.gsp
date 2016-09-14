@@ -77,7 +77,6 @@
 						<td valign="top" class="name"><label for="durationShowId">Estimated Duration:</label></td>
 						<td valign="top" class="value"colspan="3" nowrap="nowrap">
 							<span id="durationShowId" >{{ac.duration}}</span>
-							<span id="durationScale" >{{ac.durationScale}}</span>
 							<div class="daterangepicker_action daterangepicker_lock_show">
 								<i ng-if="!acData.durationLocked" class="fa fa-fw fa-unlock"></i>
 								<i ng-if="acData.durationLocked" class="fa fa-fw fa-lock"></i>

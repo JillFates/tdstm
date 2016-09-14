@@ -1134,7 +1134,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 /**
  * Factory used to interact with the asset entity services
  */
-tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
+tds.comments.util.CommentUtils = function(q, interval, appCommonData, utils) {
 	var closePopup = function(scope, type) {
 		if (!scope.closed) {
 			try {
@@ -1229,8 +1229,8 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		temp.commentId = ac.id;
 		temp.commentType = ac.commentType;
 		temp.dueDate = response.dueDate;
-		temp.duration = ac.duration;
 		temp.durationScale = ac.durationScale?ac.durationScale.name:'M';
+		temp.duration =  utils.date.formatDuration(ac.duration, temp.durationScale);
 		temp.estFinish = response.etFinish;
 		temp.estStart = response.etStart;
 		temp.hardAssigned = ac.hardAssigned ? ac.hardAssigned.toString() : '0';
@@ -2185,7 +2185,7 @@ tds.comments.directive.GridButtons = function(utils, commentUtils) {
 tds.comments.module = angular.module('tdsComments', ['tdsCore', 'kendo.directives']);
 
 tds.comments.module.factory('commentService', ['utils', '$http', '$q', tds.comments.service.CommentService]);
-tds.comments.module.factory('commentUtils', ['$q', '$interval', 'appCommonData', tds.comments.util.CommentUtils]);
+tds.comments.module.factory('commentUtils', ['$q', '$interval', 'appCommonData', 'utils', tds.comments.util.CommentUtils]);
 
 tds.comments.module.directive('assignedToSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.AssignedToSelect]);
 tds.comments.module.directive('workflowTransitionSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.WorkflowTransitionSelect]);

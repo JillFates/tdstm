@@ -155,6 +155,39 @@ var tdsCommon = {
 	},
 
 	/**
+	 * Return a duration in a readable human way, show we use https://www.unc.edu/~rowlett/units/symbol.html ?
+	 * @param duration (number)
+	 * @param scale (char val)
+	 * return string representation of the duration in terms of days, hours, minutes
+	 */
+	formatDuration: function(duration, scale) {
+		var startDate = moment().startOf('day');
+		var endDate = moment().startOf('day');
+		endDate.add(duration, scale);
+
+		var durationDate = moment.duration(endDate.diff(startDate)),
+			durationResult = "";
+
+		var days = parseInt(durationDate.asDays());
+		if(days > 0) {
+			durationResult += days + " day"+((days > 1)? "s ":" ");
+		}
+
+		var hours = parseInt(durationDate.hours());
+		if(hours > 0) {
+			durationResult += hours + " hr"+((hours > 1)? "s ":" ");
+		}
+
+		var minutes = parseInt(durationDate.minutes());
+		if(minutes > 0) {
+			durationResult += minutes + " min"+((minutes > 1)? "s ":" ");
+		}
+
+
+		return durationResult;
+	},
+
+	/**
 	 * Used to validate an email address format
 	 * @param email
 	 * @return boolean true if valid else false

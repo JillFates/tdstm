@@ -22,10 +22,10 @@ function addAmPM(value){
 	if( inputVal ) {
 		inputField.val( inputVal.substring( 0,inputVal.lastIndexOf(' ') ) +' '+ value+'M' );
 	} else {
-		inputField.val( convertDateFormate(new Date(), value) )
+		inputField.val( convertDateFormat(new Date(), value) )
 	}
 }
-function convertDateFormate( date, value ){
+function convertDateFormat( date, value ){
 	var timeString = ""
 	var month =  date.getMonth();
 		

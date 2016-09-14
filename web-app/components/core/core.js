@@ -132,12 +132,17 @@ tds.core.utils = function(servRootPath) {
 			return moment(dateValue, tdsCommon.defaultDateTimeFormat(), true).isValid();
 		}
 
+		function formatDuration(duration, scale) {
+			return tdsCommon.formatDuration(duration, scale.toLowerCase());
+		}
+
 		return {
 			formatDueDate: formatDueDate,
 			formatDate: formatDate,
 			formatDateTime: formatDateTime,
 			createDateFromString: createDateFromString,
 			createDateTimeFromString: createDateTimeFromString,
+			formatDuration: formatDuration,
 			isValidDate: isValidDate,
 			isValidDateTime: isValidDateTime
 		};
