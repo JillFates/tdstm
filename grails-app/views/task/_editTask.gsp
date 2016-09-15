@@ -6,7 +6,7 @@
 		<span class="ui-button-text">close</span>
 		</button>
 	</div>
-	<div id="editCommentDialog" title="Edit Comment/Issue" class="comment-dialog-content">
+	<div id="editCommentDialog" class="comment-dialog-content">
 	<loading-indicator></loading-indicator>
 	<form name="form" class="css-form" novalidate>
 		<div class="dialog" style="border: 1px solid #5F9FCF">
@@ -95,7 +95,7 @@
 						<td valign="top" class="name" style="vertical-align: middle"><label for="durationEdit">Estimated Duration:</label></td>
 						<td valign="top" class="value">
 							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" duration-locked="ac.durationLocked" ng-change="updateEstFinish()"></tdsdurationpicker>
-							<div class="daterangepicker_action daterangepicker_lock_icon" data-toggle="tooltip" title="Click to toggle locking the Duration">
+							<div class="daterangepicker_action daterangepicker_lock_icon" title="" data-toggle="popover" data-placement="top" data-trigger="hover" data-content="Click to toggle locking the Duration">
 								<i ng-if="!ac.durationLocked" class="fa fa-fw fa-unlock" ng-click="ac.durationLocked = true"></i>
 								<i ng-if="ac.durationLocked" class="fa fa-fw fa-lock" ng-click="ac.durationLocked = false"></i>
 							</div>
@@ -187,7 +187,7 @@
 			<button type="button" id="saveAndCloseBId" class="btn btn-default tablesave" ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save</button>
 			<button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 		</div>
-			
+		<script>$('[data-toggle="popover"]').popover();</script>
 	</form>
 	</div>
 </div>

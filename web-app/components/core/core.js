@@ -827,8 +827,10 @@ tds.core.directive.RangePicker = function(utils) {
 							element.data('daterangepicker').setStartDate(scope.dateBegin);
 							element.data('daterangepicker').setEndDate(scope.dateEnd);
 							element.data('daterangepicker').updateView();
+
 						}
 
+						$('[data-toggle="popover"]').popover();
 					});
 					element.on('apply.daterangepicker', function(ev, picker) {
 						scope.durationLocked = element.data('daterangepicker').getDurationLocked();
