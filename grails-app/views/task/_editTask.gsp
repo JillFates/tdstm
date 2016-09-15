@@ -104,7 +104,7 @@
 					<tr class="prop" id="estStartEditTrId">
 						<td valign="top" class="name"><label for="estStartTrId">Estimated Start/Finish:</label></td>
 						<td valign="top" class="value" nowrap="nowrap">
-							<input type="text" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" date-begin="ac.estStart" date-end="ac.estFinish" duration-locked="ac.durationLocked" ng-model="acData.estRange" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
+							<input type="text" id-html-parent-container="'editTaskPopup'" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" date-begin="ac.estStart" date-end="ac.estFinish" duration-locked="ac.durationLocked" ng-model="acData.estRange" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
 							<div class="daterangepicker_action daterangepicker_clear_filter" ng-click="clearDateRangePickerValue('estRange')"><span class="clear_filter">×</span></div>
 							<span class="error-msg" ng-show="form.estRange.$error.dateRange">Invalid range.</span>
 						</td>

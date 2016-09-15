@@ -716,6 +716,7 @@ tds.core.directive.RangePicker = function(utils) {
 		restrict: 'A',
 		require: 'ngModel',
 		scope: {
+			idHtmlParentContainer: '=',
 			dateBegin: '=',
 			dateEnd: '=',
 			duration: '=',
@@ -811,6 +812,12 @@ tds.core.directive.RangePicker = function(utils) {
 
 						$('.modal').on('scroll', function(){ element.data('daterangepicker').move(); });
 						$(window).resize(function(){ element.data('daterangepicker').move();  });
+						var modalParent =  $('#'+scope.idHtmlParentContainer).closest('.modal-dialog');
+
+						if(modalParent && modalParent.length > 0) {
+							modalParent.height($('#'+scope.idHtmlParentContainer).height() + 236);
+						}
+
 						if(scope.duration !== "") {
 							element.data('daterangepicker').hidePickerTime();
 							element.data('daterangepicker').setDuration(scope.duration);
