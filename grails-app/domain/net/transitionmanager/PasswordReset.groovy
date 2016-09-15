@@ -12,16 +12,16 @@ class PasswordReset {
 	PasswordResetType type
 
 	// IP address the originated the request
-	String ipAddress 
+	String ipAddress
 
 	// The individual that originated the ForgotMyPassword, null if by USER
-	Person createdBy 
+	Person createdBy
 
 	// Reference to the dispatch that will send the email to the person
-	EmailDispatch emailDispatch 
+	EmailDispatch emailDispatch
 
 	// Computed time in the future that token will expire
-	Date expiresAfter 
+	Date expiresAfter
 
 	Date createdDate = TimeUtil.nowGMT()
 	Date lastModified

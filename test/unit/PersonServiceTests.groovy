@@ -1,5 +1,5 @@
 import groovy.mock.interceptor.*
-import org.apache.log4j.* 
+import org.apache.log4j.*
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -9,16 +9,16 @@ import spock.lang.Specification
  */
 @TestFor(PersonService)
 class PersonServiceTests extends Specification {
-	
+
 	def personService = new PersonService()
 	def log
 	def count = 0
 
 	void setup() {
-		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
+		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain
 
 		// build a logger...
-		BasicConfigurator.configure() 
+		BasicConfigurator.configure()
 		LogManager.rootLogger.level = Level.DEBUG
 		log = LogManager.getLogger("PersonService")
 
@@ -40,7 +40,7 @@ class PersonServiceTests extends Specification {
 
 		return valid
 	}
-	
+
 	// @Test
 	void testParseName() {
 
@@ -68,5 +68,5 @@ class PersonServiceTests extends Specification {
 			"".equals(personService.lastNameWithSuffix( [last:'']))
 			"".equals( personService.lastNameWithSuffix( [:] ))
 	}
-	
+
 }

@@ -24,13 +24,13 @@ class Person extends Party {
 	String mobilePhone
 	Integer modelScore = 0
 	Integer modelScoreBonus = 0
-	String personImageURL 
+	String personImageURL
 	String keyWords
 	String tdsNote
 	String tdsLink
 	String staffType = 'Salary'
 	Integer travelOK = 1
-	
+
 	// static Person loggedInPerson
 
 	static hasMany =[
@@ -61,13 +61,13 @@ class Person extends Party {
 		 tdsLink( blank:true, nullable:true )
 		 staffType( blank:false, nullable:false, inList:['Contractor', 'Hourly', 'Salary'])
 		 travelOK( nullable:true )
-		 
+
 	 }
 
 	/*
 	 *  mapping for COLUMN Relation
 	 */
-	static mapping  = {	
+	static mapping  = {
 		version false
 		autoTimestamp false
 		tablePerHierarchy false
@@ -82,7 +82,7 @@ class Person extends Party {
             travelOK sqlType: 'tinyint'
 		}
 	}
-	
+
 	static transients = [
 		'assignedProjects',
 		'assignedTeams',
@@ -166,7 +166,7 @@ class Person extends Party {
 	}
 
 	/**
-	 * Used to retrieve the teams that a person has been indicated as being suitable to participate on	 
+	 * Used to retrieve the teams that a person has been indicated as being suitable to participate on
 	 * @return An array of the RoleType representing the teams that the person is associated with
 	 */
 	List<RoleType> getSuitableTeams() {
@@ -183,7 +183,7 @@ class Person extends Party {
 	}
 
 	/**
-	 * Used to determine if the Person is enabled 
+	 * Used to determine if the Person is enabled
 	 * @return true if active otherwise false
 	 */
 	boolean isEnabled() {
@@ -205,13 +205,13 @@ class Person extends Party {
 	}
 
 	/**
-	 * This method is used to get person's name in 'LastName, FirstName MiddleName' format 
+	 * This method is used to get person's name in 'LastName, FirstName MiddleName' format
 	 * @return person name in 'LastName, FirstName MiddleName' format
 	 */
 	String getLastNameFirst(){
 		return ( lastName ? "${lastName}, ": '' ) + firstName + (  middleName ? " $middleName" : '' )
 	}
-	
+
 	/**
 	 * This method is used to get person's name in 'LastName, FirstName MiddleName - Title' format
 	 * @return person name in 'LastName, FirstName MiddleName - Title' format
@@ -240,16 +240,16 @@ class Person extends Party {
 	 */
 	boolean isSystemUser(){
 		if(SYSTEM_USER_AT.firstName == firstName && SYSTEM_USER_AT.lastName == lastName){
-			return true;
+			return true
 		}else{
-			return false;
+			return false
 		}
 	}
 
 	String toString(){
 		firstName + ( middleName ? " $middleName" : '' ) + ( lastName ? " $lastName" : '' )
 	}
-	
+
 	def beforeValidate() {
 		if (middleName == null) {
 			middleName = ""

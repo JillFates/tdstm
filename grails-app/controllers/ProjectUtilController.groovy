@@ -41,7 +41,7 @@ class ProjectUtilController {
 	}
 
 	/*
-	 * Action to return a list of projects , sorted desc by dateCreated 
+	 * Action to return a list of projects , sorted desc by dateCreated
 	 */
 
 	def searchList() {
@@ -87,7 +87,7 @@ class ProjectUtilController {
 	 */
 	def createDemo() { return }
 	/*
-	 *  Copy all the temp project associates to demo project 
+	 *  Copy all the temp project associates to demo project
 	 */
 	def saveDemoProject() {
 		def template = params.template

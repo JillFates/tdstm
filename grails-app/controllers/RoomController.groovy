@@ -28,7 +28,7 @@ class RoomController {
 
 	def list() {
 		def (project, user) = controllerService.getProjectAndUserForPage( this, 'RackMenuView' )
-		if (! project) 
+		if (! project)
 			return
 
 		def projectId = project.id
@@ -37,7 +37,7 @@ class RoomController {
 		def rackIds = session.getAttribute("RACK_ID")
 
 		params.max = Math.min(params.max ? params.int('max') : 100, 100)
-		
+
 		def model = [:]
 
 		def roomInstanceList = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
@@ -83,9 +83,9 @@ class RoomController {
 		else {
 			log.info GormUtil.allErrorsString(roomInstance)
 			if (roomInstance.roomName) {
-				flash.message = "Room : ${roomInstance.roomName} is not created"	
+				flash.message = "Room : ${roomInstance.roomName} is not created"
 			} else {
-				flash.message = "Room not created"	
+				flash.message = "Room not created"
 			}
 			redirect(action: "list",params:[viewType : "list"])
 		}
@@ -104,7 +104,7 @@ class RoomController {
 			redirect(action: "list", params:[viewType : "list"])
 		}
 		else {
-			def auditView 
+			def auditView
 			if(params.containsKey("auditView")){
 				auditView = params.auditView
 				userPreferenceService.setPreference(PREF.AUDIT_VIEW, params.auditView)
@@ -119,8 +119,8 @@ class RoomController {
 			def racks = []
 			def moveBundlesMap = MoveBundle.executeQuery("SELECT m.id as bundleId , m.name from MoveBundle m \
 					where m.project =:project",[project :project])
-			
-			LinkedList bundleLists = new LinkedList(moveBundlesMap);
+
+			LinkedList bundleLists = new LinkedList(moveBundlesMap)
 			bundleLists.addFirst(['taskReady', 'Active Tasks'])
 			def statusList = [:]
 			if(moveBundleId && !moveBundleId.contains("all") && !moveBundleId.contains("taskReady")){
@@ -148,14 +148,14 @@ class RoomController {
 					racks = assetsByStatus.rackSource +  assetsByStatus.rackTarget
 					racks.removeAll([null])
 					racks.each{
-						def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status 
+						def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status
 						def statusCss = statuses.contains("Hold") ? "task_hold" : (statuses.contains("Started") ? "task_started" : "task_ready")
 						statusList << [(it.id) : statusCss]
 					}
 					userPreferenceService.setPreference(PREF.HIGHLIGHT_TASKS, moveBundleId)
 					moveBundleId = 'taskReady'
 			}
-			
+
 			[roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
 			 racksList: racksList, source:params.source, target:params.target, projectId : projectId, capacityView:params.capView, capacityType:params.capType?:'Remaining',
 			 auditPref:auditView, browserTestiPad:browserTestiPad, statusList:statusList, bundleList:bundleLists, moveBundleId:moveBundleId]
@@ -168,7 +168,7 @@ class RoomController {
 		def project = Project.findById( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
 		def prefVal = userPreferenceService.getPreference(PREF.ROOM_TABLE_SHOW_ALL)?: 'FALSE'
-		def modelList = Model.findAllByRoomObjectAndAssetType(true, 'Rack');		
+		def modelList = Model.findAllByRoomObjectAndAssetType(true, 'Rack')
 		def newRacks = []
 		for(int i = 50000 ; i<50051; i++ ){
 			newRacks << i
@@ -181,20 +181,20 @@ class RoomController {
 			def draggableRack = session.getAttribute( "DraggableRack" )?.DraggableRack
 			[roomInstance: roomInstance,
 			 rackInstanceList:rackInstanceList,
-			 newRacks : newRacks, 
+			 newRacks : newRacks,
 			 modelList:modelList,
 			 draggableRack:draggableRack,
 			 prefVal:prefVal,
 			 defaultRackModel: rackService.getDefaultRackModel()
 			]
 		}
-		
+
 	}
 
 	/**
 	 * Provide layout to create/edit rack.
 	 * @param id:Rack id
-	 * @return room layout 
+	 * @return room layout
 	 */
 	def roomObject() {
 		def rack = Rack.get(params.id)
@@ -208,14 +208,14 @@ class RoomController {
 	def update() {
 		def user = securityService.getUserLogin()
 		def project = controllerService.getProjectForPage( this )
-		if (! project) 
+		if (! project)
 			return
 
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		def roomId = params.id
 		List rackIds = request.getParameterValues("rackId")
 
-		def msg 
+		def msg
 		try {
 			msg = roomService.updateRoomAndRacksInfo(project, user, roomId, rackIds, params, powerType)
 
@@ -231,13 +231,13 @@ class RoomController {
 		flash.error = msg
 		chain(action: "show", id: params.id)
 	}
-	
+
 	private void flush() {
 		def hbSession = sessionFactory.currentSession
 		hbSession.flush()
 		hbSession.clear()
 	}
-	
+
 	/**
 	 * Used to delete one or more rooms that do not have associated assets assigned to the room
 	 * @param checkbox_{roomId}
@@ -274,7 +274,7 @@ class RoomController {
 
 		redirect(action: "list", params:[viewType : "list"])
 	}
-	
+
 	/**
 	 *  Verify if rack has associated with any assets before deleting it.
 	 */
@@ -284,7 +284,7 @@ class RoomController {
 		def assetEntity
 		if(rack){
 			assetEntity = AssetEntity.findByRackSourceOrRackTarget(rack,rack)
-		} 
+		}
 		if(!assetEntity)
 			assetEntity = []
 		render assetEntity as JSON
@@ -296,7 +296,7 @@ class RoomController {
 	   def id = params.roomId
 	   def room = Room.get(id)
 	   def associatedRecords
-	   
+
 	   if(room){
 		   associatedRecords = AssetEntity.findByRoomSourceOrRoomTarget(room,room)
 		   if(!associatedRecords)
@@ -402,8 +402,8 @@ class RoomController {
 	   def thisRackTotalSpace = 42
 	   def rackId = params.rackId
 	   def rack
-	   def totalPowerInRack = 0;
-	   def unassignedPowerInRack = 0;
+	   def totalPowerInRack = 0
+	   def unassignedPowerInRack = 0
 	   if(rackId){
 		   rack = Rack.get(rackId)
 		   def assets = AssetEntity.findAllByRackSource( rack )
@@ -411,8 +411,8 @@ class RoomController {
 				   assets = AssetEntity.findAllByRackTarget( rack )
 		   }
 		   thisRackTotalSpace = rack.model?.usize ?: 42
-		   
-		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort:'sourceRackPosition']) : 
+
+		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort:'sourceRackPosition']) :
 				AssetEntity.findAllByRackTarget(rack, [sort:'targetRackPosition'])
 		   def assetPos = 0
 		   def prevUsize = 0
@@ -420,7 +420,7 @@ class RoomController {
 			   // Calculating current assets's position .
 			   def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 			   thisRackUsedSpace += posResult.assetUsize
-			   
+
 			   // Assigning rack position to keep track on upcoming asset's position in loop .
 			   assetPos = posResult.assetUsize > 0 ? posResult.currAssetPos : assetPos
 			   prevUsize = posResult.thisUsize > 0 ? posResult.thisUsize : prevUsize
@@ -430,7 +430,7 @@ class RoomController {
 			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",asset])
 			   def powerConnectors = assetPowerCabling.size()
 			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
-			   
+
 			   def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
 			   totalPowerInRack = powerDesign + totalPowerInRack
 			   assetPowerCabling.each{
@@ -444,30 +444,30 @@ class RoomController {
 					   if(cables.toPower){
 						   switch(cables.toPower){
 							   case "A": powerA += powerUseForConnector
-							   break;
+							   break
 							   case "B": powerB += powerUseForConnector
-							   break;
+							   break
 							   case "C": powerC += powerUseForConnector
-							   break;
+							   break
 						   }
 					   }
 				   }
-			  } 
+			  }
 					powerX = unassignedPowerInRack
-			  
+
 		   }
 		   powerA = powerType != "Watts" ?  powerA ? (powerA / 120).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0
 		   powerB = powerType != "Watts" ?  powerB ? (powerB / 120).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
 		   powerC = powerType != "Watts" ?  powerC ? (powerC / 120).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
 		   powerX = powerType != "Watts" ?  powerX ? (powerX / 120).toFloat().round(1) : 0.0 : powerX ? Math.round(powerX):0
-		   
+
 		   rackPowerA = powerType != "Watts" ? rack.powerA ? (rack.powerA / 120).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA) : 0
 		   rackPowerB = powerType != "Watts" ? rack.powerB ? (rack.powerB / 120).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB) : 0
 		   rackPowerC = powerType != "Watts" ? rack.powerC ? (rack.powerC / 120).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC) : 0
-			
+
 	   }
-	  
-	   
+
+
 	   def redTBD = false
 	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
 		   redTBD = true
@@ -502,8 +502,8 @@ class RoomController {
 	   } else {
 		op += "</table>"
 	   }
-		   
-		   
+
+
 		render  op
    }
    /**
@@ -525,7 +525,7 @@ class RoomController {
 	   order = order == 'asc' ? 'desc' : 'asc'
 	   query += " order by ${sort} ${order}"
 	   assetEntityList = AssetEntity.findAll(query,[projcet:project, excludeAssetType:excludeAssetType, assetClass: AssetClass.DEVICE ])
-	   
+
 	   def stringToReturn = new StringBuffer()
 	   stringToReturn.append("""
 			<div class="dialog" >
@@ -617,18 +617,18 @@ class RoomController {
 			if( rackPower && maxPower < rackPower ){
 				maxPower = rackPower
 			}
-			
-			def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort:'sourceRackPosition']) : 
+
+			def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort:'sourceRackPosition']) :
 					AssetEntity.findAllByRackTarget(rack, [sort:'targetRackPosition'])
 			def usedRacks = 0
 			def powerUsed = 0
 			def assetPos = 0 // a flag to determine the previous asset's  rack position .
-			def prevUsize = 0 // a flag to determine the previous asset's  usize . 
+			def prevUsize = 0 // a flag to determine the previous asset's  usize .
 			assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
 
 			def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 				usedRacks += posResult.assetUsize
-				
+
 				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
 				def totalPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
@@ -662,7 +662,7 @@ class RoomController {
 							rackData["${rack.id}"] = "rack_cap20"
 						}
 						rackCountMap << [("rack_"+rack.id) : usedRacks]
-						
+
 					}else{
 						if(usedRacks <= Math.round(maxU*0.2)){
 							rackData["${rack.id}"] = "rack_cap20"
@@ -681,7 +681,7 @@ class RoomController {
 						}
 						rackCountMap << [("rack_"+rack.id) : usedRacks]
 					}
-					break;
+					break
 			  case "Power":
 					 if(capacityType != "Used"){
 						powerUsed = rackPower - powerUsed
@@ -717,19 +717,19 @@ class RoomController {
 							rackData["${rack.id}"] = "rack_cap100"
 						}
 					}
-					break;
+					break
 			}
 		}
-		
-		// Implement the Scale display  
+
+		// Implement the Scale display
 		capacityData.rackData = rackData
 		capacityData.racks = racks.id
 		capacityData.rackCountMap = rackCountMap
-		
+
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		powerType = powerType ?: "Watts"
 		maxPower = powerType != "Watts" ? Math.round(maxPower / 120) : maxPower
-		// Added switch to use if we use other capacityViews 
+		// Added switch to use if we use other capacityViews
 		switch(capacityView){
 			case "Space":
 				if(capacityType != "Used"){
@@ -753,7 +753,7 @@ class RoomController {
 							cap100:"${Math.round(maxU*0.8)}+ RU"
 						]
 				}
-				break;
+				break
 			case "Power":
 				if(capacityType != "Used"){
 					capacityData.view = [
@@ -776,7 +776,7 @@ class RoomController {
 							cap100:"${Math.round(maxPower*0.8)}+ ${powerType}"
 						]
 				}
-				break;
+				break
 		}
 		if(capacityData.view){
 			render capacityData as JSON
@@ -784,27 +784,27 @@ class RoomController {
 			render "None"
 		}
 	}
-	
+
 	def setDraggableRackPref() {
 		def prefVal = params.prefVal
 		userPreferenceService.setPreference(PREF.DRAGGABLE_RACK, prefVal)
 		render 'success'
 	}
-	
+
 	/**
 	 * This method is used to fetch all the assets By position , rack and location .
 	 * @param rack - rack instance could be either source rack or target rak
 	 * @param location - location of rack could be either 'source' and 'target'
 	 * @param rackPos - the position of rack where we are requesting this method to fetch the assets
 	 * @return - list of assets at requested position
-	 */ 
+	 */
 	def retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity) {
 		def assetsAtThisPos = location == "source" ? AssetEntity.findAllBySourceRackPositionAndRackSource(assetEntity.sourceRackPosition, rack) :
 			AssetEntity.findAllByTargetRackPositionAndRackTarget(assetEntity.targetRackPosition , rack)
-	
+
 		return assetsAtThisPos
 	}
-   
+
    /**
 	 * This method is used to get information of assets and there relevant pos., and usize to count rack used count .
 	 * @param assetEntity : instance of assetEntity .

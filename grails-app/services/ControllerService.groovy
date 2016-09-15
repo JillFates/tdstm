@@ -20,7 +20,7 @@ class ControllerService {
 	def userPreferenceService
 	def auditService
 
-	/** 
+	/**
 	 * A utility service to just dump the parameters
 	 * @param controller - the controller object
 	 * @param params - the parameters
@@ -41,7 +41,7 @@ class ControllerService {
 	 * @return The user's currently selected Project object if selected otherwise null
 	 */
 	Project getProjectForPage(controller, UserLogin user, perm=null) {
-		def project = securityService.getUserCurrentProject();
+		def project = securityService.getUserCurrentProject()
 		if (! project) {
 			log.info "User ${user} didn't have default project"
 			controller.flash.message = "Please select a project before continuing"
@@ -61,7 +61,7 @@ class ControllerService {
 			}
 			if (!hasPerm) {
 				def request = RequestContextHolder.currentRequestAttributes().request
-				String 
+				String
 				securityService.reportViolation("attempted to access ${request.forwardURI} without permission ($perm)", user)
 				redirectToDefaultPage(controller, "Sorry but you are unauthorized to perform that action")
 				project = null
@@ -139,9 +139,9 @@ class ControllerService {
 	}
 
 	/*
-	 * Used to get the user and their default/project objects for a page request. If no selected project it will redirect the user to 
+	 * Used to get the user and their default/project objects for a page request. If no selected project it will redirect the user to
 	 * the Project List view automatically. In this case the returned project object will be null. The routine will optionally validation
-	 * that the user has the permission specified. If the user doesn't have the permission it will redirect the user to the default page 
+	 * that the user has the permission specified. If the user doesn't have the permission it will redirect the user to the default page
 	 * and provide a standard error message.
 	 * @param controller - a reference to the controller
 	 * @param perm - the permission (String) or permissions List<String> that the user requires (optional)
@@ -180,7 +180,7 @@ class ControllerService {
 	 * Used to retrieve an Event object for a given user appropriately. If not found then the flash message will be populated with
 	 * an message and a null is returned. It validates that the event is associated to the project as well and if not logs a security
 	 * message and returns null.
-	 * 
+	 *
 	 * @param controller - the controller that is calling this method
 	 * @param project - the user's current project
 	 * @param user - the user requesting the page
@@ -193,7 +193,7 @@ class ControllerService {
 		if (!id) {
 			log.info "getEventForPage() Invalid id ($id) from user $user"
 			return null
-		} 
+		}
 
 		// handle move events
 		event = MoveEvent.read(id)
@@ -217,7 +217,7 @@ class ControllerService {
 	 * Used to retrieve an Bundle object for a given user appropriately. If not found then the flash message will be populated with
 	 * an message and a null is returned. It validates that the event is associated to the project as well and if not logs a security
 	 * message and returns null.
-	 * 
+	 *
 	 * @param controller - the controller that is calling this method
 	 * @param project - the user's current project
 	 * @param user - the user requesting the page
@@ -230,7 +230,7 @@ class ControllerService {
 		if (!id) {
 			log.info "getBundleForPage() Invalid id ($id) from user $user"
 			return null
-		} 
+		}
 
 		// handle move events
 		bundle = MoveBundle.read(id)
@@ -273,7 +273,7 @@ class ControllerService {
 		def isNew = id == null
 
 		parseMaintExpDateAndRetireDate(params, session)
-		
+
 		try {
 			(project, user) = getProjectAndUserForPage(controller, 'AssetEdit')
 			if (project) {
@@ -285,11 +285,11 @@ class ControllerService {
 					asset = getAssetForPage(controller, project, AssetClass.DEVICE, params.id)
 					assetServiceClass.updateAssetFromForm(controller, session, project.id, user.id, params, asset.id)
 				}
-				// Reload the asset due to the hibernate session 
+				// Reload the asset due to the hibernate session
 				//asset = AssetEntity.read(asset.id)
 				asset.discard()
 				model = AssetEntityHelper.simpleModelOfAsset(asset)
-			} 
+			}
 			errorMsg = controller.flash.message
 			controller.flash.message = null
 		} catch (InvalidRequestException e) {
@@ -315,7 +315,7 @@ class ControllerService {
 
 	/**
 	 * Returns the URL information about the current controller
-	 * @param controller - the current controller 
+	 * @param controller - the current controller
 	 * @return the URL called on the controller
 	 */
 	String urlInfo(Object controller) {
@@ -354,7 +354,7 @@ class ControllerService {
 		if ((exception instanceof ServiceException) && exception.messageCode) {
 			return controller.message(code: exception.messageCode, args: exception.messageArgs)
 		} else {
-			return exception.getMessage()	
+			return exception.getMessage()
 		}
 	}
 	/**
@@ -374,7 +374,7 @@ class ControllerService {
 	}
 
 	/**
-	 * Used to handle uploaded files 
+	 * Used to handle uploaded files
 	 * @param file - the File object that will be set upon success
 	 * @param controller - the reference to the controller
 	 * @param paramName - the request parameter name of the upload file
@@ -407,11 +407,11 @@ class ControllerService {
 				}
 
 				if (contentTypes.size()) {
-					String ct = localFile.getContentType() 
+					String ct = localFile.getContentType()
 					if (! ct) {
 						emsg =  "Upload file was missing required content-type"
 						break
-					} 
+					}
 					if (! contentTypes.contains(ct)) {
 						emsg =  "Content-type of the upload file was invalid"
 						break

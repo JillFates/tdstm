@@ -6,21 +6,21 @@ import com.tdssrc.grails.WebUtil
 import org.hibernate.criterion.Order
 
 class ManufacturerController {
-	
+
 	// Initialize services
 	def jdbcTemplate
 	def sessionFactory
 	def securityService
-	
+
 	def index() { redirect(action:"list",params:params) }
-	
+
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-	
+
 	def list() {
-		return 
+		return
 	}
-	
+
 	/**
 	 * This method is used by JQgrid to load manufacturerList
 	 */
@@ -30,7 +30,7 @@ class ManufacturerController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		
+
 		session.MAN = [:]
 		def manufacturers = Manufacturer.createCriteria().list(max: maxRows, offset: rowOffset) {
 			if (params.name)
@@ -43,26 +43,26 @@ class ManufacturerController {
 				ilike('corporateLocation', "%${params.corporateLocation}%")
 			if (params.website)
 				ilike('website', "%${params.website}%")
-			
+
 			order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 		}
-		
+
 		def totalRows = manufacturers.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		
+
 		def results = manufacturers?.collect { [ cell: [ it.name, ManufacturerAlias.findAllByManufacturer( it )?.name, it.description, it.corporateName, it.corporateLocation, it.website, it.modelsCount,
 					AssetEntity.countByManufacturer(it)], id: it.id,
 			]}
-		
+
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-		
+
 		render jsonData as JSON
-		
+
 	}
-	
+
 	def show() {
 		def manufacturerInstance = Manufacturer.get( params.id )
-		
+
 		if(!manufacturerInstance) {
 			flash.message = "Manufacturer not found with id ${params.id}"
 			redirect(action:"list")
@@ -72,7 +72,7 @@ class ManufacturerController {
 			 return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ]
 		}
 	}
-	
+
 	def delete() {
 		def manufacturerInstance = Manufacturer.get( params.id )
 		if (manufacturerInstance) {
@@ -87,10 +87,10 @@ class ManufacturerController {
 			redirect(action:"list")
 		}
 	}
-	
+
 	def edit() {
 		def manufacturerInstance = Manufacturer.get( params.id )
-		
+
 		if(!manufacturerInstance) {
 			flash.message = "Manufacturer not found with id ${params.id}"
 			redirect(action:"list")
@@ -99,9 +99,9 @@ class ManufacturerController {
 			return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ]
 		}
 	}
-	
+
 	def update() {
-		
+
 		def manufacturerInstance = Manufacturer.get( params.id )
 		if (manufacturerInstance) {
 			manufacturerInstance.properties = params
@@ -118,7 +118,7 @@ class ManufacturerController {
 			akaToSave.each{aka->
 				manufacturerInstance.findOrCreateAliasByName(aka, true)
 			}
-			
+
 			if (!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
 				flash.message = "Manufacturer ${params.id} updated"
 				redirect(action:"show",id:manufacturerInstance.id)
@@ -130,13 +130,13 @@ class ManufacturerController {
 			redirect(action:"edit",id:params.id)
 		}
 	}
-	
+
 	def create() {
 		def manufacturerInstance = new Manufacturer()
 		manufacturerInstance.properties = params
 		return ['manufacturerInstance':manufacturerInstance]
 	}
-	
+
 	def save() {
 		def loggedUser = securityService.getUserLogin()
 		def manufacturerInstance = new Manufacturer(params)
@@ -153,7 +153,7 @@ class ManufacturerController {
 			render(view:'create',model:[manufacturerInstance:manufacturerInstance])
 		}
 	}
-	
+
 	/*
 	 *  Send List of Manufacturer as JSON object
 	 */
@@ -186,10 +186,10 @@ class ManufacturerController {
 		def jsonMap = [:]
 		jsonMap.put("manufacturer", manufacturer)
 		jsonMap.put("aliases", WebUtil.listAsMultiValueString(manufacturer.getAliases()?.name))
-		
+
 		render jsonMap as JSON
 	}
-	
+
 	/**
 	 *  Validate whether requested AKA already exist in DB or not
 	 *  @param: aka, name of aka
@@ -201,7 +201,7 @@ class ManufacturerController {
 		def aka = params.name
 		def manuId = params.id
 		def akaExist = Manufacturer.findByName(aka)
-		
+
 		if ( akaExist ) {
 			duplicateAka = aka
 		} else if(manuId) {
@@ -213,7 +213,7 @@ class ManufacturerController {
 		}
 		render duplicateAka
 	}
-	
+
 	/**
 	 * render a list of suggestions for manufacturer's initial.
 	 * @param : value is initial for which user wants suggestions .

@@ -10,7 +10,7 @@ class AssetEntityPlanStatus {
 	static final String CONFIRMED='Confirmed'
 	static final String LOCKED='Locked'
 	static final String MOVED='Moved'
-	
+
 	static final String[] list = [UNASSIGNED, ASSIGNED, CONFIRMED, LOCKED, MOVED]
 	static final getList() {
 		return list as List

@@ -22,16 +22,16 @@ class RackLayoutsController {
 	def supervisorConsoleService
 	def taskService
 	def userPreferenceService
-	
+
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
-	
+
 	/**
 	 * Used to generate the Rack Elevation criteria form that users access to generation elevations
 	 */
 	def create() {
 
 		def project = controllerService.getProjectForPage( this )
-		if (! project) 
+		if (! project)
 			return
 
 		def targetRack= ""
@@ -57,7 +57,7 @@ class RackLayoutsController {
 				wDCheck = rackFilters?.showCabling ? true : false
 			}
 		}
-		
+
 		List moveBundleList = MoveBundle.findAllByProject( project )
 		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
@@ -68,7 +68,7 @@ class RackLayoutsController {
 		}
 
 		// Map entities = assetEntityService.entityInfo( project )
-		
+
 		session.removeAttribute("USE_FILTERS")
 		session.removeAttribute("RACK_FILTERS")
 
@@ -88,7 +88,7 @@ class RackLayoutsController {
 			woBundleCheck: woBundleCheck
 		]
 	}
-	
+
 
 	/**
 	 * Used to generate multiple rack elevation diagrams
@@ -126,7 +126,7 @@ class RackLayoutsController {
 		def moveBundles = MoveBundle.findAllByProject( project )
 		def rackId = params.rackId
 		def hideIcons = params.hideIcons
-		
+
 		boolean printView = params.viewMode == 'Print View'
 		boolean generateView = params.viewMode == 'Generate'
 
@@ -135,7 +135,7 @@ class RackLayoutsController {
 			moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 		}
 		def rackLayoutsHasPermission = RolePermissions.hasPermission("EditAssetInRackLayout")
-		
+
 		if (request && request.getParameterValues("sourcerack") != ['none']) {
 			List rack = request.getParameterValues("sourcerack")
 			if (rack){
@@ -146,7 +146,7 @@ class RackLayoutsController {
 					moveBundles.each{ bundle->
 						bundle.sourceRacks.each{ sourceRack->
 							if( !sourceRacks.contains( sourceRack ) )
-								sourceRacks.add( sourceRack )		
+								sourceRacks.add( sourceRack )
 						}
 					}
 				} else {
@@ -183,7 +183,7 @@ class RackLayoutsController {
 			}
 			targetRacks = targetRacks.sort { it.tag }
 		}
-		
+
 		def racks = sourceRacks + targetRacks
 		if(racks.size() == 0 && rackId){
 			session.setAttribute('RACK_ID',rackId)
@@ -211,12 +211,12 @@ class RackLayoutsController {
 					.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 			}
 			racksByFilter.each { assetEntity ->
-			
+
 				def overlapError = false
 				def rackPosition = rack.source == 1 ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
 				if(rackPosition == 0 || rackPosition == null)
 					rackPosition = 1
-				
+
 				def rackSize = assetEntity?.model?.usize == 0 || assetEntity?.model?.usize == null ? 1 : assetEntity?.model?.usize?.toInteger()
 				def position = rackPosition + rackSize - 1
 				def newHigh = position
@@ -233,14 +233,14 @@ class RackLayoutsController {
 						def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
 						if(position > maxUSize) {
 							asset.position = maxUSize
-							asset.rowspan = 1 
+							asset.rowspan = 1
 							asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
 							asset.overlapError = true
 							asset.cssClass = "rack_error"
 							flag = false
 						} else if(ignoreLow) {
 							asset.position = currentHigh
-							asset.rowspan = currentHigh - currentLow + 1 
+							asset.rowspan = currentHigh - currentLow + 1
 							asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
 							asset.overlapError = true
 							asset.cssClass = "rack_error"
@@ -272,7 +272,7 @@ class RackLayoutsController {
 							flag = false
 						}
 					}
-						
+
 					if (flag) {
 						if (position > maxUSize) {
 							position = maxUSize
@@ -280,7 +280,7 @@ class RackLayoutsController {
 							//assetEntity?.model?.usize = 1
 							overlapError = true
 						}
-						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
+						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError,
 							rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
 					}
 				} else {
@@ -290,7 +290,7 @@ class RackLayoutsController {
 						//assetEntity?.model?.usize = 1
 						overlapError = true
 					}
-					assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
+					assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError,
 						rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
 				}
 			}
@@ -357,7 +357,7 @@ class RackLayoutsController {
 				forWhom: params.forWhom, bundle: moveBundles,
 				printView: printView
 			]
-			
+
 			if (backView) {
 				backViewRows = retrieveRackLayout(paramsMap)
 			}
@@ -371,17 +371,17 @@ class RackLayoutsController {
 		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
 
 		model.putAll( [
-			rackLayout: rackLayout, 
-			frontView: frontView, 
-			backView: backView, 
-			showIconPref: showIconPref, 
+			rackLayout: rackLayout,
+			frontView: frontView,
+			backView: backView,
+			showIconPref: showIconPref,
 			generateView: generateView,
 			printView: printView
 		] )
-		
+
 		return model
 	}
-	
+
 	def retrieveRackDetails() {
 		def bundleIds = params.bundles
 		def moveBundles = []
@@ -391,10 +391,10 @@ class RackLayoutsController {
 		} else if( bundleIds ){
 			moveBundles = MoveBundle.findAll( "from MoveBundle m where m.id in ($bundleIds)" )
 		}
-		
+
 		def sourceRacks = new ArrayList()
 		def targetRacks = new ArrayList()
-		
+
 		moveBundles.each{moveBundle ->
 			moveBundle.sourceRacks.each{
 				if( !sourceRacks.contains([id:it.id,location:it.location,room:it.room?.roomName,tag:it.tag]) )
@@ -405,7 +405,7 @@ class RackLayoutsController {
 					targetRacks.add([id:it.id,location:it.location,room:it.room?.roomName,tag:it.tag])
 			}
 		}
-		
+
 		def rackDetails = [[sourceRackList:sourceRacks, targetRackList:targetRacks]]
 		render rackDetails as JSON
 	}
@@ -419,7 +419,7 @@ class RackLayoutsController {
 		def cssClass = "empty"
 		def rackStyle = ""
 		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
-		
+
 		def rackLayoutsHasPermission = paramsMap.rackLayoutsHasPermission
 		def asset = paramsMap.assetDetails
 		def includeBundleName = paramsMap.includeBundleName
@@ -439,12 +439,12 @@ class RackLayoutsController {
 				def location = it.source
 				def assetEntity = it.asset?.assetEntity
 				def assetTagsList = (it.asset?.assetTag).split("<br/>")
-				def moveBundle = "" 
+				def moveBundle = ""
 				StringBuffer assetTag = new StringBuffer('')
 
 				if (it.cssClass == "rack_error")
 					assetTag.append("Devices Overlap:<br />")
-				
+
 				def hasBlades = false
 				def cabling = ""
 
@@ -475,13 +475,13 @@ class RackLayoutsController {
 					def overlappedAssets
 					def bladeTable = ""
 					def bladeLayoutMap = [
-						asset: it, 
-						bundle: paramsMap.bundle, 
-						forWhom: forWhom, 
-						hideIcons: hideIcons, 
-						permission: rackLayoutsHasPermission, 
+						asset: it,
+						bundle: paramsMap.bundle,
+						forWhom: forWhom,
+						hideIcons: hideIcons,
+						permission: rackLayoutsHasPermission,
 						printView: printView,
-						rackId: rackId, 
+						rackId: rackId,
 						redirectTo: redirectTo
 					]
 					queryParams.tag = tagValue
@@ -508,14 +508,14 @@ class RackLayoutsController {
 							if (overlappedAssetsSize > 1) {
 								cabling = ( (assetTag.indexOf("Devices Overlap") == -1) && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
 							}
-							
+
 							if (printView) {
 								assetTag.append( StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) )
 							} else {
 								assetTag.append('<a title="' + title + '" href="javascript:')
 								if (forWhom) {
 									assetTag.append("editAudit('roomAudit','${it.source}','${overlapAsset.assetClass}',${overlapAsset?.id})")
-								} else { 
+								} else {
 									assetTag.append("EntityCrud.showAssetDetailView('${overlapAsset.assetClass}',${overlapAsset?.id})")
 								}
 								assetTag.append('">' + StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) + '</a>')
@@ -525,15 +525,15 @@ class RackLayoutsController {
 								assetTag.append("<br/>" + bladeTable)
 							}
 						}
-					} 
+					}
 				}
 				if (backView) {
 
 					def taskAnchors = ""
 					if (!printView) {
-						def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity, [AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD])					
+						def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity, [AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD])
 						tasks.each{
-							taskAnchors += """<a href='#' class='${taskService.getCssClassForRackStatus(it.status)}' title='${it.taskNumber+':'+it.comment}' 
+							taskAnchors += """<a href='#' class='${taskService.getCssClassForRackStatus(it.status)}' title='${it.taskNumber+':'+it.comment}'
 								onclick=\"javascript:showAssetComment(${it.id},'show')\" > &nbsp;&nbsp;&nbsp;&nbsp; </a> &nbsp;"""
 						}
 					}
@@ -543,7 +543,7 @@ class RackLayoutsController {
 						if ( hasBlades && showCabling != 'on') {
 							row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 							if ( !printView && assetCables ) {
-								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' 
+								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#'
 									onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="${disconnectImgUrl}"/>
 									&nbsp${taskAnchors}</td>""")
 							} else {
@@ -552,7 +552,7 @@ class RackLayoutsController {
 						} else {
 							row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
 							row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag.toString()}</td>")
-							
+
 							if (includeBundleName)
 								row.append("<td style='border:0;'>${moveBundle}</td>")
 							else
@@ -562,8 +562,8 @@ class RackLayoutsController {
 								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='${disconnectImgUrl}'/> &nbsp; ${taskAnchors}</a></td></tr>")
 							else
 								row.append("<td style='border:0;'>&nbsp;${taskAnchors}</td></tr>")
-								
-							row.append("<tr><td colspan='3' style='border:0;'>${cabling}</td></tr></table></td>")	
+
+							row.append("<tr><td colspan='3' style='border:0;'>${cabling}</td></tr></table></td>")
 						}
 					} else {
 						if( hasBlades && showCabling != 'on'){
@@ -581,7 +581,7 @@ class RackLayoutsController {
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='${disconnectImgUrl}' height='12' width='12' title='Cabling'/> ${taskAnchors}</a></td>")
 							else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp; ${taskAnchors}</td>")
-							
+
 						} else {
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
 						}
@@ -597,7 +597,7 @@ class RackLayoutsController {
 						else
 							row.append("<td style='border:0;'>&nbsp;</td></tr>")
 						row.append("<tr><td colspan='2' style='border:0;'>${cabling}</td></tr></table></td>")
-						
+
 					} else {
 						row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 						if (includeBundleName)
@@ -626,16 +626,16 @@ class RackLayoutsController {
 				row.append("</td><td>&nbsp;</td>")
 				if(backView)
 					row.append("<td>&nbsp;</td>")
-				
+
 			} else {
 				row.append("<td class='${rackStyle}'>${it.rack}</td>")
 				rowspan--
 			}
-			// Remove right U-position number 
+			// Remove right U-position number
 			//row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td>")
 			row.append("</tr>")
 			rows.append(row.toString())
-			
+
 		}
 		return rows
 	}
@@ -656,7 +656,7 @@ class RackLayoutsController {
 		def forWhom = bladeLayoutMap.forWhom
 		def bundles = bladeLayoutMap.bundle
 		boolean printView = bladeLayoutMap.printView
-		
+
 		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
 		StringBuffer bladeTable = new StringBuffer('<table class="bladeTable"><tr>')
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
@@ -675,17 +675,17 @@ class RackLayoutsController {
 		def fullRows = []
 		def assetRoom
 		def assetLocation
-		
+
 		def chassisRows = 1
 		if (assetEntity.model?.bladeRows)
 			chassisRows = assetEntity.model.bladeRows
 
 		def bladesPerRow = 8
-		if (assetEntity.model.bladeCount) 
+		if (assetEntity.model.bladeCount)
 			bladesPerRow = (assetEntity.model.bladeCount / chassisRows ).intValue()
 
-		// # of chars to display of the blade label in chassis view 
-		def bladeLabelCharsToDisplay = assetEntity.model.bladeLabelCount		
+		// # of chars to display of the blade label in chassis view
+		def bladeLabelCharsToDisplay = assetEntity.model.bladeLabelCount
 
 		for (int k = 1; k <= chassisRows; k++){
 			int initialColumn = (k-1)*bladesPerRow + 1
@@ -695,7 +695,7 @@ class RackLayoutsController {
 					matching = blades.findAll { it.sourceBladePosition == i }
 				else
 					matching = blades.findAll { it.targetBladePosition == i }
-				
+
 				int bladeCount = matching.size()
 				if (fullRows.contains(i)) {
 					// What is a full row???
@@ -703,8 +703,8 @@ class RackLayoutsController {
 				} else if (bladeCount > 1) {
 					// Multiple blades are assigned to the same slot so set the the title to display all of the blades tag/name in the hover
 					String title = "Overlap Conflict"
-					matching.each { 
-						title += "\nTag: ${it.assetTag} Name: ${it.assetName}" 
+					matching.each {
+						title += "\nTag: ${it.assetTag} Name: ${it.assetName}"
 					}
 					String label = 'Conflict'.split('')[1..-1].join('<br>')
 					bladeTable.append("<td class='errorBlade' style='height:${tdHeight}px'>")
@@ -735,10 +735,10 @@ class RackLayoutsController {
 					tag = tag.split('')[1..-1].join('<br>')
 					def taglabel = "<div>$tag</div>"
 
-					def hasError 
+					def hasError
 					// TODO : JPM 10/2014 : The has logic error issue might be because it is useing bladeLabelCount - need to investigate
 					if (assetDetails.asset.source == 1) {
-						hasError = blades.findAll { it.sourceBladePosition == i + bladeLabelCharsToDisplay }.size() > 0 
+						hasError = blades.findAll { it.sourceBladePosition == i + bladeLabelCharsToDisplay }.size() > 0
 					} else {
 						hasError = blades.findAll { it.targetBladePosition == i + bladeLabelCharsToDisplay }.size() > 0
 					}
@@ -790,7 +790,7 @@ class RackLayoutsController {
 			}
 
 		}
-		
+
 		bladeTable.append('</table>')
 
 		return bladeTable.toString()
@@ -804,7 +804,7 @@ class RackLayoutsController {
 	 * Return AssetCableMap record details to display at RackLayout cabling screen
 	 */
 	def retrieveCablingDetails() {
-		
+
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject( project )
 		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
@@ -812,13 +812,13 @@ class RackLayoutsController {
 		/* set first bundle as default if user pref not exist */
 		def isCurrentBundle = true
 		def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ project ])?.model
-		
+
 		if(!currentBundle){
 			currentBundle = moveBundleList[0]?.id?.toString()
 			isCurrentBundle = false
 		}
-		def roomType = params.roomType 
-			
+		def roomType = params.roomType
+
 		def assetId = params.assetId
 		def assetEntity = assetId ? AssetEntity.get(assetId) : null
 		def assetCableMapList
@@ -829,7 +829,7 @@ class RackLayoutsController {
 			}else {
 				assetCableMapList = AssetCableMap.findAllByAssetFromAndAssetLoc( assetEntity , 'S')
 			}
-			
+
 			title = assetEntity.assetName+" ( "+assetEntity?.model?.manufacturer+" / "+assetEntity.model+" )"
 		}
 		def isTargetRoom = assetEntity.roomTarget ? true :false
@@ -879,8 +879,8 @@ class RackLayoutsController {
 				type: it.assetFromPort.type,
 				usize: assetEntity?.model?.usize
 			]
-			
-			assetCablingMap << [ (it.id): 
+
+			assetCablingMap << [ (it.id):
 				[
 					cableId: it.id,
 					color: it.cableColor,
@@ -901,15 +901,15 @@ class RackLayoutsController {
 			]
 			assetRows << [(it.id):'h']
 		}
-		render( 
-			template: 'cabling', 
+		render(
+			template: 'cabling',
 			model: [
 				assetCablingDetails: assetCablingDetails,
 				assetCablingMap: (assetCablingMap as JSON),
 				assetId: assetId,
 				assetRows: (assetRows as JSON),
 				currentBundle: currentBundle,
-				isTargetRoom: isTargetRoom,	
+				isTargetRoom: isTargetRoom,
 				models: models,
 				roomType: roomType
 			]
@@ -932,7 +932,7 @@ class RackLayoutsController {
 		}
 		def currRackAssets = currRoomRackAssets.findAll{it.rackSource?.id == assetEntity.rackSource?.id || it.rackTarget?.id == assetEntity.rackTarget?.id}
 		def sortedAssets = currRackAssets.sort{ it.assetName } + (currRoomRackAssets-currRackAssets).sort{ it.assetName }
-		
+
 		def modelConnectorMap =[:]
 		currRoomRackAssets.each{asset ->
 			def modelConnectMapList=[]
@@ -950,7 +950,7 @@ class RackLayoutsController {
 	 */
 	def updateCablingDetails() {
 		def jsonInput = request.JSON
-		def assetId = NumberUtils.toDouble(jsonInput.assetId,0).round() 
+		def assetId = NumberUtils.toDouble(jsonInput.assetId,0).round()
 		def assetCableId = jsonInput.assetCable
 		def assetCableMap
 		def toCableId
@@ -965,7 +965,7 @@ class RackLayoutsController {
 			def toPower
 			def connectorType = jsonInput.connectorType
 			assetCableMap = AssetCableMap.findById( assetCableId )
-		
+
 			if(connectorType != "Power"){
 				def fromAssetCableMap = AssetCableMap.find("from AssetCableMap where assetTo=? and assetToPort=? and assetLoc=?",
 													[assetCableMap.assetFrom,assetCableMap.assetFromPort,jsonInput.roomType])
@@ -975,15 +975,15 @@ class RackLayoutsController {
 			}
 			}
 			switch(actionType){
-				case "emptyId" : status = AssetCableStatus.EMPTY ; break;
-				case "cabledId" : status = AssetCableStatus.CABLED ; break;
-				case "assignId" : 
+				case "emptyId" : status = AssetCableStatus.EMPTY ; break
+				case "cabledId" : status = AssetCableStatus.CABLED ; break
+				case "assignId" :
 					if(connectorType != "Power"){
 						if(jsonInput.assetFromId !='null'){
 							def assetEntity = AssetEntity.findById(jsonInput.assetFromId)
 							def modelConnectors
 							if(assetEntity?.model){
-								assetTo = assetEntity 
+								assetTo = assetEntity
 								toConnector = ModelConnector.findById( jsonInput.modelConnectorId )
 								toCableId = AssetCableMap.find("from AssetCableMap where assetTo=? and assetToPort=? and assetLoc=?",
 													[assetTo,toConnector,jsonInput.roomType])
@@ -997,16 +997,16 @@ class RackLayoutsController {
 						toConnector = null
 						toPower = jsonInput.staticConnector
 					}
-					break;
+					break
 			}
-			sessionFactory.getCurrentSession().flush();
-	    	sessionFactory.getCurrentSession().clear();
+			sessionFactory.getCurrentSession().flush()
+	    	sessionFactory.getCurrentSession().clear()
 			assetCableMap.cableStatus = status
 			assetCableMap.assetTo = assetTo
 			assetCableMap.assetToPort = toConnector
 			assetCableMap.toPower = toPower
 			assetCableMap.cableColor = jsonInput.color
-			assetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(),0).round() 
+			assetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(),0).round()
 			assetCableMap.cableComment = jsonInput.cableComment
 			assetCableMap.assetLoc= jsonInput.roomType
 			if(assetCableMap.save(flush:true)){
@@ -1017,7 +1017,7 @@ class RackLayoutsController {
 					toAssetCableMap.assetTo = assetCableMap.assetFrom
 					toAssetCableMap.assetToPort = assetCableMap.assetFromPort
 					toAssetCableMap.cableColor = jsonInput.color
-					toAssetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(),0).round() 
+					toAssetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(),0).round()
 					toAssetCableMap.cableComment = jsonInput.cableComment
 					toAssetCableMap.assetLoc= jsonInput.roomType
 					if(!toAssetCableMap.save(flush:true)){
@@ -1042,13 +1042,13 @@ class RackLayoutsController {
 		}
 		def assetCable = [ label : assetCableMap.assetFromPort.label, type:assetCableMap.assetFromPort.type, color :assetCableMap.cableColor, length:assetCableMap.cableLength?:'', asset :assetCableMap.assetTo? assetCableMap.assetTo?.assetName :'',
 									status:assetCableMap.cableStatus,comment:assetCableMap.cableComment?:'', fromAssetId :assetCableMap.assetTo? assetCableMap.assetTo?.id :'',
-									fromAsset:(assetCableMap.assetTo? assetCableMap.assetTo?.assetName+"/"+connectorLabel:'') , rackUposition : connectorLabel , 
-									connectorId: assetCableMap.assetToPort ? assetCableMap.assetToPort.id : "" , toCableId:toCableId?.id, 
+									fromAsset:(assetCableMap.assetTo? assetCableMap.assetTo?.assetName+"/"+connectorLabel:'') , rackUposition : connectorLabel ,
+									connectorId: assetCableMap.assetToPort ? assetCableMap.assetToPort.id : "" , toCableId:toCableId?.id,
 									locRoom: (assetCableMap.assetLoc=='S') ? 'Current' : 'Target', powerA:powerA,powerB:powerB]
 		render assetCable as JSON
 	}
 	/*
-	 *  Provide the Rack auto complete details and connector, uposition validation 
+	 *  Provide the Rack auto complete details and connector, uposition validation
 	 */
 	def retrieveAutoCompleteDetails() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
@@ -1060,25 +1060,25 @@ class RackLayoutsController {
 		switch(field){
 			case "rack" :
 				data = Rack.executeQuery( "select distinct r.tag from Rack r where r.source = 0 and r.project = $projectId " )
-				break;
+				break
 			case "isValidRack":
 				data = Rack.findAllWhere(tag:value,source:0,project:project)
-				break;
+				break
 			case "uposition":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
 				data = rack?.targetAssets?.targetRackPosition
-				break;
+				break
 			case "isValidUposition":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
-				data = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.value)} 
-				break;
+				data = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.value)}
+				break
 			case "connector":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
 				def assetEntity = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.uposition)}
 				def modelConnectors
 				if(assetEntity?.model[0])
 					data = ModelConnector.findAllByModel(assetEntity?.model[0])?.label
-				break;
+				break
 			case "isValidConnector":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
 				def assetEntity = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.uposition)}
@@ -1086,7 +1086,7 @@ class RackLayoutsController {
 				if(assetEntity?.model[0])
 					modelConnectors = ModelConnector.findAllByModel(assetEntity?.model[0])
 				data = modelConnectors?.findAll{it.label.equalsIgnoreCase(params.value) }
-				break;
+				break
 		}
 		if(!data)
 			data = []
@@ -1096,7 +1096,7 @@ class RackLayoutsController {
 	 *  Generate Cabling diagram for given asset
 	 */
 	def generateCablingLayout( assetEntity, backView ){
-		
+
 		def cableDiagram =  ""
 		if(assetEntity.model && ModelConnector.findByModel( assetEntity.model )){
 			if(backView){
@@ -1128,7 +1128,7 @@ class RackLayoutsController {
 		return cableDiagram
 	}
 	/**
-	 * This action is used for saving 'ShowAddIcons' Preference 
+	 * This action is used for saving 'ShowAddIcons' Preference
 	 */
 	def savePreference() {
 		def preference = params.preference
@@ -1137,18 +1137,18 @@ class RackLayoutsController {
 		} else {
 			userPreferenceService.removePreference(preference)
 		}
-		
+
 	 render true
 	}
-	
+
 	/**
-	 * Assigning power automatically  through the devices in the rack connecting each to power. 
-	 * If the model has one power connector it goes to A. 
+	 * Assigning power automatically  through the devices in the rack connecting each to power.
+	 * If the model has one power connector it goes to A.
 	 * If two connectors, the second connects to B and so on.
 	 * Set the color for the power connection to black.
 	 * If the connector is already connected to power, don't change that one.
 	 * In some cases a pair of devices might be connected to opposite power sources (one A and the other B power)
-	 * 
+	 *
 	 *  @param rackId - id of requested rack.
 	 *  @return -  flash message
 	*/
@@ -1184,7 +1184,7 @@ class RackLayoutsController {
 					assetCablePower.toPower = toPowers[i]
 					assetCablePower.cableColor = 'Black'
 					assetCablePower.cableStatus = 'Cabled'
-					
+
 					if(!assetCablePower.save(flush:true)){
 						assetCablePower.errors.allErrors.each { println it }
 					}
@@ -1193,7 +1193,7 @@ class RackLayoutsController {
 		}
 		return rack
 	}
-	
+
 	/**
 	 * this action is used to get info. of racks power cabling
 	 * @param : moveBundle[] : list of multiple bundle
@@ -1214,7 +1214,7 @@ class RackLayoutsController {
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
-			
+
 			if(request && request.getParameterValues("sourcerack[]") != ['none']) {
 				List rack = request.getParameterValues("sourcerack[]")
 				if(rack){
@@ -1238,7 +1238,7 @@ class RackLayoutsController {
 				}
 				sourceRacks = sourceRacks.sort { it.tag }
 			}
-	
+
 			if(request && request.getParameterValues("targetrack[]") != ['none']) {
 				List rack = request.getParameterValues("targetrack[]")
 				if(rack){

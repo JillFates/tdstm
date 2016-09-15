@@ -29,7 +29,7 @@ class UserLogin {
 	Integer failedLoginAttempts = 0
 	Boolean passwordNeverExpires = false
 	String saltPrefix = ''
-    
+
 	static belongsTo = [ person:Person ]
 	static hasMany = [
 		dataTransferBatch : DataTransferBatch
@@ -79,15 +79,15 @@ class UserLogin {
 		'canResetPasswordByUser',
 		'comparePassword',
 		'currentProject',
-		'disabled', 
-		'lockedOut', 
+		'disabled',
+		'lockedOut',
 		'hasEmail',
 		'passwordWasChanged',
 		'personDetails',
 		'securityRoleCodes',
 		'userActive'
 	]
-	
+
 	String toString() {
 		return username ?:'Undefined User'
 	}
@@ -98,12 +98,12 @@ class UserLogin {
 	def getPersonDetails() {
 		return this.person?.toString() ?: '**Undefined**'
 	}
-	
+
 	// Check if the user has not expired and is flagged as active
 	def userActive() {
 		return ! hasExpired() && ! isDisabled()
 	}
-	
+
 	// Used to determine if the user account has expired
 	boolean hasExpired() {
 		return expiryDate <= new Date()
@@ -126,7 +126,7 @@ class UserLogin {
 
 	// Used to determine if a password reset process be initiated by the user himself
 	boolean canResetPasswordByUser() {
-		isLocal && userActive() && hasEmail() && ! isLockedOut() 
+		isLocal && userActive() && hasEmail() && ! isLockedOut()
 	}
 
 	// Used to determine if the user has an email address
@@ -148,7 +148,7 @@ class UserLogin {
 		SecurityUtil.encrypt(password, sp)
 	}
 
-	// Used to set an unencrypted password on the UserLogin that will be encrypted. Note that the domain will 
+	// Used to set an unencrypted password on the UserLogin that will be encrypted. Note that the domain will
 	// create a password history record automatically in the post insert/update events
 	String applyPassword(String unencryptedPassword) {
 		if (! this.isLocal) {
@@ -235,7 +235,7 @@ class UserLogin {
 	// -------------------------------
 	def beforeInsert = {
 	}
-	
+
 	def beforeUpdate = {
 		checkForPasswordChange()
 		lastModified = TimeUtil.nowGMT()

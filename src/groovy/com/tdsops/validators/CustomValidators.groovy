@@ -6,12 +6,12 @@ class CustomValidators {
 
 	/**
 	 * Creates a custom validator for a inList that is lazy computed
-	 * 
+	 *
 	 * @param aListClosure a closure that returns the list of valid values
 	 * @param fieldName the field name
 	 * @return the custom validator
 	 */
-	public static inList(aListClosure, fieldName) { 
+	public static inList(aListClosure, fieldName) {
 		// value = user input
 		// object = the domain object
 		// errors = Spring error object
@@ -25,23 +25,23 @@ class CustomValidators {
 			def nullable = object.constraints[fieldName].nullable
 
 			if ( (value == null && nullable && blank) || (value == '' && blank)  || validValues.contains(value.toString()) ) {
-				return true;
+				return true
 			} else {
 				errors.rejectValue(fieldName, "${fieldName}.notInList", "Value '${value}' for property '${fieldName}' is invalid, options are: ${validValues.join(', ')}")
 				return false
 			}
 		}
 	}
-	
+
 	/**
-	 * Creates a closure for the first parameter of the inList method that returns 
+	 * Creates a closure for the first parameter of the inList method that returns
 	 * the list of {@link AssetOptions} with the specific type
-	 * 
+	 *
 	 * @param type the AssetOptions type
 	 * @return the list closure
 	 */
 	public static optionsClosure(type) {
-		return { 
+		return {
 			return AssetOptions.findAllByType(type).collect { option -> option.value }
 		}
 	}

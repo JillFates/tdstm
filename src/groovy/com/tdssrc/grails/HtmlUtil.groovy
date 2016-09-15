@@ -4,7 +4,8 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import org.apache.commons.validator.UrlValidator
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
-import com.tdsops.common.grails.ApplicationContextHolder 
+import com.tdsops.common.grails.ApplicationContextHolder
+
 /**
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
  */
@@ -30,20 +31,20 @@ class HtmlUtil {
 	 * @param String selectClass - CSS class name to use (optional)
 	 * @return String HTML selectBox
 	 */
-	
+
 	def public static generateSelect(def params) {
 		def optionKey = params.optionKey
 		def optionValue = params.optionValue
 		def optionSelected = params.optionSelected
 		def selectClass = params.selectClass ? """class="${params.selectClass}" """ : ''
 		def html = new StringBuffer("""<select id="${params.selectId}" name="${params.selectName}" ${selectClass} ${params.javascript ?:''}>""")
-		def selected 
+		def selected
 		if (params.firstOption){
-			selected = optionSelected == params.firstOption ? 'selected="selected"' : ''			
+			selected = optionSelected == params.firstOption ? 'selected="selected"' : ''
 			html.append("""<option value="${params.firstOption.value}" ${selected}>${params.firstOption.display}</option>""")
 		}
 
-		
+
 		params.options.each() {
 			def key = optionKey ? it."${optionKey}" : it
 			def value = optionValue ? it."${optionValue}" : it
@@ -52,10 +53,10 @@ class HtmlUtil {
 			html.append("""<option value="${key}" ${selected} ${optionClass}>${value}</option>""")
 		}
 		html.append('</select>')
-	 
+
 		return html.toString()
 	}
-	
+
 	/**
 	 * Generate action button in action.
 	 * @param label - text that appears in button
@@ -74,8 +75,8 @@ class HtmlUtil {
 			<span id="${labelId}" class="ui-button-text task_button">${label}</span>
 			</a>"""
 	}
-	
-	 
+
+
 	/**
 	 * Used to determine the CSS class name that should be used when presenting a task, which is based on the task's status
 	 * @param status
@@ -84,16 +85,16 @@ class HtmlUtil {
 	//TODO : Overriding the service method here since facing some issue to inject service class here,  need to clean up ASAP in HtmlUilt
 	def public static getCssClassForStatus( status ) {
 		def css = 'task_na'
-		
+
 		if (AssetCommentStatus.list.contains(status)) {
 			css = "task_${status.toLowerCase()}"
 		}
 		// log.error "getCssClassForStatus('${status})=${css}"
 		return css
 	}
-	
+
 	/**
-	 * Access the remote IP address from the web request or the X-Forwarded-For header content. If the request is 
+	 * Access the remote IP address from the web request or the X-Forwarded-For header content. If the request is
 	 * unavailible then 'IP.Unknown' is returned.
 	 * @param request - the HttpRequest object which if null is then attempted to be looked up
 	 * @return String The remote IP address that made the web request
@@ -104,11 +105,11 @@ class HtmlUtil {
  		if (!request) {
  			def webUtils = WebUtils.retrieveGrailsWebRequest()
  			//Getting the Request object
-			request = webUtils?.getCurrentRequest()	
+			request = webUtils?.getCurrentRequest()
  		}
 
 		if (request) {
-			// Now try and figure out the IP 
+			// Now try and figure out the IP
 			remoteIp = request.getHeader("X-Forwarded-For")
 			if (! remoteIp) {
 				remoteIp = request.getRemoteAddr()
@@ -146,13 +147,13 @@ class HtmlUtil {
 		def link = getTagLib().resource(map)
 		String resourceUrl = ""
 		if(link){
-			resourceUrl = link.toString() 
+			resourceUrl = link.toString()
 		}else{
 			println "HtmlUtil.createLinkToResource failed for parameters: $map"
 		}
 		return resourceUrl
 	}
-	
+
 	/**
 	* Used to detirmine whether or not a string is in URL format
 	* @param input to be checked for correct format
@@ -161,15 +162,15 @@ class HtmlUtil {
 	public static boolean isURL(String input)
 	{
 		input = input?.trim()
-		if (input) { 
-			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray();
-			UrlValidator urlValidator = new UrlValidator(schemes);
+		if (input) {
+			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray()
+			UrlValidator urlValidator = new UrlValidator(schemes)
 
-			return urlValidator.isValid(input)			
+			return urlValidator.isValid(input)
 		}
 		return false
 	}
-	
+
 	public static boolean isMarkupURL(String input){
 		def isValidURL = false
 		if(input){
@@ -179,7 +180,7 @@ class HtmlUtil {
 		}
 		return isValidURL
 	}
-	
+
 	public static List parseMarkupURL(String input, String defaultLabel = ""){
 		def url = ""
 		def label = ""
@@ -198,12 +199,12 @@ class HtmlUtil {
 				}
 				result = [label, tokens[urlTokenPosition]]
 			}
-			
+
 		}
 		return result
 	}
-	
-	/** 
+
+	/**
 	 * Used to create a Grails resource
 	 * @param map of the parameters
 	 * @return A string representing the resource as HTML resource
@@ -221,7 +222,7 @@ class HtmlUtil {
 		StringBuilder text = new StringBuilder('<ul>')
 		list.each { text.append( '<li>' + it)}
 		text.append('</ul>')
-		return text.toString()		
+		return text.toString()
 	}
 
 	/**

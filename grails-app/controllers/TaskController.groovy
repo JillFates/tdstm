@@ -15,7 +15,7 @@ import UserPreferenceEnum as PREF
 import java.text.DateFormat
 
 class TaskController {
-	
+
 	def commentService
 	def controllerService
 	def runbookService
@@ -29,7 +29,7 @@ class TaskController {
 	def partyRelationshipService
 
 	def index() { }
-	
+
 	/**
 	* Used by the myTasks and Task Manager to update tasks appropriately.
 	*/
@@ -40,7 +40,7 @@ class TaskController {
 			if (map.error) {
 				flash.message = map.error
 			}
-		
+
 			def redirParams = [view:params.view]
 			if (params.containsKey('tab') && params.tab) {
 				redirParams << [tab:params.tab]
@@ -57,7 +57,7 @@ class TaskController {
 			render map as JSON
 		}
 	}
-		
+
 	/**
 	 * Used to assign assignTo through ajax call from MyTasks
 	 * @params : id, status
@@ -70,14 +70,14 @@ class TaskController {
 		def commentProject = task.project
 		def errorMsg = ''
 		def assignedTo=''
-		
+
 		if (task) {
 			if (commentProject.id != project.id) {
 				log.error "assignToMe - Task(#${task.taskNumber} id:${task.id}/${commentProject}) not associated with user(${userLogin}) project (${project})"
 				errorMsg = "It appears that you do not have permission to change the specified task"
 			} else {
-				
-				// Double check to see if the status changed while the user was reassigning so that they 
+
+				// Double check to see if the status changed while the user was reassigning so that they
 				if (! errorMsg && params.status) {
 					if (task.status != params.status) {
 						log.warn "assignToMe - Task(#:${task.taskNumber} id:${task.id}) status changed around when ${userLogin} was assigning to self"
@@ -91,15 +91,15 @@ class TaskController {
 								errorMsg = "The task status was changed to '${task.status}'"
 						}
 					}
-				}				
-				
+				}
+
 				if (! errorMsg ) {
 					// If there were no errors then try reassign the Task
 					def belongedTo = task.assignedTo ? task.assignedTo.toString() : 'Unassigned'
 					task.assignedTo = userLogin.person
 					if (task.save(flush:true)){
 						assignedTo = userLogin.person.toString()
-						if (task.isRunbookTask()) taskService.addNote( task, userLogin.person, "Assigned task to self, previously assigned to $belongedTo")					
+						if (task.isRunbookTask()) taskService.addNote( task, userLogin.person, "Assigned task to self, previously assigned to $belongedTo")
 					} else {
 						log.error "assignToMe - Task(#:${task.taskNumber} id:${task.id}) failed while trying to reassign : " + GormUtil.allErrorsString(task)
 						errorMsg = "An unexpected error occured while assigning the task to you."
@@ -109,11 +109,11 @@ class TaskController {
 		} else {
 			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - ${params.id}"
 		}
-		
+
 		def map = [assignedToName:assignedTo, errorMsg:errorMsg]
 		render map as JSON
 	}
-	
+
 	/**
 	 *  Generate action bar for a selected comment in Task Manager
 	 *  @params id - the task (aka AssetComment) id number for the task bark
@@ -121,12 +121,12 @@ class TaskController {
 	 */
 	def genActionBarHTML() {
 		def comment = AssetComment.get(params.id)
-		def actionBar = retrieveActionBarData(comment); 
+		def actionBar = retrieveActionBarData(comment)
 		render actionBar.toString()
 	}
-	
+
 	/**
-	 * Used to generate action Bar for task  
+	 * Used to generate action Bar for task
 	 * @param comment : instance of asset comment
 	 * @return : Action Bar HTML code.
 	 */
@@ -134,30 +134,30 @@ class TaskController {
 		// There are a total of 13 columns so we'll subtract for each conditional button
 		def cols=12
 		def userLogin = securityService.getUserLogin()
-		
+
 		StringBuffer actionBar = new StringBuffer("""<table style="border:0px"><tr>""")
 		if (comment) {
 			if(comment.status ==  AssetCommentStatus.READY){
 				cols--
 				actionBar.append( _actionButtonTd(	"startTdId_${comment.id}",
-					HtmlUtil.actionButton('Start', 'ui-icon-play', comment.id, 
+					HtmlUtil.actionButton('Start', 'ui-icon-play', comment.id,
 						"changeStatus('${comment.id}','${AssetCommentStatus.STARTED}','${comment.status}', 'taskManager')")))
 			}
-		
+
 			if (comment.status in[ AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
 				cols--
 				actionBar.append( _actionButtonTd("doneTdId_${comment.id}",
-					HtmlUtil.actionButton('Done', 'ui-icon-check', comment.id, 
+					HtmlUtil.actionButton('Done', 'ui-icon-check', comment.id,
 						"changeStatus('${comment.id}','${AssetCommentStatus.DONE}', '${comment.status}', 'taskManager')")))
 			}
-		
-			actionBar.append( 
-				_actionButtonTd("assignToMeId_${comment.id}", 
+
+			actionBar.append(
+				_actionButtonTd("assignToMeId_${comment.id}",
 					HtmlUtil.actionButton('Details...', 'ui-icon-zoomin', comment.id, "showAssetComment(${comment.id},'show')")))
-		
+
 			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
 				cols--
-				actionBar.append( _actionButtonTd("assignToMeId_${comment.id}", 
+				actionBar.append( _actionButtonTd("assignToMeId_${comment.id}",
 					HtmlUtil.actionButton('Assign To Me', 'ui-icon-person', comment.id,
 						"assignTask('${comment.id}','${comment.assignedTo}', '${comment.status}', 'taskManager')")))
 			}
@@ -170,7 +170,7 @@ class TaskController {
 					HtmlUtil.actionButton('2 days', 'ui-icon-seek-next', comment.id,"changeEstTime('2','${comment.id}',this.id)")))
 				actionBar.append( _actionButtonTd(	"7dEst_${comment.id}",
 					HtmlUtil.actionButton('7 days', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")))
-			} 
+			}
 		}else {
 			log.warn "genActionBarHTML - invalid comment id (${params.id}) from user ${userLogin}"
 			actionBar.append('<td>An unexpected error occurred</td>')
@@ -178,11 +178,11 @@ class TaskController {
 
 		actionBar.append(""" <td colspan='${cols}'>&nbsp;</td>
 			</tr></table>""")
-		
+
 		return actionBar
 	}
 	/**
-	 * Used to generate action Bar for task details view 
+	 * Used to generate action Bar for task details view
 	 * @param asset comment id.
 	 * @render : Action Bar HTML code.
 	 */
@@ -191,7 +191,7 @@ class TaskController {
 		StringBuffer actionBar = new StringBuffer("""<span class="slide" style=" margin-top: 4px;">""")
 		def cols=12
 		def userLogin = securityService.getUserLogin()
-		
+
 		if (comment) {
 			if(comment.status ==  AssetCommentStatus.READY){
 				cols--
@@ -199,7 +199,7 @@ class TaskController {
 					HtmlUtil.actionButton('Start', 'ui-icon-play', comment.id, "changeStatus('${comment.id}','${AssetCommentStatus.STARTED}','${comment.status}', 'taskManager')")+
 					"</span>")
 			}
-			
+
 			if (comment.status in[ AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
 				cols--
 				actionBar.append("<span id='doneTdId_${comment.id}' width='8%' nowrap='nowrap'>"+
@@ -207,7 +207,7 @@ class TaskController {
 						"changeStatus('${comment.id}','${AssetCommentStatus.DONE}', '${comment.status}', 'taskManager')")+
 					"</span>")
 			}
-		
+
 			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
 				cols--
 				actionBar.append( "<span id='assignToMeId_${comment.id}' width='8%' nowrap='nowrap'>"+
@@ -224,7 +224,7 @@ class TaskController {
 				actionBar.append("<span id='7dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
 					HtmlUtil.actionButton('7 days', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")+"</span>")
 			}
-			
+
 		}else {
 			log.warn "genActionBarHTML - invalid comment id (${params.id}) from user ${userLogin}"
 			actionBar.append('<span> An unexpected error occurred</span> ')
@@ -233,9 +233,9 @@ class TaskController {
 		actionBar.append(""" </span> """)
 		render actionBar.toString()
 	}
-	
+
 	/**
-	 * Used to generate action Bar for task details view  
+	 * Used to generate action Bar for task details view
 	 * @param asset comment id.
 	 * @render : Action Bar JSON code.
 	 */
@@ -262,7 +262,7 @@ class TaskController {
 				if (includeDetails) {
 					actionBar << [label: 'Details...', icon: 'ui-icon-zoomin', actionType: 'showDetails']
 				}
-			
+
 			if ( HtmlUtil.isMarkupURL(comment.instructionsLink)  )
 			{
 				actionBar << [label: HtmlUtil.parseMarkupURL(comment.instructionsLink)[0], icon: 'ui-icon-document', actionType: 'viewInstructions', redirect: 'taskManager']
@@ -289,7 +289,7 @@ class TaskController {
 
 				def depCount = TaskDependency.countByPredecessor( comment )
 				if (depCount > 0) {
-					actionBar << [label: 'Neighborhood', icon: 'tds-task-graph-icon', actionType: 'showNeighborhood']	
+					actionBar << [label: 'Neighborhood', icon: 'tds-task-graph-icon', actionType: 'showNeighborhood']
 				}
 
 				result = ServiceResults.success(actionBar) as JSON
@@ -299,7 +299,7 @@ class TaskController {
 		}
 
 		if (result) {
-			render result	
+			render result
 		}
 
 	}
@@ -308,9 +308,9 @@ class TaskController {
 	* Used by the getActionBarHTML to wrap the button HTML into <td>...</td>
 	*/
 	def _actionButtonTd(tdId, button) {
-		return """<td id="${tdId}" width="8%" nowrap="nowrap">${button}</td>"""	
+		return """<td id="${tdId}" width="8%" nowrap="nowrap">${button}</td>"""
 	}
-	
+
 	/**
 	 * Generates a graph of the tasks in the neighborhood around a given task
 	 * @param taskId
@@ -319,7 +319,7 @@ class TaskController {
 	def neighborhoodGraphSvg() {
 		def errorMessage = ''
 
-		while (true) {	
+		while (true) {
 			def taskId = params.id
 			if (! taskId || ! taskId.isNumber()) {
 				errorMessage = "An invalid task id was supplied. Please contact support if this problem persists."
@@ -332,34 +332,34 @@ class TaskController {
 				break
 			}
 
-			def rootTask = AssetComment.read(taskId) 
+			def rootTask = AssetComment.read(taskId)
 			if (!rootTask || rootTask.project.id != project.id) {
 				errorMessage = "Unable to find the specified task"
-				if (rootTask) 
+				if (rootTask)
 					log.warn "SECURITY : User ${securityService.getUserLogin()} attempted to access graph for task ($taskId) not associated to current project ($project)"
 				break
 			}
 
 			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished.toString())
-			
-			// check if the specified task is unpubublished and the user shouldn't see it			
+
+			// check if the specified task is unpubublished and the user shouldn't see it
 			if (!viewUnpublished && !rootTask.isPublished) {
 				errorMessage = "Unable to find the specified task"
 				break
 			}
-			
+
 			def depList = taskService.getNeighborhood(taskId, 2, 5, viewUnpublished)
 			if (depList.size() == 0) {
 				errorMessage = "The task has no interdependencies with other tasks so a map wasn't generated."
 				break
 			}
-			
+
 			def moveEventId = 0
 			if (params.moveEventId && params.moveEventId.isNumber())
 				moveEventId = params.moveEventId
-			
-			
+
+
 			def now = new Date().format('yyyy-MM-dd H:m:s')
 			def styleDef = "rounded, filled"
 
@@ -373,9 +373,9 @@ class TaskController {
 digraph runbook {
 	graph [rankdir=LR, margin=0.001];
 	node [ fontsize=10, fontname="Helvetica", shape="rect" style="${styleDef}" ]
-  
+
 """
-		
+
 			def style = ''
 			def fontcolor = ''
 			def fontsize = ''
@@ -392,10 +392,10 @@ digraph runbook {
 			def outputTaskNode = { task, rootId ->
 				if (! tasks.contains(task.id) && (viewUnpublished || task.isPublished)) {
 					tasks << task.id
-					
+
 					def label = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 					label = (label.size() < 31) ? label : label[0..30]
-					
+
 					def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 					def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
 					def fillcolor = taskService.taskStatusColorMap[colorKey][1]
@@ -403,7 +403,7 @@ digraph runbook {
 
 					// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
 					if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
-						fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
+						fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0]
 						color = taskService.taskStatusColorMap['AUTO_TASK'][1]
 						fontsize = '8'
 					} else {
@@ -418,38 +418,38 @@ digraph runbook {
 					} else {
 						style = styleDef
 					}
-					
+
 					// add the task's role to the roles list
 					def role = task.role ?: 'NONE'
 					if ( task.role && ! (role in roles) )
 						roles.push(role)
-					
+
 					taskList << task
-					
+
 					attribs = "id=\"${task.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
-					
+
 					dotText << "\t${task.taskNumber} [label=\"${label}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
-					
+
 				}
 
 			}
-			
+
 			// helper closure to output the count node for the adjacent tasks
 			def outputOuterNodeCount = { taskNode, isPred, count ->
 				if (viewUnpublished || taskNode.isPublished) {
 					log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
 					def cntNode = "C${taskNode.taskNumber}"
 					dotText << "\t$cntNode [id=\"placeholder\" label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n"
-					// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n" 
+					// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n"
 					if (isPred) {
-						dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"				
+						dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"
 					} else {
 						dotText << "\t${taskNode.taskNumber} -> $cntNode;\n"
 					}
 				}
 			}
 
-			// Iterate over the task dependency list outputting the two nodes in the relationship. If it is an outer node 
+			// Iterate over the task dependency list outputting the two nodes in the relationship. If it is an outer node
 			depList.each() { d ->
 				outputTaskNode(d.successor, taskId)
 				outputTaskNode(d.predecessor, taskId)
@@ -465,20 +465,20 @@ digraph runbook {
 			}
 
 			dotText << "}\n"
-			
+
 			try {
 				def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString() )
-				
+
 				// convert the URI to a web safe format
 				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
 				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
-				
+
 				def svgText = svgFile.text
 				def data = [svgText:svgText, roles:roles, tasks:taskList]
 				render data as JSON
-				
+
 				return false
-				
+
 			} catch(e) {
 				errorMessage = 'Encounted an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
@@ -487,14 +487,14 @@ digraph runbook {
 			}
 
 			break
-		} // while	
+		} // while
 
 		if (errorMessage) {
 			response.status = 203	// Partial data
 			response.contentType = 'text/html'
 			render errorMessage
 		}
-		
+
 	}
 
 	/**
@@ -505,8 +505,8 @@ digraph runbook {
 	 */
 	def moveEventTaskGraphSvg() {
 		def errorMessage = ''
-		
-		// Create a loop that we can break out of as we need to	
+
+		// Create a loop that we can break out of as we need to
 		while (true) {
 
 			def project = securityService.getUserCurrentProject()
@@ -515,7 +515,7 @@ digraph runbook {
 				break
 			}
 
-			def moveEventId = params.moveEventId	
+			def moveEventId = params.moveEventId
 			if (! moveEventId || ! moveEventId.isNumber()) {
 				errorMessage = "Please select an event to view the graph"
 				break
@@ -524,11 +524,11 @@ digraph runbook {
 			def moveEvent = MoveEvent.read(moveEventId)
 			if (! moveEvent || moveEvent.project.id != project.id) {
 				errorMessage = "The event specified was not found"
-				if (moveEvent) 
+				if (moveEvent)
 					log.warn "SECURITY : User ${securityService.getUserLogin()} attempted to access graph of event ($moveEventId) not associated to current project ($project)"
 				break
 			}
-			
+
 			log.debug "**** ${project.id} / ${moveEvent.project.id} - $project / $moveEvent "
 
 			def mode = params.mode ?: ''
@@ -536,22 +536,22 @@ digraph runbook {
 				mode = ''
 				log.warn "The wrong mode [$mode] was specified"
 			}
-			
+
 			def projectId = project.id
-			
+
 			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished.toString())
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, moveEventId)
-			
+
 			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
 
 			def query = """
-				SELECT 
+				SELECT
 					t.asset_comment_id AS id,
-					t.task_number, 
+					t.task_number,
 					CONVERT( GROUP_CONCAT(s.task_number SEPARATOR ',') USING 'utf8') AS successors,
-					IFNULL(a.asset_name,'') AS asset, 
-					t.comment AS task, 
+					IFNULL(a.asset_name,'') AS asset,
+					t.comment AS task,
 					t.role,
 					t.status,
 					IFNULL(CONCAT(first_name,' ', last_name),'') AS hard_assign,
@@ -563,12 +563,12 @@ digraph runbook {
 				${viewUnpublished ? '' : ' AND s.is_published=1 '}
 				LEFT OUTER JOIN asset_entity a ON t.asset_entity_id=a.asset_entity_id
 				LEFT OUTER JOIN person ON t.owner_id=person.person_id
-				WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId} 
+				WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId}
 				${viewUnpublished ? '' : ' AND t.is_published=1 '}
 				GROUP BY t.task_number
 			"""
 
-				//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
+				//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign,
 				//  -- IFNULL(t.est_start,'') AS est_start
 			//log.debug "moveEventTaskGraphSvg() SQL for tasks: $query"
 
@@ -579,7 +579,7 @@ digraph runbook {
 				if ( t.role && ! (role in roles) )
 					roles.push(role)
 			}
-			
+
 			if (tasks.size()==0) {
 				errorMessage = 'No tasks were found for the selected move event'
 				break
@@ -599,9 +599,9 @@ digraph runbook {
 digraph runbook {
 	graph [rankdir=LR, margin=0.001];
 	node [ fontsize=10, fontname="Helvetica", shape="rect" style="${styleDef}" ]
-  
+
 """
-		
+
 			def style = ''
 			def fontcolor = ''
 			def fontsize = ''
@@ -617,13 +617,13 @@ digraph runbook {
 			    def tooltip  = "${it.task_number}:" + it.task.encodeAsJSON()
 
 				def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
-				
+
 				fillcolor = taskService.taskStatusColorMap[colorKey][1]
-				
+
 				// log.info "task ${it.task}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
 				// if ("${it.roll}" == "${AssetComment.AUTOMATIC_ROLE}" ) {
 				if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
-					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
+					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0]
 					color = taskService.taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'
 				} else {
@@ -631,20 +631,20 @@ digraph runbook {
 					fontsize = '10'
 					color = 'black'
 				}
-				
+
 				// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
 				attribs = "id=\"${it.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
-				
+
 				//def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:false])
 
-				task = (task.size() > 35) ? task[0..34] : task 
+				task = (task.size() > 35) ? task[0..34] : task
 				dotText << "\t${it.task_number} [label=\"${task}\"  id=\"${it.id}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
 				def successors = it.successors
-				
+
 				if (successors) {
 					successors = (successors as Character[]).join('')
 					successors = successors.split(',')
-					successors.each { s -> 
+					successors.each { s ->
 						if (s.size() > 0) {
 							dotText << "\t${it.task_number} -> ${s};\n"
 						}
@@ -653,7 +653,7 @@ digraph runbook {
 			}
 
 			dotText << "}\n"
-			
+
 			try {
 				// String svgType = grailsApplication.config.graph.graphViz.graphType ?: 'svg'
 
@@ -662,12 +662,12 @@ digraph runbook {
 				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
 				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
 				def svgFile = new File(filename)
-				
+
 				def svgText = svgFile.text
 				def data = [svgText:svgText, roles:roles, tasks:tasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
 				return false
-				
+
 			} catch (e) {
 				errorMessage = 'Encounted an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
@@ -703,7 +703,7 @@ digraph runbook {
 			// Bounce them if they don't have a project or no perms for this controller
 			return
 		}
-		
+
 		// Lookup a neighborhood task and adjust accordingly if the user passed a valid id
 		AssetComment neighborTask
 		def neighborhoodTaskId = NumberUtil.toPositiveLong(params.neighborhoodTaskId, -1)
@@ -718,10 +718,10 @@ digraph runbook {
 				}
 			}
 		}
-		
+
 		// if user used the event selector on the page, update their preferences with the new event
 		// TODO : JPM 2/2016 Refactor this into a method
-		Long meId 
+		Long meId
 		if (params.moveEventId) {
 			meId = NumberUtil.toPositiveLong(params.moveEventId, -1)
 			if (meId > 0) {
@@ -736,44 +736,44 @@ digraph runbook {
 				}
 			}
 		}
-		
+
 		String viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
-		
+
 		List eventList = MoveEvent.findAllByProject(project)
 		def selectedEventId = 0
-		
+
 		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
 		def eventPrefLong = NumberUtil.toLong(eventPref)
-		
+
 		if (eventPref != '0' && eventPref != meId && ! eventList.find {it.id == eventPrefLong}) {
 			// The user preference references an invalid event so we should clear it out
 			eventPref = "0"
 			userPreferenceService.removePreference(PREF.MOVE_EVENT)
 		}
-		
+
 		// Determine what the Selected Event should be with the following rules
 		//    1. If user clicked on a neighborhood task, get the event from that task. If the task is not assigned to an event - try next
-		//    2. Otherwise if the user specified an event use it 
+		//    2. Otherwise if the user specified an event use it
 		//	  3. Lastly use the user's saved preference
 		if (neighborTask) {
 			selectedEventId = neighborTask.moveEvent?.id
-		} 
+		}
 		if (! selectedEventId) {
 			selectedEventId = meId ?: eventPref
 		}
-		
-		
+
+
 		return [
-			moveEvents: eventList, 
-			selectedEventId: selectedEventId, 
-			neighborhoodTaskId: neighborhoodTaskId, 
+			moveEvents: eventList,
+			selectedEventId: selectedEventId,
+			neighborhoodTaskId: neighborhoodTaskId,
 			viewUnpublished: viewUnpublished
 		]
 	}
-	
+
 	/**
 	 * Used in MyTask to set user preference for printername and quantity .
-	 * @param prefFor - Key 
+	 * @param prefFor - Key
 	 * @param selected : value
 	 */
 	def setLabelQuantityPref() {
@@ -785,11 +785,11 @@ digraph runbook {
 		}
 		render true
 	}
-	
+
 	/**
 	 * Used in Task Manager auto open action bar which status is ready or started.
 	 * @param : id[] : list of id whose status is ready or started
-	 * @return : map consist of id of task and action bar 
+	 * @return : map consist of id of task and action bar
 	 */
 	def genBulkActionBarHTML() {
 		def taskIds =  params.list("id[]")
@@ -797,18 +797,18 @@ digraph runbook {
 		taskIds.each{
 			def comment = AssetComment.read(it)
 			if( comment ){
-				def actionBar = getActionBarData( comment );
+				def actionBar = getActionBarData( comment )
 				resultMap << [(it): actionBar.toString()]
 			}
 		}
 		render resultMap as JSON
 	}
-	
+
 	/**
 	 * Used in Task Manager action bar to change estTime.
 	 * @param : day : 1,2 or 7days.
 	 * @param : commentId.
-	 * @return : retMap. 
+	 * @return : retMap.
 	 */
 	def changeEstTime() {
 		def etext = ""
@@ -821,35 +821,35 @@ digraph runbook {
 			def estDay = [1,2,7].contains(day) ? day : 0
 			if (comment) {
 				comment.estStart = TimeUtil.nowGMT().plus(estDay)
-				
+
 				if (comment.duration && comment.durationScale && comment.duration > 0) {
 					use ( TimeCategory ) {
 						switch (comment.durationScale) {
 							case TimeScale.M:
 								comment.estFinish = comment.estStart + comment.duration.minutes
-								break;
+								break
 							case TimeScale.H:
 								comment.estFinish = comment.estStart + comment.duration.hours
-								break;
+								break
 							case TimeScale.D:
 								comment.estFinish = comment.estStart.plus(comment.duration)
-								break;
+								break
 							case TimeScale.W:
 								comment.estFinish = comment.estStart + comment.duration.weeks
-								break;
+								break
 							default:
 								comment.estFinish = comment.estStart.plus(comment.duration)
 						}
 					}
 				} else {
-					comment.duration = 1;
-					comment.durationScale = "D";
+					comment.duration = 1
+					comment.durationScale = "D"
 					comment.estFinish = comment.estStart.plus(1)
 				}
-					
+
 				if (!comment.hasErrors() && !comment.save(flush:true)) {
 					etext = "unable to update estTime"+GormUtil.allErrorsString( comment )
-					log.error etext 
+					log.error etext
 				}
 			} else {
 				etext = "Requested comment does not exist. "
@@ -861,7 +861,7 @@ digraph runbook {
 					 estFinish: comment?.estFinish ? TimeUtil.formatDateTime(getSession(), comment.estFinish ) : '' ]
 		render retMap as JSON
 	}
-	
+
 	def taskTimeline() {
 		// handle project
 		def project = securityService.getUserCurrentProject()
@@ -870,22 +870,22 @@ digraph runbook {
 			redirect(controller:"project", action:"list")
 			return
 		}
-		
+
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
-		
+
 		// handle move events
 		def moveEvents = MoveEvent.findAllByProject(project)
 		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
 		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
-		
+
 		// handle the view unpublished checkbox
 		def viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
-		
+
 		return [moveEvents:moveEvents, selectedEventId:selectedEventId, viewUnpublished:viewUnpublished]
 	}
-	
+
 	// gets the JSON object used to populate the task graph timeline
 	def taskTimelineData() {
 		// handle project
@@ -895,13 +895,13 @@ digraph runbook {
 			redirect(controller:"project", action:"list")
 			return
 		}
-		
+
 		// handle the view unpublished checkbox
 		if (params.viewUnpublished && params.viewUnpublished in ['0', '1']) {
 			def viewUnpublishedBoolean = (params.viewUnpublished == '1')
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublishedBoolean.toString())
 		}
-		
+
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		boolean onlyPublished = true
 		def publishedValues = [true]
@@ -909,15 +909,15 @@ digraph runbook {
 			onlyPublished = false
 			publishedValues = [true, false]
 		}
-		
+
 		// Define default data
 		def defaultEstStart = TimeUtil.nowGMT()
 		def data = [items:[], sinks:[], starts:[], roles:[], startDate:defaultEstStart, cyclicals:[:]]
-		
+
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
-		
+
 		// handle move events
 		def moveEvents = MoveEvent.findAllByProject(Project.get(projectId))
 		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
@@ -926,18 +926,18 @@ digraph runbook {
 			render ([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
 			return
 		}
-		
+
 		// get basic task and dependency data
 		def me = MoveEvent.get(selectedEventId)
 		if (! me) {
 			render "Unable to find event $meId"
 			return
 		}
-		
+
 		Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me ,onlyPublished)
 		def tasks = tasksAndDependencies.tasks
 		def deps = tasksAndDependencies.dependencies
-		
+
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
 			if ( !(it.predecessor in tasks) && it.predecessor.isPublished in publishedValues)
@@ -950,24 +950,24 @@ digraph runbook {
 		}
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def startTime = 0
-		
+
 		if (tasks.size() == 0 || deps.size() == 0) {
 			render ([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
 			return
 		}
-		
+
 		// generate optimized schedule based on this data
 		def dfsMap = runbookService.processDFS(tasks, deps, tmp)
 		def durMap = runbookService.processDurations(tasks, deps, dfsMap.sinks, tmp)
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
-		
+
 		def estStart = dfsMap.starts[0].estStart
 		if (!estStart) {
 			estStart = TimeUtil.nowGMT()
 		}
 		def startDate = estStart
-		
+
 		// generate the JSON data used by d3
 		def items = []
 		def roles = []
@@ -979,35 +979,35 @@ digraph runbook {
 			def role = t.role ?: 'NONE'
 			if ( t.role && ! (role in roles) )
 				roles.push(role)
-			
+
 			def task = tmp['tasks'][t.id]
-			items.push( [ 
-				id:t.id, 
+			items.push( [
+				id:t.id,
 				number:t.taskNumber,
-				name:t.comment, 
-				startInitial:task.tmpEarliestStart, 
+				name:t.comment,
+				startInitial:task.tmpEarliestStart,
 				endInitial:task.tmpEarliestStart+t.durationInMinutes(),
-				predecessorIds:predecessorIds, 
-				criticalPath:task.tmpCriticalPath, 
-				assignedTo:t.assignedTo.toString(), 
+				predecessorIds:predecessorIds,
+				criticalPath:task.tmpCriticalPath,
+				assignedTo:t.assignedTo.toString(),
 				status:t.status,
-				role:role, 
+				role:role,
 			] )
 		}
-		
+
 		// Sort the roles aka teams
 		roles.sort()
-		
+
 		def sinks = []
 		dfsMap.sinks.each { s ->
 			sinks.push(s.id)
 		}
-		
+
 		def starts = []
 		dfsMap.starts.each { s ->
 			starts.push(s.id)
 		}
-		
+
 		def cyclicals = [:]
 		dfsMap.cyclicals.each {
 			cyclicals.put(it.key, it.value.stack)
@@ -1016,22 +1016,22 @@ digraph runbook {
 		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
 		render returnMap
 	}
-	
+
 	def editTask() {
 		render( view: "_editTask", model: [])
 	}
-	
-	
+
+
 	def showTask() {
 		//def instructionsLink = AssetComment.read(params.taskId)?.instructionsLink
 		//log.error instructionsLink
 		render( view: "_showTask", model: [])
 	}
-	
+
 	def list() {
 		render( view: "_list", model: [])
 	}
-	
+
 	/**
 	 * Get task roles
 	 */
@@ -1043,7 +1043,7 @@ digraph runbook {
 		}
 		try {
 			def result = taskService.getRolesForStaff()
-			
+
 			render(ServiceResults.success(result) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
@@ -1055,54 +1055,54 @@ digraph runbook {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Simply a test page for the runbook optimization
 	 * @param params.eventId - the event id to generate the data for or default to the user's current event
 	 * @param params.showAll - flag to indicate including all columns of just the planning ones (true|false)
 	 */
 	def eventTimelineResults() {
-		
+
 		// Get the form parameters
 		Boolean showAll = (params.showAll == 'true')
-		String meId = params.eventId	
-		
+		String meId = params.eventId
+
 		def (project, user) = controllerService.getProjectAndUserForPage( this, 'CriticalPathExport' )
-		if (! project) 
+		if (! project)
 			return
-		
-		MoveEvent me = controllerService.getEventForPage(this, project, user, meId) 
+
+		MoveEvent me = controllerService.getEventForPage(this, project, user, meId)
 		if (! me) {
 			render "Unable to find event $meId"
 			return
 		}
-		
+
 		def startTime = 0
 		def tasks, deps, dfsMap, durMap, graphs,estFinish
-		
+
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $me</h1>")
-		
+
 		try {
 			Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(me)
 			tasks = tasksAndDependencies.tasks
 			deps = tasksAndDependencies.dependencies
 			def tmp = runbookService.createTempObject(tasks, deps)
-			
+
 			dfsMap = runbookService.processDFS( tasks, deps, tmp )
-			durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+			durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 			graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 			estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
-			
+
 			results.append("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
 			results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
 			results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
 			results.append("Cyclical Maps: ")
-			
+
 			def cyclicals = [:]
 			dfsMap.cyclicals.each {
 				cyclicals.put(it.key, it.value.stack)
 			}
-			
+
 			// results.append(dfsMap.cyclicals)
 			if (dfsMap.cyclicals?.size()) {
 				results.append('<ol>')
@@ -1124,9 +1124,9 @@ digraph runbook {
 			results.append('<br/>')
 			results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
 			results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
-			
+
 			results.append("<b>Estimated Runbook Duration: ${estFinish} for Move Event: $me</b><br/>")
-			
+
 			/*
 			results.append("<h1>Edges data</h1><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
 			deps.each { dep ->
@@ -1134,7 +1134,7 @@ digraph runbook {
 			}
 			results.append('</table>')
 			*/
-			
+
 			def durationExtra = ''
 			def timesExtra = ''
 			def tailExtra = ''
@@ -1142,13 +1142,13 @@ digraph runbook {
 			if (showAll) {
 				durationExtra = "<th>Act Duration</th><th>Deviation</th>"
 				timesExtra = "<th>Act Start</th>"
-				tailExtra = "<th>TaskSpec</th><th>Hard Assigned</th><th>Resolved By</th><th>Class</th>" + 
+				tailExtra = "<th>TaskSpec</th><th>Hard Assigned</th><th>Resolved By</th><th>Class</th>" +
 					"<th>Asset Id</th><th>Asset Name</th>"
 			}
 
 			results.append("""<h1>Tasks Details</h1>
 				<table>
-					<tr><th>Id</th><th>Task #</th><th>Action</th> 
+					<tr><th>Id</th><th>Task #</th><th>Action</th>
 					<th>Est Duration</th>
 					$durationExtra
 					<th>Earliest Start</th><th>Latest Start</th><th>Constraint Time</th>
@@ -1208,7 +1208,7 @@ digraph runbook {
 				}
 
 				// TODO : add in computation for time differences if both constraint time est and/or actual
-	 
+
 	 			def criticalPath = (t.duration > 0 && tmp['tasks'][t.id].tmpEarliestStart == tmp['tasks'][t.id].tmpLatestStart ? 'Yes' : '&nbsp;')
 
 				results.append( """<tr>
@@ -1233,7 +1233,7 @@ digraph runbook {
 		} catch (e) {
 			results.append("<h1>Unable to complete computation</h1>${e.getMessage()}")
 		}
-		
+
 		render results.toString()
 
 	}
@@ -1241,7 +1241,7 @@ digraph runbook {
 	/**
 	 * Generates the user's list of tasks for the current project
 	 * params:
-	 *		tab - all or todo 
+	 *		tab - all or todo
 	 */
 	def listUserTasks() {
 		def project = controllerService.getProjectForPage(this)
@@ -1260,23 +1260,23 @@ digraph runbook {
 			this.sleep(500)
 			log.info "listUserTasks - sunk for ${person} on project ${project.id}"
 		}
-		
+
 		log.debug "listUserTasks: params=$params, project=$project, person=$person, entities=${entities.size()}"
 
 		def allTasks = false
 
-		// Parameters 		
+		// Parameters
 		def tab
 		def taskList
 		def todo
 		def all
-		
+
 		// Deal with the user preferences
 		def viewMode = params.viewMode
 		def search = params.search
 		def sort = params.sort
-		
-		if (viewMode) { 
+
+		if (viewMode) {
 			session.setAttribute('TASK_VIEW_MODE', viewMode)
 		}
 		// log.info "listComment() sort=${params.sort}, order=${params.order}"
@@ -1285,22 +1285,22 @@ digraph runbook {
 		def isMoveTech = partyRelationshipService.staffHasFunction(project.id, person.id, 'MOVE_TECH')
 
 		if (params.event) {
-			def eventP = params.event.equals('null') ? "_null" : params.event;
+			def eventP = params.event.equals('null') ? "_null" : params.event
 			userPreferenceService.setPreference(PREF.MYTASKS_MOVE_EVENT_ID, eventP)
 		}
-		
+
 		def moveEventId = userPreferenceService.getPreference(PREF.MYTASKS_MOVE_EVENT_ID)
 		if (moveEventId.equals("_null")) {
 			moveEventId = null
 		}
 		def moveEvent = MoveEvent.get(moveEventId)
-		
+
 		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
 		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search, moveEvent)
 		// Use the taskService.getUserTasks(countOnly:true, search=null) service to get counters of tasks and to-do
 		def tasksCounters = taskService.getUserTasks(person, project, true, 7, params.sort, params.order, "", moveEvent)
 
-		
+
 		// Get the size of the lists
 		def todoSize = tasksCounters['todo']
 		def allSize = tasksCounters['all']
@@ -1321,7 +1321,7 @@ digraph runbook {
 				taskList = tasks['todo']
 			}
 		}
-		
+
 		// Build the list and associate the proper CSS style
 		def issueList = []
 		taskList.each{ task ->
@@ -1331,35 +1331,35 @@ digraph runbook {
 		def timeToRefresh =  userPreferenceService.getPreference(PREF.MYTASKS_REFRESH)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
-		
+
 		// Determine the model and view
 		def model = [
-			taskList:issueList, 
-			tab:tab, 
-			todoSize:todoSize, 
-			allSize:allSize, 
-			search:search, 
-			sort:params.sort, 
+			taskList:issueList,
+			tab:tab,
+			todoSize:todoSize,
+			allSize:allSize,
+			search:search,
+			sort:params.sort,
 			order:params.order,
-	 		personId: person.id, 
-	 		isCleaner: isCleaner, 
+	 		personId: person.id,
+	 		isCleaner: isCleaner,
 	 		isMoveTech:isMoveTech,
-			timeToUpdate: timeToRefresh ?: 60, 
-			isOnIE: false, 
+			timeToUpdate: timeToRefresh ?: 60,
+			isOnIE: false,
 			person: person,
-			servers: entities.servers, 
-			applications: entities.applications, 
-			dbs: entities.dbs, 
-			files: entities.files,  
+			servers: entities.servers,
+			applications: entities.applications,
+			dbs: entities.dbs,
+			files: entities.files,
 			networks: entities.networks,
-			assetDependency: new AssetDependency(), 
-			dependencyType: entities.dependencyType, 
+			assetDependency: new AssetDependency(),
+			dependencyType: entities.dependencyType,
 			dependencyStatus: entities.dependencyStatus,
 			moveBundleList: moveBundleList,
-			moveEventList: moveEventList, 
+			moveEventList: moveEventList,
 			moveEvent: moveEvent,
 			selectedTaskId: params.id]
-		
+
 		if(search && taskList.size() > 0){
 			model  << [searchedAssetId : taskList*.id[0], searchedAssetStatus : taskList*.status[0]]
 		}
@@ -1374,10 +1374,10 @@ digraph runbook {
 		model.prefPrinterCopies = userPreferenceService.get("PRINTER_COPIES")
 
 		log.debug "listUserTasks: View is $view"
-		
+
 		// Send the user on his merry way
 		render (view:view, model:model)
-		
+
 	}
 
 	/**
@@ -1406,7 +1406,7 @@ digraph runbook {
 
 		def project = securityService.getUserCurrentProject()
 
-		// This is such a hack at the moment but if this errors, the mobile scanner doesn't have any way to get back to the previous screen 
+		// This is such a hack at the moment but if this errors, the mobile scanner doesn't have any way to get back to the previous screen
 		// so it is a painful experience to close the app, kill the app, restart, login and then get back to the original screen.
 		def backButton = 'Please press the Back button to return to the previous screen.<p/><button onclick="goBack()">Back</button>'
 		def backScript = """
@@ -1414,7 +1414,7 @@ digraph runbook {
 function goBack() { window.history.back() }
 </script>
 """
-		
+
 		log.debug "showIssue: params=$params, project=$project"
 
 		def assetComment = AssetComment.findByIdAndProject(params.issueId, project)
@@ -1423,11 +1423,11 @@ function goBack() { window.history.back() }
 			render "${backScript}Unable to locate a task for asset [${params.search}/${params.issueId}]. $backButton"
 			return
 		}
-		
+
 
 		def cartQty = '	'
 		def moveEvent = assetComment.moveEvent
-		
+
 		// Determine the cart quantity
 		// The quantity only appears on the last label scanned/printed for a particular cart. This is used to notify
 		// the logistics and transport people that the cart is ready to wrap up.
@@ -1439,37 +1439,37 @@ function goBack() { window.history.back() }
 			}
 		}
 		// log.info "cartQty ($cartQty)"
-		
+
 		def selectCtrlId = "assignedToEditId_${assetComment.id}"
 		def assignToSelect = taskService.assignToSelectHtml(project.id, params.issueId, assetComment.assignedTo?.id, selectCtrlId)
 		def person = securityService.getUserLoginPerson()
-		
+
 		// Bounce back to the user if we didn't get a legit id, associated with the project
 		if (! assetComment ) {
 			log.error "${person} attempted an invalide access a task/comment with id ${params.issueId} on project $project"
 			render "${backScript}Unable to find specified record. ${backButton}"
 			return
 		}
-			
+
 		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
 		def canPrint = request.getHeader ( "User-Agent" ).contains ( "Mozilla" ) && isCleaner
 		// Print the current support, seems that Chrome prints all of them
 		log.info request.getHeader ( "User-Agent" )
-		
+
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
 		noteList.each{
 			def dateCreated = TimeUtil.formatDateTime(getSession(), it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3)
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
-		
+
 		def viewMode = session.getAttribute("TASK_VIEW_MODE")
-		
+
 		// Determine if the user should be able to edit the task. The rules are:
 		// 1. If ADMIN, CLIENT_ADMIN or CLIENT_MGR can always edit
 		// 2. Can ALWAYS add a NOTE.
-		// 3. Change person - when task is in the PENDING/READY status? 
-		 
+		// 3. Change person - when task is in the PENDING/READY status?
+
 		def assignmentPerm = false
 		def categoryPerm = false
 		def permissionForUpdate = true
@@ -1480,21 +1480,21 @@ function goBack() { window.history.back() }
 			// AssignmentPerm can be changed if task is not completed/terminated
 			assignmentPerm = ! [AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(assetComment.status)
 		}
-		
+
 		def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate) : ''
-		
+
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff
 		projectStaff.sort{it.firstName}
-	    
-		def model = [ 
+
+		def model = [
 			assetComment: assetComment,
-			notes:notes, 
+			notes:notes,
 			statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
-			permissionForUpdate:permissionForUpdate, 
-			assignmentPerm:assignmentPerm, 
+			permissionForUpdate:permissionForUpdate,
+			assignmentPerm:assignmentPerm,
 			categoryPerm:categoryPerm,
-			successor:successor, 
+			successor:successor,
 			projectStaff:projectStaff,
 			canPrint:canPrint,
 			dueDate:dueDate,
@@ -1503,7 +1503,7 @@ function goBack() { window.history.back() }
             cartQty:cartQty,
 			project:project
         ]
-	
+
 		def view = isCleaner ? '_showCleanerTask' : 'showIssue'
 		if(isCleaner){
 			def lblQty= session.getAttribute('printLabelQuantity') ?: userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY)

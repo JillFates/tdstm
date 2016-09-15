@@ -14,11 +14,11 @@ class ManufacturerService {
 		// Get the manufacturer instances for params ids
 		def toManufacturer = Manufacturer.get(manufacturerToId)
 		def fromManufacturer = Manufacturer.get(manufacturerFromId)
-		
+
 		// Revise Model, Asset, and any other records that may point to this manufacturer
 		def updateAssetsQuery = "update asset_entity set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateAssetsQuery)
-		
+
 		def updateModelsQuery = "update model set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateModelsQuery)
 
@@ -27,7 +27,7 @@ class ManufacturerService {
 
 		// Add alias
 		def toManufacturerAlias = ManufacturerAlias.findAllByManufacturer(toManufacturer).name
-		
+
 		// Add to the AKA field list in the target record
 		if(!toManufacturerAlias?.contains(fromManufacturer.name)){
 			def fromManufacturerAlias = ManufacturerAlias.findAllByManufacturer(fromManufacturer)
@@ -37,17 +37,14 @@ class ManufacturerService {
 			}
 			//merging fromManufacturer as AKA of toManufacturer
 			toManufacturer.findOrCreateAliasByName(fromManufacturer.name, true)
-			
+
 			// Delete manufacturer record.
 			fromManufacturer.delete()
 		} else {
 			//	Delete manufacturer record.
 			fromManufacturer.delete()
-			sessionFactory.getCurrentSession().flush();
+			sessionFactory.getCurrentSession().flush()
 		}
 	}
 
 }
-
-
-

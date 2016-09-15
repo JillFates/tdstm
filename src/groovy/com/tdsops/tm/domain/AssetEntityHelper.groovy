@@ -9,7 +9,7 @@ import com.tdssrc.grails.NumberUtil
  * Provides helper functionality for the AssetEntity domain
  */
 class AssetEntityHelper {
-	
+
 	/**
 	 * Used to lookup an asset by it's ID number and will validate that it belongs to the user's current project
 	 * @param project - the project the user is assigned to

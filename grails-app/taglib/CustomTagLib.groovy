@@ -9,11 +9,11 @@ import com.tdssrc.grails.HtmlUtil
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import groovy.transform.Synchronized
- 
+
 class CustomTagLib {
 	static String namespace = 'tds'
 	static String faviconStr
-	
+
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
 	 * @param date - the date to be formated
@@ -23,11 +23,11 @@ class CustomTagLib {
 	 * @return a date formatted appropriately
 	 */
   def convertDate = { attrs ->
-    Date dateValue = attrs['date'];
+    Date dateValue = attrs['date']
     def format
     def endian = attrs['endian']
     def sessionObj = (attrs.containsKey('mockSession') ? attrs.mockSession : session)
-    String dateParamClassName = dateValue.getClass().getName().toString();
+    String dateParamClassName = dateValue.getClass().getName().toString()
 
     out << ""
     if (dateValue) {
@@ -68,24 +68,24 @@ class CustomTagLib {
 	def convertDateTime = { attrs, body ->
 		Date dateValue = attrs['date']
 		def format = attrs['format']
-		String dateParamClassName = dateValue.getClass().getName().toString();
+		String dateParamClassName = dateValue.getClass().getName().toString()
 		def sessionObj = (attrs.containsKey('mockSession') ? attrs.mockSession : session)
 
 		out << ""
-		if( dateParamClassName.equals("java.util.Date") || dateParamClassName.equals("java.sql.Timestamp") ){	
+		if( dateParamClassName.equals("java.util.Date") || dateParamClassName.equals("java.sql.Timestamp") ){
 			DateFormat formatter = TimeUtil.createFormatter(sessionObj, format)
 			if (formatter == null) {
 				formatter = TimeUtil.createFormatter(sessionObj, TimeUtil.FORMAT_DATE_TIME)
 			}
 			out << TimeUtil.formatDateTime(sessionObj, dateValue, formatter)
-		}  
+		}
 	}
 
 	/*
-	 * 
+	 *
 	 */
 	def truncate = { attrs ->
-		String value = attrs['value'];
+		String value = attrs['value']
 		if(value){
 			def length = value.size()
 			if(length > 50){
@@ -96,26 +96,26 @@ class CustomTagLib {
 		}
 	}
 	/*
-	 * will return the time + GMT as hh:mm AM/PM formate 
+	 * will return the time + GMT as hh:mm AM/PM formate
 	 */
 	def convertToGMT = { attrs ->
-		Date dt = attrs['date'];
-		def offsetTZ =  new Date().getTimezoneOffset() / 60 ;
-		String dtStr = dt.getClass().getName().toString();
-		String dtParam = dt.toString();	
+		Date dt = attrs['date']
+		def offsetTZ =  new Date().getTimezoneOffset() / 60
+		String dtStr = dt.getClass().getName().toString()
+		String dtParam = dt.toString()
 		// check to see whether the input date is Date object or not
 		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){
 			// convert the date into GMT
 			//def date = new Date( (Long)(dt.getTime() + (3600000 * offsetTZ)) ) ;
-			def date = new Date( (Long)(dt.getTime() + (0 * offsetTZ)) ) ;
-			DateFormat formatter ; 
+			def date = new Date( (Long)(dt.getTime() + (0 * offsetTZ)) )
+			DateFormat formatter
 			// convert the date into required formate
-			formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
-			dtParam = formatter.format(date);		
-		}  
+			formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a")
+			dtParam = formatter.format(date)
+		}
 		/* if null or any plain string */
 		if (dtParam != "null") {
-			dtParam = dtParam.trim();
+			dtParam = dtParam.trim()
 			out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
 		}
 	}
@@ -124,18 +124,18 @@ class CustomTagLib {
 	 * value should be in seconds
 	 */
 	def formatIntoHHMMSS = { attrs ->
-		def value = attrs['value'];
+		def value = attrs['value']
 		if( value ){
-			def timeFormate 
+			def timeFormate
     	    def hours = (Integer)(value / 3600 )
     	    	timeFormate = hours >= 10 ? hours : '0'+hours
     	    def minutes = (Integer)(( value % 3600 ) / 60 )
     	    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
-			
+
 			out << timeFormate
 		}
 	}
-	
+
     def sortableLink = { attrs ->
    		def writer = out
    		if(!attrs.property)
@@ -194,16 +194,16 @@ class CustomTagLib {
 	def elapsedAgo = { attrs ->
 		def start = attrs.start
 		def end = attrs.end
-		
+
 		if ( ! start || ! end ) {
 			out << ''
 		} else {
 			out << TimeUtil.ago(start, end)
 		}
 	}
-	
+
 	/**
-	* Used to generate an HTML Action Button 
+	* Used to generate an HTML Action Button
 	* @param label - text to display in Button
 	* @param icon - CSS icon to display in button
 	* @param id - CSS id to embed into IDs
@@ -228,9 +228,9 @@ class CustomTagLib {
 		def label
 		def isUrl = false
 
-		if (text) { 
-			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray();
-			UrlValidator urlValidator = new UrlValidator(schemes);
+		if (text) {
+			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray()
+			UrlValidator urlValidator = new UrlValidator(schemes)
 
 			// Attempt to split the URL from the label
 			def tokens = text.tokenize('|')
@@ -250,7 +250,7 @@ class CustomTagLib {
 						url = 'file://' + uc.encode( url.replace("\\", '/') )
 					}
 				}
-			} 
+			}
 		}
 
 		if (isUrl) {
@@ -267,12 +267,12 @@ class CustomTagLib {
 		}
 
 	}
-    
+
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
 	 */
 	def select = { attrs ->
-		def id = attrs['id'];
+		def id = attrs['id']
 		def name = attrs['name']
         def clazz = attrs['class']
         def onchange = attrs['ng-change']
@@ -280,8 +280,8 @@ class CustomTagLib {
         def ngShow = attrs['ng-show']
         def ngDisabled = attrs['ng-disabled']
         def datasource = attrs['datasource']
-        
-        def from = attrs['from']        
+
+        def from = attrs['from']
 		def optionKey = attrs['optionKey']
         def optionValue = attrs['optionValue']
         def noSelection = attrs['noSelection']
@@ -318,8 +318,8 @@ class CustomTagLib {
         }
 
         if (from && datasource) {
-            def first=true;
-            def label;
+            def first=true
+            def label
 
             out << "ng-init=\"$datasource=["
             from.eachWithIndex {el, i ->
@@ -336,7 +336,7 @@ class CustomTagLib {
                 }  else {
                     keyValue = el
                 }
-                
+
                 label = ""
                 if (optionValue) {
                     if (optionValue instanceof Closure) {
@@ -350,10 +350,10 @@ class CustomTagLib {
                 }
 
                 if (!first) {
-                    out << "," 
+                    out << ","
                 }
                 out << "{v:\'$keyValue\',l:\'$label\'} "
-                first = false;
+                first = false
             }
              out << "]\""
         }
@@ -371,9 +371,9 @@ class CustomTagLib {
         	out << "<option ng-selected=\"{{$ngModel == item.v}}\" value={{item.v}} ng-repeat=\"item in $datasource\">{{item.l}} </option> "
         }
 
-        
+
         out << "</select>"
-        
+
     }
 
 	/*
@@ -402,7 +402,7 @@ class CustomTagLib {
 	}
 
 	/**
-	 * Used in the Application show view to show Owner/SMEs name and if the person is not staff of the 
+	 * Used in the Application show view to show Owner/SMEs name and if the person is not staff of the
 	 * project client then it will include the name of their company as well.
 	 * @param client - the company that is the client
 	 * @param person - the person to output the name of
@@ -439,7 +439,7 @@ class CustomTagLib {
 		out << urlGenerated
 	}
 
-	/** 
+	/**
 	 * Used internally to initialize the URL for the favicon one time since it is referenced often
 	 */
 	@Synchronized
@@ -454,7 +454,7 @@ class CustomTagLib {
 	 * Used to generate the link for including the favicon.ico file into a page
 	 * @usage: <tds:favicon />
 	 */
-	def favicon = { attrs -> 
+	def favicon = { attrs ->
 
 		if (faviconStr == null) {
 			initializeFavicon()

@@ -1,7 +1,7 @@
 package com.tdsops.common.security
 
 import grails.test.*
-import org.apache.log4j.* 
+import org.apache.log4j.*
 
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
@@ -9,7 +9,7 @@ import com.tdsops.common.security.SecurityConfigParser
 import spock.lang.Specification
 
 // TODO : JPM 01/2015 : Fixed the SecurityConfigParserTests test cases
-// There was a large change to the structure that broke most of the test cases and I haven't had time to 
+// There was a large change to the structure that broke most of the test cases and I haven't had time to
 // correct the test cases.
 
 /**
@@ -25,11 +25,11 @@ class SecurityConfigParserTests extends Specification {
 		Map config = [ tdstm:[ security:[:] ] ]
 		Map settings = config.tdstm.security
 
-		Map map 
+		Map map
 		String e
 
 		map = SecurityConfigParser.parseLoginSettings(config)
-		
+
 		expect:
 			// authorityPrompt default
 			'na'.equals(map.authorityPrompt)
@@ -40,9 +40,9 @@ class SecurityConfigParserTests extends Specification {
 
 	/*
 		config.tdstm.settings = [
-			authorityPrompt:'hidden', 
-			authorityLabel:'label', 
-			authorityList:[], 
+			authorityPrompt:'hidden',
+			authorityLabel:'label',
+			authorityList:[],
 			usernamePlaceholder:'placeholder'
 		]
 
@@ -337,7 +337,7 @@ class SecurityConfigParserTests extends Specification {
 		Map config = createDefaultLocalUserSettings()
 		Map localUserSettings
 
-		localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 
 		assertTrue (localUserSettings != null)
 	}
@@ -351,7 +351,7 @@ class SecurityConfigParserTests extends Specification {
 		Map localUserSettings
 
 		def expection = shouldFail{
-			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 		}
 		assertEquals 'Configuration setting: property tdstm.security.localUser.invalidProperty is not valid.', expection
 	}
@@ -366,7 +366,7 @@ class SecurityConfigParserTests extends Specification {
 		Map localUserSettings
 
 		def expection = shouldFail{
-			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 		}
 		assertEquals 'Configuration setting: tdstm.security.localUser.passwordHistoryRetentionDays or tdstm.security.localUser.passwordHistoryRetentionCount must be greather than zero.', expection
 	}
@@ -381,7 +381,7 @@ class SecurityConfigParserTests extends Specification {
 		Map localUserSettings
 
 		def expection = shouldFail{
-			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 		}
 		assertEquals 'Configuration setting: tdstm.security.localUser.passwordHistoryRetentionDays and tdstm.security.localUser.passwordHistoryRetentionCount are mutually exclusive, at least one must be zero.', expection
 	}
@@ -395,7 +395,7 @@ class SecurityConfigParserTests extends Specification {
 		Map localUserSettings
 
 		def expection = shouldFail{
-			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 		}
 		assertEquals 'Configuration setting tdstm.security.localUser.maxLoginFailureAttempts property must have value greater or equal than zero (>=0)', expection
 	}
@@ -409,7 +409,7 @@ class SecurityConfigParserTests extends Specification {
 		Map localUserSettings
 
 		def expection = shouldFail{
-			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 		}
 		assertEquals 'Configuration setting tdstm.security.localUser.clearLockoutsOnRestart property has invalid value, options: true|false', expection
 	}
@@ -422,7 +422,7 @@ class SecurityConfigParserTests extends Specification {
 			tdstm:[ security:[localUser:[:] ] ]
 		]
 
-		def localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		def localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 
 		assertEquals 'enabled', true, localUserSettings.enabled
 		assertEquals 'minPasswordLength', 8, localUserSettings.minPasswordLength
@@ -447,7 +447,7 @@ class SecurityConfigParserTests extends Specification {
 			tdstm:[ security:[:] ]
 		]
 
-		def localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		def localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)
 
 		assertEquals 'enabled', true, localUserSettings.enabled
 		assertEquals 'minPasswordLength', 8, localUserSettings.minPasswordLength
@@ -460,7 +460,6 @@ class SecurityConfigParserTests extends Specification {
 		assertEquals 'forgotMyPasswordResetTimeLimit', 60, localUserSettings.forgotMyPasswordResetTimeLimit
 		assertEquals 'accountActivationTimeLimit', 60*24*3, localUserSettings.accountActivationTimeLimit
 		assertEquals 'forgotMyPasswordRetainHistoryDays', 30, localUserSettings.forgotMyPasswordRetainHistoryDays
-
 
 	}
 

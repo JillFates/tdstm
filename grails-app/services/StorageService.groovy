@@ -6,7 +6,7 @@ import com.tdssrc.grails.GormUtil
 
 
 class StorageService {
-	
+
 	def assetEntityService
 
 	/**
@@ -35,7 +35,7 @@ class StorageService {
 	Files saveAssetFromForm(controller, session, Long projectId, Long userId, params ) {
 		Files asset = new Files()
 		return saveUpdateAssetFromForm(controller, session, projectId, userId, params, asset)
-	}		
+	}
 
 	/**
 	 * Used to update a Database asset that is called from the controller
@@ -100,7 +100,7 @@ class StorageService {
 		assetEntityService.assignAssetToBundle(project, asset, params['moveBundle.id'])
 
 		assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
-		
+
 		return asset
 	}
 

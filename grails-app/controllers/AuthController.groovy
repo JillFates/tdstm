@@ -16,7 +16,7 @@ import org.apache.shiro.authc.UsernamePasswordToken
 import UserPreferenceEnum as PREF
 
 class AuthController {
-	
+
 	def shiroSecurityManager
 
 	def auditService
@@ -47,17 +47,17 @@ class AuthController {
 
 		def s = securityService.getLoginConfig()
 		def buildInfo = environmentService.getVersionText()
-		return [ 
-			username:params.username, 
-			authority:params.authority, 
-			rememberMe:(params.rememberMe != null), 
+		return [
+			username:params.username,
+			authority:params.authority,
+			rememberMe:(params.rememberMe != null),
 			loginConfig:securityService.getLoginConfig(),
 			buildInfo:buildInfo
 		]
 	}
 
 	def signIn() {
-		// helper closure used a few times 
+		// helper closure used a few times
 		def loginMap = {
 			// Keep the username and "remember me" setting so that the
 			// user doesn't have to enter them again.
@@ -65,7 +65,7 @@ class AuthController {
 			if (params.rememberMe) {
 				m['rememberMe'] = true
 			}
-			
+
 			// Remember the target URI too.
 			if (params.targetUri) {
 				m['targetUri'] = params.targetUri
@@ -83,7 +83,7 @@ class AuthController {
 
 			return m
 		}
-		
+
 		String failureMsg = ''
 		String userMsg
 		try {
@@ -96,13 +96,13 @@ class AuthController {
 			if (params.rememberMe) {
 				authToken.rememberMe = true
 			}
-	
+
 			try {
 				// Perform the actual login. An AuthenticationException will be thrown if the username is unrecognised or the password is incorrect
 				if (log.isDebugEnabled())
 					log.debug "signIn: About to call SecurityUtils.subject.login(authToken) : $authToken"
 				SecurityUtils.subject.login(authToken)
-				
+
 				if (log.isDebugEnabled())
 					log.debug "signIn: About to call securityService.getUserLogin()"
 
@@ -126,7 +126,7 @@ class AuthController {
 					auditService.saveUserAudit( UserAuditBuilder.login(userLogin))
 
 					def targetUri = params.targetUri ?: "/"
-					
+
 					userPreferenceService.loadPreferences(PREF.CURR_PROJ)
 					userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 					userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
@@ -149,7 +149,7 @@ class AuthController {
 
 					def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad")
 					def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
-					
+
 					if (browserTest) {
 						if (browserTestiPad) {
 							redirect(controller:'projectUtil')
@@ -194,10 +194,10 @@ class AuthController {
 		}
 
 		auditService.logMessage("${params.username} login attempt failed - $failureMsg")
-	
+
 		def remoteIp = HtmlUtil.getRemoteIp()
-		auditService.logMessage("${params.username} ($remoteIp) login attempt failed")			
-	
+		auditService.logMessage("${params.username} ($remoteIp) login attempt failed")
+
 		// Now redirect back to the login page.
 		redirect(action: 'login', params: loginMap())
 	}
@@ -253,7 +253,7 @@ class AuthController {
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
 		def dateNowSQL = TimeUtil.nowGMTSQLFormat()
-		
+
 		// retrive the list of 20 usernames with the most recent login times
 		def recentUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastPage DESC",[max:20])
 
@@ -261,14 +261,14 @@ class AuthController {
 		def currentLiveEvents = MoveEvent.findAll()
 		def moveEventsList = []
 		def thirtyDaysInMS = 60 * 24 * 30 * 1000
-		
+
 		currentLiveEvents.each{ moveEvent  ->
 			def completion = moveEvent.getEventTimes()?.completion?.getTime()
 			if(moveEvent.newsBarMode == "on" || (completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)){
 				def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ?  ORDER BY mes.dateCreated DESC"
 				def moveEventSnapshot = MoveEventSnapshot.findAll( query , [moveEvent] )[0]
 				def status =""
-				def dialInd = moveEventSnapshot?.dialIndicator 
+				def dialInd = moveEventSnapshot?.dialIndicator
 				if( dialInd && dialInd < 25){
 					status = "Red($dialInd)"
 				} else if( dialInd && dialInd >= 25 && dialInd < 50){
@@ -281,10 +281,10 @@ class AuthController {
 		}
 		// retrive the list of 10 upcoming bundles
 		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.startTime > '$dateNowSQL' ORDER BY mb.startTime",[max:10])
-		
+
 		render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:moveEventsList, upcomingBundles:upcomingBundles] )
 	}
-	
+
 	def maintMode() {
 		//Do nothing
 	}
@@ -296,11 +296,11 @@ class AuthController {
 		render( view:'_forgotMyPassword', model: [email: params.email ] )
 	}
 
-	/** 
+	/**
 	 * The 2nd step in the passord reset process.
 	 * This will send the email notice to the user and then redirect them to the login form with a flash message
 	 * explaining the next step.
-	 */ 
+	 */
 	def sendResetPassword() {
 		def email = params.email
 		def success = true
@@ -332,9 +332,9 @@ class AuthController {
 		}
 
 		render( view:'_resetPassword', model: [
-			token: pr.token, 
-			password: params.password, 
-			email: params.email, 
+			token: pr.token,
+			password: params.password,
+			email: params.email,
 			validToken: validToken,
 			username: pr.userLogin.username,
 			minPasswordLength: securityService.getUserLocalConfig().minPasswordLength
@@ -343,7 +343,7 @@ class AuthController {
 
 	/**
 	 * The 4th and final step in the user resetting their password. If successful the user will be logged in and redirected
-	 * to their landing page along with a message that their password was changed. If it fails it will return to the 
+	 * to their landing page along with a message that their password was changed. If it fails it will return to the
 	 * reset password form.
 	 */
 	def applyNewPassword() {
@@ -377,7 +377,6 @@ class AuthController {
 			flash.message = controllerService.getExceptionMessage(this, se) + '. Please contact support if you require assistances.'
 			resetPassword()
 		}
-		
-	}
 
+	}
 }

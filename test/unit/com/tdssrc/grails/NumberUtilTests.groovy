@@ -7,13 +7,13 @@ import spock.lang.Specification
  * Unit test cases for the NumberUtil class
 */
 class NumberUtilTests extends Specification {
-	
+
 	public void testToLong() {
 		int four=4
 
 		expect:
 			1L == NumberUtil.toLong('1')
-			2L == NumberUtil.toLong("2")	
+			2L == NumberUtil.toLong("2")
 			3L == NumberUtil.toLong(3L)
 			4L == NumberUtil.toLong(four)
 			99L == NumberUtil.toLong('', 99L)
@@ -36,7 +36,7 @@ class NumberUtilTests extends Specification {
 
 		expect:
 			1 == NumberUtil.toInteger('1')
-			2 == NumberUtil.toInteger("2")	
+			2 == NumberUtil.toInteger("2")
 			3 == NumberUtil.toInteger(3L)
 			4 == NumberUtil.toInteger(four)
 			99 == NumberUtil.toInteger('', 99)
@@ -56,7 +56,7 @@ class NumberUtilTests extends Specification {
 
 		expect:
 			1 == NumberUtil.toTinyInt('1')
-			2 == NumberUtil.toTinyInt("2")	
+			2 == NumberUtil.toTinyInt("2")
 			3 == NumberUtil.toTinyInt(3L)
 			4 == NumberUtil.toTinyInt(four)
 			99 == NumberUtil.toTinyInt('', 99)
@@ -72,7 +72,7 @@ class NumberUtilTests extends Specification {
 			NumberUtil.toTinyInt('500') == null
 
 	}
-	
+
 	public void testIsLong() {
 		assertTrue NumberUtil.isLong(50)
 		assertTrue NumberUtil.isLong(100L)

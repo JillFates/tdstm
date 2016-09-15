@@ -14,14 +14,14 @@ class CollectionUtils {
 	 * @param Any type of object
 	 * @return the object contained within an array
 	 */
-	static ArrayList asList(Object object) { 
+	static ArrayList asList(Object object) {
 		if (! ( object instanceof ArrayList ) )
 			object = [ object ]
 		return object
 	}
 
 	/**
-	 * Function to promote an Object to a Collection 
+	 * Function to promote an Object to a Collection
 	 * @author @tavo_luna
 	 * @param object the object to transform
 	 * @return Collection Object
@@ -36,7 +36,7 @@ class CollectionUtils {
 	 * @param object the object to check
 	 * @return true if the object is instance of Collection or array, false in any other case
 	 */
-	static boolean isCollectionOrArray(object) {    
+	static boolean isCollectionOrArray(object) {
     (object instanceof Collection) || object.getClass().isArray()
 	}
 
@@ -77,6 +77,4 @@ class CollectionUtils {
 			return comp
     }
 	}
-
-
 }

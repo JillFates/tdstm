@@ -1,7 +1,7 @@
 import org.apache.shiro.SecurityUtils
 
 class SecurityFilters {
-	
+
 	def securityService
 	def maintService
 	def auditService
@@ -11,20 +11,20 @@ class SecurityFilters {
 		maintModeCheck(controller:'*', action:'*'){
 			before = {
 				if( controllerName == "wsSequence") return
-				
+
 				def hasBackdoorAccess = maintService.hasBackdoorAccess(session)
 				if( controllerName == "auth" && actionName == "maintMode" ){
 					if(!hasBackdoorAccess ){
 						maintService.toggleUsersBackdoor( session )
 						hasBackdoorAccess = maintService.hasBackdoorAccess( session )
-						redirect(controller:'auth', action:'login');
+						redirect(controller:'auth', action:'login')
 						return
 					} else if( MaintService.isInMaintMode()){
 						render(status: 503, text: '503 Service Unavailable')
 						return
 					}
 				}
-				
+
 				if( MaintService.isInMaintMode() && !hasBackdoorAccess ){
 					render(status: 503, text: '503 Service Unavailable')
 				}
@@ -46,7 +46,7 @@ class SecurityFilters {
 			}
 		}
 
-		// for delete require ADMIN role 
+		// for delete require ADMIN role
 		crud(controller: "*", action: "delete") {
 			before = {
 				if (controllerName == "project" || controllerName == "userLogin") {
@@ -58,7 +58,7 @@ class SecurityFilters {
 			}
 		}
 
-		// Access to the Admin controll requires ADMIN role 
+		// Access to the Admin controll requires ADMIN role
 //		crud(controller: "admin", action: "*") {
 //			before = {
 //				accessControl {
@@ -66,7 +66,7 @@ class SecurityFilters {
 //				}
 //			}
 //		}
-		
+
 		// Check to see if the userLogin has forcePasswordChange set and only allow him to access appropriate actions
 		checkForcePasswordChange(controller:'*', action:'*'){
 			before = {
@@ -76,9 +76,9 @@ class SecurityFilters {
 					if (principal) {
 						def userLoginInstance = UserLogin.findByUsername("$principal")//securityService.getUserLogin()
 						if ( userLoginInstance?.forcePasswordChange == 'Y' ) {
-							if ( 
+							if (
 								(controllerName == 'auth' && ['login','signIn','signOut'].contains(actionName) ) ||
-							 	(controllerName == 'userLogin' && ['changePassword','updatePassword'].contains(actionName)  )  
+							 	(controllerName == 'userLogin' && ['changePassword','updatePassword'].contains(actionName)  )
 							) {
 								return true
 							} else {
@@ -91,7 +91,7 @@ class SecurityFilters {
 				}
 			}
 		}
-		
+
 		/*
 		 *   Statements to Check the Session status
 		 */
@@ -104,7 +104,7 @@ class SecurityFilters {
 						// Deal with remembering URI requested and then redirect to auth/signIn
 						def savedUrlForwardURI = (request.forwardURI - request.contextPath)
 						if (savedUrlForwardURI.contains("task/userTask")) {
-							session.setAttribute("savedUrlForwardURI", savedUrlForwardURI)	
+							session.setAttribute("savedUrlForwardURI", savedUrlForwardURI)
 						}
 						flash.message = "Your login session has expired. Please login again."
 						redirect(controller:'auth', action:'login')
@@ -114,5 +114,5 @@ class SecurityFilters {
 				return true
 			}
 		}
-	} 
+	}
 }

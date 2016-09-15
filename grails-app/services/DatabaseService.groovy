@@ -35,7 +35,7 @@ class DatabaseService {
 	Database saveAssetFromForm(controller, session, Long projectId, Long userId, params ) {
 		Database asset = new Database()
 		return saveUpdateAssetFromForm(controller, session, projectId, userId, params, asset)
-	}		
+	}
 
 	/**
 	 * Used to update a Database asset that is called from the controller

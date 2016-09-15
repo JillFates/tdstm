@@ -1,18 +1,17 @@
 import org.apache.shiro.SecurityUtils
 
-
 class AuthFilters {
 	// List of controllers that we need to validate authorization on
 	static webSvcCtrl = ['moveEventNews', 'wsDashboard']
 	def userService
-	
+
 	def filters = {
-	
+
 		String initialRequest
 
 		newAuthFilter(controller:'*', action:'*') {
 			before = {
-				initialRequest = "$controllerName/$actionName"			
+				initialRequest = "$controllerName/$actionName"
 
 				def moveObject
 				def subject = SecurityUtils.subject
@@ -33,18 +32,18 @@ class AuthFilters {
 						response.sendError( 404 , "Not Found" )
 						return false
 					} else if( RolePermissions.hasPermission("MoveEventStatus") ){		// verify the user role as ADMIN
-						return true;
+						return true
 					} else {
-						def moveEventProjectClientStaff = PartyRelationship.find( 
+						def moveEventProjectClientStaff = PartyRelationship.find(
 							"from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
 							" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
 							" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = ${person.id}" )
-						if(!moveEventProjectClientStaff){		
+						if(!moveEventProjectClientStaff){
 							// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent / MoveBundle
 							response.sendError( 403 , "Forbidden" )
 							return false
 						} else{
-							return true;
+							return true
 						}
 					}
 				}

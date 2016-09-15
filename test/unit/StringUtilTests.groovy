@@ -105,7 +105,7 @@ class StringUtilTests extends Specification {
 		then: 'Should return empty list when null value is passed'
 			SU.splitter(null).size() == 0
 
-		when: 			
+		when:
 			def result = SU.splitter('   ')
 		then: 'Should return empty list when a string of spaces is passed'
 			(result instanceof List)
@@ -118,12 +118,12 @@ class StringUtilTests extends Specification {
 			singleItem.size() == 1
 			singleItem[0].equals(str)
 
-		when: 
+		when:
 			SU.splitter('one, two, three  ', '.')
 		then: 'Should throw an exception when the delimeter is a period (.)'
 			RuntimeException ex = thrown()
 
-		when: 
+		when:
 			SU.splitter('one, two, three  ', ';', ['f', '.', ';'])
 		then: 'Should throw an exception when one of the alternate delimeters is a period (.)'
 			ex = thrown()
@@ -155,7 +155,7 @@ class StringUtilTests extends Specification {
 			" \t White\t. \t "	| 'White+.'
 			" .\bBACKSPACE. "	| '.~BACKSPACE.'
 			" .\u2028LineSep"	| '.~LineSep'
-			" .\u2029ParaSep"	| '.~ParaSep'	
+			" .\u2029ParaSep"	| '.~ParaSep'
 			" .\u00000000. "	| '.~0000.'
 			" .\u00090009. "	| '.+0009.'
 			" .\u00850085. "	| '.~0085.'
@@ -190,7 +190,7 @@ class StringUtilTests extends Specification {
 	}
 
 	def "Test the toBoolean method that compares different strings for y/n|1/0|yes/no, etc "() {
-		expect: 
+		expect:
 			SU.toBoolean(value) == result
 		where:
 			value   | result
@@ -219,7 +219,7 @@ class StringUtilTests extends Specification {
 			'../asf'		| true
 			'./asf'			| true
 			'blah/../root'	| true
-			'blah\\..\\root'| true		// Windoze backslashes 
+			'blah\\..\\root'| true		// Windoze backslashes
 			'%2e%2e%2froot'	| true		// Encoding of ../
 			'%c0%afroot'	| true		// Double encoding /
 			'%c1%9croot'	| true		// Double encoding \

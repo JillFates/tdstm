@@ -2,7 +2,7 @@ import net.transitionmanager.utils.Profiler
 
 class UserController {
 
-	/** 
+	/**
 	 * Used to toggle the profiler session variable on/off for performance troubleshooting
 	 */
 	def profilerToggle(){
@@ -16,7 +16,7 @@ class UserController {
 		render "The Profiler is: " + isProfilerSet()
 	}
 
-	/** 
+	/**
 	 * Used to show the state of the profiler session variable
 	 */
 	def profilerStatus(){

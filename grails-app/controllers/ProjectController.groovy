@@ -51,7 +51,7 @@ class ProjectController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		
+
 		// def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		boolean showAllProjPerm = securityService.hasPermission(user, 'ShowAllProjects')
 		def now = TimeUtil.nowGMT()
@@ -68,11 +68,11 @@ class ProjectController {
 
 //		def projectList = projectService.getUserProjects(user, projectHasPermission, projectStatus, searchParams)
 		def projectList = projectService.getUserProjects(user, showAllProjPerm, projectStatus, searchParams)
-		
+
 		def totalRows = projectList?.totalCount
 		def numberOfPages = totalRows ? Math.ceil(totalRows / maxRows) : 1
 
-		def results = projectList?.collect { 
+		def results = projectList?.collect {
 			def startDate = ''
 			def completionDate = ''
 			startDate = it.startDate ? TimeUtil.formatDate(getSession(), it.startDate) : ''
@@ -118,23 +118,23 @@ class ProjectController {
 		if (projectLogo) {
 			imageId = projectLogo.id
 		}
-		session.setAttribute("setImage",imageId) 
+		session.setAttribute("setImage",imageId)
 
 		def projectLogoForProject = ProjectLogo.findByProject(currProjectInstance)
 		List projectPartners = partyRelationshipService.getProjectPartners( currProjectInstance )
 
 		List projectManagers = projectService.getProjectManagers(currProjectInstance)
 
-		return [ 
-			projectInstance: currProjectInstance, 
-			projectPartners: projectPartners, 
+		return [
+			projectInstance: currProjectInstance,
+			projectPartners: projectPartners,
 			projectManagers: projectManagers,
 			projectLogoForProject: projectLogoForProject,
 			isDeleteable: !currProjectInstance.isDefaultProject()
 		]
 	}
 
-	/** 
+	/**
 	 * Used to delet the user's current project
 	 */
 	def delete() {
@@ -172,26 +172,26 @@ class ProjectController {
 
 			List projectManagers = projectService.getProjectManagers(projectInstance)
 			projectManagers.sort { a,b ->
-				a.firstName <=> b.firstName ?: a.lastName <=> b.lastName 
+				a.firstName <=> b.firstName ?: a.lastName <=> b.lastName
 			}
 
-			return [ 
+			return [
 				company: company,
-				projectInstance : projectInstance, 
-				projectPartner: projectDetails.projectPartner, 
-				projectManager: projectDetails.projectManager, 
-				moveManager: projectDetails.moveManager, 
-				companyStaff: projectDetails.companyStaff, 
-				clientStaff: projectDetails.clientStaff, 
-				partnerStaff: projectDetails.partnerStaff, 
+				projectInstance : projectInstance,
+				projectPartner: projectDetails.projectPartner,
+				projectManager: projectDetails.projectManager,
+				moveManager: projectDetails.moveManager,
+				companyStaff: projectDetails.companyStaff,
+				clientStaff: projectDetails.clientStaff,
+				partnerStaff: projectDetails.partnerStaff,
 				companyPartners: projectDetails.companyPartners,
-				projectLogoForProject: projectDetails.projectLogoForProject, 
-				workflowCodes: projectDetails.workflowCodes, 
+				projectLogoForProject: projectDetails.projectLogoForProject,
+				workflowCodes: projectDetails.workflowCodes,
 				projectPartners: projectPartners,
 				projectManagers: projectManagers,
-				moveBundles:moveBundles 
+				moveBundles:moveBundles
 			]
-		}				 
+		}
 	}
 
 	private def retrievetimeZone(timezoneValue) {
@@ -221,7 +221,7 @@ class ProjectController {
 			}
 
 			PartyGroup company = projectInstance.owner
-			
+
 			//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
 			def startDate = params.startDate
 			def completionDate = params.completionDate
@@ -241,16 +241,16 @@ class ProjectController {
 				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 				return [
 					company: company,
-					projectInstance: projectInstance, 
-					projectPartner: projectDetails.projectPartner, 
-					projectManager: projectDetails.projectManager, 
-					moveManager: projectDetails.moveManager, 
-					companyStaff: projectDetails.companyStaff, 
-					clientStaff: projectDetails.clientStaff, 
-					partnerStaff: projectDetails.partnerStaff, 
-					companyPartners: projectDetails.companyPartners, 
+					projectInstance: projectInstance,
+					projectPartner: projectDetails.projectPartner,
+					projectManager: projectDetails.projectManager,
+					moveManager: projectDetails.moveManager,
+					companyStaff: projectDetails.companyStaff,
+					clientStaff: projectDetails.clientStaff,
+					partnerStaff: projectDetails.partnerStaff,
+					companyPartners: projectDetails.companyPartners,
 					workflowCodes: projectDetails.workflowCodes,
-					projectLogoForProject: projectDetails.projectLogoForProject, 
+					projectLogoForProject: projectDetails.projectLogoForProject,
 					prevParam:params
 				]
 			}
@@ -264,10 +264,10 @@ class ProjectController {
 			}
 
 			// Logic to delete the projectLogo
-							
-			
+
+
 			if( ! projectInstance.hasErrors() && projectInstance.save() ) {
-				
+
 				def partnersIds = params.projectPartners
 
 				projectService.updateProjectPartners(projectInstance, partnersIds)
@@ -278,13 +278,13 @@ class ProjectController {
 				if (logoFile) {
 					projectLogo = ProjectLogo.createOrUpdate(projectInstance, logoFile)
 				}
-				
+
 				// Audit project changes
 				auditService.saveUserAudit(UserAuditBuilder.projectConfig(securityService.getUserLogin(), projectInstance))
 
 				flash.message = "Project ${projectInstance} updated"
 				redirect(action:"show")
-				
+
 			}
 		} // Project.withTransaction(t) {
 	}
@@ -293,7 +293,7 @@ class ProjectController {
 	 * Populate and present the create view for a new project
 	 */
 	def create() {
-		if (!controllerService.checkPermission(this, 'CreateProject')) 
+		if (!controllerService.checkPermission(this, 'CreateProject'))
 			return
 
 		Person whom = securityService.getUserLoginPerson()
@@ -308,21 +308,21 @@ class ProjectController {
 			defaultTimeZone = userTimeZone
 		}
 
-		return [ 
-			clients:projectDetails.clients, 
+		return [
+			clients:projectDetails.clients,
 			company: company,
-			managers:projectDetails.managers, 
-			partners:projectDetails.partners, 
-			projectInstance:projectInstance, 
-			workflowCodes: projectDetails.workflowCodes 
+			managers:projectDetails.managers,
+			partners:projectDetails.partners,
+			projectInstance:projectInstance,
+			workflowCodes: projectDetails.workflowCodes
 		]
 	}
 
 	/**
 	 * Used by the Project Create to actually create the project along with the following other tasks:
 	 *    - associate partner companies
-	 *    - associate the Project Manager 
-	 *    - save a partner logo 
+	 *    - associate the Project Manager
+	 *    - save a partner logo
 	 *    - create the default 'TBD' bundle
 	 * @permission CreateProject
 	 */
@@ -340,7 +340,7 @@ class ProjectController {
 			// Properly set some of the parameters that before injecting into the Project domain
 			//
 			def startDate = params.startDate
-			def completionDate = params.completionDate   
+			def completionDate = params.completionDate
 			if (startDate) {
 				params.startDate = TimeUtil.parseDate(getSession(), startDate)
 			}
@@ -357,12 +357,12 @@ class ProjectController {
 			// Closure to construct the model used for the create or show views
 			def buildModel = { discardChanges ->
 				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
-				Map model = [ 
+				Map model = [
 					company: company,
-					projectInstance:projectInstance, 
-					clients:projectDetails.clients, 
+					projectInstance:projectInstance,
+					clients:projectDetails.clients,
 					partners:projectDetails.partners,
-					managers:projectDetails.managers, 
+					managers:projectDetails.managers,
 					workflowCodes: projectDetails.workflowCodes,
 					prevParam:params
 				]
@@ -406,13 +406,13 @@ class ProjectController {
 			if (logoFile) {
 				projectLogo = ProjectLogo.createOrUpdate(projectInstance, logoFile)
 			}
-			
+
 			// Set the projectInstance as CURR_PROJ
 			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
 
-			// Will create a bundle name TBD and set it as default bundle for project   
+			// Will create a bundle name TBD and set it as default bundle for project
 			projectInstance.getProjectDefaultBundle(params["defaultBundleName"])
-			
+
 			flash.message = "Project ${projectInstance} was created"
 			redirect( action:"show",  imageId:projectLogo?.id )
 
@@ -423,7 +423,7 @@ class ProjectController {
 	 * An Ajax web service that is use to retrieve the list of active staff that can be associated with any project. This is typically
 	 * used with the Project create process so there won't be a project. There staff list will consist of those from the user's company,
 	 * the staff of the partners of the user's company and the staff of the company indicated as the client.
-	 * 
+	 *
 	 * @params request.JSON.client - the selected client that the project will be for
 	 * @params request.JSON.partners - the ids of partners to be associated with the project
 	 * @params request.JSON.role - the role to lookup (e.g. PROJ_MGR)
@@ -456,12 +456,12 @@ class ProjectController {
 		if (request.JSON.partners) {
 			// Get the list of all of the user's company's partners
 			List allPartnersList = partyRelationshipService.getCompanyPartners(whom.company)*.partyIdTo
-	
+
 			// Iterate over the list of partner ids we received and attempt to match up to a partner in allPartnersList
 			new JsonSlurper().parseText(request.JSON.partners).each { p ->
 				Long pid = NumberUtil.toPositiveLong(p, -1)
 				if (pid > 0) {
-					def partner = allPartnersList.find { it.id == pid }					
+					def partner = allPartnersList.find { it.id == pid }
 					if (partner) {
 						partnersList.add(partner)
 					} else {
@@ -498,7 +498,7 @@ class ProjectController {
 		}
 
 		getCompanyStaffClosure(whom.getCompany())
-		
+
 		if (client) {
 			getCompanyStaffClosure(client)
 		}
@@ -513,7 +513,7 @@ class ProjectController {
 		Map json = [ staffList:staffList ]
 		render json as JSON
 	}
-	
+
 	def cancel() {
 		redirect(controller:'projectUtil')
 	}
@@ -538,7 +538,7 @@ class ProjectController {
 			}else{
 				errMsg = "Unable to update your Project Preference."
 			}
-			
+
 		} else {
 			errMsg = "Please select Project"
 		}
@@ -547,9 +547,9 @@ class ProjectController {
 			flash.message = errMsg
 			redirect( action:"list" )
 		}
-			
+
 	}
-	
+
 	/**
 	 * Used to render a project logo if it exists
 	 */
@@ -564,8 +564,8 @@ class ProjectController {
 
 	/**
 	 * Used to delete the project logo for the project in the users context
-	 */	
-	def deleteImage() {	
+	 */
+	def deleteImage() {
 		def (project, user) = controllerService.getProjectAndUserForPage(this, 'ProjectEditView')
 		if (!project) {
 			return
@@ -590,7 +590,7 @@ class ProjectController {
 		userPreferenceService.setPreference(PREF.CURR_POWER_TYPE, power )
 		render power
 	}
-	
+
 	/**
 	 * Action to render the Field Settings (aka Importance) Show/Edit maintenance form for field importance and field tooltips
 	 */
@@ -598,14 +598,14 @@ class ProjectController {
 		def project = securityService.getUserCurrentProject()
 		return [project:project, hasEditProjectFieldSettingsPermission:RolePermissions.hasPermission("EditProjectFieldSettings")]
 	}
-	
+
 	/**
 	 * To create json data to for a given entity type
 	 *@param : entityType type of entity.
 	 *@return : json data
 	 */
 	def retrieveAssetFields ={
-		
+
 		def assetTypes=EntityType.list
 		def fieldMap= [:]
 		assetTypes.each{type->
@@ -656,20 +656,20 @@ class ProjectController {
 		def parseData = projectService.getConfigByEntity(entityType)
 		render parseData as JSON
 	}
-	
+
 	/**
 	 *This action is used to update field importance and display it to user
 	 *@param : entityType type of entity for which user is requested for importance .
-	 *@return success string 
+	 *@return success string
 	 */
 	def updateFieldImportance() {
 		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
 		if (! project) {
 			return
 		}
-		
+
 		def entityType = request.JSON.entityType
-		def allConfig = request.JSON.jsonString as JSON;
+		def allConfig = request.JSON.jsonString as JSON
 		try {
 			def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType", [project:project, entityType:entityType])
 			if (!assetImp)
@@ -683,14 +683,14 @@ class ProjectController {
 		} catch(Exception ex) {
 			log.error ExceptionUtil.messageWithStacktrace("Updating FieldImportance", e)
 		}
-		
+
 		render "success"
 	}
 
 	/**
 	 *This action is used to retrive default project field importance and display it to user
 	 *@param : entityType type of entity for which user is requested for importance .
-	 *@return 
+	 *@return
 	 */
 	def retriveDefaultImportance() {
 		def defaultProject = Project.getDefaultProject()
@@ -751,7 +751,7 @@ class ProjectController {
 			def params = [:]
 			def key = "ProjectDailyMetrics-" + UUID.randomUUID().toString()
 			def jobName = "TM-" + key
-			
+
 			// Delay 2 seconds to allow this current transaction to commit before firing off the job
 			Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
 			trigger.jobDataMap.putAll(params)
@@ -771,8 +771,8 @@ class ProjectController {
  	 * Notification process.
 	 */
 	def userActivationEmailsForm = {
-		Project project 
-		UserLogin userLogin 
+		Project project
+		UserLogin userLogin
 		(project, userLogin) = controllerService.getProjectAndUserForPage(this, 'SendUserActivations')
 		if (!project){
 			return
@@ -784,14 +784,14 @@ class ProjectController {
 		def defaultEmail = grailsApplication.config.grails.mail.default.from
 		defaultEmail = StringEscapeUtils.escapeHtml(defaultEmail)
 
-		Map model = [ 
-			project: project.name, 
-			client:project.client.name, 
+		Map model = [
+			project: project.name,
+			client:project.client.name,
 			accounts:accounts,
-			defaultEmail: defaultEmail, 
+			defaultEmail: defaultEmail,
 			adminEmail: userLogin.person.email
-		]		
-		render view:"userActivationEmailsForm", model:model 
+		]
+		render view:"userActivationEmailsForm", model:model
 	}
 
 
@@ -799,8 +799,8 @@ class ProjectController {
 	 * Sends out an Activation Email to those accounts selected by the admin.
 	 */
 	def sendAccountActivationEmails = {
-		Project project 
-		UserLogin userLogin 
+		Project project
+		UserLogin userLogin
 		(project, userLogin) = controllerService.getProjectAndUserForPage(this, 'SendUserActivations')
 		if (!project){
 			return
@@ -810,7 +810,7 @@ class ProjectController {
 		// Validate the user selected at least an account.
 		if(selectedAccounts){
 			try{
-				def accounts = projectService.getAccountActivationUsers(project)		
+				def accounts = projectService.getAccountActivationUsers(project)
 				// Find the accounts that could get the notice and filter only those that were checked in the form
 				List accountsToNotify = accounts.findAll{ it.personId.toString() in selectedAccounts}
 				if (accountsToNotify) {
@@ -821,7 +821,7 @@ class ProjectController {
 						fromEmail = userLogin.person.email
 					}
 					fromEmail = StringEscapeUtils.escapeHtml(fromEmail)
-					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params["customMessage"], fromEmail, request.getRemoteAddr())	
+					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params["customMessage"], fromEmail, request.getRemoteAddr())
 					message = "The Account Activation Notification has been sent out to the users."
 				}else{
 					message = "No Accounts selected for notification."
@@ -830,11 +830,11 @@ class ProjectController {
 				message = "There was an error while processing the email notifications. Please contact Support."
 				log.error ExceptionUtil.messageWithStacktrace("sendAccountActivationEmails blew up", e)
 			}
-			
+
 		}else{
 			message = "No Accounts selected for notification."
 		}
-		
+
 		flash.message = message
 		return userActivationEmailsForm()
 	}

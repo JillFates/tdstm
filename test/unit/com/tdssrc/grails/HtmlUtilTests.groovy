@@ -28,7 +28,7 @@ class HtmlUtilTests extends Specification {
 			true == HtmlUtil.isURL(url)
 
 			malformedUrls.each {
-				false == HtmlUtil.isURL(it)	
-			}			
+				false == HtmlUtil.isURL(it)
+			}
 	}
 }

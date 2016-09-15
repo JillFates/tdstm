@@ -5,8 +5,7 @@ package com.tdsops.tm.enums.domain
  *
  * This should be an Enum but we need to first switch all of the references of a string to use the class reference
  * and then we can switch this to an Enum.
- *
- */ 
+ */
 class AssetCommentStatus {
 	static final String HOLD='Hold'
 	static final String PLANNED='Planned'
@@ -23,4 +22,4 @@ class AssetCommentStatus {
 	static final getTopStatusList() {
 		return [PENDING, READY, STARTED, HOLD, DONE] as List
 	}
-}	
+}

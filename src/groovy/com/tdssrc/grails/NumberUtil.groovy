@@ -1,7 +1,7 @@
 package com.tdssrc.grails
 
 /**
- * The NumberUtil class contains a collection of useful number manipulation methods 
+ * The NumberUtil class contains a collection of useful number manipulation methods
  */
 class NumberUtil {
 
@@ -12,7 +12,7 @@ class NumberUtil {
 	 */
 	static boolean isLong(val) {
 		switch (val) {
-			case String: 
+			case String:
 			case org.codehaus.groovy.runtime.GStringImpl:
 				return (val?.isNumber() && val.isLong())
 			case Long:
@@ -20,7 +20,7 @@ class NumberUtil {
 				return true
 		}
 		return false
-	}	
+	}
 
 	/**
 	 * Nifty little test to validate that a value is a Long and Postive
@@ -29,7 +29,7 @@ class NumberUtil {
 	 */
 	static boolean isPositiveLong(val) {
 		return (isLong(val) && toLong(val) > 0)
-	}	
+	}
 
 	/**
 	 * Used to convert various types into a Long value
@@ -52,9 +52,9 @@ class NumberUtil {
 				break
 			default:
 				result = defVal
-		} 
+		}
 		return result
-	}	
+	}
 
 	/**
 	 * Used to convert various types into a Long value
@@ -67,9 +67,9 @@ class NumberUtil {
 		if (result != null && result < 0)
 			result = defVal
 		return result
-	}	
+	}
 
-	/** 
+	/**
 	 * Used to convert various types to Integer
 	 * @param value - the value to convert
 	 * @param defVal - the value to set to if it can't be converted (default null)
@@ -83,8 +83,8 @@ class NumberUtil {
 		return result
 	}
 
-	/** 
-	 * Used to convert various types to TINYINT (0-255) 
+	/**
+	 * Used to convert various types to TINYINT (0-255)
 	 * @param value - the value to convert
 	 * @param defVal - the value to set to if it can't be converted (default null)
 	 * @return a tinyint value or the default value if unable to convert

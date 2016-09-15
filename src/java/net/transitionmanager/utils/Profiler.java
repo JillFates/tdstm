@@ -301,7 +301,7 @@ public class Profiler  {
 		logPrefix(ltype, "LAP", sb.toString(), args);
 	}
 
-	/** 
+	/**
 	 * Used to log lap information at the INFO level if the profiler is enabled otherwise nothing logged
 	 * @param tag - the stopwatch tag name to log info for
 	 */
@@ -318,7 +318,7 @@ public class Profiler  {
 		}
 	}
 
-	/** 
+	/**
 	 * Used to log lap information at the INFO level regardless of if the profiler is enabled
 	 * @param tag - the stopwatch tag name to log info for
 	 */
@@ -332,7 +332,7 @@ public class Profiler  {
 		lap(INFO, tag, msg, args);
 	}
 
-	/** 
+	/**
 	 * Used to log lap information at the DEBUG level regardless of if the profiler is enabled
 	 * @param tag - the stopwatch tag name to log info for
 	 */
@@ -346,7 +346,7 @@ public class Profiler  {
 		lap(DEBUG, tag, msg, args);
 	}
 
-	/** 
+	/**
 	 * Used to log lap information at the TRACE level regardless of if the profiler is enabled
 	 * @param tag - the stopwatch tag name to log info for
 	 */
@@ -360,7 +360,7 @@ public class Profiler  {
 		logPrefix(TRACE, tag, msg, args);
 	}
 
-	/** 
+	/**
 	 * Used to log lap information at the WARN level regardless of if the profiler is enabled
 	 * @param tag - the stopwatch tag name to log info for
 	 */
@@ -374,7 +374,7 @@ public class Profiler  {
 		logPrefix(WARN, tag, msg, args);
 	}
 
-	/** 
+	/**
 	 * Used to log lap information at the ERROR level regardless of if the profiler is enabled
 	 * @param tag - the stopwatch tag name to log info for
 	 */
@@ -388,7 +388,7 @@ public class Profiler  {
 		logPrefix(ERROR, tag, msg, args);
 	}
 
-	/** 
+	/**
 	 * Used to log lap information at the FATAL level regardless of if the profiler is enabled
 	 * @param tag - the stopwatch tag name to log info for
 	 */
@@ -457,7 +457,7 @@ public class Profiler  {
 	public void lapRootFatal(String msg, ArrayList args){
 		lap(FATAL, null, msg, args);
 	}
-	
+
 	public void logSinceStart(String msg){
 		if(doProfile){
 			log(INFO, "Since Start (" + stopWatch.getSinceStart() + ") " + msg);
@@ -514,7 +514,7 @@ public class Profiler  {
 	/**
 	 * Used to log a message directly as part of the Profiler without referencing a lap tag
 	 * @param lType - the logger level
-	 * @param msg - the message to log 
+	 * @param msg - the message to log
 	 */
 	public void log(LOG_TYPE lType, String msg){
 		log(lType, msg, null);
@@ -523,7 +523,7 @@ public class Profiler  {
 	/**
 	 * Used to log a message directly as part of the Profiler without referencing a lap tag
 	 * @param lType - the logger level
-	 * @param msg - the message to log 
+	 * @param msg - the message to log
 	 * @param args - a list of parameters for a parameterized message
 	 */
 	public void log(LOG_TYPE lType, String msg, ArrayList args) {
@@ -555,7 +555,7 @@ public class Profiler  {
 	}
 
 	// ---------------------------------
-	// PRIVATE HELPER METHODS 
+	// PRIVATE HELPER METHODS
 	// ---------------------------------
 
 	private void logPrefix(LOG_TYPE lType, String prefix, String msg, ArrayList args) {

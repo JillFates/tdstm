@@ -1,6 +1,5 @@
 import groovy.time.TimeDuration
 
-
 class ProgressInfo {
 
 	String key
@@ -10,7 +9,7 @@ class ProgressInfo {
 	TimeDuration remainingTime
 	long lastUpdated
 	Map data
-	
+
 	ProgressInfo(key, status) {
 		this.key = key
 		this.status = status

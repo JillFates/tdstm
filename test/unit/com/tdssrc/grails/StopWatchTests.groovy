@@ -22,7 +22,7 @@ class StopWatchTests extends Specification {
 			stopWatch.getStartTime(tag).getTime() == startedTag.getTime()
 
 		// Test that the clocks can be terminated
-		when:	
+		when:
 			stopWatch.endDuration()
 			stopWatch.endDuration(tag)
 		then:
@@ -58,7 +58,7 @@ class StopWatchTests extends Specification {
 			// Check out the getSinceStart
 			TimeDuration since = stopWatch.getSinceStart()
 			TimeDuration sinceTag = stopWatch.getSinceStart(tag)
-		then: 
+		then:
 			since.toMilliseconds() > 500 && since.toMilliseconds() < 1000
 			sinceTag.toMilliseconds() > 500 && sinceTag.toMilliseconds() < 1000
 
@@ -67,7 +67,7 @@ class StopWatchTests extends Specification {
 			sleep(1000)
 			TimeDuration since2 = stopWatch.getSinceStart()
 			TimeDuration since2Tag = stopWatch.getSinceStart(tag)
-		then: 
+		then:
 			since2 > since
 			since2Tag > sinceTag
 			since2.toMilliseconds() > 1000 && since2.toMilliseconds() < 3000
@@ -81,30 +81,30 @@ class StopWatchTests extends Specification {
 	setup:
 		def stopWatch = new StopWatch()
 	when: "sleep 2s "
-		sleep(2000)      
+		sleep(2000)
 	then: 'stopwatch == 2s'
 		stopWatch.lap()
-		stopWatch.lastLap.seconds == 2 
+		stopWatch.lastLap.seconds == 2
 	}
 
 	def 'Test Multiple Time Lap'(){
 	setup:
-		def max = 5 
+		def max = 5
 		def startT = System.currentTimeMillis()
 		def stopWatch = new StopWatch()
 		def rand = new Random()
-	
+
 		def totalSecs = 0
-		def steps = (1..max).inject([]){result, i -> 
+		def steps = (1..max).inject([]){result, i ->
 		def secs = rand.nextInt(max+1)
-		totalSecs += secs  
+		totalSecs += secs
 		result << secs
 		}
 
 	expect: "that all steps last the computed interval"
 		steps.each{ secs ->
-		sleep(secs * 1000) 
-		stopWatch.lap()       
+		sleep(secs * 1000)
+		stopWatch.lap()
 		assert stopWatch.lastLap.seconds == secs
 		}
 

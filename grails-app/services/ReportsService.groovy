@@ -20,37 +20,37 @@ class ReportsService {
 
 	static transactional = true
 
-	@Transactional(readOnly = true) 
+	@Transactional(readOnly = true)
 	def generatePreMoveCheckList(def currProj , def moveEventInstance, def viewUnpublished = false) {
 		def projectInstance = Project.findById( currProj )
 		def moveBundles = moveEventInstance.moveBundles.sort{it.name}
-		def eventErrorList =[] 
-	
+		def eventErrorList =[]
+
   //---------------------------------------for Events and Project ---------------------------------------//
-		
+
 		def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList)
 
   //---------------------------------------for Event and Bundles ---------------------------------------//
-        
+
 		def eventBundleInfo = getEventsBundelsInfo(moveBundles,moveEventInstance,eventErrorList)
-		
+
 
   //---------------------------------------for Assets and Bundles --------------------------------------//
-		
+
 		def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance,[sort:'assetName'])
 
 		def assetsInfo = getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList, viewUnpublished)
 
   //---------------------------------------For Teams---------------------------------------------------//
-		
+
 		def moveBundleTeamInfo = getMoveBundleTeamInfo(moveEventInstance, assetEntityList,eventErrorList)
 
   //---------------------------------------For Transport------------------------------------------------//
-  
+
 		def transportInfo = getTransportInfo(assetEntityList,eventErrorList)
-		
+
 		def modelInfo = getModelInfo(moveEventInstance,eventErrorList)
-		
+
 		Set allErrors = eventErrorList
 		def eventErrorString = ''
 		if (allErrors.size() > 0) {
@@ -59,9 +59,9 @@ class ReportsService {
 		    eventErrorString +="""<span style="color:green;text-align: center;"><h3>No preparation issues for this event</h3></span>"""
 		}
   //---------------------------------------For Task Analysis------------------------------------------------//
-		
+
 		def taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList, viewUnpublished)
-		
+
 		return['project':projectInstance,'time':eventsProjectInfo.time,'moveEvent':moveEventInstance,'errorForEventTime':eventsProjectInfo.errorForEventTime,
 			'newsBarModeError':eventsProjectInfo.newsBarModeError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
 			'list':eventsProjectInfo.list,'workFlowCodeSelected':eventBundleInfo.workFlowCodeSelected,'steps':eventBundleInfo.steps,'moveBundleSize':moveBundles.size(),
@@ -76,11 +76,11 @@ class ReportsService {
 			'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,
 			'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue,
 			'dependenciesNotValid':assetsInfo.dependenciesNotValid, 'cyclicalsError':taskAnalysisInfo.cyclicalsError, 'cyclicalsRef':taskAnalysisInfo.cyclicalsRef,
-			'startsError':taskAnalysisInfo.startsError, 'startsRef':taskAnalysisInfo.startsRef, 'sinksError':taskAnalysisInfo.sinksError, 'sinksRef':taskAnalysisInfo.sinksRef, 
+			'startsError':taskAnalysisInfo.startsError, 'startsRef':taskAnalysisInfo.startsRef, 'sinksError':taskAnalysisInfo.sinksError, 'sinksRef':taskAnalysisInfo.sinksRef,
 			'personAssignErr':taskAnalysisInfo.personAssignErr, 'personTasks':taskAnalysisInfo.personTasks, 'taskerrMsg':taskAnalysisInfo.exceptionString]
 
 	}
-	
+
 	/**
 	 * Calculates the data to be used by the generateApplicationConflicts view to create a report of applications with issues in a bundle
 	 * @param int currProj - The id of the user's curret project
@@ -96,24 +96,24 @@ class ReportsService {
 		def appsInBundle
 		def currAppOwner
 		log.debug "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} missing: ${missing}"
-		
+
 		if(planning) {
 			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseForPlanning(projectInstance, true).toList(), [max:assetCap])
 		} else {
 			appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId), [max:assetCap])
 		}
-		
+
 		if(owner!='null'){
 			currAppOwner = Person.get(owner)
 			appsInBundle = appsInBundle.findAll{it.appOwner==currAppOwner}
 		}
-		
+
 		log.debug "${appsInBundle}"
 		appsInBundle.each {
 			def showApp = false
 			def dependsOnList = AssetDependency.findAllByAsset(it)
 			def supportsList = AssetDependency.findAllByDependent(it)
-			
+
 			if( !conflicts && !unresolved && !missing ){
 				showApp = true
 			} else {
@@ -143,19 +143,19 @@ class ReportsService {
 					}
 				}
 			}
-			
+
 			if(showApp)
 				appList.add([ 'app':it, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size(), 'supportsIssueCount':supportsList.size() ])
 		}
 		return['project':projectInstance, 'appList':appList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9,'currAppOwner':currAppOwner?:'All']
 	}
-	
+
 	/**
 	 * @param moveBundles
 	 * @param assetEntityList
 	 * @return bundleMap, inValidUsers, teamAssignment, notAssignedToTeam
 	 */
-	
+
 	def getMoveBundleTeamInfo( event, assetEntityList,eventErrorList) {
 		def moveBundles = event.moveBundles.sort{it.name}
 		def project = event.project
@@ -176,18 +176,18 @@ class ReportsService {
 		} else {
 			def functions = RoleType.findAllByDescriptionIlike("Staff%") // This can not be replaced with  partyRelationshipService.getStaffingRoles()
 			functions.each { func->
-				bundleMap << ["name":func.description, "code":func.id, 
-								"assignedStaff":partyRelationshipService.getProjectStaffByFunction(func, project), 
+				bundleMap << ["name":func.description, "code":func.id,
+								"assignedStaff":partyRelationshipService.getProjectStaffByFunction(func, project),
 								"tasks":AssetComment.countByMoveEventAndRole(event, func.id)
 								]
 			}
 			bundleMap = bundleMap.findAll{it.assignedStaff.size()>0 || it.tasks>0}
 		}
-		
+
 		def assetList = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(moveBundles,['Application','Database','Files'])
-		
+
 		def notAssignedToTeam = []
-		
+
 		def teamAssignment = ""
 		if(notAssignedToTeam.size()>0){
 			teamAssignment+="""<span style="color: red;"><b>MoveTech Assignment: Asset Not Assigned  </b><br></br></span>"""
@@ -195,7 +195,7 @@ class ReportsService {
 		}else{
 			teamAssignment+="""<span style="color: green;"><b>MoveTech Assignment: OK  </b><br></br></span>"""
 		}
-		
+
 		Set inValidUsers = []
 		bundleMap.teamList.teamList.each{lists->
 			lists.id[0].each{personId->
@@ -207,7 +207,7 @@ class ReportsService {
 			}
 
 		}
-		
+
 		def userLogin =""
 		if(inValidUsers.size()>0){
 			userLogin+="""<span style="color: red;"><b>Team Details Check: Team Member name Not Valid</b><br></br></span>"""
@@ -218,21 +218,21 @@ class ReportsService {
 		return [bundleMap:bundleMap,inValidUsers:inValidUsers,
 			teamAssignment:teamAssignment, notAssignedToTeam:notAssignedToTeam,userLogin:userLogin,eventErrorList:eventErrorList]
 	}
-	
+
 	/**
 	* @param assetEntityList,moveBundles,projectInstance
 	* @param assetEntityList
 	* @return summaryOk,issue,dependenciesOk,dependencies,missingRacks,missedRacks,duplicatesTag,duplicatesAssetTagNames,
 	*          duplicates,duplicatesAssetNames
 	*/
-	
+
 	def getAssetInfo(def assetEntityList,def moveBundles,def projectInstance,def currProj,def moveEventInstance,def eventErrorList, def viewUnpublished = false) {
 
 		def summaryOk = [:]
 		Set assetType
 		def typeCount
 		def types = []
-		
+
 		moveBundles.each{moveBundle->
 			def assetEntity = AssetEntity.findAllByMoveBundleAndProject(moveBundle,projectInstance)
 			typeCount = AssetEntity.executeQuery("select count(*) , assetType  from AssetEntity where moveBundle = ${moveBundle.id} group by assetType ")
@@ -240,15 +240,15 @@ class ReportsService {
 			counts = counts.replace('[[', '').replace(']]', '').replace(',', '').replace('] [',' , ').replace('[]', '0')
 			summaryOk << [(moveBundle) :  counts ]
 		}
-		
-		def duplicatesAssetNames = jdbcTemplate.queryForList("""SELECT asset_name as assetName , count(*) as counts , asset_type as type 
-                                    from asset_entity where project_id = $currProj and asset_name is not null and move_bundle_id in 
-                                    (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) 
+
+		def duplicatesAssetNames = jdbcTemplate.queryForList("""SELECT asset_name as assetName , count(*) as counts , asset_type as type
+                                    from asset_entity where project_id = $currProj and asset_name is not null and move_bundle_id in
+                                    (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id})
                                     GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1""")
-		
+
 		String duplicates = ""
-		def nullAssetname = jdbcTemplate.queryForList("""SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity 
-                                                        where project_id = $currProj and asset_name is null and move_bundle_id in 
+		def nullAssetname = jdbcTemplate.queryForList("""SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity
+                                                        where project_id = $currProj and asset_name is null and move_bundle_id in
                                                         (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) """
                                                         )
 		if(duplicatesAssetNames.size()>0){
@@ -264,22 +264,22 @@ class ReportsService {
 		}else{
 		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK<br></br></span>"""
 		}
-		
-		def duplicatesAssetTagNames = jdbcTemplate.queryForList("""SELECT asset_tag as tag , count(*) as counts from asset_entity 
-                                       where project_id = $currProj and asset_tag is not null and asset_type in ('Server','VM','Blade') 
-                                       and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) 
+
+		def duplicatesAssetTagNames = jdbcTemplate.queryForList("""SELECT asset_tag as tag , count(*) as counts from asset_entity
+                                       where project_id = $currProj and asset_tag is not null and asset_type in ('Server','VM','Blade')
+                                       and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id})
                                         GROUP BY asset_tag HAVING COUNT(*) > 1""")
-		
+
 		String duplicatesTag = ""
-		
+
 		if(duplicatesAssetTagNames.size()>0){
 			duplicatesTag += """<span style="color: red;"><b>Asset Tag: <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
 			duplicatesTag += """<span style="color: green;"><b>Asset Tag: OK <br></br></span>"""
 		}
-		def nullAssetTag =  jdbcTemplate.queryForList("""SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type 
-                            from asset_entity where project_id = $currProj and asset_tag is null and asset_type in ('Server','VM','Blade') 
+		def nullAssetTag =  jdbcTemplate.queryForList("""SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type
+                            from asset_entity where project_id = $currProj and asset_tag is null and asset_type in ('Server','VM','Blade')
                             and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) """)
 		def blankAssetTag = ''
 		if(nullAssetTag.size()>0){
@@ -288,12 +288,12 @@ class ReportsService {
 		}else{
 			blankAssetTag += """<span style="color: green;"><b>Blank Naming Tag: OK<br></br></span>"""
 		}
-		
+
 		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in (:type) \
                             and asset.moveBundle.moveEvent = :event and \
                             (rackSource is null or rackTarget is null or sourceRackPosition = '' or targetRackPosition = '') \
                             group by asset.assetName",[type:['Application','Files','Database','VM'], event:moveEventInstance]).assetName
-		
+
 		String missedRacks = ""
 		if(missingRacks.size()>0){
 			missedRacks += """<span style="color: red;"><b>Asset Details: ${missingRacks.size} Servers With Missing Rack info: </b><br></br></span>"""
@@ -302,8 +302,8 @@ class ReportsService {
 			missedRacks += """<span style="color: Green;"><b>Asset Details: OK </b><br></br></span>"""
 			missingRacks = ''
 		}
-		
-		def dependencies = [] 
+
+		def dependencies = []
 		if(assetEntityList.size()>0){
 			dependencies = AssetDependency.findAllByDependentInList(assetEntityList,assetEntityList)?.asset?.assetName
 		}else{
@@ -330,12 +330,12 @@ class ReportsService {
 		}else{
 			dependenciesOk +="""<span style="color: red;"><b>Dependency: OK-No Dependencies: </b><br></br></span>"""
 		}
-		
-		
+
+
 		def publishedValues = [true]
 		if (viewUnpublished)
 			publishedValues = [true, false]
-		
+
 		def categories = ['shutdown','moveday','startup','physical','physical-source','physical-target']
 		def issues = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds) and commentType ='issue' \
             and  isResolved =0 and comment.category not in (:categories) AND comment.isPublished IN (:publishedValues) order by comment.assetEntity.assetName ",
@@ -347,7 +347,7 @@ class ReportsService {
 		}else{
 			issue +="""<span style="color: green;"><b>Asset Tasks: OK  </b><br></br></span>"""
 		}
-		
+
 		def specialInstruction = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds)  and  mustVerify = 1 AND comment.isPublished IN (:publishedValues) order by comment.assetEntity.assetName ",
                                                         [assetIds : assetId, publishedValues:publishedValues]) : []
 		def importantInstruction = ""
@@ -357,8 +357,8 @@ class ReportsService {
 		}else{
 			importantInstruction +="""<span style="color: green;"><b>Special Instruction: OK  </b><br></br></span>"""
 		}
-		
-		
+
+
 		Set questionedDependencies = assetId ? AssetDependency.findAll("from AssetDependency dependency where (dependency.asset.id in (:assetIds) or \
             dependency.dependent.id in (:assetIds)) and dependency.status in (:statuses) and dependency.asset.moveBundle.moveEvent = :event \
             order by dependency.asset.assetName ",[assetIds : assetId, event:moveEventInstance, statuses:['Questioned','Unknown']]).asset.assetName : []
@@ -379,8 +379,8 @@ class ReportsService {
 		}else{
 			eventIssues +="""<span style="color: green;"><b>Event Tasks: OK  </b><br></br></span>"""
 		}
-		
-		
+
+
 		return[summaryOk:summaryOk,issue:issue,issues:issues,dependenciesOk:dependenciesOk,dependencies:dependencies,missingRacks:missingRacks,
 			   missedRacks:missedRacks,duplicatesTag:duplicatesTag,duplicatesAssetTagNames:duplicatesAssetTagNames,duplicates:duplicates,
 			   duplicatesAssetNames:duplicatesAssetNames,nullAssetname:nullAssetname,blankAssets:blankAssets,questioned:questioned,
@@ -389,20 +389,20 @@ class ReportsService {
 			   dependenciesNotValid:dependenciesNotValid]
 
 	}
-	
+
 	/**
 	* @param moveBundles,moveEventInstance
-	* @param Events 
+	* @param Events
 	* @return workFlowCodeSelected,steps
 	*/
-	
+
 	def getEventsBundelsInfo(moveBundles,moveEventInstance,eventErrorList) {
 		Set workFlowCode = moveBundles.workflowCode
 		def workFlow = moveBundles.workflowCode
 		def workFlowCodeSelected = [:]
 		def steps = [:]
 		def moveBundleStep
-		
+
 		if (workFlowCode.size() == 1) {
 			workFlowCodeSelected << [(moveEventInstance.name+'  (Event)  '+'  All Bundles have same WorkFlow  '):workFlow[0]]
 		} else {
@@ -410,9 +410,9 @@ class ReportsService {
 				workFlowCodeSelected << [(it.name+'(Bundle)'+'  '+'  Uses WorkFlow ') : it.workflowCode]
 			}
 		}
-		
-		
-		
+
+
+
 		String labels
 		def dashBoardOk = []
 		moveBundles.each { moveBundle->
@@ -431,13 +431,13 @@ class ReportsService {
 					labels = labels.replace('[[','').replace('], [',' , ').replace(']]','')
 					steps << [(moveBundle.name):labels]
 				}
-				
+
 				dashBoardOk += """<span style="color:green" ><b>Dashboard OK: </b></span>"""
 			}
 		}
 		return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList,dashBoardOk:dashBoardOk]
 	}
-	
+
 	/**
 	* @param moveEventInstance,projectInstance,currProj
 	* @param Events
@@ -460,14 +460,14 @@ class ReportsService {
 			} else {
 				def projectStartTime = 'Not Available'
 				def projectEndTime = 'Not Available'
-				
+
 				if (it.startTime) {
 					projectStartTime  = TimeUtil.formatDateTime(session, it.startTime, TimeUtil.FORMAT_DATE_TIME_8)
 				}
 				if (it.completionTime) {
 					projectEndTime  = TimeUtil.formatDateTime(session, it.completionTime, TimeUtil.FORMAT_DATE_TIME_8)
 				}
-				
+
 				errorForEventTime += """<span style="color:green"><b>Event Time Period ${it.name}: OK </b>${projectStartTime} - ${projectEndTime}</span><br></br>"""
 			}
 		}
@@ -488,16 +488,16 @@ class ReportsService {
 		} else {
 			newsBarModeError += """<span style="color:green" ><b>${moveEventInstance.name}: OK </b></span>"""
 		}
-		
-		
+
+
 		def list = partyRelationshipService.getProjectStaff(currProj)
 		list.sort{ a, b -> a.company[0]?.toString() <=> b.company[0]?.toString() ?: a.role?.toString() <=> b.role?.toString() }
-		
+
 		def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $currProj and p.roleTypeCodeFrom = 'PROJECT' ")
-		
+
 		projectStaff.each { staff ->
 			def user = UserLogin.findByPerson(Person.get(staff.partyIdTo.id))
-			
+
 			if (!user) {
 				eventErrorList << 'Project'
 				userLoginError +="""<span style="color:red;margin-left:50px;"><b>${Person.get(staff.partyIdTo.id)} login disabled</b></span><br></br>"""
@@ -506,7 +506,7 @@ class ReportsService {
 				eventErrorList << 'Project'
 				userLoginError +="""<span style="color:red;margin-left:50px;"><b>${user} login inactive</b></span><br></br>"""
 			}
-			
+
 		}
 		def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${projectInstance.client.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) order by s.lastName "
 		def personInstanceList = Person.findAll( query )
@@ -520,63 +520,63 @@ class ReportsService {
 			   newsBarModeError:newsBarModeError,userLoginError:userLoginError,clientAccess:clientAccess,list:list,
 			   eventErrorList:eventErrorList]
 	}
-	
+
 	/**
 	* @param assetEntityList
 	* @param Transport
 	* @return truckError,truck
 	*/
-	
+
 	def getTransportInfo(assetEntityList,eventErrorList) {
-		
+
 		Set truck = assetEntityList.truck
 		truck.remove('')
 		truck.remove(null)
 		String truckError = ''
-		
+
 		if (truck.size() == 0) {
 			eventErrorList << 'Transport'
 			truckError += """<span style="color: red;"><b>Trucks: No trucks defined</b><br></br></span>"""
 		} else {
 			truckError+="""<span style="color: green;"><b>Trucks: OK  </b><br></br></span>"""
 		}
-		
+
 		Set cart = assetEntityList.cart
 		cart.remove('')
 		cart.remove(null)
 		String cartError = ''
-		
+
 		if (cart.size() == 0) {
 			eventErrorList << 'Transport'
 			cartError += """<span style="color: red;"><b>Carts: No carts defined</b><br></br></span>"""
 		} else {
 			cartError+="""<span style="color: green;"><b>Carts: OK (${cart.size()}) </b><br></br></span>"""
 		}
-		
+
 		Set shelf = assetEntityList.shelf
 		shelf.remove('')
 		shelf.remove(null)
-		
+
 		def shelfError = ''
-		
+
 		if (shelf.size() == 0) {
 			eventErrorList << 'Transport'
 			shelfError += """<span style="color: red;"><b>Shelves: No Shelves defined</b><br></br></span>"""
 		} else {
 			shelfError+= """<span style="color: green;"><b>Shelves: OK (${shelf.size()}) </b><br></br></span>"""
 		}
-		
+
 		return[truckError:truckError,truck:truck,cartError:cartError,cart:cart,shelf:shelf,shelfError:shelfError,
 			   eventErrorList:eventErrorList]
 	}
-	
+
 	def getModelInfo(moveEventInstance,eventErrorList) {
 		Set modelLists = AssetEntity.findAll('from AssetEntity a where a.model.modelStatus = ? and a.model.usize = ? and a.moveBundle.moveEvent =? order by a.model.modelName asc',['new',1,moveEventInstance]).modelName
 		def modelList = []
 		modelList = modelLists.toList()
 		//def modelList = Model.findAllByModelStatusAndUsize('new',1,[sort:'modelName']).modelName
 		def modelError = ''
-		
+
 		if (modelList.size() > 0) {
 			eventErrorList << 'Model'
 			modelError+="""<span style="color: red;margin-left:50px;"><b>${modelList.size()}: un-validated models used : </b><br></br></span>"""
@@ -584,11 +584,11 @@ class ReportsService {
 			modelError+="""<span style="color: green;margin-left:50px;"><b>Model: OK  </b><br></br></span>"""
 		}
 		return[modelList:modelList,modelError:modelError]
-		
+
 	}
 
 	/**
-	 * Attempts to generate a dot graph file based on application graph property configurations from the 
+	 * Attempts to generate a dot graph file based on application graph property configurations from the
 	 * dotText passed to the method.
 	 * @param String filenamePrefix - a prefix used when creating the filename that will include the datetime plus a random #
 	 * @param String dotText - the dot sytax used to define the graph
@@ -605,17 +605,17 @@ class ReportsService {
 		def deleteDotFile = grailsApplication.config.graph?.containsKey('deleteDotFile') ? grailsApplication.config.graph.deleteDotFile : true
 		def random = org.apache.commons.lang.math.RandomUtils.nextInt()
 		def filename = "$filenamePrefix-${new Date().format('yyyyMMdd-HHmmss')}-$random"
-		def imgFilename = "${filename}.${graphType}"				
+		def imgFilename = "${filename}.${graphType}"
 
 		// log.info "dot: $dotText"
 
 		// Create the dot file
 		def dotFN = "${tmpDir}${filename}.dot"
-		def dotFile = new File(dotFN);
+		def dotFile = new File(dotFN)
 		dotFile << dotText
 
 		def sout = new StringBuffer()
-		def serr = new StringBuffer()		
+		def serr = new StringBuffer()
 		def cmd = "${dotExec} -T${graphType} -v -o ${targetDir}${imgFilename} ${dotFile}"
 		log.info "generateDotGraph: about to execute command: $cmd"
 		def proc = cmd.execute()
@@ -623,7 +623,7 @@ class ReportsService {
 	 	proc.waitForOrKill(150000)
 	 	log.info "generateDotGraph: process stdout=$sout"
 	 	log.info "generateDotGraph: process stderr=$serr"
-	
+
 		if (proc.exitValue() == 0) {
 			// Delete the dot file because we don't need it and configured to delete it automatically
 			if (deleteDotFile) dotFile.delete()
@@ -648,7 +648,7 @@ class ReportsService {
 			def currentBundle = MoveBundle.read(moveBundleId)
 			apps = Application.findAllByMoveBundleAndProject(currentBundle, project)
 		}else if(moveBundleId && moveBundleId =='useForPlanning'){
-			apps = Application.findAllByProjectAndMoveBundleInList(project, 
+			apps = Application.findAllByProjectAndMoveBundleInList(project,
 				MoveBundle.getUseForPlanningBundlesByProject(project))
 		}else{
 			apps = Application.findAllByProject(project)
@@ -660,7 +660,7 @@ class ReportsService {
 		}
 		smeListByBundle.remove(null)
 		smeListByBundle.sort{it.lastName}
-		
+
 		return smeListByBundle
 	}
 
@@ -678,7 +678,7 @@ class ReportsService {
 		def bundles = []
 		if(planning) {
 			bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
-			
+
 		} else {
 			bundles = [MoveBundle.findById(moveBundleId)]
 		}
@@ -690,7 +690,7 @@ class ReportsService {
 									[bundles:bundles, types:AssetType.getServerTypes()]).size()
 		}
 		log.debug "${assetsInBundle}"
-		def titleString = new StringBuffer("");
+		def titleString = new StringBuffer("")
 		if(bundleConflicts){
 			titleString.append('Bundle Conflicts')
 		}
@@ -714,7 +714,7 @@ class ReportsService {
 			// skipt the asset if there is no deps and support
 			if(!dependsOnList && !supportsList)
 				return
-			
+
 			if( !bundleConflicts && !unresolvedDep && !runsOn && !vmSupport){
 				showAsset = true
 			} else {
@@ -743,7 +743,7 @@ class ReportsService {
 						showAsset = true
 					}
 				}
-				
+
 				// Check for Run On if showAsset is false
 				if(!showAsset && runsOn){
 					def isRunOn = supportsList.find{it.type == 'Runs On'}
@@ -756,18 +756,18 @@ class ReportsService {
 			if(showAsset)
 				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, header:header ])
 		}
-		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles", 
+		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles",
 				'columns':9, title:StringUtils.stripStart(titleString.toString(), ","), maxR:maxR, ofst:ofst+maxR, bundleConflicts:bundleConflicts, unresolvedDependencies:params.unresolvedDep,
 					noRunsOn:params.noRuns, vmWithNoSupport:params.vmWithNoSupport, moveBundleId:params.moveBundle, appCount:appCount
 				]
 	}
-	
+
 	def genDatabaseConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def noApps, def dbSupport, def planning, int assetCap){
 		def project = securityService.getUserCurrentProject()
 		ArrayList assetList = new ArrayList()
 		def assetsInBundle = []
 		log.debug "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} noApps:${noApps}  dbSupport:${dbSupport} planning:${planning} "
-		
+
 		def bundles = []
 		if(planning) {
 			bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
@@ -778,9 +778,9 @@ class ReportsService {
 			assetsInBundle = AssetEntity.findAll("FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:type) ORDER BY assetName",
 								[bundles:bundles, type:[(AssetType.DATABASE).toString()]], [max:assetCap])
 		}
-		
+
 		log.debug "${assetsInBundle}"
-		def titleString = new StringBuffer("");
+		def titleString = new StringBuffer("")
 		if(bundleConflicts){
 			titleString.append('Bundle Conflicts')
 		}
@@ -801,20 +801,20 @@ class ReportsService {
 			def dependsOnList = AssetDependency.findAllByAsset(asset)
 			def supportsList = AssetDependency.findAllByDependent(asset)
 			def noAppSupport = !supportsList.asset.assetType.contains(AssetType.APPLICATION.toString())
-			
+
 			def header=''
-			
+
 			if(!supportsList){
 				header += ' No DB support?'
 			}
 			if(noAppSupport){
 				header +=' No applications?'
 			}
-			
+
 			// skip the asset if there is no deps and support
 			if(!dependsOnList && !supportsList)
 				return
-			
+
 			if( !bundleConflicts && !unresolvedDep && !noApps && !dbSupport){
 				showDb = true
 			} else {
@@ -842,7 +842,7 @@ class ReportsService {
 						showDb = true
 					}
 				}
-				
+
 				// Check for Run On if showDb is false
 				if(!showDb && noApps){
 					def isRunOn = supportsList.find{it.type == 'DB'}
@@ -874,25 +874,25 @@ class ReportsService {
 		StringBuilder startsRef = new StringBuilder()
 		StringBuilder sinksRef = new StringBuilder()
 		StringBuilder cyclicalsRef = new StringBuilder()
-		
+
 		boolean onlyPublished = true
 		def publishedValues = [true]
 		if (viewUnpublished){
 			onlyPublished = false
 			publishedValues = [true, false]
 		}
-		
+
 		Map tasksAndDependencies = runbookService.getTasksAndDependenciesForEvent(moveEventInstance ,onlyPublished)
 		def tasks = tasksAndDependencies.tasks
 		def deps = tasksAndDependencies.dependencies
 		def tmp = runbookService.createTempObject(tasks, deps)
-		
+
 		try {
 			dfsMap = runbookService.processDFS( tasks, deps, tmp )
 		} catch (e) {
 			exceptionString += "No Tasks"
 		}
-		
+
 		if (dfsMap) {
 			if (dfsMap.cyclicals?.size() == 0) {
 				cyclicalsError += """<span style="color: green;"><b>Cyclical References: OK  </b><br></br></span>"""
@@ -900,7 +900,7 @@ class ReportsService {
 				eventErrorList << 'Tasks'
 				cyclicalsError += """<span style="color: red;"><b>Cyclical References:</b><br></br></span>"""
 				cyclicalsRef.append('<ol>')
-				
+
 				dfsMap.cyclicals.each { c ->
 					def task = c.value.loopback
 					cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
@@ -915,10 +915,10 @@ class ReportsService {
 					cyclicalsRef.append(" >> $c.value.loopback.taskNumber $c.value.loopback.comment</li>")
 					cyclicalsRef.append('</ul>')
 				}
-				
+
 				cyclicalsRef.append('</ol>')
 			}
-			
+
 			// check for multiple starts
 			if (dfsMap.starts?.size() == 1) {
 				startsError += """<span style="color: green;"><b> Start Vertices: OK  </b><br></br></span>"""
@@ -930,7 +930,7 @@ class ReportsService {
 			} else {
 				eventErrorList << 'Tasks'
 				startsError += """<span style="color: red;"><b>Start Vertices: <br>
-					Warning - More than one task has no predecessors. Typical events will have just one starting task 
+					Warning - More than one task has no predecessors. Typical events will have just one starting task
 					(e.g. Prep for Move Event). This is an indicator that some task wiring may be incorrect.</b>
 					<br></br></span>"""
 				startsRef.append('<ul>')
@@ -939,7 +939,7 @@ class ReportsService {
 					}
 				startsRef.append('</ul>')
 			}
-			
+
 			// check for multiple sinks
 			if (dfsMap.sinks?.size() == 1) {
 				sinksError += """<span style="color: green;"><b> Sink Vertices: OK  </b><br></br></span>"""
@@ -951,7 +951,7 @@ class ReportsService {
 			} else {
 				eventErrorList << 'Tasks'
 				sinksError += """<span style="color: red;"><b>Sink Vertices: <br>
-					Warning - More than one task has no successors. Typical events will have just one ending task 
+					Warning - More than one task has no successors. Typical events will have just one ending task
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.</b>
 					<br></br></span>"""
 				sinksRef.append('<ul>')
@@ -960,12 +960,12 @@ class ReportsService {
 					}
 				sinksRef.append('</ul>')
 			}
-			
-			
+
+
 			personTasks = AssetComment.findAll("from AssetComment where moveEvent=:moveEvent and (assignedTo is null and (role is null or role='')) and category in (:category) AND isPublished IN (:publishedValues)",
 				[ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories, publishedValues:publishedValues] )
-			
-			
+
+
 			def missedAssignments = personTasks.size()
 			if (missedAssignments == 0) {
 				personAssignErr+="""<span style="color: green;"><b> Person/Team Assignments : OK  </b><br></br></span>"""
@@ -974,7 +974,7 @@ class ReportsService {
 				personAssignErr+="""<span style="color: red;"><b> Person/Team Assignments : $missedAssignments task${missedAssignments>1?'s have':' has'} no person or team assigned</b><br></br></span>"""
 			}
 		}
-		return ['cyclicalsError':cyclicalsError, 'cyclicalsRef':cyclicalsRef, 'sinksRef':sinksRef, 'startsRef':startsRef, 
+		return ['cyclicalsError':cyclicalsError, 'cyclicalsRef':cyclicalsRef, 'sinksRef':sinksRef, 'startsRef':startsRef,
 			'sinksError':sinksError, 'startsError':startsError, 'personAssignErr':personAssignErr, 'personTasks':personTasks, 'exceptionString':exceptionString]
 	}
 }

@@ -39,7 +39,7 @@ environments {
 
 				// Evictions set to 5 minutes of idle time
 				minEvictableIdleTimeMillis=(1000*60*5)
-				// Run evictions on idle connections every 60 seconds (default 5 seconds) 
+				// Run evictions on idle connections every 60 seconds (default 5 seconds)
 				timeBetweenEvictionRunsMillis=(1000*60)
 
 				testOnBorrow=true
@@ -68,13 +68,13 @@ environments {
 			driverClassName = "com.mysql.jdbc.Driver"
 
 			// Alternate options: 'create', 'create-drop','update'
-			dbCreate = '' 
+			dbCreate = ''
 
 			// url = "jdbc:mysql://127.0.0.1/tdstm"
 			// username = ''
 			// password = ''
 			// loggingSql = true
-			// logSql = true 
+			// logSql = true
 
 			properties {
 				// See following page for explaination of settings
@@ -85,7 +85,7 @@ environments {
 
 				// Evictions set to 5 minutes of idle time
 				minEvictableIdleTimeMillis=(1000*60*5)
-				// Run evictions on idle connections every 60 seconds (default 5 seconds) 
+				// Run evictions on idle connections every 60 seconds (default 5 seconds)
 				timeBetweenEvictionRunsMillis=(1000*60)
 
 				testOnBorrow=true

@@ -17,7 +17,7 @@ class ServiceResults {
 	 */
 	static void respondWithSuccess(response, map = [:]) {
 		respondAsJson(response, success(map))
-	}	
+	}
 
 	/**
 	 * Used to respond to a request with a Failure message
@@ -27,7 +27,7 @@ class ServiceResults {
 	 */
 	static void respondWithFailure(response, map = [:]) {
 		respondAsJson(response, fail(map))
-	}	
+	}
 
 	/**
 	 * Used to respond to a request with a Failure message
@@ -37,7 +37,7 @@ class ServiceResults {
 	 */
 	static void respondWithError(response, errorMsgs) {
 		respondAsJson(response, errors(errorMsgs))
-	}	
+	}
 
 	/**
 	 * Returns a success response to be serialized as json
@@ -47,7 +47,7 @@ class ServiceResults {
 	static Map success(map = [:]) {
 		def renderMap = [:]
 		renderMap.status = 'success'
-		renderMap.data = map		
+		renderMap.data = map
 		return renderMap
 	}
 
@@ -63,7 +63,7 @@ class ServiceResults {
 		renderMap.data = map
 		return renderMap
 	}
-	
+
 	/**
 	 * Returns a error response to be serialized as json
 	 * @param object an array or map to be set as errors
@@ -76,10 +76,10 @@ class ServiceResults {
 			renderMap.errors = errorStringOrList
 		} else {
 			renderMap.errors = [ errorStringOrList ]
-		}		
+		}
 		return renderMap
 	}
-	
+
 	/**
 	 * Returns a warning response to be serialized as json
 	 * @param object an array or map to be set as warnings
@@ -104,12 +104,12 @@ class ServiceResults {
 	 */
 	static void respondWithWarning(response, warningMsgs) {
 		respondAsJson(response, warnings(warningMsgs))
-	}	
-	
+	}
+
 	/**
 	 * Used to respond to the browser via the servlet response by returning an object formatted as JSON
 	 * @param response - the servlet response object
-	 * @param object - the object to be rendered as JSON 
+	 * @param object - the object to be rendered as JSON
 	 */
 	static respondAsJson(response, object=[:]) {
 		response.setStatus(200)
@@ -120,7 +120,7 @@ class ServiceResults {
 	/**
 	 * Used to respond to the browser via the servlet response by returning an object formatted as JSON
 	 * @param response - the servlet response object
-	 * @param object - the object to be rendered as JSON 
+	 * @param object - the object to be rendered as JSON
 	 */
 	static respondAsJson(response, File file) {
 		response.setStatus(200)
@@ -143,7 +143,7 @@ class ServiceResults {
 	static def unauthorized(response) {
 		response.sendError(401, 'Unauthorized error')
 	}
-	
+
 	/**
 	 * Sends a method failure error
 	 * @param response the response object
@@ -151,7 +151,7 @@ class ServiceResults {
 	static def methodFailure(response) {
 		response.sendError(424, 'Method Failure')
 	}
-	
+
 	/**
 	 * Internal error
 	 * @param response the response object
@@ -161,7 +161,7 @@ class ServiceResults {
 		response.addHeader("errorMessage", e.getMessage())
 		response.sendError(500, 'Internal server error')
 	}
-	
+
 	/**
 	 * Sends a method failure error with the validation errors
 	 * @param response the response object
@@ -183,7 +183,7 @@ class ServiceResults {
 		return errors(errs)
 	}
 
-	
+
 	/**
 	 * Sends a forbidden error
 	 * @param response the response object
@@ -201,7 +201,7 @@ class ServiceResults {
 	 */
 	static void notFound(response) {
 		response.sendError(404, 'Not Found')
-	}	
+	}
 
 	/**
 	 * Used to set the ContentType to JSON

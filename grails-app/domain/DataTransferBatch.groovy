@@ -19,13 +19,13 @@ class DataTransferBatch {
 	static final String LOADING='LOADING'
 	static final String PENDING='PENDING'
 	static final String POSTING='POSTING'
-	static final String COMPLETED='COMPLETED'	
+	static final String COMPLETED='COMPLETED'
 	static final String ERROR='ERROR'
 
 	static hasMany = [ dataTransferValue:DataTransferValue ]
-	
+
 	static belongsTo = [ dataTransferSet : DataTransferSet, project : Project, userLogin : UserLogin, eavEntityType : EavEntityType ]
-	
+
 	static mapping = {
 		version false
 		autoTimestamp false
@@ -44,9 +44,9 @@ class DataTransferBatch {
 		hasErrors( nullable:false )
 		progressKey nullable:true
 		importResults( nullable:true, maxSize:16384000)
-		importFilename nullable:true	
+		importFilename nullable:true
 	}
-	
+
 	/*
 	 * Date to insert in GMT
 	 */

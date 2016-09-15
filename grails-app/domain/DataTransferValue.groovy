@@ -8,19 +8,19 @@ class DataTransferValue {
 	Integer assetEntityId
 	Integer hasError
 	EavAttribute eavAttribute
-	
-	static belongsTo = [ 
+
+	static belongsTo = [
 		dataTransferBatch : DataTransferBatch
 	]
-	
+
 	static mapping = {
 		version false
 		columns {
 			id column:'value_id'
-			hasError sqlType:'tinyint' 
+			hasError sqlType:'tinyint'
 		}
 	}
-	
+
 	static constraints = {
 		importValue( blank:true, nullable:true, size:0..255 )
 		correctedValue( blank:true, nullable:true, size:0..255 )

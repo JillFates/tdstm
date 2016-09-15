@@ -30,23 +30,23 @@ class Application extends AssetEntity {
 	String latency
 	String testProc
 	String startupProc
-	
+
 	String drRpoDesc
 	String drRtoDesc
 	String moveDowntimeTolerance
-	
+
 	String shutdownBy
-	Integer shutdownFixed = 0 
-	Integer shutdownDuration 
-	
+	Integer shutdownFixed = 0
+	Integer shutdownDuration
+
 	String startupBy
 	Integer startupFixed = 0
 	Integer startupDuration
-	
+
 	String testingBy
 	Integer testingFixed = 0
 	Integer testingDuration
-	
+
     static constraints = {
 		appVendor( blank:true, nullable:true )
 		appVersion( blank:true, nullable:true )
@@ -66,23 +66,24 @@ class Application extends AssetEntity {
 		latency( blank:true, nullable:true )
 		testProc( blank:true, nullable:true )
 		startupProc( blank:true, nullable:true )
-		
+
 		drRpoDesc( blank:true, nullable:true )
 		drRtoDesc( blank:true, nullable:true )
 		moveDowntimeTolerance( blank:true, nullable:true )
-		
+
 		shutdownBy (nullable:true )
 		shutdownFixed (nullable:true )
 		shutdownDuration (nullable:true )
-		
+
 		startupBy (nullable:true )
 		startupFixed (nullable:true )
 		startupDuration (nullable:true )
-		
+
 		testingBy (nullable:true )
 		testingFixed (nullable:true )
 		testingDuration (nullable:true )
     }
+
 	static mapping  = {
 		version true
 		autoTimestamp false

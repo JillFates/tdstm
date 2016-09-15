@@ -4,7 +4,7 @@
  * @author Diego Scarpa
  */
 class CommentController {
-    
+
     /*
      * This list returns comments and tasks
      */
@@ -15,7 +15,7 @@ class CommentController {
     def editComment() {
         render( view: "_editComment", model: [])
     }
-    
+
     def showComment() {
         render( view: "_showComment", model: [])
     }

@@ -2,7 +2,7 @@ def appName = appName ?: 'tdstm'
 
 grails.project.groupId = tdstm
 grails.resources.adhoc.patterns = []
-grails.resources.adhoc.includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**', '/js/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**', '/plugins/**', '/d3/**', '/dist/**'] 
+grails.resources.adhoc.includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**', '/js/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**', '/plugins/**', '/d3/**', '/dist/**']
 grails.resources.adhoc.excludes = ['*', '**/WEB-INF/**','**/META-INF/**']
 grails.resources.rewrite.css = false
 
@@ -52,7 +52,7 @@ if (appConfigLocation) {
 }
 
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
-grails.mime.types = [ 
+grails.mime.types = [
 	html: ['text/html','application/xhtml+xml'],
 	xml: ['text/xml', 'application/xml'],
 	text: 'text-plain',
@@ -84,7 +84,7 @@ grails.stringchararrayaccessor.disabled=true
 
 //
 // Database Migrations Plugin Settings
-// 
+//
 grails.plugin.databasemigration.changelogLocation = 'grails-app/migrations'
 grails.plugin.databasemigration.changelogFileName='changelog.groovy'
 grails.plugin.databasemigration.updateOnStart = true
@@ -107,7 +107,7 @@ security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.FirstSuc
 // specify all non-controller URLs that shall require authentication
  security.shiro.shiroAnyProtector.urls = ["/monitoring"]
 
-// Application Configuration settings used for testing 
+// Application Configuration settings used for testing
 environments {
 	test {
 		tdstm {
@@ -145,10 +145,10 @@ grails.mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail
 //
 // log4J Logging Configuration
 //
-// Any custom logging configuration should be done by copying this whole definition into a local tdstm-config.groovy 
+// Any custom logging configuration should be done by copying this whole definition into a local tdstm-config.groovy
 // configuration file in order to override this closure. When running locally, the logs will reside in the target directory
-// and for Tomcat they will reside in the CATALINA_HOME/logs directory.  
-// 
+// and for Tomcat they will reside in the CATALINA_HOME/logs directory.
+//
 log4j = {
 	// Configure classes to log at the various logging levels (defaulting to error)
 	error 'org.codehaus.groovy.grails.web.servlet',  //  controllers
@@ -169,7 +169,7 @@ log4j = {
 	// info 'org.codehaus.groovy.grails.web.mapping' // URL mapping
 	// off 'org.hibernate'
 	// debug 'liquibase'
- 
+
 	appenders {
 		def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
 		def auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
@@ -177,17 +177,17 @@ log4j = {
 		if (System.properties.getProperty('catalina.base')) {
 			logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
 		}
- 
+
 		// Use this if we want to modify the default appender called 'stdout'.
 		console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
- 
+
 		// Application log file
 		rollingFile name:'applicationLog',
 				file:"${logDirectory}/${appName}.log",
 				maxFileSize:'500MB',
 				maxBackupIndex:7,
 				layout:pattern(conversionPattern: commonPattern)
- 
+
 		// Stacktrace log file
 		// Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
 		// 'null' name:'stacktrace'
@@ -204,7 +204,7 @@ log4j = {
 			maxBackupIndex:7,
 			layout:pattern(conversionPattern: auditPattern)
 	}
-	
+
 	// Set the logging level for the various log files:
 	info 'stdout', 'applicationLog'
 	//	, auditLog:'grails.app.service.AuditService',

@@ -5,9 +5,9 @@ import org.apache.directory.groovyldap.SearchScope
 
 import java.util.regex.Pattern
 import java.util.regex.Matcher
- 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
@@ -56,7 +56,7 @@ class ConnectorActiveDirectory {
 		boolean isError = false
 		boolean debug = ldapConfig.debug
 		boolean serviceAuthSuccessful = false
-		Map domain 
+		Map domain
 
 		try {
 
@@ -78,7 +78,7 @@ class ConnectorActiveDirectory {
 				case 'SAM':
 					// If the user is logging in with SAM check to see if the domain was part of the username and add it if not
 					/**
-					 * We were originally adding (at least thinking that we were - code error) the domain to the query but in 
+					 * We were originally adding (at least thinking that we were - code error) the domain to the query but in
 					 * reality we don't need to so this code has been commented out. After we roll this out and confirm all clients are okay
 					 * then we can remove this.
 					 * TODO : JPM 10/2015 : Remove this code in 3.2.0
@@ -142,8 +142,8 @@ class ConnectorActiveDirectory {
 				if (debug)
 					log.info "$logPrefix Unable to locate username $username"
 				throw new UnhandledAuthException('Unable to locate username')
-			} 
-			
+			}
+
 			def u = results[0]
 			def memberof = []
 			def roles = []
@@ -193,7 +193,7 @@ class ConnectorActiveDirectory {
 				memberof = memberof*.toLowerCase()
 				domain.roleMap.each { role, filter ->
 					def groupDN="$filter${domain.roleBaseDN ? ','+domain.roleBaseDN : ''}"
-					if (debug) 
+					if (debug)
 						log.info "$logPrefix searching MemberOf list for '$groupDN'"
 					if (memberof.find { it == groupDN.toLowerCase() }) {
 						roles << role
@@ -232,7 +232,7 @@ class ConnectorActiveDirectory {
 
 		} catch (javax.naming.directory.InvalidSearchFilterException e) {
 			isError = ! serviceAuthSuccessful
-			emsg = 'InvalidSearchFilterException occurred for ' + (serviceAuthSuccessful ? 'user info search' : 'service lookup of user') 
+			emsg = 'InvalidSearchFilterException occurred for ' + (serviceAuthSuccessful ? 'user info search' : 'service lookup of user')
 			logMessage("${emsg} : ${e.getMessage()}", serviceAuthSuccessful, isError, debug)
 		} catch (javax.naming.AuthenticationException e) {
 			isError = ! serviceAuthSuccessful

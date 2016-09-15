@@ -3,7 +3,7 @@ import com.tdssrc.grails.TimeUtil
 
 /**
  * RecipeVersion Domain Object
- * 
+ *
  * <p>Represents a particular version of a recipe within cookbook that contains the source
  *
  * @author John Martin
@@ -16,7 +16,7 @@ class RecipeVersion {
 	String changelog = ""
 	/** The recipe version that the recipe was originally cloned from */
 	RecipeVersion clonedFrom
-	/** The version number of the recipe. A zero (0) indicates that the recipe is WIP. When published it will 
+	/** The version number of the recipe. A zero (0) indicates that the recipe is WIP. When published it will
 		increment to the next highest number. Note that once a recipe is versioned that the sourceCode can not
 		be changed without going through the publish process. Default value (0). */
 	Integer versionNumber = 0
@@ -26,9 +26,9 @@ class RecipeVersion {
 	Date dateCreated
 	Date lastUpdated
 
-	static belongsTo = [ recipe : Recipe ]	
+	static belongsTo = [ recipe : Recipe ]
 
-	static constraints = {	
+	static constraints = {
 		sourceCode(blank:true, nullable:true)
 		changelog(blank:true, nullable:true)
 		clonedFrom(nullable:true)
@@ -39,7 +39,7 @@ class RecipeVersion {
 		recipe(nullable:false)
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		version true
 		autoTimestamp false
 		id column: 'recipe_version_id'
@@ -54,13 +54,13 @@ class RecipeVersion {
 		dateCreated = TimeUtil.nowGMT()
 		lastUpdated = dateCreated
 	}
-	
+
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
 	}
 
 	String toString() {
 		"${recipe.name} (${versionNumber==0 ? 'WIP' : versionNumber})"
-	}	
-	
+	}
+
 }

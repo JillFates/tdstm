@@ -13,7 +13,7 @@ class DataTransferAttributeMap {
 	EavAttribute eavAttribute
 
 	static belongsTo = [ dataTransferSet : DataTransferSet ]
-	
+
 	static mapping = {
 		version false
 		columns {
@@ -21,9 +21,9 @@ class DataTransferAttributeMap {
 			isRequired sqlType:'smallint'
 		}
 		eavAttribute lazy: false
-		
+
 	}
-	
+
 	static constraints = {
 		columnName(blank:false, size:0..32)
 		sheetName(blank:false, size:0..64)

@@ -108,7 +108,7 @@ class DESCodecTests extends Specification {
 		} catch (e) {
 			decodedValue = "can not decode"
 		}
-	
+
 		println "value: $value"
 		println "encodedValue: $encodedValue"
 		println "decodedValue: $decodedValue"

@@ -11,7 +11,7 @@ class Files extends AssetEntity {
 	AssetClass assetClass = AssetClass.STORAGE
 	String fileFormat
 	String LUN
-	
+
     static constraints = {
 		fileFormat( blank:false, nullable:false )
 		LUN( blank:true, nullable:true )
@@ -37,5 +37,4 @@ class Files extends AssetEntity {
 	String toString(){
 		"id:$id name:$assetName "
 	}
-
 }

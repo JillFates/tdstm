@@ -1,8 +1,8 @@
 package com.tdsops.tm.enums.domain
 
 /**
- * 
- * @author 
+ *
+ * @author
  *
  */
 class ValidationType {

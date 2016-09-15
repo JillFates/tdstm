@@ -29,7 +29,7 @@ import grails.converters.JSON
 import groovy.time.TimeCategory
 
 class SecurityService implements InitializingBean {
-	
+
 	static transactional = true
 
 	static final String DEFAULT_SECURITY_ROLE_CODE='USER'
@@ -45,7 +45,7 @@ class SecurityService implements InitializingBean {
 	// def loginConfigMap = [usernamePlaceholder:'Enter yo username', authorityPrompt:'prompt', authorityLabel:'DOMAIN!', authorityName:'TDS']
 	def userLocalConfigMap = [:]
 
-	
+
 	/**
 	 * Used to return the default security code that should be assigned to individuals if not is specified.
 	 * @return The security code
@@ -109,8 +109,8 @@ class SecurityService implements InitializingBean {
 			*/
 		}
 	}
-	
-	/** 
+
+	/**
 	 * Returns the configuration map for the login form that is derived from the tdstm-config.groovy settings
 	 * @return a map of all of the settings for the login
 	 *    String authorityPrompt - select:show select, prompt: prompt for autority, na: do nothing for authority
@@ -120,7 +120,7 @@ class SecurityService implements InitializingBean {
 		return this.loginConfigMap
 	}
 
-	/** 
+	/**
 	 * Returns the configuration map for the LDAP setting derived from the tdstm-config.groovy settings
 	 * @return a map of all of the settings for the login
 	 *    String authorityPrompt - select:show select, prompt: prompt for autority, na: do nothing for authority
@@ -130,7 +130,7 @@ class SecurityService implements InitializingBean {
 		return this.ldapConfigMap
 	}
 
-	/** 
+	/**
 	 * Returns the configuration map for the User Local Settings derived from the tdstm-config.groovy settings
 	 * @return a map of all of the settings for the user local settions
 	 */
@@ -138,7 +138,7 @@ class SecurityService implements InitializingBean {
 		return this.userLocalConfigMap
 	}
 
-	/** 
+	/**
 	 * Used to get user's current project
 	 */
 	// TODO : getUserCurrentProject - move to userPreferenceService
@@ -150,9 +150,9 @@ class SecurityService implements InitializingBean {
 		}
 		return project
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Used to get user's current bundleId
 	 */
 	// TODO : getUserCurrentMoveBundleId - move to userPreferenceService
@@ -170,7 +170,7 @@ class SecurityService implements InitializingBean {
 		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
 		return bundleId
 	}
-	
+
 	/**
      * Checks whether current user is allow to edit pending status for a task or not
      * TODO : JPM 4/2016 : isChangePendingStatusAllowed method here is OBSCURED and should be removed but used in tasks
@@ -205,39 +205,39 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Used to get the person (Party) object associated with the currently logged in user	
+	 * Used to get the person (Party) object associated with the currently logged in user
 	 * @return Party object of the user or null if not logged in
 	 */
 	def getUserLoginPerson() {
 		def userLogin = getUserLogin()
 		return userLogin?.person
 	}
-	
+
 	/**
 	 * Used to determine if a given string meets the password strength requirements
-	 * @param username	
-	 * @param password	
+	 * @param username
+	 * @param password
 	 * @return boolean	returns true if the password is valid
 	 */
 	boolean validPasswordStrength(String username, String password){
-		def requirements = 0;
-		def score = 0;
+		def requirements = 0
+		def score = 0
 		def minLength = getUserLocalConfig().minPasswordLength ?: 8
 		if (password && username) {
 			if (password.size() >= minLength)
-				score++;
+				score++
 			if (password ==~ /.*[a-z]+.*/)
-				requirements++;
+				requirements++
 			if (password ==~ /.*[A-Z]+.*/)
-				requirements++;
+				requirements++
 			if (password ==~ /.*[0-9]+.*/)
-				requirements++;
+				requirements++
 			if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
-				requirements++;
+				requirements++
 			if (requirements >= 3)
-				score++;
+				score++
 			if (!password.toLowerCase().contains(username.toLowerCase()))
-				score++;
+				score++
 		}
 		return score == 3
 	}
@@ -254,7 +254,7 @@ class SecurityService implements InitializingBean {
 		} else {
 			try {
 				username = getUserLogin()?.toString()
-				username = username ?: 'UnableToDetermine' 
+				username = username ?: 'UnableToDetermine'
 			} catch (org.apache.shiro.UnavailableSecurityManagerException e) {
 				username = 'ProcessRunningAsService'
 			} catch (e) {
@@ -314,7 +314,7 @@ class SecurityService implements InitializingBean {
 
 
 	/**
-	 * Unlocks a user's account 
+	 * Unlocks a user's account
 	 */
 	void unlockAccount (UserLogin account) {
 		if (hasPermission('UnlockUserLogin')) {
@@ -380,12 +380,12 @@ class SecurityService implements InitializingBean {
 				'authentication.password.reset.account.disabled.error')
 		}
 
-		// TODO - JPM 8/31/2015 - not sure we can do this since if the admin issued a reset, the user should be able to 
+		// TODO - JPM 8/31/2015 - not sure we can do this since if the admin issued a reset, the user should be able to
 		// invoke one.
 		if (pr.type == PasswordResetType.FORGOT_MY_PASSWORD && ! verifyMinPeriodToChangePswd(pr.userLogin)) {
 			throw new ServiceException(
-				'Minimun period between password changes was not met', 
-				'authentication.password.reset.minimun.period.error', 
+				'Minimun period between password changes was not met',
+				'authentication.password.reset.minimun.period.error',
 				[getUserLocalConfig().minPeriodToChangePswd * 60] )
 		}
 
@@ -399,13 +399,13 @@ class SecurityService implements InitializingBean {
 	/**
 	 * Send a reset password email to the user. This can be invoked by an admin or from the user
 	 * via the Forgot My Password.
-	 * @param 
-	 * @param 
-	 * @param 
+	 * @param
+	 * @param
+	 * @param
 	 */
 	void sendResetPasswordEmail(String email, String ipAddress, PasswordResetType resetType, emailParams = [:]) throws ServiceException {
 
-		// Note - we will not throw exceptions indicating that the account exists or not as this is a method 
+		// Note - we will not throw exceptions indicating that the account exists or not as this is a method
 		// that hackers poll systems to find valid accounts. The user will get a message that the email was sent
 		// but will only be true if everything is valid. Audit logging will log all exceptions that can be monitored.
 		// We will ONLY throw exceptions for errors and invalid input.
@@ -459,7 +459,7 @@ class SecurityService implements InitializingBean {
 			auditService.logMessage("Forgot My Password was requested for email $email from $ipAddress")
 			def token = nextAuthToken()
 			emailParams["token"] = token
-			
+
 			def dispatchOrigin = EmailDispatchOrigin.PASSWORD_RESET
 			def bodyTemplate = "passwordReset"
 			def personFrom = person
@@ -491,7 +491,7 @@ class SecurityService implements InitializingBean {
 			String errMsg = "An error occurred and we were unable to send you a password reset. Please contact support for help."
 			if (ed) {
 				def date = new Date(TimeUtil.nowGMT().time)
-				def pr = createPasswordReset(token, ipAddress, userLogin, person, ed, resetType)		
+				def pr = createPasswordReset(token, ipAddress, userLogin, person, ed, resetType)
 
 				if (pr) {
 					String granularity = emailDispatchService.getExpiryGranularity(ed)
@@ -518,10 +518,10 @@ class SecurityService implements InitializingBean {
 	 * Creates a new PasswordReset entity and invalidates any existing one
 	 */
 	PasswordReset createPasswordReset(
-		String token, 
-		String ipAddress, 
-		UserLogin userLogin, 
-		Person person, 
+		String token,
+		String ipAddress,
+		UserLogin userLogin,
+		Person person,
 		EmailDispatch emailDispatch,
 		PasswordResetType resetType) {
 
@@ -535,7 +535,7 @@ class SecurityService implements InitializingBean {
 					log.error "Unable to void pending password reset token for $userLogin : " + GormUtil.allErrorsString(apr)
 				}
 			}
-		}		
+		}
 
 		// Determine the time-to-live for the token
 		int tokenTTL
@@ -563,7 +563,7 @@ class SecurityService implements InitializingBean {
 			createdBy: person,
 			emailDispatch: emailDispatch,
 			expiresAfter: expTime,
-			
+
 		)
 
 		if (!pr.validate() || !pr.save(flush:true)) {
@@ -589,9 +589,9 @@ class SecurityService implements InitializingBean {
 			throw new ServiceException("The password provided does not meet security policy requirements")
 		}
 
-		// Perform some validation and then attempt to set the user's new password 
+		// Perform some validation and then attempt to set the user's new password
 		setUserLoginPassword(pr.userLogin, password)
-			
+
 		String errMsg = 'An error occurred while attempting to save your new password'
 
 		if (!pr.userLogin.save()) {
@@ -616,7 +616,7 @@ class SecurityService implements InitializingBean {
 	 */
 	void validateAllowedToChangePassword(UserLogin userLogin, boolean byAdmin=false) throws ServiceException {
 		// Make sure that the user account details are all set
-		// Get the current user to see if the one being changed 
+		// Get the current user to see if the one being changed
 		boolean canResetPswd = true
 
 		if (byAdmin) {
@@ -631,7 +631,7 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Used to verify that the minimun period between password changes has been met 
+	 * Used to verify that the minimun period between password changes has been met
 	 * @param userLogin - the account to verify can change their password
 	 * @return true if the period of time between password changes has been met
 	 */
@@ -710,9 +710,9 @@ class SecurityService implements InitializingBean {
 		}
 
 		//Set the expirity Date when the password changes (from today)
-		Date expirityDate = calculatePasswordExpiration(userLogin, new Date());
+		Date expirityDate = calculatePasswordExpiration(userLogin, new Date())
 		if(expirityDate != null){
-			userLogin.setPasswordExpirationDate(expirityDate);
+			userLogin.setPasswordExpirationDate(expirityDate)
 		}
 	}
 
@@ -722,13 +722,13 @@ class SecurityService implements InitializingBean {
 	 * @param byWhom - the UserLogin that is performing the update
 	 * @param tzId - the timezone of the user performing the update
 	 * @param isNewUser - flag true indicating to create otherwise update an existing user
-	 * @return The UserLogin object that was created or updated 
+	 * @return The UserLogin object that was created or updated
 	 */
-	UserLogin createOrUpdateUserLoginAndPermissions(params, UserLogin byWhom, String tzId, isNewUser) 
+	UserLogin createOrUpdateUserLoginAndPermissions(params, UserLogin byWhom, String tzId, isNewUser)
 		throws InvalidParamException, UnauthorizedException {
 
 		UserLogin userLogin
-		Person person 
+		Person person
 		Project project
 		def session = serviceHelperService.getService('userPreference').getSession()
 
@@ -744,7 +744,7 @@ class SecurityService implements InitializingBean {
 		if (! project) {
 			throw new InvalidParamException('Specified project was not found')
 		}
-		
+
 		if (isNewUser) {
 			userLogin = new UserLogin()
 			if (! NumberUtil.isPositiveLong(params.personId)) {
@@ -836,7 +836,7 @@ class SecurityService implements InitializingBean {
 			userLogin.isLocal = true
 			userLogin.forcePasswordChange = (params.forcePasswordChange ? 'Y' : 'N')
 			userLogin.passwordNeverExpires = (params.containsKey('passwordNeverExpires') && params.passwordNeverExpires.equals('true'))
-			
+
 			def email = params.email ?: ''
 			def emailUsers = Person.findAllByEmail(email)
 			emailUsers.each {
@@ -866,7 +866,7 @@ class SecurityService implements InitializingBean {
 				userLogin.passwordExpirationDate = TimeUtil.parseDateTime(session, params.passwordExpirationDate)
 			}
 
-			// TODO : should changing the locked out until be allowed? 
+			// TODO : should changing the locked out until be allowed?
 			if (params.lockedOutUntil) {
 				dateField = 'Locked Out Until'
 				userLogin.lockedOutUntil = TimeUtil.parseDateTime(session, params.lockedOutUntil)
@@ -882,7 +882,7 @@ class SecurityService implements InitializingBean {
 
 		// When enabling user - enable Person
 		// When disable user - do NOT change Person
-		
+
 		if (userLogin.active == 'Y') {
 			person.active = 'Y'
 			if (!person.save(flush:true)) {
@@ -893,7 +893,7 @@ class SecurityService implements InitializingBean {
 		//
 		// Now lets deal with the permissions
 		//
-		List<String> assignedRoles 
+		List<String> assignedRoles
 		if (params.assignedRole instanceof String [] ) {
 			assignedRoles = params.assignedRole
 		} else {
@@ -938,7 +938,7 @@ class SecurityService implements InitializingBean {
 	// ---------------------------------
 
 	/**
-	 * Used to lookup a SECURITY RoleType 
+	 * Used to lookup a SECURITY RoleType
 	 * @param roleCode - the role type code
 	 * @return the role type if it exists or NULL if the code was invalid
 	 */
@@ -954,7 +954,7 @@ class SecurityService implements InitializingBean {
 	/**
 	 * Returns the name of a RoleType which currently contains a "GROUP : " prefix that this method strips off
 	 * @param roleCode
-	 * @return String 
+	 * @return String
 	 */
 	def getRoleName( roleCode ) {
 		def name=''
@@ -973,7 +973,7 @@ class SecurityService implements InitializingBean {
 	def hasRole( role ) {
 		return SecurityUtils.subject.hasRole( role )
 	}
-	
+
 	/**
 	 * Used to determine if the current user has a role within an array of roles
 	 * @param	roles	a array of String representing a role
@@ -991,8 +991,8 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Used to determine if a UserLogin has a particular permission. The reportViolation 
-	 * parameter when true will report a security violation if the individual does not 
+	 * Used to determine if a UserLogin has a particular permission. The reportViolation
+	 * parameter when true will report a security violation if the individual does not
 	 * have the specified permission.
 	 * @param user - the UserLogin object for the given user
 	 * @param permission - the permission name string
@@ -1064,10 +1064,10 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that 
+	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that
 	 * should be returned (e.g. Staff or System). When a project is presented the method will return roles associate to the project otherwise
 	 * it return the user's global role.
-	 * 
+	 *
 	 * @param user
 	 * @param roleType
 	 * @param projectId
@@ -1078,7 +1078,7 @@ class SecurityService implements InitializingBean {
 		def likeFilter = "${roleTypeGroup} : %"
 		def prefixSize = "${roleTypeGroup} : ".length()
 		def roles=[]
-		
+
 		if (project) {
 			// Need to lookup the User's Party role to the Project
 			def client=project.client
@@ -1089,20 +1089,20 @@ class SecurityService implements InitializingBean {
 				WHERE party_relationship_type_id='PROJ_STAFF' AND party_id_from_id=${client.id} AND party_id_to_id=${person.id} AND status_code='ENABLED'"""
 			// log.error "getPersonRoles: sql=${sql}"
 			roles = jdbcTemplate.queryForList(sql)
-			
+
 			log.error "Using getPersonRoles in unsupported manor"
 			// log.error "*** Getting from PartyRelationship"
-			
+
 		} else {
 			// Get the User's default role(s)
 			PartyRole.findAllByParty( person )?.each() {
 				roles << it.roleType.id
-			}	
+			}
 			// log.error "*** Getting from PartyRole: roles=${roles}"
-		}	
-		return roles	
+		}
+		return roles
 	}
-	
+
 	// Returns a list of ALL security role codes sort on id ASC
 	// TODO : JPM 4/2016 : the getRoleCodes method returns the description of roles - don't see the point and the method name doesn't seem right
 	List<String> getRoleCodes() {
@@ -1110,7 +1110,7 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Used to retrieve the list of all security RoleType objects in the application 
+	 * Used to retrieve the list of all security RoleType objects in the application
 	 * sorted with highest privileged role first. The list can be filtered by the level
 	 * where by which if the maxLevel parameter is included only a subset of the roles where
 	 * the RoleType.level <= to the parameter.
@@ -1131,7 +1131,7 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Used to retrieve the list of all security RoleType Codes in the application 
+	 * Used to retrieve the list of all security RoleType Codes in the application
 	 * sorted with highest privileged role first. The list can be filtered by the level
 	 * where by which if the maxLevel parameter is included only a subset of the roles where
 	 * the RoleType.level <= to the parameter.
@@ -1142,14 +1142,14 @@ class SecurityService implements InitializingBean {
 		return getAllRoles(maxLevel)*.id
 	}
 
-	/** 
-	 * The list of security roles a Person is assigned to which is sorted 
-	 * on the role level DESC 
+	/**
+	 * The list of security roles a Person is assigned to which is sorted
+	 * on the role level DESC
 	 * @param person - the Person object to get the assigned roles for
-	 * @return the list of Security RoleTypes 
+	 * @return the list of Security RoleTypes
 	 */
 	List<RoleType> getAssignedRoles(Person person) {
-        String query = """from RoleType r where r.type = :type and r.id in 
+        String query = """from RoleType r where r.type = :type and r.id in
             (select pr.roleType.id from PartyRole pr where pr.party=:person group by pr.roleType.id)
             order by r.level desc"""
 
@@ -1157,17 +1157,17 @@ class SecurityService implements InitializingBean {
 		return roles
 	}
 
-	/** 
-	 * The list of security roles a UserLogin is assigned to which is sorted 
-	 * on the role level DESC 
+	/**
+	 * The list of security roles a UserLogin is assigned to which is sorted
+	 * on the role level DESC
 	 * @param user - the UserLogin to get the assigned roles for
-	 * @return the list of Security RoleTypes 
+	 * @return the list of Security RoleTypes
 	 */
 	List<RoleType> getAssignedRoles(UserLogin user) {
 		return getAssignedRoles(user.person)
 	}
 
-	/** 
+	/**
 	 * The list of security role codes that a person has sort on id ASC
 	 * @param person - the person for whom it will lookup assigned roles
 	 * @return a list of the role codes
@@ -1176,7 +1176,7 @@ class SecurityService implements InitializingBean {
 		return getAssignedRoles(person)*.id
 	}
 
-	/** 
+	/**
 	 * The list of security role codes that a UserLogin has sort on id ASC
 	 * @param user - the UserLogin for whom it will lookup assigned roles
 	 * @return a list of the role codes
@@ -1203,8 +1203,8 @@ class SecurityService implements InitializingBean {
 		}
 
 		return assignableRoles
-		/*	
-			// JPM 4/2016 : this was some of the logic for filter but wasn't used so stripped out 
+		/*
+			// JPM 4/2016 : this was some of the logic for filter but wasn't used so stripped out
 			def assignableRoles = []
 			if (person && hasPermission(person.getUserLogin(), "EditUserLogin")) {
 				// All roles
@@ -1221,17 +1221,17 @@ class SecurityService implements InitializingBean {
 			}
 		*/
 	}
- 
- 	/** 
-	 * The list of security role codes that a person can assign. If the person 
+
+ 	/**
+	 * The list of security role codes that a person can assign. If the person
 	 * doesn't have _EditUserLogin_ then no roles are returned.
 	 */
 	List<String> getAssignableRoleCodes(Person person){
 		return getAssignableRoles(person)*.id
 	}
 
-	/** 
-	 * Returns the roles that the current user is allow to assign. 
+	/**
+	 * Returns the roles that the current user is allow to assign.
 	 */
 	List<String> getAssignableRoleCodes() {
 		return getAssignableRoleCodes(getUserLoginPerson())
@@ -1239,7 +1239,7 @@ class SecurityService implements InitializingBean {
 
 	/**
 	 * Used to determine if the person has the permissions to assign a given role.
-	 * If excludeAssigned, the roles that the user already has are excluded 
+	 * If excludeAssigned, the roles that the user already has are excluded
 	 * from the list.
 	 */
 	Boolean isRoleAssignable(Person person, RoleType roleType) {
@@ -1247,7 +1247,7 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Overloaded method that looks up the RoleType first. If excludeAssigned then the roles that the user already 
+	 * Overloaded method that looks up the RoleType first. If excludeAssigned then the roles that the user already
 	 * has are excluded from the list.
 	 */
 	Boolean isRoleAssignable(Person person, String roleType) {
@@ -1259,15 +1259,15 @@ class SecurityService implements InitializingBean {
 		return isAssignable
 	}
 
-	/** 
-	 * Returns the highest level security RoleType that the person has been assigned. 
+	/**
+	 * Returns the highest level security RoleType that the person has been assigned.
 	 */
 	RoleType getMaxAssignedRole(Person person) {
 		return getAssignedRoles(person)[0]
 	}
 
-	/** 
-	 * Returns the highest level security RoleType defined. 
+	/**
+	 * Returns the highest level security RoleType defined.
 	 */
 	RoleType getMaxRole() {
 		return getAllRoles()[0]
@@ -1286,7 +1286,7 @@ class SecurityService implements InitializingBean {
 		RoleType rt = RoleType.get(roleCode)
 		if ( !rt || rt.type != RoleType.SECURITY ) {
 			throw new InvalidParamException("Invalid role code $roleCode specified")
-		} 
+		}
 
 		// Check to see if the role has already been assigned
 		pr = PartyRole.findByPartyAndRoleType(person, rt)
@@ -1351,7 +1351,7 @@ class SecurityService implements InitializingBean {
 			}
 		}
 
-		// If we found some 
+		// If we found some
 		if (rts) {
 			deleted = PartyRole.executeUpdate(query, [person:person, roles:rts])
 		}

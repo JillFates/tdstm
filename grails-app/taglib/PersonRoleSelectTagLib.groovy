@@ -4,14 +4,14 @@ import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 class PersonRoleSelectTagLib {
 	def PartyRelationshipService
     static namespace = 'tds'
-    def out // to facilitate testing 
-    
+    def out // to facilitate testing
+
 
     /**
      * A helper tag for Selecting Roles
      *
      * Examples:
-     * 
+     *
      */
     def personRoleSelect = { attrs ->
         def messageSource = grailsAttributes.applicationContext.getBean( 'messageSource' )
@@ -67,7 +67,7 @@ class PersonRoleSelectTagLib {
             }
             writer << '</option>'
         }
-      
+
         //      End of isNew=="true" Insert a default option to select box
         //      create options from list
         if ( from ) {
@@ -76,18 +76,18 @@ class PersonRoleSelectTagLib {
 
                 writer << '<option '
                 if ( keys ) {
-                	
+
                     keyValue = keys[i]
                     //                  Checking for Cuurent Role option To Select
                     if ( currentRole == keyValue.toString() )
                     {
-                    	
+
                     	writeValueAndCheckIfSelected(keyValue, keyValue, writer)
                     }
                     else
                     writeValueAndCheckIfSelected(keyValue, value, writer)
-                  
-                    	
+
+
                 }
                 else if ( optionKey ) {
                     if ( optionKey instanceof Closure ) {
@@ -102,29 +102,29 @@ class PersonRoleSelectTagLib {
                     //Checking for Cuurent Role option To Select
                     if ( currentRole == keyValue.toString() )
                     {
-                    	
+
                     	writeValueAndCheckIfSelected(keyValue, keyValue, writer)
                     }
                     else
                     writeValueAndCheckIfSelected(keyValue, value, writer)
-                  
+
                 }
                 else {
                     keyValue = el
-                    
+
                     //Checking for Cuurent Role option To Select
                     if ( currentRole == keyValue.toString() )
                     {
-                    	
+
                     	writeValueAndCheckIfSelected(keyValue, keyValue, writer)
                     }
                     else
                     writeValueAndCheckIfSelected(keyValue, value, writer)
-                   
+
                 }
-                
+
                 writer << '>'
-               
+
                 if (valueMessagePrefix) {
                     def optionValueStr = optionValueToString(el, optionValue)
                     def messageArgs = optionValue ? optionValueStr : keyValue
@@ -157,7 +157,7 @@ class PersonRoleSelectTagLib {
         }
         // close tag
         writer << '</select>'
-        
+
     }
 
 
@@ -165,10 +165,10 @@ class PersonRoleSelectTagLib {
 
     private writeValueAndCheckIfSelected(keyValue, value, writer) {
         boolean selected = false
-       
+
         def keyClass = keyValue?.getClass()
         if (keyClass.isInstance(value)) {
-        	
+
             selected = (keyValue == value)
         }
         else if (value instanceof Collection) {
@@ -215,13 +215,13 @@ class PersonRoleSelectTagLib {
 
         //el[optionValue].toString().encodeAsHTML()
     }
-    
+
     /*staffSelect Tag Library
      *
      *
      */
     def staffSelect  = { attrs ->
-        
+
     	def messageSource = grailsAttributes.applicationContext.getBean( 'messageSource' )
     	def locale = RCU.getLocale( request )
     	def writer = out
@@ -238,7 +238,7 @@ class PersonRoleSelectTagLib {
     	def noSelection = attrs.remove( 'noSelection' )
     	def isNew = attrs.remove( 'isNew' )
         def companyId = attrs.remove( 'companyId' )
-        
+
     	if (noSelection != null) {
     		noSelection = noSelection.entrySet().iterator().next()
     	}
@@ -253,13 +253,13 @@ class PersonRoleSelectTagLib {
 
     	writer << '>'
     	writer.println()
-    	
+
     	if ( noSelection ) {
     		renderNoSelectionOption( noSelection.key, noSelection.value, value )
     		writer.println()
     	}
 
-    	
+
         // If isNew=="true" Insert a default option to select box
     	if ( isNew && isNew == "true" )
     	{
@@ -272,10 +272,10 @@ class PersonRoleSelectTagLib {
         	}
     		writer << '</option>'
     	}
-    	
+
         // End of isNew=="true" Insert a default option to select box
         from = partyRelationshipService.getCompanyStaff( companyId )
-    		
+
         // create options from list
     	if ( from ) {
     		from.eachWithIndex {el, i ->
@@ -283,12 +283,12 @@ class PersonRoleSelectTagLib {
 
                 writer << '<option '
                 if ( keys ) {
-            	
+
                     keyValue = keys[i]
                     //                  Checking for Cuurent Role option To Select
-                
+
                     writeValueAndCheckIfSelected(keyValue, value, writer)
-               	
+
                 }
                 else if ( optionKey ) {
                     if ( optionKey instanceof Closure ) {
@@ -300,19 +300,19 @@ class PersonRoleSelectTagLib {
                     else {
                         keyValue = el[optionKey]
                     }
-                
+
                     writeValueAndCheckIfSelected(keyValue, value, writer)
-              
+
                 }
                 else {
                     keyValue = el
-                
+
                     writeValueAndCheckIfSelected(keyValue, value, writer)
-               
+
                 }
-            
+
                 writer << '>'
-           
+
                 if (valueMessagePrefix) {
                     def optionValueStr = optionValueToString(el, optionValue)
                     def messageArgs = optionValue ? optionValueStr : keyValue
@@ -345,7 +345,7 @@ class PersonRoleSelectTagLib {
         }
         // close tag
         writer << '</select>'
-    
+
     }
 
 }

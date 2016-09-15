@@ -5,7 +5,7 @@ import spock.util.mop.ConfineMetaClassChanges
 
 @Stepwise
 class SecurityServiceTests extends Specification {
-	
+
 	// IOC
 	def securityService
 
@@ -18,16 +18,16 @@ class SecurityServiceTests extends Specification {
 	// Helper methods to build up person/user accounts used in the tests
 	//
 
-	private void createPrivAccount() {		
+	private void createPrivAccount() {
 		// Create a new person and login that has a couple of security roles
 		privPerson = new Person(firstName:'Ben', middleName: 'D', lastName:'Over', staffType:'Salary')
 		assert (privPerson.validate() && privPerson.save())
 		privUser = new UserLogin(username:'bendover', password:'guessit', person:privPerson, active:'Y', expiryDate:TimeUtil.nowGMT())
-		assert (privUser.validate() && privUser.save()) 
+		assert (privUser.validate() && privUser.save())
 		assert securityService.assignRoleCodes(privPerson, privRoles).size() == 3
 	}
 
-	private void createUnPrivAccount() {		
+	private void createUnPrivAccount() {
 		// Create a new person and login that has no security roles
 		unPrivPerson = new Person(firstName:'Jack', lastName:'Rabbit', staffType:'Salary')
 		assert (unPrivPerson.validate() && unPrivPerson.save())
@@ -57,7 +57,7 @@ class SecurityServiceTests extends Specification {
 		then:
 			pr != null
 			securityService.getAssignedRoleCodes(unPrivPerson).size() == 1
-		
+
 		when: 'after assigning a second role there should be two assigned roles'
 			pr = securityService.assignRoleCode(unPrivPerson, 'EDITOR')
 			roles = securityService.getAssignedRoleCodes(unPrivPerson)
@@ -75,7 +75,7 @@ class SecurityServiceTests extends Specification {
 
 		when: 'unassigning a role from the user should return a 1 indicating that it was deleted'
 			count = securityService.unassignRoleCode(unPrivPerson, 'EDITOR')
-		then: 
+		then:
 			count == 1
 
 		then: 'the person should only have one role (USER) remaining if I did the math correctly'
@@ -90,8 +90,8 @@ class SecurityServiceTests extends Specification {
 
 
 		when: 'unassigning roles in bulk it should return that 2 were removed'
-			count = securityService.unassignRoleCodes(unPrivPerson, ['SUPERVISOR', 'USER'])	
-		then: 
+			count = securityService.unassignRoleCodes(unPrivPerson, ['SUPERVISOR', 'USER'])
+		then:
 			count == 2
 		then: 'there should only be one role left and while we are at it we will look it up by the UserLogin this time'
 			securityService.getAssignedRoleCodes(unPrivUser) == ['ADMIN']
@@ -99,19 +99,19 @@ class SecurityServiceTests extends Specification {
 
 		when: 'passing in an invalid role code an exception should be thrown'
 			securityService.assignRoleCode(unPrivPerson, 'BOGUS')
-		then: 
+		then:
 			thrown InvalidParamException
 
 		when: 'passing in an non-security type role code (e.g. TEAM:PROJ_MGR) an exception should be thrown'
 			securityService.assignRoleCode(unPrivPerson, 'PROJ_MGR')
-		then: 
+		then:
 			thrown InvalidParamException
 
 	}
 
 
 	def '2 - Test the getMaxAssignedRole method to see if it is behaving as it should'() {
-		setup: 
+		setup:
 			createPrivAccount()
 
 		when: 'starting this test the initial list of roles for the privPerson it should match the privRoles defined up top'
@@ -154,13 +154,13 @@ class SecurityServiceTests extends Specification {
 		when: 'the unprivileged account is assigned a role but still does not have necessary permission so it should fail'
 			assert securityService.assignRoleCode(unPrivPerson, 'SUPERVISOR')
 		then:
-			! securityService.getAssignableRoles(unPrivPerson)		
+			! securityService.getAssignableRoles(unPrivPerson)
 
 		when: 'the unprivileged account is assigned ADMIN role this will change and a number of roles will be returned'
 			assert securityService.assignRoleCode(unPrivPerson, 'ADMIN')
 			results = securityService.getAssignableRoles(unPrivPerson)
 		then:
-			results.size() >= 6 		
+			results.size() >= 6
 	}
 
 	def '5 - Test the getAllRoles and getAllRoleCodes methods'(){
@@ -169,14 +169,14 @@ class SecurityServiceTests extends Specification {
 
 		when: 'calling getAllRoles without the maxLevel parameter it should return all roles'
 			list = securityService.getAllRoles()
-		then: 
+		then:
 			list.size() >= 6
 			list.find { it.id == 'ADMIN'}
 			list.find { it.id == 'USER'}
 
 		when: 'calling getAllRoles with a the maxLevel of 30 getAllRoles should return 3 roles'
 			list = securityService.getAllRoles(30)
-		then: 
+		then:
 			list.size() == 3
 			list*.id == ['SUPERVISOR', 'EDITOR', 'USER']
 
@@ -211,26 +211,26 @@ class SecurityServiceTests extends Specification {
 	}
 
 	//
-	// TODO : JPM 4/2016 : Tried to implement some meta programming to test inside method 
+	// TODO : JPM 4/2016 : Tried to implement some meta programming to test inside method
 	// SecurityService.reportViolation however after running the tests the old method is not restored as advertised
-	// See http://blog.jdriven.com/2014/11/spock-using-confinemetaclasschanges-using-metaclass-mocking/ and 
+	// See http://blog.jdriven.com/2014/11/spock-using-confinemetaclasschanges-using-metaclass-mocking/ and
 	// http://mrhaki.blogspot.com/2015/09/spocklight-undo-metaclass-changes.html
 	@ConfineMetaClassChanges([SecurityService])
 	def '7 - Test the hasPermission calls reportViolation if user does not have permission'() {
 		setup:
 			createUnPrivAccount()
 			String privPerm = 'RestartApplication'
-			
+
 			// Use this command to figure out the method signature we want to override
-			println "SecurityService.reportViolation method signatures:\n" + 
-				securityService.metaClass.methods.findAll { it.name == "reportViolation" }.join("\n") 
-        	
+			println "SecurityService.reportViolation method signatures:\n" +
+				securityService.metaClass.methods.findAll { it.name == "reportViolation" }.join("\n")
+
         	// Save off the old method
 	        def oldMethod = securityService.metaClass.getMetaMethod("reportViolation", [java.lang.String, UserLogin] as Class[] )
-        
-			// Do some meta programming here to intercept the reportViolation method 
+
+			// Do some meta programming here to intercept the reportViolation method
 			int reportViolationCalled = 0
-			
+
 			// To test this, uncomment the next
 			// securityService.metaClass.reportViolation = { msg, userOrPerson -> reportViolationCalled++ }
 
@@ -238,12 +238,12 @@ class SecurityServiceTests extends Specification {
 			securityService.hasPermission(unPrivUser, privPerm, true)
 		then:
 			// If the metaClass method overide is done then this works but leave the method broken
-			reportViolationCalled == 0			
+			reportViolationCalled == 0
 
 		cleanup:
 			reportViolationCalled = 0
 			// Restore the reportViolation method on the service some how. Docs state to set the metaClass to null
-			// but that didn't work. 
+			// but that didn't work.
 			// The @ConfineMetaClassChanges annotation is suppose to work as well but nada...
 			// securityService.metaClass = null
 

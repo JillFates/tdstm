@@ -1,5 +1,5 @@
 class RoleTypeController {
-    def idCheck = 0;
+    def idCheck = 0
     def index() { redirect( action:"list", params:params ) }
 
     // the delete, save and update actions only accept POST requests
@@ -14,7 +14,7 @@ class RoleTypeController {
                                 order('level','desc')
                                 order('id', 'asc')
                             }
-                        } 
+                        }
         [ roleTypeInstanceList: roleTypes]
     }
     // return RoleType details to show form
@@ -27,7 +27,7 @@ class RoleTypeController {
         }
         else { return [ roleTypeInstance : roleTypeInstance ] }
     }
-    // delete RoleType details 
+    // delete RoleType details
     def delete() {
     	try{
     		def roleTypeInstance = RoleType.get( params.id )
@@ -42,7 +42,7 @@ class RoleTypeController {
 	        }
     	} catch(Exception ex){
     		flash.message = ex
-			redirect( action:"list" )	
+			redirect( action:"list" )
     	}
     }
     //return roleType details to update form
@@ -82,7 +82,7 @@ class RoleTypeController {
         roleTypeInstance.properties = params
         return ['roleTypeInstance':roleTypeInstance]
     }
-    // save RoleType details 
+    // save RoleType details
     def save() {
         RoleType roleTypeInstance = new RoleType(params)
         roleTypeInstance.id = params.id
@@ -90,7 +90,7 @@ class RoleTypeController {
         // condition to check the id
         if ( role != null ) {
             flash.message = "Role Type ${role.id} already exist "
-            idCheck = 1;
+            idCheck = 1
         }else{
             roleTypeInstance.level = 1
             println("params: $params")
@@ -100,7 +100,7 @@ class RoleTypeController {
                 redirect( action:"list")
             }
         }
-    
+
         render( view:'create', model:[roleTypeInstance:roleTypeInstance] )
     }
 }

@@ -7,7 +7,7 @@ class ProjectTeam extends PartyGroup{
 	String isDisbanded = "N"
 	String role = "MOVE_TECH"
 
-	static belongsTo = [ 
+	static belongsTo = [
 	                    moveBundle : MoveBundle,
 	                    latestAsset : AssetEntity
 	                    ]
@@ -22,7 +22,7 @@ class ProjectTeam extends PartyGroup{
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party
 	}
-	
+
 	static mapping  = {
 		version true
 		autoTimestamp false
@@ -33,7 +33,7 @@ class ProjectTeam extends PartyGroup{
 			isIdle sqlType: 'tinyint(1)'
 		}
 	}
-	
+
 	String toString() {
 		"$teamCode : $name"
 	}

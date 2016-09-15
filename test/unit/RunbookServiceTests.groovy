@@ -1,7 +1,7 @@
 import groovy.mock.interceptor.*
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
-import org.apache.log4j.* 
+import org.apache.log4j.*
 
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
@@ -13,7 +13,7 @@ import spock.lang.Specification
  */
 @TestFor(RunbookService)
 class RunbookServiceTests extends Specification {
-	
+
 	def runbookService
 	def log
 
@@ -25,7 +25,7 @@ class RunbookServiceTests extends Specification {
 		[id:5, name:'Sarah', color:'white'],
 		[id:6, name:'Tony', color:'green'],
 	]
-	
+
 	// This represents the [ edge id, downstreamTaskCount, pathDuration ] for the map defined below
 	def dataMatrix = [
 		['100', 7, 71],
@@ -43,23 +43,23 @@ class RunbookServiceTests extends Specification {
 	]
 
 	/**
-	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as 
+	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as
 	 * dynamic method injections for various object classes to be used by the application
 	 */
-	private void loadConfig() { 
-		GroovyClassLoader classLoader = new GroovyClassLoader(this.class.classLoader) 
-		ConfigSlurper slurper = new ConfigSlurper('TEST') 
-		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config")) 
-	} 
+	private void loadConfig() {
+		GroovyClassLoader classLoader = new GroovyClassLoader(this.class.classLoader)
+		ConfigSlurper slurper = new ConfigSlurper('TEST')
+		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config"))
+	}
 
 	void setup() {
-		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
-		//super.setUp() 
+		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain
+		//super.setUp()
 
         runbookService = new RunbookService()
-        
+
 		// build a logger...
-		BasicConfigurator.configure() 
+		BasicConfigurator.configure()
 		LogManager.rootLogger.level = Level.DEBUG
 		log = LogManager.getLogger("RunbookService")
 
@@ -89,7 +89,7 @@ class RunbookServiceTests extends Specification {
 		tasks << new AssetComment(id:8, taskNumber: 1008, duration:2, comment:'Make Coffee') // Sink vertex
 		tasks << new AssetComment(id:9, taskNumber: 1009, duration:1, comment:'Done Move') // Sink vertex
 
-		deps << new TaskDependency(id:100, predecessor:tasks[0], assetComment:tasks[1], type:'SS') 
+		deps << new TaskDependency(id:100, predecessor:tasks[0], assetComment:tasks[1], type:'SS')
 		// 1 > [3,4], 3 > 5, 5 > [7,8,9], 4 > 9
 		// 8    3,20  3  15, 15  45,2,1   20  1
 		// 1 > 3 > 5 > [7,8,9] (72)
@@ -106,9 +106,9 @@ class RunbookServiceTests extends Specification {
 		deps << new TaskDependency(id:110, predecessor:tasks[5], assetComment:tasks[8], type:'SS')
 		deps << new TaskDependency(id:111, predecessor:tasks[5], assetComment:tasks[9], type:'SS')
 
-        def id = 0;
+        def id = 0
         tasks.each { t -> t.id = id++}
-        id = 100;
+        id = 100
         deps.each { d -> d.id = id++}
 
 		return [tasks, deps]
@@ -127,7 +127,7 @@ class RunbookServiceTests extends Specification {
 		    'id 666 should not exist' != staff.containsKey(666)
 		    6 == staff.size()
 	}
-	
+
 	// Test that the List.asMap method actually works
 	void testAsGroup() {
 
@@ -170,7 +170,7 @@ class RunbookServiceTests extends Specification {
 	// @Test
 	// Test that the processDFS is returning the proper results
 	void testProcessDFS() {
-        
+
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
@@ -205,9 +205,9 @@ class RunbookServiceTests extends Specification {
 
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
 
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 
-		dataMatrix.each { i, c, d -> 
+		dataMatrix.each { i, c, d ->
 			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
 			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
 		}
@@ -220,7 +220,7 @@ class RunbookServiceTests extends Specification {
 			tmp['tasks'][durMap.tasks[1].id].tmpMapDepth == 4 //Task 1001 tmpMapDepth
 			tmp['tasks'][durMap.tasks[0].id].tmpMapDepth == 5 //Task 1000 tmpMapDepth
 	}
-	
+
 	// @Test
 	// Test that the processDFS and processDurations properly handle an cicular references within the map
 	void testForCyclicalMapping() {
@@ -240,7 +240,7 @@ class RunbookServiceTests extends Specification {
             dfsMap.sinks.size() == 3 //Should have 3 Sink vertices
             dfsMap.cyclicals.size() == 1 //Should have 1 Cyclical vertex
 
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 
 		// println "What tasks does edge 105 have? ${durMap.edges['105'].successor.tmpDownstreamTasks}"
 		// Run the same process as before and we shouldn't see any differences
@@ -248,7 +248,7 @@ class RunbookServiceTests extends Specification {
 			['103', 2, 21],	// We added the earlier reference
 			['109', 1, 45] 	// Shouldn't of changed
 		]
-		m.each { i, c, d -> 
+		m.each { i, c, d ->
 			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
 			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
 		}
@@ -263,9 +263,9 @@ class RunbookServiceTests extends Specification {
 		def deps
 		(tasks, deps) = initTestData()
 		def tmp = runbookService.createTempObject(tasks, deps)
-		
+
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
@@ -290,11 +290,11 @@ class RunbookServiceTests extends Specification {
 		def ltid = tasks.size() - 1
         def asset
         def dep
-        
+
         asset = new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
         asset.id = ltid+1
 		tasks << asset
-        
+
         asset = new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
         asset.id = ltid+2
 		tasks << asset
@@ -303,11 +303,11 @@ class RunbookServiceTests extends Specification {
         asset.id = ltid+3
 		tasks << asset
 
-        dep = new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS') 
+        dep = new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS')
         dep.id = 200
 		deps << dep
 
-        dep = new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS') 
+        dep = new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS')
         dep.id = 201
 		deps << dep
 
@@ -315,14 +315,14 @@ class RunbookServiceTests extends Specification {
         asset = new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
         asset.id = ltid+4
 		tasks << asset
-        
-        dep = new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
+
+        dep = new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS')
         dep.id = 210
 		deps << dep
 
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
@@ -351,7 +351,7 @@ class RunbookServiceTests extends Specification {
 		def tmp = runbookService.createTempObject(tasks, deps)
 
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		def tasksMap = tasks.asMap('id')
@@ -372,7 +372,7 @@ class RunbookServiceTests extends Specification {
 		def tmp = runbookService.createTempObject(tasks, deps)
 
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		def edgesByPred = deps.asGroup { it.predecessor.id }
@@ -410,7 +410,7 @@ class RunbookServiceTests extends Specification {
 		def tmp = runbookService.createTempObject(tasks, deps)
 
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp)
 
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
@@ -438,12 +438,12 @@ class RunbookServiceTests extends Specification {
 			[9,  0, 37, 81, false],
 		]
 
-        expect:        
+        expect:
 		    82 == estFinish //estFinish should be zero
 
 		// Check the times and critical path of all tasks
 		startTimes.each { id, estStart, earliest, latest, criticalPath ->
-			def task = tasks[id] 
+			def task = tasks[id]
 			assertEquals "Estimated Start ($id)", estStart, tmp['tasks'][tasks[id].id].tmpEstimatedStart
 			assertEquals "Earliest Start ($id)", earliest, tmp['tasks'][tasks[id].id].tmpEarliestStart
 			assertEquals "Estimated Start ($id)", latest, tmp['tasks'][tasks[id].id].tmpLatestStart
@@ -451,5 +451,5 @@ class RunbookServiceTests extends Specification {
 		}
 
 	}
-	
+
 }

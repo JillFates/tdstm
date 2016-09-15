@@ -1,11 +1,11 @@
 class DataTransferSet {
-	
+
 	String title
 	String transferMode
 	String templateFilename
 	String setCode
 	static hasMany = [ dataTransferBatch :DataTransferBatch, dataTransferAttributeMap : DataTransferAttributeMap  ]
-	
+
 	static mapping = {
 		version false
 		columns {
@@ -19,8 +19,8 @@ class DataTransferSet {
 		templateFilename(blank:true, nullable:true)
 		setCode(blank:true, nullable:true)
 	}
+
 	String toString(){
 		"$id : $title"
 	}
-
 }

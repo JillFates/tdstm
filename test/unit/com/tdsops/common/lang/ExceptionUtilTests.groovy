@@ -10,7 +10,7 @@ import spock.lang.Specification
  * Unit test cases for the ExceptionUtil class
  */
 class ExceptionUtilTests extends Specification {
-	
+
 	public void testOne() {
 		String st
 		try {
@@ -34,5 +34,5 @@ class ExceptionUtilTests extends Specification {
 		    // Number Of Lines
 		    10 == numLines
 	}
-	
+
 }

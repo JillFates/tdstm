@@ -19,7 +19,7 @@ import org.springframework.transaction.TransactionDefinition
 import UserPreferenceEnum as PREF
 
 class UserService implements InitializingBean {
-	
+
 	// IoC
 	def personService
 	def partyRelationshipService
@@ -32,7 +32,7 @@ class UserService implements InitializingBean {
 	// The following vars are initialized in afterPropertiesSet after IoC
 	def ctx
 	def sessionFactory
-	
+
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
 	 */
@@ -40,8 +40,8 @@ class UserService implements InitializingBean {
 	private synchronized void initialize() {
 		if (! initialized) {
 			// Load the RoleTypes that are used in the findOrProvisionUser method
-			roleMap.each { k, v -> 
-				roleTypeList << RoleType.read(v) 
+			roleMap.each { k, v ->
+				roleTypeList << RoleType.read(v)
 			}
 			initialized = true
 		}
@@ -55,15 +55,15 @@ class UserService implements InitializingBean {
 
 		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
 		// Initialize some class level variables used repeatedly by the application
-		
+
 		ctx = Holders.grailsApplication.mainContext
 		sessionFactory = ctx.sessionFactory
 	}
-	 
+
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
 	 * which is used by the AD and SSO integration.
-	 * 
+	 *
 	 * @param userInfo - the information provided by the login authentication session
 	 * @param config - a map of the authentication connector
 	 * @return a the userLogin account that was found or provisioned
@@ -121,9 +121,9 @@ class UserService implements InitializingBean {
 		}
 
 		// Attempt to lookup the Person and their UserLogin
-		def (person, userLogin) = findPersonAndUserLogin(client, userInfo, config, authority, personIdentifier)	
+		def (person, userLogin) = findPersonAndUserLogin(client, userInfo, config, authority, personIdentifier)
 
-		// Check various requirements based on the Authentication Configuration and fall out if we don't 
+		// Check various requirements based on the Authentication Configuration and fall out if we don't
 		// have an account and not allowed to create one.
 		if (! userLogin && ! userInfo.roles && ! domain.defaultRole) {
 			throw new AccountException('No roles defined for the user')
@@ -145,7 +145,7 @@ class UserService implements InitializingBean {
 			if (debug)
 				log.debug "$mn Creating new person"
 
-			person = new Person( 
+			person = new Person(
 				firstName:nameMap.first,
 				lastName:nameMap.last,
 				middleName: nameMap.middle,
@@ -235,7 +235,7 @@ class UserService implements InitializingBean {
 
 		if (createUser) {
 			// Add their role(s)
-			newUserRoles.each { r -> 
+			newUserRoles.each { r ->
 				if (debug)
 					log.info "$mn Adding new security role '$r' to $personIdentifier"
 				def rt = RoleType.read(r.toUpperCase())
@@ -261,7 +261,7 @@ class UserService implements InitializingBean {
 				if (debug)
 					log.debug "$mn User has existing roles $existingRoles"
 				// See if there are any existing that should be removed
-				existingRoles.each { er -> 
+				existingRoles.each { er ->
 					if (! newUserRoles*.toUpperCase().contains(er.roleType.id)) {
 						if (debug)
 							log.debug "$mn Deleting security role ${er.roleType.id} for $personIdentifier"
@@ -270,7 +270,7 @@ class UserService implements InitializingBean {
 				}
 
 				// Now go through and add any new roles that aren't in the user's existing list
-				newUserRoles.each { nr -> 
+				newUserRoles.each { nr ->
 					// Force the Role Types to uppercase
 					nr = nr.toUpperCase()
 
@@ -314,15 +314,15 @@ class UserService implements InitializingBean {
 
 		return userLogin
 	}
-	
+
 	/**
-	 * Used by the login logic to parse the name from UserInfo  
+	 * Used by the login logic to parse the name from UserInfo
 	 */
 	Map userInfoToNameMap(Map userInfo) {
 		// Parse the person's name and populate a name map
 		Map nameMap = [first:'', middle:'', last:userInfo.lastName]
 		List names = userInfo.firstName.split(' ')
-		if (names.size()) { 
+		if (names.size()) {
 			nameMap.first = names[0]
 			if (names.size() > 1)
 				nameMap.middle = names[1..-1].join(' ')
@@ -331,7 +331,7 @@ class UserService implements InitializingBean {
 	}
 
 	String formatGuid(Map userInfo) {
-		return "${userInfo.companyId}-${userInfo.guid}"	
+		return "${userInfo.companyId}-${userInfo.guid}"
 	}
 
 	/**
@@ -339,11 +339,11 @@ class UserService implements InitializingBean {
 	 * the authority configuration map.
 	 *
 	 * This assumes that a person account may previously exist but that the UserLogin may not
-	 * 
+	 *
 	 * @param userInfo - the information provided by the login authentication session
 	 * @param config - a map of the authentication connector
 	 * @return a with [Person, UserLogin] account that was found or provisioned
-	 * @throws ConfigurationException, RuntimeException	 
+	 * @throws ConfigurationException, RuntimeException
 	 */
 	List findPersonAndUserLogin( PartyGroup client, Map userInfo, Map config, String authority, String personIdentifier ) {
 
@@ -383,7 +383,7 @@ class UserService implements InitializingBean {
 			// User wasn't found so let's try by the Person information
 			// Try to find the Person in case they were previously loaded or provisioned other than by the login
 
-			// First try to find by their email 
+			// First try to find by their email
 			if (userInfo.email) {
 				if (debug)
 					log.debug "$mn Looking up person by email"
@@ -392,21 +392,21 @@ class UserService implements InitializingBean {
 
 			// Then try to find by their name
 			if (! persons) {
-				if (debug) 
+				if (debug)
 					log.debug "$mn Looking up person by name"
 
 				// The nameMap was first,middle,last but throughout the code we refer to firstName,...
-				Map correctNameMap = [firstName:nameMap.first, middleName:nameMap.middle, lastName:nameMap.last]	
+				Map correctNameMap = [firstName:nameMap.first, middleName:nameMap.middle, lastName:nameMap.last]
 				persons = personService.findByCompanyAndName(client, correctNameMap)
-				if (debug) 
+				if (debug)
 					log.debug "$mn personService.findByCompanyAndName found ${persons?.size()} people"
-			} 
+			}
 
 			// If we have any persons, try to find their respective user accounts
 			if (persons) {
 				def users = UserLogin.findAllByPersonInList(persons)
 				if (debug)
-					log.debug "$mn Found these users: $users"				
+					log.debug "$mn Found these users: $users"
 
 				// If we find more than one account we don't know which to use
 				def size = users.size()
@@ -435,7 +435,7 @@ class UserService implements InitializingBean {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param projectInstance
 	 * @return
 	 */
@@ -445,7 +445,7 @@ class UserService implements InitializingBean {
 		def upcomingEvents=[:]
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
-		
+
 		getEvents(projects, dateNow).each{ event, startTime->
 			def teams = MoveEventStaff.findAllByMoveEventAndPerson(event, currentUser).role
 			if(teams){
@@ -454,12 +454,12 @@ class UserService implements InitializingBean {
 					'daysToGo':startTime > dateNow ? (startTime-dateNow) : (" + " + (dateNow - startTime))]]
 			}
 		}
-		
+
 		return upcomingEvents
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param projectInstance
 	 * @return
 	 */
@@ -474,18 +474,18 @@ class UserService implements InitializingBean {
 		}
 		return projects
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param projectInstance
 	 * @return
 	 */
 	def getEvents(projects, dateNow ){
 		def moveEventList = MoveEvent.findAllByProjectInList(projects).sort{it.eventTimes.start}
 		def thirtyDaysInMS = 2592000000
-		
+
 		def events = [:]
-		
+
 		moveEventList.each{event->
 			def eventCompTimes = event.moveBundles.completionTime.sort().reverse()
 			def startTimes = event.moveBundles.startTime.sort()
@@ -496,10 +496,10 @@ class UserService implements InitializingBean {
 				events << [(event):startTime]
 			}
 		}
-		
+
 		return events
 	}
-	
+
 	/**
 	 * Used to retgetEventNews
 	 * @param project
@@ -510,24 +510,24 @@ class UserService implements InitializingBean {
 		List comingEvents = getEvents(getSelectedProject(projectOrAll), TimeUtil.nowGMT()).keySet().asList()
 		// log.debug "getEventNews() comingEvents=$comingEvents"
 		if (comingEvents) {
-			String q = 'from MoveEventNews where moveEvent in (:events) and isArchived=:isArchived order by dateCreated desc'	
+			String q = 'from MoveEventNews where moveEvent in (:events) and isArchived=:isArchived order by dateCreated desc'
 			newsList = MoveEventNews.executeQuery(q, [events:comingEvents, isArchived:0])
 		}
-		
+
 		return newsList
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param project
 	 * @return
 	 */
 	def getTaskSummary ( project ){
-		
+
 		def timeInMin = 0
 		def issueList = []
 		def person = securityService.getUserLoginPerson()
-		
+
 		getSelectedProject(project).each{proj->
 			def tasks = taskService.getUserTasks(person, proj, false, 7, 'score' )
 			def taskList = tasks['user']
@@ -549,14 +549,14 @@ class UserService implements InitializingBean {
 		def totalDuration = TimeUtil.createProperDuration(0,0,timeInMin,0)
 		return [taskList:issueList, totalDuration:totalDuration, dueTaskCount:dueTaskCount, personId:person.id]
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param project
 	 * @return
 	 */
 	def getApplications( project ){
-		
+
 		//to get applications assigned to particular person & there relations.
 		def currentUser= securityService.getUserLoginPerson()
 		def appList = Application.findAll("from Application where project in (:projects) and (sme=:person or sme2=:person or appOwner=:person) \
@@ -575,17 +575,17 @@ class UserService implements InitializingBean {
 			}
 			relationList << [(it.id) : WebUtil.listAsMultiValueString(relation)]
 		}
-		
+
 		return [appList:appList, relationList:relationList]
 	}
-	
+
 	/**
-	 * Used in the dashboard to show which person are active 
+	 * Used in the dashboard to show which person are active
 	 *
 	 * @param project
 	 * @return
 	 */
-	def getActivePeople( project ){ 
+	def getActivePeople( project ){
 
 		//to get active people of that particular user selected project.
 		def recentLogin = []
@@ -644,9 +644,9 @@ class UserService implements InitializingBean {
 			}
 		}
 	}
-	
+
 	/**
-	 * Update the User's last page load time. This needs to be done in a separate transaction so that it doesn't 
+	 * Update the User's last page load time. This needs to be done in a separate transaction so that it doesn't
 	 * potentially get rolled back with the whole page. It can fail due to Optimistic Locking which we'll just ignore.
 	 * @param username - username of the one that just logged in
 	 */

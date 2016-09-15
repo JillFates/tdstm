@@ -1,6 +1,6 @@
 import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
-import com.tdsops.tm.enums.domain.EntityType;
+import com.tdsops.tm.enums.domain.EntityType
 import com.tdssrc.grails.HtmlUtil
 
 class CommonController {
@@ -44,14 +44,14 @@ class CommonController {
 	 */
 	def tooltipsUpdate() {
 		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
-		if (! project) 
+		if (! project)
 			return
 
 		def entityType = request.JSON.entityType
 		def helpText = request.JSON.jsonString
-		def fields = JSON.parse(request.JSON.fields);
+		def fields = JSON.parse(request.JSON.fields)
 		def category = EntityType.getListAsCategory(entityType)
-		def result = null;
+		def result = null
 		try{
 			def attributes = projectService.getAttributes(entityType)?.attributeCode
 			def assetTypes=EntityType.list
@@ -82,16 +82,16 @@ class CommonController {
 					}
 				}
 				if (result == null) {
-					result = ServiceResults.success() as JSON	
+					result = ServiceResults.success() as JSON
 				}
 			}
 		} catch(Exception ex){
 			log.error "An error occurred : ${ex}", ex
 			result = ServiceResults.fail() as JSON
 		}
-		render result;
+		render result
 	}
-	
+
 	/**
 	 *This action is used to get Key,values of Help Text and append to asset cruds.
 	 *@param : entityType type of entity.
@@ -104,7 +104,7 @@ class CommonController {
 		returnMap = assetEntityService.retrieveTooltips(entityType, project)
 		render returnMap as JSON
 	}
-	
+
 	def tmLinkableUrl (){
 		def errMsg = null
 		try{

@@ -7,13 +7,13 @@ import com.tdsops.common.security.shiro.SHA2CredentialsMatcher
 import com.tdsops.common.security.shiro.FirstExceptionStrategy
 
 import com.tdsops.common.grails.ApplicationContextHolder
- 
+
 beans = {
 	// uses the grails dataSource from DataSource.groovy
 	jdbcTemplate(JdbcTemplate) {
 	   dataSource = ref('dataSource')
 	}
-	
+
 	namedParameterJdbcTemplate(NamedParameterJdbcTemplate, ref("dataSource")){
 	}
 
@@ -21,7 +21,7 @@ beans = {
 	applicationContextHolder(ApplicationContextHolder) { bean ->
 		bean.factoryMethod = 'getInstance'
 	}
-	
+
 	/*
 	// use a different datasource
 	otherDataSource(BasicDataSource) {
@@ -31,7 +31,7 @@ beans = {
 	   username = "root"
 	   password = "admin"
 	}
-	
+
 	otherJdbcTemplate(JdbcTemplate) {
 	   dataSource = otherDataSource
 	}
@@ -43,21 +43,21 @@ beans = {
 
 	shiroAuthenticationStrategy(FirstExceptionStrategy) {
 	}
-	
+
 	// Shiro Password Encryption configuration
 	//credentialMatcher(Sha1CredentialsMatcher) {
 	//	storedCredentialsHexEncoded = true
 	//}
 	/*
 	 * See http://suryazi.blogspot.com/2012/07/salting-password.html for more on this one
-	 * 
+	 *
 	credentialMatcher(Sha512CredentialsMatcher) {
 		storedCredentialsHexEncoded = false
 		hashSalted=true
 		hashIterations=1024
 	}
 	*/
-	
+
 	/*
 	 * Database Connection String that overrides that in conf/DataSource.groovy
 	 */
@@ -67,12 +67,12 @@ beans = {
 		url = 'jdbc:mysql://localhost:3306/tdstm'
 		username = 'tdstm'
 		password = 'tdstm'
-	
+
 		maxActive = 50
 		maxIdle = 25
 		minIdle = 5
 		initialSize = 5
-	
+
 		maxWait = 10000
 		minEvictableIdleTimeMillis=1800000
 		timeBetweenEvictionRunsMillis=1800000

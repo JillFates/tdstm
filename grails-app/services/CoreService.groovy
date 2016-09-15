@@ -5,10 +5,10 @@
 import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 
 class CoreService {
-	
+
 	def grailsApplication
 
-	/** 
+	/**
 	 * Used to retrieve the name of the application
 	 * @return the application name
 	 * @throws GrailsConfigurationException if application name is not found
@@ -51,12 +51,12 @@ class CoreService {
 		for (int i=0; i < settingList.size() - 1; i++) {
 			if (! config.containsKey(settingList[i])) {
 				return null
-			} 
+			}
 			config = config[settingList[i]]
 		}
 		config = config[ settingList[-1] ]
 		if ( (config instanceof groovy.util.ConfigObject) && config.isEmpty()) {
-			config = 
+			config =
 			null
 		}
 		return config
@@ -91,7 +91,7 @@ class CoreService {
 			throw new GrailsConfigurationException("The application temp directory configuration setting was not found ($propName)")
 		}
 		if (tmpDir[-1] == '/') {
-			tmpDir = tmpDir[0..-2] 
+			tmpDir = tmpDir[0..-2]
 		}
 		return tmpDir
 	}

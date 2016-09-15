@@ -1,6 +1,6 @@
 class UrlMappings {
     static mappings = {
-      
+
 		/**
 		 * View Controller
 		 */
@@ -27,7 +27,7 @@ class UrlMappings {
 			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
 		}
-		
+
 		"/ws/dashboard/bundleData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"bundleData"]
@@ -47,7 +47,7 @@ class UrlMappings {
 			controller = "wsCookbook"
 			action = [POST:"revert"]
 		}
-		
+
 		"/ws/cookbook/recipe/archive/$id" {
 			controller = "wsCookbook"
 			action = [POST:"archiveRecipe"]
@@ -112,7 +112,7 @@ class UrlMappings {
 			controller = "wsTask"
 			action = [GET:"findTaskBatchByRecipeAndContext"]
 		}
-		
+
 		"/ws/task/listTaskBatches" {
 			controller = "wsTask"
 			action = [GET:"listTaskBatches"]
@@ -132,17 +132,17 @@ class UrlMappings {
 			controller = "wsTask"
 			action = [POST:"unpublish"]
 		}
-		
+
 		"/ws/task/$id/taskReset" {
 			controller = "wsTask"
 			action = [POST:"taskReset"]
 		}
-		
+
 		"/ws/task/$id/tasks" {
 			controller = "wsTask"
 			action = [GET:"retrieveTasksOfTaskBatch"]
 		}
-		
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [GET:"retrieveStatus"]
@@ -162,17 +162,17 @@ class UrlMappings {
 			controller = "wsUser"
 			action = [GET:"preferences"]
 		}
-		
+
 		"/ws/user/preference" {
 			controller = "wsUser"
 			action = [POST:"savePreference"]
 		}
-		
+
 		"/ws/progress" {
 			controller = "wsProgress"
 			action = [GET:"list"]
 		}
-		
+
 		"/ws/public/sequence/$contextId/$name" {
 			controller = "wsSequence"
 			action = [GET:"retrieveNext"]
@@ -197,7 +197,7 @@ class UrlMappings {
 			controller = "auth"
 			action = [GET:"resetPassword"]
 		}
-		
+
 		"/ws/admin/unlockAccount" {
 			controller = "wsAdmin"
 			action = [PUT:"unlockAccount"]

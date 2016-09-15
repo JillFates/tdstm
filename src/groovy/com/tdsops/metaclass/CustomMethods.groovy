@@ -1,26 +1,26 @@
 package com.tdsops.metaclass
 
-/* 
+/*
  * Initialize various dynamic method injections on various classes that will be used within the application
  */
 
 class CustomMethods {
 
  	// Setup a Singleton pattern so we only initialize the methods once
-	private static INSTANCE 
-    
+	private static INSTANCE
+
 	static getInitialize(force=false) {
 		if (INSTANCE == null || force) {
 			INSTANCE = new CustomMethods()
-		} 
-		return INSTANCE 
+		}
+		return INSTANCE
 	}
 
     /**
      * private constructor that will inject the new functions onto the various classes
      */
     private CustomMethods() {
-		
+
 		/**
 		 * Used to convert a List of objects into a Map using one of the objects' properties as the key
 		 * @param String or Closure - as a String, it would be the property name or as a Closure a method that computes the key referencing the object
@@ -44,7 +44,7 @@ class CustomMethods {
 		ArrayList.metaClass.asGroup = { arg ->
 			def result = [:]
 			def isClosure = (arg instanceof Closure)
-			delegate.each { 
+			delegate.each {
 				def key = isClosure ? arg(it) : it[arg]
 				key = key.toString()
 				if ( result.containsKey(key) ) {

@@ -7,13 +7,13 @@ import spock.lang.*
  */
 class CustomMethodsTests extends Specification {
 
-	// Initialize the metaClass settings	
+	// Initialize the metaClass settings
 	@Shared customMethods = CustomMethods.initialize
 
 	public void testAsYN() {
 		expect:
 			true.asYN() == 'Y'
-			false.asYN() == 'N'	
+			false.asYN() == 'N'
 	}
 
 	public void testAsMap() {
@@ -26,7 +26,7 @@ class CustomMethodsTests extends Specification {
 
 		when:
 			def map = beatles.asMap(0)
-		then: 
+		then:
 			(map instanceof Map)
 			map.containsKey('Paul')
 			map.Ringo[1] == 3

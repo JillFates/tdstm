@@ -2,24 +2,24 @@ import groovy.time.TimeCategory
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-/** 
+/**
  * Unit Test class to test the Domain class MoveBundleStep
  */
 @TestFor(MoveBundleStep)
 class MoveBundleStepTests extends Specification {
 
-	def mbs 
+	def mbs
 	def now
-	
+
 	void initTest() {
 	 	now = new Date()
-		mbs 
+		mbs
 		use (TimeCategory) {
 		 	mbs = new MoveBundleStep(planStartTime: now - 1.hour, planCompletionTime: now + 1.hour,
 		 		actualStartTime: now - 1.hour, actualCompletionTime: now + 1.hour)
 		}
 	}
-	
+
     void testPlanDuration() {
 		initTest()
         expect:
@@ -51,7 +51,7 @@ class MoveBundleStepTests extends Specification {
 		when: "step 1"
         then:
 		    mbs.isCompleted() //Step should be completed
-		
+
         when: "step 2"
 		    mbs.actualCompletionTime = null
         then:

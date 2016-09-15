@@ -31,14 +31,14 @@ class ReportsController {
 	def sessionFactory
 	def grailsApplication
 
-	def index() { 
+	def index() {
 		render(view:'index')
 	}
-	
+
 	// Generate Report Dialog
 	def retrieveBundleListForReportDialog() {
 		def projectInstance = controllerService.getProjectForPage( this )
-		if (! projectInstance) 
+		if (! projectInstance)
 			return
 
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
@@ -49,11 +49,11 @@ class ReportsController {
 				render( view:'home',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
 				break
-			case "cart Asset":  
+			case "cart Asset":
 				render( view:'cartAssetReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
 				break
-			case "Issue Report":  
+			case "Issue Report":
 				render( view:'issueReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
 				break
@@ -63,7 +63,7 @@ class ReportsController {
 				render( view:'taskReport',
 					model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance, viewUnpublished:viewUnpublished])
 				break
-			case "Transportation Asset List":  
+			case "Transportation Asset List":
 				render( view:'transportationAssetReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
 				break
@@ -71,11 +71,11 @@ class ReportsController {
 				render( view:'assetTagLabel',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance,	browserTest: browserTest])
 				break
-			case "Login Badges":  
+			case "Login Badges":
 				render( view:'loginBadgeLabelReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, browserTest: browserTest])
 				break
-			case "CablingQA":  
+			case "CablingQA":
 				render( view:'cablingQAReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'QA'])
 				break
@@ -83,23 +83,23 @@ class ReportsController {
 				render( view:'cablingQAReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'conflict'])
 				break
-			case "CablingData":  
+			case "CablingData":
 				render( view:'cablingData',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance ])
 				break
-			default: 
+			default:
 				render 'An invalid report was specified'
 				break
 		}
 	}
-	
+
 	//  cart Asset report
 	def cartAssetReport() {
 		def reportName = params.reportName
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def projectInstance = securityService.getUserCurrentProject();
+		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
 			redirect(controller:'project',action:'list')
@@ -135,9 +135,9 @@ class ReportsController {
 				assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.project.id = $projectInstance.id and "+
 														"asset.moveBundle != null order By asset.moveBundle,asset.cart,asset.shelf")
 			}
-			
+
 			def currDate = new Date()
-			//Source AssetList 
+			//Source AssetList
 			if( assetEntityList != null) {
 				assetEntityList.each { asset ->
 					def bundleInstance
@@ -163,23 +163,23 @@ class ReportsController {
 					if (cartShelf == "/"){
 						cartShelf = ""
 					}
-					
+
 					// sort options for reportFields
 					def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset?.model?.usize ? asset?.model?.usize : "")
-					
+
 					def truckTagSort = (asset.truck ? asset.truck : "") +" "+ (asset.cart ? asset.cart : "") +" "+ (asset.shelf ? asset.shelf : "")
-					
-					def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
-					reportFields <<['assetName':asset.assetName , "model":asset.model?.toString(), 
-									"sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)", 
-									"cart":cartShelf, "shelf":asset.shelf, "source_team_id":teamPartyGroup?.id, 
+
+					def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id)
+					reportFields <<['assetName':asset.assetName , "model":asset.model?.toString(),
+									"sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)",
+									"cart":cartShelf, "shelf":asset.shelf, "source_team_id":teamPartyGroup?.id,
 									"move_bundle_id":asset?.moveBundle?.id,dlocation:asset.rackSource?asset.rackSource.location:'',
 									'projectName':partyGroupInstance?.name,
-									'startAt': projectInstance.startDate, 
-									'completedAt': projectInstance.completionDate, 
-									'bundleName':bundleInstance?.name, 
-									'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
-									'location':"Source Team", 'truck':asset.truck, 
+									'startAt': projectInstance.startDate,
+									'completedAt': projectInstance.completionDate,
+									'bundleName':bundleInstance?.name,
+									'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "",
+									'location':"Source Team", 'truck':asset.truck,
 									'room':asset.sourceRoom, 'instructions':assetCommentString,
 									'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
 									'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
@@ -187,7 +187,7 @@ class ReportsController {
 				}
 			}
 			//No Assets were found for selected moveBundle,team and Location
-			if(reportFields.size() <= 0) {    		
+			if(reportFields.size() <= 0) {
 				flash.message = " No Assets Were found for  selected values  "
 				if(reportName == 'cartAsset') {
 					redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'cart Asset'] )
@@ -207,11 +207,11 @@ class ReportsController {
 						reportFields.sort{ it.assetTagSort }
 					}
 				}
-				
+
 				def name = reportName == "cartAsset" ? "LogisticsTeam" : "TransportTeam"
 				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
-				
+
 				chain(controller:'jasper',action:'index',model:[data:reportFields],
 						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
 			}
@@ -227,7 +227,7 @@ class ReportsController {
 		def personInstance = Person.findByFirstName( principal )
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-	  def projectInstance = securityService.getUserCurrentProject();
+	  def projectInstance = securityService.getUserCurrentProject()
 	  if (!projectInstance) {
 		flash.message = "Please select project to view Reports"
 		redirect(controller:'project',action:'list')
@@ -251,7 +251,7 @@ class ReportsController {
 		}
 		String moveBundles = params.moveBundle
 		moveBundles = moveBundles.replace("[","('").replace(",]","')").replace(",","','")
-		if(params.moveBundle == "null") {    		
+		if(params.moveBundle == "null") {
 			flash.message = " Please Select Bundles. "
 			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Issue Report'] )
 		} else {
@@ -262,7 +262,7 @@ class ReportsController {
 				commentType = "('issue')"
 			}
 			def commentsQuery = new StringBuffer("from AssetComment ac where ac.commentType in ${commentType} ")
-				
+
 			if( moveBundles.size() > 4 ){
 				commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id in $moveBundles ) order by ac.assetEntity.${sortBy} ")
 				bundleNames = MoveBundle.findAll("from MoveBundle where id in $moveBundles").name.toString()
@@ -271,9 +271,9 @@ class ReportsController {
 				commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.project.id = $projectInstance.id ) order by ac.assetEntity.${sortBy} ")
 				bundleNames = "All"
 			}
-			
+
 			def assetCommentList = AssetComment.findAll( commentsQuery.toString() )
-			
+
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def currDate = new Date()
 			assetCommentList.each { assetComment ->
@@ -289,22 +289,22 @@ class ReportsController {
 					reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag,'moveBundle' :assetComment?.assetEntity?.moveBundle?.name,
 									'sourceTargetRoom':sourceTargetRoom,
 									'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
-									'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
-									'occuredAt': assetComment.dateCreated, 
-									'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
+									'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ),
+									'occuredAt': assetComment.dateCreated,
+									'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName,
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
-									'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
+									'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
 									'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
 									'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
 				}
 				if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
-					reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null, 
+					reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null,
 									'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
-									'occuredAt': assetComment.dateResolved, 
-									'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
+									'occuredAt': assetComment.dateResolved,
+									'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName,
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
-									'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
+									'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
 									'clientName':projectInstance?.client?.name,
 									'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
@@ -317,7 +317,7 @@ class ReportsController {
 					moveEventNews?.resolution = moveEventNews?.resolution ? moveEventNews?.resolution : ''
 					reportFields <<['assetName':'', 'assetTag':'', 'moveBundle' :'','sourceTargetRoom':'','model':'',
 								'commentType':"news",
-								'occuredAt': moveEventNews.dateCreated, 
+								'occuredAt': moveEventNews.dateCreated,
 								'createdBy':moveEventNews?.createdBy.toString(),
 								'owner':'',
 								'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'','projectName':projectInstance?.name,
@@ -327,7 +327,7 @@ class ReportsController {
 				}
 
 			}
-			if(reportFields.size() <= 0) {    		
+			if(reportFields.size() <= 0) {
 				flash.message = " No Issues Were found for  selected values  "
 				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Issue Report'] )
 			}else {
@@ -344,9 +344,9 @@ class ReportsController {
 						response.setContentType( "application/vnd.ms-excel" )
 						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
-						
-						def book = new HSSFWorkbook(new FileInputStream( file ));
-						
+
+						def book = new HSSFWorkbook(new FileInputStream( file ))
+
 						def sheet = book.getSheet("issues")
 						WorkbookUtil.addCell(sheet, 1, 1, String.valueOf( projectInstance?.client?.name ))
 						WorkbookUtil.addCell(sheet, 1, 2, String.valueOf( partyGroupInstance?.name ))
@@ -364,20 +364,20 @@ class ReportsController {
 							WorkbookUtil.addCell(sheet, 9, r+6, String.valueOf(reportFields[r].owner ?:''))
 							WorkbookUtil.addCell(sheet, 10, r+6, String.valueOf(WebUtil.listAsMultiValueString(reportFields[r].previousNote)?:''))
 							WorkbookUtil.addCell(sheet, 11, r+6, String.valueOf(reportFields[r].issue ?:''))
-							
+
 						}
 						WorkbookUtil.addCell(sheet, 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") )
-						
+
 						book.write(response.getOutputStream())
 
 					} catch( Exception ex ) {
 						flash.message = "Exception occurred while exporting data"+ex
 						redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'Issue Report'] )
-						return;
+						return
 					}
 				}
 			}
-			
+
 		}
 	}
 
@@ -390,7 +390,7 @@ class ReportsController {
 	def retrieveLabelBadges() {
 		def moveBundle = params.bundle
 		def location = params.location
-	  def projectInstance = securityService.getUserCurrentProject();
+	  def projectInstance = securityService.getUserCurrentProject()
 	  if (!projectInstance) {
 		flash.message = "Please select project to view Reports"
 		redirect(controller:'project',action:'list')
@@ -401,7 +401,7 @@ class ReportsController {
 		def startDate = projectInstance.startDate
 		def reportFields = []
 		def teamMembers = []
-		if(params.moveBundle == "null") {    		
+		if(params.moveBundle == "null") {
 			reportFields <<[ 'flashMessage': "Please Select Bundles."]
 			render reportFields as JSON
 		} else {
@@ -453,19 +453,19 @@ class ReportsController {
 						reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
 										 'teamName': member.partyIdFrom.name+" - Source","sortField":member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName,
 										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? TimeUtil.formatDate(getSession(), member.partyIdFrom.moveBundle.startTime) : " "),
-										 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
+										 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s'
 										 ]
 					}
 					if ( member.partyIdFrom.teamCode != "Logistics" && (params.location == "target" || params.location == "both") ) {
 						reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-										 'teamName': member.partyIdFrom.name+" - Target","sortField": member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName, 
+										 'teamName': member.partyIdFrom.name+" - Target","sortField": member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName,
 										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? TimeUtil.formatDate(getSession(), member.partyIdFrom.moveBundle.startTime) : " "),
-										 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
+										 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t'
 										 ]
 					}
 				}
 			}
-			if(reportFields.size <= 0) { 
+			if(reportFields.size <= 0) {
 				reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
 				render reportFields as JSON
 			}else {
@@ -490,12 +490,12 @@ class ReportsController {
 					rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
 					rackStyle = it.rackStyle
 					def assetTagsList = (it.asset?.assetTag).split("<br/>")
-					def moveBundle = "" 
+					def moveBundle = ""
 					def assetTag = ""
 					def assetEntityId = it.asset.assetEntity.assetEntityId
 					if(it.cssClass == "rack_error")
 						assetTag += "Devices Overlap:<br />"
-					
+
 					assetTagsList.each{
 						def index = it.indexOf('-')
 						def tag
@@ -519,12 +519,12 @@ class ReportsController {
 					}
 					if(backView){
 						if(it.cssClass != "rack_error"){
-							def cablingString = ""/*"${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
+							def cablingString = ""/*"${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+
 												"${it.asset?.assetEntity?.nicPort ? 'NIC: '+ it.asset?.assetEntity?.nicPort +' | ' : ''}"+
 												"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != 'blank / blank'? 'KVM: '+ it.asset?.assetEntity?.kvmDevice +' | ' : ''}"+
 												"${it.asset?.assetEntity?.remoteMgmtPort ? 'RMgmt: '+ it.asset?.assetEntity?.remoteMgmtPort +' | ': ''}"+
 												"${it.asset?.assetEntity?.fiberCabinet && it.asset?.assetEntity?.fiberCabinet != 'blank / blank / blank' ? 'Fiber: '+ it.asset?.assetEntity?.fiberCabinet +' | ' : ''}"
-							
+
 							if ( cablingString ) {
 								cablingString = cablingString.substring( 0, cablingString.length() - 2 )
 							}*/
@@ -554,20 +554,20 @@ class ReportsController {
 							"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
 							"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>")
 			 }*/
-			 
+
 			 row.append("</tr>")
 			 rows.append(row.toString())
 		}
 		return rows
 	 }
 	/*
-	 *  Generate PDF Cabling QA / Conflict report 
+	 *  Generate PDF Cabling QA / Conflict report
 	 */
 	def cablingQAReport() {
 		def reportName = params.reportName
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-	  def projectInstance = securityService.getUserCurrentProject();
+	  def projectInstance = securityService.getUserCurrentProject()
 	  if (!projectInstance) {
 		flash.message = "Please select project to view Reports"
 		redirect(controller:'project',action:'list')
@@ -595,8 +595,8 @@ class ReportsController {
 			if(cableType){
 				cablesQuery.append(" and acm.assetFromPort.type = '${cableType}' ")
 			}
-			
-			
+
+
 			List assetCablesList = new ArrayList()
 			if(reportName == "cablingQA"){
 				cablesQuery.append(" order By acm.assetFrom ")
@@ -614,17 +614,17 @@ class ReportsController {
 				if(unknownList.size() > 0) assetCablesList.addAll(unknownList)
 				if(orphanedList.size() > 0) assetCablesList.addAll(orphanedList)
 			}
-			
+
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def currDate = new Date()
-			//Source AssetList 
+			//Source AssetList
 			if( assetCablesList != null) {
 				assetCablesList.each { cable ->
 					def bundleInstance
 					if(cable.assetFrom.moveBundle != null) {
 						bundleInstance = MoveBundle.findById(cable.assetFrom.moveBundle.id)
 					}
-					
+
 					reportFields <<['from_asset_name':cable.assetFrom.assetName,
 									'from_asset_tag':cable.assetFrom.assetTag,
 									'cable_type': cable.assetFromPort.type,
@@ -645,26 +645,26 @@ class ReportsController {
 				}
 			}
 			//No Assets were found for selected moveBundle,team and Location
-			if(reportFields.size() <= 0) {    		
+			if(reportFields.size() <= 0) {
 				flash.message = " No Cables were found for  selected values  "
 				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingQA'] )
 			}else {
 				def name = reportName == 'cablingQA' ? "CablingQA" : "CablingConflict"
 				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
-				
+
 				chain(controller:'jasper',action:'index',model:[data:reportFields],
 						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
 			}
 		}
 	}
 	/*
-	 *  Generate XLS Structured Cabling data report 
+	 *  Generate XLS Structured Cabling data report
 	 */
 	def cablingDataReport() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-		def projectInstance = securityService.getUserCurrentProject();
+		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
 			redirect(controller:'project',action:'list')
@@ -709,7 +709,7 @@ class ReportsController {
 					response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 					response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
 
-					def book = new HSSFWorkbook(new FileInputStream( file ));
+					def book = new HSSFWorkbook(new FileInputStream( file ))
 
 					def sheet = book.getSheet("cabling_data")
 					assetEntityService.cablingReportData(assetCablesList, sheet)
@@ -719,7 +719,7 @@ class ReportsController {
 				log.error "Exception occurred while exporting cabling data: " + ExceptionUtil.stackTraceToString(ex)
 				flash.message = "Exception occurred while exporting data"
 				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
-				return;
+				return
 			}
 		}
 	}
@@ -729,7 +729,7 @@ class ReportsController {
 	def powerReport() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-		def projectInstance = securityService.getUserCurrentProject();
+		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
 			redirect(controller:'project',action:'list')
@@ -745,8 +745,8 @@ class ReportsController {
 			currentBundle = moveBundleInstanceList[0]?.id?.toString()
 			isCurrentBundle = false
 		}
-		
-		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
+
+		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models]
 	}
 	/*
@@ -768,7 +768,7 @@ class ReportsController {
 			def targetRacks = new ArrayList()
 			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
-			def project = securityService.getUserCurrentProject();
+			def project = securityService.getUserCurrentProject()
 			if (!project) {
 				flash.message = "Please select project to view Reports"
 				redirect(controller:'project',action:'list')
@@ -781,14 +781,14 @@ class ReportsController {
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
 			def reportsHasPermission = RolePermissions.hasPermission("reports")
-			
+
 			if(request.getParameterValues("sourcerack") != ['none']) {
 				def rack = request.getParameterValues("sourcerack")
 				if(rack[0] == "") {
 					moveBundles.each{ bundle->
 						bundle.sourceRacks.each{ sourceRack->
 							if( !sourceRacks.contains( sourceRack ) )
-								sourceRacks.add( sourceRack )		
+								sourceRacks.add( sourceRack )
 						}
 					}
 				} else {
@@ -819,9 +819,9 @@ class ReportsController {
 				}
 				targetRacks = targetRacks.sort { it.tag }
 			}
-			
+
 			def racks = sourceRacks + targetRacks
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def reportDetails = []
 			racks.each { rack->
 				def assets = rack.assets.findAll { it.assetType !='Blade' && moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }
@@ -841,11 +841,11 @@ class ReportsController {
 							if(cables.toPower){
 								switch(cables.toPower){
 									case "A": powerA += powerUseForConnector
-									break;
+									break
 									case "B": powerB += powerUseForConnector
-									break;
+									break
 									case "C": powerC += powerUseForConnector
-									break;
+									break
 								}
 							}
 						}
@@ -853,12 +853,12 @@ class ReportsController {
 						powerTBD += powerDesign
 					}
 				}
-				powerA = powerType != "Watts" ?  powerA ? (powerA / 120).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0 
+				powerA = powerType != "Watts" ?  powerA ? (powerA / 120).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0
 				powerB = powerType != "Watts" ?  powerB ? (powerB / 120).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
 				powerC = powerType != "Watts" ?  powerC ? (powerC / 120).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
 				powerTBD = powerType != "Watts" ?  powerTBD ? (powerTBD / 120).toFloat().round(1) : 0.0 : powerTBD ? Math.round(powerTBD):0
 				totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 120).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
-				
+
 				reportDetails << [location:rack.location?.toString(), room:rack.room?.toString(), rack:rack.tag, devices:assets.size(),
 								  powerA:powerA,powerB:powerB,powerC:powerC,powerTBD:powerTBD,totalPower:totalPower]
 			}
@@ -871,11 +871,11 @@ class ReportsController {
 					def filename = 	"Power_Report-${project.name}.xls"
 						filename = filename.replace(" ", "_")
 					response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
-					
-					def book = new HSSFWorkbook(new FileInputStream( file ));
-					
+
+					def book = new HSSFWorkbook(new FileInputStream( file ))
+
 					def sheet = book.getSheet("Power_Report")
-					
+
 					for ( int r = 1; r <= reportDetails.size(); r++ ) {
 						WorkbookUtil.addCell(sheet, 0, r, String.valueOf(reportDetails[r-1].location ))
 						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(reportDetails[r-1].room ))
@@ -887,17 +887,17 @@ class ReportsController {
 						WorkbookUtil.addCell(sheet, 7, r, String.valueOf(reportDetails[r-1].powerTBD ))
 						WorkbookUtil.addCell(sheet, 8, r, String.valueOf(reportDetails[r-1].totalPower ))
 					}
-					
+
 					book.write(response.getOutputStream())
 
 				} catch( Exception ex ) {
 					println "Exception occurred while exporting data"+ex
-					return;
+					return
 				}
 			} else if(params.output == "pdf"){
 				def filename = 	"Power_Report-${project.name}"
 					filename = filename.replace(" ", "_")
-				
+
 				chain(controller:'jasper',action:'index',model:[data:reportDetails],
 						params:["_format":"PDF","_name":"${filename}","_file":"Power_Report"])
 			}
@@ -905,7 +905,7 @@ class ReportsController {
 		}
 	}
 	def preMoveCheckList() {
-		def projectInstance = securityService.getUserCurrentProject();
+		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
 			redirect(controller:'project',action:'list')
@@ -934,11 +934,11 @@ class ReportsController {
 		}
 		flash.message = errorMsg
 		redirect( action:"preMoveCheckList")
-		
+
 	}
 	def applicationConflicts() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = securityService.getUserCurrentProject();
+		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
 			redirect(controller:'project',action:'list')
@@ -953,8 +953,8 @@ class ReportsController {
 	 * Used to display application selection criteria page.
 	 */
 	def applicationProfiles ={
-		
-	def project = securityService.getUserCurrentProject();
+
+	def project = securityService.getUserCurrentProject()
 	if (!project) {
 	  flash.message = "Please select project to view Reports"
 	  redirect(controller:'project',action:'list')
@@ -967,7 +967,7 @@ class ReportsController {
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},appOwnerList:appOwnerList.sort{it.lastName},
 				'selectedSme':params.smeByModel, 'selectedOwner':params.appOwner]
 	}
-	
+
 	/**
 	 * Used to populate sme select based on the bundle Selected
 	 * @param bundle
@@ -994,19 +994,19 @@ class ReportsController {
 	 */
 	def generateApplicationProfiles() {
 		def project = securityService.getUserCurrentProject()
-		def currentBundle 
+		def currentBundle
 		def currentSme
 		def applicationOwner
-		
+
 		def query = new StringBuffer(""" SELECT a.app_id AS id
-					FROM application a 
+					FROM application a
 					LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
 					LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 					LEFT OUTER JOIN person p ON p.person_id=a.sme_id
 					LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id
 					LEFT OUTER JOIN person p2 ON p2.person_id=ae.app_owner_id
 					WHERE ae.project_id = ${project.id} """)
-		
+
 		if(params.moveBundle == 'useForPlanning'){
 			def bundleIds = MoveBundle.getUseForPlanningBundlesByProject(project)?.id
 			query.append(" AND mb.move_bundle_id in (${WebUtil.listAsMultiValueString(bundleIds)}) ")
@@ -1014,17 +1014,17 @@ class ReportsController {
 			currentBundle = MoveBundle.get(params.moveBundle)
 			query.append(" AND mb.move_bundle_id=${params.moveBundle} ")
 		}
-		
+
 		if(params.smeByModel!='null'){
 			currentSme = Person.get(params.smeByModel)
 			query.append(" AND (p.person_id=${params.smeByModel} or p1.person_id=${params.smeByModel}) ")
 		}
-		
+
 		if(params.appOwner!='null'){
 			applicationOwner = Person.get(params.appOwner)
 			query.append(" AND p2.person_id=${params.appOwner} ")
 		}
-		
+
 		int assetCap = 100 // default value
 		if(params.report_max_assets){
 			try{
@@ -1037,7 +1037,7 @@ class ReportsController {
 		query.append(" LIMIT ${assetCap}")
 
 		log.info "query = ${query}"
-		
+
 		def applicationList = jdbcTemplate.queryForList(query.toString())
 
 		if( applicationList.size() > 500 ) {
@@ -1045,7 +1045,7 @@ class ReportsController {
 				Please adjust your criteria accordingly before resubmitting."""
 			redirect (action:'applicationProfiles', params:params)
 		}
-		
+
 		// TODO: we'd like to flush the session.
 		// def hibernateSession = sessionFactory.currentSession
 		ArrayList appList = new ArrayList()
@@ -1053,7 +1053,7 @@ class ReportsController {
 		applicationList.eachWithIndex{ app, idx ->
 			def assetEntity = AssetEntity.get(app.id)
 			def applicationInstance = Application.get(app.id)
-			def assetComment 
+			def assetComment
 			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
 			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
 			if(AssetComment.find("from AssetComment where assetEntity = ${applicationInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
@@ -1064,30 +1064,30 @@ class ReportsController {
 				assetComment = "blank"
 			}
 			def prefValue= userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
-			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)	
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
 			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
-			
+
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
 			def configMap = assetEntityService.getConfig('Application',validationType)
 			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
-			
+
 			def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
 			// TODO: we'd like to flush the session.
 			// GormUtil.flushAndClearSession(hibernateSession, idx)
-			appList.add([ app : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
+			appList.add([ app : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets,
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
-			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue,
 			  config:configMap.config, customs:configMap.customs,shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
 			  errors:params.errors, highlightMap:highlightMap])
-			
+
 		}
-		
+
 		return [applicationList:appList, moveBundle:currentBundle?:'Planning Bundles' , sme:currentSme?:'All' ,appOwner:applicationOwner?:'All', project:project]
 	}
 	def generateApplicationConflicts() {
@@ -1104,7 +1104,7 @@ class ReportsController {
 
 		if( params.moveBundle == 'useForPlanning' )
 			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, true, appOwner, assetCap)
-		
+
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
 			if ( !isProjMoveBundle ) {
@@ -1129,48 +1129,48 @@ class ReportsController {
 		def reqEvents = params.list("moveEvent").toList()
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def userDTFormat = getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
-		
+
 		if(reqEvents) {
 			def project = securityService.getUserCurrentProject()
 			def allBundles = reqEvents.find{it=='all'} ? true : false
 			def badReqEventIds
-			
+
 			if( !allBundles ){
 				reqEvents = reqEvents.collect {id-> NumberUtils.toDouble(id, 0).round() }
 				//Verifying events id are in same project or not.
 				badReqEventIds = moveEventService.verifyEventsByProject(reqEvents, project)
 			}
-			
+
 			//if found any bad id returning to the user
 			if( badReqEventIds ){
 				flash.message = "Event ids $badReqEventIds is not associated with current project.\
 								Kindly request for project associated  Event ids ."
 				return
 			}
-			
+
 			def argMap = ["type":AssetCommentType.ISSUE, "project":project]
 			def taskListHql = "FROM AssetComment WHERE project =:project AND commentType =:type "
-			
+
 			if(!allBundles){
 				taskListHql +=" AND moveEvent.id IN (:events) "
 				argMap <<["events":reqEvents]
 			}
-			
+
 			if( params.wUnresolved ){
 				taskListHql += "AND status != :status"
 				argMap << ["status":AssetCommentStatus.COMPLETED]
 			}
-			
+
 			// handle unpublished tasks
 			if (params.viewUnpublished)
 				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'true')
 			else
 				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'false')
-			
+
 			def viewUnpublished = RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished
 			if (!viewUnpublished) {
 				taskListHql += " AND isPublished = :isPublished "
-				argMap << ["isPublished": true]			
+				argMap << ["isPublished": true]
 			}
 
 			taskList = AssetComment.findAll(taskListHql, argMap)
@@ -1178,32 +1178,32 @@ class ReportsController {
 				taskList.addAll( params.wComment ? AssetComment.findAllByCommentTypeAndProject(AssetCommentType.COMMENT, project): [])
 			else
 				taskList.addAll( params.wComment ? AssetComment.findAllByCommentTypeAndProjectAndIsPublished(AssetCommentType.COMMENT, project, true): [])
-			
+
 			//Generating XLS Sheet
 			switch(params._action_tasksReport){
 				case "Generate Xls" :
 					  exportTaskReportExcel(taskList, tzId, userDTFormat, project, reqEvents)
-					  break;
-					  
+					  break
+
 				case "Generate Pdf" :
 					  exportTaskReportPdf(taskList, tzId, project)
-					  break;
-					  
+					  break
+
 				default :
-					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId, viewUnpublished:viewUnpublished, userDTFormat:userDTFormat, tzId:tzId]) 
-					 break;
+					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId, viewUnpublished:viewUnpublished, userDTFormat:userDTFormat, tzId:tzId])
+					 break
 			}
 		} else{
 			flash.message = "Please select move event to get the task report."
 			redirect( action:"retrieveBundleListForReportDialog", params:[reportId:"Task Report"])
 		}
-		
+
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Export task report in XLS format
-	 * @param taskList : list of tasks 
+	 * @param taskList : list of tasks
 	 * @param tzId : timezone
 	 * @param project : project instance
 	 * @param reqEvents : list of requested events.
@@ -1227,17 +1227,17 @@ class ReportsController {
 		//set MIME TYPE as Excel
 		response.setContentType( "application/vnd.ms-excel" )
 		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
-		
-		def book = new HSSFWorkbook(new FileInputStream( file ));
+
+		def book = new HSSFWorkbook(new FileInputStream( file ))
 
 		def tasksSheet = book.getSheet("Tasks")
 		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
 			'datePlanned','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
 			'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
-					
+
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, userDTFormat, 3, viewUnpublished)
-		
+
 
 		def exportTitleSheet = {
 			UserLogin userLogin = securityService.getUserLogin()
@@ -1248,7 +1248,7 @@ class ReportsController {
 			WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project.id).toString())
 			WorkbookUtil.addCell(titleSheet, 1, 5, eventsTitleSheet)
 			WorkbookUtil.addCell(titleSheet, 1, 6, userLogin.person.toString())
-				
+
 			def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
 			WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
 			WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
@@ -1262,10 +1262,10 @@ class ReportsController {
 
 		book.write(response.getOutputStream())
 	}
-	
+
 	/**
 	 * Export task report in pdf format
-	 * @param taskList : list of tasks 
+	 * @param taskList : list of tasks
 	 * @param tzId : timezone
 	 * @param project : project instance
 	 * @return : will generate a pdf file having task task list
@@ -1275,15 +1275,15 @@ class ReportsController {
 		def reportFields = []
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 		taskList.each{task ->
-			
+
 			def visibleDependencies = []
 			if (viewUnpublished)
 				visibleDependencies = task.taskDependencies
 			else
 				visibleDependencies = task.taskDependencies?.findAll{it?.predecessor?.isPublished}
-			
+
 			reportFields << [
-				'taskNumber':task.taskNumber?.toString() , 
+				'taskNumber':task.taskNumber?.toString() ,
 				'taskDependencies': WebUtil.listAsMultiValueString(visibleDependencies.predecessor?.comment) ,
 				"assetEntity":task.assetEntity?.assetName,"comment":task.comment,
 				"assignedTo":task.assignedTo? task.assignedTo.toString():"", "status":task.status,
@@ -1291,7 +1291,7 @@ class ReportsController {
 				"datePlanned":"","outStanding":"","dateRequired":"", 'workflow':"",
 				"clientName":project?.client?.name,"team":task.role? task.role.toString():"",
 				'projectName':project?.name,'notes':task.notes? WebUtil.listAsMultiValueString(task.notes):"",
-				'duration':task.duration ? task.duration.toString():"", 
+				'duration':task.duration ? task.duration.toString():"",
 				'estStart':task.estStart? TimeUtil.formatDate(getSession(), task.estStart):"",
 				'estFinish':task.estFinish? TimeUtil.formatDate(getSession(), task.estFinish): "",
 				'actStart':task.actStart? TimeUtil.formatDate(getSession(), task.actStart):"",
@@ -1309,13 +1309,13 @@ class ReportsController {
 					params:["_format":"PDF","_name":"${filename}","_file":"taskReport"])
 		}
 	}
-	
+
 	/**
 	 * used to render to server Conflicts selection criteria.
 	 */
 	def serverConflicts() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = securityService.getUserCurrentProject();
+		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
 			redirect(controller:'project',action:'list')
@@ -1325,7 +1325,7 @@ class ReportsController {
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
 	}
-	
+
 	/**
 	 * Used to generate server Conflicts.
 	 */
@@ -1348,7 +1348,7 @@ class ReportsController {
 				log.info("Invalid value given for assetCap: ${assetCap}")
 			}
 		}
-		
+
 		if( params.moveBundle == 'useForPlanning' ){
 				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, true, params, assetCap))
 		}
@@ -1362,7 +1362,7 @@ class ReportsController {
 				userPreferenceService.setPreference(PREF.MOVE_BUNDLE, "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, false, params, assetCap))
-				
+
 			}
 		}
 	}
@@ -1370,7 +1370,7 @@ class ReportsController {
 	 * used to render to application Migration Report selection criteria.
 	 */
 	def applicationMigrationReport() {
-	def project = securityService.getUserCurrentProject();
+	def project = securityService.getUserCurrentProject()
 	if (!project) {
 	  flash.message = "Please select project to view Reports"
 	  redirect(controller:'project',action:'list')
@@ -1396,15 +1396,15 @@ class ReportsController {
 		def currentSme
 		def currentBundle
 		def appList = []
-		if(params.moveBundle == 'useForPlanning'){		 
-			if(params.smeByModel!='null'){          
+		if(params.moveBundle == 'useForPlanning'){
+			if(params.smeByModel!='null'){
 				currentSme = Person.get(params.smeByModel)
 				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
 					[project:project,smes:currentSme])
 			}else {
 				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseForPlanningBundlesByProject(project))
 			}
-		}else{ 
+		}else{
 			currentBundle = MoveBundle.get(params.moveBundle)
 			if(params.smeByModel!='null'){
 				currentSme = Person.get(params.smeByModel)
@@ -1414,24 +1414,24 @@ class ReportsController {
 				applicationList = Application.findAllByMoveBundle(currentBundle)
 			}
 		}
-		
+
 		applicationList.each{
 			def applicationInstance = Application.get( it.id )
 			def appComments = applicationInstance.comments
 			def startTimeList = appComments.findAll{it.category == params.startCateory}.sort{it.actStart}?.actStart
 			def finishTimeList = appComments.findAll{it.category == params.stopCateory}.sort{it.actStart}?.actStart
-			
+
 			startTimeList.removeAll([null])
-			
+
 			def finishTime= finishTimeList ? finishTimeList[(finishTimeList.size()-1)] : null
 			def startTime = startTimeList ? startTimeList[0] : null
-			
-			def duration = new StringBuffer("");
+
+			def duration = new StringBuffer("")
 			def customParam
 			def windowColor
 			def workflow
 			def durationHours
-			
+
 			if(finishTime && startTime){
 				def dayTime = TimeCategory.minus(finishTime, startTime)
 				durationHours = (dayTime.days*24)+dayTime.hours
@@ -1455,10 +1455,10 @@ class ReportsController {
 				workflow.removeAll([null])
 			}
 			appList.add([ app : applicationInstance,startTime:startTime,finishTime:finishTime, duration: duration? duration : '',
-				 customParam: customParam ? customParam + (params.outageWindow == 'drRtoDesc' ? 'h': ''): '', windowColor:windowColor, 
+				 customParam: customParam ? customParam + (params.outageWindow == 'drRtoDesc' ? 'h': ''): '', windowColor:windowColor,
 				 workflow: workflow? workflow[0].duration+" "+workflow[0].durationScale : ''])
 		}
-	  
+
 	  return [appList:appList, moveBundle:currentBundle , sme:currentSme?:'All' , project:project]
 	}
 	/**
@@ -1466,7 +1466,7 @@ class ReportsController {
 	 */
 	def databaseConflicts() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-	def projectInstance = securityService.getUserCurrentProject();
+	def projectInstance = securityService.getUserCurrentProject()
 	if (!projectInstance) {
 	  flash.message = "Please select project to view Reports"
 	  redirect(controller:'project',action:'list')
@@ -1497,7 +1497,7 @@ class ReportsController {
 				log.info("Invalid value given for assetCap: ${assetCap}")
 			}
 		}
-		
+
 		if( params.moveBundle == 'useForPlanning' ){
 				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, true, assetCap)
 		}
@@ -1511,7 +1511,7 @@ class ReportsController {
 				userPreferenceService.setPreference(PREF.MOVE_BUNDLE, "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, false, assetCap)
-				
+
 			}
 		}
 	}
@@ -1521,7 +1521,7 @@ class ReportsController {
 	 */
 	def projectActivityMetrics() {
 		def projectInstance = controllerService.getProjectForPage(this, "ShowProjectDailyMetrics")
-		if (! projectInstance) 
+		if (! projectInstance)
 			return
 
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
@@ -1541,7 +1541,7 @@ class ReportsController {
 	def projectActivityMetricsExport() {
 
 		def projectInstance = controllerService.getProjectForPage(this, "ShowProjectDailyMetrics")
-		if (! projectInstance) 
+		if (! projectInstance)
 			return
 
 		def projectIds = params.list("projectId").toList()
@@ -1557,7 +1557,7 @@ class ReportsController {
 		} catch (Exception e) {
 			validDates = false
 		}
-		
+
 		if(projectIds && validDates) {
 			def allProjects = projectIds.find{it=='all'} ? true : false
 			def badProjectIds = false
@@ -1584,7 +1584,7 @@ class ReportsController {
 			} else {
 				projectIds = projectIds.collect { id -> NumberUtil.toLong(id) }
 				// Verify that the user can accesss the proj
-				projectIds.each{ id -> 
+				projectIds.each{ id ->
 					if (!userProjectsMap[id]) {
 						invalidProjectIds << id
 						badProjectIds = true
@@ -1606,7 +1606,7 @@ class ReportsController {
 		} else{
 			flash.message = "Please select at least one project and valid dates."
 			redirect( action:"projectActivityMetrics")
-		}		
+		}
 	}
 
 	/**
@@ -1623,10 +1623,10 @@ class ReportsController {
 		//set MIME TYPE as Excel
 		response.setContentType( "application/vnd.ms-excel" )
 		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
-		
-		def book = new HSSFWorkbook(new FileInputStream( file ));
+
+		def book = new HSSFWorkbook(new FileInputStream( file ))
 		def metricsSheet = book.getSheet("metrics")
-					
+
 		def projectNameFont = book.createFont()
 		projectNameFont.setFontHeightInPoints((short)12)
 		projectNameFont.setFontName("Arial")
@@ -1647,7 +1647,7 @@ class ReportsController {
 				WorkbookUtil.addCell(metricsSheet, 0, rowNum, am['project_code'])
 				WorkbookUtil.applyStyleToCell(metricsSheet, 0, rowNum, projectNameCellStyle)
 			}
-			
+
 			WorkbookUtil.addCell(metricsSheet, 1, rowNum, TimeUtil.formatDateTime(getSession(), am['metric_date'], TimeUtil.FORMAT_DATE_TIME_23))
 			WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Planning')
 			WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['planning_servers'])
@@ -1683,4 +1683,3 @@ class ReportsController {
 	}
 
 }
- 

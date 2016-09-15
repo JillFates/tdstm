@@ -64,7 +64,7 @@ class AssetEntityAttributeLoaderService {
 
 		try {
 			//workbook = Workbook.getWorkbook( stream )
-			workbook = new HSSFWorkbook(stream);
+			workbook = new HSSFWorkbook(stream)
 			sheet = workbook.getSheetAt( sheetNo )
 			// export should use the same map.
 			//check for column
@@ -109,7 +109,7 @@ class AssetEntityAttributeLoaderService {
 						validation: validation,
 						isRequired: (isRequired.equalsIgnoreCase("X"))?1:0,
 						isUnique: (isUnique.equalsIgnoreCase("X"))?1:0,
-						sortOrder: sortOrder 
+						sortOrder: sortOrder
 					)
 
 					// Make sure we can save the record
@@ -141,7 +141,7 @@ class AssetEntityAttributeLoaderService {
 						ex.printStackTrace()
 					}
 					// create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet
-					   
+
 					try {
 						dataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
 						def dataTransferAttributeMap = new DataTransferAttributeMap(
@@ -164,7 +164,7 @@ class AssetEntityAttributeLoaderService {
 					try {
 						eavAttributeSetId = 1
 						eavAttributeSet = EavAttributeSet.findById( eavAttributeSetId )
-						
+
 						def eavEntityAttribute = new EavEntityAttribute(
 							attribute:eavAttribute,
 							eavAttributeSet:eavAttributeSet,
@@ -181,9 +181,9 @@ class AssetEntityAttributeLoaderService {
 					 * If there then eavAttributeOptions.save() will be called corresponding to current attribute
 					 */
 					if(options != ""){
-						String attributeOptions = options;
+						String attributeOptions = options
 						String[] eavAttributeOptions = null
-						eavAttributeOptions = attributeOptions.split(",");
+						eavAttributeOptions = attributeOptions.split(",")
 						for( int attributeOption = 0; attributeOption < eavAttributeOptions.length; attributeOption++ ){
 							def eavAttributeOption = new EavAttributeOption(
 								attribute:eavAttribute,
@@ -202,7 +202,7 @@ class AssetEntityAttributeLoaderService {
 			ex.printStackTrace()
 		}
 	}
-	
+
 	/*
 	 * Used to check the sheet headers and return boolean value
 	 */
@@ -219,14 +219,14 @@ class AssetEntityAttributeLoaderService {
 			return true
 		}
 	}
-	
+
 	/*
-	 * Method to assign Assets to Bundles 
+	 * Method to assign Assets to Bundles
 	 */
 	def saveAssetsToBundle( def bundleTo, def bundleFrom, def assets ){
 		def moveBundleAssets
-		
-		// remove assets from source bundle 
+
+		// remove assets from source bundle
 		if ( bundleTo ) {
 			def moveBundleTo = MoveBundle.findById( bundleTo )
 			// get Assets into list
@@ -237,7 +237,7 @@ class AssetEntityAttributeLoaderService {
 			assetsList.each{asset->
 				if ( bundleFrom ) {
 					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo,project = $moveBundleTo.project.id where moveBundle = $bundleFrom  and id = $asset")
-				
+
 				} else {
 					/*def assetEntity = AssetEntity.findById( asset )
 					def assetsExist = AssetEntity.findByMoveBundle( moveBundleTo )
@@ -253,7 +253,7 @@ class AssetEntityAttributeLoaderService {
 		}
 		return moveBundleAssets
 	}
-	
+
 	// get StringArray from StringList
 	// TODO : JPM - Why not just use String.split(",") ?
 	def getStringArray(def stringList){
@@ -287,14 +287,14 @@ class AssetEntityAttributeLoaderService {
 		}
 		return cartAssetCounts
 	}
-	
+
 	/**
 	 * To Validate the Import Process If any Errors update DataTransferBatch and DataTransferValue
 	 * @author Srinivas
 	 * @param DataTransferBatch - the record of the transfer batch
-	 * @param AssetEntity - the asset to validate 
+	 * @param AssetEntity - the asset to validate
 	 * @param Map of the property attributes from the import
-	 * @return Map of [ flag, errorConflictCount] 
+	 * @return Map of [ flag, errorConflictCount]
 	 *     flag being true indicates that the asset was updated since the export was generated
 	 *     errorConflictCount indicates the number of fields that have conflicts
 	 */
@@ -340,14 +340,14 @@ class AssetEntityAttributeLoaderService {
 						updateChangeConflicts( dataTransferBatch, dtValue )
 						errorConflictCount++
 					}
-					
+
 				}
 			}
 		}
-		
+
 		return [flag:modifiedSinceExport, errorConflictCount:errorConflictCount]
 	}
-	
+
 	/*
 	 * Update ChangeConficts if value is changed in spreadsheet
 	 * @param dataTransferBatch, datatransfervalue
@@ -362,7 +362,7 @@ class AssetEntityAttributeLoaderService {
 		dtValue.save(flush:true)
 		log.warn "Conflict in change: $dtValue"
 	}
-	
+
 	/* To get DataTransferValue Asset MoveBundle
 	 * @param dataTransferValue, projectInstance
 	 * @author srinivas
@@ -378,15 +378,15 @@ class AssetEntityAttributeLoaderService {
 		}
 		return moveBundleInstance
 	}
-	 
+
 	/**
-	 * 
+	 *
 	 * @param bundleName
 	 * @param project
 	 * @return
 	 */
 	def createBundleIfNotExist(String bundleName, Project project){
-		def moveBundle = MoveBundle.findByNameAndProject( bundleName, project );
+		def moveBundle = MoveBundle.findByNameAndProject( bundleName, project )
 		if(!moveBundle){
 			moveBundle = new MoveBundle( name:bundleName, operationalOrder:1, workflowCode: project.workflowCode )
 			moveBundle.project = project
@@ -404,7 +404,7 @@ class AssetEntityAttributeLoaderService {
 	 * @param userLogin - the UserLogin object of the person invoking this method
 	 * @param device - the AssetEntity object that is being created or updated
 	 * @param mfgNameParam - name of the manufacturer
-	 * @param modelNameParam - name of the model 
+	 * @param modelNameParam - name of the model
 	 * @param deviceTypeParam - the Device Type of the device that is used to help resolve the model at times
 	 * @param deviceTypeMap - a map of all of the existing types that the user's import must match in order to insert/update devices' models
 	 * @param usize - the Usize of the asset used when creating new models
@@ -423,7 +423,7 @@ class AssetEntityAttributeLoaderService {
 		boolean mfgWasCreated = false
 		boolean modelWasCreated = false
 		// Flag to control if a combination should be cachable (e.g. blank mfg/model/type should NOT be cached)
-		boolean cachable = true 	
+		boolean cachable = true
 
 		String mfgName = mfgNameParam
 		String modelName = modelNameParam
@@ -435,11 +435,11 @@ class AssetEntityAttributeLoaderService {
 		String delim = '. '
 
 		// Flag when deviceType is supplied and is invalid which in most cases will result in an error or warning
-		boolean invalidDeviceType = true 	
+		boolean invalidDeviceType = true
 
 		// Get the Unknown Mfg in case we're doing a partial Mfg/Model reference and will go with the Unknown Mfg and corresponding Model
 		Manufacturer unknownMfg = Manufacturer.findByName('Unknown')
-		
+
 		// Double check the device type and set the deviceType to the proper case if found so we can use it below correctly
 		if (haveDeviceType) {
 			String dtlc = deviceType.toLowerCase()
@@ -449,7 +449,7 @@ class AssetEntityAttributeLoaderService {
 				invalidDeviceType = false
 				haveDeviceType = true
 			}
-		}	
+		}
 
 		log.debug "**** $methodName mfgNameParam=$mfgNameParam, modelNameParam=$modelNameParam, deviceType=($deviceTypeParam/$deviceType), deviceExists=$deviceExists, haveDeviceType=$haveDeviceType, invalidDeviceType=$invalidDeviceType"
 
@@ -478,15 +478,15 @@ class AssetEntityAttributeLoaderService {
 				warningMsg = StringUtil.concat(warningMsg, "Specified u-size ($usize) differs from existing model (${modelObj.usize})", delim)
 			}
 			if (haveDeviceType && deviceType != modelObj.assetType) {
-				warningMsg = StringUtil.concat(warningMsg, 
+				warningMsg = StringUtil.concat(warningMsg,
 					"Specified device type ($deviceTypeParam) differs from existing model type (${modelObj.assetType}) for ${device.model}", delim)
 			} else if (invalidDeviceType) {
-				warningMsg = StringUtil.concat(warningMsg, 
+				warningMsg = StringUtil.concat(warningMsg,
 					"Specified device type ($deviceTypeParam) was invalid, defaulted to existed model type (${modelObj.assetType})", delim)
 			}
 		}
 
-		// Helper closure used to create a model and possibly a manufacturer 
+		// Helper closure used to create a model and possibly a manufacturer
 		// @param mfgObj - the name of the Mfg if creating a new Mfg or the existing Mfg record
 		// @param createModelName - the name of the model to create
 		// @note This will assume the usize and deviceType from the local scope variables
@@ -572,7 +572,7 @@ class AssetEntityAttributeLoaderService {
 					}
 				}
 				break
-			} 
+			}
 
 			// Handle the NULLing situation which will set the mfg/model to Unknow/Unknown - DeviceType, which will be created as necessary
 			if (mfgName == ImportService.NULL_INDICATOR || modelName == ImportService.NULL_INDICATOR) {
@@ -597,13 +597,13 @@ class AssetEntityAttributeLoaderService {
 
 			List modelList = []
 			if (haveModelName)
-				modelList = findModelsByName(modelName)		
+				modelList = findModelsByName(modelName)
 			int modelListCount = modelList.size()
 
 			List filteredModels
 			int filteredCount
 
-			// 
+			//
 			// Case when user has supplied a valid/existing Mfg
 			//
 			if (mfgList) {
@@ -634,7 +634,7 @@ class AssetEntityAttributeLoaderService {
 
 				//
 				// Case when we have no mfg / model matches
-				// 
+				//
 				if (filteredCount == 0) {
 					log.debug "$methodName we have ZERO models matching Mfg"
 					if (modelListCount==0) {
@@ -663,9 +663,9 @@ class AssetEntityAttributeLoaderService {
 							errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_BLANK, delim)
 							break
 						}
-						
-	
-						// Try filtering down the original model list (w/o Mfg filtering) to get a model for the specified device type						
+
+
+						// Try filtering down the original model list (w/o Mfg filtering) to get a model for the specified device type
 						filteredModels = modelList.findAll { it.assetType == deviceType }
 						filteredCount = filteredModels.size()
 
@@ -725,9 +725,9 @@ class AssetEntityAttributeLoaderService {
 				log.error "$methodName Reached condition with existing Mfg that was unhandled"
 				errorMsg = UNEXPECTED_CONDITION + ' for known Mfg'
 				break
-			} 
+			}
 
-			// 
+			//
 			// Case when user has supplied a non-existing Mfg Name
 			//
 			// TODO : JPM 11/2014 : Should add logic to compare mfg name against model aliases to see if mfg name in the model name
@@ -752,7 +752,7 @@ class AssetEntityAttributeLoaderService {
 						errorMsg = StringUtil.concat(errorMsg, UNEXPECTED_CONDITION + ' without Mfg name', delim)
 					}
 					break
-				} 
+				}
 
 				// Okay so we have a model name and a legit device type so try filtering the model list on the deviceType
 				filteredModels = modelList.findAll { it.assetType == deviceType }
@@ -772,7 +772,7 @@ class AssetEntityAttributeLoaderService {
 				break
 			}
 
-			// 
+			//
 			// Case when user has NOT supplied the Mfg Name
 			//
 			if (! haveMfgName) {
@@ -808,7 +808,7 @@ class AssetEntityAttributeLoaderService {
 						// Didn't find any matched after filtering on the device type so go back to the master model list
 						if (modelListCount == 1) {
 							log.debug "$methodName CASE 123"
-							// We'll assign the model regardless of the deviceType but may warn 
+							// We'll assign the model regardless of the deviceType but may warn
 							performAssignment(modelList[0])
 						} else {
 							log.debug "$methodName CASE 123 multiple model matches"
@@ -822,7 +822,7 @@ class AssetEntityAttributeLoaderService {
 						log.debug "$methodName CASE 122 multiple model/type matches"
 					}
 					break
-				} 
+				}
 			}
 
 			errorMsg = UNEXPECTED_CONDITION + ' at the end of conditions'
@@ -832,7 +832,7 @@ class AssetEntityAttributeLoaderService {
 
 		return [errorMsg: errorMsg, warningMsg: warningMsg, mfgWasCreated: mfgWasCreated, modelWasCreated: modelWasCreated, cachable: cachable]
 	}
-	
+
 	/* To get DataTransferValue Asset Manufacturer
 	 * @param dataTransferValue
 	 * @author Lokanada Reddy
@@ -874,7 +874,7 @@ class AssetEntityAttributeLoaderService {
 		list = list.unique({ a, b -> a.id <=> b.id })
 		return list
 	}
-	
+
 	/**
 	 * Used to retrieve a list of all models and their aliases that have the same name
 	 * @param modelName - the name to lookup
@@ -889,13 +889,13 @@ class AssetEntityAttributeLoaderService {
 
 	// TODO: Move to AssetEntityService
 	/**
-	 * Method used to find model by manufacturrName as well as create model if modelnot exist and manufacturer exist. 
+	 * Method used to find model by manufacturrName as well as create model if modelnot exist and manufacturer exist.
 	 * @param manufacturerName : name of manufacturer
 	 * @param modelName : name of model
 	 * @param type : asset's asset type
 	 * @param create : a boolean flag to determine if model don't exist create model or not.
 	 * @param usize : usize of model (default 1)
-	 * @params dtvList : dataTransferValueList 
+	 * @params dtvList : dataTransferValueList
 	 * @return model instance
 	 */
 	List findOrCreateModel(UserLogin userLogin, Manufacturer mfg, String modelName, String deviceType, String usize, boolean canCreateMfgAndModel) {
@@ -952,7 +952,7 @@ class AssetEntityAttributeLoaderService {
 
 	// TODO: Move to AssetEntityService and change the code to check for existing connectors (see TM-3308)
 	/*
-	*  Create asset_cabled_Map for all asset model connectors 
+	*  Create asset_cabled_Map for all asset model connectors
 	*/
 	def createModelConnectors( assetEntity ){
 		if(assetEntity.model){
@@ -980,16 +980,16 @@ class AssetEntityAttributeLoaderService {
 
 	// TODO: Move to AssetEntityService
 	/*
-	 *  Create asset_cabled_Map for all asset model connectors 
+	 *  Create asset_cabled_Map for all asset model connectors
 	 */
 	def updateModelConnectors( assetEntity ) {
 		if (assetEntity.model) {
-			// Set to connectors to blank if associated 
+			// Set to connectors to blank if associated
 			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
 				assetToPort=null where assetTo = ? """,[assetEntity])
 			// Delete AssetCableMap for this asset
 			AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?",[assetEntity])
-			// Create new connectors 
+			// Create new connectors
 			def assetConnectors = ModelConnector.findAllByModel( assetEntity.model )
 			assetConnectors.each{
 				def assetCableMap = new AssetCableMap(
@@ -1012,10 +1012,10 @@ class AssetEntityAttributeLoaderService {
 			}
 		}
 	}
-	 
+
 	 /**
 	  * Storing imported asset type in EavAttributeOptions table if not exist .
-	  * @param assetTypeName : assetTypeName is imported assetTypeName 
+	  * @param assetTypeName : assetTypeName is imported assetTypeName
 	  * @param create : create (Boolean) a flag to determine assetType will get created or not
 	  * @return
 	  */
@@ -1032,7 +1032,7 @@ class AssetEntityAttributeLoaderService {
 		 }
 		 return assetType
 	}
-	 
+
 	// TODO: Move to AssetEntityService
 	/**
 	 * This method is used to find a person object after importing and if not found create it
@@ -1055,7 +1055,7 @@ class AssetEntityAttributeLoaderService {
 		} else {
 			firstName = importValue.trim()
 		}
-		 
+
 		//Serching Person in compnies staff list .
 		def personList = partyRelationshipService.getCompanyStaff(project.client.id)
 		def person = personList.find{it.firstName==firstName && it.lastName==lastName}
@@ -1069,18 +1069,18 @@ class AssetEntityAttributeLoaderService {
 			def partyRelationshipType = PartyRelationshipType.findById( "STAFF" )
 			 def roleTypeFrom = RoleType.findById( "COMPANY" )
 			 def roleTypeTo = RoleType.findById( "STAFF" )
-			 
+
 			 def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType,
 				 partyIdFrom :project.client, roleTypeCodeFrom:roleTypeFrom, partyIdTo:person,
 				 roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
 			 .save( insert:true, flush:true )
 		 }
-		 
+
 		return person
 	}
 
 	/**
-	 * A helper closure used to set property to null or blank if the import value equals "NULL" and the property supports NULL or is a String. 
+	 * A helper closure used to set property to null or blank if the import value equals "NULL" and the property supports NULL or is a String.
 	 * In the case of being a String, if not blankable, then it sets the field to "NULL"
 	 * @param The asset instance that is being updated
 	 * @param The name of the property
@@ -1092,7 +1092,7 @@ class AssetEntityAttributeLoaderService {
 	 * @references
 	 *    - nullFProps
 	 *    - blankFProps
-	 *    
+	 *
 	 */
 	def setToNullOrBlank(asset, propertyName, value, nullProps, blankProps ) {
 		def msg = ''
@@ -1103,7 +1103,7 @@ class AssetEntityAttributeLoaderService {
 			if ( nullProps.contains( propertyName ) ) {
 				asset[propertyName] = null
 			} else if ( type == "java.lang.String" ) {
-				asset[propertyName] = blankProps.contains( propertyName ) ? '' : 'NULL'	
+				asset[propertyName] = blankProps.contains( propertyName ) ? '' : 'NULL'
 			} else {
 				log.warn "setToNullOrBlank() Imported invalid value 'NULL' which is not allowed for $propertyName property."
 				msg = "Unable to set $propertyName to NULL"
@@ -1126,10 +1126,10 @@ class AssetEntityAttributeLoaderService {
 	 *   - dtvList
 	 *   - project
 	 */
-	def findAndValidateAsset(Project project, UserLogin userLogin, clazz, assetId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum) { 
-		
+	def findAndValidateAsset(Project project, UserLogin userLogin, clazz, assetId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum) {
+
 		// Try loading the application and make sure it is associated to the current project
-		def asset 
+		def asset
 		def clazzName = clazz.getName().tokenize('.')[-1]
 		def clazzMap = ['AssetEntity':'Server', 'Database':'Database', 'Application':'Application', 'Files':'Files']
 
@@ -1174,7 +1174,7 @@ class AssetEntityAttributeLoaderService {
 			return null
 
 		return asset
-	} 
+	}
 
 	/**
 	 * Used by the import process to save the assets and update various vars used to track status
@@ -1197,7 +1197,7 @@ class AssetEntityAttributeLoaderService {
 				saved = true 	// Mark as saved even though it wasn't changed
 			}
 		} else {
-			// Handle a new asset 
+			// Handle a new asset
 			saved = asset.validate() && asset.save(flush:true)
 			if (saved) {
 				insertCount++
@@ -1217,7 +1217,7 @@ class AssetEntityAttributeLoaderService {
 		return [insertCount, updateCount, errorCount]
 	}
 
-	/** 
+	/**
 	 * Used by the import process to update status and clear hibernate session
 	 * @param
 	 * @return void
@@ -1226,9 +1226,9 @@ class AssetEntityAttributeLoaderService {
 		if (dataTransferValueRow % clearEvery == (clearEvery - 1)) {
 			sessionFactory.getCurrentSession().flush()
 			sessionFactory.getCurrentSession().clear()
-			 
-			// Merging back the project to current session, 
-			// As it is being detach after flushing and clearing hibernate session 
+
+			// Merging back the project to current session,
+			// As it is being detach after flushing and clearing hibernate session
 
 			project = project.merge()
 		}
@@ -1257,7 +1257,7 @@ class AssetEntityAttributeLoaderService {
 	/**
 	 * Used by the asset import process to set the various properties that a common across the various asset classes
 	 * @param Project - the project that is being processed
-	 * @param Object the asset that is being updated 
+	 * @param Object the asset that is being updated
 	 * @param Map the DataTransferValue to update
 	 * @param Integer the row number being processed
 	 * @param List the list of warning messages
@@ -1265,7 +1265,7 @@ class AssetEntityAttributeLoaderService {
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
 	 * @param dtFormat - the date time format of the current user
 	 * @return void
-	 */	 
+	 */
 	def setCommonProperties(project, asset, dtv, rowNum, warnings, errorConflictCount, tzId, dtFormat) {
 		// def handled = true
 		def property = dtv.eavAttribute.attributeCode
@@ -1283,10 +1283,10 @@ class AssetEntityAttributeLoaderService {
 					if (! asset[property] && ! value ) {
 						newVal = projectService.getNewAssetTag(project, asset)
 					} else {
-						newVal = value ?: null						
+						newVal = value ?: null
 					}
 				} else {
-					newVal = value ?: null						
+					newVal = value ?: null
 				}
 				if (newVal)
 					asset[property] = newVal
@@ -1306,7 +1306,7 @@ class AssetEntityAttributeLoaderService {
 							asset[property] = newDate
 						}
 					} catch (e) {
-						warnings << "Invalid date (${value}) for $property on row $rowNum" + 
+						warnings << "Invalid date (${value}) for $property on row $rowNum" +
 							(asset.assetName ? ", asset '${asset.assetName}'" : '') +
 							', proper format mm/dd/yyyy'
 						errorConflictCount++
@@ -1340,7 +1340,7 @@ class AssetEntityAttributeLoaderService {
 			case "validation":
 				setValueOrDefault(asset, property, value, 'Discovery')
 				break
-			case ~/version|modifiedBy|lastUpdated/: 
+			case ~/version|modifiedBy|lastUpdated/:
 				// Do not want to all user to modify these properties
 				break
 			default:
@@ -1355,7 +1355,7 @@ class AssetEntityAttributeLoaderService {
 							}
 							//correctedPos = dtv.correctedValue
 							if ( asset[property] != correctedPos || ! asset.id ) {
-								asset[property] = correctedPos 
+								asset[property] = correctedPos
 							}
 						} catch ( Exception ex ) {
 							log.error "setCommonProperties() exception 1 : ${ex.getMessage()}"
@@ -1381,7 +1381,6 @@ class AssetEntityAttributeLoaderService {
 					}
 				}
 		}
-		
-	}
 
+	}
 }

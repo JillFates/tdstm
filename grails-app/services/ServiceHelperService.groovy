@@ -17,5 +17,5 @@ class ServiceHelperService {
 	Map getApplicationConfig() {
 		return grailsApplication.config
 	}
-	
+
 }

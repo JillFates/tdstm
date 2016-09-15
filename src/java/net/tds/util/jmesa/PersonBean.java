@@ -5,10 +5,10 @@ import java.util.Date;
 
 public class PersonBean implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private long id;
 	private long userLoginId;
 	private String firstName;
@@ -19,7 +19,7 @@ public class PersonBean implements Serializable {
 	private Date lastUpdated;
 	private Integer modelScore;
 	private String userCompany;
-	
+
 	public String getUserCompany() {
 		return userCompany;
 	}
@@ -37,7 +37,7 @@ public class PersonBean implements Serializable {
 	}
 
 	public PersonBean() {
-		
+
 	}
 
 	public long getId() {

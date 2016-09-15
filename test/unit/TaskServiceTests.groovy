@@ -3,7 +3,7 @@ import com.tdsops.tm.enums.domain.TimeScale
 import com.tds.asset.*
 import groovy.mock.interceptor.*
 import grails.test.GrailsUnitTestCase
-import org.apache.log4j.* 
+import org.apache.log4j.*
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
@@ -13,43 +13,43 @@ import spock.lang.Specification
 @TestFor(TaskService)
 @Mock([AssetComment, CommentNote, TaskDependency, RoleType, PartyRelationshipService, Person])
 class TaskServiceTests extends Specification {
-	
+
 	def taskService
 	def log
-	
+
 	void setup() {
-		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
-		//super.setUp() 
-		
+		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain
+		//super.setUp()
+
 		// build a logger...
-		BasicConfigurator.configure() 
+		BasicConfigurator.configure()
 		LogManager.rootLogger.level = Level.DEBUG
 		log = LogManager.getLogger("TaskService")
 
 		taskService = new TaskService()
-		
+
 		// use groovy metaClass to put the log into the class
 		TaskService.class.metaClass.getLog << {-> log}
 
 		// Perform some IOC on the task service that is necessary
 		taskService.securityService = new SecurityService()
 		taskService.partyRelationshipService = new PartyRelationshipService()
-		
+
 		// The domains to mock
 	}
-	
+
 	// @Test
 	void testCompareStatus() {
 		// Groovy compiler doesn't like the -1 parameter unless in parens
 		expect:
-		-1 == taskService.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.DONE) 
+		-1 == taskService.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.DONE)
 		0 == taskService.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.STARTED)
 		1 == taskService.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.READY)
-		-1 == taskService.compareStatus(AssetCommentStatus.STARTED, null) 
+		-1 == taskService.compareStatus(AssetCommentStatus.STARTED, null)
 		1 == taskService.compareStatus(null, AssetCommentStatus.READY)
 		0 == taskService.compareStatus(null,null)
 	}
-	
+
 	void testSetTaskStatus() {
 		when:
 			def whom = new Person(firstName:'Robin', lastName:'Banks')
@@ -70,7 +70,7 @@ class TaskServiceTests extends Specification {
 			task.metaClass.isRunbookTask { return true }
 			task.metaClass.addToNotes { note -> println "Note added: " + note}
 
-			// Test setting to STARTED 
+			// Test setting to STARTED
 			task.previousStatus = AssetCommentStatus.PENDING
 			task = taskService.setTaskStatus( task, AssetCommentStatus.STARTED, whom )
 		then:
@@ -92,7 +92,7 @@ class TaskServiceTests extends Specification {
 			task.resolvedBy != null
 			AssetCommentStatus.DONE == task.status
 			task.isResolved == 1
-		
+
 		when:
 			// Test reverting status TO STARTED from DONE
 			task.metaClass.getPersistentValue { prop -> return AssetCommentStatus.DONE }
@@ -107,18 +107,18 @@ class TaskServiceTests extends Specification {
 			AssetCommentStatus.STARTED == task.status
 			0 == task.isResolved
 	}
-		
+
 	void testGetMoveEventRunbookRecipe() {
 		def text = "[ tasks: [ [ 'id':1000, 'description':'Start' ] ] ]"
 		def mock = new MockFor(MoveEvent)
 		def me = new MoveEvent(runbookRecipe:text)
 		MoveEvent.metaClass.static.read = { id -> return id == 1 ? me : null }
-		
+
 		def recipe = taskService.getMoveEventRunbookRecipe(me)
 		def task = recipe[0].tasks[0]
-		
+
 		println recipe
-		
+
 		// See that it handles not getting an event as well
 		expect:
 			recipe.size() > 0
@@ -126,7 +126,7 @@ class TaskServiceTests extends Specification {
 			'Start' == task.description
 			taskService.getMoveEventRunbookRecipe(null) == null
 	}
-	
+
 	// Helper method used to check a task duration settings
 	boolean checkDurations(label, task, duration, scale) {
 		def valid = true
@@ -145,7 +145,7 @@ class TaskServiceTests extends Specification {
 		def task = new AssetComment()
 		task.assetEntity = new AssetEntity()
 
-		def msg 
+		def msg
 		def label
 
 		when:
@@ -222,7 +222,7 @@ class TaskServiceTests extends Specification {
 		def task = new AssetComment()
 		task.assetEntity = new AssetEntity()
 
-		def msg 
+		def msg
 		def label
 		shouldFail(Exception) {
 			label = 'Indirect with invalid property'
@@ -236,7 +236,7 @@ class TaskServiceTests extends Specification {
 		def task = new AssetComment()
 		task.assetEntity = new AssetEntity()
 
-		def msg 
+		def msg
 		def label
 		shouldFail(Exception) {
 			label = 'Indirect with invalid default'

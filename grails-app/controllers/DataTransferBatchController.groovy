@@ -37,7 +37,7 @@ class DataTransferBatchController {
 	def messageSource
 
 	// Data used within some of the controller methods static vars bundleMoveAndClientTeams and bundleTeamRoles
-	// TODO : JPM 9/2014 : Need to remove the 
+	// TODO : JPM 9/2014 : Need to remove the
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
 		'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
@@ -72,16 +72,16 @@ class DataTransferBatchController {
 			flash.message = params.message
 		}
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = securityService.getUserCurrentProject();
+		def project = securityService.getUserCurrentProject()
 		if (!project) {
 			flash.message = "Please select project to view Manage Batches"
 			redirect(controller:'project',action:'list')
 			return
 		}
 		if( !params.max ) params.max = 25
-		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", 
+		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I",
 			[sort:"dateCreated", order:"desc", max:params.max,offset:params.offset ? params.offset : 0] )
-		
+
 		def isMSIE = false
 		def userAgent = request.getHeader("User-Agent")
 		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
@@ -94,12 +94,12 @@ class DataTransferBatchController {
 	def public static allErrorsString = { domain, separator= " : " ->
 		def text = new StringBuilder()
 		def first = true
-		domain.errors.allErrors.each { 
+		domain.errors.allErrors.each {
 			println message(error: it)
-//			text.append( (first ? '' : separator) + messageSource.getMessage(it, null) ) 
-			text.append( (first ? '' : separator) + message(error:it) ) 
+//			text.append( (first ? '' : separator) + messageSource.getMessage(it, null) )
+			text.append( (first ? '' : separator) + message(error:it) )
 		}
-		
+
 		text.toString()
 	}
 
@@ -117,7 +117,7 @@ class DataTransferBatchController {
 		while (true) {
 			try {
 				(project, userLogin) = controllerService.getProjectAndUserForPage( this, 'Import' )
-				if (! project) { 
+				if (! project) {
 					error = flash.message
 					flash.message = null
 					break
@@ -134,7 +134,7 @@ class DataTransferBatchController {
 				// Call the service stub that knowns which actual service method to run
 				results = importService.invokeAssetImportProcess(project.id, userLogin.id, id, tzId, session)
 				error = results.error
-				
+
 			} catch (UnauthorizedException e) {
 				error = e.getMessage()
 			} catch (InvalidParamException e) {
@@ -163,7 +163,7 @@ class DataTransferBatchController {
 	 * @return : list of batches process as JSON
 	 */
 	def retrieveManageBatchList() {
-		def project = securityService.getUserCurrentProject();
+		def project = securityService.getUserCurrentProject()
 
 		def result = new ArrayList()
 
@@ -237,17 +237,17 @@ class DataTransferBatchController {
 
 	/**
 	 * Called by the Asset Post page via Ajax in order to show progress of how many assets have been posted
-	 * 	@param  : processed and total assts from session 
+	 * 	@param  : processed and total assts from session
 	 *	@return : processed data for Batch progress bar
 	 */
 	def retrieveProgress() {
 		def progressData = []
-		def total = session.getAttribute("TOTAL_BATCH_ASSETS") 
+		def total = session.getAttribute("TOTAL_BATCH_ASSETS")
 		def processed = session.getAttribute("TOTAL_PROCESSES_ASSETS")
 		progressData << [processed:processed, total:total]
 		render progressData as JSON
 	 }
-	
+
 	/* --------------------------------------
 	 * 	@author : Mallikarjun
 	 *	@return : data transfer batch error list
@@ -273,7 +273,7 @@ class DataTransferBatchController {
 			} else {
 				currentValues = assetEntity?.(it.attribute_code)
 			}
-			completeDataTransferErrorList << ["assetName":assetName, "assetTag":assetTag, "attribute":it.attribute_code, "error":it.error_text,  
+			completeDataTransferErrorList << ["assetName":assetName, "assetTag":assetTag, "attribute":it.attribute_code, "error":it.error_text,
 											  "currentValue":currentValues, "importValue":it.import_value]
 		}
 		completeDataTransferErrorList.sort{it.assetTag + it.attribute}
@@ -301,5 +301,5 @@ class DataTransferBatchController {
 			e.printStackTrace()
 		}
 	}
-	
+
 }

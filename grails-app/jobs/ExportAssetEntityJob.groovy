@@ -2,7 +2,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdsops.common.lang.ExceptionUtil
 
 class ExportAssetEntityJob {
-
+	
 	// Quartz Properties
 	def group = 'tdstm-export-asset'
 	// def concurrent = false

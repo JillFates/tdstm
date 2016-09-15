@@ -1,6 +1,6 @@
 import org.apache.shiro.SecurityUtils
 
-import com.tdssrc.grails.GormUtil;
+import com.tdssrc.grails.GormUtil
 
 class CustomSecurityTagLib {
 	static namespace = 'tds'
@@ -13,7 +13,7 @@ class CustomSecurityTagLib {
 		def returnVal = false
 		def permissionItem = attrs['permission']
 		def permission = Permissions.findByPermissionItem(permissionItem)
-		
+
 		List roles = []
 		def subject = SecurityUtils.subject
 		Permissions.Roles.values().each{
@@ -26,7 +26,7 @@ class CustomSecurityTagLib {
 			if(hasPermission)
 				returnVal = true
 		}
-		
+
 		if(returnVal)
 		  out << body()
 	}

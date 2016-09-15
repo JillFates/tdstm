@@ -10,7 +10,7 @@ class Database extends AssetEntity {
 
 	AssetClass assetClass = AssetClass.DATABASE
 	String dbFormat
-	
+
     static constraints = {
 		dbFormat( blank:false, nullable:false )
     }

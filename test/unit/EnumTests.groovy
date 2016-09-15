@@ -11,8 +11,8 @@ import spock.lang.Specification
  * Unit test cases for the Enum class
  */
 class EnumTests extends Specification {
-    
-	/** 
+
+	/**
 	 * closure used to perform a number of standard tests against an enum
 	 * @param e 	the Enum under test
 	 * @param obj 	One of the Enum elements
@@ -48,22 +48,22 @@ class EnumTests extends Specification {
 	}
 
 	void testSizeScale() {
-		expect:		
+		expect:
 			enumTest SizeScale, SizeScale.GB, 'GB', 'Gigabyte', 'KB', 'Kilobyte'
 	}
 
 	void testSpeedScale() {
-		expect:		
+		expect:
 			enumTest SpeedScale, SpeedScale.MBps, 'MBps', 'MegaByte/sec', 'Kbps', 'Kilobit/sec'
 	}
 
 	void testTaskDependencyType() {
-		expect:		
+		expect:
 			enumTest TaskDependencyType, TaskDependencyType.FS, 'FS', 'Finish-Start', 'FR', 'Finish-Ready'
 	}
 
 	void testTimeConstraintType() {
-		expect:		
+		expect:
 			enumTest TimeConstraintType, TimeConstraintType.ASAP, 'ASAP', 'As Soon As Possible', 'ALAP', 'As Late As Possible'
 	}
 

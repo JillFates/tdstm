@@ -24,7 +24,7 @@ class ShellTests extends Specification {
       assert retVal.exitValue == 0
       assert file.exists() == true
 
-    file.delete() 
+    file.delete()
   }
 
   public void testSystemLog() {

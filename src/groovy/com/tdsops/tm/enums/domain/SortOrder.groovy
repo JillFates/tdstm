@@ -1,15 +1,15 @@
-package com.tdsops.tm.enums.domain;
+package com.tdsops.tm.enums.domain
 
 import com.tdssrc.grails.EnumUtil
 
 /**
  * Define all sort types.
- * 
+ *
  * @author Diego Scarpa <diego.scarpa@bairesdev.com>
  *
  */
 enum SortOrder {
-	ASC("asc"), DESC("desc");
+	ASC("asc"), DESC("desc")
 
 	final String value
 

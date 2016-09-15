@@ -1,6 +1,4 @@
-
-
-public enum PermissionGroup {	
+public enum PermissionGroup {
 	ADMIN('Admin'),
 	ASSETENTITY('Asset Entity'),
 	ASSETTRACKER('Asset Tracker'),
@@ -22,23 +20,23 @@ public enum PermissionGroup {
 	ROOMLAYOUT('room'),
 	TASK('Task'),
 	USER('User')
-	
+
 	String name
-	
+
 	PermissionGroup(String name) {
 		 this.name = name
 	 }
-	
+
 	String getKey(){
 		name()
 	}
-	
+
 	static list() {
-		 [ 
+		 [
 			ADMIN,
 			MODEL,
 			MOVEEVENT,
-			PARTY, 
+			PARTY,
 			PERSON,
 			RACKLAYOUT,
 			REPORTS,
@@ -58,7 +56,7 @@ public enum PermissionGroup {
 		 	PROJECT
 		]
 	}
-	
+
 	String toString() {
 		return name
 	}

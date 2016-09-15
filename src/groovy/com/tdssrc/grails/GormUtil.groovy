@@ -3,18 +3,18 @@ package com.tdssrc.grails
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
-import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod 
+import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 import org.hibernate.ScrollableResults
 import org.hibernate.ScrollMode
 import com.tdsops.common.grails.ApplicationContextHolder
 
 public class GormUtil {
 
-    private static BindDynamicMethod bindDynamicMethod = new BindDynamicMethod()  
+    private static BindDynamicMethod bindDynamicMethod = new BindDynamicMethod()
 
-    /** 
-     * make the controller bindData method statically available, e.g. for service layer use 
-     * implemented as closure to allow static import emulating controller layer bindData usage 1:1 
+    /**
+     * make the controller bindData method statically available, e.g. for service layer use
+     * implemented as closure to allow static import emulating controller layer bindData usage 1:1
 	 *
  	 * Used to bind params to a domain object by using the Grails bindUtil method used in controllers
  	 * TODO : JPM 10/2014 : The bindData doesn't appear to work correctly in Grails 1.3.8 but hopefully will in 2.3
@@ -24,9 +24,9 @@ public class GormUtil {
 	 * @see http://grails.org/doc/2.4.3/ref/Controllers/bindData.html
 	 * @see http://codingwithpassion.blogspot.com/2014/06/grails-databind-in-service-layer.html
 	 */
-    static Closure bindData = { Object[] args ->  
-        bindDynamicMethod.invoke(args ? args[0] : null, BindDynamicMethod.METHOD_SIGNATURE, args)  
-    }  
+    static Closure bindData = { Object[] args ->
+        bindDynamicMethod.invoke(args ? args[0] : null, BindDynamicMethod.METHOD_SIGNATURE, args)
+    }
 
 	/**
 	 * Used to output GORM Domain constraints and update errors in human readable format
@@ -38,8 +38,8 @@ public class GormUtil {
 	def static String allErrorsString(domain, separator=" : ", locale=java.util.Locale.US) {
 		def messageSource = ApplicationContextHolder.getApplicationContext().messageSource
 		StringBuilder text = new StringBuilder()
-		domain?.errors?.allErrors?.each() { 
-			text.append("$separator ${messageSource.getMessage(it, locale)}") 
+		domain?.errors?.allErrors?.each() {
+			text.append("$separator ${messageSource.getMessage(it, locale)}")
 		}
 		text.toString()
 	}
@@ -56,7 +56,7 @@ public class GormUtil {
 		text.append('</ul>')
 		return text.toString()
 	}
-	
+
 	/*
 	 * Convert a list into a comma delimited of type String to use inside sql statement.
 	 * @param List
@@ -65,7 +65,7 @@ public class GormUtil {
 	 public static String asCommaDelimitedString( def list ){
 		return list.toString().replace("[","").replace("]","")
 	}
-	
+
 	/*
 	 * Convert a list into a quoted comma delimited of type String to use inside sql statement.
 	 * @param List
@@ -74,13 +74,13 @@ public class GormUtil {
 	 public static String asQuoteCommaDelimitedString( def list ) {
 		StringBuffer sb = new StringBuffer()
 		def first = true
-		list.each { 
+		list.each {
 			sb.append( (first?'':',') + "'${it}'")
 			first = false
 		}
 		return sb.toString()
 	}
-	
+
 	/**
 	 * This method is used to generate a list of the domain property names that the have the specified constraint. If a
 	 * value is passed then only those properties having the constraint value will be returned.
@@ -88,25 +88,25 @@ public class GormUtil {
 	 * @param constraintName - String that defines the constraint name (presently supports nullable and blank)
 	 * @param value - if passed then it will check the constraint value against that to further filter the list
 	 * @return List<String> containing the property name(s) in the domain with/without blank/null constraint
-	 * @usage getDomainPropertiesWithConstraint(Model, 'nullable', true) - returns all properties that are nullable 
+	 * @usage getDomainPropertiesWithConstraint(Model, 'nullable', true) - returns all properties that are nullable
 	 */
 	public static List<String> getDomainPropertiesWithConstraint(def domain, def constraintName, def value=null ) {
-		 
+
 		def fields = []
 		domain.constraints.each() { propName, props ->
 			def constraint = props.getAppliedConstraint( constraintName )?.getAt(constraintName)
 			switch (constraintName) {
 				case 'blank':
-					/* By default property blank is false except String prop so if false is requested as value 
+					/* By default property blank is false except String prop so if false is requested as value
 					 * and property is not string so considering as 'blank : false' */
 					def type = GrailsClassUtils.getPropertyType(domain, propName)?.getName()
-					if (type == 'java.lang.String' && constraint in [null , true]) 
+					if (type == 'java.lang.String' && constraint in [null , true])
 						constraint = true
-					else 
+					else
 						constraint = false
 					break
 
-				case ['nullable', 'range']:	
+				case ['nullable', 'range']:
 					// println "propName=$propName, constraintName=$constraintName, constraint=$constraint, value=$value"
 					break
 
@@ -126,7 +126,7 @@ public class GormUtil {
 	 * Used to validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
 	 * @param domainObj - the domain object to check the version on
 	 * @param versionFromForm - the original value of the domain version when it was originally read
-	 * @param label - the text to indicate the domain object in error message 
+	 * @param label - the text to indicate the domain object in error message
 	 * @throws RuntimeException if there no initialVersion value
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
@@ -187,7 +187,7 @@ public class GormUtil {
 
 	/**
 	 * This method is used to free up memory that is allocated in local threads when GORM is used in background processes
-	 * where there is no HTTP Request object in the session. This is a known problem documented in the blog post 
+	 * where there is no HTTP Request object in the session. This is a known problem documented in the blog post
 	 * http://burtbeckwith.com/blog/?p=73.
 	 */
 	static void releaseLocalThreadMemory() {
@@ -197,7 +197,7 @@ public class GormUtil {
 	/**
 	 * Used to access the maxSize constraint value on a property of a Domain class
 	 * @param domainClass - the Domain class to access the property on
-	 * @param propertyName - the name of the property to get the maxSize constraint of 
+	 * @param propertyName - the name of the property to get the maxSize constraint of
 	 * @return The value set in the maxSize constraint
 	 */
 	static Long getConstraintMaxSize(def domainClass, String propertyName) {
@@ -224,5 +224,4 @@ public class GormUtil {
 		def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
 		return grailsApp.isDomainClass( clazz?.getClass() )
 	}
-
 }

@@ -28,7 +28,7 @@ class PersonService {
 	def projectService
 	def securityService
 	def userPreferenceService
-	
+
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
 		"phd", "ph.d", "ph.d.", "m.d.", "md", "d.d.s.", "dds", // doctors
@@ -49,11 +49,11 @@ class PersonService {
 
 	static PERSON_DOMAIN_RELATIONSHIP_MAP = [
 		'application':['sme_id', 'sme2_id', 'shutdown_by', 'startup_by', 'testing_by'],
-		'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'], 
+		'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'],
 		'comment_note':['created_by_id'],
 		'asset_dependency':['created_by','updated_by'],
 		'asset_entity':['app_owner_id'],
-		'exception_dates':['person_id'], 
+		'exception_dates':['person_id'],
 		'model':['created_by', 'updated_by', 'validated_by'],
 		'model_sync':['created_by_id', 'updated_by_id', 'validated_by_id'],
 		'model_sync_batch':['created_by_id'],
@@ -91,7 +91,7 @@ class PersonService {
 		return last
 	}
 
-	/** 
+	/**
 	 * Used to find a person by their name that is staff of the specified company
 	 * @param company - The company that the person would be associated as Staff
 	 * @param nameMap - a map of the person's name (map [first, last, middle])
@@ -132,9 +132,9 @@ class PersonService {
 		}
 
 		return persons
-	}  
+	}
 
-	/** 
+	/**
 	 * Used to find a person by their name that is staff of the specified company
 	 * @param company - The company that the person would be associated as Staff
 	 * @param nameMap - a map of the person's name (map [first, last, middle])
@@ -161,7 +161,7 @@ class PersonService {
 		if (nameMap.middle) {
 			queryParams.middle = nameMap.middle
 			query.append(' AND p.middle_name=:middle' )
-			middle = true			
+			middle = true
 		}
 		if (nameMap.last) {
 			queryParams.last = nameMap.last
@@ -186,9 +186,9 @@ class PersonService {
 		}
 
 		return persons
-	}  
+	}
 
-	/** 
+	/**
 	 * Used to find a person by their name for a specified client
 	 * @param client - The client that the person would be associated as Staff
 	 * @param nameMap - a map of the person's name (map [first, last, middle])
@@ -211,16 +211,16 @@ class PersonService {
 		}
 
 		return persons
-	}  
+	}
 
 	/**
 	 * Used to find a person associated with a given project using a string representation of their name.
 	 * This method overloads the other findPerson as a convinence so one can just pass the string vs parsing the name and calling the alternate method.
 	 * @param A string representing a person's name (e.g. John Doe; Doe, John; John T. Doe)
 	 * @param Project the project/client that the person is associated with
-	 * @param The staff for the project. This is optional but recommended if the function is used repeatedly (use partyRelationshipService.getCompanyStaff(project?.client.id) to get list). 
+	 * @param The staff for the project. This is optional but recommended if the function is used repeatedly (use partyRelationshipService.getCompanyStaff(project?.client.id) to get list).
 	 * @param Flag used to indicate if the search should only look at staff of the client or all persons associated to the project
-	 * @return Null if name unable to be parsed or a Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is 
+	 * @return Null if name unable to be parsed or a Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is
 	 * found. If more than one match is found then isAmbiguous will be set to true.
 	 */
 	Map findPerson(String name, Project project, def staffList = null, def clientStaffOnly=true) {
@@ -234,7 +234,7 @@ class PersonService {
 	/**
 	 * Used to find a person by full name
 	 * @param A string representing a person's name (e.g. John Doe; Doe, John; John T. Doe)
-	 * @return Null if name unable to be parsed or a Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is 
+	 * @return Null if name unable to be parsed or a Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is
 	 * found. If more than one match is found then isAmbiguous will be set to true.
 	 */
 	Map findPersonByFullName(String name) {
@@ -244,28 +244,28 @@ class PersonService {
 			if (people.size() == 1) {
 				map.person = people.get(0)
 			} else {
-				map.isAmbiguous = true;
+				map.isAmbiguous = true
 			}
 		} else {
-			map.isAmbiguous = true;
+			map.isAmbiguous = true
 		}
-		
-		return map;
+
+		return map
 	}
-		
+
 	/**
 	 * Used to find a person associated with a given project using a parsed name map
 	 * @param nameMap - a Map containing person name elements
 	 * @param project - the project object that the person is associated with
 	 * @param staffList - deprecated argument that is no longer used
 	 * @param clientStaffOnly - a flag used to indicate if the search should only look at staff of the client or all persons associated to the project
-	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is 
+	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is
 	 * found then isAmbiguous will be set to true.
 	 */
 	Map findPerson(Map nameMap , Project project, List staffList=null, boolean clientStaffOnly=true) {
 		String mn = 'findPerson()'
 		def results = [person:null, isAmbiguous:false]
-		
+
 		log.debug "findPersion() attempting to find nameMap=$nameMap in project $project"
 
 		// Make sure we have a person
@@ -277,10 +277,10 @@ class PersonService {
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType='STAFF' " +
 			"and PR.roleTypeCodeFrom='COMPANY' and PR.roleTypeCodeTo='STAFF' and PR.partyIdFrom IN (:companies)"
 		List companies = [project.client]
-		
+
 		String where = " and P.firstName=:firstName"
 		String lastName = lastNameWithSuffix(nameMap)
-		Map queryParams = [ 
+		Map queryParams = [
 			companies: companies,
 			firstName: nameMap.first
 		]
@@ -301,7 +301,7 @@ class PersonService {
 
 		// Try finding the person with an exact match
 		List persons = Person.findAll(hql+where, queryParams)
-		if (persons) 
+		if (persons)
 			persons = persons.collect( {it[1]} )
 		log.debug "$mn Initial search found ${persons.size()} $nameMap"
 
@@ -312,11 +312,11 @@ class PersonService {
 		} else if (s == 1) {
 			results.person = persons[0]
 		} else {
-			
+
 			// Try to find match on partial
 
 			// Closure to construct the where and queryParams used below
-			def addQueryParam = { name, value -> 
+			def addQueryParam = { name, value ->
 				if (! StringUtil.isBlank(value) ) {
 					where += " and P.$name=:$name"
 					queryParams.put(name, value)
@@ -331,7 +331,7 @@ class PersonService {
 
 			log.debug "$mn partial search using $queryParams"
 			persons = Person.findAll(hql+where, queryParams)
-			if (persons) 
+			if (persons)
 				persons = persons.collect( {it[1]} )
 			log.debug "$mn partial search found ${persons.size()}"
 
@@ -354,7 +354,7 @@ class PersonService {
 	 * @param project - the project object that the person is associated with
 	 * @param staffList - deprecated argument that is no longer used
 	 * @param clientStaffOnly - a flag used to indicate if the search should only look at staff of the client or all persons associated to the project
-	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is 
+	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is
 	 * found then isAmbiguous will be set to true.
 	 */
 	Map findOrCreatePerson(String name , Project project, List staffList=null, boolean clientStaffOnly=true) {
@@ -386,7 +386,7 @@ class PersonService {
 			if ( ! results.person && nameMap.first ) {
 				log.info "findOrCreatePerson() Creating new person ($nameMap) as Staff for ${project.client}"
 				person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
-				
+
 				if ( ! person.validate() || ! person.save(insert:true, flush:true)) {
 					log.error "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
 					results.error = "Unable to create person ${nameMap}${GormUtil.allErrorsString( person )}"
@@ -433,7 +433,7 @@ class PersonService {
 			//println "a) split ($split) isa ${split.getClass()}"
 			def size = split.size()
 
-			if ( size == 2) { 
+			if ( size == 2) {
 				// Check to see if it is a Suffix vs last, first
 				def s = split[1]
 				if (SUFFIXES.contains( s.toLowerCase() )) {
@@ -443,7 +443,7 @@ class PersonService {
 					//println "b) splitting ${split[0]}"
 					split = split[0].split("\\s+").collect { it.trim() }
 					//println "b) split ($split) isa ${split.getClass()}"
-	
+
 				} else {
 					firstLast = false
 				}
@@ -490,7 +490,7 @@ class PersonService {
 				map.last = last
 				map.middle = split.join(' ')
 				size = 0
-			} 
+			}
 
 			if (size > 0) {
 				// Join what ever is left as the last name
@@ -521,9 +521,9 @@ class PersonService {
 
 		return map
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param fromPerson
 	 * @param toPerson
 	 * @return
@@ -531,7 +531,7 @@ class PersonService {
 	def mergePerson(Person fromPerson, Person toPerson){
 		def toUserLogin = UserLogin.findByPerson( toPerson )
 		def fromUserLogin = UserLogin.findByPerson( fromPerson )
-		
+
 		def personDomain = new DefaultGrailsDomainClass( Person.class )
 		def notToUpdate = ['beforeDelete','beforeInsert', 'beforeUpdate','id', 'firstName','blackOutDates']
 		personDomain.properties.each{
@@ -540,22 +540,22 @@ class PersonService {
 				toPerson."${prop}" = fromPerson."${prop}"
 			}
 		}
-		
+
 		if(!toPerson.save(flush:true)){
 			toPerson.errors.allErrors.each{println it}
 		}
-		
+
 		//Calling method to merge roles
 		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
 		//Updating person reference from 'fromPerson' to 'toPerson'
 		updatePersonReference(fromPerson, toPerson)
 		//Updating ProjectRelationship relation from 'fromPerson' to 'toPerson'
 		updateProjectRelationship(fromPerson, toPerson)
-		
-		sessionFactory.getCurrentSession().flush();
-		sessionFactory.getCurrentSession().clear();
+
+		sessionFactory.getCurrentSession().flush()
+		sessionFactory.getCurrentSession().clear()
 		fromPerson.delete()
-		
+
 		return fromPerson
 	}
 
@@ -605,7 +605,7 @@ class PersonService {
 							}
 						}
 					}
-						
+
 					if(isDeletable){
 						Map map = [person: person]
 						// Deletes Party Roles
@@ -629,13 +629,13 @@ class PersonService {
 						deleted = true
 
 					}
-				
+
 				}catch(Exception e){
 					status.setRollbackOnly()
 					messages << "There was an error trying to delete staff '${person.firstName}, ${person.lastName}'"
 					log.debug("An error occurred while trying to delete ${person.id}: " + e)
-				}		
-			}		
+				}
+			}
 		}else{
 			String msg
 			if(person.isSystemUser()){
@@ -685,7 +685,7 @@ class PersonService {
 			}
 		}
 		if(fromUserLogin && toUserLogin)
-			updateUserLoginRefrence(fromUserLogin, toUserLogin);
+			updateUserLoginRefrence(fromUserLogin, toUserLogin)
 	}
 
 	/**
@@ -742,7 +742,7 @@ class PersonService {
 					p.party_relationship_type_id='${relation.prType}' AND p.party_id_from_id =${relation.pIdFrom} \
 					AND p.party_id_to_id =${toPerson.id} AND p.role_type_code_from_id='${relation.rTypeCodeFrom}'\
 					AND p.role_type_code_to_id ='${relation.rTypeCodeTo}'")
-				
+
 				def where = " WHERE party_relationship_type_id = '${relation.prType}' \
 					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
 					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}"
@@ -835,7 +835,7 @@ class PersonService {
 		def skipped = 0
 		def cleared = 0
 		def messages = []
-		
+
 		if (ids) {
 			for (id in ids) {
 				if (id.isLong()) {
@@ -899,7 +899,7 @@ class PersonService {
 										messages << "Staff '${person.firstName}, ${person.lastName}' unable to be deleted due it contains $column association with asset(s)."
 										foundAssoc=true
 										return
-									}								
+									}
 								}
 							}
 							if (foundAssoc)
@@ -910,7 +910,7 @@ class PersonService {
 							skipped++
 							continue
 						}
-	
+
 						//delete references
 						log.info "Bulk deleting person $id $person"
 						Person.executeUpdate("Delete PartyRole p where p.party=:person", map)
@@ -922,7 +922,7 @@ class PersonService {
 				}
 			}
 		}
-		
+
 		return [deleted: deleted, skipped: skipped, cleared: cleared, messages: messages]
 	}
 
@@ -932,7 +932,7 @@ class PersonService {
 	 * @param eventId - the id of the event to manage the assignment of
 	 * @param teamCode - the team code for the assigment
 	 * @param toAssign - indicates if the assignment should be added (1) or removed (0)
-	 * @return A String that when blank indicates success otherwise will contain an error message 
+	 * @return A String that when blank indicates success otherwise will contain an error message
 	 */
 	String assignToProjectEvent(UserLogin byWhom, personId, eventId, teamCode, toAssign ) {
 		String message = ""
@@ -993,7 +993,7 @@ class PersonService {
 
 	/**
 	 * Used to validate that a user has the permissions to edit Staffing that the person/project are accessible as well. This will
-	 * validate and lookup values for project:project, person:person, teamRoleType:teamRoleType. If there are any problems it will 
+	 * validate and lookup values for project:project, person:person, teamRoleType:teamRoleType. If there are any problems it will
 	 * throw the appropriate Exception.
 	 * @param user- the UserLogin that is attempting to edit staffing
 	 * @param projectId - the id of the project to assign/remove a person from
@@ -1030,7 +1030,7 @@ class PersonService {
 
 		RoleType teamRoleType
 		if (teamCode) {
-			teamRoleType = RoleType.get(teamCode) 
+			teamRoleType = RoleType.get(teamCode)
 			if (! teamRoleType || ! teamRoleType.isTeamRole() ) {
 				log.warn "assignToProject() user $user called with invalid team code $teamCode"
 				throw new InvalidParamException("The specified team code was invalid")
@@ -1059,7 +1059,7 @@ class PersonService {
 	 * @param forEdit - flag that when set to true will validate the accessor has permission to edit
 	 * @return true if byWhom has access to the person otherwise false
 	 */
-	boolean hasAccessToPerson(Person byWhom, Person personToAccess, boolean forEdit=false, boolean reportViolation=true) 
+	boolean hasAccessToPerson(Person byWhom, Person personToAccess, boolean forEdit=false, boolean reportViolation=true)
 		throws UnauthorizedException {
 
 	//
@@ -1094,7 +1094,7 @@ class PersonService {
 		}
 	}
 
-	/** 
+	/**
 	 * Used to associate a person to a project for a given team code
 	 * @param byWhom - the user performing the action
 	 * @param projectId - the id number of the project to assign the person to
@@ -1115,7 +1115,7 @@ class PersonService {
 
 	}
 
-	/** 
+	/**
 	 * Used to associate a person to a project as staff
 	 * @param byWhom - the user performing the action
 	 * @param project - the project to assign the person to
@@ -1134,7 +1134,7 @@ class PersonService {
 				auditService.logMessage("$byWhom assigned ${person} to project '${project.name}' on team $teamCode")
 			} else {
 				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
-			}			
+			}
 		} else {
 			println "addToProjectSecured - isAssignedToProjectTeam returned that it was assigned to project team"
 			log.warn "addToProjectTeam() called for project ${project}, person ${person}, team ${teamCode} but already exists"
@@ -1142,7 +1142,7 @@ class PersonService {
 
 	}
 
-	/** 
+	/**
 	 * Used to assign a teamCode to a Person
 	 * @param person - the person to assign the team to
 	 * @param teamCode - the team code to associate to the person
@@ -1153,11 +1153,11 @@ class PersonService {
 				auditService.logMessage("$byWhom assigned ${person} to team $teamCode")
 			} else {
 				throw new DomainUpdateException("An error occurred while trying to assign a person to a team")
-			}			
+			}
 		}
 	}
 
-	/** 
+	/**
 	 * Used to associate a person to a project as staff
 	 * @param byWhom - the user performing the action
 	 * @param projectId - the id number of the project to add the person to
@@ -1174,9 +1174,9 @@ class PersonService {
 		addToProjectSecured(byWhom, map.project, map.person)
 	}
 
-	/** 
+	/**
 	 * Used to associate a person to a project as staff (Secured) which is only used if permissions were already checked
-	 * if the 
+	 * if the
 	 * @param user - the user performing the action
 	 * @param projectId - the id number of the project to remove the person from
 	 * @param personId - the id of the person to update
@@ -1189,7 +1189,7 @@ class PersonService {
 				auditService.logMessage("$byWhom assigned ${person} to project ${project.name} as STAFF")
 			} else {
 				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
-			}			
+			}
 		}
 	}
 
@@ -1221,8 +1221,8 @@ class PersonService {
 				}
 			}
 		}
-		mes?.each { 
-			it.delete() 
+		mes?.each {
+			it.delete()
 			c++
 		}
 		return c
@@ -1250,7 +1250,7 @@ class PersonService {
 		return event
 	}
 
-	/** 
+	/**
 	 * Used to remove a person from a team on a project which will also clear out references to MoveEventStaff
 	 * for the given team.
 	 * @param user - the user performing the action
@@ -1271,7 +1271,7 @@ class PersonService {
 		auditService.logMessage("$user unassigned ${map.person} from team $teamCode of project ${map.project.name}")
 	}
 
-	/** 
+	/**
 	 * Used to remove a person from a project as staff and also clear out various association that the individual may have
 	 * When disassociating a person from the project there are a few things to be done:
 	 * 	  1. Remove their association to the project in PartyRelationship for STAFF and any TEAM relations
@@ -1305,14 +1305,14 @@ class PersonService {
 		}
 
 		// Remove the person from the project
-		PartyRelationship prProjectStaff = getProjectReference(map.project, map.person) 
+		PartyRelationship prProjectStaff = getProjectReference(map.project, map.person)
 		if (prProjectStaff) {
 			log.debug "removeFromProject() deleting PartyRelationship $prProjectStaff"
 			prProjectStaff.delete()
 			metrics.staffUnassigned = 1
 		} else {
 			log.warn "removeFromProject() No Project Staff record found for project $projectId and person $personId"
-		} 
+		}
 
 		Map qparams = [project:map.project, person:map.person]
 
@@ -1330,7 +1330,7 @@ class PersonService {
 				userPreferenceService.removeProjectAssociatedPreferences(targetUserLogin)
 			}
 		}
-		
+
 
 
 		qparams.person = map.person.id.toString()
@@ -1342,7 +1342,7 @@ class PersonService {
 		def employer = map.person.company
 		// log.debug "removeFromProject() project=${map.project.id}, employer=$employer (${employer.id}), project client=${map.project.client} (${map.project.client.id})"
 		if (map.project.client.id != employer.id) {
-			
+
 			qparams.person = map.person
 
 			sql = 'update AssetEntity a set a.appOwner=null where a.project=:project and a.appOwner=:person'
@@ -1358,7 +1358,7 @@ class PersonService {
 		auditService.logMessage("$user unassigned ${map.person} from project ${map.project.name} - results $metrics")
 	}
 
-	/** 
+	/**
 	 * Used to associate a person to a project as staff
 	 * @param user - the user performing the action
 	 * @param projectId - the id number of the project to remove the person from
@@ -1391,7 +1391,7 @@ class PersonService {
 		}
 	}
 
-	/** 
+	/**
 	 * Used to remove a person from a project as staff and also clear out references to MoveEventStaff
 	 * @param user - the user performing the action
 	 * @param projectId - the id number of the project to remove the person from
@@ -1411,7 +1411,7 @@ class PersonService {
 
 	/**
 	 * Used to determine if a person is assigned to a project as a STAFF member
-	 * @param person - the person whom to check 
+	 * @param person - the person whom to check
 	 * @param project - the project to check if user is assigned to
 	 * @return The company whom the person is employeed
 	 */
@@ -1421,7 +1421,7 @@ class PersonService {
 
 	/**
 	 * Used to determine if a person is assigned to a project as a STAFF member
-	 * @param person - the person whom to check 
+	 * @param person - the person whom to check
 	 * @param project - the project to check if user is assigned to
 	 * @return The company whom the person is employeed
 	 */
@@ -1432,7 +1432,7 @@ class PersonService {
 	/**
 	 * Used to determine if a person is assigned to a project as a STAFF member
 	 * @param project - the project to check if user is assigned to
-	 * @param person - the person whom to check 
+	 * @param person - the person whom to check
 	 * @param teamCode - the team code
 	 * @return The company whom the person is employeed
 	 */
@@ -1445,7 +1445,7 @@ class PersonService {
 	/**
 	 * Used retrieve the 'STAFF' PartyRelationship reference for a person to a particular project
 	 * @param project - the project to check if user is assigned to
-	 * @param person - the person whom to check 
+	 * @param person - the person whom to check
 	 * @param teamCode - the team code
 	 * @return The PartyRelationshipReference that represents the person's relationship to a project
 	 */
@@ -1456,7 +1456,7 @@ class PersonService {
 	/**
 	 * Used retrieve the Team PartyRelationship reference for a person to a particular project
 	 * @param project - the project to check if user is assigned to
-	 * @param person - the person whom to check 
+	 * @param person - the person whom to check
 	 * @param teamCode - the team code
 	 * @return The company whom the person is employeed
 	 */
@@ -1479,8 +1479,8 @@ class PersonService {
 	}
 
 	/**
-	 * Used to determine if a person is assigned to an Event for a particular team role 
-	 * @param person - the person whom to check 
+	 * Used to determine if a person is assigned to an Event for a particular team role
+	 * @param person - the person whom to check
 	 * @param event - the event to check if user is assigned to
 	 * @param teamCode - the team code
 	 * @return The company whom the person is employeed
@@ -1491,7 +1491,7 @@ class PersonService {
 
 	/**
 	 * Used to retrieve an MoveEventStaff reference for a person assigned to an event with a give team code
-	 * @param person - the person whom to check 
+	 * @param person - the person whom to check
 	 * @param event - the event to check if user is assigned to
 	 * @param teamCode - the team code
 	 * @return The MoveEventStaff record if found otherwise null
@@ -1583,7 +1583,7 @@ class PersonService {
 		return projects
 	}
 
-	/** 
+	/**
 	 * Used to determine if the person is associated with the project
 	 * @param person - the person to check
 	 * @param project - the project to see if person has access to
@@ -1594,23 +1594,23 @@ class PersonService {
 		def found = false
 		if (projects){
 			found = ( projects.find { it.id == project.id } != null )
-		}	
+		}
 		return found
 	}
 
 	/**
-	 * Used to validate that the user can access a person and will respond with appropriate 
+	 * Used to validate that the user can access a person and will respond with appropriate
 	 * HTTP responses based on access constraints (e.g. Unauthorized or Not Found)
 	 * @param personId - the id of the person to access
 	 * @param byWhom - the Person that is attempting to access the Person
 	 * @return Person - the person if can access or null
 	 */
-	Person validatePersonAccess(personId, Person byWhom) 
+	Person validatePersonAccess(personId, Person byWhom)
 		throws UnauthorizedException, InvalidParamException, EmptyResultException {
 
 		if (!byWhom) throw new UnauthorizedException('Must specify whom is accessing person')
-		
-		if (! NumberUtil.isPositiveLong(personId))  throw new InvalidParamException('Invalid person id requested')	
+
+		if (! NumberUtil.isPositiveLong(personId))  throw new InvalidParamException('Invalid person id requested')
 
 		// If not edit own account, the user must have privilege to edit the account
 		boolean editSelf = ( NumberUtil.toLong(personId) == NumberUtil.toLong(byWhom.id) )
@@ -1632,26 +1632,26 @@ class PersonService {
 	}
 
 	/**
-	 * Used by controller update an actual Person and possibly UserLogin. The logic works for cases where user updating their own 
+	 * Used by controller update an actual Person and possibly UserLogin. The logic works for cases where user updating their own
 	 * account as well as an administrator updating others. In the case of the latter, there are more things that can be updated.
-	 * @param params - the form params that were passed 
+	 * @param params - the form params that were passed
 	 * @param byWhom - The person that is performing the update
 	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
 	 * @return The Person record being updated or throws an exception for various issues
 	 */
-	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false) 
+	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false)
 		throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
 		Person person = validatePersonAccess(params.id, byWhom)
 		def session = WebUtils.retrieveGrailsWebRequest().session
 		if(!isAssociatedTo(byWhom, person.company)){
 			throw new UnauthorizedException("You do not have permission to manage staffing for the user's company")
 		}
-	
+
 		def ret = []
 		params.travelOK == "1" ? params : (params.travelOK = 0)
-		
+
 		if (!person.staffType && !params.staffType) params.staffType = 'Hourly'
-		
+
 		// TODO : JPM 8/31/2015 : Replace person.properties = params with proper field assignments
 		person.properties = params
 
@@ -1672,8 +1672,8 @@ class PersonService {
 		if ( ! person.save(flush:true) ) {
 			log.error "updatePerson() unable to save $person : " + GormUtil.allErrorsString(person)
 			throw new DomainUpdateException('An error occurred while attempting to save person changes')
-		}			
-	
+		}
+
 		UserLogin userLogin = securityService.getPersonUserLogin( person )
 		if (userLogin) {
 			if (params.newPassword) {
@@ -1768,15 +1768,15 @@ class PersonService {
 	}
 
 	/**
-	 * Used by controller to create a Person. 
-	 * @param params - the form params that were passed 
+	 * Used by controller to create a Person.
+	 * @param params - the form params that were passed
 	 * @param byWhom - The person that is performing the update
 	 * @param companyId - The person company
 	 * @param defaultProject - this is the byWhom's currentProject that the person will be assigned to if the company is the project.client
 	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
 	 * @return The Person record being created or throws an exception for various issues
 	 */
-	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin=false) 
+	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin=false)
 		throws DomainUpdateException, InvalidParamException {
 
 		def companyParty
@@ -1822,7 +1822,7 @@ class PersonService {
 					}
 					if (teamCodes) {
 						// Assign the person to the appropriate teams
-						partyRelationshipService.updateAssignedTeams(person, teamCodes)						
+						partyRelationshipService.updateAssignedTeams(person, teamCodes)
 					}
 
 					// If the byUser's current project.client is the same as the new person's company then we'll

@@ -13,7 +13,7 @@ class ModelSync {
 	Integer bladeLabelCount
 	String bladeHeight = 'Half'
 
-	// Product information 
+	// Product information
 	Integer usize
 	Integer useImage
 	Integer height
@@ -27,23 +27,23 @@ class ModelSync {
 	String modelFamily
 	Date endOfLifeDate
 	String endOfLifeStatus
-	String sourceURL		// URL of where model data was derived from	
+	String sourceURL		// URL of where model data was derived from
 
 	// Room Associated properties
     Boolean roomObject		// TODO change to tinyint 0/1
-	
+
 	Integer	masterVersion	// This contains the model's version from the master
-	
+
 	Person createdBy
 	Person updatedBy
 	Person validatedBy
-	
+
 	// Properties distinct to ModelSync
 
 	// TO BE DELETED
 	String importStatus
 	Integer sourceTDS
-	Integer sourceTDSVersion	
+	Integer sourceTDSVersion
 	long modelTempId
 	String aka
 	long manufacturerTempId
@@ -51,13 +51,13 @@ class ModelSync {
 	byte[] frontImage
 	byte[] rearImage
 	Project modelScope
-		
+
 	static belongsTo = [ batch: ModelSyncBatch,
 	 	manufacturer: Manufacturer
 	]
-	
+
 // 	static hasMany = [ modelConnectors : ModelConnectorSync ]
-	
+
 	static constraints = {
 		modelName( blank:false, nullable:false, unique:['manufacturer'])
 		manufacturer( nullable:false )
@@ -87,7 +87,7 @@ class ModelSync {
 		createdBy( nullable:true )
 		updatedBy( nullable:true )
 		validatedBy( nullable:true )
-		
+
 		// TODO - DELETE THIS
 		modelScope( nullable:true )
 		frontImage( nullable:true )
@@ -95,7 +95,7 @@ class ModelSync {
 		sourceTDS( nullable:true )
 		sourceTDSVersion( nullable:true )
 	}
-	
+
 	/*
 	static constraints = {
 		modelName( blank:false, nullable:false )
@@ -132,12 +132,11 @@ class ModelSync {
 		aka( blank:true, nullable:true)
 		sourceTDS( nullable:true )
 		sourceTDSVersion( nullable:true )
-		
 
 	}
 	*/
-	
-	static mapping  = {	
+
+	static mapping  = {
 		version false
 		columns {
 			id column:'model_id'

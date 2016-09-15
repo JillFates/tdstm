@@ -34,7 +34,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 class ImportService {
 
 	boolean transactional = true
-	
+
 	def assetEntityAttributeLoaderService
 	def assetEntityService
 	def deviceService
@@ -46,8 +46,8 @@ class ImportService {
 	def partyRelationshipService
 
 	def sessionFactory
-	
-	// The number of assets to process before clearing the hibernate session 
+
+	// The number of assets to process before clearing the hibernate session
 	static final int CLEAR_SESSION_AFTER = 100
 
 	static final String indent = '&nbsp;&nbsp;&nbsp;'
@@ -78,13 +78,13 @@ class ImportService {
 					securityService.reportViolation("getAndValidateBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)", userLogin)
 					errorMsg = 'Unable to locate specified batch'
 					dtb = null
-				}			
+				}
 			}
 		}
 		return [dtb, errorMsg]
 	}
 
-	/** 
+	/**
 	 * Used by the process methods to peform the common validation checks before processing
 	 * @param project - the project that the user is logged into and the batch is associated with
 	 * @param userLogin - the user login object of whom invoked the process
@@ -132,14 +132,14 @@ class ImportService {
 	}
 
 	/**
-	 * Utility method for tbeh batch processing to load the import batch data 
+	 * Utility method for tbeh batch processing to load the import batch data
 	 * @param batchId - the batch id number to process
 	 * @return a map containing the following elements:
 	 *		assetsInBatch - the number of assets in the batch
 	 *		eavAttributeSet - the attribute set for set #1
 	 *		staffList - the company staff for the project associated with the batch
 	 *      dataTransferValueRowList - the list of DataTransferValue row ids
-	 */	
+	 */
 	private Map loadBatchData(DataTransferBatch dtb) {
 		Project project = dtb.project
 
@@ -153,18 +153,18 @@ class ImportService {
 		if (domainName.equals('AssetEntity')) {
 			domainName = 'Server'
 		}
-		// TODO : JPM 11/2014 : loadBatchData() has hard-code AssetEntity to Server switch for EavAttributeSet - someday it should just be Device...	
+		// TODO : JPM 11/2014 : loadBatchData() has hard-code AssetEntity to Server switch for EavAttributeSet - someday it should just be Device...
 		data.eavAttributeSet = EavAttributeSet.findByAttributeSetName(domainName)
 		assert data.eavAttributeSet != null
 
 		// log.debug "loadBatchData(${dtb.id}) for dtb.eavEntityType?.domainName=${dtb.eavEntityType?.domainName}, domainName=[${domainName}], data.eavAttributeSet=${data.eavAttributeSet}"
 
 		return data
-	} 
+	}
 
 	/**
 	 * Used to update the progressService with the current state of the import job
-	 * @param progressKey - the key used to access the 
+	 * @param progressKey - the key used to access the
 	 * @param current - index of the current record
 	 * @param total - the index of the total number of records to process
 	 */
@@ -193,7 +193,7 @@ class ImportService {
 
 	/**
 	 * Used to update the progressService with the current state of the import job
-	 * @param progressKey - the key used to access the 
+	 * @param progressKey - the key used to access the
 	 * @param current - index of the current record
 	 * @param total - the index of the total number of records to process
 	 */
@@ -224,7 +224,7 @@ class ImportService {
 	}
 
 	/**
-	 * Used to review an import batch for any unexpected issues 
+	 * Used to review an import batch for any unexpected issues
 	 * @param projectId - the id of the project
 	 * @param userLoginId - the id of the user that has invoked the process
 	 * @param batchId - the id of the batch to examine
@@ -239,7 +239,7 @@ class ImportService {
 		String methodName = 'reviewImportBatch()'
 		StringBuffer sb = new StringBuffer()
 
-		setSessionFlushMode( FlushMode.COMMIT ) 
+		setSessionFlushMode( FlushMode.COMMIT )
 
 		Project project = Project.get(projectId)
 		UserLogin userLogin = UserLogin.get(userLoginId)
@@ -259,7 +259,7 @@ class ImportService {
 		}
 
 		boolean batchIsForDevices = dtb.eavEntityType?.domainName == "AssetEntity"
-		
+
 		// Get a Device Type Map used to verify that device type are valid
 		Map deviceTypeMap = getDeviceTypeMap()
 
@@ -303,7 +303,7 @@ class ImportService {
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 
 			// log.debug "***$methodName $dataTransferValueRow of $assetCount"
-			
+
 			if (batchIsForDevices) {
 				String mfgName = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:mfgEavAttr)?.importValue
 				String modelName = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:modelEavAttr)?.importValue
@@ -344,39 +344,39 @@ class ImportService {
 					}
 				}
 			}
-			
+
 			// log.debug "Checking for dups"
 			// Checking for duplicate asset ids
 			if (assetEntityId && assetIdList.contains(assetEntityId))
 				dupAssetIds << assetEntityId
-			
+
 			// log.debug "Checking for missing ids"
 			// Checking for asset ids which does not exist in database
 			if (assetEntityId && !assetIds.contains((Long)(assetEntityId)))
 				notExistedIds << assetEntityId
-				
+
 			assetIdList << assetEntityId
 
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
 
 			project = flushAndClearSession(sessionFactory.currentSession, rowNum, project)
-			
+
 		} // for
 
 		if (performance) log.debug "Reviewing $assetCount batch records took ${TimeUtil.elapsed(now)}"
 
-		sb.append("<h3>Review Import for Batch $batchId</h3><ul>" + 
+		sb.append("<h3>Review Import for Batch $batchId</h3><ul>" +
 			"<li>Assets in batch: $assetCount</li>" +
 			"</ul>"
-		) 
+		)
 
 		// Log missed Mfg/Model references
-		def missingMfgModel = mfgModelMatches.findAll { k, v -> ! v.found} 
+		def missingMfgModel = mfgModelMatches.findAll { k, v -> ! v.found}
 		if (missingMfgModel) {
 			sb.append("<b>Missing Mfg / Model references:</b><ul>")
 			missingMfgModel.each { k, d ->
-				sb.append("<li>Mfg: ${d.mfg} | Model: ${d.model} | ${d.count} reference${d.count > 1 ? '(s)' : ''}</li>") 
+				sb.append("<li>Mfg: ${d.mfg} | Model: ${d.model} | ${d.count} reference${d.count > 1 ? '(s)' : ''}</li>")
 			}
 			sb.append('</ul>')
 			if (!canCreateMfgAndModel) {
@@ -396,18 +396,18 @@ class ImportService {
 
 		if (invalidDeviceTypeMap) {
 			sb.append("<b>Invalid device type${invalidDeviceTypeMap.size() > 1 ? 's' : ''} specified:</b><ul>")
-			invalidDeviceTypeMap.each { k, v -> 
+			invalidDeviceTypeMap.each { k, v ->
 				sb.append("<li>$k ($v)" + '</li>')
 			}
 			sb.append('</ul>')
 		}
-	
+
 		def elapsedTime = TimeUtil.elapsed(startedAt).toString()
 
 		log.info "$methodName Review process of $assetCount batch records took $elapsedTime"
 
 		//if (log.isDebugEnabled()) {
-		//	mfgModelMatches.each {k,v -> sb.append("Mfg/Model Matches $k: $v <br>")} 
+		//	mfgModelMatches.each {k,v -> sb.append("Mfg/Model Matches $k: $v <br>")}
 		//}
 
 		sb.append("<br>Review took $elapsedTime to complete")
@@ -429,7 +429,7 @@ class ImportService {
 	 * @return false if not found
 	 */
 	private boolean verifyMfgAndModelExist(searchMfgName, searchModelName) {
-		 
+
 		boolean found=false
 		boolean mfgBlank = StringUtil.isBlank(searchMfgName)
 		boolean modelBlank = StringUtil.isBlank(searchModelName)
@@ -438,7 +438,7 @@ class ImportService {
 		if ( mfgBlank || modelBlank)
 			return false
 
-		Manufacturer mfg 
+		Manufacturer mfg
 		if (! mfgBlank ) {
 			mfg = Manufacturer.findByName(searchMfgName)
 			if( !mfg ) {
@@ -551,14 +551,14 @@ class ImportService {
 
 				log.debug "$methodName Current flushMode=${session.flushMode}"
 				// Set the hibernate flush mode to be controlled by us for performance reasons
-				session.setFlushMode(FlushMode.COMMIT)				
-				
+				session.setFlushMode(FlushMode.COMMIT)
+
 				errorMsg = validateImportBatchCanBeProcessed(projectId, userLoginId, batchId, progressKey)
 				if (errorMsg) {
 					break
 				}
 
-				DataTransferBatch.withTransaction { tx -> 
+				DataTransferBatch.withTransaction { tx ->
 
 					DataTransferBatch dtb = DataTransferBatch.get(batchId)
 
@@ -575,7 +575,7 @@ class ImportService {
 						assert domainName
 						String servicMethodName = "process${domainName}Import"
 
-						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId, dtFormat) 
+						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId, dtFormat)
 						errorMsg = results.error
 						dtb = dtb.merge()
 						if (errorMsg) {
@@ -591,7 +591,7 @@ class ImportService {
 							log.error(errorMsg)
 						}
 					}
-	
+
 					// TODO : JPM 5/2016 : invokeAssetImportProcess() should probably only call the flushAndClearSession every few hundred or even one thousand rows
 					GormUtil.flushAndClearSession(session, 1, 1)
 				}
@@ -632,7 +632,7 @@ class ImportService {
 	 * @param results - A Sting containing the information to save
 	 * @return The string of the combined results (Process Results <hr> Import Results)
 	 */
-	private String combineDataTransferBatchImportResults(DataTransferBatch dtb, String results) { 
+	private String combineDataTransferBatchImportResults(DataTransferBatch dtb, String results) {
 		Long maxSizeImportResults = GormUtil.getConstraintMaxSize(dtb, 'importResults')
 		String current = dtb.importResults ?: ''
 		String s = ''
@@ -656,14 +656,14 @@ class ImportService {
 	}
 
 	/**
-	 * This method will iterate over a list of properties that may not have been set during the import process and then 
+	 * This method will iterate over a list of properties that may not have been set during the import process and then
 	 * assign default values appropriately.
 	 */
 	private void processRequiredProperties(project, assetObj, rowNum, warnings, errorConflictCount, tzId, dtFormat) {
 		List requiredProps = ['assetTag', 'moveBundle', 'planStatus', 'validation']
 		requiredProps.each { prop ->
 			if (! assetObj[prop]) {
-				Map dtvMap = [ 
+				Map dtvMap = [
 					importValue: '',
 					eavAttribute: [attributeCode : prop ]
 				]
@@ -673,7 +673,7 @@ class ImportService {
 	}
 
 
-	/**	
+	/**
 	 * This process will iterate over the assets imported into the specified batch and update the Application appropriately
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginID - the id of user login object of whom invoked the process
@@ -755,7 +755,7 @@ class ImportService {
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
 
-			// Get all of the property values imported for a given row					
+			// Get all of the property values imported for a given row
 			dtvList?.clear()
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
@@ -818,7 +818,7 @@ class ImportService {
 												warnMsg = "Ambiguous name for $attribName (${it.importValue}) in application ${application.assetName} on row $rowNum. Name set to ${resultMap.person}"
 											}
 
-											if (resultMap.isNew) 
+											if (resultMap.isNew)
 												personsAdded++
 
 										} else if ( resultMap?.error ) {
@@ -851,7 +851,7 @@ class ImportService {
 					errorConflictCount++
 				}
 
-			}	// dtvList.each	
+			}	// dtvList.each
 
 			// Update various common properties that may not have been set by the above loop
 			processRequiredProperties(project, application, rowNum, warnings, errorConflictCount, tzId, dtFormat)
@@ -873,9 +873,9 @@ class ImportService {
 
 		def sb = new StringBuilder(
 			"<h3>Process Results for Batch ${batchId}:</h3><ul>" +
-			"<li>Assets in Batch: ${assetCount}</li>" + 
+			"<li>Assets in Batch: ${assetCount}</li>" +
 			"<li>Records Inserted: ${insertCount}</li>"+
-			"<li>Records Updated: ${updateCount}</li>" + 
+			"<li>Records Updated: ${updateCount}</li>" +
 			"<li>Asset Errors: ${errorCount}</li> "+
 			"<li>Persons Added: $personsAdded</li>" +
 			"<li>Attribute Errors: ${errorConflictCount}</li>" +
@@ -901,10 +901,10 @@ class ImportService {
 
 		String info = sb.toString()
 
-		return [elapsedTime: elapsedTime, assetCount: assetCount, info: sb.toString()] 
-	}	
+		return [elapsedTime: elapsedTime, assetCount: assetCount, info: sb.toString()]
+	}
 
-	/**	
+	/**
 	 * This process will iterate over the assets imported into the specified batch and update the devices appropriately
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginId - the id of the user login object of whom invoked the process
@@ -972,7 +972,7 @@ class ImportService {
 		counts.room = Room.countByProject(project)
 		counts.rack = Rack.countByProject(project)
 
-		// 
+		//
 		// Iterate over the rows
 		//
 		def dtvList
@@ -1039,10 +1039,10 @@ class ImportService {
 							break
 						case 'manufacturer':
 							mfgName = it.correctedValue ?: it.importValue
-							break;
+							break
 						case 'model':
 							modelName = it.correctedValue ?: it.importValue
-							break;
+							break
 						case "assetType":
 							deviceType = it.correctedValue ?: it.importValue
 							break
@@ -1078,7 +1078,7 @@ class ImportService {
 							}
 							break
 
-						default: 
+						default:
 							// Try processing all common properties
 							assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 					}
@@ -1105,11 +1105,11 @@ class ImportService {
 					Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, asset, mfgName, modelName, deviceType, deviceTypeMap, usize, canCreateMfgAndModel)
 					log.debug "$methodName call to assetEntityAttributeLoaderService.assignMfgAndModelToDevice() resulted in: $results"
 					mmm = [
-						errorMsg: results.errorMsg, 
-						warningMsg: results.warningMsg, 
-						mfgId: asset.manufacturer?.id, 
+						errorMsg: results.errorMsg,
+						warningMsg: results.warningMsg,
+						mfgId: asset.manufacturer?.id,
 						modelId: asset.model?.id,
-						deviceType: asset.assetType, 
+						deviceType: asset.assetType,
 						refCount: 1
 					]
 					if (results.cachable)
@@ -1137,7 +1137,7 @@ class ImportService {
 				// Update various common properties that may not have been set by the above loop
 				processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 
-				// 
+				//
 				// Deal with Chassis
 				//
 				if (asset.isaBlade()) {
@@ -1183,7 +1183,7 @@ class ImportService {
 
 						if (validChassisRoom) {
 							errors = deviceService.assignDeviceToLocationRoomRack(
-								asset, 
+								asset,
 								d["${disposition}Location"],
 								d["${disposition}Room"],
 								d["${disposition}Rack"],
@@ -1222,7 +1222,7 @@ class ImportService {
 				}
 			}
 
-			
+
 
 
 		} // for
@@ -1238,15 +1238,15 @@ class ImportService {
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
 		def sb = new StringBuilder(
-			"<h3>Process Results for Batch ${batchId}:</h3><ul>" + 
-			"<li>Assets in Batch: ${data.assetsInBatch}</li>" + 
+			"<h3>Process Results for Batch ${batchId}:</h3><ul>" +
+			"<li>Assets in Batch: ${data.assetsInBatch}</li>" +
 			"<li>Records Inserted: ${insertCount}</li>"+
-			"<li>Records Updated: ${updateCount}</li>" + 
-			"<li>Rooms Created: ${counts.room}</li>" + 
-			"<li>Racks Created: ${counts.rack}</li>" + 
+			"<li>Records Updated: ${updateCount}</li>" +
+			"<li>Rooms Created: ${counts.room}</li>" +
+			"<li>Racks Created: ${counts.rack}</li>" +
 			"<li>Asset Errors: ${errorCount} </li> "+
 			"<li>Attribute Errors: ${errorConflictCount}</li>" +
-			"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" + 
+			"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" +
 			"</ul>"
 		)
 
@@ -1256,7 +1256,7 @@ class ImportService {
 			if (warnings)
 				sb.append(WebUtil.getListAsli(warnings))
 
-			if (missingMfgModel) 
+			if (missingMfgModel)
 				appendIssueList(sb, 'Unable to assign Mfg/Model to device', missingMfgModel)
 
 			if (ignoredAssets)
@@ -1269,10 +1269,10 @@ class ImportService {
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
-		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()] 
+		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()]
 	}
 
-	/**	
+	/**
 	 * This process will iterate over the assets imported into the specified batch and update the Database appropriately
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginId - the id of the user login object of whom invoked the process
@@ -1299,7 +1299,7 @@ class ImportService {
 		def assetsList = new ArrayList()
 		def warnings = []
 		def ignoredAssets = []
-		
+
 		def insertCount = 0
 		def errorConflictCount = 0
 		def updateCount = 0
@@ -1327,7 +1327,7 @@ class ImportService {
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
-		
+
 		def dtvList
 
 		for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
@@ -1343,7 +1343,7 @@ class ImportService {
 
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
-			if (! asset) 
+			if (! asset)
 				continue
 
 			if ( ! asset.id ) {
@@ -1387,12 +1387,12 @@ class ImportService {
 
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
-		def sb = new StringBuilder("<h3>Process Results for Batch ${batchId}:</h3><ul>" + 
-			"<li>Assets in Batch: ${assetCount}</li>" + 
+		def sb = new StringBuilder("<h3>Process Results for Batch ${batchId}:</h3><ul>" +
+			"<li>Assets in Batch: ${assetCount}</li>" +
 			"<li>Records Inserted: ${insertCount}</li>" +
-			"<li>Records Updated: ${updateCount}</li>" + 
+			"<li>Records Updated: ${updateCount}</li>" +
 			"<li>Asset Errors: ${errorCount}</li>"+
-			"<li>Attribute Errors: ${errorConflictCount}</li>" + 
+			"<li>Attribute Errors: ${errorConflictCount}</li>" +
 			"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>"
 		)
 
@@ -1412,10 +1412,10 @@ class ImportService {
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
-		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()] 
+		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()]
 	}
-	
-	/**	
+
+	/**
 	 * This process will iterate over the assets imported into the specified batch and update the Logical Storage (aka Files) appropriately
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginId - the id of the user login object of whom invoked the process
@@ -1434,7 +1434,7 @@ class ImportService {
 		def startedAt = new Date()
 		def importStartedAt = new Date()
 
-		Project project = Project.get(projectId) 
+		Project project = Project.get(projectId)
 		UserLogin userLogin = UserLogin.get(userLoginId)
 
 		def assetEntityErrorList = []
@@ -1442,7 +1442,7 @@ class ImportService {
 		def newVal
 		def warnings = []
 		def ignoredAssets = []
-		
+
 		// def dataTransferBatch
 		def insertCount = 0
 		def errorConflictCount = 0
@@ -1471,7 +1471,7 @@ class ImportService {
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
 
-		def dtvList			
+		def dtvList
 
 		for( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 			now = new Date()
@@ -1538,20 +1538,20 @@ class ImportService {
 
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
-		def sb = new StringBuilder("<b>Process results for Batch ${batchId}:</b><ul>" + 
-			"<li>Assets in Batch: ${assetCount}</li>" + 
+		def sb = new StringBuilder("<b>Process results for Batch ${batchId}:</b><ul>" +
+			"<li>Assets in Batch: ${assetCount}</li>" +
 			"<li>Records Inserted: ${insertCount}</li>"+
-			"<li>Records Updated: ${updateCount}</li>" + 
+			"<li>Records Updated: ${updateCount}</li>" +
 			"<li>Asset Errors: ${errorCount} </li> "+
-			"<li>Attribute Errors: ${errorConflictCount}</li>" + 
-			"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" + 
+			"<li>Attribute Errors: ${errorConflictCount}</li>" +
+			"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" +
 			"</ul>"
 		)
 
 		if (warnings || ignoredAssets) {
 			sb.append("<b>Warnings:</b><ul>")
 
-			if (warnings) 
+			if (warnings)
 				sb.append(WebUtil.getListAsli(warnings))
 
 			if (ignoredAssets)
@@ -1564,7 +1564,7 @@ class ImportService {
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
-		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()] 	
+		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()]
 	}
 
 	/**
@@ -1650,7 +1650,7 @@ class ImportService {
 						String bladeWarnings = assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource, bladePosition)
 						if (bladeWarnings)
 							warnings << "WARNING: Blade $chassisIdName $bladeWarnings (row $rowNum)"
-					}				
+					}
 				} else {
 					warnings << "ERROR: No $chassisType chassis found with name ($chassisIdName) (row $rowNum)"
 				}
@@ -1659,7 +1659,7 @@ class ImportService {
 	}
 
 	/**
-	 * Used to clear out the hibernate session of objects no longer needed to help performance. It will also merge the existing 
+	 * Used to clear out the hibernate session of objects no longer needed to help performance. It will also merge the existing
 	 * @param session - current hibernate session
 	 * @param rowsProcessed - number of row processed
 	 * @param project - the project object

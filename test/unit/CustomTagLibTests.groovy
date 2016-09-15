@@ -27,13 +27,13 @@ class CustomTagLibTests extends Specification {
 		// Set the User Date Format on the session
 		mockSession.setProperty('CURR_DT_FORMAT', [CURR_DT_FORMAT: userDateFormat] )
 
-		return mockSession		
+		return mockSession
 	}
 
 	// Creates a reference test date to be used for all of the tests
 	private getTestDate() {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 		// def date = sdf.parse("2012-08-21T01:00:00-0000")
 		def date = TimeUtil.parseDateTimeWithFormatter('GMT', '2012-08-21T01:00:00-0000', sdf)
 
@@ -41,12 +41,12 @@ class CustomTagLibTests extends Specification {
 	}
 
 	// Returns the <tds:convertDate> taglet HTML mockup
-	private getConvertDateTag() {		
+	private getConvertDateTag() {
 		return '<tds:convertDate date="${date}" format="${format}" mockSession="${mockSession}"/>'
 	}
 
 	// Returns the <tds:convertDateTime> taglet HTML mockup
-	private getConvertDateTimeTag() {		
+	private getConvertDateTimeTag() {
 		return '<tds:convertDateTime date="${date}" timeZone="${timeZone}" format="${format}" mockSession="${mockSession}"/>'
 	}
 
@@ -184,9 +184,8 @@ class CustomTagLibTests extends Specification {
 		setup:
 			String faviconStr = '<link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"/>'
 
-		expect: 
+		expect:
 			applyTemplate('<tds:favicon />') == faviconStr
 
 	}
-
 }

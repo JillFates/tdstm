@@ -5,10 +5,10 @@ import java.util.Date;
 
 public class NewsEditorBean implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private long id;
 	private String displayOption;
 	private String commentType;
@@ -18,9 +18,9 @@ public class NewsEditorBean implements Serializable {
 	private String resolvedBy;
 	private Date createdAt;
 	private Date resolvedAt;
-	
+
 	public NewsEditorBean() {
-		
+
 	}
 
 	public long getId() {

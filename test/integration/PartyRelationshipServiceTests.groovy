@@ -2,7 +2,7 @@ import grails.test.mixin.TestFor
 import spock.lang.*
 
 class PartyRelationshipServiceTests  extends Specification {
-	
+
 	def partyRelationshipService
 	def personService
 	def projectService
@@ -118,9 +118,9 @@ class PartyRelationshipServiceTests  extends Specification {
 
 		// Remove the PROJ_MGR team assignment from the person should also delete the moveEvent assignment
 		when:
-			partyRelationshipService.updateAssignedTeams(person, ['SYS_ADMIN'])		
+			partyRelationshipService.updateAssignedTeams(person, ['SYS_ADMIN'])
 			moveEventAssignments = MoveEventStaff.findAllByPersonAndMoveEvent(person, moveEvent)
-		then: 
+		then:
 			! moveEventAssignments?.find { it.role.id == 'PROJ_MGR'}
 	}
 
@@ -155,7 +155,7 @@ class PartyRelationshipServiceTests  extends Specification {
 			staffSize > 0
 
 		// Disable one of the staff and make sure that the list size drops by one
-		when: 
+		when:
 			def staff = staffList[0]
 			staff.disable()
 			assert staff.save()

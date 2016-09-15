@@ -1,30 +1,30 @@
 import com.tdsops.tm.enums.domain.ContextType
 
 /**
- * The MoveEvent domain represents the concept of an event where one or move bundles that will occur at one logical 
+ * The MoveEvent domain represents the concept of an event where one or move bundles that will occur at one logical
  * period of time.
  */
 class MoveEvent {
-		
+
 	static ContextType getContextType() {
 		return ContextType.E
 	}
-	
+
 	static transients = [ "jdbcTemplate" ]
 	def jdbcTemplate
-	
+
 	static final String METHOD_LINEAR="L"
 	static final String METHOD_MANUAL="M"
-	
+
     Project project
     String name
     String description
-	String newsBarMode = "off" 
+	String newsBarMode = "off"
 	String calcMethod = METHOD_LINEAR
 	String runbookStatus
 	Integer runbookVersion = 1
 	String runbookBridge1
-	String runbookBridge2 
+	String runbookBridge2
 	String videolink
 	String runbookRecipe
 
@@ -36,7 +36,7 @@ class MoveEvent {
 	Date estStartTime
 	Date estCompletionTime
 
-    static constraints = {        
+    static constraints = {
 		name( blank:false, nullable:false )
 		project( nullable:false )
 		description( blank:true, nullable:true )
@@ -70,7 +70,7 @@ class MoveEvent {
 			runbookRecipe sqlType: 'Text'
 	 		estStartTime sqlType: 'DateTime'
 	 		estCompletionTime sqlType: 'DateTime'
-		}        
+		}
 	}
 
 	/**
@@ -94,7 +94,7 @@ class MoveEvent {
 			"SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ${id} ")
 		return eventTimes
 	}
-	
+
 	/*
 	 *  Render moveBundles list as comma separated value string
 	 */

@@ -50,7 +50,7 @@ class EmailDispatchService {
 	 */
 	def createEmailJob(emailDispatch, dataMap) {
 		def jobName = "TM-EmailDispatchJob-" + UUID.randomUUID().toString()
-		
+
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
 		Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
 
@@ -81,9 +81,9 @@ class EmailDispatchService {
 			log.error "Invalid EmailDispatch id: $edId"
 			return
 		}
-		
+
 		log.info "sendEmail: edId=${edId} to=${ed.toPerson.id}/${ed.toPerson.email}"
-		
+
 		mailService.sendMail {
 			to ed.toPerson.email
 			subject ed.subject
@@ -116,12 +116,12 @@ class EmailDispatchService {
 						expiredTime: emailParams.expiredTime,
 						supportEmail: "support@transitionaldata.com"
 					]
-				break;
+				break
 			case "passwordResetNotif":
 				result = [
 						person: ed.toPerson.firstName
 					]
-				break;
+				break
 			case "accountActivation":
 				result = [
 					person: ed.toPerson.firstName,
@@ -132,7 +132,7 @@ class EmailDispatchService {
 					sysAdminEmail: emailParams.from,
 					username: emailParams.username
 				]
-				break;
+				break
 			case "adminResetPassword":
 				result = [
 					person: ed.toPerson.firstName,
@@ -141,7 +141,7 @@ class EmailDispatchService {
 					username: emailParams.username,
 					sysAdminEmail: emailParams.sysAdminEmail
 				]
-				break;
+				break
 		}
 		return result
 	}
@@ -155,16 +155,16 @@ class EmailDispatchService {
 		switch (ed.bodyTemplate) {
 			case "passwordReset":
 				result = "/auth/_resetPasswordEmail"
-				break;
+				break
 			case "passwordResetNotif":
 				result = "/auth/_resetPasswordNotificationEmail"
-				break;
+				break
 			case "accountActivation":
 				result = "/auth/_accountActivationNotificationEmail"
-				break;
+				break
 			case "adminResetPassword":
 				result = "/admin/_ResetPasswordNotificationEmail"
-				break;
+				break
 		}
 		return result
 	}
@@ -178,13 +178,13 @@ class EmailDispatchService {
 		switch (ed.bodyTemplate) {
 			case "passwordReset":
 				result = TimeUtil.GRANULARITY_MINUTES
-				break;
+				break
 			case "accountActivation":
 				result = TimeUtil.GRANULARITY_HOURS
-				break;
+				break
 			case "adminResetPassword":
 				result = TimeUtil.GRANULARITY_MINUTES
-				break;
+				break
 		}
 		return result
 	}

@@ -2,15 +2,15 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdsops.common.lang.ExceptionUtil
-import org.apache.commons.lang.math.NumberUtils 
+import org.apache.commons.lang.math.NumberUtils
 
 class RackService {
-	
+
 	boolean transactional = true
 	def securityService
 
 	/**
-	 * Used to find or create a Rack automatically. If the rack name is blank then it will default to 'TBD' 
+	 * Used to find or create a Rack automatically. If the rack name is blank then it will default to 'TBD'
 	 * @param project - the project to find/create the rack for
 	 * @param room - the room to place the rack in
 	 * @param rackName - the name (aka tag) of the rack
@@ -19,7 +19,7 @@ class RackService {
 	Rack findOrCreateRack(Room room, String rackName, Model model=null) {
 		if (!room?.project) {
 			log.error "findOrCreate() called with invalid project or room objects (room: $room)"
-			return 
+			return
 		}
 
 		Rack rack
@@ -65,7 +65,7 @@ class RackService {
 		Model model
 
 		Map names = [
-			manuName: 'Generic', 
+			manuName: 'Generic',
 			modelName: '42U Rack'
 		]
 

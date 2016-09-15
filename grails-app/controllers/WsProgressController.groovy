@@ -1,7 +1,7 @@
 import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
-import grails.validation.ValidationException;
+import grails.validation.ValidationException
 
 /**
  * {@link Controller} for handling WS calls of the {@link ProgressService}
@@ -12,7 +12,7 @@ class WsProgressController {
 
 	def progressService
 	def securityService
-	
+
 	/**
 	 * Gets the status of the progress of a async task
 	 */
@@ -22,7 +22,7 @@ class WsProgressController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
@@ -52,7 +52,7 @@ class WsProgressController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def dataKey = params.dataKey
 
@@ -74,7 +74,7 @@ class WsProgressController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-		
+
 	/**
 	 * Returns the list of pending progresses
 	 */
@@ -84,7 +84,7 @@ class WsProgressController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		try {
 			def progressMap = progressService.list()
 
@@ -101,7 +101,7 @@ class WsProgressController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Returns the list of pending progresses
 	 */
@@ -111,7 +111,7 @@ class WsProgressController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		try {
 			def progressMap = progressService.demo()
 
@@ -128,7 +128,7 @@ class WsProgressController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Returns the list of pending progresses
 	 */
@@ -138,7 +138,7 @@ class WsProgressController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		try {
 			def progressMap = progressService.demoFailed()
 

@@ -12,7 +12,7 @@ import net.transitionmanager.UserAudit
  */
 class AuditService {
 
-	static final String AUDIT_TYPE_ACCESS = "access"	
+	static final String AUDIT_TYPE_ACCESS = "access"
 	static final String AUDIT_TYPE_ACTIVITY = "activity"
 
 	static String AUDIT_TYPE = AUDIT_TYPE_ACCESS
@@ -32,7 +32,7 @@ class AuditService {
 
 	/**
 	 * Audit information based on request information
-	 * 
+	 *
 	 * @param subject subject associated with the request, could be null
 	 * @param request request made
 	 * @param params parameters associated with the request
@@ -51,7 +51,7 @@ class AuditService {
 
 	/**
 	 * Determine if the request should be logged or not
-	 * 
+	 *
 	 * @param request to validate
 	 */
 	boolean auditedUri(uri) {
@@ -60,7 +60,7 @@ class AuditService {
 
 	/**
 	 * Filter parameters, keep in only the ones audited
-	 * 
+	 *
 	 * @param request to validate
 	 */
 	Map filterParams(params) {
@@ -85,7 +85,7 @@ class AuditService {
 
 	/**
 	 * Force log a security violation
-	 * 
+	 *
 	 * @param user user involved in the security violation
 	 * @param message message associated with the security violation
 	 */
@@ -95,8 +95,8 @@ class AuditService {
 	}
 
 	/**
-	 * Used to simply log a message 
-	 * 
+	 * Used to simply log a message
+	 *
 	 * @param message message associated with the security violation
 	 */
 	def logMessage(message) {
@@ -109,7 +109,7 @@ class AuditService {
 
 	/**
 	 * Check if the configuration property is set to activity
-	 * 
+	 *
 	 * @return returns true if the configuration property is set to activity.
 	 */
 	def logActivityEnabled() {
@@ -125,5 +125,4 @@ class AuditService {
 		}
 		// TODO : JPM 9/2015 : Record message to log file too
 	}
-
 }

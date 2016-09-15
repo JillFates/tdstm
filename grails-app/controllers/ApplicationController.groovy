@@ -22,7 +22,7 @@ class ApplicationController {
 
 	def jdbcTemplate
 	def dataSource
-	
+
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
@@ -35,7 +35,7 @@ class ApplicationController {
 		session.APP?.JQ_FILTERS = []
 
 		def project = controllerService.getProjectForPage( this )
-		if (! project) 
+		if (! project)
 			return
 
 		// TODO - This should be replaced with the staffRoles which is in the defaultModel already
@@ -44,17 +44,17 @@ class ApplicationController {
 		def companiesList = partyRelationshipService.getCompaniesList()
 
 		def fieldPrefs = assetEntityService.getExistingPref('App_Columns')
-		
+
 		Map model = [
-			appName: filters?.assetNameFilter ?:'', 
-			appPref: fieldPrefs, 
+			appName: filters?.assetNameFilter ?:'',
+			appPref: fieldPrefs,
 			appSme: filters?.appSmeFilter ?:'',
-			availabaleRoles: availabaleRoles, 
-			company: project.client, 
+			availabaleRoles: availabaleRoles,
+			company: project.client,
 			latencys: params.latencys,
-			partyGroupList: companiesList, 
+			partyGroupList: companiesList,
 			runbook: params.runbook,
-			validationFilter: filters?.appValidationFilter ?:'' 
+			validationFilter: filters?.appValidationFilter ?:''
 		]
 
 		model.putAll( assetEntityService.getDefaultModelForLists(AssetClass.APPLICATION, 'Application', project, fieldPrefs, params, filters) )
@@ -66,9 +66,9 @@ class ApplicationController {
 	def getListJsonPrefQueryParts(assetType, prefs){
 		return assetEntityService.getAppCustomQuery(prefs)
 	}
-	
+
 	/**
-	 * This method is used by JQgrid to load appList 
+	 * This method is used by JQgrid to load appList
 	 */
 	def listJson() {
 		def sortIndex = params.sidx ?: 'assetName'
@@ -78,10 +78,10 @@ class ApplicationController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
 		def firstWhere = true
-		
+
 		def filterParams = ['assetName':params.assetName,'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
 		def attributes = projectService.getAttributes('Application')
-		
+
 		def appPref= assetEntityService.getExistingPref('App_Columns')
 		def appPrefVal = appPref.collect{it.value}
 		attributes.each{ attribute ->
@@ -89,7 +89,7 @@ class ApplicationController {
 				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
-		
+
 		def moveBundleList = []
 		session.APP = [:]
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, "${maxRows}")
@@ -99,29 +99,29 @@ class ApplicationController {
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		}
-		
+
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
-		
+
 		//def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
 		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
 		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
-		def query = new StringBuffer("""SELECT * FROM ( 
+		def query = new StringBuffer("""SELECT * FROM (
 			SELECT a.app_id AS appId, ae.asset_name AS assetName,a.latency AS latency,
-				IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, 
+				IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
 				IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event, """)
 
 		if (customizeQuery.query) {
 			query.append(customizeQuery.query)
-		}	
-		
+		}
+
 		query.append(""" ae.asset_type AS assetType,
 			ae.validation AS validation,
 			ae.plan_status AS planStatus,
-			me.runbook_status AS runbookStatus, 
-			ae.move_bundle_id, 
+			me.runbook_status AS runbookStatus,
+			ae.move_bundle_id,
 			mb.name as moveBundle
-			FROM application a 
+			FROM application a
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
@@ -132,21 +132,21 @@ class ApplicationController {
 		//commented as per craig comments for performance issue
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve,  adb.dependency_bundle AS depNumber,
 		COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
-		
+
 		query.append("""\n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
-			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
+			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 			WHERE ae.project_id = ${project.id} """)
 
 		if (justPlanning=='true')
 			query.append(" AND mb.use_for_planning=${justPlanning} ")
-			
+
 		if(params.event && params.event.isNumber() && moveBundleList)
 			query.append( " AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})" )
-			
+
 		if(params.unassigned){
 			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
 				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
-			
+
 			if(unasgnMB){
 				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
 				query.append( " AND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id is null)" )
@@ -154,15 +154,15 @@ class ApplicationController {
 		}
 
 		query.append("GROUP BY app_id  ) AS apps")
-		
-		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+
+		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned})
 		LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned})
 		LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned})
 			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id
 		LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned})
 			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id*/
-		
+
 		// Handle the filtering by each column's text field
 
 		def queryParams = [:]
@@ -181,7 +181,7 @@ class ApplicationController {
 			if(params.latencys!='unknown')
 				query.append(" WHERE apps.latency = '${params.latencys.replaceAll("'", "")}' ")
 			else
-				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")	
+				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")
 		}
 		if(params.moveBundleId){
 			if(params.moveBundleId!='unAssigned'){
@@ -219,7 +219,7 @@ class ApplicationController {
 			}
 			query.append( " apps.runbookStatus='Done' " )
 		}
-		
+
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 		// log.debug "query = ${query}"
 		def appsList = []
@@ -231,7 +231,7 @@ class ApplicationController {
 		}
 
 		//def appsList = jdbcTemplate.queryForList(query.toString())
-		
+
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
 		def totalRows = appsList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
@@ -239,15 +239,15 @@ class ApplicationController {
 			appsList = appsList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		else
 			appsList = []
-			
-		def results = appsList?.collect { 
+
+		def results = appsList?.collect {
 			[ cell: [
 			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]] ?: '', it[appPref["3"]] ?: '', it[appPref["4"]] ?: '', it[appPref["5"]] ?: '',
 			/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
 			it.tasksStatus, it.assetType, it.event, it.commentsStatus
 		], id: it.appId, escapedName:assetEntityService.getEscapedName(it)]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-		
+
 		render jsonData as JSON
 	}
 	/**
@@ -278,17 +278,17 @@ class ApplicationController {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
-	
+
 		def personList = partyRelationshipService.getProjectApplicationStaff( project )
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
-		
+
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
-		
+
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 			planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,moveEventList:moveEventList,
-			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client, 
+			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client,
 			availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 
@@ -322,7 +322,7 @@ class ApplicationController {
 	 */
 	def edit() {
 		def project = controllerService.getProjectForPage( this )
-		if (! project) 
+		if (! project)
 			return
 
 		def applicationInstance = controllerService.getAssetForPage(this, project, AssetClass.APPLICATION, params.id)
@@ -351,15 +351,15 @@ class ApplicationController {
 		def personList = partyRelationshipService.getProjectApplicationStaff( project )
 
 		def model = [
-			applicationInstance:applicationInstance, 
-			availabaleRoles:availabaleRoles, 
+			applicationInstance:applicationInstance,
+			availabaleRoles:availabaleRoles,
 			moveEvent:moveEvent,
 			personList:personList
 		]
 
 		model.putAll( assetEntityService.getDefaultModelForEdits('Application', project, applicationInstance, params) )
 
-		return model		
+		return model
 	}
 
 	def save() {
@@ -376,7 +376,7 @@ class ApplicationController {
 
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id, errors:errors])
-				
+
 			}else if(params.updateView == 'closeView'){
 				render flash.message
 			}else{
@@ -408,7 +408,7 @@ class ApplicationController {
 					case "dependencyConsole":
 						forward( controller:'assetEntity',action:'retrieveLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
-					
+
 				}
 			}
 		*/
@@ -419,14 +419,14 @@ class ApplicationController {
 		if(application) {
 				assetEntityService.deleteAsset( application )
 				// deleting all appmoveEvent associated records .
-				AppMoveEvent.withNewSession { s -> 
-					def appMove = AppMoveEvent.findAllByApplication( application );
+				AppMoveEvent.withNewSession { s ->
+					def appMove = AppMoveEvent.findAllByApplication( application )
 					appMove*.delete()
 					s.flush()
 					s.clear()
 			 	}
-				application.delete();
-			
+				application.delete()
+
 			flash.message = "Application ${application.assetName} deleted"
 			if(params.dstPath =='dependencyConsole'){
 				forward( controller:'assetEntity',action:'retrieveLists', params:[entity: 'apps',dependencyBundle:session.getAttribute("dependencyBundle")])
@@ -435,12 +435,12 @@ class ApplicationController {
 			}
 		}
 		else {
-			flash.message = "Application not found with id ${params.id}"	
+			flash.message = "Application not found with id ${params.id}"
 			redirect( action:"list" )
-		}		
+		}
 	}
 	/*
-	 * Delete multiple Application 
+	 * Delete multiple Application
 	 */
 	def deleteBulkAsset() {
 		def assetList = params.id.split(",")
@@ -450,22 +450,22 @@ class ApplicationController {
 			if( application ) {
 				assetNames.add(application.assetName)
 				assetEntityService.deleteAsset( application )
-				
+
 				// deleting all appmoveEvent associated records .
-				AppMoveEvent.withNewSession { s -> 
-					def appMove = AppMoveEvent.findAllByApplication( application );
+				AppMoveEvent.withNewSession { s ->
+					def appMove = AppMoveEvent.findAllByApplication( application )
 					appMove*.delete()
 					s.flush()
 					s.clear()
-			 	}				
+			 	}
 				application.delete()
 			}
-		}	
+		}
 		String names = assetNames.toString().replace('[','').replace(']','')
-		
+
 	  	render "Application $names deleted"
 	}
-	
+
 	def customColumns() {
 		def columnName = params.column
 		def removeCol = params.fromName
@@ -477,5 +477,4 @@ class ApplicationController {
 		def existingCol= "'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
 		render existingCol as JSON
 	}
-
 }

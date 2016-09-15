@@ -7,7 +7,7 @@ import com.tdsops.tm.enums.domain.AssetClass
  * Contains utility functions for Assets
  */
 class AssetClassUtil {
-	
+
 	/**
 	 * Gets the image type string for an asset given its type and class
 	 */
@@ -30,5 +30,4 @@ class AssetClassUtil {
 			return 'Other'
 		}
 	}
-
 }

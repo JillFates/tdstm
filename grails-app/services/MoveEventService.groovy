@@ -1,9 +1,8 @@
-
 class MoveEventService {
-	
+
 	/**
 	 * This function using to verify events for requested project
-	 * @param reqEventIds : reqEventIds is list of requested id from browser 
+	 * @param reqEventIds : reqEventIds is list of requested id from browser
 	 * @param project : project list
 	 * @return
 	 */
@@ -87,7 +86,7 @@ class MoveEventService {
 
 	/**
 	 * Used to retrieve a TEAM RoleType based on the code
-	 * @param teamCode - the TEAM string code 
+	 * @param teamCode - the TEAM string code
 	 * @return the TEAM RoleType if found otherwise null
 	 */
 	RoleType teamRoleType(String teamCode) {
@@ -112,7 +111,7 @@ class MoveEventService {
 
 		// Try finding the assignment first
 		MoveEventStaff mes = getTeamMember(moveEvent, person, teamRoleType)
-		
+
 		if (mes) {
 			status = mes.delete()
 

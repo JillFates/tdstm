@@ -1,5 +1,5 @@
 class PartyTypeController {
-    
+
     def index() { redirect( action:"list", params:params ) }
 
     // the delete, save and update actions only accept POST requests
@@ -19,7 +19,7 @@ class PartyTypeController {
         }
         else { return [ partyTypeInstance : partyTypeInstance ] }
     }
-    //  delete PartyType details 
+    //  delete PartyType details
     def delete() {
         def partyTypeInstance = PartyType.get( params.id )
         if ( partyTypeInstance ) {
@@ -68,7 +68,7 @@ class PartyTypeController {
         partyTypeInstance.properties = params
         return ['partyTypeInstance':partyTypeInstance]
     }
-    // save RoleType details 
+    // save RoleType details
     def save() {
         def partyTypeInstance = new PartyType( params )
         partyTypeInstance.id = params.id

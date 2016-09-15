@@ -3,16 +3,16 @@ import grails.validation.ValidationException
 import org.springframework.stereotype.Controller
 /**
  * {@link Controller} for handling WS calls of the {@link UserService}
- * 
+ *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 class WsUserController {
 
 	def securityService
 	def userPreferenceService
-	
+
 	/**
-	 * Used to access a list of one or more user preferences 
+	 * Used to access a list of one or more user preferences
 	 * @param id - a comma separated list of the preference(s) to be retrieved
 	 * Check {@link UrlMappings} for the right call
 	 * @example GET ./ws/user/preferences/EVENT,BUNDLE
@@ -25,7 +25,7 @@ class WsUserController {
 
 		render(ServiceResults.success('preferences' : data) as JSON)
 	}
-	
+
 	/**
 	 * Used to set a user preference through an AJAX call
 	 * @param code - the preference code for the preference that is being set
@@ -37,15 +37,15 @@ class WsUserController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
 			def prefCode = params.code?.toString() ?: ''
 			def prefValue = params.value ?: ''
-			
+
 			userPreferenceService.savePreference(prefCode, prefValue)
-			
+
 			render(ServiceResults.success() as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)

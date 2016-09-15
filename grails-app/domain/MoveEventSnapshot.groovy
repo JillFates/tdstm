@@ -8,15 +8,15 @@ import org.apache.shiro.SecurityUtils
 class MoveEventSnapshot {
 	static final String TYPE_PLANNED="P"
 	static final String TYPE_REVISED="R"
-	
+
 	String type=TYPE_PLANNED	// Indicates if the snapshot is for P)lann or R)evised
 	int planDelta=0				// The number of seconds that the move is over(+)/under(-) the planned finish time.
 	int dialIndicator=0			// Quantity to display in the dial/gage on dashboard
 	Date dateCreated
 
 	static belongsTo = [moveEvent:MoveEvent]
-	
-	static constraints = { 
+
+	static constraints = {
 		type( nullable:false, inList:[TYPE_PLANNED, TYPE_REVISED] )
 		dateCreated( nullable:true )
 	}
@@ -27,7 +27,7 @@ class MoveEventSnapshot {
 		columns {
 			type sqltype: "char(1)"
 			planDelta sqltype: 'int'
-			dialIndicator sqltype: 'tinyint'		
+			dialIndicator sqltype: 'tinyint'
 		}
 	}
 	/*

@@ -10,5 +10,5 @@ class UnhandledAuthException extends ShiroException {
 
 	public UnhandledAuthException(String message) {
 		super(message)
-	}	
+	}
 }

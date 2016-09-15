@@ -1,9 +1,9 @@
-import com.tds.asset.AssetEntity;
+import com.tds.asset.AssetEntity
 
 class ProjectTeamController {
-    
+
 	def partyRelationshipService
-	
+
     def index() { redirect(action:"list",params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -12,7 +12,7 @@ class ProjectTeamController {
      * 	Return all of the teams associated to the project
      */
     def list() {
-        def bundleId = params.bundleId		
+        def bundleId = params.bundleId
 		def bundleInstance = MoveBundle.findById(bundleId)
         if(!bundleId){
            def project = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
@@ -20,7 +20,7 @@ class ProjectTeamController {
         }
         def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )
         //ProjectTeam.findAllByProject(projectInstance)
-    	 
+
         return [ projectTeamInstanceList: projectTeamInstanceList, bundleInstance:bundleInstance ]
     }
 	/*
@@ -44,7 +44,7 @@ class ProjectTeamController {
 	 */
     def delete() {
         def projectTeamInstance = ProjectTeam.get( params.id )
-        
+
         def bundleId = params.bundleId
         if(projectTeamInstance) {
         	PartyRelationship.executeUpdate("delete from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $projectTeamInstance.id and p.roleTypeCodeFrom = 'TEAM' ")
@@ -80,7 +80,7 @@ class ProjectTeamController {
     def update() {
 
         // TODO : Security : Need to check to see if the person is associated to the project and has permissions.
-        
+
         def projectTeamInstance = ProjectTeam.get( params.id )
         //projectTeamInstance.lastUpdated = new Date()
         def bundleId = params.bundleId
@@ -112,17 +112,17 @@ class ProjectTeamController {
      *  Return the project team details to create form
      */
     def create() {
-    	
+
         def projectTeamInstance = new ProjectTeam()
         def bundleId = params.bundleId
         def bundleInstance = MoveBundle.findById( bundleId )
         projectTeamInstance.properties = params
         def projectStaff = partyRelationshipService.getProjectStaff( bundleInstance.project.id )
         return [ 'projectTeamInstance':projectTeamInstance, bundleInstance:bundleInstance, availableStaff :projectStaff ]
-        
+
     }
 	/*
-	 *  Save the project team details 
+	 *  Save the project team details
 	 */
     def save() {
 		def bundleId = params.bundleId

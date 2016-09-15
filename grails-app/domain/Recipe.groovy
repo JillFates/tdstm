@@ -1,10 +1,9 @@
-
 import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
 
 /**
  * Recipe Domain Object
- * 
+ *
  * <p>Represents a recipe within cookbook that contains various properties of the recipe
  *
  * @author John Martin
@@ -19,22 +18,22 @@ class Recipe {
 	String context
 	/** The project that the recipe is associated with */
 	Project project
-	/** The current version of the recipe that has been released, which is the version that people should use 
+	/** The current version of the recipe that has been released, which is the version that people should use
 		to generate tasks */
 	RecipeVersion releasedVersion
 
 	Date dateCreated
 	Date lastUpdated
-	
+
 	Boolean archived = false
 
 	Integer defaultAssetId
 
-	static constraints = {	
+	static constraints = {
 		name(blank:false, nullable:false, size: 1..40)
 		description(blank:true, nullable:true, size: 0..255)
 		// TODO : Switch the context property to ENUM RecipeContext
-		context(blank:false, nullable:false, inList: ['Event', 'Bundle', 'Application'], size: 1..45 )	
+		context(blank:false, nullable:false, inList: ['Event', 'Bundle', 'Application'], size: 1..45 )
 		project(nullable:false)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
@@ -42,7 +41,7 @@ class Recipe {
 		defaultAssetId(nullable:true)
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		version true
 		autoTimestamp false
 		id column: 'recipe_id'
@@ -53,38 +52,38 @@ class Recipe {
 		}
 	}
 
-	static hasMany = [ 
+	static hasMany = [
 		versions : RecipeVersion,
 	]
-	
+
 	def beforeInsert = {
 		dateCreated = TimeUtil.nowGMT()
 		lastUpdated = dateCreated
 	}
-	
+
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
 	}
 
 	String toString() {
 		name
-	}	
-	
+	}
+
 	ContextType asContextType() {
 		switch (this.context) {
 			case 'Application' :
 				return ContextType.A
-				break;
+				break
 			case 'Bundle' :
 				return ContextType.B
-				break;
+				break
 			case 'Event' :
 				return ContextType.E
-				break;
+				break
 			default :
 				throw new IllegalArgumentException('Invalid context')
-				break;
+				break
 		}
 	}
-	
+
 }

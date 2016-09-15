@@ -6,14 +6,14 @@ import org.hibernate.exception.ConstraintViolationException
 
 /**
  * {@link Controller} for handling WS calls of the {@link CookbookService}
- * 
+ *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 class WsCookbookController {
 
 	def cookbookService
 	def securityService
-	
+
 	/**
 	 * Creates a recipe
 	 * Check {@link UrlMappings} for the right call
@@ -24,7 +24,7 @@ class WsCookbookController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def name = params.name
 		def description = params.description
 		def context = params.context
@@ -56,12 +56,12 @@ class WsCookbookController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def recipeVersionid = params.recipeVersionid
 		def name = params.name
 		def description = params.description
 		def currentProject = securityService.getUserCurrentProject()
-		
+
 		try {
 			def data = cookbookService.cloneRecipe(recipeVersionid, name, description, loginUser, currentProject)
 
@@ -91,7 +91,7 @@ class WsCookbookController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def version = params.version
 		def currentProject = securityService.getUserCurrentProject()
@@ -118,7 +118,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-		
+
 	/**
 	 * Updates the name and description of an existing Recipe
 	 * Check {@link UrlMappings} for the right call
@@ -129,7 +129,7 @@ class WsCookbookController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def recipeId = params.id
 		def json = request.JSON
 		def name = json.name
@@ -150,7 +150,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Saves a version of the recipe
 	 * Check {@link UrlMappings} for the right call
@@ -184,7 +184,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Releases a recipe that is WIP
 	 * Check {@link UrlMappings} for the right call
@@ -213,7 +213,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Reverts a recipe to the previous release version
 	 * Check {@link UrlMappings} for the right call
@@ -242,7 +242,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Obtains the information about a recipe
 	 * Check {@link UrlMappings} for the right call
@@ -253,10 +253,10 @@ class WsCookbookController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def recipeId = params.id
 		def recipeVersion = params.version
-		
+
 		try {
 			def result = cookbookService.getRecipe(recipeId, recipeVersion, loginUser)
 
@@ -290,7 +290,7 @@ class WsCookbookController {
 		}
 	}
 
-		
+
 	/**
 	 * Lists the recipes of the current user
 	 * Check {@link UrlMappings} for the right call
@@ -329,7 +329,7 @@ class WsCookbookController {
 
 	/**
 	 * List of RecipeVersion objects for a given recipe id.
-	 * 
+	 *
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def recipeVersionList() {
@@ -376,7 +376,7 @@ class WsCookbookController {
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
-			
+
 			def results = cookbookService.validateSyntaxForUser(sourceCode, loginUser, currentProject)
 
 			if (results == null) {
@@ -395,7 +395,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Archive recipes
 	 * Check {@link UrlMappings} for the right call
@@ -423,7 +423,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Unarchive recipes
 	 * Check {@link UrlMappings} for the right call
@@ -451,7 +451,7 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * List the groups
 	 * Check {@link UrlMappings} for the right call

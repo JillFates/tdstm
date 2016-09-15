@@ -17,7 +17,7 @@ import UserPreferenceEnum as PREF
  *
  */
 class CommentService {
-	
+
 	boolean transactional = true
 	BindDynamicMethod bindData = new BindDynamicMethod()
 
@@ -40,7 +40,7 @@ class CommentService {
 		AssetCommentCategory.PREMOVE,
 		AssetCommentCategory.POSTMOVE
 	]
-    
+
 	/**
 	 * Used to persist changes to the AssetComment and CommentNote from various forms for both Tasks and Comments
 	 * @param session - the user session
@@ -53,19 +53,19 @@ class CommentService {
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 		def canEditAsset = securityService.hasPermission(userLogin.person, 'AssetEdit')
-		
+
 		def tzId = session.getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ
 		def userDTFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
-		
+
 		def date = new Date()
 		def assetEntity
 		def assetComment
 		def commentProject
 		def map=[:]
 		def errorMsg
-		
+
 		// log.info "saveUpdateCommentAndNotes: tzId -- ${session.getAttribute( "CURR_TZ" )} / ${session.getAttribute( "CURR_TZ" )?.CURR_TZ}"
-		
+
 		// Wrap the whole routine so that we can break out when we hit fatal situations
 		while (true) {
 			if (! project) {
@@ -85,7 +85,7 @@ class CommentService {
 				if(params.containsKey("assetEntity")){
 					assetEntity = params.assetEntity !='null' ? AssetEntity.read(params.assetEntity) : null
 				}
-				
+
 				if (assetEntity) {
 					def assetProject = assetEntity.project
 					if (assetProject.id != project.id) {
@@ -112,7 +112,7 @@ class CommentService {
 					securityService.reportViolation("User don't have permission to create comments", userLogin)
 					break
 				}
-			
+
 				// Let's create a new Comment/Task
 				assetComment = new AssetComment()
 				assetComment.createdBy = userLogin.person
@@ -143,7 +143,7 @@ class CommentService {
 					break
 				}
 
-				// If params.currentStatus is passed along, the form is expecting the status to be in this state so if it has changed 
+				// If params.currentStatus is passed along, the form is expecting the status to be in this state so if it has changed
 				// then someone else beat the user to changing the status so we are going to stop and warn the user.
 				if (params.currentStatus) {
 					if (assetComment.status != params.currentStatus) {
@@ -159,7 +159,7 @@ class CommentService {
 								def isPM = partyRelationshipService.staffHasFunction(project.id, userLogin.person.id, 'PROJ_MGR')
 
 								log.debug "Task Already STARTED - isPM? $isPM, whoDidIt=$whoDidIt, person=${userLogin.person}"
-								// We'll allow the same user to click Start and Done 
+								// We'll allow the same user to click Start and Done
 								if (whoDidIt != userLogin.person && ! isPM) {
 									errorMsg = "The task was previously STARTED by ${whoDidIt}"
 								}
@@ -177,7 +177,7 @@ class CommentService {
 				if (errorMsg) {
 					break
 				}
-			
+
 				commentProject = assetComment.project
 				if (params.containsKey("assetEntity")){
 					assetComment.assetEntity = assetEntity
@@ -189,17 +189,17 @@ class CommentService {
 					break
 				}
 			}
-		
+
 			/*
 			 * Now do the general binding of params to the new or updated object
 			 */
-			
+
 			//	def bindArgs = [assetComment, params, [ exclude:['assignedTo', 'assetEntity', 'moveEvent', 'project', 'dueDate', 'status'] ] ]
 			//	def bindArgs = [assetComment, params, [ include:['comment', 'category', 'displayOption', 'attribute'] ] ]
 			//	bindData.invoke( assetComment, 'bind', (Object[])bindArgs )
 			// TODO - assignedTo is getting set even though it is in exclude list (seen in debugger with issue type)
-		
-			// Assign the general params for all types.  Was having an issue with the above binding, which was 
+
+			// Assign the general params for all types.  Was having an issue with the above binding, which was
 			// setting the assignedTo automatically with a blank Person object even though it was excluded.
 			// TODO : should only set properties base on the commentType
 			if (params.commentType) assetComment.commentType = params.commentType
@@ -230,7 +230,7 @@ class CommentService {
 					assetComment.resolvedBy = userLogin.person
 				}
 			}
-			
+
 			// Actual Start/Finish are handled by the statusUpdate function
 			// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
 			if (params.containsKey('workflowTransition')) {
@@ -241,7 +241,7 @@ class CommentService {
 						assetComment.workflowTransition = wft
 					} else {
 						log.warn "saveUpdateCommentAndNotes: Invalid workflowTransition id (${params.workflowTransition})"
-					}  
+					}
 				} else {
 					assetComment.workflowTransition = null
 				}
@@ -250,16 +250,16 @@ class CommentService {
 
 			// TM-4765: @tavo_luna: assign the new Notification Value with a NULL safe operation that defaults to 'true'
 			assetComment.sendNotification = (params.sendNotification ?: true).toBoolean()
-			
+
 			if (params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
 			if (params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
 			if (params.duration?.isInteger()) assetComment.duration = Integer.parseInt(params.duration)
 			if (params.durationScale) {
-				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())		
+				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())
 				log.debug "saveUpdateCommentAndNotes - TimeScale=${assetComment.durationScale}"
 			}
-			
-			// Issues (aka tasks) have a number of additional properties to be managed 
+
+			// Issues (aka tasks) have a number of additional properties to be managed
 			if ( assetComment.commentType == AssetCommentType.TASK ) {
 				if ( params.containsKey('moveEvent') ) {
 					if ( params.moveEvent.isNumber() ) {
@@ -286,7 +286,7 @@ class CommentService {
 						assetComment.moveEvent = null
 					}
 				}
-			
+
 				if (params.containsKey('assignedTo')) {
 					if (params.assignedTo && params.assignedTo.isNumber()){
 						if(params.assignedTo == '0'){ // if unassigned is selected .
@@ -305,29 +305,29 @@ class CommentService {
 					}
 				}
 
-				if (params.containsKey('dueDate') ) { 
+				if (params.containsKey('dueDate') ) {
 					// log.info "saveUpdateCommentAndNotes: dueDate=[${params.dueDate}]"
 					assetComment.dueDate = params.dueDate ? TimeUtil.parseDate(session, params.dueDate)  : null
 				}
-	
+
 			}
 
-			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This 
-			// should be the last update to Task properties before saving.	
-			taskService.setTaskStatus( assetComment, params.status )		
-        
+			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This
+			// should be the last update to Task properties before saving.
+			taskService.setTaskStatus( assetComment, params.status )
+
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 			Person byWhom = userLogin.person	// load so that we don't have a lazyInit issue
 			boolean addingNote = assetComment.commentType == AssetCommentType.TASK && params.note?.size() > 0
 
 			// Note that shouldSendNotification has to be called before calling save on the object
-			boolean shouldSendNotification = shouldSendNotification(assetComment, byWhom, isNew, addingNote) 
+			boolean shouldSendNotification = shouldSendNotification(assetComment, byWhom, isNew, addingNote)
 
 			if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
 				// Deal with Notes if there are any
 				if (assetComment.commentType == AssetCommentType.TASK && params.note){
 					// TODO The adding of commentNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everything keeps on as though it didn't which is wrong.
-					def commentNote = new CommentNote();
+					def commentNote = new CommentNote()
 					commentNote.createdBy = userLogin.person
 					commentNote.dateCreated = date
 					commentNote.note = params.note
@@ -341,13 +341,13 @@ class CommentService {
 						break
 					}
 				}
-			
+
 				// Now handle creating / updating task dependencies if the "manageDependency flag was passed
 				if (params.manageDependency) {
 					def taskDependencies = params.list('taskDependency[]')
 				    def taskSuccessors = params.list('taskSuccessor[]')
 					def deletedPreds = params.deletedPreds
-					
+
 					// If we're updating, we'll delete the existing dependencies and then readd them following
 					if (! isNew && deletedPreds) {
 						TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( ${deletedPreds} ) ")
@@ -387,24 +387,24 @@ class CommentService {
 
 				// TODO - comparison of the assetComment.dueDate may not work if the dueDate is stored in GMT
 				def css =  (assetComment.dueDate < date ? 'Lightpink' : 'White')
-				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0)	
+				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0)
 
-				map = [ 
+				map = [
 					assetComment : assetComment,
 					status : status ? true : false,
 					cssClass:css,
-					statusCss: taskService.getCssClassForStatus(assetComment.status ), 
+					statusCss: taskService.getCssClassForStatus(assetComment.status ),
 					assignedToName: assetComment.assignedTo?(assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName):"",
-					lastUpdatedDate: TimeUtil.formatDateTime(session, assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13) 
+					lastUpdatedDate: TimeUtil.formatDateTime(session, assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13)
 				]
-				
+
 				// Now refine if the task should be sent based on it being new or updated
 				if (shouldSendNotification) {
 					dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew, userDTFormat: userDTFormat])
 				}
-			
+
 				break
-				
+
 			} else {
 				log.error "saveUpdateCommentAndNotes: Saving comment changes - " + GormUtil.allErrorsString(assetComment)
 				errorMsg = 'An unexpected error occurred while saving your change'
@@ -412,7 +412,7 @@ class CommentService {
 			}
 			break
 		} // while (true)
-		
+
 		if (errorMsg) {
 			return [error:errorMsg]
 		} else {
@@ -420,24 +420,24 @@ class CommentService {
 		}
 	}
 
-	/** 
+	/**
 	 * Internal method used to determine if any of the Task comments were modified that would trigger a notification
 	 * NOTE: This method should be called before the task is actual saved as it checks for dirty properties which get
 	 * wiped out on the save.
 	 * @param task - the task to check if a notification is warranted
-	 * @param triggeredByWhom - the person that created/modified the task 
+	 * @param triggeredByWhom - the person that created/modified the task
 	 * @param isNew - a flag that indicates if the task was just created
 	 * @return true if a notification should be sent
 	 */
 	private boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote) {
-		boolean shouldNotify = ( 
-			task.commentType == AssetCommentType.TASK && 
+		boolean shouldNotify = (
+			task.commentType == AssetCommentType.TASK &&
 			task.sendNotification &&
 			task.isPublished &&
 			(task.status == AssetCommentStatus.READY || task.status == AssetCommentStatus.STARTED) &&
-			task.assignedTo	&& 
+			task.assignedTo	&&
 			task.assignedTo.id != triggeredByWhom.id
-		) 
+		)
 
 		// Now refine if the task should be sent based on it being new or updated
 		if (shouldNotify) {
@@ -460,9 +460,9 @@ class CommentService {
 			}
 		}
 		//log.info "shouldSendNotification() returns $shouldNotify"
-		return 	shouldNotify	
+		return 	shouldNotify
 	}
-	
+
     /**
      *  This method is responsible for creating the Quartz job for sending Emails for comments
      *  @param : paramsMap ["taskId":taskId, "tzId":tzId, "isNew":isNew]
@@ -473,16 +473,16 @@ class CommentService {
         trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'userDTFormat':params.userDTFormat, 'isNew':params.isNew,'tries':0L])
 		trigger.setJobName('SendTaskEmailJob')
 		trigger.setJobGroup('tdstm')
-  
+
 		quartzScheduler.scheduleJob(trigger)
 		log.info "dispatchTaskEmail ${params}"
-        
+
     }
-	
+
 	/**
 	 * Used to send the Task email to the appropriate user for the comment passed to the method. This is typically called from
 	 * a Quartz Job so that it happens outside of the User controller request handler for performance reasons.
-	 * 
+	 *
 	 * @param assetComment
 	 * @param tzId
 	 * @return
@@ -497,36 +497,36 @@ class CommentService {
 			log.error "sendTaskEMail: Invalid AssetComment ID [${taskId}] referenced in call"
 			return "reschedule"
 		}
-		
+
 		// log.info "sendTaskEMail: commentType: ${assetComment.commentType}, category: ${assetComment.category}"
-			
+
 		// Only send emails out for issues in the categories up to premove
 		if ( assetComment.commentType != AssetCommentType.TASK || ! statusToSendEmailFor.contains(assetComment.category) ) {
 			return
 		}
 
 		def assignedTo = assetComment.assignedTo
-		
+
 		// Must have an email address
 		if ( ! assignedTo?.email) {
 			log.warn "sendTaskEMail: No valid email address for assigned individual"
 			return
 		}
-		
+
 		// Truncate long comments to make manageable subject line
 		// TODO : Use Apache commons StringUtil and get rid of this function
 		def sub = leftString(getLine(assetComment.comment,0), 40)
 		sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : (assetComment.taskNumber ? assetComment.taskNumber+":"+sub : sub) )
-		
+
 		log.info "sendTaskEMail: taskId=${taskId} to=${assignedTo.id}/${assignedTo.email}"
-		
+
 		if(assignedTo?.userLogin){
 			def dateFormat = userPreferenceService.getPreferenceByUserAndCode(assignedTo?.userLogin, PREF.CURR_DT_FORMAT)
 			if(dateFormat){
 				userDTFormat = dateFormat
 			}
 		}
-		
+
 		mailService.sendMail {
 			to assignedTo.email
 			subject "${sub}"
@@ -537,7 +537,7 @@ class CommentService {
 		}
 
 	}
-	
+
 	/**
 	 * Returns a map of variables for the AssetComment and notes
 	 * @param assetComment - the assetComment object to create a model of
@@ -548,19 +548,19 @@ class CommentService {
 		def assetName = assetComment.assetEntity ? "${assetComment.assetEntity.assetName} (${assetComment.assetEntity.assetType})" : null
 		def createdBy = assetComment.createdBy
 		def resolvedBy = assetComment.resolvedBy
-		def dtCreated 
+		def dtCreated
 		def dueDate
 		def dtResolved
-		
+
 		dtCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
-		
+
 		if(assetComment.dateResolved) {
 			dtResolved = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dateResolved, TimeUtil.FORMAT_DATE_TIME)
 		}
 		if(assetComment.dueDate){
 			dueDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dueDate, TimeUtil.FORMAT_DATE)
 		}
-		
+
 		[	assetComment:assetComment,
 			assetName:assetName,
 			moveEvent:assetComment.moveEvent,
@@ -569,9 +569,9 @@ class CommentService {
 			dateFormat: userDTFormat,
 			notes:notes ]
 	}
-	
+
 	// TODO : move the leftString and getLine methods into a reusable class - perhaps extending string with @Delegate
-	
+
 	/**
 	 * Returns the left of a string to an optional length limit
 	 * @param str - string to return
@@ -597,9 +597,9 @@ class CommentService {
 		return ( (lineNum+1) > lines.size() ) ? null : lines[lineNum]
 	}
     /**
-     * 
+     *
      * @param task, assetComment
-     * @param dependent, predecessor 
+     * @param dependent, predecessor
      * @param taskDepId, existing dependency Id
      * @param depId, successor/predecessor
      * @return validate message
@@ -621,7 +621,7 @@ class CommentService {
         }
         return errorMsg
     }
-	
+
 	def showOrEditTask(params){
 		def commentList = []
 		def personResolvedObj
@@ -640,25 +640,25 @@ class CommentService {
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
 				dtResolved = TimeUtil.formatDateTime(session, assetComment.dateResolved)
 			}
-			
+
 			def etStart =  assetComment.estStart ? TimeUtil.formatDateTime(session, assetComment.estStart) : ''
-			
+
 			def etFinish = assetComment.estFinish ? TimeUtil.formatDateTime(session, assetComment.estFinish) : ''
-			
+
 			def atStart = assetComment.actStart ? TimeUtil.formatDateTime(session, assetComment.actStart) : ''
-			
+
 			def dueDate = assetComment.dueDate ? TimeUtil.formatDate(session, assetComment.dueDate) : ''
-	
+
 			def workflowTransition = assetComment?.workflowTransition
 			def workflow = workflowTransition?.name
-			
+
 			def noteList = assetComment.notes.sort{it.dateCreated}
 			def notes = []
 			noteList.each {
 				def dateCreated = it.dateCreated ? TimeUtil.formatDateTime(session, it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3) : ''
 				notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			}
-			
+
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
 			def predecessorTable = ""
@@ -687,20 +687,20 @@ class CommentService {
 					successorTable.append("""<tr class="${css}" ><td>${task.category}</td><td>${task}</td>""")
 				}
 				successorTable.append("""</tbody></table>""")
-			
+
 			}
 			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 			def entities = assetEntityService.entityInfo( project )
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
-			commentList = [ 
+			commentList = [
 				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,
-				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
+				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
 				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,
-				assetType:assetComment.assetEntity?.assetType ,staffRoles:taskService.getRolesForStaff(), servers : entities.servers, 
+				assetType:assetComment.assetEntity?.assetType ,staffRoles:taskService.getRolesForStaff(), servers : entities.servers,
 				applications : entities.applications, dbs : entities.dbs, files : entities.files,  networks :entities.networks,moveBundleList:moveBundleList,
 				assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
 		}else{
@@ -710,5 +710,5 @@ class CommentService {
 		}
 		return commentList
 	}
-	
+
 }

@@ -3,12 +3,12 @@ package com.tdssrc.grails
 import com.tdssrc.grails.NumberUtil
 
 /**
- * The StringUtil class contains a collection of useful string manipulation methods 
+ * The StringUtil class contains a collection of useful string manipulation methods
  */
 class StringUtil {
-	
+
 	/**
-	 * Truncates a string to a specified length and adds ellipsis (...) if the string was longer than the specified length. The total length 
+	 * Truncates a string to a specified length and adds ellipsis (...) if the string was longer than the specified length. The total length
 	 * including the ellipsis will be the length specified.
 	 * @param String	The string to ellipsis if necessary
 	 * @param Integer	The length to truncate the string to
@@ -21,8 +21,8 @@ class StringUtil {
 		}
 		return r
 	}
-	
-	/** 
+
+	/**
 	 * Used to strip off one or more characters that may appear at the beginning of a string and return the remainder
 	 * @param String chars - the characters that should be stripped off
 	 * @param String str - the string to manipulate
@@ -131,8 +131,8 @@ class StringUtil {
 	}
 
 	/**
-	 * Used to validate that any string/file name reference that is passed via the browser 
-	 * does not contain any directory tranversal notations (e.g. /root, ../../etc/passwd, etc). This 
+	 * Used to validate that any string/file name reference that is passed via the browser
+	 * does not contain any directory tranversal notations (e.g. /root, ../../etc/passwd, etc). This
 	 * will not allow the following strings in the name:  '..', '/', '\', '&', '?' and the '%' which can be used
 	 * to encode other characters. It will also fail if a null is passed as this shouldn't be considered safe...
 	 * @reference https://www.owasp.org/index.php/Path_Traversal
@@ -142,7 +142,7 @@ class StringUtil {
 	static boolean containsPathTraversals(String str) {
 		boolean someoneIsTryingToHack = true
 
-		if (str != null) { 
+		if (str != null) {
 			// Make sure that the user can NOT perform any PATH tranversal
 			List pathTraversals = ['..', '/', '\\', '%', '&', '?']
 
@@ -171,41 +171,41 @@ class StringUtil {
 	 */
 	static String encodeAsJson(CharSequence str) {
 		if (str == null || str.length() == 0) {
-			return str;
+			return str
 		}
 
-		StringBuilder sb = null;
-		int n = str.length(), i;
-		int startPos = -1;
-		char prevChar = (char)0;
+		StringBuilder sb = null
+		int n = str.length(), i
+		int startPos = -1
+		char prevChar = (char)0
 		for (i = 0; i < n; i++) {
-			char ch = str.charAt(i);
+			char ch = str.charAt(i)
 			if (startPos == -1) {
-				startPos = i;
+				startPos = i
 			}
-			String escaped = escapeCharacter(ch, prevChar);
+			String escaped = escapeCharacter(ch, prevChar)
 			if (escaped != null) {
 				if (sb == null) {
-					sb = new StringBuilder();
+					sb = new StringBuilder()
 				}
 				if (i - startPos > 0) {
-					sb.append(str, startPos, i);
+					sb.append(str, startPos, i)
 				}
 				if (escaped.length() > 0) {
-					sb.append(escaped);
+					sb.append(escaped)
 				}
-				startPos = -1;
+				startPos = -1
 			}
-			prevChar = ch;
+			prevChar = ch
 		}
 		if (sb != null) {
 			if (startPos > -1 && i - startPos > 0) {
-				sb.append(str, startPos, i);
+				sb.append(str, startPos, i)
 			}
-			return sb.toString();
+			return sb.toString()
 		}
 		else {
-			return str;
+			return str
 		}
 	}
 
@@ -219,39 +219,39 @@ class StringUtil {
 	static String escapeCharacter(char ch, char previousChar) {
 		switch (ch) {
 			case '"':
-				return "\\\"";
+				return "\\\""
 			case '\\':
-				return "\\\\";
+				return "\\\\"
 			case '\t':
-				return "\\t";
+				return "\\t"
 			case '\n':
-				return "\\n";
+				return "\\n"
 			case '\r':
-				return "\\r";
+				return "\\r"
 			case '\f':
-				return "\\f";
+				return "\\f"
 			case '\b':
-				return "\\b";
+				return "\\b"
 			case '\u000B': // vertical tab: http://bclary.com/2004/11/07/#a-7.8.4
-				return "\\v";
+				return "\\v"
 			case '\u2028':
-				return "\\u2028"; // Line separator
+				return "\\u2028" // Line separator
 			case '\u2029':
-				return "\\u2029"; // Paragraph separator
+				return "\\u2029" // Paragraph separator
 			case '/':
 				// preserve special handling that exists in JSONObject.quote to improve security if JSON is embedded in HTML document
 				// prevents outputting "</" gets outputted with unicode escaping for the slash
 				if (previousChar == '<') {
-					return "\\u002f"; 
+					return "\\u002f"
 				}
-				break;
+				break
 		}
 		if(ch < ' ') {
 			// escape all other control characters
 			return ch
 			//return "\\u" + StringGroovyMethods.padLeft(Integer.toHexString(ch), 4, "0");
 		}
-		return null;
+		return null
 	}
 
 	/**

@@ -19,8 +19,8 @@ class DataTransferComment
 		 commentId( nullable:true )
 		 commentType( inList:['issue','instruction','comment'] )
 		 mustVerify( nullable:true )
-		 rowId()	
+		 rowId()
 		 assetId( nullable:true )
-	}	
-	
+	}
+
 }

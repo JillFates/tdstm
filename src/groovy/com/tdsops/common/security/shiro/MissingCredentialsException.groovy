@@ -9,5 +9,5 @@ class MissingCredentialsException extends ShiroException {
 
 	public MissingCredentialsException(String message) {
 		super(message)
-	}	
+	}
 }

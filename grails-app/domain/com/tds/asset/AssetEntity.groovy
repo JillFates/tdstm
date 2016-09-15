@@ -1,17 +1,17 @@
 package com.tds.asset
 
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdsops.tm.enums.domain.SizeScale;
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.validators.CustomValidators
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil;
+import com.tdssrc.grails.TimeUtil
 
 
 class AssetEntity extends com.tdssrc.eav.EavEntity {
-	
+
 	AssetClass assetClass = AssetClass.DEVICE
 	String application = ""
 	String assetName
@@ -29,7 +29,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String description
 	String supportType
 	String environment
-	
+
 	String custom1
 	String custom2
 	String custom3
@@ -126,10 +126,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String custom94
 	String custom95
 	String custom96
-	
+
 	MoveBundle moveBundle
 	Project project
-	
+
 	String serialNumber
 	String assetTag
 	Manufacturer manufacturer
@@ -137,7 +137,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String ipAddress
 	String os
 	Integer usize
-	
+
 	Integer sourceRackPosition
 	AssetEntity sourceChassis
 	Integer sourceBladePosition
@@ -151,44 +151,44 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String cart
 	String shelf
 	String railType
-	
+
 	PartyGroup owner
 	Rack rackSource
 	Room roomSource
 	Rack rackTarget
 	Room roomTarget
-	Person appOwner 
+	Person appOwner
 	String appSme = ""
 
 	// MoveBundleAsset fields
 	String validation
-	
+
 	String externalRefId
-	
+
 	Integer dependencyBundle = 0
 	Integer size
 	SizeScale scale
 	Integer rateOfChange
 	Person modifiedBy
-		
+
 	static hasMany = [
 		// assetEntityVarchars : AssetEntityVarchar,
 		comments : AssetComment
 	]
-	
+
 	static constraints = {
 		application( blank:true, nullable:true )
 		assetName( blank:false, nullable:false, size:0..255 )
 		shortName( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
-		priority( nullable:true, validator: 
+		priority( nullable:true, validator:
 			CustomValidators.inList(
-				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.PRIORITY_OPTION), 
+				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.PRIORITY_OPTION),
 				"priority")
 		)
-		planStatus( blank:true, nullable:true, validator: 
+		planStatus( blank:true, nullable:true, validator:
 			CustomValidators.inList(
-				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.STATUS_OPTION), 
+				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.STATUS_OPTION),
 				"planStatus")
 		)
 		purchaseDate( nullable:true )
@@ -200,9 +200,9 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		retireDate( nullable:true )
 		description( blank:true, nullable:true, size:0..255 )
 		supportType( blank:true, nullable:true )
-		environment( blank:true, nullable:true, size:0..20, validator: 
+		environment( blank:true, nullable:true, size:0..20, validator:
 			CustomValidators.inList(
-				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION), 
+				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION),
 				"environment")
 		)
 		custom1( blank:true, nullable:true )
@@ -301,9 +301,9 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		custom94( blank:true, nullable:true )
 		custom95( blank:true, nullable:true )
 		custom96( blank:true, nullable:true )
-		
+
 		project( nullable:true )
-		
+
 		serialNumber( blank:true, nullable:true )
 		assetTag( blank:true, nullable:true )
 		manufacturer( nullable:true )
@@ -311,21 +311,21 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		ipAddress( blank:true, nullable:true )
 		os( blank:true, nullable:true )
 		usize( nullable:true )
-		
+
 		sourceRackPosition( nullable:true )
 		sourceChassis( nullable:true )
 		sourceBladePosition( nullable:true )
-	
+
 		targetRackPosition( nullable:true )
 		targetChassis( nullable:true )
 		targetBladePosition( nullable:true )
-	
+
 		virtualHost( blank:true, nullable:true )
 		truck( blank:true, nullable:true )
 		cart( blank:true, nullable:true )
 		shelf( blank:true, nullable:true )
 		railType( blank:true, nullable:true )
-		
+
 		// TODO : owner should not be nullable - remove and test
 		owner( nullable:true )
 		roomSource( nullable:true )
@@ -334,19 +334,19 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		rackTarget( nullable:true )
 		appOwner( nullable:true )
 		appSme( blank:true, nullable:true )
-	
+
 		// MoveBundleAsset fields
-		validation( blank:true, nullable:true, size:0..20, inList:ValidationType.getList() )		
+		validation( blank:true, nullable:true, size:0..20, inList:ValidationType.getList() )
 		dependencyBundle( nullable:true )
 		externalRefId( blank:true, nullable:true )
-				
+
 		size( nullable:true )
 		scale( nullable:true, inList:SizeScale.getKeys() )
 		rateOfChange( nullable:true )
 		modifiedBy( nullable:true )
 	}
-	
-	static mapping  = {	
+
+	static mapping  = {
 		version           true
 		autoTimestamp     false
 		tablePerHierarchy false
@@ -377,11 +377,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		lastUpdated = TimeUtil.nowGMT()
 		// modifiedBy = Person.loggedInPerson
 	}
-	
+
 	String toString(){
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}
-		
+
 	/*
 	 *  methods for JMESA filter/sort
 	 */
@@ -396,7 +396,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * Used to access the manufacturer of the asset which will return either the model.manufacturer or this.manufacturer where the model takes precedence
 	 */
 	Manufacturer getManufacturer() {
-		return (this.model ? this.model.manufacturer : this.manufacturer) 
+		return (this.model ? this.model.manufacturer : this.manufacturer)
 	}
 
 	/**
@@ -408,8 +408,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String getAssetType() {
 		String at = this.assetType
 		if (this.assetClass == AssetClass.DEVICE) {
-			at = this.model ? 
-					 this.model.assetType : 
+			at = this.model ?
+					 this.model.assetType :
 					 at == "Files" ? "Logical Storage" : at
 		}
 
@@ -439,7 +439,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * @return boolean
 	 */
 	def isaDevice() {
-		return ( ! isaApplication() && ! isaNetwork() && ! isaStorage() && ! isaDatabase() ) 
+		return ( ! isaApplication() && ! isaNetwork() && ! isaStorage() && ! isaDatabase() )
 	}
 
 	/**
@@ -448,7 +448,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 */
 
 	def isaDatabase() {
-		return assetType?.toLowerCase() == 'database'		
+		return assetType?.toLowerCase() == 'database'
 	}
 
 	/**
@@ -468,7 +468,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def isaNetwork() {
 		return false
 		// TODO - Fix isNetwork when domain is implemented
-		// return assetType.toLowerCase() == 'network'		
+		// return assetType.toLowerCase() == 'network'
 		// return entityType == AssetEntityType.NETWORK
 	}
 
@@ -519,14 +519,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		if (isApplication()) {
 			return readonly ? Application.read(id) : Application.get(id)
 		} else if (isStorage() ) {
-			return readonly ? Files.read(id) : Files.get(id)			
+			return readonly ? Files.read(id) : Files.get(id)
 		} else if (isNetwork()) {
 			// TODO - Fix getSuper when Network domain is implemented
 			return this
 		} else {
 			return this
 		}
-	} 
+	}
 	*/
 
 	/**
@@ -536,7 +536,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def transient getDepUp(){
 		return AssetDependency.countByDependentAndStatusNotEqual(this, 'Validated')
 	}
-	
+
 	/**
 	 * this method is used to count of dependencies to assets and the status is not Validated.
 	 * @return dependencyDown Count
@@ -544,7 +544,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def transient getDepDown(){
 		return AssetDependency.countByAssetAndStatusNotEqual(this, 'Validated')
 	}
-	
+
 	/**
 	 * this method is used to count of dependencies to assets where status in QUESTIONED,UNKNOWN.
 	 * @return
@@ -553,12 +553,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		return AssetDependency.findAll(" FROM AssetDependency ad \
 				WHERE (ad.status IN (:status)) AND (ad.asset=:asset OR ad.dependent=:asset)",
 				[asset:this, status:[AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.QUESTIONED]]).size()
-		/*return AssetDependency.countByAssetAndStatusInList(this, 
+		/*return AssetDependency.countByAssetAndStatusInList(this,
 			[AssetDependencyStatus.QUESTIONED,AssetDependencyStatus.UNKNOWN])*/
 	}
-	
+
 	/**
-	 * this method is used to count of dependencies to assets where the status in QUESTIONED,UNKNOWN,VALIDATED 
+	 * this method is used to count of dependencies to assets where the status in QUESTIONED,UNKNOWN,VALIDATED
 	 * of different MoveBundle.
 	 * @return
 	 */
@@ -568,7 +568,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 				[asset:this, bundle:this.moveBundle,
 				 status:[AssetDependencyStatus.VALIDATED, AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.QUESTIONED]]).size()
 	}
-	
+
 	/**
 	 * This method is used to set source Room and location or target Room and Location when we get request from select box
 	 * @param roomId : id of the room that we need to set
@@ -581,7 +581,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		def room = null
 		if(roomId && roomId !='0')
 			room = Room.read( roomId )
-		
+
 		//If flag is source then setting all source to requested value and vice versa .
 		if( source ){
 			roomSource = room
@@ -606,7 +606,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		def rack = null
 		if(rackId && rackId !='0')
 			rack = Rack.read( rackId )
-		
+
 		//If flag is source then setting all source to requested value and vice versa .
 		if( source ){
 			rackSource = rack

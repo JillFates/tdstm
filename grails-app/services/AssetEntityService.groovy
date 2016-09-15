@@ -58,11 +58,11 @@ class AssetEntityService {
 		// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
 		'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt', 'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
 		],
-		(AssetClass.STORAGE): [] 
+		(AssetClass.STORAGE): []
 	]
 
 	// The follow define the various properties that can be used with bindData to assign domain.properties
-	static CUSTOM_PROPERTIES = [ 
+	static CUSTOM_PROPERTIES = [
 		'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10',
 		'custom11', 'custom12', 'custom13', 'custom14', 'custom15', 'custom16', 'custom17', 'custom18', 'custom19', 'custom20',
 		'custom21', 'custom22', 'custom23', 'custom24', 'custom25', 'custom26', 'custom27', 'custom28', 'custom29', 'custom30',
@@ -73,23 +73,23 @@ class AssetEntityService {
 		'custom71', 'custom72', 'custom73', 'custom74', 'custom75', 'custom76', 'custom77', 'custom78', 'custom79', 'custom80',
 		'custom81', 'custom82', 'custom83', 'custom84', 'custom85', 'custom86', 'custom87', 'custom88', 'custom89', 'custom90',
 		'custom91', 'custom92', 'custom93', 'custom94', 'custom95', 'custom96']
-	
+
 	// Common properties for all asset classes (Application, Database, Files/Storate, Device)
-	static ASSET_PROPERTIES = [ 'assetName',  'shortName', 'priority', 'planStatus',  'department', 'costCenter', 
-		'maintContract', 'maintExpDate', 'retireDate', 'description', 'supportType', 'environment', 'serialNumber', 'validation', 'externalRefId', 
+	static ASSET_PROPERTIES = [ 'assetName',  'shortName', 'priority', 'planStatus',  'department', 'costCenter',
+		'maintContract', 'maintExpDate', 'retireDate', 'description', 'supportType', 'environment', 'serialNumber', 'validation', 'externalRefId',
 		'size', 'scale', 'rateOfChange'
 	]
-	// 'purchaseDate', 'purchasePrice', 
+	// 'purchaseDate', 'purchasePrice',
 
 	// Properties strictly for DEVICES (a.k.a. AssetEntity)
-	static DEVICE_PROPERTIES = [ 
-		'assetTag', 'assetType', 'ipAddress', 'os', 'usize', 'truck', 'cart', 'shelf', 'railType', 
+	static DEVICE_PROPERTIES = [
+		'assetTag', 'assetType', 'ipAddress', 'os', 'usize', 'truck', 'cart', 'shelf', 'railType',
 		'sourceBladePosition', 'targetRackPosition',
 		'sourceRackPosition', 'targetBladePosition'
 	]
 
 	// Properties strictly for ASSETS that are date (a.k.a. AssetEntity)
-	static ASSET_DATE_PROPERTIES = [ 
+	static ASSET_DATE_PROPERTIES = [
 		'purchaseDate', 'maintExpDate', 'retireDate'
 	]
 
@@ -100,7 +100,7 @@ class AssetEntityService {
 
 	// List of all of the Integer properties for the potentially any of the asset classes
 	static ASSET_INTEGER_PROPERTIES = ['size', 'rateOfChange', 'priority', 'sourceBladePosition', 'targetBladePosition', 'sourceRackPosition', 'targetRackPosition']
-	
+
 	static ASSET_TYPE_NAME_MAP = [
 		(AssetType.APPLICATION.toString()) : [ internalName:"application", frontEndName:"Application", frontEndNamePlural:"Applications", labelPreferenceName:"appLbl", labelText:"Application", labelHandles:"application"],
 		(AssetType.DATABASE.toString()) : [ internalName:"database", frontEndName:"Database", frontEndNamePlural:"Databases", labelPreferenceName:"dbLbl", labelText:"Database", labelHandles:"database"],
@@ -112,7 +112,7 @@ class AssetEntityService {
 		(AssetType.NETWORK.toString()) : [ internalName:"networkLogical", frontEndName:"Network", frontEndNamePlural:"Network", labelPreferenceName:"netLbl", labelText:"Network Device", labelHandles:"networkLogical"],
 		"Other" : [ internalName:"other", frontEndName:"Other Device", frontEndNamePlural:"Other Devices", labelPreferenceName:"oLbl", labelText:"Other Device", labelHandles:"other"]
 	]
-	
+
 	static transactional = true
 
 	def assetEntityAttributeLoaderService
@@ -129,7 +129,7 @@ class AssetEntityService {
 
 	def sessionFactory
 
-	/** 
+	/**
 	 * This map contains a key for each asset class and a list of their
 	 * related asset types.
 	 */
@@ -160,13 +160,13 @@ class AssetEntityService {
 		def results = []
 		def project = securityService.getUserCurrentProject()
 		def additionalFilters = [sort:'assetName']
-		
+
 		// We'll query for assets if there's a valid asset class (and project).
 		if (project && typesInfoByClassMap.containsKey(params.assetClass)) {
 
 			def typeInfo = typesInfoByClassMap[params.assetClass]
 			def assetClass = typeInfo.assetClass
-			
+
 			// Checks if paging is required.
 			if(limitResults){
 				def max = 10
@@ -192,13 +192,13 @@ class AssetEntityService {
 									.append(typeInfo.domain.name)
 									.append(" AS a")
 
-			StringBuffer whereQuery = new StringBuffer(" WHERE a.project=:project AND a.assetClass=:assetClass") 
-			
+			StringBuffer whereQuery = new StringBuffer(" WHERE a.project=:project AND a.assetClass=:assetClass")
+
 			def qparams = [project:project, assetClass:typeInfo.assetClass]
 
 			def doJoin = typeInfo.containsKey('assetType')
 			def notIn = typeInfo.containsKey('notIn') && typeInfo.notIn
-			
+
 			if (doJoin) {
 				if (notIn) {
 					fromQuery.append(" LEFT OUTER JOIN a.model AS m")
@@ -210,13 +210,13 @@ class AssetEntityService {
 				whereQuery.append(' IN (:assetType)')
 				qparams.assetType = typeInfo.assetType
 			}
-				
+
 			query.append(fromQuery).append(whereQuery)
 			def assets = typeInfo.domain.executeQuery(query.toString(), qparams, additionalFilters)
 			assets.each{a -> results << [id: a[0], name: a[1]]}
 			return results
 		}
-		
+
 		return results
 	}
 
@@ -244,7 +244,7 @@ class AssetEntityService {
 		List allAssets=AssetEntity.findAllByIdInList(assetIdList)
 		List invalidIds = allAssets.findAll({ it.project.id != project.id}).id
 		List missingIds=[]
-		assetIdList.each { x -> 
+		assetIdList.each { x ->
 			if (! allAssets.find({it.id == x})) {
 				missingIds << x
 			}
@@ -260,7 +260,7 @@ class AssetEntityService {
 		return invalidIds
 	}
 
-	/** 
+	/**
 	 * Used by the various asset controllers to return the JSON response to the callers when creating new asset
 	 * @param model
 	 * @param errorMsg
@@ -268,7 +268,7 @@ class AssetEntityService {
 	void renderSaveAssetJsonResponse(controller, Map model, errorMsg) {
 		renderSaveUpdateJsonResponse(controller, model, errorMsg, true)
 	}
-	/** 
+	/**
 	 * Used by the various asset controllers to return the JSON response to the callers when updating existing asset
 	 * @param model
 	 * @param errorMsg
@@ -292,7 +292,7 @@ class AssetEntityService {
 	}
 
 	/**
-	 * Used to assign a device to a blade chassis or rack appropriately. In the case of a VM it will clear out 
+	 * Used to assign a device to a blade chassis or rack appropriately. In the case of a VM it will clear out
 	 * all of the rack/chassis properties appropriately that shouldn't be set in the first place.
 	 * @param project - the project object that the device belongs to
 	 * @param userLogin - the user making the change
@@ -302,21 +302,21 @@ class AssetEntityService {
 	void assignDeviceToChassisOrRack(Project project, UserLogin userLogin, AssetEntity device, params) {
 		if (device.isaBlade()) {
 			if (NumberUtil.toLong(params.roomSourceId) > 0)
-				assignBladeToChassis(project, device, params.sourceChassis, true) 
+				assignBladeToChassis(project, device, params.sourceChassis, true)
 			if (NumberUtil.toLong(params.roomTargetId) > 0)
 				assignBladeToChassis(project, device, params.targetChassis, false)
 		} else if (device.isaVM()) {
 			// Clear out various physical assignments that shouldn't be there anyways
-			[	'rackSource', 'sourceRackPosition', 
-				'rackTarget', 'targetRackPosition', 
-				'sourceChassis', 'sourceBladePosition', 
+			[	'rackSource', 'sourceRackPosition',
+				'rackTarget', 'targetRackPosition',
+				'sourceChassis', 'sourceBladePosition',
 				'targetChassis', 'targetBladePosition'
 			].each { prop -> device[prop] = null }
 		} else {
 			// This should handle all rackable devices
 			// Set the source/target rack appropriate and create the rack appropriately
-			assignAssetToRack(project, device, params.rackSourceId, params.sourceRack, true) 
-			assignAssetToRack(project, device, params.rackTargetId, params.targetRack, false) 
+			assignAssetToRack(project, device, params.rackSourceId, params.sourceRack, true)
+			assignAssetToRack(project, device, params.rackTargetId, params.targetRack, false)
 		}
 	}
 
@@ -327,7 +327,7 @@ class AssetEntityService {
 	 * @param bundleId - the id of the bundle to assign to
 	 */
 	void assignAssetToBundle(Project project, AssetEntity asset, String bundleId) {
-		Long id = NumberUtil.toLong(bundleId) 
+		Long id = NumberUtil.toLong(bundleId)
 
 		if (id.is(null)) {
 			throw new InvalidRequestException('Invalid Bundle id was specified')
@@ -409,7 +409,7 @@ class AssetEntityService {
 	}
 
 	/**
-	 * Used to assign the asset to source and target rack with the params thatt were passed in from the form. If the rack is being 
+	 * Used to assign the asset to source and target rack with the params thatt were passed in from the form. If the rack is being
 	 * created then it will use the Room associated to the asset in the source or target room appropriately.
 	 * @param project - the current project of the user
 	 * @param asset - the asset/device being assigned to a rack
@@ -435,7 +435,7 @@ class AssetEntityService {
 				asset.targetBladePosition = null
 				asset.targetRackPosition = null
 			}
-			return 
+			return
 		}
 
 		def id = NumberUtil.toLong(rackId)
@@ -454,7 +454,7 @@ class AssetEntityService {
 					throw new InvalidRequestException("Creating a $srcOrTarget rack requires a name".toString())
 				}
 
-				def rack = rackService.findOrCreateRack(room, rackName) 
+				def rack = rackService.findOrCreateRack(room, rackName)
 				if (rack) {
 					asset[rackProp] = rack
 				} else {
@@ -485,7 +485,7 @@ class AssetEntityService {
 					throw new InvalidRequestException("Referenced rack ($id) was not found".toString())
 				}
 		}
-	}	
+	}
 
 	/**
 	 * Used to set a blade to a chassis in the source or target locations
@@ -552,7 +552,7 @@ class AssetEntityService {
 							blade.sourceBladePosition = bp
 						} else {
 							blade.targetBladePosition = bp
-						}						
+						}
 					}
 				} else {
 					warnings = "position ($bladePosition) specified is invalid"
@@ -568,7 +568,7 @@ class AssetEntityService {
 	 * @param loginUser : Instance of current logged in user
 	 * @param assetEntity : instance of entity including Server, Application, Database, Files
 	 * @param params : params map received from client side
-	 */	
+	 */
 	def createOrUpdateAssetEntityAndDependencies(Project project, UserLogin userLogin, AssetEntity assetEntity, def params) {
 		List errors = []
 		String errObject = 'dependencies'
@@ -581,16 +581,16 @@ class AssetEntityService {
 				}
 
 				// Verifying assetEntity assigned to the project
-				validateAssetsAssocToProject([assetEntity.id], project) 
+				validateAssetsAssocToProject([assetEntity.id], project)
 
 				//
 				// Handle deleting first
-				// 
+				//
 
 				// Collecting deleted deps ids and fetching there instances list
 				List toDelDepIds = params.deletedDep ? params.deletedDep.split(",").collect { NumberUtil.toLong(it, 0L)} : []
 				List toDelDepObjs = ( toDelDepIds.size() ? AssetDependency.findAllByIdInList(toDelDepIds) : [] )
-				
+
 				// Delete any dependencies that were listed in the params.deletedDep parameter
 				if (toDelDepObjs) {
 					// Gather all of the assets referenced in the dependendencies and make sure that they are associated to the project
@@ -601,13 +601,13 @@ class AssetEntityService {
 					AssetDependency.executeUpdate('delete AssetDependency where id in ( :dependencyIds ) ', [dependencyIds:toDelDepObjs.id])
 				}
 
-				// Add/Update Support dependencies 
+				// Add/Update Support dependencies
 				addOrUpdateDependencies(project, userLogin, 'support', assetEntity,  params)
 
-				// Add/Update Dependent dependencies 
+				// Add/Update Dependent dependencies
 				addOrUpdateDependencies(project, userLogin, 'dependent', assetEntity,  params)
 
-			} catch (DomainUpdateException e) {		
+			} catch (DomainUpdateException e) {
 				errors << e.getMessage()
 			} catch (InvalidRequestException e) {
 				errors << e.getMessage()
@@ -620,7 +620,7 @@ class AssetEntityService {
 			if (errors.size()){
 				assetEntity.discard()
 				status.setRollbackOnly()
-				throw new DomainUpdateException("Unable to update $errObject : $errors".toString())		
+				throw new DomainUpdateException("Unable to update $errObject : $errors".toString())
 			}
 		}
 	}
@@ -636,7 +636,7 @@ class AssetEntityService {
 	 * @throws DomainUpdateException for errors in data validation
 	 */
 	private void addOrUpdateDependencies(Project project, UserLogin userLogin, String depType, AssetEntity asset, params) {
-	
+
 		def (existingDeps, newDeps) = parseParamsForDependencyAssetIds(depType, params)
 
 		// Check that all of the referenced assets are associated with the project
@@ -658,7 +658,7 @@ class AssetEntityService {
 			// note that we are using withNewSession so that it doesn't cause the notorious 'Not Processed by Flush()' hibernate error
 			// TODO : JPM 10/2014 : Change query to readOnly:true or load entire list into memory so we don't do individual queries
 			AssetDependency.withNewSession() { status ->
-				AssetDependency dupAd 
+				AssetDependency dupAd
 				if (depType == 'support') {
 					dupAd = AssetDependency.findByAssetAndDependent(depAsset, asset)
 				} else {
@@ -715,7 +715,7 @@ class AssetEntityService {
 				throw new InvalidRequestException("Associating asset ($asset.name) to itself is not allowed")
 			}
 
-			AssetDependency ad = AssetDependency.get(depId) 
+			AssetDependency ad = AssetDependency.get(depId)
 			if (!ad) {
 				throw new InvalidRequestException("Unable to find referenced dependency ($depId)")
 			}
@@ -731,7 +731,7 @@ class AssetEntityService {
 			}
 
 			// Create a new dependency that will be saved
-			AssetDependency ad = new AssetDependency() 
+			AssetDependency ad = new AssetDependency()
 
 			updateDependency(depId, ad, depAssetId)
 		}
@@ -739,8 +739,8 @@ class AssetEntityService {
 
 	/**
 	 * Helper method used to parse the dependency id and reference asset from the paramaters of a request
-	 * 
-	 * Get list of all the AssetDependency ids referenced by stripping off the suffix of the asset_$type_ID param. For each 
+	 *
+	 * Get list of all the AssetDependency ids referenced by stripping off the suffix of the asset_$type_ID param. For each
 	 * form table row there will be variable representing each property of the domain followed by the type (support|dependent)
 	 * and the id of the domain. Values greater (>) than zero (0) reference existing records and <=0 are for new records.
 	 * @param depType - what dependency type is being updated (options support|dependent)
@@ -748,7 +748,7 @@ class AssetEntityService {
 	 * @return Existing Dependency List and New Dependency List, each containing maps of the dependency id : asset reference id
 	*/
 	private List parseParamsForDependencyAssetIds(String depType, params) {
-		// Get list of all the AssetDependency ids referenced by stripping off the suffix of the asset_$type_ID param. For each 
+		// Get list of all the AssetDependency ids referenced by stripping off the suffix of the asset_$type_ID param. For each
 		// form table row there will be variable representing each property of the domain followed by the type (support|dependent)
 		// and the id of the domain. Values greater (>) than zero (0) reference existing records and <=0 are for new records.
 		//
@@ -761,7 +761,7 @@ class AssetEntityService {
 			n.find(regex, { match, id ->
 				id = NumberUtil.toLong(id)
 				if (id == null) {
-					throw new InvalidRequestException("An invalid asset reference id was received ($n:$v)")	
+					throw new InvalidRequestException("An invalid asset reference id was received ($n:$v)")
 				}
 
 				// Fetch the asset id
@@ -798,7 +798,7 @@ class AssetEntityService {
 			throw new InvalidRequestException("Invalid asset id ${invalidAsset.id} referenced for project ${project.name}")
 		}
 	}
-	
+
 	/**
 	 * Delete all files that are match with params criteria
 	 * @param files path, file name startsWith
@@ -826,7 +826,7 @@ class AssetEntityService {
 
 	/**
 	 * @param project
-	 * @return list of entities 
+	 * @return list of entities
 	 */
 	def getSpecialExportData( project ){
 		String queryForSpecialExport = """ ( SELECT
@@ -854,7 +854,7 @@ class AssetEntityService {
 				ORDER BY app_name, server_name
 			)
 			UNION DISTINCT
-			
+
 			 ( SELECT
 				dbsrv.asset_entity_id AS server_id,
 				app.asset_entity_id AS app_id,
@@ -909,12 +909,12 @@ class AssetEntityService {
 				AND app.asset_type = 'Application' )"""
 
 		def splList =   jdbcTemplate.queryForList( queryForSpecialExport )
-											
+
 		return splList
 	}
-	
+
 	/**
-	 * Delete asset and associated records - use this method when we want to delete any asset 
+	 * Delete asset and associated records - use this method when we want to delete any asset
 	 * @param assetEntity
 	 * @return
 	 */
@@ -925,9 +925,9 @@ class AssetEntityService {
 		AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = :asset",[asset:assetEntity])
 		ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = :asset",[asset:assetEntity])
 		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom = :asset",[asset:assetEntity])
-		AssetCableMap.executeUpdate("""Update AssetCableMap 
+		AssetCableMap.executeUpdate("""Update AssetCableMap
 			set cableStatus='${AssetCableStatus.UNKNOWN}', assetTo=null,
-			assetToPort=null 
+			assetToPort=null
 			where assetTo = :asset""", [asset:assetEntity])
 		AssetDependency.executeUpdate("delete AssetDependency where asset = :asset or dependent = :dependent ",[asset:assetEntity, dependent:assetEntity])
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = :asset",[asset:assetEntity])
@@ -937,7 +937,7 @@ class AssetEntityService {
 		AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.targetChassis=NULL, ae.targetBladePosition=NULL WHERE ae.targetChassis=:asset", [asset:assetEntity])
 	}
 
-	
+
 	/**
 	 * Used to gather all of the assets for a project by asset class with option to return just individual classes
 	 * @param project
@@ -948,32 +948,32 @@ class AssetEntityService {
 		def map = [ servers:[], applications:[], dbs:[], files:[], networks:[], dependencyType:[], dependencyStatus:[] ]
 				if (groups == null || groups.contains(AssetType.SERVER.toString())) {
 			map.servers = AssetEntity.executeQuery(
-				"SELECT a.id, a.assetName FROM AssetEntity a " + 
-				"WHERE assetClass=:ac AND assetType in (:types) AND project=:project ORDER BY assetName", 
+				"SELECT a.id, a.assetName FROM AssetEntity a " +
+				"WHERE assetClass=:ac AND assetType in (:types) AND project=:project ORDER BY assetName",
 				[ac:AssetClass.DEVICE, types:AssetType.getAllServerTypes(), project:project] )
 		}
 
 		if (groups == null || groups.contains(AssetType.APPLICATION.toString())) {
 			map.applications = Application.executeQuery(
 				"SELECT a.id, a.assetName FROM Application a " +
-				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
+				"WHERE assetClass=:ac AND project=:project ORDER BY assetName",
 				[ac:AssetClass.APPLICATION, project:project] )
 		}
 
 		if (groups == null || groups.contains(AssetType.DATABASE.toString())) {
 			map.dbs = Database.executeQuery(
 				"SELECT d.id, d.assetName FROM Database d " +
-				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
+				"WHERE assetClass=:ac AND project=:project ORDER BY assetName",
 				[ac:AssetClass.DATABASE, project:project] )
 		}
-		
+
 		if (groups == null || groups.contains(AssetType.STORAGE.toString())) {
 			map.files = Files.executeQuery(
-				"SELECT f.id, f.assetName FROM Files f " + 
-				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
+				"SELECT f.id, f.assetName FROM Files f " +
+				"WHERE assetClass=:ac AND project=:project ORDER BY assetName",
 				[ac:AssetClass.STORAGE, project:project] )
 			map.files += AssetEntity.executeQuery(
-				"SELECT a.id, a.assetName FROM AssetEntity a " + 
+				"SELECT a.id, a.assetName FROM AssetEntity a " +
 				"WHERE assetClass=:ac AND project=:project AND COALESCE(a.assetType,'')='Storage' ORDER BY assetName",
 				[ ac:AssetClass.DEVICE, project:project] )
 		}
@@ -981,7 +981,7 @@ class AssetEntityService {
 		// NOTE - the networks is REALLY OTHER devices other than servers
 		if (groups == null || groups.contains(AssetType.NETWORK.toString())) {
 			map.networks = AssetEntity.executeQuery(
-				"SELECT a.id, a.assetName FROM AssetEntity a " + 
+				"SELECT a.id, a.assetName FROM AssetEntity a " +
 				"WHERE assetClass=:ac AND project=:project AND COALESCE(a.assetType,'') NOT IN (:types) ORDER BY assetName",
 				[ ac:AssetClass.DEVICE, project:project, types:AssetType.getNonOtherTypes() ] )
 		}
@@ -1028,9 +1028,9 @@ class AssetEntityService {
 
 	/**
 	 * Use to get the list of Priority Options
-	 * @return List of Priority values 
+	 * @return List of Priority values
 	 */
-	List getAssetPriorityOptions() {	
+	List getAssetPriorityOptions() {
 		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)?.value
 	}
 
@@ -1046,7 +1046,7 @@ class AssetEntityService {
 	/**
 	 * Used to retrieve the assettype attribute object
 	 * @param the name of the attribute
-	 * @return the Attribute object 
+	 * @return the Attribute object
 	 */
 	Object getPropertyAttribute(String property) {
 		EavAttribute.findByAttributeCode(property)
@@ -1133,8 +1133,8 @@ class AssetEntityService {
 	/**
 	 * Used to retrieve the asset and model that will be used for the Device Create form
 	 */
-	@Transactional(readOnly = true) 
-	List getDeviceAndModelForCreate(Project project, Object params) {	
+	@Transactional(readOnly = true)
+	List getDeviceAndModelForCreate(Project project, Object params) {
 
 		def (device, model) = getCommonDeviceModelForCreateEdit(project, null, params)
 
@@ -1159,20 +1159,20 @@ class AssetEntityService {
 	 * Used to retrieve the asset and model that will be used for the Device Edit form
 	 */
 	// TODO : JPM 9/2014 : these methods should be renamed from getDeviceModel to getDeviceAndModel to avoid confusion (improvement)
-	@Transactional(readOnly = true) 
+	@Transactional(readOnly = true)
 	List getDeviceModelForEdit(Project project, Object deviceId, Object params) {
 		def (device, model) = getCommonDeviceModelForCreateEdit(project, deviceId, params)
 		if (device) {
 			// TODO : JPM 9/2014 : refactor the quote strip into StringUtil.stripQuotes method or escape the name. This is done to fix issue with putting device name into javascript links
-			model.quotelessName = device.assetName?.replaceAll('\"', {''}) 
-		} 
+			model.quotelessName = device.assetName?.replaceAll('\"', {''})
+		}
 		return [device, model]
 	}
 
 	/**
-	 * Used to get the model properties that are common between the Create and Edit forms. It will also 
+	 * Used to get the model properties that are common between the Create and Edit forms. It will also
 	 * lookup the device if the id is presented. If the id is presented but is not found or references
-	 * another project's asset the function will return [null, null]. If successful it will return the 
+	 * another project's asset the function will return [null, null]. If successful it will return the
 	 * device and model map.
 	 * For Create purpose, the Manufacturer and Model will default to the user's session variables
 	 *
@@ -1181,7 +1181,7 @@ class AssetEntityService {
 	 * @param params - the http params
 	 * @return A list containing [device object, model map]
 	 */
-	@Transactional(readOnly = true) 
+	@Transactional(readOnly = true)
 	private List getCommonDeviceModelForCreateEdit(Project project, Object deviceId, Object params) {
 		boolean isNew = deviceId == null
 		def (device, model) = getCommonDeviceAndModel(project, deviceId, params)
@@ -1207,13 +1207,13 @@ class AssetEntityService {
 			assetEntityInstance: device,
 			assetType: assetType,
 			manufacturer: device.manufacturer,
-			manufacturers: getManufacturers( assetType ), 
+			manufacturers: getManufacturers( assetType ),
 			models: getModelSortedByStatus( device.manufacturer ),
 			// TODO : JPM 9/2014 : Determine what nonNetworkTypes is used for in the view (clean up if unnecessary)
 			modelName: modelName,
-			nonNetworkTypes: AssetType.getNonNetworkTypes(), 	
+			nonNetworkTypes: AssetType.getNonNetworkTypes(),
 			railTypeOption: getAssetRailTypeOptions(),
-			// TODO : JPM 9/2014 : determine if the views use source/targetRacks - I believe these can be removed as they are replaced by source/targetRackSelect 
+			// TODO : JPM 9/2014 : determine if the views use source/targetRacks - I believe these can be removed as they are replaced by source/targetRackSelect
 			sourceRacks: [],
 			targetRacks: [],
 			sourceChassisSelect: [],
@@ -1224,8 +1224,8 @@ class AssetEntityService {
 		// List of the room and racks to be used in the SELECTs
 		model.sourceRoomSelect = getRoomSelectOptions(project, true, true)
 		model.targetRoomSelect = getRoomSelectOptions(project, false, true)
-		model.sourceRackSelect = getRackSelectOptions(project, device?.roomSource?.id, true) 
-		model.targetRackSelect = getRackSelectOptions(project, device?.roomTarget?.id, true) 
+		model.sourceRackSelect = getRackSelectOptions(project, device?.roomSource?.id, true)
+		model.targetRackSelect = getRackSelectOptions(project, device?.roomTarget?.id, true)
 
 		model.putAll( getDefaultModelForEdits('AssetEntity', project, device, params) )
 
@@ -1236,12 +1236,12 @@ class AssetEntityService {
 			model.targetChassisSelect = getChassisSelectOptions(project, device?.roomTarget?.id)
 		}
 
-		// This is used to track the current assetType in the crud form. If the asset is new, it will default to Server otherwise 
+		// This is used to track the current assetType in the crud form. If the asset is new, it will default to Server otherwise
 		// it will use that of the model the asset is assigned to.
 		model.currentAssetType = device.assetType
 
 		model.rooms = getRooms(project)
-		
+
 		return [device, model]
 	}
 
@@ -1252,7 +1252,7 @@ class AssetEntityService {
 	 * @param params - the parameters passed from the browser
 	 * @return (device,model) the device if found and the map of model properties
 	 */
-	@Transactional(readOnly = true) 
+	@Transactional(readOnly = true)
 	private List getCommonDeviceAndModel(Project project, Object deviceId, Object params) {
 		AssetEntity device = AssetEntityHelper.getAssetById(project, AssetClass.DEVICE, deviceId)
 		Map model = [:]
@@ -1274,12 +1274,12 @@ class AssetEntityService {
 		def configMap = getConfig(type, asset?.validation ?: 'Discovery')
 
 		def assetTypeAttribute = getPropertyAttribute('assetType')
-		//def validationType = asset.validation 
+		//def validationType = asset.validation
 		def highlightMap = getHighlightedInfo(type, asset, configMap)
 		def dependentAssets = getDependentAssets(asset)
 		def supportAssets = getSupportingAssets(asset)
 
-		// TODO - JPM 8/2014 - Need to see if Edit even uses the servers list at all. If so, this needs to join the model to filter on assetType 
+		// TODO - JPM 8/2014 - Need to see if Edit even uses the servers list at all. If so, this needs to join the model to filter on assetType
 		def servers = AssetEntity.findAll("FROM AssetEntity WHERE project=:project AND assetClass=:ac AND assetType IN (:types) ORDER BY assetName",
 			[project:project, ac: AssetClass.DEVICE, types:AssetType.getServerTypes()])
 
@@ -1317,7 +1317,7 @@ class AssetEntityService {
 	 * @param
 	 * @return a Map that includes the list of common properties
 	 */
-	@Transactional(readOnly = true) 
+	@Transactional(readOnly = true)
 	Map getCommonModelForShows(String type, Project project, Object params, Object assetEntity=null) {
 
 		log.debug "### getCommonModelForShows() type=$type, project=${project.id}, asset=${assetEntity? assetEntity.id : 'null'}"
@@ -1339,38 +1339,38 @@ class AssetEntityService {
 		def validationType = assetEntity.validation
 
 		def projectAttributes = projectService.getAttributes(type)
-		
+
 		def configMap = getConfig(type, validationType, projectAttributes)
 
 		def dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by a.dependent.assetType, a.dependent.assetName asc",[assetEntity])
-		
+
 		def supportAssets = AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType, a.asset.assetName asc",[assetEntity])
 
 		def highlightMap = getHighlightedInfo(type, assetEntity, configMap, projectAttributes)
 
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
-		
+
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
-		
+
 		def hasPublishPermission = RolePermissions.hasPermission("PublishTasks")
 
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
 
 		Map model = [
 			assetId: assetEntity?.id,
-			assetComment:assetComment, 
+			assetComment:assetComment,
 			assetCommentList:assetCommentList,
-			config:configMap.config, 
-			customs:configMap.customs, 
+			config:configMap.config,
+			customs:configMap.customs,
 			dependencyBundleNumber: depBundle,
-			dependentAssets:dependentAssets, 
-			errors:params?.errors, 
+			dependentAssets:dependentAssets,
+			errors:params?.errors,
 			escapedName:getEscapedName(assetEntity),
-			highlightMap:highlightMap, 
-			prefValue:prefValue, 
+			highlightMap:highlightMap,
+			prefValue:prefValue,
 			project:project,
 			client: project.client,
-			redirectTo:params.redirectTo, 
+			redirectTo:params.redirectTo,
 			supportAssets:supportAssets,
 			viewUnpublishedValue:viewUnpublishedValue,
 			hasPublishPermission:hasPublishPermission
@@ -1379,7 +1379,7 @@ class AssetEntityService {
 		return model
 	}
 
-	/** 
+	/**
 	 * Used to provide the default properties used for the Asset Dependency views
 	 * @param listType - indicates the type of list [Application|AssetEntity|Files|Storage]
 	 * @param moveEvent
@@ -1387,31 +1387,31 @@ class AssetEntityService {
 	 * @param filters - the map of the filter settings
 	 * @return a Map that includes all of the common properties shared between all Asset List views
 	 */
-	@Transactional(readOnly = true) 
+	@Transactional(readOnly = true)
 	Map getDefaultModelForLists(AssetClass ac, String listType, Project project, Object fieldPrefs, Object params, Object filters) {
 
 		Map model = [
 			assetClassOptions: AssetClass.getClassOptions(),
-			assetDependency: new AssetDependency(), 
+			assetDependency: new AssetDependency(),
 			attributesList: [],		// Set below
 			dependencyStatus: getDependencyStatuses(),
-			dependencyType: getDependencyTypes(), 
-			event: params.moveEvent, 
+			dependencyType: getDependencyTypes(),
+			event: params.moveEvent,
 			fixedFilter: (params.filter ? true : false),
 			filter: params.filter,
 			hasPerm: RolePermissions.hasPermission("AssetEdit"),
 			justPlanning: userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true',
 			modelPref: null,		// Set below
-			moveBundleId: params.moveBundleId, 
-			moveBundle: filters?.moveBundleFilter ?: '', 
+			moveBundleId: params.moveBundleId,
+			moveBundle: filters?.moveBundleFilter ?: '',
 			moveBundleList: getMoveBundles(project),
 			moveEvent: null,		// Set below
-			planStatus: filters?.planStatusFilter ?:'', 
-			plannedStatus: params.plannedStatus, 
+			planStatus: filters?.planStatusFilter ?:'',
+			plannedStatus: params.plannedStatus,
 			projectId: project.id,
-			sizePref: getAssetListSizePref(), 
-			sortIndex: filters?.sortIndex, 
-			sortOrder: filters?.sortOrder, 
+			sizePref: getAssetListSizePref(),
+			sortIndex: filters?.sortIndex,
+			sortOrder: filters?.sortOrder,
 			staffRoles: taskService.getRolesForStaff(),
 			toValidate: params.toValidate,
 			unassigned: params.unassigned,
@@ -1421,10 +1421,10 @@ class AssetEntityService {
 		// Override the Use Just For Planning if a URL requests it (e.g. Planning Dashboard)
 		/*
 		// This was being added to correct the issue when coming from the Planning Dashboard but there are some ill-effects still
-		if (params.justPlanning) 
+		if (params.justPlanning)
 			model.justPlanning=true
 		*/
-		
+
 		def moveEvent = null
 		if (params.moveEvent && params.moveEvent.isNumber()) {
 			moveEvent = MoveEvent.findByProjectAndId(project, params.moveEvent )
@@ -1437,12 +1437,12 @@ class AssetEntityService {
 		// Create a list of the "custom##" fields that are currently selectable
 		def projectCustoms = project.customFieldsShown+1
 		def nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
-		
+
 		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll{ 
-			it.attributeCode!="assetName" && 
-			it.attributeCode!="manufacturer" && 
-			! (it.attributeCode in nonCustomList) && 
+		def appAttributes = attributes.findAll{
+			it.attributeCode!="assetName" &&
+			it.attributeCode!="manufacturer" &&
+			! (it.attributeCode in nonCustomList) &&
 			! COLUMN_PROPS_TO_EXCLUDE[ac].contains(it.attributeCode)
 		}
 
@@ -1467,7 +1467,7 @@ class AssetEntityService {
 	/**
 	 * Used to get an Select Option list of the Rooms for the source or target of the specified Project
 	 * @param project
-	 * @param isSource - flag to indicate that it should return Source rooms if true 
+	 * @param isSource - flag to indicate that it should return Source rooms if true
 	 * @param allowAdd - flag if true will include a Add Room... option (-1) default true
 	 * @return List<Map<id,value>>
 	 */
@@ -1599,9 +1599,9 @@ class AssetEntityService {
 		fields.each{f ->
 			if(allconfig[f.label])
 			config << [(f.label):allconfig[f.label]['phase'][validationType]]
-			
+
 		}
-		
+
 		//used to hide the customs whose fieldImportance is "H"
 		def customs = []
 		def hiddenConfig = []
@@ -1610,14 +1610,14 @@ class AssetEntityService {
 				customs << i
 				if(config.('custom'+i)=='H')
 				hiddenConfig << i
-			}	
+			}
 		}
-		
+
 		customs.removeAll(hiddenConfig)
-		
+
 		return [project:project, config:config, customs:customs]
 	}
-	
+
 	/**
 	 * Resolves the display string for the shutdownBy, startupBy, testingBy fields by either
 	 * getting the name of the person or stripping the prefix for SME/AppOwner or Role
@@ -1646,7 +1646,7 @@ class AssetEntityService {
 		def entities = []
 		def types
 
-		if (!project) 
+		if (!project)
 			project = securityService.getUserCurrentProject()
 
 		if (assetType) {
@@ -1665,7 +1665,7 @@ class AssetEntityService {
 			entities = AssetEntity.findAllByProjectAndAssetTypeInList(project, types, [sort:'assetName'])
 		} else {
 			log.warn "getAssetsByType() calledwith unhandled type '$assetType'"
-		}	
+		}
 
 		/*
 			if (assetType=='Server' || assetType=='Blade' || assetType=='VM'){
@@ -1751,13 +1751,13 @@ class AssetEntityService {
 	*/
 
 	/*
-	 * Update assets cabling data for selected list of assets 
+	 * Update assets cabling data for selected list of assets
 	 * @param list of assets to be updated
 	 */
 	def updateCablingOfAssets( modelAssetsList ) {
 		modelAssetsList.each{ assetEntity->
 			AssetCableMap.executeUpdate("Update AssetCableMap set cableStatus=?, assetTo=null, assetToPort=null where assetTo=?",[AssetCableStatus.UNKNOWN, assetEntity])
-			
+
 			AssetCableMap.executeUpdate("Delete from AssetCableMap where assetFrom=?",[assetEntity])
 
 			assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
@@ -1833,36 +1833,36 @@ class AssetEntityService {
 				case 'sme':
 						query +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme,"
 						joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n"
-						break;
+						break
 				case 'sme2':
 						query +="CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS sme2,"
 						joinQuery +="\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n"
-						break;
+						break
 				case 'modifiedBy':
 						query +="CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,"
 						joinQuery +="\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n"
-						break;
+						break
 				case 'lastUpdated':
 						query +="ee.last_updated AS ${value},"
 						joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
-						break;
+						break
 				case 'event':
 						query +="me.move_event_id AS event,"
 						joinQuery +="\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n"
-						break;
+						break
 				case 'appOwner':
 						query +="CONCAT(CONCAT(p3.first_name, ' '), IFNULL(p3.last_name,'')) AS appOwner,"
 						joinQuery +="\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n"
-						break;
+						break
 				case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownBy|shutdownDuration|startupBy|startupFixed|startupDuration|testingBy|testingFixed|testingDuration/:
 						query +="a.${WebUtil.splitCamelCase(value)} AS ${value},"
-						break;
+						break
 				case ~/custom\d{1,3}/:
 						query +="ae.${value} AS ${value},"
-						break;
+						break
 				case ~/validation|latency|planStatus|moveBundle/:
 					// Handled by the calling routine
-					break;
+					break
 				default:
 					query +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
 			}
@@ -1870,7 +1870,7 @@ class AssetEntityService {
 		return [ query:query, joinQuery:joinQuery ]
 	}
 	/**
-	 * Returns the default optional/customizable columns 
+	 * Returns the default optional/customizable columns
 	 * @param prefName - the preference name for the various asset lists
 	 * @return appPref
 	 */
@@ -1878,14 +1878,14 @@ class AssetEntityService {
 	Map getExistingPref(prefName){
 		def colPref
 		def existingPref = userPreferenceService.getPreference(prefName)
-		
-		if (existingPref) {	
+
+		if (existingPref) {
 			// TODO : JPM 9/2014 : I'm assuming that the JSON.parse function could throw an error if the json is corrupt so there should be a try/catch
 			colPref = JSON.parse(existingPref)
 		}
 
 		if (! colPref) {
-		
+
 			switch (prefName) {
 				case 'App_Columns':
 					colPref = ['1':'sme', '2':'environment', '3':'validation', '4':'planStatus', '5':'moveBundle']
@@ -1919,7 +1919,7 @@ class AssetEntityService {
 
 	/**
 	 * Used to save cabling data to database while importing.
-	 * 
+	 *
 	 */
 	def saveImportCables(cablingSheet){
 		def warnMsg = []
@@ -1927,7 +1927,7 @@ class AssetEntityService {
 		def cablingUpdated = 0
 		def project = securityService.getUserCurrentProject()
 		for ( int r = 2; r < cablingSheet.getLastRowNum(); r++ ) {
-			int cols = 0 ;
+			int cols = 0
 			def isNew = false
 			def cableType=WorkbookUtil.getStringCellValue(cablingSheet, cols, r ).replace("'","\\'")
 			def fromAsset = AssetEntity.get(NumberUtils.toDouble(WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'"), 0).round())
@@ -1964,7 +1964,7 @@ class AssetEntityService {
 					def fromConnector = fromAsset.model?.modelConnectors.find{it.label == fromConnectorLabel}
 					def assetCable = AssetCableMap.findByAssetFromAndAssetFromPort(fromAsset,fromConnector)
 					if (!assetCable) {
-						log.info "Cable not found for $fromAsset and $fromConnector"						
+						log.info "Cable not found for $fromAsset and $fromConnector"
 						warnMsg << "row (${r+1}) with connector $fromConnectorLabel and Asset Name $fromAssetName don't have a cable"
 						cablingSkipped++
 						continue
@@ -1991,27 +1991,27 @@ class AssetEntityService {
 						assetCable.assetToPort = null
 						assetCable.toPower = ''
 					}
-					
+
 					if (AssetCableMap.constraints.cableColor.inList.contains(cableColor)) {
 						assetCable.cableColor = cableColor
 					}
-						
+
 					assetCable.cableComment = cableComment
 					assetCable.cableStatus = cableStatus
-					
+
 					if(AssetCableMap.constraints.assetLoc.inList.contains(roomType))
 						assetCable.assetLoc= roomType
-						
+
 					if( assetCable.dirtyPropertyNames.size() ) {
 						assetCable.save(flush:true)
 						cablingUpdated++
 					}
-					
+
 				} else {
 					warnMsg << "row (${r+1}) with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped"
 					cablingSkipped++
 				}
-				
+
 			}else{
 				warnMsg << "row (${r+1}) with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped"
 				cablingSkipped+=1
@@ -2065,8 +2065,8 @@ class AssetEntityService {
 		}
 		return highlightMap
 	}
-	
-	/** 
+
+	/**
 	 * This is used to escape quotes in a string to be used in Javascript
 	 * TODO : JPM 9/2014 : getEscapeName should be refactored into a reusable function in String or HtmlUtil as it should not be SOOOOO tied to an asset
 	 */
@@ -2075,7 +2075,7 @@ class AssetEntityService {
 		if (assetEntity.assetName?.size() > 0 ) {
 			name = SEU.escapeHtml(SEU.escapeJavaScript(assetEntity.assetName))
 		}
-/*			
+/*
 		def size = assetEntity.assetName?.size() ?: 0
 		for (int i = 0; i < size; ++i)
 			if (assetEntity.assetName[i] == "'")
@@ -2095,7 +2095,7 @@ class AssetEntityService {
 	/**
 	 * This method is used to sort model by status full, valid and new to display at Asset CRUD
 	 * @param manufacturerInstance : instance of Manufacturer for which model list is requested
-	 * @return : model list 
+	 * @return : model list
 	 */
 	def getModelSortedByStatus (Manufacturer mfr) {
 		def models = [Validated:[], Unvalidated:[]]
@@ -2107,7 +2107,7 @@ class AssetEntityService {
 			models.Validated = modelListValid
 			models.Unvalidated = modelListFull+modelListNew
 		}
-		
+
 		return models
 	}
 
@@ -2173,13 +2173,13 @@ class AssetEntityService {
 	 * job so that the user request can happen quickly. The job then will post progress updates to report back
 	 * to the user referencing the params.key.
 	 * The user's system timezone is critical to computing the datetimes in the spreadsheet since the application
-	 * runs in GMT but Excel/Apache POI assume that the spreadsheet is in the system timezone. So if we generate a 
-	 * spreadsheet and stuff a 
+	 * runs in GMT but Excel/Apache POI assume that the spreadsheet is in the system timezone. So if we generate a
+	 * spreadsheet and stuff a
 	 * @param Datatransferset,Project,Movebundle
 	 *		params.key - the key to reference for progress status
 	 *		params.projectId - the project for which to export assets
 	 *		params.bundle - the bundle to export
-	 *		params.dataTransferSet - 
+	 *		params.dataTransferSet -
 	 *		params.username - the user that made the request
 	 *		params.tzId - the user's timezone (IMPORTANT that this be their system TZ and not their user preference*)
 	 * 		params.userDTFormat - the user's Date Format (MIDDLE_ENDIAN, LITTLE_ENDIAN)
@@ -2210,14 +2210,14 @@ class AssetEntityService {
 			def progressCount = 0
 			def progressTotal = 0
 			def missingHeader = ""
-			
+
 			//get project Id
 			def dataTransferSet = params.dataTransferSet
 			def bundleNameList = new StringBuffer()
 			def bundles = []
 			def principal = params.username
 			def loginUser = UserLogin.findByUsername(principal)
-			
+
 			def bundle = params.bundle
 			def bundleSize = bundle.size()
 			bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')
@@ -2228,7 +2228,7 @@ class AssetEntityService {
 			def project = Project.get(projectId)
 			if ( project == null) {
 				progressService.update(key, 100, 'Cancelled', 'Project is required.')
-				return;
+				return
 			}
 
 			// Maps for each class for mapping spreadsheet column names to the domain properties
@@ -2302,7 +2302,7 @@ class AssetEntityService {
 				query += " AND d.moveBundle.id IN(${bundleStr})"
 				//queryParams.bundles = bundles
 			}
-			
+
 			/*
 				The following size related variables are used to
 				update the progress meter.
@@ -2332,7 +2332,7 @@ class AssetEntityService {
 
 			def countRows = { q, qParams ->
 				def tmpQueryStr = "SELECT COUNT(*) " + q
-				def countQuery = session.createQuery(tmpQueryStr) 
+				def countQuery = session.createQuery(tmpQueryStr)
 				qParams.each{ k, v ->
 					countQuery.setParameter(k,v)
 				}
@@ -2391,7 +2391,7 @@ class AssetEntityService {
 			float updateOnPercent = 0.01
 
 			// Used by the profile sampling to determine # of rows to profile and how often within the dataset
-			double percentToProfile = 25.0		// Sample 5% of all of data 
+			double percentToProfile = 25.0		// Sample 5% of all of data
 			double frequencyToProfile = 5.0		// Sample the data every 5% of the way
 
 			// Have to load the maps because we update the column names across the top for all sheets
@@ -2422,7 +2422,7 @@ class AssetEntityService {
 			Map assetDepBundleMap = new HashMap(assetDepBundleList.size())
 			assetDepBundleList.each {
 				assetDepBundleMap.put(it[0].toString(), it[1])
-			}			
+			}
 			profiler.lap(mainProfTag, 'Created asset dep bundles')
 
 			//create book and sheet
@@ -2556,7 +2556,7 @@ class AssetEntityService {
 					WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(projectId).toString())
 					WorkbookUtil.addCell(titleSheet, 1, 5, bundleNameList.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
-				
+
 					def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
 					WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
 					WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
@@ -2566,8 +2566,8 @@ class AssetEntityService {
 				}
 				profiler.lap(mainProfTag, 'Updated title sheet')
 
-				//update data from Asset Entity table to EXCEL				
-				
+				//update data from Asset Entity table to EXCEL
+
 				def serverColumnNameListSize = sizeOf(serverColumnNameList)
 				def appcolumnNameListSize = sizeOf(appColumnNameList)
 				def dbcolumnNameListSize = sizeOf(dbColumnNameList)
@@ -2603,13 +2603,13 @@ class AssetEntityService {
 					writeValidationColumn(getDependencyStatuses(), col, "DepStatus")
 					WorkbookUtil.makeSheetReadOnly(validationSheet)
 					profiler.lap("Validations", "Finished exporting Validation values")
-					profiler.endInfo("Validations", "Finished writing validation values to sheet.")	
+					profiler.endInfo("Validations", "Finished writing validation values to sheet.")
 				}
 
 
 				writeValidationSheet()
-			
-				def calcProfilerCriteria = { datasetSize -> 
+
+				def calcProfilerCriteria = { datasetSize ->
 					int sampleQty = 1
 					int sampleModulus = 1
 					// int numOfSampleSets = (int)(1/frequencyToProfile)
@@ -2638,7 +2638,7 @@ class AssetEntityService {
 				]
 
 				// The maximum # of row level threshold violations to log
-				final int profileThresholdLogLimit = 1000 
+				final int profileThresholdLogLimit = 1000
 
 				// Will log if setting a field exceeds this threadhold (msec)
 				final int profileThresholdSettingField = 2
@@ -2648,7 +2648,7 @@ class AssetEntityService {
 				// The following variables are used to control the profiling behavior
 				//
 				// Counter used to count the number of threshold violations
-				int profileThresholdViolations 
+				int profileThresholdViolations
 				int profileHighwaterMark = 0
 				String profileHighwaterAsset = ''
 				int profileSampleQty
@@ -2718,7 +2718,7 @@ class AssetEntityService {
 						}
 
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
-						
+
 						// Add assetId for walkthrough template only.
 						if( serverSheetColumnNames.containsKey("assetId") ) {
 							addCell(serverSheet, deviceCount, 0, currentAsset.id, Cell.CELL_TYPE_NUMERIC)
@@ -2759,7 +2759,7 @@ class AssetEntityService {
 										case ~/usize|SourcePos|TargetPos/:
 											def pos = a[attribute] ?: 0
 											// Don't bother populating position if it is a zero
-											if (pos == 0) 
+											if (pos == 0)
 												continue
 											addCell(serverSheet, deviceCount, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
 											break
@@ -2789,7 +2789,7 @@ class AssetEntityService {
 									}
 								}
 							}
-							
+
 							if (profilingRow) {
 								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
 								if (lapDuration > 2) {
@@ -2811,7 +2811,7 @@ class AssetEntityService {
 							lapDuration = profiler.getLapDuration(silentTag).toMilliseconds()
 							if (lapDuration > profileRowThresholds[(AssetClass.DEVICE)]) {
 								profileThresholdViolations++
-								profiler.log(Profiler.LOG_TYPE.WARN, "Asset '${currentAsset.assetName}' (id:${currentAsset.id}) exceeded duration threshold ($lapDuration msec)") 
+								profiler.log(Profiler.LOG_TYPE.WARN, "Asset '${currentAsset.assetName}' (id:${currentAsset.id}) exceeded duration threshold ($lapDuration msec)")
 								if ( lapDuration > profileHighwaterMark ) {
 									// Log each row that bumps up the highwater mark
 									profileHighwaterMark = lapDuration
@@ -2833,7 +2833,7 @@ class AssetEntityService {
 								durationMatrix[durationGroup].average = (int)(durationMatrix[durationGroup].duration / durationMatrix[durationGroup].count)
 							}
 						}
-						
+
 						profiler.endSilent(silentTag)
 					} // asset.each
 					asset = null
@@ -2849,13 +2849,13 @@ class AssetEntityService {
 
 						int durSum = durationMatrix.values().sum { it.duration }
 						if (durSum > 0) {
-							durationMatrix.each {k,v -> 
+							durationMatrix.each {k,v ->
 								durationMatrix[k].perc = Math.round(v.duration/durSum*100)
 							}
 						}
 						profiler.log(Profiler.LOG_TYPE.INFO, "Duration Matrix: $durationMatrix")
 					}
-					
+
 				}else{
 					// Add validations for the first row (which is blank)
 					WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap["Environment"], 1, 1)
@@ -2888,7 +2888,7 @@ class AssetEntityService {
 					// Flag to know if the AppId Column exists
 					def idColName = 'appId'
 					def hasIdCol = appSheetColumnNames.containsKey(idColName)
-					
+
 					int applicationCount = 0
 					//application.each { app ->
 					application.each{ app ->
@@ -3015,7 +3015,7 @@ class AssetEntityService {
 									dateValue =''
 								}
 								addCell(dbSheet, databaseCount, dbMap[colName], dateValue)
-							} else { 
+							} else {
 								def prop = currentDatabase[attribute]
 								if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
 									if ( bundleMoveAndClientTeams.contains(attribute) ) {
@@ -3027,7 +3027,7 @@ class AssetEntityService {
 							}
 						}
 						//GormUtil.flushAndClearSession(session, progressCount)
-						
+
 					}
 					database = null
 					profiler.endInfo("Databases", "processed %d rows", [dbSize])
@@ -3052,14 +3052,14 @@ class AssetEntityService {
 
 					exportedEntity += "F"
 					files = getAssetList(filesQuery, queryParams)
-					
+
 					//for ( int r = 1; r <= fileSize; r++ ) {
 					int filesCount = 0
 					files.each{currentFile ->
 						progressCount++
 						filesCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
-						
+
 						// Add assetId for walkthrough template only.
 						if ( storageSheetColumnNames.containsKey("filesId") ) {
 							addCell(storageSheet, filesCount, 0, (currentFile.id), Cell.CELL_TYPE_NUMERIC)
@@ -3093,7 +3093,7 @@ class AssetEntityService {
 						}
 
 						//GormUtil.flushAndClearSession(session, progressCount)
-						
+
 					}
 					files = null
 					profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
@@ -3102,7 +3102,7 @@ class AssetEntityService {
 					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap["Environment"], 1, 1)
 					WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, 1)
 				}
-				
+
 				//
 				// Dependencies
 				//
@@ -3160,7 +3160,7 @@ class AssetEntityService {
 							if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
 								addCell(dependencySheet, r + 1, i, dependency[i])
 							}
-							
+
 						}
 						//GormUtil.flushAndClearSession(session, progressCount)
 					}
@@ -3230,7 +3230,7 @@ class AssetEntityService {
 							if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
 								addCell(roomSheet, rowNum, col, String.valueOf(prop?:""))
 							}
-							
+
 						}
 						// Export date fields using the user's TZ.
 						dateFields.each{ col->
@@ -3241,9 +3241,9 @@ class AssetEntityService {
 						//GormUtil.flushAndClearSession(session, progressCount)
 					}
 					profiler.endInfo("Rooms", "processed %d rows", [roomSize])
-					results = null	
+					results = null
 				}
-				
+
 				//
 				// Rack Export
 				//
@@ -3255,14 +3255,14 @@ class AssetEntityService {
 
 					def racks = Rack.createCriteria().list{
 						and{
-							eq("project", project)	
+							eq("project", project)
 						}
-						
+
 						resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
 						fetchSize 1000
 						readOnly true
 					}
-			
+
 					def rackMap = ['rackId':'id', 'Tag':'tag', 'Location':'location', 'Room':'room', 'RoomX':'roomX',
 									 'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
 									 'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
@@ -3270,7 +3270,7 @@ class AssetEntityService {
 
 					def rackCol = rackSheet.getRow(0).getLastCellNum()
 					def rackSheetColumns = []
-					
+
 					for ( int c = 0; c < rackCol; c++ ) {
 						def rackCellContent = rackSheet.getRow(0).getCell(c).getStringCellValue()
 						rackSheetColumns << rackCellContent
@@ -3293,7 +3293,7 @@ class AssetEntityService {
 									if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
 										addCell(rackSheet, rowNum, i, String.valueOf(prop))
 									}
-									
+
 								}
 							}
 						}
@@ -3303,12 +3303,12 @@ class AssetEntityService {
 					profiler.endInfo("Racks", "processed %d rows", [rackSize])
 
 				}
-				
+
 			}
 
 			//
 			// Cabling Export
-			// 
+			//
 			if ( doCabling ) {
 				profiler.beginInfo "Cabling"
 
@@ -3338,7 +3338,7 @@ class AssetEntityService {
 
 			//
 			// Comments Export
-			// 
+			//
 			if ( doComment ) {
 				profiler.beginInfo "Comments"
 
@@ -3347,13 +3347,13 @@ class AssetEntityService {
 				if (commentSize > 0) {
 					def commentSheet = getWorksheet("Comments")
 
-					def c = AssetComment.createCriteria()				
+					def c = AssetComment.createCriteria()
 					List commentList = c {
 						and {
 							eq('project', project)
 							eq('commentType', 'comment')
 							isNotNull('assetEntity')
-							
+
 						}
 						resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
 						setReadOnly true
@@ -3366,7 +3366,7 @@ class AssetEntityService {
 					def commentId
 					def category
 					def comment
-					
+
 					commentList.eachWithIndex{ comm, idx ->
 						def rowNum = idx + 1 //HEADER Offset
 						def currentComment = comm.get(Criteria.ROOT_ALIAS)
@@ -3375,7 +3375,7 @@ class AssetEntityService {
 						def dateCommentCreated = ''
 						if (currentComment.dateCreated) {
 							dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
-						} 
+						}
 
 						addCell(commentSheet, rowNum, 0, String.valueOf(currentComment.id))
 
@@ -3400,28 +3400,28 @@ class AssetEntityService {
 
 			//
 			// Wrap up the process
-			// 
+			//
 			profiler.lap(mainProfTag, 'All sheets populated')
 
 			profiler.begin("RECALCULATE_FORMULAS")
 			book.setForceFormulaRecalculation(true)
 			profiler.end("RECALCULATE_FORMULAS")
 
-			File tempExportFile = File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(), null);
+			File tempExportFile = File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(), null)
 			progressService.updateData(key, 'filename', tempExportFile.getAbsolutePath())
 			FileOutputStream out =  new FileOutputStream(tempExportFile)
 			book.write(out)
 			out.close()
 
 			// The filename will consiste of the following:
-			//    - Owner of the Project 
-			//    - Name of the Project or ID 
+			//    - Owner of the Project
+			//    - Name of the Project or ID
 			//    - Bundle name(s) selected or ALL
-			//    - Letters symbolizing each of the tabs that were exported 
+			//    - Letters symbolizing each of the tabs that were exported
 			//    - The date that the spreadsheet was exported
 			//	  - The file extension to use
-			String filename = project.client.name + '-' + 
-				( project.name ?: project.id ) + 
+			String filename = project.client.name + '-' +
+				( project.name ?: project.id ) +
 				"-${bundleNameList}-${exportedEntity}-${exportDate}.${fileExtension}"
 
 			filename = StringUtil.sanitizeAndStripSpaces(filename)
@@ -3463,7 +3463,7 @@ class AssetEntityService {
 			return false
 		}
 	}
-	
+
 	/**
 	 * This method is used to update sheet's column header with custom labels
 	 * @param sheet : sheet's instance
@@ -3497,25 +3497,25 @@ class AssetEntityService {
 		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
 		def prefType = 'Asset_Columns'
 		def fieldPrefs = getExistingPref(prefType)
-		
+
 		// The hack for the dot notation
 		fieldPrefs.each {k,v -> fieldPrefs[k] = v }
 
 		Map model = getDefaultModelForLists(AssetClass.DEVICE, 'AssetEntity', project, fieldPrefs, params, filters)
 
 		// Check the getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
-		model.assetName = filters?.assetNameFilter ?:'' 
-		model.assetPref = fieldPrefs 
-		model.assetTag = filters?.assetTagFilter ?:'' 
-		model.assetType = filters?.assetTypeFilter ?:'' 
-		model.model = filters?.modelFilter ?:'' 
-		model.manufacturer = filters?.manufacturer ?:'' 
-		model.prefType = prefType 
-		model.serialNumber = filters?.serialNumberFilter ?:'' 
-		model.sourceLocation = filters?.sourceLocationFilter ?:'' 
+		model.assetName = filters?.assetNameFilter ?:''
+		model.assetPref = fieldPrefs
+		model.assetTag = filters?.assetTagFilter ?:''
+		model.assetType = filters?.assetTypeFilter ?:''
+		model.model = filters?.modelFilter ?:''
+		model.manufacturer = filters?.manufacturer ?:''
+		model.prefType = prefType
+		model.serialNumber = filters?.serialNumberFilter ?:''
+		model.sourceLocation = filters?.sourceLocationFilter ?:''
 		model.sourceRack = filters?.sourceRackFilter ?:''
-		model.targetLocation = filters?.targetLocationFilter ?:'' 
-		model.targetRack = filters?.targetRackFilter ?:'' 
+		model.targetLocation = filters?.targetLocationFilter ?:''
+		model.targetRack = filters?.targetRackFilter ?:''
 		// Used for filter toValidate from the Planning Dashboard - want a better parameter (JPM 9/2014)
 		model.type = params.type
 
@@ -3534,38 +3534,38 @@ class AssetEntityService {
 		return model
 	}
 
-	 /** 
+	 /**
 		* Used to retrieve the data used by the AssetEntity List
 		*/
 	 Map getDeviceDataForList(Project project, UserLogin userLogin, session, params, tzId) {
 		def filterParams = [
-			assetName: params.assetName, 
-			assetType: params.assetType, 
-			depConflicts: params.depConflicts, 
-			depNumber: params.depNumber, 
+			assetName: params.assetName,
+			assetType: params.assetType,
+			depConflicts: params.depConflicts,
+			depNumber: params.depNumber,
 			depToResolve: params.depToResolve,
 			event: params.event,
-			model: params.model, 
-			manufacturer: params.manufacturer, 
-			moveBundle: params.moveBundle, 
-			planStatus: params.planStatus, 
-			sourceLocation: params.sourceLocation, 
-			sourceRack: params.sourceRack, 
+			model: params.model,
+			manufacturer: params.manufacturer,
+			moveBundle: params.moveBundle,
+			planStatus: params.planStatus,
+			sourceLocation: params.sourceLocation,
+			sourceRack: params.sourceRack,
 		]
 		def validSords = ['asc', 'desc']
 		def sortOrder = (validSords.indexOf(params.sord) != -1) ? (params.sord) : ('asc')
-		def maxRows = Integer.valueOf(params.rows) 
+		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
 		def moveBundleList
-		
+
 		def attributes = projectService.getAttributes('AssetEntity')
-		
+
 		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
 		def prefType = 'Asset_Columns'
 		def assetPref= getExistingPref(prefType)
-		
+
 		def assetPrefVal = assetPref.collect{it.value}
 		attributes.each { attribute ->
 			if (attribute.attributeCode in assetPrefVal)
@@ -3574,23 +3574,23 @@ class AssetEntityService {
 
 		// Lookup the field name reference for the sort
 		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
-		
+
 		// This is used by the JQ-Grid some how
 		session.AE = [:]
 
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, "${maxRows}")
-		
+
 		if (params.event && params.event.isNumber()) {
 			def moveEvent = MoveEvent.read( params.event )
 			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		}
-		
+
 		def assetType = params.filter ? ApplicationConstants.assetFilters[ params.filter ] : []
 
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
-		
+
 		StringBuffer altColumns = new StringBuffer()
 		StringBuffer joinQuery = new StringBuffer()
 
@@ -3636,14 +3636,14 @@ class AssetEntityService {
 						srcRoomAdded = true
 					}
 					if (locOrRoom == 'Location') {
-						// Note that this is added by default above 
+						// Note that this is added by default above
 						// altColumns.append(', srcRoom.location AS sourceLocation')
 					} else if (locOrRoom == 'Room') {
 						altColumns.append(', srcRoom.room_name AS sourceRoom')
 					} else {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
-					break	
+					break
 				case ~/sourceRack|moveBundle/:
 						// Handled by the default columns
 					break
@@ -3663,7 +3663,7 @@ class AssetEntityService {
 					} else {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
-					break	
+					break
 				case 'targetRack':
 					// Property was moved to the Rack domain
 					altColumns.append(", tgtRack.tag AS targetRack")
@@ -3679,19 +3679,19 @@ class AssetEntityService {
 					break
 
 				case 'validation':
-					break;
+					break
 				default:
 					altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS ${value} ")
 			}
 		}
 
-		def query = new StringBuffer(""" 
-			SELECT * FROM ( 
-				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, 
-				ae.asset_type AS assetType, m.name AS model,  
-				IF(at.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, 
-				IF(ac.comment_type IS NULL, 'noComments','comments') AS commentsStatus, 
-				me.move_event_id AS event, ae.plan_status AS planStatus, 
+		def query = new StringBuffer("""
+			SELECT * FROM (
+				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName,
+				ae.asset_type AS assetType, m.name AS model,
+				IF(at.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
+				IF(ac.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
+				me.move_event_id AS event, ae.plan_status AS planStatus,
 				mb.name AS moveBundle, ae.validation AS validation
 			""" )
 
@@ -3709,9 +3709,9 @@ class AssetEntityService {
 
 		if (joinQuery.length())
 			query.append(joinQuery)
-			
+
 		//
-		// Begin the WHERE section of the query	
+		// Begin the WHERE section of the query
 		//
 		query.append("\nWHERE ae.project_id = ${project.id}\nAND ae.asset_class = '${AssetClass.DEVICE}'")
 
@@ -3723,7 +3723,7 @@ class AssetEntityService {
 		*/
 		if (justPlanning=='true')
 			query.append("\nAND mb.use_for_planning=${justPlanning}")
-		
+
 		query.append("\nAND ae.asset_class='${AssetClass.DEVICE}'")
 
 		def filter = params.filter ?: 'all'
@@ -3750,27 +3750,27 @@ class AssetEntityService {
 				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getNonOtherTypes())}) " )
 				break
 
-			case 'all': 
+			case 'all':
 				break
 		}
 
 		if (params.event && params.event.isNumber() && moveBundleList)
 			query.append( "\nAND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
-			
+
 		if (params.unassigned) {
 			def unasgnMB = MoveBundle.findAll("\nFROM MoveBundle mb WHERE mb.moveEvent IS NULL AND mb.useForPlanning=true AND mb.project=:project ", [project:project])
-			
+
 			if (unasgnMB) {
 				def unasgnmbId = GormUtil.asQuoteCommaDelimitedString(unasgnMB?.id)
 				query.append( "\nAND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
 			}
 		}
-			
+
 		query.append("\nGROUP BY assetId \n) AS assets")
-		
+
 		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
 		def firstWhere = true
-		def whereAnd = { 
+		def whereAnd = {
 			if (firstWhere) {
 				firstWhere = false
 				return ' WHERE'
@@ -3787,7 +3787,7 @@ class AssetEntityService {
 				whereConditions << SqlUtil.parseParameter(key, val, queryParams, AssetEntity)
 			}
 		}
-		
+
 		if(whereConditions.size()){
 			firstWhere = false
 			query.append(" WHERE assets.${whereConditions.join(" AND assets.")}")
@@ -3801,7 +3801,7 @@ class AssetEntityService {
 				query.append( whereAnd() + " assets.moveBundle IS NULL ")
 			}
 		}
-		
+
 		if (params.type && params.type == 'toValidate') {
 			query.append( whereAnd() + " assets.validation='Discovery' ") //eq ('validation','Discovery')
 		}
@@ -3816,7 +3816,7 @@ class AssetEntityService {
 		}
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 		log.debug  "query = ${query}"
-		
+
 		def assetList = []
 		if(queryParams.size()){
 			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
@@ -3824,7 +3824,7 @@ class AssetEntityService {
 		}else{
 			assetList = jdbcTemplate.queryForList(query.toString())
 		}
-		
+
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
 		def totalRows = assetList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
@@ -3832,28 +3832,28 @@ class AssetEntityService {
 			assetList = assetList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		else
 			assetList = []
-			
+
 		def results = assetList?.collect {
 			def commentType = it.commentType
-			[ 	
-				cell: [ 
+			[
+				cell: [
 					'', // The action checkbox
-					it.assetName, 
-					(it.assetType ?: ''), 
+					it.assetName,
+					(it.assetType ?: ''),
 					it.manufacturer,
-					it.model, 
-					it.sourceLocation, 					
-					( it[ assetPref['1'] ] ?: ''), 
-					( it[ assetPref['2'] ] ?: ''), 
-					( it[ assetPref['3'] ] ?: ''), 
-					( it[ assetPref['4'] ] ?: ''), 
-					( it[ assetPref['5'] ] ?: ''), 
-					it.planStatus, 
-					it.moveBundle, 
+					it.model,
+					it.sourceLocation,
+					( it[ assetPref['1'] ] ?: ''),
+					( it[ assetPref['2'] ] ?: ''),
+					( it[ assetPref['3'] ] ?: ''),
+					( it[ assetPref['4'] ] ?: ''),
+					( it[ assetPref['5'] ] ?: ''),
+					it.planStatus,
+					it.moveBundle,
 					/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
-					it.tasksStatus, 
-					it.assetType, 
-					it.event, 
+					it.tasksStatus,
+					it.assetType,
+					it.event,
 					it.commentsStatus
 				], id: it.assetId
 			]
@@ -3862,10 +3862,10 @@ class AssetEntityService {
 		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 	}
-	 
+
 	 /**
 		* Returns the list of models from a specific manufacturer and asset type
-		* 
+		*
 		* @param manufacturerId the id of the manufacturer
 		* @param assetType the type of asset
 		* @param term the term to be searched
@@ -3877,7 +3877,7 @@ class AssetEntityService {
 		def result = []
 		List words = []
 
-		def manuId = NumberUtil.toLong(manufacturerId)	   
+		def manuId = NumberUtil.toLong(manufacturerId)
 		if (manuId) {
 			manufacturer = Manufacturer.read(manuId)
 		}
@@ -3968,27 +3968,27 @@ class AssetEntityService {
 				text: title,
 				isValid: isValid,
 				usize: model[6]
-			] 
+			]
 			added++
 		}
 
 		return result
 	}
-	 
+
 	 /**
 		* Obtains the list of manufactures using the assetType and term
-		* 
+		*
 		* @param assetType the type of asset
 		* @param term the term to be searched
 		* @param currentProject the current project
 		* @return the map of manufacturers
 		*/
 	 def manufacturersOf(assetType, term, currentProject) {
-		 def hql = "SELECT distinct m.id, m.name FROM Manufacturer m";
+		 def hql = "SELECT distinct m.id, m.name FROM Manufacturer m"
 		 def joinTables = ""
 		 def condition = ""
 		 def hqlParams = []
-		 
+
 		 if (StringUtils.isNotBlank(term)) {
 			 if (hqlParams.isEmpty()) {
 				 condition = condition + " WHERE m.name LIKE ?"
@@ -3999,7 +3999,7 @@ class AssetEntityService {
 		 }
 
 		 if (StringUtils.isNotBlank(assetType)) {
-			 joinTables = " LEFT OUTER JOIN m.models as model";
+			 joinTables = " LEFT OUTER JOIN m.models as model"
 			 if (hqlParams.isEmpty()) {
 				 condition = condition + " WHERE model.assetType = ?"
 			 } else {
@@ -4013,23 +4013,23 @@ class AssetEntityService {
 			return [
 				 "id" : manufacturer[0],
 				 "text" : manufacturer[1]
-			 ];
+			 ]
 		 }
-		 
+
 		 return result
 	 }
 
 	 /**
 	* Obtains the list of asset types using the manufacturer and term
-	* 
-	* @param manufacturer the manufacturer 
+	*
+	* @param manufacturer the manufacturer
 	* @param term the term to be searched
 	* @param currentProject the current project
 	* @return the map of asset types
 	*/
 	def assetTypesOf(manufacturerId, term, currentProject) {
-		def hql = "SELECT distinct m.assetType as assetType FROM Model m WHERE m.assetType is not null ";
-		def joinTables = " ";
+		def hql = "SELECT distinct m.assetType as assetType FROM Model m WHERE m.assetType is not null "
+		def joinTables = " "
 		def condition = ""
 		def hqlParams = []
 
@@ -4048,7 +4048,7 @@ class AssetEntityService {
 			return [
 				id : model,
 				text : model
-			];
+			]
 		}
 
 		result = result.sort {it.text}

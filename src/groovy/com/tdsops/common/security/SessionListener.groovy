@@ -55,7 +55,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 					// boolean added = false
 					if (name == SHIRO_KEY) {
 						PrincipalCollection principals = session.getAttribute(name)
-						sb << 'Shiro principal found in session: ' << principals.primaryPrincipal 
+						sb << 'Shiro principal found in session: ' << principals.primaryPrincipal
 						// added = true
 					}
 
@@ -82,7 +82,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 				sb << 'Value: ' << value
 				delimiter = ', '
 			}
-			*/ 
+			*/
 
 			log.debug sb.toString()
 		}
@@ -133,10 +133,10 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 		//	if (added) sb << ', '
 		//	sb << 'LOGIN_PERSON ' + what + ' session ' << session.id << ': ' << session[LOGIN_PERSON]
 		//}
-		
+
 		if (added) {
 			sb << ', ip: ' + HtmlUtil.getRemoteIp()
-			
+
 			log.debug sb.toString()
 		}
 	}

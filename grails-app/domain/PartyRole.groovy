@@ -8,16 +8,16 @@ class PartyRole implements Serializable {
 
 	static belongsTo = [ party:Party, roleType:RoleType ]
 
-	static mapping  = {	
+	static mapping  = {
 		version false
 		id composite:['party', 'roleType'], generator:'assigned', unique:true
 		columns {
 			roleType sqlType:'varchar(20)'
 		}
-		
+
 	}
 
 	String toString() {
 		"$party : $roleType"
-	}	
+	}
 }

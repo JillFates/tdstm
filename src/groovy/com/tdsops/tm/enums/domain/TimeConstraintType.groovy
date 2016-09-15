@@ -1,10 +1,10 @@
 /**
  * The TimeConstraintType represents the various contraints that can be applied to a task that while affect its scheduling
- * 
+ *
  * 		ALAP 	As Late As Possible: Schedules the task as late as it can without delaying subsequent tasks. Use no constraint date.
  * 		ASAP	As Soon As Possible: Schedules the task to start as early as it can. Use no constraint date.
  * 		MSO 	Must Start On: Schedules the task to start on the constraint date. Once selected the task will not be movable on the timescale
- * 
+ *
  * For more information visit http://support.microsoft.com/kb/74978
  */
 
@@ -28,7 +28,7 @@ enum TimeConstraintType {
 
 	TimeConstraintType(String value) {
 		this.value = value
-	}	
+	}
 
 	String toString() { name() }
 	String value() { value }
@@ -43,31 +43,31 @@ enum TimeConstraintType {
 	}
 
 	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
+	static List getKeys() {
+		if (keys == null)
 			buildKeys()
 		return keys
 	}
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
+	// Construct the static keys
+	private static synchronized void buildKeys() {
 		if (keys == null) {
 			keys = TimeConstraintType.values()
 		}
-	} 
+	}
 
 	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
+	static List getLabels(String locale='en') {
+		if (labels == null)
 			buildLabels()
 		return labels
 	}
 
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
+	// Construct the static labels
+	private static synchronized void buildLabels() {
 		if (labels == null) {
 			labels = TimeConstraintType.values()*.value
 		}
-	} 
+	}
 
 }

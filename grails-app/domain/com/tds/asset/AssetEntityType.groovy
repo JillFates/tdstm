@@ -17,7 +17,7 @@ public enum AssetEntityType {
 
 	AssetEntityType(String value) {
 		this.value = value
-	}	
+	}
 
 	String toString() { name() }
 	String value() { return value }
@@ -32,31 +32,31 @@ public enum AssetEntityType {
 	}
 
 	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
+	static List getKeys() {
+		if (keys == null)
 			buildKeys()
 
 		return keys
 	}
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
+	// Construct the static keys
+	private static synchronized void buildKeys() {
 		if (keys == null)
 			keys = AssetEntityType.values()
-	} 
+	}
 
 	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
+	static List getLabels(String locale='en') {
+		if (labels == null)
 			buildLabels()
 		return labels
 	}
 
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
+	// Construct the static labels
+	private static synchronized void buildLabels() {
 		if (labels == null) {
 			labels = AssetEntityType.values()*.value
 		}
-	} 
+	}
 
 }

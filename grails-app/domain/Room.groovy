@@ -9,22 +9,22 @@ class Room {
 	Integer roomWidth = 24
 	Integer roomDepth = 24
 	Project project
-	String address 
-	String city 
-	String stateProv 
-	String postalCode 
-	String country 	
-	
+	String address
+	String city
+	String stateProv
+	String postalCode
+	String country
+
 	// Groovy time stime stamps
 	Date dateCreated
 	Date lastUpdated
-	
+
 	// Value of 1 indicates that the room is a source location otherwise it is a target room
 	Integer source = 1
-	
+
 	static hasMany = [racks:Rack, sourceAssets:AssetEntity, targetAssets:AssetEntity]
 	static mappedBy = [sourceAssets:"roomSource", targetAssets:"roomTarget"]
-	
+
 	static constraints = {
 		project( nullable:false )
 		roomName( blank:false, nullable:false, size:1..255 )
@@ -39,7 +39,7 @@ class Room {
 		country( blank:true, nullable:true, size:0..255 )
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		version true
 		id column:'room_id'
 		postalCode sqlType:"varchar(12)"
@@ -48,11 +48,11 @@ class Room {
 			source sqltype: 'tinyint(1)'
 		}
 	}
-	
+
 	String toString(){
 		"$location / $roomName"
 	}
-		
+
 	/*
 	 * Date to insert in GMT
 	 */
@@ -63,7 +63,7 @@ class Room {
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
 	}
-	
+
 	def getRackCount(){
 		return Rack.countByRoom(this)
 	}
@@ -75,7 +75,7 @@ class Room {
 	/**
 	 * Returned the number of assets assiged to racks in the room
 	 * @return Integer count of assets
-	 */	
+	 */
 	def getAssetCount(){
 		// TODO - jpm 8/13 - I would like to see this be a criteria with .count() instead so that the whole recordset isn't returned just to call size()
 		return AssetEntity.findAll(
@@ -83,17 +83,17 @@ class Room {
 			[this, this]
 		).size()
 	}
-	
+
 	def transient getRoomAddress(forWhom) {
-		def roomAddress = 
-			(this.address ? (forWhom == "link" ? this.address : this.address+"<br/>") : "") + 
-			(this.city ?: '' ) + 
+		def roomAddress =
+			(this.address ? (forWhom == "link" ? this.address : this.address+"<br/>") : "") +
+			(this.city ?: '' ) +
 			(this.stateProv  ? ", ${this.stateProv}" : '' ) +
 			(this.postalCode ? "  ${this.postalCode}" : '' ) +
 			(this.country  ? " ${this.country}" : '' )
-		return 	roomAddress			   
+		return 	roomAddress
 	}
-	
+
 	/**
 	 * Updating all Room reference as null
 	 */

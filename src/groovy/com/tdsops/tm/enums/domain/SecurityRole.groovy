@@ -8,7 +8,7 @@ enum SecurityRole {
 
 	USER ('User'),	// Limited access
 	EDITOR ('Editor'),	// Client user with moderate access'),
-	SUPERVISOR ('Supervisor'), 
+	SUPERVISOR ('Supervisor'),
 	ADMIN ('Administrator') // All rights
 
 	//
@@ -21,7 +21,7 @@ enum SecurityRole {
 
 	SecurityRole(String value) {
 		this.value = value
-	}	
+	}
 
 	String toString() { name() }
 	String value() { value }
@@ -36,31 +36,31 @@ enum SecurityRole {
 	}
 
 	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
+	static List getKeys() {
+		if (keys == null)
 			buildKeys()
 		return keys
 	}
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
+	// Construct the static keys
+	private static synchronized void buildKeys() {
 		if (keys == null) {
 			keys = SecurityRole.values()
 		}
-	} 
+	}
 
 	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
+	static List getLabels(String locale='en') {
+		if (labels == null)
 			buildLabels()
 		return labels
 	}
 
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
+	// Construct the static labels
+	private static synchronized void buildLabels() {
 		if (labels == null) {
 			labels = SecurityRole.values()*.value
 		}
-	} 
+	}
 
 }

@@ -1,20 +1,20 @@
 /**
  * The MoveBundleStep domain represents the various steps that are associated with a MoveBundle and contains
- * information entered by the user plus some properties that are determined during the execution of the 
- * move event.  
+ * information entered by the user plus some properties that are determined during the execution of the
+ * move event.
  */
 import com.tdssrc.grails.TimeUtil
-class MoveBundleStep {	
+class MoveBundleStep {
 	static final String METHOD_LINEAR="L"
 	static final String METHOD_MANUAL="M"
-	
+
     MoveBundle moveBundle			// The bundle that the step is associated with
     Integer transitionId			// Maps to the id # of the transition in the workflow XML definition
 	String label					// Value to display in UI
     Date planStartTime				// The date/time of when the step will start, entered by the project manager enters while planning to move
     Date planCompletionTime			// The date/time of when the step will complete, entered by the project manager enters while planning to move
 	String calcMethod				// The method that will be used to calculate the projection of completion for the step
-	Integer showOnDashboard=1		// Used to determine if the Step appears in the dashboard		
+	Integer showOnDashboard=1		// Used to determine if the Step appears in the dashboard
 	Date dateCreated
 	Date lastUpdated
 	Integer showInGreen = 0			// used to show the step progress in green when user set to 1
@@ -23,7 +23,7 @@ class MoveBundleStep {
     Date actualStartTime
     Date actualCompletionTime
 
-	static constraints = { 
+	static constraints = {
 		label( blank:false, nullable:false)
 		planStartTime( nullable:true )
 		planCompletionTime( nullable:true )
@@ -79,7 +79,7 @@ class MoveBundleStep {
 		}
 		return timeDuration
 	}
-		
+
 	/**
 	 * calculates the actual time that the step has taken.  If the step hasn't completed
 	 * it will determine the duration from the start to the current time or time passed into method.
@@ -89,18 +89,18 @@ class MoveBundleStep {
 	def getActualDuration( def asOfTime ) {
 		def timeDuration
 		if ( ! asOfTime ) asOfTime = TimeUtil.nowGMT()
-		
+
 		if( actualStartTime && actualCompletionTime ){
 			timeDuration = actualCompletionTime.getTime() - actualStartTime.getTime()
 		} else if( !actualCompletionTime && actualStartTime){
 			timeDuration = asOfTime.getTime() - actualStartTime.getTime()
 		}
-		
+
 		timeDuration = timeDuration ? (timeDuration / 1000).intValue() : 0
-		
+
 		return timeDuration
 	}
-	
+
 	/**
 	 * determines if the step is completed
 	 * @return bool - true if completed

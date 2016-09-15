@@ -1,7 +1,7 @@
 import groovy.mock.interceptor.*
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
-import org.apache.log4j.* 
+import org.apache.log4j.*
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -11,7 +11,7 @@ import spock.lang.Specification
  */
 @TestFor(CookbookService)
 class CookbookServiceTests extends Specification {
-	
+
 	def cookbookService = new CookbookService()
 	def log
 
@@ -37,7 +37,7 @@ class CookbookServiceTests extends Specification {
 			terminal: true,
 			chain: false,
 		]"""
-		
+
 	def goodGeneralTask = """[
 			id: 1110,
 			description: 'Make NAT changes for various CSG services',
@@ -56,7 +56,7 @@ class CookbookServiceTests extends Specification {
 			]
 		]"""
 
-		
+
 		def problemRecipe1 = """
 /**
 			 * Recipe to create branching and gather tasks
@@ -68,7 +68,7 @@ tasks: [
 		type: 'milestone',
 		category: 'moveday',
 		team: 'PROJ_MGR'
-	],	
+	],
 	[
 		id: 1100,
 		description: 'Validate ALL applications',
@@ -97,7 +97,7 @@ tasks: [
 		successor: [
 			defer: 'App Tasks'
 		]
-	],	
+	],
 	[
 		id: 1120,
 		description: 'Document ALL applications',
@@ -111,7 +111,7 @@ tasks: [
 		predecessor: [
 			taskSpec:1100,	// This will allow 1110 and this (1120) to execute in parallel
  		]
-	],	
+	],
 
 		[
 		id: 1130,
@@ -126,7 +126,7 @@ tasks: [
 		predecessor: [
 			gather: 'App Tasks',
 		]
-	],	
+	],
 
 	[
 		id: 1200,
@@ -134,7 +134,7 @@ tasks: [
 		type: 'milestone',
 		category: 'moveday',
 		team: 'PROJ_MGR'
-	],	
+	],
 ]
 	"""
 
@@ -267,7 +267,7 @@ tasks: [
 	],
 ]
 	"""
-		
+
 	def invalidFilters = """
 groups: [
 	[
@@ -381,21 +381,21 @@ tasks: [
 ]
 	"""
 	/**
-	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as 
+	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as
 	 * dynamic method injections for various object classes to be used by the application
 	 */
-	private void loadConfig() { 
-		GroovyClassLoader classLoader = new GroovyClassLoader(this.class.classLoader) 
-		ConfigSlurper slurper = new ConfigSlurper('TEST') 
-		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config")) 
-	} 
+	private void loadConfig() {
+		GroovyClassLoader classLoader = new GroovyClassLoader(this.class.classLoader)
+		ConfigSlurper slurper = new ConfigSlurper('TEST')
+		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config"))
+	}
 
 	void setup() {
-		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
-		//super.setUp() 
+		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain
+		//super.setUp()
 
 		// build a logger...
-		BasicConfigurator.configure() 
+		BasicConfigurator.configure()
 		LogManager.rootLogger.level = Level.DEBUG
 		log = LogManager.getLogger("CookbookService")
 
@@ -419,31 +419,31 @@ tasks: [
 		expect:
 			errors == null
 	}
-	
+
 	void testInvalidFilters() {
 		def errors = cookbookService.validateSyntax(invalidFilters)
-		
+
 		def expectedErrors = [
 			"Group BAD-GROUP in element 2 contains unknown property 'custom8'",
 			"Task id 4100 in element 1 property 'class' contains invalid value 'asset'",
 			"Task id 4120 in element 1 property 'class' contains invalid value 'asset'",
 			"Task id 4120 in element 2 contains unknown property 'custom8'"
 		].sort{ a, b -> a.compareTo(b) }
-		
+
 		def returnedErrors = errors.collect {
 			it.detail
 		}.sort{ a, b -> a.compareTo(b) }
-		
+
 		expect:
 			errors != null
 			errors.size() == 4
 			returnedErrors == expectedErrors
 	}
-	
+
 	void testValidateProblem2() {
 		def errors = cookbookService.validateSyntax( problemRecipe2 )
-		def returnedErrors = errors.collect { 
-			it.detail 
+		def returnedErrors = errors.collect {
+			it.detail
 		}.sort{ a, b -> a.compareTo(b) }
 		def expectedErrors = [
 				"Task id 2144 'duration' has invalid reference (#startupDuration,10x)",
@@ -459,19 +459,19 @@ tasks: [
 			errors.size() == 6
 			returnedErrors == expectedErrors
 	}
-	
+
 	void testValidateProblem1() {
 		def errors = cookbookService.validateSyntax( problemRecipe1 )
 		expect:
 			errors == null
 	}
-	
+
 	void testValidateNotificationProblem1() {
 		def errors = cookbookService.validateSyntax( notificationRecipeProblem1 )
 		expect:
 			errors != null
 	}
-	
+
 	void testValidateNotificationProblem2() {
 		def errors = cookbookService.validateSyntax( notificationRecipeProblem2 )
 		expect:
@@ -497,7 +497,7 @@ tasks: [
 	// Testing the Groups Section
 	void testValidateSyntaxGroupMissingName() {
 		def recipe = """
-			groups: [ [name:'', filter: [class:'application'] ] ], 
+			groups: [ [name:'', filter: [class:'application'] ] ],
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		expect:
@@ -508,7 +508,7 @@ tasks: [
 
 	void testValidateSyntaxGroupNameHasSpace() {
 		def recipe = """
-			groups: [ [name:'a b c', filter: [class:'application'] ] ], 
+			groups: [ [name:'a b c', filter: [class:'application'] ] ],
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		expect:
@@ -519,7 +519,7 @@ tasks: [
 
 	void testValidateSyntaxGroupHasDuplicateNameDefined() {
 		def recipe = """
-			groups: [ $goodGroup, $goodGroup ], 
+			groups: [ $goodGroup, $goodGroup ],
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		expect:
@@ -566,8 +566,8 @@ tasks: [
 
 	void testValidateSyntaxGroupFilterExcludeBadReference() {
 		def recipe = """
-			groups: [ 
-				[ name:'APPS', 
+			groups: [
+				[ name:'APPS',
 					filter: [
 						class: 'device',
 						exclude: 'FOO'
@@ -585,8 +585,8 @@ tasks: [
 
 	void testValidateSyntaxGroupFilterIncludeBadReferenceInAnArray() {
 		def recipe = """
-			groups: [ 
-				[ name:'APPS', 
+			groups: [
+				[ name:'APPS',
 					filter: [
 						class: 'device',
 						include: ['FOO']

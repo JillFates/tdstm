@@ -11,7 +11,7 @@ import spock.lang.Specification
  * TODO: A lot of methods are still missing to test ( We need some code coverage)
  */
 class CollectionUtilsTests extends Specification {
-	
+
 	/**
 	 * Testing the Sorting using closure builder
 	 * @author @tavo_luna
@@ -25,7 +25,7 @@ class CollectionUtilsTests extends Specification {
 		list.sort(sorter)
 
 		expect:
-			assert expectedSort == list							
+			assert expectedSort == list
 	}
-	
+
 }

@@ -22,19 +22,19 @@ class ProgressService {
 	static final String STARTED='In progress'
 	static final String PAUSED='Paused'
 
-	Cache<String, ProgressInfo> progressInfo 
+	Cache<String, ProgressInfo> progressInfo
 	//REMOVE THIS. ONLY FOR DEMO
 	ExecutorService service
-	
+
 	public ProgressService() {
 		this.progressInfo = CacheBuilder.newBuilder()
 			.expireAfterWrite(2, TimeUnit.HOURS)
-			.build();
-			
+			.build()
+
 		//REMOVE THIS. ONLY FOR DEMO
 		//this.service = Executors.newFixedThreadPool(10)
 	}
-	
+
 	/**
 	 * Creates a new progress info under the key and with initial status
 	 * @param key the key of the progress
@@ -45,13 +45,13 @@ class ProgressService {
 		info.lastUpdated = new Date().getTime()
 		this.progressInfo.put(key, info)
 	}
-	
+
 	// TODO : the ProgressService class will need be updated for a Clustered Tomcat configuration
 
 	/**
 	 * Updates a progress info with the specific information
 	 * If the info doesn't exists it simply ignores it
-	 * 
+	 *
 	 * @param key - the key of the progress
 	 * @param percentComp - the percentage completed
 	 * @param status - the initial status
@@ -63,7 +63,7 @@ class ProgressService {
 		if (key == null) {
 			log.error "update() called with null key"
 			return
-		} 
+		}
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
 			// log.debug("update() Key was found ${key}")
@@ -78,11 +78,11 @@ class ProgressService {
 			log.debug("Key not found ${key}")
 		}
 	}
-	
+
 	/**
 	 * Updates a progress info with the specific information
 	 * If the info doesn't exists it simply ignores it
-	 * 
+	 *
 	 * @param key - the key of the progress
 	 * @param percentComp - the percentage completed
 	 * @param status - the initial status
@@ -94,7 +94,7 @@ class ProgressService {
 		if (key == null) {
 			log.error "update() called with null key"
 			return
-		} 
+		}
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
 			log.debug("update() Key was found ${key}")
@@ -120,7 +120,7 @@ class ProgressService {
 		if (key == null) {
 			log.error "updateData() called with null key"
 			return
-		} 
+		}
 
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
@@ -129,7 +129,7 @@ class ProgressService {
 			log.debug("Key not found ${key}")
 		}
 	}
-	
+
 	/**
 	 * Gets the data value of the progressInfo under key
 	 * @param key the key of the progressInfo
@@ -140,7 +140,7 @@ class ProgressService {
 		if (key == null) {
 			log.error "getData() called with null key"
 			return null
-		} 
+		}
 
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
@@ -150,7 +150,7 @@ class ProgressService {
 			return null
 		}
 	}
-	
+
 	/**
 	 * Manually removes a progress info under a specific key
 	 * @param key the key of the progress
@@ -162,22 +162,22 @@ class ProgressService {
 			this.progressInfo.invalidate(key)
 		}
 	}
-	
+
 	/**
 	 * Lists the existing progress infos in this service
 	 * @return a list of maps each containing the info of the get method
 	 */
 	List<Map> list() {
 		def results = []
-		
+
 		for (def entry : this.progressInfo.asMap().entrySet()) {
 			def info = this.get(entry.getKey())
 			results << [ entry.getKey(), info ]
 		}
-		
+
 		return results
 	}
-	
+
 	/**
 	 * Returns the information about a specific key if exists and if not empty map
 	 * @param key the key of the progress
@@ -187,10 +187,10 @@ class ProgressService {
 		if (key == null) {
 			log.error "updateData() called with null key"
 			return [:]
-		} 
+		}
 
-		ProgressInfo info = this.progressInfo.getIfPresent(key);
-		
+		ProgressInfo info = this.progressInfo.getIfPresent(key)
+
 		if (info == null) {
 			log.debug("Key not found ${key}")
 			return [:]
@@ -205,7 +205,7 @@ class ProgressService {
 			]
 		}
 	}
-	
+
 	def demo() {
 		def key = 'Task-' + UUID.randomUUID().toString()
 		this.create(key)
@@ -219,7 +219,7 @@ class ProgressService {
 				}
 				ProgressService.this.update(key, 100, COMPLETED, null)
 			}
-		});
+		})
 		return [key: key]
 	}
 
@@ -237,7 +237,7 @@ class ProgressService {
 				ProgressService.this.update(key, p, FAILED, null)
 				Thread.sleep(1200)
 			}
-		});
+		})
 		return [key: key]
 	}
 }

@@ -9,7 +9,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdsops.common.lang.ExceptionUtil
 
 class ImportController {
-	
+
 	def controllerService
 	def importService
 	def progressService
@@ -27,7 +27,7 @@ class ImportController {
 	}
 
 	/**
-	 * This action used to review batch and find error in excel import if any 
+	 * This action used to review batch and find error in excel import if any
 	 * @param : id- data transfer batch id
 	 * @return map containing error message if any and import permission  (NewModelsFromImport)
 	 */
@@ -44,23 +44,23 @@ class ImportController {
 
 		while (true) {
 			try {
-				
+
 				(project, userLogin) = controllerService.getProjectAndUserForPage(this, 'import')
 				if (!project) {
 					errorMsg = flash.message
 					flash.message = null
 					break
 				}
-				DataTransferBatch dtb 
+				DataTransferBatch dtb
 				(dtb, errorMsg) = importService.getAndValidateBatch(params.id, project.id, userLogin.id)
 				if (errorMsg)
 					break
-				
-				// Update the batch status to POSTING and save the progress key 
+
+				// Update the batch status to POSTING and save the progress key
 				progressKey = "AssetImportReview-" + UUID.randomUUID().toString()
 				dtb.progressKey = progressKey
 				if (!dtb.save(flush:true, failOnError:true)) {
-					log.error "$methodName error occurred while trying to update the DataTransferBatch ${dtb.id} ${GormUtil.allErrorsString(dtb)}" 
+					log.error "$methodName error occurred while trying to update the DataTransferBatch ${dtb.id} ${GormUtil.allErrorsString(dtb)}"
 					errorMsg = "Unable to update batch record : ${GormUtil.allErrorsString(dtb)}"
 					break
 				}
@@ -156,7 +156,7 @@ class ImportController {
 
 				DataTransferBatch dtb = DataTransferBatch.get(batchId)
 
-				// Update the batch and save the progress key 
+				// Update the batch and save the progress key
 				progressKey = "AssetImportProcess-" + UUID.randomUUID().toString()
 				dtb.progressKey = progressKey
 				if (!dtb.save(flush:true, failOnError:true)) {
@@ -214,7 +214,7 @@ class ImportController {
 
 			break
 		}
-		
+
 		if (errorMsg) {
 			render ServiceResults.errors(errorMsg) as JSON
 		} else {
@@ -272,7 +272,7 @@ class ImportController {
 
 			break
 		}
-		
+
 		if (errorMsg) {
 			//if (progressKey)
 			//	progressService.remove(progressKey)
