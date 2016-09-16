@@ -276,7 +276,7 @@ class ImportService {
 		def assetIds = AssetEntity.findAllByProject(project)?.id
 		if (performance) log.debug "Fetching existing asset IDS took ${TimeUtil.elapsed(now)}"
 
-		def eavAttributeSet = EavAttributeSet.findById(1)
+		def eavAttributeSet = EavAttributeSet.get(1)
 
 		def assetIdList = []
 		def dupAssetIds = []

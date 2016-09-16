@@ -964,7 +964,7 @@ class RackLayoutsController {
 			def assetTo
 			def toPower
 			def connectorType = jsonInput.connectorType
-			assetCableMap = AssetCableMap.findById( assetCableId )
+			assetCableMap = AssetCableMap.get( assetCableId )
 
 			if(connectorType != "Power"){
 				def fromAssetCableMap = AssetCableMap.find("from AssetCableMap where assetTo=? and assetToPort=? and assetLoc=?",
@@ -980,11 +980,11 @@ class RackLayoutsController {
 				case "assignId" :
 					if(connectorType != "Power"){
 						if(jsonInput.assetFromId !='null'){
-							def assetEntity = AssetEntity.findById(jsonInput.assetFromId)
+							def assetEntity = AssetEntity.get(jsonInput.assetFromId)
 							def modelConnectors
 							if(assetEntity?.model){
 								assetTo = assetEntity
-								toConnector = ModelConnector.findById( jsonInput.modelConnectorId )
+								toConnector = ModelConnector.get( jsonInput.modelConnectorId )
 								toCableId = AssetCableMap.find("from AssetCableMap where assetTo=? and assetToPort=? and assetLoc=?",
 													[assetTo,toConnector,jsonInput.roomType])
 								AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus=?,assetTo=null,

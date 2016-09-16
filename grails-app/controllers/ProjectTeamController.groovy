@@ -13,9 +13,9 @@ class ProjectTeamController {
      */
     def list() {
         def bundleId = params.bundleId
-		def bundleInstance = MoveBundle.findById(bundleId)
+		def bundleInstance = MoveBundle.get(bundleId)
         if(!bundleId){
-           def project = Project.findById(session.getAttribute( "CURR_PROJ" ).CURR_PROJ)
+           def project = Project.get(session.getAttribute( "CURR_PROJ" ).CURR_PROJ)
 		   bundleInstance = MoveBundle.findByProject(project)
         }
         def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )
@@ -28,7 +28,7 @@ class ProjectTeamController {
 	 */
     def show() {
 		def bundleId = params.bundleId
-		def bundleInstance = MoveBundle.findById( bundleId )
+		def bundleInstance = MoveBundle.get( bundleId )
         def projectTeamInstance = ProjectTeam.get( params.id )
 
         if(!projectTeamInstance) {
@@ -63,7 +63,7 @@ class ProjectTeamController {
     def edit() {
         def projectTeamInstance = ProjectTeam.get( params.id )
         def bundleId = params.bundleId
-        def bundleInstance = MoveBundle.findById( bundleId )
+        def bundleInstance = MoveBundle.get( bundleId )
         if(!projectTeamInstance) {
             flash.message = "ProjectTeam not found with id ${params.id}"
             redirect( action:"list", params:[bundleId:bundleId] )
@@ -84,7 +84,7 @@ class ProjectTeamController {
         def projectTeamInstance = ProjectTeam.get( params.id )
         //projectTeamInstance.lastUpdated = new Date()
         def bundleId = params.bundleId
-        def bundleInstance = MoveBundle.findById( bundleId )
+        def bundleInstance = MoveBundle.get( bundleId )
         def teamMembers = request.getParameterValues("teamMembers")
 
         if(projectTeamInstance) {
@@ -115,7 +115,7 @@ class ProjectTeamController {
 
         def projectTeamInstance = new ProjectTeam()
         def bundleId = params.bundleId
-        def bundleInstance = MoveBundle.findById( bundleId )
+        def bundleInstance = MoveBundle.get( bundleId )
         projectTeamInstance.properties = params
         def projectStaff = partyRelationshipService.getProjectStaff( bundleInstance.project.id )
         return [ 'projectTeamInstance':projectTeamInstance, bundleInstance:bundleInstance, availableStaff :projectStaff ]
@@ -126,7 +126,7 @@ class ProjectTeamController {
 	 */
     def save() {
 		def bundleId = params.bundleId
-		def bundleInstance = MoveBundle.findById( bundleId )
+		def bundleInstance = MoveBundle.get( bundleId )
         def projectTeamInstance = new ProjectTeam(params)
 		def teamMembers = request.getParameterValues("teamMembers")
 		if ( !projectTeamInstance.hasErrors() && projectTeamInstance.save() ) {

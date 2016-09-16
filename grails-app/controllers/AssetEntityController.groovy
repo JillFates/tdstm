@@ -170,7 +170,7 @@ class AssetEntityController {
 				if ( !params.max ) params.max = 50
 			}
 		}
-		def project = Project.findById(session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def project = Project.get(session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
 
 		params['project.id'] = project.id
 
@@ -258,7 +258,7 @@ class AssetEntityController {
 		def dataTransferSetExport
 		def moveBundleInstanceList
 		if( projectId != null ) {
-			projectInstance = Project.findById( projectId )
+			projectInstance = Project.get( projectId )
 			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		}
 		dataTransferSetExport = DataTransferSet.findAll("from DataTransferSet dts where dts.transferMode IN ('B','E') ")
@@ -270,11 +270,11 @@ class AssetEntityController {
 				flash.message = " No Projects are Associated, Please select Project. "
 				redirect( controller:"project",action:"list" )
 			}
-			projectInstance = Project.findById( projectId )
+			projectInstance = Project.get( projectId )
 			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		}
 		if ( projectId != null ) {
-			project = Project.findById(projectId)
+			project = Project.get(projectId)
 		}
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
 
@@ -878,7 +878,7 @@ class AssetEntityController {
 			return
 		}
 
-		DataTransferSet dataTransferSet = DataTransferSet.findById( params.dataTransferSet )
+		DataTransferSet dataTransferSet = DataTransferSet.get( params.dataTransferSet )
 		if (! dataTransferSet) {
 			failWithError 'Unable to locate Data Import definition for ${params.dataTransferSet}'
 		}
@@ -1801,7 +1801,7 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
-		def project = Project.findById( projectId )
+		def project = Project.get( projectId )
 		entityAttributeInstance.each{
 			def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
 			def options = []
@@ -1834,12 +1834,12 @@ class AssetEntityController {
 		def items = []
 		def entityAttributeInstance = []
 		if(attributeSetId != null &&  attributeSetId != ""){
-			def attributeSetInstance = EavAttributeSet.findById( attributeSetId )
+			def attributeSetInstance = EavAttributeSet.get( attributeSetId )
 			//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
 			entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $attributeSetId order by eav.sortOrder ")
 		}
 		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
-		def project = Project.findById( projectId )
+		def project = Project.get( projectId )
 		entityAttributeInstance.each{
 			def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
 			def options = []
@@ -1868,7 +1868,7 @@ class AssetEntityController {
 		def items = []
 		def entityAttributeInstance = []
 		if(assetId != null &&  assetId != ""){
-			def assetEntity = AssetEntity.findById( assetId )
+			def assetEntity = AssetEntity.get( assetId )
 			//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
 			entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
 		}
@@ -1892,7 +1892,7 @@ class AssetEntityController {
 			def autoCompAttribsList = autoCompAttribs.split(",")
 			def currProj = session.getAttribute( "CURR_PROJ" )
 			def projectId = currProj.CURR_PROJ
-			def project = Project.findById( projectId )
+			def project = Project.get( projectId )
 			autoCompAttribsList.each{
 				def assetEntity = AssetEntity.executeQuery( "select distinct a.$it from AssetEntity a where a.owner = $project.client.id" )
 				data<<[value:assetEntity , attributeCode : it]
@@ -2144,7 +2144,7 @@ class AssetEntityController {
 	 * @return: boolean value to validate comment field
 	 *---------------------------------*/
 	def retrieveFlag() {
-		def projectInstance = Project.findById( session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def projectInstance = Project.get( session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def moveBundleInstance = MoveBundle.get(params.moveBundle)
 		def toState = params.toState
 		def fromState = params.fromState
@@ -2161,7 +2161,7 @@ class AssetEntityController {
 	 *@return: List of valid stated for param state
 	 *----------------------------------------*/
 	def retrieveStates(def state,def assetEntity){
-		def projectInstance = Project.findById(session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def projectInstance = Project.get(session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def stateIdList = []
 		def validStates
 		if(state){
@@ -4404,7 +4404,7 @@ class AssetEntityController {
 
 		//Get all column count of first row or header
 		def colCount = sheet.getRow(0).physicalNumberOfCells
-		def dataTransferSetInstance = DataTransferSet.findById( 1 )
+		def dataTransferSetInstance = DataTransferSet.get( 1 )
 		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Servers" )
 		def serverMap = [:]
 		def serverColumnNameList =[]

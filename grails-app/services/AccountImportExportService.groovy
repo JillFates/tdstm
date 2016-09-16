@@ -1623,7 +1623,7 @@ class AccountImportExportService {
 				// TODO : JPM 4/2016 : This needs to be reviewed because we're not returning all of the correct accounts
 				Long companyId = project.client.id
 
-				// persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(companyId))
+				// persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.get(companyId))
 				persons = projectService.getAssignableStaff(project, byWhom.person)
 				break
 

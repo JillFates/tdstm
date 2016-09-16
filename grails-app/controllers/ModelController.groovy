@@ -714,7 +714,7 @@ class ModelController {
      */
     def retrieveFrontImage() {
 		if( params.id ) {
-    		def model = Model.findById( params.id )
+    		def model = Model.get( params.id )
      		def image = model?.frontImage
      		response.contentType = 'image/jpg'
      		response.outputStream << image
@@ -727,7 +727,7 @@ class ModelController {
      */
     def retrieveRearImage() {
 		if( params.id ) {
-    		def model = Model.findById( params.id )
+    		def model = Model.get( params.id )
      		def image = model?.rearImage
      		response.contentType = 'image/jpg'
      		response.outputStream << image
@@ -759,7 +759,7 @@ class ModelController {
      */
     def checkModelDependency() {
     	def modelId = params.modelId
-		def modelInstance = Model.findById(Integer.parseInt(modelId))
+		def modelInstance = Model.get(modelId)
 		def returnValue = false
 		if( modelInstance ){
 			if( AssetEntity.findByModel( modelInstance ) )
@@ -867,7 +867,7 @@ class ModelController {
 
 			def manuSheet = book.getSheet("manufacturer")
 			def manufacturers = params.exportCheckbox ? Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer :
-			 Manufacturer.findAll()	
+			 Manufacturer.findAll()
 
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
 				WorkbookUtil.addCell(manuSheet, 0, r+1, String.valueOf(manufacturers[r].id ))

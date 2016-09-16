@@ -440,7 +440,7 @@ class UserPreferenceService {
 	 */
 	// TODO : setUserRoles - Move to SecurityService
 	def setUserRoles( def roleTypeList, def personId ) {
-		def person = Party.findById(personId)
+		def person = Party.get(personId)
 		def login = securityService.getUserLogin()
 		def securityViolations = false
 		roleTypeList.each { roleCode ->
@@ -449,7 +449,7 @@ class UserPreferenceService {
 					securityService.reportViolation("Attempted to update user $person permission to assign security role $roleCode, which is not permissible", login)
 					securityViolations = true
 				} else {
-					RoleType roleType = RoleType.findById(roleCode)
+					RoleType roleType = RoleType.get(roleCode)
 					if (!roleType) {
 						securityService.reportViolation("attempted to update user $person permission with undefined role $roleCode", login)
 						securityViolations = true

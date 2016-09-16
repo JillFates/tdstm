@@ -163,7 +163,7 @@ class AssetEntityAttributeLoaderService {
 					def eavAttributeSet
 					try {
 						eavAttributeSetId = 1
-						eavAttributeSet = EavAttributeSet.findById( eavAttributeSetId )
+						eavAttributeSet = EavAttributeSet.get( eavAttributeSetId )
 
 						def eavEntityAttribute = new EavEntityAttribute(
 							attribute:eavAttribute,
@@ -228,7 +228,7 @@ class AssetEntityAttributeLoaderService {
 
 		// remove assets from source bundle
 		if ( bundleTo ) {
-			def moveBundleTo = MoveBundle.findById( bundleTo )
+			def moveBundleTo = MoveBundle.get( bundleTo )
 			// get Assets into list
 			// def assetsList = assets.tokenize(',')
 			def assetsList = getStringArray( assets )
@@ -239,7 +239,7 @@ class AssetEntityAttributeLoaderService {
 					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo,project = $moveBundleTo.project.id where moveBundle = $bundleFrom  and id = $asset")
 
 				} else {
-					/*def assetEntity = AssetEntity.findById( asset )
+					/*def assetEntity = AssetEntity.get( asset )
 					def assetsExist = AssetEntity.findByMoveBundle( moveBundleTo )
 					if ( !assetsExist ) {
 					def moveBundleAsset = new AssetEntity( moveBundle:moveBundleTo, asset:assetEntity ).save()
@@ -270,7 +270,7 @@ class AssetEntityAttributeLoaderService {
 	//	get Cart - #Asset count corresponding to Bundle
 	def getCartAssetCounts ( def bundleId ) {
 		def cartAssetCounts = []
-		def bundleInstance = MoveBundle.findById(bundleId)
+		def bundleInstance = MoveBundle.get(bundleId)
 		def cartList = AssetEntity.executeQuery(" select ma.cart from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
 		cartList.each { assetCart ->
 			def cartAssetCount = AssetEntity.countByMoveBundleAndCart( bundleInstance, assetCart )
@@ -1066,9 +1066,9 @@ class AssetEntityAttributeLoaderService {
 				def etext = "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
 				log.error( etext )
 			}
-			def partyRelationshipType = PartyRelationshipType.findById( "STAFF" )
-			 def roleTypeFrom = RoleType.findById( "COMPANY" )
-			 def roleTypeTo = RoleType.findById( "STAFF" )
+			def partyRelationshipType = PartyRelationshipType.get( "STAFF" )
+			 def roleTypeFrom = RoleType.get( "COMPANY" )
+			 def roleTypeTo = RoleType.get( "STAFF" )
 
 			 def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType,
 				 partyIdFrom :project.client, roleTypeCodeFrom:roleTypeFrom, partyIdTo:person,

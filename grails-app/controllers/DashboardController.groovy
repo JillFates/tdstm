@@ -31,7 +31,7 @@ class DashboardController {
 		}
 
 		if (params.moveEvent && params.moveEvent.isInteger()) {
-			moveEvent = MoveEvent.findById(params.moveEvent)
+			moveEvent = MoveEvent.get(params.moveEvent)
 			if (moveEvent && moveEvent.project != project) {
 				log.warn "SECURITY : User $user attempted to access event ($moveEvent) that was not associate to his current project ($project)"
 				flash.message = "Sorry but the event select was not found. Please select another event before retrying."

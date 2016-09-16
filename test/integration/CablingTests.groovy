@@ -55,8 +55,8 @@ class CablingTests extends IntegrationSpec {
 	/*
    void testAssetCableMapCreate() {
 	   def assetCableMapInstance = new AssetCableMap( cable : "PowerEdge wire",
-									   assetFrom : AssetEntity.findById(10),
-									   assetTo : AssetEntity.findById(11),
+									   assetFrom : AssetEntity.get(10),
+									   assetTo : AssetEntity.get(11),
 									   assetFromPort : 52,
 									   assetToPort : 25,
 									   state : 1

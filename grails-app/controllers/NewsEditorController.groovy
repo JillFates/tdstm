@@ -39,12 +39,12 @@ class NewsEditorController {
 		def moveEvent
 		if(moveEventId){
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEventId}" )
-			moveEvent = MoveEvent.findById(moveEventId)
+			moveEvent = MoveEvent.get(moveEventId)
 		} else {
 			userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
 			def defaultEvent = session.getAttribute("MOVE_EVENT")
 			if(defaultEvent?.MOVE_EVENT){
-				moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
+				moveEvent = MoveEvent.get(defaultEvent.MOVE_EVENT)
 				if( moveEvent?.project?.id != Integer.parseInt(projectId) ){
 					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
 				}
@@ -69,7 +69,7 @@ class NewsEditorController {
 	def listEventNewsJson() {
 
 		def projectId =  session.getAttribute('CURR_PROJ').CURR_PROJ
-		def projectInstance = Project.findById( projectId )
+		def projectInstance = Project.get( projectId )
 		def bundleId = params.moveBundle
 		def viewFilter = params.viewFilter
 		def moveBundleInstance = null
@@ -82,7 +82,7 @@ class NewsEditorController {
 		def moveEvent = MoveEvent.read(params.moveEvent)
 		def moveBundlesList
 		if(bundleId){
-			moveBundleInstance = MoveBundle.findById(bundleId)
+			moveBundleInstance = MoveBundle.get(bundleId)
 		}
 		def sortIndex = params.sidx ?: 'comment'
 		def sortOrder  = params.sord ?: 'asc'
@@ -191,7 +191,7 @@ class NewsEditorController {
 		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
 		def moveEvent = MoveEvent.read(params.moveEvent)
 		if(bundleId){
-			moveBundleInstance = MoveBundle.findById(bundleId)
+			moveBundleInstance = MoveBundle.get(bundleId)
 		}
 
 		def assetCommentsQuery = new StringBuffer( """select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption,

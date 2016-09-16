@@ -287,7 +287,7 @@
 
 				                                <g:each in="${assignedRole}" var="assignedRole">
 
-				                                	<option value="${assignedRole}" selected="selected">${RoleType.findById(assignedRole)}</option>
+				                                	<option value="${assignedRole}" selected="selected">${RoleType.get(assignedRole)}</option>
 
 				                                </g:each>
 
@@ -295,7 +295,7 @@
 
 			                                <g:else>
 
-			                                	<option value="USER" selected="selected">${RoleType.findById('USER')}</option>
+			                                	<option value="USER" selected="selected">${RoleType.get('USER')}</option>
 
 			                                </g:else>
 

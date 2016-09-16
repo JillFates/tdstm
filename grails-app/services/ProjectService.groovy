@@ -776,7 +776,7 @@ class ProjectService {
 
 		// Add partners to the relationship
 		toAddPartners.each { partnerId ->
-			partnerParty = Party.findById(partnerId)
+			partnerParty = Party.get(partnerId)
 			if (! partnerParty) {
 				throw new InvalidParamException("Partner id specified is not found ($partnerId)")
 			} else if (partnerParty.partyType.id != 'COMPANY') {
@@ -800,7 +800,7 @@ class ProjectService {
 			"AND task.assignedTo IN (:staff)"
 
 		toDeletePartners.each { partnerId ->
-			partnerParty = Party.findById(partnerId)
+			partnerParty = Party.get(partnerId)
 			if (partnerParty) {
 				log.info "updateProjectPartners() Removing partner $partnerParty from project $projectInstance"
 
@@ -873,7 +873,7 @@ class ProjectService {
 
 			if ( projectManager != null && projectManager != "" ) {
 
-				def projectManagerParty = Party.findById(projectManager)
+				def projectManagerParty = Party.get(projectManager)
 				//	For Project to ProjectManager PartyRelationship
 				def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )
 			}

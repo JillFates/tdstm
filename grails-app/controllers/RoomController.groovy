@@ -111,7 +111,7 @@ class RoomController {
 			} else {
 				auditView = session.AUDIT_VIEW?.AUDIT_VIEW ?:(userPreferenceService.getPreference(PREF.AUDIT_VIEW)?:0 )
 			}
-			def project = Project.findById( projectId )
+			def project = Project.get( projectId )
 			def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
 			def moveBundleList = []
 			def moveBundleId = params.moveBundleId
@@ -165,7 +165,7 @@ class RoomController {
 	def edit() {
 		def roomInstance = Room.get(params.id)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.findById( projectId )
+		def project = Project.get( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
 		def prefVal = userPreferenceService.getPreference(PREF.ROOM_TABLE_SHOW_ALL)?: 'FALSE'
 		def modelList = Model.findAllByRoomObjectAndAssetType(true, 'Rack')
@@ -575,7 +575,7 @@ class RoomController {
 	   }
 	   def stringToReturn = new StringBuffer()
 
-	   def bladeAsset = AssetEntity.findById(params.blade)
+	   def bladeAsset = AssetEntity.get(params.blade)
 	   def bladeAssetId = bladeAsset?.id
 	   def bundleId = bladeAsset?.moveBundle?.id
 		stringToReturn.append("""

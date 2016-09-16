@@ -27,7 +27,7 @@
 
 <%
 def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-moveEvent = MoveEvent.findById(moveEventId)
+moveEvent = MoveEvent.get(moveEventId)
 /*Date date = new Date()
 def showCrawler = false
 if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){

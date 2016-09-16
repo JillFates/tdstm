@@ -290,7 +290,7 @@ class UserLoginController {
 		def companyId = params.companyId
 		def person
 		if ( personId != null ) {
-			person = Person.findById( personId )
+			person = Person.get( personId )
 			if (person.lastName == null) {
 				person.lastName = ""
 			}

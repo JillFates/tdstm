@@ -60,20 +60,20 @@
 
     def projectId = currProj?.CURR_PROJ ;
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-    def moveEventName = moveEventId ? MoveEvent.findById( moveEventId ) : ''
+    def moveEventName = moveEventId ? MoveEvent.get( moveEventId ) : ''
     def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
     def roomId = session.getAttribute("CURR_ROOM")?.CURR_ROOM;
     def room = Room.get(roomId)
-    def moveBundleName = moveBundleId ? MoveBundle.findById( moveBundleId ) : ''
+    def moveBundleName = moveBundleId ? MoveBundle.get( moveBundleId ) : ''
     def currProjObj;
     def moveEvent;
     def personId = session.getAttribute("LOGIN_PERSON").id
     def person = Person.get(personId)
     if (projectId != null) {
-        currProjObj = Project.findById(projectId)
+        currProjObj = Project.get(projectId)
     }
     if (moveEventId != null) {
-        moveEvent = MoveEvent.findById(moveEventId)
+        moveEvent = MoveEvent.get(moveEventId)
     }
     def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");

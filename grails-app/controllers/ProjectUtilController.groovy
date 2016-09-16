@@ -24,7 +24,7 @@ class ProjectUtilController {
 			def userPreference = UserPreference.findAllByUserLoginAndPreferenceCode( userLogin, "CURR_PROJ" )
 			def projectInstance
 			if ( userPreference != null && userPreference != []) {
-				projectInstance = Project.findById( userPreference.value[0] )
+				projectInstance = Project.get( userPreference.value[0] )
 			}
 			if (projectInstance) {
 				redirect( controller:"project", action:"show")
@@ -147,7 +147,7 @@ class ProjectUtilController {
 					def newProjectLogo = new ProjectLogo(project:projectInstance, name:tempProjectLogo.name, partnerImage:tempProjectLogo.partnerImage,party:tempProjectLogo.party).save(insert : true, flush:true)
 				}
 				/* Create Demo Bundle */
-				def attributeSet = com.tdssrc.eav.EavAttributeSet.findById(1)
+				def attributeSet = com.tdssrc.eav.EavAttributeSet.get(1)
 				def principal = SecurityUtils.subject.principal
 				def userLogin = UserLogin.findByUsername( principal )
 				def tempMoveBundleList = MoveBundle.findAllByProject( templateInstance )
@@ -356,8 +356,8 @@ class ProjectUtilController {
 	def copyBundleTeams(def moveBundle, def oldBundle){
 		def tempBundleTeams = partyRelationshipService.getBundleTeamInstanceList( oldBundle  )
 		def teamRelationshipType = PartyRelationshipType.get("PROJ_TEAM")
-		def teamRole = RoleType.findById("TEAM")
-		def teamMemberRole = RoleType.findById("TEAM_MEMBER")
+		def teamRole = RoleType.get("TEAM")
+		def teamMemberRole = RoleType.get("TEAM_MEMBER")
 		tempBundleTeams.each{ obj->
 			def bundleTeam = new ProjectTeam(
 					name : obj.projectTeam?.name,

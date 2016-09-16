@@ -75,7 +75,7 @@ class EmailDispatchService {
 		log.info("Send email: Start.")
 
 		def edId = dataMap.getLongValue('edId')
-		def ed = EmailDispatch.findById(edId)
+		def ed = EmailDispatch.get(edId)
 
 		if (!ed) {
 			log.error "Invalid EmailDispatch id: $edId"

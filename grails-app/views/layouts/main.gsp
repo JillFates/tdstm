@@ -33,7 +33,7 @@
 	def personId = session.getAttribute("LOGIN_PERSON").id
 	def person = Person.get(personId)
     if( projectId != null){
-      currProjObj = Project.findById(projectId)
+      currProjObj = Project.get(projectId)
     }
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>
@@ -52,8 +52,8 @@
     	</div>
       	<div class="title">&nbsp;TransitionManager&trade; 
       	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
-      	<g:if test="${moveEventId}"> : ${MoveEvent.findById( moveEventId )?.name}</g:if>
-      	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
+      	<g:if test="${moveEventId}"> : ${MoveEvent.get( moveEventId )?.name}</g:if>
+      	<g:if test="${moveBundleId}"> : ${MoveBundle.get( moveBundleId )?.name}</g:if>
       </div>
         <div class="header_right"><br />
           <div style="font-weight: bold;">

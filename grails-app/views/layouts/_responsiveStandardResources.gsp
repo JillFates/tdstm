@@ -63,7 +63,7 @@
 
         <%
             def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-            moveEvent = MoveEvent.findById(moveEventId)
+            moveEvent = MoveEvent.get(moveEventId)
         %>
 
         <g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">

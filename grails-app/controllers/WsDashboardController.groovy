@@ -154,7 +154,7 @@ class WsDashboardController {
 			def planStartTime = data.planStart.getTime() / 1000
 
 			if ( data.snapshotId ) {
-				snapshot = StepSnapshot.findById( data.snapshotId )
+				snapshot = StepSnapshot.get( data.snapshotId )
 				data.put( "projComp", TimeUtil.formatDateTime(session, snapshot.getProjectedCompletionTime()) )
 				data.put( "statColor", snapshot.getStatusColor() )
 				if (snapshot.moveBundleStep.showInGreen) {

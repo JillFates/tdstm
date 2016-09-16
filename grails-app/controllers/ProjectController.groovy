@@ -554,7 +554,7 @@ class ProjectController {
 	 */
 	def showImage() {
 		if( params.id ) {
-			def projectLogo = ProjectLogo.findById( params.id )
+			def projectLogo = ProjectLogo.get( params.id )
 	 		def image = projectLogo?.partnerImage?.binaryStream
 	 		response.contentType = 'image/jpg'
 	 		response.outputStream << image

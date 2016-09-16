@@ -324,7 +324,7 @@ def test = {
 				def userLogin = UserLogin.findByPerson(person)
 				userLogin.active = person.active
 				if (companyId != null ){
-					def companyParty = Party.findById(companyId)
+					def companyParty = Party.get(companyId)
 					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
 				}
 				flash.message = "Person '$person' was updated"
@@ -405,7 +405,7 @@ def test = {
 
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
-		def companyParty = Party.findById(companyId)
+		def companyParty = Party.get(companyId)
 		def dateCreatedByFormat = TimeUtil.formatDateTime(session, personInstance.dateCreated)
 		def lastUpdatedFormat = TimeUtil.formatDateTime(session, personInstance.lastUpdated)
 		if(!personInstance) {
@@ -469,9 +469,9 @@ def test = {
 				personInstance.lastName = ""
 			}
 			if ( !personInstance.hasErrors() && personInstance.save() ) {
-				def projectParty = Project.findById(projectId)
+				def projectParty = Project.get(projectId)
 				if(companyId != ""){
-					def companyParty = Party.findById(companyId)
+					def companyParty = Party.get(companyId)
 					if(!personService.isAssociatedTo(personInstance, companyParty)){
 						throw new DomainUpdateException("The person ${personInstance} is not associated with the company ${companyParty}")
 					}
@@ -523,9 +523,9 @@ def test = {
 			def personId = request.JSON.personId
 			def roleType = request.JSON.roleType
 			def projectId = request.JSON.projectId
-			//def projectParty = Project.findById( projectId )
+			//def projectParty = Project.get( projectId )
 			def projectParty = securityService.getUserCurrentProject()
-			def personParty = Person.findById( personId )
+			def personParty = Person.get( personId )
 			def projectStaff
 			if(NumberUtil.toInteger(request.JSON.val) == 1) {
 				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
@@ -577,12 +577,12 @@ def test = {
 		if ( !person.hasErrors() && person.save() ) {
 
 			if ( companyId != null && companyId != "" ) {
-				def companyParty = Party.findById( companyId )
+				def companyParty = Party.get( companyId )
 				def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
 			}
 
 			if ( projectId != null && projectId != "" && roleType != null) {
-				def projectParty = Party.findById( projectId )
+				def projectParty = Party.get( projectId )
 				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
 			}
 
@@ -766,7 +766,7 @@ def test = {
 		def currPhase = userPreferenceService.getPreference(PREF.STAFFING_PHASES)?:"All"
 		def currScale = userPreferenceService.getPreference(PREF.STAFFING_SCALE)?:"6"
 		def moveEvents
-		def projectId = Project.findById( project.id) ? project.id : 0
+		def projectId = Project.get( project.id) ? project.id : 0
 		def reqProjects = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectsPerm, ProjectStatus.ACTIVE)
 
 		List projects = personService.getAvailableProjects(loginPerson)

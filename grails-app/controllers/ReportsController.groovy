@@ -117,7 +117,7 @@ class ReportsController {
 				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
 			}
 		} else {
-			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def moveBundleInstance = MoveBundle.get(params.moveBundle)
 			def reportFields = []
 			def bundleName = "All Bundles"
 			def teamName = "All Teams"
@@ -141,7 +141,7 @@ class ReportsController {
 				assetEntityList.each { asset ->
 					def bundleInstance
 					if(asset.moveBundle != null) {
-						bundleInstance = MoveBundle.findById(asset.moveBundle.id)
+						bundleInstance = MoveBundle.get(asset.moveBundle.id)
 					}
 					if(reportName == 'cartAsset') {
 						teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Logistics')
@@ -151,7 +151,7 @@ class ReportsController {
 					def assetCommentList = AssetComment.findAllByAssetEntity(asset)
 					def moveTeamName
 					if(teamPartyGroup != null ){
-						def moveteamInstance = PartyGroup.findById(teamPartyGroup.id)
+						def moveteamInstance = PartyGroup.get(teamPartyGroup.id)
 						moveTeamName = moveteamInstance?.name
 					}
 					def assetCommentString =""
@@ -404,7 +404,7 @@ class ReportsController {
 			reportFields <<[ 'flashMessage': "Please Select Bundles."]
 			render reportFields as JSON
 		} else {
-			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def moveBundleInstance = MoveBundle.get(params.moveBundle)
 			def projectTeamInstance
 			def loginBadges = []
 			def bundleName = "All Bundles"
@@ -412,7 +412,7 @@ class ReportsController {
 			def assetEntityList
 			def targetAssetEntitylist
 			if(params.teamFilter != "null"){
-				projectTeamInstance = ProjectTeam.findById( params.teamFilter )
+				projectTeamInstance = ProjectTeam.get( params.teamFilter )
 			}
 			//if moveBundleinstance is selected (single moveBundle)
 			if( moveBundleInstance ) {
@@ -578,7 +578,7 @@ class ReportsController {
 			flash.message = " Please Select Bundles. "
 			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingQA'] )
 		} else {
-			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def moveBundleInstance = MoveBundle.get(params.moveBundle)
 			def reportFields = []
 			def bundleName = "All Bundles"
 			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")
@@ -621,7 +621,7 @@ class ReportsController {
 				assetCablesList.each { cable ->
 					def bundleInstance
 					if(cable.assetFrom.moveBundle != null) {
-						bundleInstance = MoveBundle.findById(cable.assetFrom.moveBundle.id)
+						bundleInstance = MoveBundle.get(cable.assetFrom.moveBundle.id)
 					}
 
 					reportFields <<['from_asset_name':cable.assetFrom.assetName,
@@ -675,7 +675,7 @@ class ReportsController {
 			flash.message = " Please Select Bundles. "
 				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingQA'] )
 		} else {
-			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def moveBundleInstance = MoveBundle.get(params.moveBundle)
 			def reportFields = []
 			def bundleName = "All Bundles"
 				def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")

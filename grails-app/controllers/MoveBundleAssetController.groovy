@@ -100,7 +100,7 @@ class MoveBundleAssetController {
 				log.error "assignAssetsToBundle: Invalid bundle id (${params.bundleId}"
 			}else{
 				def bundleId = params.bundleId
-				moveBundleInstance = MoveBundle.findById( bundleId)
+				moveBundleInstance = MoveBundle.get( bundleId)
 			}
 		} else {
 		   moveBundleInstance = MoveBundle.findByProject(project,[sort:'name',order:'asc']  )
@@ -122,8 +122,8 @@ class MoveBundleAssetController {
         def sideField = params.sideField
         def currentBundleAssets
         def moveBundleAssets
-        def moveBundleInstanceRight = MoveBundle.findById( bundleRight )
-        def moveBundleInstanceLeft = MoveBundle.findById( bundleLeft )
+        def moveBundleInstanceRight = MoveBundle.get( bundleRight )
+        def moveBundleInstanceLeft = MoveBundle.get( bundleLeft )
         def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstanceRight.project.id order by name")
 	    def sessionSort = session.getAttribute("sessionSort")
         def sessionSide = session.getAttribute("sessionSide")
@@ -213,12 +213,12 @@ class MoveBundleAssetController {
 		}
 		//Right Side AssetTable Sort
 		if( sideList == "right" ) {
-			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
+			rightMoveBundleInstance = MoveBundle.get( rightBundleId )
 			moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $rightMoveBundleInstance.project.id")
 			currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id "+
                     									"order by  $sortField $params.order")
 			if( leftBundleId != null && leftBundleId != "" ) {
-				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
+				leftMoveBundleInstance = MoveBundle.get( leftBundleId )
 				if( params.sideField == "left" ){
                     moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id "+
                     										"order by  $params.sortField $params.orderField")
@@ -254,14 +254,14 @@ class MoveBundleAssetController {
 		//Left Side AssetTable Sort
 		else {
 			if( leftBundleId != null && leftBundleId != "" ) {
-				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
+				leftMoveBundleInstance = MoveBundle.get( leftBundleId )
 				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id "+
                     									"order by  $sortField $params.order ")
 		    } else {
 		    	moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId "+
                     									"order by  $sortField $params.order")
 		    }
-			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
+			rightMoveBundleInstance = MoveBundle.get( rightBundleId )
 			moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $rightMoveBundleInstance.project.id")
 			if( params.sideField == "right" ){
                 currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id "+
@@ -311,13 +311,13 @@ class MoveBundleAssetController {
     def retrieveTeamsForBundles() {
     	def bundleId = params.bundleId
     	def projectId = session.CURR_PROJ.CURR_PROJ
-    	def projectInstance = Project.findById( projectId )
+    	def projectInstance = Project.get( projectId )
     	def TeamInstance
         if( bundleId == "") {
             TeamInstance = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where "+
                     							"m.project = $projectId ) " )
         } else {
-            def moveBundleInstance = MoveBundle.findById( bundleId )
+            def moveBundleInstance = MoveBundle.get( bundleId )
             TeamInstance = ProjectTeam.findAllByMoveBundle( moveBundleInstance )
         }
         def teams = []
@@ -330,8 +330,8 @@ class MoveBundleAssetController {
     def retrieveRacksForBundles() {
     	def bundleId = params.bundleId
         def projectId = session.CURR_PROJ.CURR_PROJ
-        def projectInstance = Project.findById( projectId )
-        def movebundleInstance = MoveBundle.findById(bundleId)
+        def projectInstance = Project.get( projectId )
+        def movebundleInstance = MoveBundle.get(bundleId)
        	def assetEntityList = AssetEntity.findAllByMoveBundle(movebundleInstance)
        	def racks = []
     	assetEntityList.each {

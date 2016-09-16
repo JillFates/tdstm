@@ -22,7 +22,7 @@ class ReportsService {
 
 	@Transactional(readOnly = true)
 	def generatePreMoveCheckList(def currProj , def moveEventInstance, def viewUnpublished = false) {
-		def projectInstance = Project.findById( currProj )
+		def projectInstance = Project.get( currProj )
 		def moveBundles = moveEventInstance.moveBundles.sort{it.name}
 		def eventErrorList =[]
 
@@ -91,7 +91,7 @@ class ReportsService {
 	 * @return Map - The parameters used by the view to generate the report
 	 */
 	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def missing, def planning, def owner, int assetCap) {
-		def projectInstance = Project.findById( currProj )
+		def projectInstance = Project.get( currProj )
 		ArrayList appList = new ArrayList()
 		def appsInBundle
 		def currAppOwner
@@ -100,7 +100,7 @@ class ReportsService {
 		if(planning) {
 			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseForPlanning(projectInstance, true).toList(), [max:assetCap])
 		} else {
-			appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId), [max:assetCap])
+			appsInBundle = Application.findAllByMoveBundle(MoveBundle.get(moveBundleId), [max:assetCap])
 		}
 
 		if(owner!='null'){
@@ -147,7 +147,7 @@ class ReportsService {
 			if(showApp)
 				appList.add([ 'app':it, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size(), 'supportsIssueCount':supportsList.size() ])
 		}
-		return['project':projectInstance, 'appList':appList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9,'currAppOwner':currAppOwner?:'All']
+		return['project':projectInstance, 'appList':appList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.get(moveBundleId)) : (moveBundleId), 'columns':9,'currAppOwner':currAppOwner?:'All']
 	}
 
 	/**
@@ -680,7 +680,7 @@ class ReportsService {
 			bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
 
 		} else {
-			bundles = [MoveBundle.findById(moveBundleId)]
+			bundles = [MoveBundle.get(moveBundleId)]
 		}
 		if(bundles){
 			assetsInBundle = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types) ORDER BY assetName",
@@ -756,7 +756,7 @@ class ReportsService {
 			if(showAsset)
 				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, header:header ])
 		}
-		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles",
+		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.get(moveBundleId)) : "Planning Bundles",
 				'columns':9, title:StringUtils.stripStart(titleString.toString(), ","), maxR:maxR, ofst:ofst+maxR, bundleConflicts:bundleConflicts, unresolvedDependencies:params.unresolvedDep,
 					noRunsOn:params.noRuns, vmWithNoSupport:params.vmWithNoSupport, moveBundleId:params.moveBundle, appCount:appCount
 				]
@@ -772,7 +772,7 @@ class ReportsService {
 		if(planning) {
 			bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
 		} else {
-			bundles = [MoveBundle.findById(moveBundleId)]
+			bundles = [MoveBundle.get(moveBundleId)]
 		}
 		if(bundles){
 			assetsInBundle = AssetEntity.findAll("FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:type) ORDER BY assetName",
@@ -854,7 +854,7 @@ class ReportsService {
 			if(showDb)
 				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, header:header ])
 		}
-		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles",
+		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.get(moveBundleId)) : "Planning Bundles",
 				'columns':9, title:StringUtils.stripStart(titleString.toString(), ",")]
 	}
 	/**

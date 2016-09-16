@@ -86,7 +86,7 @@ class RoleTypeController {
     def save() {
         RoleType roleTypeInstance = new RoleType(params)
         roleTypeInstance.id = params.id
-        def role = RoleType.findById(params.id)
+        def role = RoleType.get(params.id)
         // condition to check the id
         if ( role != null ) {
             flash.message = "Role Type ${role.id} already exist "

@@ -57,8 +57,8 @@ class PermissionsController {
 				}
 			}
 		}
-		for(String id : paramList){
-			def permissionInstansce = Permissions.findById(id.toInteger())
+		for(String id in paramList){
+			def permissionInstansce = Permissions.get(id)
 			if(permissionInstansce){
 				permissionInstansce.description = params["description_"+id]
 				if(!permissionInstansce.save(flush:true)){

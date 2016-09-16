@@ -2223,7 +2223,7 @@ class AssetEntityService {
 			bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')
 
 
-			def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
+			def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
 			def project = Project.get(projectId)
 			if ( project == null) {

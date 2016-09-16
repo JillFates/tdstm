@@ -20,9 +20,9 @@ class PartyRelationshipService {
 	 */
 	def savePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
 		try {
-			def partyRelationshipType = ((relationshipType instanceof PartyRelationshipType) ?: PartyRelationshipType.findById( relationshipType ))
-			def roleTypeFrom = (roleTypeIdFrom instanceof RoleType) ? roleTypeIdFrom : RoleType.findById( roleTypeIdFrom )
-			def roleTypeTo = (roleTypeIdTo instanceof RoleType) ? roleTypeIdTo : RoleType.findById( roleTypeIdTo )
+			def partyRelationshipType = ((relationshipType instanceof PartyRelationshipType) ?: PartyRelationshipType.get( relationshipType ))
+			def roleTypeFrom = (roleTypeIdFrom instanceof RoleType) ? roleTypeIdFrom : RoleType.get( roleTypeIdFrom )
+			def roleTypeTo = (roleTypeIdTo instanceof RoleType) ? roleTypeIdTo : RoleType.get( roleTypeIdTo )
 
 			assert partyRelationshipType != null
 			assert roleTypeFrom != null
@@ -56,9 +56,9 @@ class PartyRelationshipService {
 	 */
 	def deletePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
 		//log.info "------------------- relationshipType=${relationshipType} partyIdFrom=${partyIdFrom} roleTypeIdFrom=${roleTypeIdFrom} partyIdTo=${partyIdTo} roleTypeIdTo=${roleTypeIdTo} -------------------"
-		def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
-		def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
-		def roleTypeTo = RoleType.findById( roleTypeIdTo )
+		def partyRelationshipType = PartyRelationshipType.get( relationshipType )
+		def roleTypeFrom = RoleType.get( roleTypeIdFrom )
+		def roleTypeTo = RoleType.get( roleTypeIdTo )
 
 		def partyRelationInstance = PartyRelationship.getRelationshipInstance(partyIdTo,partyIdFrom,roleTypeTo,roleTypeFrom,partyRelationshipType)
 		if(partyRelationInstance){
@@ -279,9 +279,9 @@ class PartyRelationshipService {
 	def updatePartyRelationshipRoleTypeTo( def relationshipType, def partyFrom, def roleTypeIdFrom, def partyTo, def roleTypeIdTo ){
 		if(roleTypeIdTo != null && roleTypeIdTo != ""){
 			def partyRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
-			def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
-			def roleTypeTo = RoleType.findById( roleTypeIdTo )
-			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
+			def partyRelationshipType = PartyRelationshipType.get( relationshipType )
+			def roleTypeTo = RoleType.get( roleTypeIdTo )
+			def roleTypeFrom = RoleType.get( roleTypeIdFrom )
 			if ( partyRelationship == null ) {
 				def otherRole = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom' ")
 				if ( otherRole != null && otherRole != "" ) {
@@ -345,9 +345,9 @@ class PartyRelationshipService {
 			[relationshipType, partyIdFrom, roleTypeIdFrom, partyIdTo, roleTypeIdTo] )
 
 		if (! partyRelationship ) {
-			def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
-			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
-			def roleTypeTo = RoleType.findById( roleTypeIdTo )
+			def partyRelationshipType = PartyRelationshipType.get( relationshipType )
+			def roleTypeFrom = RoleType.get( roleTypeIdFrom )
+			def roleTypeTo = RoleType.get( roleTypeIdTo )
 			partyRelationship = new PartyRelationship(
 				partyRelationshipType:partyRelationshipType,
 				partyIdFrom:partyIdFrom,
@@ -607,7 +607,7 @@ class PartyRelationshipService {
 	 */
 	def createBundleTeamMembers( def projectTeam, def teamMembers ){
 		teamMembers.each{teamMember->
-			def personParty = Party.findById( teamMember )
+			def personParty = Party.get( teamMember )
 			def projectTeamRel = savePartyRelationship( "PROJ_TEAM", projectTeam, "TEAM", personParty, "TEAM_MEMBER" )
 		}
 
@@ -696,7 +696,7 @@ class PartyRelationshipService {
 	def getTeamMemberNames(def teamId )
 	{
 		def roleTypeCodeTo ="TEAM_MEMBER"
-		def roleTypeInstance = RoleType.findById('TEAM_MEMBER')
+		def roleTypeInstance = RoleType.get('TEAM_MEMBER')
 		def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
 		def memberNames = new StringBuffer()
 		teamMembers.each{team ->
@@ -717,7 +717,7 @@ class PartyRelationshipService {
 	def getTeamMembers(def teamId )
 	{
 		def roleTypeCodeTo ="TEAM_MEMBER"
-		def roleTypeInstance = RoleType.findById('TEAM_MEMBER')
+		def roleTypeInstance = RoleType.get('TEAM_MEMBER')
 		def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyRelationshipType = 'PROJ_TEAM' and pr.roleTypeCodeFrom ='TEAM' and pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
 		return teamMembers
 	}

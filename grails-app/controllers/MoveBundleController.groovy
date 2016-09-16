@@ -269,7 +269,7 @@ class MoveBundleController {
 					}
 				}
 
-				//def projectManegerInstance = Party.findById( projectManagerId )
+				//def projectManegerInstance = Party.get( projectManagerId )
 				def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
 				def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
 				flash.message = "MoveBundle ${moveBundleInstance} updated"
@@ -335,11 +335,11 @@ class MoveBundleController {
 		}
 		if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
 			if( projectManager != null && projectManager != ""){
-				def projectManegerInstance = Party.findById( projectManager )
+				def projectManegerInstance = Party.get( projectManager )
 				def pmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", projectManegerInstance, "PROJ_MGR")
 			}
 			if( moveManager != null && moveManager != "" ){
-				def moveManegerInstance = Party.findById( moveManager )
+				def moveManegerInstance = Party.get( moveManager )
 				def mmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", moveManegerInstance, "MOVE_MGR")
 			}
 
@@ -383,7 +383,7 @@ class MoveBundleController {
 	 *---------------------------------------------------*/
 	def checkStepSnapshotRecord() {
 		def steps = params.steps
-		def moveBundle = MoveBundle.findById( params.moveBundleId )
+		def moveBundle = MoveBundle.get( params.moveBundleId )
 		def transitionIds
 		def message = "success"
 		if(steps){
@@ -935,7 +935,7 @@ class MoveBundleController {
 			return
 
 		def assetArray = params.assetVal
-		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundle))
+		def moveBundleInstance = MoveBundle.get(params.moveBundle)
 		session.ASSIGN_BUNDLE = params.moveBundle
 		def assetList = assetArray.split(",")
 		assetList.each{assetId->

@@ -612,7 +612,7 @@ class PersonService {
 						Person.executeUpdate("Delete PartyRole p where p.party=:person", map)
 						// Deletes Party Relationships
 						Person.executeUpdate("Delete PartyRelationship p where p.partyIdFrom=:person or p.partyIdTo=:person", map)
-						def partyInstance = Party.findById(person.id)
+						def partyInstance = Party.get(person.id)
 						// Deletes Party
 						partyInstance.delete()
 
@@ -1623,7 +1623,7 @@ class PersonService {
 			// TODO : JPM 5/2015 : Need to make sure showing/editing someone that the user has access to
 		}
 
-		Person person = Person.findById(personId)
+		Person person = Person.get(personId)
 		if (! person) {
 			throw new EmptyResultException()
 		}
@@ -1785,7 +1785,7 @@ class PersonService {
 		// Look to allow easy breakout for exceptions
 		while (true) {
 			if (companyId != null) {
-				companyParty = Party.findById( companyId )
+				companyParty = Party.get( companyId )
 			}
 
 			if (!companyParty) {
