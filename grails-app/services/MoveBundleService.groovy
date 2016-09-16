@@ -557,6 +557,9 @@ class MoveBundleService {
 						 cellValue = (assetComment.taskBatch?.id) ?: ""
 						 isNumber = true
 						 break
+					case "durationLocked":
+						 cellValue = assetComment.durationLocked? "YES" : "NO"
+						 break
 					case "":
 						cellValue = ""
 						break
