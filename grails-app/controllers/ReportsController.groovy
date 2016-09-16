@@ -29,7 +29,6 @@ class ReportsController {
 	def securityService
 	def userPreferenceService
 	def sessionFactory
-	def grailsApplication
 
 	def index() {
 		render(view:'index')

@@ -26,7 +26,6 @@ class ProjectController {
 	def securityService
 	def controllerService
 	def quartzScheduler
-	def grailsApplication
 	def auditService
 	def assetEntityService
 	def userService

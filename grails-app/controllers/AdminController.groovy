@@ -13,7 +13,6 @@ import grails.converters.JSON
 class AdminController {
 	def jdbcTemplate
 	def sessionFactory
-	def grailsApplication
 
 	def accountImportExportService
 	def auditService
