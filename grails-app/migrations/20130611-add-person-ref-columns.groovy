@@ -1,5 +1,4 @@
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 
 import com.tdssrc.grails.GormUtil
 
@@ -7,8 +6,8 @@ import com.tdssrc.grails.GormUtil
  * This Changelog is written to add column for sme, sme2 and app_owner to use person reference. 
  */
 
-def ctx = AH.application.mainContext
-def jdbcTemplate = ctx.jdbcTemplate
+def jdbcTemplate = com.tdsops.common.grails.ApplicationContextHolder.getBean('jdbcTemplate')
+
 databaseChangeLog = {
 	// This Changeset is used for migrate sme record to sme_id column
 	changeSet(author: "lokanada", id: "20130611 TM-1904-7") {

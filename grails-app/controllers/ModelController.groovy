@@ -6,7 +6,6 @@ import org.apache.poi.*
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.apache.shiro.SecurityUtils
 import org.springframework.web.multipart.*
@@ -857,7 +856,7 @@ class ModelController {
     def export() {
         //get template Excel
         try {
-        	File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
+        	File file =  grailsApplication.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
 			//set MIME TYPE as Excel
 			def filename = 	"TDS-Sync-Data-"+TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_6)+".xls"
 					filename = filename.replace(" ", "_")
@@ -868,7 +867,7 @@ class ModelController {
 
 			def manuSheet = book.getSheet("manufacturer")
 			def manufacturers = params.exportCheckbox ? Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer :
-			 Manufacturer.findAll()
+			 Manufacturer.findAll()	
 
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
 				WorkbookUtil.addCell(manuSheet, 0, r+1, String.valueOf(manufacturers[r].id ))

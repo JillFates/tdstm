@@ -14,7 +14,6 @@ import com.tdssrc.grails.TimeUtil
 
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
-import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.ConnectorActiveDirectory
 
 import org.apache.commons.logging.Log
@@ -200,12 +199,7 @@ class TestCaseController {
 	}
 
 	def adIntegration() {
-		def ctx = ApplicationContextHolder.getApplicationContext()
-		def conf = ApplicationContextHolder.getConfig()
-		def adConf = conf?.tdstm?.security?.ad
-
-		//render ctx.securityService.class
-		//return
+		def adConf = grailsApplication.config?.tdstm?.security?.ad
 
 		def username='jmtest'
 		def pswd='tryT0Gu3ss1t'
@@ -218,7 +212,6 @@ class TestCaseController {
 
 	def testGormUtilGetDPWC() {
 		def sb = new StringBuilder()
-
 		def list = []
 
 		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'nullable', true)

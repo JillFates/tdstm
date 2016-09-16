@@ -1,6 +1,3 @@
-import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-
 /**
  * This changelog will set expiry date to now + 365 days for users with expired accounts that have logged in during the past 30 days
  */

@@ -17,7 +17,6 @@ import java.util.concurrent.Executors
 
 import org.apache.commons.lang.StringUtils as SU
 import org.apache.commons.lang.math.NumberUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.quartz.SimpleTrigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -77,10 +76,6 @@ class TaskService implements InitializingBean {
 	def grailsApplication
 	ExecutorService executors
 
-	// The following vars are initialized in afterPropertiesSet after IoC
-	def ctx
-	def sessionFactory
-
 	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
@@ -134,10 +129,6 @@ class TaskService implements InitializingBean {
 		]
 		(1..(Project.CUSTOM_FIELD_COUNT)).each() { commonFilterProperties << "custom$it".toString() }	// Add custom1..custom##
 		// log.debug "commonFilterProperties include $commonFilterProperties"
-
-		ctx = AH.application.mainContext
-		sessionFactory = ctx.sessionFactory
-
 	}
 
 	/**

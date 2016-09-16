@@ -1,16 +1,12 @@
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
 
 /**
  * This Changelog we have to written cause we are getting "getting-lock-wait-timeout-exceeded-try-restarting-transaction". due to 
  * some hibernate issues
  */
 
-def ctx = AH.application.mainContext
-def jdbcTemplate = ctx.jdbcTemplate
+def jdbcTemplate = com.tdsops.common.grails.ApplicationContextHolder.getBean('jdbcTemplate')
+
 databaseChangeLog = {
 	// This Changeset is used for migrate sme record to sme_id column
 	changeSet(author: "lokanada", id: "20130612 TM-1904-10") {

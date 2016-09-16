@@ -19,7 +19,6 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Row
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.quartz.SimpleTrigger
@@ -4389,7 +4388,7 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 
 		def assetEntities = AssetEntity.findAllByProject(project, [max:50])
-		File file  = ApplicationHolder.application.parentContext.getResource(filePath).getFile()
+		File file  = grailsApplication.parentContext.getResource(filePath).getFile()
 
 		//getting FileInputStream instance for template file
 		FileInputStream fileInputStream = new FileInputStream( file )

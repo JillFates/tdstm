@@ -6,7 +6,7 @@ import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap.Values
 import java.io.*
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.RowMapper
@@ -31,10 +31,11 @@ import org.apache.commons.lang3.SerializationUtils
  */
 class CookbookService {
 
-		boolean transactional = true
+	static transactional = true
 	static allowedCatalogs = ['Event', 'Bundle', 'Application']
 	static searchAllowedCatalogs = ['All', 'Event', 'Bundle', 'Application']
 
+	GrailsApplication grailsApplication
 	def namedParameterJdbcTemplate
 	def projectService
 	def partyRelationshipService
@@ -605,7 +606,7 @@ class CookbookService {
 			throw new UnauthorizedException('The client doesn\'t own this context')
 		}
 
-		def taskService = AH.application.mainContext.getBean('taskService')
+		def taskService = grailsApplication.mainContext.getBean('taskService')
 		def recipeMap = this.parseRecipeSyntax(sourceCode)
 		def exceptions = new StringBuilder()
 		def fetchedGroups = taskService.fetchGroups(recipeMap, context, exceptions)

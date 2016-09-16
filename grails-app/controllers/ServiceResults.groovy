@@ -1,5 +1,4 @@
-// import java.beans.StaticFieldsPersistenceDelegate;
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdsops.common.grails.ApplicationContextHolder
 import grails.converters.JSON
 
 /**
@@ -167,7 +166,7 @@ class ServiceResults {
 	 * @param response the response object
 	 */
 	static def errorsInValidation(errs) {
-		def messageSource = ApplicationHolder.application.mainContext.messageSource
+		def messageSource = ApplicationContextHolder.getBean('messageSource')
 		def locale = null
 		def allErrorsAsArray = errs.allErrors.collect { it -> "${messageSource.getMessage(it, locale)}" }
 		return errors(allErrorsAsArray)

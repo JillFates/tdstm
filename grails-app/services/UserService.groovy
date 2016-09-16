@@ -12,8 +12,8 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import grails.util.Holders
 import org.apache.shiro.authc.AccountException
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.transaction.TransactionDefinition
 import UserPreferenceEnum as PREF
@@ -28,6 +28,7 @@ class UserService implements InitializingBean {
 	def projectService
 	def securityService
 	def jdbcTemplate
+	GrailsApplication grailsApplication
 
 	// The following vars are initialized in afterPropertiesSet after IoC
 	def ctx
@@ -56,7 +57,7 @@ class UserService implements InitializingBean {
 		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
 		// Initialize some class level variables used repeatedly by the application
 
-		ctx = Holders.grailsApplication.mainContext
+		ctx = grailsApplication.mainContext
 		sessionFactory = ctx.sessionFactory
 	}
 

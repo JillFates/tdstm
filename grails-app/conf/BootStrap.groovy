@@ -4,7 +4,6 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 import groovy.sql.Sql
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.shiro.crypto.hash.Sha256Hash
 import grails.util.Environment
