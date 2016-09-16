@@ -406,8 +406,8 @@ def test = {
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
 		def companyParty = Party.findById(companyId)
-		def dateCreatedByFormat = TimeUtil.formatDateTime(getSession(), personInstance.dateCreated)
-		def lastUpdatedFormat = TimeUtil.formatDateTime(getSession(), personInstance.lastUpdated)
+		def dateCreatedByFormat = TimeUtil.formatDateTime(session, personInstance.dateCreated)
+		def lastUpdatedFormat = TimeUtil.formatDateTime(session, personInstance.lastUpdated)
 		if(!personInstance) {
 			flash.message = "Person not found with id ${params.id}"
 			redirect( action:"list", params:[ id:companyId ] )
@@ -603,7 +603,7 @@ def test = {
 
 		try {
 			Person byWhom = securityService.getUserLoginPerson()
-			String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 			/*Party newCompany = Party.findByName(params["Company"])
 			if(!personService.isAssociatedTo(person, newCompany)){
 				throw new DomainUpdateException("The person ${personInstance} is not associated with the company ${newCompany}")
@@ -612,7 +612,7 @@ def test = {
 			if (params.tab) {
 				forward( action:'loadGeneral', params:[tab: params.tab, personId:person.id])
 			} else {
-				List results = [ name:person.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ ]
+				List results = [ name:person.firstName, tz:session.getAttribute( "CURR_TZ" )?.CURR_TZ ]
 				render results as JSON
 			}
 		} catch (e) {
@@ -638,9 +638,9 @@ def test = {
 			Person person = personService.validatePersonAccess(params.id, currentPerson)
 			UserLogin userLogin = securityService.getPersonUserLogin( person )
 
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
-			def expiryDate = userLogin.expiryDate ? TimeUtil.formatDateTime(getSession(), userLogin.expiryDate) : ""
+			def expiryDate = userLogin.expiryDate ? TimeUtil.formatDateTime(session, userLogin.expiryDate) : ""
 
 			def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
 
@@ -661,7 +661,7 @@ def test = {
 		try {
 			Person byWhom = securityService.getUserLoginPerson()
 			params.id = byWhom.id
-			String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 			Person person = personService.updatePerson(params, byWhom, tzId, false)
 
 			if (params.tab) {
@@ -1171,13 +1171,13 @@ def test = {
 				startDate?.removeAll([null])
 				if (startDate.size()>0) {
 					if (startDate[0]) {
-						bundleStartDate = TimeUtil.formatDateTime(getSession(), startDate[0], TimeUtil.FORMAT_DATE_TIME_10)
+						bundleStartDate = TimeUtil.formatDateTime(session, startDate[0], TimeUtil.FORMAT_DATE_TIME_10)
 					}
 				}
 				moveMap.put("project", moveEvent.project.name)
 				moveMap.put("name", moveEvent.name)
 				moveMap.put("startTime", bundleStartDate)
-				moveMap.put("startDate", (eventTimes.start ? TimeUtil.formatDateTime(getSession(), eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6) : '') )
+				moveMap.put("startDate", (eventTimes.start ? TimeUtil.formatDateTime(session, eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6) : '') )
 				moveMap.put("id", moveEvent.id)
 
 				moveEventList << moveMap

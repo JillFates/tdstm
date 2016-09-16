@@ -1159,7 +1159,6 @@ class AdminController {
 		]
 
 		try {
-			// def session = getSession()
 			accountImportExportService.generateAccountsExportToBrowser(session, response, byWhom, project, formOptions)
 			return
 
@@ -1296,7 +1295,6 @@ class AdminController {
 
 		Map options = accountImportExportService.importParamsToOptionsMap(params)
 		String view = 'importAccounts'
-		def session = getSession()
 
 		// There is a bug or undocumented feature that doesn't allow overriding params when forwarding which is used
 		// in the upload step to forward to the review so we look for the stepAlt and use it if found.

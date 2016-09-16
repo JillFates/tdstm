@@ -163,14 +163,14 @@ class AssetEntityController {
 			if (!params.max) params.max = params.rowVal
 			userPreferenceService.setPreference(PREF.MAX_ASSET_LIST, "${params.rowVal}" )
 		} else {
-			def userMax = getSession().getAttribute("MAX_ASSET_LIST")
+			def userMax = session.getAttribute("MAX_ASSET_LIST")
 			if ( userMax.MAX_ASSET_LIST ) {
 				if ( !params.max ) params.max = userMax.MAX_ASSET_LIST
 			} else {
 				if ( !params.max ) params.max = 50
 			}
 		}
-		def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def project = Project.findById(session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
 
 		params['project.id'] = project.id
 
@@ -251,7 +251,7 @@ class AssetEntityController {
 		if (!controllerService.checkPermission(this, 'Export')){
 			return
 		}
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project
 		def projectInstance
 		def assetsByProject
@@ -264,7 +264,7 @@ class AssetEntityController {
 		dataTransferSetExport = DataTransferSet.findAll("from DataTransferSet dts where dts.transferMode IN ('B','E') ")
 		if( projectId == null ) {
 			//get project id from session
-			def currProj = getSession().getAttribute( "CURR_PROJ" )
+			def currProj = session.getAttribute( "CURR_PROJ" )
 			projectId = currProj.CURR_PROJ
 			if( projectId == null ) {
 				flash.message = " No Projects are Associated, Please select Project. "
@@ -346,7 +346,7 @@ class AssetEntityController {
 						// Convert to string in the Date format
 						if (dateValue) {
 							cellValue = TimeUtil.formatDate(dateValue, sheetInfo.userDateFormatter)
-							//cellValue = TimeUtil.formatDate(getSession(), dateValue)
+							//cellValue = TimeUtil.formatDate(session, dateValue)
 						} else {
 							cellValue = ''
 						}
@@ -950,8 +950,8 @@ class AssetEntityController {
 					def dateTimeFormatter = TimeUtil.createFormatterForType(dateFormatType, TimeUtil.FORMAT_DATE_TIME_22)
 					def dateFormatter = TimeUtil.createFormatterForType(dateFormatType, TimeUtil.FORMAT_DATE_TIME_12)
 
-					String userTzId = getSession().getAttribute(TimeUtil.TIMEZONE_ATTR )?.CURR_TZ
-					String userDTFormat = getSession().getAttribute(TimeUtil.DATE_TIME_FORMAT_ATTR)?.CURR_DT_FORMAT
+					String userTzId = session.getAttribute(TimeUtil.TIMEZONE_ATTR )?.CURR_TZ
+					String userDTFormat = session.getAttribute(TimeUtil.DATE_TIME_FORMAT_ATTR)?.CURR_DT_FORMAT
 
 					def userDateFormatter = TimeUtil.createFormatterForType(userDTFormat, TimeUtil.FORMAT_DATE)
 
@@ -1429,7 +1429,7 @@ class AssetEntityController {
 							TimeUtil.FORMAT_DATE_TIME_25,
 							TimeUtil.FORMAT_DATE
 						]
-						def dateCreated = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), validFormats)
+						def dateCreated = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, session, validFormats)
 						if (!dateCreated) {
 							dateCreated = new Date()
 						}
@@ -1564,7 +1564,7 @@ class AssetEntityController {
 		progressService.create(key)
 
 		def username = securityService.getUserLogin().username
-		def projectId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
 
 
 		def jobName = "TM-" + key
@@ -1579,8 +1579,8 @@ class AssetEntityController {
 		trigger.jobDataMap.put('key', key)
 		trigger.jobDataMap.put('username', username)
 		trigger.jobDataMap.put('projectId', projectId)
-		trigger.jobDataMap.put('tzId', getSession().getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ)
-		trigger.jobDataMap.put('userDTFormat', getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT)
+		trigger.jobDataMap.put('tzId', session.getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ)
+		trigger.jobDataMap.put('userDTFormat', session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT)
 		trigger.jobDataMap[Profiler.KEY_NAME] = session[Profiler.KEY_NAME]
 
 		trigger.setJobName('ExportAssetEntityJob')
@@ -1659,7 +1659,7 @@ class AssetEntityController {
 	def delete() {
 		def redirectAsset = params.dstPath
 		def assetEntityInstance = AssetEntity.get( params.id )
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
 			assetEntityService.deleteAsset(assetEntityInstance)
 			assetEntityInstance.delete()
@@ -1711,7 +1711,7 @@ class AssetEntityController {
 	 *-------------------------------------------------*/
 	def remove() {
 		def assetEntityInstance = AssetEntity.get( params.id )
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
 			ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${params.id}")
@@ -1800,7 +1800,7 @@ class AssetEntityController {
 		def items = []
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
-		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
 		def project = Project.findById( projectId )
 		entityAttributeInstance.each{
 			def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
@@ -1838,7 +1838,7 @@ class AssetEntityController {
 			//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
 			entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $attributeSetId order by eav.sortOrder ")
 		}
-		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
 		def project = Project.findById( projectId )
 		entityAttributeInstance.each{
 			def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
@@ -1890,7 +1890,7 @@ class AssetEntityController {
 		def data = []
 		if(autoCompAttribs){
 			def autoCompAttribsList = autoCompAttribs.split(",")
-			def currProj = getSession().getAttribute( "CURR_PROJ" )
+			def currProj = session.getAttribute( "CURR_PROJ" )
 			def projectId = currProj.CURR_PROJ
 			def project = Project.findById( projectId )
 			autoCompAttribsList.each{
@@ -1953,20 +1953,20 @@ class AssetEntityController {
 		if(assetComment){
 			if(assetComment.createdBy){
 				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.toString()
-				dtCreated = TimeUtil.formatDateTime(getSession(), assetComment.dateCreated)
+				dtCreated = TimeUtil.formatDateTime(session, assetComment.dateCreated)
 			}
 			if (assetComment.dateResolved) {
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
-				dtResolved = TimeUtil.formatDateTime(getSession(), assetComment.dateResolved)
+				dtResolved = TimeUtil.formatDateTime(session, assetComment.dateResolved)
 			}
 
-			def etStart =  assetComment.estStart ? TimeUtil.formatDateTime(getSession(), assetComment.estStart) : ''
+			def etStart =  assetComment.estStart ? TimeUtil.formatDateTime(session, assetComment.estStart) : ''
 
-			def etFinish = assetComment.estFinish ? TimeUtil.formatDateTime(getSession(), assetComment.estFinish) : ''
+			def etFinish = assetComment.estFinish ? TimeUtil.formatDateTime(session, assetComment.estFinish) : ''
 
-			def atStart = assetComment.actStart ? TimeUtil.formatDateTime(getSession(), assetComment.actStart) : ''
+			def atStart = assetComment.actStart ? TimeUtil.formatDateTime(session, assetComment.actStart) : ''
 
-			def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate): ''
+			def dueDate = assetComment.dueDate ? TimeUtil.formatDate(session, assetComment.dueDate): ''
 
 			def workflowTransition = assetComment?.workflowTransition
 			def workflow = workflowTransition?.name
@@ -1974,7 +1974,7 @@ class AssetEntityController {
 			def noteList = assetComment.notes.sort{it.dateCreated}
 			def notes = []
 			noteList.each {
-				def dateCreated = it.dateCreated ? TimeUtil.formatDateTime(getSession(), it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3) : ''
+				def dateCreated = it.dateCreated ? TimeUtil.formatDateTime(session, it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3) : ''
 				notes << [ dateCreated , it.createdBy?.toString() ,it.note, it.createdBy?.id]
 			}
 
@@ -2144,7 +2144,7 @@ class AssetEntityController {
 	 * @return: boolean value to validate comment field
 	 *---------------------------------*/
 	def retrieveFlag() {
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def projectInstance = Project.findById( session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def moveBundleInstance = MoveBundle.get(params.moveBundle)
 		def toState = params.toState
 		def fromState = params.fromState
@@ -2161,7 +2161,7 @@ class AssetEntityController {
 	 *@return: List of valid stated for param state
 	 *----------------------------------------*/
 	def retrieveStates(def state,def assetEntity){
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def projectInstance = Project.findById(session.getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def stateIdList = []
 		def validStates
 		if(state){
@@ -2541,7 +2541,7 @@ class AssetEntityController {
 				[
 					'',
 					(it.comment?.length()>50 ? (it.comment.substring(0,50) + '...') : it.comment).replace("\n",""),
-					it.lastUpdated ? TimeUtil.formatDate(getSession(), it.lastUpdated):'',
+					it.lastUpdated ? TimeUtil.formatDate(session, it.lastUpdated):'',
 					it.commentType ,
 					it.assetEntity?.assetName ?:'',
 					it.assetEntity?.assetType ?:'',
@@ -2799,9 +2799,9 @@ class AssetEntityController {
 
 			def dueDate=''
 			if (isRunbookTask) {
-				dueDate = it.estFinish ? TimeUtil.formatDateTime(getSession(), it.estFinish, TimeUtil.FORMAT_DATE_TIME_4) : ''
+				dueDate = it.estFinish ? TimeUtil.formatDateTime(session, it.estFinish, TimeUtil.FORMAT_DATE_TIME_4) : ''
 			} else {
-				dueDate = it.dueDate ? TimeUtil.formatDate(getSession(), it.dueDate) : ''
+				dueDate = it.dueDate ? TimeUtil.formatDate(session, it.dueDate) : ''
 			}
 
 			def deps = TaskDependency.findAllByPredecessor( it )
@@ -2890,7 +2890,7 @@ class AssetEntityController {
 				result = task.createdBy ? task.createdBy.toString(): ''
 			break
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:
-				result = task[value] ? TimeUtil.formatDate(getSession(), task[value]) : ''
+				result = task[value] ? TimeUtil.formatDate(session, task[value]) : ''
 			break
 			case "event":
 				result = task.moveEvent?.name
@@ -3880,7 +3880,7 @@ class AssetEntityController {
 	def exportSpecialReport() {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_5)
+		def today = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		try{
 			def filePath = "/templates/TDS-Storage-Inventory.xls"
 			def book = ExportUtil.loadSpreadsheetTemplate(filePath)
@@ -4383,7 +4383,7 @@ class AssetEntityController {
 
 	def exportPoiDemo() {
 		def filePath = "/templates/TDSMaster_Poi_template.xls" // Template file Path
-		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_5)
+		def today = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		def filename = "Demo_POI_Export-${today}" // Export file name
 		def project = securityService.getUserCurrentProject()
 

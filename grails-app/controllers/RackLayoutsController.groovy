@@ -60,7 +60,7 @@ class RackLayoutsController {
 
 		List moveBundleList = MoveBundle.findAllByProject( project )
 		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
-		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+		def currentBundle = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		boolean isCurrentBundle=true
 		if (!currentBundle){
 			currentBundle = moveBundleList[0]?.id?.toString()
@@ -386,14 +386,14 @@ class RackLayoutsController {
 		def bundleIds = params.bundles
 		def moveBundles = []
 		if(bundleIds.contains('all')){
-			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+			def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
 			moveBundles = MoveBundle.findAllByProject( Project.get( projectId ) )
 		} else if( bundleIds ){
 			moveBundles = MoveBundle.findAll( "from MoveBundle m where m.id in ($bundleIds)" )
 		}
 
-		def sourceRacks = new ArrayList()
-		def targetRacks = new ArrayList()
+		def sourceRacks = []
+		def targetRacks = []
 
 		moveBundles.each{moveBundle ->
 			moveBundle.sourceRacks.each{
@@ -808,7 +808,7 @@ class RackLayoutsController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject( project )
 		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
-		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+		def currentBundle = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		/* set first bundle as default if user pref not exist */
 		def isCurrentBundle = true
 		def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ project ])?.model
@@ -955,7 +955,7 @@ class RackLayoutsController {
 		def assetCableMap
 		def toCableId
 		if(assetCableId){
-			def currProj = getSession().getAttribute( "CURR_PROJ" )
+			def currProj = session.getAttribute( "CURR_PROJ" )
 			def projectId = currProj.CURR_PROJ
 			def project = Project.get( projectId )
 			def actionType = jsonInput.actionType
@@ -1051,7 +1051,7 @@ class RackLayoutsController {
 	 *  Provide the Rack auto complete details and connector, uposition validation
 	 */
 	def retrieveAutoCompleteDetails() {
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def currProj = session.getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def project = Project.get( projectId )
 		def data

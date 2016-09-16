@@ -857,8 +857,8 @@ digraph runbook {
 		} else {
 				etext = "Requested comment does not exist. "
 		}
-		def retMap=[etext:etext, estStart : comment?.estStart ? TimeUtil.formatDateTime(getSession(), comment.estStart) : '' ,
-					 estFinish: comment?.estFinish ? TimeUtil.formatDateTime(getSession(), comment.estFinish ) : '' ]
+		def retMap=[etext:etext, estStart : comment?.estStart ? TimeUtil.formatDateTime(session, comment.estStart) : '' ,
+					 estFinish: comment?.estFinish ? TimeUtil.formatDateTime(session, comment.estFinish ) : '' ]
 		render retMap as JSON
 	}
 
@@ -1459,7 +1459,7 @@ function goBack() { window.history.back() }
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
 		noteList.each{
-			def dateCreated = TimeUtil.formatDateTime(getSession(), it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3)
+			def dateCreated = TimeUtil.formatDateTime(session, it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3)
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
 
@@ -1481,7 +1481,7 @@ function goBack() { window.history.back() }
 			assignmentPerm = ! [AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(assetComment.status)
 		}
 
-		def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate) : ''
+		def dueDate = assetComment.dueDate ? TimeUtil.formatDate(session, assetComment.dueDate) : ''
 
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff

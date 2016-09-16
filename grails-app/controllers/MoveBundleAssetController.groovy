@@ -125,9 +125,9 @@ class MoveBundleAssetController {
         def moveBundleInstanceRight = MoveBundle.findById( bundleRight )
         def moveBundleInstanceLeft = MoveBundle.findById( bundleLeft )
         def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstanceRight.project.id order by name")
-	    def sessionSort = request.getSession(true).getAttribute("sessionSort")
-        def sessionSide = request.getSession(true).getAttribute("sessionSide")
-        def sessionOrder = request.getSession(true).getAttribute("sessionOrder")
+	    def sessionSort = session.getAttribute("sessionSort")
+        def sessionSide = session.getAttribute("sessionSide")
+        def sessionOrder = session.getAttribute("sessionOrder")
         if( bundleRight ){
             if ( sideField == "right" ) {
                 currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceRight.id "+
@@ -156,7 +156,7 @@ class MoveBundleAssetController {
                 }
             }
         } else {
-            def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+            def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
             if( sideField == "left" ){
                 moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId "+
                     									"order by  $sortField $params.orderField")
@@ -200,16 +200,16 @@ class MoveBundleAssetController {
 		def sessionSort
 		def sessionSide
 		def sessionOrder
-		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+		def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
 		if( ( sideList == "right" && params.sideField == "left" )||( sideList == "left" && params.sideField == "right" ) ){
-			request.getSession(true).setAttribute( "sessionSort", params.sortField )
-			request.getSession(true).setAttribute( "sessionSide", params.sideField )
-			request.getSession(true).setAttribute( "sessionOrder", params.orderField )
+			session.setAttribute( "sessionSort", params.sortField )
+			session.setAttribute( "sessionSide", params.sideField )
+			session.setAttribute( "sessionOrder", params.orderField )
 		}
 		if( ( sideList == "right" && params.sideField == "right" )||( sideList == "left" && params.sideField == "left" ) ){
-            sessionSort = request.getSession(true).getAttribute( "sessionSort" )
-            sessionSide = request.getSession(true).getAttribute( "sessionSide" )
-            sessionOrder = request.getSession(true).getAttribute( "sessionOrder" )
+            sessionSort = session.getAttribute( "sessionSort" )
+            sessionSide = session.getAttribute( "sessionSide" )
+            sessionOrder = session.getAttribute( "sessionOrder" )
 		}
 		//Right Side AssetTable Sort
 		if( sideList == "right" ) {
@@ -297,7 +297,7 @@ class MoveBundleAssetController {
 				         application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation  +"/"+bundleAsset.sourceRack  ]
 	    	}
         } else {
-    		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+    		def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
     		def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId ")
 			assetEntities.each{assetEntity ->
 				items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag,
@@ -360,7 +360,7 @@ class MoveBundleAssetController {
     		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "and move_bundle_id = $bundleId " + sourceGroup )
     		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "and move_bundle_id = $bundleId " + targetGroup)
     	} else if(bundleId == ""){
-    		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+    		def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
      		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "and project_id = $projectId " + sourceGroup)
 			targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "and project_id = $projectId " + targetGroup)
     	}

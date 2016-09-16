@@ -71,11 +71,11 @@
 								</td>
 								
 								<td style="text-align: left;">
-									<tds:convertDateTime date="${account?.lastActivationNotice}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+									<tds:convertDateTime date="${account?.lastActivationNotice}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}" />
 								</td>
 
 								<td style="text-align: left;">
-									<tds:convertDateTime date="${account?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+									<tds:convertDateTime date="${account?.dateCreated}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}" />
 								</td>
 							</tr>
 						</g:each>

@@ -11,7 +11,7 @@ class MoveEventNewsController {
 	 */
 	def list() {
 
-			def projectId = getSession().getAttribute("CURR_PROJ")?.CURR_PROJ
+			def projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ
 			def moveEventId = params.id
 			def moveEvent
 			def state = params.state

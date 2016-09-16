@@ -158,7 +158,7 @@ class ShiroDbRealm {
 					if (getSecurityService().getUserLocalConfig().failedLoginLockoutPeriodMinutes == 0) {
 						throw new LockedAccountException("Your account is presently locked. Please contact support to unlock your account.")
 					} else {
-						def tzId = getUserPreferenceService().getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+						def tzId = getUserPreferenceService().session.getAttribute( "CURR_TZ" )?.CURR_TZ
 						def lockoutUntil = dateTimeFormat.format(TimeUtil.formatDateTimeWithTZ(tzId, TimeUtil.getDefaultFormatType(), state.user.lockedOutUntil, TimeUtil.FORMAT_DATE_TIME_2))
 						throw new LockedAccountException("Your account is presently locked until $lockoutUntil. You may wait or contact support to have your account unlock.")
 					}

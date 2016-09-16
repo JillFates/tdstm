@@ -75,8 +75,8 @@ class MoveBundleController {
 
 		def results = bundleList?.collect {
 			[ cell: [it.name, it.description, (it.useForPlanning ? 'Y' : 'N'), it.assetQty,
-				(it.startTime ? TimeUtil.formatDate(getSession(), it.startTime):''),
-				(it.completionTime ? TimeUtil.formatDate(getSession(), it.completionTime):'')],
+				(it.startTime ? TimeUtil.formatDate(session, it.startTime):''),
+				(it.completionTime ? TimeUtil.formatDate(session, it.completionTime):'')],
 				 id: it.id]
 			}
 
@@ -161,7 +161,7 @@ class MoveBundleController {
 
 	def deleteBundleAndAssets() {
 		def moveBundleInstance = MoveBundle.get( params.id )
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(moveBundleInstance) {
 			AssetEntity.withTransaction { status ->
 				try{
@@ -245,9 +245,9 @@ class MoveBundleController {
 			def startTime = params.startTime
 			def completionTime = params.completionTime
 
-			moveBundleInstance.startTime = startTime? TimeUtil.parseDateTime(getSession(), startTime) : null
+			moveBundleInstance.startTime = startTime? TimeUtil.parseDateTime(session, startTime) : null
 
-			moveBundleInstance.completionTime =  completionTime ? TimeUtil.parseDateTime(getSession(), completionTime) : null
+			moveBundleInstance.completionTime =  completionTime ? TimeUtil.parseDateTime(session, completionTime) : null
 
 			// TODO : SECURITY : Should be confirming that the rooms belong to the moveBundle.project instead of blindly assigning plus should be
 			// validating that the rooms even exist.
@@ -313,10 +313,10 @@ class MoveBundleController {
 		def startTime = params.startTime
 		def completionTime = params.completionTime
 		if(startTime){
-			params.startTime =  TimeUtil.parseDateTime(getSession(), startTime)
+			params.startTime =  TimeUtil.parseDateTime(session, startTime)
 		}
 		if(completionTime){
-			params.completionTime =  TimeUtil.parseDateTime(getSession(), completionTime)
+			params.completionTime =  TimeUtil.parseDateTime(session, completionTime)
 		}
 
 		params.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null
@@ -403,7 +403,7 @@ class MoveBundleController {
 	}
 
 	def projectMoveBundles() {
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def moveBundlesList
 		if(projectId){
 			moveBundlesList = MoveBundle.findAllByProject(Project.get(projectId),[sort:'name',order:'asc'])
@@ -415,7 +415,7 @@ class MoveBundleController {
 	 *
 	 */
 	def planningStats() {
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.get(projectId)
 		def appList = []
 		//def assetList = []
@@ -495,7 +495,7 @@ class MoveBundleController {
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 
 			def eventDates = moveEvent.getEventTimes()
-			eventStartDate << [(moveEvent.id):(eventDates.start ? TimeUtil.formatDateTime(getSession(), eventDates.start, TimeUtil.FORMAT_DATE_TIME_7) : 'TBD')]
+			eventStartDate << [(moveEvent.id):(eventDates.start ? TimeUtil.formatDateTime(session, eventDates.start, TimeUtil.FORMAT_DATE_TIME_7) : 'TBD')]
 
 			// Fetching application count that are assigned to current move event
 			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs)[0] : 0
@@ -700,7 +700,7 @@ class MoveBundleController {
 
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
-		time = date ? TimeUtil.formatDateTime(getSession(), date, TimeUtil.FORMAT_DATE_TIME_8) : ''
+		time = date ? TimeUtil.formatDateTime(session, date, TimeUtil.FORMAT_DATE_TIME_8) : ''
 
 		def today = new Date()
 		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
@@ -891,7 +891,7 @@ class MoveBundleController {
 		progressService.create(key)
 
 		def username = securityService.getUserLogin().username
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 
 		def jobName = "TM-" + baseName + "-" + projectId
 		log.info "Initiate Generate Dependency"

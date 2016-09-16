@@ -105,7 +105,7 @@
 							<td valign="top" class="name">Locked Out Until:</td>
 							<td nowrap="nowrap" valign="middle" class="value">
 								<g:if test="${userLoginInstance?.lockedOutUntil}">
-									<tds:convertDateTime date="${userLoginInstance?.lockedOutUntil}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+									<tds:convertDateTime date="${userLoginInstance?.lockedOutUntil}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}" />
 									<input tm-unlock-account type="button" id="unlockButtonId" value="Unlock" cellValue='${cellValue}' refreshPage="true"/>
 								</g:if>
 								<g:else>Not Locked Out</g:else>
@@ -121,7 +121,7 @@
 							<td valign="top" class="name"><g:message code="userLogin.passwordExpires.label" default="Password Expires" />:</td>
 							<td nowrap="nowrap" valign="top" class="value">
 								<g:if test="${userLoginInstance?.passwordExpirationDate}">
-									<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+									<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
 								</g:if>
 								<g:else>Never</g:else>
 							</td>

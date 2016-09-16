@@ -4,6 +4,7 @@
 
 import javax.servlet.http.HttpSession
 import org.apache.shiro.SecurityUtils
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.web.context.request.RequestContextHolder
@@ -144,7 +145,7 @@ class SecurityService implements InitializingBean {
 	// TODO : getUserCurrentProject - move to userPreferenceService
 	def getUserCurrentProject() {
 		def project
-		def projectId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
 		if ( projectId ) {
 			project = Project.get( projectId )
 		}
@@ -157,8 +158,7 @@ class SecurityService implements InitializingBean {
 	 */
 	// TODO : getUserCurrentMoveBundleId - move to userPreferenceService
 	def getUserCurrentMoveBundleId() {
-		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
-		return bundleId
+		session.getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
 	}
 
 	/**
@@ -167,8 +167,7 @@ class SecurityService implements InitializingBean {
 	 */
 	// TODO : getUserCurrentMoveEventId - move to userPreferenceService
 	def getUserCurrentMoveEventId() {
-		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
-		return bundleId
+		session.getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
 	}
 
 	/**
@@ -730,7 +729,6 @@ class SecurityService implements InitializingBean {
 		UserLogin userLogin
 		Person person
 		Project project
-		def session = serviceHelperService.getService('userPreference').getSession()
 
 		if (StringUtil.isBlank(params.username)) {
 			throw new InvalidParamException('Username should not be empty')
@@ -1399,4 +1397,7 @@ class SecurityService implements InitializingBean {
 		return expires
 	}
 
+	private HttpSession getSession() {
+		((GrailsWebRequest) RequestContextHolder.currentRequestAttributes()).session
+	}
 }

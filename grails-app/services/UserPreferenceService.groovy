@@ -105,7 +105,7 @@ class UserPreferenceService {
 	 * Return current session object
 	 */
 	private HttpSession getSession() {
-		return WebUtils.retrieveGrailsWebRequest().session
+		WebUtils.retrieveGrailsWebRequest().session
 	}
 
 	/**
@@ -147,7 +147,7 @@ class UserPreferenceService {
 					currProj.put( userPreference[i].preferenceCode, userPreference[i].value )
 				}
 				// Set CURR_PROJ into User session
-				getSession().setAttribute( preferenceCode, currProj )
+				session.setAttribute( preferenceCode, currProj )
 			}
 		}
 	}
@@ -220,7 +220,7 @@ class UserPreferenceService {
 	 */
 	def String getPreference( String preferenceCode ) {
 		loadPreferences(preferenceCode)
-		def currProj = getSession().getAttribute( preferenceCode )
+		def currProj = session.getAttribute( preferenceCode )
 		def prefValue
 		if ( currProj != null ) {
 			prefValue = currProj[preferenceCode]
@@ -247,7 +247,7 @@ class UserPreferenceService {
 	 */
 	def String getPreference (String preferenceCode, UserLogin userLogin) {
 		loadPreferences(userLogin, preferenceCode)
-		def currProj = getSession().getAttribute(preferenceCode)
+		def currProj = session.getAttribute(preferenceCode)
 		def prefValue
 		if (currProj != null) {
 			prefValue = currProj[preferenceCode]

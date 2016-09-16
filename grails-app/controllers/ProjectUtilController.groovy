@@ -101,7 +101,7 @@ class ProjectUtilController {
 			 *  Create Project
 			 */
 			def templateInstance = Project.get(template)
-			def startDateTime = TimeUtil.parseDate(getSession(), startDate)
+			def startDateTime = TimeUtil.parseDate(session, startDate)
 			def timeDelta = startDateTime.getTime() - templateInstance?.startDate?.getTime() > 0 ? startDateTime.getTime() - templateInstance?.startDate?.getTime() : 0
 			def completionDateTime = templateInstance?.completionDate?.getTime() ? new Date(templateInstance?.completionDate?.getTime() + timeDelta ) : null
 			projectInstance = new Project(name:name,
@@ -355,7 +355,7 @@ class ProjectUtilController {
 	 */
 	def copyBundleTeams(def moveBundle, def oldBundle){
 		def tempBundleTeams = partyRelationshipService.getBundleTeamInstanceList( oldBundle  )
-		def teamRelationshipType = PartyRelationshipType.findById("PROJ_TEAM")
+		def teamRelationshipType = PartyRelationshipType.get("PROJ_TEAM")
 		def teamRole = RoleType.findById("TEAM")
 		def teamMemberRole = RoleType.findById("TEAM_MEMBER")
 		tempBundleTeams.each{ obj->

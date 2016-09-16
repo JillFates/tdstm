@@ -26,7 +26,7 @@ class NewsEditorController {
      *--------------------------------------------------------*/
 	def newsEditorList() {
 
-		def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
+		def projectId =  session.getAttribute('CURR_PROJ').CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view News"
@@ -42,7 +42,7 @@ class NewsEditorController {
 			moveEvent = MoveEvent.findById(moveEventId)
 		} else {
 			userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
-			def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+			def defaultEvent = session.getAttribute("MOVE_EVENT")
 			if(defaultEvent?.MOVE_EVENT){
 				moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
 				if( moveEvent?.project?.id != Integer.parseInt(projectId) ){
@@ -68,7 +68,7 @@ class NewsEditorController {
 	 */
 	def listEventNewsJson() {
 
-		def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
+		def projectId =  session.getAttribute('CURR_PROJ').CURR_PROJ
 		def projectInstance = Project.findById( projectId )
 		def bundleId = params.moveBundle
 		def viewFilter = params.viewFilter
@@ -77,7 +77,7 @@ class NewsEditorController {
 		def moveEventNewsList
 		def offset = params.offset
 		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
-		def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
+		def defaultBundle = session.getAttribute("CURR_BUNDLE")
 		def moveEventsList = MoveEvent.findAllByProject(projectInstance)
 		def moveEvent = MoveEvent.read(params.moveEvent)
 		def moveBundlesList
@@ -166,9 +166,9 @@ class NewsEditorController {
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
 		def results = totalComments?.collect {
-			[ cell: [ it.createdAt ? TimeUtil.formatDate(getSession(), it.createdAt):'',
+			[ cell: [ it.createdAt ? TimeUtil.formatDate(session, it.createdAt):'',
 					it.createdBy, it.commentType, it.comment, it.resolution,
-					it.resolvedAt ? TimeUtil.formatDate(getSession(), it.resolvedAt):'',
+					it.resolvedAt ? TimeUtil.formatDate(session, it.resolvedAt):'',
 					it.resolvedBy], id: it.id]
 			}
 
@@ -183,8 +183,8 @@ class NewsEditorController {
 	 */
 	def getEventNewsList() {
 
-		def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
-		def projectInstance = Project.findById( projectId )
+		def projectId =  session.getAttribute('CURR_PROJ').CURR_PROJ
+		def projectInstance = Project.get( projectId )
 		def bundleId = params.moveBundle
 		def viewFilter = params.viewFilter
 		def moveBundleInstance = null
@@ -240,12 +240,12 @@ class NewsEditorController {
 
 		def result = totalComments?.collect {
 			[
-			  createdAt: it.createdAt ? TimeUtil.formatDate(getSession(), it.createdAt):'',
+			  createdAt: it.createdAt ? TimeUtil.formatDate(session, it.createdAt):'',
 			  createdBy: it.createdBy,
 			  commentType: it.commentType,
 			  comment: it.comment,
 			  resolution: it.resolution,
-			  resolvedAt: it.resolvedAt ? TimeUtil.formatDate(getSession(), it.resolvedAt):'',
+			  resolvedAt: it.resolvedAt ? TimeUtil.formatDate(session, it.resolvedAt):'',
 			  resolvedBy: it.resolvedBy,
 			  newsId: it.id
 			]
@@ -264,7 +264,7 @@ class NewsEditorController {
 		def personCreateObj
 		def dtCreated
 		def dtResolved
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetName
 		def commentType = params.commentType
 		def commentObject
@@ -272,19 +272,19 @@ class NewsEditorController {
 			commentObject = AssetComment.get( params.id )
 			if(commentObject?.resolvedBy){
 				personResolvedObj = Person.find("from Person p where p.id = $commentObject.resolvedBy.id")?.toString()
-				dtResolved = TimeUtil.formatDateTime(getSession(), commentObject.dateResolved, TimeUtil.FORMAT_DATE_TIME_9)
+				dtResolved = TimeUtil.formatDateTime(session, commentObject.dateResolved, TimeUtil.FORMAT_DATE_TIME_9)
 			}
 			assetName = commentObject.assetEntity.assetName
 		} else {
 			commentObject = MoveEventNews.get( params.id )
 			if(commentObject?.archivedBy){
 				personResolvedObj = Person.find("from Person p where p.id = $commentObject.archivedBy.id")?.toString()
-				dtResolved = TimeUtil.formatDateTime(getSession(), commentObject.dateArchived, TimeUtil.FORMAT_DATE_TIME_9)
+				dtResolved = TimeUtil.formatDateTime(session, commentObject.dateArchived, TimeUtil.FORMAT_DATE_TIME_9)
 			}
 		}
 		if(commentObject?.createdBy){
 			personCreateObj = Person.find("from Person p where p.id = $commentObject.createdBy.id")?.toString()
-			dtCreated = TimeUtil.formatDateTime(getSession(), commentObject.dateCreated, TimeUtil.FORMAT_DATE_TIME_9)
+			dtCreated = TimeUtil.formatDateTime(session, commentObject.dateCreated, TimeUtil.FORMAT_DATE_TIME_9)
 		}
 		commentList<<[ commentObject:commentObject,personCreateObj:personCreateObj,
 					   personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",

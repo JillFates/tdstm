@@ -145,7 +145,7 @@ class AuthController {
 						userPreferenceService.loadPreferences(TimeUtil.DATE_TIME_FORMAT_ATTR)
 					}
 
-					userService.updateLastLogin( params.username.toString(), getSession() )
+					userService.updateLastLogin( params.username.toString(), session)
 
 					def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad")
 					def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")

@@ -71,7 +71,7 @@ class DataTransferBatchController {
 		if(params.message){
 			flash.message = params.message
 		}
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = securityService.getUserCurrentProject()
 		if (!project) {
 			flash.message = "Please select project to view Manage Batches"

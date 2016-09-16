@@ -64,7 +64,7 @@ class TestCaseController {
 	def tz() {
 		String tz = session.getAttribute( 'CURR_TZ' ).CURR_TZ
 		String dateFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )[TimeUtil.DATE_TIME_FORMAT_ATTR]
-		String now = TimeUtil.formatDateTime(getSession(), new Date())
+		String now = TimeUtil.formatDateTime(session, new Date())
 		// String str = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )
 		render "session isa ${session.getClass().getName()}, TZ=$tz<br>dateFormat=$dateFormat<br>now=$now".toString()
 	}

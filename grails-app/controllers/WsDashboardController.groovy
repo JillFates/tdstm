@@ -155,7 +155,7 @@ class WsDashboardController {
 
 			if ( data.snapshotId ) {
 				snapshot = StepSnapshot.findById( data.snapshotId )
-				data.put( "projComp", TimeUtil.formatDateTime(getSession(), snapshot.getProjectedCompletionTime()) )
+				data.put( "projComp", TimeUtil.formatDateTime(session, snapshot.getProjectedCompletionTime()) )
 				data.put( "statColor", snapshot.getStatusColor() )
 				if (snapshot.moveBundleStep.showInGreen) {
 					data.put( "percentageStyle", "step_statusbar_good" )
@@ -273,7 +273,7 @@ class WsDashboardController {
 				"moveBundleId" : moveBundleId,
 				"calcMethod":moveEvent?.calcMethod,
 				"planDelta" : moveEventPlannedSnapshot?.planDelta,
-				"systime": TimeUtil.formatDateTime(getSession(), sysTime, TimeUtil.FORMAT_DATE_TIME_11),
+				"systime": TimeUtil.formatDateTime(session, sysTime, TimeUtil.FORMAT_DATE_TIME_11),
 				"planSum": [
 					"dialInd": moveEventPlannedSnapshot?.dialIndicator, "confText": "High",
 					"confColor": "green", "compTime":planSumCompTime,
@@ -282,7 +282,7 @@ class WsDashboardController {
 				],
 				"revSum": [
 					"dialInd": moveEventRevisedSnapshot?.dialIndicator,
-					"compTime": revisedComp ? TimeUtil.formatDateTime(getSession(), revisedComp, TimeUtil.FORMAT_DATE_TIME_11) : ""
+					"compTime": revisedComp ? TimeUtil.formatDateTime(session, revisedComp, TimeUtil.FORMAT_DATE_TIME_11) : ""
 				],
 				"steps": dataPointsForEachStep,
 				'runbookOn':project.runbookOn,

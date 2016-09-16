@@ -168,7 +168,7 @@ class MoveEventController {
 		if(moveEventInstance) {
 			def estStartTime = params.estStartTime
 			if(estStartTime){
-				params.estStartTime = TimeUtil.parseDateTime(getSession(), estStartTime)
+				params.estStartTime = TimeUtil.parseDateTime(session, estStartTime)
 			}
 				
             moveEventInstance.properties = params
@@ -206,7 +206,7 @@ class MoveEventController {
     def save() {
 		def estStartTime = params.estStartTime
 		if(estStartTime){
-			params.estStartTime = TimeUtil.parseDateTime(getSession(), estStartTime)
+			params.estStartTime = TimeUtil.parseDateTime(session, estStartTime)
 		}
 		
         def moveEventInstance = new MoveEvent(params)
@@ -272,7 +272,7 @@ class MoveEventController {
 				
 				book = new HSSFWorkbook(new FileInputStream( file ));
 				def sheet = book.getSheet("moveEvent_results")
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
@@ -284,7 +284,7 @@ class MoveEventController {
 						WorkbookUtil.addCell(sheet, 4, r, String.valueOf(moveEventResults[r-1].voided ))
 						WorkbookUtil.addCell(sheet, 5, r, String.valueOf(moveEventResults[r-1].from_name ))
 						WorkbookUtil.addCell(sheet, 6, r, String.valueOf(moveEventResults[r-1].to_name ))
-						WorkbookUtil.addCell(sheet, 7, r, String.valueOf( TimeUtil.formatDateTime(getSession(), moveEventResults[r-1].transition_time) ))
+						WorkbookUtil.addCell(sheet, 7, r, String.valueOf( TimeUtil.formatDateTime(session, moveEventResults[r-1].transition_time) ))
 						WorkbookUtil.addCell(sheet, 8, r, String.valueOf(moveEventResults[r-1].username ))
 						WorkbookUtil.addCell(sheet, 9, r, String.valueOf(moveEventResults[r-1].team_name ))
 					}
@@ -295,8 +295,8 @@ class MoveEventController {
 						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(moveEventResults[r-1].bundle_name ))
 						WorkbookUtil.addCell(sheet, 2, r, String.valueOf(moveEventResults[r-1].state_to ))
 						WorkbookUtil.addCell(sheet, 3, r, String.valueOf(moveEventResults[r-1].name ))
-						WorkbookUtil.addCell(sheet, 4, r, String.valueOf( TimeUtil.formatDateTime(getSession(), moveEventResults[r-1].started) ))
-						WorkbookUtil.addCell(sheet, 5, r, String.valueOf( TimeUtil.formatDateTime(getSession(), moveEventResults[r-1].completed) ))
+						WorkbookUtil.addCell(sheet, 4, r, String.valueOf( TimeUtil.formatDateTime(session, moveEventResults[r-1].started) ))
+						WorkbookUtil.addCell(sheet, 5, r, String.valueOf( TimeUtil.formatDateTime(session, moveEventResults[r-1].completed) ))
 					}	
 				}
 				WorkbookUtil.addCell(sheet, 0, moveEventResults.size() + 2, "Note: All times are in $tzId time zone")
@@ -410,7 +410,7 @@ class MoveEventController {
 			def news = new StringBuffer()
 			
 			moveEventNews.each{
-	    		news.append(String.valueOf( TimeUtil.formatDateTime(getSession(), it.created) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;"))
+	    		news.append(String.valueOf( TimeUtil.formatDateTime(session, it.created) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;"))
 	    	}
 			
 			// append recent tasks  whose status is completed, moveEvent is newsBarMode
@@ -424,7 +424,7 @@ class MoveEventController {
 				def tasksCompList=jdbcTemplate.queryForList( tasksCompQuery )
 				tasksCompList.each{
 				 	def comment = it.comment
-					def dateResolved = it.dateResolved ? TimeUtil.formatDateTime(getSession(), it.dateResolved) : ''
+					def dateResolved = it.dateResolved ? TimeUtil.formatDateTime(session, it.dateResolved) : ''
 					transitionComment.append(comment+":&nbsp;&nbsp;"+dateResolved+".&nbsp;&nbsp;")
 				}
 			}
@@ -553,8 +553,8 @@ class MoveEventController {
 
 		def currentVersion = moveEvent.runbookVersion
 
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def userDTFormat = getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def userDTFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
 		if (params.version=='on'){
 			if (moveEvent.runbookVersion) {
 				moveEvent.runbookVersion = currentVersion + 1
@@ -567,7 +567,7 @@ class MoveEventController {
 		}
 
 		def bundles = moveEvent.moveBundles
-		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_6)
+		def today = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_6)
 		def moveEventList = MoveEvent.findAllByProject(project)
 		def applcationAssigned = 0
 		def assetCount = 0
@@ -726,8 +726,8 @@ class MoveEventController {
 
 			// Update the Schedule/Tasks Sheet with the correct start/end times
 			Map times = moveEvent.getEventTimes()
-			WorkbookUtil.addCell(scheduleSheet, 5, 1, TimeUtil.formatDateTime(getSession(), times.start))
-			WorkbookUtil.addCell(scheduleSheet, 5, 3, TimeUtil.formatDateTime(getSession(), times.completion))
+			WorkbookUtil.addCell(scheduleSheet, 5, 1, TimeUtil.formatDateTime(session, times.start))
+			WorkbookUtil.addCell(scheduleSheet, 5, 3, TimeUtil.formatDateTime(session, times.completion))
 
 			// Update the project staff
 			// TODO : JPM 11/2015 : Project staff should get list from ProjectService instead of querying PartyRelationship

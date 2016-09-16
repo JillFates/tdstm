@@ -105,7 +105,7 @@ class ModelController {
 		def result
 		switch(value){
 			case ~/dateCreated|lastModified|endOfLifeDate/:
-				result = model[value] ? TimeUtil.formatDate(getSession(), model[value]) : ''
+				result = model[value] ? TimeUtil.formatDate(session, model[value]) : ''
 			break
 			case 'modelConnectors':
 				result= model.noOfConnectors
@@ -239,7 +239,7 @@ class ModelController {
 				}
 			}
 			if(endOfLifeDate){
-				params.endOfLifeDate = TimeUtil.parseDate(getSession(), endOfLifeDate)
+				params.endOfLifeDate = TimeUtil.parseDate(session, endOfLifeDate)
 			}
 			if( powerType == "Amps"){
 				powerNameplate =  powerNameplate * 120
@@ -448,7 +448,7 @@ class ModelController {
 			     }
 			}
 			if(endOfLifeDate){
-				params.endOfLifeDate = TimeUtil.parseDate(getSession(), endOfLifeDate)
+				params.endOfLifeDate = TimeUtil.parseDate(session, endOfLifeDate)
 			}
 
 	        if (modelInstance) {
@@ -821,7 +821,7 @@ class ModelController {
 		def assetUpdated = 0
 		//Saving toModel before merge
 		if(params.endOfLifeDate){
-			params.endOfLifeDate =  TimeUtil.formatDate(getSession(), params.endOfLifeDate)
+			params.endOfLifeDate =  TimeUtil.formatDate(session, params.endOfLifeDate)
 		} else {
 			params.endOfLifeDate=null
 		}
@@ -858,7 +858,7 @@ class ModelController {
         try {
         	File file =  grailsApplication.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
 			//set MIME TYPE as Excel
-			def filename = 	"TDS-Sync-Data-"+TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_6)+".xls"
+			def filename = 	"TDS-Sync-Data-"+TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_6)+".xls"
 					filename = filename.replace(" ", "_")
 			response.setContentType( "application/vnd.ms-excel" )
 			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
@@ -912,8 +912,8 @@ class ModelController {
 				WorkbookUtil.addCell(modelSheet, 30, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :""))
 				WorkbookUtil.addCell(modelSheet, 31, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:""))
 				WorkbookUtil.addCell(modelSheet, 32, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :""))
-				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].dateCreated ? TimeUtil.formatDate(getSession(), models[r].dateCreated) : ''))
-				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].lastModified ? TimeUtil.formatDate(getSession(), models[r].lastModified) : ''))
+				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].dateCreated ? TimeUtil.formatDate(session, models[r].dateCreated) : ''))
+				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].lastModified ? TimeUtil.formatDate(session, models[r].lastModified) : ''))
 
 			}
 			def connectorSheet = book.getSheet("connector")

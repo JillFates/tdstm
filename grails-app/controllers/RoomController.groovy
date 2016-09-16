@@ -41,7 +41,7 @@ class RoomController {
 		def model = [:]
 
 		def roomInstanceList = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
-		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
+		def roomId = session.getAttribute( "CURR_ROOM" )?.CURR_ROOM
 		def roomInstance = new Room()
 		def entities = assetEntityService.entityInfo( project )
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
@@ -95,7 +95,7 @@ class RoomController {
 
 		session.removeAttribute("RACK_ID")
 		def roomInstance = Room.get(params.id)
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		userPreferenceService.setPreference(PREF.CURR_ROOM, "${roomInstance?.id}" )
 		def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad") ?:request.getHeader("User-Agent").toLowerCase().contains("mobile")
 		if (!roomInstance) {
@@ -164,7 +164,7 @@ class RoomController {
 
 	def edit() {
 		def roomInstance = Room.get(params.id)
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
 		def prefVal = userPreferenceService.getPreference(PREF.ROOM_TABLE_SHOW_ALL)?: 'FALSE'
@@ -557,7 +557,7 @@ class RoomController {
 	*  Return blades list as html row format to assign blade chassis
 	*/
    def retrieveBladeAssetsListToAddRack() {
-	   def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+	   def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 	   def source = params.source
 	   def assetEntityList = null
 	   if(params.assign == 'assign'){

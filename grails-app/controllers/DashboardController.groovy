@@ -42,7 +42,7 @@ class DashboardController {
 		if (! moveEvent) {
 			//TODO: OLB remove reloading of Map
 			userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
-			def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+			def defaultEvent = session.getAttribute("MOVE_EVENT")
 			if (defaultEvent.MOVE_EVENT) {
 				// Try finding the event in the user's preferences
 				moveEvent = MoveEvent.findByIdAndProject(defaultEvent.MOVE_EVENT, project)
@@ -64,7 +64,7 @@ class DashboardController {
 			def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
 			def projectLogo = ProjectLogo.findByProject(project)
 			userPreferenceService.loadPreferences(PREF.DASHBOARD_REFRESH)
-			def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
+			def timeToUpdate = session.getAttribute("DASHBOARD_REFRESH")
 			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")
 
 			// handle the view unpublished tasks checkbox
@@ -110,10 +110,10 @@ class DashboardController {
 		moveEventNewsInstance.createdBy = loginUser.person
 
 		if(params.isArchived == '1'){
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 			moveEventNewsInstance.isArchived = 1
 			moveEventNewsInstance.archivedBy = loginUser.person
-			moveEventNewsInstance.dateArchived = Timetil.nowGMT()
+			moveEventNewsInstance.dateArchived = TimeUtil.nowGMT()
 		}
 		moveEventNewsInstance.save(flush:true)
 		redirect(action:"index")

@@ -232,7 +232,7 @@ class UserLoginController {
 	def update() {
 		UserLogin byWhom = securityService.getUserLogin()
 		UserLogin userLogin
-		String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		String errMsg
 		try {
 			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, byWhom, tzId, false)
@@ -322,7 +322,7 @@ class UserLoginController {
 
 		UserLogin byWhom = securityService.getUserLogin()
 		UserLogin userLogin
-		String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		String errMsg
 
 		try {
@@ -437,7 +437,7 @@ class UserLoginController {
 	 * This method triggers the password reset on a selected account.
 	 */
 	def sendPasswordReset = {
-		def userLogin = UserLogin.findById(params.id)
+		def userLogin = UserLogin.get(params.id)
 		if(userLogin.canResetPasswordByAdmin(securityService.getUserLoginPerson())){
 			def emailParams = [sysAdminEmail : securityService.getUserLogin().person.email, username: userLogin.username]
 			securityService.sendResetPasswordEmail(userLogin.person.email, request.getRemoteAddr(), PasswordResetType.ADMIN_RESET, emailParams)

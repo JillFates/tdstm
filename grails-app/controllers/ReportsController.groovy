@@ -95,9 +95,9 @@ class ReportsController {
 	//  cart Asset report
 	def cartAssetReport() {
 		def reportName = params.reportName
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def currProj = session.getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
@@ -224,7 +224,7 @@ class ReportsController {
 		def subject = SecurityUtils.subject
 		def principal = subject.principal
 		def personInstance = Person.findByFirstName( principal )
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def currProj = session.getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 	  def projectInstance = securityService.getUserCurrentProject()
 	  if (!projectInstance) {
@@ -273,7 +273,7 @@ class ReportsController {
 
 			def assetCommentList = AssetComment.findAll( commentsQuery.toString() )
 
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 			def currDate = new Date()
 			assetCommentList.each { assetComment ->
 				def createdBy
@@ -294,7 +294,7 @@ class ReportsController {
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
 									'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
 									'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
-									'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
+									'timezone':tzId, "rptTime": TimeUtil.formatDate(session, currDate),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
 				}
 				if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
@@ -305,7 +305,7 @@ class ReportsController {
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
 									'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
 									'clientName':projectInstance?.client?.name,
-									'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
+									'timezone':tzId, "rptTime": TimeUtil.formatDate(session, currDate),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
 				}
 			}
@@ -321,7 +321,7 @@ class ReportsController {
 								'owner':'',
 								'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'','projectName':projectInstance?.name,
 								'clientName':projectInstance?.client?.name,
-								'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
+								'timezone':tzId, "rptTime": TimeUtil.formatDate(session, currDate),
 								'previousNote':'']
 				}
 
@@ -358,7 +358,7 @@ class ReportsController {
 							WorkbookUtil.addCell(sheet, 4, r+6, String.valueOf(reportFields[r].model ?:''))
 							WorkbookUtil.addCell(sheet, 5, r+6, String.valueOf(reportFields[r].commentCode ?:''))
 							WorkbookUtil.addCell(sheet, 6, r+6, String.valueOf(reportFields[r].commentType ?:''))
-							WorkbookUtil.addCell(sheet, 7, r+6, String.valueOf(reportFields[r].occuredAt ? TimeUtil.formatDateTime(getSession(), reportFields[r].occuredAt) : ""))
+							WorkbookUtil.addCell(sheet, 7, r+6, String.valueOf(reportFields[r].occuredAt ? TimeUtil.formatDateTime(session, reportFields[r].occuredAt) : ""))
 							WorkbookUtil.addCell(sheet, 8, r+6, String.valueOf(reportFields[r].createdBy ?:''))
 							WorkbookUtil.addCell(sheet, 9, r+6, String.valueOf(reportFields[r].owner ?:''))
 							WorkbookUtil.addCell(sheet, 10, r+6, String.valueOf(WebUtil.listAsMultiValueString(reportFields[r].previousNote)?:''))
@@ -451,14 +451,14 @@ class ReportsController {
 					if ( params.location == "source" || params.location == "both" ) {
 						reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
 										 'teamName': member.partyIdFrom.name+" - Source","sortField":member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName,
-										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? TimeUtil.formatDate(getSession(), member.partyIdFrom.moveBundle.startTime) : " "),
+										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? TimeUtil.formatDate(session, member.partyIdFrom.moveBundle.startTime) : " "),
 										 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s'
 										 ]
 					}
 					if ( member.partyIdFrom.teamCode != "Logistics" && (params.location == "target" || params.location == "both") ) {
 						reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
 										 'teamName': member.partyIdFrom.name+" - Target","sortField": member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName,
-										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? TimeUtil.formatDate(getSession(), member.partyIdFrom.moveBundle.startTime) : " "),
+										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? TimeUtil.formatDate(session, member.partyIdFrom.moveBundle.startTime) : " "),
 										 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t'
 										 ]
 					}
@@ -564,7 +564,7 @@ class ReportsController {
 	 */
 	def cablingQAReport() {
 		def reportName = params.reportName
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def currProj = session.getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 	  def projectInstance = securityService.getUserCurrentProject()
 	  if (!projectInstance) {
@@ -614,7 +614,7 @@ class ReportsController {
 				if(orphanedList.size() > 0) assetCablesList.addAll(orphanedList)
 			}
 
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 			def currDate = new Date()
 			//Source AssetList
 			if( assetCablesList != null) {
@@ -640,7 +640,7 @@ class ReportsController {
 									'project_name':projectInstance?.name,
 									'bundle_name':bundleInstance?.name,
 									'report_type': reportName == 'cablingQA' ? "Cabling QA Report" : "Cabling Conflict Report",
-									'timezone':tzId, "rpt_time": TimeUtil.formatDateTime(getSession(), currDate) ]
+									'timezone':tzId, "rpt_time": TimeUtil.formatDateTime(session, currDate) ]
 				}
 			}
 			//No Assets were found for selected moveBundle,team and Location
@@ -661,7 +661,7 @@ class ReportsController {
 	 *  Generate XLS Structured Cabling data report
 	 */
 	def cablingDataReport() {
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def currProj = session.getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
@@ -726,7 +726,7 @@ class ReportsController {
 	 * request page for power report
 	 */
 	def powerReport() {
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def currProj = session.getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
@@ -736,7 +736,7 @@ class ReportsController {
 		}
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
-		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+		def currentBundle = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		/* set first bundle as default if user pref not exist */
 		def isCurrentBundle = true
 		def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ projectInstance ])?.model
@@ -765,7 +765,7 @@ class ReportsController {
 			def backView = params.backView
 			def sourceRacks = new ArrayList()
 			def targetRacks = new ArrayList()
-			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+			def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
 			def project = securityService.getUserCurrentProject()
 			if (!project) {
@@ -820,7 +820,7 @@ class ReportsController {
 			}
 
 			def racks = sourceRacks + targetRacks
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 			def reportDetails = []
 			racks.each { rack->
 				def assets = rack.assets.findAll { it.assetType !='Blade' && moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }
@@ -936,7 +936,7 @@ class ReportsController {
 
 	}
 	def applicationConflicts() {
-		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def currProj = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
@@ -1126,8 +1126,8 @@ class ReportsController {
 	def tasksReport() {
 		def taskList = []
 		def reqEvents = params.list("moveEvent").toList()
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def userDTFormat = getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def userDTFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
 
 		if(reqEvents) {
 			def project = securityService.getUserCurrentProject()
@@ -1291,13 +1291,13 @@ class ReportsController {
 				"clientName":project?.client?.name,"team":task.role? task.role.toString():"",
 				'projectName':project?.name,'notes':task.notes? WebUtil.listAsMultiValueString(task.notes):"",
 				'duration':task.duration ? task.duration.toString():"",
-				'estStart':task.estStart? TimeUtil.formatDate(getSession(), task.estStart):"",
-				'estFinish':task.estFinish? TimeUtil.formatDate(getSession(), task.estFinish): "",
-				'actStart':task.actStart? TimeUtil.formatDate(getSession(), task.actStart):"",
-				'actFinish':task.actFinish? TimeUtil.formatDate(getSession(), task.actFinish):"",
-				"createdOn":task.dateCreated? TimeUtil.formatDate(getSession(), task.dateCreated):"",
+				'estStart':task.estStart? TimeUtil.formatDate(session, task.estStart):"",
+				'estFinish':task.estFinish? TimeUtil.formatDate(session, task.estFinish): "",
+				'actStart':task.actStart? TimeUtil.formatDate(session, task.actStart):"",
+				'actFinish':task.actFinish? TimeUtil.formatDate(session, task.actFinish):"",
+				"createdOn":task.dateCreated? TimeUtil.formatDate(session, task.dateCreated):"",
 				"createdBy":task.createdBy.toString() ,"moveEvent":task.moveEvent? task.moveEvent.toString():"",
-				'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate) ]
+				'timezone':tzId, "rptTime": TimeUtil.formatDate(session, currDate) ]
 		}
 		if(reportFields.size() <= 0) {
 			flash.message = " No Assets Were found for  selected values  "
@@ -1313,7 +1313,7 @@ class ReportsController {
 	 * used to render to server Conflicts selection criteria.
 	 */
 	def serverConflicts() {
-		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def currProj = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject()
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
@@ -1464,7 +1464,7 @@ class ReportsController {
 	 * used to render to database Report selection criteria.
 	 */
 	def databaseConflicts() {
-		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def currProj = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 	def projectInstance = securityService.getUserCurrentProject()
 	if (!projectInstance) {
 	  flash.message = "Please select project to view Reports"
@@ -1551,8 +1551,8 @@ class ReportsController {
 
 		def validDates = true
 		try {
-			startDate = TimeUtil.parseDate(getSession(), startDate)
-			endDate = TimeUtil.parseDate(getSession(), endDate)
+			startDate = TimeUtil.parseDate(session, startDate)
+			endDate = TimeUtil.parseDate(session, endDate)
 		} catch (Exception e) {
 			validDates = false
 		}
@@ -1616,7 +1616,7 @@ class ReportsController {
 	 */
 	private def exportProjectActivityMetricsExcel(activityMetrics, includeNonPlanning) {
 		File file =  grailsApplication.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
-		def fileDate = TimeUtil.formatDateTime(getSession(), TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_TIME_6)
+		def fileDate = TimeUtil.formatDateTime(session, TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_TIME_6)
 		def filename = "ActivityMetrics-${fileDate}-Report"
 
 		//set MIME TYPE as Excel
@@ -1647,7 +1647,7 @@ class ReportsController {
 				WorkbookUtil.applyStyleToCell(metricsSheet, 0, rowNum, projectNameCellStyle)
 			}
 
-			WorkbookUtil.addCell(metricsSheet, 1, rowNum, TimeUtil.formatDateTime(getSession(), am['metric_date'], TimeUtil.FORMAT_DATE_TIME_23))
+			WorkbookUtil.addCell(metricsSheet, 1, rowNum, TimeUtil.formatDateTime(session, am['metric_date'], TimeUtil.FORMAT_DATE_TIME_23))
 			WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Planning')
 			WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['planning_servers'])
 			WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['planning_applications'])

@@ -74,8 +74,8 @@ class ProjectController {
 		def results = projectList?.collect {
 			def startDate = ''
 			def completionDate = ''
-			startDate = it.startDate ? TimeUtil.formatDate(getSession(), it.startDate) : ''
-			completionDate = it.completionDate ? TimeUtil.formatDate(getSession(), it.completionDate) : ''
+			startDate = it.startDate ? TimeUtil.formatDate(session, it.startDate) : ''
+			completionDate = it.completionDate ? TimeUtil.formatDate(session, it.completionDate) : ''
 			[ cell: [it.projectCode, it.name, startDate, completionDate,it.comment], id: it.id,]
 		}
 
@@ -225,10 +225,10 @@ class ProjectController {
 			def startDate = params.startDate
 			def completionDate = params.completionDate
 			if (startDate) {
-				params.startDate = TimeUtil.parseDate(getSession(), startDate)
+				params.startDate = TimeUtil.parseDate(session, startDate)
 			}
 			if (completionDate){
-				params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
+				params.completionDate = TimeUtil.parseDate(session, completionDate)
 			}
 			params.timezone = retrievetimeZone(params.timezone)
 
@@ -341,10 +341,10 @@ class ProjectController {
 			def startDate = params.startDate
 			def completionDate = params.completionDate
 			if (startDate) {
-				params.startDate = TimeUtil.parseDate(getSession(), startDate)
+				params.startDate = TimeUtil.parseDate(session, startDate)
 			}
 			if (completionDate) {
-				params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
+				params.completionDate = TimeUtil.parseDate(session, completionDate)
 			}
 			params.runbookOn =  1	// Default to ON
 			params.timezone = retrievetimeZone(params.timezone)

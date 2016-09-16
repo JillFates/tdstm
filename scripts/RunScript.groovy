@@ -31,8 +31,8 @@ target(runScript: "Main implementation that executes the specified script after 
 def configureHibernateSession() {
     // without this you'll get a lazy initialization exception when using a many-to-many relationship
     def sessionFactory = appCtx.getBean("sessionFactory")
-    def session = SessionFactoryUtils.getSession(sessionFactory, true)
-    TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session))
+    def hibernateSession = SessionFactoryUtils.getSession(sessionFactory, true)
+    TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(hibernateSession))
 }
 
 def executeScript(scriptFile, classLoader) {
