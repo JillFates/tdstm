@@ -6,8 +6,7 @@ import org.apache.directory.groovyldap.SearchScope
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import groovy.util.logging.Commons
 
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
@@ -18,17 +17,9 @@ import com.tdsops.common.lang.ExceptionUtil
 /**
  * Class used to authenticate with Active Directory via LDAP protocol
  */
+@Commons
 @Singleton
 class ConnectorActiveDirectory {
-
-	private static log
-
-	/**
-	 * Constructor
-	 */
-	ConnectorActiveDirectory() {
-		log = LogFactory.getLog(this.class)
-	}
 
 	/**
 	 * Used to authenticate and get user information from an Active Directory server. If any issues occur during the lookup

@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
-import org.apache.commons.logging.LogFactory
+import groovy.util.logging.Commons
+import org.apache.poi.hssf.usermodel.HSSFDataValidation
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddressList
@@ -13,13 +14,9 @@ import java.text.DateFormat
 /**
  * The WorkbookUtil class contains a collection of useful Apache POI manipulation methods
  */
+@Commons
 @Singleton
 class WorkbookUtil {
-	private static log = LogFactory.getLog(WorkbookUtil.class)
-
-	WorkbookUtil() {
-		log = LogFactory.getLog(this.class)
-	}
 
 	public static getSheetNames(workbook) {
 		def result = []
@@ -339,7 +336,7 @@ class WorkbookUtil {
   		namedRange.setRefersToFormula(createFormulaString())
   		def dvConstraint = dvHelper.createFormulaListConstraint(name)
   		
-  taValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
+//  taValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
   		
   DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint)
 		// Note the check on the actual type of the DataValidation object.

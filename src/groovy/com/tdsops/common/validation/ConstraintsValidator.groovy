@@ -2,17 +2,11 @@ package com.tdsops.common.validation
 
 import com.tdssrc.grails.NumberUtil
 import com.tdsops.common.lang.ExceptionUtil
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import groovy.util.logging.Commons
 
+@Commons
 @Singleton
 class ConstraintsValidator {
-
-	private static log
-
-	ConstraintsValidator () {
-		log = LogFactory.getLog(this.class)
-	}
 
 	static boolean validate (String value, Map constraints) {
 		try {

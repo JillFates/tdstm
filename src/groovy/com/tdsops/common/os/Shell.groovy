@@ -28,4 +28,3 @@ class Shell {
     Shell.executeCommand("logger $message")
   }
 }
-s

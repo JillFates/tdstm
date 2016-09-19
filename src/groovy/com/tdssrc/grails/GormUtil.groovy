@@ -1,11 +1,10 @@
 package com.tdssrc.grails
 
-import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
-import org.hibernate.ScrollableResults
-import org.hibernate.ScrollMode
+import org.hibernate.Session
+
 import com.tdsops.common.grails.ApplicationContextHolder
 
 public class GormUtil {
@@ -132,14 +131,13 @@ public class GormUtil {
 	 */
 	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
 		def version = NumberUtil.toLong(params.version)
-		if (version.is(null)) {
+		if (version == null) {
 			println "domainVersionCheck failed on domain $domainObj for no version id parameter"
-			throw new DomainUpdateException("The $label version was missing from request")
-		} else {
-			if (domainObj.version > version) {
+			throw new /*DomainUpdateException*/RuntimeException("The $label version was missing from request")
+		}
 
-				throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
-			}
+		if (domainObj.version > version) {
+			throw new /*DomainUpdateException*/RuntimeException("The $label was updated by someone while you were editting therefore your changes were not saved.")
 		}
 	}
 
@@ -160,7 +158,7 @@ public class GormUtil {
 	 * @param session - the Hibernate session object
 	 * @param domainObjects - a list of domain objects that need to be merged back into the session after the session flush
 	 */
-	static List mergeWithSession(org.hibernate.impl.SessionImpl session, List<Object> domainObjects) {
+	static List mergeWithSession(Session session, List<Object> domainObjects) {
 		if (domainObjects != null) {
 			for (int i=0; i < domainObjects.size(); i++) {
 				domainObjects[i] = session.merge(domainObjects[i])
@@ -176,7 +174,7 @@ public class GormUtil {
 	 * @param flushAfterLimit - the limit at which the session is flushed (default 50)
 	 * @return true if the limit was hit and the session was flushed otherwise false
 	 */
-	static boolean flushAndClearSession(org.hibernate.impl.SessionImpl session, int rowsProcessed, int flushAfterLimit=50) {
+	static boolean flushAndClearSession(Session session, int rowsProcessed, int flushAfterLimit=50) {
 		if (rowsProcessed % flushAfterLimit == 0) {
 			session.flush()
 			session.clear()
@@ -217,11 +215,10 @@ public class GormUtil {
 
 	/**
 	 * Used to determine if an object is a Domain class
-	 * @param clazz - the class to evaluate to determine if it is a Domain class
+	 * @param instance  the object
 	 * @return true if the object is a Domain class otherwise false
 	 */
-	static boolean isDomainClass( def clazz ) {
-		def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
-		return grailsApp.isDomainClass( clazz?.getClass() )
+	static boolean isDomainClass(instance) {
+		ApplicationContextHolder.grailsApplication.isDomainClass(instance?.getClass())
 	}
 }
