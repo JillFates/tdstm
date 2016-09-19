@@ -22,7 +22,7 @@ class FilesController {
 	def userPreferenceService
 
 	def jdbcTemplate
-	def dataSource
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	def index() {
 		redirect action:'list', params:params
@@ -191,7 +191,6 @@ class FilesController {
 		def filesList = []
 
 		if(queryParams.size()){
-			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 			filesList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		}else{
 			filesList = jdbcTemplate.queryForList(query.toString())

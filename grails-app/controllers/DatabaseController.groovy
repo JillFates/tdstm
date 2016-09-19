@@ -21,7 +21,7 @@ class DatabaseController {
 	def userPreferenceService
 	def projectService
 
-	def dataSource
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	def index() {
 		redirect action:'list', params:params
@@ -189,7 +189,6 @@ class DatabaseController {
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 
 		if(queryParams.size()){
-			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 			dbsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		}else{
 			dbsList = jdbcTemplate.queryForList(query.toString())

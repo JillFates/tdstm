@@ -21,7 +21,7 @@ class ApplicationController {
 	def userPreferenceService
 
 	def jdbcTemplate
-	def dataSource
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
@@ -224,7 +224,6 @@ class ApplicationController {
 		// log.debug "query = ${query}"
 		def appsList = []
 		if(queryParams.size()){
-			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 			appsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		}else{
 			appsList = jdbcTemplate.queryForList(query.toString())
