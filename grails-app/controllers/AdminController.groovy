@@ -7,9 +7,7 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
-// import org.codehaus.groovy.grails.commons.ApplicationHolder
-//import org.springframework.web.multipart.*
-//import org.springframework.web.multipart.commons.*
+
 class AdminController {
 	def jdbcTemplate
 	def sessionFactory

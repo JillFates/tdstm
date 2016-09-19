@@ -1,5 +1,4 @@
 import groovy.mock.interceptor.*
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.log4j.*
 
@@ -34,6 +33,7 @@ class RunbookServiceTests extends Specification {
 		['103', 2, 21],
 		['104', 5, 63],
 		['105', 4, 60],
+
 		['106', 1,  1],
 		['107', 7, 71],
 		['108', 6, 73],

@@ -1,5 +1,4 @@
 import groovy.mock.interceptor.*
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.log4j.*
 
