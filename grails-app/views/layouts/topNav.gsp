@@ -18,7 +18,7 @@
     <g:javascript src="tdsmenu.js" />
     <g:javascript src="PasswordValidation.js" />
 
-    <script type="text/javascript"> 
+    <script type="text/javascript">
 	$(document).ready(function() {
             $("#personDialog").dialog({ autoOpen: false });
             $("#userPrefDivId").dialog({ autoOpen: false });
@@ -94,7 +94,7 @@
     <header class="main-header">
         <input id="contextPath" type="hidden" value="${request.contextPath}"/>
         <input id="tzId" type="hidden" value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
-        <input id="userDTFormat" type="hidden" value="${sessions.getAttribute('CURR_DT_FORMAT')?.CURR_DT_FORMAT}"/>
+        <input id="userDTFormat" type="hidden" value="${session.getAttribute('CURR_DT_FORMAT')?.CURR_DT_FORMAT}"/>
         <nav class="navbar navbar-static-top">
             <div class="container menu-top-container">
                 <div class="navbar-header">
@@ -557,7 +557,7 @@
 
     <%-- DIV for editing User Preferences --%>
     <div id="userPrefDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
-		
+
 	<%-- DIV for editing User date and timezone --%>
 	<div id="userTimezoneDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Date and Timezone"></div>
 
