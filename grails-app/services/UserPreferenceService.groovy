@@ -1,19 +1,19 @@
-import com.tdsops.common.validation.ConstraintsValidator
-import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.web.util.WebUtils
+import grails.transaction.Transactional
 
 import javax.servlet.http.HttpSession
 
-/**
- * The Service is transactional (http://docs.grails.org/2.3.11/guide/services.html#declarativeTransactions)
- */
+import org.apache.shiro.SecurityUtils
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.util.WebUtils
+
+import com.tdsops.common.validation.ConstraintsValidator
+import com.tdssrc.grails.GormUtil
+
 class UserPreferenceService {
 
-	static transactional = true
-	def grailsApplication
-	def securityService
+	GrailsApplication grailsApplication
+	SecurityService securityService
 
 	// defaults holds global defaults for certain values
 	// TODO - load these from application settings
@@ -218,7 +218,7 @@ class UserPreferenceService {
 	 * @return String the user's saved preference or null if not found
 	 * @deprecated
 	 */
-	def String getPreference( String preferenceCode ) {
+	String getPreference( String preferenceCode ) {
 		loadPreferences(preferenceCode)
 		def currProj = session.getAttribute( preferenceCode )
 		def prefValue
@@ -235,7 +235,7 @@ class UserPreferenceService {
 	 * @return String the user's saved preference or null if not found
 	 * @deprecated
 	 */
-	def String getPreference( UserPreferenceEnum preference ) {
+	String getPreference( UserPreferenceEnum preference ) {
 		return getPreference(preference.toString())
 	}
 
@@ -245,7 +245,7 @@ class UserPreferenceService {
 	 * @param UserLogin userLogin
 	 * @return String the user's saved preference or null if not found
 	 */
-	def String getPreference (String preferenceCode, UserLogin userLogin) {
+	String getPreference (String preferenceCode, UserLogin userLogin) {
 		loadPreferences(userLogin, preferenceCode)
 		def currProj = session.getAttribute(preferenceCode)
 		def prefValue
@@ -294,6 +294,7 @@ class UserPreferenceService {
 	 * Method will remove the user preference record for selected preferenceCode and loginUser
 	 * @deprecated
 	 */
+	@Transactional
 	def removePreference( String preferenceCode ) {
 		def principal = SecurityUtils.subject.principal
 		def userLogin = UserLogin.findByUsername( principal )
@@ -306,6 +307,7 @@ class UserPreferenceService {
 	/**
 	 * Method will remove the user preference record for selected preferenceCode and loginUser
 	 */
+	@Transactional
 	def removePreference(UserPreferenceEnum preference ) {
 		removePreference(preference.toString())
 	}
@@ -317,6 +319,7 @@ class UserPreferenceService {
 	 * @return true if the set was successful
 	 * @deprecated you should rather use setPreference( UserPreferenceEnum, String)
 	 */
+	@Transactional
 	Boolean setPreference( String preferenceCode, String value ) {
 		def principal = SecurityUtils.subject.principal
 		def userLogin = UserLogin.findByUsername( principal )
@@ -329,6 +332,7 @@ class UserPreferenceService {
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
 	 */
+	@Transactional
 	Boolean setPreference( UserPreferenceEnum preferenceCode, String value ) {
 		return setPreference(preferenceCode.toString(), value)
 	}
@@ -343,6 +347,7 @@ class UserPreferenceService {
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
 	 */
+	@Transactional
 	Boolean setPreference(UserLogin userLogin, UserPreferenceEnum preference, String value ) {
 		return setPreference(userLogin, preference.toString(), value)
 	}
@@ -358,6 +363,7 @@ class UserPreferenceService {
 	 * @return true if the set was successful
 	 * @deprecated
 	 */
+	@Transactional
 	Boolean setPreference( UserLogin userLogin, String preferenceCode, String value ) {
 		def saved = false
 		if (log.isDebugEnabled())
@@ -409,10 +415,12 @@ class UserPreferenceService {
 		return saved
 
 	}
+
 	/*-------------------------------------------------------------------------------------------
 	 * Remove the Move Event and Move Bundle preferences when user switched to different project.
 	 * @param : login user
 	 * ----------------------------------------------------------------------------------------*/
+	@Transactional
 	def removeProjectAssociatedPreferences(def userLogin ){
 		def eventPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, "MOVE_EVENT")
 		if( eventPreference ){
@@ -434,11 +442,13 @@ class UserPreferenceService {
 			loadPreferences("CURR_ROOM")
 		}
 	}
+
 	/*
 	 * Set Roles to Persons in PartyRole
 	 * @return true or false indicating the occurrence of Security Violations.
 	 */
 	// TODO : setUserRoles - Move to SecurityService
+	@Transactional
 	def setUserRoles( def roleTypeList, def personId ) {
 		def person = Party.get(personId)
 		def login = securityService.getUserLogin()

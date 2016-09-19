@@ -1,11 +1,9 @@
+import grails.transaction.Transactional
+
 import com.tds.asset.Application
-import com.tdssrc.eav.EavAttributeSet
-//import com.tdssrc.eav.EavEntityAttribute
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
-import com.tdsops.tm.domain.AssetEntityHelper
-import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetType
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.eav.EavAttributeSet
 
 /**
  * The application service handles the logic for CRUD applications
@@ -14,9 +12,8 @@ import com.tds.asset.AssetType
  */
 class ApplicationService {
 
-	boolean transactional = true
-
-	def assetEntityService
+	AssetEntityService assetEntityService
+	SecurityService securityService
 
 	/**
 	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
@@ -123,6 +120,7 @@ class ApplicationService {
 	 * @param params - the request parameters
 	 * @throws various RuntimeExceptions if there are any errors
 	 */
+	@Transactional
 	Application saveAssetFromForm(controller, session, Long projectId, Long userId, params ) {
 		Application asset = new Application()
 		return saveUpdateAssetFromForm(controller, session, projectId, userId, params, asset)

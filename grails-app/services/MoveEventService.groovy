@@ -1,3 +1,6 @@
+import com.tdssrc.grails.GormUtil
+import grails.transaction.Transactional
+
 class MoveEventService {
 
 	/**
@@ -20,7 +23,6 @@ class MoveEventService {
 		return nonProjEventIds
 	}
 
-
 	/**
 	 * Used to retrieve a person to a move event for a specified team
 	 * @param moveEvent - the move event to search for the member
@@ -41,6 +43,7 @@ class MoveEventService {
 	 * @param teamRoleType - a valid TEAM role
 	 * @return An error message if unable to create the team otherwise null
 	 */
+	@Transactional
 	MoveEventStaff addTeamMember(MoveEvent moveEvent, Person person, RoleType teamRoleType) {
 		assert moveEvent
 		assert person
@@ -76,6 +79,7 @@ class MoveEventService {
 	 * @param teamRoleType - a valid TEAM role
 	 * @return An error message if unable to create the team otherwise null
 	 */
+	@Transactional
 	MoveEventStaff addTeamMember(MoveEvent moveEvent, Person person, String teamCode) {
 		def teamRoleType = teamRoleType(teamCode)
 		if (! teamRoleType) {
@@ -100,6 +104,7 @@ class MoveEventService {
 	 * @param teamRoleType - the team role
 	 * @return true if the team member was deleted or false if not found
 	 */
+	@Transactional
 	boolean removeTeamMember(MoveEvent moveEvent, Person person, RoleType teamRoleType) {
 		assert moveEvent
 		assert person
@@ -126,6 +131,7 @@ class MoveEventService {
 	 * @param teamCode - the team role code
 	 * @return true if the team member was deleted or false if not found
 	 */
+	@Transactional
 	MoveEventStaff removeTeamMember(MoveEvent moveEvent, Person person, String teamCode) {
 		def teamRoleType = teamRoleType(teamCode)
 		if (! teamRoleType) {
@@ -133,6 +139,4 @@ class MoveEventService {
 		}
 		return removeTeamMember(moveEvent, person, teamRoleType)
 	}
-
-
 }

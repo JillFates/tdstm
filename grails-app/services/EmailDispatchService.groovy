@@ -1,8 +1,11 @@
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.quartz.Scheduler
 import org.quartz.SimpleTrigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
@@ -15,15 +18,16 @@ import grails.converters.JSON
  */
 class EmailDispatchService {
 
-	def grailsApplication
+	GrailsApplication grailsApplication
 	def mailService
-	def quartzScheduler
+	Scheduler quartzScheduler
 
 	static SimpleEmailDispatchJob = "EmailDispatchJob"
 
 	/**
 	 * Creates a new EmailDispatch entity initializing all attributes
 	 */
+	@Transactional
 	EmailDispatch basicEmailDispatchEntity(EmailDispatchOrigin origin, String subject, String bodyTemplate, paramsJson, fromAddress, toAddress, toPerson, createdBy) {
 
 		EmailDispatch ed = new EmailDispatch()
@@ -71,6 +75,7 @@ class EmailDispatchService {
 	/**
 	 * Used to send an email using a template defined in EmailDispatch
 	 */
+	@Transactional
 	def sendEmail(dataMap) {
 		log.info("Send email: Start.")
 

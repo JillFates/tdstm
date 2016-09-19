@@ -6,7 +6,7 @@ import org.springframework.core.io.Resource
 
 class EnvironmentService implements InitializingBean {
 
-	def transactional = false
+	static transactional = false
 
 	String version
 	String build

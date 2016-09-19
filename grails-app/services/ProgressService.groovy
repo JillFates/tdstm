@@ -1,13 +1,10 @@
-import groovy.time.TimeDuration
-
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.tdssrc.grails.TimeUtil
+import groovy.time.TimeDuration
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 
 /**
  * The progress services handles the logic for holding the status of async tasks
@@ -15,6 +12,8 @@ import com.tdssrc.grails.TimeUtil
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 class ProgressService {
+
+	static transactional = false
 
 	static final String FAILED='Failed'
 	static final String COMPLETED='Completed'

@@ -1,47 +1,36 @@
-import java.sql.ResultSet
-import java.sql.SQLException
-
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.util.concurrent.ConcurrentHashMap.Values
-import java.io.*
-
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.runtime.InvokerHelper
-import org.springframework.dao.IncorrectResultSizeDataAccessException
-import org.springframework.jdbc.core.RowMapper
-
-import com.tds.asset.Application
 import com.tdsops.common.lang.CollectionUtils as CU
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.ContextType
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
-import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdsops.tm.enums.domain.AssetCommentCategory
+import grails.transaction.Transactional
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.dao.IncorrectResultSizeDataAccessException
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import org.apache.commons.codec.digest.DigestUtils
-import org.apache.commons.lang3.SerializationUtils
+import java.sql.ResultSet
+import java.sql.SQLException
 
 /**
  * The cookbook services handles the logic for creating recipes and running the cookbook
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
+@Transactional
 class CookbookService {
 
-	static transactional = true
 	static allowedCatalogs = ['Event', 'Bundle', 'Application']
 	static searchAllowedCatalogs = ['All', 'Event', 'Bundle', 'Application']
 
 	GrailsApplication grailsApplication
-	def namedParameterJdbcTemplate
-	def projectService
-	def partyRelationshipService
-	def securityService
-	def progressService
-	def serviceHelperService
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	ProjectService projectService
+	TaskService taskService
 
 	/**
 	 * Checks if person can access project. If it can't then it throws an {@link UnauthorizedException}
@@ -606,7 +595,6 @@ class CookbookService {
 			throw new UnauthorizedException('The client doesn\'t own this context')
 		}
 
-		def taskService = grailsApplication.mainContext.getBean('taskService')
 		def recipeMap = this.parseRecipeSyntax(sourceCode)
 		def exceptions = new StringBuilder()
 		def fetchedGroups = taskService.fetchGroups(recipeMap, context, exceptions)

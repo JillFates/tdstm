@@ -1,19 +1,22 @@
-import org.apache.poi.*
-
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import grails.transaction.Transactional
+import org.springframework.jdbc.core.JdbcTemplate
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tds.asset.AssetComment
-import com.tdsops.common.lang.ExceptionUtil
-import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
+import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
+
+@Transactional
 class PartyRelationshipService {
 
-	boolean transactional = true
-	def jdbcTemplate
-	def securityService
-	def serviceHelperService
+	JdbcTemplate jdbcTemplate
+	PersonService personService
+	ProjectService projectService
+	SecurityService securityService
 
 	/*
 	 * method to save party Relationship
@@ -1239,16 +1242,15 @@ class PartyRelationshipService {
 	 */
 	List getProjectApplicationStaff(Project project) {
 		def companies = new StringBuffer('0')
-		def projService = serviceHelperService.getService('project')
 
-		def projectPartners = projService.getPartners(project)
+		def projectPartners = projectService.getPartners(project)
 		if (projectPartners) {
 			projectPartners.each {
 				companies.append(",${it.id}")
 			}
 		}
 
-		def projectOwner = projService.getOwner(project)
+		def projectOwner = projectService.getOwner(project)
 		if (projectOwner) {
 			companies.append(",${projectOwner.id}")
 		}
@@ -1400,7 +1402,6 @@ class PartyRelationshipService {
 		 * This closure looks up a person by name.
 		 */
 		def assignByName = {
-			def personService = serviceHelperService.getService("person")
 			def map = personService.findPerson(value, project, projectStaff)
 			def personMap = personService.findPersonByFullName(value)
 

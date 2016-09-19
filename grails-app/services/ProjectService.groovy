@@ -1,5 +1,19 @@
-import com.tds.asset.*
-import com.tdsops.tm.enums.domain.*
+import UserPreferenceEnum as PREF
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetType
+import com.tds.asset.FieldImportance
+import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.PasswordResetType
+import com.tdsops.tm.enums.domain.ProjectSortProperty
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SortOrder
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
@@ -7,20 +21,20 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.ProjectDailyMetric
 import org.codehaus.groovy.grails.web.util.WebUtils
-import UserPreferenceEnum as PREF
+import org.springframework.jdbc.core.JdbcTemplate
 
 class ProjectService {
 
-	static transactional = true
-	def securityService
-	def partyRelationshipService
-	def jdbcTemplate
-	def stateEngineService
-	def userPreferenceService
-	def sequenceService
-	def auditService
+	AuditService auditService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	SecurityService securityService
+	SequenceService sequenceService
+	StateEngineService stateEngineService
+	UserPreferenceService userPreferenceService
 
 	List getStaffList(onlyAssigned, role, projects, companies, sorting) {
 
@@ -568,6 +582,7 @@ class ProjectService {
 	 *@param includeProject indicates if should be deleted the project too
 	 *@return message
 	 */
+	@Transactional
 	def deleteProject(prokectId, includeProject=false) throws UnauthorizedException {
 		def message
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
@@ -671,6 +686,7 @@ class ProjectService {
 	 * @param defaultBundleName name to be given to the default bundle, should it be created.
 	 * @return MoveBundle - the default bundle assigned to the project or will create it on the fly
 	 */
+	@Transactional
 	MoveBundle getDefaultBundle(Project project, String defaultBundleName = null ) {
 		return project.defaultBundle ?: createDefaultBundle( project, defaultBundleName )
 	}
@@ -681,6 +697,7 @@ class ProjectService {
 	 * @param defaultBundle
 	 * @return project's default move bundle
 	 */
+	@Transactional
 	MoveBundle createDefaultBundle (Project project, String defaultBundleName ) {
 		def defaultCode = defaultBundleName?:'TBD'
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
@@ -715,6 +732,7 @@ class ProjectService {
 	 * @param partnerIds - a single id or a list of ids
 	 * @throws InvalidParamException when the partner ids are invalid or not associated with the owner of the project
 	 */
+	@Transactional
 	void updateProjectPartners(Project projectInstance, def partnersIds) {
 
 		// Get a list of the partners associated to the owner of the project plus the partners assigned to the project
@@ -821,6 +839,7 @@ class ProjectService {
 	/**
 	 * Used to save new Projects
 	 */
+	@Transactional
 	def saveProject(projectInstance, file, projectPartners, projectManager) {
 
 		def workflowCodes = []
@@ -912,6 +931,7 @@ class ProjectService {
 	 * This function is used by the daily project metrics job to generate daily metrics.
 	 * It search for active projects and for each one retrives specific metrics: assets, deps, users, tasks
 	 */
+	@Transactional
 	def activitySnapshot(params) {
 		log.info "Project Daily Metrics started."
 
@@ -1503,6 +1523,7 @@ class ProjectService {
 	 * @param person - the person to be assigned
 	 * @param teamCodes - a single team code or a list of team codes
 	 */
+	@Transactional
 	void addTeamMember(Project project, Person person, teamCodes) {
 		partyRelationshipService.addProjectStaff(project, person)
 
@@ -1525,6 +1546,7 @@ class ProjectService {
 	 * @param teamCodes - a single team code or a list of team codes
 	 * @return the number of teams that were deleted
 	 */
+	@Transactional
 	int removeTeamMember(Project project, Person person, teamCodes) {
 		if (! (teamCodes instanceof List)) {
 			teamCodes = [ teamCodes ]

@@ -1,24 +1,25 @@
+import grails.transaction.Transactional
 import org.apache.commons.lang3.StringUtils
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetComment
 import com.tds.asset.Application
 import com.tds.asset.AssetType
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.util.WebUtils
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.jdbc.core.JdbcTemplate
 import com.tdssrc.grails.TimeUtil
 
 @Transactional
 class ReportsService {
 
-	def partyRelationshipService
-	def jdbcTemplate
-    def grailsApplication
-	def securityService
-	def runbookService
-	def taskService
-
-	static transactional = true
+	GrailsApplication grailsApplication
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	RunbookService runbookService
+	SecurityService securityService
+	TaskService taskService
+	UserPreferenceService userPreferenceService
 
 	@Transactional(readOnly = true)
 	def generatePreMoveCheckList(def currProj , def moveEventInstance, def viewUnpublished = false) {

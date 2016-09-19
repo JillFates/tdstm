@@ -1,33 +1,35 @@
+import grails.transaction.Transactional
+import net.transitionmanager.UserAudit
+
 import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.springframework.transaction.annotation.Transactional
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.beans.factory.InitializingBean
+
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
-import net.transitionmanager.UserAudit
 
 /**
  * Service used to log audit information
  *
  * @author Diego Scarpa
  */
-class AuditService {
+class AuditService implements InitializingBean {
 
-	static final String AUDIT_TYPE_ACCESS = "access"
-	static final String AUDIT_TYPE_ACTIVITY = "activity"
+	private static final String AUDIT_TYPE_ACCESS = "access"
+	private static final String AUDIT_TYPE_ACTIVITY = "activity"
 
-	static String AUDIT_TYPE = AUDIT_TYPE_ACCESS
-	static Boolean AUDIT_ACTIVITY = true
+	private static String AUDIT_TYPE
+	private static boolean AUDIT_ACTIVITY
 
-	static ACCESS_URI = ["/auth/signIn": true, "/auth/signOut": true]
-	static AUDITED_PARAMS = ["username": true, "id": true, "_action_Delete": true, "moveBundleId": true, "assetEntityId": true, "moveEventId": true]
+	private static Map<String, String> ACCESS_URI = ["/auth/signIn": true, "/auth/signOut": true]
+	private static final Map AUDITED_PARAMS = [username: true, id: true, _action_Delete: true, moveBundleId: true,
+	                                           assetEntityId: true, moveEventId: true]
 
-	// Constructor - should be using the Spring post construction method...
-	AuditService() {
-		AUDIT_TYPE = ConfigurationHolder.config.tdstm.security.auditLogging
-		if (!AUDIT_TYPE) {
-			AUDIT_TYPE = AUDIT_TYPE_ACCESS
-		}
-		AUDIT_ACTIVITY = (AUDIT_TYPE == AUDIT_TYPE_ACTIVITY)
+	GrailsApplication grailsApplication
+
+	void afterPropertiesSet() {
+		AUDIT_TYPE = grailsApplication.config.tdstm.security.auditLogging ?: AUDIT_TYPE_ACCESS
+		AUDIT_ACTIVITY = AUDIT_TYPE == AUDIT_TYPE_ACTIVITY
 	}
 
 	/**
@@ -119,6 +121,7 @@ class AuditService {
 	/**
 	 * Used to store a UserAudit activity
 	 */
+	@Transactional
 	def saveUserAudit(UserAudit userAudit) {
 		if (!userAudit.validate() || !userAudit.save(flush:true)) {
 			log.error "saveUserAudit() Unable to save UserAudit : " + GormUtil.allErrorsString(userAudit)

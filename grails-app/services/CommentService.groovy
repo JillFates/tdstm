@@ -5,31 +5,33 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 import org.codehaus.groovy.grails.web.util.WebUtils
+import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import UserPreferenceEnum as PREF
+import org.springframework.jdbc.core.JdbcTemplate
 
 /**
- * CommentService class contains methods used to manage comments/tasks
- * @author jmartin
+ * CommentService class contains methods used to manage comments/tasks.
  *
+ * @author jmartin
  */
 class CommentService {
 
-	boolean transactional = true
 	BindDynamicMethod bindData = new BindDynamicMethod()
 
 	def mailService					// SendMail MailService class
-	def jdbcTemplate
-	def partyRelationshipService
-	def quartzScheduler
-	def securityService
-	def taskService
-	def userPreferenceService
-	def assetEntityService
-	def sequenceService
+	AssetEntityService assetEntityService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	Scheduler quartzScheduler
+	SecurityService securityService
+	TaskService taskService
+	SequenceService sequenceService
+	UserPreferenceService userPreferenceService
 
 	// TODO : This should use an array defined in AssetCommentCategory instead as that is where people will add new statuses
 	private final List<String> statusToSendEmailFor = [
@@ -49,6 +51,7 @@ class CommentService {
 	 * @param flash - the controller flash message object to stuff messages into (YUK!!!)
 	 * @return map of the AssetComment data used to refresh the view
 	 */
+	@Transactional
 	def saveUpdateCommentAndNotes(session, params, isNew=true, flash) {
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
@@ -468,6 +471,7 @@ class CommentService {
      *  @param : paramsMap ["taskId":taskId, "tzId":tzId, "isNew":isNew]
      *  @return : create Trigger
      */
+	@Transactional
     def dispatchTaskEmail(Map params) {
 		Trigger trigger = new SimpleTriggerImpl("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date(System.currentTimeMillis() + 5000) )
         trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'userDTFormat':params.userDTFormat, 'isNew':params.isNew,'tries':0L])
@@ -487,6 +491,7 @@ class CommentService {
 	 * @param tzId
 	 * @return
 	 */
+	@Transactional
 	def sendTaskEMail(taskId, tzId, userDTFormat, isNew=true) {
 		// Perform this withNewSession because it runs in a separate thread and the session would otherwise be lost
 		// TODO re-enable the withNewSession after upgrade to 2.x as there is a bug in 1.3 that we ran into

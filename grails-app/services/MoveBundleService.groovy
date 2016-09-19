@@ -1,26 +1,42 @@
-import com.tds.asset.*
+import UserPreferenceEnum as PREF
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetOptions
+import com.tds.asset.AssetType
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
-import com.tdssrc.grails.*
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import org.apache.poi.ss.usermodel.Cell
 import org.codehaus.groovy.grails.web.util.WebUtils
-import UserPreferenceEnum as PREF
+import grails.transaction.Transactional
+import org.hibernate.SessionFactory
+import org.springframework.jdbc.core.JdbcTemplate
 
+@Transactional
 class MoveBundleService {
 
-	def jdbcTemplate
-	def stateEngineService
-	def userPreferenceService
-	def sessionFactory
-	def assetEntityService
-	def partyRelationshipService
-	def securityService
-	def taskService
-	def progressService
+	AssetEntityService assetEntityService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	ProgressService progressService
+	SecurityService securityService
+	SessionFactory sessionFactory
+	StateEngineService stateEngineService
+	TaskService taskService
+	UserPreferenceService userPreferenceService
 
 	/*----------------------------------------------
 	 * @author : Lokanada Reddy
@@ -71,6 +87,7 @@ class MoveBundleService {
 			moveEvent.addToMoveBundles( MoveBundle.get( it ) )
 		}
 	}
+
 	/*----------------------------------------------------
 	 * will update the moveBundles with moveEvent
 	 * @author : Lokanada Reddy
@@ -104,6 +121,7 @@ class MoveBundleService {
 		}
 		return moveBundleStep
 	}
+
 	/* -----------------------------------------------
 	 * delete moveBundleStep and associsted records
 	 * @author : Lokanada Reddy
@@ -113,6 +131,7 @@ class MoveBundleService {
 		 def stepSnapshot = StepSnapshot.executeUpdate("DELETE from StepSnapshot ss where ss.moveBundleStep = ?",[moveBundleStep])
 		 moveBundleStep.delete(flush:true)
 	 }
+
 	/*-----------------------------------------------------
 	 * Return MoveEvent Detailed Results for given event.
 	 * @author : Lokanada Reddy
@@ -143,6 +162,7 @@ class MoveBundleService {
 		def detailedResults = jdbcTemplate.queryForList(detailedQuery)
 		return detailedResults
 	}
+
 	/*-----------------------------------------------------
 	 * Return MoveEvent Summary Results for given event.
 	 * @author : Lokanada Reddy
@@ -181,6 +201,7 @@ class MoveBundleService {
 		jdbcTemplate.execute( "DROP TEMPORARY TABLE IF EXISTS tmp_step_summary" )
 		return summaryResults
 	}
+
 	/**
 	 *  Delete Bundle AssetEntitys and its associated records
 	 */
@@ -477,6 +498,7 @@ class MoveBundleService {
 			}
 		}
 	}
+
 	/**
 	 * Method help to write data in excel sheet's appropriate column and remove redundant code.
 	 * @param exportList : list of data which is being export

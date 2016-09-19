@@ -1,12 +1,11 @@
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.beans.factory.InitializingBean
 
 import javax.servlet.ServletContext
 import javax.servlet.http.HttpSession
-
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.springframework.beans.factory.InitializingBean
 
 @CompileStatic
 @Slf4j
@@ -14,6 +13,8 @@ class MaintService implements InitializingBean {
 
 	private static String MAINT_MODE_FILE_PATH = ''
 	private static final String MAINT_BACKDOOR_ENTRY = 'MAINT_BACKDOOR_ENTRY'
+
+	static transactional = false
 
 	static boolean inMaintMode = false
 

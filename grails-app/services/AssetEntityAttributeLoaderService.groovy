@@ -1,36 +1,33 @@
-import org.apache.commons.lang.math.NumberUtils
-
-import org.apache.poi.*
-import org.apache.poi.hssf.usermodel.HSSFSheet
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-
-import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.eav.EavEntityType
-import com.tdsops.tm.enums.domain.SizeScale
-import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WorkbookUtil
+import grails.transaction.Transactional
+import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang.math.NumberUtils
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 class AssetEntityAttributeLoaderService {
 
-	boolean transactional = true
-	def eavAttribute
-	def projectService
-	def rackService
-	def roomService
-	def securityService
-	def partyRelationshipService
+	PartyRelationshipService partyRelationshipService
+	ProjectService projectService
+	SecurityService securityService
+
+	// TODO : JPM 9/2014 - remove these statics that should no longer be referenced
+	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
+	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
+	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 
 	String DEFAULT_DEVICE_TYPE = 'Server'
 	String UNKNOWN_MFG_MODEL = 'Unknown'
@@ -38,7 +35,8 @@ class AssetEntityAttributeLoaderService {
 	/*
 	 * upload records in to EavAttribute table from from AssetEntity.xls
 	 */
-	def uploadEavAttribute = { def stream ->
+	@Transactional
+	void uploadEavAttribute(InputStream stream) {
 		//get Entity TYpe
 		def entityType = EavEntityType.findByEntityTypeCode( "AssetEntity" )
 		// create workbook
@@ -99,7 +97,8 @@ class AssetEntityAttributeLoaderService {
 					if ( ! "AR".contains(mode) ) continue
 
 					// Try saving
-					eavAttribute = new EavAttribute( attributeCode:attributeCode,
+					def eavAttribute = new EavAttribute(
+						attributeCode:attributeCode,
 						note: note,
 						backendType: backEndType,
 						frontendInput: frontEndInput,
@@ -223,6 +222,7 @@ class AssetEntityAttributeLoaderService {
 	/*
 	 * Method to assign Assets to Bundles
 	 */
+	@Transactional
 	def saveAssetsToBundle( def bundleTo, def bundleFrom, def assets ){
 		def moveBundleAssets
 
@@ -298,6 +298,7 @@ class AssetEntityAttributeLoaderService {
 	 *     flag being true indicates that the asset was updated since the export was generated
 	 *     errorConflictCount indicates the number of fields that have conflicts
 	 */
+	@Transactional
 	def importValidation( dataTransferBatch, asset, dtvList) {
 		//Export Date Validation
 		def errorConflictCount = 0
@@ -353,6 +354,7 @@ class AssetEntityAttributeLoaderService {
 	 * @param dataTransferBatch, datatransfervalue
 	 * @author srinivas
 	 */
+	@Transactional
 	def updateChangeConflicts( def dataTransferBatch, def dtValue) {
 		if( dataTransferBatch.hasErrors == 0 ) {
 			dataTransferBatch.hasErrors = 1

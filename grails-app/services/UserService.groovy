@@ -1,10 +1,3 @@
-/**
- * The UserService class provides methods to manage UserLogin domain
- * @author jmartin
- *
- */
-
-
 import com.tds.asset.Application
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
@@ -12,54 +5,29 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import grails.transaction.Transactional
 import org.apache.shiro.authc.AccountException
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.hibernate.SessionFactory
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
 import UserPreferenceEnum as PREF
 
-class UserService implements InitializingBean {
+/**
+ * Methods to manage UserLogin domain.
+ * @author jmartin
+ */
+class UserService {
 
-	// IoC
-	def personService
-	def partyRelationshipService
-	def userPreferenceService
-	def taskService
-	def projectService
-	def securityService
-	def jdbcTemplate
-	GrailsApplication grailsApplication
-
-	// The following vars are initialized in afterPropertiesSet after IoC
-	def ctx
-	def sessionFactory
-
-	/**
-	 * This is a post initialization method to allow late configuration settings to occur
-	 */
-	 /*
-	private synchronized void initialize() {
-		if (! initialized) {
-			// Load the RoleTypes that are used in the findOrProvisionUser method
-			roleMap.each { k, v ->
-				roleTypeList << RoleType.read(v)
-			}
-			initialized = true
-		}
-	}
-	 */
-
-	/**
-	 * This is a post initialization method to allow late configuration settings to occur
-	 */
-	public void afterPropertiesSet () throws Exception {
-
-		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
-		// Initialize some class level variables used repeatedly by the application
-
-		ctx = grailsApplication.mainContext
-		sessionFactory = ctx.sessionFactory
-	}
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	ProjectService projectService
+	SecurityService securityService
+	SessionFactory sessionFactory
+	TaskService taskService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
@@ -70,7 +38,7 @@ class UserService implements InitializingBean {
 	 * @return a the userLogin account that was found or provisioned
 	 * @throws ConfigurationException, RuntimeException
 	 */
-
+	@Transactional
 	UserLogin findOrProvisionUser( Map userInfo, Map config, String authority ) {
 
 		//if (!initialized)

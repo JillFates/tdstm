@@ -1,26 +1,25 @@
-/**
- * A subset of the TaskService class for the purpose of updateTaskSuccessors which requires a non-transactional service in order to control when the
- * transaction actual starts due to the concurrency of the update of tasks through the Quartz Job and the database transaction isolation level.
- *
- * @author John Martin
- *
- */
-
 import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
 import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-
 import com.tdssrc.grails.GormUtil
+import org.hibernate.SessionFactory
+import org.springframework.jdbc.core.JdbcTemplate
 
+/**
+ * A subset of the TaskService class for the purpose of updateTaskSuccessors which requires a
+ * non-transactional service in order to control when the transaction actual starts due to the
+ * concurrency of the update of tasks through the Quartz Job and the database transaction isolation level.
+ *
+ * @author John Martin
+ */
 class TaskNonTranService {
 
 	static transactional = false
 
-	def securityService
-	def jdbcTemplate
-	def taskService
-	def sessionFactory
+	JdbcTemplate jdbcTemplate
+	SecurityService securityService
+	SessionFactory sessionFactory
+	TaskService taskService
 
 	/**
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes

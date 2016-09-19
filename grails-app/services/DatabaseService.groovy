@@ -1,14 +1,16 @@
-import com.tds.asset.Database
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.eav.EavAttributeSet
-import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetType
+import com.tds.asset.Database
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
+import grails.transaction.NotTransactional
+import grails.transaction.Transactional
 
+@Transactional
 class DatabaseService {
 
-	def assetEntityService
+	AssetEntityService assetEntityService
+	SecurityService securityService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a database asset
@@ -16,6 +18,7 @@ class DatabaseService {
 	 * @param db - the database object that the user is attempting to look at
 	 * @param params - parameters coming from the request
 	 */
+	@NotTransactional
 	Map getModelForShow(Project project, Database db, params) {
 		Map model = [ databaseInstance: db ]
 

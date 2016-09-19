@@ -1,32 +1,29 @@
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
-
 import com.tds.asset.AssetCableMap
-import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.WebUtil
-
-//import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
-//import org.springframework.jdbc.core.namedparam.SqlParameterSource
+import grails.transaction.Transactional
+import org.apache.shiro.SecurityUtils
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.hibernate.SessionFactory
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class ModelService {
 
-	static transactional = true
+	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
+	AssetEntityService assetEntityService
+	JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+	SessionFactory sessionFactory
 
-   	// Services and objects to be injected by IoC
-	def sessionFactory
-	def assetEntityAttributeLoaderService
-	def dataSource
-	def jdbcTemplate
-	def assetEntityService
-
-   /**
+    /**
 	 * @param fromModel : instance of the model that is being merged
 	 * @param toModel : instance of toModel
 	 * @return : updated assetCount
 	 */
+	@Transactional
 	def mergeModel(fromModel, toModel){
 		//	Revise Asset, and any other records that may point to this model
 		def fromModelAssets = AssetEntity.findAllByModel( fromModel )
@@ -107,7 +104,6 @@ class ModelService {
 	 */
 	def listOfFilteredModels(filterParams, sortColumn, sortOrder) {
 		def instanceList
-		def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 
 		// Cut the list of fields to filter by down to only the fields the user has entered text into
 		def queryParams = [:]

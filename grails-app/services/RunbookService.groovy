@@ -1,18 +1,19 @@
-/**
- * The RunbookService class contains methods useful for management of Runbook process and optimization
- *
- * @author John Martin
- *
- */
+import org.hibernate.SessionFactory
 
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
-
 import com.tdssrc.grails.TimeUtil
 
+/**
+ * Management of Runbook process and optimization.
+ *
+ * @author John Martin
+ */
 class RunbookService {
 
-	def sessionFactory
+	static transactional = false
+
+	SessionFactory sessionFactory
 
 	/**
 	 * Used to load all runbook related tasks associated with an event
@@ -186,7 +187,7 @@ class RunbookService {
 			// Mark vertices that are know not to be start vertices
 			if ( edgesBySucc.containsKey(vertex.id.toString()) ) {
 				tmp['tasks'][vertex.id].tmpIsStartVertex = false
-				//log.debug "cleared out tmpIsStartVertex for $n"
+				//log.debug "cleared out tmpIsStartVertex for $n"save
 			}
 
 			// Throw the current node onto the stack

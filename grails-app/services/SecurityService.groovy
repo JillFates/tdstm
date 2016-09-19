@@ -1,45 +1,51 @@
-/**
- * The SecurityService class provides methods to manage User Roles and Permissions, etc.
- */
-
-import javax.servlet.http.HttpSession
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-
-import org.springframework.beans.factory.InitializingBean
-import org.springframework.web.context.request.RequestContextHolder
-
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ConfigurationException
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.SecurityConfigParser
-import com.tdsops.common.exceptions.ServiceException
-import com.tdsops.common.builder.UserAuditBuilder
-import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdsops.common.security.SecurityUtil
+import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetStatus
 import com.tdsops.tm.enums.domain.PasswordResetType
-import com.tdsops.tm.enums.domain.EmailDispatchOrigin
+import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.GormUtil
-import com.tdsops.common.security.SecurityUtil
+import grails.converters.JSON
+import grails.transaction.Transactional
+import groovy.time.TimeCategory
+import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
-import net.transitionmanager.EmailDispatch
-import grails.converters.JSON
-import groovy.time.TimeCategory
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.UnavailableSecurityManagerException
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.web.context.request.RequestContextHolder
 
+import javax.servlet.http.HttpSession
+
+/**
+ * Methods to manage User Roles and Permissions, etc.
+ */
 class SecurityService implements InitializingBean {
 
-	static transactional = true
+	static final String DEFAULT_SECURITY_ROLE_CODE = 'USER'
 
-	static final String DEFAULT_SECURITY_ROLE_CODE='USER'
+	AuditService auditService
+	EmailDispatchService emailDispatchService
+	GrailsApplication grailsApplication
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	UserPreferenceService userPreferenceService
 
-	// IoC
-	def jdbcTemplate
-	def auditService
-	def emailDispatchService
-	def serviceHelperService
+	private Map ldapConfigMap
+	private Map loginConfigMap
+	private Map userLocalConfigMap
 
 	def ldapConfigMap = [:]
 	def loginConfigMap = [:]
@@ -68,7 +74,7 @@ class SecurityService implements InitializingBean {
 	 */
 	public void afterPropertiesSet() throws Exception {
 
-		def config = serviceHelperService.getApplicationConfig()
+		def config = grailsApplication.config
 
 		println "Parsing Security Login setting options"
 		loginConfigMap = SecurityConfigParser.parseLoginSettings(config)
@@ -297,6 +303,7 @@ class SecurityService implements InitializingBean {
 	/**
 	 * Used to cleanup expired password reset entires
 	 */
+	@Transactional
 	def cleanupPasswordReset(dataMap) {
 		log.info("Cleanup Password Reset: Started.")
 
@@ -315,6 +322,7 @@ class SecurityService implements InitializingBean {
 	/**
 	 * Unlocks a user's account
 	 */
+	@Transactional
 	void unlockAccount (UserLogin account) {
 		if (hasPermission('UnlockUserLogin')) {
 			account.lockedOutUntil = null
@@ -516,6 +524,7 @@ class SecurityService implements InitializingBean {
 	/**
 	 * Creates a new PasswordReset entity and invalidates any existing one
 	 */
+	@Transactional
 	PasswordReset createPasswordReset(
 		String token,
 		String ipAddress,
@@ -771,9 +780,6 @@ class SecurityService implements InitializingBean {
 			person = userLogin.person
 		}
 
-		// Determine if the individual has proper access to the user/person to be editted
-		def personService = serviceHelperService.getService('person')
-
 		// Test that the user has access account being updated
 		personService.hasAccessToPerson(byWhom.person, person, true, true)
 
@@ -898,11 +904,8 @@ class SecurityService implements InitializingBean {
 			assignedRoles = [params.assignedRole]
 		}
 
-		// Remove any Roles that are not in the above list
-		def partyRelationshipService = serviceHelperService.getService('partyRelationship')
 		partyRelationshipService.updatePartyRoleByType('system', person, assignedRoles)
 
-		def userPreferenceService = serviceHelperService.getService('userPreference')
 		if (userPreferenceService.setUserRoles(assignedRoles, person.id)) {
 			throw new DomainUpdateException('Unable to update user security roles')
 		}
@@ -978,14 +981,12 @@ class SecurityService implements InitializingBean {
 	 * @return 	bool	true or false indicating if the user has the role
 	 * @Usage  if ( securityService.hasRole( ['ADMIN','SUPERVISOR']) ...
 	 */
-	boolean hasRole( java.util.ArrayList roles ) {
-		boolean found = false
-		roles.each() {
-			if (! found && SecurityUtils.subject.hasRole( it ) ) {
-				found = true
+	boolean hasRole(List roles) {
+		for (it in roles) {
+			if (SecurityUtils.subject.hasRole(it)) {
+				return true
 			}
 		}
-		return found
 	}
 
 	/**

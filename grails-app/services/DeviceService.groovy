@@ -1,3 +1,4 @@
+import UserPreferenceEnum as PREF
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
@@ -9,20 +10,17 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import UserPreferenceEnum as PREF
-
-import org.springframework.transaction.annotation.Transactional
+import grails.transaction.Transactional
 
 @Transactional
 class DeviceService {
 
-	boolean transactional = true
-
-	def assetEntityService
-	def projectService
-	def rackService
-	def roomService
-	def userPreferenceService
+	AssetEntityService assetEntityService
+	ProjectService projectService
+	RackService rackService
+	RoomService roomService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Used to assign a DEVICE asset to a location/room/rack appropriately. If the referenced room or rack
@@ -37,7 +35,6 @@ class DeviceService {
 	 * @param isSource - flag that when true indicates that the associate is to the source otherwise to the target
 	 * @return Null if successful otherwise a string indicating the error
 	 */
-
 	String assignDeviceToLocationRoomRack(AssetEntity asset, String location, String roomName, String rackName, boolean isSource) {
 		log.debug("assignDeviceToLocationRoomRack() START $asset $location/$roomName/$rackName/$isSource")
 

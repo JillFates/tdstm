@@ -1,11 +1,11 @@
 /**
- * The event service handles the logic for CRUD events
+ * Handles the logic for CRUD events
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 class EventService {
 
-	boolean transactional = true
+	static transactional = false
 
 	/**
 	 * Provides a list all bundles associated to a specified project

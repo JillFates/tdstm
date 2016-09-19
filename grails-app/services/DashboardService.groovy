@@ -1,4 +1,3 @@
-import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.TimeUtil
 
 /**
@@ -6,7 +5,9 @@ import com.tdssrc.grails.TimeUtil
  */
 class DashboardService {
 
-	def taskService
+	static transactional = false
+
+	TaskService taskService
 
 	/**
 	 * Generates the model used by the Task Summary section of the Event Dashboard

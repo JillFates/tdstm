@@ -1,30 +1,3 @@
-/**
- * The TaskService class contains methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate away from using AssetComment
- * to persist our task functionality.
- *
- * @author John Martin
- *
- */
-
-// Domains
-import groovy.text.GStringTemplateEngine as Engine
-import groovy.time.TimeCategory
-import groovy.time.TimeDuration
-import groovy.transform.Synchronized
-
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-
-import org.apache.commons.lang.StringUtils as SU
-import org.apache.commons.lang.math.NumberUtils
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.quartz.SimpleTrigger
-import org.quartz.impl.triggers.SimpleTriggerImpl
-import org.quartz.Trigger
-import org.springframework.beans.factory.InitializingBean
-import org.springframework.dao.IncorrectResultSizeDataAccessException
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
@@ -35,6 +8,7 @@ import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -47,34 +21,48 @@ import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
-
-// Utilities
-import com.tdsops.common.lang.CollectionUtils as CU
-import com.tdsops.common.lang.GStringEval
-import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
+import groovy.text.GStringTemplateEngine as Engine
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
+import groovy.transform.Synchronized
+import org.apache.commons.lang.math.NumberUtils
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.dao.IncorrectResultSizeDataAccessException
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
+/**
+ * Methods useful for working with Task	ProgressService progressService
+ Scheduler quartzScheduler
+ SecurityService securityService
+
+ related domain (a.k.a. AssetComment). Eventually we should migrate
+ * away from using AssetComment to persist our task functionality.
+ *
+ *
+ * @author John Martin
+ */
+@Transactional
 class TaskService implements InitializingBean {
 
-	static transactional = true
-
-	def cookbookService
-	def partyRelationshipService
-	def personService
-	def progressService
-	def securityService
-	def sequenceService
-
-	def dataSource
-	def jdbcTemplate
-	def namedParameterJdbcTemplate
-	def quartzScheduler
-	def grailsApplication
-	ExecutorService executors
+	CookbookService cookbookService
+	JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	ProgressService progressService
+	Scheduler quartzScheduler
+	SecurityService securityService
+	SequenceService sequenceService
 
 	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
@@ -99,14 +87,7 @@ class TaskService implements InitializingBean {
 		'ERROR': ['red', 'white'],		// Use if the status doesn't match
 	]
 
-	public TaskService() {
-		this.executors = Executors.newFixedThreadPool(20)
-	}
-
-	/**
-	 * This is a post initialization method to allow late configuration settings to occur
-	 */
-	public void afterPropertiesSet() throws Exception {
+	void afterPropertiesSet() {
 
 		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
 
@@ -145,8 +126,6 @@ class TaskService implements InitializingBean {
 	 * @return Map	A map containing keys all and todo. Values will contain the task lists or counts based on countOnly flag
 	 */
 	def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null, moveEvent = null ) {
-		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
-		def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 
 		// log.info "getUserTasks: limitHistory=${limitHistory}, sortOn=${sortOn}, sortOrder=${sortOrder}, search=${search}"
 
@@ -1274,7 +1253,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				AND ae.cart=:cartName
 				ORDER BY cart"""
 
-			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 			def params = [status:AssetCommentStatus.DONE, moveEventId:moveEvent.id, moveBundleIds:bundleIds, cartName:cartName]
 			def cartInfo = namedParameterJdbcTemplate.queryForList( cartQtySQL, params )
 			log.info "moveEvent ${moveEvent.id} : bundleIds $bundleIds : cart $cartName : info $cartInfo"

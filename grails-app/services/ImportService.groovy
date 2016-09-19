@@ -1,51 +1,34 @@
-//import org.apache.commons.lang.math.NumberUtils
-//import org.apache.commons.lang.StringUtils
-//import org.codehaus.groovy.grails.commons.GrailsClassUtils
-//import com.tds.asset.AssetCableMap
-//import com.tdssrc.eav.EavAttributeOption
-//import com.tdsops.tm.enums.domain.SizeScale
-//import com.tdsops.tm.enums.domain.AssetCableStatus
-
-
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavEntityAttribute
-import com.tdssrc.eav.EavEntityType
-
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tdssrc.eav.EavAttributeSet
-import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.SizeScale
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttributeSet
+import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import org.apache.commons.lang.StringUtils
-
-import java.util.regex.Matcher
 import org.hibernate.FlushMode
+import org.hibernate.SessionFactory
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
+import java.util.regex.Matcher
+
 class ImportService {
 
-	boolean transactional = true
-
-	def assetEntityAttributeLoaderService
-	def assetEntityService
-	def deviceService
-	def personService
-	def progressService
-	def rackService
-	def roomService
-	def securityService
-	def partyRelationshipService
-
-	def sessionFactory
+	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
+	AssetEntityService assetEntityService
+	DeviceService deviceService
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	ProgressService progressService
+	SecurityService securityService
+	SessionFactory sessionFactory
 
 	// The number of assets to process before clearing the hibernate session
 	static final int CLEAR_SESSION_AFTER = 100

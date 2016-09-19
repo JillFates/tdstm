@@ -1,18 +1,18 @@
+import UserPreferenceEnum as PREF
+import com.tds.asset.AssetEntity
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
-import com.tdsops.common.lang.ExceptionUtil
-import com.tds.asset.AssetEntity
-
-import org.apache.commons.lang.math.NumberUtils
+import grails.transaction.Transactional
 import org.apache.commons.lang.StringUtils
-import UserPreferenceEnum as PREF
+import org.apache.commons.lang.math.NumberUtils
 
+@Transactional
 class RoomService {
 
-	boolean transactional = true
-	def securityService
-	def userPreferenceService
-	def rackService
+	RackService rackService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Used to update the information about Rooms, Racks and the devices within the racks

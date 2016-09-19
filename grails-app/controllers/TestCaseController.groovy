@@ -4,20 +4,11 @@
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
-
-import com.tdssrc.grails.StringUtil
+import com.tdsops.common.security.ConnectorActiveDirectory
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-
-import com.tdsops.common.security.ConnectorActiveDirectory
-
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
 
 class TestCaseController {
 
@@ -27,11 +18,8 @@ class TestCaseController {
 	def runbookService
 	def taskService
 	def securityService
-	def serviceHelperService
 	def userService
 	def accountImportExportService
-
-	// def messageSource
 
 	def remoteAddr() {
 		render "Your address is ${HtmlUtil.getRemoteIp()}"
@@ -124,19 +112,10 @@ class TestCaseController {
 		render out.toString()
 	}
 
-	def testServiceHelper() {
-
-		def securitySrcv = serviceHelperService.getService('security')
-		def personSrcv = serviceHelperService.getService('person')
-		render 'It worked'
-
-	}
-
 	def testPersonGetAssignedProjects() {
 		def user = securityService.getUserLogin()
 		List projects = personService.getAssignedProjects(user.person)
 		render "Assigned to projects ${projects*.id}".toString()
-
 	}
 
 	def testPerms() {

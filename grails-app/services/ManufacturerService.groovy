@@ -1,7 +1,10 @@
+import grails.transaction.Transactional
+import org.springframework.jdbc.core.JdbcTemplate
+
+@Transactional
 class ManufacturerService {
 
-	def jdbcTemplate
-	def sessionFactory
+	JdbcTemplate jdbcTemplate
 
 	/**
 	 *	1. Add to the AKA field list in the target record
@@ -9,8 +12,7 @@ class ManufacturerService {
 	 *	3. Delete manufacturer record.
 	 *	4. Return to manufacturer list view with the flash message "Merge completed."
 	 */
-	def merge(manufacturerToId, manufacturerFromId) {
-
+	void merge(String manufacturerToId, String manufacturerFromId) {
 		// Get the manufacturer instances for params ids
 		def toManufacturer = Manufacturer.get(manufacturerToId)
 		def fromManufacturer = Manufacturer.get(manufacturerFromId)
@@ -40,11 +42,10 @@ class ManufacturerService {
 
 			// Delete manufacturer record.
 			fromManufacturer.delete()
-		} else {
+		}
+		else {
 			//	Delete manufacturer record.
 			fromManufacturer.delete()
-			sessionFactory.getCurrentSession().flush()
 		}
 	}
-
 }

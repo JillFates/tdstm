@@ -1,3 +1,4 @@
+import UserPreferenceEnum as PREF
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
@@ -8,26 +9,30 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.util.WebUtils
-import UserPreferenceEnum as PREF
+import org.hibernate.SessionFactory
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
  */
 class PersonService {
 
-	def jdbcTemplate
-	def namedParameterJdbcTemplate
-	def sessionFactory
-
-	def auditService
-	def moveEventService
-	def partyRelationshipService
-	def projectService
-	def securityService
-	def userPreferenceService
+	AuditService auditService
+	GrailsApplication grailsApplication
+	JdbcTemplate jdbcTemplate
+	MoveEventService moveEventService
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	ProjectService projectService
+	SecurityService securityService
+	SessionFactory sessionFactory
+	UserPreferenceService userPreferenceService
 
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -528,7 +533,8 @@ class PersonService {
 	 * @param toPerson
 	 * @return
 	 */
-	def mergePerson(Person fromPerson, Person toPerson){
+	@Transactional
+	def mergePerson(Person fromPerson, Person toPerson) {
 		def toUserLogin = UserLogin.findByPerson( toPerson )
 		def fromUserLogin = UserLogin.findByPerson( fromPerson )
 
@@ -573,7 +579,8 @@ class PersonService {
 	 *				Boolean 	-> deleted: the person was deleted.
 	 *			]
 	 */
-	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets){
+	@Transactional
+	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets) {
 		int cleared = 0
 		boolean deleted = false
 		def messages = []
@@ -663,7 +670,8 @@ class PersonService {
 	 * @param toPerson: instance of toPerson
 	 * @return
 	 */
-	def mergeUserLogin(toUserLogin, fromUserLogin, toPerson){
+	@Transactional
+	def mergeUserLogin(toUserLogin, fromUserLogin, toPerson) {
 		if(fromUserLogin && !toUserLogin){
 			fromUserLogin.person = toPerson
 			fromUserLogin.save(flush:true)
@@ -714,7 +722,8 @@ class PersonService {
 	 * @param toUserLogin : instance of toUserLogin
 	 * @return
 	 */
-	def updateUserLoginRefrence(fromUserLogin, toUserLogin){
+	@Transactional
+	def updateUserLoginRefrence(fromUserLogin, toUserLogin) {
 		def map = ['data_transfer_batch':['user_login_id'],'model_sync':['created_by_id']]
 		map.each { table, columns->
 			columns.each { column->
@@ -727,9 +736,9 @@ class PersonService {
 	 * This method is used to update person reference in PartyRelationship table.
 	 * @param toPerson : instance of Person
 	 * @param fromPerson : instance of Person
-	 * @return void
 	 */
-	def updateProjectRelationship(Party fromPerson, Party toPerson){
+	@Transactional
+	void updateProjectRelationship(Party fromPerson, Party toPerson) {
 		try{
 			// Find all of the relationships that the FROM person has
 			def allRelations = jdbcTemplate.queryForList("SELECT p.party_relationship_type_id AS prType, p.party_id_from_id AS pIdFrom, \
@@ -824,6 +833,7 @@ class PersonService {
 	 *   skipped: number of persons skipped
 	 *   cleared: number of assets references that were cleared/unassigned
 	 */
+	@Transactional
 	Map bulkDelete(Object ids, Boolean deleteIfAssocWithAssets) {
 		if (! ids || ids.size()==0) {
 			throw new InvalidParamException('Must select at least one person to delete')
@@ -934,7 +944,8 @@ class PersonService {
 	 * @param toAssign - indicates if the assignment should be added (1) or removed (0)
 	 * @return A String that when blank indicates success otherwise will contain an error message
 	 */
-	String assignToProjectEvent(UserLogin byWhom, personId, eventId, teamCode, toAssign ) {
+	@Transactional
+	String assignToProjectEvent(UserLogin byWhom, personId, eventId, teamCode, toAssign) {
 		String message = ""
 
 		// Check if the user has permission to edit the staff
@@ -1102,7 +1113,8 @@ class PersonService {
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
 	 * @param map - Used to load various data and errors to reference
 	 */
-	void addToProjectTeam(UserLogin byWhom, def projectId, def personId, String teamCode, Map map=null) {
+	@Transactional
+	void addToProjectTeam(UserLogin byWhom, def projectId, def personId, String teamCode, Map map = null) {
 		// The addToEvent may call this method as well
 		if (! map) {
 			map = validateUserCanEditStaffing(byWhom, projectId, personId, teamCode)
@@ -1122,6 +1134,7 @@ class PersonService {
 	 * @param person - the person to assign update to the project
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
 	 */
+	@Transactional
 	void addToProjectTeamSecured(UserLogin byWhom, Project project, Person person, String teamCode) {
 		// Add to the project if not assiged already
 		addToProjectSecured(byWhom, project, person)
@@ -1147,6 +1160,7 @@ class PersonService {
 	 * @param person - the person to assign the team to
 	 * @param teamCode - the team code to associate to the person
 	 */
+	@Transactional
 	void addToTeam(UserLogin byWhom, Person person, String teamCode) {
 		if (! isAssignedToTeam(person, teamCode)) {
 			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "COMPANY", person, teamCode)) {
@@ -1284,6 +1298,7 @@ class PersonService {
 	 * @param personId - the id of the person to update
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
+	@Transactional
 	String removeFromProject(UserLogin user, String projectId, String personId) {
 		Map map = validateUserCanEditStaffing(user, projectId, personId, null)
 		if (map.error) {
@@ -1366,6 +1381,7 @@ class PersonService {
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
+	@Transactional
 	void addToEvent(UserLogin user, def projectId, def eventId, def personId, String teamCode) {
 		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
 
@@ -1399,6 +1415,7 @@ class PersonService {
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
+	@Transactional
 	void removeFromEvent(UserLogin user, String projectId, String eventId, String personId, String teamCode) {
 		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
 
@@ -1639,7 +1656,8 @@ class PersonService {
 	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
 	 * @return The Person record being updated or throws an exception for various issues
 	 */
-	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false)
+	@Transactional
+	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin = false)
 		throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
 		Person person = validatePersonAccess(params.id, byWhom)
 		def session = WebUtils.retrieveGrailsWebRequest().session
@@ -1776,7 +1794,8 @@ class PersonService {
 	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
 	 * @return The Person record being created or throws an exception for various issues
 	 */
-	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin=false)
+	@Transactional
+	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin = false)
 		throws DomainUpdateException, InvalidParamException {
 
 		def companyParty

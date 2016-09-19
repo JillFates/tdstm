@@ -1,12 +1,15 @@
-/**
- * CoreService contain service methods considered core to the application functionality
- */
-
+import grails.util.Environment
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 
+/**
+ * Methods considered core to the application functionality
+ */
 class CoreService {
 
-	def grailsApplication
+	static transactional = false
+
+	GrailsApplication grailsApplication
 
 	/**
 	 * Used to retrieve the name of the application
@@ -77,7 +80,7 @@ class CoreService {
 	 * Used to return the current runtime environment
 	 */
 	def getEnvironment() {
-		return grails.util.Environment.current.toString()
+		Environment.current.name
 	}
 
 	/**

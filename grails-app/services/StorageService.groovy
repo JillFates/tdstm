@@ -4,10 +4,10 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetType
 import com.tdssrc.grails.GormUtil
 
-
 class StorageService {
 
-	def assetEntityService
+	AssetEntityService assetEntityService
+	SecurityService securityService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a Storage asset

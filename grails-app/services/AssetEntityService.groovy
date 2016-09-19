@@ -1,38 +1,58 @@
-import com.tds.asset.*
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.common.sql.SqlUtil
-import com.tdsops.tm.domain.AssetEntityHelper
-import com.tdsops.tm.enums.domain.*
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.grails.*
 import grails.converters.JSON
+import grails.transaction.Transactional
+
+import java.util.regex.Matcher
+
 import net.transitionmanager.utils.Profiler
+
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.Criteria
+import org.hibernate.SessionFactory
 import org.hibernate.transform.Transformers
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.transaction.annotation.Transactional
-import UserPreferenceEnum as PREF
 
-import java.util.regex.Matcher
-// Used to wire up bindData
-//import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
-//import org.codehaus.groovy.grails.commons.metaclass.GroovyDynamicMethodsInterceptor
-//import org.springframework.validation.BindingResult
+import com.tds.asset.Application
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetOptions
+import com.tds.asset.AssetType
+import com.tds.asset.Database
+import com.tds.asset.Files
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.domain.AssetEntityHelper
+import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.EntityType
+import com.tdsops.tm.enums.domain.ValidationType
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.grails.ApplicationConstants
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
+
 @Transactional
 class AssetEntityService {
 	static final TEMPLATES = [
 			xls  : "/templates/TDSMaster_template.xls",
 			xlsx : "/templates/TDSMaster_template.xlsx"
 	]
-
-	def grailsApplication
-	def dataSource
 
 	// TODO : JPM 9/2014 : determine if customLabels is used as it does NOT have all of the values it should
 	protected static customLabels = [
@@ -113,21 +133,19 @@ class AssetEntityService {
 		"Other" : [ internalName:"other", frontEndName:"Other Device", frontEndNamePlural:"Other Devices", labelPreferenceName:"oLbl", labelText:"Other Device", labelHandles:"other"]
 	]
 
-	static transactional = true
-
-	def assetEntityAttributeLoaderService
-	def partyRelationshipService
-	def progressService
-	def projectService
-	def rackService
-	def roomService
-	def securityService
-	def taskService
-	def userPreferenceService
-
-	def jdbcTemplate
-
-	def sessionFactory
+	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
+	GrailsApplication grailsApplication
+	JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	ProgressService progressService
+	ProjectService projectService
+	RackService rackService
+	RoomService roomService
+	SecurityService securityService
+	SessionFactory sessionFactory
+	TaskService taskService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -807,7 +825,7 @@ class AssetEntityService {
 		// TODO : JPM 10/2014 : deleteTempGraphFiles function should NOT be allowed the way this looks so it was disabled and should be deleted
 		log.error "deleteTempGraphFiles() should NEVER be called but obviously it is..."
 		/*
-		def filePath = ApplicationHolder.application.parentContext.getResource(path).file
+		def filePath = grailsApplication.parentContext.getResource(path).file
 		// Get file path
 		def dir = new File( "${filePath.absolutePath}" )
 		def children = dir.list()
@@ -816,7 +834,7 @@ class AssetEntityService {
 				// Get filename
 				def filename = children[i]
 				if ( filename.startsWith(startsWith) ) {
-					def jsonFile =  ApplicationHolder.application.parentContext.getResource( "${path}/${filename}" ).getFile()
+					def jsonFile =  grailsApplication.parentContext.getResource( "${path}/${filename}" ).getFile()
 					jsonFile?.delete()
 				}
 			}
@@ -3819,7 +3837,6 @@ class AssetEntityService {
 
 		def assetList = []
 		if(queryParams.size()){
-			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 			assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		}else{
 			assetList = jdbcTemplate.queryForList(query.toString())
