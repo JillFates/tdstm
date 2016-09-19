@@ -111,7 +111,7 @@ grails {
 	scaffolding.templates.domainSuffix = 'Instance'
 	spring.bean.packages = []
 	stringchararrayaccessor.disabled = true // Eliminates warning error - see TM-3681
-	views.default.codec = 'html' // TODO BB
+	views.default.codec = 'none'
 	views {
 		gsp {
 			codecs {
