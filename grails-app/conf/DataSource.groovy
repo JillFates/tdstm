@@ -1,99 +1,90 @@
-/*
 dataSource {
+	dbCreate = 'none'
+	dialect = 'org.hibernate.dialect.MySQL5InnoDBDialect'
+	driverClassName = 'com.mysql.jdbc.Driver'
+	jmxExport = true
 	pooled = true
-	driverClassName = "org.hsqldb.jdbcDriver"
-	username = "sa"
-	password = ""
 }
-*/
 
 hibernate {
-    cache.use_second_level_cache=true
-    cache.use_query_cache=true
-    cache.provider_class='net.sf.ehcache.hibernate.EhCacheProvider'
+	cache {
+		use_second_level_cache = true
+		use_query_cache = false
+		region.factory_class = 'org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory' // Hibernate 4
+	}
+	flush.mode = 'manual' // OSIV session flush mode outside of transactional context
+	// format_sql = true
+	singleSession = true
+	// use_sql_comments = true
 }
-
-// environment specific settings
 
 environments {
 	development {
 		dataSource {
-			// TDS Transitional Manager
-			pooled = true
-			// Alternate options: 'create', 'create-drop','update'
-			dbCreate = ''
-
 			// url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
-			driverClassName = "com.mysql.jdbc.Driver"
 			username = "tdstmapp"
 			password = "tdstmpswd"
-			dbCreate = ''
 			logSql = false
 
+			// See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
 			properties {
-				// See following page for explaination of settings
-				// https://commons.apache.org/proper/commons-pool/api-1.6/org/apache/commons/pool/impl/GenericObjectPool.html
-				maxActive=70
-				maxIdle=15
+				defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
 				initialSize=15
-
-				// Evictions set to 5 minutes of idle time
-				minEvictableIdleTimeMillis=(1000*60*5)
-				// Run evictions on idle connections every 60 seconds (default 5 seconds)
-				timeBetweenEvictionRunsMillis=(1000*60)
-
-				testOnBorrow=true
-				testWhileIdle=false
-				testOnReturn=false
-				removeAbandoned=true
-				removeAbandonedTimeout=600
+				jdbcInterceptors = 'ConnectionState'
+				jmxEnabled = true
+				maxActive=70
+				maxAge = 10 * 60000
+				maxIdle=15
+				maxWait = 10000
+				minEvictableIdleTimeMillis = 1000 * 60 * 5 // Evictions set to 5 minutes of idle time
+				minIdle = 5
+				removeAbandoned = true
+				removeAbandonedTimeout = 600
+				testOnBorrow = true
+				testOnReturn = false
+				testWhileIdle = false
+				timeBetweenEvictionRunsMillis = 1000 * 60 // Run evictions on idle connections every 60 seconds (default 5 seconds)
+				validationInterval = 15000
 				validationQuery='/* ping */'
+				validationQueryTimeout = 3
 			}
 		}
 	}
 	test {
 		dataSource {
-			dbCreate = "create"
-			url = "jdbc:mysql://localhost/relo?autoReconnect=true"
-			driverClassName = "com.mysql.jdbc.Driver"
-			username = "tdstm"
-			password = "tdstm"
-			dbCreate = ''
+			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
+			username = "tdstmapp"
+			password = "tdstmpswd"
 			logSql = false
 		}
 	}
 	production {
 		dataSource {
-			// TDS Transitional Manager
-			driverClassName = "com.mysql.jdbc.Driver"
-
-			// Alternate options: 'create', 'create-drop','update'
-			dbCreate = ''
-
 			// url = "jdbc:mysql://127.0.0.1/tdstm"
 			// username = ''
 			// password = ''
-			// loggingSql = true
-			// logSql = true
 
+			// See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
 			properties {
-				// See following page for explaination of settings
-				// https://commons.apache.org/proper/commons-pool/api-1.6/org/apache/commons/pool/impl/GenericObjectPool.html
-				maxActive=70
-				maxIdle=15
+				defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
 				initialSize=15
-
-				// Evictions set to 5 minutes of idle time
-				minEvictableIdleTimeMillis=(1000*60*5)
-				// Run evictions on idle connections every 60 seconds (default 5 seconds)
-				timeBetweenEvictionRunsMillis=(1000*60)
-
-				testOnBorrow=true
-				testWhileIdle=false
-				testOnReturn=false
+				jdbcInterceptors = 'ConnectionState'
+				jmxEnabled = true
+				maxActive=70
+				maxAge = 10 * 60000
+				maxIdle=15
+				maxWait = 10000
+				minEvictableIdleTimeMillis=(1000*60*5) // Evictions set to 5 minutes of idle time
+				minIdle = 5
 				removeAbandoned=true
 				removeAbandonedTimeout=600
+				testOnBorrow=true
+				testOnReturn=false
+				testWhileIdle=false
+				timeBetweenEvictionRunsMillis=(1000*60) // Run evictions on idle connections every 60 seconds (default 5 seconds)
+				validationInterval = 15000
 				validationQuery='/* ping */'
+				validationQueryTimeout = 3
 			}
 		}
 	}

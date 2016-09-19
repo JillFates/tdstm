@@ -1,5 +1,6 @@
 class UrlMappings {
-    static mappings = {
+
+	static mappings = {
 
 		/**
 		 * View Controller
@@ -9,10 +10,8 @@ class UrlMappings {
 			action = [GET:"userTask"]
 		}
 
-		"/$controller/$action?/$id?"{
-			constraints {
-			 // apply constraints here
-			}
+		"/$controller/$action?/$id?(.$format)?" {
+			constraints {}
 		}
 
 		/**
@@ -212,10 +211,7 @@ class UrlMappings {
 		}
 
 		//ROOT map to the auth/index action
-		"/" {
-			controller = "auth"
-			action = "index"
-		}
+		"/"(controller: "auth")
 
 		"500"(view:'/error')
 		"401"(view:'/unauthorized')

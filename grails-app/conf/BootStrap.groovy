@@ -25,7 +25,7 @@ class BootStrap {
 			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
 		}
 
-		if ( grails.util.GrailsUtil.environment.equals("production") ) return
+		if (Environment.current == Environment.PRODUCTION) return
 
 		// createInitialData()
 
