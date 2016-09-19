@@ -457,10 +457,12 @@
                 <h3 class="box-title">Buttons</h3>
               </div>
               <div class="box-body pad table-responsive">
-                <p>Various types of buttons. Using the base class <code>.btn</code></p>
+                <p>Various types of buttons. Using the base class <code>.btn</code> and <code>.btn-block</code>. To add an icon an reduce the size remove <code>.btn-block</code> and include the  <code>&lt;span class="glyphicon glyphicon-ok"&gt;&lt;/span&gt;</code></p>
                 <table class="table table-bordered text-center">
                   <tr>
                     <th>Normal</th>
+                    <th>With Icon</th>
+                    <th>With Icon and no .btn-block</th>
                     <th>Large <code>.btn-lg</code></th>
                     <th>Small <code>.btn-sm</code></th>
                     <th>X-Small <code>.btn-xs</code></th>
@@ -469,6 +471,8 @@
                   </tr>
                   <tr>
                     <td><button class="btn btn-block btn-default">Default</button></td>
+                    <td><button class="btn btn-block btn-default"><span class="glyphicon glyphicon-ok"></span> Default</button></td>
+                    <td><button class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Default</button></td>
                     <td><button class="btn btn-block btn-default btn-lg">Default</button></td>
                     <td><button class="btn btn-block btn-default btn-sm">Default</button></td>
                     <td><button class="btn btn-block btn-default btn-xs">Default</button></td>
@@ -477,6 +481,8 @@
                   </tr>
                   <tr>
                     <td><button class="btn btn-block btn-primary">Primary</button></td>
+                    <td><button class="btn btn-block btn-primary"><span class="glyphicon glyphicon-ok"></span> Primary</button></td>
+                    <td><button class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span> Primary</button></td>
                     <td><button class="btn btn-block btn-primary btn-lg">Primary</button></td>
                     <td><button class="btn btn-block btn-primary btn-sm">Primary</button></td>
                     <td><button class="btn btn-block btn-primary btn-xs">Primary</button></td>
@@ -485,6 +491,8 @@
                   </tr>
                   <tr>
                     <td><button class="btn btn-block btn-success">Success</button></td>
+                    <td><button class="btn btn-block btn-success"><span class="glyphicon glyphicon-ok"></span> Success</button></td>
+                    <td><button class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Success</button></td>
                     <td><button class="btn btn-block btn-success btn-lg">Success</button></td>
                     <td><button class="btn btn-block btn-success btn-sm">Success</button></td>
                     <td><button class="btn btn-block btn-success btn-xs">Success</button></td>
@@ -493,6 +501,8 @@
                   </tr>
                   <tr>
                     <td><button class="btn btn-block btn-info">Info</button></td>
+                    <td><button class="btn btn-block btn-info"><span class="glyphicon glyphicon-ok"></span> Info</button></td>
+                    <td><button class="btn btn-info"><span class="glyphicon glyphicon-ok"></span> Info</button></td>
                     <td><button class="btn btn-block btn-info btn-lg">Info</button></td>
                     <td><button class="btn btn-block btn-info btn-sm">Info</button></td>
                     <td><button class="btn btn-block btn-info btn-xs">Info</button></td>
@@ -501,14 +511,16 @@
                   </tr>
                   <tr>
                     <td><button class="btn btn-block btn-danger">Danger</button></td>
-                    <td><button class="btn btn-block btn-danger btn-lg">Danger</button></td>
-                    <td><button class="btn btn-block btn-danger btn-sm">Danger</button></td>
+                    <td><button class="btn btn-block btn-danger btn-lg"><span class="glyphicon glyphicon-ok"></span> Danger</button></td>
+                    <td><button class="btn btn-danger btn-sm">Danger</button></td>
                     <td><button class="btn btn-block btn-danger btn-xs">Danger</button></td>
                     <td><button class="btn btn-block btn-danger btn-flat">Danger</button></td>
                     <td><button class="btn btn-block btn-danger disabled">Danger</button></td>
                   </tr>
                   <tr>
                     <td><button class="btn btn-block btn-warning">Warning</button></td>
+                    <td><button class="btn btn-block btn-warning"><span class="glyphicon glyphicon-ok"></span> Warning</button></td>
+                    <td><button class="btn btn-warning"><span class="glyphicon glyphicon-ok"></span> Warning</button></td>
                     <td><button class="btn btn-block btn-warning btn-lg">Warning</button></td>
                     <td><button class="btn btn-block btn-warning btn-sm">Warning</button></td>
                     <td><button class="btn btn-block btn-warning btn-xs">Warning</button></td>
