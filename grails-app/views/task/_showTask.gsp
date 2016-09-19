@@ -76,7 +76,7 @@
 					<tr id="workFlowShow3">
 						<td valign="top" class="name"><label for="durationShowId">Estimated Duration:</label></td>
 						<td valign="top" class="value"colspan="3" nowrap="nowrap">
-							<span id="durationShowId" >{{ac.duration}}</span>
+							<span id="durationShowId" >{{ac.durationText}}</span>
 							<div class="daterangepicker_action daterangepicker_lock_show">
 								<i ng-if="!acData.durationLocked" class="fa fa-fw fa-unlock"></i>
 								<i ng-if="acData.durationLocked" class="fa fa-fw fa-lock"></i>

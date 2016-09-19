@@ -133,7 +133,7 @@
                 '<input type="number" min="0" step="1" class="input_duration_days" name="daterangepicker_day" value="" size="3" >&nbsp;<label class="duration_days duration_label">Days</label>' +
                 '<input type="number" min="0" step="1" class="input_duration_hours" name="daterangepicker_hour" value="" size="3" >&nbsp;<label class="duration_hours duration_label">Hours</label>' +
                 '<input type="number" min="0" step="1" class="input_duration_minutes" name="daterangepicker_minutes" value="" size="3" >&nbsp;<label class="duration_minutes duration_label">Minutes</label>' +
-                '<div class="daterangepicker_action daterangepicker_lock_icon_popup daterangepicker_lock_icon" title="" data-toggle="popover" data-placement="top" data-trigger="hover" data-content="Click to toggle locking the Duration"><i class="fa fa-fw fa-unlock"></i></div>' +
+                '<div class="daterangepicker_action daterangepicker_lock_icon_popup daterangepicker_lock_icon" title="" data-toggle="popover" data-placement="top" data-trigger="hover" data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration."><i class="fa fa-fw fa-unlock"></i></div>' +
                 '</div>' +
                 '</div>' +
                 '<div class="ranges">' +

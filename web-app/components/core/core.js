@@ -811,7 +811,10 @@ tds.core.directive.RangePicker = function(utils) {
 						element.data('daterangepicker').hidePickerTime();
 
 						$('.modal').on('scroll', function(){ element.data('daterangepicker').move(); });
-						$(window).resize(function(){ element.data('daterangepicker').move();  });
+						$(window).resize(function(){
+							if(element.data('daterangepicker'))
+								element.data('daterangepicker').move();
+						});
 						var modalParent =  $('#'+scope.idHtmlParentContainer).closest('.modal-dialog');
 
 						if(modalParent && modalParent.length > 0) {

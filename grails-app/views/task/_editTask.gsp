@@ -95,7 +95,7 @@
 						<td valign="top" class="name" style="vertical-align: middle"><label for="durationEdit">Estimated Duration:</label></td>
 						<td valign="top" class="value">
 							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" duration-locked="ac.durationLocked" ng-change="updateEstFinish()"></tdsdurationpicker>
-							<div class="daterangepicker_action daterangepicker_lock_icon" title="" data-toggle="popover" data-placement="top" data-trigger="hover" data-content="Click to toggle locking the Duration">
+							<div class="daterangepicker_action daterangepicker_lock_icon" title="" data-toggle="popover" data-placement="top" data-trigger="hover" data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration.">
 								<i ng-if="!ac.durationLocked" class="fa fa-fw fa-unlock" ng-click="ac.durationLocked = true"></i>
 								<i ng-if="ac.durationLocked" class="fa fa-fw fa-lock" ng-click="ac.durationLocked = false"></i>
 							</div>
