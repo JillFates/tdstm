@@ -84,7 +84,7 @@
 					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:myLinkFormatter, width:60, fixed:true},
-					{name:'comment', width:680, formatter:taskFormatter},
+					{name:'comment', width:680, formatter:taskViewFormatter},
 					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
 					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
@@ -133,17 +133,21 @@
 					$('#viewtaskgraph_button_graph').attr('href', href);
 				}
 				$('#viewtaskgraph_button_graph').attr('href', href + '&viewUnpublished=' + $('#viewUnpublishedCB').is(':checked'));
-				$('#viewtaskgraph_button_graph').attr('title', 'View Task');
 			}
 		};
 
-		function myCustomFormatter (cellVal,options,rowObject) {
-			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')" title="Edit Task">'+
+		function myCustomFormatter (cellVal, options, rowObject) {
+			var value = rowObject && rowObject[1] ? _.escape(rowObject[1]) : '';
+			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')" title="Edit Task ' + value + '">'+
 				"<img src='${resource(dir:'icons',file:'table_edit.png')}' border='0px'/>"+"</a>"
 			return editButton
 		}
 		function isPublishedFormatter(cellVal,options,rowObject) {
 			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
+		}
+
+		function taskViewFormatter(cellVal,options,rowObject) {
+			return '<span title="View Task '+ (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") +'" class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
 			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
