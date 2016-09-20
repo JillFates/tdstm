@@ -7,7 +7,7 @@
 			<span class="ui-button-text">close</span>
 		</button>
 	</div>
-	<div id="showCommentDialog" title="Comment/Issue detail" class="comment-dialog-content">
+	<div id="showCommentDialog" class="comment-dialog-content">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 			<div>
 				<table id="showCommentTable" style="border: 0px;">

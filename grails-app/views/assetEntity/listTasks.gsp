@@ -133,11 +133,12 @@
 					$('#viewtaskgraph_button_graph').attr('href', href);
 				}
 				$('#viewtaskgraph_button_graph').attr('href', href + '&viewUnpublished=' + $('#viewUnpublishedCB').is(':checked'));
+				$('#viewtaskgraph_button_graph').attr('title', 'View Task');
 			}
 		};
 
 		function myCustomFormatter (cellVal,options,rowObject) {
-			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')">'+
+			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')" title="Edit Task">'+
 				"<img src='${resource(dir:'icons',file:'table_edit.png')}' border='0px'/>"+"</a>"
 			return editButton
 		}
