@@ -14,7 +14,7 @@ import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
 import org.apache.shiro.SecurityUtils
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class ReportsController {
 

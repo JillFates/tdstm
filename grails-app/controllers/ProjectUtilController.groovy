@@ -9,7 +9,7 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class ProjectUtilController {
 

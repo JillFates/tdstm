@@ -11,7 +11,7 @@ import org.codehaus.groovy.grails.web.util.WebUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import org.springframework.jdbc.core.JdbcTemplate
 
 /**

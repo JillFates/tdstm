@@ -1,3 +1,4 @@
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.converters.JSON
 import grails.transaction.Transactional
 
@@ -317,7 +318,7 @@ class UserPreferenceService {
 	 * @param preferenceCode - the code to set
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
-	 * @deprecated you should rather use setPreference( UserPreferenceEnum, String)
+	 * @deprecated you should rather use setPreference( com.tdsops.tm.enums.domain.UserPreferenceEnum, String)
 	 */
 	@Transactional
 	Boolean setPreference( String preferenceCode, String value ) {

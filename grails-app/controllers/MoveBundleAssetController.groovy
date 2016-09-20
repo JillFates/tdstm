@@ -1,7 +1,7 @@
 import com.tds.asset.AssetEntity
 import grails.converters.JSON
 
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class MoveBundleAssetController {
 	def partyRelationshipService

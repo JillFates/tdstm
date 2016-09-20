@@ -15,7 +15,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class ProjectController {
 	def userPreferenceService

@@ -6,7 +6,7 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import org.apache.shiro.SecurityUtils
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class UserLoginController {
 

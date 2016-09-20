@@ -7,7 +7,7 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class ApplicationController {
 

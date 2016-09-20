@@ -13,7 +13,7 @@ import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.LockedAccountException
 import org.apache.shiro.authc.UsernamePasswordToken
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class AuthController {
 

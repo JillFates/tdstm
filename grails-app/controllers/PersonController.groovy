@@ -5,7 +5,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.shiro.SecurityUtils
 
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class PersonController {
 

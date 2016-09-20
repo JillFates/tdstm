@@ -2,17 +2,15 @@ import com.tds.asset.Application
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.transaction.Transactional
 import org.apache.shiro.authc.AccountException
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
-import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
-import UserPreferenceEnum as PREF
 
 /**
  * Methods to manage UserLogin domain.

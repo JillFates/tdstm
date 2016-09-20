@@ -7,7 +7,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import org.hibernate.SessionFactory
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class RoomController {
 

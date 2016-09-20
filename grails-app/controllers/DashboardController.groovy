@@ -7,7 +7,7 @@ import grails.converters.JSON
 import org.apache.shiro.SecurityUtils
 
 import java.text.DateFormat
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class DashboardController {
 

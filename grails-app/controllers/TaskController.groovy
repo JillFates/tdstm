@@ -11,7 +11,7 @@ import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import org.apache.commons.lang.math.NumberUtils
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import java.text.DateFormat
 
 class TaskController {

@@ -7,7 +7,7 @@ import grails.converters.JSON
 import org.hibernate.criterion.Order
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class MoveBundleController {
 

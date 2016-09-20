@@ -2,7 +2,7 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import org.apache.commons.lang.StringUtils
 
 class PartyGroupController {

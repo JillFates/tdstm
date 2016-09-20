@@ -11,7 +11,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import org.apache.commons.lang.math.NumberUtils
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class RackLayoutsController {
 	def assetEntityService
