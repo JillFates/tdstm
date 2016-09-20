@@ -272,8 +272,8 @@
 	</div>
 </g:form>
 <tds:hasPermission permission='PersonEditView'>
-	<div class="buttons buttonsToUpdate">
-		<input class="save" type="button" id="updateBId" value="Update" onClick="Person.updatePerson('generalInfoShow','personDialogForm')" />
-		<input class="cancel" type="button" id="cancelBId" value="Cancel" onClick="Person.closePersonDiv('personGeneralViewId');Person.showPersonDialog(${person.id}, 'generalInfoShow')" />
+	<div class="footer_buttons">
+		<button class="btn btn-default" role="button" onClick="Person.updatePerson('generalInfoShow','personDialogForm')"><span class="glyphicon  glyphicon-ok"></span> Update</button>
+		<button class="btn btn-default" role="button" onClick="Person.closePersonDiv('personGeneralViewId');Person.showPersonDialog(${person.id}, 'generalInfoShow')"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>
 </tds:hasPermission>

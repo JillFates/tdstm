@@ -183,7 +183,7 @@
 					<button type="button" class="btn btn-default save"  onclick="cancelButton(${assetComment.id})"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 				</td>
 				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
-					<button type="button" class="btn btn-default save"  onclick="validateComment(${assetComment.id})"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Update Task</button>
+					<button type="button" class="btn btn-default save"  onclick="validateComment(${assetComment.id})"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Update Task</button>
 				</td>
 			</tr>	
 		</table>

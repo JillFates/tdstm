@@ -176,15 +176,13 @@
 				
 				<div>
 					<div class="buttons" style="white-space: nowrap;">
-						<span class="button" class="slide">
-							<span class="slide">
-								<input class="tableedit" type="button" value="Edit" id="commentButtonEditId" ng-click="editComment();" />
-							</span>
-							<span id="fromAssetId" class="slide">
-								<input class="tabledelete" type="button" value="Delete" ng-click="deleteComment()" />
-							</span>
-						</span>
-						<action-bar comment='ac' show-details='false' update-table='false'></action-bar>
+						<div style="float: left;">
+							<button class="btn btn-default" role="button" ng-click="editComment();"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+							<button class="btn btn-default" role="button" ng-click="deleteComment()"><span class="glyphicon glyphicon-minus"></span> Delete</button>
+						</div>
+						<div style="margin-top: 5px;">
+							<action-bar comment='ac' show-details='false' update-table='false'></action-bar>
+						</div>
 					</div>
 				</div>
 

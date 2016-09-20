@@ -184,7 +184,7 @@
 		</div>
 
 		<div class="buttons" ng-class="form.$invalid?'disabledButton' : ''">
-			<button type="button" id="saveAndCloseBId" class="btn btn-default tablesave" ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save</button>
+			<button type="button" id="saveAndCloseBId" class="btn btn-default tablesave" ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Save</button>
 			<button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 		</div>
 		<script>$('[data-toggle="popover"]').popover();</script>

@@ -208,8 +208,8 @@
              </div>
 </div>
 <tds:hasPermission permission='PersonEditView'>
-<div class="buttons">
-	<input class="edit" type="button" id="edtBId" value="Edit" onClick="Person.showPersonDialog(${person.id},'generalInfo','edit')" />
-	<input class="cancel" type="button" id="cancelBId" value="Cancel" onClick="Person.closePersonDiv('personGeneralViewId')"/>
+<div class="footer_buttons">
+	<button class="btn btn-default" role="button" onClick="Person.showPersonDialog(${person.id},'generalInfo','edit')"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+	<button class="btn btn-default" role="button" onClick="Person.closePersonDiv('personGeneralViewId')"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 </div>
  </tds:hasPermission>
