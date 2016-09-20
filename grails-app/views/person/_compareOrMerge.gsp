@@ -1,9 +1,6 @@
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-</head>
 <body>
-	<div class="body">
+	<div>
 		<table>
 			<tr class="odd">
 				<td colspan="${personsMap.size() + 1}" style="text-align: center;">
@@ -101,9 +98,9 @@
 			</g:each>
 		</table>
 		
-		<div class="buttons">
-			<input type="button" id="mergeModelId" class="save" value="Merge" onclick="Person.mergePerson()" />
-			<input type="button" class="cancel" value="Cancel" id="processData" onclick="jQuery('#showOrMergeId').dialog('close')" /> 
+		<div class="footer_buttons">
+			<button class="btn btn-default" onclick="Person.mergePerson()"><span class="glyphicon glyphicon-save"></span> Merge</button>
+			<button class="btn btn-default" onclick="jQuery('#showOrMergeId').dialog('close')"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 		</div>
 	</div>
 </body>
