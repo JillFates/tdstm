@@ -455,7 +455,7 @@ class SecurityConfigParser {
 		)
 
 		if ((map.passwordHistoryRetentionDays == 0) && (map.passwordHistoryRetentionCount == 0)) {
-			throw new ConfigurationException("Configuration setting: ${propNamePrefix}.localUser.passwordHistoryRetentionDays or ${propNamePrefix}.localUser.passwordHistoryRetentionCount must be greather than zero.")
+			throw new ConfigurationException("Configuration setting: ${propNamePrefix}.localUser.passwordHistoryRetentionDays or ${propNamePrefix}.localUser.passwordHistoryRetentionCount must be greater than zero.")
 		}
 
 		if ((map.passwordHistoryRetentionDays > 0) && (map.passwordHistoryRetentionCount > 0)) {
