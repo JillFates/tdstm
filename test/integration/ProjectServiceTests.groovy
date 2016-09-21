@@ -4,7 +4,7 @@ import grails.test.mixin.TestFor
 import spock.lang.*
 
 class ProjectServiceTests  extends Specification {
-	
+
 	// IOC
 	def projectService
 	def personService
@@ -66,7 +66,7 @@ class ProjectServiceTests  extends Specification {
 			// Default is ProjectStatus.ACTIVE
 			List projects = projectService.getProjectsWherePersonIsStaff(adminPerson)
 			int activeCount = projects?.size()
-		then: 
+		then:
 			projects != null
 			activeCount > 0
 
@@ -74,7 +74,7 @@ class ProjectServiceTests  extends Specification {
 		when:
 			projects = projectService.getProjectsWherePersonIsStaff(adminPerson, ProjectStatus.COMPLETED)
 			int completedCount = projects?.size()
-		then: 
+		then:
 			projects != null
 			completedCount > 0
 
@@ -82,13 +82,13 @@ class ProjectServiceTests  extends Specification {
 		when:
 			projects = projectService.getProjectsWherePersonIsStaff(adminPerson, ProjectStatus.ANY)
 			int allCount = projects?.size()
-		then: 
+		then:
 			projects != null
 			allCount > 0
 			allCount == (activeCount + completedCount)
 
 		// Check a new person that shouldn't have any projects
-		when: 
+		when:
 			Person newPerson = personHelper.createPerson(adminPerson, project.client)
 			projects = projectService.getProjectsWherePersonIsStaff(newPerson, ProjectStatus.ANY)
 		then:
@@ -113,7 +113,7 @@ class ProjectServiceTests  extends Specification {
 			projectList.find { it.id == project.id }
 
 		// The total of the ACTIVE and COMPLETED projects should equal that of ANY
-		when: 
+		when:
 			projectList = projectService.getProjectsWhereClient(company, ProjectStatus.ACTIVE)
 			int activeProjects = projectList?.size()
 			projectList = projectService.getProjectsWhereClient(company, ProjectStatus.COMPLETED)
@@ -141,7 +141,7 @@ class ProjectServiceTests  extends Specification {
 		then:
 			projectService.defaultAccountExpirationDate(project) > compDate
 
-		when: 
+		when:
 			project.completionDate = compDate
 		then:
 			projectService.defaultAccountExpirationDate(project) == compDate

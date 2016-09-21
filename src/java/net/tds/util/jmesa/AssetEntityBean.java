@@ -40,14 +40,13 @@ public class AssetEntityBean implements Serializable {
 	private String targetRack;
 	private String serialNumber;
 	private String validation;
-	
-	
+
 	private String name;
 	private String description;
 	private String aka;
 	private Integer modelCount;
 	private Integer count;
-	
+
 	private String userName;
 	private String person;
 	private Date lastLogin;
@@ -55,7 +54,7 @@ public class AssetEntityBean implements Serializable {
 	private Date dateCreated;
 	private Date expiryDate;
 	private String role;
-	
+
 	public String getRole() {
 		return role;
 	}
@@ -114,7 +113,7 @@ public class AssetEntityBean implements Serializable {
 
 	// Default constructor
 	public AssetEntityBean() {}
-	
+
 	public Integer getModelCount() {
 		return modelCount;
 	}
@@ -234,7 +233,7 @@ public class AssetEntityBean implements Serializable {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
+
 	public String getCssClass() {
 		return cssClass;
 	}

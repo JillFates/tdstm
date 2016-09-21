@@ -1,33 +1,35 @@
-/**
- * AccountImportExportService - A set of service methods the importing and exporting of project staff and users
- */
-
-
-
-import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.lang.CollectionUtils
-import com.tdssrc.grails.*
 import grails.transaction.Transactional
 import groovy.json.JsonBuilder
+
+import javax.servlet.http.HttpSession
+
 import org.apache.commons.lang.RandomStringUtils as RSU
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
-import javax.servlet.http.HttpSession
-//import org.apache.commons.validator.routines.EmailValidator
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.lang.CollectionUtils
+import com.tdssrc.grails.ExportUtil
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WorkbookUtil
 
+/**
+ * Methods for importing and exporting of project staff and users
+ */
 class AccountImportExportService {
 
-	static transactional = false
-
-	def auditService
-	def coreService
-	def partyRelationshipService
-	def personService
-	def projectService
-	def securityService	
+	AuditService auditService
+	CoreService coreService
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	ProjectService projectService
+	SecurityService securityService
 
 	static final String LOGIN_OPT_ALL = 'A'
 	static final String LOGIN_OPT_ACTIVE = 'Y'
@@ -64,10 +66,10 @@ class AccountImportExportService {
 	static final int FIRST_DATA_ROW_OFFSET=1
 
 	// Users can split Teams and Security roles on the follow characters as well as the default comma (,)
-	static final List DELIM_OPTIONS = [';',':','|'] 
+	static final List DELIM_OPTIONS = [';',':','|']
 
 	// ------------------------------------------------------------------------
-	// Kendo Template builder closures 
+	// Kendo Template builder closures
 	// ------------------------------------------------------------------------
 
 	// Used in the map below to set the various template strings used by Kendo
@@ -88,13 +90,13 @@ class AccountImportExportService {
 		if (StringUtil.isBlank(val)) {
 			valid = true
 		} else if (val && (val instanceof String)) {
-			valid = ['Y','N'].contains(val.toUpperCase()) 
+			valid = ['Y','N'].contains(val.toUpperCase())
 		}
 		return valid
 	}
 
 	// Closure used to validate that a string can be parsed as a Date
-	static final validator_date = { val, Map options -> 
+	static final validator_date = { val, Map options ->
 		boolean valid = false
 		if (val) {
 			if (val instanceof Date) {
@@ -108,7 +110,7 @@ class AccountImportExportService {
 	}
 
 	// Closure used to validate that a string can be parsed as a DateTime
-	static final validator_datetime = { val, Map options -> 
+	static final validator_datetime = { val, Map options ->
 		boolean valid = false
 		if (val instanceof Date) {
 			valid=true
@@ -124,7 +126,7 @@ class AccountImportExportService {
 
 	// Used to transform a string which will change null to blank
 	static final xfrmString = { val, options ->
-		String r = val ?: '' 
+		String r = val ?: ''
 		return r
 	}
 
@@ -135,7 +137,7 @@ class AccountImportExportService {
 			r = ''
 		} else if (val instanceof Boolean) {
 			r = (val ? 'Y' : 'N')
-		} 
+		}
 		// log.debug "xfrmToYN val=$val, r=$r"
 		return r
 	}
@@ -150,7 +152,7 @@ class AccountImportExportService {
 				r = val
 				log.error "xfrmDateToString() got unexpected data type ${val?.getClass()?.getName()}"
 			}
-		} 
+		}
 		return r
 	}
 
@@ -165,13 +167,13 @@ class AccountImportExportService {
 				r = val
 				log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
 			}
-		} 
+		}
 		return r
 	}
 
 	// Transforms a List to a comma separated list
 	// @IntegrationTest
-	static final xfrmListToString = { list, options -> 
+	static final xfrmListToString = { list, options ->
 		if (list != null && ! (list instanceof List)) {
 			throw new LogicException("xfrmListToString() called with ${list.getClass().getName()} $list")
 		}
@@ -179,13 +181,13 @@ class AccountImportExportService {
 		if (list != null) {
 			r = (list instanceof List) ? list.join(', ') : list
 		}
-		// log.debug "xfrmListToString() converted $list to $r which isa ${r.getClass().getName()}" 
+		// log.debug "xfrmListToString() converted $list to $r which isa ${r.getClass().getName()}"
 		return r
 	}
 
-	// Transforms a List to a pipe (|) separated string 
+	// Transforms a List to a pipe (|) separated string
 	// @IntegrationTest
-	static final xfrmListToPipedString = { list, options -> 
+	static final xfrmListToPipedString = { list, options ->
 		if (list != null && ! (list instanceof List)) {
 			throw new LogicException("xfrmListToPipedString() called with ${list.getClass().getName()} $list")
 		}
@@ -193,7 +195,7 @@ class AccountImportExportService {
 		if (list != null) {
 			r = (list instanceof List) ? list.join('|') : list
 		}
-		// log.debug "xfrmListToString() converted $list to $r which isa ${r.getClass().getName()}" 
+		// log.debug "xfrmListToString() converted $list to $r which isa ${r.getClass().getName()}"
 		return r
 	}
 
@@ -206,7 +208,7 @@ class AccountImportExportService {
 			throw new RuntimeException('Require Project object was not passed in the options map')
 		}
 
-		// For some reason the projectService on the class is not in scope to the closure so 
+		// For some reason the projectService on the class is not in scope to the closure so
 		// we'll fetch it from the App Context.
 		def service = ApplicationContextHolder.getService('projectService')
 		return service.defaultAccountExpirationDate(options.project)
@@ -233,7 +235,7 @@ class AccountImportExportService {
 	 */
 	static final Map accountSpreadsheetColumnMap = [
 		personId               : [type:'number',  ssPos:0,    formPos:1, domain:'I', width:80,  locked:true, label:'ID',
-									template:changeTmpl('personId')],																	
+									template:changeTmpl('personId')],
 		firstName              : [type:'string',  ssPos:1,    formPos:2, domain:'P', width:120,  locked:true, label:'First Name',
 									template:changeTmpl('firstName'), transform:xfrmString],
 		middleName             : [type:'string',  ssPos:2,    formPos:3,  domain:'P', width:120,  locked:true,  label:'Middle Name',
@@ -242,15 +244,15 @@ class AccountImportExportService {
 								 	template:changeTmpl('lastName'), transform:xfrmString],
 		company                : [type:'string',  ssPos:4,    formPos:5, domain:'T', width:120,  locked:true,  label:'Company',
 									template:changeTmpl('company'), transform:xfrmString],
-		errors                 : [type:'list',    ssPos:null, formPos:6,  domain:'T', width:240, locked:false, label:'Errors', 
+		errors                 : [type:'list',    ssPos:null, formPos:6,  domain:'T', width:240, locked:false, label:'Errors',
 									template:errorListTmpl(), templateClass:'error', transform:xfrmListToPipedString ],
 		workPhone              : [type:'string',  ssPos:5,    formPos:7,  domain:'P', width:120, locked:false, label:'Work Phone',
 									template:changeTmpl('workPhone'), transform:xfrmString],
 		mobilePhone            : [type:'string',  ssPos:6,    formPos:8,  domain:'P', width:120, locked:false, label:'Mobile Phone',
 									template:changeTmpl('mobilePhone'), transform:xfrmString],
-		email                  : [type:'string',  ssPos:7,    formPos:9,  domain:'P', width:100, locked:false, label:'Email', 
+		email                  : [type:'string',  ssPos:7,    formPos:9,  domain:'P', width:100, locked:false, label:'Email',
 									template:changeTmpl('email'), transform:xfrmString],
-		title                  : [type:'string',  ssPos:8,    formPos:10, domain:'P', width:100, locked:false, label:'Title', 
+		title                  : [type:'string',  ssPos:8,    formPos:10, domain:'P', width:100, locked:false, label:'Title',
 									template:changeTmpl('title'), transform:xfrmString],
 		department             : [type:'string',  ssPos:9,    formPos:11, domain:'P', width:120, locked:false, label:'Department',
 									template:changeTmpl('department'), transform:xfrmString],
@@ -258,15 +260,15 @@ class AccountImportExportService {
 									template:changeTmpl('location'), transform:xfrmString],
 		stateProv              : [type:'string',  ssPos:11,   formPos:13, domain:'P', width:120, locked:false, label:'State/Prov',
 									template:changeTmpl('stateProv'), transform:xfrmString],
-		country                : [type:'string',  ssPos:12,   formPos:14, domain:'P', width:100, locked:false, label:'Country', 
+		country                : [type:'string',  ssPos:12,   formPos:14, domain:'P', width:100, locked:false, label:'Country',
 									template:changeTmpl('country'), transform:xfrmString],
-		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:190, locked:false, label:'Person Team(s)', 
+		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:190, locked:false, label:'Person Team(s)',
 									template:changeTmpl('personTeams'), transform: xfrmListToString ],
-		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:190, locked:false, label:'Project Team(s)', 
+		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:190, locked:false, label:'Project Team(s)',
 									template:changeTmpl('projectTeams'), transform: xfrmListToString ],
 		roles                  : [type:'list',    ssPos:15,   formPos:17, domain:'T', width:120, locked:false, label:'Security Role(s)',
 									template:changeTmpl('roles'), defaultValue: DEFAULT_SECURITY_ROLE, transform: xfrmListToString],
-		username               : [type:'string',  ssPos:16,   formPos:18, domain:'U', width:120, locked:false, label:'Username', 
+		username               : [type:'string',  ssPos:16,   formPos:18, domain:'U', width:120, locked:false, label:'Username',
 									template:changeTmpl('username'), transform:xfrmString, transform:xfrmString, defaultOnError:{RSU.randomAlphabetic(10)}],
 		isLocal                : [type:'boolean', ssPos:17,   formPos:19, domain:'U', width:140, locked:false, label:'Local Account?',
 									template:changeTmpl('isLocal'), defaultValue: 'Y', validator: validator_YN, transform: xfrmToYN],
@@ -303,13 +305,13 @@ class AccountImportExportService {
 	// Controller called methods
 	// --------------------------------
 
-	/** 
-	 * Used to load a blank import template that updates the title sheet and then downloads the file to the 
+	/**
+	 * Used to load a blank import template that updates the title sheet and then downloads the file to the
 	 * end user.
 	 * @param session - the HttpSession object
 	 * @param response - the HttpResponse object
 	 * @param byWhom - the user that is attempting to download the spreadsheet template
-	 * @param project - the user's currently selected project 
+	 * @param project - the user's currently selected project
 	 * @param filename - the name of the file that the download should have for the mime-type
 	 */
 	void generateImportTemplateToBrowser(session, response, UserLogin byWhom, Project project, String filename) {
@@ -329,7 +331,7 @@ class AccountImportExportService {
 	/**
 	 * Used to generate the spreadsheet of accounts based on the user submitted options and will stream
 	 * it directly to the browser.
-	 * @param session - the HttpSession 
+	 * @param session - the HttpSession
 	 * @param response - the HttpResponse object to write the spreadsheet to
 	 * @param byWhom - the user that is invoking the request
 	 * @param project - the user's current project
@@ -357,13 +359,13 @@ class AccountImportExportService {
 		String projectName = project.projectCode.replaceAll(' ','')
 		String formattedDate = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		String filename = "${EXPORT_FILENAME_PREFIX}-$projectName-$formattedDate"
-		
+
 		// Send the file out to the browser
 		sendSpreadsheetToBrowser(response, spreadsheet, filename)
 	}
 
 	/**
-	 * This method is used to load the spreadsheet into memory and validate that it contains some information. If 
+	 * This method is used to load the spreadsheet into memory and validate that it contains some information. If
 	 * successful it will save the file with a random name and then return the model containing the filename.
 	 * @param session - the HttpSession object
 	 * @param request - the servlet request object
@@ -400,7 +402,7 @@ class AccountImportExportService {
 		Workbook workbook = readImportSpreadsheet(model.filename)
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
-		sheetInfoOpts.putAll(formOptions)		
+		sheetInfoOpts.putAll(formOptions)
 
 		if (sheetInfoOpts.sheetProjectId.toString() != project.id.toString()) {
 			throw new InvalidRequestException('The imported spreadsheet did not originate from the currently selected project')
@@ -419,11 +421,11 @@ class AccountImportExportService {
 			if (! new File(fqfn).delete()) {
 				log.error "Unable to delete temporary account import worksheet $fqfn"
 			}
-			throw new InvalidParamException('The spreadsheet column headers did not match the expected format. Please '+ 
+			throw new InvalidParamException('The spreadsheet column headers did not match the expected format. Please '+
 				' export a new template before attempt an import.')
 		}
 
-		// Read in the accounts to VALIDATE that we're able read it without errors		
+		// Read in the accounts to VALIDATE that we're able read it without errors
 		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
 
 		if (!accounts) {
@@ -534,12 +536,12 @@ class AccountImportExportService {
 		model.importOption = formOptions[IMPORT_OPTION_PARAM_NAME]
 		model.importOptionDesc = optionLabels[formOptions[IMPORT_OPTION_PARAM_NAME]]	// Used to display the user's option selection
 
-		// Need to load the spreadsheet into the list of accounts so we can determine the accountsToRemoveFromProject param. This param 
+		// Need to load the spreadsheet into the list of accounts so we can determine the accountsToRemoveFromProject param. This param
 		// will be used to determine if warning message should be show when it is > 0 when user is about to post
 		Workbook workbook = readImportSpreadsheet(formOptions.filename)
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
 		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
-		model.accountsToRemoveFromProject = countRemoveFromProject(accounts)	
+		model.accountsToRemoveFromProject = countRemoveFromProject(accounts)
 
 		return model
 	}
@@ -594,7 +596,7 @@ class AccountImportExportService {
 	 *    gridMap - the meta data used by the data grid
 	 * @controllerMethod
 	 */
-	@Transactional	
+	@Transactional
 	Map postChangesToAccounts(session, UserLogin byWhom, Project project, Object formOptions) {
 		if (formOptions.flagToUpdatePerson && ! securityService.hasPermission(byWhom, 'PersonImport', true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
@@ -647,7 +649,7 @@ class AccountImportExportService {
 				}
 				if (formOptions.testMode) {
 					recordedErrors = true
-					errorsSB.append("<tr><td>${i+2}</td><td>${accounts[i].firstName} ${accounts[i].lastName}</td><td><ul><li>" + 
+					errorsSB.append("<tr><td>${i+2}</td><td>${accounts[i].firstName} ${accounts[i].lastName}</td><td><ul><li>" +
 						accounts[i].errors.join('<li>') + '</ul></td></tr>')
 				}
 
@@ -663,7 +665,7 @@ class AccountImportExportService {
 			// Reset the errors on the account
 			accounts[i].errors = []
 
-			Person person = accounts[i].person			
+			Person person = accounts[i].person
 
 			// Create / Update the persons and associated teams
 			if (formOptions.flagToUpdatePerson) {
@@ -744,13 +746,13 @@ class AccountImportExportService {
 				// Track the update metrics base of either user or security updated
 				if (updateUserAndOrSecurity && ! isNewUser) {
 					results.userLoginUpdated++
-				} 
+				}
 			}
 
 			// Add the account to the new updatedAccounts to be displayed on the results page
 			if (accounts[i].errors || personChanged || userChanged || teamsChanged || securityRolesChanged) {
 
-				// Copy all of the properties out of the Accounts Map and transform to the format that the 
+				// Copy all of the properties out of the Accounts Map and transform to the format that the
 				// data grid can use later
 				Map account = [:]
 				accountSpreadsheetColumnMap.each { prop, info ->
@@ -768,7 +770,7 @@ class AccountImportExportService {
 							}
 						}
 					}
-					
+
 					if (accounts[i].changeHistory) {
 						account.changeHistory = accounts[i].changeHistory
 					}
@@ -794,7 +796,7 @@ class AccountImportExportService {
 
 				if (accounts[i].errors) {
 					recordedErrors = true
-					errorsSB.append("<tr><td>${i+2}</td><td>${accounts[i].firstName} ${accounts[i].lastName}</td><td><ul><li>" + 
+					errorsSB.append("<tr><td>${i+2}</td><td>${accounts[i].firstName} ${accounts[i].lastName}</td><td><ul><li>" +
 						accounts[i].errors.join('<li>') + '</ul></td></tr>')
 				}
 
@@ -813,12 +815,12 @@ class AccountImportExportService {
 		// Throw an exception so we don't commit the data while testing (to be removed)
 		if (formOptions.testMode) {
 			errorsSB.append('</table>')
-			String resultData = results.toString() + chgSB.toString() + 
+			String resultData = results.toString() + chgSB.toString() +
 				(recordedErrors ? errorsSB.toString() : '')
 			throw new DomainUpdateException('<H2>Test Mode - Import Results</H2>' + resultData )
 		}
 
-		return results	
+		return results
 	}
 
 	/**
@@ -837,8 +839,8 @@ class AccountImportExportService {
 		deleteUploadedSpreadsheet(formOptions.filename)
 	}
 
-	/** 
-	 * Used by the controller in the event that an exception was thrown and there's the potential that a file 
+	/**
+	 * Used by the controller in the event that an exception was thrown and there's the potential that a file
 	 * exists.
 	 * @param byWhom - the user that is trying to delete the spreadsheet
 	 * @param formOptions - the params which will include the filename
@@ -868,7 +870,7 @@ class AccountImportExportService {
 	 * @IntegrationTest
 	 */
 	private Map getUserPreferences(HttpSession session) {
-		Map map = [ 
+		Map map = [
 			userTzId: TimeUtil.getUserTimezone(session),
 			userDateFormat: TimeUtil.getUserDateFormat(session)
 		]
@@ -890,9 +892,9 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to read in the TitleSheet information and load the TZ and Date/DateTime formatters used for most of the 
+	 * Used to read in the TitleSheet information and load the TZ and Date/DateTime formatters used for most of the
 	 * application.
-	 * @param session 
+	 * @param session
 	 * @param project
 	 * @param workbook
 	 * @return A map containing the values from the title page plus the userTzId, and userDateFormat and formatters
@@ -936,17 +938,17 @@ class AccountImportExportService {
 	 */
 	private boolean hasUserLoginPropertiesSet(Map account) {
 
-		debugLogAccountInfo('In hasUserLoginPropertiesSet about to see if there are changes:', account, 'UserLogin')		
+		debugLogAccountInfo('In hasUserLoginPropertiesSet about to see if there are changes:', account, 'UserLogin')
 		log.debug "hasUserLoginPropertiesSet() account isa ${account.getClass().getName()}"
 
-		boolean found = accountSpreadsheetColumnMap.find { prop, info -> 
+		boolean found = accountSpreadsheetColumnMap.find { prop, info ->
 			boolean yup = false
 			if (info.domain == 'U') {
 				log.debug "hasUserLoginPropertiesSet() on prop $prop"
 				String origKey = "${prop}${ORIGINAL_SUFFIX}".toString()
 				String defKey = "${prop}${DEFAULTED_SUFFIX}".toString()
 				yup = ( account.containsKey(origKey) && ! account.containsKey(defKey) )
-				if (yup) { 
+				if (yup) {
 					log.debug "hasUserLoginPropertiesSet() property $prop has been set"
 				} else {
 					log.debug "hasUserLoginPropertiesSet() for prop $prop, origKey=$origKey, defKey=$defKey"
@@ -964,7 +966,7 @@ class AccountImportExportService {
 		}
 
 		debugLogAccountInfo("hasUserLoginPropertiesSet(found=$found)", account, 'UserLogin')
-		return found 
+		return found
 	}
 
 	/**
@@ -999,7 +1001,7 @@ class AccountImportExportService {
 	 * @return the map of the parameters
 	 */
 	private Map importParamsToOptionsMap(params) {
-		Map options = [ 
+		Map options = [
 			importOption:params[IMPORT_OPTION_PARAM_NAME],
 		]
 
@@ -1059,7 +1061,7 @@ class AccountImportExportService {
 			if (accounts[i].errors) {
 				icon = 'exclamation.png'
 			} else if (accounts[i].flags.isNewAccount) {
-				icon = 'add.png'				
+				icon = 'add.png'
 			}
 			accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: icon, absolute: false])
 		}
@@ -1069,7 +1071,7 @@ class AccountImportExportService {
 	 * Used to set the appropriate property on the account Map to indicate that a defaulted value
 	 * was used on the Account. This also sets the actual property value since it is defaulting afterall.
 	 * @param account - the Map with all of the account information
-	 * @param property - the name of the property to set 
+	 * @param property - the name of the property to set
 	 * @param value - the value to set the defaulted field to
 	 */
 	private void setDefaultedValue(Map account, String property, value) {
@@ -1081,7 +1083,7 @@ class AccountImportExportService {
 	 * Used to set the appropriate property on the account Map to indicate that the original value is being
 	 * changed on the Account.
 	 * @param account - the Map with all of the account information
-	 * @param property - the name of the property to set 
+	 * @param property - the name of the property to set
 	 * @param value - the original value that the domain object had
 	 */
 	private void setOriginalValue(Map account, String property, value) {
@@ -1089,10 +1091,10 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to set the appropriate property on the account Map to indicate that the original value 
-	 * failed the validation. 
+	 * Used to set the appropriate property on the account Map to indicate that the original value
+	 * failed the validation.
 	 * @param account - the Map with all of the account information
-	 * @param property - the name of the property to set 
+	 * @param property - the name of the property to set
 	 * @param value - the original value that the domain object had
 	 */
 	private void setErrorValue(Map account, String property, value) {
@@ -1104,14 +1106,14 @@ class AccountImportExportService {
 	 * method directly.
 	 * @param account - the Map with all of the account information
 	 * @param suffix - the suffix that is tacked onto the end of the variable name
-	 * @param property - the name of the property to set 
+	 * @param property - the name of the property to set
 	 * @param value - the value to set the defaulted field to
 	 */
 	private void setValue(Map account, String suffix, String property, value) {
 		String prop = "$property$suffix".toString()
 		account[prop] = value
 	}
-	
+
 	/**
 	 * Used to determine if an error was previously recorded against a property
 	 * @param account - the account map information
@@ -1122,12 +1124,12 @@ class AccountImportExportService {
 	private boolean propertyHasError(Map account, String property) {
 		return account.containsKey("${property}${ERROR_SUFFIX}".toString())
 	}
-	
+
 	/**
 	 * Used to remove errors if they got recorded
 	 * Note that this does not remove errors recorded against the account, just the property
 	 * @param account - the account Map with all the goodies
-	 * @param prop - the property for which to remove the error 
+	 * @param prop - the property for which to remove the error
 	 */
 	private void removeErrorValue(Map account, String prop) {
 		if (accountSpreadsheetColumnMap.containsKey(prop)) {
@@ -1167,7 +1169,7 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used by the above get*Value methods to access the original/defaulted/error 
+	 * Used by the above get*Value methods to access the original/defaulted/error
 	 * value set on the account.
 	 * @param account - the Map of the account
 	 * @param property - the propertyName
@@ -1183,7 +1185,7 @@ class AccountImportExportService {
 	 * Used to determine the number of accounts that are flagged to be removed from the project
 	 * @param accounts - the list of all of the accounts
 	 * @return the count of accounts to be removed from the project
-	 */	
+	 */
 	private countRemoveFromProject(accounts) {
 		int count = 0
 		accounts.each { acct ->
@@ -1248,7 +1250,7 @@ class AccountImportExportService {
 				String defaulted = "${prop}${DEFAULTED_SUFFIX}".toString()
 				if (account.containsKey(defaulted)) {
 					account.remove(defaulted)
-	
+
 					String original = "${prop}${ORIGINAL_SUFFIX}".toString()
 					if (account.containsKey(original)) {
 						account.remove(original)
@@ -1301,12 +1303,12 @@ class AccountImportExportService {
 	}
 
 	// A helper method used to determine if a value has leading minus
-	private boolean isMinus(String str) { 
+	private boolean isMinus(String str) {
 		return (str?.startsWith('-'))
 	}
 
 	// A helper method that will strip off a minus prefix if it exists
-	private String stripTheMinus(String str) { 
+	private String stripTheMinus(String str) {
 		String r = str
 		if ( isMinus(str) ) {
 			r = (str.size() > 1 ? str.substring(1).trim() : '')
@@ -1328,7 +1330,7 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to set the error codes onto the properties that errored so that we can put the error 
+	 * Used to set the error codes onto the properties that errored so that we can put the error
 	 * in context of where the error is.
 	 * @param account - the Map with all of the account details
 	 * @param domainObj - the domain object to generate the list of errors on
@@ -1345,7 +1347,7 @@ class AccountImportExportService {
 	/**
 	 * Used to verify for a given domain if unplanned changes should be identified because the user's input option
 	 * was to exclude the domain
-	 * @param options - the sheet options that are passed around 
+	 * @param options - the sheet options that are passed around
 	 * @param domainName - the name of the domain being processed
 	 * @return a boolean indicating true if changes should be identify changes
 	 */
@@ -1366,7 +1368,7 @@ class AccountImportExportService {
 	 */
 	private void debugLogAccountInfo(String header, Map accounts, String domainName) {
 		Collection list = CollectionUtils.asCollection(accounts)
-		
+
 		// Used to possibly filter the domain to list properties for
 		List domainCodes = ['P','U','T']
 
@@ -1378,14 +1380,14 @@ class AccountImportExportService {
 		list.each { account ->
 			sb.append("$header:")
 			log.debug "debugLogAccountInfo() account isa ${account.getClass().getName()} ${account.firstName} ${account.lastName}"
-			accountSpreadsheetColumnMap.each { prop, info -> 
+			accountSpreadsheetColumnMap.each { prop, info ->
 				if (info.domain in domainCodes) {
 					String acctPropAlternates = "${prop}_".toString()
-					Map properties = account.findAll { acctPropName, value -> 
-						acctPropName == prop ||  acctPropName.startsWith(acctPropAlternates) 
+					Map properties = account.findAll { acctPropName, value ->
+						acctPropName == prop ||  acctPropName.startsWith(acctPropAlternates)
 					}
 					properties.each { p, v ->
-						sb.append("\n\t$p=$v") 
+						sb.append("\n\t$p=$v")
 					}
 				}
 			}
@@ -1397,7 +1399,7 @@ class AccountImportExportService {
 	// Spreadsheet Helper Methods
 	// ---------------------------
 
-	/** 
+	/**
 	 * Used to retrieve a blank Account Export Spreadsheet
 	 * @return The blank spreadsheet
 	 */
@@ -1428,9 +1430,9 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * This method is used to update the spreadsheet title tab with various information about the export that 
+	 * This method is used to update the spreadsheet title tab with various information about the export that
 	 * will come in handy on a subsequent import.
-	 * @param session - the servlet container session 
+	 * @param session - the servlet container session
 	 * @param byWhom - the user that is requesting the export
 	 * @param project - the project that this export is for
 	 * @param sheet - the spreadsheet to update
@@ -1464,7 +1466,7 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * This method is used to read the spreadsheet title tab that should have various information from the export that 
+	 * This method is used to read the spreadsheet title tab that should have various information from the export that
 	 * is required for the import process (e.g. timezone and exportedOn)
 	 * @param project - the project that this export is for
 	 * @param sheet - the spreadsheet to update
@@ -1488,7 +1490,7 @@ class AccountImportExportService {
 			// log.debug "getCell($prop,$type)"
 			// log.debug "   for col ${TitlePropMap[prop][0]}, row ${TitlePropMap[prop][1]}"
 			switch (type) {
-				case 'Integer': 
+				case 'Integer':
 					val = WorkbookUtil.getIntegerCellValue(sheet, col, row)
 					break
 				case 'Date':
@@ -1504,7 +1506,7 @@ class AccountImportExportService {
 					break
 				default:
 					throw new RuntimeException("readTitleSheetInfo.getCell had unhandled case for $type")
-			} 
+			}
 		}
 
 		sheetOpts.sheetTzId = getCell('timezone')
@@ -1518,14 +1520,14 @@ class AccountImportExportService {
 		assert sheetOpts.sheetDateTimeFormatter
 
 		// Note that the exportedOn property is dependent on timezone being previously loaded
-		sheetOpts.sheetExportedOn = getCell('exportedOn')	
+		sheetOpts.sheetExportedOn = getCell('exportedOn')
 		if (sheetOpts.sheetExportedOn == -1) {
-			log.error "*** readTitleSheetInfo() the Exported On wasn't properly read from the spreadsheet" 
-			throw new InvalidRequestException("Unable to parse the 'Exported On' value from the '${TEMPLATE_TAB_TITLE}' sheet")			
+			log.error "*** readTitleSheetInfo() the Exported On wasn't properly read from the spreadsheet"
+			throw new InvalidRequestException("Unable to parse the 'Exported On' value from the '${TEMPLATE_TAB_TITLE}' sheet")
 		}
 
 		return sheetOpts
-	} 
+	}
 
 	/**
 	 * This method will compare the column headers to the map to determine if the spreadsheet being read in
@@ -1554,7 +1556,7 @@ class AccountImportExportService {
 	 * @param response - the servlet response object
 	 * @param spreadsheet - the spreadsheet object
 	 * @param filename - the filename that it should be saved as on the client
-	 */ 
+	 */
 	private void sendSpreadsheetToBrowser(Object response, Workbook spreadsheet, String filename) {
 		filename += "." + ExportUtil.getWorkbookExtension(spreadsheet)
 		ExportUtil.setContentType(response, filename)
@@ -1573,7 +1575,7 @@ class AccountImportExportService {
 			log.warn "getFilenameWithPath() called with a HACKED filename $filename"
 			throw new EmptyResultException('Unable to locate uploaded spreadsheet')
 		}
-		String fqfn=coreService.getAppTempDirectory() + '/' + filename	
+		String fqfn=coreService.getAppTempDirectory() + '/' + filename
 		return fqfn
 	}
 
@@ -1588,7 +1590,7 @@ class AccountImportExportService {
 			if (file.delete()) {
 				log.debug "deleteUploadedSpreadsheet() deleted $fqfn"
 			} else {
-				log.error "deleteUploadedSpreadsheet() Failed to delete $fqfn"				
+				log.error "deleteUploadedSpreadsheet() Failed to delete $fqfn"
 			}
 		} else {
 			log.debug "deleteUploadedSpreadsheet() didn't find file $fqfn"
@@ -1605,7 +1607,7 @@ class AccountImportExportService {
 	 * @param byWhom - the user that invoked the method
 	 * @param project - the user's project context
 	 * @param formOptions - A map of the form variables submitted by the user
-	 * @permission PersonExport 
+	 * @permission PersonExport
 	 */
 	private Workbook generateAccountExportSpreadsheet(Object session, UserLogin byWhom, Project project, Map formOptions) {
 		if (!project) {
@@ -1623,8 +1625,8 @@ class AccountImportExportService {
 			case 'AVAIL_STAFF':
 				// TODO : JPM 4/2016 : This needs to be reviewed because we're not returning all of the correct accounts
 				Long companyId = project.client.id
-				
-				// persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(companyId))
+
+				// persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.get(companyId))
 				persons = projectService.getAssignableStaff(project, byWhom.person)
 				break
 
@@ -1658,13 +1660,13 @@ class AccountImportExportService {
 	 * @param project - the project associated to the accounts being exported
 	 * @param persons - the list of persons to be exported
 	 * @param workbook - the spreadsheet workbook to be populated
-	 * @param formOptions - a map of options from the user input fomr 
+	 * @param formOptions - a map of options from the user input fomr
 	 * @param sheetInfoOpts - a map of options used in formating dates in the sheet
 	 */
-	private void populateAccountSpreadsheet( 
-		UserLogin byWhom, 
-		Project project, 
-		List persons, 
+	private void populateAccountSpreadsheet(
+		UserLogin byWhom,
+		Project project,
+		List persons,
 		Workbook workbook,
 		Map formOptions,
 		Map sheetInfoOpts) {
@@ -1685,7 +1687,7 @@ class AccountImportExportService {
 				log.info "Exported $row staff records of $max"
 			}
 			Map account = personToFieldMap(person, project, sheetInfoOpts)
-			
+
 			boolean includeAccount=false
 			UserLogin userLogin = person.userLogin
 
@@ -1705,7 +1707,7 @@ class AccountImportExportService {
 					}
 					break
 
-				case 3: 
+				case 3:
 					// With ACTIVE account
 					if (userLogin && userLogin.userActive()) {
 						includeAccount=true
@@ -1739,17 +1741,17 @@ class AccountImportExportService {
 
 			// Now that we have the map, we can iterate over the account map
 			addAccountToSpreadsheet(sheet, account, row++, sheetInfoOpts)
-		
+
 			// log.debug "addRowToAccountSpreadsheet took ${ TimeUtil.elapsed(elapsedNow) }"
 
 		}
-	}	
+	}
 
 	/**
 	 * This method outputs all the account mapped fields to a row in the sheet
 	 * @param sheet - the spreadsheet to update
 	 * @param account - the map of the account properties
-	 * @param rowNumber - the row in the spreadsheet to insert the values 
+	 * @param rowNumber - the row in the spreadsheet to insert the values
 	 */
 	private void addAccountToSpreadsheet(sheet, Map account, int rowNumber, Map sheetInfoOpts) {
 		// Loop through the SpreadSheet Map and add to the cells
@@ -1772,7 +1774,7 @@ class AccountImportExportService {
 	 */
 	private void addTeamsToSpreadsheet(sheet) {
 		def tab = sheet.getSheet('Teams')
-		assert tab	
+		assert tab
 		List teams = RoleType.findAllByType(RoleType.TEAM, [order:'description'])
 		int row = 1
 		teams.each {t ->
@@ -1787,12 +1789,12 @@ class AccountImportExportService {
 	 */
 	private void addRolesToSpreadsheet(sheet) {
 		def tab = sheet.getSheet('Roles')
-		assert tab		
+		assert tab
 		List roles = securityService.getAllRoles()
 		//RoleType.findAllByType(RoleType.SECURITY, [order:'level'])
 		int row = 1
 		roles.each {r ->
-			if (r.id == 'TEST_ROLE') 
+			if (r.id == 'TEST_ROLE')
 				return
 			WorkbookUtil.addCell(tab, 0, row, r.id)
 			WorkbookUtil.addCell(tab, 1, row++, r.toString())
@@ -1800,7 +1802,7 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to map a Person to the accountSpreadsheetColumnMap 
+	 * Used to map a Person to the accountSpreadsheetColumnMap
 	 * @param person - the person to map to the AccountFieldMap format
 	 * @return a map of the person information
 	 */
@@ -1810,18 +1812,18 @@ class AccountImportExportService {
 		//log.debug "   buildMapFromDomain took ${TimeUtil.elapsed(enow)}"
 		// Deal with transient properties that we can't handle through the map just yet...
 		List personTeams = person.getTeamsCanParticipateIn().id
-		
+
 		//log.debug "   getTeamsCanParticipateIn took ${TimeUtil.elapsed(enow)}"
 		List projectTeams = partyRelationshipService.getProjectStaffFunctionCodes(project, person)
 		//log.debug "   getProjectStaffFunctionCodes took ${TimeUtil.elapsed(enow)}"
 		List roles = securityService.getAssignedRoleCodes(person)
 		//log.debug "   getAssignedRoleCodes took ${TimeUtil.elapsed(enow)}"
 
-		// map.personTeams  = personTeams.join(", ") 
-		// map.projectTeams = projectTeams.join(", ") 
+		// map.personTeams  = personTeams.join(", ")
+		// map.projectTeams = projectTeams.join(", ")
 		// map.roles        = roles.join(", ")
-		map.personTeams  = personTeams 
-		map.projectTeams = projectTeams 
+		map.personTeams  = personTeams
+		map.projectTeams = projectTeams
 		map.roles        = roles
 		map.personId = person.id
 		map.company = person.company.name
@@ -1835,7 +1837,7 @@ class AccountImportExportService {
 	 * @param sheetInfoOpts - a map that includes the tzId and date/time formats
 	 * @return a map of the person information
 	 */
-	private Map userLoginToFieldMap(UserLogin user, Map sheetInfoOpts) {	
+	private Map userLoginToFieldMap(UserLogin user, Map sheetInfoOpts) {
 		Map map = buildMapFromDomain(user, 'U', sheetInfoOpts)
 
 		// Handle Transient properties
@@ -1846,7 +1848,7 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to create a map of properties from a Domain object by using the accountSpreadsheetColumnMap 
+	 * Used to create a map of properties from a Domain object by using the accountSpreadsheetColumnMap
 	 * to determine the properties to fetch.
 	 * @param domainObj - the object to pull the values from (Person, UserLogin)
 	 * @param domainCode - the code for the domain property in the Map e.g. P)erson or U)ser
@@ -1870,8 +1872,8 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to transform a value coming from the spreadsheet into the format that the domain object is 
-	 * expected based on the definition in accountSpreadsheetColumnMap. 
+	 * Used to transform a value coming from the spreadsheet into the format that the domain object is
+	 * expected based on the definition in accountSpreadsheetColumnMap.
 	 * @param property - the name of the property
 	 * @param value - the value to transform
 	 * @return the transformed value
@@ -1941,13 +1943,13 @@ class AccountImportExportService {
 	private String saveImportSpreadsheet(Object request, UserLogin byWhom, String paramName) {
 		MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
 		CommonsMultipartFile xlsFile = ( CommonsMultipartFile )mpr.getFile(paramName)
-		
+
 		// Generate a random filename to store the spreadsheet between page loads
 		String filename = "AccountImport-${byWhom.id}-" + com.tdsops.common.security.SecurityUtil.randomString(10)+'.xls'
 
 		// Save file locally
 		String fqfn=getFilenameWithPath(filename)
-		log.info "saveImportSpreadsheet() user $byWhom uploaded AccountImport spreadsheet to $fqfn"	
+		log.info "saveImportSpreadsheet() user $byWhom uploaded AccountImport spreadsheet to $fqfn"
 
 		File localFile = new File(fqfn)
 		xlsFile.transferTo(localFile)
@@ -1955,8 +1957,8 @@ class AccountImportExportService {
 		return filename
 	}
 
-	/** 
-	 * Used to get the derived filename for the JSON file from the Excel filename plus the 
+	/**
+	 * Used to get the derived filename for the JSON file from the Excel filename plus the
 	 * fully qualified path to access the file.
 	 * @param filename - the spreadsheet filename
 	 * @return the FQPN to the where the JSON file is written to
@@ -1964,20 +1966,20 @@ class AccountImportExportService {
 	private String getJsonFilename(String filename) {
 		// Swap out the XLS? extension and replace with .json
 		filename = filename.substring(0, filename.lastIndexOf('.')) + '.json'
-		
+
 		String fqfn = getFilenameWithPath(filename)
 
 		return fqfn
 	}
 
 	/**
-	 * Used to write the results of the update out to the temporary directory as JSON so that it can then be 
+	 * Used to write the results of the update out to the temporary directory as JSON so that it can then be
 	 * rendered to the user.
 	 * @param filename - the filename to spreadsheet (which assumes it is in the app configured tmp directory)
 	 * @return the spreadsheet itself
 	 */
 	private String saveResultsAsJson(List accounts, String filename) {
-		String fqfn = getJsonFilename(filename) 
+		String fqfn = getJsonFilename(filename)
 		log.debug "saveResultsAsJson() filename=$filename fqfn=$fqfn"
 		File file = new File(fqfn)
 		if (file) {
@@ -2005,9 +2007,9 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to read the Account Import Spreadsheet and load up a list of account+user properties. This will 
+	 * Used to read the Account Import Spreadsheet and load up a list of account+user properties. This will
 	 * iterate over the accountSpreadsheetColumnMap Map to pluck the values out of the appropriate columns of
-	 * each row and add to the map that is returned for each person/userlogin. 
+	 * each row and add to the map that is returned for each person/userlogin.
 	 * ---- The values are just saved in their String type and will be manipulated later. ----
 	 * The values are saved into the Map in the domain specific data type primarily because we need to
 	 * be able to change date/datetimes potentially in different timezones and saving as string will prevent
@@ -2031,7 +2033,7 @@ class AccountImportExportService {
 				def value=null
 				if (colPos != null) {
 					switch (info.type) {
-						case 'datetime': 
+						case 'datetime':
 							value = WorkbookUtil.getDateTimeCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateTimeFormatter)
 							if (value == -1) {
 								account.errors << "Invalid date value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"
@@ -2072,7 +2074,7 @@ class AccountImportExportService {
 
 							if (info.type == 'list') {
 								value = StringUtil.splitter(value, ',', DELIM_OPTIONS)
-							} 
+							}
 							break
 					}
 
@@ -2087,7 +2089,7 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to validate the list of accounts that were uploaded and will populate the individual maps with 
+	 * Used to validate the list of accounts that were uploaded and will populate the individual maps with
 	 * properties errors when anything is found. The logic will update the accounts object that is passed into
 	 * the method.  The logic will update the accounts data with the following information:
 	 *    - set companyObj to the company
@@ -2119,7 +2121,7 @@ class AccountImportExportService {
 
 		// Get all of the email address that were uploaded
 		List emailList = accounts.findAll( { it.email })?.collect({it.email.toLowerCase()})
-		
+
 		List allTeamCodes
 
 		PartyGroup client = project.client
@@ -2217,19 +2219,19 @@ class AccountImportExportService {
 				//debugLogAccountInfo('validateUploadedAccounts() UserLogin after validatePerson', accounts[i], 'UserLogin')
 
 				// Get all teams except AUTO
-				validateTeams(accounts[i], project, allTeamCodes) 
+				validateTeams(accounts[i], project, allTeamCodes)
 			}
 			// log.debug "validateUploadedAccounts() formOptions=$formOptions"
 			//
 			// User specific validation
 			//
 			if (true || formOptions.flagToUpdateUserLogin) {
-				
+
 				// Validate user and security roles if user requested to update Users
 				boolean canUpdateUser = (accounts[i].username?.size() > 0)
-				//log.debug "validateUploadedAccounts() 1. canUpdateUser=$canUpdateUser"		
+				//log.debug "validateUploadedAccounts() 1. canUpdateUser=$canUpdateUser"
 				// TODO : JPM 4/2016 : check for new create user permission
-				// Check if user is trying to create a user without a person already created 
+				// Check if user is trying to create a user without a person already created
 				if (canUpdateUser && accounts[i].flags.isNewAccount && !formOptions.flagToUpdatePerson) {
 					accounts[i].errors << 'User can not be created without a saved person'
 					canUpdateUser = false
@@ -2272,17 +2274,17 @@ class AccountImportExportService {
 			}
 
 			// List staff = partyRelationshipService.getCompanyStaff( project.client.id )
-			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project  
+			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project
 		}
 
 		// Update all the accounts icons
 		setIconsOnAccounts(accounts)
-	}	
+	}
 
 	/**
-	 * Used to validate the UserLogin properties that were imported are valid and to update the account 
+	 * Used to validate the UserLogin properties that were imported are valid and to update the account
 	 * Map with the appropriate values for tracking changes as well setting default values where applicable.
-	 * If the account doesn't have an expiration date then it will attempt to get it from the project expiration 
+	 * If the account doesn't have an expiration date then it will attempt to get it from the project expiration
 	 * otherwise it will default N days in the future.
 	 *
 	 * The method will populate the following properties on the account map accordingly:
@@ -2299,12 +2301,12 @@ class AccountImportExportService {
 
 		debugLogAccountInfo('**** validatePerson', account, 'Person')
 
-		Person.withNewSession { ses -> 
+		Person.withNewSession { ses ->
 			Person personToValidate = (account.person?.id ? Person.get((account.person.id)) : new Person() )
 
 			applyChangesToDomainObject(personToValidate, account, sheetInfoOpts, true)
 
-			ok = personToValidate.validate() 
+			ok = personToValidate.validate()
 			if (! ok) {
 				account.errors.addAll(gormValidationErrors(personToValidate))
 				registerGormErrorsOnProperties(account, personToValidate)
@@ -2315,16 +2317,16 @@ class AccountImportExportService {
 				}
 				*/
 				account.errors.addAll(gormValidationErrors(personToValidate))
-			} 
+			}
 			personToValidate.discard()
 		}
 		return ok
 	}
 
 	/**
-	 * Used to validate the UserLogin properties that were imported are valid and to update the account 
+	 * Used to validate the UserLogin properties that were imported are valid and to update the account
 	 * Map with the appropriate values for tracking changes as well setting default values where applicable.
-	 * If the account doesn't have an expiration date then it will attempt to get it from the project expiration 
+	 * If the account doesn't have an expiration date then it will attempt to get it from the project expiration
 	 * otherwise it will default N days in the future.
 	 *
 	 * The method will populate the following properties on the account map accordingly:
@@ -2347,7 +2349,7 @@ class AccountImportExportService {
 		if (hasUserChanges && ! hasUsername) {
 			account.errors << 'User changes but missing Username'
 			return false
-		} 
+		}
 
 		if (! hasUserChanges && ! hasUsername) {
 			return true
@@ -2375,7 +2377,7 @@ class AccountImportExportService {
 
 			if (hasUserChanges) {
 				if ( !shouldUpdateUser) {
-					// TODO : iterate over the changed fields and put the error changed values					
+					// TODO : iterate over the changed fields and put the error changed values
 				} else {
 					// Let's check to make sure that the person has an email address which is a requirement
 				}
@@ -2412,7 +2414,7 @@ class AccountImportExportService {
 			// log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 
 			if ( shouldUpdateUser && hasUserChanges ) {
-				ok = userLogin.validate() 
+				ok = userLogin.validate()
 				if (! ok ) {
 					registerGormErrorsOnProperties(account, userLogin)
 					account.errors.addAll(gormValidationErrors(userLogin))
@@ -2470,7 +2472,7 @@ class AccountImportExportService {
 				// Attempt to find the company by name
 				company = PartyGroup.findByName(account.company)
 				if (! company) {
-					account.errors << 'Unable to find company by name' 
+					account.errors << 'Unable to find company by name'
 				} else {
 					if (companiesById.containsKey(company.id.toString())) {
 						account.company = company.name
@@ -2480,13 +2482,13 @@ class AccountImportExportService {
 					}
 				}
 			} else {
-				// Set the company default to the project.client when the company wasn't specified and 
+				// Set the company default to the project.client when the company wasn't specified and
 				// we haven't found a person account
 				company = project.client
 				setDefaultedValue(account, 'company', company.name)
 				// account.company = company.name
 				// account["company$DEFAULTED_SUFFIX"] = company.name
-				ok = true				
+				ok = true
 			}
 			break
 		}
@@ -2509,17 +2511,17 @@ class AccountImportExportService {
 	 * @param validRoleCodes - a list of the valid role codes in the system
 	 * @param authorizedRoleCodes - a list of the role codes that byWhom is authorized to manage
 	 * @param A flag that indicates success (true) or an error occurred (false)
-	 */	 
+	 */
 	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List authorizedRoleCodes, Map sheetInfoOpts ) {
 		boolean ok=false
-		
+
 		log.debug "validateSecurityRoles() validating by byWhom - authorizedRoleCodes=$authorizedRoleCodes"
 		String prop='roles'
 		List currentRoles = []
 		boolean isNewUser = true
 
 		// Validate the Setup the default security role if necessary
-		UserLogin userLogin 
+		UserLogin userLogin
 		if (account.person.id) {
 			userLogin = account.person.userLogin
 			if (userLogin) {
@@ -2560,7 +2562,7 @@ class AccountImportExportService {
 		} else {
 			ok = true
 			if (changeMap.hasChanges) {
-				// For roles we are going to want to show the imported values along with the original and the resulting 
+				// For roles we are going to want to show the imported values along with the original and the resulting
 				// changes so we'll use all three underlying properties
 				if (! setDefaulted) {
 					setOriginalValue(account, prop, currentRoles)
@@ -2573,7 +2575,7 @@ class AccountImportExportService {
 					//setDefaultedValue(account, prop, roleChanges)
 					//account[prop] = changeMap.results
 				}
-				
+
 				// Save the changeMap to be used later on by the update logic
 				account.securityChanges = changeMap
 			}
@@ -2582,7 +2584,7 @@ class AccountImportExportService {
 		if (! shouldUpdateUserLogin(sheetInfoOpts)) {
 			if (changeMap.hasChanges) {
 				account.errors << 'Unplanned change on security roles'
-			} 
+			}
 		}
 
 		return ok
@@ -2599,7 +2601,7 @@ class AccountImportExportService {
 		List currPersonTeams=[], currProjectTeams=[]
 		if (account.person.id) {
 			currPersonTeams = account.person.getTeamsCanParticipateIn().id
-	
+
 			// currProjectTeams= account.person.getTeamsAssignedTo(project)
 			currProjectTeams = partyRelationshipService.getProjectStaffFunctionCodes(project, account.person)
 
@@ -2611,7 +2613,7 @@ class AccountImportExportService {
 		List chgProjectTeams = account.projectTeams
 
 		Map changeMap =	determineTeamChanges(allTeamCodes, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
-		/* 
+		/*
 		log.debug """
 			validateTeams(${account.firstName} ${account.lastName})
 				currPersonTeams=$currPersonTeams
@@ -2675,26 +2677,26 @@ class AccountImportExportService {
 	 *        add: a list of roles to be added
 	 *     delete: a list of roles to be deleted
 	 *     result: a list of the resulting roles after the changes are applied
-	 *     errors: an error message String if invalid codes are referenced or tried to assign 
+	 *     errors: an error message String if invalid codes are referenced or tried to assign
 	 * hasChanges: a boolean indicating if there were changes or not
 	 */
 	private Map determineSecurityRoleChanges(List allRoles, List currentRoles, List changes, List authorizedRoleCodes) {
 
 		Map map = [:]
 
-		// Used to reset the results array and inject the error message before the code bails out 
+		// Used to reset the results array and inject the error message before the code bails out
 		def panicButton = { errorMessage ->
 			map.hasChanges=false
 			map.add = []
 			map.delete = []
-			map.error = errorMessage 
+			map.error = errorMessage
 		}
 
 		panicButton ''	// Initialize the map without an error message
 
 		List remainingCodes = []
 
-		log.debug "determineSecurityRoleChanges() \n   allRoles=$allRoles\n   currentRoles=$currentRoles\n   changes=$changes\n   authorizedRoleCodes=$authorizedRoleCodes" 
+		log.debug "determineSecurityRoleChanges() \n   allRoles=$allRoles\n   currentRoles=$currentRoles\n   changes=$changes\n   authorizedRoleCodes=$authorizedRoleCodes"
 
 		while (true) {
 			List list
@@ -2726,7 +2728,7 @@ class AccountImportExportService {
 			remainingCodes = currentRoles.clone()
 			List violationCodes = []
 			changes.each { chgCode ->
-				// Determine if there is a security violation. Note that a user may have security roles 
+				// Determine if there is a security violation. Note that a user may have security roles
 				// previously assigned that are higher than what the individual who is making the changes can
 				// assign so as long as the code was in the original list we're fine. The individual can not
 				// add or remove codes above their clearence.
@@ -2734,7 +2736,7 @@ class AccountImportExportService {
 				String code = stripTheMinus(chgCode)
 
 				if ( ! authorizedRoleCodes.contains(code) ) {
-					boolean alreadyAssignedToUser = currentRoles.contains(code) 
+					boolean alreadyAssignedToUser = currentRoles.contains(code)
 					// See if they are trying to add or delete an unauthorize code
 					if ( ( !alreadyAssignedToUser && ! toDelete) || (alreadyAssignedToUser && toDelete) ) {
 						violationCodes << code
@@ -2747,7 +2749,7 @@ class AccountImportExportService {
 					panicButton "Unauthorized security role ${violationCodes.size()>1?'s':''} (${violationCodes.join(', ')})"
 					return
 				}
-				
+
 				boolean alreadyInList = remainingCodes.contains(code)
 				if (toDelete && alreadyInList) {
 					remainingCodes = remainingCodes - code
@@ -2775,9 +2777,9 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to determine the actions that should be done based on the current teams assigned to the person directly as well as 
+	 * Used to determine the actions that should be done based on the current teams assigned to the person directly as well as
 	 * to the project. Here are a few rules to how the changes will work:
-	 *    - Any team code with a minus (-) prefix in the chgPersonTeams or chgProjectTeams is an indicator to delete the 
+	 *    - Any team code with a minus (-) prefix in the chgPersonTeams or chgProjectTeams is an indicator to delete the
 	 *      appropriate reference
 	 *    - If a chgPersonTeams entry contains a minus then the team is removed from the person as well as *ALL* projects
 	 *    - If a chgProjectTeams is listed that is not associated to the person's existing personal list then it will be added
@@ -2804,7 +2806,7 @@ class AccountImportExportService {
 
 		Map map = [:]
 
-		// Used to reset the results array and inject the error message before the code bails out 
+		// Used to reset the results array and inject the error message before the code bails out
 		def panicButton = { errorMessage ->
 			map.hasChanges=false
 			map.personHasChanges=false
@@ -2815,7 +2817,7 @@ class AccountImportExportService {
 			map.deleteFromProject = []
 			map.resultPerson = []
 			map.resultProject = []
-			map.error = errorMessage 
+			map.error = errorMessage
 		}
 		panicButton ''	// Initialize the map without an error message
 
@@ -2932,7 +2934,7 @@ class AccountImportExportService {
 	 *    person - the person if found and was valid
 	 *    errors - appends any errors that occurred
 	 * @param account - the map used to track the person/user properties
-	 * @return returns 
+	 * @return returns
 	 *    true - if the lookup was successful,
 	 *    false - if no id was present
 	 *    null - if there were any errors
@@ -2965,7 +2967,7 @@ class AccountImportExportService {
 	 *    person - the person if found and was valid
 	 *    errors - appends any errors that occurred
 	 * @param account - the map used to track the person/user properties
-	 * @return returns 
+	 * @return returns
 	 *    true - if the lookup was successful,
 	 *    false - if no id was present
 	 *    null - if there were any errors
@@ -2979,7 +2981,7 @@ class AccountImportExportService {
 			if (! person) {
 				ok = false
 			} else {
-				// Check for a person mismatch 
+				// Check for a person mismatch
 				if (account.person) {
 					if (person.id != account.person.id) {
 						account.errors << 'Email cross referenced other person'
@@ -2991,7 +2993,7 @@ class AccountImportExportService {
 					account.matches << 'email'
 					ok = true
 				}
-			} 
+			}
 		}
 		return ok
 	}
@@ -3001,7 +3003,7 @@ class AccountImportExportService {
 	 *    person - the person if found and was valid
 	 *    errors - appends any errors that occurred
 	 * @param account - the map used to track the person/user properties
-	 * @return returns 
+	 * @return returns
 	 *    true - if the lookup was successful,
 	 *    false - if no id was present
 	 *    null - if there were any errors
@@ -3038,7 +3040,7 @@ class AccountImportExportService {
 	 *    person - the person if found and was valid
 	 *    errors - appends any errors that occurred
 	 * @param account - the map used to track the person/user properties
-	 * @return returns 
+	 * @return returns
 	 *    true - if the lookup was successful,
 	 *    false - if no id was present
 	 *    null - if there were any errors
@@ -3056,26 +3058,26 @@ class AccountImportExportService {
 		return people
 	}
 
-	/** 
+	/**
 	 * Used to transform the list of accounts into the form that can be displayed in the spreadsheet
 	 * copying only the properties that are used by the spreadsheet.
 	 * @param accounts - the list of accounts that were loaded from the spreadsheet
-	 * @param sheetInfoOpts - the map of various preferences 
+	 * @param sheetInfoOpts - the map of various preferences
 	 * @return the list of accounts formatted for presentation
 	 */
 	private List transformAccounts(List accounts, Map sheetInfoOpts) {
 		List list = []
 
 		accounts.each { row ->
-			Map account = [:] 
+			Map account = [:]
 			accountSpreadsheetColumnMap.each { prop, info ->
 				if (info.formPos != null) {
 					// Get the transformer if one exists
 					def transformer = (info.containsKey('transform') ? info.transform : false)
-					
+
 					def value = row[prop]
 
-					// Remove duplicate error messages that can happen because the Person is validated and then the UserLogin that 
+					// Remove duplicate error messages that can happen because the Person is validated and then the UserLogin that
 					// has a reference to the person. If the person has a constraints error then it gets logged twice.
 					if (prop == 'errors' && value.size() > 0) {
 						value.unique()
@@ -3211,8 +3213,8 @@ class AccountImportExportService {
 		if (! userLogin.save()) {
 			error = gormValidationErrors(userLogin)
 			userLogin.discard()
-			userLogin = null	
-			account.changeHistory = null	
+			userLogin = null
+			account.changeHistory = null
 		} else {
 			if (isNew) {
 				changed = true
@@ -3228,12 +3230,12 @@ class AccountImportExportService {
 
 	/**
 	 * Used to update the person's SecurityRoles associated to them
-	 * by examining the SecurityRoles of the person and the roles lists passed in the account map. 
+	 * by examining the SecurityRoles of the person and the roles lists passed in the account map.
 	 * Removing those not pressent in the new array and adding the new ones
 	 *************************
 	 * TODO: If I remove all roles from the Spreadsheet the account.roles gets filled with some roles, I don't know if I should commit those or just fail.
-	 * also should I double check the security and if those roles belongs to me? (I think this has already been done on the review step.) my best guess is 
-	 * I should, but I'll check before anything else. 
+	 * also should I double check the security and if those roles belongs to me? (I think this has already been done on the review step.) my best guess is
+	 * I should, but I'll check before anything else.
 	 *************************
 	 * @author @tavo_luna
 	 *
@@ -3246,7 +3248,7 @@ class AccountImportExportService {
 		boolean changed = false
 
 		// Check to see if there were any security changes
-		if(account?.securityChanges) {			
+		if(account?.securityChanges) {
 			UserLogin userLogin
 			if(account.person?.id){
 				userLogin = account.person?.userLogin
@@ -3257,10 +3259,10 @@ class AccountImportExportService {
 
 				def rolesToRemove = account.securityChanges.delete
 				def rolesToAdd    = account.securityChanges.add
-				
+
 				if(rolesToRemove) securityService.unassignRoleCodes(person, rolesToRemove)
 				if(rolesToAdd)    securityService.assignRoleCodes(person, rolesToAdd)
-				
+
 				changed = true
 			}
 		}
@@ -3270,7 +3272,7 @@ class AccountImportExportService {
 
 	/**
 	 * Used to update the person's teams associated to themselves/company and to the project
-	 * by examining the personTeams and projectTeams lists passed in the account map. If the codes have 
+	 * by examining the personTeams and projectTeams lists passed in the account map. If the codes have
 	 * a minus(-) suffix then the team will be removed otherwise it is added if it doesn't already exist.
 	 * @param byWhom - the UserLogin that invoked the update
 	 * @param account - the account map with all of the information about the person/user
@@ -3310,38 +3312,38 @@ class AccountImportExportService {
 					} else {
 						if (deleteTeamsFromProject) {
 							log.debug "projectService.removeTeamMember($project, $person, $deleteTeamsFromProject)"
-							projectService.removeTeamMember(project, person, deleteTeamsFromProject)						
+							projectService.removeTeamMember(project, person, deleteTeamsFromProject)
 						}
 
 						def addTeamsToProject = chgMap.addToProject
 						if (addTeamsToProject) {
 							log.debug "projectService.addTeamMember($project, $person, $addTeamsToProject)"
-							projectService.addTeamMember(project, person, addTeamsToProject)	
+							projectService.addTeamMember(project, person, addTeamsToProject)
 							account.changeHistory.put("Person.projectTeams".toString(), getOriginalValue(account, 'projectTeams'))
 						}
 					}
 				}
-				
+
 				changed = true
 			}
 		}
 
 		return [error, changed]
 	}
-	
+
 	/**
 	 * This method serves two purposes:
 	 *    1. Applies values from the account map into the domain object passed in when shouldUpdateDomain is true
 	 *    2. Updates the account map to track changed, Defaulted and Original values that is used in the review process
 	 *
 	 * Note: When applying changes to existing domains there needs to be some caution to prevent overwritting existing information
-	 * in the case that the import of a person/userLogin occurred as a result of someone just entering values in the spreadsheet and 
+	 * in the case that the import of a person/userLogin occurred as a result of someone just entering values in the spreadsheet and
 	 * a match of the person happens to occur. In this scenario we can not be certain that the person  entered all of the information so
 	 * we will ONLY overwrite values with blanks if we the load was matched on the person's id. This match indicates that the spreadsheet
 	 * originated from an export so all of the data should be there.
 	 * @param domainObject - the Person or UserLogin domain object to populate
 	 * @param account - the Map containing all of the changes
-	 * @param sheetInfoOpts - a Map containing TZ, Date formatters, etc used for transforming values 
+	 * @param sheetInfoOpts - a Map containing TZ, Date formatters, etc used for transforming values
 	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
 	 */
 	private void applyChangesToDomainObject(Object domainObject, Map account, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
@@ -3379,18 +3381,18 @@ class AccountImportExportService {
 			}
 
 			// Note that origValueTransformed for null values will return as a blank String such that the comparison to the spreadsheet values will match
-			def origValue = domainObject[prop]	
+			def origValue = domainObject[prop]
 			if (info.type == 'date' && origValue != null) {
-				// We have a special case with date in that the value coming from the database could have a time element so we need to 
+				// We have a special case with date in that the value coming from the database could have a time element so we need to
 				// clear the time so that we don't have in appropriate indication that the value was changed.
 				origValue.clearTime()
-			}	
+			}
 			String origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
 			String chgValueTransformed = transformProperty(prop, account[prop], sheetInfoOpts)
-			
+
 			// Check for null or blank)
 			boolean valuesEqual = origValueTransformed == chgValueTransformed
-			boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)			
+			boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)
 			boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
 			/*
 			log.debug "applyChangesToDomainObject(${account.firstName + ' ' + account.lastName}) prop $prop value"
@@ -3403,10 +3405,10 @@ class AccountImportExportService {
 			if (isNew) {
 				//
 				// Working with a NEW Domain object
-				// 
+				//
 				if (chgValueIsBlank) {
 					if (shouldUpdateDomain) {
-						// Try to first default it from the model has a default value 
+						// Try to first default it from the model has a default value
 						def defPropertyValue = evaluateDefaultValue(prop, account, sheetInfoOpts)
 						if (defPropertyValue != null) {
 							setDefaultedValue(account, prop, defPropertyValue)
@@ -3426,15 +3428,15 @@ class AccountImportExportService {
 							setErrorValue(account, prop, unChgdLabel)
 						}
 					//}
-				} 
+				}
 			} else {
 				//
 				// Working with an EXISTING Domain object
 				//
 				if (chgValueIsBlank) {
 					// User didn't give us any changes so do we want to overwrite existing values?
-					// Only if there was a perfect match from an export - which is flagged with the 
-					// setting account.flags.blockBlankOverwrites. 
+					// Only if there was a perfect match from an export - which is flagged with the
+					// setting account.flags.blockBlankOverwrites.
 					if (! origValueIsBlank) {
 						if (! blockBlankOverwrites) {
 							//if (shouldUpdateDomain) {

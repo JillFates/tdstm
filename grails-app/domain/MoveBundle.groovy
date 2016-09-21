@@ -1,12 +1,12 @@
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.ContextType;
+import com.tdsops.tm.enums.domain.ContextType
 
-class MoveBundle extends Party {	
-	
+class MoveBundle extends Party {
+
 	static ContextType getContextType() {
 		return ContextType.B
 	}
-	
+
     Project project
     String name
     String description
@@ -19,12 +19,12 @@ class MoveBundle extends Party {
 	Room sourceRoom
 	Room targetRoom
 	Boolean tasksCreated = false
-    
-    static constraints = {        
+
+    static constraints = {
 		name( blank:false, nullable:false, unique:['project'] )
 		project( nullable:false )
 		moveEvent( nullable:true )
-		description( blank:true, nullable:true )		
+		description( blank:true, nullable:true )
 		startTime( nullable:true )
 		completionTime( nullable:true )
 		operationalOrder( nullable:false, range:1..25 )
@@ -40,7 +40,7 @@ class MoveBundle extends Party {
 		targetRacks : Rack,
 		assets : AssetEntity
 	]
-	
+
 	static mapping  = {
 		version true
 		sort "name" // Sorting moveBundle list by name.
@@ -50,26 +50,26 @@ class MoveBundle extends Party {
 			name sqlType: 'varchar(30)'
 		 	startTime sqlType: 'DateTime'
 		 	completionTime sqlType: 'DateTime'
-		}        
+		}
 		sourceRacks joinTable:[name: 'asset_entity', key:'move_bundle_id', column:'rack_source_id']
 		targetRacks joinTable:[name: 'asset_entity', key:'move_bundle_id', column:'rack_target_id']
 	}
 
 	def beforeDelete(){
-		/* Discarding current move bundle object from delete if 
-		   trying to delete project's default move bundle */	
+		/* Discarding current move bundle object from delete if
+		   trying to delete project's default move bundle */
 		if(this.id == this.project.getProjectDefaultBundle().id)
 			this.discard()
 	}
-	
+
     String toString(){
 		name
 	}
     def getAssetQty(){
     	return AssetEntity.countByMoveBundle(this)
     }
-	
-	/** 
+
+	/**
 	 * @author: Lokanada Reddy
 	 * @param : projectId, currentTime
 	 * @return : List of move bundles
@@ -82,10 +82,10 @@ class MoveBundle extends Party {
 			}
 			order("startTime", "desc")
 		}
-		
+
 		return projectId ? moveBundles.findAll{it.project.id == projectId } : moveBundles
 	}
-	
+
 	/**
 	 * @param : project Instance of project
 	 * @return : all moveBundles list that is set true for UseForPlanning
@@ -93,7 +93,7 @@ class MoveBundle extends Party {
 	static def getUseForPlanningBundlesByProject( def project){
 		return project ? MoveBundle.findAllByProjectAndUseForPlanning(project, true) : []
 	}
-	
+
 	boolean belongsToClient(aClient) {
 		return this.project.client.equals(aClient)
 	}

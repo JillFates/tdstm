@@ -15,7 +15,7 @@ enum SizeScale {
 	// Used to access the application's default value to use
 	static SizeScale getDefault() {
 		return MB
-	} 
+	}
 
 	//
 	// Boiler Plate from here down - Just swap out the enum class name
@@ -27,7 +27,7 @@ enum SizeScale {
 
 	SizeScale(String value) {
 		this.value = value
-	}	
+	}
 
 	String toString() { name() }
 	String value() { value }
@@ -42,31 +42,31 @@ enum SizeScale {
 	}
 
 	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
+	static List getKeys() {
+		if (keys == null)
 			buildKeys()
 		return keys
 	}
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
+	// Construct the static keys
+	private static synchronized void buildKeys() {
 		if (keys == null) {
 			keys = SizeScale.values()
 		}
-	} 
+	}
 
 	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
+	static List getLabels(String locale='en') {
+		if (labels == null)
 			buildLabels()
 		return labels
 	}
 
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
+	// Construct the static labels
+	private static synchronized void buildLabels() {
 		if (labels == null) {
 			labels = SizeScale.values()*.value
 		}
-	} 
+	}
 
 }

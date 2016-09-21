@@ -14,12 +14,12 @@ class Rack {
 	Integer powerC = 0
 	String rackType = "Rack"
 	String front = "L"
-	
+
 	static hasMany = [sourceAssets:AssetEntity, targetAssets:AssetEntity]
 	static mappedBy = [sourceAssets:"rackSource", targetAssets:"rackTarget"]
-	
+
 	static belongsTo = [ manufacturer:Manufacturer, model:Model, room:Room ]
-	
+
 	static constraints = {
 		project( nullable:false )
 		source( nullable:true )
@@ -37,7 +37,7 @@ class Rack {
 		model( nullable:true )
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		id column:'rack_id'
 		sourceAssets sort:'sourceRackPosition'
 		targetAssets sort:'targetRackPosition'
@@ -45,7 +45,7 @@ class Rack {
 			rackType sqlType: 'varchar(20)'
 		}
 	}
-	
+
 	def getAssets() {
 		return(source == 1 ? sourceAssets : targetAssets)
 	}
@@ -60,7 +60,7 @@ class Rack {
 		}
 		return returnVal
 	}
-	
+
 	/**
 	 * Updating reference of assetentity's  rackSource and sourceRack to null while deleting rack
 	 */

@@ -1,6 +1,7 @@
 package com.tds.asset
+
 class AssetEntityVarchar extends com.tdssrc.eav.EavEntityDatatype {
-	
+
 	String value
 	String auditAction
 

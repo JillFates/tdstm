@@ -127,4 +127,3 @@ sql.eachRow( query ) {
 }
 
 println "}"
-				

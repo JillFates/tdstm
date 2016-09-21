@@ -1,27 +1,32 @@
 /**
-* tdstm-config.groovy.default
-* 
-* This is an optional configuration file that is used to override settings in the grails-app/conf/*.groovy files. To use this,
-* copy this file to a configuration directory  renaming it appropriately (e.g. /etc/tdstm-config.groovy) and then provide a 
-* JVM -D argument in the start up of the application as shown:
-*
-*	grails -Dtdstm.config.location=/etc/tdstm-config.groovy run-app
-*	java -Dtdstm.config.location=/etc/tdstm-config.groovy ...
-*
-**/
-import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP
-import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
-import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
-import ch.qos.logback.core.rolling.FixedWindowRollingPolicy
+ * tdstm-config.groovy.default
+ *
+ * This is an optional configuration file that is used to override settings in the grails-app/conf/*.groovy files. To use this,
+ * copy this file to a configuration directory  renaming it appropriately (e.g. /etc/tdstm-config.groovy) and then provide a
+ * JVM -D argument in the start up of the application as shown:
+ *
+ *	grails -Dtdstm.config.location=/etc/tdstm-config.groovy run-app
+ *	java -Dtdstm.config.location=/etc/tdstm-config.groovy ...
+ *
+ */
+
+// Grails makes several variables available when processing BuildConfig.groovy, Config.groovy and any external
+// files and of those, appName is used here. The variables are set in the main config's Binding, but when parsing
+// external files the binding used for that file is the entire config to make previously set values available.
+// But because of visibility differences between binding variables and config properties, the Config.groovy binding
+// vars are not visible here, only config values. Config.groovy has been modified to make copies its binding vars
+// into the config to make them available here, but since those are locally only binding vars, the log4j closure(s)
+// cannot access the values. So an additional step is needed, and a local variable is set from the config and then
+// any closure defined here has access to that. If more variables are needed in the same way, the only change needed
+// is to define another local variabla as is done below for appName no changes are required in Config.groovy.
+
+String appName = this.appName ?: null
 
 // Set the DEFAULT URL to use for the site
 grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 
 // Restart application command
 tdstm.admin.serviceRestartCommand = "service tomcat_tranman01 restart"
-
-// Set log4j appender file name
-def appenderFileName = appName ?: "tdstm"	// If not defined (for local config)
 
 tdstm {
 
@@ -40,7 +45,7 @@ tdstm {
 		// Label to for the authority input prompt
 		authorityLabel = "Domain"
 
-		// Control how login form prompts for an authority, options: 
+		// Control how login form prompts for an authority, options:
 		//    select: select list
 		//    prompt: input field
 		//    hidden: references a defined domain
@@ -69,7 +74,7 @@ tdstm {
 					type = 'ActiveDirectory'
 
 					// One or more URLs to perform searchs against, if first fails it will try the second
-					url = ['ldap://127.0.0.1:389'] 
+					url = ['ldap://127.0.0.1:389']
 
 					// The credentials for the service account which can be in the format:
 					// 		DOMAIN\\username
@@ -113,9 +118,9 @@ tdstm {
 						client_mgr: 'CN=ClientMgr,OU=TransitionMananager,OU=Applications'
 					]
 
-					// The default group to assign users when updateRoles=true. When set to blank, it requires that the individuals be assigned to 
+					// The default group to assign users when updateRoles=true. When set to blank, it requires that the individuals be assigned to
 					// security group(s). Use will receive this role along with any that are mapped.
-					defaultRole = ''	
+					defaultRole = ''
 
 					// When true and the user does not previously exists in TM, it will create the user's account if they have a role or there is a default
 					autoProvision = true
@@ -166,7 +171,7 @@ tdstm {
 			// As a fail-safe, locked out accounts could be cleared when the application is restarted in the event of a DOS style attack (default true)
 			clearLockoutsOnRestart = true
 
-			// How long to retain password history to prevent re-use, set to zero (0) disables password history (default 2 years). This is mutually exclusive with passwordHistoryRetentionCount. 
+			// How long to retain password history to prevent re-use, set to zero (0) disables password history (default 2 years). This is mutually exclusive with passwordHistoryRetentionCount.
 			passwordHistoryRetentionDays = 365 * 2
 
 			// How many previous passwords to retain to prevent the user from reusing. This is mutually exclusive with passwordHistoryRetentionDays =
@@ -177,17 +182,17 @@ tdstm {
 
 			// forgot my password reset time limit (minutes)
 			forgotMyPasswordResetTimeLimit = 60
-			
+
 			// Account Activation Email time limit (minutes)
 			accountActivationTimeLimit = 60*24*3
-			
+
 			// forgot my password retain history days
 			forgotMyPasswordRetainHistoryDays = 30
 
 			// prevent the user from changing their password (hours)
 			minPeriodToChangePswd = 24
 
-			// Disable the forcing of users from changing their passwords if the encryption method was used was the obsolete one.
+			// Disable the forcing of users from changing their passwords if the hash method used was the obsolete one.
 			forceUseNewEncryption = true
 		}
 	}
@@ -199,47 +204,49 @@ environments {
 		dataSource {
 			// TDS Transitional Manager
 			//	url = "jdbc:mysql://dev02.tdsops.net/tdstm"
-			driverClassName = "com.mysql.jdbc.Driver"
 			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
 			username = "tdstm"
 			password = "tdstm"
-			dbCreate = ""
 			//dbCreate = "create"
 			//logSql = true
 		}
 	}
+
 	production {
 		dataSource {
 			// TDS Transitional Manager
 			//	url = "jdbc:mysql://dev02.tdsops.net/tdstm"
-			driverClassName = "com.mysql.jdbc.Driver"
 			url = "jdbc:mysql://dev02.tdsops.net/tdstm?autoReconnect=true"
 			username = ""
 			password = ""
-			dbCreate = ""
 
-			pooled=true
 			properties {
-				maxActive=100
-				maxIdle=5
+				defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
 				initialSize=5
+				jdbcInterceptors = 'ConnectionState'
+				jmxEnabled = true
+				maxActive=100
+				maxAge = 10 * 60000
+				maxIdle=5
+				maxWait = 10000
 				minEvictableIdleTimeMillis=(1000*60*30)
-				timeBetweenEvictionRunsMillis=(1000*60*30)
-				// numTestsPerEvictionRun=3
-				testOnBorrow=true
-				testWhileIdle=true
-				testOnReturn=true
+				minIdle = 5
 				removeAbandoned=true
-				// Should be set to the longest running query (default 60 seconds)
-				removeAbandonedTimeout=(60*5)
+				removeAbandonedTimeout=(60*5) // Should be set to the longest running query (default 60 seconds)
+				testOnBorrow=true
+				testOnReturn=true
+				testWhileIdle=true
+				timeBetweenEvictionRunsMillis=(1000*60*30)
+				validationInterval = 15000
 				validationQuery='/* ping */'
+				validationQueryTimeout = 3
 			}
 		}
+	}
 
 	// DB Configuation to be used with the LiquiBase tool but not fully implemented yet
 	dbdiff {
 		dataSource {
-			driverClassName = "com.mysql.jdbc.Driver"
 			url = "jdbc:mysql://localhost/dbdiff?autoReconnect=true"
 			username = "tdstm"
 			password = "tdstm"
@@ -250,14 +257,14 @@ environments {
 
 // Graph Properties
 graph {
-	 graphviz {
-			dotCmd = '/usr/local/bin/dot'
-			graphType = 'svg'
-	 }
-	 deleteDotFile = false
-	 tmpDir = '/data/tmp/'
-	 targetDir = '/private/var/www/tdstm/images/tmp/'
-	 targetURI = '/../images/tmp/'
+	graphviz {
+		dotCmd = '/usr/local/bin/dot'
+		graphType = 'svg'
+	}
+	deleteDotFile = false
+	tmpDir = '/data/tmp/'
+	targetDir = '/private/var/www/tdstm/images/tmp/'
+	targetURI = '/../images/tmp/'
 }
 
 /**
@@ -265,7 +272,7 @@ graph {
  */
 grails {
 
-	/* 
+	/*
 	 * SMTP connection using typical no authenticated/secure communications
 	 */
 	mail {
@@ -297,7 +304,7 @@ grails {
 			'mail.smtp.auth': true,
 			'mail.smtp.socketFactory.port': 465,
 			'mail.smtp.socketFactory.class':'javax.net.ssl.SSLSocketFactory',
-			'mail.smtp.starttls.enable': false, 
+			'mail.smtp.starttls.enable': false,
 			'mail.smtp.ssl.enable': true,
 			'mail.smtp.socketFactory.fallback': false
 		]
@@ -335,35 +342,43 @@ grails.mail.overrideAddress="*** EMAIL ADDRESS IF OVERRIDING ***"
 /**
  * Logging configuration
  */
+// TODO log4j
 logback = {
+
+	if (!appName) {
+		// the config is parsed multiple times, some properly initialized and
+		// some not, so exit early if not configured and wait until next time
+		return
+	}
+
 	appenders {
 		//def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
 		//def auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
 		def commonPattern = "%d{[dd-MMM-yyyy HH:mm:ss.SSS]} %-5level %logger{5} - %msg%n"
 		def auditPattern = "%d{[dd-MMM-yyyy hh:mm:ss.SSS]} %msg%n"
 		def logDirectory = 'target'
-		if (System.properties.getProperty('catalina.base')) {
-			logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
+		if (System.getProperty('catalina.base')) {
+			logDirectory = System.getProperty('catalina.base') + '/logs'
 		}
 
 		// Use this if we want to modify the default appender called 'stdout'.
-		console name:'stdout', 
+		console name: 'stdout',
 			// threshold: org.apache.log4j.Level.FATAL,
-			//encoder:pattern(pattern: '[%t] %-5p %c{2} %x - %m%n')
-			encoder:pattern(pattern: '%-5level %logger{5} - %msg%n')
+			//encoder: pattern(pattern: '[%t] %-5p %c{2} %x - %m%n')
+			encoder: pattern(pattern: '%-5level %logger{5} - %msg%n')
 
 		// Application log file
-		rollingFile name:'applicationLog',
-			file: "${logDirectory}/${appenderFileName}.log",
+		rollingFile name: 'applicationLog',
+			file: logDirectory + '/' + appName + '.log',
 			triggeringPolicy: new SizeBasedTriggeringPolicy(maxFileSize: "100MB"),
-			rollingPolicy: new FixedWindowRollingPolicy(fileNamePattern: "${logDirectory}/${appenderFileName}.%i.log.gz", maxIndex: 7),
-			encoder:pattern(pattern: commonPattern)
+			rollingPolicy: new FixedWindowRollingPolicy(fileNamePattern: logDirectory + '/' + appName + '.%i.log.gz', maxIndex: 7),
+			encoder: pattern(pattern: commonPattern)
 
 		// Audit log file
-		rollingFile name:'auditLog',
-			file:"$logDirectory/${appenderFileName}-audit.log",
+		rollingFile name: 'auditLog',
+			file: logDirectory + '/' + appName + '-audit.log',
 			rollingPolicy: new TimeBasedRollingPolicy(
-				fileNamePattern: "$logDirectory/${appenderFileName}-audit-%d{yyyy-MM-dd}.%i.log",
+				fileNamePattern: logDirectory + '/' + appName + '-audit-%d{yyyy-MM-dd}.%i.log',
 				maxHistory: 30,
 				timeBasedFileNamingAndTriggeringPolicy: new SizeAndTimeBasedFNATP(maxFileSize: "100MB")
 			),
@@ -371,33 +386,26 @@ logback = {
 
 		// Stacktrace log file
 		// Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
-		// 'null' name:'stacktrace'
-		rollingFile name:'stacktraceLog',
-			file:"$logDirectory/${appenderFileName}-stacktrace.log",
+		// 'null' name: 'stacktrace'
+		rollingFile name: 'stacktraceLog',
+			file: logDirectory + '/' + appName + '-stacktrace.log',
 			triggeringPolicy: new SizeBasedTriggeringPolicy(maxFileSize: "100MB"),
-			rollingPolicy: new FixedWindowRollingPolicy(fileNamePattern: "$logDirectory/${appenderFileName}-stacktrace.%i.log.gz", maxIndex: 7),
-			encoder:pattern(pattern: commonPattern)
+			rollingPolicy: new FixedWindowRollingPolicy(fileNamePattern: logDirectory + '/' + appName + '-stacktrace.%i.log.gz', maxIndex: 7),
+			encoder: pattern(pattern: commonPattern)
 	}
 
 	def debugPackages = ['grails.app']
 	def auditClass = 'grails.app.services.AuditService'
 
-	info 'org.codehaus.groovy.grails.web.servlet',        // controllers
-		'org.codehaus.groovy.grails.web.pages',          // GSP
-		'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-		'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-		'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-		'org.codehaus.groovy.grails.commons',            // core / classloading
-		'org.codehaus.groovy.grails.plugins',            // plugins
-		'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-		'org.grails',
-		'grails.app.services.org.grails.plugin.resource',
-		'grails.app.taglib.org.grails.plugin.resource',      
-		'grails.app.resourceMappers.org.grails.plugin.resource',
-		'grails.app.conf',
-		'org.springframework',
-		'org.hibernate',
-		'net.sf.ehcache.hibernate'
+	info 'org.codehaus.groovy.grails',
+	     'org.grails',
+	     'grails.app.services.org.grails.plugin.resource',
+	     'grails.app.taglib.org.grails.plugin.resource',
+	     'grails.app.resourceMappers.org.grails.plugin.resource',
+	     'grails.app.conf',
+	     'org.springframework',
+	     'org.hibernate',
+	     'net.sf.ehcache.hibernate'
 
 	root {
 		info 'stdout', 'applicationLog'
@@ -405,9 +413,8 @@ logback = {
 	}
 
 	// Send debug logging to consle
-	debug 	applicationLog: 'grails.app', additivity: true
+	debug applicationLog: 'grails.app', additivity: true
 
 	// Setup Audit Logging messages to go to their own log file in addition to the application log
-	info 	auditLog: 'grails.app.services.AuditService', additivity: true
-
+	info  auditLog: 'grails.app.services.AuditService', additivity: true
 }

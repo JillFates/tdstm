@@ -4,7 +4,6 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 import groovy.sql.Sql
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.shiro.crypto.hash.Sha256Hash
 import grails.util.Environment
@@ -19,29 +18,29 @@ class BootStrap {
 
 		// Initialize various custom metaclass methods used by the application
 		com.tdsops.metaclass.CustomMethods.initialize
-	
+
 		// Load all of the Workflow definitions into the StateEngine service
 		def workflowList = Workflow.list()
 		workflowList.each { wf ->
 			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
 		}
-		
-		if ( grails.util.GrailsUtil.environment.equals("production") ) return
+
+		if (Environment.current == Environment.PRODUCTION) return
 
 		// createInitialData()
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
 	}
-		
+
 	def destroy = {
 	}
-		
+
 	/**
 	 * Create Initial Datasets
 	 */
 	private void createInitialData() {
-		
+
 		// -------------------------------
 		// Role Types
 		// The description now classifies groups of roles.  Eventually this will be implemented
@@ -320,17 +319,17 @@ class BootStrap {
 		println "PROJECTS "
 		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
 					description:'100 servers', partyType:groupPartyType,
-					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
+					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save()
 		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
 					description:'500 servers', partyType:groupPartyType,
-					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
+					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save()
 
 
 		// -------------------------------
 		// Create moveEvent Details
 		// -------------------------------
 		println "MOVE EVENT"
-		def moveEvent =  new MoveEvent(project:cedarsProject, name:"Move Event 1").save( insert : true );
+		def moveEvent =  new MoveEvent(project:cedarsProject, name:"Move Event 1").save( insert : true )
 		// -------------------------------
 		// Create MoveBundle Details
 		// -------------------------------
@@ -384,7 +383,7 @@ class BootStrap {
 		// -------------------------------
 		println "PARTY RELATIONSHIPS "
 		// Save all the rows in list
-		def i = 0;
+		def i = 0
 		def pr = [
 			// Partners, Clients and Vendors
 			[ partnerType, tds, companyRole, emc, partnerRole ],
@@ -645,7 +644,7 @@ class BootStrap {
 						).save()
 		}
 		/*
-		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database 
+		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database
 		 * using assetEntityAttributeLoaderService
 		 */
 		InputStream stream
@@ -674,7 +673,7 @@ class BootStrap {
 			log.warn "*** WARNING ***\n BLACK LISTED ARGUMENTS FOUND IN THE CONFIGURATION!\n This can cause unexpected behaviour on the application, please check that you really want to do this: \n\t $blacklist\n***********************************************************"
 		}
 	}
-	
+
 
 	/** SOME LOAD TEST ***********/
 	/**
@@ -683,7 +682,7 @@ class BootStrap {
 	 */
 	private testMemoryAllocation(){
 		//Use only in development mode
-		if (Environment.current != Environment.DEVELOPMENT) return;
+		if (Environment.current != Environment.DEVELOPMENT) return
 
 	  log.info "THREAD INICIALIZANDO!!!! LETS KILL THIS GUY"
 		Thread.start {
@@ -704,10 +703,10 @@ class BootStrap {
 
 		  for (int i = 0; i < 100000; i++) {
 		    //new Person(firstName:'Octavio', lastName:'Luna',title:'Dev')
-        def daMap = Eval.me(strMap)        
+        def daMap = Eval.me(strMap)
 		    Thread.sleep(50)
 		  }
-		  
+
 		  log.info "THREAD TERMINADO!"
 		}
 	}

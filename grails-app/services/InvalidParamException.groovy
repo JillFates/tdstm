@@ -14,5 +14,5 @@ class InvalidParamException extends RuntimeException {
 	public InvalidParamException(groovy.lang.GString message) {
 		super(message.toString())
 	}
-	
+
 }

@@ -7,7 +7,7 @@ import grails.converters.JSON
 import org.hibernate.criterion.Order
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class MoveBundleController {
 
@@ -23,10 +23,10 @@ class MoveBundleController {
 	def stateEngineService
 	def taskService
 	def userPreferenceService
-    
-	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database','Appliance','Storage')"  
+
+	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database','Appliance','Storage')"
 	protected static Map dependecyBundlingAssetTypeMap = ['SERVER':true,'VM':true,'BLADE':true,'APPLICATION':true,'FILES':true,'DATABASE':true,'APPLIANCE':true,'STORAGE':true]
-	
+
 	def index() { redirect(action:"list",params:params) }
 
 	// the delete, save and update actions only accept POST requests
@@ -34,7 +34,7 @@ class MoveBundleController {
 
 	def list() {
 	}
-	
+
 	/**
 	 * Used to generate the List for Bundles using jqgrid.
 	 * @return : list of bundles as JSON
@@ -46,10 +46,10 @@ class MoveBundleController {
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
-		
+
 		def startDates = params.startTime ? MoveBundle.findAll("from MoveBundle where project =:project and startTime like '%${params.startTime}%'",[project:project])?.startTime : []
 		def completionDates = params.completionTime ? MoveBundle.findAll("from MoveBundle where project =:project and completionTime like '%${params.completionTime}%'",[project:project])?.completionTime : []
-		
+
 		def bundleList = MoveBundle.createCriteria().list(max: maxRows, offset: rowOffset) {
 				eq('project',project)
 				if (params.name)
@@ -58,25 +58,25 @@ class MoveBundleController {
 					ilike('description', "%${params.description}%")
 				if (params.useForPlanning)
 					eq('useForPlanning', (params.useForPlanning.equalsIgnoreCase('Y') ? true : false))
-				if (startDates) 
+				if (startDates)
 					'in'('startTime' , startDates)
 				if (completionDates)
 					'in'('completionTime' , completionDates)
-				
-				if(sortIndex!='assetQty')	
+
+				if(sortIndex!='assetQty')
 					order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 		}
 		def totalRows = bundleList.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		
+
 		//Sorting by assetQuantity per page
 		if(sortIndex=='assetQty')
 			bundleList.sort{(sortOrder=='desc' ? -it.assetQty : it.assetQty)}
-		
+
 		def results = bundleList?.collect {
-			[ cell: [it.name, it.description, (it.useForPlanning ? 'Y' : 'N'), it.assetQty, 
-				(it.startTime ? TimeUtil.formatDate(getSession(), it.startTime):''),
-				(it.completionTime ? TimeUtil.formatDate(getSession(), it.completionTime):'')],
+			[ cell: [it.name, it.description, (it.useForPlanning ? 'Y' : 'N'), it.assetQty,
+				(it.startTime ? TimeUtil.formatDate(session, it.startTime):''),
+				(it.completionTime ? TimeUtil.formatDate(session, it.completionTime):'')],
 				 id: it.id]
 			}
 
@@ -114,10 +114,10 @@ class MoveBundleController {
 
 	def show() {
 		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
-		if (! project) 
+		if (! project)
 			return
 
-		def moveBundleId = params.id ?: session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
+		def moveBundleId = params.id ?: session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		def moveBundleInstance = controllerService.getBundleForPage(this, project, userLogin, moveBundleId)
 		if (! moveBundleInstance) {
 			redirect(action:"list")
@@ -136,16 +136,16 @@ class MoveBundleController {
 			def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
 			dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
 		}
-			
+
 		def isDefaultBundle = (moveBundleInstance.id == project.defaultBundle.id)
 
-		return [ 
-			moveBundleInstance: moveBundleInstance, 
-			projectId: project.id, 
+		return [
+			moveBundleInstance: moveBundleInstance,
+			projectId: project.id,
 			projectManager: projectManager,
-			moveManager: moveManager, 
-			dashboardSteps: dashboardSteps, 
-			isDefaultBundle: isDefaultBundle 
+			moveManager: moveManager,
+			dashboardSteps: dashboardSteps,
+			isDefaultBundle: isDefaultBundle
 		]
 	}
 
@@ -155,13 +155,13 @@ class MoveBundleController {
 		def msg = moveBundleService.deleteBundle(moveBundleInstance, project)
 		flash.message = msg
 		redirect(action:"list")
-	
+
 	}
 
 
 	def deleteBundleAndAssets() {
 		def moveBundleInstance = MoveBundle.get( params.id )
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(moveBundleInstance) {
 			AssetEntity.withTransaction { status ->
 				try{
@@ -244,16 +244,16 @@ class MoveBundleController {
 			moveBundleInstance.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
 			def startTime = params.startTime
 			def completionTime = params.completionTime
-			
-			moveBundleInstance.startTime = startTime? TimeUtil.parseDateTime(getSession(), startTime) : null
-			
-			moveBundleInstance.completionTime =  completionTime ? TimeUtil.parseDateTime(getSession(), completionTime) : null
+
+			moveBundleInstance.startTime = startTime? TimeUtil.parseDateTime(session, startTime) : null
+
+			moveBundleInstance.completionTime =  completionTime ? TimeUtil.parseDateTime(session, completionTime) : null
 
 			// TODO : SECURITY : Should be confirming that the rooms belong to the moveBundle.project instead of blindly assigning plus should be
-			// validating that the rooms even exist.			
+			// validating that the rooms even exist.
 			moveBundleInstance.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null
 			moveBundleInstance.targetRoom = params.targetRoom ? Room.read( params.targetRoom ) : null
-			
+
 			if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
 				stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
 				def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.workflowCode )
@@ -269,7 +269,7 @@ class MoveBundleController {
 					}
 				}
 
-				//def projectManegerInstance = Party.findById( projectManagerId )
+				//def projectManegerInstance = Party.get( projectManagerId )
 				def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
 				def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
 				flash.message = "MoveBundle ${moveBundleInstance} updated"
@@ -279,7 +279,7 @@ class MoveBundleController {
 				//	get the all Dashboard Steps that are associated to moveBundle.project
 				def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 				def remainingSteps = allDashboardSteps.remainingSteps
-				
+
 				moveBundleInstance.discard()
 				def project = securityService.getUserCurrentProject()
 				def managers = partyRelationshipService.getProjectStaff( project.id )
@@ -313,14 +313,14 @@ class MoveBundleController {
 		def startTime = params.startTime
 		def completionTime = params.completionTime
 		if(startTime){
-			params.startTime =  TimeUtil.parseDateTime(getSession(), startTime)
+			params.startTime =  TimeUtil.parseDateTime(session, startTime)
 		}
 		if(completionTime){
-			params.completionTime =  TimeUtil.parseDateTime(getSession(), completionTime)
+			params.completionTime =  TimeUtil.parseDateTime(session, completionTime)
 		}
 
-		params.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null 
-		
+		params.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null
+
 		params.targetRoom = params.targetRoom ? Room.read( params.targetRoom ) : null
 
 		def moveBundleInstance = new MoveBundle(params)
@@ -335,11 +335,11 @@ class MoveBundleController {
 		}
 		if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
 			if( projectManager != null && projectManager != ""){
-				def projectManegerInstance = Party.findById( projectManager )
+				def projectManegerInstance = Party.get( projectManager )
 				def pmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", projectManegerInstance, "PROJ_MGR")
 			}
 			if( moveManager != null && moveManager != "" ){
-				def moveManegerInstance = Party.findById( moveManager )
+				def moveManegerInstance = Party.get( moveManager )
 				def mmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", moveManegerInstance, "MOVE_MGR")
 			}
 
@@ -376,14 +376,14 @@ class MoveBundleController {
 	}
 	/*-----------------------------------------------------
 	 * remote function to verify stepSnapshot records for a list of steps.
-	 * if there are more than one snapshots associated with any of the step in list 
+	 * if there are more than one snapshots associated with any of the step in list
 	 * then return failure otherwise success.
 	 * @param  : moveBundleId, list of unchecked steps
 	 * @return : success / failure
 	 *---------------------------------------------------*/
 	def checkStepSnapshotRecord() {
 		def steps = params.steps
-		def moveBundle = MoveBundle.findById( params.moveBundleId )
+		def moveBundle = MoveBundle.get( params.moveBundleId )
 		def transitionIds
 		def message = "success"
 		if(steps){
@@ -399,11 +399,11 @@ class MoveBundleController {
 				}
 			}
 		}
-		render message;
+		render message
 	}
 
 	def projectMoveBundles() {
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def moveBundlesList
 		if(projectId){
 			moveBundlesList = MoveBundle.findAllByProject(Project.get(projectId),[sort:'name',order:'asc'])
@@ -412,20 +412,20 @@ class MoveBundleController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	def planningStats() {
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.get(projectId)
 		def appList = []
 		//def assetList = []
 		def eventStartDate = [:]
-		
+
 		def unassignedPlan = AssetEntityPlanStatus.UNASSIGNED
 		def assignedPlan = AssetEntityPlanStatus.ASSIGNED
 		def confirmedPlan = AssetEntityPlanStatus.CONFIRMED
 		def movedPlan = AssetEntityPlanStatus.MOVED
-		
+
 		def app = AssetType.APPLICATION.toString()
 		def db = AssetType.DATABASE.toString()
 		def files = AssetType.FILES.toString()
@@ -433,7 +433,7 @@ class MoveBundleController {
 		def vm = AssetType.VM.toString()
 		def blade = AssetType.BLADE.toString()
 		def appliance = AssetType.APPLIANCE.toString()
-		
+
 		// Get list of all of the MoveBundles that are used for Planning
 		def moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project, true, [sort:'startTime'])
 
@@ -443,10 +443,10 @@ class MoveBundleController {
 			return
 		}
 
-		// Get the list of Move Events and sort on the start date 
+		// Get the list of Move Events and sort on the start date
 		List moveEventList = moveBundleList*.moveEvent.unique()
 		moveEventList.remove(null)
-		moveEventList = moveEventList.sort { 
+		moveEventList = moveEventList.sort {
 			def start = it.getEventTimes().start
 			(start ? "$start-${it.name}" : it.name)
 		}
@@ -466,14 +466,14 @@ class MoveBundleController {
 		def phyStorageQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
 		def phyStorageCountQuery = "$selectCount $phyStorageQuery"
 		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
-		def deviceCountQuery = "$selectCount $deviceQuery"	
+		def deviceCountQuery = "$selectCount $deviceQuery"
 		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') NOT IN (:type)"
 
 		def databaseCount = Database.executeQuery(dbCountQuery, countArgs)[0]
 		def fileCount = Files.executeQuery(filesCountQuery, countArgs)[0]
 
  		// Get the list of apps and servers assigned to planning bundles
-		def applicationsOfPlanningBundle = Application.findAll(appQuery, countArgs) 
+		def applicationsOfPlanningBundle = Application.findAll(appQuery, countArgs)
 		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInList(applicationsOfPlanningBundle) : 0
 		def serversOfPlanningBundle = AssetEntity.findAll(deviceQuery, countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()])
 		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInList(serversOfPlanningBundle) : 0
@@ -488,48 +488,48 @@ class MoveBundleController {
 		def filesList = []
 		def otherTypeList = []
 		def openTasks = []
-		
+
 		moveEventList.each{ moveEvent->
-			// fetching bundles for current moveEvent which was set 'true' for useForPlanning 
+			// fetching bundles for current moveEvent which was set 'true' for useForPlanning
 			def moveBundles = moveEvent.moveBundles?.findAll {it.useForPlanning}
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
-			
+
 			def eventDates = moveEvent.getEventTimes()
-			eventStartDate << [(moveEvent.id):(eventDates.start ? TimeUtil.formatDateTime(getSession(), eventDates.start, TimeUtil.FORMAT_DATE_TIME_7) : 'TBD')]
-			
+			eventStartDate << [(moveEvent.id):(eventDates.start ? TimeUtil.formatDateTime(session, eventDates.start, TimeUtil.FORMAT_DATE_TIME_7) : 'TBD')]
+
 			// Fetching application count that are assigned to current move event
 			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs)[0] : 0
 			appList << ['count':assignedApplicationCount , 'moveEvent':moveEvent.id]
-			
+
 			// fetching physicalAsset (e.g. 'Server',blade ) and virtualAsset (e.g. 'VM') count that are assigned to current move-event .
 			def physicalAssetCount = moveBundles ? AssetEntity.executeQuery(deviceCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes() ])[0] : 0
 			def virtualAssetCount = moveBundles ? AssetEntity.executeQuery(deviceCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes() ])[0] : 0
 			def serverCnt = moveBundles ? AssetEntity.executeQuery(deviceCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0] : 0
-			
+
 			allServerList << [moveEvent:moveEvent.id , count:serverCnt]
 			phyServerList << [moveEvent:moveEvent.id , count:physicalAssetCount]
 			virtServerList << [moveEvent:moveEvent.id , count:virtualAssetCount]
 
 			def dbCount = moveBundles ? Database.executeQuery(dbCountQuery, eventWiseArgs)[0] : 0
 			dbList << [moveEvent:moveEvent.id , count:dbCount]
-						
+
 			def phyStoragesCount = moveBundles ? AssetEntity.executeQuery(phyStorageCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ])[0] : 0
 			phyStorageList << ['moveEvent':moveEvent.id , 'count':phyStoragesCount]
-			
+
 			def filesCount = moveBundles ? Files.executeQuery(filesCountQuery, eventWiseArgs)[0] : 0
 			filesList << ['moveEvent':moveEvent.id , 'count':filesCount]
-			
-			def otherCount = moveBundles ? AssetEntity.executeQuery(otherCountQuery, 
+
+			def otherCount = moveBundles ? AssetEntity.executeQuery(otherCountQuery,
 				eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes() ])[0] : 0
 			otherTypeList << [ moveEvent:moveEvent.id , count:otherCount ]
-			
+
 			def openIssues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status IN (:status) \
-				and a.moveEvent = :event AND a.isPublished=true", [project:project, type:AssetCommentType.TASK, 
+				and a.moveEvent = :event AND a.isPublished=true", [project:project, type:AssetCommentType.TASK,
 				status: [AssetCommentStatus.READY,AssetCommentStatus.STARTED,AssetCommentStatus.PENDING], event:moveEvent] )
-			
-			openTasks << [moveEvent:moveEvent.id , count:openIssues.size()]			
+
+			openTasks << [moveEvent:moveEvent.id , count:openIssues.size()]
 		}
-		
+
 		// ----------------------------------------------------------------------------
 		// Get the totals count for assigned and unassigned assets
 		// ----------------------------------------------------------------------------
@@ -557,19 +557,19 @@ class MoveBundleController {
 		int confirmedAppCount = 0
 		int assignedAppCount = 0
 
-		def basicCountsQuery = """SELECT 
-				assetClass, 
+		def basicCountsQuery = """SELECT
+				assetClass,
 				COUNT(ae) AS all1,
 				SUM( CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END )  AS allUnassigned2,
 				SUM( CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END )     AS allMoveded3,
 				SUM( CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END ) AS allConfirmed4
 			FROM AssetEntity ae
-			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles) 
+			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)
 			GROUP BY ae.assetClass"""
 
-		def basicCountsParams = [ 
-			project: project, 
-			moveBundles: moveBundleList, 
+		def basicCountsParams = [
+			project: project,
+			moveBundles: moveBundleList,
 			unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
 			movedStatus: AssetEntityPlanStatus.MOVED,
 			confirmedStatus: AssetEntityPlanStatus.CONFIRMED ]
@@ -583,37 +583,37 @@ class MoveBundleController {
 					assignedAppCount = applicationCount - unassignedAppCount
 					movedAppCount = ua[3]
 					confirmedAppCount = movedAppCount + ua[4]
-					break;
+					break
 				case AssetClass.DATABASE:
-					unassignedDbCount = ua[2]; break;
+					unassignedDbCount = ua[2]; break
 				case AssetClass.DEVICE:
-					unassignedDeviceCount = ua[2]; break;
+					unassignedDeviceCount = ua[2]; break
 				case AssetClass.STORAGE:
-					unassignedFilesCount = ua[2]; break;
+					unassignedFilesCount = ua[2]; break
 			}
 		}
 		// Calculate the Assigned Application Count
 		def totalAssignedApp = applicationCount - unassignedAppCount
 		def unassignedAssetCount = unassignedDbCount + unassignedFilesCount + unassignedAppCount + unassignedDeviceCount
-		
+
 		// Get the various DEVICE types broken out
 		def deviceMetricsQuery = """SELECT
-			COUNT(ae) AS allDevices, 
-			COALESCE(SUM( CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS allDevicesUnassigned, 			
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:phyTypes) THEN 1 ELSE 0 END ), 0) AS physicalAll, 
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:phyTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS physicalUnassigned, 
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:virtTypes) THEN 1 ELSE 0 END ), 0) AS virtualAll, 
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:virtTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS virtualUnassigned, 
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:storageTypes) THEN 1 ELSE 0 END ), 0) AS storageAll, 
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:storageTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS storageUnassigned, 
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:networkTypes) THEN 1 ELSE 0 END ), 0) AS networkAll, 
-			COALESCE(SUM( CASE WHEN ae.assetType IN (:networkTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS networkUnassigned 
-			FROM AssetEntity ae 
+			COUNT(ae) AS allDevices,
+			COALESCE(SUM( CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS allDevicesUnassigned,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:phyTypes) THEN 1 ELSE 0 END ), 0) AS physicalAll,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:phyTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS physicalUnassigned,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:virtTypes) THEN 1 ELSE 0 END ), 0) AS virtualAll,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:virtTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS virtualUnassigned,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:storageTypes) THEN 1 ELSE 0 END ), 0) AS storageAll,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:storageTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS storageUnassigned,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:networkTypes) THEN 1 ELSE 0 END ), 0) AS networkAll,
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:networkTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS networkUnassigned
+			FROM AssetEntity ae
 			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles) AND ae.assetClass=:assetClass"""
 
-		def deviceMetricsParams = [ 
-			project:project, 
-			moveBundles:moveBundleList, 
+		def deviceMetricsParams = [
+			project:project,
+			moveBundles:moveBundleList,
 			unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
 			assetClass: AssetClass.DEVICE,
 			phyTypes: AssetType.getPhysicalServerTypes(),
@@ -651,61 +651,61 @@ class MoveBundleController {
 		def confirmedAppPerc = countAppPercentage(applicationCount, confirmedAppCount)
 		def movedAppPerc = countAppPercentage(applicationCount, movedAppCount)
 		def percAppDoneCount = countAppPercentage(applicationCount, movedAppCount)
-				
-		int percentagePhysicalServerCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'", 
+
+		int percentagePhysicalServerCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'",
 			countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes() ] )[0] : 0
-		
+
 		// Quick closure for calculating the percentage below
 		def percOfCount = { count, total ->
 			( total > 0 ? Math.round(count/total*100)  : 0 )
 		}
-		
+
 		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
-		int percVirtualServerCount = moveBundleList ? 
-			AssetEntity.executeQuery(deviceCountQuery + planStatusMovedQuery, countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0] 
+		int percVirtualServerCount = moveBundleList ?
+			AssetEntity.executeQuery(deviceCountQuery + planStatusMovedQuery, countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0]
 			: 0
-		
+
 		percentagePhysicalServerCount = percOfCount(percentagePhysicalServerCount, totalPhysicalServerCount)
 		percVirtualServerCount = percOfCount(percVirtualServerCount, totalVirtualServerCount)
-		
+
 		int percentageDBCount = moveBundleList ? Database.executeQuery(dbCountQuery + planStatusMovedQuery, countArgs)[0] : 0
-		
+
 		percentageDBCount = percOfCount(percentageDBCount, databaseCount)
-		
+
 		int percentagePhyStorageCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'",
 			countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ] )[0] : 0
-		
+
 		percentagePhyStorageCount = percOfCount(percentagePhyStorageCount, phyStorageCount)
-		
+
 		int percentageFilesCount = moveBundleList ? Files.executeQuery(filesCountQuery + planStatusMovedQuery, countArgs)[0] : 0
 		percentageFilesCount = percOfCount(percentageFilesCount, fileCount)
-		
-		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery + planStatusMovedQuery, 
+
+		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery + planStatusMovedQuery,
 			countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()])[0] : 0
 		percentageOtherCount = percOfCount(percentageOtherCount, otherAssetCount)
 
-		def likelyLatencyCount=0;
-		def unlikelyLatencyCount=0;
-		def unknownLatencyCount=0;
-		
-		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? 
+		def likelyLatencyCount=0
+		def unlikelyLatencyCount=0
+		def unknownLatencyCount=0
+
+		def pendingAppDependenciesCount = applicationsOfPlanningBundle ?
 			AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
-		
-		def pendingServerDependenciesCount = serversOfPlanningBundle ? 
+
+		def pendingServerDependenciesCount = serversOfPlanningBundle ?
 		AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
 
 		def assetDependencyList = jdbcTemplate.queryForList("select dependency_bundle as dependencyBundle from  asset_dependency_bundle \
 			where project_id = $projectId  group by dependency_bundle order by dependency_bundle  limit 48")
-		
+
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
-		time = date ? TimeUtil.formatDateTime(getSession(), date, TimeUtil.FORMAT_DATE_TIME_8) : ''
-		
+		time = date ? TimeUtil.formatDateTime(session, date, TimeUtil.FORMAT_DATE_TIME_8) : ''
+
 		def today = new Date()
 		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
 		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED, type:AssetCommentType.TASK.toString()]
-		
+
 		def openIssue =  AssetComment.findAll(issueQuery,issueArgs << [category : AssetComment.discoveryCategories]).size()
 		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : AssetComment.discoveryCategories, dueDate:today]).size()
 		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
@@ -729,10 +729,10 @@ class MoveBundleController {
 
 			dependencyConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle, 'appCount':appCount, 'serverCount':serverCount, 'vmCount':vmCount]
 		}
-		
+
 		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
-        def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)	
-		
+        def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)
+
 		// Remove the param 'type' that was used for a while above
 		countArgs.remove('type')
 
@@ -741,13 +741,13 @@ class MoveBundleController {
 		def appValidateCountQuery = appCountQuery + validationQuery
 		def dbValidateCountQuery = dbCountQuery + validationQuery
 		def filesValidateCountQuery = filesCountQuery + validationQuery
-		
+
 		// This section could be consolidated to a simple query instead of a bunch
 		def dependencyScan = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyScan'] )[0]
 		def validated = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'Validated'])[0]
 		def dependencyReview = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyReview'])[0]
 		def bundleReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'BundleReady'])[0]
-		
+
 		countArgs << [validation:'Discovery']
 		def appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
 		def dbToValidate = Database.executeQuery(dbValidateCountQuery, countArgs)[0]
@@ -755,42 +755,42 @@ class MoveBundleController {
 		def phyStorageToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ])[0]
 		def psToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes() ])[0]
 		def vsToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes() ])[0]
-		
+
 		def otherValidateQuery = countQuery + validationQuery + " AND COALESCE(ae.assetType,'') NOT IN (:type) AND ae.assetClass=:assetClass"
 		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes() ])[0]
-		
+
 		def percentageAppToValidate = applicationCount ? percOfCount(appToValidate, applicationCount) : 100
 		def percentageBundleReady = applicationCount ? percOfCount(bundleReady, applicationCount) : 0
-		def percentagePSToValidate= totalPhysicalServerCount ? percOfCount(psToValidate, totalPhysicalServerCount) :100 
+		def percentagePSToValidate= totalPhysicalServerCount ? percOfCount(psToValidate, totalPhysicalServerCount) :100
 		def percentageVMToValidate= totalVirtualServerCount ? percOfCount(vsToValidate, totalVirtualServerCount) : 100
 		def percentageDBToValidate= databaseCount ? percOfCount(dbToValidate, databaseCount) :100
 		def percentageStorToValidate=fileCount ? percOfCount(fileToValidate, fileCount) :100
 		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
-		
-		return [			
-			appList:appList, 
-			applicationCount:applicationCount, 
+
+		return [
+			appList:appList,
+			applicationCount:applicationCount,
 			unassignedAppCount:unassignedAppCount,
 			assignedAppPerc: assignedAppPerc,
 			confirmedAppPerc: confirmedAppPerc,
-			movedAppPerc: movedAppPerc, 
+			movedAppPerc: movedAppPerc,
 			appToValidate:appToValidate,
 			unassignedServerCount: unassignedServerCount,
-			unassignedPhysicalServerCount:unassignedPhysicalServerCount, 
-			percentagePhysicalServerCount:percentagePhysicalServerCount, 
-			psToValidate:psToValidate, 
-			unassignedVirtualServerCount:unassignedVirtualServerCount, 
-			percVirtualServerCount:percVirtualServerCount, 
-			vsToValidate:vsToValidate, 
-			dbList:dbList, dbCount:databaseCount, 
-			unassignedDbCount:unassignedDbCount, 
-			percentageDBCount:percentageDBCount, 
-			dbToValidate:dbToValidate, 
+			unassignedPhysicalServerCount:unassignedPhysicalServerCount,
+			percentagePhysicalServerCount:percentagePhysicalServerCount,
+			psToValidate:psToValidate,
+			unassignedVirtualServerCount:unassignedVirtualServerCount,
+			percVirtualServerCount:percVirtualServerCount,
+			vsToValidate:vsToValidate,
+			dbList:dbList, dbCount:databaseCount,
+			unassignedDbCount:unassignedDbCount,
+			percentageDBCount:percentageDBCount,
+			dbToValidate:dbToValidate,
 			// Files (aka Storage)
-			filesList:filesList, fileCount:fileCount, 
-			unassignedFilesCount:unassignedFilesCount, 
-			percentageFilesCount:percentageFilesCount, 
+			filesList:filesList, fileCount:fileCount,
+			unassignedFilesCount:unassignedFilesCount,
+			percentageFilesCount:percentageFilesCount,
 			fileToValidate:fileToValidate,
 			unAssignedPhyStorageCount:unAssignedPhyStorageCount,
 			phyStorageCount:phyStorageCount,
@@ -798,63 +798,63 @@ class MoveBundleController {
 			phyStorageToValidate:phyStorageToValidate,
 			percentagePhyStorageCount:percentagePhyStorageCount,
 			// Other
-			otherTypeList:otherTypeList, 
-			otherAssetCount:otherAssetCount, 
-			unassignedOtherCount:unassignedOtherCount, 
-			percentageOtherCount:percentageOtherCount, 
-			otherToValidate:otherToValidate, 
-			
-			// assetList:assetList, assetCount:assetCount, 
+			otherTypeList:otherTypeList,
+			otherAssetCount:otherAssetCount,
+			unassignedOtherCount:unassignedOtherCount,
+			percentageOtherCount:percentageOtherCount,
+			otherToValidate:otherToValidate,
+
+			// assetList:assetList, assetCount:assetCount,
 			totalServerCount: totalServerCount,
 			allServerList: allServerList,
-			phyServerCount:totalPhysicalServerCount, 
+			phyServerCount:totalPhysicalServerCount,
 			phyServerList: phyServerList,
-			virtServerCount:totalVirtualServerCount, 
+			virtServerCount:totalVirtualServerCount,
 			virtServerList: virtServerList,
-			
-			unassignedAssetCount:unassignedAssetCount, 
-			
-			likelyLatency:likelyLatency, likelyLatencyCount:likelyLatencyCount, 
-			unknownLatency:unknownLatency, unknownLatencyCount:unknownLatencyCount, 
-			unlikelyLatency:unlikelyLatency, unlikelyLatencyCount:unlikelyLatencyCount, 
-			
-			appDependenciesCount:appDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount, 
-			serverDependenciesCount:serverDependenciesCount, pendingServerDependenciesCount:pendingServerDependenciesCount, 
-			
-			project:project, 
-			moveEventList:moveEventList, 
-			moveBundleList:moveBundleList, 
-			dependencyConsoleList:dependencyConsoleList, 
-			dependencyBundleCount:dependencyBundleCount, 
-			planningDashboard:'planningDashboard', 
-			eventStartDate:eventStartDate, 
-			date:time, 
-			
-			issuesCount:issues.size(), 
-			openIssue:openIssue, dueOpenIssue:dueOpenIssue, 
-			openTasks:openTasks, generalOverDue:generalOverDue, 
-			
+
+			unassignedAssetCount:unassignedAssetCount,
+
+			likelyLatency:likelyLatency, likelyLatencyCount:likelyLatencyCount,
+			unknownLatency:unknownLatency, unknownLatencyCount:unknownLatencyCount,
+			unlikelyLatency:unlikelyLatency, unlikelyLatencyCount:unlikelyLatencyCount,
+
+			appDependenciesCount:appDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
+			serverDependenciesCount:serverDependenciesCount, pendingServerDependenciesCount:pendingServerDependenciesCount,
+
+			project:project,
+			moveEventList:moveEventList,
+			moveBundleList:moveBundleList,
+			dependencyConsoleList:dependencyConsoleList,
+			dependencyBundleCount:dependencyBundleCount,
+			planningDashboard:'planningDashboard',
+			eventStartDate:eventStartDate,
+			date:time,
+
+			issuesCount:issues.size(),
+			openIssue:openIssue, dueOpenIssue:dueOpenIssue,
+			openTasks:openTasks, generalOverDue:generalOverDue,
+
 			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady,
-			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount, 
+			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount,
 			percAppDoneCount:percAppDoneCount, percentageAppToValidate:percentageAppToValidate,
 			percentageBundleReady:percentageBundleReady,
-			
-			percentagePSToValidate:percentagePSToValidate, 
-			percentageVMToValidate:percentageVMToValidate, 
-			percentageDBToValidate:percentageDBToValidate, 
+
+			percentagePSToValidate:percentagePSToValidate,
+			percentageVMToValidate:percentageVMToValidate,
 			percentageDBToValidate:percentageDBToValidate,
-			percentageStorToValidate:percentageStorToValidate, 
+			percentageDBToValidate:percentageDBToValidate,
+			percentageStorToValidate:percentageStorToValidate,
 			percentageOtherToValidate:percentageOtherToValidate,
 			percentageUnassignedAppCount:percentageUnassignedAppCount
 		]
 	}
-	
+
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
 	 */
 	def dependencyConsole() {
 		def project = controllerService.getProjectForPage(this, "DepAnalyzerView")
-		if (!project) 
+		if (!project)
 			return
 
 		Date start = new Date()
@@ -863,17 +863,17 @@ class MoveBundleController {
 			assignedGroup = "1"
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP, assignedGroup)
 		def map = moveBundleService.dependencyConsoleMap(project.id, params.bundle, assignedGroup, null)
-		
+
 		//log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
 		return map
 	}
-	
+
 	/*
 	 * Controller to render the Dependency Bundle Details
 	 */
-	def dependencyBundleDetails() { 
+	def dependencyBundleDetails() {
 		def project = controllerService.getProjectForPage(this, "DepAnalyzerView")
-		if (!project) 
+		if (!project)
 			return
 
 		// Now get the model and display results
@@ -883,23 +883,23 @@ class MoveBundleController {
 
 	def generateDependency() {
 		def project = controllerService.getProjectForPage(this, "DepAnalyzerGenerate")
-		if (!project) 
+		if (!project)
 			return
 
 		def baseName = "generateDependency"
 		def key = baseName + "-" + UUID.randomUUID().toString()
 		progressService.create(key)
-		
+
 		def username = securityService.getUserLogin().username
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+
 		def jobName = "TM-" + baseName + "-" + projectId
 		log.info "Initiate Generate Dependency"
-		
+
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
 		Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
 		trigger.jobDataMap.putAll(params)
-		
+
 		String connectionTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "connection" ) )
 		String statusTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "status" ) )
 		def isChecked = params.saveDefault
@@ -915,14 +915,14 @@ class MoveBundleController {
 		trigger.setJobName('GenerateDependencyGroupsJob')
 		trigger.setJobGroup('tdstm-dependency-groups')
 		try{
-			quartzScheduler.scheduleJob(trigger)	
+			quartzScheduler.scheduleJob(trigger)
 			progressService.update(key, 1, 'In progress')
 		}catch(ex){
 			log.warn "generateDependency failed to create Quartz job : ${ex.getMessage()}"
 			progressService.update(key, 100I, ProgressService.FAILED,
 				'It appears that someone else is currently generating dependency groups for this project. Please try again later.')
 		}
-		
+
 		render(ServiceResults.success(['key' : key]) as JSON)
 	}
 
@@ -931,11 +931,11 @@ class MoveBundleController {
 	 */
 	def saveAssetsToBundle() {
 		def project = controllerService.getProjectForPage(this, "AssetEdit")
-		if (!project) 
+		if (!project)
 			return
 
 		def assetArray = params.assetVal
-		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundle))
+		def moveBundleInstance = MoveBundle.get(params.moveBundle)
 		session.ASSIGN_BUNDLE = params.moveBundle
 		def assetList = assetArray.split(",")
 		assetList.each{assetId->
@@ -944,14 +944,14 @@ class MoveBundleController {
 			assetInstance.planStatus = params.planStatus
 			if(!assetInstance.save(flush:true)){
 				assetInstance.errors.allErrors.each{
-			          log.error it 		
+			          log.error it
 				}
 			}
-			
+
 		}
 		forward(controller:"assetEntity",action:"retrieveLists", params:[entity:params.assetType,dependencyBundle:session.getAttribute('dependencyBundle')])
    }
-	
+
 	/**
 	 * To generate Moveday Tasks for a specified Bundle
 	 * @param - bundleId - Id of the Bundle to generate the tasks for that bundle
@@ -959,7 +959,7 @@ class MoveBundleController {
 	 * TODO -- THIS METHOD CAN BE REMOVED AS IT IS NOT USED ANY MORE
 	 */
 	def createTask() {
-		
+
 		def bundleId = params.bundleId
 		def bundle = MoveBundle.get(bundleId)
         def errMsg = ""
@@ -967,7 +967,7 @@ class MoveBundleController {
 		if (bundle.getAssetQty() == 0 ) {
 			errMsg = "No assets are assigned to current bundle (${bundle.name}). As such no action was taken."
 		} else {
-			
+
             def bundleMoveEvent = bundle.moveEvent
             def userLogin = securityService.getUserLogin()
             def project = securityService.getUserCurrentProject()
@@ -975,16 +975,16 @@ class MoveBundleController {
 
 			// Get last task # used
 			def lastTask = jdbcTemplate.queryForInt("SELECT MAX(task_number) FROM asset_comment WHERE project_id = ${project.id}")
-			
+
 			// Create the Begin Event Task
 			def commentToBegin = new AssetComment(
 				taskNumber:++lastTask,
 				comment:'Begin Event',
-			    moveEvent:bundleMoveEvent,  
+			    moveEvent:bundleMoveEvent,
 				category:AssetCommentCategory.SHUTDOWN,
-				Status: AssetCommentStatus.PENDING, 
-				commentType:AssetCommentType.TASK, 
-				project:project, 
+				Status: AssetCommentStatus.PENDING,
+				commentType:AssetCommentType.TASK,
+				project:project,
 				estStart:bundle.startTime, estFinish:bundle.completionTime, duration:0,
 				createdBy:person, assignedTo:person, role:'PROJ_MGR',
 				autoGenerated:true
@@ -998,11 +998,11 @@ class MoveBundleController {
 					taskNumber:++lastTask,
 					comment:'Event Completed',
 					project:project,
-				    moveEvent:bundleMoveEvent, 
-					commentType:AssetCommentType.TASK, 
+				    moveEvent:bundleMoveEvent,
+					commentType:AssetCommentType.TASK,
 					category:AssetCommentCategory.STARTUP,
 					Status:AssetCommentStatus.PENDING,
-					duration:0, 
+					duration:0,
 					assignedTo:person, role:'PROJ_MGR',
 					createdBy:person,
 					autoGenerated:true
@@ -1017,29 +1017,29 @@ class MoveBundleController {
                     def bundleworkFlow = bundle.workflowCode
                     def workFlow = Workflow.findByProcess(bundleworkFlow)
 					// Find all sets that can be applied to servers
-                    def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow,[sort:'transId'])	
-                    workFlowSteps = workFlowSteps.findAll{ 
+                    def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow,[sort:'transId'])
+                    workFlowSteps = workFlowSteps.findAll{
 	  					! [ WorkflowTransitionId.HOLD, WorkflowTransitionId.READY, WorkflowTransitionId.COMPLETED, WorkflowTransitionId.TERMINATED
 						].contains(it.transId)}
-	
+
 					// Create the end of transit task that will be used for Off-Truck tasks afterward
                     def results = taskService.createTaskBasedOnWorkflow(
 	   					[	taskNumber:++lastTask,
-							workflow:workFlowSteps.find{it.transId == WorkflowTransitionId.TRANSPORT}, 
+							workflow:workFlowSteps.find{it.transId == WorkflowTransitionId.TRANSPORT},
 							bundleMoveEvent:bundleMoveEvent,
                         	project:project, person:person, bundle:bundle
 						] )
                     def transportTask = results.stepTask
 
 					def previousTask
-					
+
 					// Iterate over each Asset and create the various work flow steps
                     bundledAssets.each{asset->
                         workFlowSteps.eachWithIndex{ workflow, index->
                             if (workflow.transId != WorkflowTransitionId.TRANSPORT) {
-                                results = taskService.createTaskBasedOnWorkflow( 
-									[	taskNumber:++lastTask, 
-										workflow:workflow, 
+                                results = taskService.createTaskBasedOnWorkflow(
+									[	taskNumber:++lastTask,
+										workflow:workflow,
 										bundleMoveEvent:bundleMoveEvent, assetEntity:asset,
                                     	project:project, person:person, bundle:bundle
 									] )
@@ -1054,7 +1054,7 @@ class MoveBundleController {
 									commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null)
                                 } else if(previousTask){
 									// Create task dependency on previous task
-									commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null) 
+									commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null)
 								}
 								previousTask = stepTask
                             } else {
@@ -1076,7 +1076,7 @@ class MoveBundleController {
 		}
 	    render errMsg ? errMsg : "Generated Tasks for Bundle - ${bundle.name} successfully."
 	}
-    
+
     /**
      * To delete all generated task for bundle
      * @Param : bundleId - Id of bundle for which generated task needs to be deleted
@@ -1096,7 +1096,7 @@ class MoveBundleController {
         }
         render errMsg
     }
-	
+
 	/**
 	 * This method is used to calculate percentage of Filtered Apps on Total Planned apps.
 	 * @param totalAppCount : Total count of Application that is in Planned Bundle
@@ -1106,7 +1106,7 @@ class MoveBundleController {
 	def countAppPercentage(def totalAppCount, def filteredAppCount){
 		return totalAppCount ? Math.round((filteredAppCount/totalAppCount)*100) : 0
 	}
-	
+
 	/**
 	 * This method is used to set compactControl preference
 	 * @param prefFor

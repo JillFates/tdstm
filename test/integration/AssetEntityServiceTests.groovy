@@ -1,7 +1,7 @@
 import grails.test.spock.IntegrationSpec
 
 class AssetEntityServiceTests extends IntegrationSpec {
-	
+
 	def assetEntityService
 
 	void "test Entity Info Method"(){

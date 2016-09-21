@@ -15,7 +15,7 @@ class Project extends PartyGroup {
 	//INSTANCE
 	def projectService
 	def partyRelationshipService
-	
+
 	static isDefaultProject(aProjectRef) {
 		if (aProjectRef instanceof Project) {
 			return aProjectRef.isDefaultProject()
@@ -23,7 +23,7 @@ class Project extends PartyGroup {
 			return aProjectRef == DEFAULT_PROJECT_ID
 		}
 	}
-	
+
 	String projectCode
 	String description
 	Date startDate	// Date that the project will start
@@ -34,10 +34,10 @@ class Project extends PartyGroup {
 	Integer lastAssetId
 	Integer runbookOn=1		// Flag that indicates that the project should use the runbook mode for various screens
     Integer customFieldsShown = 8
-	String depConsoleCriteria 
+	String depConsoleCriteria
 	MoveBundle defaultBundle
 	Timezone timezone
-    
+
 	// Custom field labels
     	String custom1
     	String custom2
@@ -135,9 +135,9 @@ class Project extends PartyGroup {
 		String custom94
 		String custom95
 		String custom96
-		
+
 	static hasMany = [ dataTransferBatch : DataTransferBatch ]
-	
+
 	static constraints = {
 		name( ) // related party Group
 		projectCode( blank:false, nullable:false,unique:'client' )
@@ -265,21 +265,21 @@ class Project extends PartyGroup {
 			depConsoleCriteria sqlType : 'TEXT'
 		}
 	}
-	
-	static transients = [ 
-		'active', 
-		'defaultProject', 
+
+	static transients = [
+		'active',
+		'defaultProject',
 		'owner',
 		'partners',
-		'projectDefaultBundle', 
-		'readDefaultProject', 
+		'projectDefaultBundle',
+		'readDefaultProject',
 		'status'
 	]
 
 	String toString() {
 		"$projectCode : $name"
 	}
-	
+
 	/**
 	 * Used to retrieve the default Project for the appliction wit the get operator
 	 * @return Project - the default Project object
@@ -312,7 +312,7 @@ class Project extends PartyGroup {
 		//TODO: check time GMT
 		completionDate.compareTo(new Date()) > 0
 	}
-	
+
 	/**
 	 * Used to access the list of partners associated with a project
 	 * @return the project owner
@@ -322,7 +322,7 @@ class Project extends PartyGroup {
 	}
 
     /**
-     * 
+     *
      * Method csn used to get default move bundle for for a current project.
      * @param Default Bundle name (in case a new one is to be created).
      * @return default moveBundle for current project
@@ -338,7 +338,7 @@ class Project extends PartyGroup {
 	PartyGroup getOwner() {
 		return projectService.getOwner(this)
 	}
-	
+
 	/**
 	 * Used to set the owner of the project
 	 * @return the project owner

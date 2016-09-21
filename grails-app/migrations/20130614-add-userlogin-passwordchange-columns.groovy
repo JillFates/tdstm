@@ -1,6 +1,3 @@
-import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-
 /**
  * This changelog will add the password_changed_date and force_password_change columns to the user_login table and give them default values
  */

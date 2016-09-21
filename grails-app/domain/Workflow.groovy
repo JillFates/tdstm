@@ -1,20 +1,21 @@
 import com.tdssrc.grails.TimeUtil
+
 class Workflow {
-	
+
 	String process
 	Date dateCreated
 	Date lastUpdated
 	Person updatedBy
-	
+
 	static hasMany  = [ WorkflowTransition, WorkflowTransitionMap, Swimlane ]
-	
+
 	static constraints = {
 		process( blank:false, nullable:false, unique:true)
 		dateCreated( nullable:true  )
 		lastUpdated( nullable:true  )
 		updatedBy( nullable:true  )
     }
-	
+
 	static mapping  = {
 		version false
 		autoTimestamp false
@@ -34,5 +35,5 @@ class Workflow {
 	String toString() {
 		process
 	}
-	
+
 }

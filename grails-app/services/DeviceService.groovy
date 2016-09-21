@@ -1,3 +1,4 @@
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
@@ -9,35 +10,31 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import UserPreferenceEnum as PREF
-
-import org.springframework.transaction.annotation.Transactional
+import grails.transaction.Transactional
 
 @Transactional
 class DeviceService {
 
-	boolean transactional = true
+	AssetEntityService assetEntityService
+	ProjectService projectService
+	RackService rackService
+	RoomService roomService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
-	def assetEntityService
-	def projectService
-	def rackService
-	def roomService	
-	def userPreferenceService
-
-	/** 
-	 * Used to assign a DEVICE asset to a location/room/rack appropriately. If the referenced room or rack 
-	 * does not exists then it will be created. 
+	/**
+	 * Used to assign a DEVICE asset to a location/room/rack appropriately. If the referenced room or rack
+	 * does not exists then it will be created.
 	 *
 	 * Note that the function does NOT commit the change to the Asset and is left up to the caller.
 	 *
-	 * @param asset - the asset being associated 
+	 * @param asset - the asset being associated
 	 * @param location - the location to assign the asset to
 	 * @param roomName - the room name to assign the asset to
 	 * @param rackName - the rackname to assign the asset to
 	 * @param isSource - flag that when true indicates that the associate is to the source otherwise to the target
 	 * @return Null if successful otherwise a string indicating the error
 	 */
-
 	String assignDeviceToLocationRoomRack(AssetEntity asset, String location, String roomName, String rackName, boolean isSource) {
 		log.debug("assignDeviceToLocationRoomRack() START $asset $location/$roomName/$rackName/$isSource")
 
@@ -81,10 +78,10 @@ class DeviceService {
 
 	/**
 	 * Used to provide a map/model of the properties used by the DEVICE show view
-	 * @param project 
+	 * @param project
 	 * @return a Map that includes the list of common properties
 	 */
-	@Transactional(readOnly = true) 
+	@Transactional(readOnly = true)
 	Map getModelForShow(Project project, assetEntity, Object params) {
 
 		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
@@ -113,7 +110,7 @@ class DeviceService {
 		}
 
 		def model = [
-			assetEntity: assetEntity, 
+			assetEntity: assetEntity,
 			label: frontEndLabel,
 			canEdit: RolePermissions.hasPermission("AssetEdit"),
 			deleteChassisWarning: deleteChassisWarning
@@ -147,7 +144,7 @@ class DeviceService {
 			modelName += ' ?'
 		model.modelName = modelName
 		*/
-		
+
 		if (params.redirectTo == "roomAudit") {
 			model << [source:params.source, assetType:params.assetType]
 		}
@@ -169,7 +166,7 @@ class DeviceService {
 		def asset = new AssetEntity( )
 
 		return saveUpdateAssetFromForm(controller, session, projectId, userId, params, asset)
-		
+
 	}
 
 	/**
@@ -228,7 +225,7 @@ class DeviceService {
 		}
 		*/
 		assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
-		
+
 		saveUserPreferencesForDevice(asset)
 
 		return asset
@@ -251,7 +248,7 @@ class DeviceService {
 		} else {
 
 			// Validate the optimistic locking to prevent two people from editing the same EXISTING asset
-			GormUtil.optimisticLockCheck(device, params, 'Device')			
+			GormUtil.optimisticLockCheck(device, params, 'Device')
 		}
 
 		//
@@ -259,7 +256,7 @@ class DeviceService {
 		//
 		params.scale = SizeScale.asEnum(params.scale)
 
-		AssetEntityService.ASSET_INTEGER_PROPERTIES.each { p -> 
+		AssetEntityService.ASSET_INTEGER_PROPERTIES.each { p ->
 			if (params.containsKey(p))
 				params[p] = NumberUtil.toInteger(params[p])
 		}
@@ -275,7 +272,7 @@ class DeviceService {
 							device[p] = TimeUtil.parseDate(params[p])
 						}
 					} else {
-						device[p] = params[p]	
+						device[p] = params[p]
 					}
 				} else {
 					device[p] = params[p]
@@ -292,12 +289,12 @@ class DeviceService {
 		device.modifiedBy = userLogin.person
 
 		if (! device.assetTag?.size())
-			device.assetTag = projectService.getNextAssetTag(project) 
+			device.assetTag = projectService.getNextAssetTag(project)
 
 		assetEntityService.assignAssetToBundle(project, device, params['moveBundle.id'])
 
-		// Update the Manufacturer and/or Model for the asset based on what the user has selected. If the model was selected 
-		// then we'll use that for everything otherwise we will set the manufacturer from the form. 
+		// Update the Manufacturer and/or Model for the asset based on what the user has selected. If the model was selected
+		// then we'll use that for everything otherwise we will set the manufacturer from the form.
 		def manuId = NumberUtil.toLong(params.manufacturerId)
 		def modelId = NumberUtil.toLong(params.modelId)
 
@@ -331,10 +328,10 @@ class DeviceService {
 				device.assetType = null
 			}
 		}
-		
+
 		// Set the source/target location/room which creates the Room if necessary
-		assetEntityService.assignAssetToRoom(project, device, params.roomSourceId, params.sourceLocation, params.sourceRoom, true) 
-		assetEntityService.assignAssetToRoom(project, device, params.roomTargetId, params.targetLocation, params.targetRoom, false) 
+		assetEntityService.assignAssetToRoom(project, device, params.roomSourceId, params.sourceLocation, params.sourceRoom, true)
+		assetEntityService.assignAssetToRoom(project, device, params.roomTargetId, params.targetLocation, params.targetRoom, false)
 
 		assetEntityService.assignDeviceToChassisOrRack(project, userLogin, device, params)
 
@@ -353,7 +350,7 @@ class DeviceService {
 		// Set some preferences if we were successful
 		if (device.manufacturer)
 			userPreferenceService.setPreference(PREF.LAST_MANUFACTURER, device.manufacturer.name)
-		if (device.model) 
+		if (device.model)
 			userPreferenceService.setPreference(PREF.LAST_TYPE, device.model.assetType)
 	}
 

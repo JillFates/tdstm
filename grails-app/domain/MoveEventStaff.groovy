@@ -11,20 +11,20 @@ class MoveEventStaff {
 
     Date dateCreated
     Date lastUpdated
-    
+
 	static constraints = {
 		moveEvent ( nullable:false )
 		person ( nullable:false )
 		role( nullable:false )
 	}
-	
+
     /**
      *  mapping for COLUMN Relation
      */
     static mapping  = {
         autoTimestamp false
     }
-    
+
 	/**
 	 * to get moveEventStaff object
 	 * @param : person, instance of person for which need to get instance
@@ -42,7 +42,7 @@ class MoveEventStaff {
 		}
 		return result
 	}
-    
+
     /*
      * Date to insert in GMT
      */

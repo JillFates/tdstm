@@ -4,12 +4,12 @@ import com.tdssrc.grails.EnumUtil
 
 /**
  * Define all the possible status that can have a project
- *  
+ *
  * @author Diego Scarpa <diego.scarpa@bairesdev.com>
  *
  */
 enum ProjectStatus {
-	ANY("any"), ACTIVE("active"), COMPLETED("completed");
+	ANY("any"), ACTIVE("active"), COMPLETED("completed")
 
 	final String value
 

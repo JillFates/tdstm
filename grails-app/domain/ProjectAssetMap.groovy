@@ -1,8 +1,8 @@
 /**
- * This domain is used to manage the many-to-many relationship of assets that are owned 
+ * This domain is used to manage the many-to-many relationship of assets that are owned
  * by a company but can be associated to one or more projects.
  * */
-import com.tds.asset.AssetEntity;
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 class ProjectAssetMap {
 	Project project
@@ -10,12 +10,12 @@ class ProjectAssetMap {
 	Integer currentStateId
 	Date createdDate
 	Date lastModified
-	
+
 	static constraints = {
 		createdDate( nullable:true )
 		lastModified( nullable:true )
 	}
-	
+
 	static mapping = {
 		version false
 		autoTimestamp false

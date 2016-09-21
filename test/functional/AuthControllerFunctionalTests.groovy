@@ -18,7 +18,3 @@ class AuthControllerFunctionalTests extends functionaltestplugin.FunctionalTestC
 
     }
 }
-
-
-
-

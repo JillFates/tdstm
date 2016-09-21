@@ -8,7 +8,7 @@ class ConfigurationException extends RuntimeException {
 	public ConfigurationException() {
 		super()
 	}
-		
+
 	public ConfigurationException(String message) {
 		super(message)
 	}
@@ -16,5 +16,4 @@ class ConfigurationException extends RuntimeException {
 	public ConfigurationException(groovy.lang.GString message) {
 		super(message.toString())
 	}
-
 }

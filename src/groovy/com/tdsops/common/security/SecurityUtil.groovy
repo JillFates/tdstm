@@ -18,7 +18,7 @@ class SecurityUtil {
 	 * @return The guid converted to a hex string
 	 */
 	static String guidToString( guid ) {
-		def addLeadingZero = { k -> 
+		def addLeadingZero = { k ->
 			return (k <= 0xF ? '0' + Integer.toHexString(k) : Integer.toHexString(k))
 		}
 
@@ -32,7 +32,7 @@ class SecurityUtil {
 		return str
 	}
 
-	/** 
+	/**
 	 * Encrypts a clear text password - using legacy SHA
 	 * @param String password
 	 * @return String Encripted passsword
@@ -42,8 +42,8 @@ class SecurityUtil {
 		return etext.toString()
 	}
 
-	/** 
-	 * Apply the new password to the userLogin, encrypt it and update 
+	/**
+	 * Apply the new password to the userLogin, encrypt it and update
 	 * @param userLogin userLogin to apply the new password
 	 * @param password new password to use
 	 */
@@ -52,7 +52,7 @@ class SecurityUtil {
 		throw new RuntimeException("replace with UserLogin")
 	}
 
-	/** 
+	/**
 	 * Encrypts a clear text password - using SHA2
 	 * @param String password
 	 * @param String salt_key to use to hash the password
@@ -62,7 +62,7 @@ class SecurityUtil {
 		return SHA2Codec.encode(text, salt_key)
 	}
 
-	/** 
+	/**
 	 * Encrypts a clear text password - using AES
 	 * @param String password
 	 * @return String Encrypted passsword

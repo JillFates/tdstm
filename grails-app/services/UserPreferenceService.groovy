@@ -1,21 +1,22 @@
-import com.tdsops.common.validation.ConstraintsValidator
-import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.converters.JSON
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.web.util.WebUtils
+import grails.transaction.Transactional
 
 import javax.servlet.http.HttpSession
 
-/**
- * The Service is transactional (http://docs.grails.org/2.3.11/guide/services.html#declarativeTransactions)
- */
+import org.apache.shiro.SecurityUtils
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.util.WebUtils
+
+import com.tdsops.common.validation.ConstraintsValidator
+import com.tdssrc.grails.GormUtil
+
 class UserPreferenceService {
 
-	static transactional = true
-	def grailsApplication
-	def securityService
+	GrailsApplication grailsApplication
+	SecurityService securityService
 
-	// defaults holds global defaults for certain values 
+	// defaults holds global defaults for certain values
 	// TODO - load these from application settings
 	protected static defaults = [
 		'CURR_TZ'        :'GMT',
@@ -51,12 +52,12 @@ class UserPreferenceService {
 		depGraph: [
 			type: 'string',
 			validator: {
-				def prefs = JSON.parse(it)	
+				def prefs = JSON.parse(it)
 				def checkboxLabels = ['bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
-				
+
 				if ( ! (prefs.colorBy in ['group', 'bundle', 'event', 'environment', 'sourceLocation', 'targetLocation']) )
 					return false
-				
+
 				checkboxLabels.each { label ->
 					if (prefs[label] && prefs[label] != 'true')
 						return false
@@ -69,18 +70,18 @@ class UserPreferenceService {
 		archGraph: [
 			type: 'string',
 			validator: {
-				def prefs = JSON.parse(it)	
+				def prefs = JSON.parse(it)
 				def checkboxLabels = ['showCycles', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 				checkboxLabels.each { label ->
 					if (prefs[label] && prefs[label] != 'true')
 						return false
 				}
-				
+
 				if ( ! (Integer.parseInt(prefs.levelsUp) in (0..10)) )
 					return false
 				if ( ! (Integer.parseInt(prefs.levelsDown) in (0..10)) )
 					return false
-				
+
 				return true
 			}
 		],
@@ -92,24 +93,24 @@ class UserPreferenceService {
 					if (pref != '0' && pref != '1')
 						return false
 				}
-				
+
 				if (prefs.length > 4)
 					return false
-				
+
 				return true
 			}
 		]
 	]
-	
+
 	/*
 	 * Return current session object
 	 */
 	private HttpSession getSession() {
-		return WebUtils.retrieveGrailsWebRequest().session
+		WebUtils.retrieveGrailsWebRequest().session
 	}
 
 	/**
-	 * Method to read all of the user's preferences into a MAP and 
+	 * Method to read all of the user's preferences into a MAP and
 	 * saved into the user's session
 	 *
 	 * @deprecated To Be Removed!!!
@@ -131,29 +132,29 @@ class UserPreferenceService {
 	}
 
 	/*
-	 * Method to read all of the user's preferences into a MAP and 
+	 * Method to read all of the user's preferences into a MAP and
 	 * saved into the user's session
 	 */
 	def loadPreferences(UserLogin userLogin, String preferenceCode) {
 		// TODO : JPM 6/2015 : Just want to PUKE - this is loading all of the users' preferences into a map and storing as individual preferences - WTF?
 		if(userLogin){
 			def userPreference = UserPreference.findAllByUserLogin( userLogin )
-			
+
 			if ( userPreference != null ) {
 				// Initialize Map
 				def currProj = new HashMap()
-				
+
 				for (int i = 0; i < userPreference.size(); i++) {
 					currProj.put( userPreference[i].preferenceCode, userPreference[i].value )
 				}
 				// Set CURR_PROJ into User session
-				getSession().setAttribute( preferenceCode, currProj )
+				session.setAttribute( preferenceCode, currProj )
 			}
 		}
 	}
-	
+
 	/*
-	 * Method will access the map stored into the user's session and 
+	 * Method will access the map stored into the user's session and
 	 * return the value if found otherwise return null
 	 */
 	String get( String preferenceCode ) {
@@ -165,17 +166,17 @@ class UserPreferenceService {
 				value = userPref.value
 			}
 		}
-		
+
 		if (value == null && defaults.containsKey(preferenceCode)) {
 			value = defaults[preferenceCode]
 			// log.info "user preference $preferenceCode=$value from defaults"
 		}
-		
+
 		// log.info "user preference $preferenceCode=$value"
 		return value
 	}
 
-	/* 
+	/*
 	 * Used to retrieve a map of user preferences based on the list of codes that are passed. Those preferences that are not found
 	 * will default to a blank string value
 	 * @param codes - a list of one or more String preference codes to lookup
@@ -188,7 +189,7 @@ class UserPreferenceService {
 		return getPreferences(codesWithDefaults, userLogin)
 	}
 
-	/* 
+	/*
 	 * Used to retrieve a map of user preferences based on the list of codes that are passed with their default values if not found
 	 * @param codesWithDefaults - a map of preference codes with their default values
 	 * @param userLogin - the user whom to lookup the preference for, if not supplied it will lookup the user from the session
@@ -203,24 +204,24 @@ class UserPreferenceService {
 
 		def codes = codesWithDefaults.keySet()
 		def ups = UserPreference.findAllByUserLoginAndPreferenceCodeInList( userLogin, codes)
-		codesWithDefaults.each { code, defVal -> 
+		codesWithDefaults.each { code, defVal ->
 			def up = ups.find { it.preferenceCode == code }
 			map[code] = up ? up.value : defVal
 		}
 
-		return map  
+		return map
 	}
 
-	/* 
-	 * Reads the preference stored in the database for a user instead of the mess that is going on with  
+	/*
+	 * Reads the preference stored in the database for a user instead of the mess that is going on with
 	 * the getPreference()
 	 * @param String preferenceCode
 	 * @return String the user's saved preference or null if not found
 	 * @deprecated
 	 */
-	def String getPreference( String preferenceCode ) {
+	String getPreference( String preferenceCode ) {
 		loadPreferences(preferenceCode)
-		def currProj = getSession().getAttribute( preferenceCode )
+		def currProj = session.getAttribute( preferenceCode )
 		def prefValue
 		if ( currProj != null ) {
 			prefValue = currProj[preferenceCode]
@@ -235,26 +236,26 @@ class UserPreferenceService {
 	 * @return String the user's saved preference or null if not found
 	 * @deprecated
 	 */
-	def String getPreference( UserPreferenceEnum preference ) {
+	String getPreference( UserPreferenceEnum preference ) {
 		return getPreference(preference.toString())
 	}
 
-	/* 
+	/*
 	 * Reads the preference stored in the database for the user specified by the parameters
 	 * @param String preferenceCode
 	 * @param UserLogin userLogin
 	 * @return String the user's saved preference or null if not found
 	 */
-	def String getPreference (String preferenceCode, UserLogin userLogin) {
+	String getPreference (String preferenceCode, UserLogin userLogin) {
 		loadPreferences(userLogin, preferenceCode)
-		def currProj = getSession().getAttribute(preferenceCode)
+		def currProj = session.getAttribute(preferenceCode)
 		def prefValue
 		if (currProj != null) {
 			prefValue = currProj[preferenceCode]
 		}
 		return prefValue
 	}
-	
+
 	/**
 	 * Get Preference Map by default User by preferenceKeys
 	 * @author @tavo_luna
@@ -265,7 +266,7 @@ class UserPreferenceService {
 		if (userLogin && preferenceKeys) {
 			def keyNames = preferenceKeys.collect{ it.name() }
 			def userPreferences = UserPreference.findAllByUserLoginAndPreferenceCodeInList(userLogin, keyNames) ?: []
-			
+
 			userPreferences.each{ preferenceCode ->
 				mapPref[preferenceCode.preferenceCode] = preferenceCode.value
 			}
@@ -289,11 +290,12 @@ class UserPreferenceService {
 		def prefKeys = UserPreferenceEnum.getExportPreferenceKeys()
 		return getPreferencesMap(prefKeys)
 	}
-	
+
 	/**
 	 * Method will remove the user preference record for selected preferenceCode and loginUser
 	 * @deprecated
 	 */
+	@Transactional
 	def removePreference( String preferenceCode ) {
 		def principal = SecurityUtils.subject.principal
 		def userLogin = UserLogin.findByUsername( principal )
@@ -306,6 +308,7 @@ class UserPreferenceService {
 	/**
 	 * Method will remove the user preference record for selected preferenceCode and loginUser
 	 */
+	@Transactional
 	def removePreference(UserPreferenceEnum preference ) {
 		removePreference(preference.toString())
 	}
@@ -315,8 +318,9 @@ class UserPreferenceService {
 	 * @param preferenceCode - the code to set
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
-	 * @deprecated you should rather use setPreference( UserPreferenceEnum, String)
+	 * @deprecated you should rather use setPreference( com.tdsops.tm.enums.domain.UserPreferenceEnum, String)
 	 */
+	@Transactional
 	Boolean setPreference( String preferenceCode, String value ) {
 		def principal = SecurityUtils.subject.principal
 		def userLogin = UserLogin.findByUsername( principal )
@@ -329,6 +333,7 @@ class UserPreferenceService {
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
 	 */
+	@Transactional
 	Boolean setPreference( UserPreferenceEnum preferenceCode, String value ) {
 		return setPreference(preferenceCode.toString(), value)
 	}
@@ -343,6 +348,7 @@ class UserPreferenceService {
 	 * @param value - the value to set for the preference
 	 * @return true if the set was successful
 	 */
+	@Transactional
 	Boolean setPreference(UserLogin userLogin, UserPreferenceEnum preference, String value ) {
 		return setPreference(userLogin, preference.toString(), value)
 	}
@@ -358,6 +364,7 @@ class UserPreferenceService {
 	 * @return true if the set was successful
 	 * @deprecated
 	 */
+	@Transactional
 	Boolean setPreference( UserLogin userLogin, String preferenceCode, String value ) {
 		def saved = false
 		if (log.isDebugEnabled())
@@ -367,15 +374,15 @@ class UserPreferenceService {
 
 		if (value && value != "null" && userLogin) {
 			def prefValue = getPreference(preferenceCode)
-	
+
 			//log.debug "setPreference() phase 1 took ${TimeUtil.elapsed(start)}"
 			//start = new Date()
 
 			//	remove the movebundle and event preferences if user switched to different project
 			if (preferenceCode == "CURR_PROJ" && prefValue && prefValue != value){
-				removeProjectAssociatedPreferences(userLogin)	
+				removeProjectAssociatedPreferences(userLogin)
 			}
-			
+
 			//log.debug "setPreference() phase 2 took ${TimeUtil.elapsed(start)}"
 			//start = new Date()
 
@@ -390,7 +397,7 @@ class UserPreferenceService {
 			} else {
 				//	Statements to Update UserPreference to login user
 				def userPreference = UserPreference.get( new UserPreference( userLogin:userLogin, preferenceCode: preferenceCode ) )
-				userPreference.value = value;
+				userPreference.value = value
 				saved = userPreference.save(flush:true)
 				if (! saved ) {
 					log.error "setPreference: failed update : ${GormUtil.allErrorsString(userPreference)}"
@@ -402,17 +409,19 @@ class UserPreferenceService {
 
 			// call loadPreferences() to load CURR_PROJ MAP into session
 			loadPreferences(userLogin, preferenceCode)
-		
+
 			// log.debug "setPreference() phase 4 took ${TimeUtil.elapsed(start)}"
 
 		}
 		return saved
 
 	}
+
 	/*-------------------------------------------------------------------------------------------
 	 * Remove the Move Event and Move Bundle preferences when user switched to different project.
 	 * @param : login user
 	 * ----------------------------------------------------------------------------------------*/
+	@Transactional
 	def removeProjectAssociatedPreferences(def userLogin ){
 		def eventPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, "MOVE_EVENT")
 		if( eventPreference ){
@@ -420,7 +429,7 @@ class UserPreferenceService {
 			println"Removed MOVE_EVENT preference as user switched to other project"
 			loadPreferences("MOVE_EVENT")
 		}
-		
+
 		def bundlePreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, "CURR_BUNDLE")
 		if( bundlePreference ){
 			bundlePreference.delete(flush:true)
@@ -434,13 +443,15 @@ class UserPreferenceService {
 			loadPreferences("CURR_ROOM")
 		}
 	}
+
 	/*
-	 * Set Roles to Persons in PartyRole 
-	 * @return true or false indicating the occurrence of Security Violations. 
+	 * Set Roles to Persons in PartyRole
+	 * @return true or false indicating the occurrence of Security Violations.
 	 */
 	// TODO : setUserRoles - Move to SecurityService
+	@Transactional
 	def setUserRoles( def roleTypeList, def personId ) {
-		def person = Party.findById(personId)
+		def person = Party.get(personId)
 		def login = securityService.getUserLogin()
 		def securityViolations = false
 		roleTypeList.each { roleCode ->
@@ -449,7 +460,7 @@ class UserPreferenceService {
 					securityService.reportViolation("Attempted to update user $person permission to assign security role $roleCode, which is not permissible", login)
 					securityViolations = true
 				} else {
-					RoleType roleType = RoleType.findById(roleCode)
+					RoleType roleType = RoleType.get(roleCode)
 					if (!roleType) {
 						securityService.reportViolation("attempted to update user $person permission with undefined role $roleCode", login)
 						securityViolations = true
@@ -474,7 +485,7 @@ class UserPreferenceService {
 	/*----------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : person and rols
-	 * @return : Remove Roles to Persons in PartyRole  
+	 * @return : Remove Roles to Persons in PartyRole
 	 *----------------------------------------------------------*/
 	// TODO : setUserRoles - Move to SecurityService
 	def removeUserRoles( def roleType, def personId ){
@@ -482,7 +493,7 @@ class UserPreferenceService {
 			PartyRole.executeUpdate("delete from PartyRole where party = '$personId' and roleType = '$role' ")
 		}
 	}
-	
+
 	/*
 	 *  Method to return List of Roles Available for User
 	 */
@@ -491,7 +502,7 @@ class UserPreferenceService {
 		def availableRoles = RoleType.findAll("from RoleType r where \
 			r.id not in (select roleType.id from PartyRole where party = $person.id  group by roleType.id ) \
 			and r.description like 'staff%' OR r.description like 'system%' order by r.description ")
-		 
+
 		return availableRoles
 	}
 	/*
@@ -501,7 +512,7 @@ class UserPreferenceService {
 	def getAssignedRoles( def person ){
 
 		def assignedRoles = RoleType.findAll("from RoleType r where r.id in (select roleType.id from PartyRole where party = $person.id group by roleType.id )")
-		 
+
 		return assignedRoles
 	}
 
@@ -519,9 +530,9 @@ class UserPreferenceService {
 			userPreference.value = value
 		} else {
 			userPreference = new UserPreference(
-				userLogin:userLogin, 
-				preferenceCode:preference, 
-				value:value 
+				userLogin:userLogin,
+				preferenceCode:preference,
+				value:value
 			)
 		}
 		if (! userPreference.save( insert: true, flush:true)) {
@@ -530,7 +541,7 @@ class UserPreferenceService {
 		}
 		return success
 	}
-	
+
 	/**
 	 * get the preference for the given user and preferenceCode
 	 * @param userLogin
@@ -554,30 +565,30 @@ class UserPreferenceService {
 	}
 
 	def deleteSecurityRoles(person) {
-		def currentRoles = getAssignedRoles(person);
+		def currentRoles = getAssignedRoles(person)
 		def toRemoveRoles = []
-		currentRoles.each { r -> 
+		currentRoles.each { r ->
 			if (SECURITY_ROLES[r.id]) {
 				toRemoveRoles << r.id
 			}
 		}
 		if (toRemoveRoles.size() > 0) {
-			removeUserRoles(toRemoveRoles, person.id);
+			removeUserRoles(toRemoveRoles, person.id)
 		}
 	}
-	
+
 	/* Saves a user preference after making sure that it passes validation using the constraints map */
 	def savePreference (String code, def value) {
 		if (code in prefCodeConstraints) {
 			def validated = ConstraintsValidator.validate(value, prefCodeConstraints[code])
 			if (! validated)
 				throw new InvalidParamException()
-			
+
 			setPreference(code, value)
 		} else {
 			throw new InvalidRequestException()
 		}
-		
+
 		return true
 	}
 	/**

@@ -15,16 +15,15 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.SecurityConfigParser
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 /**
  * The Shiro Realm for Active Directory authentication
  */
 class ShiroActiveDirectoryRealm {
-	
+
 	static final authTokenClass = org.apache.shiro.authc.UsernamePasswordToken
-	//private static final grailsApplication = ApplicationHolder.application
 
 	static boolean initialized = false
 	static config
@@ -46,7 +45,7 @@ class ShiroActiveDirectoryRealm {
 		if (! initialized ) {
 			initialized = true
 			log = LogFactory.getLog(this.class)
-			if (log.isDebugEnabled()) 
+			if (log.isDebugEnabled())
 				log.debug "initialize()"
 
 			ctx = ApplicationContextHolder.getApplicationContext()
@@ -59,12 +58,12 @@ class ShiroActiveDirectoryRealm {
 					java.lang.StringBuffer sb = new java.lang.StringBuffer('ShiroActiveDirectoryRealm() Loaded Configuration:')
 					config.each {k,v ->
 						if (k=='domains') {
-							config.domains.each { dk, domain -> 
+							config.domains.each { dk, domain ->
 								sb.append("\n\tdomains.$dk:")
 								domain.each { domainKey, domainValue ->
 									if (domainKey.toLowerCase().contains('password'))
 										domainValue = '************'
-									sb.append("\n\t\t$domainKey=$domainValue") 
+									sb.append("\n\t\t$domainKey=$domainValue")
 								}
 							}
 						} else {
@@ -74,14 +73,14 @@ class ShiroActiveDirectoryRealm {
 					log.info sb.toString()
 				}
 
-				isEnabled = ( config && config.enabled && SecurityConfigParser.hasActiveDirectoryDomain(config) ) 
+				isEnabled = ( config && config.enabled && SecurityConfigParser.hasActiveDirectoryDomain(config) )
 
 			} else {
-				log.error "ShiroActiveDirectoryRealm: Unable to access security service"			
+				log.error "ShiroActiveDirectoryRealm: Unable to access security service"
 			}
 
 			if (! config)
-				log.error "ShiroActiveDirectoryRealm: Unable to load security configuration settings"					
+				log.error "ShiroActiveDirectoryRealm: Unable to load security configuration settings"
 		}
 	}
 
@@ -109,9 +108,9 @@ class ShiroActiveDirectoryRealm {
 		String msg
 
 		// The password is a char[] in AuthToken so we convert to a string
-		// TODO : Security doc mentions that keeping the password as char[] is safer for in-memory 
+		// TODO : Security doc mentions that keeping the password as char[] is safer for in-memory
 		def password = authToken.password
-		password=password?.toString() 
+		password=password?.toString()
 
 		// User must enter a username and password for their credentials
 		if ( ! username?.size() || ! password?.size() ) {
@@ -141,7 +140,7 @@ class ShiroActiveDirectoryRealm {
 		}
 
 		// Now attempt to lookup the user or provision the Person+UserLogin accordingly
-		def userLogin 
+		def userLogin
 		try {
 			userLogin = ctx.userService.findOrProvisionUser(userInfo, config, authority)
 		} catch (e) {
@@ -158,7 +157,7 @@ class ShiroActiveDirectoryRealm {
 		// Check if the userLogin is active
 		if(! userLogin.active){
 			log.warn "$logPrefix User $username is not active."
-			throw new DisabledAccountException('Your account has been locked out.')	
+			throw new DisabledAccountException('Your account has been locked out.')
 		}
 
 		// Create a SimpleAccount to hand back to Shiro

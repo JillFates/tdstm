@@ -1,7 +1,7 @@
 import com.tds.asset.AssetEntity
 import grails.converters.JSON
 
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class MoveBundleAssetController {
 	def partyRelationshipService
@@ -10,7 +10,7 @@ class MoveBundleAssetController {
 	def jdbcTemplate
 	def supervisorConsoleService
 	def securityService
-	
+
     def index() { redirect( action:"list", params:params ) }
 
     // the delete, save and update actions only accept POST requests
@@ -100,14 +100,14 @@ class MoveBundleAssetController {
 				log.error "assignAssetsToBundle: Invalid bundle id (${params.bundleId}"
 			}else{
 				def bundleId = params.bundleId
-				moveBundleInstance = MoveBundle.findById( bundleId)
+				moveBundleInstance = MoveBundle.get( bundleId)
 			}
 		} else {
 		   moveBundleInstance = MoveBundle.findByProject(project,[sort:'name',order:'asc']  )
         }
-		
+
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id order by name")
-		
+
 		redirect(action: "assignAssetsToBundleChange", params: ['bundleLeft': moveBundles.getAt(0).id, 'bundleRight' : moveBundleInstance.id])
     }
     def assignAssetsToBundleChange() {
@@ -122,17 +122,17 @@ class MoveBundleAssetController {
         def sideField = params.sideField
         def currentBundleAssets
         def moveBundleAssets
-        def moveBundleInstanceRight = MoveBundle.findById( bundleRight )
-        def moveBundleInstanceLeft = MoveBundle.findById( bundleLeft )
+        def moveBundleInstanceRight = MoveBundle.get( bundleRight )
+        def moveBundleInstanceLeft = MoveBundle.get( bundleLeft )
         def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstanceRight.project.id order by name")
-	    def sessionSort = request.getSession(true).getAttribute("sessionSort")
-        def sessionSide = request.getSession(true).getAttribute("sessionSide")
-        def sessionOrder = request.getSession(true).getAttribute("sessionOrder")
+	    def sessionSort = session.getAttribute("sessionSort")
+        def sessionSide = session.getAttribute("sessionSide")
+        def sessionOrder = session.getAttribute("sessionOrder")
         if( bundleRight ){
             if ( sideField == "right" ) {
                 currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceRight.id "+
                 											"order by  $sortField $params.orderField")
-	    			
+
             } else {
                 if ( sessionSide == "right" ) {
                     currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceRight.id "+
@@ -146,7 +146,7 @@ class MoveBundleAssetController {
             if( sideField == "left" ){
                 moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceLeft.id "+
                     									"order by  $sortField $params.orderField")
-	    			
+
             } else {
                 if( sessionSide == "left" ){
                     moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceLeft.id "+
@@ -156,28 +156,28 @@ class MoveBundleAssetController {
                 }
             }
         } else {
-            def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+            def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
             if( sideField == "left" ){
                 moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId "+
                     									"order by  $sortField $params.orderField")
             } else {
                 if( sessionSide == "left" ){
 	    			moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId "+
-                    										"order by  $sessionSort $sessionOrder")	
+                    										"order by  $sessionSort $sessionOrder")
                 } else {
 	    		    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
                 }
             }
         }
-        render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, 
+        render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets,
                                             moveBundleInstance:moveBundleInstanceRight,moveBundleAssets:moveBundleAssets,
                                             leftBundleInstance:moveBundleInstanceLeft,sortField:params.sortField,
                                             orderField:params.orderField,sideField:params.sideField] )
     }
-	
-	 
+
+
 	/*
-	 *  Sort Assets By Selected Row Column 
+	 *  Sort Assets By Selected Row Column
 	 */
 	def sortAssetList() {
 		def rightBundleId = params.rightBundle
@@ -200,38 +200,38 @@ class MoveBundleAssetController {
 		def sessionSort
 		def sessionSide
 		def sessionOrder
-		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+		def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
 		if( ( sideList == "right" && params.sideField == "left" )||( sideList == "left" && params.sideField == "right" ) ){
-			request.getSession(true).setAttribute( "sessionSort", params.sortField )
-			request.getSession(true).setAttribute( "sessionSide", params.sideField )
-			request.getSession(true).setAttribute( "sessionOrder", params.orderField )	
+			session.setAttribute( "sessionSort", params.sortField )
+			session.setAttribute( "sessionSide", params.sideField )
+			session.setAttribute( "sessionOrder", params.orderField )
 		}
 		if( ( sideList == "right" && params.sideField == "right" )||( sideList == "left" && params.sideField == "left" ) ){
-            sessionSort = request.getSession(true).getAttribute( "sessionSort" )
-            sessionSide = request.getSession(true).getAttribute( "sessionSide" )
-            sessionOrder = request.getSession(true).getAttribute( "sessionOrder" )
+            sessionSort = session.getAttribute( "sessionSort" )
+            sessionSide = session.getAttribute( "sessionSide" )
+            sessionOrder = session.getAttribute( "sessionOrder" )
 		}
 		//Right Side AssetTable Sort
 		if( sideList == "right" ) {
-			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
+			rightMoveBundleInstance = MoveBundle.get( rightBundleId )
 			moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $rightMoveBundleInstance.project.id")
 			currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id "+
                     									"order by  $sortField $params.order")
 			if( leftBundleId != null && leftBundleId != "" ) {
-				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
+				leftMoveBundleInstance = MoveBundle.get( leftBundleId )
 				if( params.sideField == "left" ){
                     moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id "+
                     										"order by  $params.sortField $params.orderField")
-				
+
 				} else if( params.sideField == "right" ) {
 					if( sessionSort != null ){
 						moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id "+
                     											"order by  $sessionSort $sessionOrder")
-						
+
 					} else {
                         moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id ")
 					}
-					
+
 				} else {
                     moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id ")
 				}
@@ -242,9 +242,9 @@ class MoveBundleAssetController {
 				} else if ( params.sideField == "right" ) {
 					if( sessionSort != null ){
 						moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId "+
-                    											"order by  $sessionSort $sessionOrder")	
+                    											"order by  $sessionSort $sessionOrder")
 					} else {
-						moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")		
+						moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
 					}
 				} else {
                     moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
@@ -254,14 +254,14 @@ class MoveBundleAssetController {
 		//Left Side AssetTable Sort
 		else {
 			if( leftBundleId != null && leftBundleId != "" ) {
-				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
+				leftMoveBundleInstance = MoveBundle.get( leftBundleId )
 				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id "+
                     									"order by  $sortField $params.order ")
 		    } else {
 		    	moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId "+
                     									"order by  $sortField $params.order")
 		    }
-			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
+			rightMoveBundleInstance = MoveBundle.get( rightBundleId )
 			moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $rightMoveBundleInstance.project.id")
 			if( params.sideField == "right" ){
                 currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id "+
@@ -269,17 +269,17 @@ class MoveBundleAssetController {
 			} else if ( params.sideField == "left" ) {
 				if( sessionSort != null ){
 					currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id "+
-                    											"order by  $sessionSort $sessionOrder")	
+                    											"order by  $sessionSort $sessionOrder")
 				} else {
-					currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id ")	
+					currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id ")
 				}
 			} else {
                 currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id ")
 			}
 		}
-		render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, 
-		                                    moveBundleInstance:rightMoveBundleInstance, leftBundleInstance:leftMoveBundleInstance, 
-		                                    moveBundleAssets:moveBundleAssets, sortField:params.sort, 
+		render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets,
+		                                    moveBundleInstance:rightMoveBundleInstance, leftBundleInstance:leftMoveBundleInstance,
+		                                    moveBundleAssets:moveBundleAssets, sortField:params.sort,
 		                                    orderField:params.order, sideField:params.side ] )
 	}
 	/*
@@ -293,31 +293,31 @@ class MoveBundleAssetController {
     	def moveBundleAssets = assetEntityAttributeLoaderService.saveAssetsToBundle( bundleTo, bundleFrom, assets )
     	if( moveBundleAssets != null ){
 	    	moveBundleAssets.each{bundleAsset ->
-				items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag, 
+				items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag,
 				         application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation  +"/"+bundleAsset.sourceRack  ]
 	    	}
         } else {
-    		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+    		def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
     		def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId ")
 			assetEntities.each{assetEntity ->
-				items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag, 
+				items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag,
 				         application:assetEntity.application, srcLocation:assetEntity.sourceLocation +"/"+assetEntity.sourceRack  ]
 			}
     	}
 		render items as JSON
     }
-    
+
     //get teams for selected bundles.
     def retrieveTeamsForBundles() {
     	def bundleId = params.bundleId
     	def projectId = session.CURR_PROJ.CURR_PROJ
-    	def projectInstance = Project.findById( projectId )
-    	def TeamInstance 
+    	def projectInstance = Project.get( projectId )
+    	def TeamInstance
         if( bundleId == "") {
             TeamInstance = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where "+
                     							"m.project = $projectId ) " )
         } else {
-            def moveBundleInstance = MoveBundle.findById( bundleId )
+            def moveBundleInstance = MoveBundle.get( bundleId )
             TeamInstance = ProjectTeam.findAllByMoveBundle( moveBundleInstance )
         }
         def teams = []
@@ -330,17 +330,17 @@ class MoveBundleAssetController {
     def retrieveRacksForBundles() {
     	def bundleId = params.bundleId
         def projectId = session.CURR_PROJ.CURR_PROJ
-        def projectInstance = Project.findById( projectId )
-        def movebundleInstance = MoveBundle.findById(bundleId)
+        def projectInstance = Project.get( projectId )
+        def movebundleInstance = MoveBundle.get(bundleId)
        	def assetEntityList = AssetEntity.findAllByMoveBundle(movebundleInstance)
        	def racks = []
     	assetEntityList.each {
-           	racks <<[id:it.sourceRack, name:it.sourceRack]    		
+           	racks <<[id:it.sourceRack, name:it.sourceRack]
     	}
     	render racks as JSON
     }
-	
-	
+
+
 	/*----------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : move bundle id
@@ -360,7 +360,7 @@ class MoveBundleAssetController {
     		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "and move_bundle_id = $bundleId " + sourceGroup )
     		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "and move_bundle_id = $bundleId " + targetGroup)
     	} else if(bundleId == ""){
-    		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+    		def projectId = session.getAttribute("CURR_PROJ").CURR_PROJ
      		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "and project_id = $projectId " + sourceGroup)
 			targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "and project_id = $projectId " + targetGroup)
     	}
@@ -375,12 +375,12 @@ class MoveBundleAssetController {
 		def location = params.location
 		def projectId = params.project
 	    def reportFields = []
-		if( !moveBundleId || !projectId ) {    		
+		if( !moveBundleId || !projectId ) {
 			reportFields <<[ 'flashMessage': "Please Select Bundles."]
 			render reportFields as JSON
 	    } else {
 			def assetsQuery = new StringBuffer(""" SELECT ae.asset_entity_id as id, ae.asset_name as assetName, ae.asset_tag as assetTag,
-								ae.move_bundle_id as bundle, ae.asset_type as type, ae.source_blade_chassis as chassis, ae.source_rack as rack, 
+								ae.move_bundle_id as bundle, ae.asset_type as type, ae.source_blade_chassis as chassis, ae.source_rack as rack,
 								ae.source_blade_position as bladePos, ae.source_rack_position as uposition
 								FROM asset_entity ae WHERE ae.project_id = ${projectId} """)
 			if(moveBundleId != "all"){
@@ -402,11 +402,11 @@ class MoveBundleAssetController {
 						it.rack = it.rack + pos
 					}
 				}
-				
+
 				reportFields << assetEntityList
 			}
 			println "==============================="+reportFields
 			render reportFields  as JSON
 	    }
 	}
-}   
+}

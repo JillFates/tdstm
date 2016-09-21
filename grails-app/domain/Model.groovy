@@ -14,28 +14,28 @@ class Model {
 	String assetType = 'Server'
 	String modelStatus = 'new'
 	String layoutStyle
-		
+
 	// Blade chassis fields
 	Integer bladeRows
 	Integer bladeCount
 	Integer bladeLabelCount
 	String bladeHeight = 'Half'
-	
-	// Product information 
+
+	// Product information
 	Integer usize = 1
 	Integer useImage = 0
 	Integer height
-	Integer weight 
+	Integer weight
 	Integer depth
 	Integer width
 	Integer powerUse
 	Integer powerNameplate
-	Integer powerDesign 
+	Integer powerDesign
 	String productLine
 	String modelFamily
 	Date endOfLifeDate
 	String endOfLifeStatus
-	String sourceURL		// URL of where model data was derived from	
+	String sourceURL		// URL of where model data was derived from
 
 	// Room Associated properties (should be tinyint 0/1)
     Boolean roomObject
@@ -45,18 +45,18 @@ class Model {
 	Person validatedBy
 	Date dateCreated
 	Date lastModified
-		
+
 	// TO BE DELETED
 	byte[] frontImage
 	byte[] rearImage
 	Project modelScope
 	Integer sourceTDS = 1
 	Integer sourceTDSVersion = 1
-	
+
 	static belongsTo = [ manufacturer : Manufacturer]
-	
+
 	static hasMany = [ modelConnectors : ModelConnector, racks:Rack ]
-	
+
 	static constraints = {
 		modelName( blank:false, nullable:false, unique:['manufacturer'])
 		manufacturer( nullable:false )
@@ -86,7 +86,7 @@ class Model {
 		createdBy( nullable:true )
 		updatedBy( nullable:true )
 		validatedBy( nullable:true )
-		
+
 		// TODO - DELETE THIS
 		modelScope( nullable:true )
 		frontImage( nullable:true )
@@ -96,7 +96,7 @@ class Model {
 		lastModified( nullable:true )
 		dateCreated( nullable:true )
 	}
-	
+
 	static transients = [
 		'findOrCreateAliasByName',
 		'createModelByModelName',
@@ -108,8 +108,8 @@ class Model {
 		'aliases',
 		'isValid'
 	]
-	
-	static mapping  = {	
+
+	static mapping  = {
 		autoTimestamp false
 		columns {
 			id column:'model_id'
@@ -128,7 +128,7 @@ class Model {
 	/*
 	 * Date to insert in GMT
 	 */
-	
+
 	String toString(){
 		modelName
 	}
@@ -150,11 +150,11 @@ class Model {
 		if (! createdBy) {
 			def principal
 			try {
-				principal = SecurityUtils.subject?.principal	
+				principal = SecurityUtils.subject?.principal
 			} catch (Exception e) {
 				log.info("No user found to associate to the model. " + e)
 			}
-			
+
 			if( principal ){
 				createdBy  = UserLogin.findByUsername( principal )?.person
 			}
@@ -177,14 +177,14 @@ class Model {
 		}
 		prependHttp()
 	}
-	
+
 	def beforeDelete = {
         AssetEntity.withNewSession{
             AssetEntity.executeUpdate("Update AssetEntity set model=null where model = :model",[model:this])
         }
         ModelAlias.withNewSession { aliases*.delete() }
 	}
-	
+
 	def getAssetTypeList(){
 		def assetTypeList = EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode("assetType"),[sort:'value',order:'asc'])?.value
 		return assetTypeList.findAll({it.trim()})
@@ -210,7 +210,7 @@ class Model {
 	def getAliases() {
 		ModelAlias.findAllByModel(this, [sort:'name'])
 	}
-    
+
 	/**
 	 * Used to determine if the current model has been validated
 	 * @return true if is validated else false
@@ -220,10 +220,10 @@ class Model {
    	}
 
 	/**
-	 * Used to get a ModelAlias object by name and create one (optionally) if it doesn't exist 
+	 * Used to get a ModelAlias object by name and create one (optionally) if it doesn't exist
 	 * @param String name - name of the model alias
 	 * @param Boolean createIfNotFound - optional flag to indicating if record should be created (default false)
-	 * @return ModelAlias - a ModelAlias object if found or was successfully created , or null if not found or not created 
+	 * @return ModelAlias - a ModelAlias object if found or was successfully created , or null if not found or not created
 	 */
 	def findOrCreateAliasByName(name, def createIfNotFound = false) {
 		name = name.trim()
@@ -237,7 +237,7 @@ class Model {
 		}
         return alias
 	}
-	
+
 	/**
 	 * Used to create a model for a given model name and manufacturer.
 	 *
@@ -248,11 +248,11 @@ class Model {
 	 * @return object of Model if created else null.
 	 */
 	def static createModelByModelName(def modelName, def manufacturer, def assetType='Server',  def usize=1, createdBy=null) {
-		def model = new Model( 
-			modelName: modelName, 
-			manufacturer: manufacturer, 
-			assetType: assetType, 
-			sourceTDS: 0, 
+		def model = new Model(
+			modelName: modelName,
+			manufacturer: manufacturer,
+			assetType: assetType,
+			sourceTDS: 0,
 			usize: usize,
 			createdBy: createdBy )
 
@@ -270,19 +270,19 @@ class Model {
 				connectorPosY : 0,
 				status: "missing",
 			)
-				
+
 			if ( !powerConnector.save(flush: true)) {
 				throw new PersistenceException("Unable to create Power Connectors for ${model}")
 					.addContextValue('messageCode', 'model.create.connector.failure')
 					.addContextValue('messageArgs', [model])
-					.addContextValue('gorm', GormUtil.allErrorsString( powerConnector ) );
+					.addContextValue('gorm', GormUtil.allErrorsString( powerConnector ) )
 			}
 		}
 		return model
 	}
-	
+
 	/**
-	 * This method is used to prepend "http" for sourceURL if http:// does not exist.  
+	 * This method is used to prepend "http" for sourceURL if http:// does not exist.
 	 */
 	def prependHttp(){
 		if(sourceURL && sourceURL?.size() > 10){
@@ -302,5 +302,4 @@ class Model {
 			     'validatedBy':'Validated By','dateCreated':'Date Created','lastModified':'Last Modified','sourceURL':'Source URL'
 			  ]
 	}
-	
 }

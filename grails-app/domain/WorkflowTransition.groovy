@@ -1,8 +1,8 @@
 /*
- * WorkflowTransition is used to store the data found in the xml in the 'transitions' section 
+ * WorkflowTransition is used to store the data found in the xml in the 'transitions' section
  */
 class WorkflowTransition {
-	
+
 	String code
 	String name
 	Integer transId
@@ -15,11 +15,11 @@ class WorkflowTransition {
 	Integer duration	// The duration to assign to tasks when building runbooks
 	String durationScale = 'm'		// Scale that duration represents m)inute, h)our, d)ay, w)eek
 	String category		// Identifies which task category that a transition will assigned to when building a runbook
-	RoleType role 
+	RoleType role
 
 	static belongsTo = [ workflow : Workflow ]
 	static hasMany  = [ WorkflowTransitionMap ]
-	
+
 	static constraints = {
 		workflow( nullable:false )
 		code( blank:false, nullable:false, unique:'workflow' )
@@ -36,8 +36,8 @@ class WorkflowTransition {
 		duration( nullable:true)
 		durationScale(nullable:true, blank:true, inList:['m','h','d','w'])
 		role( nullable:false)
-}	
-	
+}
+
 	static mapping  = {
 		version false
 		id column:'workflow_transition_id'
@@ -47,7 +47,7 @@ class WorkflowTransition {
 	def beforeInsert = {
 		role = this.role ? this.role : RoleType.get('PROJ_MGR')
 	}
-	
+
 	String toString() {
 		"${workflow} : ${code}"
 	}

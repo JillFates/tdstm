@@ -1,4 +1,3 @@
-
 class UnauthorizedException extends RuntimeException {
 
 	public UnauthorizedException() {
@@ -13,5 +12,5 @@ class UnauthorizedException extends RuntimeException {
 		super(message.toString())
 	}
 
-	
+
 }

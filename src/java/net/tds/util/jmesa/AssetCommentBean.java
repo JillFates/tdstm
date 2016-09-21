@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class AssetCommentBean implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private Long id;
 	private String assetType;
 	private String assetName;
@@ -22,7 +22,7 @@ public class AssetCommentBean implements Serializable {
 	private String category;
 	private Integer succCount;
 	private Long assetEntityId;
-	
+
 	// CSS class names used for the Updated, Due and Status columns
 	private String updatedClass="";
 	private String dueClass="";
@@ -31,10 +31,9 @@ public class AssetCommentBean implements Serializable {
 	private Integer score;
 	private Boolean isRunbookTask=false;
 	private Integer hardAssigned=0;
-	
-	
+
 	public AssetCommentBean() {}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -42,7 +41,7 @@ public class AssetCommentBean implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public String getAssetType() {
 		return this.assetType;
 	}
@@ -84,7 +83,7 @@ public class AssetCommentBean implements Serializable {
 	public void setScore(Integer score) {
 		this.score = score;
 	}
-	
+
 	public Long getAssetEntityId() {
 		return this.assetEntityId;
 	}
@@ -146,7 +145,7 @@ public class AssetCommentBean implements Serializable {
 	public void setSuccCount(Integer succCount) {
 		this.succCount = succCount;
 	}
-	
+
 	// score
 	public String getElapsedAgo() {
 		return this.elapsedAgo;
@@ -154,7 +153,7 @@ public class AssetCommentBean implements Serializable {
 	public void setElapsedAgo(String ago) {
 		this.elapsedAgo = ago;
 	}
-	
+
 	// StatusClass
 	public String getStatusClass() {
 		return this.statusClass;
@@ -162,7 +161,7 @@ public class AssetCommentBean implements Serializable {
 	public void setStatusClass(String val) {
 		this.statusClass = val;
 	}
-	
+
 	// DueClass
 	public String getDueClass() {
 		return this.dueClass;
@@ -170,7 +169,7 @@ public class AssetCommentBean implements Serializable {
 	public void setDueClass(String val) {
 		this.dueClass = val;
 	}
-	
+
 	// UpdatedClass
 	public String getUpdatedClass() {
 		return this.updatedClass;
@@ -178,7 +177,7 @@ public class AssetCommentBean implements Serializable {
 	public void setUpdatedClass(String val) {
 		this.updatedClass = val;
 	}
-	
+
 	// isRunbookTask
 	public Boolean isRunbookTask() {
 		return this.isRunbookTask;

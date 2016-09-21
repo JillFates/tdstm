@@ -1,16 +1,16 @@
 import com.tdssrc.grails.TimeUtil
 
 class ModelSyncBatch {
-	
+
 	String statusCode = "PENDING"
 	String source			// Where the batch originated
 	Date dateCreated
 	Date lastModified
 	Date changesSince		// Date passed to the master for filtering changes
 	UserLogin createdBy
-	
-	static hasMany = [ manufacturerSync:ManufacturerSync, modelSync:ModelSync ]	
-	
+
+	static hasMany = [ manufacturerSync:ManufacturerSync, modelSync:ModelSync ]
+
 	static mapping = {
 		version false
 		autoTimestamp false
@@ -24,7 +24,7 @@ class ModelSyncBatch {
 		dateCreated( nullable:true )
 		lastModified( nullable:true )
 	}
-	
+
 	/*
 	 * Date to insert in GMT
 	 */

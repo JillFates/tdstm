@@ -1,20 +1,20 @@
 import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller;
-import grails.validation.ValidationException;
+import org.springframework.stereotype.Controller
+import grails.validation.ValidationException
 
 
 /**
  * {@link Controller} for handling WS calls of the {@link EventService}
- * 
+ *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 class WsEventController {
 
 	def securityService
 	def eventService
-	
+
 	/**
 	 * Provides a list all events and associate bundles for the user's current project
 	 * Check {@link UrlMappings} for the right call
@@ -27,7 +27,7 @@ class WsEventController {
 		}
 
 		def currentProject = securityService.getUserCurrentProject()
-		
+
 		try {
 			def results = eventService.listEventsAndBundles(loginUser, currentProject)
 			render(ServiceResults.success(['list' : results]) as JSON)
@@ -42,7 +42,7 @@ class WsEventController {
 		}
 	}
 
-	
+
 	/**
 	 * Provides a list all bundles associated to a specified move event or if id=0 then unassigned bundles
 	 * for the user's current project
@@ -58,7 +58,7 @@ class WsEventController {
 		def currentProject = securityService.getUserCurrentProject()
 		def id = params.id
 		def useForPlanning = params.useForPlanning
-		
+
 		try {
 			def results = eventService.listBundles(id, useForPlanning, loginUser, currentProject)
 			render(ServiceResults.success(['list' : results]) as JSON)

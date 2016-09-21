@@ -3,12 +3,12 @@ import spock.lang.*
 
 class CoreServiceTests extends Specification {
 
-	def coreService	
+	def coreService
 
 	def "getAppName"() {
 		expect: 'Should return the application name'
 			coreService.getAppName() == 'tdstm'
-	}		
+	}
 
 	def "getAppConfig"() {
 		expect: 'getAppConfig() should not return null'
@@ -52,7 +52,7 @@ class CoreServiceTests extends Specification {
 			(setting instanceof groovy.util.ConfigObject)
 
 		when:
-			setting = coreService.getAppConfigSetting('testing.foo.man.choo') 
+			setting = coreService.getAppConfigSetting('testing.foo.man.choo')
 		then: 'Missing settings should return null value'
 			setting == null
 	}
@@ -61,6 +61,4 @@ class CoreServiceTests extends Specification {
 		expect:
 			coreService.getEnvironment() == 'TEST'
 	}
-
-
 }

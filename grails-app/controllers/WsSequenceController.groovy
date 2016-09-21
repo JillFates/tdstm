@@ -1,10 +1,9 @@
 import grails.converters.JSON
 
-
 class WsSequenceController {
 
 	def sequenceService
-	
+
 	def retrieveNext() {
 		def contextId = params.contextId
 		def name = params.name

@@ -1,7 +1,10 @@
+import grails.transaction.Transactional
+import org.springframework.jdbc.core.JdbcTemplate
+
+@Transactional
 class ManufacturerService {
 
-	def jdbcTemplate
-	def sessionFactory
+	JdbcTemplate jdbcTemplate
 
 	/**
 	 *	1. Add to the AKA field list in the target record
@@ -9,16 +12,15 @@ class ManufacturerService {
 	 *	3. Delete manufacturer record.
 	 *	4. Return to manufacturer list view with the flash message "Merge completed."
 	 */
-	def merge(manufacturerToId, manufacturerFromId) {
-
+	void merge(String manufacturerToId, String manufacturerFromId) {
 		// Get the manufacturer instances for params ids
 		def toManufacturer = Manufacturer.get(manufacturerToId)
 		def fromManufacturer = Manufacturer.get(manufacturerFromId)
-		
+
 		// Revise Model, Asset, and any other records that may point to this manufacturer
 		def updateAssetsQuery = "update asset_entity set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateAssetsQuery)
-		
+
 		def updateModelsQuery = "update model set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateModelsQuery)
 
@@ -27,7 +29,7 @@ class ManufacturerService {
 
 		// Add alias
 		def toManufacturerAlias = ManufacturerAlias.findAllByManufacturer(toManufacturer).name
-		
+
 		// Add to the AKA field list in the target record
 		if(!toManufacturerAlias?.contains(fromManufacturer.name)){
 			def fromManufacturerAlias = ManufacturerAlias.findAllByManufacturer(fromManufacturer)
@@ -37,17 +39,13 @@ class ManufacturerService {
 			}
 			//merging fromManufacturer as AKA of toManufacturer
 			toManufacturer.findOrCreateAliasByName(fromManufacturer.name, true)
-			
+
 			// Delete manufacturer record.
 			fromManufacturer.delete()
-		} else {
+		}
+		else {
 			//	Delete manufacturer record.
 			fromManufacturer.delete()
-			sessionFactory.getCurrentSession().flush();
 		}
 	}
-
 }
-
-
-

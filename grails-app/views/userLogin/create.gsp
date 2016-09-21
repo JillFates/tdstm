@@ -149,7 +149,7 @@
 										});
 									</script>
 									<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
-										value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
 									<g:hasErrors bean="${userLoginInstance}" field="expiryDate">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="expiryDate"/>
@@ -287,7 +287,7 @@
 
 				                                <g:each in="${assignedRole}" var="assignedRole">
 
-				                                	<option value="${assignedRole}" selected="selected">${RoleType.findById(assignedRole)}</option>
+				                                	<option value="${assignedRole}" selected="selected">${RoleType.get(assignedRole)}</option>
 
 				                                </g:each>
 
@@ -295,7 +295,7 @@
 
 			                                <g:else>
 
-			                                	<option value="USER" selected="selected">${RoleType.findById('USER')}</option>
+			                                	<option value="USER" selected="selected">${RoleType.get('USER')}</option>
 
 			                                </g:else>
 

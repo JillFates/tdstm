@@ -28,7 +28,7 @@ class ProjectDailyMetric {
 	Long totalUserLogins = 0
 	Long activeUserLogins = 0
 	Date dateCreated
-	
+
     static constraints = {
 		project (nullable:false)
 		metricDate (nullable:false)
@@ -63,4 +63,3 @@ class ProjectDailyMetric {
 	}
 
 }
-

@@ -4,10 +4,10 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetType
 import com.tdssrc.grails.GormUtil
 
-
 class StorageService {
-	
-	def assetEntityService
+
+	AssetEntityService assetEntityService
+	SecurityService securityService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a Storage asset
@@ -35,7 +35,7 @@ class StorageService {
 	Files saveAssetFromForm(controller, session, Long projectId, Long userId, params ) {
 		Files asset = new Files()
 		return saveUpdateAssetFromForm(controller, session, projectId, userId, params, asset)
-	}		
+	}
 
 	/**
 	 * Used to update a Database asset that is called from the controller
@@ -100,7 +100,7 @@ class StorageService {
 		assetEntityService.assignAssetToBundle(project, asset, params['moveBundle.id'])
 
 		assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
-		
+
 		return asset
 	}
 

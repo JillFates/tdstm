@@ -1,4 +1,5 @@
 package com.tds.asset
+
 class AssetCableMap {
 	String cable
 	String cableComment
@@ -11,7 +12,7 @@ class AssetCableMap {
 	Integer cableLength
 	String toPower
 	String assetLoc = 'S'
-	
+
 	static constraints = {
 		cable( nullable:false, blank:false )
 		cableComment( nullable:true, blank:true )
@@ -25,7 +26,7 @@ class AssetCableMap {
 		toPower( nullable:true, blank:true)
 		assetLoc( nullable: true , inList:['S', 'T'])
 	}
-	
+
 	static mapping = {
 		version false
 		autoTimestamp false

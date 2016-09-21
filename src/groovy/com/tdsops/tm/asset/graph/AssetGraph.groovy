@@ -14,7 +14,7 @@ public class AssetGraph {
 		nodes = [:]
 		def currentId = -1
 		def currentNode = null
-		def aType 
+		def aType
 		result.each { record ->
 			if (currentId != record["assetId"]) {
 				currentId = record["assetId"]
@@ -54,7 +54,7 @@ public class AssetGraph {
 			}
 		}
 
-		return groups;
+		return groups
 	}
 
 	/**
@@ -72,8 +72,8 @@ public class AssetGraph {
 				n.deps.each { dep ->
 					def depNode = nodes[dep.depId]
 					if ( depNode &&
-						 statusList.contains(dep.status) && 
-						 typeList.contains(dep.type) && 
+						 statusList.contains(dep.status) &&
+						 typeList.contains(dep.type) &&
 						 moveBundleList.contains(depNode.moveBundleId?.toString())
 					) {
 						nodesStack << depNode
@@ -93,5 +93,4 @@ public class AssetGraph {
 		}
 		nodes = null
 	}
-
 }

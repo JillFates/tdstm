@@ -7,7 +7,7 @@ class ExceptionUtil {
 
 	/**
 	 * Used to generate a Stacktrace as a string that limited to N lines
-	 * @param e - the exception to get the stacktrace on 
+	 * @param e - the exception to get the stacktrace on
 	 * @param lines - the number of lines to include in the trace (default 40)
 	 * @return The string containing the stacktrace
 	 */
@@ -18,7 +18,7 @@ class ExceptionUtil {
 	/**
 	 * Used to generate a Stacktrace as a string that limited to N lines with a message prefix
 	 * @param msg - the prefix message to include in the resulting string
-	 * @param e - the exception to get the stacktrace on 
+	 * @param e - the exception to get the stacktrace on
 	 * @param lines - the number of lines to include in the trace (default 40)
 	 * @return The string containing the stacktrace
 	 */

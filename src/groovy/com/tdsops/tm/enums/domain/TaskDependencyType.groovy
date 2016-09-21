@@ -1,11 +1,11 @@
 /**
  * The TaskDependencyType represents the various types of dependency types. The different types consist of:
- * 
+ *
  *		FR - The most common Finish-to-Ready that TM will use to update the successor to READY once the predecessor has completed
  * 		FS - Finish-to-Start is typically used with Resource type tasks that automatically START when the Predecessor completes
  * 		SS - Start-to-Start which in TM will automatically start a successor when the predecessor starts
- * 			(e.g. TBD)	
- * 		FF - Finish-to-Finish which in TM will automatically complete a successor task when its predecessor completes 
+ * 			(e.g. TBD)
+ * 		FF - Finish-to-Finish which in TM will automatically complete a successor task when its predecessor completes
  * 			( e.g. Predecessor:Validation of VM copy successful (SYS_ADMIN), Successor:VM Copy time (SYS_RESOURCE) )
  * 		SF - Start-to-Finish the least common method that is not going to be implemented in TM at this time.
  *      MM - Matched is a special case where the predecessor and successor tasks statuses are matched. When one is updated so is the other.
@@ -15,9 +15,9 @@
 package com.tdsops.tm.enums.domain
 
 enum TaskDependencyType {
-	
+
 	FR ('Finish-Ready'),
-	FS ('Finish-Start'), 
+	FS ('Finish-Start'),
 	FF ('Finish-Finish'),
 	SS ('Start-Start'),
 	MM ('Matched-Matched')
@@ -34,10 +34,10 @@ enum TaskDependencyType {
 	final String value
 	private static List keys
 	private static List labels
-	
+
 	// Constructor
 	TaskDependencyType( String value ) { this.value = value }
-	
+
 	String toString() { name() }
 	String value() { value }
 
@@ -51,31 +51,31 @@ enum TaskDependencyType {
 	}
 
 	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
+	static List getKeys() {
+		if (keys == null)
 			buildKeys()
 		return keys
 	}
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
+	// Construct the static keys
+	private static synchronized void buildKeys() {
 		if (keys == null) {
 			keys = TaskDependencyType.values()
 		}
-	} 
+	}
 
 	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
+	static List getLabels(String locale='en') {
+		if (labels == null)
 			buildLabels()
 		return labels
 	}
 
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
+	// Construct the static labels
+	private static synchronized void buildLabels() {
 		if (labels == null) {
 			labels = TaskDependencyType.values()*.value
 		}
-	} 
+	}
 
 }

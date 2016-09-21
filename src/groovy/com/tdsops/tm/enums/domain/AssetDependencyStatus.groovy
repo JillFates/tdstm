@@ -2,7 +2,7 @@ package com.tdsops.tm.enums.domain
 
 /**
  * AssetDependencyStatus - represents the valid options for the AssetDependancy.status property
- */ 
+ */
 class AssetDependencyStatus {
 	static final String VALIDATED='Validated'
 	static final String NA='Not Applicable'
@@ -11,6 +11,7 @@ class AssetDependencyStatus {
 	static final String ARCHIVED='Archived'
 	static final String FUTURE='Future'
 	static final String TESTING='Testing'
+
 	static final getList() {
 		return [ UNKNOWN, QUESTIONED, VALIDATED, ARCHIVED, NA, FUTURE, TESTING ]
 	}
@@ -30,4 +31,4 @@ class AssetDependencyStatus {
 	static final String getReviewCodesAsString() {
 		"'$QUESTIONED','$UNKNOWN'"
 	}
-}	
+}

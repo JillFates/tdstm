@@ -18,11 +18,11 @@ public enum AssetType {
 	AssetType(String name) {
 		this.name = name
 	}
-	
+
 	String toString() { name }
 
 	/**
-	 * The list of types that represent ONLY virtual servers 
+	 * The list of types that represent ONLY virtual servers
 	 * @return List<String>
 	 */
 	static List getVirtualServerTypes() {
@@ -38,7 +38,7 @@ public enum AssetType {
 	}
 
 	/**
-	 * The list of types that represent ONLY physical servers 
+	 * The list of types that represent ONLY physical servers
 	 * @return List<String>
 	 */
 	static List getPhysicalServerTypes() {
@@ -59,7 +59,7 @@ public enum AssetType {
 	 */
 	static List getBladeChassisTypes() {
 		return [
-			'Blade Chassis', 
+			'Blade Chassis',
 			'Chassis'
 		]
 	}

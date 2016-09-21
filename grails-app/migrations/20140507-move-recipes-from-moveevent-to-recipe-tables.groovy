@@ -1,7 +1,5 @@
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+def jdbcTemplate = com.tdsops.common.grails.ApplicationContextHolder.getBean('jdbcTemplate')
 
-def ctx = AH.application.mainContext
-def jdbcTemplate = ctx.jdbcTemplate
 databaseChangeLog = {
 	changeSet(author: "lokanada", id: "20140507 TM-2688-1") {
 		comment('move recipes from moveEvent to recipe tables')

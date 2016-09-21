@@ -39,7 +39,7 @@ class ExportUtil {
 		return (wb instanceof XSSFWorkbook)? "xlsx" : "xls"
 	}
 	/**
-	 * Used to send the appropriate content-type header to the response 
+	 * Used to send the appropriate content-type header to the response
 	 * @param response - the servlet response object
 	 * @param filename - the name that the file should be saved as when downloaded
 	 * @deprecated use setExcelContentType(response, filename, mimetypes)

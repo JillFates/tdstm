@@ -5,7 +5,7 @@ import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 
 class EmailDispatch {
 
-	EmailDispatchOrigin origin // What part of the system originated the email 
+	EmailDispatchOrigin origin // What part of the system originated the email
 	String subject // The subject to use for the email
 	String bodyTemplate // The name of the template to use for rendering the email body
 	String paramsJson // A set of properties that are used to populate the bodyTemplate

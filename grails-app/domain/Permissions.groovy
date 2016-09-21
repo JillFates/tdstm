@@ -1,4 +1,3 @@
-
 class Permissions {
 	static enum Roles{ADMIN,CLIENT_ADMIN,CLIENT_MGR,SUPERVISOR,EDITOR,USER}
 
@@ -6,10 +5,10 @@ class Permissions {
 	PermissionGroup permissionGroup
 	String description
 
-	static mapping = { 
-		version false 
+	static mapping = {
+		version false
 	}
-	
+
 	static hasMany = [ rolePermissions: RolePermissions ]
 
 	static constraints = {

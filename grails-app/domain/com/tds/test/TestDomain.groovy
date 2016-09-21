@@ -6,7 +6,7 @@
 package com.tds.test
 
 class TestDomain {
-	
+
 	String name
 	String color
 	String label
@@ -26,7 +26,7 @@ class TestDomain {
 		score 	range: 1..5
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		columns {
 			name sqlType: 'varchar(30)'
 			color sqlType: 'varchar(10)'

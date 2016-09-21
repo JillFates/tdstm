@@ -1,8 +1,11 @@
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.quartz.Scheduler
 import org.quartz.SimpleTrigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
@@ -15,15 +18,16 @@ import grails.converters.JSON
  */
 class EmailDispatchService {
 
-	def grailsApplication
+	GrailsApplication grailsApplication
 	def mailService
-	def quartzScheduler
+	Scheduler quartzScheduler
 
 	static SimpleEmailDispatchJob = "EmailDispatchJob"
 
 	/**
 	 * Creates a new EmailDispatch entity initializing all attributes
 	 */
+	@Transactional
 	EmailDispatch basicEmailDispatchEntity(EmailDispatchOrigin origin, String subject, String bodyTemplate, paramsJson, fromAddress, toAddress, toPerson, createdBy) {
 
 		EmailDispatch ed = new EmailDispatch()
@@ -50,7 +54,7 @@ class EmailDispatchService {
 	 */
 	def createEmailJob(emailDispatch, dataMap) {
 		def jobName = "TM-EmailDispatchJob-" + UUID.randomUUID().toString()
-		
+
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
 		Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
 
@@ -71,19 +75,20 @@ class EmailDispatchService {
 	/**
 	 * Used to send an email using a template defined in EmailDispatch
 	 */
+	@Transactional
 	def sendEmail(dataMap) {
 		log.info("Send email: Start.")
 
 		def edId = dataMap.getLongValue('edId')
-		def ed = EmailDispatch.findById(edId)
+		def ed = EmailDispatch.get(edId)
 
 		if (!ed) {
 			log.error "Invalid EmailDispatch id: $edId"
 			return
 		}
-		
+
 		log.info "sendEmail: edId=${edId} to=${ed.toPerson.id}/${ed.toPerson.email}"
-		
+
 		mailService.sendMail {
 			to ed.toPerson.email
 			subject ed.subject
@@ -116,12 +121,12 @@ class EmailDispatchService {
 						expiredTime: emailParams.expiredTime,
 						supportEmail: "support@transitionaldata.com"
 					]
-				break;
+				break
 			case "passwordResetNotif":
 				result = [
 						person: ed.toPerson.firstName
 					]
-				break;
+				break
 			case "accountActivation":
 				result = [
 					person: ed.toPerson.firstName,
@@ -132,7 +137,7 @@ class EmailDispatchService {
 					sysAdminEmail: emailParams.from,
 					username: emailParams.username
 				]
-				break;
+				break
 			case "adminResetPassword":
 				result = [
 					person: ed.toPerson.firstName,
@@ -141,7 +146,7 @@ class EmailDispatchService {
 					username: emailParams.username,
 					sysAdminEmail: emailParams.sysAdminEmail
 				]
-				break;
+				break
 		}
 		return result
 	}
@@ -155,16 +160,16 @@ class EmailDispatchService {
 		switch (ed.bodyTemplate) {
 			case "passwordReset":
 				result = "/auth/_resetPasswordEmail"
-				break;
+				break
 			case "passwordResetNotif":
 				result = "/auth/_resetPasswordNotificationEmail"
-				break;
+				break
 			case "accountActivation":
 				result = "/auth/_accountActivationNotificationEmail"
-				break;
+				break
 			case "adminResetPassword":
 				result = "/admin/_ResetPasswordNotificationEmail"
-				break;
+				break
 		}
 		return result
 	}
@@ -178,13 +183,13 @@ class EmailDispatchService {
 		switch (ed.bodyTemplate) {
 			case "passwordReset":
 				result = TimeUtil.GRANULARITY_MINUTES
-				break;
+				break
 			case "accountActivation":
 				result = TimeUtil.GRANULARITY_HOURS
-				break;
+				break
 			case "adminResetPassword":
 				result = TimeUtil.GRANULARITY_MINUTES
-				break;
+				break
 		}
 		return result
 	}

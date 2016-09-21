@@ -1,7 +1,7 @@
 package com.tdsops.common.security
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdssrc.grails.NumberUtil
@@ -167,13 +167,13 @@ class SecurityConfigParser {
 			// If we're prompting for an authority that means that LDAP integration must be enabled so lets check that and that there are domains defined
 			def ldapEnabled = requiredBoolProp('ldap.enabled', props.ldap?.enabled)
 
-			List domains = props.ldap?.domains?.keySet() as String[]		
+			List domains = props.ldap?.domains?.keySet() as String[]
 			map.authorityList = domains
 
-			if (!domains || domains.size()==0) 
+			if (!domains || domains.size()==0)
 				throw new ConfigurationException("Configuration setting ${propNamePrefix}.ldap.domains must be defined")
 
-			// If there is no user prompting for the domain, lets validate that the 
+			// If there is no user prompting for the domain, lets validate that the
 			if (ap == 'hidden') {
 				map.authorityName = requiredAndValidProp('authorityName', props.authorityName, domains, "for authorityPrompt='hidden'")
 			}
@@ -217,11 +217,11 @@ class SecurityConfigParser {
 		map.domainList = ldap.domains?.keySet()
 		if (! map.domainList || map.domainList.size() == 0) {
 			throw new ConfigurationException("Configuration setting ${propNamePrefix}.ldap.domains must be defined")
-		} 
+		}
 		map.domains = [:]
 
 		// Map all of the individual fields for each of the domains with the default values
-		map.domainList.each { domainCode -> 
+		map.domainList.each { domainCode ->
 			Map dm = [autoProvision:false, updateUser:false, updateRoles:false, defaultRole:'', defaultTimezone:'GMT']
 			String errMsg = "Security properties tdstm.security"
 
@@ -304,7 +304,7 @@ class SecurityConfigParser {
 	public static boolean hasActiveDirectoryDomain(Map map) {
 		boolean has=false
 
-		map.domains.each { k, v -> 
+		map.domains.each { k, v ->
 			if (v.isActiveDirectory)
 				has = true
 		}
@@ -320,7 +320,7 @@ class SecurityConfigParser {
 	public static boolean hasLDAPDomain(Map map) {
 		boolean has=false
 
-		map.domains { k, v -> 
+		map.domains { k, v ->
 			if (v.isLDAP)
 				has = true
 		}
@@ -372,7 +372,7 @@ class SecurityConfigParser {
 
 		// Minimum number of characters the password must be (default 8)
 		map.minPasswordLength = zeroOrPositiveProp(
-			'localUser.minPasswordLength', 
+			'localUser.minPasswordLength',
 			localUser.minPasswordLength,
 			validLocalUserSettingsNames['minPasswordLength']
 		)
@@ -398,7 +398,7 @@ class SecurityConfigParser {
 			validLocalUserSettingsNames['clearLockoutsOnRestart']
 		)
 
-		// How long to retain password history to prevent re-use, set to zero (0) disables password history (default 2 years). This is mutually exclusive with passwordHistoryRetentionCount. 
+		// How long to retain password history to prevent re-use, set to zero (0) disables password history (default 2 years). This is mutually exclusive with passwordHistoryRetentionCount.
 		map.passwordHistoryRetentionDays = zeroOrPositiveProp(
 			'localUser.passwordHistoryRetentionDays',
 			localUser.passwordHistoryRetentionDays,
@@ -425,27 +425,27 @@ class SecurityConfigParser {
 			localUser.forgotMyPasswordResetTimeLimit,
 			validLocalUserSettingsNames['forgotMyPasswordResetTimeLimit']
 		) //(minutes)
-		
+
 		// forgot my password welcome email time limit
 		map.accountActivationTimeLimit = zeroOrPositiveProp(
 			'localUser.accountActivationTimeLimit',
 			localUser.accountActivationTimeLimit,
 			validLocalUserSettingsNames['accountActivationTimeLimit']
 		) //(minutes)
-		
+
 		// forgot my password retain history days
 		map.forgotMyPasswordRetainHistoryDays = zeroOrPositiveProp(
 			'localUser.forgotMyPasswordRetainHistoryDays',
 			localUser.forgotMyPasswordRetainHistoryDays,
 			validLocalUserSettingsNames['forgotMyPasswordRetainHistoryDays']
-		) 
+		)
 
 		// prevent the user from changing their password (hours)
 		map.minPeriodToChangePswd = zeroOrPositiveProp(
 			'localUser.minPeriodToChangePswd',
 			localUser.minPeriodToChangePswd,
 			validLocalUserSettingsNames['minPeriodToChangePswd']
-		) 
+		)
 
 		// Disable the forcing of users from changing their passwords if the encryption method was used was the obsolete one.
 		map.forceUseNewEncryption = boolProp(
@@ -462,6 +462,6 @@ class SecurityConfigParser {
 			throw new ConfigurationException("Configuration setting: ${propNamePrefix}.localUser.passwordHistoryRetentionDays and ${propNamePrefix}.localUser.passwordHistoryRetentionCount are mutually exclusive, at least one must be zero.")
 		}
 
-		return map		
+		return map
 	}
 }

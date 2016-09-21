@@ -6,10 +6,10 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import org.apache.shiro.SecurityUtils
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class UserLoginController {
-	
+
 	def partyRelationshipService
 	def userPreferenceService
 	def securityService
@@ -29,7 +29,7 @@ class UserLoginController {
 			return
 
 		def listJsonUrl
-		
+
 		def companyId = params.companyId ?: 'All'
 		if(companyId && companyId != 'All'){
 			def map = [controller:'userLogin', action:'listJson', id:"${companyId}"]
@@ -38,7 +38,7 @@ class UserLoginController {
 			def map = [controller:'userLogin', action:'listJson']
 			listJsonUrl = HtmlUtil.createLink(map)+'/All'
 		}
-		
+
 		if(params.activeUsers){
 			 session.setAttribute("InActive", params.activeUsers)
 		}
@@ -47,12 +47,12 @@ class UserLoginController {
 		if(!active){
 			active = 'Y'
 		}
-		
+
 		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort { a, b -> a.name.compareToIgnoreCase b.name }
-		
+
 		return [companyId:companyId ,partyGroupList:partyGroupList,listJsonUrl:listJsonUrl]
 	}
-	
+
 	def listJson() {
 		if (!controllerService.checkPermission(this, "UserLoginView"))
 			return
@@ -67,13 +67,13 @@ class UserLoginController {
 		def userLogin = securityService.getUserLogin()
 		def filterParams = ['username':params.username, 'fullname':params.fullname, 'roles':params.roles, 'company':params.company,
 			'lastLogin':params.lastLogin, 'dateCreated':params.dateCreated, 'expiryDate':params.expiryDate]
-		
+
 		// Validate that the user is sorting by a valid column
 		if ( ! sortIndex in filterParams)
 			sortIndex = 'username'
-			
+
 		def presentDate = TimeUtil.nowGMTSQLFormat()
-		
+
 		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
 		if (!active) {
 			active = 'Y'
@@ -87,14 +87,14 @@ class UserLoginController {
 		}
 
 		def query = new StringBuffer("""SELECT * FROM ( SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
-			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate, 
+			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId, u.is_local AS isLocal, u.locked_out_until AS locked, u.failed_login_attempts AS failedAttempts
-			FROM party_role pr 
-			LEFT OUTER JOIN person p on p.person_id=pr.party_id 
-			LEFT OUTER JOIN user_login u on u.person_id=p.person_id 
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF' 
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pr.party_id 
-			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id 
+			FROM party_role pr
+			LEFT OUTER JOIN person p on p.person_id=pr.party_id
+			LEFT OUTER JOIN user_login u on u.person_id=p.person_id
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pr.party_id
+			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
 			WHERE role_type_id in (${systemRolesList.join(", ")}) AND u.active = '${active}'""")
 		if (active=='Y')
 			query.append(" AND u.expiry_date > '${presentDate}' ")
@@ -119,7 +119,7 @@ class UserLoginController {
 			}
 			//query.append(" GROUP BY pr.party_id ORDER BY pr.role_type_id, pg.name, first_name, last_name ) as users")
 			query.append(" GROUP BY pr.party_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
-		
+
 			// Handle the filtering by each column's text field
 			def firstWhere = true
 			filterParams.each {
@@ -136,7 +136,7 @@ class UserLoginController {
 		} else {
 			userLoginInstanceList = []
 		}
-		
+
 		// Limit the returned results to the user's page size and number
 		def totalRows = userLoginInstanceList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
@@ -144,23 +144,23 @@ class UserLoginController {
 			userLoginInstanceList = userLoginInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		else
 			userLoginInstanceList = []
-		
+
 		def map = [controller:'userLogin', action:'listJson', id:"${params.companyId}"]
 		def listJsonUrl = HtmlUtil.createLink(map)
 		def acceptIconUrl = HtmlUtil.resource([dir: 'icons', file: 'accept.png', absolute: false])
 		def acceptImgTag = '<img src="' + acceptIconUrl + '"></img>'
-		
+
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLoginInstanceList?.collect {
-			[ cell: [ [id:it.userLoginId, username:it.username, lockedOutUntil:it.locked, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts:it.failedAttempts], 
+			[ cell: [ [id:it.userLoginId, username:it.username, lockedOutUntil:it.locked, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts:it.failedAttempts],
 			'<a href="'+HtmlUtil.createLink([controller:'userLogin', action:'show', id:"${it.userLoginId}"])+'">'+it.username+'</a>',
-			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>', 
+			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>',
 			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate ], id: it.userLoginId ]}
-			
+
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
 	}
-	
+
 	def show() {
 		if (!controllerService.checkPermission(this, "UserLoginView"))
 			return
@@ -170,12 +170,12 @@ class UserLoginController {
 		if(!userLoginInstance) {
 			flash.message = "UserLogin not found with id ${params.id}"
 			redirect( action:"list", params:[ id:companyId ] )
-		} else { 
+		} else {
 			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
 			def assignedRoles = userPreferenceService.getAssignedRoles( userLoginInstance.person )
 			def canResetByAdmin = userLoginInstance.canResetPasswordByAdmin(securityService.getUserLoginPerson())
 			def cellValue = [id:userLoginInstance.id, username:userLoginInstance.username, lockedOutUntil:userLoginInstance.lockedOutUntil, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), userLoginInstance.lockedOutUntil), failedLoginAttempts:userLoginInstance.failedLoginAttempts] as JSON
-			return [ userLoginInstance : userLoginInstance, companyId:companyId, roleList:roleList, assignedRoles:assignedRoles, cellValue:cellValue, canResetPasswordByAdmin: canResetByAdmin ] 
+			return [ userLoginInstance : userLoginInstance, companyId:companyId, roleList:roleList, assignedRoles:assignedRoles, cellValue:cellValue, canResetPasswordByAdmin: canResetByAdmin ]
 		}
 	}
 
@@ -186,7 +186,7 @@ class UserLoginController {
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(userLoginInstance) {
-			userPreferenceService.deleteSecurityRoles(userLoginInstance.person);
+			userPreferenceService.deleteSecurityRoles(userLoginInstance.person)
 			userLoginInstance.delete(flush:true)
 			flash.message = "UserLogin ${userLoginInstance} deleted"
 			redirect( action:"list", params:[ id:companyId ] )
@@ -206,7 +206,7 @@ class UserLoginController {
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
-		
+
 		if(!userLoginInstance) {
 			flash.message = "UserLogin not found with id ${params.id}"
 			redirect( action:"list", params:[ id:companyId ] )
@@ -232,7 +232,7 @@ class UserLoginController {
 	def update() {
 		UserLogin byWhom = securityService.getUserLogin()
 		UserLogin userLogin
-		String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		String errMsg
 		try {
 			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, byWhom, tzId, false)
@@ -257,9 +257,9 @@ class UserLoginController {
 			List assignedRoles = userPreferenceService.getAssignedRoles( person )
 			render( view: 'edit', model: [
 				userLogin:userLogin,
-				vailableRoles:availableRoles, 
-				assignedRoles:assignedRoles, 
-				companyId: params.companyId 
+				vailableRoles:availableRoles,
+				assignedRoles:assignedRoles,
+				companyId: params.companyId
 			])
 			*/
 		} else {
@@ -267,7 +267,7 @@ class UserLoginController {
 			redirect( action:"show", id:userLogin.id, params:[ companyId:params.companyId ] )
 		}
 	}
-	
+
 	// set the User Roles to the Person
 	def addRoles() {
 			def assignedRoles = params.assignedRoleId.split(',')
@@ -280,7 +280,7 @@ class UserLoginController {
 			}
 		render true
 	}
-	
+
 	// return userlogin details to create form
 	def create() {
 		if (!controllerService.checkPermission(this, "CreateUserLogin"))
@@ -290,14 +290,14 @@ class UserLoginController {
 		def companyId = params.companyId
 		def person
 		if ( personId != null ) {
-			person = Person.findById( personId )
+			person = Person.get( personId )
 			if (person.lastName == null) {
 				person.lastName = ""
 			}
 		}
-		
+
 		def now = TimeUtil.nowGMT()
-		
+
 		def userLoginInstance = new UserLogin()
 		userLoginInstance.properties = params
 		def expiryDate = new Date(now.getTime() + 7776000000) // 3 Months
@@ -309,7 +309,7 @@ class UserLoginController {
 		PartyGroup company = userLoginInstance.person.getCompany()
 		def projectList = projectService.getProjectsForCompany(company)
 		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
-		def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level 
+		def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level
 		return ['userLoginInstance':userLoginInstance, personInstance:person, companyId:companyId, roleList:roleList, projectList:projectList,
 			 	project:project, minPasswordLength:minPasswordLength, maxLevel: maxLevel]
 	}
@@ -322,7 +322,7 @@ class UserLoginController {
 
 		UserLogin byWhom = securityService.getUserLogin()
 		UserLogin userLogin
-		String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		String errMsg
 
 		try {
@@ -359,7 +359,7 @@ class UserLoginController {
 			if(userLogin){
 				userLogin.lastPage = TimeUtil.nowGMT()
 				userLogin.save(flush:true)
-				session.REDIRECT_URL = params.url	
+				session.REDIRECT_URL = params.url
 			}
 		}
 		render "SUCCESS"
@@ -437,7 +437,7 @@ class UserLoginController {
 	 * This method triggers the password reset on a selected account.
 	 */
 	def sendPasswordReset = {
-		def userLogin = UserLogin.findById(params.id)
+		def userLogin = UserLogin.get(params.id)
 		if(userLogin.canResetPasswordByAdmin(securityService.getUserLoginPerson())){
 			def emailParams = [sysAdminEmail : securityService.getUserLogin().person.email, username: userLogin.username]
 			securityService.sendResetPasswordEmail(userLogin.person.email, request.getRemoteAddr(), PasswordResetType.ADMIN_RESET, emailParams)

@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory
  * ----------------------------------------*/
 class WorkflowController {
 	protected static Log log = LogFactory.getLog( WorkflowController.class )
-	def static standardTransitions = ["Hold", "Ready", "PoweredDown", "Release", "Unracking", "Unracked", "Cleaned", "OnCart", 
+	def static standardTransitions = ["Hold", "Ready", "PoweredDown", "Release", "Unracking", "Unracked", "Cleaned", "OnCart",
 									  "OnTruck", "OffTruck", "Staged", "Reracking", "Reracked", "Completed", "Terminated"]
 	/* Initialize the services */
 	def stateEngineService
@@ -18,13 +18,12 @@ class WorkflowController {
     def partyRelationshipService
 	def projectService
 	def securityService
-	def grailsApplication
 
 	/*-----------------------------------------------
 	 * Index method for default action
 	 *---------------------------------------------*/
 	def index() { redirect(action:"home",params:params) }
-	
+
 	/*-----------------------------------------------
 	 *  Will render Workflow data
 	 *---------------------------------------------*/
@@ -46,17 +45,17 @@ class WorkflowController {
 		if( workflowId ){
 			workflow = Workflow.get(params.workflow)
 			stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'project')
-			def query = """SELECT mbs.transition_id as transitionId FROM move_bundle_step mbs 
+			def query = """SELECT mbs.transition_id as transitionId FROM move_bundle_step mbs
 							left join move_bundle mb on mb.move_bundle_id = mbs.move_bundle_id
-							left join project p on p.project_id = mb.project_id 
+							left join project p on p.project_id = mb.project_id
 							where p.workflow_code = '${workflow.process}' group by mbs.transition_id"""
 			stepsExistInWorkflowProject = jdbcTemplate.queryForList( query )
-			
+
 			workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
 		} else {
 			redirect(action:"home")
 		}
-		
+
 		workflowTransitions.each{ workflowTransition ->
 			def isExist = false
 			def donotDelete = false
@@ -64,7 +63,7 @@ class WorkflowController {
 				donotDelete = true
 			if( stepsExistInWorkflowProject.size() > 0 && stepsExistInWorkflowProject?.transitionId?.contains( workflowTransition.transId ))
 				isExist = true
-				
+
 			workflowTransitionsList << [transition : workflowTransition, isExist : isExist, donotDelete : donotDelete ]
 		}
 		def roles = partyRelationshipService.getStaffingRoles()
@@ -95,11 +94,11 @@ class WorkflowController {
 					}
 					roleWiseTransitions << [ transition:transition, transitionsMap : transitionsMap]
 				}
-			
+
 			} else {
 				redirect(action:"home")
 			}
-			
+
 			return [workflowTransitionsList : workflowTransitionsList, workflowTransition:workflowTransition,
 					workflow : workflowTransition?.workflow, swimlanes : swimlanes,
 					headerCount : headerCount, roleWiseTransitions : roleWiseTransitions ]
@@ -115,7 +114,7 @@ class WorkflowController {
 		if(process && principal){
 			def userLogin = UserLogin.findByUsername( principal )
 			def dateNow = TimeUtil.nowGMT()
-			def workflowInstance = new Workflow( process : process, 
+			def workflowInstance = new Workflow( process : process,
 										dateCreated : dateNow,
 										lastUpdated : dateNow,
 										updatedBy : userLogin.person
@@ -138,10 +137,10 @@ class WorkflowController {
                     def defaultRole = RoleType.read("PROJ_MGR")
 					stdWorkflowTransitions.each{ stdWorkflowTransition ->
 						def workflowTransition = new WorkflowTransition(workflow : workflowInstance,
-							code : stdWorkflowTransition.code, 
+							code : stdWorkflowTransition.code,
 							name : stdWorkflowTransition.name,
 							transId : stdWorkflowTransition.transId,
-							type : stdWorkflowTransition.type,	
+							type : stdWorkflowTransition.type,
 							color : stdWorkflowTransition.color,
 							dashboardLabel : stdWorkflowTransition.dashboardLabel,
 							predecessor : stdWorkflowTransition.predecessor,
@@ -163,7 +162,7 @@ class WorkflowController {
 						def workflowTransition = workflowTransitions.find{	it.code == map.workflowTransition.code &&
 																			it.transId == map.workflowTransition.transId }
 						def swimlane = swimlanes.find{	it.name == map.swimlane.name }
-						
+
 						def workflowTransitionMap = new WorkflowTransitionMap(workflow:workflowInstance, workflowTransition:workflowTransition,swimlane:swimlane,transId:map.transId, flag:map.flag )
 						if (  workflowTransitionMap.validate() && workflowTransitionMap.save( flush:true) ) {
 							log.debug(" Workfolw Roles \"${workflowTransitionMap}\" created")
@@ -177,7 +176,7 @@ class WorkflowController {
 	}
 	/*====================================================
 	 *  Update the workflow steps for selected workflow
-	 *  @param : workflowId, steps 
+	 *  @param : workflowId, steps
 	 *==================================================*/
 def updateWorkflowSteps() {
 		def workflowId = params.workflow
@@ -193,10 +192,10 @@ def updateWorkflowSteps() {
 			workflow.updatedBy = UserLogin.findByUsername( principal )?.person
 			if ( workflow.validate() && workflow.save(insert : true, flush:true) ) {
 				log.debug("Workfolw \"${workflow}\" updated")
-			}	
+			}
 			workflowTransitions = WorkflowTransition.findAllByWorkflow( workflow )
 			workflowTransitions.each{ workflowTransition ->
-				
+
 				workflowTransition.code = params["code_"+workflowTransition.id]
 				workflowTransition.name = params["name_"+workflowTransition.id]
 				workflowTransition.transId = params["transId_"+workflowTransition.id] ? Integer.parseInt( params["transId_"+workflowTransition.id] ) : null
@@ -219,39 +218,39 @@ def updateWorkflowSteps() {
 			def additionalSteps = Integer.parseInt(params.additionalSteps)
 			for(int i=1; i <= additionalSteps; i++){
 				def workflowTransition = new WorkflowTransition(workflow : workflow,
-					code : params["code_$i"], 
+					code : params["code_$i"],
 					name : params["name_$i"],
 					transId : params["transId_$i"] ? Integer.parseInt( params["transId_$i"] ) : null,
-					// type : params["type_$i"],	
+					// type : params["type_$i"],
 					type : 'boolean',
 					category : params["category_$i"],
 					// color : params["color_$i"],
 					dashboardLabel : params["dashboardLabel_$i"],
 					// predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
-					// header : params["header_$i"],		
+					// header : params["header_$i"],
 					role : RoleType.get(params["role_$i"]),
 					//effort : params["effort_$i"] ? Integer.parseInt( params["effort_$i"] ) : null,
 					duration : params["duration_$i"] ? Integer.parseInt( params["duration_$i"] ) : null
 					)
-				
+
 				if (  ! workflowTransition.validate() || ! workflowTransition.save( flush:true) ) {
 					flash.message += "["+workflowTransition.code +"]"
 				} else {
 					log.debug("Workfolw step \"${workflowTransition}\" updated")
 				}
 			}
-			def query = """SELECT mbs.transition_id as transitionId FROM move_bundle_step mbs 
+			def query = """SELECT mbs.transition_id as transitionId FROM move_bundle_step mbs
 							left join move_bundle mb on mb.move_bundle_id = mbs.move_bundle_id
-							left join project p on p.project_id = mb.project_id 
+							left join project p on p.project_id = mb.project_id
 							where p.workflow_code = '${workflow.process}' group by mbs.transition_id"""
 			def stepsExistInWorkflowProject = jdbcTemplate.queryForList( query )
 			workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
-			
+
 			workflowTransitions.each{ workflowTransition ->
 				def isExist = false
 			if( stepsExistInWorkflowProject.size() > 0 && stepsExistInWorkflowProject?.transitionId?.contains( workflowTransition.transId ) )
 				isExist = true
-				
+
 			workflowTransitionsList << [transition : workflowTransition, isExist : isExist ]
 			}
 			//load transitions details into application memory.
@@ -303,7 +302,7 @@ def updateWorkflowSteps() {
 			def maxTargetId = jdbcTemplate.queryForInt("SELECT Max(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
             def minSourceId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck} and trans_id > ${hold}")
 			def minTargetId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
-			
+
 			if(minSourceId){
 				def workflowTransition = WorkflowTransitionMap.findAllBySwimlaneAndTransId(role,minSourceId, [sort:"transId", order:"asc"])?.workflowTransition
 				def minProcessIds = workflowTransition?.findAll { it.transId < minSourceId }?.sort{it.transId}
@@ -316,17 +315,17 @@ def updateWorkflowSteps() {
 				minTargetId = minProcessIds.transId[0]
 				role.minTarget = minTargetId ? stateEngineService.getState( workflow.process, minTargetId ) : null
 			}
-			
+
 			role.maxTarget = maxTargetId ? stateEngineService.getState( workflow.process, maxTargetId ) : null
 			role.maxSource = maxSourceId ? stateEngineService.getState( workflow.process, maxSourceId ) : null
-			
+
 			if(!role.save( flush:true )){
 				role.errors.each {  println it}
 			}
 		}
 		//	load transitions details into application memory.
     	stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
-		
+
 		redirect(action:"workflowList", params:[workflow:workflowId])
 	 }
 
@@ -349,7 +348,7 @@ def updateWorkflowSteps() {
 				MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in (select mb.id from MoveBundle mb where mb.workflowCode = '${workflowTransition.workflow.process}') and mbs.transitionId = ?",[ workflowTransition.transId])
 				WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflowTransition = ?",[workflowTransition])
 				workflowTransition.delete(flush:true)
-				
+
 				//	load transitions details into application memory.
 		    	stateEngineService.loadWorkflowTransitionsIntoMap( process, 'workflow')
 		    }
@@ -394,10 +393,10 @@ def updateWorkflowSteps() {
 	 * Generate .svg file for vertical text display in FF/ Safari
 	 *---------------------------------------------*/
 	def generateHeder(def workflowId){
-			
+
 			def workflow = Workflow.get( workflowId )
 			def tempTransitions = WorkflowTransition.findAllByWorkflow( workflow, [sort:"transId"] )
-		       
+
 			def svgHeaderFile = new StringBuffer()
 			svgHeaderFile.append("<?xml version='1.0' encoding='UTF-8' standalone='no'?>")
 			svgHeaderFile.append("<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>")
@@ -417,7 +416,7 @@ def updateWorkflowSteps() {
 								"font-size='12' fill='#333333' x='-44' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
 			def count = 0
 			tempTransitions.sort{it.transId}.each{ transition ->
-				if(transition.code == "SourceWalkthru" || transition.code == "TargetWalkthru") return 
+				if(transition.code == "SourceWalkthru" || transition.code == "TargetWalkthru") return
 				def processTransition = transition.name
 				def fillColor = transition.header
 				if( !fillColor ){
@@ -469,5 +468,5 @@ def updateWorkflowSteps() {
 		}
 		render actorId
 	}
-	
+
 }

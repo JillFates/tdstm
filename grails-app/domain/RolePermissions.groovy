@@ -3,24 +3,24 @@ import org.apache.shiro.SecurityUtils
 class RolePermissions {
 	String role
 	Permissions permission
-	
+
 	static mapping = {
 		version false
 	}
-	
+
 	static belongsTo = Permissions
 
     static constraints = {
 		role( blank:false, nullable:false )
 		permission( nullable:false )
     }
-	
+
 	// Helper methods
 	static Boolean hasPermission( permissionItems){
 		def returnVal = false
 		def permissionItem = permissionItems
 		def permission = Permissions.findByPermissionItem(permissionItem)
-		
+
 		List roles = []
 		def subject = SecurityUtils.subject
 		Permissions.Roles.values().each{
@@ -35,7 +35,7 @@ class RolePermissions {
 		}
 		return returnVal
 	}
-	
+
 	static Boolean hasAnyPermissionToRole(role, permissions){
 		def returnVal = false
 		def rolePermissions = RolePermissions.createCriteria().list {
@@ -49,7 +49,7 @@ class RolePermissions {
 		}
 		return returnVal
 	}
-	
+
 	static Boolean hasPermissionToAnyRole(roles, permission){
 		def returnVal = false
 		def rolePermissions = RolePermissions.findAllByPermissionAndRoleInList(permission,roles)
@@ -58,7 +58,7 @@ class RolePermissions {
 		}
 		return returnVal
 	}
-	
+
 	static Boolean lacksPermissionToAllRole(role, permission){
 		def returnVal = false
 		def rolePermissions = RolePermissions.createCriteria().list {
@@ -76,5 +76,5 @@ class RolePermissions {
 	String toString() {
 		return role
 	}
-	
+
 }

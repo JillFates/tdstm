@@ -29,7 +29,7 @@ class ModelSyncBatchController {
 					if( !manufacturerInstance ){
 						manufacturerInstance = Manufacturer.findByName( manufacturerSync.name )
 						if(!manufacturerInstance){
-							manufacturerInstance = new Manufacturer( name : manufacturerSync.name,  
+							manufacturerInstance = new Manufacturer( name : manufacturerSync.name,
 																	 description : manufacturerSync.description
 																	)
 							if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
@@ -50,7 +50,7 @@ class ModelSyncBatchController {
 							}
 						} else {
 							//manufacturerInstance.aka = manufacturerSync.aka
-							manufacturerInstance.description = manufacturerSync.description 
+							manufacturerInstance.description = manufacturerSync.description
 							manufacturerInstance.userLogin = loggedUser
 							if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 								def etext = "Unable to create manufacturerInstance" +
@@ -68,11 +68,11 @@ class ModelSyncBatchController {
 							    }
 								manuUpdated ++
 							}
-						
+
 						}
 					} else {
 						//manufacturerInstance.aka = manufacturerSync.aka
-						manufacturerInstance.description = manufacturerSync.description 
+						manufacturerInstance.description = manufacturerSync.description
 						if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 							def etext = "Unable to create manufacturerInstance" +
 							GormUtil.allErrorsString( manufacturerInstance )
@@ -85,7 +85,7 @@ class ModelSyncBatchController {
 									if(!manuExist){
 										manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
 									}
-									
+
 								}
 						    }
 							manuUpdated ++
@@ -101,8 +101,8 @@ class ModelSyncBatchController {
 					if( !modelInstance ){
 						modelInstance = Model.findByModelNameAndAssetType( modelSync.modelName,modelSync.assetType )
 						if(!modelInstance){
-							modelInstance = new Model( 
-							   modelName : modelSync.modelName, 
+							modelInstance = new Model(
+							   modelName : modelSync.modelName,
 							   description : modelSync.description,
 							   assetType : modelSync.assetType,
 							   powerNameplate : modelSync.powerNameplate,
@@ -147,8 +147,8 @@ class ModelSyncBatchController {
 							}
 						} else {
 							if (modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion) {
-								
-								modelInstance.description = modelSync.description 
+
+								modelInstance.description = modelSync.description
 								modelInstance.powerNameplate = modelSync.powerNameplate
 								modelInstance.powerDesign = modelSync.powerDesign
 								modelInstance.powerUse = modelSync.powerUse
@@ -172,7 +172,7 @@ class ModelSyncBatchController {
 								modelInstance.sourceURL = modelSync.sourceURL
 								modelInstance.modelStatus = modelSync.modelStatus
 								modelInstance.modelScope = modelSync.modelScope
-								
+
 								if ( !modelInstance.validate() || !modelInstance.save() ) {
 									def etext = "Unable to create modelInstance" +
 									GormUtil.allErrorsString( modelInstance )
@@ -193,8 +193,8 @@ class ModelSyncBatchController {
 						}
 					} else {
 						if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
-						    
-							modelInstance.description = modelSync.description 
+
+							modelInstance.description = modelSync.description
 							modelInstance.powerNameplate = modelSync.powerNameplate
 							modelInstance.powerDesign = modelSync.powerDesign
 							modelInstance.powerUse = modelSync.powerUse
@@ -219,7 +219,7 @@ class ModelSyncBatchController {
 							modelInstance.sourceURL = modelSync.sourceURL
 							modelInstance.modelStatus = modelSync.modelStatus
 							modelInstance.modelScope = modelSync.modelScope
-							
+
 							if ( !modelInstance.validate() || !modelInstance.save() ) {
 								def etext = "Unable to create modelInstance" +
 								GormUtil.allErrorsString( modelInstance )
@@ -249,7 +249,7 @@ class ModelSyncBatchController {
 					if(model){
 						def connectorInstance = ModelConnector.findByConnectorAndModel( connectorSync.connector ,model)
 						if( !connectorInstance ){
-							connectorInstance = new ModelConnector( 
+							connectorInstance = new ModelConnector(
 								connector : connectorSync.connector,
 								label : connectorSync.label,
 								type : connectorSync.type,
@@ -276,7 +276,7 @@ class ModelSyncBatchController {
 								connectorInstance.connectorPosY = connectorSync.connectorPosY
 								connectorInstance.status = connectorSync.status
 								connectorInstance.option = connectorSync.option
-								
+
 								if ( !connectorInstance.validate() || !connectorInstance.save() ) {
 									def etext = "Unable to create connectorInstance" +
 									GormUtil.allErrorsString( connectorInstance )
@@ -292,7 +292,7 @@ class ModelSyncBatchController {
 						<li>Manufacturers in Batch: ${manufacturersSync.size()}</li>
 						<li>Maufacturers Inserted: ${manuAdded}</li>
 						<li>Manufacturers Updated: ${manuUpdated}</li>
-					</ul> 
+					</ul>
 					<ul>
 						<li>Models in Batch: ${modelsSync.size()}</li>
 						<li>Models Inserted: ${modelAdded}</li>
@@ -302,14 +302,14 @@ class ModelSyncBatchController {
 						<li> Connectors in Batch: ${connectorsSync.size()}</li>
 						<li>Connectors Inserted: ${connectorsAdded}</li>
 						<li>Connectors Updated: ${connectorsUpdated}</li>
-					</ul>""" 
+					</ul>"""
 			}
 			modelSyncBatch.statusCode = "COMPLETED"
 			modelSyncBatch.save()
 		} catch (Exception e) {
 			flash.message = "Import Batch process failed"
 			log.error "Can't import: " + e.message
-			e.printStackTrace();
+			e.printStackTrace()
 		}
     	redirect(action: "list", params: params)
     }

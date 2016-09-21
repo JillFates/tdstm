@@ -1,12 +1,11 @@
-
 class PermissionsController {
 
 	def jdbcTemplate
-	
+
 	def index() {
 		redirect(action:"show",params:params)
 	}
-	
+
 	def show() {
 		if(RolePermissions.hasPermission("RolePermissionView")){
 			def permissions = Permissions.withCriteria {
@@ -21,8 +20,8 @@ class PermissionsController {
 			flash.message = "You don't have permission to access Permission List"
 			redirect(controller:'project', action: 'list')
 		}
-	} 
-	
+	}
+
 	def edit() {
 		if(RolePermissions.hasPermission("RolePermissionView")){
 			def permissions = Permissions.withCriteria {
@@ -37,7 +36,7 @@ class PermissionsController {
 			redirect(controller:'project', action: 'list')
 		}
 	}
-	
+
 	def update() {
 		def paramList = params.column
 		jdbcTemplate.update("delete from role_permissions")
@@ -58,12 +57,12 @@ class PermissionsController {
 				}
 			}
 		}
-		for(String id : paramList){
-			def permissionInstansce = Permissions.findById(id.toInteger())
+		for(String id in paramList){
+			def permissionInstansce = Permissions.get(id)
 			if(permissionInstansce){
 				permissionInstansce.description = params["description_"+id]
 				if(!permissionInstansce.save(flush:true)){
-					permissionInstansce.errors.allErrors.each {  
+					permissionInstansce.errors.allErrors.each {
 						println it
 				    }
 			    }

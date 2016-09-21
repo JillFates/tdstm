@@ -10,7 +10,6 @@ import org.apache.shiro.realm.Realm
 /**
  * Using this strategy if some realm throw an exception then the authentication fails and the exception is propagated.
  */
-
 //public class FirstExceptionStrategy extends AtLeastOneSuccessfulStrategy {
 public class FirstExceptionStrategy extends FirstSuccessfulStrategy {
 
@@ -25,10 +24,10 @@ public class FirstExceptionStrategy extends FirstSuccessfulStrategy {
 		// If a realm throws an AuthenticationException then the authentication is stopped and no new realms are checked
 		if ( (throwable != null) &&
 			 (throwable instanceof AuthenticationException) ) {
-			throw (AuthenticationException) throwable;
-		} 
+			throw (AuthenticationException) throwable
+		}
 
-		return super.afterAttempt(realm, token, singleRealmInfo, aggregateInfo, throwable);
+		return super.afterAttempt(realm, token, singleRealmInfo, aggregateInfo, throwable)
 	}
 
 }

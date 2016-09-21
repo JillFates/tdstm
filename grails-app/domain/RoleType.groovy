@@ -1,17 +1,17 @@
 class RoleType {
-	
+
 	/** Code that represent User Security Group types */
 	static String SECURITY = "SECURITY"
-	
+
 	/** Code that represent Person Team types */
 	static String TEAM = "TEAM"
-	
+
 	/** Code that represents Project type roles */
 	static String PROJECT = "PROJECT"
-	
+
 	/** Code that represents Party roles */
 	static String PARTY = "PARTY"
-	
+
 	/** Code that represents Application roles - do not think this is utilized */
 	static String APP = "APP"
 
@@ -41,7 +41,7 @@ class RoleType {
 
 	static transients = ['securityRole']
 
-	/** 
+	/**
 	 * Used to determine if the given type is a security role type
 	 */
 	boolean isSecurityRole() {
@@ -65,7 +65,7 @@ class RoleType {
 			} else {
 				str = description.trim()
 			}
-		} 
+		}
 		return str
 	}
 

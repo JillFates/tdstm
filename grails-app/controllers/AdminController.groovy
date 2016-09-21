@@ -7,13 +7,10 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
-// import org.codehaus.groovy.grails.commons.ApplicationHolder
-//import org.springframework.web.multipart.*
-//import org.springframework.web.multipart.commons.*
+
 class AdminController {
 	def jdbcTemplate
 	def sessionFactory
-	def grailsApplication
 
 	def accountImportExportService
 	def auditService
@@ -34,8 +31,8 @@ class AdminController {
 	 * @Permission RestartApplication
 	 */
 	def restartAppServiceForm(){
-		if (!controllerService.checkPermission(this, 'RestartApplication')) { 
-			return 
+		if (!controllerService.checkPermission(this, 'RestartApplication')) {
+			return
 		}
 
 		String restartCmd = coreService.getAppConfigSetting(APP_RESTART_CMD_PROPERTY)
@@ -44,10 +41,10 @@ class AdminController {
 		List users = userService.usernamesWithRecentActivity(activityTimeLimit)
 
 		model:[ restartable: restartable, users: users, activityTimeLimit: activityTimeLimit ]
-	}	
+	}
 
 	/**
-	 * Action to invoke a Application Restart process if the property has been configured with a proper command. This will 
+	 * Action to invoke a Application Restart process if the property has been configured with a proper command. This will
 	 * look for the tdstm.admin.serviceRestartCommand property and attempt to shell out to the OS and run if defined.
 	 * @Permission RestartApplication
 	 */
@@ -60,12 +57,12 @@ class AdminController {
 		} else if (cmd == null) {
 			render(status: 400, text:g.message(code:"tdstm.admin.serviceRestartCommand.error"))
 			return
-		} 
+		}
 
 		def username = securityService.getUserLogin().username
 
 		// Log to the app log as well as to the system log that we're going to restart the app
-		def logStr = g.message(code:"tdstm.admin.serviceRestartCommand.log", args:[username, cmd])		 
+		def logStr = g.message(code:"tdstm.admin.serviceRestartCommand.log", args:[username, cmd])
 		Shell.systemLog(logStr)
 		log.info(logStr)
 
@@ -78,11 +75,11 @@ class AdminController {
 
 		render "OK"
 	}
-	
+
 	def orphanSummary() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def summaryRecords = []
@@ -98,20 +95,20 @@ class AdminController {
 								select project_team_id as party_id from project_team
 								union
 								select app_id as party_id from application ) pr)"""
-								
+
 		def AssetsummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR APPLICATION_ASSET_MAP---------------------------------*/
 			SELECT * FROM (SELECT 'application_asset_map' as mainTable,'application_id' as refId,'Orphan' as type,count(*) as totalCount FROM application_asset_map asm where asm.application_id not in (select app.app_id from application app )
 				UNION
 				SELECT 'application_asset_map' as mainTable,'application_id' as refId,'Null' as type,count(*) as totalCount FROM application_asset_map asm where asm.application_id is null
-				UNION 
+				UNION
 				SELECT 'application_asset_map' as mainTable,'asset_id' as refId,'Orphan' as type,count(*) as totalCount FROM application_asset_map asm where asm.asset_id not in (select ae.asset_entity_id from asset_entity ae )
 				UNION
 				SELECT 'application_asset_map' as mainTable,'asset_id' as refId,'Null' as type,count(*) as totalCount FROM application_asset_map asm where asm.asset_id is null) asm
 			WHERE asm.totalCount > 0
-				
-			UNION 
-		
+
+			UNION
+
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR ASSET_COMMENT-------------------------------------------*/
 			SELECT * FROM ( SELECT 'asset_comment' as mainTable,'asset_entity_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_comment ac where ac.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )
 				UNION
@@ -123,7 +120,7 @@ class AdminController {
 				UNION
 				SELECT 'asset_comment' as mainTable,'resolved_by' as refId,'Orphan' as type,count(*) as totalCount FROM asset_comment ac where ac.resolved_by not in (select p.person_id from person p )) ac
 			WHERE ac.totalCount > 0
-			
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR ASSET_ENTITY-------------------------------------------*/
 			SELECT * FROM (SELECT 'asset_entity' as mainTable,'project_id' as refId,'Orphan' as type, count(*) as totalCount FROM asset_entity a where a.project_id not in (select p.project_id from project p )
@@ -140,7 +137,7 @@ class AdminController {
 				UNION
 				SELECT 'asset_entity' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)) a
 			WHERE a.totalCount > 0
-						
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR ASSET_ENTITY_VARCHAR-------------------------------------------*/
 			SELECT * FROM (	SELECT 'asset_entity_varchar' as mainTable,'asset_entity_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity_varchar aev where aev.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )
@@ -156,26 +153,26 @@ class AdminController {
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL-------------------------------------------*/
 			SELECT * FROM (	SELECT 'model' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) OR m.manufacturer_id is null OR m.manufacturer_id = '' ) aev
 			WHERE aev.totalCount > 0
-			
-			UNION 
+
+			UNION
 
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL WHERE Manufacturers with no Models -------------------------------------------*/
 			SELECT * FROM (	SELECT 'manufacturer' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM manufacturer mn where mn.manufacturer_id not in (select m.manufacturer_id from model m) ) mnm
 			WHERE mnm.totalCount > 0
 
-			UNION 
+			UNION
 
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL WHERE Models with no assets-------------------------------------------*/
 			SELECT * FROM (	SELECT 'model' as mainTable,'model_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.model_id not in (select ae.model_id from asset_entity ae where ae.model_id is not null)  ) mae
 			WHERE mae.totalCount > 0
-			
-			UNION 
+
+			UNION
 
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL WHERE Models with no assets-------------------------------------------*/
 			SELECT * FROM (	SELECT 'model_connector' as mainTable,'model_id' as refId,'Orphan' as type,count(*) as totalCount FROM model_connector mn where mn.model_id not in (select m.model_id from model m)  ) mae
 			WHERE mae.totalCount > 0
 			"""
-		
+
 		summaryRecords << jdbcTemplate.queryForList( AssetsummaryQuery )
 
 		def dataTransferSummaryQuery = """
@@ -188,7 +185,7 @@ class AdminController {
 				UNION
 				SELECT 'data_transfer_attribute_map' as mainTable,'data_transfer_set_id' as refId,'Null' as type,count(*) as totalCount FROM data_transfer_attribute_map dam where dam.data_transfer_set_id is null) dam
 			WHERE dam.totalCount > 0
-				
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR DATA_TRANSFER_BATCH-------------------------------------------*/
 			SELECT * FROM ( SELECT 'data_transfer_batch' as mainTable,'user_login_id' as refId,'Orphan' as type,count(*) as totalCount FROM data_transfer_batch dtb where dtb.user_login_id not in (select ul.user_login_id from user_login ul)
@@ -210,7 +207,7 @@ class AdminController {
 				UNION
 				SELECT 'data_transfer_comment' as mainTable,'data_transfer_batch_id' as refId,'Null' as type,count(*) as totalCount FROM data_transfer_comment dtm where dtm.data_transfer_batch_id is null) dtm
 			WHERE dtm.totalCount > 0
-				
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR DATA_TRANSFER_VALUE-------------------------------------------*/
 			SELECT * FROM ( SELECT 'data_transfer_value' as mainTable,'data_transfer_batch_id' as refId,'Orphan' as type,count(*) as totalCount FROM data_transfer_value dtv where dtv.data_transfer_batch_id not in (select dtb.batch_id from data_transfer_batch dtb)
@@ -221,37 +218,37 @@ class AdminController {
 				UNION
 				SELECT 'data_transfer_value' as mainTable,'eav_attribute_id' as refId,'Null' as type,count(*) as totalCount FROM data_transfer_value dtv where dtv.eav_attribute_id is null	) dtv
 			WHERE dtv.totalCount > 0"""
-		
-		summaryRecords << jdbcTemplate.queryForList( dataTransferSummaryQuery )				
-		
+
+		summaryRecords << jdbcTemplate.queryForList( dataTransferSummaryQuery )
+
 		def eavSummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ATTRIBUTE-------------------------------------------*/
 			SELECT * FROM ( SELECT 'eav_attribute' as mainTable,'entity_type_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_attribute ea where ea.entity_type_id not in (select et.entity_type_id from eav_entity_type et)
 				UNION
 				SELECT 'eav_attribute' as mainTable,'entity_type_id' as refId,'Null' as type,count(*) as totalCount FROM eav_attribute ea where ea.entity_type_id is null) ea
 			WHERE ea.totalCount > 0
-				
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ATTRIBUTE_OPTION-------------------------------------------*/
 			SELECT * FROM ( SELECT 'eav_attribute_option' as mainTable,'attribute_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_attribute_option eao where eao.attribute_id not in (select ea.attribute_id from eav_attribute ea)
 				UNION
 				SELECT 'eav_attribute_option' as mainTable,'attribute_id' as refId,'Null' as type,count(*) as totalCount FROM eav_attribute_option eao where eao.attribute_id is null) eao
 			WHERE eao.totalCount > 0
-				
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ATTRIBUTE_SET-------------------------------------------*/
 			SELECT * FROM ( SELECT 'eav_attribute_set' as mainTable,'entity_type_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_attribute_set eas where eas.entity_type_id not in (select et.entity_type_id from eav_entity_type et)
 				UNION
 				SELECT 'eav_attribute_set' as mainTable,'entity_type_id' as refId,'Null' as type,count(*) as totalCount FROM eav_attribute_set eas where eas.entity_type_id is null) eas
 			WHERE eas.totalCount > 0
-			
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ENTITY-------------------------------------------*/
 			SELECT * FROM ( SELECT 'eav_entity' as mainTable,'attribute_set_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_entity ee where ee.attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)
 				UNION
 				SELECT 'eav_entity' as mainTable,'attribute_set_id' as refId,'Null' as type,count(*) as totalCount FROM eav_entity ee where ee.attribute_set_id is null) ee
 			WHERE ee.totalCount > 0
-			
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ENTITY_ATTRIBUTE-------------------------------------------*/
 			SELECT * FROM ( SELECT 'eav_entity_attribute' as mainTable,'eav_attribute_set_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_entity_attribute eea where eea.eav_attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)
@@ -272,10 +269,10 @@ class AdminController {
 				SELECT 'eav_entity_datatype' as mainTable,'attribute_id' as refId,'Null' as type,count(*) as totalCount FROM eav_entity_datatype eed where eed.attribute_id is null ) eed
 			WHERE eed.totalCount > 0
 			"""
-		
-		summaryRecords << jdbcTemplate.queryForList( eavSummaryQuery )	
-		
-		def moveSummaryQuery = """ 
+
+		summaryRecords << jdbcTemplate.queryForList( eavSummaryQuery )
+
+		def moveSummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MOVE_BUNDLE-------------------------------------------*/
 			SELECT * FROM  ( SELECT 'move_bundle' as mainTable,'project_id' as refId,'Orphan' as type,count(*) as totalCount FROM move_bundle m where m.project_id not in (select p.project_id from project p )
 				UNION
@@ -285,7 +282,7 @@ class AdminController {
 				UNION
 				SELECT 'move_bundle' as mainTable,'move_event_id' as refId,'Null' as type,count(*) as totalCount FROM move_bundle m where m.move_event_id is null ) m
 			WHERE m.totalCount > 0
-						
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MOVE_BUNDLE_STEP-------------------------------------------*/
 			SELECT * FROM  ( SELECT 'move_bundle_step' as mainTable,'move_bundle_id' as refId,'Orphan' as type,count(*) as totalCount FROM move_bundle_step mbs where mbs.move_bundle_id not in (select m.move_bundle_id from move_bundle m )
@@ -299,7 +296,7 @@ class AdminController {
 				UNION
 				SELECT 'move_event' as mainTable,'project_id' as refId,'Null' as type,count(*) as totalCount FROM move_event me where me.project_id is null ) me
 			WHERE me.totalCount > 0
-				
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MOVE_EVENT_NEWS-------------------------------------------*/
 			SELECT * FROM ( SELECT 'move_event_news' as mainTable,'move_event_id' as refId,'Orphan' as type,count(*) as totalCount FROM move_event_news men where men.move_event_id not in (select me.move_event_id from move_event me )
@@ -319,20 +316,20 @@ class AdminController {
 				UNION
 				SELECT 'move_event_snapshot' as mainTable,'move_event_id' as refId,'Null' as type,count(*) as totalCount FROM move_event_snapshot mes where mes.move_event_id is null) mes
 			WHERE mes.totalCount > 0
-						
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR STEP_SNAPSHOT-----------------------------------------*/
 			SELECT * FROM  ( SELECT 'step_snapshot' as mainTable,'move_bundle_step_id' as refId,'Orphan' as type,count(*) as totalCount FROM step_snapshot ss where ss.move_bundle_step_id not in (select m.id from move_bundle_step m)
 				UNION
 				SELECT 'step_snapshot' as mainTable,'move_bundle_step_id' as refId,'Null' as type,count(*) as totalCount FROM step_snapshot ss where ss.move_bundle_step_id is null ) ss
 			WHERE ss.totalCount > 0	"""
-		
-		summaryRecords << jdbcTemplate.queryForList( moveSummaryQuery )	
-			
+
+		summaryRecords << jdbcTemplate.queryForList( moveSummaryQuery )
+
 		def partySummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PARTY-------------------------------------------*/
-			SELECT * FROM  ( SELECT 'party' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM party p 
-							where p.party_id not in (select distinct pr.party_id from 
+			SELECT * FROM  ( SELECT 'party' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM party p
+							where p.party_id not in (select distinct pr.party_id from
 													( select party_group_id as party_id from party_group
 													union
 													select person_id as party_id from person
@@ -369,8 +366,8 @@ class AdminController {
 				SELECT 'party_relationship' as mainTable,'party_relationship_type_id' as refId,'Orphan' as type,count(*) as totalCount FROM party_relationship pr where pr.party_relationship_type_id not in (select prt.party_relationship_type_code from party_relationship_type prt )
 				UNION
 				SELECT 'party_relationship' as mainTable,'party_relationship_type_id' as refId,'Null' as type,count(*) as totalCount FROM party_relationship pr where pr.party_relationship_type_id is null ) pr
-			WHERE pr.totalCount > 0	
-						
+			WHERE pr.totalCount > 0
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PARTY_ROLE-----------------------------------------*/
 			SELECT * FROM  (SELECT 'party_role' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM party_role pr where pr.party_id not in (select p.party_id from party p)
@@ -381,7 +378,7 @@ class AdminController {
 				UNION
 				SELECT 'party_role' as mainTable,'role_type_id' as refId,'Null' as type,count(*) as totalCount FROM party_role pr where pr.role_type_id is null ) pr
 			WHERE pr.totalCount > 0
-						
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PROJECT-----------------------------------------*/
 			SELECT * FROM  (SELECT 'project' as mainTable,'client_id' as refId,'Orphan' as type,count(*) as totalCount FROM project pr where pr.client_id not in (select pg.party_group_id from party_group pg)
@@ -406,7 +403,7 @@ class AdminController {
 				UNION
 				SELECT 'project_logo' as mainTable,'project_id' as refId,'Null' as type,count(*) as totalCount FROM project_logo pl where pl.project_id is null) pl
 			WHERE pl.totalCount > 0
-						
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PROJECT_TEAM-----------------------------------------*/
 			SELECT * FROM  ( SELECT 'project_team' as mainTable,'move_bundle_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_team pt where pt.move_bundle_id not in (select m.move_bundle_id from move_bundle m)
@@ -415,7 +412,7 @@ class AdminController {
 				UNION
 				SELECT 'project_team' as mainTable,'latest_asset_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_team pt where pt.latest_asset_id not in (select ae.asset_entity_id from asset_entity ae)) pt
 			WHERE pt.totalCount > 0
-						
+
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR USER_LOGIN-----------------------------------------*/
 			SELECT * FROM  ( SELECT 'user_login' as mainTable,'person_id' as refId,'Orphan' as type,count(*) as totalCount FROM user_login ul where ul.person_id not in (select per.person_id from person per)
@@ -432,15 +429,15 @@ class AdminController {
 
 			summaryRecords << jdbcTemplate.queryForList( partySummaryQuery )
 
-			return[summaryRecords : summaryRecords];	
+			return[summaryRecords : summaryRecords]
 	}
 	/*
-	 * 
+	 *
 	 */
 	def orphanDetails() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def orphanDeatils
@@ -468,8 +465,8 @@ class AdminController {
 					query = "SELECT * FROM application app where app.owner_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "application_asset_map" :
 				switch (column){
 					case "application_id" :
@@ -479,7 +476,7 @@ class AdminController {
 							query = "SELECT * FROM application_asset_map asm where asm.application_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "asset_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM application_asset_map asm where asm.asset_id not in (select ae.asset_entity_id from asset_entity ae )"
@@ -487,10 +484,10 @@ class AdminController {
 							query = "SELECT * FROM application_asset_map asm where asm.asset_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "asset_comment" :
 				switch (column){
 					case "asset_entity_id" :
@@ -500,7 +497,7 @@ class AdminController {
 							query = "SELECT * FROM asset_comment ac where ac.asset_entity_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "created_by" :
 						if(type != "Null"){
 							query = "SELECT * FROM asset_comment ac where ac.created_by not in (select p.person_id from person p )"
@@ -508,14 +505,14 @@ class AdminController {
 							query = "SELECT * FROM asset_comment ac where ac.created_by is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "resolved_by" :
 						query = "SELECT * FROM asset_comment ac where ac.resolved_by not in (select p.person_id from person p )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "asset_entity" :
 				switch (column){
 					case "project_id" :
@@ -525,7 +522,7 @@ class AdminController {
 							query = "SELECT * FROM asset_entity a where a.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "owner_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM asset_entity a where a.owner_id not in (select p.party_group_id from party_group p )"
@@ -533,22 +530,22 @@ class AdminController {
 							query = "SELECT * FROM asset_entity a where a.owner_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "move_bundle_id" :
 						query = "SELECT * FROM asset_entity a where a.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "model_id" :
 						query = "SELECT * FROM asset_entity a where a.model_id not in (select m.model_id from model m ) and a.model_id is not null "
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "manufacturer_id" :
 						query = "SELECT * FROM asset_entity a where a.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) and a.manunfacturer_id is not null"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "asset_entity_varchar" :
 				switch (column) {
 					case "asset_entity_id" :
@@ -558,7 +555,7 @@ class AdminController {
 							query = "SELECT * FROM asset_entity_varchar aev where aev.asset_entity_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "attribute_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM asset_entity_varchar aev where aev.attribute_id not in (select ea.attribute_id from eav_attribute ea )"
@@ -566,10 +563,10 @@ class AdminController {
 							query = "SELECT * FROM asset_entity_varchar aev where aev.attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "data_transfer_attribute_map" :
 				switch (column){
 					case "eav_attribute_id" :
@@ -579,7 +576,7 @@ class AdminController {
 							query = "SELECT * FROM data_transfer_attribute_map dam where dam.eav_attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "data_transfer_set_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM data_transfer_attribute_map dam where dam.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)"
@@ -587,10 +584,10 @@ class AdminController {
 							query = "SELECT * FROM data_transfer_attribute_map dam where dam.data_transfer_set_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "data_transfer_batch" :
 				switch (column){
 					case "user_login_id" :
@@ -600,7 +597,7 @@ class AdminController {
 							query = "SELECT * FROM data_transfer_batch dtb where dtb.user_login_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "data_transfer_set_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM data_transfer_batch dtb where dtb.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)"
@@ -608,7 +605,7 @@ class AdminController {
 							query = "SELECT * FROM data_transfer_batch dtb where dtb.data_transfer_set_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "project_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM data_transfer_batch dtb where dtb.project_id not in (select p.project_id from project p)"
@@ -616,10 +613,10 @@ class AdminController {
 							query = "SELECT * FROM data_transfer_batch dtb where dtb.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "data_transfer_comment" :
 				if(type != "Null"){
 					query = "SELECT * FROM data_transfer_comment dtm where dtm.data_transfer_batch_id not in (select dtb.batch_id from data_transfer_batch dtb)"
@@ -627,8 +624,8 @@ class AdminController {
 					query = "SELECT * FROM data_transfer_comment dtm where dtm.data_transfer_batch_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "data_transfer_value" :
 				switch (column){
 					case "data_transfer_batch_id" :
@@ -638,7 +635,7 @@ class AdminController {
 							query = "SELECT * FROM data_transfer_value dtv where dtv.data_transfer_batch_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "eav_attribute_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM data_transfer_value dtv where dtv.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)"
@@ -646,10 +643,10 @@ class AdminController {
 							query = "SELECT * FROM data_transfer_value dtv where dtv.eav_attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "eav_attribute" :
 				if(type != "Null"){
 					query = "SELECT * FROM eav_attribute ea where ea.entity_type_id not in (select et.entity_type_id from eav_entity_type et)"
@@ -657,8 +654,8 @@ class AdminController {
 					query = "SELECT * FROM eav_attribute ea where ea.entity_type_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "eav_attribute_option" :
 				if(type != "Null"){
 					query = "SELECT * FROM eav_attribute_option eao where eao.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
@@ -666,8 +663,8 @@ class AdminController {
 					query = "SELECT * FROM eav_attribute_option eao where eao.attribute_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-			
+			break
+
 			case "eav_attribute_set" :
 				if(type != "Null"){
 					query = "SELECT * FROM eav_attribute_set eas where eas.entity_type_id not in (select et.entity_type_id from eav_entity_type et)"
@@ -675,8 +672,8 @@ class AdminController {
 					query = "SELECT * FROM eav_attribute_set eas where eas.entity_type_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "eav_entity" :
 				if(type != "Null"){
 					query = "SELECT * FROM eav_entity ee where ee.attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)"
@@ -684,8 +681,8 @@ class AdminController {
 					query = "SELECT * FROM eav_entity ee where ee.attribute_set_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-			
+			break
+
 			case "eav_entity_attribute" :
 				switch (column){
 					case "eav_attribute_set_id" :
@@ -695,7 +692,7 @@ class AdminController {
 							query = "SELECT * FROM eav_entity_attribute eea where eea.eav_attribute_set_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "attribute_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM eav_entity_attribute eea where eea.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
@@ -703,14 +700,14 @@ class AdminController {
 							query = "SELECT * FROM eav_entity_attribute eea where eea.attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "eav_entity_id" :
 						query = "SELECT * FROM eav_entity_attribute eea where eea.eav_entity_id not in (select ee.entity_id from eav_entity ee)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "eav_entity_datatype" :
 				if(type != "Null"){
 					query = "SELECT * FROM eav_entity_datatype eed where eed.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
@@ -718,35 +715,35 @@ class AdminController {
 					query = "SELECT * FROM eav_entity_datatype eed where eed.attribute_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
+			break
 			case "manufacturer" :
 				switch (column){
 					case "manufacturer_id" :
 						query = "SELECT * FROM manufacturer mn where mn.manufacturer_id not in (select m.manufacturer_id from model m)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
+			break
 			case "model" :
 				switch (column){
 					case "manufacturer_id" :
 						query = "SELECT * FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) OR m.manufacturer_id is null OR m.manufacturer_id = ''"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "model_id" :
 						query = "SELECT * FROM model m where m.model_id not in (select ae.model_id from asset_entity ae where ae.model_id is not null) "
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
+			break
 			case "model_connector" :
 				switch (column){
 					case "model_id" :
 						query = "SELECT * FROM model_connector mn where mn.model_id not in (select m.model_id from model m ) "
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
+			break
 			case "move_bundle" :
 				switch (column){
 					case "project_id" :
@@ -756,7 +753,7 @@ class AdminController {
 							query = "SELECT * FROM move_bundle m where m.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "move_event_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM move_bundle m where m.move_event_id not in (select me.move_event_id from move_event me )"
@@ -764,11 +761,11 @@ class AdminController {
 							query = "SELECT * FROM move_bundle m where m.move_event_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 
 				}
-			break;
-			
+			break
+
 			case "move_bundle_step" :
 				if(type != "Null"){
 					query = "SELECT * FROM move_bundle_step mbs where mbs.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
@@ -776,8 +773,8 @@ class AdminController {
 					query = "SELECT * FROM move_bundle_step mbs where mbs.move_bundle_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "move_event" :
 				if(type != "Null"){
 					query = "SELECT * FROM move_event me where me.project_id not in (select p.project_id from project p )"
@@ -785,8 +782,8 @@ class AdminController {
 					query = "SELECT * FROM move_event me where me.project_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "move_event_news" :
 				switch (column){
 					case "move_event_id" :
@@ -796,7 +793,7 @@ class AdminController {
 							query = "SELECT * FROM move_event_news men where men.move_event_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "created_by" :
 						if(type != "Null"){
 							query = "SELECT * FROM move_event_news men where men.created_by not in (select p.person_id from person p )"
@@ -804,14 +801,14 @@ class AdminController {
 							query = "SELECT * FROM move_event_news men where men.created_by is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "archived_by" :
 						query = "SELECT * FROM move_event_news men where men.archived_by not in (select p.person_id from person p )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "move_event_snapshot" :
 				if(type != "Null"){
 					query = "SELECT * FROM move_event_snapshot mes where mes.move_event_id not in (select me.move_event_id from move_event me )"
@@ -819,8 +816,8 @@ class AdminController {
 					query = "SELECT * FROM move_event_snapshot mes where mes.move_event_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "step_snapshot" :
 				if(type != "Null"){
 					query = "SELECT * FROM step_snapshot ss where ss.move_bundle_step_id not in (select m.id from move_bundle_step m)"
@@ -828,8 +825,8 @@ class AdminController {
 					query = "SELECT * FROM step_snapshot ss where ss.move_bundle_step_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "party":
 				switch (column){
 					case "party_id" :
@@ -846,14 +843,14 @@ class AdminController {
 						union
 						select app_id as party_id from application ) pr)"""
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "" :
 					query = "SELECT * FROM party p where p.party_type_id not in (select pt.party_type_code from party_type pt)"
 					orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-		break;
-		
+		break
+
 			case "party_relationship" :
 				switch (column){
 					case "party_id_from_id" :
@@ -863,7 +860,7 @@ class AdminController {
 							query = "SELECT * FROM party_relationship pr where pr.party_id_from_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "party_id_to_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM party_relationship pr where pr.party_id_to_id in ( $orphanParty )"
@@ -871,7 +868,7 @@ class AdminController {
 							query = "SELECT * FROM party_relationship pr where pr.party_id_to_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "role_type_code_from_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM party_relationship pr where pr.role_type_code_from_id not in (select rt.role_type_code from role_type rt )"
@@ -879,7 +876,7 @@ class AdminController {
 							query = "SELECT * FROM party_relationship pr where pr.role_type_code_from_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "role_type_code_to_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM party_relationship pr where pr.role_type_code_to_id not in (select rt.role_type_code from role_type rt )"
@@ -887,7 +884,7 @@ class AdminController {
 							query = "SELECT * FROM party_relationship pr where pr.role_type_code_to_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "party_relationship_type_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM party_relationship pr where pr.party_relationship_type_id not in (select prt.party_relationship_type_code from party_relationship_type prt )"
@@ -895,9 +892,9 @@ class AdminController {
 							query = "SELECT * FROM party_relationship pr where pr.party_relationship_type_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
+			break
 			case "party_role" :
 				switch (column){
 					case "party_id" :
@@ -907,7 +904,7 @@ class AdminController {
 							query = "SELECT * FROM party_role pr where pr.party_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "role_type_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM party_role pr where pr.role_type_id not in (select rt.role_type_code from role_type rt)"
@@ -915,10 +912,10 @@ class AdminController {
 							query = "SELECT * FROM party_role pr where pr.role_type_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "project" :
 				if(type != "Null"){
 					query = "SELECT * FROM project pr where pr.client_id not in (select pg.party_group_id from party_group pg)"
@@ -926,8 +923,8 @@ class AdminController {
 					query = "SELECT * FROM project pr where pr.client_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
-				
+			break
+
 			case "project_asset_map" :
 				switch (column){
 					case "project_id" :
@@ -937,7 +934,7 @@ class AdminController {
 							query = "SELECT * FROM project_asset_map pam where pam.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "asset_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM project_asset_map pam where pam.asset_id not in (select ae.asset_entity_id from asset_entity ae)"
@@ -945,10 +942,10 @@ class AdminController {
 							query = "SELECT * FROM project_asset_map pam where pam.asset_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "project_logo" :
 				switch (column){
 					case "project_id" :
@@ -958,10 +955,10 @@ class AdminController {
 							query = "SELECT * FROM project_logo pl where pl.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "project_team" :
 				switch (column){
 					case "move_bundle_id" :
@@ -971,14 +968,14 @@ class AdminController {
 							query = "SELECT * FROM project_team pt where pt.move_bundle_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 					case "latest_asset_id" :
 						query = "SELECT * FROM project_team pt where pt.latest_asset_id not in (select ae.asset_entity_id from asset_entity ae)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
+					break
 				}
-			break;
-			
+			break
+
 			case "user_login" :
 				if(type != "Null"){
 					query = "SELECT * FROM user_login ul where ul.person_id not in (select per.person_id from person per)"
@@ -986,7 +983,7 @@ class AdminController {
 					query = "SELECT * FROM user_login ul where ul.person_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
+			break
 			case "user_preference" :
 				if(type != "Null"){
 					query = "SELECT * FROM user_preference up where up.user_login_id not in (select ul.user_login_id from user_login ul)"
@@ -994,9 +991,9 @@ class AdminController {
 					query = "SELECT * FROM user_preference up where up.user_login_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
-			break;
+			break
 		}// END OF MAIN SWITCH
-		def results = [orphanDeatils : orphanDeatils, query:query]  
+		def results = [orphanDeatils : orphanDeatils, query:query]
 		render results as JSON
 	}
 	/**
@@ -1004,11 +1001,11 @@ class AdminController {
 	 * @param deleteHistory : the time constraint the end user want to delete the records .
 	 * @return : count of record that is deleted.
 	 */
-	
+
 	def processOldData() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def deleteHistory = params.deleteHistory
@@ -1018,31 +1015,31 @@ class AdminController {
 			case "anyProcessed" :
 				queryForBatch.append(" WHERE status_code = 'completed'")
 				queryForData.append(" WHERE data_transfer_batch_id  IN (SELECT batch_id $queryForBatch) ")
-			break;
+			break
 			case "overTwoMonths" :
 				queryForBatch.append(" WHERE date_created <= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 60 DAY)")
 				queryForData.append(" WHERE data_transfer_batch_id IN (SELECT batch_id $queryForBatch )")
-			break;
+			break
 		}
-		
+
 		def records = jdbcTemplate.queryForInt("SELECT count(*) FROM (SELECT 1 as count ${queryForData} group by data_transfer_batch_id,row_id) a")
-		
+
 		jdbcTemplate.update("DELETE $queryForData")
 		jdbcTemplate.update( "DELETE $queryForBatch")
-		
+
 		def msg = "Deleted  $records Records"
 		render msg
 	}
-	
+
 	/**
 	 * This method is used to get the processed and pending batches counts
-	 * @params N/A : 
+	 * @params N/A :
 	 * @return : String formatted to display processed and pending batches and records
 	 */
 	def retrieveBatchRecords() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		String queryForRecords ="""SELECT COUNT(*) AS batchCount, IF(SUM(noOfRows),SUM(noOfRows),0) AS records
@@ -1055,15 +1052,15 @@ class AdminController {
 									 LEFT OUTER JOIN data_transfer_batch dtb ON dtv.data_transfer_batch_id = dtb.batch_id
 									 WHERE dtb.status_code = 'pending'	GROUP BY data_transfer_batch_id, row_id ) a GROUP BY data_transfer_batch_id ) b;
 								"""
-		
-		def recordsLegend = jdbcTemplate.queryForList( queryForRecords ) 
-		
+
+		def recordsLegend = jdbcTemplate.queryForList( queryForRecords )
+
 		def pendingInfo = "Current: ${recordsLegend[0].batchCount} batches / ${recordsLegend[0].records} records process,"+
 						  (recordsLegend[1] ? "${recordsLegend[1].batchCount} batches / ${recordsLegend[1].records} records pending" : "0 batches / 0 records pending")
-		
+
 		render pendingInfo
 	}
-	
+
 	/**
 	 * This method is used to get the Asset type and their respective Asset Count and Model Count
 	 * @param:N/A
@@ -1071,7 +1068,7 @@ class AdminController {
 	def retrieveAssetTypes() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -1080,20 +1077,20 @@ class AdminController {
 		assetTypeOptions.remove("Blade") // TODO : temp fix to resolve the below issue
 		assetTypeOptions.each{type->
 			def modelCount = Model.findAllByAssetType(type)
-			def assets = AssetEntity.findAllByAssetType(type) // TODO : getting Exception when type=Blade. assuming data issue. 
+			def assets = AssetEntity.findAllByAssetType(type) // TODO : getting Exception when type=Blade. assuming data issue.
 			Set projects = assets?.project
-			returnMap << [type, assets.size(), modelCount.size(), 
+			returnMap << [type, assets.size(), modelCount.size(),
 						assets[0]? assets[0]?.project.name : '', projects.size() > 1 ? projects.size()-1 : '']
 		}
 		render (template:'getAssetTypes', model:['returnMap':returnMap])
 	}
-	
+
 	/**
 	 * This method is used to clean the UnUsed Asset types
 	 */
 	def cleanAssetTypes() {
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -1125,7 +1122,7 @@ class AdminController {
 		def company = user.person.company
 		Map model = [
 			project: project.name,
-			client:project.client.name, 
+			client:project.client.name,
 			company:company
 		]
 
@@ -1144,7 +1141,7 @@ class AdminController {
 
 	/**
 	 * Used to export project staff and users to a spreadsheet
-	 * @response Excel Spreadsheet 
+	 * @response Excel Spreadsheet
 	 */
 	def exportAccountsProcess() {
 		def (project, byWhom) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
@@ -1160,20 +1157,19 @@ class AdminController {
 		]
 
 		try {
-			// def session = getSession()
-			accountImportExportService.generateAccountsExportToBrowser(session, response, byWhom, project, formOptions) 
+			accountImportExportService.generateAccountsExportToBrowser(session, response, byWhom, project, formOptions)
 			return
 
 		} catch (InvalidParamException e) {
 			flash.message = e.getMessage()
 		} catch (EmptyResultException e) {
 			flash.message = e.getMessage()
-		} catch (e) { 
+		} catch (e) {
 			log.error "Exception occurred while exporting data" + e.printStackTrace()
 			flash.message = "An error occurred while attempting to export accounts"
 		}
 
-		redirect (action:"exportAccounts", params:formOptions)	
+		redirect (action:"exportAccounts", params:formOptions)
 	}
 
 	/**
@@ -1208,9 +1204,9 @@ class AdminController {
 
 		forward (action:'importAccounts')
 	}
-	
+
 	/**
-	 * Used to retrieve the account information during the import process after it has been read in from the 
+	 * Used to retrieve the account information during the import process after it has been read in from the
 	 * uploaded spreadsheet and reviewed for errors.
 	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
 	 * @return JSON { accounts: List of accounts }
@@ -1244,7 +1240,7 @@ class AdminController {
 	}
 
 	/**
-	 * Used to retrieve the account information during the import process after it has been read in from the 
+	 * Used to retrieve the account information during the import process after it has been read in from the
 	 * uploaded spreadsheet and reviewed for errors.
 	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
 	 * @return JSON { accounts: List of accounts }
@@ -1263,7 +1259,7 @@ class AdminController {
 		try {
 			Map formOptions = accountImportExportService.importParamsToOptionsMap(params)
 			accountImportExportService.generatePostResultsDataToBrowser(session, response, user, project, params.filename, formOptions)
-			return 
+			return
 
 		} catch(e) {
 			log.error "importAccountsPostResultsData() Exception occurred while retrieving import accounts post results: " + e.printStackTrace()
@@ -1279,9 +1275,9 @@ class AdminController {
 	 *     start  - The user is presented a form
 	 *     upload - The user has uploaded the spreadsheet which is saved to a temporary random filename and the user
 	 *              is presented with the validation results
-	 *     post   - The previously confirmed and this submission will reload the saved spreadsheet and post the 
+	 *     post   - The previously confirmed and this submission will reload the saved spreadsheet and post the
 	 *              changes to the database and delete the spreadsheet.
-	 */	 
+	 */
 	def importAccounts() {
 		// TODO : JPM 4/2016 : importAccounts - check permissions based on importing person and users (options if person but not user should update the import form as well)
 		def (project, user) = controllerService.getProjectAndUserForPage(this, 'EditUserLogin')
@@ -1294,10 +1290,9 @@ class AdminController {
 		// fileParamName is the name of the parameter that the file will be uploaded as
 		String fileParamName = 'importSpreadsheet'
 		Map model = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
-		
+
 		Map options = accountImportExportService.importParamsToOptionsMap(params)
 		String view = 'importAccounts'
-		def session = getSession()
 
 		// There is a bug or undocumented feature that doesn't allow overriding params when forwarding which is used
 		// in the upload step to forward to the review so we look for the stepAlt and use it if found.
@@ -1307,17 +1302,17 @@ class AdminController {
 			switch (step) {
 
 				case 'upload':
-					// This step will save the spreadsheet that was posted to the server after reading it 
-					// and verifying that it has some accounts in it. If successful it will do a forward to 
+					// This step will save the spreadsheet that was posted to the server after reading it
+					// and verifying that it has some accounts in it. If successful it will do a forward to
 					// the review step.
 
 					options.fileParamName = fileParamName
 					model = accountImportExportService.processFileUpload(session, request, user, project, options)
 
 					Map forwardParams = [
-						stepAlt:'review', 
-						filename:model.filename, 
-						importOption: params.importOption, 
+						stepAlt:'review',
+						filename:model.filename,
+						importOption: params.importOption,
 						accountsToRemoveFromProject: model.accountsToRemoveFromProject
 					]
 
@@ -1327,7 +1322,7 @@ class AdminController {
 					break
 
 				case 'review':
-					// This step will serve up the review template that in turn fetch the review data 
+					// This step will serve up the review template that in turn fetch the review data
 					// via an Ajax request.
 					model << accountImportExportService.generateModelForReview(session, user, project, options)
 					// log.debug "importAccounts() case 'review':\n\toptions=$options\n\tmodel=$model"
@@ -1342,7 +1337,7 @@ class AdminController {
 					break
 
 				case 'post':
-					// This is the daddy of the steps in that it is going to post the changes back to the 
+					// This is the daddy of the steps in that it is going to post the changes back to the
 					// database either creating or updating Person and/or UserLogin records.
 
 					List optionErrors = accountImportExportService.validateImportOptions(options)
@@ -1355,7 +1350,7 @@ class AdminController {
 
 					// Here's the money maker call that will update existing accounts and create new ones accordingly
 					model.results = accountImportExportService.postChangesToAccounts(session, user, project, options)
-					
+
 					log.debug "importAccounts() post results = ${model.results}"
 
 					model << accountImportExportService.generateModelForPostResults(session, user, project, options)
@@ -1387,9 +1382,9 @@ class AdminController {
 					log.debug "importAccounts() exception ${e.getClass().getName()} ${e.getMessage()}"
 					flash.message = e.getMessage()
 					break
-				default: 
+				default:
 					log.error "Exception occurred while importing data (step $currentStep)" + e.printStackTrace()
-					flash.message = "An error occurred while attempting to import accounts"				
+					flash.message = "An error occurred while attempting to import accounts"
 			}
 			// Attempt to delete the temporary uploaded worksheet if an exception occurred
 			if (options.filename) {
@@ -1442,19 +1437,19 @@ class AdminController {
 	def projectReport() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		return
 	}
-	
+
 	/**
 	 * To Generate project Summary Web report
 	 */
 	def projectSummaryReport() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def person  = securityService.getUserLoginPerson().toString()
@@ -1462,12 +1457,12 @@ class AdminController {
 		def results = projectService.getProjectReportSummary( params )
 		render (template :'projectSummaryReport', model:[results:results, person:person, time:now])
 	}
-	
+
 	// Gets the number of assets with a desync between the device's assetType and its model's assetType
 	def countAssetsOutOfSync() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def query = """ -- Case sensitive - assets that assetType don't match
@@ -1478,7 +1473,7 @@ class AdminController {
 		def assetCount = jdbcTemplate.queryForLong(query)
 		render assetCount
 	}
-	
+
 	/**
 	 * Used to reconcile assetTypes of devices with the assetType of their models
 	 */
@@ -1505,7 +1500,7 @@ class AdminController {
 	def encryptValue() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
 		def toEncryptString = params.toEncryptString
@@ -1515,7 +1510,7 @@ class AdminController {
 		switch (encryptAlghoritm) {
 			case "AES":
 				encodedValue = AESCodec.encode(toEncryptString, encryptSalt)
-				break;
+				break
 			case "DES":
 			default:
 				encodedValue = DESCodec.encode(toEncryptString, encryptSalt)
@@ -1529,10 +1524,10 @@ class AdminController {
 	def systemInfo() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		if (!project)
 			return
 
-		int MegaBytes = 1024;
+		int MegaBytes = 1024
 
 		Runtime rt = Runtime.getRuntime()
 		long freeMemory = rt.freeMemory()/MegaBytes
@@ -1596,13 +1591,13 @@ class AdminController {
 	 *  Action to navigate the admin control home page
 	 */
 	def home() {
-		if (!controllerService.checkPermission(this, 'AdminMenuView')) 
+		if (!controllerService.checkPermission(this, 'AdminMenuView'))
 			return
 
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
 		def dateNowSQL = TimeUtil.nowGMTSQLFormat()
-		
+
 		// retrive the list of 20 usernames with the most recent login times
 		def recentUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastPage DESC",[max:20])
 
@@ -1610,14 +1605,14 @@ class AdminController {
 		def currentLiveEvents = MoveEvent.findAll()
 		def moveEventsList = []
 		def thirtyDaysInMS = 60 * 24 * 30 * 1000
-		
+
 		currentLiveEvents.each{ moveEvent  ->
 			def completion = moveEvent.getEventTimes()?.completion?.getTime()
 			if(moveEvent.newsBarMode == "on" || (completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)){
 				def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ?  ORDER BY mes.dateCreated DESC"
 				def moveEventSnapshot = MoveEventSnapshot.findAll( query , [moveEvent] )[0]
 				def status =""
-				def dialInd = moveEventSnapshot?.dialIndicator 
+				def dialInd = moveEventSnapshot?.dialIndicator
 				if( dialInd && dialInd < 25){
 					status = "Red($dialInd)"
 				} else if( dialInd && dialInd >= 25 && dialInd < 50){
@@ -1630,7 +1625,7 @@ class AdminController {
 		}
 		// retrive the list of 10 upcoming bundles
 		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.startTime > '$dateNowSQL' ORDER BY mb.startTime",[max:10])
-		
+
 		render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:moveEventsList, upcomingBundles:upcomingBundles] )
 	}
 

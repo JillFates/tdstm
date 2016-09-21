@@ -1,14 +1,17 @@
-/**
- * CoreService contain service methods considered core to the application functionality
- */
-
+import grails.util.Environment
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 
+/**
+ * Methods considered core to the application functionality
+ */
 class CoreService {
-	
-	def grailsApplication
 
-	/** 
+	static transactional = false
+
+	GrailsApplication grailsApplication
+
+	/**
 	 * Used to retrieve the name of the application
 	 * @return the application name
 	 * @throws GrailsConfigurationException if application name is not found
@@ -51,12 +54,12 @@ class CoreService {
 		for (int i=0; i < settingList.size() - 1; i++) {
 			if (! config.containsKey(settingList[i])) {
 				return null
-			} 
+			}
 			config = config[settingList[i]]
 		}
 		config = config[ settingList[-1] ]
 		if ( (config instanceof groovy.util.ConfigObject) && config.isEmpty()) {
-			config = 
+			config =
 			null
 		}
 		return config
@@ -77,7 +80,7 @@ class CoreService {
 	 * Used to return the current runtime environment
 	 */
 	def getEnvironment() {
-		return grails.util.Environment.current.toString()
+		Environment.current.name
 	}
 
 	/**
@@ -91,7 +94,7 @@ class CoreService {
 			throw new GrailsConfigurationException("The application temp directory configuration setting was not found ($propName)")
 		}
 		if (tmpDir[-1] == '/') {
-			tmpDir = tmpDir[0..-2] 
+			tmpDir = tmpDir[0..-2]
 		}
 		return tmpDir
 	}

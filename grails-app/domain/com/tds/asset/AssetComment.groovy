@@ -22,37 +22,37 @@ class AssetComment {
 	Date statusUpdated				// Updated when the status changes so we can compute the elapsed time that a task is in a status
 
 	Integer isResolved = 0
-	Date dateResolved 
+	Date dateResolved
 	String resolution
 	Person resolvedBy
 	Person createdBy
 	Person assignedTo				// FKA owner
 	Integer hardAssigned = 0			// Flags a task that can ONLY be done by an individual TODO : constraint 1/0 default 0 type tinyint
-	String commentCode 
+	String commentCode
 	String category = AssetCommentCategory.GENERAL
 	String displayOption = "U"		// Used in dashboard to control display of user entered test (comment) or a generic message
 	String attribute = 'default'	// TODO : What is attribute used for?  See if we're using and remove if not
 	String commentKey				// TODO : What is commentKey used for?  See if we're using and remove if not
-	
+
 	String status
 	Date dueDate
-	
+
 	Integer duration = 0			// # of minutes/hours/days/weeks to perform task
 	TimeScale durationScale = TimeScale.M	// Scale that duration represents m)inute, h)our, d)ay, w)eek
 	Integer priority=3				// An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
-	
+
 	Date estStart
-	Date estFinish	
+	Date estFinish
 	Date actStart
 	Date constraintTime				// Used for tasks that have a constraint on the time that it can start or finish (typically used for start event or start testing)
 	TimeConstraintType constraintType	// The type of constraint for time (e.g. MSO-Must Start On, )
 	// Date actFinish		// Alias of dateResolved
-	
+
 	Integer slack					// Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
 	WorkflowTransition workflowTransition	// The transition that this task was cloned from
 	Integer workflowOverride = 0			// Flag that the Transition values (duration) has been overridden
 	String role			// This is the team that will perform the task
-	Integer taskNumber	// TODO : constraint type short int min 1, max ?, nullable 
+	Integer taskNumber	// TODO : constraint type short int min 1, max ?, nullable
 	Integer score		// Derived property that calculates the weighted score for sorting on priority
 
 	/** The batch from which the task was generated */
@@ -69,15 +69,15 @@ class AssetComment {
 	String instructionsLink
 	Boolean durationLocked
 
-	static hasMany = [ 
+	static hasMany = [
 		notes : CommentNote,
-		taskDependencies : TaskDependency 
+		taskDependencies : TaskDependency
 	]
-	
+
 	static belongsTo = [ assetEntity : AssetEntity ]
-	
+
 	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
-	
+
 	// Grouping of the various categories
 	def static final preMoveCategories = AssetCommentCategory.getPreMoveCategories()
 	def static final moveDayCategories = AssetCommentCategory.getMoveDayCategories()
@@ -97,7 +97,7 @@ class AssetComment {
 	Boolean isImported = false
 	/* End transient properties for Task Generation.*/
 
-	static constraints = {	
+	static constraints = {
 		// comment(size:255)	// TODO: add constraint for comment size
 		comment(size:0..65535)
 		assetEntity(nullable:true )
@@ -150,7 +150,7 @@ class AssetComment {
 		durationLocked(nullable:false)
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		version true
 		autoTimestamp false
 		id column: 'asset_comment_id'
@@ -180,7 +180,7 @@ class AssetComment {
 				- HOLD 900
 					+ last updated factor ASC
 				- DONE recently (60 seconds), to allow undo 800
-					+ actual finish factor DESC	
+					+ actual finish factor DESC
 				- STARTED tasks     700
 					- Hard assigned to user	+55
 					- by the user	+50
@@ -192,14 +192,14 @@ class AssetComment {
 				- PENDING tasks		500
 					- + Est Start factor to sort ASC
 				- DONE tasks		200
-					- Assigned to User	+50 
+					- Assigned to User	+50
 					- + actual finish factor DESC
 					- DONE by others	+0 + actual finish factor DESC
 				- All other statuses ?
 				- Task # DESC (handled outside the score)
-			
+
 			The inverse of Priority will be added to any score * 5 so that Priority tasks bubble up above hard assigned to user
-			
+
 			DON'T THINK THIS APPLIES ANY MORE - Category of Startup, Physical, Moveday, or Shutdown +10
 			- If duedate exists and is older than today +5
 			- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
@@ -213,7 +213,7 @@ class AssetComment {
 			WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
 			ELSE 0 END + \
 			IF(role='${AssetComment.AUTOMATIC_ROLE}',-100,0) + \
-			(6 - priority) * 5"			
+			(6 - priority) * 5"
 	}
 
 	// List of properties that should NOT be persisted
@@ -271,9 +271,9 @@ class AssetComment {
 	}
 
 
-	
-	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique 
-	
+
+	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique
+
 	def getAssignedToString(){
 		return assignedTo.toString()
 	}
@@ -289,13 +289,13 @@ class AssetComment {
 		setDateResolved( date )
 	}
 
-	/* 
+	/*
 	 * @return Boolean indicating if the tast is done
 	 */
 	def isDone() {
 		return this.status == AssetCommentStatus.DONE
 	}
-	
+
 	/*
 	 * Used to determine if an object is a runbook task
 	 * @return Boolean true if is runbook task
@@ -303,20 +303,20 @@ class AssetComment {
 	def isRunbookTask() {
 		return moveDayCategories.contains(this.category)
 	}
-	
+
 	// Extend the dateResolved setter to also set the isResolved appropriately
 	public void setDateResolved( Date date ) {
 		this.dateResolved = date
 		this.isResolved = date ? 1 : 0
 	}
-			
+
 	/*
 	 * Returns the duration in seconds that a task has been in at particular status
 	 * @return Integer
 	 */
 	def statusDuration() {
 		if (statusDate) {
-			return groovy.time.TimeCategory.minus(new Date(), statusDate)			
+			return groovy.time.TimeCategory.minus(new Date(), statusDate)
 		} else {
 			return null
 		}
@@ -339,14 +339,14 @@ class AssetComment {
 			d = durationScale.toMinutes( duration )
 		return d
 	}
-	
+
 	def beforeInsert = {
 		if (!isImported) {
 			dateCreated = TimeUtil.nowGMT()
 			lastUpdated = dateCreated
 		}
 	}
-	
+
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
 	}
@@ -359,7 +359,7 @@ class AssetComment {
 		def assetCommentFields = ['actStart':'Actual Start:', 'assignedTo':'Assigned To', 'category':'Category', 'commentType': 'Comment Type', 'createdBy':'Created By',
 			 'dateCreated':'Date Created', 'dateResolved':'Date Resolved', 'displayOption':'Display Option', 'duration':'Duration', 'durationScale':'Duration Scale',
 			 'estFinish':'Estimated Finish:', 'estStart':'Estimated Start', 'hardAssigned':'Hard Assignement', 'isPublished':'Is Published', 'sendNotification':'Send Notification',
-			 'isResolved':'Is Resolved', 'priority':'Priority', 'resolution':'Resolution', 'resolvedBy':'Resolved By', 
+			 'isResolved':'Is Resolved', 'priority':'Priority', 'resolution':'Resolution', 'resolvedBy':'Resolved By',
 			 'role':'Team', 'statusUpdated':'Status Updated', 'assetName':'Asset Name', 'assetType':'Asset Type','instructionsLink':'instructionsLink',
 			 "event" : "Move Event", "bundle" : "Move Bundle"]
 		return assetCommentFields

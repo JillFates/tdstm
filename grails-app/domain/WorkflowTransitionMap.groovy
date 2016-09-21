@@ -5,7 +5,7 @@ class WorkflowTransitionMap {
 	String flag
 
 	static belongsTo = [ workflow : Workflow, workflowTransition : WorkflowTransition, swimlane : Swimlane  ]
-	
+
 	static constraints = {
 		transId( nullable:false )
 		flag( blank:true, nullable:true )
@@ -13,7 +13,7 @@ class WorkflowTransitionMap {
 		workflowTransition( nullable:false )
 		swimlane( nullable:false )
 	}
-	
+
 	static mapping = {
 		version false
 		id column:'workflow_transition_map_id'
@@ -22,5 +22,5 @@ class WorkflowTransitionMap {
 	String toString() {
 		"${workflowTransition} : ${swimlane}"
 	}
-	
+
 }

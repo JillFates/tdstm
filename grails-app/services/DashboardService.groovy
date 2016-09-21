@@ -1,4 +1,3 @@
-import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.TimeUtil
 
 /**
@@ -6,7 +5,9 @@ import com.tdssrc.grails.TimeUtil
  */
 class DashboardService {
 
-	def taskService
+	static transactional = false
+
+	TaskService taskService
 
 	/**
 	 * Generates the model used by the Task Summary section of the Event Dashboard
@@ -36,12 +37,12 @@ class DashboardService {
 		def taskStatusMap = results.taskStatusMap
 		def taskCountByEvent = results.taskCountByEvent
 		def totalDuration = results.totalDuration
-		model.remainTaskCount = results.taskCountByEvent - taskStatusMap['Completed'].taskCount 
+		model.remainTaskCount = results.taskCountByEvent - taskStatusMap['Completed'].taskCount
 		model.remainTaskCountFormat = String.format("%,d", model.remainTaskCount)
 		model.taskCountByEvent = taskCountByEvent
 		model.taskStatusMap = taskStatusMap
 		model.totalDuration = totalDuration
-		model.remainTaskCount = results.taskCountByEvent - taskStatusMap['Completed'].taskCount 
+		model.remainTaskCount = results.taskCountByEvent - taskStatusMap['Completed'].taskCount
 		model.remainTaskCountFormat = String.format("%,d", model.remainTaskCount)
 
 		// helper closure to compute the percentage completed
@@ -86,12 +87,12 @@ class DashboardService {
 		model.effortRemainDone = effortRemaining('Completed')
 
 		// Process Team information
-		def teamTaskResults = taskService.getMoveEventTeamTaskSummary(event, viewUnpublished) //use the matrix instead once _taskSummary		
+		def teamTaskResults = taskService.getMoveEventTeamTaskSummary(event, viewUnpublished) //use the matrix instead once _taskSummary
 		model.roles = teamTaskResults.values()*.role
 		// TODO : John 8/2014 : Shouldn't need the teamTaskMap but something in the view is still using it
 		model.teamTaskMap = teamTaskResults
 
-		// Contruct the team results as a matrix of rows and columns to layout the teams sorted serpentine 
+		// Contruct the team results as a matrix of rows and columns to layout the teams sorted serpentine
 		ArrayList teamTaskResultsMatrix = [] //use this in _taskSummary.gsp
 		def i = 0
 		teamTaskResults.each() { key, teamData ->
@@ -106,5 +107,5 @@ class DashboardService {
 
 		return model
 	}
-	
+
 }

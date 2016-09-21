@@ -1,25 +1,24 @@
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import com.tdsops.common.lang.ExceptionUtil
-import org.apache.commons.lang.math.NumberUtils 
+import grails.transaction.Transactional
 
 class RackService {
-	
-	boolean transactional = true
-	def securityService
+
+	SecurityService securityService
 
 	/**
-	 * Used to find or create a Rack automatically. If the rack name is blank then it will default to 'TBD' 
+	 * Used to find or create a Rack automatically. If the rack name is blank then it will default to 'TBD'
 	 * @param project - the project to find/create the rack for
 	 * @param room - the room to place the rack in
 	 * @param rackName - the name (aka tag) of the rack
 	 * @param model - the Model of the rack if null then it defaults to an 'Generic 42U Rack' rack will be added
 	 */
+	@Transactional
 	Rack findOrCreateRack(Room room, String rackName, Model model=null) {
 		if (!room?.project) {
 			log.error "findOrCreate() called with invalid project or room objects (room: $room)"
-			return 
+			return
 		}
 
 		Rack rack
@@ -49,7 +48,7 @@ class RackService {
 
 			rack = new Rack(params)
 			if ( ! rack.validate() || ! rack.save(flush:true) ) {
-				log.error "Unable to create room project:$project, room:$room, rackName:$rackName, $model:$model" + GormUtil.allErrorsString( rack )
+				log.error "Unable to create room project:$room.project, room:$room, rackName:$rackName, $model:$model" + GormUtil.allErrorsString( rack )
 				room = null
 			}
 		}
@@ -61,11 +60,12 @@ class RackService {
 	 * Used to retrieve the default model of a rack which is manufacturer 'Generic' and model name '42U Rack', which will create it if it doesn't exist
 	 * @return The model object if found or created, or NULL if there was an error
 	 */
+	@Transactional
 	Model getDefaultRackModel() {
 		Model model
 
 		Map names = [
-			manuName: 'Generic', 
+			manuName: 'Generic',
 			modelName: '42U Rack'
 		]
 

@@ -5,7 +5,7 @@ class Party {
 	Date lastUpdated
 	PartyType partyType
 	// String tempForUpdate
-	
+
 	static constraints = {
 		dateCreated( nullable:true )
 		lastUpdated( nullable:true )
@@ -13,17 +13,17 @@ class Party {
 		// tempForUpdate(nullable:true)
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		version true
 		autoTimestamp false
 		tablePerHierarchy false
 		id column:'party_id'
 	}
-		
+
 	String toString(){
 		"$id : $dateCreated"
 	}
-	
+
 	def beforeInsert = {
 		dateCreated = TimeUtil.nowGMT()
 		lastUpdated = TimeUtil.nowGMT()

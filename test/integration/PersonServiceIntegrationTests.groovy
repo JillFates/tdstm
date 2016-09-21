@@ -1,6 +1,6 @@
 import spock.lang.*
 
-class PersonServiceTests extends Specification {
+class PersonServiceIntegrationTests extends Specification {
 
 	def partyRelationshipService	
 	def personService

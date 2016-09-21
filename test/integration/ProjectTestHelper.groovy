@@ -1,8 +1,8 @@
 /**
- * ProjectTestHelper is a helper class that can be used by the test cases to fetch, create and do other 
- * helpful data preparation necessary to be used by the integration tests. The intent of these helper classes 
+ * ProjectTestHelper is a helper class that can be used by the test cases to fetch, create and do other
+ * helpful data preparation necessary to be used by the integration tests. The intent of these helper classes
  * is to do the heavy lifting for the ITs so that they an focus on the good stuff.
- * 
+ *
  * These helpers should not rely on any pre-existing data and will generate anything that is necessary. At least
  * that's the idea...
  */
@@ -14,7 +14,7 @@ class ProjectTestHelper {
 
 	static def projectService
 	static def partyRelationshipService
-	static final Long projectId = 2445 
+	static final Long projectId = 2445
 
 	// Constructor - Used to initialize the class
 	ProjectTestHelper() {
@@ -73,7 +73,7 @@ class ProjectTestHelper {
 		return project
 	}
 
-	/** 
+	/**
 	 * Used to create a company
 	 * @param prefix - a prefix string that will prefix the company name if provided
 	 * @return a freshly minted company
@@ -89,7 +89,7 @@ class ProjectTestHelper {
 		company.save(failOnError:true)
 	}
 
-	/** 
+	/**
 	 * Used to create a company as a client and assign them as a client of a company
 	 * @param prefix - a prefix string that will prefix the company name if provided
 	 * @return a freshly minted company

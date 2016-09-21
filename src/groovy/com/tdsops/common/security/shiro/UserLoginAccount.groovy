@@ -8,6 +8,6 @@ class UserLoginAccount extends SimpleAccount {
 
 	public UserLoginAccount(Object principal, Object credentials, String realmName) {
 		super(principal, credentials, realmName)
-	} 
+	}
 
 }

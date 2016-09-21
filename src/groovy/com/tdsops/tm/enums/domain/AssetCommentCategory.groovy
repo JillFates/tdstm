@@ -5,8 +5,7 @@ package com.tdsops.tm.enums.domain
  *
  * This should be an Enum but we need to first switch all of the references of a string to use the class reference
  * and then we can switch this to an Enum.
- *
- */ 
+ */
 class AssetCommentCategory {
 	static final String GENERAL='general'
 	static final String DISCOVERY='discovery'
@@ -49,5 +48,4 @@ class AssetCommentCategory {
 	static final getPlanningCategories() {
 		return [ANALYSIS,PLANNING,DESIGN,BUILDOUT]
 	}
-
 }

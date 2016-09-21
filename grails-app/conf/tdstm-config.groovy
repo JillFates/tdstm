@@ -1,8 +1,8 @@
 /**
 * tdstm-config.groovy.default
-* 
+*
 * This is an optional configuration file that is used to override settings in the grails-app/conf/*.groovy files. To use this,
-* copy this file to a configuration directory  renaming it appropriately (e.g. /etc/tdstm-config.groovy) and then provide a 
+* copy this file to a configuration directory  renaming it appropriately (e.g. /etc/tdstm-config.groovy) and then provide a
 * JVM -D argument in the start up of the application as shown:
 *
 *	grails -Dtdstm.config.location=/etc/tdstm-config.groovy run-app
@@ -59,7 +59,7 @@ tdstm {
 			// As a fail-safe, locked out accounts could be cleared when the application is restarted in the event of a DOS style attack (default true)
 			clearLockoutsOnRestart = true
 
-			// How long to retain password history to prevent re-use, set to zero (0) disables password history (default 2 years). This is mutually exclusive with passwordHistoryRetentionCount. 
+			// How long to retain password history to prevent re-use, set to zero (0) disables password history (default 2 years). This is mutually exclusive with passwordHistoryRetentionCount.
 			passwordHistoryRetentionDays = 365 * 2
 
 			// How many previous passwords to retain to prevent the user from reusing. This is mutually exclusive with passwordHistoryRetentionDays
@@ -70,10 +70,10 @@ tdstm {
 
 			// forgot my password reset time limit (minutes)
 			forgotMyPasswordResetTimeLimit = 60
-			
+
 			// forgot my password welcome email time limit
 			accountActivationTimeLimit = 2*24*60
-			
+
 			// forgot my password retain history days
 			forgotMyPasswordRetainHistoryDays = 30
 

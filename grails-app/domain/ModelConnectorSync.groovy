@@ -1,4 +1,3 @@
-
 class ModelConnectorSync {
 	// Declare propertied
 	long connectorTempId
@@ -14,9 +13,9 @@ class ModelConnectorSync {
 	String importStatus
 	ModelSyncBatch batch
 	long modelTempId
-	
+
 	static belongsTo = [ model : ModelSync ]
-	
+
     static constraints = {
 		connector( blank:false, nullable:false )
 		label( blank:true, nullable:true, unique:'model' )
@@ -28,13 +27,13 @@ class ModelConnectorSync {
 		option( blank:true, nullable:true )
 		importStatus(blank:true, nullable:true )
     }
-	
-	static mapping  = {	
+
+	static mapping  = {
 		version false
 		id column:'model_connectors_id'
 		option column:'connector_option'
 	}
-	
+
 	String toString(){
 		"${model?.modelName} : ${connector}"
 	}

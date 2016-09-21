@@ -1,46 +1,36 @@
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.tdsops.common.lang.CollectionUtils as CU
+import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.ContextType
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.TimeConstraintType
+import com.tdsops.tm.enums.domain.TimeScale
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.dao.IncorrectResultSizeDataAccessException
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.util.concurrent.ConcurrentHashMap.Values;
-import java.io.*;
-
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-import org.codehaus.groovy.runtime.InvokerHelper
-import org.springframework.dao.IncorrectResultSizeDataAccessException
-import org.springframework.jdbc.core.RowMapper
-
-import com.tds.asset.Application
-import com.tdsops.common.lang.CollectionUtils as CU
-import com.tdsops.tm.enums.domain.ContextType
-import com.tdsops.tm.enums.domain.TimeConstraintType
-import com.tdsops.tm.enums.domain.TimeScale
-import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdsops.tm.enums.domain.AssetCommentCategory
-
-import org.apache.commons.codec.digest.DigestUtils
-import org.apache.commons.lang3.SerializationUtils
 
 /**
  * The cookbook services handles the logic for creating recipes and running the cookbook
- * 
+ *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
+@Transactional
 class CookbookService {
 
-		boolean transactional = true
 	static allowedCatalogs = ['Event', 'Bundle', 'Application']
 	static searchAllowedCatalogs = ['All', 'Event', 'Bundle', 'Application']
 
-	def namedParameterJdbcTemplate
-	def projectService
-	def partyRelationshipService
-	def securityService
-	def progressService
-	def serviceHelperService
+	GrailsApplication grailsApplication
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	ProjectService projectService
+	TaskService taskService
 
 	/**
 	 * Checks if person can access project. If it can't then it throws an {@link UnauthorizedException}
@@ -51,7 +41,7 @@ class CookbookService {
 		if (person == null || project == null) {
 			return
 		}
-		
+
 		def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)
 		if (project.id != Project.DEFAULT_PROJECT_ID
 				&& !peopleInProject.contains(person)) {
@@ -59,10 +49,10 @@ class CookbookService {
 			throw new UnauthorizedException('The current user doesn\'t have access to the project')
 		}
 	}
-	
+
 	/**
 	 * Creates a Recipe using the information passed
-	 * 
+	 *
 	 * @param name the name of the recipe
 	 * @param description the description of the recipe
 	 * @param context the context
@@ -72,21 +62,21 @@ class CookbookService {
 	 */
 	def createRecipe(recipeName, description, recipeContext, cloneFrom, loginUser, currentProject) {
 		//TODO check this checkAccess(loginUser.person, currentProject)
-		
+
 		if (!RolePermissions.hasPermission('CreateRecipe')) {
 			throw new UnauthorizedException('User doesn\'t have a CreateRecipe permission')
 		}
-		
+
 		if (currentProject == null) {
 			log.info('Current project is null')
 			throw new EmptyResultException()
 		}
-		
+
 		def clonedVersion = null
 		def defaultSourceCode = ''
 		def defaultChangelog = ''
 		def clonedReleasedVersion = null
-		
+
 		if (cloneFrom != null) {
 			if (cloneFrom.isNumber()) {
 				clonedVersion = Recipe.get(cloneFrom)
@@ -116,7 +106,7 @@ class CookbookService {
 				//defaultChangelog = clonedVersion.releasedVersion.changelog
 				clonedReleasedVersion = clonedVersion.releasedVersion
 			} else {
-				def recipeVersions = findRecipeVersionsWithSourceCode(cloneFrom);
+				def recipeVersions = findRecipeVersionsWithSourceCode(cloneFrom)
 				if ((recipeVersions != null) && (recipeVersions.size() > 0))  {
 					def wip = recipeVersions[0]
 					defaultSourceCode = wip.sourceCode
@@ -134,10 +124,10 @@ class CookbookService {
 		return result.recipe
 	}
 
-	
+
 	/**
 	 * Clones a Recipe using the information passed
-	 *  
+	 *
 	 * @param recipeVersionid The id of the RecipeVersion record to clone
 	 * @param name the name of the new recipe
 	 * @param description the description of the new recipe
@@ -151,30 +141,30 @@ class CookbookService {
 		}
 
 			if (loginUser == null || recipeVersionid == null || !recipeVersionid.isNumber() || !name || currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipeVersion = RecipeVersion.get(recipeVersionid)
-		
+
 		if (recipeVersion == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = recipeVersion.recipe
 		def recipeProject = recipeVersion.recipe.project
-		
+
 		if (!validUserProject(recipeProject, loginUser, currentProject)) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
-		return createRecipeAndRecipeVersion(name, description, recipe.context, 
+
+		return createRecipeAndRecipeVersion(name, description, recipe.context,
 			currentProject, recipeVersion.sourceCode, "", recipeVersion, loginUser.person)
-		
+
 	}
 
 	/**
-	 * Unifies create recipe and reciveVersion 
-	 * 
+	 * Unifies create recipe and reciveVersion
+	 *
 	 * @param name recipe name
 	 * @param description recipe description
 	 * @param context recipe context
@@ -185,7 +175,7 @@ class CookbookService {
 	 * @param person recipeVersion person
 	 * @return
 	 */
-	def createRecipeAndRecipeVersion(name, description, context, project, sourceCode, changelog, recipeVersion, person) {	
+	def createRecipeAndRecipeVersion(name, description, context, project, sourceCode, changelog, recipeVersion, person) {
 
 		def newRecipe = new Recipe()
 		def newRecipeVersion = new RecipeVersion()
@@ -212,7 +202,7 @@ class CookbookService {
 		result.recipe = newRecipe
 		result.recipeVersion = newRecipeVersion
 
-		return result;
+		return result
 	}
 
 	/**
@@ -220,7 +210,7 @@ class CookbookService {
 	 * @param project the project to check
 	 * @param loginUser the user to validate
 	 * @param currentProject current project
-	 * 
+	 *
 	 */
 	def validUserProject(project, loginUser, currentProject) {
 		def valid = false
@@ -247,17 +237,17 @@ class CookbookService {
 		if (!RolePermissions.hasPermission('DeleteRecipe')) {
 			throw new UnauthorizedException('User doesn\'t have a DeleteRecipe permission')
 		}
-		
+
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
-		
+
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		if (!recipe.project.equals(currentProject)) {
 			throw new UnauthorizedException('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
 		}
@@ -278,13 +268,13 @@ class CookbookService {
 
 		// Remove all versions of the recipes
 		RecipeVersion.executeUpdate('delete RecipeVersion rv where rv.recipe=:recipe', [recipe:recipe])
-		
+
 		recipe.delete(failOnError: true)
-		
+
 		return recipe
 	}
-	
-	
+
+
 	/**
 	 * Deletes a Recipe version using the information passed
 	 *
@@ -299,17 +289,17 @@ class CookbookService {
 		}
 
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null || recipeVersion == null || !recipeVersion.isNumber()) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
 
 		def rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
 		if (rv == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
 
 		if (!recipe.project.equals(currentProject)) {
@@ -332,18 +322,18 @@ class CookbookService {
 		rv.delete(failOnError: true)
 		return rv
 	}
-	
+
 	def updateRecipe(recipeId, recipeName, description, loginUser, currentProject) {
 		//TODO check this checkAccess(loginUser.person, currentProject)
-		
+
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
-		
+
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
 
 		recipe.name = recipeName
@@ -351,10 +341,10 @@ class CookbookService {
 
 		recipe.save(flush:true, failOnError: true)
 	}
-	
+
 	/**
 	 * Saves a specific recipe reference
-	 * 
+	 *
 	 * @param recipeId the recipe id
 	 * @param recipeVersionId the id of the recipe version
 	 * @param name the name of the recipe
@@ -372,20 +362,20 @@ class CookbookService {
 
 		if ( currentProject == null) {
 			log.warn "SECURITY: User $loginUser attempting to update a recipe without a valid project, recipe id: $recipeId"
-			throw new InvalidParamException('You must select a project before being able to edit recipes');
+			throw new InvalidParamException('You must select a project before being able to edit recipes')
 		}
 
 		if (recipeId == null || !recipeId.isNumber() || !recipeId.isInteger() ) {
 			log.warn "SECURITY: User $loginUser attempted to update a recipe without invalid recipe id, recipe id: $recipeId"
-			throw new InvalidParamException('Sorry but the recipe reference was invalid. Please contact support.');
+			throw new InvalidParamException('Sorry but the recipe reference was invalid. Please contact support.')
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
 		if (recipe == null) {
 			log.warn "User attempted to update recipe but recipe was not found, user: $loginUser, project: $currentProject, recipe id: $recipeId"
-			throw new EmptyResultException('Unable to find the recipe that you were attempting to update. Please contact support.');
+			throw new EmptyResultException('Unable to find the recipe that you were attempting to update. Please contact support.')
 		}
-		
+
 		if (!recipe.project.equals(currentProject)) {
 			log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeId, current project: $currentProject"
 			throw new UnauthorizedException('Sorry but you can only update a recipe within the current project')
@@ -394,9 +384,9 @@ class CookbookService {
 		// Validate that the syntax is correct before submitting
 		// TODO - Add logic to validate syntax
 
-		// TODO - why two lookups? 		
+		// TODO - why two lookups?
 		def recipeVersion = RecipeVersion.get(recipeVersionId)
-		
+
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
 		if (wip == null) {
 			wip = new RecipeVersion()
@@ -407,22 +397,22 @@ class CookbookService {
 				wip.clonedFrom = recipeVersion
 			}
 		}
-		
+
 		if (!name) {
 			recipe.name = name
 		}
 		if (description != null) {
 			recipe.description = description
 		}
-		
+
 		wip.sourceCode = sourceCode
 		wip.changelog = changelog
-		
+
 		wip.save(failOnError: true)
-		
+
 		return wip
 	}
-	
+
 	/**
 	 * Releases a WIP recipe version using the recipeId
 	 * @param recipeId the id
@@ -433,37 +423,37 @@ class CookbookService {
 //		if (!RolePermissions.hasPermission('ReleaseRecipe')) {
 //			throw new UnauthorizedException('User doesn\'t have a ReleaseRecipe permission')
 //		}
-		
+
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException(); 
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		//TODO check this checkAccess(loginUser.person, currentProject)
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
-		
+
 		if (wip == null || wip.versionNumber != 0) {
 			throw new IllegalArgumentException('Not a WIP')
 		}
-		
+
 		def max = 0
-		
+
 		try {
 			max = namedParameterJdbcTemplate.queryForInt('SELECT MAX(version_number) FROM recipe_version WHERE recipe_id = :recipeId', ['recipeId' : wip.recipe.id])
 		} catch (IncorrectResultSizeDataAccessException e) {
 			log.warn('No results when looking for a version number')
 		}
-		
+
 		wip.versionNumber = max + 1
 		wip.recipe.releasedVersion = wip
-		
+
 		wip.save(failOnError: true)
 	}
-	
+
 	/**
 	 * Reverts the recipe to the recipeVersionId version
 	 * @param recipeVersionId the id of the recipeVersion
@@ -474,42 +464,42 @@ class CookbookService {
 //		if (!RolePermissions.hasPermission('RevertRecipe')) {
 //			throw new UnauthorizedException('User doesn\'t have a RevertRecipe permission')
 //		}
-		
+
 		if (recipeVersionId == null) {
 			log.debug('Recipe version is null')
-			throw new EmptyResultException('Recipe version id is empty');
+			throw new EmptyResultException('Recipe version id is empty')
 		}
 		if (!recipeVersionId.isNumber()) {
 			log.debug('Recipe version is not a number')
-			throw new EmptyResultException('Recipe version id is not a number');
+			throw new EmptyResultException('Recipe version id is not a number')
 		}
 		if (currentProject == null) {
 			log.debug('Current project is null')
-			throw new EmptyResultException('Project is empty');
+			throw new EmptyResultException('Project is empty')
 		}
 
 		def recipeVersion = RecipeVersion.get(recipeVersionId)
 		if (recipeVersion == null) {
-			throw new EmptyResultException('Recipe version is empty');
+			throw new EmptyResultException('Recipe version is empty')
 		}
 		if (recipeVersion.versionNumber == 0) {
-			throw new IllegalArgumentException('Trying to revert a WIP');
+			throw new IllegalArgumentException('Trying to revert a WIP')
 		}
 
 		def recipe = recipeVersion.recipe
-		
+
 		if (!recipe.project.equals(currentProject)) {
 			log.warn('Person doesn\'t have access to the project')
 			throw new UnauthorizedException('The current user doesn\'t have access to the project')
 		}
-		
-		recipe.releasedVersion = recipeVersion 
+
+		recipe.releasedVersion = recipeVersion
 		recipe.save(failOnError: true)
 	}
-	
+
 	/**
 	 * Validates the syntax for sourceCode for the current loginUser and currentProject
-	 * 
+	 *
 	 * @param sourceCode the source code to be validated
 	 * @param loginUser the current user
 	 * @param currentProject the current project
@@ -519,18 +509,18 @@ class CookbookService {
 		if (!RolePermissions.hasPermission('EditRecipe')) {
 			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
 		}
-				
+
 		if (currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
-		def validationResult = this.validateSyntax(sourceCode);
+
+		def validationResult = this.validateSyntax(sourceCode)
 		return validationResult
 	}
-	
+
 	/**
 	 * Returns a list of groups based on the recipeVersionId and the contextId
-	 * 
+	 *
 	 * @param recipeVersionId the id of the RecipeVersion
 	 * @param contextId the id of the context
 	 * @param loginUser the current user
@@ -544,13 +534,13 @@ class CookbookService {
 		def sourceCode = null
 		def contextTypeKey = null
 		if (!validRecipeId && (predSourceCode==null)) {
-			throw new EmptyResultException('Invalid recipeVersionId');
+			throw new EmptyResultException('Invalid recipeVersionId')
 		}
 		if (validRecipeId) {
 			recipeVersion = RecipeVersion.get(recipeVersionId.toInteger())
 
 			if (recipeVersion == null) {
-				throw new EmptyResultException('Recipe version does not exists');
+				throw new EmptyResultException('Recipe version does not exists')
 			}
 			if (!recipeVersion.recipe.project.equals(currentProject)) {
 				log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeVersionId, current project: $currentProject"
@@ -565,27 +555,27 @@ class CookbookService {
 			sourceCode = (predSourceCode==null)?'':predSourceCode
 		}
 		if (contextId == null || !contextId.isNumber()) {
-			throw new EmptyResultException('Invalid contextId');
+			throw new EmptyResultException('Invalid contextId')
 		}
-		
+
 		contextId = contextId.toInteger()
-		
+
 		def contextType = null
 		switch (contextTypeKey) {
 			case 'Application' :
 				contextType = ContextType.A
-				break;
+				break
 			case 'Bundle' :
 				contextType = ContextType.B
-				break;
+				break
 			case 'Event' :
 				contextType = ContextType.E
-				break;
+				break
 			default :
 				throw new IllegalArgumentException('Invalid context')
-				break;
+				break
 		}
-		
+
 		log.debug('Context type ' + contextType)
 		log.debug('Context id ' + contextId)
 		def context = contextType.getObject(contextId)
@@ -594,22 +584,21 @@ class CookbookService {
 			switch (contextTypeKey) {
 				case 'Application' :
 					haveAccess = context.moveBundle.project.equals(currentProject)
-					break;
+					break
 				case 'Bundle' :
 				case 'Event' :
 					haveAccess = context.belongsToClient(currentProject.client)
-					break;
-			}			
+					break
+			}
 		}
 		if (!haveAccess) {
 			throw new UnauthorizedException('The client doesn\'t own this context')
 		}
-		
-		def taskService = AH.application.mainContext.getBean('taskService')
+
 		def recipeMap = this.parseRecipeSyntax(sourceCode)
 		def exceptions = new StringBuilder()
 		def fetchedGroups = taskService.fetchGroups(recipeMap, context, exceptions)
-		
+
 		return fetchedGroups.collect({ k, v ->
 			def assets = v.collect({ asset ->
 				return [
@@ -618,7 +607,7 @@ class CookbookService {
 					'assetType' : asset.assetType
 				]
 			})
-			
+
 			return [
 				'name' : k,
 				'assets' : assets
@@ -636,13 +625,13 @@ class CookbookService {
 	 */
 	def getRecipe(recipeId, versionNumber, loginUser) {
 		if (recipeId == null || !recipeId.isNumber()) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
 
 		if (recipe == null) {
-			throw new EmptyResultException('Recipe does not exists');
+			throw new EmptyResultException('Recipe does not exists')
 		}
 
 		if (versionNumber == null) {
@@ -651,45 +640,45 @@ class CookbookService {
 
 		def recipeVersion = RecipeVersion.findByRecipeAndVersionNumber(recipe, versionNumber)
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
-		
+
 		if (recipeVersion == null) {
 			throw new EmptyResultException('Invalid recipe')
 		}
-		
+
 		//checkAccess(loginUser.person, recipe.project)
 		def eventId = null
 		def bundleId = null
 		def applicationId = null
-		
+
 		if (recipe.defaultAssetId != null) {
 			def context
 			switch (recipe.context) {
 				case 'Application' :
 					context = ContextType.A.getObject(recipe.defaultAssetId)
 					if (context != null) {
-						eventId = context.moveBundle.moveEvent.id;
-						bundleId = context.moveBundle.id;
-						applicationId = recipe.defaultAssetId;
+						eventId = context.moveBundle.moveEvent.id
+						bundleId = context.moveBundle.id
+						applicationId = recipe.defaultAssetId
 					}
-					break;
+					break
 				case 'Bundle' :
 					context = ContextType.B.getObject(recipe.defaultAssetId)
 					if (context != null) {
-						eventId = context.moveEvent.id;
-						bundleId = recipe.defaultAssetId;
+						eventId = context.moveEvent.id
+						bundleId = recipe.defaultAssetId
 					}
-					break;
+					break
 				case 'Event' :
-					eventId = recipe.defaultAssetId;
-					break;
+					eventId = recipe.defaultAssetId
+					break
 				default :
 					throw new IllegalArgumentException('Invalid context')
-					break;
+					break
 			}
 		}
 
 		def person = recipeVersion.createdBy
-		
+
 		def result = [
 			'recipe' : recipe,
 			'recipeVersion' : recipeVersion,
@@ -699,15 +688,15 @@ class CookbookService {
 			'bundleId' : bundleId,
 			'applicationId' : applicationId
 		]
-		
+
 		return result
 	}
-	
+
 	/**
 	 * Finds the recipes according to the information provided
-	 * 
+	 *
 	 * @param isArchived indicates if service should return active or archived recipes. Valid values (y|n).
-	 * @param catalogContext used to filter context of recipes: All, Event, Bundle, Application 
+	 * @param catalogContext used to filter context of recipes: All, Event, Bundle, Application
 	 * @param searchText to search for text in name and description
 	 * @param projectType project indicates which project to provide list of recipes for (master, active, complete or integer)
 	 * When set to master, it will list search the master/default project.
@@ -716,12 +705,12 @@ class CookbookService {
 	 * When set to a numeric value, it will search the specific project by id (as long as the user is associated to the project)
 	 * @param loginUser the current user
 	 * @param currentProject the current project
-	 * 
+	 *
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
 		def findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject) {
 		def projectIds = []
-		
+
 		if (projectType == null) {
 			if (currentProject == null) {
 				throw new EmptyResultException()
@@ -729,31 +718,31 @@ class CookbookService {
 				projectIds.add(currentProject.id)
 			}
 		} else {
-		
+
 			projectType = (projectType.class == String) ? projectType.toLowerCase() : projectType
 			if (projectType.isNumber()) {
 				projectType = projectType.toLong()
 			}
-			
+
 			switch (projectType) {
 				case 'master':
 					projectIds.add(Project.DEFAULT_PROJECT_ID)
 					break
-					
+
 				case 'active':
 						def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.ACTIVE)
 					projects.each { project ->
 						projectIds << project.id
 					}
 					break
-					
+
 				case 'completed':
 						def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.COMPLETED)
 					projects.each { project ->
 						projectIds << project.id
 					}
 					break
-					
+
 				case Long:
 					def project = Project.get(projectType)
 					log.debug('PROJECT ' + project)
@@ -762,7 +751,7 @@ class CookbookService {
 						def projects = projectService.getUserProjects(loginUser, projectHasPermission, ProjectStatus.ANY)*.id
 
 						log.debug('PROJECTS of USER ' + projects)
-						
+
 						if (Project.isDefaultProject(project) || projects.contains(project.id)) {
 							projectIds.add(projectType.toInteger())
 						} else {
@@ -781,13 +770,13 @@ class CookbookService {
 		def projectIdsAsString = projectIds.isEmpty() ? '-1' : GormUtil.asCommaDelimitedString(projectIds)
 		isArchived = (isArchived.equals('y') ? '1' : 0)
 		catalogContext = (searchAllowedCatalogs.contains(catalogContext)) ? catalogContext : null
-		
+
 		def arguments = [
 			"isArchived" : isArchived,
 			"projectIdsAsString" : projectIdsAsString
 		]
 
-		
+
 		def searchCondition = ''
 		if (searchText != null) {
 			searchCondition = '''
@@ -801,17 +790,17 @@ class CookbookService {
 			arguments.searchName = searchText
 			arguments.searchDescription = searchText
 		}
-		
-		
+
+
 		def catalogCondition = ''
 		if (catalogContext != null && allowedCatalogs.contains(catalogContext)) {
 			catalogCondition = 'AND recipe.context = :catalogContext'
 			arguments.catalogContext = catalogContext
 		}
-		
-		
+
+
 		def recipes = namedParameterJdbcTemplate.query("""
-				SELECT DISTINCT recipe.recipe_id as recipeId, recipe.name, recipe.description, recipe.context, IF(ISNULL(recipe_version.last_updated), rv2.last_updated, recipe_version.last_updated) as last_updated, IF(ISNULL(p2.first_name), CONCAT(p1.first_name, ' ', p1.last_name), CONCAT(p2.first_name, ' ', p2.last_name))  as createdBy, recipe.last_updated as lastUpdated, recipe_version.version_number as versionNumber, IF(ISNULL(rv2.version_number), false, true) as hasWIP 
+				SELECT DISTINCT recipe.recipe_id as recipeId, recipe.name, recipe.description, recipe.context, IF(ISNULL(recipe_version.last_updated), rv2.last_updated, recipe_version.last_updated) as last_updated, IF(ISNULL(p2.first_name), CONCAT(p1.first_name, ' ', p1.last_name), CONCAT(p2.first_name, ' ', p2.last_name))  as createdBy, recipe.last_updated as lastUpdated, recipe_version.version_number as versionNumber, IF(ISNULL(rv2.version_number), false, true) as hasWIP
 				FROM recipe
 				LEFT OUTER JOIN recipe_version ON recipe.released_version_id = recipe_version.recipe_version_id
 				LEFT OUTER JOIN recipe_version as rv2 ON recipe.recipe_id = rv2.recipe_id AND rv2.version_number = 0
@@ -822,7 +811,7 @@ class CookbookService {
 				${searchCondition}
 				${catalogCondition}
 			""", arguments, new RecipeMapper())
-		
+
 		return recipes
 		}
 
@@ -836,13 +825,13 @@ class CookbookService {
 	def findRecipeVersions(recipeId, currentProject) {
 
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
 
 		def recipe = Recipe.get(recipeId)
 
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
 
 		if (!recipe.project.equals(currentProject)) {
@@ -858,7 +847,7 @@ class CookbookService {
 							recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
 							CONCAT(person.first_name, ' ', person.last_name) as createdBy, if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
 			FROM recipe
-			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id 
+			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id
 			INNER JOIN person ON person.person_id = recipe_version.created_by_id
 			WHERE recipe.recipe_id = :recipeId
 			ORDER BY version_number DESC
@@ -877,7 +866,7 @@ class CookbookService {
 	def findRecipeVersionsWithSourceCode(recipeId) {
 
 		if (recipeId == null || !recipeId.isNumber()) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
 
 		def arguments = [
@@ -890,7 +879,7 @@ class CookbookService {
 							recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
 							if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
 			FROM recipe
-			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id 
+			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id
 			WHERE recipe.recipe_id = :recipeId
 			ORDER BY version_number ASC
 			""", arguments, new RecipeVersionCompleteMapper())
@@ -900,7 +889,7 @@ class CookbookService {
 
 	/**
 	 * Archives the recipe with recipeId depending on the archived parameter
-	 * 
+	 *
 	 * @param recipeId the id of the recipe
 	 * @param archived true to archive, false to unarchived
 	 * @param loginUser the current user
@@ -910,24 +899,24 @@ class CookbookService {
 		if (!RolePermissions.hasPermission('EditRecipe')) {
 			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
 		}
-		
+
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
-		
+
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		if (!recipe.project.equals(currentProject)) {
 			throw new UnauthorizedException('User is trying to archive/unarchived recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
 		}
-		
+
 		recipe.archived = archived
 		recipe.save(flush:true, failOnError: true)
-		
+
 		return recipe
 	}
 
@@ -937,7 +926,7 @@ class CookbookService {
 	 * @return The recipe in a Groovy Map containing the various elements of the recipe
 	 * @throws InvalidSyntaxException if the sourcecode is invalid
 	 */
-	Map parseRecipeSyntax( sourceCode ) {	
+	Map parseRecipeSyntax( sourceCode ) {
 		def recipe
 		if (! sourceCode ) {
 //			throw new InvalidSyntaxException('Recipe contains no source code')
@@ -957,7 +946,7 @@ class CookbookService {
 
 	List<Map> validateSyntax( sourceCode ) {
 		try {
-			return this.basicValidateSyntax(sourceCode)	
+			return this.basicValidateSyntax(sourceCode)
 		} catch (e) {
 			def errorList = []
 			errorList << [ error: 1, reason: 'Invalid syntax', detail: e.getMessage().replaceAll(/[\r]/, '<br/>') ]
@@ -968,14 +957,14 @@ class CookbookService {
 	def genericConditionallyMandatoryValidator(spec, options, attribute, value, i, errorList, errorLabel){
 		if(value in options){
 			if(!spec.containsKey(attribute)){
-				errorList << [	error: 1, 
+				errorList << [	error: 1,
 								reason: "Invalid Syntax",
 								detail: "$errorLabel in element $i. $value taskspec requires '$attribute' property."
 							]
 			}else{
 				if(spec[attribute] instanceof String){
 					if(!spec[attribute].trim().size()){
-							errorList << [	error: 1, 
+							errorList << [	error: 1,
 								reason: "Invalid Syntax",
 								detail: "$errorLabel in element $i. Property '$attribute' for taskspec $value can't be empty."
 							]
@@ -994,7 +983,7 @@ class CookbookService {
 		genericConditionallyMandatoryValidator(spec, options, 'disposition', value, i, errorList, errorLabel)
 	}
 
-	
+
 
 	def validateFilter(spec, value, i, errorList, errorLabel){
 		def options = ['set', 'truck', 'location', 'room', 'rack', 'cart']
@@ -1008,14 +997,14 @@ class CookbookService {
 
 
 	def validate
-		
+
 	/**
-	* Used to validate the syntax of a recipe and will return a list of syntax violations 
-	* 
+	* Used to validate the syntax of a recipe and will return a list of syntax violations
+	*
 	* @param sourceCode - the source code to validate
 	* @return a list of errors if any otherwise null where the list map matches that used by web service errors
 	* The map will consist of:
-	*    error:Integer - 
+	*    error:Integer -
 	*    reason:String - General cause
 	*    detail:String - The specific issue, typically what the user is most interested in
 	* 1) Invalid syntax
@@ -1033,7 +1022,7 @@ class CookbookService {
 		// TODO: ValidateSyntax - Add a check to make sure that any filters that specify a group, that the group is defined
 
 		// Helper closure that compares the properties of a spec to a defined map
-		/** 
+		/**
 		 * Used to validate a section of a recipe spec (e.g. group) against a map definition for the section. The closure will
 		 * use recursion to validate maps within the maps.
 		 * @param type - the type or section of the spec (e.g. task, group)
@@ -1050,21 +1039,21 @@ class CookbookService {
 				log.debug(key)
 			}
 			def label = ( type=='task' ? "Task id ${key}" : "Group ${key}" )
-			
-			spec.each { n, v -> 
+
+			spec.each { n, v ->
 				i++
-				
+
 				if(n == "action" && type == "task"){
 					validateDisposition(spec, v, i, errorList, label)
 					validateFilter(spec, v, i, errorList, label)
 					validateSetOn(spec, v, i, errorList, label)
 				}
-				
+
 				if(n == "sendNotification" && type == "task" && (v != true && v!= false)){
 					errorList << [ error: 1, reason: 'Invalid Syntax',
 						detail: "$label in element $i must be either true or false" ]
 				}
-				
+
 				if( n=="category" && ! (v in AssetCommentCategory.getList())){
 					errorList << [ error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'" ]
@@ -1075,14 +1064,14 @@ class CookbookService {
 
 					if ( CU.isaMap(map[n])) {
 						if (!CU.isaMap(spec[n])) {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 								detail: "$label in element $i property '$n' should be a map. Invalid value '$v' was given" ]
 						} else {
 							// Check the sub section of the spec against a sub section of the map
 							// TODO : JPM 6/2016 : TM-4989 the addAll should most likely be removed
-							errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )	
+							errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )
 						}
-						
+
 					} else if ( CU.isaList(map[n]) ) {
 
 						if (v in String) {
@@ -1090,19 +1079,19 @@ class CookbookService {
 							// Need to strip out any boolean expressions
 							def cleanedExp = v.replaceAll( /[!=<>]/, '' )
 							if ( ! map[n].contains( cleanedExp ) ) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "$label in element $i property '$n' contains invalid value '$v'" ]
 							}
 						} else {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "Simple value expected for property '$n' but '$v' was given." ]
 						}
 
-						
+
 					}
 				}
 				else {
-					errorList << [ error: 1, reason: 'Invalid syntax', 
+					errorList << [ error: 1, reason: 'Invalid syntax',
 						detail: "$label in element $i contains unknown property '$n'" ]
 				}
 			}
@@ -1188,7 +1177,7 @@ class CookbookService {
 			constraintType:0,
 			class:['device','database','application','storage']
 		]
-		
+
 		def teamCodes = []
 		if (partyRelationshipService) {
 			teamCodes = partyRelationshipService.getStaffingRoles()*.id
@@ -1225,7 +1214,7 @@ class CookbookService {
 								detail: "Group name '${group.name}' in element ${index} is blank" ]
 						}
 						if (groupKeys.containsKey(group.name)) {
-							errorList << [ error: 5, reason: 'Duplicate group', 
+							errorList << [ error: 5, reason: 'Duplicate group',
 								detail: "Group name '${group.name}' duplicated in group ${groupKeys[group.name]} and ${index}" ]
 						}
 						groupKeys.put(group.name, index)
@@ -1236,16 +1225,16 @@ class CookbookService {
 								// Make sure that the filter has a class and proper value
 								//NO LONGER NECESSARY WITH NESTED EVALUATIONS
 								//if (! classNames.contains( group.filter.class.toLowerCase() ) ) {
-								//	errorList << [ error: 1, reason: 'Invalid syntax', 
+								//	errorList << [ error: 1, reason: 'Invalid syntax',
 								//		detail: "Group '${group.name}' in element ${index} has invalid filter.class value. Allowed values [${classNames.join(',')}]" ]
 								//}
 							} else {
 								// We default class=device so no error if not found
-								//errorList << [ error: 3, reason: 'Missing property', 
+								//errorList << [ error: 3, reason: 'Missing property',
 								//	detail: "Group '${group.name}' in element ${index} is missing required 'filter.class' property" ]
 							}
 							if ( group.filter.containsKey('taskSpec') ) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "Group '${group.name}' in element ${index} references a taskSpec which is not supported in groups" ]
 							}
 
@@ -1259,55 +1248,55 @@ class CookbookService {
 										// Now we need to find assets that are associated via the AssetDependency domain
 										def depMode = group.filter.dependency.mode.toLowerCase()
 										if ( ! depMode || ! ['s','r'].contains(depMode[0]) ) {
-											errorList << [ error: 1, reason: 'Invalid syntax', 
+											errorList << [ error: 1, reason: 'Invalid syntax',
 												detail: "Group '${group.name}' in element ${index} 'filter.dependency.mode' must be [supports|requires]" ]
 										}
 										if (group.filter.dependency.containsKey('asset')) {
 											if (CU.isaMap(group.filter.dependency.asset)) {
 												def suppAttribs = ['virtual','physical']
-												group.filter.dependency.asset.each { n, v -> 
-													if (! suppAttribs.contains(n)) 
-														errorList << [ error: 1, reason: 'Invalid syntax', 
-															detail: "Group '${group.name}' in element ${index} 'filter.dependency.asset' contains unsupport property '$n'" ]													
+												group.filter.dependency.asset.each { n, v ->
+													if (! suppAttribs.contains(n))
+														errorList << [ error: 1, reason: 'Invalid syntax',
+															detail: "Group '${group.name}' in element ${index} 'filter.dependency.asset' contains unsupport property '$n'" ]
 												}
 												//
 											} else {
-												errorList << [ error: 1, reason: 'Invalid syntax', 
-													detail: "Group '${group.name}' in element ${index} 'filter.dependency.asset' element not properly defined as a map" ]													
+												errorList << [ error: 1, reason: 'Invalid syntax',
+													detail: "Group '${group.name}' in element ${index} 'filter.dependency.asset' element not properly defined as a map" ]
 											}
 										}
 									} else {
-										errorList << [ error: 3, reason: 'Missing property', 
+										errorList << [ error: 3, reason: 'Missing property',
 											detail: "Group '${group.name}' in element ${index} is missing required 'filter.dependency.mode' property" ]
 									}
 								} else {
-									errorList << [ error: 1, reason: 'Invalid syntax', 
-										detail: "Group '${group.name}' in element ${index} 'filter.dependency' element not properly defined as a map" ]	
+									errorList << [ error: 1, reason: 'Invalid syntax',
+										detail: "Group '${group.name}' in element ${index} 'filter.dependency' element not properly defined as a map" ]
 								}
 
 							}
 
 						} else {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 								detail: "Group '${group.name}' in element ${index} 'filter' element not properly defined as a map" ]
 						}
 					} else {
-						errorList << [ error: 3, reason: 'Missing property', 
+						errorList << [ error: 3, reason: 'Missing property',
 							detail: "Group ${group.name} in element ${index} is missing require section 'filter'" ]
 					}
 				}
 
 				// Check to see that any include/exclude references match defined groups
 				index = 0
-				recipe.groups.each { group -> 
+				recipe.groups.each { group ->
 					index++
 					if (group.containsKey('filter') && CU.isaMap(group.filter)) {
-						['exclude','include'].each { ei -> 
+						['exclude','include'].each { ei ->
 							if (group.filter.containsKey(ei)) {
 								def eiList = CU.asList(group.filter[ei])
-								eiList.each { gName -> 
+								eiList.each { gName ->
 									if (! groupKeys.containsKey(gName) ) {
-										errorList << [ error: 4, reason: 'Invalid group reference', 
+										errorList << [ error: 4, reason: 'Invalid group reference',
 											detail: "Group ${group.name} in element ${index} 'filter.${ei}' references undefined group ${gName}" ]
 
 									}
@@ -1331,7 +1320,7 @@ class CookbookService {
 				def lastId=0
 				def match
 
-				recipe.tasks.each { task -> 
+				recipe.tasks.each { task ->
 					index++
 					def taskId = null
 					def taskRef = "Task in element $index"
@@ -1339,9 +1328,9 @@ class CookbookService {
 					def type = task.type ?: ''
 
 					if (! CU.isaMap(task) ) {
-						errorList << [ error: 1, reason: 'Invalid syntax', 
+						errorList << [ error: 1, reason: 'Invalid syntax',
 							detail: "$taskRef is not a valid map definition" ]
-						return	
+						return
 					}
 
 					// Test that the 'id' exists, that it isn't duplicated and that it is a positive whole number
@@ -1350,26 +1339,26 @@ class CookbookService {
 							taskId = task.id
 							taskRef = "Task id $taskId"
 							if (taskIds.contains(task.id)) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
-									detail: "$taskRef is a duplicate of an earlier task spec" ]													
+								errorList << [ error: 1, reason: 'Invalid syntax',
+									detail: "$taskRef is a duplicate of an earlier task spec" ]
 							} else {
 								taskIds << task.id
 							}
-							// Make sure that the id #s are assending					
+							// Make sure that the id #s are assending
 							if (lastId) {
 								if (task.id < lastId) {
-									errorList << [ error: 1, reason: 'Invalid syntax', 
-										detail: "$taskRef task id is smaller than previous task spec. The ids must have ascending values." ]													
+									errorList << [ error: 1, reason: 'Invalid syntax',
+										detail: "$taskRef task id is smaller than previous task spec. The ids must have ascending values." ]
 								}
 							}
 							lastId = task.id
 
 						} else {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 								detail: "$taskRef 'id' must be a positive whole number > 0" ]
 						}
 					} else {
-						errorList << [ error: 3, reason: 'Missing property', 
+						errorList << [ error: 3, reason: 'Missing property',
 							detail: "$taskRef is missing require property 'id' which must be a unique number" ]
 					}
 
@@ -1378,7 +1367,7 @@ class CookbookService {
 
 					if (task.containsKey('filter') && CU.isaMap(task['filter'])) {
 						def taskFilter = task.filter
-						
+
 						if (taskFilter.containsKey('group')) {
 							this.validateGroupReferences(task, 'filter/group', taskFilter.group, groupKeys, errorList)
 						}
@@ -1389,13 +1378,13 @@ class CookbookService {
 							this.validateGroupReferences(task, 'filter/exclude', taskFilter.exclude, groupKeys, errorList)
 						}
 					}
-						
+
 					// Validate the predecessor specifications
 					if (task.containsKey('predecessor')) {
 						def predecessor = task.predecessor
 
 						if (! CU.isaMap(predecessor)) {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 								detail: "$taskRef 'predecessor' attribute is not a valid map definition" ]
 						} else {
 
@@ -1406,19 +1395,19 @@ class CookbookService {
 									if ( tsid instanceof Integer && tsid > 0 ) {
 										if ( taskIds.contains(tsid) ) {
 											if (taskId && tsid == taskId) {
-												errorList << [ error: 4, reason: 'Invalid Reference', 
+												errorList << [ error: 4, reason: 'Invalid Reference',
 													detail: "$taskRef 'predecessor.taskSpec' contains reference ($tsid) to itself." ]
 											}
 										} else {
-											errorList << [ error: 4, reason: 'Invalid Reference', 
+											errorList << [ error: 4, reason: 'Invalid Reference',
 												detail: "$taskRef 'predecessor.taskSpec' contains invalid id reference ($tsid). TaskSpec ids must reference a previously defined TaskSpec." ]
 										}
 									} else {
-										errorList << [ error: 1, reason: 'Invalid syntax', 
+										errorList << [ error: 1, reason: 'Invalid syntax',
 											detail: "$taskRef 'predecessor.taskSpec' contains invalid id ($tsid). Ids must be a positive whole number > 0" ]
 									}
-									
-								} 
+
+								}
 							}
 
 							// Validate the filter section
@@ -1427,7 +1416,7 @@ class CookbookService {
 								if (CU.isaMap(filter)) {
 									hasFilter=true
 								} else {
-									errorList << [ error: 1, reason: 'Invalid syntax', 
+									errorList << [ error: 1, reason: 'Invalid syntax',
 										detail: "$taskRef 'predecessor.filter' attribute is not a valid map definition" ]
 								}
 							}
@@ -1443,32 +1432,32 @@ class CookbookService {
 								this.validateGroupReferences(task, 'predecessor/group', predecessor.group, groupKeys, errorList)
 							}
 							if ( ! (hasMode || hasTaskSpec || hasGroup || hasGather) ) {
-								errorList << [ error: 3, reason: 'Missing property', 
+								errorList << [ error: 3, reason: 'Missing property',
 									detail: "$taskRef 'predecessor' section requires [mode | taskSpec | group | gather] property" ]
 							} else if ( hasMode && hasGroup ) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "$taskRef 'predecessor' section contains 'mode' and 'group' properties which are mutually exclusive" ]
 							} else if ( hasTaskSpec && hasGroup) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "$taskRef 'predecessor' section contains 'taskSpec' and 'group' properties which are mutually exclusive" ]
-							} 
+							}
 
 							if (hasMode && predecessor.mode == 'both' && hasDefer) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "$taskRef 'predecessor' section contains 'defer' and mode with 'both' value which is not supported" ]
 							}
 							if (hasTaskSpec && hasDefer) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "$taskRef 'predecessor' section contains 'taskSpec' and 'defer' properties which are mutually exclusive" ]
 							}
 							def modeValues = ['supports','requires', 'both']
 							if (hasMode &&  ! modeValues.contains(predecessor.mode)) {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "$taskRef 'predecessor.mode' has invalid value '${predecessor.mode}'. Value options are [supports | requires | both]" ]
 							}
 
 							if (type == 'milestone') {
-								errorList << [ error: 1, reason: 'Invalid syntax', 
+								errorList << [ error: 1, reason: 'Invalid syntax',
 									detail: "$taskRef of type 'milestone' does not support 'predecessor'" ]
 							}
 						}
@@ -1477,9 +1466,9 @@ class CookbookService {
 					if (task.containsKey('successor')) {
 						def successor = task.successor
 						if (! CU.isaMap(successor)) {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 								detail: "$taskRef 'successor' element is not a valid map definition which requires at least one sub-element defined" ]
-						} 
+						}
 					}
 
 					// Validate that the team supports a valid team or if using indirect ref with a default, that the default is valid
@@ -1513,7 +1502,7 @@ class CookbookService {
 					// Validate time constraints if specified and parse the definition so that the logic can use it
 					if ( task.containsKey('constraintType')) {
 						if (! TimeConstraintType.asEnum(task.constraintType)) {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 								detail: "$taskRef 'constraintType' attribute has invalid value (${task.constraintType}). " +
 									"Possible values include ( ${TimeConstraintType.getKeys().join(' | ')} )" ]
 						}
@@ -1550,7 +1539,7 @@ class CookbookService {
 									log.debug "match[0][1] = ${match[0][1]}"
 									if ( match[0][1].isInteger() ) {
 										if (! taskIds.contains( match[0][1].toInteger() )) {
-											errorList << [ error: 1, reason: 'Invalid syntax', 
+											errorList << [ error: 1, reason: 'Invalid syntax',
 												detail: "$taskRef 'constraintTime' (${task.constraintTime}) references undefined task spec (${match[0][1]})" ]
 										}
 									}
@@ -1562,7 +1551,7 @@ class CookbookService {
 							// Stuff the parsed constraintTime into new property
 							task.constraintTimeParsed=t
 						} else {
-							errorList << [ error: 1, reason: 'Invalid syntax', 
+							errorList << [ error: 1, reason: 'Invalid syntax',
 								detail: "$taskRef 'constraintTime' has invalid value (${task.constraintTime})" ]
 						}
 
@@ -1595,7 +1584,7 @@ class CookbookService {
 										task.durationValue = match[0][2]
 										task.durationUom = match[0][3] != null ? TimeScale.asEnum(match[0][3].toUpperCase()) : TimeScale.M
 									} else {
-										errorList << [ error: 1, reason: 'Invalid syntax', 
+										errorList << [ error: 1, reason: 'Invalid syntax',
 											detail: "$taskRef 'duration' has invalid reference (${task.duration})" ]
 									}
 								}
@@ -1606,13 +1595,13 @@ class CookbookService {
 								if (match.matches()) {
 									task.durationValue = match[0][1]
 									task.durationUom = TimeScale.asEnum(match[0][2].toUpperCase())
-									
+
 									if (task.durationUom == null) {
 										errorList << [ error: 1, reason: 'Invalid syntax',
 											detail: "$taskRef 'duration' has an invalid timescale ${match[0][2].toUpperCase()}" ]
 									}
 								} else {
-									errorList << [ error: 1, reason: 'Invalid syntax', 
+									errorList << [ error: 1, reason: 'Invalid syntax',
 										detail: "$taskRef 'duration' has invalid value (${d})" ]
 								}
 							}
@@ -1622,7 +1611,7 @@ class CookbookService {
 
 				}
 
-				// TODO - Add test to validate the title expression is valid 
+				// TODO - Add test to validate the title expression is valid
 				/*
 					// Need to determine the asset type from the class property
 					try {
@@ -1641,7 +1630,7 @@ class CookbookService {
 
 		return (errorList ? errorList as List : null)
 		}
-	
+
 	void validateGroupReferences(taskRef, fieldName, field, existingGroups, errorList) {
 		if (field) {
 			def values = []
@@ -1651,7 +1640,7 @@ class CookbookService {
 			} else if (field instanceof List) {
 				values.addAll(field)
 			}
-			
+
 			values.each { groupRef ->
 				if (!existingGroups.containsKey(groupRef)) {
 					errorList << [ error: 1, reason: 'Invalid syntax',
@@ -1665,43 +1654,43 @@ class CookbookService {
 		if (!RolePermissions.hasPermission('EditRecipe')) {
 			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
 		}
-		
+
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
-		
+
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		if (!recipe.project.equals(currentProject)) {
 			throw new UnauthorizedException('User is trying to archive/unarchived recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
 		}
 
 		if (contextId == null || !contextId.isNumber()) {
-			throw new EmptyResultException('Invalid contextId');
+			throw new EmptyResultException('Invalid contextId')
 		}
-		
+
 		contextId = contextId.toInteger()
-		
+
 		def contextType = null
 		switch (recipe.context) {
 			case 'Application' :
 				contextType = ContextType.A
-				break;
+				break
 			case 'Bundle' :
 				contextType = ContextType.B
-				break;
+				break
 			case 'Event' :
 				contextType = ContextType.E
-				break;
+				break
 			default :
 				throw new IllegalArgumentException('Invalid context')
-				break;
+				break
 		}
-		
+
 		def context = contextType.getObject(contextId)
 
 		def haveAccess = false
@@ -1709,12 +1698,12 @@ class CookbookService {
 			switch (recipe.context) {
 				case 'Application' :
 					haveAccess = context.moveBundle.project.equals(currentProject)
-					break;
+					break
 				case 'Bundle' :
 				case 'Event' :
 					haveAccess = context.belongsToClient(currentProject.client)
-					break;
-			}			
+					break
+			}
 		}
 		if (!haveAccess) {
 			throw new UnauthorizedException('The client doesn\'t own this context')
@@ -1728,17 +1717,17 @@ class CookbookService {
 		if (!RolePermissions.hasPermission('EditRecipe')) {
 			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
 		}
-		
+
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		def recipe = Recipe.get(recipeId)
-		
+
 		if (recipe == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException()
 		}
-		
+
 		if (!recipe.project.equals(currentProject)) {
 			throw new UnauthorizedException('User is trying to archive/unarchived recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
 		}

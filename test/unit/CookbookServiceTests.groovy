@@ -1,29 +1,17 @@
-import groovy.mock.interceptor.*
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
-import org.apache.log4j.* 
-
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-/**
- * Unit test cases for the CookbookService class
- */
 @TestFor(CookbookService)
 class CookbookServiceTests extends Specification {
-	
-	def cookbookService = new CookbookService()
-	def log
 
-	def goodGroup = """[
+	private static final String goodGroup = '''[
 			name: 'ALL_APPS',
 			description: 'All applications',
 			filter: [
 				class: 'application'
 			]
-		]"""
+		]'''
 
-	def predTask = """[
+	private static final String predTask = '''[
 			id: 1106,
 			description: 'Make NAT changes for various CSG services',
 			title: [
@@ -36,9 +24,9 @@ class CookbookServiceTests extends Specification {
 			type: 'general',
 			terminal: true,
 			chain: false,
-		]"""
-		
-	def goodGeneralTask = """[
+		]'''
+
+	private static final String goodGeneralTask = '''[
 			id: 1110,
 			description: 'Make NAT changes for various CSG services',
 			title: [
@@ -54,13 +42,12 @@ class CookbookServiceTests extends Specification {
 			predecessor: [
 				taskSpec: 1106,
 			]
-		]"""
+		]'''
 
-		
-		def problemRecipe1 = """
+	private static final String problemRecipe1 = '''
 /**
-			 * Recipe to create branching and gather tasks
-			 */
+ * Recipe to create branching and gather tasks
+ */
 tasks: [
 	[
 		id: 1000,
@@ -68,11 +55,11 @@ tasks: [
 		type: 'milestone',
 		category: 'moveday',
 		team: 'PROJ_MGR'
-	],	
+	],
 	[
 		id: 1100,
 		description: 'Validate ALL applications',
-		title: 'Validate app \${it.assetName}',
+		title: 'Validate app ${it.assetName}',
 		whom: '#shutdownBy',
 		category: 'shutdown',
 		duration: 10,
@@ -87,7 +74,7 @@ tasks: [
 	[
 		id: 1110,
 		description: 'Schedule review of ALL applications',
-		title: 'Schedule review of app \${it.assetName}',
+		title: 'Schedule review of app ${it.assetName}',
 		whom: '#shutdownBy',
 		category: 'shutdown',
 		duration: 10,
@@ -97,11 +84,11 @@ tasks: [
 		successor: [
 			defer: 'App Tasks'
 		]
-	],	
+	],
 	[
 		id: 1120,
 		description: 'Document ALL applications',
-		title: 'Document app \${it.assetName}',
+		title: 'Document app ${it.assetName}',
 		whom: '#shutdownBy',
 		category: 'shutdown',
 		duration: 10,
@@ -111,12 +98,12 @@ tasks: [
 		predecessor: [
 			taskSpec:1100,	// This will allow 1110 and this (1120) to execute in parallel
  		]
-	],	
+	],
 
 		[
 		id: 1130,
 		description: 'Wrap-up ALL applications',
-		title: 'Wrap up app \${it.assetName}',
+		title: 'Wrap up app ${it.assetName}',
 		whom: '#shutdownBy',
 		category: 'shutdown',
 		duration: 10,
@@ -126,7 +113,7 @@ tasks: [
 		predecessor: [
 			gather: 'App Tasks',
 		]
-	],	
+	],
 
 	[
 		id: 1200,
@@ -134,11 +121,11 @@ tasks: [
 		type: 'milestone',
 		category: 'moveday',
 		team: 'PROJ_MGR'
-	],	
+	],
 ]
-	"""
+	'''
 
-	def problemRecipe2 = """
+	private static final String problemRecipe2 = '''
 groups: [
 	[	name: 'PHY',
 		filter: [
@@ -153,7 +140,7 @@ tasks: [
 	[
 		id: 2120,
 		description: 'Task with just indirect',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		team: 'SYS_ADMIN',
 		duration: '#startupDuration',
 		category: 'startup',
@@ -162,7 +149,7 @@ tasks: [
 	[
 		id: 2140,
 		description: 'Task with indirect duration and default value',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		team: 'SYS_ADMIN',
 		duration: '#startupDuration,10',
 		category: 'startup',
@@ -171,7 +158,7 @@ tasks: [
 	[
 		id: 2142,
 		description: 'Task with indirect duration and default value with valid scale',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		team: 'SYS_ADMIN',
 		duration: '#startupDuration,10h',
 		category: 'startup',
@@ -180,7 +167,7 @@ tasks: [
 	[
 		id: 2144,
 		description: 'Task with indirect duration and default value with invalid scale',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		team: 'SYS_ADMIN',
 		duration: '#startupDuration,10x',
 		category: 'startup',
@@ -189,7 +176,7 @@ tasks: [
 	[
 		id: 2160,
 		description: 'Task with bogus duration string and unknown team',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		team: 'SWAT_TEAM',
 		duration: 'abc',
 		category: 'startup',
@@ -198,7 +185,7 @@ tasks: [
 	[
 		id: 2200,
 		description: 'Task with valid filter group reference',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		category: 'startup',
 		class: 'device',
 		filter: [
@@ -208,7 +195,7 @@ tasks: [
 	[
 		id: 2210,
 		description: 'Task with bogus filter group reference',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		category: 'startup',
 		class: 'device',
 		filter: [
@@ -218,7 +205,7 @@ tasks: [
 	[
 		id: 2300,
 		description: 'Task with valid filter include reference',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		category: 'startup',
 		class: 'device',
 		filter: [
@@ -228,7 +215,7 @@ tasks: [
 	[
 		id: 2301,
 		description: 'Task with valid filter include reference',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		category: 'startup',
 		class: 'device',
 		filter: [
@@ -238,7 +225,7 @@ tasks: [
 	[
 		id: 2310,
 		description: 'Task with BOGUS filter include reference',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		category: 'startup',
 		class: 'device',
 		filter: [
@@ -248,7 +235,7 @@ tasks: [
 	[
 		id: 2320,
 		description: 'Task with valid predecessor reference',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		category: 'startup',
 		class: 'device',
 		predecessor: [
@@ -258,7 +245,7 @@ tasks: [
 	[
 		id: 2330,
 		description: 'Task with bogus predecessor reference',
-		title: 'Blah \${it.assetName}',
+		title: 'Blah ${it.assetName}',
 		category: 'startup',
 		class: 'device',
 		predecessor: [
@@ -266,9 +253,9 @@ tasks: [
 		],
 	],
 ]
-	"""
-		
-	def invalidFilters = """
+	'''
+
+	private static final String invalidFilters = '''
 groups: [
 	[
 		name: 'GOOD-GROUP',
@@ -312,14 +299,13 @@ tasks: [
 			custom8: '%hasLic%'
 		],
 	],
-
-
 ]
-"""
-			def notificationRecipeProblem1 = """
+'''
+
+	private static final String notificationRecipeProblem1 = '''
 /**
-			 * Recipe to verify handling string (non-boolean) input
-			 */
+ * Recipe to verify handling string (non-boolean) input
+ */
 tasks: [
 	[
 		id: 2000,
@@ -331,11 +317,12 @@ tasks: [
 		sendNotification: a
 	]
 ]
-	"""
-			def notificationRecipeProblem2 = """
+	'''
+
+	private static final String notificationRecipeProblem2 = '''
 /**
-			 * Recipe to verify handling integer (non-boolean) input
-			 */
+ * Recipe to verify handling integer (non-boolean) input
+ */
 tasks: [
 	[
 		id: 2000,
@@ -347,11 +334,12 @@ tasks: [
 		sendNotification: 2
 	]
 ]
-	"""
-				def notificationRecipeGood1 = """
+	'''
+
+	private static final String notificationRecipeGood1 = '''
 /**
-			 * Recipe to verify notification set to true
-			 */
+ * Recipe to verify notification set to true
+ */
 tasks: [
 	[
 		id: 2000,
@@ -363,11 +351,12 @@ tasks: [
 		sendNotification: true
 	]
 ]
-	"""
-			def notificationRecipeGood2 = """
+	'''
+
+	private static final String notificationRecipeGood2 = '''
 /**
-			 * Recipe to verify notification set to false
-			 */
+ * Recipe to verify notification set to false
+ */
 tasks: [
 	[
 		id: 2000,
@@ -379,72 +368,37 @@ tasks: [
 		sendNotification: false
 	]
 ]
-	"""
-	/**
-	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as 
-	 * dynamic method injections for various object classes to be used by the application
-	 */
-	private void loadConfig() { 
-		GroovyClassLoader classLoader = new GroovyClassLoader(this.class.classLoader) 
-		ConfigSlurper slurper = new ConfigSlurper('TEST') 
-		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config")) 
-	} 
+	'''
 
-	void setup() {
-		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
-		//super.setUp() 
-
-		// build a logger...
-		BasicConfigurator.configure() 
-		LogManager.rootLogger.level = Level.DEBUG
-		log = LogManager.getLogger("CookbookService")
-
-		// use groovy metaClass to put the log into your class
-		CookbookService.class.metaClass.getLog << {-> log }
-
-		//loadConfig()
-		// Initialize various custom methods used by our application
-		com.tdsops.metaclass.CustomMethods.initialize
-	}
-
-    def cleanup() {
-    }
-
-	//
-	// Series of tests for the validateSyntax method as there are numerous issues that could arise
-	//
 	void testValidateSyntaxGroupIsProperlyFormatted() {
+		when:
 		def recipe = "groups: [$goodGroup], tasks:[$predTask, $goodGeneralTask]"
-		def errors = cookbookService.validateSyntax( recipe )
-		expect:
-			errors == null
+		def errors = service.validateSyntax(recipe)
+		then:
+		!errors
 	}
-	
+
 	void testInvalidFilters() {
-		def errors = cookbookService.validateSyntax(invalidFilters)
-		
+		when:
+		def errors = service.validateSyntax(invalidFilters)
+		def returnedErrors = errors*.detail.sort()
 		def expectedErrors = [
-			"Group BAD-GROUP in element 2 contains unknown property 'custom8'",
-			"Task id 4100 in element 1 property 'class' contains invalid value 'asset'",
-			"Task id 4120 in element 1 property 'class' contains invalid value 'asset'",
-			"Task id 4120 in element 2 contains unknown property 'custom8'"
-		].sort{ a, b -> a.compareTo(b) }
-		
-		def returnedErrors = errors.collect {
-			it.detail
-		}.sort{ a, b -> a.compareTo(b) }
-		
-		expect:
-			errors != null
-			errors.size() == 4
-			returnedErrors == expectedErrors
+				"Group BAD-GROUP in element 2 contains unknown property 'custom8'",
+				"Task id 4100 in element 1 property 'class' contains invalid value 'asset'",
+				"Task id 4120 in element 1 property 'class' contains invalid value 'asset'",
+				"Task id 4120 in element 2 contains unknown property 'custom8'"
+		].sort()
+
+		then:
+		errors
+		errors.size() == 4
+		returnedErrors == expectedErrors
 	}
-	
+
 	void testValidateProblem2() {
-		def errors = cookbookService.validateSyntax( problemRecipe2 )
-		def returnedErrors = errors.collect { 
-			it.detail 
-		}.sort{ a, b -> a.compareTo(b) }
+		when:
+		def errors = service.validateSyntax(problemRecipe2)
+		def returnedErrors = errors*.detail.sort()
 		def expectedErrors = [
 				"Task id 2144 'duration' has invalid reference (#startupDuration,10x)",
 				"Task id 2160 'duration' has invalid value (abc)",
@@ -452,122 +406,127 @@ tasks: [
 				"Task id 2301 'filter/include' references an invalid group BOGUS",
 				"Task id 2310 'filter/exclude' references an invalid group BOGUS",
 				"Task id 2330 'predecessor/group' references an invalid group BOGUS"
-			].sort{ a, b -> a.compareTo(b) }
+		].sort()
 
-		expect:
-			errors != null
-			errors.size() == 6
-			returnedErrors == expectedErrors
+		then:
+		errors
+		errors.size() == 6
+		returnedErrors == expectedErrors
 	}
-	
+
 	void testValidateProblem1() {
-		def errors = cookbookService.validateSyntax( problemRecipe1 )
 		expect:
-			errors == null
+		!service.validateSyntax(problemRecipe1)
 	}
-	
+
 	void testValidateNotificationProblem1() {
-		def errors = cookbookService.validateSyntax( notificationRecipeProblem1 )
 		expect:
-			errors != null
+		service.validateSyntax(notificationRecipeProblem1)
 	}
-	
+
 	void testValidateNotificationProblem2() {
-		def errors = cookbookService.validateSyntax( notificationRecipeProblem2 )
 		expect:
-			errors != null
+		service.validateSyntax(notificationRecipeProblem2)
 	}
+
 	void testValidateNotificationGood1() {
-		def errors = cookbookService.validateSyntax( notificationRecipeGood1 )
 		expect:
-			errors == null
+		!service.validateSyntax(notificationRecipeGood1)
 	}
+
 	void testValidateNotificationGood2() {
-		def errors = cookbookService.validateSyntax( notificationRecipeGood2 )
 		expect:
-			errors == null
+		!service.validateSyntax(notificationRecipeGood2)
 	}
+
 	void testSimple() {
-		def recipe = "tasks: {}"
-		def errors = cookbookService.validateSyntax( recipe )
-		expect:
-			errors != null
+		expect service.validateSyntax('tasks: {}')
 	}
 
 	// Testing the Groups Section
 	void testValidateSyntaxGroupMissingName() {
+		when:
 		def recipe = """
-			groups: [ [name:'', filter: [class:'application'] ] ], 
+			groups: [ [name:'', filter: [class:'application'] ] ],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains('is blank')
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains('is blank')
 	}
 
 	void testValidateSyntaxGroupNameHasSpace() {
+		when:
 		def recipe = """
-			groups: [ [name:'a b c', filter: [class:'application'] ] ], 
+			groups: [ [name:'a b c', filter: [class:'application'] ] ],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains('contains unsupported space character(s)')
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains('contains unsupported space character(s)')
 	}
 
 	void testValidateSyntaxGroupHasDuplicateNameDefined() {
+		when:
 		def recipe = """
-			groups: [ $goodGroup, $goodGroup ], 
+			groups: [ $goodGroup, $goodGroup ],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains('duplicated in group')
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains('duplicated in group')
 	}
 
 	void testValidateSyntaxGroupHasInvalidClassName() {
+		when:
 		def recipe = """
 			groups: [ [name:'APPS', filter: [class:'invalidClassName'] ] ],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		log.info errors
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains("'class' contains invalid value")
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains("'class' contains invalid value")
 	}
 
 	void testValidateSyntaxGroupIsMissingFilterDefinition() {
+		when:
 		def recipe = """
 			groups: [ [name:'APPS'] ],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		log.info errors
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains('is missing require section \'filter\'')
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains('is missing require section \'filter\'')
 	}
 
 	void testValidateSyntaxGroupFilterIsNotMap() {
+		when:
 		def recipe = """
 			groups: [ [ name:'APPS', filter: 'Should be a Map but it is not' ] ],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		log.info errors
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains('\'filter\' element not properly defined as a map')
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains('\'filter\' element not properly defined as a map')
 	}
 
 	void testValidateSyntaxGroupFilterExcludeBadReference() {
+		when:
 		def recipe = """
-			groups: [ 
-				[ name:'APPS', 
+			groups: [
+				[ name:'APPS',
 					filter: [
 						class: 'device',
 						exclude: 'FOO'
@@ -575,18 +534,19 @@ tasks: [
 				]
 			],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		log.info errors
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains('references undefined group')
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains('references undefined group')
 	}
 
 	void testValidateSyntaxGroupFilterIncludeBadReferenceInAnArray() {
+		when:
 		def recipe = """
-			groups: [ 
-				[ name:'APPS', 
+			groups: [
+				[ name:'APPS',
 					filter: [
 						class: 'device',
 						include: ['FOO']
@@ -594,22 +554,23 @@ tasks: [
 				]
 			],
 			tasks:[$predTask, $goodGeneralTask]"""
-		def errors = cookbookService.validateSyntax( recipe )
-		log.info errors
-		expect:
-			errors != null
-			errors.size() == 1
-			errors[0].detail.contains('references undefined group')
+		def errors = service.validateSyntax(recipe)
+
+		then:
+		errors
+		errors.size() == 1
+		errors[0].detail.contains('references undefined group')
 	}
 
 	// Testing the Tasks Section
 	void testValidateSyntaxGroupMissingTasksSection() {
+		when:
 		def recipe = "groups: [$goodGroup]"
-		def errors = cookbookService.validateSyntax( recipe )
-		expect:
-			errors != null
-			errors.size() == 1
-			'Recipe is missing required \'tasks\' section' == errors[0].detail
-	}
+		def errors = service.validateSyntax(recipe)
 
+		then:
+		errors
+		errors.size() == 1
+		'Recipe is missing required \'tasks\' section' == errors[0].detail
+	}
 }

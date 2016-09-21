@@ -1,4 +1,4 @@
-/** 
+/**
  * Used to represent categories of key/value pairs at a project level
  */
 import groovy.transform.EqualsAndHashCode
@@ -46,11 +46,11 @@ class KeyValue  implements Serializable {
 	 * Used to return a KeyValue record for the specified project and category. If a default project
 	 * is supplied then key values will looked up in the default project if it doesn't exist in project
 	 * @param Project project - the project to get the override values from
-	 * @param Boolean includeDefault - if true will 
+	 * @param Boolean includeDefault - if true will
 	 * @param Project defProject - the project to get the default values from (optional)
 	 * @return List of KeyValue entries
 	 */
-	static KeyValue get(Project project, String category, String key, Project defProject) { 
+	static KeyValue get(Project project, String category, String key, Project defProject) {
 		def kv = KeyValue.findByProjectAndCategory(project, category)
 		if ( !kv && defProject ) {
 			kv = KeyValue.findByProjectAndCategory(defProject, category)
@@ -62,7 +62,7 @@ class KeyValue  implements Serializable {
 	 * Used to return a map list of KeyValue records for the specified project and category. If a default project
 	 * is supplied then key values will be interweaved for keys that only exist in the default project's list.
 	 * @param Project project - the project to get the override values from
-	 * @param Boolean includeDefault - if true will 
+	 * @param Boolean includeDefault - if true will
 	 * @param Project defProject - the project to get the default values from (optional)
 	 * @return List of KeyValue entries
 	 */
@@ -88,7 +88,7 @@ class KeyValue  implements Serializable {
 		// This should pay attention to project.isDefaultProject() and not bother with defProject in that case.
 		// If defProject.value == value and project has the key then delete it.
 	}
-	
+
 	/**
 	 * Used to return a KeyValue record for the specified project and category.
 	 * If keyValue doesn't exist then it will fetch from defProject.
@@ -105,4 +105,4 @@ class KeyValue  implements Serializable {
 		return kv
 	}
 
-}	
+}

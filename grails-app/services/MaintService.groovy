@@ -1,72 +1,66 @@
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.beans.factory.InitializingBean
 
-class MaintService {
-	
-	static String MAINT_MODE_FILE_PATH = ""
-	private static Boolean IN_MAINT_MODE = false
-	
-	def servletContext
-	
-	/**
-	 * Constructor to load config prop in a class variable.
-	 */
-	def MaintService(){
-		MAINT_MODE_FILE_PATH = ConfigurationHolder.config.tdsops.maintModeFile
+import javax.servlet.ServletContext
+import javax.servlet.http.HttpSession
+
+@CompileStatic
+@Slf4j
+class MaintService implements InitializingBean {
+
+	private static String MAINT_MODE_FILE_PATH = ''
+	private static final String MAINT_BACKDOOR_ENTRY = 'MAINT_BACKDOOR_ENTRY'
+
+	static transactional = false
+
+	static boolean inMaintMode = false
+
+	ServletContext servletContext
+	GrailsApplication grailsApplication
+
+	@CompileDynamic
+	void afterPropertiesSet() {
+		MAINT_MODE_FILE_PATH = grailsApplication.config.tdsops.maintModeFile
 	}
-	
+
 	/**
-	 * This method is used to check whether Maintenance Mode flag file exist or not
-	 * @return void
+	 * Check if the Maintenance Mode flag file exists.
 	 */
-	def checkForMaintFile(){
+	void checkForMaintFile() {
 		//Check for resource availability at given path.
-		def resource = servletContext.getResource( MaintService.MAINT_MODE_FILE_PATH )
-		if( resource ) {
-			if( !isInMaintMode() ){
-				setInMaintMode( true )
-				log.info " Maintenance Mode was enabled @ "+new Date();
+		def resource = servletContext.getResource(MaintService.MAINT_MODE_FILE_PATH)
+		if (resource) {
+			if (!inMaintMode) {
+				inMaintMode = true
+				log.info 'Maintenance Mode was enabled @ {}', new Date()
 			}
 		} else {
-			if( isInMaintMode() ){
-				setInMaintMode( false )
-				log.info " Maintenance Mode was disabled @ "+new Date();
+			if (inMaintMode) {
+				inMaintMode = false
+				log.info 'Maintenance Mode was disabled @ {}', new Date()
 			}
 		}
 	}
-	
+
 	/**
-	 * Setting a variable to determine whether application is maint mode or not
-	 * @return void
+	 * Allows a user to make a backdoor entry to indicate that the application
+	 * is in maintenance mode.
 	 */
-	def static setInMaintMode (Boolean inMaintMode ){
-		IN_MAINT_MODE = inMaintMode
-	}
-	
-	/**
-	 * This method is used to get maint. mode variable flag
-	 * @return Boolean 
-	 */
-	def static Boolean isInMaintMode (){
-		return IN_MAINT_MODE
-	}
-	
-	/**
-	 * This method allow user to make a backdoor entry either application is in maintenance mode
-	 * @return
-	 */
-	def toggleUsersBackdoor(session){
-		def hasAccess = session.getAttribute("MAINT_BACKDOOR_ENTRY")
-		if( !hasAccess  ){
-			session.MAINT_BACKDOOR_ENTRY = true
-			log.info  "User allowed for back door access @ "+ new Date()
+	void toggleUsersBackdoor(HttpSession session) {
+		def hasAccess = session.getAttribute(MAINT_BACKDOOR_ENTRY)
+		if (!hasAccess) {
+			session.setAttribute(MAINT_BACKDOOR_ENTRY, true)
+			log.info 'User allowed for back door access @ {}', new Date()
 		}
-	}
-	
+	}///////////////////////////
+
 	/**
-	 * This method is returns a flag to make a backDoor entry
-	 * @return
+	 * Returns true if the backdoor access flag is set.
 	 */
-	def hasBackdoorAccess(session){
-		return session.MAINT_BACKDOOR_ENTRY ?: false
+	boolean hasBackdoorAccess(HttpSession session) {
+		session.getAttribute(MAINT_BACKDOOR_ENTRY) ?: false
 	}
 }

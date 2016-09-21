@@ -1,119 +1,110 @@
 package com.tdssrc.grails
 
-import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-
-import grails.test.*
 import spock.lang.Specification
 
 class StopWatchTests extends Specification {
 
-	static final String tag = 'foo'
+	private static final String tag = 'foo'
 
 	void 'Test lifecycle of the StopWatch Class'() {
 		when:
-			StopWatch stopWatch = new StopWatch()
-			Date started = stopWatch.begin()
-			Date startedTag = stopWatch.begin(tag)
+		StopWatch stopWatch = new StopWatch()
+		Date started = stopWatch.begin()
+		Date startedTag = stopWatch.begin(tag)
 		then:
-			stopWatch.hasTag() == true
-			stopWatch.hasTag(tag) == true
-			stopWatch.getStartTime().getTime() == started.getTime()
-			stopWatch.getStartTime(tag).getTime() == startedTag.getTime()
+		stopWatch.hasTag() == true
+		stopWatch.hasTag(tag) == true
+		stopWatch.getStartTime().getTime() == started.getTime()
+		stopWatch.getStartTime(tag).getTime() == startedTag.getTime()
 
 		// Test that the clocks can be terminated
-		when:	
-			stopWatch.endDuration()
-			stopWatch.endDuration(tag)
+		when:
+		stopWatch.endDuration()
+		stopWatch.endDuration(tag)
 		then:
-			stopWatch.hasTag() == false
-			stopWatch.hasTag(tag) == false
+		stopWatch.hasTag() == false
+		stopWatch.hasTag(tag) == false
 	}
 
 	void 'Exercise the StopWatch Class'() {
 		when:
-			StopWatch stopWatch = new StopWatch()
-			Date started = stopWatch.begin()
-			Date startedTag = stopWatch.begin(tag)
-			sleep(50)
-			TimeDuration lap = stopWatch.lap()
-			TimeDuration lapTag = stopWatch.lap(tag)
+		StopWatch stopWatch = new StopWatch()
+		Date started = stopWatch.begin()
+		Date startedTag = stopWatch.begin(tag)
+		sleep(50)
+		TimeDuration lap = stopWatch.lap()
+		TimeDuration lapTag = stopWatch.lap(tag)
 		then:
-			lap.toMilliseconds() >= 50 && lap.toMilliseconds() <= 500
-			lapTag.toMilliseconds() >= 50 && lapTag.toMilliseconds() <= 500
+		lap.toMilliseconds() >= 50 && lap.toMilliseconds() <= 500
+		lapTag.toMilliseconds() >= 50 && lapTag.toMilliseconds() <= 500
 
 		when:
-			sleep(500)
-			lap = stopWatch.lap()
-			lapTag = stopWatch.lap(tag)
-			TimeDuration lastLap = stopWatch.getLastLap()
-			TimeDuration lastLapTag = stopWatch.getLastLap(tag)
+		sleep(500)
+		lap = stopWatch.lap()
+		lapTag = stopWatch.lap(tag)
+		TimeDuration lastLap = stopWatch.getLastLap()
+		TimeDuration lastLapTag = stopWatch.getLastLap(tag)
 		then:
-			lastLap == lap
-			lastLapTag == lapTag
-			lastLap.toMilliseconds() > 500 && lastLap.toMilliseconds() < 1000
-			lastLapTag.toMilliseconds() > 500 && lastLapTag.toMilliseconds() < 1000
+		lastLap == lap
+		lastLapTag == lapTag
+		lastLap.toMilliseconds() > 500 && lastLap.toMilliseconds() < 1000
+		lastLapTag.toMilliseconds() > 500 && lastLapTag.toMilliseconds() < 1000
 
 		when:
-			// Check out the getSinceStart
-			TimeDuration since = stopWatch.getSinceStart()
-			TimeDuration sinceTag = stopWatch.getSinceStart(tag)
-		then: 
-			since.toMilliseconds() > 500 && since.toMilliseconds() < 1000
-			sinceTag.toMilliseconds() > 500 && sinceTag.toMilliseconds() < 1000
+		// Check out the getSinceStart
+		TimeDuration since = stopWatch.getSinceStart()
+		TimeDuration sinceTag = stopWatch.getSinceStart(tag)
+		then:
+		since.toMilliseconds() > 500 && since.toMilliseconds() < 1000
+		sinceTag.toMilliseconds() > 500 && sinceTag.toMilliseconds() < 1000
 
 
 		when:
-			sleep(1000)
-			TimeDuration since2 = stopWatch.getSinceStart()
-			TimeDuration since2Tag = stopWatch.getSinceStart(tag)
-		then: 
-			since2 > since
-			since2Tag > sinceTag
-			since2.toMilliseconds() > 1000 && since2.toMilliseconds() < 3000
-			since2Tag.toMilliseconds() > 1000 && since2Tag.toMilliseconds() < 3000
-
+		sleep(1000)
+		TimeDuration since2 = stopWatch.getSinceStart()
+		TimeDuration since2Tag = stopWatch.getSinceStart(tag)
+		then:
+		since2 > since
+		since2Tag > sinceTag
+		since2.toMilliseconds() > 1000 && since2.toMilliseconds() < 3000
+		since2Tag.toMilliseconds() > 1000 && since2Tag.toMilliseconds() < 3000
 	}
 
-/*
-
-	def 'Test Time Lap'(){
-	setup:
+	void 'Test Time Lap'() {
+		setup:
 		def stopWatch = new StopWatch()
-	when: "sleep 2s "
-		sleep(2000)      
-	then: 'stopwatch == 2s'
+		when: "sleep 2s "
+		sleep(2000)
+		then: 'stopwatch == 2s'
 		stopWatch.lap()
-		stopWatch.lastLap.seconds == 2 
+		stopWatch.lastLap.seconds == 2
 	}
 
-	def 'Test Multiple Time Lap'(){
-	setup:
-		def max = 5 
+	void 'Test Multiple Time Lap'() {
+		setup:
+		def max = 5
 		def startT = System.currentTimeMillis()
 		def stopWatch = new StopWatch()
 		def rand = new Random()
-	
-		def totalSecs = 0
-		def steps = (1..max).inject([]){result, i -> 
-		def secs = rand.nextInt(max+1)
-		totalSecs += secs  
-		result << secs
+
+		int totalSecs = 0
+		def steps = (1..max).inject([]) { result, i ->
+			def secs = rand.nextInt(max + 1)
+			totalSecs += secs
+			result << secs
 		}
 
-	expect: "that all steps last the computed interval"
-		steps.each{ secs ->
-		sleep(secs * 1000) 
-		stopWatch.lap()       
-		assert stopWatch.lastLap.seconds == secs
+		expect: "that all steps last the computed interval"
+		steps.each { secs ->
+			sleep(secs * 1000)
+			stopWatch.lap()
+			assert stopWatch.lastLap.seconds == secs
 		}
 
 		def stopT = System.currentTimeMillis()
 
-	and: "the duration of the Stopwatch is the same that the time consumed for the test"
+		and: "the duration of the Stopwatch is the same that the time consumed for the test"
 		stopWatch.sinceStart.seconds == (stopT - startT).intdiv(1000)
-
 	}
-*/
-
 }

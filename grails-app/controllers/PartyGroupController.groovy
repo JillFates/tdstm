@@ -2,11 +2,11 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import org.apache.commons.lang.StringUtils
 
 class PartyGroupController {
-	
+
     def controllerService
 	def partyRelationshipService
     def securityService
@@ -25,7 +25,7 @@ class PartyGroupController {
 	}
 
 	def listJson() {
-	
+
     	Person whom = securityService.getUserLoginPerson()
 
 		def sortIndex = params.sidx ?: 'companyName'
@@ -35,30 +35,30 @@ class PartyGroupController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def companyInstanceList
 		def filterParams = ['companyName':params.companyName, 'dateCreated':params.dateCreated, 'lastUpdated':params.lastUpdated, 'partner':params.partner]
-		
+
 		// Validate that the user is sorting by a valid column
 		if( ! sortIndex in filterParams)
 			sortIndex = 'companyName'
-		
+
 		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
 		if(!active){
 			active = 'Y'
 		}
-		
-		def query = new StringBuffer("""SELECT * FROM ( 
-			SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner  
+
+		def query = new StringBuffer("""SELECT * FROM (
+			SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
 			FROM party_group pg
 			INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id
 			LEFT JOIN party_relationship pr ON pr.party_relationship_type_id = 'PARTNERS' AND pr.role_type_code_from_id = 'COMPANY' and pr.role_type_code_to_id = 'PARTNER' and pr.party_id_to_id = pg.party_group_id
 			WHERE party_group_id in (
 				SELECT party_id_to_id FROM party_relationship
-				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY' 
+				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
 				AND role_type_code_to_id='CLIENT' AND party_id_from_id=${whom.company.id}
 				)
-			GROUP BY party_group_id ORDER BY 
+			GROUP BY party_group_id ORDER BY
 		""")
 		query.append( " $sortIndex $sortOrder ) as companies")
-		
+
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 		filterParams.each {
@@ -73,7 +73,7 @@ class PartyGroupController {
 		}
 
 		companyInstanceList = jdbcTemplate.queryForList(query.toString())
-		
+
 		// Limit the returned results to the user's page size and number
 		def totalRows = companyInstanceList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
@@ -81,9 +81,9 @@ class PartyGroupController {
 			companyInstanceList = companyInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		else
 			companyInstanceList = []
-		
+
 		def showUrl = HtmlUtil.createLink([controller:'partyGroup', action:'show'])
-		
+
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = companyInstanceList?.collect {[ cell: ['<a href="' + showUrl + '/' + it.companyId + '">'+it.companyName+'</a>', it.partner, it.dateCreated, it.lastUpdated], id: it.companyId ]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
@@ -97,14 +97,14 @@ class PartyGroupController {
 		if(!partyGroupInstance) {
 			flash.message = "PartyGroup not found with id ${params.id}"
 			redirect(action:"list")
-		} else { 
-			return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ] 
+		} else {
+			return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ]
 		}
 	}
 
 	def delete() {
 		if (!controllerService.checkPermission(this, 'CompanyDelete')) {
-			return;
+			return
 		}
 
 		PartyGroup partyGroupInstance = PartyGroup.get(params.id)
@@ -167,7 +167,7 @@ class PartyGroupController {
 
 	def edit() {
 		if (!controllerService.checkPermission(this, 'CompanyEdit')) {
-			return;
+			return
 		}
 
 		def partyGroupInstance = PartyGroup.get( params.id )
@@ -186,7 +186,7 @@ class PartyGroupController {
 		//partyGroupInstance.lastUpdated = new Date()
 		if(partyGroupInstance) {
 			partyGroupInstance.properties = params
-			
+
 			if( !partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
 
 				if (params.partner && params.partner == "Y" && !isAPartner(partyGroupInstance)) {
@@ -211,7 +211,7 @@ class PartyGroupController {
 
     def create() {
 		if (!controllerService.checkPermission(this, 'CompanyCreate')) {
-			return;
+			return
 		}
 
     	log.debug "**** Got to the create() method"

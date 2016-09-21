@@ -1,22 +1,22 @@
 import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller;
-import grails.validation.ValidationException;
+import org.springframework.stereotype.Controller
+import grails.validation.ValidationException
 
 
 /**
  * {@link Controller} for handling WS calls of the {@link ApplicationService}
- * 
+ *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 class WsApplicationController {
 
 	def securityService
 	def applicationService
-	
+
 	/**
-	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned 
+	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
 	 * applications for the user's current project
 	 * Check {@link UrlMappings} for the right call
 	 */
@@ -28,7 +28,7 @@ class WsApplicationController {
 		}
 
 		def currentProject = securityService.getUserCurrentProject()
-		
+
 		try {
 			def results = applicationService.listInBundle(params.id, loginUser, currentProject)
 			render(ServiceResults.success(['list' : results]) as JSON)

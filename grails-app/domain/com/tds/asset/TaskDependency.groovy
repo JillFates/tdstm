@@ -1,5 +1,5 @@
 /**
- * TaskDependency represents the association of tasks with various types of dependencies amongst them 
+ * TaskDependency represents the association of tasks with various types of dependencies amongst them
  */
 
 package com.tds.asset
@@ -7,7 +7,7 @@ package com.tds.asset
 import com.tdsops.tm.enums.domain.TaskDependencyType
 
 class TaskDependency {
-	
+
 	AssetComment assetComment		// aka successor
 	AssetComment predecessor
 
@@ -17,13 +17,13 @@ class TaskDependency {
 	Integer tmpSuccessorDepCount 	// Tansient for TaskService.getNeighborhood
 	Integer tmpPredecessorDepCount 	// Tansient for TaskService.getNeighborhood
 	TaskDependencyType type = TaskDependencyType.getDefault()
-		
+
 	static constraints = {
 		assetComment()
 		predecessor()
 		type( inList:TaskDependencyType.getKeys() )
 	}
-	
+
 	static mapping = {
 		id column:'task_dependency_id'
 		assetComment fetch:'join'

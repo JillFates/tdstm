@@ -13,7 +13,7 @@ class StepSnapshot {
 	int dialIndicator			// Quantity to display in the dial/gage on dashboard
 	Date dateCreated = TimeUtil.nowGMT()
 
-	static constraints = { 
+	static constraints = {
 		dateCreated( nullable:true )
 	}
 
@@ -25,7 +25,7 @@ class StepSnapshot {
 			tasksCompleted sqltype: 'smallint unsigned'
 			duration sqltype: 'mediumint unsigned'
 			planDelta sqltype: 'int'
-			dialIndicator sqltype: 'tinyint'		
+			dialIndicator sqltype: 'tinyint'
 		}
 	}
 	/**
@@ -33,45 +33,45 @@ class StepSnapshot {
 	 */
 	def getPlanTaskPace () {
 		def planDuration = moveBundleStep.planDuration
-		// print "tasksCount=${tasksCount}, planDuration=${planDuration}\n"		
+		// print "tasksCount=${tasksCount}, planDuration=${planDuration}\n"
 		if( planDuration ){
 			return tasksCount > 0 ? (planDuration / tasksCount ).intValue() : 0
 		} else {
 			return 0
 		}
-				
+
 	}
-	
+
 	/**
 	 * Computes the pace of the task in seconds. Return zero (0) if no tasks have been completed
 	 */
 	def getActualTaskPace() {
 		return (tasksCompleted > 0 && duration) ? (duration / tasksCompleted ).intValue() : 0
-	}	
-	
+	}
+
 	/**
 	 * calculates the projected time (seconds) remaining based on the number task uncompleted times the planned pace.
 	 * @return int - number of projected time remaining (seconds)
-	 * Case: 
+	 * Case:
 	 *    1. step has not started - return the moveBundle.planDuration
 	 *    2. step in progress - return (taskCount - taskCompleted) * moveBundleStep.planPace
 	 *    3. step is completed - return zero (0)
 	 */
 	def getProjectedTimeRemaining( ) {
 		def timeRemaining = 0
-		
+
 		if ( tasksCompleted < tasksCount ){
 			// print "tasksCount:${tasksCount}, tasksCompleted=${tasksCompleted}, planTaskPace=${planTaskPace}\n"
 			timeRemaining = ((tasksCount - tasksCompleted) * planTaskPace ).intValue()
 		}
-		 return timeRemaining 
+		 return timeRemaining
 	}
-	
+
 	/**
-	 * Calculates the projected time (seconds) over(+)/under(-) the planned completion time for the step.  
+	 * Calculates the projected time (seconds) over(+)/under(-) the planned completion time for the step.
 	 * @return int - projected time over planed over completion time (seconds)
 	 * Case:
-	 *    1. step has not started: 
+	 *    1. step has not started:
 	 *       a. planStartTime <= current time: return zero (0)
 	 *       b. planStartTime > current time: (current time + projectedTimeRemaining) - moveBundleStep.planCompletionTime
 	 *    2. step in progress: (current time + projectedTimeRemaining) - moveBundleStep.planCompletionTime
@@ -87,11 +87,11 @@ class StepSnapshot {
 		} else if(!isCompleted()){
 			timeOver = ( nowTime + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
 		}
-		
+
 		if(timeOver){
 			timeOver = timeOver / 1000
 		}
-		 return timeOver 
+		 return timeOver
 	}
 
 	/**
@@ -112,7 +112,7 @@ class StepSnapshot {
 	def isCompleted() {
 		return tasksCount == tasksCompleted
 	}
-	
+
 	/**
 	 * Used to determine if the step has started.  It will return true even after completed
 	 * @return boolean - true if the step has started
@@ -120,9 +120,9 @@ class StepSnapshot {
 	def hasStarted() {
 		 return moveBundleStep.actualStartTime != null
 	}
-	
+
 	/**
-	 * Returns the status bar color 
+	 * Returns the status bar color
 	 * @return string - the color green/red indication the step status to planned completion time
 	 */
 	def getStatusColor() {
@@ -140,8 +140,8 @@ class StepSnapshot {
 			}
 		}
 		return color
-	}	
-	
+	}
+
     String toString(){
 		moveBundleStep.label + " " + dateCreated
 	}

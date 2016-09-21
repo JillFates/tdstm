@@ -3,20 +3,20 @@ import com.tdssrc.grails.GormUtil
 import spock.lang.Specification
 
 class GormUtilTests extends Specification  {
-	
+
 	// IOC variables
 	def sessionFactory
 
 
 	def "Test isDomainClass"() {
-		when: 
+		when:
 			def domain = new com.tds.asset.AssetDependency()
 			String prop = 'comment'
 		then:
 			GormUtil.isDomainClass(domain)
 			! GormUtil.isDomainClass(new Date())
 
-	}	
+	}
 
 	def "Test the getConstraintMaxSize"() {
 		// Positive test first
@@ -48,7 +48,7 @@ class GormUtilTests extends Specification  {
 	}
 
 	/**
-	 * 
+	 *
 	void testGetDomainPropertiesWithConstraint() {
 
 		def list = []
@@ -74,10 +74,10 @@ class GormUtilTests extends Specification  {
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range', (1..5) ).sort()
 		assertEquals 'Test "range" matching', ['score'], list
-		
+
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range', (2..4) )
 		assertEquals 'Test "range" no matching', [], list
-		
+
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range').sort()
 		assertEquals 'Test "range" for null', ['score'], list
 
@@ -86,12 +86,12 @@ class GormUtilTests extends Specification  {
 		//
 		//list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'inList', ['red','green','blue','yellow','orange'])
 		//assertEquals 'Test "inList" matching', ['color'], list
-		
+
 		//list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'inList').sort()
 		//assertEquals 'Test "inList" for null', ['color'], list
 
 			// age nullable:true
-			// color 
+			// color
 			// label nullable:true
 			// name blank:false
 			// note
@@ -128,6 +128,5 @@ class GormUtilTests extends Specification  {
 
 	}
 	*/
-
 
 }

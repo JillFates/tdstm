@@ -6,7 +6,6 @@ import org.apache.poi.*
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.apache.shiro.SecurityUtils
 import org.springframework.web.multipart.*
@@ -17,20 +16,20 @@ import com.tds.asset.AssetCableMap
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.WebUtil 
+import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 
 class ModelController {
-	
+
 	// Services and objects to be injected by IoC
     def jdbcTemplate
-	def assetEntityAttributeLoaderService 
+	def assetEntityAttributeLoaderService
     def sessionFactory
 	def securityService
 	def modelService
 	def assetEntityService
-	
+
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
@@ -46,7 +45,7 @@ class ModelController {
 		}
 		return [modelPref:modelPref, attributesList:attributes.keySet().sort{it}, columnLabelpref:columnLabelpref]
     }
-    
+
 	/**
 	 * This method is used by JQgrid to load modelList
 	 */
@@ -56,12 +55,12 @@ class ModelController {
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def modelInstanceList
-		
+
 		// This map contains all the possible fileds that the user could be sorting or filtering on
 		def filterParams = [
-			'modelName':params.modelName, 'manufacturer':params.manufacturer, 'description':params.description, 
-			'assetType':params.assetType,'powerUse':params.powerUse, 'noOfConnectors':params.modelConnectors, 
-			'assetsCount':params.assetsCount, 'sourceTDSVersion':params.sourceTDSVersion, 'sourceTDS':params.sourceTDS, 
+			'modelName':params.modelName, 'manufacturer':params.manufacturer, 'description':params.description,
+			'assetType':params.assetType,'powerUse':params.powerUse, 'noOfConnectors':params.modelConnectors,
+			'assetsCount':params.assetsCount, 'sourceTDSVersion':params.sourceTDSVersion, 'sourceTDS':params.sourceTDS,
 			'modelStatus':params.modelStatus]
 		def attributes = Model.getModelFieldsAndlabels()
 		def modelPref= assetEntityService.getExistingPref('Model_Columns')
@@ -72,10 +71,10 @@ class ModelController {
 		}
 		// Cut the list of fields to filter by down to only the fields the user has entered text into
 		def usedFilters = filterParams.findAll { key, val -> val != null }
-				
+
 		// Get the actual list from the service
 		modelInstanceList = modelService.listOfFilteredModels(filterParams, params.sidx, sortOrder)
-		
+
 		// TODO : this looks like a good utility function to refactor
 		// Limit the returned results to the user's page size and number
 		def totalRows = modelInstanceList.size()
@@ -83,14 +82,14 @@ class ModelController {
 
 		// Get the subset of all records based on the pagination
 		modelInstanceList = (totalRows > 0) ? modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)] : []
-		
+
 		// Reformat the list to allow jqgrid to use it
-		def results = modelInstanceList?.collect { 
-			[ 
+		def results = modelInstanceList?.collect {
+			[
 				id: it.modelId,
-				cell: [ 
-					it.modelName, it.manufacturer, displayModelValues(modelPref["1"],it), displayModelValues(modelPref["2"],it), 
-					displayModelValues(modelPref["3"],it), displayModelValues(modelPref["4"],it), 
+				cell: [
+					it.modelName, it.manufacturer, displayModelValues(modelPref["1"],it), displayModelValues(modelPref["2"],it),
+					displayModelValues(modelPref["3"],it), displayModelValues(modelPref["4"],it),
 					it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus
 				]
 			]
@@ -101,48 +100,48 @@ class ModelController {
 		render jsonData as JSON
 
     }
-	
+
 	def displayModelValues(value, model){
 		def result
 		switch(value){
 			case ~/dateCreated|lastModified|endOfLifeDate/:
-				result = model[value] ? TimeUtil.formatDate(getSession(), model[value]) : ''
-			break;
+				result = model[value] ? TimeUtil.formatDate(session, model[value]) : ''
+			break
 			case 'modelConnectors':
 				result= model.noOfConnectors
-			break;
+			break
 			default:
 				result = model[value]
-			break;
+			break
 		}
     }
 		/*
 		// If the user is sorting by a valid column, order by that one instead of the default
-		if ( params.sidx in filterParams.keySet ) 
-			sortIndex = params.sidx	
-		
+		if ( params.sidx in filterParams.keySet )
+			sortIndex = params.sidx
+
 		def query = new StringBuffer("SELECT ")
-		
-		// Add the columns that are to be used in the query 
+
+		// Add the columns that are to be used in the query
 		aliasValuesBase.each {
 			query.append("${it.getValue()} AS ${it.getKey()}, ")
 		}
 		aliasValuesAggregate.each {
 			query.append("${it.getValue()} AS ${it.getKey()}, ")
 		}
-		
+
 		// Remove the extra comma from the last alias
 		query.deleteCharAt(query.length()-2)
-		
+
 		// Perform all the needed table joins
-		query.append(""" 
-			FROM model m 
-			LEFT OUTER JOIN model_connector mc on mc.model_id = m.model_id 
-			LEFT OUTER JOIN model_sync ms on ms.model_id = m.model_id 
-			LEFT OUTER JOIN manufacturer man on man.manufacturer_id = m.manufacturer_id 
-			LEFT OUTER JOIN asset_entity ae ON ae.model_id = m.model_id 
+		query.append("""
+			FROM model m
+			LEFT OUTER JOIN model_connector mc on mc.model_id = m.model_id
+			LEFT OUTER JOIN model_sync ms on ms.model_id = m.model_id
+			LEFT OUTER JOIN manufacturer man on man.manufacturer_id = m.manufacturer_id
+			LEFT OUTER JOIN asset_entity ae ON ae.model_id = m.model_id
 		""")
-		
+
 		// Handle the filtering by each column's text field for base columns
 		def firstWhere = true
 		usedFilters.findAll {
@@ -156,13 +155,13 @@ class ModelController {
 					query.append(" AND ${aliasValuesBase.get(it.getKey())} LIKE CONCAT('%',:${it.getKey()},'%')\n")
 				}
 		}
-		
+
 		// Sort by the specified field
 		query.append("""
 			GROUP BY modelId
 			ORDER BY ${sortIndex} ${sortOrder}
 		""")
-		
+
 		// Handle the filtering by each column's text field for aggregate columns
 		def firstHaving = true
 		usedFilters.findAll {
@@ -176,14 +175,14 @@ class ModelController {
 					query.append(" AND ${aliasValuesAggregate.get(it.getKey())} LIKE CONCAT('%',:${it.getKey()},'%')\n")
 				}
 		}
-		
+
 		// Perform the query and store the results in a list
 		if (usedFilters.size() > 0)
 			modelInstanceList = namedParameterJdbcTemplate.queryForList(query.toString(), usedFilters)
 		else
 			modelInstanceList = jdbcTemplate.queryForList(query.toString())
 		*/
-	
+
 
     def create() {
     	def modelId = params.modelId
@@ -200,19 +199,19 @@ class ModelController {
 			otherConnectors << i
 		}
 		def powerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
-        return [modelInstance: modelInstance, modelConnectors : modelConnectors, 
+        return [modelInstance: modelInstance, modelConnectors : modelConnectors,
 				otherConnectors:otherConnectors, modelTemplate:modelTemplate, powerType : powerType ]
     }
 
     def save() {
 		try {
 			def user = securityService.getUserLogin()
-			
+
 	    	def modelId = params.modelId
 			if (!RolePermissions.hasPermission('EditModel')) {
 				log.warn "Unauthorized user $user attempted to update modelId $modelId"
-				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError: 
-				//the number of constructors during runtime and compile time for java.lang.RuntimeException do not match. Expected 4 but got 5 
+				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError:
+				//the number of constructors during runtime and compile time for java.lang.RuntimeException do not match. Expected 4 but got 5
 				//So using 'RuntimeException' for now.
 				throw new RuntimeException('User does not have permission to create model')
 			}
@@ -223,7 +222,7 @@ class ModelController {
 			def endOfLifeDate = params.endOfLifeDate
 			//def principal = SecurityUtils.subject?.principal
 			//def user
-			
+
 			if( user ){
 				//user  = UserLogin.findByUsername( principal )
 				def person = user.person
@@ -236,18 +235,18 @@ class ModelController {
 					 }
 					if(!person.save(flush:true)){
 						person.errors.allErrors.each{ println it }
-					}				
+					}
 				}
 			}
 			if(endOfLifeDate){
-				params.endOfLifeDate = TimeUtil.parseDate(getSession(), endOfLifeDate)
+				params.endOfLifeDate = TimeUtil.parseDate(session, endOfLifeDate)
 			}
 			if( powerType == "Amps"){
 				powerNameplate =  powerNameplate * 120
 				powerDesign = powerDesign * 120
 				powerUsed = powerUsed * 120
 	        }
-		    def modelTemplate 
+		    def modelTemplate
 			if(modelId)
 				modelTemplate = Model.get(modelId)
 	    	params.useImage = params.useImage == 'on' ? 1 : 0
@@ -268,7 +267,7 @@ class ModelController {
 					if (! okcontents.contains(frontImage.getContentType())) {
 		        		flash.message = "Front Image must be one of: ${okcontents}"
 		        		render(view: "create", model: [modelInstance: modelInstance])
-		        		return;
+		        		return
 		        	}
 	        	}
 	        } else if(modelTemplate){
@@ -282,7 +281,7 @@ class ModelController {
 					if (! okcontents.contains(rearImage.getContentType())) {
 		        		flash.message = "Rear Image must be one of: ${okcontents}"
 		        		render(view: "create", model: [modelInstance: modelInstance])
-		        		return;
+		        		return
 		        	}
 	        	}
 	        } else if(modelTemplate){
@@ -302,7 +301,7 @@ class ModelController {
 							connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
 							connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
 							status:params["status"+i] )
-		        		
+
 		        		if (!modelConnector.hasErrors() )
 		        			modelConnector.save(flush: true)
 		        	}
@@ -316,20 +315,20 @@ class ModelController {
 						connectorPosY : 0,
 						status: "missing"
 						)
-	
+
 					if (!powerConnector.save(flush: true)){
 						def etext = "Unable to create Power Connectors for ${modelInstance}" +
 						GormUtil.allErrorsString( powerConnector )
 						println etext
 					}
 				}
-				
+
 	        	modelInstance.sourceTDSVersion = 1
 	        	modelInstance.save(flush: true)
 				def akaNames = params.list('aka')
 				akaNames.each{ aka ->
 					aka = aka.trim()
-					if (aka)  
+					if (aka)
 						modelInstance.findOrCreateAliasByName(aka, true)
 				}
 	            flash.message = "${modelInstance.modelName} created"
@@ -364,11 +363,11 @@ class ModelController {
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
 				def modelRef = isModelReferenced( model )
 				def paramsMap = [ modelInstance : model, modelConnectors : modelConnectors, modelAkas:modelAkas,
-					modelHasPermission:RolePermissions.hasPermission("ValidateModel"), redirectTo: params.redirectTo, 
+					modelHasPermission:RolePermissions.hasPermission("ValidateModel"), redirectTo: params.redirectTo,
 					modelRef:modelRef]
-				
+
 				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
-				
+
 				render( view:view, model:paramsMap )
 	        }
 		} else {
@@ -401,12 +400,12 @@ class ModelController {
 					otherConnectors << i
 				}
 				def modelAliases = ModelAlias.findAllByModel(model)
-				def paramsMap = [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
+				def paramsMap = [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors,
 	                nextConnector:nextConnector, modelAliases:modelAliases, redirectTo:params.redirectTo ]
-				
+
 				def view = params.redirectTo== "modelDialog" ? "_edit" : "edit"
 				render(view: view, model: paramsMap )
-				
+
 	        }
 		} else {
 			flash.message = "Model id ${params.id} is not a valid Id "
@@ -415,18 +414,18 @@ class ModelController {
     }
 
     def update() {
-		
+
 		try{
 	        def modelInstance = Model.get(params.id)
 			def user = securityService.getUserLogin()
 			if (!RolePermissions.hasPermission('EditModel')) {
 				log.warn "Unauthorized user $user attempted to update modelId ${modelInstance.modelName}"
-				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError: 
-				//the number of constructors during runtime and compile time for java.lang.RuntimeException do not match. Expected 4 but got 5 
+				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError:
+				//the number of constructors during runtime and compile time for java.lang.RuntimeException do not match. Expected 4 but got 5
 				//So using 'RuntimeException' for now.
 				throw new RuntimeException('User does not have permission to update model')
 			}
-			def modelStatus = modelInstance?.modelStatus 
+			def modelStatus = modelInstance?.modelStatus
 			def endOfLifeDate = params.endOfLifeDate
 			def principal = SecurityUtils.subject?.principal
 			def person
@@ -449,9 +448,9 @@ class ModelController {
 			     }
 			}
 			if(endOfLifeDate){
-				params.endOfLifeDate = TimeUtil.parseDate(getSession(), endOfLifeDate)
+				params.endOfLifeDate = TimeUtil.parseDate(session, endOfLifeDate)
 			}
-			
+
 	        if (modelInstance) {
 				def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
 				def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
@@ -468,58 +467,58 @@ class ModelController {
 				params.powerDesign = powerDesign
 				params.powerUse = powerUsed
 	            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-	    		def frontImage 
+	    		def frontImage
 	            if( request?.getFile('frontImage') ) {
 					frontImage = request?.getFile('frontImage')
 	    			if( frontImage?.getContentType() && frontImage?.getContentType() != "application/octet-stream"){
 	    				if (! okcontents.contains(frontImage.getContentType())) {
 	    	        		flash.message = "Front Image must be one of: ${okcontents}"
 	    	        		render(view: "create", model: [modelInstance: modelInstance])
-	    	        		return;
+	    	        		return
 	    	        	}
 	    				frontImage = frontImage.bytes
-						
+
 	            	} else {
 	            		frontImage = modelInstance.frontImage
 					}
 	            } else {
 	            	frontImage = modelInstance.frontImage
 	            }
-	            def rearImage 
+	            def rearImage
 	            if( request?.getFile('rearImage') ) {
 					rearImage = request?.getFile('rearImage')
 	    			if( rearImage?.getContentType() && rearImage?.getContentType() != "application/octet-stream"){
 	    				if (! okcontents.contains(rearImage.getContentType())) {
 	    	        		flash.message = "Rear Image must be one of: ${okcontents}"
 	    	        		render(view: "create", model: [modelInstance: modelInstance])
-	    	        		return;
+	    	        		return
 	    	        	}
 	    				rearImage = rearImage.bytes
 	            	} else {
 						rearImage = modelInstance.rearImage
-					} 
+					}
 	            } else {
 	            	rearImage = modelInstance.rearImage
 	            }
-				modelInstance.height = params.modelHeight != "" ? NumberUtils.toDouble(params.modelHeight,0).round():0 
-				modelInstance.weight = params.modelWeight != "" ? NumberUtils.toDouble(params.modelWeight,0).round():0 
-				modelInstance.depth  = params.modelDepth  != "" ? NumberUtils.toDouble(params.modelDepth,0).round():0 
+				modelInstance.height = params.modelHeight != "" ? NumberUtils.toDouble(params.modelHeight,0).round():0
+				modelInstance.weight = params.modelWeight != "" ? NumberUtils.toDouble(params.modelWeight,0).round():0
+				modelInstance.depth  = params.modelDepth  != "" ? NumberUtils.toDouble(params.modelDepth,0).round():0
 				modelInstance.width  = params.modelWidth  != "" ? NumberUtils.toDouble(params.modelWidth,0).round():0
 	            if( params?.modelStatus == 'valid' && modelStatus == 'full'){
 				   modelInstance.validatedBy = user?.person
 				   modelInstance.updatedBy =  modelInstance.updatedBy
 				}else{
 				   modelInstance.updatedBy = person
-				}				
+				}
 	            modelInstance.properties = params
 	            modelInstance.rearImage = rearImage
 	            modelInstance.frontImage = frontImage
-							
+
 				def oldModelManufacturer = modelInstance.manufacturer.id
-				def oldModelType = modelInstance.assetType          
-				
+				def oldModelType = modelInstance.assetType
+
 				if (!modelInstance.hasErrors() && modelInstance.save(flush:true)) {
-					
+
 					def deletedAka = params.deletedAka
 					def akaToSave = params.list('aka')
 					if(deletedAka){
@@ -535,7 +534,7 @@ class ModelController {
 					akaToSave.each{aka->
 						modelInstance.findOrCreateAliasByName(aka, true)
 					}
-					
+
 					def connectorCount = 0
 					if(params.connectorCount){
 	            	    connectorCount = NumberUtils.toDouble(params.connectorCount,0).round()
@@ -545,9 +544,9 @@ class ModelController {
 							def connector = params["connector"+i]
 			        		def modelConnector = connector ? ModelConnector.findByModelAndConnector(modelInstance,connector) : ModelConnector.findByModelAndConnector(modelInstance,i)
 							if( !connector && modelConnector ){
-								
+
 								modelConnector.delete(flush:true)
-								
+
 							} else {
 								if(modelConnector){
 									modelConnector.connector = params["connector"+i]
@@ -557,7 +556,7 @@ class ModelController {
 									modelConnector.connectorPosX = NumberUtils.toDouble(params["connectorPosX"+i],0).round()
 									modelConnector.connectorPosY = NumberUtils.toDouble(params["connectorPosY"+i],0).round()
 									modelConnector.status = params["status"+i]
-									
+
 								} else if(connector){
 									modelConnector = new ModelConnector(
 										model: modelInstance,
@@ -568,14 +567,14 @@ class ModelController {
 										connectorPosX: NumberUtils.toDouble(params["connectorPosX"+i],0).round(),
 										connectorPosY: NumberUtils.toDouble(params["connectorPosY"+i],0).round(),
 										status: params["status"+i] )
-	
+
 								}
 				        		if (modelConnector && !modelConnector.hasErrors() )
 				        			modelConnector.save(flush: true)
 							}
 			        	}
 		        	} else {
-					
+
 						def powerConnector = new ModelConnector(model : modelInstance,
 							connector: 1,
 							label: "Pwr1",
@@ -585,19 +584,19 @@ class ModelController {
 							connectorPosY: 0,
 							status: "${AssetCableStatus.UNKNOWN}"
 						)
-						
+
 						if (!powerConnector.save(flush: true)){
 							def etext = "Unable to create Power Connectors for ${modelInstance}" +
 							GormUtil.allErrorsString( powerConnector )
 							println etext
 						}
-					
+
 					}
 	            	def assetEntitysByModel = AssetEntity.findAllByModel( modelInstance )
 					def assetConnectors = ModelConnector.findAllByModel( modelInstance )
 					assetEntitysByModel.each{ assetEntity ->
 	            		assetConnectors.each{connector->
-	            			
+
 	    					def assetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetEntity, connector )
 							if( !assetCableMap ){
 		    					assetCableMap = new AssetCableMap(
@@ -608,7 +607,7 @@ class ModelController {
 									cableComment : "Cable"+connector.connector
 								)
 							}
-							if(assetEntity?.rackTarget && connector.type == "Power" && 
+							if(assetEntity?.rackTarget && connector.type == "Power" &&
 								connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower){
 								assetCableMap.assetToPort = null
 								assetCableMap.toPower = "A"
@@ -635,20 +634,20 @@ class ModelController {
 					// TODO : JPM 9/2014 : assetType Legacy code that shoule be removed at some point when we normalize out the assetType from AssetEntity
 	            	def updateAssetsQuery = "update asset_entity set asset_type = '${modelInstance.assetType}' where model_id='${modelInstance.id}'"
 	            	jdbcTemplate.update(updateAssetsQuery)
-	                
+
 					if(modelInstance.sourceTDSVersion){
 		        		modelInstance.sourceTDSVersion ++
 		    		} else {
 		    			modelInstance.sourceTDSVersion = 1
 		    		}
 		        	modelInstance.save(flush: true)
-					
+
 					flash.message = "${modelInstance.modelName} Updated"
 					if(params.redirectTo == "assetAudit"){
 						render(template: "modelAuditView", model: [modelInstance:modelInstance] )
 					}
 					forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
-					
+
 	            } else {
 					modelInstance.errors.allErrors.each {log.error it}
 	            	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
@@ -686,14 +685,14 @@ class ModelController {
 						int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0
 					    person.modelScoreBonus = bonusScore+1
 						int score =  person.modelScore ?: 0
-						person.modelScore = score+bonusScore;
+						person.modelScore = score+bonusScore
 					}
 					if(!person.save(flush:true)){
 						person.errors.allErrors.each{
 							println it
 							}
 					}
-					
+
 	                flash.message = "${model} deleted"
 	                redirect(action: "list")
 	            } catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -715,12 +714,12 @@ class ModelController {
      */
     def retrieveFrontImage() {
 		if( params.id ) {
-    		def model = Model.findById( params.id )
+    		def model = Model.get( params.id )
      		def image = model?.frontImage
-     		response.contentType = 'image/jpg'		
+     		response.contentType = 'image/jpg'
      		response.outputStream << image
 		} else {
-			return "";
+			return ""
 		}
     }
     /*
@@ -728,12 +727,12 @@ class ModelController {
      */
     def retrieveRearImage() {
 		if( params.id ) {
-    		def model = Model.findById( params.id )
+    		def model = Model.get( params.id )
      		def image = model?.rearImage
-     		response.contentType = 'image/jpg'		
+     		response.contentType = 'image/jpg'
      		response.outputStream << image
 		} else {
-			return "";
+			return ""
 		}
     }
     /*
@@ -760,7 +759,7 @@ class ModelController {
      */
     def checkModelDependency() {
     	def modelId = params.modelId
-		def modelInstance = Model.findById(Integer.parseInt(modelId))
+		def modelInstance = Model.get(modelId)
 		def returnValue = false
 		if( modelInstance ){
 			if( AssetEntity.findByModel( modelInstance ) )
@@ -799,22 +798,22 @@ class ModelController {
     	// Get the Model instances for params ids
 		def toModel = Model.get(params.id)
 		def fromModel = Model.get(params.fromId)
-		
+
 		def assetUpdated = modelService.mergeModel(fromModel, toModel)
-		
+
     	flash.message = "Merge Completed, $assetUpdated assets updated"
     	redirect(action:"list")
     }
-	
-	
-	
+
+
+
 	/**
 	 * @param : toId id of target model
 	 * @param : fromId[] id of model that is being merged
      * @return : message
 	 */
 	def mergeModels() {
-		
+
 		def toModel = Model.get(params.toId)
 		def fromModelsId = params.list("fromId[]")
 		def mergedModel = []
@@ -822,7 +821,7 @@ class ModelController {
 		def assetUpdated = 0
 		//Saving toModel before merge
 		if(params.endOfLifeDate){
-			params.endOfLifeDate =  TimeUtil.formatDate(getSession(), params.endOfLifeDate)
+			params.endOfLifeDate =  TimeUtil.formatDate(session, params.endOfLifeDate)
 		} else {
 			params.endOfLifeDate=null
 		}
@@ -838,38 +837,38 @@ class ModelController {
 		msg+="${mergedModel.size()}  models were merged to ${toModel.modelName} . ${assetUpdated} assets were updated."
 		render msg
 	}
-	
+
     /*
-     * 
+     *
      */
 	def importExport() {
 		if( params.message ) {
 			flash.message = params.message
 		}
-		
+
 		def batchCount = jdbcTemplate.queryForInt("select count(*) from ( select * from manufacturer_sync group by batch_id ) a")
 		[batchCount:batchCount]
     }
     /*
-     * Use excel format with the manufacturer,model and connector sheets. 
+     * Use excel format with the manufacturer,model and connector sheets.
      * The file name should be of the format TDS-Sync-Data-2011-05-02.xls with the current date.
      */
     def export() {
         //get template Excel
         try {
-        	File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
+        	File file =  grailsApplication.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
 			//set MIME TYPE as Excel
-			def filename = 	"TDS-Sync-Data-"+TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_6)+".xls"
+			def filename = 	"TDS-Sync-Data-"+TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_6)+".xls"
 					filename = filename.replace(" ", "_")
 			response.setContentType( "application/vnd.ms-excel" )
 			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
-			
-			def book = new HSSFWorkbook(new FileInputStream( file ));
-			
+
+			def book = new HSSFWorkbook(new FileInputStream( file ))
+
 			def manuSheet = book.getSheet("manufacturer")
 			def manufacturers = params.exportCheckbox ? Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer :
 			 Manufacturer.findAll()
-			
+
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
 				WorkbookUtil.addCell(manuSheet, 0, r+1, String.valueOf(manufacturers[r].id ))
 				WorkbookUtil.addCell(manuSheet, 1, r+1, String.valueOf(manufacturers[r].name ))
@@ -913,14 +912,14 @@ class ModelController {
 				WorkbookUtil.addCell(modelSheet, 30, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :""))
 				WorkbookUtil.addCell(modelSheet, 31, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:""))
 				WorkbookUtil.addCell(modelSheet, 32, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :""))
-				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].dateCreated ? TimeUtil.formatDate(getSession(), models[r].dateCreated) : ''))
-				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].lastModified ? TimeUtil.formatDate(getSession(), models[r].lastModified) : ''))
+				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].dateCreated ? TimeUtil.formatDate(session, models[r].dateCreated) : ''))
+				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].lastModified ? TimeUtil.formatDate(session, models[r].lastModified) : ''))
 
 			}
 			def connectorSheet = book.getSheet("connector")
-			def connectors = params.exportCheckbox ? ModelConnector.findAll("FROM ModelConnector where model.sourceTDS = 1 order by model.id") : 
+			def connectors = params.exportCheckbox ? ModelConnector.findAll("FROM ModelConnector where model.sourceTDS = 1 order by model.id") :
 				ModelConnector.findAll()
-			
+
 			for ( int r = 0; r < connectors.size(); r++ ) {
 				WorkbookUtil.addCell(connectorSheet, 0, r+1, String.valueOf(connectors[r].id ))
 				WorkbookUtil.addCell(connectorSheet, 1, r+1, String.valueOf(connectors[r].connector ))
@@ -938,7 +937,7 @@ class ModelController {
 		} catch( Exception ex ) {
 			flash.message = "Exception occurred while exporting data"+ex
 			redirect( controller:'model', action:"importExport")
-			return;
+			return
 		}
     }
     /*
@@ -957,7 +956,7 @@ class ModelController {
 	        // get File
 	        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
 	        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
-			def date = new Date();
+			def date = new Date()
 			def modelSyncBatch = new ModelSyncBatch(changesSince:date,createdBy:userLogin,source:"TDS")
 			if ( modelSyncBatch.hasErrors() || !modelSyncBatch.save() ) {
 				log.error "Unable to create ModelSyncBatch for ${modelSyncBatch}" + GormUtil.allErrorsString( modelSyncBatch )
@@ -970,13 +969,13 @@ class ModelController {
 			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_nameplate","power_design","power_use","sourcetdsversion","use_image","usize","height","weight","depth","width", "layout_style","product_line","model_family","end_of_life_date","end_of_life_status","created_by","updated_by","validated_by","sourceurl","model_status","model_scope"] )
 			sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
 	        try {
-	            workbook = new HSSFWorkbook(file.inputStream);
+	            workbook = new HSSFWorkbook(file.inputStream)
 				def sheetNames = WorkbookUtil.getSheetNames(workbook)
 				def sheets = sheetNameMap.keySet()
 				def missingSheets = []
 	            def flag = 1
 	            def sheetsLength = sheets.size()
-				
+
 				sheets.each{
 					if ( !sheetNames.contains( it ) ) {
 	                    flag = 0
@@ -986,7 +985,7 @@ class ModelController {
 	            if( flag == 0 ) {
 	                flash.message = "${missingSheets} sheets not found, Please check it."
 	                redirect( action:"importExport", params:[message:flash.message] )
-	                return;
+	                return
 	            } else {
 	            	def manuAdded = 0
 					def manuSkipped = []
@@ -1003,7 +1002,7 @@ class ModelController {
 	                if ( missingHeader != "" ) {
 	                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
 	                    redirect( action: "importExport", params:[message:flash.message] )
-	                    return;
+	                    return
 	                } else {
 	                    def sheetrows = manuSheet.getLastRowNum()
 	                    for ( int r = 1; r < sheetrows ; r++ ) {
@@ -1019,7 +1018,7 @@ class ModelController {
 	                			manuSkipped += ( r +1 )
 	                		}
 	                    }
-	
+
 	                }
 	                /*
 	                 *  Import Model Information
@@ -1036,12 +1035,12 @@ class ModelController {
 						modelSheetColumnNames.put(cellContent, c)
 					}
 	                missingHeader = checkHeader( sheetNameMap.get("model"), modelSheetColumnNames )
-					def onlyTds 
+					def onlyTds
 					// Statement to check Headers if header are not found it will return Error message
 					if ( missingHeader != "" ) {
 						flash.message = " Column Headers : ${missingHeader} not found, Please check it."
 						redirect( action:"importExport", params:[ message:flash.message] )
-						return;
+						return
 					} else {
 						def sheetrows = modelSheet.getLastRowNum()
 						for ( int r = 1; r < sheetrows ; r++ ) {
@@ -1054,67 +1053,67 @@ class ModelController {
 							def projectId
 		                 	for( int cols = 0; cols < modelCol; cols++ ) {
 								switch(WorkbookUtil.getStringCellValue(modelSheet, cols, 0 )){
-								case "manufacturer_name" : 
+								case "manufacturer_name" :
 									def manuName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									manuId = ManufacturerSync.findByNameAndBatch(manuName,modelSyncBatch)?.id
 									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
-									break;
-								case "blade_count" : 
+									break
+								case "blade_count" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "blade_label_count" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
-								case "blade_rows" : 
+									break
+								case "blade_rows" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
-								case "use_image" : 
+									break
+								case "use_image" :
 									int useImage = 0
 									if(WorkbookUtil.getStringCellValue(modelSheet, cols, r ).toLowerCase() != "no"){
 										useImage = 1
 									}
 									valueList.append(useImage+",")
-									break;
-								case "power_nameplate" : 
+									break
+								case "power_nameplate" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
-								case "power_design" : 
+									break
+								case "power_design" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
-								case "power_use" : 
+									break
+								case "power_use" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
-								case "usize" : 
+									break
+								case "usize" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
-								case "sourcetds" : 
+									break
+								case "sourcetds" :
 									int isTDS = 0
 									if(WorkbookUtil.getStringCellValue(modelSheet, cols, r ).toLowerCase() == "tds"){
 										isTDS = 1
 										onlyTds = true
 									}
 									valueList.append(isTDS+",")
-									break;
-								case "sourcetdsversion" : 
+									break
+								case "sourcetdsversion" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "height" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "weight" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "depth" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "width" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "model_scope" :
 								    def modelScope = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									projectId = Project.findByProjectCode(modelScope)?.id
 									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "end_of_life_date" :
 								    def endOfLifeDate = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									if(endOfLifeDate){
@@ -1122,54 +1121,54 @@ class ModelController {
 									}else{
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									}
-									break;
+									break
 								/*case "end_of_life_status" :
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;*/
 								case "created_by" :
 								    def createdByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									createdPersonId = Person.findByFirstName(createdByName)?.id
-									break;
+									break
 								case "updated_by" :
 									def updatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									updatedPersonId = Person.findByFirstName(updatedByName)?.id
 									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "validated_by" :
 									def validatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									validatedPersonId = Person.findByFirstName(validatedByName)?.id
 									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
-									break;
-								case "room_object" : 
+									break
+								case "room_object" :
 									int roomObject = 0
 									if(WorkbookUtil.getStringCellValue(modelSheet, cols, r ).toLowerCase() != "False"){
 										roomObject = 1
 									}
 									valueList.append(roomObject+",")
-									break;
+									break
 								case "date_created":
 								case "last_modified":
-									break;
-								default : 
+									break
+								default :
 									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
-									break;
+									break
 								}
-		                 									
+
 		                 	}
 		             		try{
-		             			if(manuId){ 
+		             			if(manuId){
 									 if(params.importCheckbox ){
 										 if(onlyTds == true) {
 											jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId)")
-											modelAdded = r                                                                                                                                                                                                                    
+											modelAdded = r
 										 } else {
 										 // TODO : getting ArrayIndexOutOfbound exception, need to fix
 										 	//modelSkipped += ( r +1 )
-										 }	
+										 }
 									 } else {
 									 	jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
 										 modelAdded = r
-									 }	  
+									 }
 		             			} else {
 		             				//modelSkipped += ( r +1 )
 		             			}
@@ -1198,7 +1197,7 @@ class ModelController {
 					if ( missingHeader != "" ) {
 						flash.message = " Column Headers : ${missingHeader} not found, Please check it."
 						redirect( action:"importExport", params:[message:flash.message] )
-						return;
+						return
 					} else {
 						def sheetrows = connectorSheet.getLastRowNum()
 						for ( int r = 1; r < sheetrows ; r++ ) {
@@ -1206,22 +1205,22 @@ class ModelController {
 		             		def modelId
 		                 	for( int cols = 0; cols < connectorCol; cols++ ) {
 								switch(WorkbookUtil.getStringCellValue(connectorSheet, cols, 0 )){
-								case "model_name" : 
+								case "model_name" :
 									def modelName = WorkbookUtil.getStringCellValue(connectorSheet, cols, r )
 									modelId = ModelSync.findByModelNameAndBatch(modelName,modelSyncBatch)?.id
 									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
-									break;
-								case "connector_posx" : 
+									break
+								case "connector_posx" :
 									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) : null)+",")
-									break;
+									break
 								case "connector_posy" :
 									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) : null)+",")
-									break;
-								default : 
+									break
+								default :
 									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
-									break;
+									break
 								}
-		                 									
+
 		                 	}
 		             		try{
 		             			if(modelId){
@@ -1235,30 +1234,30 @@ class ModelController {
 		             			connectorSkipped += ( r +1 )
 		             		}
 		                }
-					} 
+					}
 	                if (manuSkipped.size() > 0 || modelSkipped.size() > 0 || connectorSkipped.size() > 0) {
 	                    flash.message = " File Uploaded Successfully with Manufactures:${manuAdded},Model:${modelAdded},Connectors:${connectorAdded} records. and  Manufactures:${manuSkipped},Model:${modelSkipped},Connectors:${connectorSkipped} Records skipped Please click the Manage Batches to review and post these changes."
 	                } else {
 	                    flash.message = " File uploaded successfully with Manufactures:${manuAdded},Model:${modelAdded},Connectors:${connectorAdded} records.  Please click the Manage Batches to review and post these changes."
 	                }
 	                redirect( action:"importExport", params:[message:flash.message] )
-		            return;  
+		            return
 		        }
 	        } catch( NumberFormatException ex ) {
 	            flash.message = ex
 	            status.setRollbackOnly()
 	            redirect( action:"importExport", params:[message:flash.message] )
-	            return;
+	            return
 	        } catch( Exception ex ) {
 	        	ex.printStackTrace()
 				status.setRollbackOnly()
 	            flash.message = ex
 	            redirect( action:"importExport", params:[message:flash.message] )
-	            return;
-	        } 
+	            return
+	        }
 		}
     }
-    def checkHeader( def list, def sheetColumnNames  ) {  
+    def checkHeader( def list, def sheetColumnNames  ) {
     	def missingHeader = ""
         def listSize = list.size()
         for ( int coll = 0; coll < listSize; coll++ ) {
@@ -1307,7 +1306,7 @@ class ModelController {
 						sourceTDSVersion:model.sourceTDSVersion,
 						powerNameplate: powerNameplate,
 						powerDesign : powerDesign
-						
+
 						]
     	render modelMap as JSON
     }
@@ -1320,7 +1319,7 @@ class ModelController {
 		    def  person = user.person
 			modelInstance.validatedBy = person
 			modelInstance.modelStatus = "valid"
-			
+
 		}
 		if(!modelInstance.save(flush:true)){
 			modelInstance.errors.allErrors.each { println it }
@@ -1340,7 +1339,7 @@ class ModelController {
 		def aka = params.name
 		def modelId = params.id
 		def akaExist = Model.findByModelName(aka)
-        
+
         if(akaExist) {
             duplicateAka = aka
         } else if( modelId ){
@@ -1349,20 +1348,20 @@ class ModelController {
 			if( akaInAlias ){
 				duplicateAka = aka
 			}
-		} 
-        
-	
+		}
+
+
 		render duplicateAka
 	}
 	/**
 	 * this method is used to update model for audit view , not using update method as there have a lot of code in update action might degrade performance.
 	 * @param id : id of model for update
-	 * 
+	 *
 	 */
 	def updateModel() {
 		def modelId = params.id
 		if(modelId && modelId.isNumber()){
-			def model = Model.get( params.id ) 
+			def model = Model.get( params.id )
 			model.properties = params
 			if(!model.save(flush:true)){
 				model.errors.allErrors.each{
@@ -1374,7 +1373,7 @@ class ModelController {
 			render "<b> No Model found for id: ${params.id}</b>"
 		}
 	}
-	
+
 	/**
 	 * render a list of suggestions for model's initial.
 	 * @param : value is initial for which user wants suggestions .
@@ -1390,12 +1389,12 @@ class ModelController {
 		}
 		[models:models]
 	}
-	
+
 	/**
 	 * Fetch models's type for model name
 	 * @param value : name of model name
 	 * @return model's assetType
-	 * 
+	 *
 	 */
 	def retrieveModelType ={
 		def modelName = params.value
@@ -1403,7 +1402,7 @@ class ModelController {
 		def modelType = model?.assetType ?: 'Server'
 		render modelType
 	}
-	
+
 	/**
 	 * Methods checks whether model exist in model or model alias table
 	 * @param modelName : name of model
@@ -1419,12 +1418,12 @@ class ModelController {
 		} else {
 			render "<b> No Model found of name ${params.modelName}</b>"
 		}
-		
+
 	}
-	
+
 	/**
      *@param : ids[] list of ids to compare
-     *@return 
+     *@return
      */
 	def compareOrMerge ={
 		def ids = params.list("ids[]")
@@ -1436,30 +1435,30 @@ class ModelController {
 				models << model
 			}
 		}
-		
+
 		// Sorting Model in order of status (valid, full, new)
 		def sortedModel = []
 		def validModel = models.findAll{it.modelStatus == 'valid'}
 		def fullModel = models.findAll{it.modelStatus == 'full'}
-		def newmodel =  models.findAll{!['full','valid'].contains(it.modelStatus)} 
-		
+		def newmodel =  models.findAll{!['full','valid'].contains(it.modelStatus)}
+
 		sortedModel = validModel + fullModel + newmodel
-		
+
 		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label .
-		def columnList =  [ 'Model Name': 'modelName', 'Manufacturer':'manufacturer', 'AKA': 'aliases' , 'Asset Type':'assetType','Usize':'usize', 
-							'Dimensions(inches)':'', 'Weight(pounds)':'weight', 'Layout Style':'layoutStyle', 'Product Line':'productLine', 
+		def columnList =  [ 'Model Name': 'modelName', 'Manufacturer':'manufacturer', 'AKA': 'aliases' , 'Asset Type':'assetType','Usize':'usize',
+							'Dimensions(inches)':'', 'Weight(pounds)':'weight', 'Layout Style':'layoutStyle', 'Product Line':'productLine',
 							'Model Family':'modelFamily', 'End Of Life Date':'endOfLifeDate','End Of Life Status':'endOfLifeStatus',
 							'Power(Max/Design/Avg)':'powerUse','Notes':'description', 'Front Image':'frontImage', 'Rear Image':'rearImage', 'Room Object': 'roomObject',
 							'Use Image':'useImage','Blade Rows':'bladeRows', 'Blade Count':'bladeCount','Blade Label Count':'bladeLabelCount',
 							'Blade Height':'bladeHeight', 'Created By':'createdBy', 'Updated By':'updatedBy', 'Validated By':'validatedBy',
 							'Source TDS':'sourceTDS','Source URL':'sourceURL', 'Model Status':'modelStatus', 'Merge To':'']
 
-		
+
 	   // Checking whether models have any Model of Type 'Blade Chassis' or 'Blade' .
 	   def hasBladeChassis = sortedModel.find{it.assetType=='Blade Chassis'}
 	   def hasBlade = sortedModel.find{it.assetType=='Blade'}
-	   
-	   // If models to compare are not of type 'Blade Chassis' or 'Blade' removing from Map 
+
+	   // If models to compare are not of type 'Blade Chassis' or 'Blade' removing from Map
        if(!hasBladeChassis){
 		   ['Blade Rows', 'Blade Count', 'Blade Label Count'].each{
 			   columnList.remove(it)
@@ -1467,10 +1466,10 @@ class ModelController {
 	   }
 	   if(!hasBlade)
 		   columnList.remove('Blade Height')
-		
+
 		render(template:"compareOrMerge", model:[models:sortedModel, columnList:columnList, hasBladeChassis:hasBladeChassis, hasBlade:hasBlade])
 	}
-	
+
 	/**
 	 * This Method is used to bulk delete models.
 	 * @param modelLists
@@ -1494,12 +1493,12 @@ class ModelController {
 			}
 			def delModelNames = WebUtil.listAsMultiValueString( deletedModels )
 			def skipModelNames = WebUtil.listAsMultiValueString( skippedModels )
-			resp = (delModelNames ? "Models $delModelNames are deleted.</br> " : "No Models Deleted </br>") + 
+			resp = (delModelNames ? "Models $delModelNames are deleted.</br> " : "No Models Deleted </br>") +
 					(skipModelNames ? " Models $skipModelNames skipped due to Asset Reference" : "")
 		}catch(Exception e){
 			e.printStackTrace()
 			resp = "Error while deleting Models"
-		} 
+		}
 		render resp
 	}
 	/**

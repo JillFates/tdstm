@@ -1,4 +1,5 @@
 class ManufacturerSync {
+
 	String name
 	String description
 	String corporateName
@@ -8,7 +9,7 @@ class ManufacturerSync {
 	String importStatus
 	ModelSyncBatch batch
 	long manufacturerTempId
-	
+
 	static constraints = {
 		name( blank:false, nullable:false )
 		description( blank:true, nullable:true )
@@ -18,12 +19,12 @@ class ManufacturerSync {
 		aka( blank:true, nullable:true)
 		importStatus(blank:true, nullable:true )
 	}
-	
-	static mapping  = {	
+
+	static mapping  = {
 		version false
 		id column:'manufacturer_id'
 	}
-	
+
 	String toString(){
 		name
 	}

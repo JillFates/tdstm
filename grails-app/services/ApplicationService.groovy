@@ -1,12 +1,9 @@
-import com.tds.asset.Application
-import com.tdssrc.eav.EavAttributeSet
-//import com.tdssrc.eav.EavEntityAttribute
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
-import com.tdsops.tm.domain.AssetEntityHelper
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tds.asset.AssetType
+import grails.transaction.Transactional
 
+import com.tds.asset.Application
+import com.tds.asset.AssetType
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.eav.EavAttributeSet
 
 /**
  * The application service handles the logic for CRUD applications
@@ -15,14 +12,13 @@ import com.tds.asset.AssetType
  */
 class ApplicationService {
 
-	boolean transactional = true
-	
-	def assetEntityService
+	AssetEntityService assetEntityService
+	SecurityService securityService
 
 	/**
 	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
 	 * applications for the user's current project
-	 * 
+	 *
 	 * @param bundleId the id of the bundle
 	 * @param user the current user
 	 * @param currentProject the current project
@@ -33,14 +29,14 @@ class ApplicationService {
 			log.info('Current project is null')
 			throw new EmptyResultException()
 		}
-		
+
 		if (bundleId != null && !bundleId.isNumber()) {
 			throw new IllegalArgumentException('Not a valid number')
 		}
-		
+
 		bundleId = bundleId.toInteger()
 		def mb = null
-		
+
 		if (bundleId > 0) {
 			mb = MoveBundle.get(bundleId)
 			if (mb != null) {
@@ -52,25 +48,25 @@ class ApplicationService {
 				throw new EmptyResultException()
 			}
 		}
-		
+
 		def result = []
 		def applications = []
-		
+
 		if (mb != null) {
-			applications = Application.findAllByMoveBundle(mb)	
+			applications = Application.findAllByMoveBundle(mb)
 		} else {
 			applications = Application.findAllByMoveBundleIsNullAndOwner(currentProject.client)
 		}
-		
+
 		for (application in applications) {
 			def applicationMap = [
 				'id' : application.id,
 				'name' : application.assetName
-			];
-		
+			]
+
 			result.add(applicationMap)
 		}
-		
+
 		return result
 	}
 
@@ -92,21 +88,21 @@ class ApplicationService {
 			def shutdownBy = app.shutdownBy  ? assetEntityService.resolveByName(app.shutdownBy) : ''
 			def startupBy = app.startupBy  ? assetEntityService.resolveByName(app.startupBy) : ''
 			def testingBy = app.testingBy  ? assetEntityService.resolveByName(app.testingBy) : ''
-			
+
 			def shutdownById = shutdownBy instanceof Person ? shutdownBy.id : -1
 			def startupById = startupBy instanceof Person ? startupBy.id : -1
 			def testingById = testingBy instanceof Person ? testingBy.id : -1
-			
+
 			def model = [
 				applicationInstance : app,
-				appMoveEvent:appMoveEvent, 
-				appMoveEventlist:appMoveEventlist, 
-				moveEventList:moveEventList, 
-				shutdownBy:shutdownBy, 
-				startupBy:startupBy, 
+				appMoveEvent:appMoveEvent,
+				appMoveEventlist:appMoveEventlist,
+				moveEventList:moveEventList,
+				shutdownBy:shutdownBy,
+				startupBy:startupBy,
 				testingBy:testingBy,
-				shutdownById:shutdownById, 
-				startupById:startupById, 
+				shutdownById:shutdownById,
+				startupById:startupById,
 				testingById:testingById
 			]
 
@@ -124,10 +120,11 @@ class ApplicationService {
 	 * @param params - the request parameters
 	 * @throws various RuntimeExceptions if there are any errors
 	 */
+	@Transactional
 	Application saveAssetFromForm(controller, session, Long projectId, Long userId, params ) {
 		Application asset = new Application()
 		return saveUpdateAssetFromForm(controller, session, projectId, userId, params, asset)
-	}		
+	}
 
 	/**
 	 * Used to update a Database asset that is called from the controller
@@ -179,18 +176,18 @@ class ApplicationService {
 		} else if (asset.project != project) {
 			securityService.reportViolation("Attempted to access asset $id not belonging to current project $project.id", userLogin)
 			throw new RuntimeException("updateDeviceFromForm() user access violation")
-		}		
+		}
 
 		asset.sme = null
 		asset.sme2 = null
 		asset.appOwner = null
-		
+
 		asset.properties = params
 
 		asset.shutdownFixed = params.shutdownFixed ?  1 : 0
 		asset.startupFixed = params.startupFixed ?  1 : 0
 		asset.testingFixed = params.testingFixed ?  1 : 0
-		
+
 		// Save who changed it
 		asset.modifiedBy = userLogin.person
 
@@ -213,5 +210,4 @@ class ApplicationService {
 
 		return asset
 	}
-
 }

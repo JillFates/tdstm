@@ -1,11 +1,11 @@
-import java.util.Map;
+import java.util.Map
 
 import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Controller
 
-import grails.validation.ValidationException;
+import grails.validation.ValidationException
 
 /**
  * {@link Controller} for handling WS calls of the {@link TaskService}
@@ -27,7 +27,7 @@ class WsTaskController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
@@ -58,7 +58,7 @@ class WsTaskController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
@@ -78,7 +78,7 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Deletes a {@link TaskBatch}
 	 * Check {@link UrlMappings} for the right call
@@ -89,7 +89,7 @@ class WsTaskController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
@@ -109,7 +109,7 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Generates a set of tasks based on a recipe
 	 */
@@ -120,7 +120,7 @@ class WsTaskController {
 			return
 		}
 		def currentProject = securityService.getUserCurrentProject()
-		
+
 		def recipeId = params.recipeId
 		def contextId = params.contextId
 		def publishTasks = params.autoPublish == 'true'
@@ -129,7 +129,7 @@ class WsTaskController {
 
 
 		try {
-			def result = taskService.initiateCreateTasksWithRecipe(loginUser, currentProject, contextId, recipeId, deletePrevious, useWIP, publishTasks);
+			def result = taskService.initiateCreateTasksWithRecipe(loginUser, currentProject, contextId, recipeId, deletePrevious, useWIP, publishTasks)
 
 			render(ServiceResults.success('jobId' : result.jobId) as JSON)
 		} catch (UnauthorizedException e) {
@@ -157,14 +157,14 @@ class WsTaskController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def recipeId = params.recipeId
 		def contextId = params.contextId
 		def logs = params.logs
 		def currentProject = securityService.getUserCurrentProject()
-		
+
 		try {
-			def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, logs, loginUser, currentProject);
+			def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, logs, loginUser, currentProject)
 
 			render(ServiceResults.success('taskBatch' : result) as JSON)
 		} catch (UnauthorizedException e) {
@@ -179,8 +179,8 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
-	
+
+
 	/**
 	 * List the {@link TaskBatch} using the parameters passed in the request
 	 * Check {@link UrlMappings} for the right call
@@ -191,13 +191,13 @@ class WsTaskController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def recipeId = params.recipeId
 		def limitDays = params.limitDays
 		def currentProject = securityService.getUserCurrentProject()
-		
+
 		try {
-			def result = taskService.listTaskBatches(recipeId, limitDays, loginUser, currentProject);
+			def result = taskService.listTaskBatches(recipeId, limitDays, loginUser, currentProject)
 
 			render(ServiceResults.success('list' : result) as JSON)
 		} catch (UnauthorizedException e) {
@@ -212,7 +212,7 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	/**
 	 * Gets a {@link TaskBatch} based on a id
 	 * Check {@link UrlMappings} for the right call
@@ -223,7 +223,7 @@ class WsTaskController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
@@ -243,14 +243,14 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	def taskReset() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
@@ -270,15 +270,15 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
-	
+
+
 	def retrieveTasksOfTaskBatch() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
@@ -297,7 +297,6 @@ class WsTaskController {
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
-		
-		
+
 	}
 }

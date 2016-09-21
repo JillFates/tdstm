@@ -19,13 +19,19 @@ class PartyRelationship implements Serializable {
 		roleTypeCodeFrom( nullable:false )
 		partyIdTo( nullable:false )
 		roleTypeCodeTo( nullable:false )
-		statusCode( nullable:false, inList:['ENABLED', 'DISABLED'] )
+		statusCode( nullable:false, inList:['ENABLED', 'DISABLED'])
 		comment (blank:true,nullable:true)
 	}
-	
-	static mapping  = {	
+
+	static mapping  = {
 		version false
-		id composite:['partyRelationshipType', 'partyIdFrom', 'partyIdTo', 'roleTypeCodeFrom', 'roleTypeCodeTo'], generator:'assigned', unique:true
+		id composite:[
+			'partyRelationshipType',
+			'partyIdFrom',
+			'partyIdTo',
+			'roleTypeCodeFrom',
+			'roleTypeCodeTo'
+		], generator:'assigned', unique:true
 		partyIdFrom ignoreNotFound: true
 		partyIdTo ignoreNotFound: true
 		columns {
@@ -33,9 +39,8 @@ class PartyRelationship implements Serializable {
 			roleTypeCodeTo sqlType:'varchar(20)'
 			statusCode sqlType:'varchar(20)'
 		}
-		
 	}
-	
+
 	/*
 	 * to get moveEventStaff object
 	 * @partyIdTo : instance of person for which need to get instance
@@ -45,15 +50,15 @@ class PartyRelationship implements Serializable {
 	 * @partyRelationshipType : instance of partyRelationshipType for which need to get instance
 	 * @return : PartyRelationship  instance
 	 */
-	
+
 	static def getRelationshipInstance(partyIdTo, partyIdFrom, roleTypeCodeTo, roleTypeCodeFrom, partyRelationshipType){
 		def result = PartyRelationship.createCriteria().get {
 			and {
-				 eq('partyIdTo', partyIdTo )
-				 eq('partyIdFrom', partyIdFrom )
-				 eq('roleTypeCodeTo', roleTypeCodeTo )
-				 eq('roleTypeCodeFrom', roleTypeCodeFrom )
-				 eq('partyRelationshipType', partyRelationshipType )
+				eq('partyIdTo', partyIdTo )
+				eq('partyIdFrom', partyIdFrom )
+				eq('roleTypeCodeTo', roleTypeCodeTo )
+				eq('roleTypeCodeFrom', roleTypeCodeFrom )
+				eq('partyRelationshipType', partyRelationshipType )
 			}
 		}
 		return result
@@ -62,5 +67,4 @@ class PartyRelationship implements Serializable {
 	String toString() {
 		"$partyRelationshipType : $roleTypeCodeFrom ${partyIdFrom.id} : $roleTypeCodeTo ${partyIdTo.id}"
 	}
-	
 }

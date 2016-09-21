@@ -4,21 +4,11 @@
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
-
-import com.tdssrc.grails.StringUtil
+import com.tdsops.common.security.ConnectorActiveDirectory
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-
-import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.security.ConnectorActiveDirectory
-
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
 
 class TestCaseController {
 
@@ -26,14 +16,11 @@ class TestCaseController {
 	def partyRelationshipService
 	def personService
 	def runbookService
-	def taskService	
+	def taskService
 	def securityService
-	def serviceHelperService
 	def userService
 	def accountImportExportService
 
-	// def messageSource
-	
 	def remoteAddr() {
 		render "Your address is ${HtmlUtil.getRemoteIp()}"
 	}
@@ -65,7 +52,7 @@ class TestCaseController {
 	def tz() {
 		String tz = session.getAttribute( 'CURR_TZ' ).CURR_TZ
 		String dateFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )[TimeUtil.DATE_TIME_FORMAT_ATTR]
-		String now = TimeUtil.formatDateTime(getSession(), new Date())
+		String now = TimeUtil.formatDateTime(session, new Date())
 		// String str = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )
 		render "session isa ${session.getClass().getName()}, TZ=$tz<br>dateFormat=$dateFormat<br>now=$now".toString()
 	}
@@ -125,19 +112,10 @@ class TestCaseController {
 		render out.toString()
 	}
 
-	def testServiceHelper() {
-
-		def securitySrcv = serviceHelperService.getService('security')
-		def personSrcv = serviceHelperService.getService('person')
-		render 'It worked'
-
-	}
-
 	def testPersonGetAssignedProjects() {
 		def user = securityService.getUserLogin()
 		List projects = personService.getAssignedProjects(user.person)
 		render "Assigned to projects ${projects*.id}".toString()
-
 	}
 
 	def testPerms() {
@@ -151,7 +129,7 @@ class TestCaseController {
 	}
 
 	def checkADConfig() {
-		def out = "<h1>Testing AD Configuration</h1><pre>" 
+		def out = "<h1>Testing AD Configuration</h1><pre>"
 		out += securityService.getActiveDirectorySettings().toString() + "</pre>"
 
 		render out.toString()
@@ -161,7 +139,7 @@ class TestCaseController {
 		def nameMap = [first:'John', last:'Martin']
 
 		def client = PartyGroup.read(18)
-		def fullname = personService.findByClientAndName(client, nameMap) 
+		def fullname = personService.findByClientAndName(client, nameMap)
 		def firstname = personService.findByClientAndName(client, [first:'John'])
 		def email = personService.findByClientAndEmail(client, 'jmartin@transitionaldata.com')
 		def login = UserLogin.findAllByPersonInList(firstname)
@@ -178,7 +156,7 @@ class TestCaseController {
 		def userLogin = UserLogin.findByUsername( 'jmtest@transitionaldata.com' )
 		render (userLogin ? userLogin.toString() : 'Not found')
 	}
-	
+
 	def provisioning() {
 		def conf = securityService.getActiveDirectoryConfig()
 		conf.defaultProject = 2468
@@ -196,16 +174,11 @@ class TestCaseController {
 		userInfo.roles = ['editor']
 
 		def user = userService.findOrProvisionUser(userInfo, conf)
-		render (user ? user.toString() : 'Nothing') 
+		render (user ? user.toString() : 'Nothing')
 	}
 
 	def adIntegration() {
-		def ctx = ApplicationContextHolder.getApplicationContext()
-		def conf = ApplicationContextHolder.getConfig()
-		def adConf = conf?.tdstm?.security?.ad
-
-		//render ctx.securityService.class
-		//return
+		def adConf = grailsApplication.config?.tdstm?.security?.ad
 
 		def username='jmtest'
 		def pswd='tryT0Gu3ss1t'
@@ -218,7 +191,6 @@ class TestCaseController {
 
 	def testGormUtilGetDPWC() {
 		def sb = new StringBuilder()
-
 		def list = []
 
 		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'nullable', true)
@@ -336,7 +308,7 @@ class TestCaseController {
 			s.append("$msg</td></tr>")
 		}
 		s.append("</table>")
-		
+
 		render s
 	}
 

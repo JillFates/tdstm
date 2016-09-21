@@ -7,10 +7,10 @@ import grails.converters.JSON
 import org.apache.shiro.SecurityUtils
 
 import java.text.DateFormat
-import UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 
 class DashboardController {
-	
+
 	def assetEntityService
 	def dashboardService
 	def projectService
@@ -18,38 +18,38 @@ class DashboardController {
 	def taskService
 	def userService
 	def userPreferenceService
-	
+
 	def index() {
-		
+
 		def moveEvent
 		def user = securityService.getUserLogin()
-		def project = securityService.getUserCurrentProject();
+		def project = securityService.getUserCurrentProject()
 		if (! project) {
 			flash.message = "Please select project to view User Dashboard"
 			redirect(controller:'project',action:'list')
 			return
 		}
-		
+
 		if (params.moveEvent && params.moveEvent.isInteger()) {
-			moveEvent = MoveEvent.findById(params.moveEvent)
+			moveEvent = MoveEvent.get(params.moveEvent)
 			if (moveEvent && moveEvent.project != project) {
 				log.warn "SECURITY : User $user attempted to access event ($moveEvent) that was not associate to his current project ($project)"
 				flash.message = "Sorry but the event select was not found. Please select another event before retrying."
 				redirect(controller:"moveEvent",action:"list")
 			}
-		} 
+		}
 
 		if (! moveEvent) {
 			//TODO: OLB remove reloading of Map
 			userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
-			def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+			def defaultEvent = session.getAttribute("MOVE_EVENT")
 			if (defaultEvent.MOVE_EVENT) {
 				// Try finding the event in the user's preferences
 				moveEvent = MoveEvent.findByIdAndProject(defaultEvent.MOVE_EVENT, project)
 			}
 			if (!moveEvent) {
 				// Last resort, get the first moveEvent in the list ordered by name
-				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])				
+				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
 			}
 		}
 
@@ -64,15 +64,15 @@ class DashboardController {
 			def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
 			def projectLogo = ProjectLogo.findByProject(project)
 			userPreferenceService.loadPreferences(PREF.DASHBOARD_REFRESH)
-			def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
-			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
-		
+			def timeToUpdate = session.getAttribute("DASHBOARD_REFRESH")
+			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")
+
 			// handle the view unpublished tasks checkbox
 			if (params.containsKey('viewUnpublished')) {
 				def unpublishVal = (params.viewUnpublished == '1')?'true':'false'
 				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, unpublishVal)
 			}
-			
+
 			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
 
 			def model = [:]
@@ -97,7 +97,7 @@ class DashboardController {
 			return model
 		}
 	}
-	
+
 	/*---------------------------------------------------------
 	 * @author : Lokanada Reddy
 	 * @param  : project, bundle, and filters, moveEventNews data
@@ -108,17 +108,17 @@ class DashboardController {
 		def loginUser = UserLogin.findByUsername(principal)
 		def moveEventNewsInstance = new MoveEventNews(params)
 		moveEventNewsInstance.createdBy = loginUser.person
-		
+
 		if(params.isArchived == '1'){
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 			moveEventNewsInstance.isArchived = 1
 			moveEventNewsInstance.archivedBy = loginUser.person
-			moveEventNewsInstance.dateArchived = Timetil.nowGMT()
+			moveEventNewsInstance.dateArchived = TimeUtil.nowGMT()
 		}
 		moveEventNewsInstance.save(flush:true)
 		redirect(action:"index")
 	}
-	
+
 	/**
 	 * Used to render the Task Summary HTML that appears in the Event dashboard
 	 * @param id moveEventId
@@ -130,7 +130,7 @@ class DashboardController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		
+
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
@@ -145,7 +145,7 @@ class DashboardController {
 
 	/**
 	 * user portal details for default project.
-	 * 
+	 *
 	 */
 	def userPortal() {
 		def projectInstance = securityService.getUserCurrentProject()
@@ -193,12 +193,12 @@ class DashboardController {
 
 		render result as JSON
 	}
-	
+
 	/**
 	 * This action will load the event template for User Dashboard.
-	 * @param : project id of selected project 
+	 * @param : project id of selected project
 	 * @render : events template
-	 * 
+	 *
 	 */
 	def retrieveEvents() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
@@ -217,7 +217,7 @@ class DashboardController {
 	 */
 	def retrieveEventsNewsList() {
 		// TODO : JPM 6/2016 : SECURITY : Users should only have the projects that they can access
-		Map map = [ 
+		Map map = [
 			project: null,
 			newsList: []
 		]
@@ -230,7 +230,7 @@ class DashboardController {
 			if (projectOrAll) {
 				// TODO : JPM 6/2016 : SECURITY : Should be checking if user has access to project
 				userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectId}" )
-			} else { 
+			} else {
 				projectId = -1
 			}
 		} else if (projectId == 0) {
@@ -270,12 +270,12 @@ class DashboardController {
 
 		render result as JSON
 	}
-	
+
 	/**
 	 * This action will load the event news for User Dashboard.
-	 * @param : project id of selected project 
+	 * @param : project id of selected project
 	 * @render : eventNews template
-	 * 
+	 *
 	 */
 	def retrieveEventsNews() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
@@ -316,24 +316,24 @@ class DashboardController {
 
 		def totalDuration = TimeUtil.ago(taskSummary.totalDuration, TimeUtil.SHORT)
 		def dueTaskCount = taskSummary.dueTaskCount
-		
+
 		def summaryDetail = 'No active tasks were found.'
 		if (taskSummary.taskList.size() > 0)
 			summaryDetail = taskSummary.taskList.size() + ' assigned tasks with ' + totalDuration + ' of duration' + (dueTaskCount ? ' (' +  dueTaskCount + ' are over due).' : '.')
-		
+
 		Map data = [
 				taskList: result,
 				summaryDetail: summaryDetail
 		]
-		
+
 		render data as JSON
 	}
-	
+
 	/**
 	 * This action will load the tasks for User Dashboard.
-	 * @param : project id of selected project 
+	 * @param : project id of selected project
 	 * @render : tasks template
-	 * 
+	 *
 	 */
 	def retrieveTaskSummary() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
@@ -372,18 +372,18 @@ class DashboardController {
 		render result as JSON
 
 	}
-	
+
 	/**
 	 * This action will load the apps for User Dashboard.
-	 * @param : project id of selected project 
-	 * @render : application template 
-	 * 
+	 * @param : project id of selected project
+	 * @render : application template
+	 *
 	 */
 	def retrieveApplications() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		def appSummary = userService.getApplications(projectInstance)
 		render (template :'application', model:[ appList:appSummary.appList, relationList:appSummary.relationList, project:projectInstance ])
-	
+
 	}
 
 	/**
@@ -412,22 +412,22 @@ class DashboardController {
 
 		render result as JSON
 	}
-	
+
 	/**
 	 * This action will load the active people for User Dashboard.
-	 * @param : project id of selected project 
-	 * @render : activePeople template 
-	 * 
+	 * @param : project id of selected project
+	 * @render : activePeople template
+	 *
 	 */
 	def retrieveActivePeople() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		render (template :'activePeople', model:[ recentLogin:userService.getActivePeople(projectInstance), project:projectInstance ])
 	}
-	
+
 	/**
 	 * This action will load the related Entities User Dashboard that would be hidden.
-	 * @param : project id of selected project 
-	 * @render : activePeople template 
+	 * @param : project id of selected project
+	 * @render : activePeople template
 	 */
 	def retrieveRelatedEntities() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
@@ -437,5 +437,5 @@ class DashboardController {
 			files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 			staffRoles:taskService.getTeamRolesForTasks(), moveBundleList:moveBundleList])
 	}
-	
+
 }

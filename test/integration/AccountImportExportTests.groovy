@@ -10,9 +10,9 @@ import spock.lang.Specification
  */
 @TestFor(AdminController)
 class AccountImportExportTests  extends Specification {
-	
+
 	// IOC
-	def accountImportExportService 
+	def accountImportExportService
 	def securityService
 	def AIES
 
@@ -21,12 +21,12 @@ class AccountImportExportTests  extends Specification {
 	}
 
 	def "Validate the checkMinusListForInvalidCodes method"() {
-		when: 
+		when:
 			List valid = ['A','B','C','D','E','F']
 		then:
 			! AIES.checkMinusListForInvalidCodes(valid, ['A', '-B', '-C'])
 			['X','Z'] == AIES.checkMinusListForInvalidCodes(valid, ['B','-X','C','Z','D'])
-			['X'] == AIES.checkMinusListForInvalidCodes(valid, ['-X'])	
+			['X'] == AIES.checkMinusListForInvalidCodes(valid, ['-X'])
 	}
 
 	def "Test that isMinus is do it's job"(){
@@ -96,7 +96,7 @@ class AccountImportExportTests  extends Specification {
 		when: 'a bad code for the CURRENT PERSON teams which is highly unlikely (A.K.A. orphaned record)'
 			chgPersonTeams = ['A', 'B']
 			chgProjectTeams = ['A', 'B']
-			currPersonTeams = ['A','X']		
+			currPersonTeams = ['A','X']
 			map = AIES.determineTeamChanges(allTeams, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
 		then: 'it should report an error with a bad code'
 			map.error.contains('System issue with invalid team role')
@@ -135,7 +135,7 @@ class AccountImportExportTests  extends Specification {
 			changes = ['EDITOR', '-ADMIN', '-CLIENT_MGR']
 			authorizedRoleCodes = ['USER', 'SUPERVISOR', 'EDITOR']
 			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)
-		then: 
+		then:
 			map.error
 			map.error.contains(' role')
 			map.error.contains('ADMIN')
@@ -147,7 +147,7 @@ class AccountImportExportTests  extends Specification {
 			authorizedRoleCodes = ['SUPERVISOR', 'CLIENT_ADMIN']
 			currentRoles = ['SUPERVISOR', 'USER']
 			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)
-		then: 
+		then:
 			map.error
 			map.error.contains('unauthorized security role')
 			map.error.contains('ADMIN')
@@ -158,7 +158,7 @@ class AccountImportExportTests  extends Specification {
 			currentRoles = ['EDITOR']
 			changes = ['-EDITOR']
 			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)
-		then: 
+		then:
 			map.error
 			map.error.contains('Deleting all security roles not permitted')
 
@@ -168,7 +168,7 @@ class AccountImportExportTests  extends Specification {
 			changes = []
 			currentRoles = ['EDITOR', 'SUPERVISOR']
 			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)
-		then: 
+		then:
 			! map.error
 			! map.hasChanges
 			map.results == currentRoles
@@ -179,7 +179,7 @@ class AccountImportExportTests  extends Specification {
 			currentRoles = ['SUPERVISOR', 'USER', 'ADMIN']
 			changes = ['-USER', 'CLIENT_MGR']
 			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)
-		then: 
+		then:
 			! map.error
 			map.results == ['ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
 
@@ -188,7 +188,7 @@ class AccountImportExportTests  extends Specification {
 			authorizedRoleCodes = ['SUPERVISOR', 'CLIENT_ADMIN']
 			currentRoles = ['BAD','ADMIN']
 			changes = ['-USER', 'CLIENT_MGR']
-			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)	
+			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)
 		then:
 			map.error
 			map.error.contains('invalid security role')
@@ -199,7 +199,7 @@ class AccountImportExportTests  extends Specification {
 			authorizedRoleCodes = ['SUPERVISOR', 'CLIENT_ADMIN']
 			currentRoles = ['ADMIN']
 			changes = ['WTF','-USER', 'CLIENT_MGR']
-			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)	
+			map = AIES.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoleCodes)
 		then:
 			map.error
 			map.error.contains('Invalid security code')
@@ -208,7 +208,7 @@ class AccountImportExportTests  extends Specification {
 
 
 	def "Test shouldUpdate methods"() {
-		given: 
+		given:
 			String PARAM_NAME = AIES.IMPORT_OPTION_PARAM_NAME
 			String OPT_PERSON = AIES.IMPORT_OPTION_PERSON
 			String OPT_USER = AIES.IMPORT_OPTION_USERLOGIN
@@ -226,7 +226,7 @@ class AccountImportExportTests  extends Specification {
 	}
 
 	def "Test the shouldIdentifyUnplannedChanges method"() {
-		given: 
+		given:
 			String PARAM_NAME = AIES.IMPORT_OPTION_PARAM_NAME
 			String OPT_PERSON = AIES.IMPORT_OPTION_PERSON
 			String OPT_USER = AIES.IMPORT_OPTION_USERLOGIN
@@ -278,15 +278,15 @@ class AccountImportExportTests  extends Specification {
 
 			AIES.xfrmListToPipedString(['c','d'], options) == 'c|d'
 			AIES.xfrmListToPipedString(['e'], options) == 'e'
-			
-		when:	
+
+		when:
 			AIES.xfrmListToString('not a list for comma separated list', options)
-		then: 
+		then:
 			thrown LogicException
 
-		when:	
+		when:
 			AIES.xfrmListToPipedString('not a list for pipe separated list', options)
-		then: 
+		then:
 			thrown LogicException
 
 	}

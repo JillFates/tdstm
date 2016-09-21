@@ -39,4 +39,4 @@ class UserAudit {
 	String toString() {
 		return "UserAudit user (${ (userLogin ? userLogin.username : 'Unknown')}) '$message'"
 	}
-} 
+}

@@ -1,5 +1,19 @@
-import com.tds.asset.*
-import com.tdsops.tm.enums.domain.*
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetType
+import com.tds.asset.FieldImportance
+import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.PasswordResetType
+import com.tdsops.tm.enums.domain.ProjectSortProperty
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SortOrder
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
@@ -7,46 +21,46 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.ProjectDailyMetric
 import org.codehaus.groovy.grails.web.util.WebUtils
-import UserPreferenceEnum as PREF
+import org.springframework.jdbc.core.JdbcTemplate
 
 class ProjectService {
 
-	static transactional = true
-	def securityService
-	def partyRelationshipService
-	def jdbcTemplate
-	def stateEngineService
-	def userPreferenceService
-	def sequenceService
-	def auditService
+	AuditService auditService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	SecurityService securityService
+	SequenceService sequenceService
+	StateEngineService stateEngineService
+	UserPreferenceService userPreferenceService
 
 	List getStaffList(onlyAssigned, role, projects, companies, sorting) {
-		
+
 		def query = new StringBuffer("""
 			SELECT * FROM (
-				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
-					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName, 
-					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates 
-				FROM tdstm.party_relationship pr 
-					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
-					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
-					LEFT OUTER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
-					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
-					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
-						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
-						AND pr2.party_id_from_id IN (${projects}) 
+				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company,
+					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName,
+					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates
+				FROM tdstm.party_relationship pr
+					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id
+					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id
+					LEFT OUTER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
+					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id
+					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
+						AND pr2.role_type_code_to_id = pr.role_type_code_to_id
+						AND pr2.party_id_from_id IN (${projects})
 						AND pr2.role_type_code_from_id = 'PROJECT'
-					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
-						AND mes.role_id = pr.role_type_code_to_id 
-				WHERE pr.role_type_code_from_id IN ('COMPANY') 
-					AND pr.party_relationship_type_id IN ('STAFF', 'PROJ_PARTNER') 
+					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id
+						AND mes.role_id = pr.role_type_code_to_id
+				WHERE pr.role_type_code_from_id IN ('COMPANY')
+					AND pr.party_relationship_type_id IN ('STAFF', 'PROJ_PARTNER')
 					AND pr.party_id_from_id IN (${companies})
-                    AND p.active = 'Y' 
-				GROUP BY role, personId 
-				ORDER BY fullName ASC 
-			) AS companyStaff 
+                    AND p.active = 'Y'
+				GROUP BY role, personId
+				ORDER BY fullName ASC
+			) AS companyStaff
 			WHERE 1=1
 		""")
 
@@ -56,7 +70,7 @@ class ProjectService {
 
 		if (role != '0')
 			query.append("AND companyStaff.role = '${role}'")
-			
+
 		query.append(" ORDER BY ${sorting}")
 
 		return jdbcTemplate.queryForList(query.toString())
@@ -69,9 +83,9 @@ class ProjectService {
 	 * @return List of projects
 	 */
 	List<Project> getProjectsWherePersonIsStaff(Person person, ProjectStatus projectStatus=ProjectStatus.ACTIVE) {
-		StringBuffer query = new StringBuffer("""from Project p 
+		StringBuffer query = new StringBuffer("""from Project p
 			where p.id in (
-				select pr.partyIdFrom.id from PartyRelationship pr 
+				select pr.partyIdFrom.id from PartyRelationship pr
 				where pr.partyRelationshipType.id = 'PROJ_STAFF' and
 					pr.roleTypeCodeFrom.id = 'PROJECT' and
 					pr.roleTypeCodeTo.id = 'STAFF' and
@@ -102,10 +116,10 @@ class ProjectService {
 	 * @return list of projects
 	 */
 	List<Project> getUserProjectsOrderBy(
-		UserLogin userLogin, 
-		Boolean showAllProjPerm=false, 
-		ProjectStatus projectStatus=ProjectStatus.ANY, 
-		ProjectSortProperty sortOn = ProjectSortProperty.NAME, 
+		UserLogin userLogin,
+		Boolean showAllProjPerm=false,
+		ProjectStatus projectStatus=ProjectStatus.ANY,
+		ProjectSortProperty sortOn = ProjectSortProperty.NAME,
 		SortOrder sortOrder = SortOrder.ASC
 	) {
 		def searchParams = [:]
@@ -114,11 +128,11 @@ class ProjectService {
 		return getUserProjects(userLogin, showAllProjPerm, projectStatus, searchParams)
 	}
 
-	/** 
-	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all 
-	 * projects affiliated with the individual's company. If showAllProjPerm is false then the list will be restricted to those that 
-	 * the user has been assigned to via an association in the PartyRelationship table. The list will be filtered by the projectState 
-	 * and possibly the pagination params. 
+	/**
+	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
+	 * projects affiliated with the individual's company. If showAllProjPerm is false then the list will be restricted to those that
+	 * the user has been assigned to via an association in the PartyRelationship table. The list will be filtered by the projectState
+	 * and possibly the pagination params.
 	 *
 	 * @param userLogin - the user to lookup projects for
 	 * @param showAllProjPerm - flag if the user has the ShowAllProject permission (default false)
@@ -127,15 +141,15 @@ class ProjectService {
 	 * @return list of projects
 	 */
 	List<Project> getUserProjects(
-		UserLogin userLogin, 
-		Boolean showAllProjPerm=false, 
-		ProjectStatus projectStatus=ProjectStatus.ANY, 
+		UserLogin userLogin,
+		Boolean showAllProjPerm=false,
+		ProjectStatus projectStatus=ProjectStatus.ANY,
 		Map searchParams=[:]
 	) {
 		def projects = []
 		def projectIds = []
-		def timeNow = new Date() 
-		
+		def timeNow = new Date()
+
 		searchParams = searchParams ?: [:]
 		def maxRows = searchParams.maxRows ? Integer.valueOf(searchParams.maxRows) : Project.count()
 		def currentPage = searchParams.currentPage ? Integer.valueOf(searchParams.currentPage) : 1
@@ -179,8 +193,8 @@ class ProjectService {
 				'in'('startDate' , startDates)
 			if (completionDates)
 				'in'('completionDate' , completionDates)
-				
-			if (projectStatus != ProjectStatus.ANY) { 
+
+			if (projectStatus != ProjectStatus.ANY) {
 				if(projectStatus == ProjectStatus.ACTIVE){
 					ge("completionDate", timeNow)
 				}else{
@@ -234,20 +248,20 @@ class ProjectService {
 			staffList.sort { it.toString() }
 		}
 		return staffList
-	}	
-	
+	}
+
 	/**
 	 * This action is used to get the fields, splitted fields in to two to handle common customs.
 	 * @param : entityType type of entity.
 	 * @param projectAttributes
-	 *@return 
+	 *@return
 	 */
 	def getFields(def entityType, projectAttributes = null){
 		def project = securityService.getUserCurrentProject()
 		if(!projectAttributes){
 			projectAttributes = getAttributes(entityType)
 		}
-		
+
 		def returnMap = projectAttributes.findAll{!(it.attributeCode.contains('custom'))}.collect{ p->
 			return ['id':p.frontendLabel, 'label':p.attributeCode]
 		}
@@ -256,7 +270,7 @@ class ProjectService {
 	/**
 	 * This action is used to get the custom fields
 	 * @param projectAttributes
-	 *@return 
+	 *@return
 	 */
 	def getCustoms(def projectAttributes = null){
 		def project = securityService.getUserCurrentProject()
@@ -352,7 +366,7 @@ class ProjectService {
 
 		return attributes
 	}
-	
+
 	/**
 	 * Used to get next asset tag based on client id of project
 	 * Internally uses sequenceService to generate assetTag
@@ -374,7 +388,7 @@ class ProjectService {
 		if (asset.id) {
 			tag = "TM-${asset.id}"
 		} else {
-			tag = getNextAssetTag(project) 
+			tag = getNextAssetTag(project)
 		}
 		return tag
 	}
@@ -385,16 +399,16 @@ class ProjectService {
 	 * @return map
 	 */
 	def getProjectReportSummary( params ) {
-		
+
 		def projects = []
-		
+
 		// check if either of the active/inactive checkboxes are checked
 		if( params.active || params.inactive ) {
 			def query = new StringBuffer(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
 				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
 					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
-					COUNT(IF(ae.asset_type = "${AssetType.FILES}",1,NULL)) AS filesCount, 
-					COUNT(IF(ae.asset_type = "${AssetType.DATABASE}",1,NULL)) AS dbCount, 
+					COUNT(IF(ae.asset_type = "${AssetType.FILES}",1,NULL)) AS filesCount,
+					COUNT(IF(ae.asset_type = "${AssetType.DATABASE}",1,NULL)) AS dbCount,
 					COUNT(IF(ae.asset_type = "${AssetType.APPLICATION}",1,NULL)) AS appCount,
 					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}), 1, NULL)) AS totalServCount,
 					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) and mb.use_for_planning and ae.move_bundle_id = mb.move_bundle_id ,1,NULL)) AS inPlanningServCount,
@@ -405,48 +419,48 @@ class ProjectService {
 					pg2.name AS partnerName,
 					p.description AS description
 					FROM asset_entity ae
-					LEFT JOIN move_bundle mb ON (mb.move_bundle_id = ae.move_bundle_id) 
+					LEFT JOIN move_bundle mb ON (mb.move_bundle_id = ae.move_bundle_id)
 						AND ((ae.move_bundle_id = NULL) OR (mb.use_for_planning = true))
 					LEFT JOIN project p ON (p.project_id = ae.project_id)
 					LEFT JOIN party_group pg ON (pg.party_group_id = p.client_id)
-					LEFT JOIN party_relationship pr ON (pr.party_relationship_type_id = 'PROJ_PARTNER' AND pr.party_id_from_id = p.project_id 
+					LEFT JOIN party_relationship pr ON (pr.party_relationship_type_id = 'PROJ_PARTNER' AND pr.party_id_from_id = p.project_id
 						AND pr.role_type_code_from_id = 'PROJECT' AND pr.role_type_code_to_id = 'PARTNER')
 					LEFT JOIN party_group pg2 ON (pg2.party_group_id = pr.party_id_to_id) """)
-			
+
 			// handle active/inactive project specification
 			if ( params.inactive && ! params.active )
 				query.append(" WHERE CURDATE() > p.completion_date ")
 			if ( params.active && ! params.inactive )
 				query.append(" WHERE CURDATE() < p.completion_date ")
-			
+
 			query.append(""" GROUP BY ae.project_id
 					) inside
 				ORDER BY inside.projName """)
 			projects = jdbcTemplate.queryForList(query.toString())
-			
+
 			// add the staff count to each project
 			projects.each {
 				it["staffCount"] = partyRelationshipService.getCompanyStaff(it["clientId"]).size()
 			}
 		}
-		
+
 		return projects
 	}
 	/**
 	 * This method used to get all clients, partners, managers and workflowcodes.
 	 */
 	def getCompanyPartnerAndManagerDetails(PartyGroup company) {
-		
+
 		def clients = partyRelationshipService.getCompanyClients(company)//	Populate a SELECT listbox with default list as earlier.
 		def partners = partyRelationshipService.getCompanyPartners(company)*.partyIdTo
-		
+
 		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
-		def managers = PartyRelationship.findAll( 
+		def managers = PartyRelationship.findAll(
 			"from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${company.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 		managers?.sort{it.partyIdTo?.lastName}
-		
+
 		def workflowCodes = stateEngineService.getWorkflowCode()
-		
+
 		return [ clients:clients, partners:partners, managers:managers, workflowCodes: workflowCodes ]
 	}
 
@@ -455,13 +469,13 @@ class ProjectService {
 	 */
 	def getprojectEditDetails(projectInstance,prevParam){
 		def session = WebUtils.retrieveGrailsWebRequest().session
-		def currProj = session.getAttribute("CURR_PROJ");
+		def currProj = session.getAttribute("CURR_PROJ")
 		def currProjectInstance = Project.get( currProj.CURR_PROJ )
 		def loginPerson = securityService.getUserLoginPerson()
 		def userCompany = loginPerson.company
 
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${userCompany?.id}" )
-		
+
 		def projectLogo
 		if (currProjectInstance) {
 			projectLogo = ProjectLogo.findByProject(currProjectInstance)
@@ -531,9 +545,9 @@ class ProjectService {
 	}
 
 	/**
-	 * Used to fetch a map of the companies associated with the project which include the owner, client and 
-	 * any partners. The map key will be the name and value the company object. By default it will force to lowercase the 
-	 * company name. 
+	 * Used to fetch a map of the companies associated with the project which include the owner, client and
+	 * any partners. The map key will be the name and value the company object. By default it will force to lowercase the
+	 * company name.
 	 * @param project - the project to query
 	 * @param toLowercase - flag if true (default) will force the company names to lowercase otherwise they remain untouched
 	 * @return A map of [CompanyName : PartyGroup company]
@@ -543,12 +557,12 @@ class ProjectService {
 		Map mapped = [:]
 		companies.each {
 			mapped << (toLowercase ? [ (it.name.toLowerCase()): it] : [ (it.name): it])
-		}		
+		}
 		return mapped
 	}
 
 	/**
-	 * Used to fetch a map of the companies associated with the project which include the owner, client and 
+	 * Used to fetch a map of the companies associated with the project which include the owner, client and
 	 * any partners. The map key will be the id and value the company object.
 	 * @param project - the project to query
 	 * @return A map of ['id' : PartyGroup company]
@@ -558,7 +572,7 @@ class ProjectService {
 		Map mapped = [:]
 		companies.each {
 			mapped << [ (it.id.toString()): it]
-		}		
+		}
 		return mapped
 	}
 
@@ -568,23 +582,24 @@ class ProjectService {
 	 *@param includeProject indicates if should be deleted the project too
 	 *@return message
 	 */
+	@Transactional
 	def deleteProject(prokectId, includeProject=false) throws UnauthorizedException {
 		def message
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		def projects = getUserProjects(securityService.getUserLogin(), projectHasPermission)
 		def projectInstance = Project.get(prokectId)
-		
+
 		if(!(projectInstance in projects)){
 			throw new UnauthorizedException('You do not have access to the specified project')
 		}
-		
+
 		// remove preferences
 		def bundleQuery = "select mb.id from MoveBundle mb where mb.project = ${projectInstance.id}"
 		def eventQuery = "select me.id from MoveEvent me where me.project = ${projectInstance.id}"
 		UserPreference.executeUpdate("delete from UserPreference up where up.value = ${projectInstance.id} or up.value in ($bundleQuery) or up.value in ($eventQuery) ")
 		//remove the AssetEntity
 		def assetsQuery = "select a.id from AssetEntity a where a.project = ${projectInstance.id}"
-		
+
 		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)")
 		AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)")
 		AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
@@ -593,54 +608,54 @@ class ProjectService {
 		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
 										assetToPort=null where assetTo in ($assetsQuery)""")
 		ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
-		
+
 		AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = ${projectInstance.id}")
 		AssetComment.executeUpdate("delete from AssetComment ac where ac.project = ${projectInstance.id}")
 		TaskBatch.executeUpdate("delete from TaskBatch tb where tb.project = ${projectInstance.id}")
-		
+
 		// remove DataTransferBatch
 		def batchQuery = "select dtb.id from DataTransferBatch dtb where dtb.project = ${projectInstance.id}"
-		
+
 		DataTransferComment.executeUpdate("delete from DataTransferComment dtc where dtc.dataTransferBatch in ($batchQuery)")
 		DataTransferValue.executeUpdate("delete from DataTransferValue dtv where dtv.dataTransferBatch in ($batchQuery)")
-		
+
 		DataTransferBatch.executeUpdate("delete from DataTransferBatch dtb where dtb.project = ${projectInstance.id}")
-		
+
 		// remove Move Bundle
-		
+
 		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)")
 		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))")
 		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)")
-		
+
 		def teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
 		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ( $teamQuery ) or pr.partyIdTo in ( $teamQuery )")
 		PartyGroup.executeUpdate("delete from Party p where p.id in ( $teamQuery )")
 		Party.executeUpdate("delete from Party p where p.id in ( $teamQuery )")
 		ProjectTeam.executeUpdate("delete from ProjectTeam pt where pt.moveBundle in ($bundleQuery)")
-		
+
 		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($bundleQuery) or pr.partyIdTo in ($bundleQuery)")
 		Party.executeUpdate("delete from Party p where p.id in ($bundleQuery)")
 		MoveBundle.executeUpdate("delete from MoveBundle mb where mb.project = ${projectInstance.id}")
-		
+
 		// remove Move Event
 		MoveBundle.executeUpdate("Update MoveBundle mb SET mb.moveEvent = null where mb.moveEvent in ($eventQuery)")
 		MoveEventNews.executeUpdate("delete from MoveEventNews men where men.moveEvent in ($eventQuery)")
 		MoveEventSnapshot.executeUpdate("delete from MoveEventSnapshot mes where mes.moveEvent in ($eventQuery)")
-		
+
 		MoveEvent.executeUpdate("delete from MoveEvent me where me.project = ${projectInstance.id}")
-		
+
 		// remove Project Logo
 		ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = ${projectInstance.id}")
 		// remove party relationship
 		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom  = ${projectInstance.id} or pr.partyIdTo = ${projectInstance.id}")
-		
+
 		// remove associated references e.g. Room, Rack FI, AssetDepBundles, KeyValue .
 		Room.executeUpdate("delete from Room r where r.project  = ${projectInstance.id}")
 		Rack.executeUpdate("delete from Rack ra where ra.project  = ${projectInstance.id}")
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle adb where adb.project = ${projectInstance.id}")
 		FieldImportance.executeUpdate("delete from FieldImportance fi where fi.project  = ${projectInstance.id}")
 		KeyValue.executeUpdate("delete from KeyValue kv where kv.project  = ${projectInstance.id}")
-		
+
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = ${projectInstance.id}")
 		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = ${projectInstance.id}")
 
@@ -664,23 +679,25 @@ class ProjectService {
 
 		return message
 	}
-	
+
 	/**
 	 * Used retrieve the default Bundle configured for the project or create one if it does not exist
 	 * @param project
 	 * @param defaultBundleName name to be given to the default bundle, should it be created.
 	 * @return MoveBundle - the default bundle assigned to the project or will create it on the fly
 	 */
+	@Transactional
 	MoveBundle getDefaultBundle(Project project, String defaultBundleName = null ) {
 		return project.defaultBundle ?: createDefaultBundle( project, defaultBundleName )
 	}
-	
+
 	/**
-	 * Method is used to create createDefaultBundle  
+	 * Method is used to create createDefaultBundle
 	 * @param project
 	 * @param defaultBundle
-	 * @return project's default move bundle 
+	 * @return project's default move bundle
 	 */
+	@Transactional
 	MoveBundle createDefaultBundle (Project project, String defaultBundleName ) {
 		def defaultCode = defaultBundleName?:'TBD'
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
@@ -690,35 +707,36 @@ class ProjectService {
 				return moveBundle
 			else
 				moveBundle = new MoveBundle(
-					name:defaultCode, 
-					project:project, 
-					useForPlanning:true, 
+					name:defaultCode,
+					project:project,
+					useForPlanning:true,
 					workflowCode:project.workflowCode,
 					startTime: project.startDate,
 					completionTime:project.completionDate
 				)
-				
+
 			if (!moveBundle.save(flush:true)){
 				log.error "createDefaultBundle: failed to create DefaultBundle for project $project: ${GormUtil.allErrorsString(moveBundle)}"
 				return null
-			} 
+			}
 			return moveBundle
 		}
 	}
 
 	/**
-	 * Used to add/remove partners from a project by comparing the list of partner ids passed. If a partner is 
-	 * removed from a project, all the partner staff is also removed. Any tasks assigned to the individuals will be 
+	 * Used to add/remove partners from a project by comparing the list of partner ids passed. If a partner is
+	 * removed from a project, all the partner staff is also removed. Any tasks assigned to the individuals will be
 	 * unassigned however historical references of staff will remain.
 	 *
 	 * @param projectInstance - the project that is being updated
 	 * @param partnerIds - a single id or a list of ids
 	 * @throws InvalidParamException when the partner ids are invalid or not associated with the owner of the project
 	 */
+	@Transactional
 	void updateProjectPartners(Project projectInstance, def partnersIds) {
 
 		// Get a list of the partners associated to the owner of the project plus the partners assigned to the project
-		Party projectOwner = projectInstance.getOwner() 
+		Party projectOwner = projectInstance.getOwner()
 		List ownerPartners = partyRelationshipService.getCompanyPartners(projectOwner)
 		List ownerPartnerIds = ownerPartners*.partyIdTo.id
 
@@ -745,7 +763,7 @@ class ProjectService {
 			// Lets weed out the possibility of duplicates
 			partnersIds.unique()
 		}
-		
+
 		// Convert partners to Long
 		def newPartnersIds = []
 		partnersIds.each { p ->
@@ -774,9 +792,9 @@ class ProjectService {
 
 		Party partnerParty
 
-		// Add partners to the relationship 
+		// Add partners to the relationship
 		toAddPartners.each { partnerId ->
-			partnerParty = Party.findById(partnerId)
+			partnerParty = Party.get(partnerId)
 			if (! partnerParty) {
 				throw new InvalidParamException("Partner id specified is not found ($partnerId)")
 			} else if (partnerParty.partyType.id != 'COMPANY') {
@@ -786,13 +804,13 @@ class ProjectService {
 			partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
 			log.info "updateProjectPartners() Added partner $partnerParty to project $projectInstance"
 		}
-		
+
 		// Delete partners from the relationship
-		String findPartnerStaff = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' " + 
+		String findPartnerStaff = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
 			"and p.partyIdFrom = :partner and " +
 			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
 
-		String deleteProjectStaff = "DELETE FROM PartyRelationship pr WHERE pr.partyRelationshipType='PROJ_STAFF' " + 
+		String deleteProjectStaff = "DELETE FROM PartyRelationship pr WHERE pr.partyRelationshipType='PROJ_STAFF' " +
 			"AND pr.partyIdFrom = :project AND pr.roleTypeCodeFrom = 'PROJECT' " +
 			"AND pr.partyIdTo IN (:staff)"
 
@@ -800,10 +818,10 @@ class ProjectService {
 			"AND task.assignedTo IN (:staff)"
 
 		toDeletePartners.each { partnerId ->
-			partnerParty = Party.findById(partnerId)
+			partnerParty = Party.get(partnerId)
 			if (partnerParty) {
 				log.info "updateProjectPartners() Removing partner $partnerParty from project $projectInstance"
-	
+
 				List partnerStaff = PartyRelationship.findAll(findPartnerStaff, [partner: partnerParty] )?.partyIdTo
 				if (partnerStaff.size() > 0) {
 					def c = PartyRelationship.executeUpdate(deleteProjectStaff, [project:projectInstance, staff:partnerStaff])
@@ -821,6 +839,7 @@ class ProjectService {
 	/**
 	 * Used to save new Projects
 	 */
+	@Transactional
 	def saveProject(projectInstance, file, projectPartners, projectManager) {
 
 		def workflowCodes = []
@@ -833,18 +852,18 @@ class ProjectService {
 		if( file && file.getContentType() && file.getContentType() != "application/octet-stream" ){
 			if (! okcontents.contains(file.getContentType())) {
 				return [message: "Image must be one of: ${okcontents}", success: false]
-			}		
+			}
 		}
 
 		//save image
 		def image
-		image = ProjectLogo.fromUpload(file)		   
+		image = ProjectLogo.fromUpload(file)
 		image.project = projectInstance
 		def imageSize = image.getSize()
 		if( imageSize > 50000 ) {
 			return [message: " Image size is too large. Please select proper Image", success: false]
 		}
-		
+
 		if ( !projectInstance.hasErrors() && projectInstance.save() ) {
 			if(file && file.getContentType() == "application/octet-stream"){
 				//Nonthing to perform.
@@ -852,7 +871,7 @@ class ProjectService {
 				image.save()
 			}
 			//def client = params.projectClient
-		
+
 			def person = securityService.getUserLogin().person
 			def companyParty = person.company
 			if (!companyParty) {
@@ -870,19 +889,19 @@ class ProjectService {
 			}
 
 			updateProjectPartners(projectInstance, partnersIds)
-			
+
 			if ( projectManager != null && projectManager != "" ) {
-				
-				def projectManagerParty = Party.findById(projectManager)
+
+				def projectManagerParty = Party.get(projectManager)
 				//	For Project to ProjectManager PartyRelationship
-				def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )  
+				def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )
 			}
-			
+
 			// set the projectInstance as CURR_PROJ
 			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
-			//Will create a bundle name TBD and set it as default bundle for project   
+			//Will create a bundle name TBD and set it as default bundle for project
 			projectInstance.getProjectDefaultBundle()
-			
+
 			return [message: "Project ${projectInstance} created", success: true, imageId: image.id]
 		} else {
 			return [message: "", success: false]
@@ -893,7 +912,7 @@ class ProjectService {
 	 * Used to get a list of projects where the company is the client of project(s)
 	 * @param company - the company to find projects for
 	 * @param projectStatus - filter on the projects based on being ACTIVE|COMPLETED|ANY (default ACTIVE)
-	 * @return the list of projects of the company 
+	 * @return the list of projects of the company
 	 */
 	List<Project> getProjectsWhereClient(PartyGroup company, ProjectStatus projectStatus=ProjectStatus.ACTIVE) {
 		StringBuffer query = new StringBuffer("from Project p where p.client = :client")
@@ -912,6 +931,7 @@ class ProjectService {
 	 * This function is used by the daily project metrics job to generate daily metrics.
 	 * It search for active projects and for each one retrives specific metrics: assets, deps, users, tasks
 	 */
+	@Transactional
 	def activitySnapshot(params) {
 		log.info "Project Daily Metrics started."
 
@@ -987,7 +1007,7 @@ class ProjectService {
 			result = new Date(metricsLastDate[0]['last_date'].getTime())
 		}
 
-		return result;
+		return result
 	}
 
 	/**
@@ -1020,7 +1040,7 @@ class ProjectService {
 		def params = [
 			project:project
 		]
-		
+
 		def owner = PartyRelationship.executeQuery("select partyIdTo from PartyRelationship pr where \
 			pr.partyRelationshipType.id = 'PROJ_COMPANY' and \
 			pr.roleTypeCodeFrom.id = 'PROJECT' and \
@@ -1125,49 +1145,49 @@ class ProjectService {
 				switch(assetClassOption) {
 					case 'SERVER-DEVICE':
 						projectDailyMetric.planningServers += it["count"]
-						break;
+						break
 					case 'STORAGE-DEVICE':
 						projectDailyMetric.planningPhysicalStorages += it["count"]
-						break;
+						break
 					case 'NETWORK-DEVICE':
 						projectDailyMetric.planningNetworkDevices += it["count"]
-						break;
+						break
 					case 'OTHER-DEVICE':
 						projectDailyMetric.planningOtherDevices += it["count"]
-						break;
+						break
 					case 'APPLICATION':
 						projectDailyMetric.planningApplications += it["count"]
-						break;
+						break
 					case 'DATABASE':
 						projectDailyMetric.planningDatabases += it["count"]
-						break;
+						break
 					case 'STORAGE-LOGICAL':
 						projectDailyMetric.planningLogicalStorages += it["count"]
-						break;
+						break
 				}
 			} else {
 				switch(assetClassOption) {
 					case 'SERVER-DEVICE':
 						projectDailyMetric.nonPlanningServers += it["count"]
-						break;
+						break
 					case 'STORAGE-DEVICE':
 						projectDailyMetric.nonPlanningPhysicalStorages += it["count"]
-						break;
+						break
 					case 'NETWORK-DEVICE':
 						projectDailyMetric.nonPlanningNetworkDevices += it["count"]
-						break;
+						break
 					case 'OTHER-DEVICE':
 						projectDailyMetric.nonPlanningOtherDevices += it["count"]
-						break;
+						break
 					case 'APPLICATION':
 						projectDailyMetric.nonPlanningApplications += it["count"]
-						break;
+						break
 					case 'DATABASE':
 						projectDailyMetric.nonPlanningDatabases += it["count"]
-						break;
+						break
 					case 'STORAGE-LOGICAL':
 						projectDailyMetric.nonPlanningLogicalStorages += it["count"]
-						break;
+						break
 				}
 			}
 		}
@@ -1215,7 +1235,7 @@ class ProjectService {
 			INNER JOIN asset_dependency ad ON ae.asset_entity_id = ad.asset_id
 			INNER JOIN project p ON p.project_id = ae.project_id
 			WHERE p.completion_date > '$sqlSearchDate'
-			GROUP BY ae.project_id 
+			GROUP BY ae.project_id
 			ORDER BY ae.project_id
 		""")
 
@@ -1241,7 +1261,7 @@ class ProjectService {
 
 		projects.each{ p ->
 			companyIds << p.client.id
-			projectsMapByCompanyId[p.client.id] = p 
+			projectsMapByCompanyId[p.client.id] = p
 		}
 
 		def cIds = companyIds.join(",")
@@ -1249,12 +1269,12 @@ class ProjectService {
 		def personsCountsQuery = new StringBuffer("""
 			SELECT pg.party_group_id as companyId, count(p.person_id) AS totalPersons, count(u.username) as totalUserLogins, count(u_active.username) as activeUserLogins
 			FROM person p
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF' 
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id 
-			LEFT OUTER JOIN party pa on p.person_id=pa.party_id 
-			LEFT OUTER JOIN user_login u on p.person_id=u.person_id 
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
+			LEFT OUTER JOIN party pa on p.person_id=pa.party_id
+			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
 			LEFT OUTER JOIN user_login u_active on p.person_id=u_active.person_id AND u_active.last_modified > ('$sqlSearchDate' - INTERVAL 1 DAY)
-			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id 
+			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
 			WHERE pg.party_group_id in ($cIds)
 			GROUP BY pg.party_group_id
 		""")
@@ -1296,7 +1316,7 @@ class ProjectService {
 	}
 
 	/**
-	 * This method will query for all the accounts that haven't been 
+	 * This method will query for all the accounts that haven't been
 	 * activated.
 	 * Used to retrieve a list project users whom are eligible as activation notices
 	 * @param project - the project that the users are associated with which includes anybody assoicated with the project
@@ -1308,7 +1328,7 @@ class ProjectService {
 	 *		String company - company name
 	 *		List<String> roles - list of security roles the user has been assigned
 	 *		Date lastActivationNotice - Date of latest activation notice sent to the user otherwise null
-	 *		Date expiry - the expiry date of the user 
+	 *		Date expiry - the expiry date of the user
 	 *		Date created - the date the user was created
 	 * Rules: Has a userLogin account where lastLogin is null and localAccount=true and Active='Y' and expiry > now()
 	 */
@@ -1323,7 +1343,7 @@ class ProjectService {
 			return accounts
 		}
 
-		// Now using that list, perform a join against the UserLogin in order to find the users that are candidates 
+		// Now using that list, perform a join against the UserLogin in order to find the users that are candidates
 		String query = 'select u' +
 			', (select max(reset.createdDate) from PasswordReset reset where reset.userLogin = u and reset.type=:type) as latestReset' +
 			' from UserLogin u' +
@@ -1342,14 +1362,14 @@ class ProjectService {
 			accounts << [
 				userLogin: userLogin,
 				personId: person.id,
-				firstName: person.firstName, 
-				lastName : person.lastName, 
+				firstName: person.firstName,
+				lastName : person.lastName,
 				email: person.email,
-				company: person.getCompany().name, 
-				roles: userLogin.securityRoleCodes, 
-				expiry: userLogin.expiryDate, 
+				company: person.getCompany().name,
+				roles: userLogin.securityRoleCodes,
+				expiry: userLogin.expiryDate,
 				dateCreated: userLogin.createdDate,
-				lastActivationNotice: u[1], 
+				lastActivationNotice: u[1],
 				currentProject: userLogin.currentProject
 			]
 		}
@@ -1369,7 +1389,7 @@ class ProjectService {
 			// We instantiate the model map each time to clear out any data from the previous account.
 			def model = [customMessage: message, from: from, username: account.userLogin.username ]
 			securityService.sendResetPasswordEmail(account.email, ipAddress, PasswordResetType.WELCOME, model)
-		}		
+		}
 	}
 
 	/**
@@ -1390,7 +1410,7 @@ class ProjectService {
 	}
 
 	/*
-	 * Used to retrieve a list of all staff that could be assigned to a project. The staff that are available will be 
+	 * Used to retrieve a list of all staff that could be assigned to a project. The staff that are available will be
 	 * contingent on what user is requesting the list and their relationship to the project. The use-cases are:
 	 *    - Staff of Owner:   ALL owner, partner(s) and client staff without limitations (when the Only Assigned is not checked)
 	 *    - Staff of Partner: ONLY assigned staff to the project
@@ -1401,9 +1421,9 @@ class ProjectService {
 	 *    - PartyGroup company
 	 *    - String name
 	 *    - teams
-	 *    - Person staff 
-	 *    - boolean assigned 
-	 */	
+	 *    - Person staff
+	 *    - boolean assigned
+	 */
 	List<Map> getAssignableStaff(Project project, Person forWhom) {
 
 		// Get the list of all Staff for the owner, partners and client
@@ -1411,15 +1431,15 @@ class ProjectService {
 		PartyGroup owner = project.owner
 		PartyGroup client = project.client
 
-		// Get the existing list of assigned staff 
+		// Get the existing list of assigned staff
 		List<Map> assignedStaffDetail = getAssignedStaff(project)
-		//assignedStaffDetail.each { 
-		//	it.assigned = true 
+		//assignedStaffDetail.each {
+		//	it.assigned = true
 		//	it.company = it.company[0]
 		//}
 		Map assignedStaffIds = assignedStaffDetail*.id.groupBy { it }
 
-		// Based on the whom is making the request and the 
+		// Based on the whom is making the request and the
 		boolean isOwnerStaff = owner.id == employer.id
 		boolean isClientStaff = project.client.id == employer.id
 		boolean isPartnerStaff = ! (isOwnerStaff && isClientStaff)
@@ -1429,7 +1449,7 @@ class ProjectService {
 
 			// Add any Owner staff that are not already assigned to the project
 			List ownerStaff = partyRelationshipService.getCompanyStaff(owner.id)
-			ownerStaff.each { staff -> 
+			ownerStaff.each { staff ->
 				if (! assignedStaffIds.containsKey(staff.id)) {
 					assignedStaffDetail << staff
 				}
@@ -1440,7 +1460,7 @@ class ProjectService {
 			List partnerList = getPartners(project)
 			partnerList.each { partner ->
 				partnerStaff = partyRelationshipService.getCompanyStaff(partner.id)
-				partnerStaff.each { staff -> 
+				partnerStaff.each { staff ->
 					if (! assignedStaffIds.containsKey(staff.id)) {
 						assignedStaffDetail << staff
 					}
@@ -1451,7 +1471,7 @@ class ProjectService {
 		// For Owner or Client Staff we'll add all of the non-assigned client staff to the list
 		if (isOwnerStaff || isClientStaff) {
 			List clientStaff = partyRelationshipService.getCompanyStaff(client.id)
-			clientStaff.each { staff -> 
+			clientStaff.each { staff ->
 				if (! assignedStaffIds.containsKey(staff.id)) {
 					assignedStaffDetail << staff
 				}
@@ -1472,11 +1492,11 @@ class ProjectService {
 	 * @return The list of persons found that are team members
 	 */
 	List<Person> getTeamMembers(Project project, RoleType teamRoleType=null, Person person=null) {
-		List persons = [] 
+		List persons = []
 		List relations = getTeamMemberRelationships(project, teamRoleType, person)
 		if (relations) {
 			// Get the unique Person objects
-			persons = relations*.partyIdTo?.unique { a,b -> a.id <=> b.id}		
+			persons = relations*.partyIdTo?.unique { a,b -> a.id <=> b.id}
 		}
 
 		return persons
@@ -1494,7 +1514,7 @@ class ProjectService {
 			log.warn "getTeamMembers() called with invalid teamCode $teamCode"
 			return null
 		}
-		return getTeamMembers(project, rt, person) 
+		return getTeamMembers(project, rt, person)
 	}
 
 	/**
@@ -1503,6 +1523,7 @@ class ProjectService {
 	 * @param person - the person to be assigned
 	 * @param teamCodes - a single team code or a list of team codes
 	 */
+	@Transactional
 	void addTeamMember(Project project, Person person, teamCodes) {
 		partyRelationshipService.addProjectStaff(project, person)
 
@@ -1518,13 +1539,14 @@ class ProjectService {
 	}
 
 	/**
-	 * Used to remove a person from a team on a project. This will also remove any assignments that the 
+	 * Used to remove a person from a team on a project. This will also remove any assignments that the
 	 * person may have to a move event.
 	 * @param project - the project the person will be associated with
 	 * @param person - the person to be assigned
 	 * @param teamCodes - a single team code or a list of team codes
 	 * @return the number of teams that were deleted
 	 */
+	@Transactional
 	int removeTeamMember(Project project, Person person, teamCodes) {
 		if (! (teamCodes instanceof List)) {
 			teamCodes = [ teamCodes ]
@@ -1534,21 +1556,21 @@ class ProjectService {
 			// If you are getting this exception you should look at the PersonService.removeFromProject method
 			throw new InvalidParamException('STAFF can not be removed by removeTeamMember method')
 		}
-		
-		// Remove person/team references in the MoveEventStaff table			
+
+		// Remove person/team references in the MoveEventStaff table
 		String mesQuery = """DELETE from MoveEventStaff mes where
 			person=:person and role.id in (:teams) and
 			mes.moveEvent.id in ( (select me.id from MoveEvent me where me.project = :project) )"""
 		MoveEventStaff.executeUpdate(mesQuery, [project:project, person:person, teams:teamCodes])
 
-		// Remove Team assignments for the individual against the project 
+		// Remove Team assignments for the individual against the project
 		String prQuery = """DELETE from PartyRelationship pr where
 			pr.partyRelationshipType = 'PROJ_STAFF' and
 			pr.roleTypeCodeFrom.id='PROJECT' and
 			pr.roleTypeCodeTo.id in (:teamCodes) and
 			pr.partyIdFrom=:project and
 			pr.partyIdTo=:person"""
-		int count = PartyRelationship.executeUpdate(prQuery, [project:project, person:person, teamCodes:teamCodes]) 
+		int count = PartyRelationship.executeUpdate(prQuery, [project:project, person:person, teamCodes:teamCodes])
 
 		return count
 	}
@@ -1560,7 +1582,7 @@ class ProjectService {
 	 * @param person - used to filter the results to the individual person (optional)
 	 */
 	List<PartyRelationship> getTeamMemberRelationships(Project project, def teamRoleType=null, Person person=null) {
-		RoleType rt 
+		RoleType rt
 
 		if (teamRoleType) {
 			if ( (teamRoleType instanceof String) ) {
@@ -1623,7 +1645,7 @@ class ProjectService {
 	 /**
 	 * This method determines if the current user has access to a particular
 	 * project.
-	 * 
+	 *
 	 * @param project - Project to look up.
 	 * @return - true: the user has access, false otherwise.
 	 */

@@ -5,9 +5,9 @@ class AssetDependencyBundle {
 	String dependencySource
 	Date lastUpdated
 	Project project
-    
+
 	static belongsTo = [asset: AssetEntity]
-	
+
     static constraints = {
 		dependencyBundle( nullable:false, unique:'asset')
 		asset( nullable:false, unique:true)

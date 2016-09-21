@@ -15,5 +15,5 @@ class LogicException extends RuntimeException {
 	public LogicException(groovy.lang.GString message) {
 		super(message.toString())
 	}
-	
+
 }

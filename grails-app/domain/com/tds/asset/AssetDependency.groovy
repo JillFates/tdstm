@@ -1,11 +1,12 @@
 package com.tds.asset
+
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 
 class AssetDependency {
 
 	AssetEntity  asset			// The asset that that REQUIRES the 'dependent'
-	AssetEntity dependent		// The asset that SUPPORTS 'asset' 
+	AssetEntity dependent		// The asset that SUPPORTS 'asset'
 	String type = "Unknown"
 	String dataFlowFreq = "Unknown"
 	String dataFlowDirection = "Unknown"
@@ -13,7 +14,7 @@ class AssetDependency {
 	String comment
 	Person createdBy
 	Person updatedBy
-		
+
 	Date dateCreated
 	Date lastUpdated
 
@@ -21,10 +22,10 @@ class AssetDependency {
 	String c2
 	String c3
 	String c4
-	
+
 	Boolean isFuture
 	Boolean isStatusResolved
-	
+
 	static constraints = {
 		asset( nullable:false, unique:['dependent', 'type'] )
 		dependent( nullable:true)
@@ -52,7 +53,7 @@ class AssetDependency {
 		c4( blank:true, nullable:true, size:0..255 )
 	}
 
-	static mapping={	
+	static mapping={
 		version true
 		autoTimestamp false
 		id column: 'asset_dependency_id'

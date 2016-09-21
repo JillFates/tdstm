@@ -14,7 +14,7 @@ class PartyGroup extends Party {
 	/*
 	 *  mapping for COLUMN Relation
 	 */
-	static mapping  = {	
+	static mapping  = {
 		version false
 		autoTimestamp false
 		tablePerHierarchy false
@@ -27,5 +27,4 @@ class PartyGroup extends Party {
 	String toString(){
 		name
 	}
-
 }

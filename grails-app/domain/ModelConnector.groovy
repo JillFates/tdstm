@@ -2,7 +2,6 @@ import com.tds.asset.AssetCableMap
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
 
-
 class ModelConnector {
 	// Declare propertied
 	String connector
@@ -15,10 +14,10 @@ class ModelConnector {
 	String option
 	Date dateCreated
 	Date lastModified
-	
-	
+
+
 	static belongsTo = [ model : Model ]
-	
+
     static constraints = {
 		connector( blank:false, nullable:false, unique:'model' )
 		label( blank:true, nullable:true, unique:'model' )
@@ -31,8 +30,8 @@ class ModelConnector {
         lastModified( nullable:true )
         dateCreated( nullable:true )
     }
-	
-	static mapping  = {	
+
+	static mapping  = {
 		version false
         autoTimestamp false
 		columns {
@@ -49,7 +48,7 @@ class ModelConnector {
 	def beforeUpdate = {
 		lastModified = TimeUtil.nowGMT()
 	}
-    
+
     def beforeDelete = {
         AssetCableMap.withNewSession { fromConnectorCableMaps*.delete() }
         AssetCableMap.withNewSession{
@@ -57,11 +56,11 @@ class ModelConnector {
                                                         assetToPort=null where assetToPort = :connector",[connector:this])
         }
     }
-    
+
     def getFromConnectorCableMaps(){
         AssetCableMap.findAllByAssetFromPort(this)
     }
-	
+
 	String toString(){
 		"${model?.modelName} : ${connector}"
 	}

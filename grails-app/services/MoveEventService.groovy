@@ -1,9 +1,11 @@
+import com.tdssrc.grails.GormUtil
+import grails.transaction.Transactional
 
 class MoveEventService {
-	
+
 	/**
 	 * This function using to verify events for requested project
-	 * @param reqEventIds : reqEventIds is list of requested id from browser 
+	 * @param reqEventIds : reqEventIds is list of requested id from browser
 	 * @param project : project list
 	 * @return
 	 */
@@ -20,7 +22,6 @@ class MoveEventService {
 		}
 		return nonProjEventIds
 	}
-
 
 	/**
 	 * Used to retrieve a person to a move event for a specified team
@@ -42,6 +43,7 @@ class MoveEventService {
 	 * @param teamRoleType - a valid TEAM role
 	 * @return An error message if unable to create the team otherwise null
 	 */
+	@Transactional
 	MoveEventStaff addTeamMember(MoveEvent moveEvent, Person person, RoleType teamRoleType) {
 		assert moveEvent
 		assert person
@@ -77,6 +79,7 @@ class MoveEventService {
 	 * @param teamRoleType - a valid TEAM role
 	 * @return An error message if unable to create the team otherwise null
 	 */
+	@Transactional
 	MoveEventStaff addTeamMember(MoveEvent moveEvent, Person person, String teamCode) {
 		def teamRoleType = teamRoleType(teamCode)
 		if (! teamRoleType) {
@@ -87,7 +90,7 @@ class MoveEventService {
 
 	/**
 	 * Used to retrieve a TEAM RoleType based on the code
-	 * @param teamCode - the TEAM string code 
+	 * @param teamCode - the TEAM string code
 	 * @return the TEAM RoleType if found otherwise null
 	 */
 	RoleType teamRoleType(String teamCode) {
@@ -101,6 +104,7 @@ class MoveEventService {
 	 * @param teamRoleType - the team role
 	 * @return true if the team member was deleted or false if not found
 	 */
+	@Transactional
 	boolean removeTeamMember(MoveEvent moveEvent, Person person, RoleType teamRoleType) {
 		assert moveEvent
 		assert person
@@ -112,7 +116,7 @@ class MoveEventService {
 
 		// Try finding the assignment first
 		MoveEventStaff mes = getTeamMember(moveEvent, person, teamRoleType)
-		
+
 		if (mes) {
 			status = mes.delete()
 
@@ -127,6 +131,7 @@ class MoveEventService {
 	 * @param teamCode - the team role code
 	 * @return true if the team member was deleted or false if not found
 	 */
+	@Transactional
 	MoveEventStaff removeTeamMember(MoveEvent moveEvent, Person person, String teamCode) {
 		def teamRoleType = teamRoleType(teamCode)
 		if (! teamRoleType) {
@@ -134,6 +139,4 @@ class MoveEventService {
 		}
 		return removeTeamMember(moveEvent, person, teamRoleType)
 	}
-
-
 }

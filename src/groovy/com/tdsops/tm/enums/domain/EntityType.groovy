@@ -1,9 +1,8 @@
 package com.tdsops.tm.enums.domain
 
 /**
- * 
- * @author 
  *
+ * @author
  */
 class EntityType {
 	static final String AE='AssetEntity'

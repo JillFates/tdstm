@@ -1,18 +1,18 @@
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tds.asset.AssetEntity
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
-import com.tdsops.common.lang.ExceptionUtil
-import com.tds.asset.AssetEntity
-
-import org.apache.commons.lang.math.NumberUtils 
+import grails.transaction.Transactional
 import org.apache.commons.lang.StringUtils
-import UserPreferenceEnum as PREF
+import org.apache.commons.lang.math.NumberUtils
 
+@Transactional
 class RoomService {
-	
-	boolean transactional = true
-	def securityService
-	def userPreferenceService
-	def rackService
+
+	RackService rackService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Used to update the information about Rooms, Racks and the devices within the racks
@@ -32,7 +32,7 @@ class RoomService {
 					msg = 'Sorry but you do not appear to have the security rights to modify Room and Rack information'
 					break
 				}
-				
+
 				if (! roomId || ! roomId.isInteger() ) {
 					log.warning "SECURITY : User $user attemtped to edit room with invalid room id ($roomId)"
 					msg = 'Sorry but the room reference id appears to be invalid'
@@ -59,20 +59,20 @@ class RoomService {
 				roomInstance.postalCode = params.postalCode
 				roomInstance.country = params.country
 				roomInstance.source = source
-				
+
 				if (! roomInstance.validate() || ! roomInstance.save()) {
 					log.info "Updating room information failed - ${GormUtil.allErrorsString(roomInstance)} - user $user"
 					msg = "Updating room failed due to ${GormUtil.allErrorsString(roomInstance)}"
 					break
 				}
-				
+
 				// Deal with updating the existing racks
 				def racks = Rack.findAllByRoom( roomInstance )
 				racks.each { rack->
 					if (! msg && rackIds?.contains(rack.id.toString())) {
 						rack.tag = params["tag_"+rack.id]
 						rack.location = roomInstance.location
-						rack.roomX = params["roomX_"+rack.id] ? NumberUtils.toDouble(params["roomX_"+rack.id],0).round() :0 
+						rack.roomX = params["roomX_"+rack.id] ? NumberUtils.toDouble(params["roomX_"+rack.id],0).round() :0
 						rack.roomY = params["roomY_"+rack.id] ? NumberUtils.toDouble(params["roomY_"+rack.id],0).round() :0
 						rack.powerA = params["powerA_"+rack.id] ? NumberUtils.toDouble(params["powerA_"+rack.id],0).round() : 0
 						rack.powerB = params["powerB_"+rack.id] ? NumberUtils.toDouble(params["powerB_"+rack.id],0).round() : 0
@@ -171,7 +171,7 @@ class RoomService {
 		if (StringUtils.isNotBlank(location) || StringUtils.isNotBlank(roomName) || StringUtils.isNotBlank(rackName)) {
 
 			def query = 'from Room r where project=:project and location=:location and roomName=:roomName and source=:source'
-			def params = [ 
+			def params = [
 				project: project,
 				location: StringUtil.defaultIfEmpty(location, 'TBD'),
 				roomName: StringUtil.defaultIfEmpty(roomName, 'TBD'),
@@ -213,24 +213,24 @@ class RoomService {
 
 		log.info "User $user is deleting room(s) $roomIds"
 
-		roomIds.each { roomId ->  
+		roomIds.each { roomId ->
 			if ( roomId instanceof String) {
 				if (! roomId.isLong()) {
 					log.warn "SECURITY : $user attempted to delete rooms with an invalid id ($roomId), project $project"
-					throw new InvalidParamException("An invalid room id was received ($roomId)")					
+					throw new InvalidParamException("An invalid room id was received ($roomId)")
 				}
 			}
 
 			def room = Room.get(roomId)
 			if (! room) {
 				skippedRooms << [roomId: 'Missing']
-				return 
+				return
 			}
 
 			if (room.project != project) {
 				log.warn "SECURITY : $user attempted to delete rooms associated to another project, room $room, project $project"
 				skippedRooms << [roomId: 'Missing']
-				return 
+				return
 			}
 
 			// Check to see if the room has any associated devices
@@ -267,7 +267,7 @@ class RoomService {
 		}
 
 		return skippedRooms
-		
+
 	}
 
 }

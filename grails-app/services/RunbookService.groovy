@@ -1,30 +1,31 @@
-/**
- * The RunbookService class contains methods useful for management of Runbook process and optimization
- * 
- * @author John Martin
- *
- */
+import org.hibernate.SessionFactory
 
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
-
 import com.tdssrc.grails.TimeUtil
 
+/**
+ * Management of Runbook process and optimization.
+ *
+ * @author John Martin
+ */
 class RunbookService {
 
-	def sessionFactory
-	
-	/** 
+	static transactional = false
+
+	SessionFactory sessionFactory
+
+	/**
 	 * Used to load all runbook related tasks associated with an event
 	 * @param moveEvent the event to retrieve tasks for
 	 * @return List<AssetCommet> a list of tasks
-	 */ 
+	 */
 	List getEventTasks(MoveEvent moveEvent) {
 		def tasks = []
 		if (moveEvent) {
 			tasks = AssetComment.findAllByMoveEvent(moveEvent)
 		}
-		
+
 		return tasks
 	}
 
@@ -32,11 +33,11 @@ class RunbookService {
 	 * Used to get the list of task dependencies for a given list of tasks
 	 * @param List<AssetComment> a list of tasks
 	 * @return List<TaskDependency> a list of the dependencies associated to the tasks
-	 */ 
+	 */
 	List getTaskDependencies(List tasks) {
 		def dependencies = []
 		tasks.each { t ->
-			t.taskDependencies.each { d -> 
+			t.taskDependencies.each { d ->
 				dependencies << d
 			}
 		}
@@ -76,13 +77,13 @@ class RunbookService {
 				taskId = task.id
 			}
 			if(dep){
-				dependencies << dep	
+				dependencies << dep
 			}
-			
+
 		}
 		return [tasks: tasks, dependencies: dependencies]
 	}
-	
+
 	/**
 	 * Used to create an object to hold temporary data during runbook optimization
 	 * @param List<AssetComment> a list of tasks
@@ -108,7 +109,7 @@ class RunbookService {
 	}
 
 	/**
-	 * processDFS performs a Depth First Search front-to-back through the directed graph of tasks in order to build up a number of datapoints 
+	 * processDFS performs a Depth First Search front-to-back through the directed graph of tasks in order to build up a number of datapoints
 	 * needed to properly navigate the graph. The process will return a number of arrays that can be then be used to navigate front-to-back
 	 * and back-to-front through the graph.
 	 * @param List<AssetComment> a list of tasks
@@ -139,9 +140,9 @@ class RunbookService {
 			tmp['tasks'][it.id].tmpBeenExplored = false // Flag to indicate that the task was previously explored
 			tmp['tasks'][it.id].tmpIsStartVertex = true // Flag that the task is a start vertex
 		}
-		
+
 		dependencies.each {
-			tmp['dependencies'][it.id].tmpIgnore = false;
+			tmp['dependencies'][it.id].tmpIgnore = false
 		}
 
 		// Convert the task list into map by their ids
@@ -159,14 +160,14 @@ class RunbookService {
 		// This will be used to reference any cyclic maps that we encounter
 		def cyclicalMaps = [:]
 
-		// A list of vertexes (vertexes that don't have subsequent nodes/tasks) 
+		// A list of vertexes (vertexes that don't have subsequent nodes/tasks)
 		def sinkVertices = []
 
 		def depth = 0
 		def vertexId = 0
 
 		// The closure that we'll use to walk through the list of nodes
-		def dfsOfGraph 
+		def dfsOfGraph
 		dfsOfGraph = { n ->
 			if (++tick > maxRecursions) {
 				log.debug "#### Short circuited the recursion as it seems we're in an infinite loop (maxRecursions=$maxRecursions)"
@@ -186,7 +187,7 @@ class RunbookService {
 			// Mark vertices that are know not to be start vertices
 			if ( edgesBySucc.containsKey(vertex.id.toString()) ) {
 				tmp['tasks'][vertex.id].tmpIsStartVertex = false
-				//log.debug "cleared out tmpIsStartVertex for $n"	
+				//log.debug "cleared out tmpIsStartVertex for $n"save
 			}
 
 			// Throw the current node onto the stack
@@ -201,7 +202,7 @@ class RunbookService {
 			// Find the adject nodes if any
 			if (nodeEdges.containsKey(n.toString())) {
 				nodeEdges[n.toString()].each { edges ->
-					edges.each { edge -> 
+					edges.each { edge ->
 						//log.debug "dfsOfGraph() processing edge $edge"
 						// Check the node that the edge points to and see if we've already visited it
 						if (! tmp['tasks'][nodes[edge.assetComment.id.toString()].id].tmpBeenExplored) {
@@ -213,13 +214,13 @@ class RunbookService {
 							if (stack.find { it == edge.assetComment.id }) {
 								//log.debug "dfsOfGraph() found cyclical reference(2) with ${nodes[edge.assetComment.id]}"
 								cyclicalMaps[n] = [stack:stack.clone(), loopback:edge.assetComment]
-								tmp['dependencies'][edge.id].tmpIgnore = true;
+								tmp['dependencies'][edge.id].tmpIgnore = true
 							}
 						}
 					}
 				}
 			} else {
-				// We hit a sink vertex so save it 
+				// We hit a sink vertex so save it
 				if (! sinkVertices.find { it.id == n}) {
 					//log.debug "dfsOfGraph()  Found Sink Vertex ${vertex}"
 					sinkVertices << vertex
@@ -261,14 +262,14 @@ class RunbookService {
 		def elapsed = TimeUtil.elapsed(e)
 
 /*
-		log.debug "processDFS() processed moveEvent ${tasks[0].moveEvent} - ${tasks.size()} tasks and ${dependencies.size()} dependencies; \n" + 
+		log.debug "processDFS() processed moveEvent ${tasks[0].moveEvent} - ${tasks.size()} tasks and ${dependencies.size()} dependencies; \n" +
 			"startVertices=$startVertices \n" +
 			"sinkVertices=$sinkVertices \n looped $loops times; recursed $tick times; took ${elapsed} to process"
 
 */
 
 		// Clean up objects that are causing memory leaks
-		
+
 		return [ 'sinks': sinkVertices, 'starts': startVertices, 'cyclicals': cyclicalMaps, 'elapsed': elapsed ]
 	}
 
@@ -288,11 +289,11 @@ class RunbookService {
 		def msg = ''
 
 		// We need to mark all of the nodes as not having been explored yet so that when we walk through the map we can track that we've been here before
-		tasks.each { 
+		tasks.each {
 			tmp['tasks'][it.id].tmpMaxPathDuration = 0 // The max pathDuration of all of the tasks successor edges
 			tmp['tasks'][it.id].tmpDownstreamTasks = [:] // The number of tasks downstream from the current task
 			tmp['tasks'][it.id].tmpMapDepth = 0 // The level/depth up from the furthest out sink vector
-			tmp['tasks'][it.id].tmpBeenExplored = false	
+			tmp['tasks'][it.id].tmpBeenExplored = false
 			// Todo - check for the existence of tmpBeenExplored and only add if not there before
 		}
 
@@ -324,7 +325,7 @@ class RunbookService {
 			// Create a queue that we'll use to push and pull from using FIFO
 			java.util.LinkedList queue = new java.util.LinkedList()
 			queue.add(sink.id)
-			
+
 			// log.debug "sinks[0] tmpBeenExplored? ${sinks[0].tmpBeenExplored} : ${sinks[0]}"
 
 			log.info "processDurations() Processing Sink ${s+1} of ${sinkSize} - $sink"
@@ -342,11 +343,11 @@ class RunbookService {
 				def task = taskMap[taskId.toString()]
 
 				def currentMapDepth = tmp['tasks'][task.id].tmpMapDepth + 1
-				
+
 				// Safety valve so we don't get in an infinite loop
 				if (--ticks == 0) {
 					log.error "processDurations() exceeded loop count"
-					throw new RuntimeException('processDurations exceeded excepted loop count') 
+					throw new RuntimeException('processDurations exceeded excepted loop count')
 				}
 
 				// Find all edges that would be predecessors of the current task
@@ -359,14 +360,14 @@ class RunbookService {
 					// Get the list of the downstream (predecessor or successors?) tasks for the current task
 					def downstreamTasks = tmp['tasks'][task.id].tmpDownstreamTasks
 
-					edgesBySucc[task.id.toString()].each { ebs -> 
+					edgesBySucc[task.id.toString()].each { ebs ->
 						// JPM : 10/2015 - why is there nested lists here?
 						ebs.each { edge ->
-							
+
 							// Check if this edge should be ignored (this would only happen if it was involved in a cyclical reference)
 							if ( ! tmp['dependencies'][edge.id].tmpIgnore && tmp['tasks'][edge.predecessor.id]) {
 
-								// Set the time it will take to finish all the remaining tasks along this current path 
+								// Set the time it will take to finish all the remaining tasks along this current path
 								// This will be the max time of any forked path downstream
 								// TODO : JPM 10/2015 - should check so we don't step on bigger values by accident
 								if (tmp['dependencies'][edge.id].tmpPathDuration < durationToSinkTask) {
@@ -404,7 +405,7 @@ class RunbookService {
 			s++
 		}
 
-		// Update all of the edges with the total 
+		// Update all of the edges with the total
 		edges.each { k,v -> tmp['dependencies'][v.id].tmpDownstreamTaskCount = tmp['tasks'][v.successor.id].tmpDownstreamTasks.size() + 1 }
 
 		def elapsed = TimeUtil.elapsed(e)
@@ -417,7 +418,7 @@ class RunbookService {
 	/**
 	 * Used to determine the unique graphs (separate directed graphs) where groups of start vertices share intersecting sink vertices.
 	 * For example if start A references sink X,Y, B references Y,Z and C references Z then they are all in  the same group or map.
-	 * If D references sink R,Q it would be a separate group/map   
+	 * If D references sink R,Q it would be a separate group/map
 	 * @param List<AssetComment> start vertices
 	 * @param List<AssetComment> sink vertices
 	 * @param tmp a data structure containing temporary data related to tasks and dependencies
@@ -435,16 +436,16 @@ class RunbookService {
 		starts.each { start ->
 			// log.debug "determineUniqueGraphs() start $start contains ${start.tmpDownstreamTasks.size()} downstream tasks"
 			def idsFound = []
-			tmp['tasks'][start.id].tmpDownstreamTasks.each { k,t -> 
+			tmp['tasks'][start.id].tmpDownstreamTasks.each { k,t ->
 				// log.debug "checking $k for $t id ${t.id} in sinkIds"
 				if ( sinkIds.contains(t?.id) )
-					idsFound << t.id 
+					idsFound << t.id
 			}
 			startSinks.putAt(start.id, idsFound?.sort() )
 		}
 
 		// Now create graphs that contain the unions of each start vectors' sink vertices where at least one sink vertex is shared
-		// between each of the starts. This will basically create a graph for each separate map if there are more than one. We don't 
+		// between each of the starts. This will basically create a graph for each separate map if there are more than one. We don't
 		// expect there to be more than one but you never know...
 		def graphs = []
 		def processed = []
@@ -468,9 +469,9 @@ class RunbookService {
 
 			maxDur = tmp['tasks'][starts[x].id].tmpMaxPathDuration + starts[x].durationRemaining()
 			maxDST = tmp['tasks'][starts[x].id].tmpDownstreamTasks.size()
-			log.debug "determineUniqueGraphs() Initial maxDur=$maxDur, maxDST=$maxDST" 
+			log.debug "determineUniqueGraphs() Initial maxDur=$maxDur, maxDST=$maxDST"
 			// Initialize this set of sink ids that will be in this grap
-			graphSinks = startSinks[startId]	
+			graphSinks = startSinks[startId]
 
 			// Initials this set of start ids that will be in this grap
 			graphStarts << startId
@@ -494,8 +495,8 @@ class RunbookService {
 
 					// track that we've processed this start vertex
 					processed << nextId
-		
-					log.debug "determineUniqueGraphs() task:${starts[y].taskNumber} maxDur=${tmp['tasks'][starts[y].id].tmpMaxPathDuration}, maxDST=${tmp['tasks'][starts[y].id].tmpDownstreamTasks.size()}" 
+
+					log.debug "determineUniqueGraphs() task:${starts[y].taskNumber} maxDur=${tmp['tasks'][starts[y].id].tmpMaxPathDuration}, maxDST=${tmp['tasks'][starts[y].id].tmpDownstreamTasks.size()}"
 
 					// Track the max values for path duration and # of tasks downstream
 					def yDur = tmp['tasks'][starts[y].id].tmpMaxPathDuration + starts[y].durationRemaining()
@@ -504,9 +505,9 @@ class RunbookService {
 					if (maxDST < tmp['tasks'][starts[y].id].tmpDownstreamTasks.size())
 						maxDST = tmp['tasks'][starts[y].id].tmpDownstreamTasks.size()
 
-					// If we are 2 or more beyond x, then we need to start at the top otherwise we can skip to the next 
+					// If we are 2 or more beyond x, then we need to start at the top otherwise we can skip to the next
 					y = (y > (x+1)) ? x+1 : y+1
-					continue	
+					continue
 				}
 				y++
 			}
@@ -528,7 +529,7 @@ class RunbookService {
 	 * @param Map<AssetComment.id : AssetComment> the list of tasks mapped by their id
 	 * @param Map - The resulting graphs data from determineUniqueGraphs() method
 	 * @param tmp a data structure containing temporary data related to tasks and dependencies
-	 * @return The optimal task to start with 
+	 * @return The optimal task to start with
 	 */
 	private AssetComment findCriticalStartTask(tasksMap, graph, tmp) {
 		def taskId
@@ -600,7 +601,7 @@ class RunbookService {
 
 		return edgeList
 	}
-	
+
 	/**
 	 * Used to compute the earliest and latest starts of a set of tasks in a directed graph
 	 * @param Integer the start time as an integer
@@ -614,9 +615,9 @@ class RunbookService {
 	 */
 	def computeStartTimes(startTime, tasks, dependencies, starts, sinks, graphs, tmp) {
 
-		// 
+		//
 		// Initialization
-		// 
+		//
 
 		def time = startTime
 		// TODO - we need to convert to some time offset? TimeUtil.nowGMT()
@@ -625,8 +626,8 @@ class RunbookService {
 		if (graphs.size() > 1)
 			graphs = graphs.sort{ [it.maxDownstreamTaskCount, it.maxPathDuration ] }
 
-		// Add the temporary starts variables and reset the beenExplored 
-		tasks.each { 
+		// Add the temporary starts variables and reset the beenExplored
+		tasks.each {
 			tmp['tasks'][it.id].tmpEarliestStart = 0
 			tmp['tasks'][it.id].tmpEstimatedStart = 0
 			tmp['tasks'][it.id].tmpLatestStart = 0
@@ -644,9 +645,9 @@ class RunbookService {
 		def estFinish
 		def safetyValve
 
-		// 
+		//
 		// Main Loop
-		// 			
+		//
 		// Iterate over the list of independent graphs
 		for (int g=0; g < graphs.size(); g++) {
 
@@ -684,12 +685,12 @@ class RunbookService {
 				newTime += newTask.durationRemaining()
 				time = newTime
 				log.debug "computeStartTimes() DFS/CP task id=${newTask.id}, dur=${newTask.duration}. time=$newTime"
-				
+
 				def edgeList = findCriticalPath(newTask, edgesByPred, tmp)
 				edgeList?.each {
 					def nextTask = it.successor
 					def nextId = (long)(nextTask.id)
-					
+
 					if (tmp['tasks'][nextId]) {
 						if (! tmp['tasks'][nextId].tmpBeenExplored) {
 							tmp['tasks'][nextId].tmpBeenExplored = true
@@ -702,7 +703,7 @@ class RunbookService {
 			estFinish = time
 
 			//
-			// Calculate Latest Starts for all tasks 
+			// Calculate Latest Starts for all tasks
 			// Do a reverse BFS walk through the graph to update the tmpLatestStart values for all tasks that we haven't walked
 			// using each of the sink vertices in the graph
 			//
@@ -714,7 +715,7 @@ class RunbookService {
 			graphs[g].sinks.each { id ->
 				id = id.toString()
 
-				queue.add(id) 
+				queue.add(id)
 
 				tmp['tasks'][tasksMap[id].id].tmpBeenExplored = true
 
@@ -730,7 +731,7 @@ class RunbookService {
 
 				// Bail out of infinite loop
 				if ( --safetyValve == 0 ) {
-					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')			
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')
 				}
 
 				// Get task id out of the queue
@@ -738,16 +739,16 @@ class RunbookService {
 				log.debug "computeStartTimes() RBFS task=$taskId"
 
 				if (edgesBySucc.containsKey(taskId)) {
-					// Get the latest start of the successor task 
+					// Get the latest start of the successor task
 					def succLatestStart = tmp['tasks'][tasksMap[taskId].id].tmpLatestStart
 
 					// Iterate over the edges back to the predecessor tasks
 					edgesBySucc[taskId].each() { edge ->
-						def calcLatestStart = succLatestStart - edge.predecessor.duration 
-						
+						def calcLatestStart = succLatestStart - edge.predecessor.duration
+
 						// check if this edge should be ignored
 						if ( ! tmp['dependencies'][edge.id].tmpIgnore && tmp['tasks'][edge.predecessor.id]) {
-						
+
 							def predTaskInfo = tmp['tasks'][edge.predecessor.id]
 							if ( ! predTaskInfo.tmpBeenExplored ) {
 								// Add the task to the queue
@@ -783,7 +784,7 @@ class RunbookService {
 			// log.debug "computeStartTimes() edgesByPred Keys: ${edgesByPred.keySet()}"
 
 			// Reset the tmpBeenExplored flag on all the tasks
-			tasks.each { 
+			tasks.each {
 				tmp['tasks'][it.id].tmpBeenExplored = false
 			}
 
@@ -792,7 +793,7 @@ class RunbookService {
 
 				// Bail out of infinite loop
 				if ( --safetyValve == 0 ) {
-					throw new RuntimeException('computeStartTimes() caught in infinite loop - Earliest Start')					
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Earliest Start')
 				}
 
 				def taskId = queue.poll()
@@ -835,11 +836,11 @@ class RunbookService {
 	 * @return ?
 	 */
 	 /*
-	def computeStartTimes2(Date startTime, List<AssetComment> tasks, List<TaskDependency> dependencies, List<AssetComment> starts, List<AssetComment> sinks, List<Map> graphs ) {	
+	def computeStartTimes2(Date startTime, List<AssetComment> tasks, List<TaskDependency> dependencies, List<AssetComment> starts, List<AssetComment> sinks, List<Map> graphs ) {
 
-		// 
+		//
 		// Initialization
-		// 
+		//
 
 		def time = startTime
 		// TODO - we need to convert to some time offset? TimeUtil.nowGMT()
@@ -848,8 +849,8 @@ class RunbookService {
 		if (graphs.size() > 1)
 			graphs = graphs.sort{ [it.maxDownstreamTaskCount, it.maxPathDuration ] }
 
-		// Add the temporary starts variables and reset the beenExplored 
-		tasks.each { 
+		// Add the temporary starts variables and reset the beenExplored
+		tasks.each {
 			it.metaClass.setProperty('tmpEarliestStart', 0)
 			it.metaClass.setProperty('tmpEstimatedStart', 0)
 			it.metaClass.setProperty('tmpLatestStart', 0)
@@ -868,9 +869,9 @@ class RunbookService {
 
 		def constraintViolations = []
 
-		// 
+		//
 		// Main Loop
-		// 
+		//
 
 		// Need to iterate over the list of graphs and choose the first graph to work on
 		for (int g=0; g < graphs.size(); g++) {
@@ -915,7 +916,7 @@ class RunbookService {
 			estFinish = time
 
 			//
-			// Calculate Latest Starts for all tasks 
+			// Calculate Latest Starts for all tasks
 			// Do a reverse BFS walk through the graph to update the tmpLatestStart values for all tasks that we haven't walked
 			// using each of the sink vertices in the graph
 			//
@@ -927,7 +928,7 @@ class RunbookService {
 			graphs[g].sinks.each { id ->
 				id = id.toString()
 
-				queue.add(id) 
+				queue.add(id)
 
 				tasksMap[id].tmpBeenExplored = true
 
@@ -942,7 +943,7 @@ class RunbookService {
 
 				// Bail out of infinite loop
 				if ( --safety == 0 ) {
-					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')					
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')
 				}
 
 				// Get task id out of the queue
@@ -950,12 +951,12 @@ class RunbookService {
 				log.debug "computeStartTimes() RBFS task=$taskId"
 
 				if (edgesBySucc.containsKey(taskId)) {
-					// Get the latest start of the successor task 
+					// Get the latest start of the successor task
 					def succLatestStart = tasksMap[taskId].tmpLatestStart
 
 					// Iterate over the edges back to the predecessor tasks
 					edgesBySucc[taskId].each() { edge ->
-						def calcLatestStart = succLatestStart - edge.predecessor.duration 
+						def calcLatestStart = succLatestStart - edge.predecessor.duration
 						if ( ! tasksMap[edge.predecessor.id.toString()].tmpBeenExplored ) {
 							// Add the task to the queue
 							queue.push(edge.predecessor.id.toString())
@@ -963,7 +964,7 @@ class RunbookService {
 							edge.predecessor.tmpBeenExplored = true
 						} else {
 							// Been here before so we need to compare the latest starts to set to the ealiest start of the two
-							if ( calcLatestStart < edge.predecessor.tmpLatestStart ) 
+							if ( calcLatestStart < edge.predecessor.tmpLatestStart )
 								edge.predecessor.tmpLatestStart = calcLatestStart
 						}
 					}
@@ -981,7 +982,7 @@ class RunbookService {
 			// load queue with the start vertices
 			graphs[g].starts.each { id -> queue.push( id.toString() ) }
 
-			tasks.each { 
+			tasks.each {
 				it.tmpBeenExplored = false
 			}
 
@@ -992,7 +993,7 @@ class RunbookService {
 
 				// Bail out of infinite loop
 				if ( --safety == 0 ) {
-					throw new RuntimeException('computeStartTimes() caught in infinite loop - Earliest Start')					
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Earliest Start')
 				}
 
 				def taskId = queue.poll()
@@ -1024,20 +1025,20 @@ class RunbookService {
 
 
 //  eventStart, eventFinish, constraintTask
-	/** 
+	/**
 	 * Used to find the task that would be used as the starting point for calculating a plan's scheduled based on the method
 	 * @param method - the way to look for the contraint
 	 */
 	def findInitialConstrainedTask(String method, List<AssetComment> tasksList, List<AssetComment> starts, List<AssetComment> sinks ) {
 		def task
 
-		assert starts.size() 
+		assert starts.size()
 		assert sinks.size()
 		int i
 
 		switch (method) {
 			case 'ES':
-				// Event Start - find the start vertice with the longest path duration 
+				// Event Start - find the start vertice with the longest path duration
 				task = starts.find { it.tmpCriticalPath }
 				break
 			case 'EF':

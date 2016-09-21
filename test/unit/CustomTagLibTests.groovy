@@ -1,129 +1,97 @@
-import grails.test.*
-
-import java.text.SimpleDateFormat
-
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-import com.tdssrc.grails.TimeUtil
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession
-import org.codehaus.groovy.grails.plugins.testing.GrailsMockHttpServletRequest
+
+import java.text.SimpleDateFormat
 
 @TestFor(CustomTagLib)
 class CustomTagLibTests extends Specification {
 
-	/** Setup metaclass fixtures for mocking. */
-	protected void setup() {
+	// the <tds:convertDate> taglet HTML mockup
+	private static final String convertDateTag = '<tds:convertDate date="${date}" format="${format}"/>'
+
+	// the <tds:convertDateTime> taglet HTML mockup
+	private static final String convertDateTimeTag = '<tds:convertDateTime date="${date}" timeZone="${timeZone}" format="${format}"/>'
+
+	private Date testDate
+
+	void setup() {
+		testDate = TimeUtil.parseDateTimeWithFormatter('GMT', '2012-08-21T01:00:00-0000', new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"))
 	}
 
-	/** Remove metaclass fixtures for mocking. */
-	def cleanup() {
-	}
-
-	private createMockSession(String userDateFormat) {
-		def request = new GrailsMockHttpServletRequest()
-		def mockSession = new GrailsHttpSession(request)
-
-		// Set the User Date Format on the session
-		mockSession.setProperty('CURR_DT_FORMAT', [CURR_DT_FORMAT: userDateFormat] )
-
-		return mockSession		
-	}
-
-	// Creates a reference test date to be used for all of the tests
-	private getTestDate() {
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-		// def date = sdf.parse("2012-08-21T01:00:00-0000")
-		def date = TimeUtil.parseDateTimeWithFormatter('GMT', '2012-08-21T01:00:00-0000', sdf)
-
-		return date
-	}
-
-	// Returns the <tds:convertDate> taglet HTML mockup
-	private getConvertDateTag() {		
-		return '<tds:convertDate date="${date}" format="${format}" mockSession="${mockSession}"/>'
-	}
-
-	// Returns the <tds:convertDateTime> taglet HTML mockup
-	private getConvertDateTimeTag() {		
-		return '<tds:convertDateTime date="${date}" timeZone="${timeZone}" format="${format}" mockSession="${mockSession}"/>'
-	}
-
-
-	def 'Test tds:convertDate tag with MIDDLE_ENDIAN'() {
+	void 'Test tds:convertDate tag with MIDDLE_ENDIAN'() {
 		setup:
-			def mockSession=createMockSession(TimeUtil.MIDDLE_ENDIAN)
-			Date date = getTestDate()
-			String dateTag = getConvertDateTag()
+		setUserDateFormat TimeUtil.MIDDLE_ENDIAN
 
-		expect: 'Test DateTime with MIDDLE_ENDIAN'
-			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': timezone ] ) == null
-			applyTemplate(dateTag, [date: date, format: format, mockSession:mockSession]) == expectedValue
+		when:
+		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+
+		then: 'Test DateTime with MIDDLE_ENDIAN'
+		applyTemplate(convertDateTag, [date: testDate, format: format]) == expectedValue
 
 		where:
-			timezone                            | format 				| expectedValue
-			'GMT'                               | TimeUtil.FORMAT_DATE 	| '08/21/2012'
-			'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE 	| '08/21/2012'
-			'America/New_York'                  | TimeUtil.FORMAT_DATE 	| '08/21/2012'
+		timezone                            | format                | expectedValue
+		'GMT'                               | TimeUtil.FORMAT_DATE  | '08/21/2012'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '08/21/2012'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '08/21/2012'
 	}
 
-	def 'Test tds:convertDate tag with LITTLE_ENDIAN'() {
+	void 'Test tds:convertDate tag with LITTLE_ENDIAN'() {
 		setup:
-			def mockSession=createMockSession(TimeUtil.LITTLE_ENDIAN)
-			Date date = getTestDate()
-			String dateTag = getConvertDateTag()
+		setUserDateFormat(TimeUtil.LITTLE_ENDIAN)
 
-		expect: 'Test DateTime with LITTLE_ENDIAN'
-			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': timezone ] ) == null
-			applyTemplate(dateTag, [date: date, format: format, mockSession:mockSession]) == expectedValue
+		when:
+		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+
+		then: 'Test DateTime with LITTLE_ENDIAN'
+		applyTemplate(convertDateTag, [date: testDate, format: format]) == expectedValue
 
 		where:
-			timezone                            | format 				| expectedValue
-			'GMT'                               | TimeUtil.FORMAT_DATE 	| '21/08/2012'
-			'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE 	| '21/08/2012'
-			'America/New_York'                  | TimeUtil.FORMAT_DATE 	| '21/08/2012'
+		timezone                            | format                | expectedValue
+		'GMT'                               | TimeUtil.FORMAT_DATE  | '21/08/2012'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '21/08/2012'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '21/08/2012'
 	}
 
-	def 'Test tds:convertDateTime tag with MIDDLE_ENDIAN'() {
+	void 'Test tds:convertDateTime tag with MIDDLE_ENDIAN'() {
 		setup:
-			def mockSession=createMockSession(TimeUtil.MIDDLE_ENDIAN)
-			Date date = getTestDate()
-			String dateTimeTag = getConvertDateTimeTag()
+		setUserDateFormat(TimeUtil.MIDDLE_ENDIAN)
 
-		expect: 'Test DateTime with MIDDLE_ENDIAN'
-			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': timezone ] ) == null
-			applyTemplate(dateTimeTag, [date: date, format: format, mockSession:mockSession]) == expectedValue
+		when:
+		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+
+		then: 'Test DateTime with MIDDLE_ENDIAN'
+		applyTemplate(convertDateTimeTag, [date: testDate, format: format]) == expectedValue
 
 		where:
-			timezone                            | format 					| expectedValue
-			'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '08/21/2012 01:00 AM'
-			'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 10:00 PM'
-			'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 09:00 PM'
+		timezone                            | format                    | expectedValue
+		'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '08/21/2012 01:00 AM'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 10:00 PM'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 09:00 PM'
 	}
 
-	def 'Test tds:convertDateTime tag with LITTLE_ENDIAN'() {
+	void 'Test tds:convertDateTime tag with LITTLE_ENDIAN'() {
 		setup:
-			def mockSession=createMockSession(TimeUtil.LITTLE_ENDIAN)
-			Date date = getTestDate()
-			String dateTimeTag = getConvertDateTimeTag()
+		setUserDateFormat(TimeUtil.LITTLE_ENDIAN)
 
-		expect: 'Test DateTime with MIDDLE_ENDIAN'
-			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': timezone ] ) == null
-			applyTemplate(dateTimeTag, [date: date, format: format, mockSession:mockSession]) == expectedValue
+		when:
+		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+
+		then: 'Test DateTime with MIDDLE_ENDIAN'
+		applyTemplate(convertDateTimeTag, [date: testDate, format: format]) == expectedValue
 
 		where:
-			timezone                            | format 					| expectedValue
-			'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '21/08/2012 01:00 AM'
-			'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 10:00 PM'
-			'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 09:00 PM'
+		timezone                            | format                    | expectedValue
+		'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '21/08/2012 01:00 AM'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 10:00 PM'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 09:00 PM'
 	}
 
 	void testTextAsLink() {
 
 		expect:
 		// Just Text
-		applyTemplate('<tds:textAsLink text="${text}" />', [text: "p:some more data that is not a URL"]).equals("p:some more data that is not a URL")
+		applyTemplate('<tds:textAsLink text="${text}" />', [text: "p:some more data that is not a URL"]) == "p:some more data that is not a URL"
 		// Testing http
 		applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "http://www.google.com", target: "_blank"]).startsWith("<a href")
 		// Testing HTTP
@@ -153,9 +121,9 @@ class CustomTagLibTests extends Specification {
 		// A Windows File
 		applyTemplate('<tds:textAsLink text="${text}" />', [text: 'p:\\dir\\file name']).startsWith('<a href="file://p%3A%2Fdir%2Ffile+name')
 		// Testing Blank Text
-		applyTemplate('<tds:textAsLink text="${text}" />', [text: '']).equals('')
+		applyTemplate('<tds:textAsLink text="${text}" />', [text: '']) == ''
 		// Testing Null Text
-		applyTemplate('<tds:textAsLink text="${text}" />', [text: null]).equals('')
+		applyTemplate('<tds:textAsLink text="${text}" />', [text: null]) == ''
 	}
 
 	void testSVGIcon() {
@@ -182,11 +150,13 @@ class CustomTagLibTests extends Specification {
 
 	void testFaviconTag() {
 		setup:
-			String faviconStr = '<link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"/>'
+		String faviconStr = '<link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"/>'
 
-		expect: 
-			applyTemplate('<tds:favicon />') == faviconStr
-
+		expect:
+		applyTemplate('<tds:favicon />') == faviconStr
 	}
 
+	private void setUserDateFormat(String userDateFormat) {
+		session.setAttribute 'CURR_DT_FORMAT', [CURR_DT_FORMAT: userDateFormat]
+	}
 }

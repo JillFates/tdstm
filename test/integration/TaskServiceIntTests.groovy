@@ -1,5 +1,3 @@
-
-
 import grails.test.*
 
 import com.tds.asset.AssetComment
@@ -14,7 +12,7 @@ import com.tdssrc.grails.GormUtil
 import grails.test.spock.IntegrationSpec
 
 class TaskServiceIntTests extends IntegrationSpec {
-	
+
 	def project
 	def attributeSet
 	def moveEvent
@@ -150,7 +148,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 				println etext
 			}
 		}
-		
+
 		// Create Tasks for AssetEntity
 		AssetEntity.list()  // <==
 /*				.each{ assetEntity->
@@ -165,7 +163,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 				println etext
 			}
 		}
-		
+
 		def taskForEvent = new AssetComment(
 				comment:"Sample for "+moveEvent.toString(),
 				commentType:'issue',
@@ -176,7 +174,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 			GormUtil.allErrorsString( taskForEvent )
 			println etext
 		}
-		
+
 		// Create Task Dependency for all Assets tasks as event tasks as predecessor
 		AssetComment.findAllByAssetEntityIsNotNull().each{ task ->
 			def taskDependency = new TaskDependency(

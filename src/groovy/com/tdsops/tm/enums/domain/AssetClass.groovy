@@ -13,8 +13,8 @@ import com.tds.asset.Files
 enum AssetClass {
 	APPLICATION,
 	DATABASE,
-	DEVICE, 
-	STORAGE;
+	DEVICE,
+	STORAGE
 
 	static AssetClass safeValueOf(String key) {
 		AssetClass obj
@@ -76,11 +76,11 @@ enum AssetClass {
 	 * @return String
 	 */
 	static String getClassOptionsDefinition() {
-		def assetMap = getClassOptions();
+		def assetMap = getClassOptions()
 		def assetClassesForSelect2 = new ArrayList<String>(getClassOptions().keySet())
-		def results = [];
+		def results = []
 
-		results.push("{ id: 'ALL', 'text': 'Filter: All Classes' }");
+		results.push("{ id: 'ALL', 'text': 'Filter: All Classes' }")
 
 		assetClassesForSelect2.each {
 			def value = assetMap[it]
@@ -90,7 +90,7 @@ enum AssetClass {
 		return results
 	}
 
-	/** 
+	/**
 	 * Used to determine the Class Option based on the assetType
 	 * @param type - the asset type
 	 * @return the name of the class option
@@ -99,7 +99,7 @@ enum AssetClass {
 		return getClassOptionForAsset(asset?.assetClass, asset.model?.assetType)
 	}
 
-	/** 
+	/**
 	 * Used to determine the Class Option based on the assetType
 	 * @param assetClass - the asset class
 	 * @param assetType - the asset type
@@ -144,5 +144,4 @@ enum AssetClass {
 
 		return option
 	}
-
 }

@@ -1,14 +1,15 @@
 import com.tdssrc.grails.TimeUtil
+
 class MoveEventNews {
 	MoveEvent moveEvent
 	String message
 	Integer isArchived = 0
 	Date dateCreated = TimeUtil.nowGMT()
-	Date dateArchived 
+	Date dateArchived
 	String resolution
 	Person archivedBy
 	Person createdBy
-	
+
 	static constraints = {
 		message( blank:true, nullable:true  )
 		isArchived( nullable:true )
@@ -19,7 +20,7 @@ class MoveEventNews {
 		dateArchived( nullable:true  )
 	}
 
-	static mapping  = {	
+	static mapping  = {
 		version true
 		autoTimestamp false
 		id column: 'move_event_news_id'
@@ -31,9 +32,9 @@ class MoveEventNews {
 			isArchived sqltype: 'tinyint'
 		}
 	}
-	
+
 	String toString() {
 		 message
 	}
-	
+
 }

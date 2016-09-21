@@ -5,11 +5,11 @@ import org.apache.commons.lang.StringUtils
 
 import org.apache.commons.lang.StringEscapeUtils
 
-/** 
+/**
  * This class provides a number of utility functions
  */
 class SqlUtil {
-	
+
 	/**
 	 * Helper class that allows the concatenantion of sql with and/or which only adds the logic if the query already contains content
 	 * @param query - the string buffer that contains the current WHERE clause
@@ -20,9 +20,9 @@ class SqlUtil {
 	static String appendToWhere(String query, String additional, String andOr='and') {
 		return query + (query.size() > 0 ? " $andOr " : '') + additional
 	}
-	
+
 	/**
-	 * Used to append a clause to a SQL query string and account for the AND/OR prefix boolean 
+	 * Used to append a clause to a SQL query string and account for the AND/OR prefix boolean
 	 * @param query - the string buffer that contains the current WHERE clause
 	 * @param criteria - the additional criteria to append to the query (StringBuffer or String)
 	 * @param andOr - the boolean identifier (defaul 'and')
@@ -30,7 +30,7 @@ class SqlUtil {
 	static void appendToWhere(StringBuffer query, criteria, String andOr='and') {
 		query.append((query.size() > 0 ? " $andOr " : '') + criteria)
 	}
-	
+
 	/**
 	 * Used to do a multiple word match against a particular field
 	 * @param property - the property to query on
@@ -69,7 +69,7 @@ class SqlUtil {
 	}
 
 	/**
-	 * Used to generate the WHERE expression for a particular property in which based on the criteria will create an EQUALS, IN or LIKE based on 
+	 * Used to generate the WHERE expression for a particular property in which based on the criteria will create an EQUALS, IN or LIKE based on
 	 * the criteria value. The options are as such for when criteria is:
 	 *  * An array - it will create an IN clause
 	 *  * A string:
@@ -81,7 +81,7 @@ class SqlUtil {
 	 * @param String/Array - criteria (e.g. '5', '>=5', 'a%', ['a','b'])
 	 * @param String - paramName that will be used for parameterized variables in QUERY
 	 * @param Boolean - isNot flag that will add NOT to the LIKE and IN expressions
-	 * @return Map[sql:param] where the SQL is the parameterized SQL and the param contains the value used as the parameterize value. The BETWEEN 
+	 * @return Map[sql:param] where the SQL is the parameterized SQL and the param contains the value used as the parameterize value. The BETWEEN
 	 * 		expression does not return a parameter as there needs to be two params and not presently supported.
 	 *
 	 */
@@ -94,7 +94,7 @@ class SqlUtil {
 				map = [sql:"${property}${not}LIKE :${paramName}", param:criteria]
 			} else if (criteria.toLowerCase() ==~ /^between / ) {
 				// BETWEEN expression
-				map = [sql:"${property}${not}${criteria}", param:null] 
+				map = [sql:"${property}${not}${criteria}", param:null]
 			} else if ('!<>='.contains(criteria.substring(0,1))) {
 				// BOOLEAN expression
 				def param = StringUtil.stripOffPrefixChars('!<>=', criteria)
@@ -108,18 +108,18 @@ class SqlUtil {
 			def expr=isNot ? '<>' : '='
 			map = [sql:"$property $expr :$paramName", param:criteria]
 		} else if (criteria instanceof java.util.ArrayList) {
-			map = [sql:"${property}${not}IN (:$paramName)", param:criteria]				
+			map = [sql:"${property}${not}IN (:$paramName)", param:criteria]
 		} else if (criteria instanceof java.lang.Enum) {
-			map = [sql:"$property = :$paramName", param:criteria]	
+			map = [sql:"$property = :$paramName", param:criteria]
 		} else if (org.codehaus.groovy.grails.commons.DomainClassArtefactHandler.isDomainClass(criteria.getClass())) {
-			map = [sql:"$property = :$paramName", param:criteria]	
+			map = [sql:"$property = :$paramName", param:criteria]
 		} else {
 			println "whereExpression() received criteria of unsupported class type (${criteria?.class}) for property $property"
 			throw RuntimeException("whereExpression() received criteria of unsupported class type (${criteria?.class}) for property $property")
 		}
 		return map
 	}
-	
+
 	/**
 	 * Used to parse user input from filters so that we can create the appropriate SQL expression that will support boolean expressions
 	 * like <, <=, >, >= or - to cause a NOT filter
@@ -194,7 +194,7 @@ class SqlUtil {
 	*/
 
 	static parseParameter(prop, expr, params, clazz){
-		
+
 		expr = expr.trim()
 
 		def firstChar = expr[0]
@@ -208,7 +208,7 @@ class SqlUtil {
 			case "=":
 				queryString = buildSingleValueParameter(prop, rest, "=", params)
 				break
-			
+
 			/* Starts with '<' or '>' */
 			case ["<", ">"]:
 				/* Starts with '<=' or '>=' */
@@ -221,9 +221,9 @@ class SqlUtil {
 				}else{
 					queryString = buildSingleValueParameter(prop, rest, firstChar, params)
 				}
-				
+
 				break
-			
+
 			/* Starts with '-' or '!' */
 			case ["-", "!"]:
 				switch(rest){
@@ -243,12 +243,12 @@ class SqlUtil {
 							queryString = buildDistinctParameter(prop, rest.replaceAll("\\*", "%"), params, clazz, true)
 						/* Starts with '-' and no overriding required. */
 						}else if(firstChar == "-"){
-							queryString = buildDistinctParameter(prop, rest, params, clazz)	
+							queryString = buildDistinctParameter(prop, rest, params, clazz)
 						/* Starts with '!' and it's not a list of values and no overriding required. */
 						}else{
 							queryString = buildSingleValueParameter(prop, rest, "<>", params)
 						}
-						
+
 						break
 				}
 				break
@@ -382,7 +382,7 @@ class SqlUtil {
 
 	/**
 	 * This method determines the type of a given field.
-	 */	
+	 */
 	private static def fieldType(def clazz, def field){
 		return clazz.metaClass.properties.find{ it.name == field }.type
 	}
@@ -390,13 +390,12 @@ class SqlUtil {
 	/* ************************************************************************* */
 
 	/**
-	 *  
+	 *
 	 */
 	private static def isSubclassOf(def clazz, def superClazz){
 		return superClazz.isAssignableFrom(clazz)
 	}
 
 	/* ************************************************************************* */
-
 
 }

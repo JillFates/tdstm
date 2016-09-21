@@ -1,22 +1,20 @@
 package com.tdsops.metaclass
 
-import spock.lang.*
+import spock.lang.Shared
+import spock.lang.Specification
 
-/**
- * Unit test cases for the CollectionUtils class
- */
 class CustomMethodsTests extends Specification {
 
-	// Initialize the metaClass settings	
+	// Initialize the metaClass settings
 	@Shared customMethods = CustomMethods.initialize
 
-	public void testAsYN() {
+	void testAsYN() {
 		expect:
-			true.asYN() == 'Y'
-			false.asYN() == 'N'	
+		true.asYN() == 'Y'
+		false.asYN() == 'N'
 	}
 
-	public void testAsMap() {
+	void testAsMap() {
 		List beatles = [
 			['John', 1, 'Guitar', true],
 			['Paul', 2, 'Bass', true],
@@ -25,21 +23,23 @@ class CustomMethodsTests extends Specification {
 		]
 
 		when:
-			def map = beatles.asMap(0)
-		then: 
-			(map instanceof Map)
-			map.containsKey('Paul')
-			map.Ringo[1] == 3
+		def map = beatles.asMap(0)
+
+		then:
+		map instanceof Map
+		map.containsKey('Paul')
+		map.Ringo[1] == 3
 
 		when:
-			map = beatles.asMap( { it[0].toUpperCase() } )
+		map = beatles.asMap { it[0].toUpperCase() }
+
 		then:
-			(map instanceof Map)
-			map.containsKey('PAUL')
-			map.RINGO[1] == 3
+		map instanceof Map
+		map.containsKey('PAUL')
+		map.RINGO[1] == 3
 	}
 
 	// TODO : JPM 4/2016 : Need to implement tests for List.asGroup metaClass method
-	public void testAsGroup() {
+	void testAsGroup() {
 	}
 }

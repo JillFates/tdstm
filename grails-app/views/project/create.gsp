@@ -116,7 +116,7 @@
 		def projectId = currProj.CURR_PROJ;
 		def currProjObj;
 		if (projectId != null) {
-			currProjObj = Project.findById(projectId);
+			currProjObj = Project.get(projectId);
 		}
 	*/
 	%>
