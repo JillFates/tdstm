@@ -50,15 +50,17 @@ class ProjectTestHelper {
 	Project createProject(PartyGroup company=null) {
 
 		Project project = new Project()
+		String name = RSU.randomAlphabetic(10)
 		project.with {
 			client = createCompany('Owner')
-			projectCode = RSU.randomAlphabetic(10)
+			projectCode = name.toUpperCase()
+			name = name
 			description = 'Test project created by the ProjectTestHelper'
 			startDate = new Date()
 			completionDate = startDate + 30
-			client = createClient()
+			//client = createClient()
 			workflowCode = 'STD_PROCESS'
-			timezone = 'GMT'
+			//timezone = TimeZone.getTimeZone("GMT")
 		}
 
 		project.save(failOnError:true)
@@ -82,11 +84,12 @@ class ProjectTestHelper {
 		PartyType pt = PartyType.get('COMPANY')
 		PartyGroup company = new PartyGroup()
 		company.with {
-			type = pt
+			//type = pt
 			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
 		}
 
 		company.save(failOnError:true)
+		return company
 	}
 
 	/**
