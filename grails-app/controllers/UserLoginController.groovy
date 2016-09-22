@@ -306,7 +306,7 @@ class UserLoginController {
 		def project = securityService.getUserCurrentProject()
 
 		def currentUser = securityService.getUserLogin()
-		PartyGroup company = userLoginInstance.person.getCompany()
+		PartyGroup company = currentUser.person.getCompany()
 		def projectList = projectService.getProjectsForCompany(company)
 		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
 		def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level
