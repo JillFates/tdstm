@@ -26,6 +26,8 @@ grails.project.dependency.resolution = {
 		compile 'com.google.guava:guava:16.0.1'
 		compile 'net.sf.jasperreports:jasperreports:4.5.1'
 		compile 'org.apache.poi:poi-ooxml:3.14'
+		compile 'org.apache.poi:ooxml-schemas:1.1'
+		compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
 		compile 'org.apache.poi:poi:3.14'
 
 		runtime 'mysql:mysql-connector-java:5.1.39'
