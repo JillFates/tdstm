@@ -43,7 +43,7 @@
             $.datepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
             $.datetimepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
 
-            $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+            $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span> Close');
         });
 
         function updateEventHeader( e ){
@@ -102,10 +102,10 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <g:if test="${setImage}">
-                        <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;  margin-top: 8px;"/>
+                        <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProjObj.name} project" style="height: 30px;  margin-top: 8px;"/>
                     </g:if>
                     <g:else>
-                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" border="0" />
+                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
                     </g:else>
                 </div>
 
@@ -218,7 +218,7 @@
                                         <li class="menu-parent-item">Assets</li>
                                         <li class="menu-child-item menu-parent-assets-summary-table">
                                             <g:link class="mmlink" controller="assetEntity" action="assetSummary">
-                                                <g:img uri="/icons/application_view_columns.png" width="16" height="16"/>
+                                                <g:img uri="/icons/application_view_columns.png" width="16" height="16" alt="Summary Table"/>
                                                 Summary Table
                                             </g:link>
                                         </li>
@@ -260,20 +260,20 @@
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-comments-list">
                                             <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <g:img uri="/icons/comments.png" width="16" height="16"/>
+                                                <g:img uri="/icons/comments.png" width="16" height="16" alt="Comments"/>
                                                 Comments
                                             </g:link>
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-dependencies-list">
                                             <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <g:img uri="/icons/bricks.png" width="16" height="16"/>
+                                                <g:img uri="/icons/bricks.png" width="16" height="16" alt="Dependencies"/>
                                                 Dependencies
                                             </g:link>
                                         </li>
                                         <tds:hasPermission permission='DepAnalyzerView'>
                                             <li class="menu-child-item menu-parent-assets-dependency-analyzer">
                                                 <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-                                                    <g:img uri="/icons//brick_magnify.png" width="16" height="16"/>
+                                                    <g:img uri="/icons//brick_magnify.png" width="16" height="16" alt="Dependency Analyzer"/>
                                                     Dependency Analyzer
                                                 </g:link>
                                             </li>
@@ -281,7 +281,7 @@
                                         <tds:hasPermission permission='ArchitectureView'>
                                             <li class="menu-child-item menu-parent-assets-architecture-graph">
                                                 <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
-                                                    <g:img uri="/icons/chart_organisation.png" width="16" height="16"/>
+                                                    <g:img uri="/icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph"/>
                                                     Architecture Graph
                                                 </g:link>
                                             </li>
@@ -483,7 +483,7 @@
                                 <!-- Menu Toggle Button -->
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <!-- The user image in the navbar-->
-                                    <img src="${resource(dir:'images',file:'personIcon.png')}" class="user-image" alt="User Image">
+                                    <img src="${resource(dir:'images',file:'personIcon.png')}" class="user-image" alt="${session.getAttribute("LOGIN_PERSON").name }">
                                     <!-- hidden-xs hides the username on small devices so only the image appears. -->
                                     <span class="hidden-xs user-name">${session.getAttribute("LOGIN_PERSON").name }</span>
                                 </a>

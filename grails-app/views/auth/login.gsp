@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -70,7 +70,7 @@
 						minWidth: 520,
 						resizable: false
 					});
-				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span>');
+				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span> Close');
 			});
 
 			// This functions search for the real version and detects if is or not in compatiblity Mode for IE
@@ -135,9 +135,8 @@
 				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
 			</a>
 		</div>
-		<p class="login-box-msg">Sign in to start your session</p>
-		<div id="spinner" class="spinner" style="display: none;"><img
-				src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+		<h1 class="login-box-msg">Sign in to start your session</h1>
+		<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 		</div>
 		<g:form action="signIn" name="loginForm" class="loginPageFormWrapper">
 			<input type="hidden" name="targetUri" value="${targetUri}" />
@@ -156,11 +155,11 @@
 				</div>
 			</g:if>
 			<div class="form-group has-feedback">
-				<input type="text" class="form-control" name="username" id="usernameid" placeholder="Enter your username" value="${username}" autocorrect="off" autocapitalize="off" >
+				<input type="text" class="form-control" name="username" id="usernameid" placeholder="Enter your username" title="Enter your username" value="${username}" autocorrect="off" autocapitalize="off" >
 				<span class="glyphicon glyphicon-user form-control-feedback"></span>
 			</div>
 			<div class="form-group has-feedback">
-				<input type="password" class="form-control" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your password"/>
+				<input type="password" class="form-control" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your password" title="Enter your password"/>
 				<span class="glyphicon glyphicon-lock form-control-feedback"></span>
 			</div>
 			<g:if test="${flash.message}">
@@ -179,14 +178,14 @@
 
 		<div class="loginErrorMsg">
 			<div class="message unsopported" style="display: none;">
-				<p><label>Warning:</label> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
+				<p><span>Warning:</span> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
 				<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
-				<p>Click <a href="#" class="openSupportedBrowsers">here</a> for supported browsers.</p>
+				<p><a href="#" class="openSupportedBrowsers">View supported browsers.</a></p>
 			</div>
 
 			<div class="message compatibility-mode" style="display: none;">
 				<p>Internet Explorer is configured to use Compatibility Mode that may cause erratic behavior in the application therefore it is recommended to disable or use a supported browser.</p>
-				<p>Click <a href="#" class="openSupportedBrowsers">here</a> for more information</p>
+				<p><a href="#" class="openSupportedBrowsers">View more information.</a></p>
 			</div>
 		</div>
 		<div class="loginIframe">
@@ -196,24 +195,24 @@
 	</div>
 	<!-- /.login-box-body -->
 
-	<div id="dialog" title="Browser Upgrade Recommended" style="display: none; text-align: justify;">
+	<div id="dialog" title="Browser Upgrade Recommended" style="display: none;">
 		<p><strong>Warning:</strong> Our site has detected that you are using an outdated browser version that will cause errors and limit some functionality in the application.</p>
 		<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
-		<div class="row" style="margin-top: 28px; margin-left: 0px; font-size: 14px; text-align: justify;">
+		<div class="row" style="margin-top: 28px; margin-left: 0px; font-size: 14px;">
 			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'internet_explorer.png')}" border="0" /><br />
+				<img src="${resource(dir:'icons/png',file:'internet_explorer.png')}" border="0" alt="Internet Explorer Browser" /><br />
 				<span style="font-size: 13px;">Internet Explorer 9+</span>
 			</div>
 			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'firefox.png')}" border="0" /><br />
+				<img src="${resource(dir:'icons/png',file:'firefox.png')}" border="0" alt="Fire Fox Browser" /><br />
 				<span style="font-size: 13px;">FireFox 42+</span>
 			</div>
 			<div class="col-xs-3" >
-				<img src="${resource(dir:'icons/png',file:'chrome.png')}" border="0" /><br />
+				<img src="${resource(dir:'icons/png',file:'chrome.png')}" border="0" alt="Chrome Browser" /><br />
 				<span style="font-size: 13px;">Chrome 44+</span>
 			</div>
 			<div class="col-xs-3" >
-				<img src="${resource(dir:'icons/png',file:'safari.png')}" border="0" /><br />
+				<img src="${resource(dir:'icons/png',file:'safari.png')}" border="0" alt="Safari Browser" /><br />
 				<span style="font-size: 13px;">Safari 8+ <br /> (Only Mac)</span>
 			</div>
 			<br />

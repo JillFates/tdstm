@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -55,7 +55,7 @@
 			<div style="text-align: center;"><g:link action="login" class="light">Back to Login</g:link></div>
 		</g:if>
 		<g:else>
-			<p class="login-box-msg">Password Assistant</p>
+			<h1 class="login-box-msg">Password Assistant</h1>
 
 			<div id="spinner" class="spinner" style="display: none;"><img
 					src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
@@ -64,7 +64,7 @@
 			<g:form action="sendResetPassword" name="forgotPasswordForm">
 				<p>We will send an e-mail to you that contains a link to a page where you can create new password.</p>
 				<div class="form-group has-feedback">
-					<input type="email" class="form-control" name="email" id="email" placeholder="Enter your email address" value="${email}" autocorrect="off" autocapitalize="off" required autofocus>
+					<input type="email" class="form-control" name="email" id="email" placeholder="Enter your email address" title="Enter your email address" value="${email}" autocorrect="off" autocapitalize="off" required autofocus>
 					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 				</div>
 				<g:if test="${flash.message}">
