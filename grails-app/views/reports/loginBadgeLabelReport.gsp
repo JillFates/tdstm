@@ -325,8 +325,9 @@ var sHint = "C:\\temp\\output";
 
 		<tr>
 
-			<td class="buttonR"><input type="button" id="printButton"
-				value="Print" onclick="generateLabels();" /></td>
+			<td class="buttonR">
+				<button id="printButton" class="btn btn-default" value="Print" role="button" onclick="generateLabels();"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print</button>
+			</td>
 
 		</tr>
 	</tbody>
