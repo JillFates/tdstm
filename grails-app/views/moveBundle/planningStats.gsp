@@ -46,7 +46,28 @@ $(document).ready(function() {
 
 });
 </script>
-<g:javascript src="entity.crud.js" /></head>
+<g:javascript src="entity.crud.js" />
+<style>
+
+	table.dashboard_stat_table th {
+		padding: 0px;
+	}
+
+	table.dashboard_stat_table td {
+		padding: 0px;
+		height: 27px;
+	}
+
+	table#eventHeaderTableId th {
+		padding: 0px;
+	}
+
+	table#eventHeaderTableId td {
+		padding: 0px;
+		height: 27px;
+	}
+</style>
+</head>
 <body>
 
 		<div class="execution-phase-wrapper">
@@ -92,6 +113,7 @@ $(document).ready(function() {
 				<h4>
 					<b>Total Discovered</b>
 				</h4>
+
 				<table class="dashboard_stat_table">
 					<tr>
 						<g:render template="discoveryGraph"
