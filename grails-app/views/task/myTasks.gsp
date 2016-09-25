@@ -13,7 +13,7 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	
 <script type="text/javascript">
 	window.addEventListener('load', function(){

@@ -8,7 +8,12 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <g:render template="../layouts/responsiveStandardResources" />
+    <g:if test="${topNavClean}">
+        <g:render template="../layouts/responsiveResources" />
+    </g:if>
+    <g:if test="${!topNavClean}">
+        <g:render template="../layouts/responsiveStandardResources" />
+    </g:if>
 
     <g:layoutHead />
 

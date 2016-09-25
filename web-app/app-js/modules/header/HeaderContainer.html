@@ -1,0 +1,11 @@
+<toast-handler></toast-handler>
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        {{header.pageMetaData.title | translate}}
+        <small>{{header.pageMetaData.instruction | translate}}</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li ng-repeat="menu in header.pageMetaData.menu" ng-class="{'active':$last}"><!-- <a href="#"> -->{{menu | translate}} <!-- </a> --></li>
+    </ol>
+</section>
