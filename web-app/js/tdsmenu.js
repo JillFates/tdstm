@@ -355,10 +355,10 @@ showSubMenu(currentMenuId);
 var menus = [['project', 'project'], ['racks', 'room'], ['asset', 'asset'], ['bundle', 'event'], ['team', 'team'], ['console', 'console'], ['dashboard', 'dashboard'], ['reports', 'reports']];
 
 // iterate through each menu to position the megamenus
-for (var i = 0; i < menus.size(); ++i) {
+for (var i = 0; i < menus.length; ++i) {
 	
 	// only perform calculations on menus that are shown for this user
-	if ($('#' + menus[i] + 'MegaMenu').size() > 0 && $('#' + menus[i][1] + 'MenuId').size() > 0) {
+	if ($('#' + menus[i] + 'MegaMenu').length > 0 && $('#' + menus[i][1] + 'MenuId').length > 0) {
 	
 		// the reports menu uses the right offset instead of the left
 		if (menus[i] != 'reports')
