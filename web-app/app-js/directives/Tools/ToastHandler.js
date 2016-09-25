@@ -24,7 +24,7 @@ TDSTM.createDirective('toastHandler', ['$log', '$timeout', 'HTTPRequestHandlerIn
             status: '='
         },
         priority: 5,
-        templateUrl: './app-js/directives/Tools/ToastHandler.html',
+        templateUrl: '../app-js/directives/Tools/ToastHandler.html',
         restrict: 'E',
         controller: ['$scope', function ($scope) {
             $scope.alert = {

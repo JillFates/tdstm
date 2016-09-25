@@ -19,6 +19,7 @@ require('rx-angular');
 import HTTPModule from '../services/http/HTTPModule.js';
 import RestAPIModule from '../services/RestAPI/RestAPIModule.js'
 import HeaderModule from '../modules/header/HeaderModule.js';
+import LicenseManagerModule from '../modules/licenseManager/LicenseManagerModule.js';
 import TaskManagerModule from '../modules/taskManager/TaskManagerModule.js';
 import ProjectModule from '../modules/project/ProjectModule.js';
 
@@ -31,13 +32,13 @@ var TDSTM = angular.module('TDSTM', [
     'pascalprecht.translate', // 'angular-translate'
     'ui.router',
     'kendo.directives',
-    'ui.checkbox',
     'rx',
     'ui.bootstrap',
     HTTPModule.name,
     RestAPIModule.name,
     HeaderModule.name,
     TaskManagerModule.name,
+    LicenseManagerModule.name,
     ProjectModule.name
 ]).config([
     '$logProvider',
@@ -51,13 +52,7 @@ var TDSTM = angular.module('TDSTM', [
     '$urlRouterProvider',
     '$locationProvider',
     function ($logProvider, $rootScopeProvider, $compileProvider, $controllerProvider, $provide, $httpProvider,
-              $translateProvider, $translatePartialLoaderProvider, $urlRouterProvider, $locationProvider) {
-
-        /*
-        $locationProvider.html5Mode({
-            enabled: true,
-            requireBase: false
-        });*/
+              $translateProvider, $translatePartialLoaderProvider, $urlRouterProvider) {
 
         $rootScopeProvider.digestTtl(30);
 
@@ -78,13 +73,13 @@ var TDSTM = angular.module('TDSTM', [
         $translatePartialLoaderProvider.addPart('tdstm');
 
         $translateProvider.useLoader('$translatePartialLoader', {
-            urlTemplate: './i18n/{part}/app.i18n-{lang}.json'
+            urlTemplate: '../i18n/{part}/app.i18n-{lang}.json'
         });
 
         $translateProvider.preferredLanguage('en_US');
         $translateProvider.fallbackLanguage('en_US');
 
-        $urlRouterProvider.otherwise('dashboard');
+        //$urlRouterProvider.otherwise('dashboard');
 
     }]).
     run(['$rootScope', '$http', '$log', '$location', function ($rootScope, $http, $log, $location, $state, $stateParams, $locale) {

@@ -101,7 +101,7 @@
 <!-- Vendors -->
 <script src="${resource(dir:'dist',file:'Vendors.js')}"></script>
 <!-- Single Page Logic -->
-<script src="${resource(dir:'dist',file:'App.js')}"></script>
+<g:javascript src="../dist/App.js"/>
 <!-- Kendo Directives -->
 <script src="${resource(dir: 'dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
 <!-- Boosttrap -->

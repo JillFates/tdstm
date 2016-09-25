@@ -27,7 +27,6 @@ class SVGLoader {
     }
 
     link(scope, element, attrs, ctrl) {
-        //ctrl.$log.debug('Drawing SVG');
         element.html(scope.svgData);
     }
 

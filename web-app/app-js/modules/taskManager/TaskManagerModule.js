@@ -17,7 +17,7 @@ var TaskManagerModule = angular.module('TDSTM.TaskManagerModule', [uiRouter]).co
 
     // Define a generic header for the entire module, or it can be changed for each instance.
     var header = {
-        templateUrl: './app-js/modules/header/HeaderContainer.html',
+        templateUrl: 'app-js/modules/header/HeaderContainer.html',
         controller: 'HeaderController as header'
     };
 
@@ -28,7 +28,7 @@ var TaskManagerModule = angular.module('TDSTM.TaskManagerModule', [uiRouter]).co
             views: {
                 'headerView@': header,
                 'bodyView@': {
-                    templateUrl: './app-js/modules/taskManager/list/TaskManagerContainer.html',
+                    templateUrl: 'app-js/modules/taskManager/list/TaskManagerContainer.html',
                     controller: 'TaskManagerController as taskManager'
                 }
             }

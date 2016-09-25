@@ -16,7 +16,6 @@ export default class TaskManagerController {
         // Init Class
         this.getEventDataSource();
         this.getDataSource();
-
         this.log.debug('TaskManager Controller Instanced');
 
     }
