@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import groovy.util.logging.Commons
 import org.apache.poi.hssf.usermodel.HSSFDataValidation
+import org.apache.poi.xssf.usermodel.XSSFDataValidationConstraint
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddressList
@@ -335,26 +336,15 @@ class WorkbookUtil {
   		namedRange.setNameName(name)
   		namedRange.setRefersToFormula(createFormulaString())
   		def dvConstraint = dvHelper.createFormulaListConstraint(name)
-  		
-//  taValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
-  		
-  DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint)
-		// Note the check on the actual type of the DataValidation object.
-		// If it is an instance of the XSSFDataValidation class then the
-		// boolean value 'false' must be passed to the setSuppressDropDownArrow()
-		// method and an explicit call made to the setShowErrorBox() method.
-		if(dataValidation instanceof XSSFDataValidation) {
-		 	dataValidation.setSuppressDropDownArrow(false)
+
+  		DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
+  		if(dvConstraint instanceof XSSFDataValidationConstraint){
+  			dataValidation.setSuppressDropDownArrow(false)
 			dataValidation.setShowErrorBox(true)
-		}
-		else {
-		 	// If the Datavalidation contains an instance of the HSSFDataValidation
-		 	// class then 'true' should be passed to the setSuppressDropDownArrow()
-		 	// method and the call to setShowErrorBox() is not necessary.
-			dataValidation.setSuppressDropDownArrow(true)
-		}
-
-
+  		}else{
+  			dataValidation.setSuppressDropDownArrow(true)
+  		}
+  		
   		targetSheet.addValidationData(dataValidation)
 
 
