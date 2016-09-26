@@ -34,6 +34,7 @@ export default class HeaderController {
     prepareHeader() {
         if (this.state && this.state.$current && this.state.$current.data) {
             this.pageMetaData = this.state.$current.data.page;
+            document.title = this.pageMetaData.title;
         }
     }
 

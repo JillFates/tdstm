@@ -16,7 +16,6 @@ export default class RestServiceHandler extends RequestHandler {
         this.log = $log;
         this.http = $http;
         this.resource = $resource;
-        this.restPath = 'webresources/';
 
         this.log.debug('RestService Loaded');
     }
@@ -33,6 +32,14 @@ export default class RestServiceHandler extends RequestHandler {
         return {
             getFeeds: (callback) => {
                 return this.subscribeRequest(this.http.get('test/mockupData/TaskManager/taskManagerList.json'), callback);
+            }
+        };
+    }
+
+    LicenseManagerServiceHandler() {
+        return {
+            getLicense: (callback) => {
+                return this.subscribeRequest(this.http.get('../test/mockupData/LicenseManager/licenseManagerList.json'), callback);
             }
         };
     }

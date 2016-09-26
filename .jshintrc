@@ -66,6 +66,7 @@
     "angular": true,
     "define": false,
     "jasmine": false,
+    "kendo": false,
     "require": false,
     "exports": false,
     "module": false,
