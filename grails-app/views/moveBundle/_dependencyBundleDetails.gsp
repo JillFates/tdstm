@@ -1,3 +1,4 @@
+<%@page defaultCodec="none" %>
 <div style="margin-top: 10px; float: left;">
 	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />

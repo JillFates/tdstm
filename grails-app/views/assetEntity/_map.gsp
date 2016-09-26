@@ -1,3 +1,4 @@
+<%@page defaultCodec="none" %>
 <div id="toolsContainerId">
 	<!-- The top bar with various buttons and controls on it -->
 	<div id="graphToolbarId">

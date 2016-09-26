@@ -1611,7 +1611,7 @@ function reloadDependencyGroupsSection() {
 	});
 }
 function submitCheckBox(){
-	if($("#connectionStatusOptions input:checked").length == 0){
+	if($(".checkboxdiv_control input:checked").length == 0){
 		alert("One or more status values must be selected.")
 		return
 	}
