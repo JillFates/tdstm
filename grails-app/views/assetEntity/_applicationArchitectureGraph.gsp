@@ -1,3 +1,4 @@
+<%@page defaultCodec="none" %>
 <div id="scriptDivId">
 <style>
 /* 	these styles must be included here due to a bug in firefox

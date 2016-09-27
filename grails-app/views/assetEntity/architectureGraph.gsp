@@ -1,3 +1,4 @@
+<%@page defaultCodec="none" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
@@ -190,7 +191,7 @@
 	// if the user navigated here from an asset crud button, there will be a specific asset to start with
 	var initialAssetId = ${assetId ?: 'null'};
 	var parameterRanges = {'levelsUp':[0, 10], 'levelsDown':[0, 10]};
-	var defaultPrefs = ${defaultPrefs};
+	var defaultPrefs = ${raw(defaultPrefs)};
 	var assetSelectWidth = 172;
 	
 	// Used to track ajax requests and abort them when needed
