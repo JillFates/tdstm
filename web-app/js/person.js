@@ -81,7 +81,7 @@ var Person = function () {
 			personDiv.dialog({ autoOpen: false })
 			
 			// hack to get the close button to show up while using bootstrap
-			$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span> Close')
+			$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>')
 		}
 		
 		return personDiv

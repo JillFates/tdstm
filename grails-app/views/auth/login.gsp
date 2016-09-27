@@ -70,7 +70,7 @@
 						minWidth: 520,
 						resizable: false
 					});
-				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span> Close');
+				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span>');
 			});
 
 			// This functions search for the real version and detects if is or not in compatiblity Mode for IE
