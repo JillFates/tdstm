@@ -18,5 +18,11 @@ export default class LicenseManagerService {
             return callback(data);
         });
     }
+
+    getLicenseList(callback) {
+        this.restService.LicenseManagerServiceHandler().getLicenseList((data) => {
+            return callback(data);
+        });
+    }
 }
 

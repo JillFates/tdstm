@@ -12,6 +12,7 @@ export default class LicenseManagerController {
         this.uibModal = $uibModal;
 
         this.getDataSource();
+        this.getLicenseList();
         this.log.debug('LicenseManagerController Instanced');
     }
 
@@ -69,6 +70,12 @@ export default class LicenseManagerController {
             this.debug(selectedItem);
         }, () => {
             this.log.info('Modal dismissed at: ' + new Date());
+        });
+    }
+
+    getLicenseList() {
+        this.licenseManagerService.getLicenseList((data) => {
+            this.log.info(data);
         });
     }
 
