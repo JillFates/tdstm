@@ -49,23 +49,15 @@ $(document).ready(function() {
 <g:javascript src="entity.crud.js" />
 <style>
 
-	table.dashboard_stat_table th {
+	table.dashboard_right_table th {
 		padding: 0px;
 	}
 
-	table.dashboard_stat_table td {
+	table.dashboard_right_table td {
 		padding: 0px;
 		height: 27px;
 	}
 
-	table#eventHeaderTableId th {
-		padding: 0px;
-	}
-
-	table#eventHeaderTableId td {
-		padding: 0px;
-		height: 27px;
-	}
 </style>
 </head>
 <body>
@@ -432,7 +424,7 @@ $(document).ready(function() {
 					<div class="row-fluid">
 						<div class="col-md-2 col-xs-2">
 							<div>
-								<table id="eventHeaderTableId" style="border: none;">
+								<table id="eventHeaderTableId" class="dashboard_right_table" style="border: none;">
 									<thead>
 									<tr><th class="dashboard_stat_exec_td headerWidth">&nbsp;</th></tr>
 									<tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
@@ -505,7 +497,7 @@ $(document).ready(function() {
 						</div>
 						<div class="col-md-10 col-xs-10" >
 							<div id="eventDataTableId" style="overflow-y: hidden;">
-								<table class="dashboard_stat_table">
+								<table class="dashboard_right_table dashboard_stat_table">
 									<thead>
 									<tr>
 										<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
