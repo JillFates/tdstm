@@ -60,16 +60,25 @@ export default class LicenseManagerController {
             controller: 'RequestLicenseController as requestLicense',
             size: 'md',
             resolve: {
-                items: function () {
-                    return ['1','a2','gg'];
+                params: function () {
+                    return { id: 50, name: 'Acme, Inc.' };
                 }
             }
         });
 
         modalInstance.result.then((selectedItem) => {
-            this.debug(selectedItem);
+            this.log.info('New License Created: ', selectedItem);
+            this.onNewLicenseCreated();
         }, () => {
-            this.log.info('Modal dismissed at: ' + new Date());
+            this.log.info('Request Canceled.');
+        });
+    }
+
+    onNewLicenseCreated() {
+        this.uibModal.open({
+            animation: true,
+            templateUrl: '../app-js/modules/licenseManager/requestLicense/CreatedRequestLicenseView.html',
+            size: 'md',
         });
     }
 

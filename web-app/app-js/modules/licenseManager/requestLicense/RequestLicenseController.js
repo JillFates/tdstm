@@ -6,11 +6,19 @@
 
 export default class RequestLicenseController {
 
-    constructor($log, licenseManagerService, $uibModalInstance) {
+    constructor($log, licenseManagerService, $uibModalInstance, params) {
         this.licenseManagerService = licenseManagerService;
         this.uibModalInstance = $uibModalInstance;
+        this.log = $log;
         this.getEnvironmentDataSource();
         this.getProjectDataSource();
+        this.newLicenseModel = {
+            contactEmail: '',
+            environmentId: null,
+            projectId: null,
+            client: params,
+            specialInstructions: ''
+        }
     }
 
     /**
@@ -18,8 +26,8 @@ export default class RequestLicenseController {
      */
     getEnvironmentDataSource() {
         this.environmentDataSource = [
-            {id: 1, name: 'Production'},
-            {id: 2, name: 'Demo'}
+            {environmentId: 1, name: 'Production'},
+            {environmentId: 2, name: 'Demo'}
         ];
     }
 
@@ -28,9 +36,19 @@ export default class RequestLicenseController {
      */
     getProjectDataSource() {
         this.projectDataSource = [
-            {id: 1, name: 'n/a'},
-            {id: 2, name: 'DR Relo'}
+            {projectId: 1, name: 'n/a'},
+            {projectId: 2, name: 'DR Relo'}
         ];
+    }
+
+    /**
+     * Execute the Service call to generate a new License request
+     */
+    saveLicenseRequest() {
+        this.log.info('New License Requested: ', this.newLicenseModel);
+        this.licenseManagerService.createNewLicenseRequest(this.newLicenseModel, (data) => {
+            this.uibModalInstance.close(data);
+        });
     }
 
     /**

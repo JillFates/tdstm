@@ -6,21 +6,28 @@
 
 export default class LicenseManagerService {
 
-    constructor($log, RestServiceHandler) {
+    constructor($log, restServiceHandler) {
         this.log = $log;
-        this.restService = RestServiceHandler;
+        this.restService = restServiceHandler;
 
         this.log.debug('LicenseManagerService Instanced');
     }
 
     testService(callback) {
-        this.restService.LicenseManagerServiceHandler().getLicense((data) => {
+        this.restService.licenseManagerServiceHandler().getLicense((data) => {
             return callback(data);
         });
     }
 
     getLicenseList(callback) {
-        this.restService.LicenseManagerServiceHandler().getLicenseList((data) => {
+        this.restService.licenseManagerServiceHandler().getLicenseList((data) => {
+            return callback(data);
+        });
+    }
+
+    createNewLicenseRequest(newLicense, callback){
+        // Process New License data if necessary (add, remove, etc)
+        this.restService.licenseManagerServiceHandler().createNewLicenseRequest(newLicense, (data) => {
             return callback(data);
         });
     }

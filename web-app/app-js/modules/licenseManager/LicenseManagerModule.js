@@ -44,7 +44,7 @@ LicenceManagerModule.service('LicenseManagerService', ['$log', 'RestServiceHandl
 LicenceManagerModule.controller('LicenseManagerController', ['$log', 'LicenseManagerService', '$uibModal', LicenseManagerController]);
 
 // Modal - Controllers
-LicenceManagerModule.controller('RequestLicenseController', ['$log', 'LicenseManagerService', '$uibModalInstance', RequestLicenseController]);
+LicenceManagerModule.controller('RequestLicenseController', ['$log', 'LicenseManagerService', '$uibModalInstance', 'params', RequestLicenseController]);
 
 
 export default LicenceManagerModule;
