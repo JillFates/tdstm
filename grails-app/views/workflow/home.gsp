@@ -37,7 +37,7 @@
 
                     <g:sortableColumn property="dateCreated" title="Created On"/>
 
-                    <g:sortableColumn property="lastUpdated" title="Updatated On"/>
+                    <g:sortableColumn property="lastUpdated" title="Updated On"/>
 
                     <g:sortableColumn property="updatedBy" title="Updated By"/>
 
