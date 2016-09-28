@@ -7,9 +7,11 @@
 import angular  from 'angular';
 import uiRouter from 'ui-router';
 
-import LicenseManagerController from './main/LicenseManagerController.js';
+import LicenseList from './list/LicenseList.js';
 import LicenseManagerService from './service/LicenseManagerService.js';
-import RequestLicenseController from './requestLicense/RequestLicenseController.js';
+import RequestLicense from './request/RequestLicense.js';
+import CreatedLicense from './created/CreatedLicense.js';
+import LicenseDetail from './detail/LicenseDetail.js';
 
 
 var LicenceManagerModule = angular.module('TDSTM.LicenseManagerModule', [uiRouter]).config(['$stateProvider',  '$translatePartialLoaderProvider',
@@ -24,14 +26,14 @@ var LicenceManagerModule = angular.module('TDSTM.LicenseManagerModule', [uiRoute
     };
 
     $stateProvider
-        .state('licenseManager', {
-            data: {page: {title: 'License Manager', instruction: '', menu: ['ADMINISTER_LICENSES']}},
-            url: '/license/manager',
+        .state('licenseList', {
+            data: {page: {title: 'Administer Licenses', instruction: '', menu: ['ADMIN', 'LICENSE', 'LIST']}},
+            url: '/license/list',
             views: {
                 'headerView@': header,
                 'bodyView@': {
-                    templateUrl: '../app-js/modules/licenseManager/main/LicenseManagerView.html',
-                    controller: 'LicenseManagerController as licenseManager'
+                    templateUrl: '../app-js/modules/licenseManager/list/LicenseList.html',
+                    controller: 'LicenseList as licenseList'
                 }
             }
         });
@@ -41,10 +43,12 @@ var LicenceManagerModule = angular.module('TDSTM.LicenseManagerModule', [uiRoute
 LicenceManagerModule.service('LicenseManagerService', ['$log', 'RestServiceHandler', LicenseManagerService]);
 
 // Controllers
-LicenceManagerModule.controller('LicenseManagerController', ['$log', 'LicenseManagerService', '$uibModal', LicenseManagerController]);
+LicenceManagerModule.controller('LicenseList', ['$log', '$state', 'LicenseManagerService', '$uibModal', LicenseList]);
 
 // Modal - Controllers
-LicenceManagerModule.controller('RequestLicenseController', ['$log', 'LicenseManagerService', '$uibModalInstance', 'params', RequestLicenseController]);
+LicenceManagerModule.controller('RequestLicense', ['$log', 'LicenseManagerService', '$uibModalInstance', 'params', RequestLicense]);
+LicenceManagerModule.controller('CreatedLicense', ['$log', '$uibModalInstance', 'params', CreatedLicense]);
+LicenceManagerModule.controller('LicenseDetail', ['$log', 'LicenseManagerService', '$uibModalInstance', '$uibModal', LicenseDetail]);
 
 
 export default LicenceManagerModule;
