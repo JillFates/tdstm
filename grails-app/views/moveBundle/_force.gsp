@@ -1122,7 +1122,7 @@ function getLinkDistance (link) {
 
 // initializes the progress bar for min cuts
 function displayProgressBar () {
-	var progressBar = tds.ui.progressBar(-1, 999999, function() {}, function() {}, "<h1>Calculating Group Split Suggestion</h1>")
+	var progressBar = tds.ui.progressBar(-1, 999999, function() {}, function() {}, "Calculating Group Split Suggestion")
 	progressBarCancelDisplayed = false
 	
 	return progressBar
