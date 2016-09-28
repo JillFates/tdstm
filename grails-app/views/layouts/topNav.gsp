@@ -279,7 +279,7 @@
                                         <tds:hasPermission permission='DepAnalyzerView'>
                                             <li class="menu-child-item menu-parent-assets-dependency-analyzer">
                                                 <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-                                                    <g:img uri="/icons//brick_magnify.png" width="16" height="16" alt="Dependency Analyzer"/>
+                                                    <g:img uri="/icons/brick_magnify.png" width="16" height="16" alt="Dependency Analyzer"/>
                                                     Dependency Analyzer
                                                 </g:link>
                                             </li>
