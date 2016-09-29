@@ -34,11 +34,6 @@
 		<div id="DependencyGroupsTableId" style="min-width: 1000px;">
 			<div id="dependencyTitle" style="float: left;">
 				<h1>Dependency Analyzer</h1>
-				<div style="position: absolute; margin: -25px 170px 0;">
-					<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
-						<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
-					</g:link>
-				</div>
 			</div>
 			
 			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
