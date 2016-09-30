@@ -20,7 +20,7 @@
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
 		</div>
-		${eventErrorString}
+		${raw(eventErrorString)}
 
 
 
@@ -36,24 +36,24 @@
 			<tr>
 				<td></td>
 				<td>
-					${errorForEventTime}
+					${raw(errorForEventTime)}
 				</td>
 			</tr>
 			<tr>
 				<td></td>
 				<td>
-					${newsBarModeError}
+					${raw(newsBarModeError)}
 				</td>
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green"><b>Staff</b></span>:${clientAccess.toString().replace('[','').replace(']','')}
+				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess.toString().replace('[','').replace(']',''))}
 				</td>
 			</tr>
 			<tr>
 				<td></td>
 				<td>
-					${userLoginError}
+					${raw(userLoginError)}
 				</td>
 			</tr>
 			<tr>
@@ -168,7 +168,7 @@
 			<tr>
 				<td></td>
 				<td>
-					${blankAssets} 
+					${raw(blankAssets)} 
 					 <g:if test="${nullAssetname.size()>0 }">
 						<span style="color: red;margin-left: 50px;"> Blank names: ${nullAssetname.size()} Assets with no name-${nullAssetname.tag.toString().replace('[','').replace(']','')}</span>
 					 </g:if>
@@ -178,7 +178,7 @@
 			<tr>
 				<td></td>
 				<td>
-					${duplicates} <g:each in="${duplicatesAssetNames}" var="duplicate">
+					${raw(duplicates)} <g:each in="${duplicatesAssetNames}" var="duplicate">
 						<span style="margin-left: 50px;">
 							${duplicate.counts} duplicates Named "${duplicate.assetName} "- (${duplicate.type})
 						</span>
@@ -189,7 +189,7 @@
 			<tr>
 				<td></td>
 				<td>
-					${blankAssetTag} 
+					${raw(blankAssetTag)} 
 					<g:if test="${nullAssetTag.size()>0 }">
 						<span style="color: red;margin-left: 50px;"> Blank names: ${nullAssetTag.size()} Assets with no tag- ${nullAssetTag.assetName.toString().replace('[','').replace(']','')}</span>
 					</g:if>
@@ -199,7 +199,7 @@
 			<tr>
 				<td></td>
 				<td>
-					${duplicatesTag} <g:each in="${duplicatesAssetTagNames}"
+					${raw(duplicatesTag)} <g:each in="${duplicatesAssetTagNames}"
 						var="duplicate">
 						<span style="margin-left: 50px"> ${duplicate.counts}
 							duplicates Named "${duplicate.tag}"
@@ -211,7 +211,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${missedRacks}<br />
+					${raw(missedRacks)}<br />
 					<div style="margin-left: 50px; text-align: left;">
 						${missingRacks.toString().replace('[','').replace(']','')}
 					</div>
@@ -220,13 +220,13 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${dependenciesOk}
+					${raw(dependenciesOk)}
 				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${questioned}
+					${raw(questioned)}
 					<div style="margin-left: 50px;">
 						${questionedDependency.toString().replace('[','').replace(']','') }
 					</div>
@@ -235,13 +235,13 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${dependenciesNotValid}
+					${raw(dependenciesNotValid)}
 				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${issue}<br />
+					${raw(issue)}<br />
 					<table style="width: auto; margin-left: 100px;">
 						<tr>
 							<th>AssetName</th>
@@ -277,7 +277,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${eventIssues}<br />
+					${raw(eventIssues)}<br />
 					<table style="width: auto; margin-left: 100px;">
 						<tr>
 							<th>Due Date</th>
@@ -328,7 +328,7 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-						${modelError}
+						${raw(modelError)}
 						<div style="margin-left: 50px">
 							<b>${modelList.toString().replace('[','').replace(']','')}</b>
 						</div>
@@ -371,7 +371,7 @@
 			--%><tr>
 				<td>&nbsp;</td>
 				<td>
-					${userLogin}<br />
+					${raw(userLogin)}<br />
 				<div style="margin-left: 50px">
 						<g:each in="${inValidUsers}" var="user">
 							<b>
@@ -391,7 +391,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${truckError}
+					${raw(truckError)}
 					<div style="margin-left: 50px">
 						${truck.toString().replace('[','').replace(']','')}
 					</div>
@@ -400,7 +400,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${cartError}
+					${raw(cartError)}
 					<div style="margin-left: 50px">
 							${cart.toString().replace('[','').replace(']','')}
 					</div>
@@ -409,7 +409,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${shelfError}
+					${raw(shelfError)}
 					<div style="margin-left: 50px">
 							${shelf.toString().replace('[','').replace(']','')}
 					</div>
