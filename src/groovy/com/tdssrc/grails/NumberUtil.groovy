@@ -57,6 +57,26 @@ class NumberUtil {
 	}
 
 	/**
+	 * Used to convert various types into a Long value. If the value is null then the default 
+	 * value will be used. If the value is less than the minimum it will be set to the minimum
+	 * and likewise with the max value it will be set to the max.
+	 * @param value - the value to be converted to a Long
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @param minVal - the minimum value that can be set
+	 * @param maxVal - the maximum value that can be set
+	 * @return the Long value if valid else null
+	 */
+	static Long toLong(value, defVal, minVal, maxVal) {
+		Long result = toLong(value, defVal)
+		if (result < minVal) {
+			result = minVal
+		} else if (result > maxVal) {
+			result = maxVal
+		}
+		return result
+	}
+
+	/**
 	 * Used to convert various types into a Long value
 	 * @param value - the value to be converted to a Long
 	 * @param defVal - the value to set to if it can't be converted (default null)

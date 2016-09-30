@@ -4472,7 +4472,7 @@ class AssetEntityController {
 	 */
 	def assetListForSelect2() {
 		def results = []
-		def total = 0
+		Long total = 0
 
 		def project = securityService.getUserCurrentProject()
 		if (project) {
@@ -4481,24 +4481,13 @@ class AssetEntityController {
 			// params passed into the request. The query will be constructed with @COLS@ tag that can be substitued when performing
 			// the actual queries.
 
-			// TODO - need to fix this so that the values are handled correctly (reusable too)
-			def max = 10
-			if (params.containsKey('max') && params.max.isInteger()) {
-				max = Integer.valueOf(params.max)
-				if (max > 25)
-					max = 25
-			}
-			def currentPage = 1
-			if (params.containsKey('page') && params.page.isInteger()) {
-				currentPage = Integer.valueOf(params.page)
-				if (currentPage == 0)
-					currentPage = 1
-			}
-			def offset = currentPage == 1 ? 0 : (currentPage - 1) * max
+			Long max = NumberUtil.toLong(params.max, 10, 1, 25)
+			Long currentPage = NumberUtil.toLong(params.page, 10, 1, 1000)
+			Long offset = currentPage == 1 ? 0 : (currentPage - 1) * max
 
 
 			// This map will drive how the query is constructed for each of the various options
-			def qmap = [
+			Map qmap = [
 				'APPLICATION': 		[ assetClass: AssetClass.APPLICATION, domain: Application ],
 				'SERVER-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getServerTypes() ],
 				'DATABASE': 		[ assetClass: AssetClass.DATABASE, domain: Database ],
@@ -4569,7 +4558,7 @@ class AssetEntityController {
 
 				if (total > 0) {
 					def rquery = query.toString().replace('@COLS@', queryColumns)
-					rquery = rquery + " ORDER BY a.assetName"
+					// rquery = rquery + " ORDER BY a.assetName"
 					if (log.isDebugEnabled())
 						log.debug "***** Results Query: $rquery"
 
