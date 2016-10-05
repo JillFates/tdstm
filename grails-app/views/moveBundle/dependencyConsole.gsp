@@ -118,6 +118,70 @@
 				</g:form>
 			</div>
 		</div>
+			<div id="statusColors"  title="Dependency Group Status" style="display: none" class="static-dialog">
+				<div id="statusColorsId">
+					<div class="row">
+						<div class="col-sm-12" style="padding-top: 6px;">
+							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+								<div class="box-header with-border" style="background-color: yellow;">
+									<h3 class="box-title">Conflicts</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+									</div><!-- /.box-tools -->
+								</div><!-- /.box-header -->
+								<div class="box-body" style="display: none;">
+									Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or more assets are assigned to different bundles/events or one or more assets' dependency status is set to Questioned or Unknown.
+								</div><!-- /.box-body -->
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+								<div class="box-header with-border" style="background-color: #e0e0e0;">
+									<h3 class="box-title">Pending</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+									</div><!-- /.box-tools -->
+								</div><!-- /.box-header -->
+								<div class="box-body" style="display: none;">
+									Grey indicates that there are no outstanding conflicts but the dependency Validation needs to be set to Bundle Ready in order to become Ready to Bundle.
+								</div><!-- /.box-body -->
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+								<div class="box-header with-border" style="background-color: lightgreen;">
+									<h3 class="box-title">Ready to Bundle</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+									</div><!-- /.box-tools -->
+								</div><!-- /.box-header -->
+								<div class="box-body" style="display: none;">
+									Green indicates that the assets in the group are Ready to be assigned to bundles.
+								</div><!-- /.box-body -->
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+								<div class="box-header with-border" style="background-color: #5f9fcf;">
+									<h3 class="box-title">Completed</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+									</div><!-- /.box-tools -->
+								</div><!-- /.box-header -->
+								<div class="box-body" style="display: none;">
+									Blue indicates that the work flow process of bundling assets has been completed for the group of assets. There are no conflicts and all of the assets in the group have been assigned to common bundles (in same event).
+								</div><!-- /.box-body -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		<div style="float:left;">
 			<div id="items1" style="display: none"></div>
 			<div id="spinnerDivId" class="containsSpinner" style="display: none"></div>
@@ -241,6 +305,21 @@
 				}
 				
 			}
+
+			function openStatusColors() {
+				$("#statusColors").dialog({ autoOpen: false, resizable: false });
+				$("#statusColors").dialog('option', 'width', '480px');
+				$("#statusColors").dialog('option', 'modal', 'true');
+				$("#statusColors").dialog('option', 'position', ['center', 60]);
+				$("#statusColors").dialog('open');
+				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+				$("#statusColors").show();
+
+				$("#btnCloseStatusColors").click(function () {
+					$("#statusColors").dialog('close');
+				});
+			}
+
 			function listUpdate(e){
 				var resp = e.responseText;
 				$('#items1').html(resp);

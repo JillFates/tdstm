@@ -36,7 +36,7 @@
 		<div id="dependencyDivId" style="overflow-x:auto;">
 			<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0px;">
 				<tr id="dependencyGroupsRowId" class="odd">
-					<td class="labelColumn"><b>Group</b></td>
+					<td class="labelColumn"><b>Group</b> <i class="fa fa-fw fa-question-circle" style="font-size: 14px; cursor: pointer;" onclick="openStatusColors()"></i></td>
 					<td id="span_all" class="pointer" onclick="getList($('#tabTypeId').val(), null)" title="All Groups:&#013;Apps: &Tab;${gridStats.app[0]}&#013;Servers: &Tab;${gridStats.server[0] + gridStats.vm[0]}&#013;DBs: &Tab;${gridStats.db[0]}&#013;Storage: &Tab;${gridStats.storage[0]}">
 						<span class="depGroup">All</span>
 					</td>
