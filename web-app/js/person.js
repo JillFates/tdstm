@@ -192,8 +192,52 @@ var Person = function () {
 			}
 		});
 	}
-	
 
+
+	/**
+	 * Validate person form
+	 */
+	function validatePersonForm(form) {
+		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+		var mobileExp=/^([0-9 +-])+$/
+		var returnVal = true
+		var allFields = $("form[name = "+form+"] input[type = 'text']");
+
+		jQuery.each(allFields , function(i, field) {
+			field.value= $.trim(field.value)
+		});
+
+		var firstName = $(
+			"form[name = "+form+"] input[name = 'firstName']")
+			.val()
+		var email = $(
+			"form[name = "+form+"] input[name = 'email']")
+			.val()
+		var workPhone = $(
+			"form[name = "+form+"] input[name = 'workPhone']")
+			.val().replace(/[\(\)\.\-\ ]/g, '')
+		var mobilePhone = $(
+			"form[name = "+form+"] input[name = 'mobilePhone']")
+			.val().replace(/[\(\)\.\-\ ]/g, '')
+		if (!firstName) {
+			alert("First Name should not be blank ")
+			returnVal = false
+		}
+		if (email && !emailExp.test(email)) {
+			alert(email + " is not a valid e-mail address ")
+			returnVal = false
+		}
+		if (workPhone && !(mobileExp.test(workPhone))) {
+			alert("The Work phone number contains illegal characters.");
+			returnVal = false
+		}
+		if (mobilePhone && !(mobileExp.test(mobilePhone))) {
+			alert("The Mobile phone number contains illegal characters.");
+			returnVal = false
+		}
+		return returnVal
+	}
+	
 	// performs the person merge
 	var mergePerson = function () {
 		var returnStatus =  confirm('This will merge the selected Person');
