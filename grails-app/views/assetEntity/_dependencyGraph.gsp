@@ -31,15 +31,20 @@ $(document).ready(function() {
 	
 	// handle applying the legend twistie preferences
 	var legendTwistiePref = '${legendTwistiePref}'
-	var twisties = $('#legendDivId #twistieSpanId')
 	var twistieDivs = $('#legendDivId .twistieControlledDiv')
-	for (var i = 0; i < legendTwistiePref.length; ++i) {
-		var pref = legendTwistiePref[i]
-		if (pref == '0' && twisties.length > i) {
-			$(twisties[i]).addClass('closed').removeClass('open')
-			$(twistieDivs[i]).css('display','none')
+	if(legendTwistiePref && legendTwistiePref.length > 0) {
+		legendTwistiePref = legendTwistiePref.split(',');
+		for (var i = 0; i < legendTwistiePref.length; ++i) {
+			//debugger;
+			var pref = legendTwistiePref[i];
+			var selectedTwisty = $("#legendDivId #twistieSpanId[groupType="+pref+"]");
+			if (selectedTwisty && selectedTwisty.length > 0) {
+				$(selectedTwisty).addClass('open').removeClass('closed');
+				$('#'+selectedTwisty.attr('for')).css('display','block');
+			}
 		}
 	}
+
 	
 	// add bindings to the filtering selects to set their corresponding radio buttons when clicked on
 	$('#filterOptionsMenuId .optionRow select').click(function () {

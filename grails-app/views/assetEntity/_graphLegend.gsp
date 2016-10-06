@@ -3,7 +3,7 @@
 	<table cellpadding="0" cellspacing="0">
 		<tr id="twistieRowId">
 			<td class="noPadding">
-				<span id="twistieSpanId" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="assetClassesContainerId">
+				<span id="twistieSpanId" groupType="ac" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="assetClassesContainerId">
 					Asset Classes
 					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
@@ -11,7 +11,7 @@
 		</tr>
 	</table>
 	<!-- The list of asset classes with their icons -->
-	<div id="assetClassesContainerId" class="twistieControlledDiv">
+	<div id="assetClassesContainerId" class="twistieControlledDiv" style="display: none;">
 		<table cellpadding="0" cellspacing="0">
 			<g:each in="${assetTypes}" var="entry" status="i">
 				<g:set var="type" value="${entry.getKey()}" />
@@ -33,7 +33,7 @@
 		<tr><td colspan="3" class="noPadding"><br /></td></tr> <!-- Spacer -->
 		<tr id="twistieRowId">
 			<td class="noPadding">
-				<span id="twistieSpanId" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="dependencyTypeContainerId">
+				<span id="twistieSpanId" groupType="de" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="dependencyTypeContainerId">
 					Dependencies
 					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
@@ -41,7 +41,7 @@
 		</tr>
 	</table>
 	<!-- The list of dependency line types with examples of each -->
-	<div id="dependencyTypeContainerId" class="twistieControlledDiv">
+	<div id="dependencyTypeContainerId" class="twistieControlledDiv" style="display: none;">
 		<table cellpadding="0" cellspacing="0">
 			<g:set var="arrowheadOffset" value="${params.arrowheadOffset ? 45 : 40}" />
 			<g:each in="${[['Standard','Valid Links'],['notApplicable','N/A'],['unresolved','Questioned'],['future','Future']]}" var="item" status="i">
@@ -61,56 +61,13 @@
 			</g:if>
 		</table>
 	</div>
-	
-	<g:if test="${params.showDependencyGroupColors}">
-		<!-- The twistie for the dependency group colors section -->
-		<table cellpadding="0" cellspacing="0">
-			<tr><td colspan="3" class="noPadding"><br /></td></tr> <!-- Spacer -->
-			<tr id="twistieRowId">
-				<td class="noPadding">
-					<span id="twistieSpanId" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="dependencyGroupContainerId">
-						Dependency Group Status
-						<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
-					</span>
-				</td>
-			</tr>
-		</table>
-		<!-- The list of dependency group colors -->
-		<div id="dependencyGroupContainerId" class="twistieControlledDiv">
-			<table cellpadding="0" cellspacing="0">
-				<tr>
-					<td>
-					<span class="depLabel depGroupConflict">Conflicts</span>
-					<span class="toolTipButton" title="" data-toggle="popover" data-trigger="hover" data-content="Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or more assets are assigned to different bundles/events or one or more assets' dependency status is set to Questioned or Unknown."></span>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<span class="depLabel depGroupPending">Pending</span>
-						<span class="toolTipButton" title="" data-toggle="popover" data-trigger="hover" data-content="Grey indicates that there are no outstanding conflicts but the dependency Validation needs to be set to Bundle Ready in order to become Ready to Bundle."></span>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<span class="depLabel depGroupReady">Ready to Bundle</span>
-						<span class="toolTipButton" title="" data-toggle="popover" data-trigger="hover" data-content="Green indicates that the assets in the group are Ready to be assigned to bundles."></span>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<span class="depLabel depGroupDone">Completed</span>
-						<span class="toolTipButton" title="" data-toggle="popover" data-trigger="hover" data-content="Blue indicates that the work flow process of bundling assets has been completed for the group of assets. There are no conflicts and all of the assets in the group have been assigned to common bundles (in same event)."></span>
-					</td>
-				</tr>
-			</table>
-		</div>
-	</g:if>
+
 	<!-- The twistie for the color grouping section -->
 	<table id="colorKeyLabelId" class="hidden" cellpadding="0" cellspacing="0">
 		<tr><td colspan="3" class="noPadding"><br /></td></tr> <!-- Spacer -->
 		<tr id="twistieRowId">
 			<td class="noPadding">
-				<span id="twistieSpanId" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="colorGroupingContainerId">
+				<span id="twistieSpanId" groupType="hb" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="colorGroupingContainerId">
 					<p>Move Bundles</p>
 					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
@@ -118,7 +75,7 @@
 		</tr>
 	</table>
 	<!-- The list of groups and their colors -->
-	<div id="colorGroupingContainerId" class="twistieControlledDiv">
+	<div id="colorGroupingContainerId" class="twistieControlledDiv" style="display: none;">
 		<table id="colorGroupingTableId" cellpadding="0" cellspacing="0">
 			<tr id="colorKeyTemplateId" class="hidden">
 				<td class="bundleColorExample">

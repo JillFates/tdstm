@@ -215,7 +215,7 @@
 		</table>
 	</div>
 	<!-- The legend div containing information about the shapes and colors used in the graph -->
-	<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:false, displayCycles:false, displayBundleConflicts:true, arrowheadOffset:true, displayCuts:true, legendTwistiePref:legendTwistiePref, showDependencyGroupColors:true]}" />
+	<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:false, displayCycles:false, displayBundleConflicts:true, arrowheadOffset:true, displayCuts:true, legendTwistiePref:legendTwistiePref]}" />
 	
 </div>
 

@@ -88,13 +88,20 @@ class UserPreferenceService {
 		legendTwistieState: [
 			type: 'string',
 			validator: {
-				def prefs = it.toCharArray()
+				def prefs = it.split(',')
+				log.info prefs
+				log.info prefs.length
+				if(prefs.length == 0)
+					return true // it means is just empty (nothing open)
+
+				def validGroup = ['ac','de','hb'] // ac:Asset Classes, de: Dependencies, hb: Highlight By
+
 				prefs.each { pref ->
-					if (pref != '0' && pref != '1')
-						return false
+					if (!(prefs in validGroup))
+						return false // Value passed doesn't exist
 				}
 
-				if (prefs.length > 4)
+				if (prefs.length > 3)
 					return false
 
 				return true

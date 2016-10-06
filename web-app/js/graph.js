@@ -418,16 +418,14 @@ var GraphUtil = (function ($) {
 		force.start();
 	}
 	
-	// generates the prefernce value for the current legend twistie state
+	// generates the preference value for the current legend twistie state
 	public.serializeLegendTwistiePrefs = function () {
-		var twisties = $('#legendDivId #twistieSpanId')
-		var pref = ''
+		var twisties = $('#legendDivId #twistieSpanId'); // '#' means ONE! ONLY ONE!
+		var pref = [];
 		for (var i = 0; i < twisties.length; ++i)
 			if ($(twisties[i]).hasClass('open'))
-				pref = pref + '1'
-			else
-				pref = pref + '0'
-		return pref
+				pref.push($(twisties[i]).attr('groupType'));
+		return pref.join(',');
 	}
 	
 	
