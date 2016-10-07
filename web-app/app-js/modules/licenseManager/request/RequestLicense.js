@@ -4,7 +4,7 @@
 
 'use strict';
 
-export default class RequestLicenseController {
+export default class RequestLicense {
 
     constructor($log, licenseManagerService, $uibModalInstance, params) {
         this.licenseManagerService = licenseManagerService;

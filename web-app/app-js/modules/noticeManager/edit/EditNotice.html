@@ -1,0 +1,51 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <button ng-click="requestLicense.cancelCloseDialog()" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">{{editNotice.action}} Notice</h4>
+    </div>
+    <div class="modal-body">
+        <form name="editNoticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="inputTitle" class="col-sm-3 control-label">Title: <span class="required_field">*</span></label>
+                    <div class="col-sm-9">
+                        <input type="text" name="inputTitle" id="inputTitle" class="form-control" placeholder="Notice Title" ng-model="editNotice.editModel.title" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="selectType" class="col-sm-3 control-label">Type: <span class="required_field">*</span></label>
+                    <div class="col-sm-9">
+                        <select kendo-combo-box
+                                k-placeholder="'Select a Type'"
+                                k-filter="'contains'"
+                                k-data-text-field="'name'"
+                                k-data-value-field="'typeId'"
+                                k-data-source="editNotice.typeDataSource"
+                                ng-model="editNotice.editModel.typeId"
+                                id="selectType"
+                                class="form-control"
+                                required >
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="checkActive"  class="col-sm-3 control-label">Active:</label>
+                    <div class="col-sm-9 checkbox">
+                        <label>
+                            <input id="checkActive" type="checkbox" ng-model="editNotice.editModel.active">
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" >
+                    <div class="col-sm-12">
+                        <textarea kendo-editor k-tools="editNotice.kendoEditorTools" k-ng-model="editNotice.editModel.noticeBody" style="height: 400px;"></textarea>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        </form>
+    </div>
+    <div class="modal-footer" class="form-group">
+        <button ng-click="editNotice.saveNotice()" type="submit" class="btn btn-primary pull-left" ng-disabled="editNoticeForm.$invalid"><span class="glyphicon glyphicon-ok"></span> Save</button>
+        <button ng-click="editNotice.cancelCloseDialog()" type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+    </div>
+</div>

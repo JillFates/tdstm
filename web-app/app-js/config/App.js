@@ -20,6 +20,7 @@ import HTTPModule from '../services/http/HTTPModule.js';
 import RestAPIModule from '../services/RestAPI/RestAPIModule.js'
 import HeaderModule from '../modules/header/HeaderModule.js';
 import LicenseManagerModule from '../modules/licenseManager/LicenseManagerModule.js';
+import NoticeManagerModule from '../modules/noticeManager/NoticeManagerModule.js';
 import TaskManagerModule from '../modules/taskManager/TaskManagerModule.js';
 
 var ProviderCore = {};
@@ -37,7 +38,8 @@ var TDSTM = angular.module('TDSTM', [
     RestAPIModule.name,
     HeaderModule.name,
     TaskManagerModule.name,
-    LicenseManagerModule.name
+    LicenseManagerModule.name,
+    NoticeManagerModule.name
 ]).config([
     '$logProvider',
     '$rootScopeProvider',

@@ -1,0 +1,20 @@
+[
+  {
+    "noticeId": 1,
+    "title": "Warning before login",
+    "type": "Prelogin",
+    "active": "Yes",
+    "project": "ALL",
+    "noticeBody": "<h4>Example Title</h4> <p> Example body </p>",
+    "acknowledge": "No"
+  },
+  {
+    "noticeId": 2,
+    "title": "Post warning",
+    "type": "Postlogin",
+    "active": "No",
+    "project": "ALL",
+    "noticeBody": "<h4>Example Title 2</h4> <p> Example body 2 </p>",
+    "acknowledge": "No"
+  }
+]
