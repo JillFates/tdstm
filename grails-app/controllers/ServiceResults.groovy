@@ -3,8 +3,6 @@ import grails.converters.JSON
 
 /**
  * Utility class for creating HTTP resposes
- *
- * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 class ServiceResults {
 
@@ -88,7 +86,7 @@ class ServiceResults {
 		def renderMap = [:]
 		renderMap.status = 'warning'
 		if (warnStringOrList instanceof List) {
-			renderMap.errors = warnStringOrList
+			renderMap.warnings = warnStringOrList
 		} else {
 			renderMap.warnings = [ warnStringOrList ]
 		}
@@ -117,9 +115,10 @@ class ServiceResults {
 	}
 
 	/**
-	 * Used to respond to the browser via the servlet response by returning an object formatted as JSON
+	 * Used to respond to the browser via the servlet response by returning a file contained
+	 * as JSON
 	 * @param response - the servlet response object
-	 * @param object - the object to be rendered as JSON
+	 * @param file - a file to stream back to the browser directly
 	 */
 	static respondAsJson(response, File file) {
 		response.setStatus(200)
