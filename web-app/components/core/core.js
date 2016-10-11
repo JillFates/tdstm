@@ -887,6 +887,7 @@ tds.core.directive.DurationPicker = function(utils) {
 				if (duration || duration == 0) {
 					var startDate = moment().startOf('day');
 					var endDate = moment().startOf('day');
+
 					endDate.add(scope.scale.toLowerCase(), duration);
 
 					var duration = moment.duration(endDate.diff(startDate));
@@ -897,9 +898,19 @@ tds.core.directive.DurationPicker = function(utils) {
 
 					modifyLockDuration = false;
 
-					ngModelCtrl.$setViewValue((scope.durationpicker.day * 8.64e+7) + (scope.durationpicker.hour * 3.6e+6) + (scope.durationpicker.minutes * 60000));
+					updateNGModel();
 
 				}
+			}
+
+
+			var updateNGModel = function() {
+				// Update Model to ms for start/end date
+				ngModelCtrl.$setViewValue(
+					(scope.durationpicker.day * 8.64e+7) +
+					(scope.durationpicker.hour * 3.6e+6) +
+					(scope.durationpicker.minutes * 60000) // Update Model to ms for start/end date
+				);
 			}
 
 			var updateView = function() {
@@ -923,13 +934,12 @@ tds.core.directive.DurationPicker = function(utils) {
 
 			scope.$watch('durationpicker', function(nVal, oVal) {
 				if (nVal && (nVal != oVal) ) {
-					ngModelCtrl.$setViewValue((scope.durationpicker.day * 8.64e+7) + (scope.durationpicker.hour * 3.6e+6) + (scope.durationpicker.minutes * 60000));
+					updateNGModel();
 					if(modifyLockDuration) {
 						scope.durationLocked = true;
 					}
 					modifyLockDuration = true;
 				}
-
 			}, true);
 
 			scope.$watch('duration', function(nVal, oVal) {
