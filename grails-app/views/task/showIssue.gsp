@@ -78,7 +78,7 @@
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" >
-					${assignToSelect}
+					${raw(assignToSelect)}
 				</td>
 			</tr> 
 			<g:if test="${assetComment.estStart}">	
