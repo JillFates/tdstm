@@ -9,8 +9,13 @@ class WsNoticeController{
 
 	public fetch(){
 		try {
-			def json = request.JSON
-			def type = Notice.NoticeType.valueOf(json.type)
+			def sType = params.type
+			Notice.NoticeType type = null
+
+			if(sType){
+				type = Notice.NoticeType.valueOf(pType)
+			}
+
 			def list = noticeService.fetch(type)
 			render( [notices: list] as JSON )
 		}catch(Exception e){
@@ -60,8 +65,7 @@ class WsNoticeController{
 
 	public delete(){
 		try {
-			def json = request.JSON
-			def result = noticeService.delete(json.id)
+			def result = noticeService.delete(params.id)
 
 			if (!result) {
 				response.status = 404

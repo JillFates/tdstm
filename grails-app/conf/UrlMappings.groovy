@@ -220,7 +220,8 @@ class UrlMappings {
 		"/ws/notices/$id" {
 			controller = "wsNotice"
 			action = [
-					GET:  "get"
+					GET:  "get",
+					DELETE: "delete"
 			]
 		}
 
@@ -228,8 +229,7 @@ class UrlMappings {
 			controller = "wsNotice"
 			action = [
 					GET:  "fetch",
-					POST: "save",
-					DELETE:"delete"
+					POST: "save"
 			]
 		}
 

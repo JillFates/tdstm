@@ -61,7 +61,7 @@ class NoticeService {
 	/**
 	 * Deletes a single Notice record
 	 */
-	public delete(Long id){
+	public delete(id){
 		if(id != null) {
 			Notice notice = Notice.get(id)
 			if (notice) {
