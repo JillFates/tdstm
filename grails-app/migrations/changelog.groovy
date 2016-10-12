@@ -136,4 +136,5 @@ databaseChangeLog = {
 	include file: "20160817-delete-source-target-team-eav-attributes.groovy"
 	include file: "20160909-add-duration-locked-to-tasks.groovy"
 	include file: "20161006-update-user-preference-code-legendTwistieState.groovy"
+	include file: "20161010-notice-support.groovy"
 }

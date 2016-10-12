@@ -216,6 +216,24 @@ class UrlMappings {
 			]
 		}
 
+		///// NOTICES API /////////
+		"/ws/notices/$id" {
+			controller = "wsNotice"
+			action = [
+					GET:  "get"
+			]
+		}
+
+		"/ws/notices" {
+			controller = "wsNotice"
+			action = [
+					GET:  "fetch",
+					POST: "save",
+					DELETE:"delete"
+			]
+		}
+
+
 		//ROOT map to the auth/index action
 		"/"(controller: "auth")
 
