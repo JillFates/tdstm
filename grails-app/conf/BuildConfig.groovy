@@ -54,7 +54,7 @@ grails.project.dependency.resolution = {
 		compile ':shiro-protect-any:0.1.0'  //@tavo_luna: shiro protection for grails-melody
 
 		runtime ':database-migration:1.4.0'
-		runtime ':grails-melody:1.59.0'
+		runtime ':grails-melody:1.54.0'
 		runtime ':hibernate4:4.3.10'
 		runtime ':jmesa:2.0.4-SNAPSHOT-0.1'
 		runtime ':jqgrid:3.8.0.1'
