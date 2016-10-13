@@ -307,7 +307,6 @@
 .menu3 {
 	width:100%;
 	height:auto;
-	float:left;
 	margin-top:0px;
 }
 
@@ -795,16 +794,14 @@ div.tableContainer thead th a {
 	background-color: #FFCCCC;
 	border: 1px solid #CD3333;
 }
-#head_crawler{
-	border:1px solid #cccccc;
-}
+
 #head_mycrawler {
 	float: left;
 }
 #crawlerHead {
 	float: left;
 	width: auto;
-	margin-top: 7px;
+	margin-top: 4px;
 	text-align: right;
 }
 .statusbar_good{
@@ -813,6 +810,7 @@ div.tableContainer thead th a {
 	font-size:12px;
 	font-weight:bold;
 	color:#FFFFFF;
+	padding-left: 20px;
 }
 	
 .statusbar_bad{

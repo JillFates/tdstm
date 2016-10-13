@@ -181,8 +181,6 @@ function marqueeInit(config){
   this.c.removeAttribute('id', 0);
   this.m[1].style.left = this.w + 'px';
   s = this.mq.moveatleast? Math.max(this.mq.moveatleast, this.sinc) : (this.sinc || this.mq.inc);
-  while(this.c.offsetWidth > this.w - s)
-   this.c.style.width = isNaN(this.cw[0])? this.w - s + 'px' : --this.cw[0] + this.cw[1];
   this.c.style.visibility = 'visible';
   this.runit();
   }
@@ -236,8 +234,6 @@ function marqueeInit(config){
     s = m.mq.moveatleast? Math.max(m.mq.moveatleast, m.sinc) : (m.sinc || m.mq.inc);
     m.c.style.width = m.mq.style.width;
     m.cw[0] = m.cw.length > 1? parseInt(m.mq.style.width) : 'a';
-    while(m.c.offsetWidth > m.w - s)
-     m.c.style.width = isNaN(m.cw[0])? m.w - s + 'px' : --m.cw[0] + m.cw[1];
    }
   }
  }
