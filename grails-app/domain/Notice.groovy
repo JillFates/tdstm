@@ -97,8 +97,6 @@ class Notice {
                 def type = prop.type
                 def value = it[name]
 
-                println("$name : $value")
-
                 if(value != null){
                     switch(type){
                         case NoticeType:
