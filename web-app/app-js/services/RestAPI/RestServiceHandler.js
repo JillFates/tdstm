@@ -18,6 +18,14 @@ export default class RestServiceHandler {
         this.resource = $resource;
         this.prepareHeaders();
         this.log.debug('RestService Loaded');
+        this.postReq = {
+            method: 'POST',
+            url: '',
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            data: []
+        };
     }
 
     prepareHeaders() {
@@ -55,7 +63,9 @@ export default class RestServiceHandler {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/NoticeManager/noticeManagerList.json'), callback);
             },
             createNotice: (data, callback) => {
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../ws/notices', data), callback);
+                this.postReq.url =  '../ws/notices';
+                this.postReq.data = data;
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.postReq), callback);
             },
             editNotice: (data, callback) => {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/NoticeManager/noticeManagerList.json', data), callback);

@@ -53,6 +53,7 @@ export default class EditNotice {
     saveNotice() {
         this.log.info(this.action + ' Notice Requested: ', this.editModel);
         this.editModel.rawText = $('#kendo-editor-create-edit').text();
+        this.editModel.typeId = parseInt(this.editModel.typeId);
         if(this.action === this.actionType.NEW) {
             this.noticeManagerService.createNotice(this.editModel, (data) => {
                 this.uibModalInstance.close(data);
