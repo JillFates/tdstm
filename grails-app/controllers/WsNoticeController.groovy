@@ -7,13 +7,18 @@ import grails.converters.JSON
 class WsNoticeController{
 	NoticeService noticeService
 
+	/**
+	 * Fetch using pType
+	 * We might expand this to add different tipe of filters
+	 * @return
+	 */
 	public fetch(){
 		try {
-			def sType = params.type
+			Integer typeId = params.typeId
 			Notice.NoticeType type = null
 
-			if(sType){
-				type = Notice.NoticeType.valueOf(pType)
+			if(typeId){
+				type = Notice.NoticeType.forId(typeId)
 			}
 
 			def list = noticeService.fetch(type)
@@ -24,6 +29,10 @@ class WsNoticeController{
 		}
 	}
 
+	/**
+	 * Get Notice By ID
+	 * @return
+	 */
 	public get(){
 		try {
 			def notice = noticeService.get(params.id)
@@ -39,13 +48,15 @@ class WsNoticeController{
 	}
 
 	/**
-	 * Example
-	 {
-	 "title":"titulo",
-	 "rawText":"este es el Mensaje",
-	 "htmlText":"<strong>este es el Mensaje</strong>",
-	 "type":"Prelogin"
-	 }
+	 * Insert/Update Notice
+	 *
+	 * Example:
+	 * {
+	 * 		"title":"titulo",
+	 * 		"rawText":"este es el Mensaje",
+	 * 		"htmlText":"<strong>este es el Mensaje</strong>",
+	 * 		"type":"Prelogin"
+	 * }
 	 * @return
 	 */
 	public save(){
@@ -63,6 +74,10 @@ class WsNoticeController{
 		}
 	}
 
+	/**
+	 * Deletes an existing Notice
+	 * @return
+	 */
 	public delete(){
 		try {
 			def result = noticeService.delete(params.id)

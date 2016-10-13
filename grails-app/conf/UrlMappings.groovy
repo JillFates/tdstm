@@ -221,7 +221,8 @@ class UrlMappings {
 			controller = "wsNotice"
 			action = [
 					GET:  "get",
-					DELETE: "delete"
+					DELETE: "delete",
+					PUT: "update"
 			]
 		}
 

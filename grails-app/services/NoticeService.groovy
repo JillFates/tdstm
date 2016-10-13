@@ -30,26 +30,46 @@ class NoticeService {
 	}
 
 	public save(json){
-		Notice notice= new Notice();
+		def id = json.id
+
+		Notice notice
+		if(id){
+			notice = get(id)
+		}else{
+			notice = new Notice()
+		}
+
 
 		[
-			[prop:"title",           type:String.class],
-			[prop:"rawText",         type:String.class],
-			[prop:"htmlText",        type:String.class],
-			[prop:"type",            type:String.class],
-			[prop:"acknowledgeable", type:String.class],
-			[prop:"active",          type:Boolean.class],
-			[prop:"project",         type:String.class],
-			[prop:"activationDate",  type:Date.class],
-			[prop:"expirationDate",  type:Date.class],
+				[prop:"title",           type:String],
+				[prop:"rawText",         type:String],
+				[prop:"htmlText",        type:String],
+				[prop:"typeId",          type:Notice.NoticeType],
+				[prop:"acknowledgeable", type:String],
+				[prop:"active",          type:Boolean],
+				[prop:"projectId",       type:Project],
+				[prop:"activationDate",  type:Date],
+				[prop:"expirationDate",  type:Date],
 		].each { prop ->
 			def p = prop.prop
 			def t = prop.type
 			def val = json[p]
 			if(val != null){
-				if(t == Date.class){
-					val = javax.xml.bind.DatatypeConverter.parseDateTime(val).getTime()
+				switch (t){
+					case Date:
+							val = javax.xml.bind.DatatypeConverter.parseDateTime(val).getTime()
+							break
+
+					case Notice.NoticeType:
+							val = Notice.NoticeType.forId(val)
+							break
+
+					case Project:
+							val = Project.get(val)
+							break
+
 				}
+
 				notice[p] = val
 			}
 		}

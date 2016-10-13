@@ -4,7 +4,14 @@
 
 class Notice {
     public enum NoticeType {
-        Prelogin, Postlogin, General
+        Prelogin(1), Postlogin(2), General(3)
+
+        final int id
+        private NoticeType(int id) { this.id = id }
+
+        static NoticeType forId(int id) {
+            return NoticeType.values().find { it.id == id }
+        }
     }
 
     // The title of the notice
@@ -16,7 +23,7 @@ class Notice {
     // The rendered HTML from the Richtext editor
     String htmlText
 
-    NoticeType type
+    NoticeType typeId
 
     // Flag if the notice can be acknowledged by the user and hidden
     Boolean acknowledgeable = false
@@ -67,6 +74,63 @@ class Notice {
             dateCreated = lastModified
         }
     }
+
+    static {
+        grails.converters.JSON.registerObjectMarshaller(Notice) {
+            def json = [:]
+
+            [
+                [name: "id",              type:Object],
+                [name: "acknowledgeable", type:Object],
+                [name: "active",          type:Object],
+                [name: "dateCreated",     type:Object],
+                [name: "expirationDate",  type:Object],
+                [name: "htmlText",        type:Object],
+                [name: "lastModified",    type:Object],
+                [name: "rawText",         type:Object],
+                [name: "title",           type:Object],
+                [name: "typeId",          type:NoticeType],
+                [name: "createdBy",       type:Person],
+                [name: "project",         type:Project]
+            ].each { prop ->
+                def name = prop.name
+                def type = prop.type
+                def value = it[name]
+
+                println("$name : $value")
+
+                if(value != null){
+                    switch(type){
+                        case NoticeType:
+                            value = value.id
+                            break
+
+                        case Person:
+                            def createdBy = value
+                            value = [
+                                id: createdBy.id,
+                                fullname: createdBy.toString()
+                            ]
+                            break
+
+                        case Project:
+                            def project = value
+                            value = [
+                                    id: project.id,
+                                    code: project.projectCode,
+                                    name: project.name
+                            ]
+                            break
+                    }
+                    
+                    json[name] = value
+                }
+            }
+
+            return json
+        }
+    }
+
 
 }
 

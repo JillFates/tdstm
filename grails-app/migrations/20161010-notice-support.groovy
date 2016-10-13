@@ -12,7 +12,7 @@ databaseChangeLog = {
 				tableExists(schemaName:'tdstm', tableName:'notice')
 			}
 		}
-		//Changing  'key' column name as 'fi_key' cause 'key' is a reserved keyword in MYSQL
+
 		sql("""
 			  CREATE TABLE `notice` (
 				  `notice_id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -45,7 +45,7 @@ databaseChangeLog = {
 				tableExists(schemaName:'tdstm', tableName:'notice_acknowledgment')
 			}
 		}
-		//Changing  'key' column name as 'fi_key' cause 'key' is a reserved keyword in MYSQL
+
 		sql("""
 			  CREATE TABLE `notice_acknowledgment` (
 				  `id` bigint(20) NOT NULL AUTO_INCREMENT,
