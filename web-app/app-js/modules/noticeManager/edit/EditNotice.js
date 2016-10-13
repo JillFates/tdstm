@@ -25,9 +25,10 @@ export default class EditNotice {
         this.getTypeDataSource();
         this.editModel = {
             title: '',
-            typeId: null,
+            typeId: 0,
             active: false,
-            noticeBody: ''
+            htmlText: '',
+            rawText: ''
         }
 
         if(params.notice) {
@@ -41,7 +42,8 @@ export default class EditNotice {
     getTypeDataSource() {
         this.typeDataSource = [
             {typeId: 1, name: 'Prelogin'},
-            {typeId: 2, name: 'Postlogin'}
+            {typeId: 2, name: 'Postlogin'}//,
+            //{typeId: 3, name: 'General'}
         ];
     }
 
@@ -50,7 +52,7 @@ export default class EditNotice {
      */
     saveNotice() {
         this.log.info(this.action + ' Notice Requested: ', this.editModel);
-
+        this.editModel.rawText = $('#kendo-editor-create-edit').text();
         if(this.action === this.actionType.NEW) {
             this.noticeManagerService.createNotice(this.editModel, (data) => {
                 this.uibModalInstance.close(data);

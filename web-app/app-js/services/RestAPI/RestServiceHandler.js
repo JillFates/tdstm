@@ -49,13 +49,13 @@ export default class RestServiceHandler {
     noticeManagerServiceHandler() {
         return {
             getNoticeList: (data, callback) => { // real ws example
-                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/cookbook/recipe/list?archived=n&context=All&rand=oDFqLTpbZRj38AW'), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/notices'), callback);
             },
             getNoticeMockUp: (callback) => { // Mockup Data for testing see url
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/NoticeManager/noticeManagerList.json'), callback);
             },
             createNotice: (data, callback) => {
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/NoticeManager/noticeManagerList.json', data), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../ws/notices', data), callback);
             },
             editNotice: (data, callback) => {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/NoticeManager/noticeManagerList.json', data), callback);

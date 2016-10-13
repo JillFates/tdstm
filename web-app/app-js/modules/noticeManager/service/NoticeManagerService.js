@@ -13,12 +13,6 @@ export default class NoticeManagerService {
         this.log.debug('NoticeManagerService Instanced');
     }
 
-    testService(callback) {
-        this.restService.noticeManagerServiceHandler().getNoticeMockUp((data) => {
-            return callback(data);
-        });
-    }
-
     getNoticeList(callback) {
         this.restService.noticeManagerServiceHandler().getNoticeList((data) => {
             return callback(data);

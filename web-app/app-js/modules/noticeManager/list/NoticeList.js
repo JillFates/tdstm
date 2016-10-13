@@ -18,7 +18,6 @@ export default class NoticeList {
         this.uibModal = $uibModal;
 
         this.getDataSource();
-        this.getLicenseList();
         this.log.debug('LicenseList Instanced');
     }
 
@@ -32,7 +31,7 @@ export default class NoticeList {
             },
             columns: [
                 {field: 'noticeId', hidden: true },
-                {field: 'rawText', hidden: true },
+                {field: 'htmlText', hidden: true },
                 {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="noticeList.onEditCreateNotice(noticeList.actionType.EDIT, this)"><span class="glyphicon glyphicon-edit"></span></button>' },
                 {field: 'title', title: 'Title'},
                 {field: 'type', title: 'Project'},
@@ -45,7 +44,7 @@ export default class NoticeList {
                 pageSize: 10,
                 transport: {
                     read: (e) => {
-                        this.noticeManagerService.testService((data) => {
+                        this.noticeManagerService.getNoticeList((data) => {
                             e.success(data);
                         });
                     }
@@ -77,13 +76,5 @@ export default class NoticeList {
             this.log.info(action + ' Request Canceled.');
         });
     }
-
-
-    getLicenseList() {
-        this.noticeManagerService.getNoticeList((data) => {
-            this.log.info(data);
-        });
-    }
-
 
 }
