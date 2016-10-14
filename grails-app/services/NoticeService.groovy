@@ -23,7 +23,7 @@ class NoticeService {
 			def g = new ValidationTagLib()
 			result.data.errors = notice.errors.allErrors.collect{g.message([error : it])}
 		}else{
-			result.data.notice = [notice]
+			result.data.notice = notice
 		}
 
 		return result
