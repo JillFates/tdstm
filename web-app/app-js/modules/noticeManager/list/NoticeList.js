@@ -13,6 +13,8 @@ export default class NoticeList {
             NEW: 'New',
             EDIT: 'Edit'
         }
+
+        this.noticeGrid = {};
         this.noticeGridOptions = {};
         this.noticeManagerService = noticeManagerService;
         this.uibModal = $uibModal;
@@ -30,15 +32,13 @@ export default class NoticeList {
                 buttonCount: 5
             },
             columns: [
-                {field: 'noticeId', hidden: true },
+                {field: 'id', hidden: true },
                 {field: 'htmlText', hidden: true },
                 {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="noticeList.onEditCreateNotice(noticeList.actionType.EDIT, this)"><span class="glyphicon glyphicon-edit"></span></button>' },
                 {field: 'title', title: 'Title'},
-                {field: 'type', title: 'Project'},
-                {field: 'active', title: 'Active'},
-                {field: 'project', title: 'project'},
-                {field: 'type', title: 'Type'},
-                {field: 'acknowledge', title: 'Acknowledge'}
+                {field: 'type.id', hidden: true},
+                {field: 'type.name', title: 'Type'},
+                {field: 'active', title: 'Active'}
             ],
             dataSource: {
                 pageSize: 10,
@@ -48,8 +48,13 @@ export default class NoticeList {
                             e.success(data);
                         });
                     }
+                },
+                sort: {
+                    field: 'title',
+                    dir: 'asc'
                 }
-            }
+            },
+            sortable: true
         };
     }
 
@@ -72,6 +77,10 @@ export default class NoticeList {
 
         modalInstance.result.then((license) => {
             this.log.info(action + ' Notice: ', license);
+            // After a new value is added, lets to refresh the Grid
+            if(this.noticeGrid.dataSource) {
+                this.noticeGrid.dataSource.read();
+            }
         }, () => {
             this.log.info(action + ' Request Canceled.');
         });

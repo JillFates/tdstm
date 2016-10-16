@@ -9,6 +9,11 @@
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-ban"></i> {{"ERROR" | translate }}</h4>
             <div><span ng-if="alert.danger.status">{{alert.danger.status}} : </span> {{alert.danger.statusText}}</div>
+            <div ng-if="alert.danger.errors.length > 0">
+                <ul>
+                    <li ng-repeat="error in alert.danger.errors">{{error}}</li>
+                </ul>
+            </div>
         </div>
         <div class="alert alert-info alert-dismissable fadeIn" ng-show="alert.info.show">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

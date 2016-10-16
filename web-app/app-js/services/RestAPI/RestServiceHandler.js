@@ -56,19 +56,19 @@ export default class RestServiceHandler {
 
     noticeManagerServiceHandler() {
         return {
-            getNoticeList: (data, callback) => { // real ws example
-                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/notices'), callback);
+            getNoticeList: (onSuccess) => { // real ws example
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/notices'), onSuccess);
             },
-            getNoticeMockUp: (callback) => { // Mockup Data for testing see url
-                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/NoticeManager/noticeManagerList.json'), callback);
+            getNoticeMockUp: (onSuccess) => { // Mockup Data for testing see url
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/NoticeManager/noticeManagerList.json'), onSuccess);
             },
-            createNotice: (data, callback) => {
+            createNotice: (data, onSuccess, onError) => {
                 this.postReq.url =  '../ws/notices';
                 this.postReq.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http(this.postReq), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.postReq), onSuccess, onError);
             },
-            editNotice: (data, callback) => {
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/NoticeManager/noticeManagerList.json', data), callback);
+            editNotice: (data, onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/NoticeManager/noticeManagerList.json', data), onSuccess);
             }
         };
     }

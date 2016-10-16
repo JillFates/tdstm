@@ -17,7 +17,7 @@ export default class RequestHandler {
      * @param request
      * @returns {*}
      */
-    subscribeRequest(request, callback) {
+    subscribeRequest(request, onSuccess, onError) {
         var rxObservable = this.rx.Observable.fromPromise(request);
         // Verify is not a duplicate call
         if (this.isSubscribed(rxObservable)) {
@@ -25,20 +25,20 @@ export default class RequestHandler {
         }
 
         // Subscribe the request
-        var resultSubscribe = this.addSubscribe(rxObservable, callback);
+        var resultSubscribe = this.addSubscribe(rxObservable, onSuccess, onError);
         if (resultSubscribe && resultSubscribe.isStopped) {
             // An error happens, tracked by HttpInterceptorInterface
             delete this.promise[rxObservable._p];
         }
     }
 
-    addSubscribe(rxObservable, callback) {
+    addSubscribe(rxObservable, onSuccess, onError) {
         this.promise[rxObservable._p] = rxObservable.subscribe(
             (response) => {
-                return this.onSubscribedSuccess(response, rxObservable, callback);
+                return this.onSubscribedSuccess(response, rxObservable, onSuccess);
             },
             (error) => {
-                return this.onSubscribedError(error, rxObservable, callback);
+                return this.onSubscribedError(error, rxObservable, onError);
             }, () => {
                 // NO-OP Subscribe completed
             });
@@ -57,12 +57,12 @@ export default class RequestHandler {
         return (rxObservable && rxObservable._p && this.promise[rxObservable._p]);
     }
 
-    onSubscribedSuccess(response, rxObservable, callback) {
+    onSubscribedSuccess(response, rxObservable, onSuccess) {
         if (this.isSubscribed(rxObservable)) {
             delete this.promise[rxObservable._p];
         }
-        if(callback){
-            return callback(response.data);
+        if(onSuccess){
+            return onSuccess(response.data);
         }
     }
 
@@ -72,12 +72,12 @@ export default class RequestHandler {
      * @param error
      * @returns {*}
      */
-    onSubscribedError(error, rxObservable, callback) {
+    onSubscribedError(error, rxObservable, onError) {
         if (this.isSubscribed(rxObservable)) {
             delete this.promise[rxObservable._p];
         }
-        if(callback){
-            return callback({});
+        if(onError){
+            return onError({});
         }
     }
 

@@ -90,6 +90,7 @@ TDSTM.createDirective('toastHandler', ['$log', '$timeout', 'HTTPRequestHandlerIn
                 $scope.alert.danger.show = true;
                 $scope.alert.danger.status = rejection.status;
                 $scope.alert.danger.statusText = rejection.statusText;
+                $scope.alert.danger.errors = rejection.data.errors;
                 $timeout(turnOffNotifications, 3000);
             });
 

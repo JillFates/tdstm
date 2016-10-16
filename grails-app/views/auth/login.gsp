@@ -1,3 +1,4 @@
+<%@page expressionCodec="none" %>
 <!DOCTYPE>
 <html lang="en">
 <head>

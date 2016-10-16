@@ -15,9 +15,8 @@
                 <div class="form-group">
                     <label for="selectType" class="col-sm-3 control-label">Type: <span class="required_field">*</span></label>
                     <div class="col-sm-9">
-                        <select kendo-combo-box
-                                k-placeholder="'Select a Type'"
-                                k-filter="'contains'"
+                        <select kendo-drop-down-list
+                                k-option-label="'Select a Type'"
                                 k-data-text-field="'name'"
                                 k-data-value-field="'typeId'"
                                 k-data-source="editNotice.typeDataSource"
@@ -45,7 +44,7 @@
         </form>
     </div>
     <div class="modal-footer" class="form-group">
-        <button ng-click="editNotice.saveNotice()" type="submit" class="btn btn-primary pull-left" ng-disabled="editNoticeForm.$invalid"><span class="glyphicon glyphicon-ok"></span> Save</button>
+        <button ng-click="editNotice.saveNotice()" type="submit" class="btn btn-primary pull-left" ng-disabled="editNoticeForm.$invalid "><span class="glyphicon glyphicon-ok"></span> Save</button>
         <button ng-click="editNotice.cancelCloseDialog()" type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
 </div>
