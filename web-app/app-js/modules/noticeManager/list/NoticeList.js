@@ -25,7 +25,7 @@ export default class NoticeList {
 
     getDataSource() {
         this.noticeGridOptions = {
-            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="noticeList.onEditCreateNotice(noticeList.actionType.NEW)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create New Notice</button> <div onclick="loadGridBundleList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="noticeList.onEditCreateNotice(noticeList.actionType.NEW)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create New Notice</button> <div ng-click="noticeList.reloadNoticeList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
             pageable: {
                 refresh: true,
                 pageSizes: true,
@@ -78,12 +78,16 @@ export default class NoticeList {
         modalInstance.result.then((license) => {
             this.log.info(action + ' Notice: ', license);
             // After a new value is added, lets to refresh the Grid
-            if(this.noticeGrid.dataSource) {
-                this.noticeGrid.dataSource.read();
-            }
+            this.reloadNoticeList();
         }, () => {
             this.log.info(action + ' Request Canceled.');
         });
+    }
+
+    reloadNoticeList() {
+        if(this.noticeGrid.dataSource) {
+            this.noticeGrid.dataSource.read();
+        }
     }
 
 }
