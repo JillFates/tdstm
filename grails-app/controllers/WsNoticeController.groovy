@@ -14,10 +14,11 @@ class WsNoticeController{
 	 */
 	public fetch(){
 		try {
-			Integer typeId = params.typeId
 			Notice.NoticeType type = null
-
+			def typeId = params.typeId
+			
 			if(typeId){
+				typeId =  Integer.parseInt(typeId)
 				type = Notice.NoticeType.forId(typeId)
 			}
 

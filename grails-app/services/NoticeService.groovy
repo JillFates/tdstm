@@ -34,7 +34,7 @@ class NoticeService {
 	 */
 	public fetch(Notice.NoticeType type = null){
 		if(type){
-			return Notice.findAllByType(type)
+			return Notice.findAllByTypeId(type)
 		}else{
 			return Notice.findAll()
 		}
