@@ -138,7 +138,7 @@
 		</div>
 		<g:if test="${noticeList && noticeList.size() > 0}">
 			<g:each var="notice" in="${noticeList}">
-				<g:if test="${notice.typeId == noticeType.Prelogin}" >
+				<g:if test="${notice.typeId == noticeType.Prelogin && notice.active}" >
 						${notice.htmlText}
 				</g:if>
 			</g:each>
