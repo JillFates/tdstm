@@ -230,7 +230,7 @@ class UrlMappings {
 			controller = "wsNotice"
 			action = [
 					GET:  "fetch",
-					POST: "save"
+					POST: "create"
 			]
 		}
 

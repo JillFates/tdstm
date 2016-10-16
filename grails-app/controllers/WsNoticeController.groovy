@@ -59,10 +59,10 @@ class WsNoticeController{
 	 * }
 	 * @return
 	 */
-	public save(){
+	public create(){
 		try {
 			def json = request.JSON
-			def result = noticeService.save(json)
+			def result = noticeService.create(json)
 
 			if (!result.status) {
 				response.status = 400
@@ -71,6 +71,23 @@ class WsNoticeController{
 		}catch(Exception e){
 			response.status = 500
 			render([errors:[e.getMessage()]] as JSON)
+		}
+	}
+
+	public update(){
+		try {
+			def json = request.JSON
+			def id = params.id
+			def result = noticeService.update(id, json)
+
+			if (!result.status) {
+				response.status = 404
+			}
+
+			render(result.data as JSON)
+		}catch(Exception e){
+			response.status = 500
+			render( [errors:[e.getMessage()]] as JSON )
 		}
 	}
 
