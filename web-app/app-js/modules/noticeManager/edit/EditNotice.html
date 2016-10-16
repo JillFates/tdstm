@@ -1,6 +1,6 @@
 <div class="modal-content">
     <div class="modal-header">
-        <button ng-click="requestLicense.cancelCloseDialog()" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <button ng-click="editNotice.cancelCloseDialog()" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">{{editNotice.action}} Notice</h4>
     </div>
     <div class="modal-body">
@@ -20,7 +20,8 @@
                                 k-data-text-field="'name'"
                                 k-data-value-field="'typeId'"
                                 k-data-source="editNotice.typeDataSource"
-                                ng-model="editNotice.editModel.typeId"
+                                k-ng-model="editNotice.editModel.typeId"
+                                k-value-primitive="true"
                                 id="selectType"
                                 class="form-control"
                                 required >

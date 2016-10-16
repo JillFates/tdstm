@@ -31,8 +31,13 @@ export default class EditNotice {
             rawText: ''
         }
 
+        // On Edition Mode we cc the model and only the params we need
         if(params.notice) {
-            this.editModel = params.notice;
+            this.editModel.id = params.notice.id;
+            this.editModel.title = params.notice.title;
+            this.editModel.typeId = params.notice.type.id;
+            this.editModel.active = params.notice.active;
+            this.editModel.htmlText = params.notice.htmlText;
         }
     }
 
@@ -42,8 +47,8 @@ export default class EditNotice {
     getTypeDataSource() {
         this.typeDataSource = [
             {typeId: 1, name: 'Prelogin'},
-            {typeId: 2, name: 'Postlogin'}//,
-            //{typeId: 3, name: 'General'}
+            {typeId: 2, name: 'Postlogin'}
+            //{typeId: 3, name: 'General'} Disabled until Phase II
         ];
     }
 

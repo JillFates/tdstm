@@ -18,8 +18,8 @@ export default class RestServiceHandler {
         this.resource = $resource;
         this.prepareHeaders();
         this.log.debug('RestService Loaded');
-        this.postReq = {
-            method: 'POST',
+        this.req = {
+            method: '',
             url: '',
             headers: {
                 'Content-Type': 'application/json;charset=UTF-8'
@@ -63,12 +63,16 @@ export default class RestServiceHandler {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/NoticeManager/noticeManagerList.json'), onSuccess);
             },
             createNotice: (data, onSuccess, onError) => {
-                this.postReq.url =  '../ws/notices';
-                this.postReq.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http(this.postReq), onSuccess, onError);
+                this.req.method = 'POST';
+                this.req.url =  '../ws/notices';
+                this.req.data = data;
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            editNotice: (data, onSuccess) => {
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/NoticeManager/noticeManagerList.json', data), onSuccess);
+            editNotice: (data, onSuccess, onError) => {
+                this.req.method = 'PUT';
+                this.req.url =  '../ws/notices/'+data.id;
+                this.req.data = data;
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             }
         };
     }
