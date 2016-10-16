@@ -34,7 +34,7 @@ export default class EditNotice {
         this.getTypeDataSource();
         this.editModel = {
             title: '',
-            typeId: null,
+            typeId: 0,
             active: false,
             htmlText: '',
             rawText: ''

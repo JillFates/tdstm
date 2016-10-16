@@ -45,7 +45,7 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button ng-click="editNotice.saveNotice()" type="submit" class="btn btn-primary pull-left" ng-disabled="editNoticeForm.$invalid "><span class="glyphicon glyphicon-ok"></span> Save</button>
+        <button ng-click="editNotice.saveNotice()" type="submit" class="btn btn-primary pull-left" ng-disabled="editNoticeForm.$invalid || editNotice.editModel.typeId === 0"><span class="glyphicon glyphicon-ok"></span> Save</button>
         <button ng-if="editNotice.action === editNotice.actionType.EDIT" ng-click="editNotice.deleteNotice()" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete</button>
         <button ng-click="editNotice.cancelCloseDialog()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>

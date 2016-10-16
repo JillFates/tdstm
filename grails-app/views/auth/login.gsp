@@ -139,7 +139,11 @@
 		<g:if test="${noticeList && noticeList.size() > 0}">
 			<g:each var="notice" in="${noticeList}">
 				<g:if test="${notice.typeId == noticeType.Prelogin && notice.active}" >
+					<div class="callout pre-login-message">
+						<div class="pre-login-tag"><span class="glyphicon glyphicon-tag"></span></div>
+						<h4>${notice.title}</h4>
 						${notice.htmlText}
+					</div>
 				</g:if>
 			</g:each>
 		</g:if>
