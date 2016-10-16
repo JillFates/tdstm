@@ -55,11 +55,38 @@
 		if (top != self) { top.location.replace(self.location.href); }
 
 		$(document).ready(function() {
-			$("#submitButton").click(function(){
-				$("#overlay").css('display', 'inline');
-				$("#submitButton").attr('disabled', true);
-				var form = $("form")[0];
-				form.submit();
+			$("#submitButton").click(function(e){
+				<g:if test="${noticeList && noticeList.size() > 0 && false}">
+					e.preventDefault();
+
+					$("#postLoginMessages").dialog({
+						resizable: false,
+						minWidth: 520,
+						modal: true,
+						position: ['center', 50]
+					});
+
+					$('#confirmAccess').click(function() {
+						$("#postLoginMessages").dialog('close');
+						$("#overlay").css('display', 'inline');
+						$("#submitButton").attr('disabled', true);
+						var form = $("form")[0];
+						form.submit();
+					});
+
+					$('#cancelAccess').click(function() {
+						$("#postLoginMessages").dialog('close');
+					});
+
+
+					$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span>');
+				</g:if>
+				<g:else>
+					$("#overlay").css('display', 'inline');
+					$("#submitButton").attr('disabled', true);
+					var form = $("form")[0];
+					form.submit();
+				</g:else>
 			});
 
 			$('.openSupportedBrowsers').click(function(event){
@@ -231,6 +258,21 @@
 		</div>
 		<br />
 		<a class="get-latest-version" style="float: right; color: #337ab7; font-weight: 600;" href="http://browsehappy.com/?locale=en" target="_blank">Get Latest Versions</a>
+	</div>
+
+	<div id="postLoginMessages" title="Confirmation Required" style="display: none;">
+			<g:if test="${noticeList && noticeList.size() > 0}">
+				<g:each var="notice" in="${noticeList}">
+					<g:if test="${notice.typeId == noticeType.Postlogin && notice.active}" >
+						<h4>${notice.title}</h4>
+						${notice.htmlText}
+					</g:if>
+				</g:each>
+			</g:if>
+			<div class="modal-footer">
+				<button id="confirmAccess" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span> Confirm</button>
+				<button id="cancelAccess" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+			</div>
 	</div>
 
 </div>
