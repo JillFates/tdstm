@@ -26,6 +26,8 @@ class AuthController {
 	def securityService
 	def userPreferenceService
 	def userService
+	def NoticeService noticeService
+	def Notice notice
 
 	/**
 	 * Here whe choose if there's a user logIn we redirect to the preferedPage and to the login otherwise
@@ -47,12 +49,17 @@ class AuthController {
 
 		def s = securityService.getLoginConfig()
 		def buildInfo = environmentService.getVersionText()
+		// Fetch the current list Messages where no params means find all of them
+		def list = noticeService.fetch();
+
 		return [
 			username:params.username,
 			authority:params.authority,
 			rememberMe:(params.rememberMe != null),
 			loginConfig:securityService.getLoginConfig(),
-			buildInfo:buildInfo
+			buildInfo:buildInfo,
+			noticeList: list,
+			noticeType: Notice.NoticeType
 		]
 	}
 

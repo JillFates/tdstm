@@ -75,8 +75,8 @@ export default class NoticeList {
             }
         });
 
-        modalInstance.result.then((license) => {
-            this.log.info(action + ' Notice: ', license);
+        modalInstance.result.then((notice) => {
+            this.log.info(action + ' Notice: ', notice);
             // After a new value is added, lets to refresh the Grid
             this.reloadNoticeList();
         }, () => {

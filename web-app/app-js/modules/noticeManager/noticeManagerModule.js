@@ -44,6 +44,6 @@ NoticeManagerModule.service('NoticeManagerService', ['$log', 'RestServiceHandler
 NoticeManagerModule.controller('NoticeList', ['$log', '$state', 'NoticeManagerService', '$uibModal', NoticeList]);
 
 // Modal - Controllers
-NoticeManagerModule.controller('EditNotice', ['$log', 'NoticeManagerService', '$uibModalInstance', 'params', EditNotice]);
+NoticeManagerModule.controller('EditNotice', ['$log', 'NoticeManagerService', '$uibModal', '$uibModalInstance', 'params', EditNotice]);
 
 export default NoticeManagerModule;

@@ -6,8 +6,9 @@
 
 export default class EditNotice {
 
-    constructor($log, noticeManagerService, $uibModalInstance, params) {
+    constructor($log, noticeManagerService, $uibModal, $uibModalInstance, params) {
         this.noticeManagerService = noticeManagerService;
+        this.uibModal = $uibModal;
         this.uibModalInstance = $uibModalInstance;
         this.log = $log;
 
@@ -22,6 +23,14 @@ export default class EditNotice {
             'italic',
             'viewHtml'
         ];
+
+        // CSS has not canceling attributes, so instead of removing every possible HTML, we make editor has same css
+        this.kendoStylesheets = [
+            '../static/dist/js/vendors/bootstrap/dist/css/bootstrap.min.css', // Ourt current Bootstrap css
+            '../static/dist/css/TDSTMLayout.min.css' // Original Template CSS
+
+        ];
+
         this.getTypeDataSource();
         this.editModel = {
             title: '',
@@ -53,7 +62,7 @@ export default class EditNotice {
     }
 
     /**
-     * Execute the Service call to generate a new License request
+     * Execute the Service call to Create/Edit a notice
      */
     saveNotice() {
         this.log.info(this.action + ' Notice Requested: ', this.editModel);
@@ -68,6 +77,26 @@ export default class EditNotice {
                 this.uibModalInstance.close(data);
             });
         }
+    }
+
+    deleteNotice() {
+        var modalInstance = this.uibModal.open({
+            animation: true,
+            templateUrl: '../app-js/modules/dialogAction/DialogAction.html',
+            controller: 'DialogAction as dialogAction',
+            size: 'sm',
+            resolve: {
+                params: () => {
+                    return { title: 'Confirmation Required', message: 'Are you sure you want to delete it? This action cannot be undone.'};
+                }
+            }
+        });
+
+        modalInstance.result.then(() => {
+            this.noticeManagerService.deleteNotice(this.editModel, (data) => {
+                this.uibModalInstance.close(data);
+            });
+        });
     }
 
     /**

@@ -43,18 +43,38 @@ export default class NoticeManagerService {
         });
     }
 
+    /**
+     * Create a New Notice passing params
+     * @param notice
+     * @param callback
+     */
     createNotice(notice, callback){
-        // Process New License data if necessary (add, remove, etc)
         this.restService.noticeManagerServiceHandler().createNotice(notice, (data) => {
             return callback(data);
         });
     }
 
+    /**
+     * Notice should have the ID in order to edit the Notice
+     * @param notice
+     * @param callback
+     */
     editNotice(notice, callback){
-        // Process New License data if necessary (add, remove, etc)
         this.restService.noticeManagerServiceHandler().editNotice(notice, (data) => {
             return callback(data);
         });
     }
+
+    /**
+     * Notice should have the ID in order to delete the notice
+     * @param notice
+     * @param callback
+     */
+    deleteNotice(notice, callback) {
+        this.restService.noticeManagerServiceHandler().deleteNotice(notice, (data) => {
+            return callback(data);
+        });
+    }
+
 }
 

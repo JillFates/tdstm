@@ -136,6 +136,13 @@
 				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
 			</a>
 		</div>
+		<g:if test="${noticeList && noticeList.size() > 0}">
+			<g:each var="notice" in="${noticeList}">
+				<g:if test="${notice.typeId == noticeType.Prelogin}" >
+						${notice.htmlText}
+				</g:if>
+			</g:each>
+		</g:if>
 		<h1 class="login-box-msg">Sign in to start your session</h1>
 		<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 		</div>

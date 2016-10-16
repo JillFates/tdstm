@@ -73,6 +73,11 @@ export default class RestServiceHandler {
                 this.req.url =  '../ws/notices/'+data.id;
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
+            },
+            deleteNotice: (data, onSuccess, onError) => {
+                this.req.method = 'DELETE';
+                this.req.url =  '../ws/notices/'+data.id;
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             }
         };
     }
