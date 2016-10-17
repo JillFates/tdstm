@@ -121,7 +121,7 @@
         <div class="callout callout-info" style="margin-bottom: 0!important;">
             <h3 class="icon"><i class="fa fa-info"></i></h3>
             <div class="info-content-msg">
-                ${message}
+                ${raw(message)}
             </div>
         </div>
     </div>
