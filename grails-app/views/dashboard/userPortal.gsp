@@ -341,7 +341,7 @@
                     },
                     {
                         field: "name",
-                        template: '<a href="dashboard/index?moveEvent=#=eventId#">#=name#</a>'
+                        template: '<a href="index?moveEvent=#=eventId#">#=name#</a>'
                     },
                     {
                         field: "startDate",
@@ -411,7 +411,7 @@
                     }, {
                         field: "event",
                         title: "Event",
-                        template: '<a href="dashboard/index?moveEvent=#=eventId#">#=event#</a>',
+                        template: '<a href="index?moveEvent=#=eventId#">#=event#</a>',
                     }, {
                         field: "news",
                         title: "News"
