@@ -234,6 +234,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/notices/$id/ack" {
+			controller = "wsNotice"
+			action = [
+					POST: "ack"
+			]
+		}
+
 
 		//ROOT map to the auth/index action
 		"/"(controller: "auth")

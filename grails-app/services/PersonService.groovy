@@ -1898,4 +1898,15 @@ class PersonService {
 		return c != null
 	}
 
+	Person findByUsername(username){
+		def userLogin = UserLogin.findByUsername(username)
+		log.info("Userlogin ($username): $userLogin")
+		Person person = null
+		if(userLogin){
+			person = userLogin.person
+			log.info("DaPErson: $person")
+		}
+		return person
+	}
+
 }

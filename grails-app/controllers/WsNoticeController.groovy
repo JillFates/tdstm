@@ -16,7 +16,7 @@ class WsNoticeController{
 		try {
 			Notice.NoticeType type = null
 			def typeId = params.typeId
-			
+
 			if(typeId){
 				typeId =  Integer.parseInt(typeId)
 				type = Notice.NoticeType.forId(typeId)
@@ -104,6 +104,23 @@ class WsNoticeController{
 				response.status = 404
 			}
 			render( [notices:[]] as JSON)
+		}catch(Exception e){
+			response.status = 500
+			render([errors:[e.getMessage()]] as JSON)
+		}
+	}
+
+	/**
+	 * Mark a Note Acknowledge by a User
+	 * TODO: (oluna)Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
+	 */
+	public ack(){
+		try{
+			def result = noticeService.ack(params.id, params.username)
+			if (!result) {
+				response.status = 404
+			}
+			render("")
 		}catch(Exception e){
 			response.status = 500
 			render([errors:[e.getMessage()]] as JSON)

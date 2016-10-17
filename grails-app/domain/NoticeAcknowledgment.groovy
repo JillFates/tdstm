@@ -5,4 +5,10 @@ class NoticeAcknowledgment {
 	Notice notice
 	Person person
 	Date   dateCreated
+
+	def beforeValidate() {
+		if(!dateCreated){
+			dateCreated = new Date()
+		}
+	}
 }
