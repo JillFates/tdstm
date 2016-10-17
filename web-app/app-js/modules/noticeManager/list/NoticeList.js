@@ -38,7 +38,7 @@ export default class NoticeList {
                 {field: 'title', title: 'Title'},
                 {field: 'type.id', hidden: true},
                 {field: 'type.name', title: 'Type'},
-                {field: 'active', title: 'Active'}
+                {field: 'active', title: 'Active', template: '#if(active) {# Yes #} else {# No #}#' }
             ],
             dataSource: {
                 pageSize: 10,
