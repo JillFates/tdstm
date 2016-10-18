@@ -71,24 +71,6 @@
 				<input type="text" maxlength="64" id="emailId" name="email"/>
 			  </td>
 			</tr>
-			
-			<tds:hasPermission permission='PersonExpiryDate'>
-				<tr class="prop">
-					<td valign="top" class="name">
-						<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></b></label>
-					</td>
-					<td valign="top" class="value">
-						<script type="text/javascript">
-							$(document).ready(function(){
-							$("#expiryDateId").datetimepicker();
-						  });
-						</script>
-						<input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
-						<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
-					</td>
-				</tr>
-			</tds:hasPermission>
-
 			<tr class="prop">
 				<td valign="top" class="name">
 					<label for="startPage">Start Page:</label>
