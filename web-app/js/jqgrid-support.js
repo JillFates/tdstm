@@ -176,8 +176,9 @@ function unfreezeHeaderGeneral (header) {
  *   TDS.jqGridFilterToolbar(id) //defaults to 700
  *   TDS.jqGridFilterToolbar(id, 800)
  */
-window.TDS = Object.assign(window.TDS || {},{
-	jqGridFilterToolbar: function(id, debounce) {
+window.TDS = window.TDS || {};
+
+window.TDS.jqGridFilterToolbar = function(id, debounce) {
 		var VK_ENTER = 13;
 		debounce = typeof debounce !== 'undefined' ? debounce : 700;
 		var gridSelector = '#' + id + 'Grid';
@@ -198,5 +199,4 @@ window.TDS = Object.assign(window.TDS || {},{
 				timeoutHnd = setTimeout(function(){triggerToolBar();}, debounce);
 			}
 		});
-	}
-});
+}
