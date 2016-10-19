@@ -823,7 +823,7 @@ class SecurityService implements InitializingBean {
 		if (!isCurrentUserLogin && !StringUtil.isBlank(params.username) && !userLogin.username.equals(params.username)) {
 			def newUserNameUserLogin = UserLogin.findByUsername(params.username)
 			if (newUserNameUserLogin != null) {
-				throw new InvalidParamException("The username you is selected is already in use.")
+				throw new InvalidParamException("The username you selected is already in use.")
 			} else {
 				userLogin.username = params.username
 			}
