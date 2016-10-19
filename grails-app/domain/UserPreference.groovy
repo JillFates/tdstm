@@ -15,6 +15,15 @@ class UserPreference implements Serializable {
 		preferenceCode sqlType:'varchar(50)'
 	}
 
+
+	public String getValue(){
+		if((!value || value == 'undefined') && UserPreferenceService.defaults[preferenceCode]){
+			value = UserPreferenceService.defaults[preferenceCode]
+		}
+
+		return value
+	}
+
 	String toString(){
 		"$userLogin.id : $preferenceCode : $value"
 	}
