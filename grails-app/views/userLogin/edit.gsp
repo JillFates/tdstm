@@ -170,9 +170,7 @@
 							</td>
 							<td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'passwordExpirationDate', 'errors')}">
 								<script type="text/javascript">
-									$(document).ready(function(){
-										$("#passwordExpirationDate").datetimepicker();
-									});
+									jQuery(function($){ $("#passwordExpirationDate").kendoDateTimePicker({ animation: false}); });
 								</script>
 								<input type="text" class="dateRange" id="passwordExpirationDate" name="passwordExpirationDate"
 									value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" formate="12hrs" />"/>
