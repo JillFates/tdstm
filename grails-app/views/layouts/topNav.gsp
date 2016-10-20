@@ -366,9 +366,18 @@
                                         <tds:hasPermission permission="GenerateTasks">
                                             <li class="menu-child-item menu-parent-tasks-generation-history"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
                                         </tds:hasPermission>
+
+                                         <tds:hasPermission permission='GenerateTasks'>
+                                            <li class="menu-child-item menu-parent-tasks-import-tasks">
+                                                <g:link class="mmlink" controller="assetEntity" action="importTask" >Import Tasks</g:link>
+                                            </li>
+                                        </tds:hasPermission>
+
                                         <tds:hasPermission permission='HelpMenuView'>
                                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a></li>
                                         </tds:hasPermission>
+
+
                                     </ul>
                                 </li>
                             </tds:hasPermission>

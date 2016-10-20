@@ -93,6 +93,8 @@ class AssetEntityController {
 	def userPreferenceService
 	def userService
 
+	def taskImportExportService
+
 	def jdbcTemplate
 	def quartzScheduler
 
@@ -3063,6 +3065,7 @@ class AssetEntityController {
 	 * @return String HTML representing the page
 	 */
 	def retrieveLists() {
+
 		def start = new Date()
 		session.removeAttribute('assetDependentlist')
 
@@ -4918,6 +4921,171 @@ class AssetEntityController {
 	 */
 	private def userCanEditComments(commentType) {
 		return ((commentType == AssetCommentType.TASK) || controllerService.checkPermissionForWS('AssetEdit', false))
+	}
+
+
+
+	/**
+	 * Used to retrieve the account information during the import process after it has been read in from the
+	 * uploaded spreadsheet and reviewed for errors.
+	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
+	 * @return JSON { accounts: List of accounts }
+	 */
+	def importTaskReviewData() {
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'GenerateTasks')
+		if (!project) {
+			ServiceResults.respondWithError(response, flash.message)
+			flash.message = ''
+			return
+		}
+		if (! params.filename) {
+			ServiceResults.respondWithError(response, "Request was missing the required filename reference")
+			return
+		}
+		try {
+			// TODO : JPM 4/2016 : importAccountsReviewData This method should be refactored so that the bulk of the logic
+			// is implemented in the service.
+
+			Map formOptions = taskImportExportService.importParamsToOptionsMap(params)
+			List tasks = taskImportExportService.generateReviewData(session, user, project, params.filename, formOptions)
+
+			ServiceResults.respondAsJson(response, tasks )
+
+		} catch(e) {
+			log.error "Exception occurred while importing data: " + e.printStackTrace()
+
+			ServiceResults.respondWithError(response,
+				[ "An error occurred while attempting to import tasks", e.getMessage()]  )
+		}
+	}
+
+
+	/**
+	 * Used to import tasks. This is a three
+	 * step form that take param.step to track at what point the user is in the process. The steps include:
+	 *     start  - The user is presented a form
+	 *     upload - The user has uploaded the spreadsheet which is saved to a temporary random filename and the user
+	 *              is presented with the validation results
+	 *     post   - The previously confirmed and this submission will reload the saved spreadsheet and post the 
+	 *              changes to the database and delete the spreadsheet.
+	 */	 
+	def importTask() {
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'GenerateTasks')
+		if (!project) {
+			return
+		}
+		String formAction='importTask'
+		String currentStep = (params.step ?: 'start')
+
+		// fileParamName is the name of the parameter that the file will be uploaded as
+		String fileParamName = 'importTasksSpreadsheet'
+		Map model = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
+		
+
+		Map options = taskImportExportService.importParamsToOptionsMap(params)
+		String view = 'importTasks'
+		def session = getSession()
+
+		// There is a bug or undocumented feature that doesn't allow overriding params when forwarding which is used
+		// in the upload step to forward to the review so we look for the stepAlt and use it if found.
+		String step = params.stepAlt ?: params.step
+		try {
+
+			switch(step) {
+
+				case 'upload':
+					// This step will save the spreadsheet that was posted to the server after reading it 
+					// and verifying that it has some accounts in it. If successful it will do a forward to 
+					// the review step.
+
+					options.fileParamName = fileParamName
+					model = taskImportExportService.processFileUpload(session, request, user, project, options)	
+
+					Map forwardParams = [
+						stepAlt:'review', 
+						filename:model.filename, 
+						importOption: params.importOption, 
+					]
+
+					// Redirect the user to the Review step
+					forward( action:formAction, params: forwardParams )
+					return
+					break
+
+				case 'review':
+					// This step will serve up the review template that in turn fetch the review data 
+					// via an Ajax request.
+					model << taskImportExportService.generateModelForReview(session, user, project, options)
+					// log.debug "importAccounts() case 'review':\n\toptions=$options\n\tmodel=$model"
+					if (!options.filename && model.filename) {
+						// log.debug "importAccounts() step=$step set filename=${model.filename}"
+						options.filename = model.filename
+					}
+
+					// This is used by the AJAX request in the form to construct the URL appropriately
+					model.paramsForReviewDataRequest = [filename:model.filename, importOption:params.importOption]
+					view = "${formAction}Review"
+					break
+
+				case 'post':
+					// This is the daddy of the steps in that it is going to post the changes back to the 
+					// database.
+
+					List optionErrors = taskImportExportService.validateImportOptions(options)
+
+					if (optionErrors) {
+						throw new InvalidParamException(optionErrors.toString())
+					}
+
+					options.testMode = params.testMode == 'Y'
+
+					// Here's the money maker call that will update existing accounts and create new ones accordingly
+					model.results = taskImportExportService.postChangesToTasks(session, user, project, options)
+					
+					log.debug "importTasks() post results = ${model.results}"
+
+					model << taskImportExportService.generateModelForPostResults(session, user, project, options)
+					if (!options.filename && model.filename) {
+						options.filename = model.filename
+					}
+
+					// This is used by the AJAX request in the form to construct the URL appropriately
+					model.paramsForReviewDataRequest = [filename:model.filename, importOption:params.importOption]
+
+					view = "${formAction}Results"
+					log.debug "importTasks() view = $view"
+
+					break
+
+				default:
+					// The default which is the first step to prompt for the spreadsheet to upload
+					break
+
+			}
+
+		} catch (e) {
+			switch (e) {
+				case InvalidRequestException:
+				case DomainUpdateException:
+				case InvalidParamException:
+				case EmptyResultException:
+					log.debug "importTasks() exception ${e.getClass().getName()} ${e.getMessage()}"
+					flash.message = e.getMessage()
+					break
+				default: 
+					log.error "Exception occurred while importing data (step $currentStep)" + e.printStackTrace()
+					flash.message = "An error occurred while attempting to import accounts"				
+			}
+			// Attempt to delete the temporary uploaded worksheet if an exception occurred
+			if (options.filename) {
+				e.printStackTrace()
+				taskImportExportService.deletePreviousUpload(user, options)
+			}
+
+		}
+
+		// log.debug "importAccounts() Finishing up controller step=$step, view=$view, model=$model"
+		render view:view, model:model
 	}
 
 }
