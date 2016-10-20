@@ -208,7 +208,7 @@ class DataTransferBatchController {
 					action: '',
 					className: className,
 					hasErrors: entry.hasErrors,
-					importResults: entry.importResults.length() > 0
+					importResults: (entry.importResults ? true : false)
 			])
 
 		}

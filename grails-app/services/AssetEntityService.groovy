@@ -2903,6 +2903,7 @@ class AssetEntityService {
 
 					// This determines which columns are added as Number vs Label
 					def numericCols = []
+					def stringCols = ['Version']
 
 					// Flag to know if the AppId Column exists
 					def idColName = 'appId'
@@ -2972,8 +2973,11 @@ class AssetEntityService {
 
 								if ( numericCols.contains(colName) )
 									addCell(appSheet, applicationCount, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC)
-								else
+								else if ( stringCols.contains(colName) ){
+									addCell(appSheet, applicationCount, colNum, colVal.toString(), Cell.CELL_TYPE_STRING)
+								} else {
 									addCell(appSheet, applicationCount, colNum, colVal.toString())
+								}
 							}
 						}
 						//GormUtil.flushAndClearSession(session, progressCount)

@@ -48,6 +48,10 @@ class WorkbookUtil {
 				style.setDataFormat(df)
 
 				cell.setCellStyle(style)
+			}else if(type ==  Cell.CELL_TYPE_STRING){
+				CellStyle textFormatStyle = sheet.workbook.createCellStyle();
+				textFormatStyle.setDataFormat((short)BuiltinFormats.getBuiltinFormat("text"));
+				cell.setCellStyle(textFormatStyle);
 			}
 		}
 		cell.setCellValue(value)
@@ -264,7 +268,10 @@ class WorkbookUtil {
 					if (DateUtil.isCellDateFormatted(cell)) {
 						result = cell.getDateCellValue().toString()
 					} else {
-						result = cell.getNumericCellValue().intValue().toString()
+						//TODO: oluna this is bad!!! that the cell is numeric doesn't make it INT presicion lost! but how we do change it without hitting everything else
+						//result = cell.getNumericCellValue().intValue().toString()
+						DataFormatter formatter = new DataFormatter();
+						result = formatter.formatCellValue(cell)
 					}
 					break
 				case Cell.CELL_TYPE_STRING:
