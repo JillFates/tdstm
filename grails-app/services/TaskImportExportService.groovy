@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
+import com.tds.asset.AssetComment
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.ExportUtil
@@ -148,10 +149,10 @@ class TaskImportExportService{
 		taskNumber 				: [type:'number', ssPos:0, formPos:1, domain:'C', width:80, locked: true, 
 										label: 'Task #', template:changeTmpl('taskNumber')],
 
-		taskDescription			: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:false, 
+		comment					: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:false, 
 										label: 'Task Description', template:changeTmpl('taskDescription')],
 
-		relatedAsset			: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:true, 
+		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:true, 
 										label: 'Related Asset', template:changeTmpl('relatedAsset'), tansform:xfrmString],
 
 		assetClass				: [type: 'string', ssPos:3, formPos:4, domain: 'A', width:120, locked:true,
@@ -1089,6 +1090,181 @@ class TaskImportExportService{
 		}
 
 		return results
+	}
+
+
+	private void applyChangesToDomainObject(Object domainObject, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
+		
+		
+		boolean unplannedChange = false
+		String unChgdLabel='Unplanned change'
+		boolean identifyUnplannedChanges = true
+		boolean blockBlankOverwrites = task.flags.blockBlankOverwrites
+
+		taskSpreadsheetColumnMap.each { prop, info ->
+
+			if (propertyHasError(task, prop)) {
+				if (taskSpreadsheetColumnMap.containsKey('defaultOnError')) {
+					// Set a default value so that the domain validation will not fail
+					domainObject[prop] = taskSpreadsheetColumnMap.defaultOnError()
+				}
+				return
+			}
+			def bypassProps = ["assetClass", "assetId"]
+			if(!prop in bypassProps){
+
+				def origValue = domainObject[prop]
+				if (info.type == 'date' && origValue != null) {
+					origValue.clearTime()
+				}
+				String origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
+				String chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
+
+				boolean valuesEqual = origValueTransformed == chgValueTransformed
+				boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)
+				boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
+
+
+				if (chgValueIsBlank) {
+					if (! origValueIsBlank) {
+						if (! blockBlankOverwrites) {
+							setOriginalValue(task, prop, domainObject[prop])
+							if (identifyUnplannedChanges) {
+								unplannedChange = true
+								setErrorValue(task, prop, unChgdLabel)
+							}
+						} else {
+								setDefaultedValue(task, prop, domainObject[prop])
+						}
+					}
+				} else {
+					if (! valuesEqual) {
+						setOriginalValue(task, prop, domainObject[prop])
+						if (identifyUnplannedChanges) {
+							unplannedChange = true
+							setErrorValue(task, prop, unChgdLabel)
+						}
+					}
+				}
+		
+
+				if (! propertyHasError(task, prop)) {
+					chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
+					chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
+					if (! chgValueIsBlank && chgValueTransformed != origValueTransformed) {
+						domainObject[prop] = task[prop]
+					}
+				}
+			}
+			if (unplannedChange) {
+				task.errors << "Unplanned change(s) for task."
+			}
+		}
+			
+	}
+
+
+	/**
+	 * Used to update tasks
+	 * @param task - the task map
+	 * @param options - the map of the options
+	 * @return a list containing:
+	 *    String - an error message if the update failed
+	 *    boolean - a flag indicating if the task object was changed (true) or unchanged (false)
+	 */
+	private List applyTaskChanges( Map task, Map sheetInfoOpts, Map formOptions) {
+		String error
+		boolean changed = false
+		AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
+		if (assetComment) {
+
+			log.debug "applyTaskChanges() About to apply changes to $assetComment"
+
+			// Update the person with the values passed in
+			applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true)
+
+			changed = (assetComment.dirtyPropertyNames.size()>0)
+
+		
+			if (assetComment.id) {
+				log.debug "applyTaskChanges() is update person $assetComment (${assetComment.id}) properties: ${assetComment.dirtyPropertyNames}"
+			} else {
+				log.debug "applyTaskChanges() is creating task $assetComment"
+			}
+
+			if (changed) {
+				recordChangeHistory(task.changeHistory, assetComment)
+				if (! assetComment.save()) {
+					task.changeHistory = null
+					log.error "applyTaskChanges() save task $assetComment failed : ${GormUtil.allErrorsString(assetComment)}"
+					error = gormValidationErrors(assetComment)
+					assetComment.discard()
+					assetComment = null
+				}
+			}
+		}
+		return [error, changed]
+	}
+
+
+	private String saveResultsAsJson(List tasks, String filename) {
+		String fqfn = getJsonFilename(filename)
+		log.debug "saveResultsAsJson() filename=$filename fqfn=$fqfn"
+		File file = new File(fqfn)
+		if (file) {
+			file.write( new JsonBuilder(tasks).toPrettyString() )
+		}
+		return filename
+	}
+
+
+	/**
+	 * Used to get the derived filename for the JSON file from the Excel filename plus the
+	 * fully qualified path to access the file.
+	 * @param filename - the spreadsheet filename
+	 * @return the FQPN to the where the JSON file is written to
+	 */
+	private String getJsonFilename(String filename) {
+		// Swap out the XLS? extension and replace with .json
+		filename = filename.substring(0, filename.lastIndexOf('.')) + '.json'
+
+		String fqfn = getFilenameWithPath(filename)
+
+		return fqfn
+	}
+
+	/**
+	 * Used to determine if an error was previously recorded against a property
+	 * @param task - the task map information
+	 * @param property - the name of the property
+	 * @return true if a previous error was recorded on the property
+	 * @IntegrationTest
+	 */
+	private boolean propertyHasError(Map task, String property) {
+		return task.containsKey("${property}${ERROR_SUFFIX}".toString())
+	}
+
+
+	/**
+	 * Utility method used to transform a property where there is a tranform defined in the taskSpreadsheetColumnMap map for a property
+	 * otherwise it just returns the current value
+	 * @param propName - the name of the property
+	 * @param value - the current value
+	 * @param sheetInfoOpts - the Map that contains all the goodies for tranforming data
+	 * @return the transformed or original value appropriately
+	 */
+	private transformProperty(String propName, value, Map sheetInfoOpts) {
+		def result
+		if (taskSpreadsheetColumnMap.containsKey(propName)) {
+			if (taskSpreadsheetColumnMap[propName].containsKey('transform')) {
+				result = taskSpreadsheetColumnMap[propName].transform(value, sheetInfoOpts)
+			} else {
+				result = (value == null ? '' : value)
+			}
+		} else {
+			throw new RuntimeException("transformProperty called with invalid property name $propName")
+		}
+		return result
 	}
 
 }

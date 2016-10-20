@@ -15,7 +15,7 @@
 	</script>
 	<div class="body body-disabled-float">
 		<h1>Import Accounts - Step 1 &gt; Upload Import File</h1>
-		<g:if test="${flash.message}">
+		<g:if test="${raw(flash.message)}">
 			<div class="message">${raw(flash.message)}</div>
 		</g:if>
 
