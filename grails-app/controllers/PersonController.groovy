@@ -74,7 +74,7 @@ def test = {
 
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 		//used to show roles in addTeam select
-		def availabaleRoles = partyRelationshipService.getStaffingRoles()
+		def availabaleRoles = partyRelationshipService.getStaffingRoles(false)
 		return [companyId:companyId?:'All', company:company, partyGroupList:partyGroupList,
 					listJsonUrl:listJsonUrl, availabaleRoles:availabaleRoles]
 	}
@@ -378,7 +378,7 @@ def test = {
 			errMsg += "to view the person."
 		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-
+			errMsg = e.getMessage()
 		}
 
 		if (isAjaxCall) {

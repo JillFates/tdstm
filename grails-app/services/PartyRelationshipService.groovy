@@ -987,6 +987,7 @@ class PartyRelationshipService {
 		boolean debugEnabled = log.isDebugEnabled()
 
 		List allTeamCodes = getTeamCodes()
+		//if there are codes that are not part of TEAMCODES those CANNOT be assigned.
 		List invalidTeamCodes = ( teamCodes ? teamCodes - allTeamCodes : [])
 		if (invalidTeamCodes) {
 			securityService.reportViolation("attempted to assign invalid team codes ($invalidTeamCodes) to $person")
@@ -1105,9 +1106,10 @@ class PartyRelationshipService {
 					ne('id', 'AUTO')
 				}
 			}
-			order('description', 'asc')
+			//The sort was removed and replaced for a 'code' sort since the mix name (:) miss to sort some names and it's cheap
 		}
-		return roles
+
+		return roles.sort { it.toString() }
 	}
 
 	/**
