@@ -425,6 +425,7 @@ setFocus();
 		});
 	});
 </script>
+<g:if test="${isCleaner}">
 <script type="text/javascript" src="${resource(dir:'js/qz-print/js',file:'deployJava.js')}"></script>
 <script type="text/javascript" src="${resource(dir:'js/qz-print',file:'qzShowCleanerTasks.js')}"></script>
 <script type="text/javascript">
@@ -470,6 +471,7 @@ setFocus();
 		});
 	});
 </script>
+</g:if>
 	<g:render template="../assetEntity/initAssetEntityData"/>
 	<g:render template="../layouts/error"/>
 </body>
