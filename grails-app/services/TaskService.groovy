@@ -4561,6 +4561,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			def title = "Rollcall for $lastPerson (${teams.join(', ')})"
 			log.info "createRollcallTasks: creating task $title"
 			// TODO : SequenceService - Change to use new SequenceService
+			def durationLocked = false
+			if(taskSpec.durationLocked){
+				durationLocked = taskSpec.durationLocked.toBoolean()
+			}
 			def task = new AssetComment(
 				taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 				taskBatch: settings.taskBatch,
@@ -4577,7 +4581,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				hardAssigned: 1,
 				assignedTo: lastPerson,
 				recipe: recipeId,
-				taskSpec: taskSpec.id )
+				taskSpec: taskSpec.id,
+				durationLocked: durationLocked )
 
 			// Handle the various settings from the taskSpec
 			if (taskSpec.containsKey('category')) task.category = taskSpec.category
