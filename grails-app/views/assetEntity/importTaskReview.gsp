@@ -211,7 +211,7 @@
 				dataSource: {
 					type: "json",
 					transport: {
-						read: "${createLink(action:'importTaskReviewData', params:paramsForReviewDataRequest)}"
+						read: "${raw(createLink(action:'importTaskReviewData', params:paramsForReviewDataRequest))}"
 					},
 					error: processErrors,
 					schema: {

@@ -222,7 +222,7 @@
 				dataSource: {
 					type: "json",
 					transport: {
-						read: "${createLink(action:'importAccountsPostResultsData', params:paramsForReviewDataRequest)}"
+						read: "${raw(createLink(action:'importAccountsPostResultsData', params:paramsForReviewDataRequest))}"
 					},
 					error: processErrors,
 					schema: {
