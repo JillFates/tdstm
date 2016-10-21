@@ -3443,6 +3443,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			task.duration=0
 		}
 
+		if (taskSpec.containsKey('durationLocked')){
+					task.durationLocked = taskSpec.durationLocked.toBoolean()
+				}else{
+					task.durationLocked = false
+				}
+
 		if (taskSpec.containsKey('category') && taskSpec.category )
 			task.category = taskSpec.category
 
@@ -4490,6 +4496,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (taskSpec.containsKey('duration')) task.duration = taskSpec.duration
 				if (taskSpec.containsKey('team')) task.role = taskSpec.team
 				if (taskSpec.containsKey('category')) task.category = taskSpec.category
+				
+				if (taskSpec.containsKey('durationLocked')){
+					task.durationLocked = taskSpec.durationLocked.toBoolean()
+				}else{
+					task.durationLocked = false
+				}
 				// TODO - Normalize this logic and sadd logic to update from Workflow if exists
 
 				if (! ( task.validate() && task.save(flush:true) ) ) {
