@@ -161,23 +161,23 @@
 			<tr>
 			    <td class="buttonR" >
 					<g:if test="${permissionForUpdate==true}">
-						<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+						<button type="button" class="btn btn-default" onclick="validateComment(${assetComment.id})" ><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Update Task</button>
 					</g:if>
 					<g:else>
-						<input type="button" value="Update Task" disabled="disabled" />
+						<button type="button" class="btn btn-default" disabled="disabled" ><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Update Task</button>
 					</g:else>
 				</td>
 				<td class="buttonR printView" style="text-align:right;padding: 5px 3px;">
-					<input type="button" id="printButton" value="P)rint" ${canPrint ? '': 'disabled="disabled"' } onclick="startprintjob();"  />
+					<button type="button" class="btn btn-default"  id="printButton" ${canPrint ? '': 'disabled="disabled"' } onclick="startprintjob();"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> P)rint</button>
 					<g:if test="${assetComment.status == "Started" || assetComment.status == "Ready"}">
-						<input type="button" id="printAndDoneButton" value="Print And D)one" onclick="printAndMarkDone(${assetComment.id}, 'Completed', '${assetComment.status}');"  />
+						<button type="button" class="btn btn-default"  id="printAndDoneButton" onclick="printAndMarkDone(${assetComment.id}, 'Completed', '${assetComment.status}');"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print And D)one</button>
 					</g:if>
 					<g:else>
-						<input type="button" id="printAndDoneButton" value="Print And D)one" disabled="disabled"/>
+						<button type="button" class="btn btn-default"  id="printAndDoneButton" disabled="disabled" ><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print And D)one</button>
 					</g:else>
 				</td>
 				<td class="buttonR" colspan="2" style="text-align:right;padding: 5px 3px;">
-					<input type="button" value="Cancel" onclick="clearSearch()" />
+					<button type="button" class="btn btn-default" onclick="clearSearch()" ><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 				</td>
 			</tr>	
 		</table>
