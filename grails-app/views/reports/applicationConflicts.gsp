@@ -54,7 +54,9 @@
 
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td><input type="button" class="submit" value="Generate" id="applicationConflictsButton" onclick="return verifyBundle();"/></td>
+						<td>
+							<button type="button" class="btn btn-default" id="applicationConflictsButton" onclick="return verifyBundle();"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Generate</button>
+						</td>
 					</tds:hasPermission>
 					</tr>
 				</tbody>

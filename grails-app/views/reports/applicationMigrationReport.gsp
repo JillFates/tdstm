@@ -48,7 +48,9 @@
 					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td><input type="submit" class="submit" value="Generate" id="applicationMigrationButton"/></td>
+						<td>
+							<button type="submit" class="btn btn-default" value="Generate" id="applicationMigrationButton"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Generate</button>
+						</td>
 					</tds:hasPermission>
 					</tr>
 				</tbody>

@@ -54,7 +54,9 @@
 					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td><input type="button" class="submit" value="Generate" id="databaseConflictsButton"/></td>
+						<td>
+							<button type="button" class="btn btn-default" id="databaseConflictsButton"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Generate</button>
+						</td>
 					</tds:hasPermission>
 					</tr>
 				</tbody>

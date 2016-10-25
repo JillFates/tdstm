@@ -67,7 +67,10 @@
 			</tr>
 			<tr>
 			<td colspan="2" class="buttonR">
-				<g:actionSubmit type="submit"  value="Generate Xls" action="projectActivityMetricsExport"/>
+				<button type="submit" name="_action_projectActivityMetricsExport" class="btn btn-default" value="Generate Xls">
+					Generate (.xls)
+					<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span>
+				</button>
 			</td>
 		</tr>
 		</tbody>
