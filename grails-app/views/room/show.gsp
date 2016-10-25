@@ -27,9 +27,9 @@
 							<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;
 							<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a><br />
 							<input type="hidden" name="viewType" value="list" />
-							<input type="submit" class="submit" value="List" />
+							<button type="submit" class="btn btn-default" ><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> List</button>
 							<tds:hasPermission permission='RoomEditView'>
-								<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}" />
+								<button type="button" value="Edit" class="btn btn-default" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Edit</button>
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetEdit'>
 								<input type="checkbox" id="auditCheckId" ${auditPref=='1' ? 'checked="checked"  value="1"' : 'value="0"'}
