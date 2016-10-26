@@ -1,3 +1,4 @@
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.service.NoticeService
@@ -5,6 +6,7 @@ import net.transitionmanager.service.NoticeService
 /**
  * @author oluna
  */
+@Secured('isAuthenticated()')
 class WsNoticeController implements ControllerMethods {
 
 	NoticeService noticeService
