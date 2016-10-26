@@ -47,10 +47,10 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="buttonR" colspan="3"><input type="button"
-									class="submit" value="Cancel"
-									onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}" />
-									<input type="submit" class="submit" value="Update" /></td>
+								<td class="buttonR" colspan="3">
+									<button type="button" value="Cancel" class="btn btn-default" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
+									<button type="submit" value="Update" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Update</button>
+								</td>
 								<td class="buttonR"
 									style="padding-left: 115px; vertical-align: top;" colspan="6"
 									nowrap="nowrap"><span> <label for="addTargetRoom"><b>Target
@@ -65,14 +65,12 @@
 										name="showRoomObjects"
 										${draggableRack == 'on'? 'checked' :'checked' }
 										onclick="enableDraggableRack()" />&nbsp;
-										<input type="button" class="powerIcon" value="Power Connect" onclick="assignPowersForRoom(${roomInstance.id})"/>
-								</span> <span> <b>Add to Room:</b>&nbsp; <input type="button"
-										class="submit" value="Rack" onclick="createRack(this.value)" />
-										<input type="button" class="submit" value="UPS"
-										onclick="createRack(this.value)" /> <input type="button"
-										class="submit" value="CRAC" onclick="createRack(this.value)" />
-										<input type="button" class="submit" value="Object"
-										onclick="createRack(this.value)" />
+										<button type="button" value="Power Connect" class="btn btn-default" onclick="assignPowersForRoom(${roomInstance.id})"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Power Connect</button>
+								</span> <span> <b>Add to Room:</b>&nbsp;
+										<button type="button" value="Rack" class="btn btn-default" onclick="createRack(this.value)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Rack</button>
+										<button type="button" value="UPS" class="btn btn-default" onclick="createRack(this.value)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> UPS</button>
+										<button type="button" value="CRAC" class="btn btn-default" onclick="createRack(this.value)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> CRAC</button>
+										<button type="button" value="Object" class="btn btn-default" onclick="createRack(this.value)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Object</button>
 								</span></td>
 							</tr>
 						</tbody>
