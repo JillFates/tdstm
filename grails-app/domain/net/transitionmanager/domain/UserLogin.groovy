@@ -185,10 +185,10 @@ class UserLogin {
 	}
 
 	Project getCurrentProject() {
-		String prefCodeValue = executeQuery(
-			'select value from UserPreference ' +
-			'where userLogin=? and preferenceCode="CURR_PROJ"',
-			[this], [max: 1])[0]
+		String prefCodeValue = executeQuery('''
+				select value from UserPreference
+				where userLogin=? and preferenceCode='CURR_PROJ'
+			''',[this], [max: 1])[0]
 		Long projectId = NumberUtil.toPositiveLong(prefCodeValue, 0)
 
 		if (projectId) {
