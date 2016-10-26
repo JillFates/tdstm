@@ -24,7 +24,7 @@ class Notice {
 	// The rendered HTML from the Richtext editor
 	String htmlText
 
-//	NoticeType typeId
+	NoticeType typeId
 
 	// Flag if the notice can be acknowledged by the user and hidden
 	Boolean acknowledgeable = false
