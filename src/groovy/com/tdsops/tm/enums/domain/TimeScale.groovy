@@ -1,142 +1,97 @@
-/**
- * The TimeScale represents the various values that durations represent with task duration lengths
- */
-
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
+/**
+ * Represents the various values that durations represent with task duration lengths
+ */
+@CompileStatic
 enum TimeScale {
 
-	M ('Minutes'),
-	H ('Hours'),
-	D ('Days'),
-	W ('Weeks')
+	M('Minutes'),
+	H('Hours'),
+	D('Days'),
+	W('Weeks')
 
-	// Used to access the application's default value to use
-	static TimeScale getDefault() {
-		return TimeScale.M
-	}
+	static TimeScale getDefault() { M }
 
-	//
 	// Some conversion functions
-	//
 
 	/**
-	 * Coverts a value from the particular type to minutes
-	 * @param value - an integer to convert
+	 * Converts a value from the particular type to minutes.
+	 * @param value  the amount to convert
 	 * @return the value converted to minutes
-	 * @example assert TimeScale.D.toMinutes( 5 ) == 5 * 60 * 24
+	 * @example assert TimeScale.D.toMinutes(5) == 5 * 60 * 24
 	 */
-	Integer toMinutes( Integer value ) {
-		def v = value
+	int toMinutes(int value) {
 		switch (this) {
-			case M:	break
-			case H:	v = value * 60; break
-			case D: v = value * 60 * 24; break
-			case W:	v = value * 60 * 24 * 7; break
+			case M: return value
+			case H: return value * 60
+			case D: return value * 60 * 24
+			case W: return value * 60 * 24 * 7
 		}
-		return v
 	}
 
 	/**
-	 * Coverts a value from the particular type to hours
-	 * @param value - an integer to convert
+	 * Coverts a value from the particular type to hours.
+	 * @param value  the amount to convert
 	 * @return the value converted to hours rounded down
-	 * @example assert TimeScale.D.toHours( 2 ) == 2 * 24
-	 */	
-	Integer toHours( Integer value ) {
-		def v = value
+	 * @example assert TimeScale.D.toHours(2) == 2 * 24
+	 */
+	int toHours(int value) {
 		switch (this) {
-			case M:	v = (value / 60).toInteger() ; break
-			case H:	break
-			case D: v = value * 24; break
-			case W:	v = value * 24 * 7; break
+			case M: return (int)(value / 60)
+			case H: return value
+			case D: return value * 24
+			case W: return value * 24 * 7
 		}
-		return v
 	}
 
 	/**
-	 * Coverts a value from the particular type to days
-	 * @param value - an integer to convert
+	 * Coverts a value from the particular type to days.
+	 * @param value  the amount to convert
 	 * @return the value converted to days rounded down
-	 * @example assert TimeScale.H.toDays( 48 ) == 2
-	 */	
-	Integer toDays( Integer value ) {
-		def v = value
+	 * @example assert TimeScale.H.toDays(48) == 2
+	 */
+	int toDays(int value) {
 		switch (this) {
-			case M:	v = (value / (60 * 24)).toInteger() ; break
-			case H:	v = (value / 24).toInteger() ; break
-			case D: break
-			case W:	v = value * 7; break
+			case M: return (int)(value / 60 / 24)
+			case H: return (int)(value / 24)
+			case D: return value
+			case W: return value * 7
 		}
-		return v
 	}
 
 	/**
-	 * Coverts a value from the particular type to weeks
-	 * @param value - an integer to convert
+	 * Coverts a value from the particular type to weeks.
+	 * @param value  the amount to convert
 	 * @return the value converted to weeks rounded down
-	 * @example assert TimeScale.D.toWeeks( 14 ) == 2
-	 */	
-	Integer toWeeks( Integer value ) {
-		def v = value
+	 * @example assert TimeScale.D.toWeeks(14) == 2
+	 */
+	int toWeeks(int value) {
 		switch (this) {
-			case M:	v = (value / (60 * 24 * 7)).toInteger() ; break
-			case H:	v = (value / (24 * 7)).toInteger() ; break
-			case D: v = (value / 7).toInteger() ;break
-			case W:	break
+			case M: return (int)(value / 60 / 24 / 7)
+			case H: return (int)(value / 24 / 7)
+			case D: return (int)(value / 7)
+			case W: return value
 		}
-		return v
 	}
 
-	//
-	// Boiler Plate from here down - Just swap out the enum class name
-	//
+	final String value
 
-	String value
-	private static List keys
-	private static List labels
+	private TimeScale(String label) {
+		value = label
+	}
 
-	TimeScale(String value) {
-		this.value = value
-	}	
-
-	String toString() { name() }
 	String value() { value }
 
-	// Used to convert a string to the enum or null if string doesn't match any of the constants
-	static TimeScale asEnum(key) {
-		def obj
-		try {
-			obj = key as TimeScale
-		} catch (e) { }
-		return obj
+	static TimeScale asEnum(String key) {
+		values().find { it.name() == key }
 	}
 
-	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
-			buildKeys()
-		return keys
-	}
+	static final List<TimeScale> keys = (values() as List).asImmutable()
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
-		if (keys == null) {
-			keys = TimeScale.values()
-		}
-	} 
+	static final List<String> labels = keys.collect { it.value }.asImmutable()
 
-	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
-			buildLabels()
-		return labels
-	}
-
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
-		if (labels == null) {
-			labels = TimeScale.values()*.value
-		}
-	} 
+	static List<String> getLabels(String locale = 'en') { labels }
 }

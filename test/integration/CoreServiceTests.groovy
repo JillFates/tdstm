@@ -1,64 +1,72 @@
+import net.transitionmanager.service.CoreService
 import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
-import spock.lang.*
+import spock.lang.Specification
 
 class CoreServiceTests extends Specification {
 
-	def coreService
+	CoreService coreService
 
-	def "getAppName"() {
+	void "getAppName"() {
 		expect: 'Should return the application name'
-			coreService.getAppName() == 'tdstm'
+		coreService.getAppName() == 'tdstm'
 	}
 
-	def "getAppConfig"() {
+	void "getAppConfig"() {
 		expect: 'getAppConfig() should not return null'
-			coreService.getAppConfig() != null
+		coreService.getAppConfig() != null
 
 		when:
-			coreService.getAppConfig('bogusAppName')
+		coreService.getAppConfig('bogusAppName')
+
 		then:
-			GrailsConfigurationException ex = thrown()
-   			ex.message.contains('configuration not found')
+		GrailsConfigurationException ex = thrown()
+		ex.message.contains('configuration not found')
 	}
 
-	def "getConfigSetting"() {
+	void "getConfigSetting"() {
 		when:
-			def setting = coreService.getConfigSetting('dataSource')
+		def setting = coreService.getConfigSetting('dataSource')
+
 		then: 'Should return ConfigObject valid setting from grails-app/conf/Config.groovy'
-			(setting instanceof groovy.util.ConfigObject)
+		setting instanceof ConfigObject
 
 		when:
-			setting = coreService.getConfigSetting('dataSource.driverClassName')
+		setting = coreService.getConfigSetting('dataSource.driverClassName')
+
 		then: 'Should return String valid setting from grails-app/conf/Config.groovy'
-			(setting instanceof String)
+		setting instanceof String
 	}
 
-	def "getAppConfigSetting"() {
+	void "getAppConfigSetting"() {
 		when:
-			def setting = coreService.getAppConfigSetting('testing.foo.intVal')
+		def setting = coreService.getAppConfigSetting('testing.foo.intVal')
+
 		then: 'Should return Integer valid setting from grails-app/conf/Config.groovy'
-			setting == 123
-			(setting instanceof Integer)
+		setting == 123
+		setting instanceof Integer
 
 		when:
-			setting = coreService.getAppConfigSetting('testing.foo.stringVal')
+		setting = coreService.getAppConfigSetting('testing.foo.stringVal')
+
 		then: 'Should return String valid setting from grails-app/conf/Config.groovy'
-			setting == 'abc'
-			(setting instanceof String)
+		setting == 'abc'
+		setting instanceof String
 
 		when:
-			setting = coreService.getAppConfigSetting('testing.foo.configVal')
+		setting = coreService.getAppConfigSetting('testing.foo.configVal')
+
 		then: 'Should return ConfigObject valid setting from grails-app/conf/Config.groovy'
-			(setting instanceof groovy.util.ConfigObject)
+		setting instanceof ConfigObject
 
 		when:
-			setting = coreService.getAppConfigSetting('testing.foo.man.choo')
+		setting = coreService.getAppConfigSetting('testing.foo.man.choo')
+
 		then: 'Missing settings should return null value'
-			setting == null
+		setting == null
 	}
 
-	def "getEnvironment"() {
+	void "getEnvironment"() {
 		expect:
-			coreService.getEnvironment() == 'TEST'
+		coreService.getEnvironment() == 'TEST'
 	}
 }

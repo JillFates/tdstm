@@ -1,15 +1,15 @@
-import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.SequenceService
 
-class WsSequenceController {
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+@Slf4j(value='logger', category='grails.app.controllers.WsSequenceController')
+class WsSequenceController implements ControllerMethods {
 
-	def sequenceService
+	SequenceService sequenceService
 
 	def retrieveNext() {
-		def contextId = params.contextId
-		def name = params.name
-
-		int seq = sequenceService.next(contextId.toInteger(), name)
-
-		render(ServiceResults.success('seq' : seq) as JSON)
+		renderAsJson(seq: sequenceService.next(params.int('contextId'), params.name))
 	}
 }

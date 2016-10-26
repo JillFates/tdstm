@@ -1,21 +1,16 @@
 package com.tdsops.tm.enums.domain
 
-/**
- * Password Reset Status
- */
+import groovy.transform.CompileStatic
+
+@CompileStatic
 enum PasswordResetStatus {
 
 	PENDING,
 	COMPLETED,
 	VOIDED,
-	EXPIRED;
+	EXPIRED
 
 	static PasswordResetStatus safeValueOf(String key) {
-		PasswordResetStatus obj
-		try {
-			obj = key as PasswordResetStatus
-		} catch (e) { }
-		return obj
+		values().find { it.name() == key }
 	}
-
 }

@@ -1,5 +1,4 @@
 import grails.util.Environment
-import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 
 // copy binding variables into properties in the config for visibility in external scripts; as of 2.5.4 the
 // vars are: appName, appVersion, basedir, baseFile, baseName, grailsHome,
@@ -128,17 +127,6 @@ grails {
 	web.disable.multipart=false
 }
 
-security {
-	shiro {
-		annotationdriven.enabled = true
-		authentication.strategy = new FirstSuccessfulStrategy()
-		// default shiro configuration
-		redirectUrl = "/auth/unauthorized"
-		// non-controller URLs that require authentication
-		shiroAnyProtector.urls = ["/monitoring"]
-	}
-}
-
 environments {
 	development {
 		grails {
@@ -226,7 +214,7 @@ log4j.main = {
 	debug  applicationLog: 'grails.app', additivity: true
 
 	// Setup Audit Logging messages to go to their own log file in addition to the application log
-	info  auditLog: 'grails.app.services.AuditService', additivity: true
+	info  auditLog: 'net.transitionmanager.service.AuditService', additivity: true
 
 	//additivity.grails=false
 	//additivity.StackTrace=false
@@ -242,3 +230,36 @@ tdsops.buildFile = "/build.txt"
 // access: logging will include login, logout and security violations
 // activity:  will also include all user interactions with the application.
 //tdstm.security.auditLogging = "access"
+
+
+grails {
+	plugin {
+		springsecurity {
+			adh {
+				errorPage = '/auth/unauthorized'
+				useForward = false
+			}
+			apf {
+				filterProcessesUrl = '/auth/signIn'
+				usernameParameter = 'username'
+				passwordParameter = 'password'
+			}
+			auth.loginFormUrl = '/auth/login'
+			dao.hideUserNotFoundExceptions = false
+			failureHandler.defaultFailureUrl = '/auth/login'
+
+			controllerAnnotations.staticRules = [
+				'/':               'permitAll',
+				'/index':          'permitAll',
+				'/index.gsp':      'permitAll',
+				'/assets/**':      'permitAll',
+				'/**/js/**':       'permitAll',
+				'/**/css/**':      'permitAll',
+				'/**/images/**':   'permitAll',
+				'/**/favicon.ico': 'permitAll',
+
+				'/monitoring':     'hasPermission(request, "ViewAdminTools")'
+			]
+		}
+	}
+}

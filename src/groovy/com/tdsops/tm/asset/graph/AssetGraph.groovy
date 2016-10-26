@@ -1,9 +1,13 @@
 package com.tdsops.tm.asset.graph
 
+import net.transitionmanager.domain.MoveBundle
+
 /**
  * Struct to maintain an asset dependency graph, that allow operation like group assets by references
  */
-public class AssetGraph {
+class AssetGraph {
+
+	static final List<String> dependecyBundlingAssetTypesUC = MoveBundle.dependecyBundlingAssetTypes*.toUpperCase()
 
 	def nodes = [:]
 
@@ -32,25 +36,25 @@ public class AssetGraph {
 	private def addDependencyToNode(node, assetDepFromId, assetDepToId, type, status) {
 		if (node.id == assetDepFromId) {
 			node.deps << new AssetDep(status: status, type: type, depId: assetDepToId)
-		} else {
+		}
+		else {
 			node.deps << new AssetDep(status: status, type: type, depId: assetDepFromId)
 		}
 	}
 
 	/**
 	 * Group assets by dependencies
-	 * @param dependecyBundlingAssetTypeMap : filter for asset types
 	 */
-	def groupByDependencies(statusList, typeList, moveBundleList, dependecyBundlingAssetTypeMap) {
+	def groupByDependencies(statusList, typeList, List<String> moveBundleIds) {
 		def groups = []
 		def group = []
 
 		nodes.each { assetId, node ->
-			if (!node.checked && node.assetType && dependecyBundlingAssetTypeMap[node.assetType]) {
+			if (!node.checked && node.assetType && dependecyBundlingAssetTypesUC.contains(node.assetType?.toUpperCase())) {
 				//If the node is not checked, then creates a new group and search for all assets/nodes related to this one
 				group = []
 				groups << group
-				addToGroupAndAnalize(node, group, statusList, typeList, moveBundleList)
+				addToGroupAndAnalize(node, group, statusList, typeList, moveBundleIds)
 			}
 		}
 
@@ -60,22 +64,19 @@ public class AssetGraph {
 	/**
 	 * Analyze current node and if the first time that is viewed, the analyze all his dependencies and add it to the group
 	 */
-	private def addToGroupAndAnalize(node, group, statusList, typeList, moveBundleList) {
+	private void addToGroupAndAnalize(node, group, statusList, typeList, List<String> moveBundleIds) {
 		def nodesStack = []
 		def n
 		nodesStack << node
-		while(nodesStack.size() > 0) {
+		while (nodesStack.size() > 0) {
 			n = nodesStack.pop()
 			if (!n.checked) {
 				n.checked = true
 				group << n
 				n.deps.each { dep ->
 					def depNode = nodes[dep.depId]
-					if ( depNode &&
-						 statusList.contains(dep.status) &&
-						 typeList.contains(dep.type) &&
-						 moveBundleList.contains(depNode.moveBundleId?.toString())
-					) {
+					if (depNode && statusList.contains(dep.status) && typeList.contains(dep.type) &&
+							moveBundleIds.contains(depNode.moveBundleId?.toString())) {
 						nodesStack << depNode
 					}
 				}

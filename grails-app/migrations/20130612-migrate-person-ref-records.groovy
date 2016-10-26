@@ -1,3 +1,4 @@
+import net.transitionmanager.domain.Person
 import org.apache.commons.lang.StringUtils
 
 /**

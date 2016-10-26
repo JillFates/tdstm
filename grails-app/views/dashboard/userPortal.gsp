@@ -1,9 +1,3 @@
-<%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
-<%@page import="com.tds.asset.AssetComment"%>
-<%@page import="com.tdssrc.grails.TimeUtil"%>
-<%@page import="com.tdssrc.grails.HtmlUtil"%>
-<g:set var="now" value="${TimeUtil.nowGMT()}" />
-
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -672,7 +666,7 @@
 
         }
 
-	  
+
         function loadAll(id) {
             loadRelatedEntities(id)
             loadEventTable(id);

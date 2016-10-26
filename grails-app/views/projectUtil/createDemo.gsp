@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -15,7 +16,7 @@
 <br/>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
-</g:if> 
+</g:if>
 <g:hasErrors bean="${projectInstance}" >
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" /></div>
@@ -23,7 +24,7 @@
 <g:form action="saveDemoProject" method="post" name="createDemoProjectForm">
 	<div class="dialog">
 	<table>
-		<tbody>	
+		<tbody>
 			<tr>
 			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 			</tr>
@@ -33,7 +34,7 @@
 					<input type="text" id="name" name="name" maxlength="20" value="${name}" />
 					<g:if test="${nameError}">
 						<div class="errors">${nameError}</div>
-					</g:if> 
+					</g:if>
 				</td>
 			</tr>
 			<tr class="prop">
@@ -50,11 +51,11 @@
 					 $(document).ready(function(){
 						  $("#startDateId").kendoDatePicker({ animation: false });
 	                    });
-                  	</script> 
+                  	</script>
                   	<input type="text" class="dateRange" size="15" style="width: 138px;"  name="startDate" id="startDateId" value="${startDate}"/>
                   	<g:if test="${startDateError}">
 						<div class="errors">${startDateError}</div>
-					</g:if> 
+					</g:if>
 				</td>
 			</tr>
 
@@ -65,7 +66,7 @@
 				$(document).ready(function(){
 					$("#cleanupDateId").kendoDatePicker({ animation: false });
                   });
-                </script> 
+                </script>
                 <input type="text" class="dateRange" size="15" style="width: 138px;"  id="cleanupDateId"	name="cleanupDate" value="${cleanupDate}"/>
 				</td>
 			</tr>
@@ -76,7 +77,7 @@
 	<div class="buttons">
 		<span class="button">
 			<input class="save" type="submit" value="Save" />
-		</span> 
+		</span>
 		<span class="button">
 			<input type="button" class="delete" onclick="javascript:location.href='../project/list'" value="Cancel" />
 		</span>

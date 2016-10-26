@@ -1,8 +1,6 @@
-<%@page import="com.tds.asset.Application;"%>
 <html>
 <head>
 	<title>Transition Planning Dashboard</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 	<meta name="layout" content="topNav" />
 
 <script type="text/javascript">

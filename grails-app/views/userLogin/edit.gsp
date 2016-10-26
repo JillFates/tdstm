@@ -3,27 +3,27 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<meta name="layout" content="topNav" />
 		<title>Edit UserLogin</title>
-		<script type="text/javascript"> 
+		<script type="text/javascript">
 			var flag
 			$().ready(function() {
 				var isLocal = ${userLoginInstance.isLocal}
 				if (!isLocal) {
 					$(".passwordsEditFields").hide();
 				}
-				
+
 				$('#add').click(function() {
 					updateRole( 'add',$('#availableRoleId').val() );
 					flag = !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
-					return flag;  
-				});  
+					return flag;
+				});
 				$('#remove').click(function() {
 					updateRole( 'remove',$('#assignedRoleId').val() );
 					flag = !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
-					return flag;  
+					return flag;
 				});
-				
+
 				$('#username').focus();
-				
+
 			});
 			function updateRole( action, values ) {
 				var personId = $('#person').val();
@@ -50,7 +50,7 @@
 	<body>
 		<div class="body">
 			<h1>Edit UserLogin</h1>
-			
+
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
@@ -63,7 +63,7 @@
 						<tr>
 							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 						</tr>
-						
+
 						<tr class="prop">
 							<td valign="top" class="name">
 								<label for="person">Company:</label>
@@ -72,7 +72,7 @@
 								${userLoginInstance.person.company}
 							</td>
 						</tr>
-						
+
 						<tr class="prop">
 							<td valign="top" class="name">
 								<label for="person">Person:</label>
@@ -80,8 +80,8 @@
 							<td valign="top" class="value">
 								${userLoginInstance.person}
 							</td>
-						</tr> 
-						
+						</tr>
+
 						<tr class="prop requiredField">
 							<td valign="top" class="name">
 								<label for="username">Username (use email):</label>
@@ -93,7 +93,7 @@
 								<g:else>
 									<input type="text" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}" />
 								</g:else>
-								
+
 								<g:hasErrors bean="${userLoginInstance}" field="username">
 									<div class="errors">
 										<g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -101,7 +101,7 @@
 								</g:hasErrors>
 							</td>
 						</tr>
-						
+
 						<tr class="prop requiredField">
 							<td valign="top" class="name">
 								<label for="email">Email:</label>
@@ -111,17 +111,17 @@
 								<span id="emailDisplayId" ${userLoginInstance.isLocal ? 'style="display:none;"' : ''}>${fieldValue(bean:userLoginInstance,field:'person.email')}</span>
 							</td>
 						</tr>
-						
+
 						<tr>
 							<td valign="top" class="name">
 								<label for="isLocal">Local Account:</label>
 							</td>
 							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
-								<input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}  
+								<input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}
 									onchange="togglePasswordEditFields( $(this) )" onclick='if(this.checked){this.value = true} else {this.value = false }'/>
 							</td>
 						</tr>
-						
+
 						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="forcePasswordChange">Force password change:</label>
@@ -130,19 +130,19 @@
 								<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" ${(userLoginInstance.forcePasswordChange=='Y') ? 'checked="checked"' : ''}/>
 							</td>
 						</tr>
-						
+
 						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="passwordNeverExpiresId">Password never expires:</label>
 							</td>
-							
+
 							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'passwordNeverExpires','errors')}">
 								<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" ${userLoginInstance.passwordNeverExpires ? 'checked="checked"' : ''}/>
 							</td>
 						</tr>
-						
+
 						<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength, fromDialog:true]}" />
-						
+
 
 						<tr class="prop">
 							<td valign="top" class="name">
@@ -156,7 +156,7 @@
 									});
 								</script>
 								<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
-									value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+									value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
 								<g:hasErrors bean="${userLoginInstance}" field="expiryDate">
 									<div class="errors">
 										<g:renderErrors bean="${userLoginInstance}" as="list" field="expiryDate"/>
@@ -222,17 +222,17 @@
 									${role}:
 								</td>
 								<td valign="top" class="value" >
-									<input type="checkbox" id="${role.id}" name="assignedRole"  value="${role.id}" ${assignedRoles.id.contains(role.id) ? 'checked="checked"' : ''} 
-									
+									<input type="checkbox" id="${role.id}" name="assignedRole"  value="${role.id}" ${assignedRoles.id.contains(role.id) ? 'checked="checked"' : ''}
+
 									<g:if test="${role.level > maxLevel}">disabled</g:if>
-									
+
 									/>
 									&nbsp; ${role.help ? role.help : ''} &nbsp;
 								</td>
 							</tr>
 						</g:each>
-						
-						<%-- 
+
+						<%--
 						<tr class="prop">
 							<td valign="top" class="value" colspan="2">
 								<table style="border: none;">
@@ -302,7 +302,7 @@
 				errMsg = "Email address is required!"
 			}
 		}
-	
+
     	if(errMsg.length > 0){
     		event.preventDefault()
     		alert(errMsg)
@@ -316,7 +316,7 @@
 	currentMenuId = "#adminMenu";
 	$('.menu-list-users').addClass('active');
 	$('.menu-parent-admin').addClass('active');
-	
+
 	function deleteRole(id){
 		var values = $("#"+id).val()
 		var personId =  $('#person').val();
@@ -325,7 +325,7 @@
 			${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + values +\'&person=\'+personId +\'&actionType=\'+action')}
 		}
 	}
-	
+
 	</script>
 	</body>
 </html>

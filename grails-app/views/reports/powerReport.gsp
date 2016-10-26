@@ -146,7 +146,7 @@
                                 <table style="border: 0" class="reports-discovery-table">
                                     <tr>
                                         <td nowrap="nowrap">
-                                            Display in: <g:select id="powerType" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}" style="float:right; margin-right:510px;" from="${['Watts', 'Amps']}"></g:select>
+                                            Display in: <g:select id="powerType" name='powerType' value="${tds.powerType()}" style="float:right; margin-right:510px;" from="${['Watts', 'Amps']}"/>
                                         </td>
                                     </tr>
                                     <tr>

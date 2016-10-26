@@ -1,4 +1,6 @@
 <%@page import="com.tdssrc.grails.TimeUtil"%>
+<%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="net.transitionmanager.domain.UserPreference" %>
 
 <script>
 	$(document).ready(function(){
@@ -38,7 +40,7 @@
 	<div class="buttons">
 		<g:if test="${userPref}">
 			<span class="button"><input type="button" class="save" value="Save" onclick="UserPreference.savePreferences('userTimezoneForm')" /> </span>
-			<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetTimezonePrefs(${session.getAttribute('LOGIN_PERSON').id})" value="Reset All"/> </span>
+			<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetTimezonePrefs(${tds.currentPersonId()})" value="Reset All"/> </span>
 		</g:if>
 		<g:else>
 			<span class="button"><input type="button" class="edit" value="Select" onclick="Project.setTimeZone('dateTimezone', 'timezone')" /> </span>

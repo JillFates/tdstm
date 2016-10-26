@@ -1,7 +1,3 @@
-/*
- * This controller just allows us to do some testing of things until we can move them into an integrated testcase
- */
-
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.ConnectorActiveDirectory
@@ -9,17 +5,40 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.AccountImportExportService
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.TaskService
+import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.service.UserService
 
-class TestCaseController {
+import static net.transitionmanager.domain.Permissions.Roles.ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
+import static net.transitionmanager.domain.Permissions.Roles.SUPERVISOR
+import static net.transitionmanager.domain.Permissions.Roles.USER
 
-	// IoC
-	def partyRelationshipService
-	def personService
-	def runbookService
-	def taskService
-	def securityService
-	def userService
-	def accountImportExportService
+/*
+ * This controller just allows us to do some testing of things until we can move them into an integrated testcase
+ */
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class TestCaseController implements ControllerMethods {
+
+	AccountImportExportService accountImportExportService
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	SecurityService securityService
+	TaskService taskService
+	UserPreferenceService userPreferenceService
+	UserService userService
 
 	def remoteAddr() {
 		render "Your address is ${HtmlUtil.getRemoteIp()}"
@@ -33,8 +52,9 @@ class TestCaseController {
 	def cleanString() {
 		def a = " a\tstring\nwith\rcharacters \u000bA\u007cB\u008fC that\r\ncan\fhave funcky\'character\"in it"
 		def b = StringUtil.clean(a)
-		render ('[' + b + ']').toString()
+		render '[' + b + ']'
 	}
+
 	def elapsed() {
 		StringBuffer sb = new StringBuffer("<h1>Testing the Elapsed Method</h1>")
 		List now = [new Date()]
@@ -42,7 +62,7 @@ class TestCaseController {
 		sb.append("elapsed now=$now <br>")
 
 		sleep(3000)
-		sb.append("elapsed time was ${ TimeUtil.elapsed(now) } now=$now <br>")
+		sb.append("elapsed time was ${TimeUtil.elapsed(now)} now=$now <br>")
 		sleep(1000)
 		sb.append("elapsed time was ${TimeUtil.elapsed(now)} now=$now <br>")
 
@@ -50,23 +70,22 @@ class TestCaseController {
 	}
 
 	def tz() {
-		String tz = session.getAttribute( 'CURR_TZ' ).CURR_TZ
-		String dateFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )[TimeUtil.DATE_TIME_FORMAT_ATTR]
-		String now = TimeUtil.formatDateTime(session, new Date())
-		// String str = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )
-		render "session isa ${session.getClass().getName()}, TZ=$tz<br>dateFormat=$dateFormat<br>now=$now".toString()
+		String tz = userPreferenceService.timeZone
+		String dateFormat = userPreferenceService.dateFormat
+		String now = TimeUtil.formatDateTime(new Date())
+		render "session isa ${session.getClass().name}, TZ=$tz<br>dateFormat=$dateFormat<br>now=$now".toString()
 	}
 
 	def securityRoleChanges() {
-		List allRoles = securityService.getAllRoleCodes()
-		// List currentRoles = ['ADMIN', 'SUPERVISOR', 'USER']
-		List currentRoles = ['WHAT', 'USER', 'ADMIN']
-		List authorizedRoles = ['SUPERVISOR', 'CLIENT_ADMIN']
-		List changes = ['CLIENT_MGR']
+		List<String> allRoles = securityService.getAllRoleCodes()
+		// List currentRoles = [ADMIN.name(), SUPERVISOR.name(), USER.name()]
+		List<String> currentRoles = ['WHAT', USER.name(), ADMIN.name()]
+		List<String> authorizedRoles = [SUPERVISOR.name(), CLIENT_ADMIN.name()]
+		List<String> changes = [CLIENT_MGR.name()]
 
 		Map map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoles)
 		String out = "Results were:<br> <pre>current: $currentRoles\nchanges:$changes\nauthorized:$authorizedRoles\n$map</pre>"
-		render out.toString()
+		render out
 	}
 
 	def teamCodeChanges() {
@@ -109,30 +128,24 @@ class TestCaseController {
 		List toCheck = ['A','-B','Q','-Z']
 		List results = accountImportExportService.checkMinusListForInvalidCodes(valid, toCheck)
 		String out="Checking of <pre>valid: $valid\ntoCheck: $toCheck\nresults: $results"
-		render out.toString()
+		render out
 	}
 
 	def testPersonGetAssignedProjects() {
-		def user = securityService.getUserLogin()
-		List projects = personService.getAssignedProjects(user.person)
-		render "Assigned to projects ${projects*.id}".toString()
+		List projects = personService.getAssignedProjects(securityService.userLoginPerson)
+		render 'Assigned to projects ' + projects*.id
 	}
 
 	def testPerms() {
-		def user = securityService.getUserLogin()
-
-		def hasPermGood = securityService.hasPermission(user, 'ShowCartTracker')
-		def hasPermBad = securityService.hasPermission(user, 'xyzzy')
+		boolean hasPermGood = securityService.hasPermission('ShowCartTracker')
+		boolean hasPermBad = securityService.hasPermission('xyzzy')
 
 		render "hasPermGood=$hasPermGood, hasPermBad=$hasPermBad"
-
 	}
 
 	def checkADConfig() {
-		def out = "<h1>Testing AD Configuration</h1><pre>"
-		out += securityService.getActiveDirectorySettings().toString() + "</pre>"
-
-		render out.toString()
+		String out = "<h1>Testing AD Configuration</h1><pre>" + securityService.getActiveDirectorySettings() + "</pre>"
+		render out
 	}
 
 	def findPerson() {
@@ -178,7 +191,7 @@ class TestCaseController {
 	}
 
 	def adIntegration() {
-		def adConf = grailsApplication.config?.tdstm?.security?.ad
+		def adConf = grailsApplication.config.tdstm?.security?.ad
 
 		def username='jmtest'
 		def pswd='tryT0Gu3ss1t'
@@ -191,6 +204,7 @@ class TestCaseController {
 
 	def testGormUtilGetDPWC() {
 		def sb = new StringBuilder()
+
 		def list = []
 
 		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'nullable', true)
@@ -230,7 +244,7 @@ class TestCaseController {
 		def list = partyRelationshipService.getStaffingRoles(false)
 		def s = '<table>'
 		list.each {
-			s += "<tr><td>${it.id}</td><td>${it.description}</td></tr>"
+			s += "<tr><td>$it.id</td><td>$it.description</td></tr>"
 		}
 		s += '</table>'
 		render s
@@ -305,7 +319,7 @@ class TestCaseController {
 					msg = 'FAILED - Not Found'
 				}
 			}
-			s.append("$msg</td></tr>")
+			s.append(msg).append('</td></tr>')
 		}
 		s.append("</table>")
 
@@ -321,10 +335,10 @@ class TestCaseController {
 		def asset2 = new AssetEntity()
 
 
-		//def type = GrailsClassUtils.getPropertyType(Application, property)?.getName()
-		//def type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.getName()
+		//def type = GrailsClassUtils.getPropertyType(Application, property)?.name
+		//def type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.name
 
-		//render "type=$type, ${asset.testingBy}, asset2=${asset2.getClass().getName()}"
+		//render "type=$type, $asset.testingBy, asset2=${asset2.getClass().name}"
 
 		def obj = taskService.getIndirectPropertyRef(asset, property)
 

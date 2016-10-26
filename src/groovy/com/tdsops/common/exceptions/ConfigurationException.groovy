@@ -1,19 +1,13 @@
 package com.tdsops.common.exceptions
 
+import groovy.transform.CompileStatic
+
 /**
- * Exception used to signal a configuration issue with the application
+ * Signals a configuration issue with the application.
  */
+@CompileStatic
 class ConfigurationException extends RuntimeException {
-
-	public ConfigurationException() {
-		super()
-	}
-
-	public ConfigurationException(String message) {
-		super(message)
-	}
-
-	public ConfigurationException(groovy.lang.GString message) {
+	ConfigurationException(CharSequence message) {
 		super(message.toString())
 	}
 }

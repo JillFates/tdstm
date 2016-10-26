@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.domain.Person" %>
 <div class="dialog">
         <g:form action="save" id="createDivFormId" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')">
           <input type="hidden"  id="createstaff" name="createstaff" value="${forWhom}" />

@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.ProjectTeam" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -51,10 +52,10 @@
 			<span class="button"><g:actionSubmit class="create" action="Create" value="Create Project Team" /></span>
 		</g:form>
             </div>
-	</div>            
+	</div>
 	<script>
 		currentMenuId = "#eventMenu";
 		$("#eventMenuId a").css('background-color','#003366')
-   </script>        
+   </script>
     </body>
 </html>

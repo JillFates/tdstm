@@ -1,5 +1,4 @@
-
-
+<%@page import="net.transitionmanager.domain.PartyType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -20,21 +19,21 @@
                 <table>
                     <thead>
                         <tr>
-                        
+
                    	        <g:sortableColumn property="id" title="Code" />
-                        
+
                    	        <g:sortableColumn property="description" title="Description" />
-                        
+
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${partyTypeInstanceList}" status="i" var="partyTypeInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
+
                             <td><g:link action="show" id="${partyTypeInstance.id}">${fieldValue(bean:partyTypeInstance, field:'id')}</g:link></td>
-                        
+
                             <td>${fieldValue(bean:partyTypeInstance, field:'description')}</td>
-                        
+
                         </tr>
                     </g:each>
                     </tbody>

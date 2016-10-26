@@ -1,5 +1,7 @@
+import grails.test.mixin.Mock
 import groovy.time.TimeCategory
-import grails.test.mixin.TestFor
+import net.transitionmanager.domain.MoveBundleStep
+import net.transitionmanager.domain.StepSnapshot
 import spock.lang.Specification
 
 @Mock(StepSnapshot)
@@ -9,7 +11,7 @@ class StepSnapshotTests extends Specification {
 
 	void setup() {
 		def now = new Date()
-		def mbs
+		MoveBundleStep mbs
 		use (TimeCategory) {
 			mbs = new MoveBundleStep(label: "Testing Code", transitionId: 666, planStartTime: now - 1.hour,
 			                         planCompletionTime: now + 1.hour)

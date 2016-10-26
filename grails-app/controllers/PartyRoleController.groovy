@@ -1,85 +1,83 @@
-class PartyRoleController {
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.PartyRole
+import net.transitionmanager.domain.RoleType
 
-    def index() { redirect( action:"list", params:params ) }
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class PartyRoleController implements ControllerMethods {
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-    def list() {
-        if( !params.max ) params.max = 10
-        [ partyRoleInstanceList: PartyRole.list( params ) ]
-    }
-    // return Party role details by using composite primary Key
-    def show() {
-    	// return PartyRole object by using composite PrimaryKey
-        def partyRoleInstance = PartyRole.get( new PartyRole( party:Party.get( params.partyId ), roleType:RoleType.get( params.roleTypeId ) ) )
+	def list() {
+		if (!params.max) params.max = 10
+		[partyRoleInstanceList: PartyRole.list(params)]
+	}
 
-        if ( !partyRoleInstance ) {
-            flash.message = "PartyRole not found with id ${partyRoleInstance.party},${partyRoleInstance.roleType}"
-            redirect( action:"list" )
-        }
-        else { return [ partyRoleInstance : partyRoleInstance ] }
-    }
-    // delete PartyRole details
-    def delete() {
-    	def partyRoleInstance = PartyRole.get( new PartyRole( party:Party.get( params.partyId ), roleType:RoleType.get( params.roleTypeId ) ) )
-        if ( partyRoleInstance ) {
-            partyRoleInstance.delete()
-            flash.message = "PartyRole ${partyRoleInstance.party},${partyRoleInstance.roleType} deleted"
-            redirect( action:"list" )
-        }
-        else {
-            flash.message = "PartyRole not found with id ${partyRoleInstance.party},${partyRoleInstance.roleType}"
-            redirect( action:"list" )
-        }
-    }
-    // retuen PartyRole details to the Update form
-    def edit() {
+	def show() {
+		PartyRole partyRole = fromParams()
+		if (!partyRole) return
 
-    	def partyRoleInstance = PartyRole.get( new PartyRole( party:Party.get( params.partyId ), roleType:RoleType.get( params.roleTypeId ) ) )
+		[partyRoleInstance: partyRole]
+	}
 
-        if ( !partyRoleInstance ) {
-            flash.message = "PartyRole not found with id ${partyRoleInstance.party},${partyRoleInstance.roleType}"
-            redirect(action:"list")
-        }
-        else {
-            return [ partyRoleInstance : partyRoleInstance ]
-        }
-    }
-    // update PartyRole Details
-    def update() {
-    	def partyRoleDel = PartyRole.get( new PartyRole( party:Party.get( params.partyId ), roleType:RoleType.get( params.roleTypeId ) ) )
-        if ( partyRoleDel ) {
-            def partyRoleInstance = new PartyRole( params )
-            if ( !partyRoleInstance.hasErrors() && partyRoleInstance.save( insert:true ) ) {
-            	partyRoleDel.delete()
-                flash.message = "PartyRole ${partyRoleInstance.party},${partyRoleInstance.roleType} Updated"
-                redirect( action:"show", params:[ partyId:partyRoleInstance.party.id, roleTypeId:partyRoleInstance.roleType.id ] )
-            }
-            else {
-                render( view:'edit', model:[partyRoleInstance:partyRoleInstance] )
-            }
-        }
-        else {
-            flash.message = "PartyRole not found with id ${partyRoleInstance.party},${partyRoleInstance.roleType}"
-            redirect( action:"edit", id:params.id )
-        }
-    }
-    // delete partyRole details
-    def create() {
-        def partyRoleInstance = new PartyRole()
-        partyRoleInstance.properties = params
-        return ['partyRoleInstance':partyRoleInstance]
-    }
-    // save PartyRole details
-    def save() {
-        def partyRoleInstance = new PartyRole( params )
-        if ( !partyRoleInstance.hasErrors() && partyRoleInstance.save( insert:true ) ) {
-            flash.message = "PartyRole ${partyRoleInstance.party},${partyRoleInstance.roleType} created"
-            redirect( action:"show", params:[ partyId:partyRoleInstance.party.id, roleTypeId:partyRoleInstance.roleType.id ] )
-        }
-        else {
-            render( view:'create', model:[partyRoleInstance:partyRoleInstance] )
-        }
-    }
+	def delete() {
+		PartyRole partyRole = fromParams()
+		if (!partyRole) return
+
+		partyRole.delete()
+		flash.message = "PartyRole ${partyRole.party},${partyRole.roleType} deleted"
+		redirect(action: 'list')
+	}
+
+	def edit() {
+		PartyRole partyRole = fromParams()
+		if (!partyRole) return
+
+		[partyRoleInstance: partyRole]
+	}
+
+	def update() {
+		PartyRole partyRoleDel = fromParams()
+		if (!partyRoleDel) return
+
+		def partyRole = new PartyRole(params)
+		if (!partyRole.hasErrors() && partyRole.save()) {
+			partyRoleDel.delete()
+			flash.message = "PartyRole ${partyRole.partyId},${partyRole.roleTypeId} Updated"
+			redirect(action: 'show', params: [partyId: partyRole.partyId, roleTypeId: partyRole.roleTypeId])
+		}
+		else {
+			render(view: 'edit', model: [partyRoleInstance: partyRole])
+		}
+	}
+
+	def create() {
+		[partyRoleInstance: new PartyRole(params)]
+	}
+
+	def save() {
+		def partyRole = new PartyRole(params)
+		if (!partyRole.hasErrors() && partyRole.save()) {
+			flash.message = "PartyRole ${partyRole.party},${partyRole.roleType} created"
+			redirect(action: 'show', params: [partyId: partyRole.party.id, roleTypeId: partyRole.roleType.id])
+		}
+		else {
+			render(view: 'create', model: [partyRoleInstance: partyRole])
+		}
+	}
+
+	private PartyRole fromParams() {
+		def party = Party.load(params.partyId)
+		def roleType = RoleType.load(params.roleTypeId)
+		def partyRole = PartyRole.get(new PartyRole(party: party, roleType: roleType))
+		if (partyRole) {
+			partyRole
+		}
+		else {
+			flash.message = "PartyRole not found with id ${party.id},${roleType.id}"
+			redirect(action: 'list')
+		}
+	}
 }

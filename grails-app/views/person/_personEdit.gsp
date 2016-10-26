@@ -13,16 +13,16 @@
 
 			<tr class="prop">
 				<td valign="top" class="name">
-					<label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
+					<label for="firstNameId"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
 				</td>
 				<td valign="top" class="value">
 					<input type="text" maxlength="64" id="firstNameId" name="firstName"/>
 				</td>
 			</tr>
-			
+
 			<tr class="prop" style="display:none;">
 				<td valign="top" class="name">
-					<label for="username"><b>User Name:&nbsp;<span style="color: red">*</span></b></label>
+					<label for="prefUsernameId"><b>User Name:&nbsp;<span style="color: red">*</span></b></label>
 				</td>
 				<td valign="top" class="value">
 					<input type="text" maxlength="64" id="prefUsernameId" name="username" value="${user.username}"/>
@@ -31,7 +31,7 @@
 
 			<tr class="prop">
 			  <td valign="top" class="name">
-				<label for="middleName">Middle Name:</label>
+				<label for="middleNameId">Middle Name:</label>
 			  </td>
 			  <td valign="top" class="value">
 				<input type="text" maxlength="64" id="middleNameId" name="middleName"/>
@@ -40,7 +40,7 @@
 
 			<tr class="prop">
 			  <td valign="top" class="name">
-				<label for="lastName">Last Name:</label>
+				<label for="lastNameId">Last Name:</label>
 			  </td>
 			  <td valign="top" class="value">
 				<input type="text" maxlength="64" id="lastNameId" name="lastName"/>
@@ -49,7 +49,7 @@
 
 			<tr class="prop">
 			  <td valign="top" class="name">
-				<label for="nickName">Nick Name:</label>
+				<label for="nickNameId">Nick Name:</label>
 			  </td>
 			  <td valign="top" class="value">
 				<input type="text" maxlength="64" id="nickNameId" name="nickName"/>
@@ -57,7 +57,7 @@
 			</tr>
 			<tr class="prop">
 			  <td valign="top" class="name">
-				<label for="title">Title:</label>
+				<label for="titleId">Title:</label>
 			  </td>
 			  <td valign="top" class="value">
 				<input type="text" maxlength="34" id="titleId" name="title"/>
@@ -65,7 +65,7 @@
 			</tr>
 			<tr class="prop">
 			  <td valign="top" class="name">
-				<label for="nickName">Email:</label>
+				<label for="emailId">Email:</label>
 			  </td>
 			  <td valign="top" class="value">
 				<input type="text" maxlength="64" id="emailId" name="email"/>
@@ -76,35 +76,34 @@
 					<label for="startPage">Start Page:</label>
 				</td>
 				<td valign="top" class="value">
-					<g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
-						<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal', 'User Dashboard']}" 
-						value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-					</g:if>
-					<g:else>
-						<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard', 'User Dashboard']}" 
-							value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-					</g:else>
+					<tds:hasPermission permission='AdminMenuView'>
+						<g:select name="startPage" value="${tds.startPage()}"
+						         from="${['Project Settings','Current Dashboard','Admin Portal', 'User Dashboard']}" />
+					</tds:hasPermission>
+					<tds:lacksPermission permission='AdminMenuView'>
+						<g:select name="startPage" value="${tds.startPage()}"
+						          from="${['Project Settings','Current Dashboard', 'User Dashboard']}" />
+					</tds:lacksPermission>
 				</td>
 			</tr>
 
 			<tr class="prop">
 				<td valign="top" class="name">
-					<label for="title">Power In:</label>
+					<label for="powerTypeId">Power In:</label>
 				</td>
 				<td valign="top" class="value">
-					<g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
-					value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
+					<g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" value="${tds.powerType()}"/>
 				</td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name">
-					<label for="title">Model Score:</label>
+					<label for="modelScoreId">Model Score:</label>
 				</td>
 				<td valign="top" class="value">
 					<input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
 				</td>
 			</tr>
-			
+
 			<g:render template="../userLogin/setPasswordFields" model="${[changingPassword:true, minPasswordLength:minPasswordLength, fromDialog:true]}" />
 		  </tbody>
 		</table>

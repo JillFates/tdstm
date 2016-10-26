@@ -48,10 +48,8 @@ grails.project.dependency.resolution = {
 		compile ':plugin-config:0.2.0'
 		compile ':ref-code:0.3.0'
 		compile ':scaffolding:2.1.2'
-		compile (':shiro:1.2.1') {
-			excludes 'quartz', 'shiro-quartz'
-		}
-		compile ':shiro-protect-any:0.1.0'  //@tavo_luna: shiro protection for grails-melody
+		compile ':spring-security-core:2.0.0'
+
 
 		runtime ':database-migration:1.4.0'
 		runtime ':grails-melody:1.54.0'

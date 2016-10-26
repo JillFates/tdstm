@@ -1,102 +1,86 @@
 package com.tdsops.tm.enums.domain
 
-import com.tdssrc.grails.EnumUtil
-import com.tds.asset.AssetType
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 /**
- * Define all the possible classes of assets that are supported by TransitionManager
+ * Defines all the possible classes of assets that are supported by TransitionManager.
  */
+@CompileStatic
 enum AssetClass {
-	APPLICATION,
-	DATABASE,
-	DEVICE,
-	STORAGE
+
+	APPLICATION(Application),
+	DATABASE(Database),
+	DEVICE(AssetEntity),
+	STORAGE(Files)
+
+	/**
+	 * The Asset Class Options used for filtering
+	 */
+	static final Map<String, String> classOptions = ([
+			'APPLICATION'    : 'Applications',
+			'SERVER-DEVICE'  : 'Servers',
+			'DATABASE'       : 'Databases',
+			'NETWORK-DEVICE' : 'Network Devices',
+		// 'NETWORK-LOGICAL': 'Logical Network',
+			'STORAGE-DEVICE' : 'Storage Devices',
+			'STORAGE-LOGICAL': 'Logical Storage',
+			'OTHER-DEVICE'   : 'Other Devices'
+	] as TreeMap).asImmutable()
+
+	private final Class domainClass
+
+	private AssetClass(Class clazz) {
+		domainClass = clazz
+	}
 
 	static AssetClass safeValueOf(String key) {
-		AssetClass obj
-		try {
-			obj = key as AssetClass
-		} catch (e) { }
-		return obj
+		values().find { it.name() == key }
 	}
 
 	/**
-	 * Used to get the name of the name of the domain class associated with the AssetClass
-	 * @param assetClass - the enum of the asset class
+	 * The name of the name of the domain class associated with the AssetClass
+	 * @param assetClass  the enum of the asset class
 	 * @return the name of the GORM domain class
 	 */
 	static String domainNameFor(AssetClass assetClass) {
-		def domain = domainClassFor(assetClass).name
-		domain.split(/\./)[3]
+		domainClassFor(assetClass).name.split(/\./)[3]
 	}
 
 	/**
-	 * Used to get the appropriate Domain Class for a specified asset class
+	 * Get the appropriate Domain Class for a specified asset class
 	 * @param assetClass - the enum of the asset class
 	 * @return the GORM domain class
 	 */
-	static Object domainClassFor(Object assetClass) {
-		def domain
-		def map = [
-			(AssetClass.DEVICE) : AssetEntity,
-			(AssetClass.DATABASE) : Database,
-			(AssetClass.APPLICATION) : Application,
-			(AssetClass.STORAGE) : Files
-		]
-		if (map.containsKey(assetClass)) {
-			return map[assetClass]
-		} else {
-			throw RuntimeException("domainClassFor() Unhandled case for $assetClass")
-		}
+	static Class domainClassFor(AssetClass assetClass) {
+		assetClass.domainClass
 	}
 
 	/**
-	 * A list of the Asset Class Options used for filtering
-	 * @return Map of names
+	 * The Asset Class Options used for filtering
 	 */
-	static Map getClassOptions() {
-		TreeMap list = [
-			'APPLICATION': 'Applications',
-			'SERVER-DEVICE': 'Servers',
-			'DATABASE': 'Databases',
-			'NETWORK-DEVICE': 'Network Devices',
-			// 'NETWORK-LOGICAL': 'Logical Network',
-			'STORAGE-DEVICE': 'Storage Devices',
-			'STORAGE-LOGICAL': 'Logical Storage',
-			'OTHER-DEVICE': 'Other Devices',
-		]
-	}
-
-	/**
-	 * A list of the Asset Class Options used for filtering
-	 * @return String
-	 */
-	static String getClassOptionsDefinition() {
-		def assetMap = getClassOptions()
-		def assetClassesForSelect2 = new ArrayList<String>(getClassOptions().keySet())
-		def results = []
-
-		results.push("{ id: 'ALL', 'text': 'Filter: All Classes' }")
-
-		assetClassesForSelect2.each {
-			def value = assetMap[it]
-			results.push("{ id: '${it}', 'text': '${value}' }")
+	static final String classOptionsDefinition
+	static {
+		List<String> results = ["{ id: 'ALL', 'text': 'Filter: All Classes' }"]
+		for (String key in classOptions.keySet()) {
+			results.push("{ id: '$key', 'text': '${classOptions[key]}' }".toString())
 		}
-
-		return results
+		classOptionsDefinition = results
 	}
 
 	/**
-	 * Used to determine the Class Option based on the assetType
+	 * Determine the Class Option based on the assetType
 	 * @param type - the asset type
 	 * @return the name of the class option
 	 */
-	static String getClassOptionForAsset(Object asset) {
-		return getClassOptionForAsset(asset?.assetClass, asset.model?.assetType)
+	@CompileDynamic
+	static String getClassOptionForAsset(asset) {
+		getClassOptionForAsset(asset?.assetClass, asset?.model?.assetType)
 	}
 
 	/**
@@ -106,42 +90,17 @@ enum AssetClass {
 	 * @return the name of the class option
 	 */
 	static String getClassOptionForAsset(AssetClass assetClass, String assetType) {
-		String option
-
-		switch(assetClass) {
-			case AssetClass.DEVICE:
-				def type = assetType
-				if (type) {
-					if (AssetType.getServerTypes().contains(type)) {
-						option = 'SERVER-DEVICE'
-					} else if (AssetType.getStorageTypes().contains(type)) {
-						option = 'STORAGE-DEVICE'
-					} else if (AssetType.getNetworkDeviceTypes().contains(type)) {
-						option = 'NETWORK-DEVICE'
-					}
+		switch (assetClass) {
+			case APPLICATION: return 'APPLICATION'
+			case DATABASE:    return 'DATABASE'
+			case STORAGE:     return 'STORAGE-LOGICAL'
+			case DEVICE:
+				if (assetType) {
+					if (AssetType.serverTypes.contains(assetType))        return 'SERVER-DEVICE'
+					if (AssetType.storageTypes.contains(assetType))       return 'STORAGE-DEVICE'
+					if (AssetType.networkDeviceTypes.contains(assetType)) return 'NETWORK-DEVICE'
 				}
-				if (! option)
-					option = 'OTHER-DEVICE'
-
-				break
-
-			case AssetClass.APPLICATION:
-				option = 'APPLICATION'
-				break
-
-			case AssetClass.DATABASE:
-				option = 'DATABASE'
-				break
-
-			case AssetClass.STORAGE:
-				option = 'STORAGE-LOGICAL'
-				break
-
-			default:
-				throw new RuntimeException("Unhandled switch statement for value ${assetClass}")
-
+				return 'OTHER-DEVICE'
 		}
-
-		return option
 	}
 }

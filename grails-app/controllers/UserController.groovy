@@ -1,30 +1,33 @@
-import net.transitionmanager.utils.Profiler
+import net.transitionmanager.controller.ControllerMethods
 
-class UserController {
+import static net.transitionmanager.utils.Profiler.KEY_NAME
+
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class UserController implements ControllerMethods {
 
 	/**
-	 * Used to toggle the profiler session variable on/off for performance troubleshooting
+	 * Toggles the profiler session variable on/off for performance troubleshooting.
 	 */
-	def profilerToggle(){
-		def value = session[Profiler.KEY_NAME]
+	def profilerToggle() {
+		def value = session[KEY_NAME]
 		if (value) {
-			session.removeAttribute(Profiler.KEY_NAME)
+			session.removeAttribute(KEY_NAME)
 		} else {
-			session[Profiler.KEY_NAME] = Profiler.KEY_NAME
+			session[KEY_NAME] = KEY_NAME
 		}
 
-		render "The Profiler is: " + isProfilerSet()
+		render "The Profiler is: " + profilerState()
 	}
 
 	/**
-	 * Used to show the state of the profiler session variable
+	 * Show the state of the profiler session variable.
 	 */
-	def profilerStatus(){
-		render "The Profiler is: " + isProfilerSet()
+	def profilerStatus() {
+		render "The Profiler is: " + profilerState()
 	}
 
-	private isProfilerSet(){
-		return (session[Profiler.KEY_NAME] == Profiler.KEY_NAME) ? "ENABLED" : "DISABLED"
+	private String profilerState() {
+		session[KEY_NAME] == KEY_NAME ? "ENABLED" : "DISABLED"
 	}
-
 }

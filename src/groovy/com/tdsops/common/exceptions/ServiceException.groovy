@@ -1,26 +1,28 @@
 package com.tdsops.common.exceptions
 
+import groovy.transform.CompileStatic
+
 /**
- * Exception used to inform invalid behaviour in the service layer.
+ * Informs invalid behaviour in the service layer.
  */
+@CompileStatic
 class ServiceException extends Exception {
 
-	String messageCode
-	List messageArgs
+	final String messageCode
+	final List messageArgs
 
-	public ServiceException(String message) {
-		super(message);
+	ServiceException(String message) {
+		super(message)
 	}
 
-	public ServiceException(String message, String messageCode) {
-		super(message);
+	ServiceException(String message, String messageCode) {
+		super(message)
 		this.messageCode = messageCode
 	}
 
-	public ServiceException(String message, String messageCode, List messageArgs) {
-		super(message);
+	ServiceException(String message, String messageCode, List messageArgs) {
+		super(message)
 		this.messageCode = messageCode
 		this.messageArgs = messageArgs
 	}
-
 }

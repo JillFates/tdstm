@@ -1,50 +1,45 @@
-import grails.converters.JSON
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Notice
+import net.transitionmanager.service.NoticeService
 
 /**
- * Created by octavio on 10/10/16.
  * @author oluna
  */
-class WsNoticeController{
+class WsNoticeController implements ControllerMethods {
+
 	NoticeService noticeService
 
 	/**
 	 * Fetch using pType
 	 * We might expand this to add different tipe of filters
-	 * @return
 	 */
-	public fetch(){
+	def fetch(Integer typeId) {
 		try {
-			Notice.NoticeType type = null
-			def typeId = params.typeId
-
-			if(typeId){
-				typeId =  Integer.parseInt(typeId)
+			Notice.NoticeType type
+			if (typeId) {
 				type = Notice.NoticeType.forId(typeId)
 			}
 
-			def list = noticeService.fetch(type)
-			render( [notices: list] as JSON )
-		}catch(Exception e){
-			response.status = 500
-			render( [errors:[e.getMessage()]] as JSON )
+			renderAsJson(notices: noticeService.fetch(type))
+		}
+		catch (e) {
+			renderError500 e
 		}
 	}
 
 	/**
 	 * Get Notice By ID
-	 * @return
 	 */
-	public get(){
+	def get(Long id) {
 		try {
-			def notice = noticeService.get(params.id)
-
+			Notice notice = noticeService.get(id)
 			if (!notice) {
 				response.status = 404
 			}
-			render( notice as JSON )
-		}catch(Exception e){
-			response.status = 500
-			render( [errors:[e.getMessage()]] as JSON )
+			renderAsJson notice
+		}
+		catch (e) {
+			renderError500 e
 		}
 	}
 
@@ -52,61 +47,51 @@ class WsNoticeController{
 	 * Insert/Update Notice
 	 *
 	 * Example:
-	 * {
-	 * 		"title":"titulo",
+	 *{* 		"title":"titulo",
 	 * 		"rawText":"este es el Mensaje",
 	 * 		"htmlText":"<strong>este es el Mensaje</strong>",
 	 * 		"type":"Prelogin"
-	 * }
-	 * @return
 	 */
-	public create(){
+	def create() {
 		try {
-			def json = request.JSON
-			def result = noticeService.create(json)
-
+			Map<String, ?> result = noticeService.create(request.JSON)
 			if (!result.status) {
 				response.status = 400
 			}
-			render(result.data as JSON)
-		}catch(Exception e){
-			response.status = 500
-			render([errors:[e.getMessage()]] as JSON)
+			renderAsJson result.data
+		}
+		catch (e) {
+			renderError500 e
 		}
 	}
 
-	public update(){
+	def update() {
 		try {
-			def json = request.JSON
-			def id = params.id
-			def result = noticeService.update(id, json)
-
+			Map<String, ?> result = noticeService.update(params.long('id'), request.JSON)
 			if (!result.status) {
 				response.status = 404
 			}
 
-			render(result.data as JSON)
-		}catch(Exception e){
-			response.status = 500
-			render( [errors:[e.getMessage()]] as JSON )
+			renderAsJson result.data
+		}
+		catch (e) {
+			renderError500 e
 		}
 	}
 
 	/**
 	 * Deletes an existing Notice
-	 * @return
 	 */
-	public delete(){
+	def delete(Long id) {
 		try {
-			def result = noticeService.delete(params.id)
-
+			boolean result = noticeService.delete(id)
 			if (!result) {
 				response.status = 404
 			}
-			render( [notices:[]] as JSON)
-		}catch(Exception e){
-			response.status = 500
-			render([errors:[e.getMessage()]] as JSON)
+			renderAsJson(notices: [])
+		}
+		catch (e) {
+			renderError500 e
 		}
 	}
 
@@ -114,16 +99,21 @@ class WsNoticeController{
 	 * Mark a Note Acknowledge by a User
 	 * TODO: (oluna)Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
 	 */
-	public ack(){
-		try{
-			def result = noticeService.ack(params.id, params.username)
+	def ack(Long id, String username) {
+		try {
+			boolean result = noticeService.ack(id, username)
 			if (!result) {
 				response.status = 404
 			}
 			render("")
-		}catch(Exception e){
-			response.status = 500
-			render([errors:[e.getMessage()]] as JSON)
 		}
+		catch (e) {
+			renderError500 e
+		}
+	}
+
+	private void renderError500(Exception e) {
+		response.status = 500
+		renderAsJson(errors: [e.message])
 	}
 }

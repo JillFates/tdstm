@@ -1,3 +1,5 @@
+<%@page import="net.transitionmanager.domain.Party" %>
+<%@page import="net.transitionmanager.domain.RoleType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -18,11 +20,11 @@
             <g:form method="post" >
                 <input type="hidden" name="partyId" value="${partyRoleInstance?.party.id}" />
                 <input type="hidden" name="roleTypeId" value="${partyRoleInstance?.roleType.id}" />
-                
+
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="party">Party:</label>
@@ -35,8 +37,8 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="roleType">Role Type:</label>
@@ -49,8 +51,8 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>

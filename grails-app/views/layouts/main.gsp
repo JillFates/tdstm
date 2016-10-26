@@ -5,9 +5,9 @@
     <title><g:layoutTitle default="Grails" /></title>
     <link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
     <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />  
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />
     <tds:favicon />
-	
+
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
@@ -15,7 +15,7 @@
     <g:javascript src="prototype/prototype.js" />
     <jq:plugin name="jquery.combined" />
     <g:layoutHead />
-	
+
     <script type="text/javascript">
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
@@ -24,20 +24,15 @@
      	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
    </script>
    </head>
-    <% def currProj = session.getAttribute("CURR_PROJ");
-    def setImage = session.getAttribute("setImage");
-    def projectId = currProj.CURR_PROJ ;
-    def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-    def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
-    def currProjObj;
-	def personId = session.getAttribute("LOGIN_PERSON").id
-	def person = Person.get(personId)
-    if( projectId != null){
-      currProjObj = Project.get(projectId)
-    }
-    def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
-    %>
-  
+<%
+def setImage = tds.setImage()
+def moveEvent = tds.currentMoveEvent()
+def moveBundle = tds.currentMoveBundle()
+def currProject = tds.currentProject()
+def person = tds.currentPerson()
+boolean isIE6 = tds.isIE6()
+%>
+
   <body>
     <div class="main_body">
 
@@ -46,32 +41,32 @@
       		<g:if test="${setImage}">
     	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
     	  	</g:if>
-	      	<g:else>      	
-     			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new"><img src="${resource(dir:'images',file:'TMMenuLogo.png')}" height="30" style="float: left;border: 0px"/></a>      	    	 
+	      	<g:else>
+     			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new"><img src="${resource(dir:'images',file:'TMMenuLogo.png')}" height="30" style="float: left;border: 0px"/></a>
     		</g:else>
     	</div>
-      	<div class="title">&nbsp;TransitionManager&trade; 
-      	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
-      	<g:if test="${moveEventId}"> : ${MoveEvent.get( moveEventId )?.name}</g:if>
-      	<g:if test="${moveBundleId}"> : ${MoveBundle.get( moveBundleId )?.name}</g:if>
+      	<div class="title">&nbsp;TransitionManager&trade;
+      	<g:if test="${currProject}"> - ${currProject.name} </g:if>
+      	<g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>
+      	<g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>
       </div>
         <div class="header_right"><br />
           <div style="font-weight: bold;">
-          <shiro:isLoggedIn>
+          <sec:ifLoggedIn>
           	<g:if test="${isIE6}">
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
-              	<g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(XMLHttpRequest)">
+              	<g:remoteLink controller="person" action="retrievePersonDetails" id="${tds.currentPersonId()}" onComplete="updatePersonDetails(XMLHttpRequest)">
 			<strong>
-		
+
 			<div style="float: left;">
-	              		Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }(${person?.modelScore}) </span>
+	              		Welcome,&nbsp;<span id="loginUserId">${person?.firstName}(${person?.modelScore}) </span>
 	              	</div>
-	              	&nbsp;| 
+	              	&nbsp;|
 	              </strong>
               </g:remoteLink>
               &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
-          </shiro:isLoggedIn>
+          </sec:ifLoggedIn>
           </div>
         </div>
       </div>
@@ -80,11 +75,11 @@
          <div class="menu1">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
-            <shiro:hasRole name="ADMIN">
+            <sec:ifAllGranted roles='ROLE_ADMIN'>
               <li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
-            </shiro:hasRole>
+            </sec:ifAllGranted>
           </ul>
-        </div> 
+        </div>
         </div>--%>
         <div class="menu2">
       	<ul>
@@ -100,10 +95,10 @@
     <li><g:link class="home" controller="projectUtil">Main</g:link></li>
     <li><g:link class="home" controller="projectUtil"
         action="searchList">Search</g:link></li>
-    <shiro:hasRole name="CLIENT_ADMIN">
+    <sec:ifAllGranted roles='ROLE_CLIENT_ADMIN'>
         <li><g:link class="home" controller="project" action="create">Add</g:link>
         </li>
-    </shiro:hasRole>
+    </sec:ifAllGranted>
     <li><a href="#">Import/Export</a></li>
 </ul>
 </div>
@@ -121,7 +116,7 @@
 
                 <tr class="prop">
                     <td valign="top" class="name">
-                        <label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
+                        <label for="firstNameId"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
                     </td>
                     <td valign="top" class="value">
                         <input type="text" maxlength="64" id="firstNameId" name="firstName"/>
@@ -130,7 +125,7 @@
 
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="lastName">Last Name:</label>
+                    <label for="lastNameId">Last Name:</label>
                   </td>
                   <td valign="top" class="value">
                     <input type="text" maxlength="64" id="lastNameId" name="lastName"/>
@@ -139,7 +134,7 @@
 
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="nickName">Nick Name:</label>
+                    <label for="lastNameId">Nick Name:</label>
                   </td>
                   <td valign="top" class="value">
                     <input type="text" maxlength="64" id="nickNameId" name="nickName"/>
@@ -147,7 +142,7 @@
                 </tr>
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="title">Title:</label>
+                    <label for="titleId">Title:</label>
                   </td>
                   <td valign="top" class="value">
                     <input type="text" maxlength="34" id="titleId" name="title"/>
@@ -155,17 +150,17 @@
                 </tr>
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="nickName">Email:</label>
+                    <label for="emailId">Email:</label>
                   </td>
                   <td valign="top" class="value">
                     <input type="text" maxlength="64" id="emailId" name="email"/>
                   </td>
                 </tr>
-                
+
                 <tds:hasPermission permission='PersonExpiryDate'>
                     <tr class="prop">
                         <td valign="top" class="name">
-                            <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></b></label>
+                            <label for="expiryDateId"><b>Expiry Date:<span style="color: red">*</span></b></label>
                         </td>
                         <td valign="top" class="value">
                         <script type="text/javascript">
@@ -178,34 +173,32 @@
                         </td>
                     </tr>
                 </tds:hasPermission>
-                
+
                     <tr class="prop">
                         <td valign="top" class="name">
                             <label for="startPage">Start Page:</label>
                         </td>
                         <td valign="top" class="value">
-                        <g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
-                            <g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal']}" 
-                            value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-                        </g:if>
-                        <g:else>
-                        <g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard']}" 
-                            value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-                        </g:else>
+	                     <tds:hasPermission permission='AdminMenuView'>
+                            <g:select name="startPage" from="${['Project Settings','Current Dashboard','Admin Portal']}"
+                            value="${tds.startPage()}"/>
+                        </tds:hasPermission>
+	                     <tds:lacksPermission permission='AdminMenuView'>
+		                     <g:select name="startPage" from="${['Project Settings','Current Dashboard']}" value="${tds.startPage()}"/>
+	                     </tds:lacksPermission>
                         </td>
                     </tr>
                 <tr class="prop">
                     <td valign="top" class="name">
-                       <label for="title">Power In:</label>
+                       <label for="powerTypeId">Power In:</label>
                     </td>
                     <td valign="top" class="value">
-                        <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
-                        value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
+                        <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" value="${tds.powerType()}"/>
                     </td>
                 </tr>
                 <tr class="prop">
                     <td valign="top" class="name">
-                       <label for="title">Model Score:</label>
+                       <label for="modelScoreId">Model Score:</label>
                     </td>
                     <td valign="top" class="value">
                        <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
@@ -213,7 +206,7 @@
                 </tr>
                 <tr class="prop">
                     <td valign="top" class="name">
-                        <label for="password">Old Password:&nbsp;</label>
+                        <label for="oldPasswordId">Old Password:&nbsp;</label>
                     </td>
                     <td valign="top" class="value">
                         <input type="hidden" id="personId" name="personId" value=""/>
@@ -223,7 +216,7 @@
 
                 <tr class="prop">
                     <td valign="top" class="name">
-                        <label for="password">New Password:&nbsp;</label>
+                        <label for="newPasswordId">New Password:&nbsp;</label>
                     </td>
                     <td valign="top" class="value">
                         <input type="password" maxlength="25" name="newPassword" id="newPasswordId" value=""/>
@@ -232,7 +225,7 @@
 
                 <tr class="prop">
                     <td valign="top" class="name">
-                        <label for="password">New Password (confirm):&nbsp;</label>
+                        <label for="newPasswordConfirmId">New Password (confirm):&nbsp;</label>
                     </td>
                     <td valign="top" class="value">
                         <input type="password" maxlength="25" name="newPasswordConfirm" id="newPasswordConfirmId" value=""/>

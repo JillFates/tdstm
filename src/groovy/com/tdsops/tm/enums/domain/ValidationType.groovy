@@ -1,23 +1,18 @@
 package com.tdsops.tm.enums.domain
 
-/**
- *
- * @author
- *
- */
+import groovy.transform.CompileStatic
+
+@CompileStatic()
 class ValidationType {
-	static final String DIS='Discovery'
-	static final String VL='Validated'
-	static final String DR='DependencyReview'
-	static final String DS='DependencyScan'
-	static final String BR='BundleReady'
-	static final getList() {
-		return [ DIS, VL, DR, DS, BR ]
-	}
-	static final getListAsMap() {
-		return [ D:DIS, V:VL, R:DR, S:DS, B:BR  ]
-	}
-	static final getValuesAsMap() {
-		return [ Discovery:'D', Validated:'V', DependencyReview:'R', DependencyScan:'S', BundleReady:'B'  ]
-	}
+	public static final String DIS = 'Discovery'
+	public static final String VL  = 'Validated'
+	public static final String DR  = 'DependencyReview'
+	public static final String DS  = 'DependencyScan'
+	public static final String BR  = 'BundleReady'
+
+	static final List<String> list = [DIS, VL, DR, DS, BR].asImmutable()
+
+	static final Map<String, String> listAsMap = [D: DIS, V: VL, R: DR, S: DS, B: BR].asImmutable()
+
+	static final Map<String, String> valuesAsMap = [(DIS): 'D', (VL): 'V', (DS): 'S', (BR): 'B'].asImmutable()
 }

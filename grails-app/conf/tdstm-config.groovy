@@ -80,7 +80,7 @@ tdstm {
 			// prevent the user from changing their password (hours)
 			minPeriodToChangePswd = 24
 
-			// Disable the forcing of users from changing their passwords if the encryption method was used was the obsolete one.
+			// Disable the forcing of users from changing their passwords if the hash method used was the obsolete one.
 			forceUseNewEncryption = true
 		}
 	}

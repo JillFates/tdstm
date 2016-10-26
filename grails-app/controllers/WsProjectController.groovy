@@ -1,34 +1,30 @@
-import grails.converters.JSON
-import grails.validation.ValidationException
-
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.SecurityService
 
 /**
- * {@link Controller} for handling WS calls of the {@link ProjectsService}
+ * Handles WS calls of the ProjectsService.
  *
  * @author Diego Scarpa <diego.scarpa@bairesdev.com>
  */
-class WsProjectController {
+@Secured('isAuthenticated()')
+@Slf4j(value='logger', category='grails.app.controllers.WsProjectController')
+class WsProjectController implements ControllerMethods {
 
-	def projectService
-	def securityService
+	ProjectService projectService
+	SecurityService securityService
 
 	/**
 	 * Gets the projects associated to a user
 	 */
 	def userProjects() {
 
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-
-		def projectStatus = ProjectStatus.valueOfParam(params.status)
-		projectStatus = projectStatus?projectStatus:ProjectStatus.ANY
+		def projectStatus = ProjectStatus.valueOfParam(params.status) ?: ProjectStatus.ANY
 
 		def searchParams = [:]
 		searchParams.maxRows = params.maxRows
@@ -37,36 +33,21 @@ class WsProjectController {
 		searchParams.sortOrder = SortOrder.valueOfParam(params.sortOrder)
 
 		try {
-			def projects = projectService.getUserProjects(loginUser, projectHasPermission, projectStatus, searchParams)
+			def projects = projectService.getUserProjects(securityService.hasPermission("ShowAllProjects"), projectStatus, searchParams)
 			def dataMap = [:]
 			def results = []
-			projects.each() { project ->
-				def dto = [:]
-				dto.id = project.id
-				dto.name = project.name
-				dto.description = project.description
-				dto.projectCode = project.projectCode
-				dto.status = project.getStatus()
-				dto.completionDate = project.completionDate
-				dto.clientId = project.client.id
-				dto.clientName = project.client.name
-				results.add(dto)
+			projects.each { project ->
+				results.add(name: project.name, description: project.description, clientId: project.client.id,
+				            id: project.id, projectCode: project.projectCode, status: project.getStatus(),
+				            clientName: project.client.name, completionDate: project.completionDate)
 			}
 
 			dataMap.projects = results
 
-			render(ServiceResults.success(dataMap) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(dataMap)
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
-
 }

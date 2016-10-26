@@ -32,12 +32,12 @@ a:hover {
 					</tr>
 				</thead>
 				<tbody>
-					<g:each in="${recentUsers}" status="i"  var="user">			
+					<g:each in="${recentUsers}" status="i"  var="user">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 						<td><span class="clickableText" onClick="Person.showPersonDialog(${user.person?.id},'generalInfoShow')">${user.person}</span></td>
 						<td><g:link controller="userLogin" action="show" id="${user.id}">${user.username}</g:link></td>
-						<td><tds:convertDateTime date="${user.lastLogin}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-						<td><tds:convertDateTime date="${user.lastPage}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td><tds:convertDateTime date="${user.lastLogin}" timeZone="${tds.timeZone()}"/></td>
+						<td><tds:convertDateTime date="${user.lastPage}" timeZone="${tds.timeZone()}"/></td>
 					</tr>
 					</g:each>
 				</tbody>
@@ -60,12 +60,12 @@ a:hover {
 				</thead>
 				<tbody>
 					<g:if test="${moveEventsList}">
-						<g:each in="${moveEventsList}" status="i"  var="eventList">	
+						<g:each in="${moveEventsList}" status="i"  var="eventList">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td><g:link controller="project" action="show" id="${eventList?.moveEvent?.project?.id}">${eventList?.moveEvent?.project?.name} - ${eventList?.moveEvent?.name}</g:link></td>
 							<td>${eventList?.status }</td>
-							<td><tds:convertDateTime date="${eventList?.startTime}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-							<td><tds:convertDateTime date="${eventList?.completionTime}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+							<td><tds:convertDateTime date="${eventList?.startTime}" timeZone="${tds.timeZone()}"/></td>
+							<td><tds:convertDateTime date="${eventList?.completionTime}" timeZone="${tds.timeZone()}"/></td>
 						</tr>
 						</g:each>
 					</g:if>
@@ -88,11 +88,11 @@ a:hover {
 					</thead>
 					<tbody>
 						<g:if test="${upcomingBundles}">
-							<g:each in="${upcomingBundles}" status="i"  var="bundle">		
+							<g:each in="${upcomingBundles}" status="i"  var="bundle">
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 								<td><g:link controller="project" action="show" id="${bundle.project?.id}">${bundle.project?.name} - ${bundle.name}</g:link></td>
-								<td><tds:convertDateTime date="${bundle.startTime}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-								<td><tds:convertDateTime date="${bundle.completionTime}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+								<td><tds:convertDateTime date="${bundle.startTime}" timeZone="${tds.timeZone()}"/></td>
+								<td><tds:convertDateTime date="${bundle.completionTime}" timeZone="${tds.timeZone()}"/></td>
 							</tr>
 							</g:each>
 						</g:if>
@@ -134,7 +134,7 @@ a:hover {
 								<g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link>
 							</td>
 							<td>
-								<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link> 
+								<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link>
 							</td>
 						</tr>
 						<tds:hasPermission permission='ShowProjectDailyMetrics'>
@@ -220,20 +220,20 @@ a:hover {
 	<input type="radio" name="deleteHistory" id="anyProcessed" value="anyProcessed" > <label for="anyProcessed">Any Processed</label> <br>
 	<input type="radio" name="deleteHistory" id="all" value="all" > <label for="all">All processed AND pending data</label> <br>
 	<div class="buttons">
-		<input type="button" id="processData" class="save" value="Submit" onclick="processBatch()"/> 
+		<input type="button" id="processData" class="save" value="Submit" onclick="processBatch()"/>
 		<input type="button"  class="delete" value="Cancel" id="processData" onclick="jQuery('#flushOldBatchId').dialog('close')"/>
 	</div>
 	</div>
 </div>
 <div id="showOrCleanTypeId" title="Clean Asset Types">
 	<div id="cleanProcessId" style="display: none; " >
-		Processing...<img src="${resource(dir:'images',file:'processing.gif')}" /> 
+		Processing...<img src="${resource(dir:'images',file:'processing.gif')}" />
 	</div>
 	<div id="cleanProcessDivId" class="cleanProcessDiv">
 		<img src="${resource(dir:'images',file:'processing.gif')}" />
 	</div>
 	<div class="buttons">
-		<input type="button" id="cleanTypes" class="save" value="Clean" onclick="cleanTypes()"/> 
+		<input type="button" id="cleanTypes" class="save" value="Clean" onclick="cleanTypes()"/>
 		<input type="button"  class="delete" value="Cancel" onclick="jQuery('#showOrCleanTypeId').dialog('close')"/>
 	</div>
 </div>
@@ -242,12 +242,12 @@ a:hover {
 	currentMenuId = '#adminMenu';
 	$('.menu-admin-portal').addClass('active');
 	$('.menu-parent-admin').addClass('active');
-	
+
 	$(document).ready(function() {
 		$("#flushOldBatchId").dialog({ autoOpen: false })
 		$("#showOrCleanTypeId").dialog({ autoOpen: false })
 	})
-	
+
 </script>
 </body>
 </html>

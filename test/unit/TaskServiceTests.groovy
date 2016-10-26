@@ -1,13 +1,17 @@
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import spock.lang.Specification
-
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
 import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.RoleType
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.TaskService
+import spock.lang.Specification
 
 @SuppressWarnings('unused')
 @TestFor(TaskService)

@@ -1,6 +1,12 @@
 package com.tdsops.common.security
 
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.security.spring.TdsUserDetails
 import com.tdssrc.grails.HtmlUtil
+import grails.converters.JSON
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+import net.transitionmanager.service.SecurityService
 
 import javax.servlet.http.HttpSession
 import javax.servlet.http.HttpSessionAttributeListener
@@ -8,136 +14,125 @@ import javax.servlet.http.HttpSessionBindingEvent
 import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
 
-import org.apache.log4j.Logger
-import org.apache.shiro.subject.PrincipalCollection
-import org.apache.shiro.subject.support.DefaultSubjectContext
-
-import com.tdssrc.grails.HtmlUtil
-
+@CompileStatic
+@Slf4j(value='logger')
 class SessionListener implements HttpSessionListener, HttpSessionAttributeListener {
 
-	private static final String SHIRO_KEY = DefaultSubjectContext.PRINCIPALS_SESSION_KEY
-	private static final String LOGIN_PERSON = 'LOGIN_PERSON'
 	private static final String LOGGER_PREFIX = 'SESSION_ACTIVITY: '
 
-	private final Logger log = Logger.getLogger(getClass())
+	@CompileStatic
+	static enum EventType {
+		sessionCreated,
+		sessionDestroyed,
+		attributeAdded,
+		attributeReplaced,
+		attributeRemoved
+	}
 
 	void sessionCreated(HttpSessionEvent event) {
-		log.effectiveLevel
-		try {
-			if (!log.debugEnabled) return
-
-			HttpSession session = event.session
-
-			log.debug LOGGER_PREFIX + 'Created; id: ' + session.id + ', at ' + session.creationTime +
-				', ip: ' + HtmlUtil.getRemoteIp()
-		}
-		catch (ignored) {}
+		processEvent(type: EventType.sessionCreated, event: event)
 	}
 
 	void sessionDestroyed(HttpSessionEvent event) {
-		try {
-			if (!log.debugEnabled) return
-
-			HttpSession session = event.session
-
-			String ipAddr = HtmlUtil.getRemoteIp()
-
-			StringBuilder sb = new StringBuilder(LOGGER_PREFIX + 'Destroyed; ')
-			sb << 'id:' << session.id << ' @ ' << ipAddr << ' created at ' << session.creationTime
-			sb << ' (age: ' << (System.currentTimeMillis() - session.creationTime) << '), '
-			sb << 'lastAccessed at ' << session.lastAccessedTime
-			sb << ' (' + (System.currentTimeMillis() - session.lastAccessedTime) + ' ms ago), '
-
-			for (Enumeration<String> names = session.attributeNames; names.hasMoreElements(); ) {
-				String name = names.nextElement()
-				if (name == SHIRO_KEY || name == LOGIN_PERSON) {
-					// boolean added = false
-					if (name == SHIRO_KEY) {
-						PrincipalCollection principals = session.getAttribute(name)
-						sb << 'Shiro principal found in session: ' << principals.primaryPrincipal
-						// added = true
-					}
-
-					sb << ', ip: ' + HTMLUtil.getRemoteIp()
-					/*
-					if (name == LOGIN_PERSON) {
-						if (added) sb << ', '
-						sb << 'LOGIN_PERSON found in session: ' + session[LOGIN_PERSON]
-					}
-					*/
-					break
-				}
-			}
-
-			/*
-			sb << 'Attributes: '
-
-			String delimiter = ''
-			for (Enumeration<String> names = session.attributeNames; names.hasMoreElements(); ) {
-				String name = names.nextElement()
-				def value = session.getAttribute(name)
-				sb << delimiter
-				sb << 'Name: "' << name << '" '
-				sb << 'Value: ' << value
-				delimiter = ', '
-			}
-			*/
-
-			log.debug sb.toString()
-		}
-		catch (ignored) {}
+		processEvent(type: EventType.sessionDestroyed, event: event)
 	}
 
 	void attributeAdded(HttpSessionBindingEvent event) {
-		try {
-			if (!log.debugEnabled) return
-			findPrincipal event, 'added to'
-		}
-		catch (ignored) {}
-	}
-
-	void attributeRemoved(HttpSessionBindingEvent event) {
-		try {
-			if (!log.debugEnabled) return
-			findPrincipal event, 'removed from'
-		}
-		catch (ignored) {}
+		processEvent(type: EventType.attributeAdded, sessionBindingEvent: event)
 	}
 
 	void attributeReplaced(HttpSessionBindingEvent event) {
-		try {
-			if (!log.debugEnabled) return
-			findPrincipal event, 'replaced in'
-		}
-		catch (ignored) {}
+		processEvent(type: EventType.attributeReplaced, sessionBindingEvent: event)
 	}
 
-	private findPrincipal(HttpSessionBindingEvent event, String what) {
-		String name = event.name
-		if (name != SHIRO_KEY && name != LOGIN_PERSON) {
-			return
+	void attributeRemoved(HttpSessionBindingEvent event) {
+		processEvent(type: EventType.attributeRemoved, sessionBindingEvent: event)
+	}
+
+	private void processEvent(Map data) {
+		try {
+			if (!debugEnabled) return
+
+			HttpSessionEvent event = (HttpSessionEvent) data.event
+			HttpSessionBindingEvent bindingEvent = (HttpSessionBindingEvent) data.sessionBindingEvent
+			if (bindingEvent) {
+				event = bindingEvent
+			}
+
+			EventType type = (EventType) data.type
+			Map<String, Object> jsonData = [:]
+			jsonData.eventTime = new Date()
+			jsonData.type = type.name()
+			HttpSession session = event.session
+			jsonData.sessionId = session.id
+
+			if (bindingEvent) {
+				jsonData.attributeName = bindingEvent.name
+				if (type != EventType.attributeRemoved) {
+					jsonData.attributeValueType = bindingEvent.value?.getClass()?.name
+					String valueToString
+					try {
+						valueToString = bindingEvent.value == null ? '{{ null }}' : bindingEvent.value.toString()
+					}
+					catch (e) {
+						valueToString = '{{ Error occurred rendering as String }}'
+					}
+					if (valueToString.length() > 500) {
+						valueToString = valueToString.substring(0, 500) + '...'
+					}
+					jsonData.attributeValue = valueToString
+				}
+			}
+
+			try {
+				if (type == EventType.sessionCreated) {
+					jsonData.sessionCreationTime = session.creationTime
+				}
+				jsonData.sessionLastAccessedTime = session.lastAccessedTime
+			}
+			catch (IllegalStateException e) {
+				// ignored; both method calls throw IllegalStateException if invalidated,
+				// but there's no way to check that the session is still active
+			}
+
+			String ipAddress = HtmlUtil.getRemoteIp()
+			if (ipAddress == 'Unknown') ipAddress = securityService.ipAddress
+			jsonData.ip = ipAddress
+			jsonData.authInfo = authInfo
+
+			logger.debug '{} {}', LOGGER_PREFIX, (jsonData as JSON)
 		}
-
-		HttpSession session = event.session
-		StringBuilder sb = new StringBuilder(LOGGER_PREFIX + 'Attrib Change; ')
-
-		boolean added = false
-		if (name == SHIRO_KEY) {
-			PrincipalCollection principals = session.getAttribute(name)
-			sb << 'Shiro principal ' + what + ' session ' << session.id << ': ' << principals.primaryPrincipal
-			added = true
+		catch (e) {
+			handleException 'sessionCreated', e
 		}
+	}
 
-		//if (event.name == LOGIN_PERSON) {
-		//	if (added) sb << ', '
-		//	sb << 'LOGIN_PERSON ' + what + ' session ' << session.id << ': ' << session[LOGIN_PERSON]
-		//}
-
-		if (added) {
-			sb << ', ip: ' + HtmlUtil.getRemoteIp()
-
-			log.debug sb.toString()
+	private Map<String, Object> getAuthInfo() {
+		if (securityService.loggedIn) {
+			TdsUserDetails details = securityService.currentUserDetails
+			[username: details.username, 'UserLogin.id': details.id,
+			 'Person.id': details.personId, roles: details.authorities*.authority]
 		}
+		else {
+			Collections.emptyMap()
+		}
+	}
+
+	private void handleException(String type, Throwable t) {
+		try {
+			logger.error t.message, t
+		}
+		catch (Throwable t2) {
+			t2.printStackTrace()
+			t?.printStackTrace()
+		}
+	}
+
+	private boolean isDebugEnabled() {
+		logger.debugEnabled
+	}
+
+	private SecurityService getSecurityService() {
+		ApplicationContextHolder.getBean('securityService', SecurityService)
 	}
 }

@@ -1,11 +1,14 @@
+import net.transitionmanager.controller.ControllerMethods
 
-class WidgetController {
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class WidgetController implements ControllerMethods {
 
 	def progressBar() {
-		render(view: 'progressBarDemo', model: ['url' : '/demo'])
+		render(view: 'progressBarDemo', model: [url: '/demo'])
 	}
 
 	def progressBarFailed() {
-		render(view: 'progressBarDemo', model: ['url' : '/demo/failed'])
+		render(view: 'progressBarDemo', model: [url: '/demo/failed'])
 	}
 }

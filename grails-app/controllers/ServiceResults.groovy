@@ -1,210 +1,109 @@
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.lang.CollectionUtils
 import grails.converters.JSON
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.validation.Errors
+
+import javax.servlet.http.HttpServletResponse
+
+import static org.springframework.http.HttpStatus.FORBIDDEN
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import static org.springframework.http.HttpStatus.NOT_FOUND
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 /**
- * Utility class for creating HTTP resposes
+ * Utility class for creating HTTP responses.
  */
 class ServiceResults {
 
-	/**
-	 * Used to respond to a request with a success message
-	 * @param response - the HTTP response object
-	 * @param map - a Map of any returning data (optional)
-	 * @return void
-	 */
-	static void respondWithSuccess(response, map = [:]) {
-		respondAsJson(response, success(map))
+	static void respondWithSuccess(HttpServletResponse response, Map data = [:]) {
+		respondAsJson(response, success(data))
 	}
 
-	/**
-	 * Used to respond to a request with a Failure message
-	 * @param response - the HTTP response object
-	 * @param map - a Map of any returning data (optional)
-	 * @return void
-	 */
-	static void respondWithFailure(response, map = [:]) {
-		respondAsJson(response, fail(map))
+	static void respondWithFailure(HttpServletResponse response, Map data = [:]) {
+		respondAsJson(response, fail(data))
 	}
 
-	/**
-	 * Used to respond to a request with a Failure message
-	 * @param response - the HTTP response object
-	 * @param An error message string or list of error messages
-	 * @return void
-	 */
-	static void respondWithError(response, errorMsgs) {
+	static void respondWithError(HttpServletResponse response, errorMsgs) {
 		respondAsJson(response, errors(errorMsgs))
 	}
 
-	/**
-	 * Returns a success response to be serialized as json
-	 * @param map the Map data to be added to the response object
-	 * @return the response map
-	 */
-	static Map success(map = [:]) {
-		def renderMap = [:]
-		renderMap.status = 'success'
-		renderMap.data = map
-		return renderMap
+	static Map success(Map data = [:]) {
+		[status: 'success', data: data]
 	}
 
 	// TODO - JPM 5/2015 - I think that the fail() and respondWithFailure should? return list instead of map?
-	/**
-	 * Returns a fail response to be serialized as json
-	 * @param map the Map data to be added to the response object
-	 * @return the response map
-	 */
-	static def fail(map = [:]) {
-		def renderMap = [:]
-		renderMap.status = 'fail'
-		renderMap.data = map
-		return renderMap
+	static Map fail(Map data = [:]) {
+		[status: 'fail', data: data]
 	}
 
-	/**
-	 * Returns a error response to be serialized as json
-	 * @param object an array or map to be set as errors
-	 * @return the response map
-	 */
 	static Map errors(errorStringOrList) {
-		def renderMap = [:]
-		renderMap.status = 'error'
-		if (errorStringOrList instanceof List) {
-			renderMap.errors = errorStringOrList
-		} else {
-			renderMap.errors = [ errorStringOrList ]
-		}
-		return renderMap
+		[status: 'error', errors: CollectionUtils.asList(errorStringOrList)]
 	}
 
-	/**
-	 * Returns a warning response to be serialized as json
-	 * @param object an array or map to be set as warnings
-	 * @return the response map
-	 */
-	static def warnings(warnStringOrList) {
-		def renderMap = [:]
-		renderMap.status = 'warning'
-		if (warnStringOrList instanceof List) {
-			renderMap.warnings = warnStringOrList
-		} else {
-			renderMap.warnings = [ warnStringOrList ]
-		}
-		return renderMap
+	static Map warnings(warnStringOrList) {
+		[status: 'warning', warnings: CollectionUtils.asList(warnStringOrList)]
 	}
 
-	/**
-	 * Used to respond to a request with a Failure message
-	 * @param response - the HTTP response object
-	 * @param An error message string or list of error messages
-	 * @return void
-	 */
-	static void respondWithWarning(response, warningMsgs) {
+	static void respondWithWarning(HttpServletResponse response, warningMsgs) {
 		respondAsJson(response, warnings(warningMsgs))
 	}
 
-	/**
-	 * Used to respond to the browser via the servlet response by returning an object formatted as JSON
-	 * @param response - the servlet response object
-	 * @param object - the object to be rendered as JSON
-	 */
-	static respondAsJson(response, object=[:]) {
-		response.setStatus(200)
+	static void respondAsJson(HttpServletResponse response, object = [:]) {
+		response.setStatus(OK.value())
 		setContentTypeJson(response)
-		response.outputStream << ( object as JSON )
+		response.outputStream << (object as JSON)
 	}
 
 	/**
-	 * Used to respond to the browser via the servlet response by returning a file contained
-	 * as JSON
-	 * @param response - the servlet response object
-	 * @param file - a file to stream back to the browser directly
+	 * Sends the text of a file as JSON to the response.
+	 * @param response - the servlet response
+	 * @param file - a text file
 	 */
-	static respondAsJson(response, File file) {
-		response.setStatus(200)
+	static void respondAsJson(HttpServletResponse response, File file) {
+		response.setStatus(OK.value())
 		setContentTypeJson(response)
-		//def fis = file.newInputStream()
-
-		//response.outputStream << fis
-		//fis.close()
-		//response.flush()
-		String json = file.text
-		println "json=$json"
-		response.outputStream << json
+		response.outputStream << file.text
 		response.flushBuffer()
 	}
 
-	/**
-	 * Sends an unauthorized error
-	 * @param response the response object
-	 */
-	static def unauthorized(response) {
-		response.sendError(401, 'Unauthorized error')
+	static void unauthorized(HttpServletResponse response) {
+		response.sendError(UNAUTHORIZED.value(), UNAUTHORIZED.reasonPhrase) // 401
 	}
 
-	/**
-	 * Sends a method failure error
-	 * @param response the response object
-	 */
-	static def methodFailure(response) {
+	static void methodFailure(HttpServletResponse response) {
 		response.sendError(424, 'Method Failure')
 	}
 
-	/**
-	 * Internal error
-	 * @param response the response object
-	 */
-	static def internalError(response, log, Exception e) {
-		log.error(e.getMessage())
-		response.addHeader("errorMessage", e.getMessage())
-		response.sendError(500, 'Internal server error')
+	static void internalError(HttpServletResponse response, log, Exception e) {
+		log.error(e.message)
+		response.addHeader('errorMessage', e.message)
+		response.sendError(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR.reasonPhrase) // 500
 	}
 
-	/**
-	 * Sends a method failure error with the validation errors
-	 * @param response the response object
-	 */
-	static def errorsInValidation(errs) {
-		def messageSource = ApplicationContextHolder.getBean('messageSource')
-		def locale = null
-		def allErrorsAsArray = errs.allErrors.collect { it -> "${messageSource.getMessage(it, locale)}" }
-		return errors(allErrorsAsArray)
+	static Map errorsInValidation(Errors errors) {
+		MessageSource messageSource = ApplicationContextHolder.getBean('messageSource', MessageSource)
+		def allErrorsAsArray = errors.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) }
 	}
 
-	/**
-	 * Sends a method failure error with the validation errors
-	 * @param response the response object
-	 */
 	static Map invalidParams(errs) {
-		if (errs instanceof String)
-			errs = [errs]
-		return errors(errs)
+		errors(CollectionUtils.asList(errs))
 	}
 
-
-	/**
-	 * Sends a forbidden error
-	 * @param response the response object
-	 */
-	static void forbidden(response, log = null, Exception e = null) {
-		if (e != null) {
-			response.addHeader("errorMessage", e.getMessage())
+	static void forbidden(HttpServletResponse response, Exception e = null) {
+		if (e) {
+			response.addHeader('errorMessage', e.message)
 		}
-		response.sendError(403, 'Forbidden')
+		response.sendError(FORBIDDEN.value(), FORBIDDEN.reasonPhrase) // 403, 'Forbidden'
 	}
 
-	/**
-	 * Sends a Not Found 404 error
-	 * @param response the response object
-	 */
-	static void notFound(response) {
-		response.sendError(404, 'Not Found')
+	static void notFound(HttpServletResponse response) {
+		response.sendError(NOT_FOUND.value(), NOT_FOUND.reasonPhrase) // 404
 	}
 
-	/**
-	 * Used to set the ContentType to JSON
-	 */
-	static void setContentTypeJson(response) {
+	static void setContentTypeJson(HttpServletResponse response) {
 		response.setContentType('text/json')
 	}
 }

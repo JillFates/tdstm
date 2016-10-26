@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.domain.MoveBundleStep" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -413,7 +414,7 @@
 	var eventType = "load";
 	var hasTimedOut = false;
 	var modWidth
-	var tz = '${session.getAttribute('CURR_TZ')?.CURR_TZ}'
+	var tz = '${tds.timeZone()}'
 	var stepWidth = 130;
 	var totalSteps = $('div.show_bundle_step').children().size();
 	var progressTimer;
@@ -790,7 +791,7 @@
 			$("#eventDescription").html(planSum.eventDescription)
 			$("#eventStringId").html(planSum.eventString)
 			$("#eventRunbook").html(planSum.eventRunbook)
-			
+
 			var taskManagerUrl = contextPath + "/assetEntity/listTasks?bundle=" + moveBundleId + "&justRemaining="
 			// handle the calculations for each step
 			for( i = 0; i < steps.length; i++ ) {
@@ -809,7 +810,7 @@
 				var linksHtml = "<a href=\""+ firstUrl +"\">" + remainingTasksNumber + "</a> (of <a href=\"" + secondUrl+ "\">" + totalTasksNumber + "</a>)"
 
 				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(linksHtml);
-			
+
 				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planStart));
 				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planComp));
 				var startDelta = 0

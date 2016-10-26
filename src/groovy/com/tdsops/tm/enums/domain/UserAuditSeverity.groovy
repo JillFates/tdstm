@@ -1,20 +1,18 @@
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
 /**
- * Define all the possible user audit severities
+ * Defines all the possible user audit severities
  */
+@CompileStatic
 enum UserAuditSeverity {
 
 	INFO,
 	WARNING,
-	CRITICAL;
+	CRITICAL
 
 	static UserAuditSeverity safeValueOf(String key) {
-		UserAuditSeverity obj
-		try {
-			obj = key as UserAuditSeverity
-		} catch (e) { }
-		return obj
+		values().find { it.name() == key }
 	}
-
 }

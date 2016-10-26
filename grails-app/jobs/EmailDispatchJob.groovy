@@ -1,29 +1,26 @@
-import com.tdssrc.grails.GormUtil
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.EmailDispatchService
+import org.quartz.JobExecutionContext
 
 class EmailDispatchJob {
 
-	// Quartz Properties
 	def group = 'tdstm-send-email'
+	static triggers = {}
 
-	// def concurrent = false
-	static triggers = { }
-
-	// IOC services
-	def emailDispatchService
+	EmailDispatchService emailDispatchService
 
 	/**
-	 * executes the AssetEntityController.basicExport
-	 * @param context
-	 * @return void
+	 * Calls emailDispatchService.sendEmail().
 	 */
-	 def execute(context) {
-	 	try {
-			def dataMap = context.mergedJobDataMap
-			emailDispatchService.sendEmail(dataMap)
-		} catch (e) {
-			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
-		} finally {
+	void execute(JobExecutionContext context) {
+		try {
+			emailDispatchService.sendEmail(context.mergedJobDataMap)
+		}
+		catch (e) {
+			log.error "execute() received exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
+		}
+		finally {
 			GormUtil.releaseLocalThreadMemory()
 		}
 	}

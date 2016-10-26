@@ -1,31 +1,29 @@
-/**
- * ProjectTestHelper is a helper class that can be used by the test cases to fetch, create and do other
- * helpful data preparation necessary to be used by the integration tests. The intent of these helper classes
- * is to do the heavy lifting for the ITs so that they an focus on the good stuff.
- *
- * These helpers should not rely on any pre-existing data and will generate anything that is necessary. At least
- * that's the idea...
- */
-
 import com.tdsops.common.grails.ApplicationContextHolder
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang.RandomStringUtils as RSU
 
+/**
+ * Fetches, creates and does other helpful data preparation in the integration tests, doing the heavy lifting
+ * for the ITs so that they an focus on the good stuff.
+ *
+ * Should not rely on any pre-existing data and will generate anything that is necessary. At least that's the idea...
+ */
 class ProjectTestHelper {
 
-	static def projectService
-	static def partyRelationshipService
-	static final Long projectId = 2445
+	static ProjectService projectService
+	static PartyRelationshipService partyRelationshipService
+	static final long projectId = 2445
 
-	// Constructor - Used to initialize the class
+	// Initialize
 	ProjectTestHelper() {
-		projectService = ApplicationContextHolder.getService('projectService')
-		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
-		assert (projectService instanceof ProjectService)
+		projectService = ApplicationContextHolder.getService('projectService', ProjectService)
+		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService', PartyRelationshipService)
 	}
 
 	/**
-	 * Used to get the project to test with
-	 * @return a Person that has Administration privileges
+	 * Get the project to test with
+	 * @return a project with the default id (2445)
 	 */
 	Project getProject() {
 		Project project = Project.get(projectId)
@@ -34,65 +32,45 @@ class ProjectTestHelper {
 	}
 
 	/**
-	 * Used to get the first Move Event of a project
-	 * @param project - the project to test with
+	 * Get the first MoveEvent of a Project.
+	 * @param project  the project
 	 * @return the move event
 	 */
 	MoveEvent getFirstMoveEvent(Project project) {
-		List moveEvent = MoveEvent.findAllByProject(project, [max:1]) // Grab any one of the events
+		MoveEvent moveEvent = MoveEvent.findByProject(project) // Grab any one of the events
 		assert moveEvent
-		return moveEvent[0]
+		return moveEvent
 	}
 
 	/**
-	 * Used to create a project
+	 * Create a project
 	 */
-	Project createProject(PartyGroup company=null) {
-
-		Project project = new Project()
-		project.with {
-			client = createCompany('Owner')
-			projectCode = RSU.randomAlphabetic(10)
-			description = 'Test project created by the ProjectTestHelper'
-			startDate = new Date()
-			completionDate = startDate + 30
-			client = createClient()
-			workflowCode = 'STD_PROCESS'
-			timezone = 'GMT'
-		}
-
-		project.save(failOnError:true)
-
-		// Save the company that owns the project
-		if (!company) {
-			company = createCompany('Owner')
-		}
-		project.owner = company
-		project.save(failOnError:true)
-
-		return project
+	Project createProject(PartyGroup company = null) {
+		new Project(client: createCompany('Owner'),
+		            projectCode: RSU.randomAlphabetic(10),
+		            description: 'Test project created by the ProjectTestHelper',
+		            startDate: new Date(),
+		            completionDate: startDate + 30,
+		            workflowCode: 'STD_PROCESS',
+		            timezone: 'GMT',
+		            owner: company ?: createCompany('Owner')).save(failOnError: true)
 	}
 
 	/**
-	 * Used to create a company
-	 * @param prefix - a prefix string that will prefix the company name if provided
-	 * @return a freshly minted company
+	 * Create a company.
+	 *
+	 * @param prefix  the prefix of the company name if provided
+	 * @return the company
 	 */
 	PartyGroup createCompany(String prefix) {
-		PartyType pt = PartyType.get('COMPANY')
-		PartyGroup company = new PartyGroup()
-		company.with {
-			type = pt
-			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
-		}
-
-		company.save(failOnError:true)
+		new PartyGroup(type: PartyType.get('COMPANY'),
+		               name: (prefix ? prefix + ' ' : '') + RSU.randomAlphabetic(10)).save(failOnError: true)
 	}
 
 	/**
-	 * Used to create a company as a client and assign them as a client of a company
-	 * @param prefix - a prefix string that will prefix the company name if provided
-	 * @return a freshly minted company
+	 * Create a company as a client and assign them as a client of the specified company.
+	 * @param company  the client's owning company
+	 * @return the client
 	 */
 	PartyGroup createClient(PartyGroup company) {
 		PartyType pt = PartyType.get('COMPANY')
@@ -100,5 +78,4 @@ class ProjectTestHelper {
 		PartyGroup client = createCompany('Client')
 		partyRelationshipService.assignClientToCompany(client, company)
 	}
-
 }

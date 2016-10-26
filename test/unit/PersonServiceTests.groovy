@@ -1,4 +1,5 @@
 import grails.test.mixin.TestFor
+import net.transitionmanager.service.PersonService
 import spock.lang.Specification
 
 @TestFor(PersonService)

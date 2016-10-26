@@ -1,34 +1,40 @@
-import grails.test.mixin.TestFor
+import com.tdssrc.grails.TimeUtil
+import grails.test.mixin.Mock
+import grails.test.mixin.TestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserPreference
+import spock.lang.Issue
+import test.AbstractUnitSpec
 
 import java.sql.Timestamp
 import java.text.DateFormat
 
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession
-
-import spock.lang.Issue
-import spock.lang.Specification
-
-import com.tdssrc.grails.TimeUtil
+import static com.tdssrc.grails.TimeUtil.ABBREVIATED
+import static com.tdssrc.grails.TimeUtil.FULL
 
 /**
  * Unit test cases for the TimeUtil class
- * Note that in order to test with the HttpSession that this test spec is using the AdminController not for any thing in particular
- * but it allows the tests to access the session and manipulate it appropriately.
  */
-@TestFor(AdminController)
-class TimeUtilTests extends Specification {
+@Mock([UserLogin, UserPreference])
+@TestMixin(ControllerUnitTestMixin)
+class TimeUtilTests extends AbstractUnitSpec {
+
+	void setup() {
+		login()
+	}
 
 	void testAgoWithSeconds() {
 		expect:
 		'25s' == TimeUtil.ago(25)
 		'3m 5s' == TimeUtil.ago(185)
-		'1-day 1-hr' == TimeUtil.ago(24 * 60 * 60 + 60 * 60 + 61, TimeUtil.ABBREVIATED)
-		'2-days 2-hrs' == TimeUtil.ago(24 * 60 * 60 * 2 + 60 * 60 * 2 + 61 * 2, TimeUtil.ABBREVIATED)
-		'3-days 3-hours' == TimeUtil.ago(24 * 60 * 60 * 3 + 60 * 60 * 3 + 61 * 3, TimeUtil.FULL)
-		'3-hours 1-minute' == TimeUtil.ago(60 * 60 * 3 + 60, TimeUtil.FULL)
-		'1-minute 12-seconds' == TimeUtil.ago(72, TimeUtil.FULL)
+		'1-day 1-hr' == TimeUtil.ago(24 * 60 * 60 + 60 * 60 + 61, ABBREVIATED)
+		'2-days 2-hrs' == TimeUtil.ago(24 * 60 * 60 * 2 + 60 * 60 * 2 + 61 * 2, ABBREVIATED)
+		'3-days 3-hours' == TimeUtil.ago(24 * 60 * 60 * 3 + 60 * 60 * 3 + 61 * 3, FULL)
+		'3-hours 1-minute' == TimeUtil.ago(60 * 60 * 3 + 60, FULL)
+		'1-minute 12-seconds' == TimeUtil.ago(72, FULL)
 	}
 
 	void testAgoWithTwoDates() {
@@ -40,8 +46,8 @@ class TimeUtilTests extends Specification {
 			end = start + 1.day + 2.hours + 5.minutes + 21.seconds
 
 			validDates = validDates && ('1d 2h' == TimeUtil.ago(start, end))
-			validDates = validDates && ('1-day 2-hrs' == TimeUtil.ago(start, end, TimeUtil.ABBREVIATED))
-			validDates = validDates && ('1-day 2-hours' == TimeUtil.ago(start, end, TimeUtil.FULL))
+			validDates = validDates && ('1-day 2-hrs' == TimeUtil.ago(start, end, ABBREVIATED))
+			validDates = validDates && ('1-day 2-hours' == TimeUtil.ago(start, end, FULL))
 
 			end = start + 3.hours
 
@@ -101,28 +107,23 @@ class TimeUtilTests extends Specification {
 		// ******************************************
 		// Test dates using date format: "MM/DD/YYYY"
 
-		def mockSession = getMockSession()
 		def testDate = new Date()
 		testDate.clearTime()
 		testDate.set(year: 2014, month: 9, date: 5)
 
 		expect:
-		testDate == TimeUtil.parseDate(mockSession, '10/5/2014')
+		testDate == TimeUtil.parseDate('10/5/2014')
 	}
 
 	void testParseDateTime() {
 		given:
-		def mockSession = getMockSession()
 		def testDate = new Date(Date.UTC(114, 9, 5, 10, 15, 0))
 
 		expect:
-		testDate == TimeUtil.parseDateTime(mockSession, '10/5/2014 10:15 AM')
+		testDate == TimeUtil.parseDateTime('10/5/2014 10:15 AM')
 	}
 
 	void 'Test the createFormatterForType with various options'() {
-		given:
-		String username = 'UserName7!'
-
 		expect: """Iterating through the various date/datetime formats that the createFormatterForType method returns
 				a valid DateFormat object for both the middle-endian and little-endian date formats """
 
@@ -164,20 +165,18 @@ class TimeUtilTests extends Specification {
 	//F
 
 	@Issue('https://support.transitionmanager.com/browse/TM-4795')
-	void 'Test formatDate(HttpSession session, Date dateValue) and formatDate(Date dateValue, DateFormat formatter)'() {
+	void 'Test formatDate(Date dateValue) and formatDate(Date dateValue, DateFormat formatter)'() {
 		// No signature of method: static com.tdssrc.grails.TimeUtil.formatDate() is applicable for argument types:
 		// (org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession, java.sql.Timestamp)
 		// TM-4795
 		given:
-		def mockSession = getMockSession()
-
 		// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
 		long oneDay = 60 * 60 * 24 * 1000
 		Timestamp ts = new Timestamp(oneDay)
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:
-		TimeUtil.formatDate(mockSession, ts) == '01/02/1970'
+		TimeUtil.formatDate(ts) == '01/02/1970'
 		TimeUtil.formatDate(ts, formatter) == '02/01/1970'
 	}
 
@@ -192,12 +191,9 @@ class TimeUtilTests extends Specification {
 		TimeUtil.formatDate('GMT', timestamp, formatter) == '02/01/1970'
 	}
 
-	void 'Test formatDateTime(HttpSession session, dateValue, DateFormat formatter)'() {
-		given:
-		def mockSession = getMockSession()
-
+	void 'Test formatDateTime(dateValue, DateFormat formatter)'() {
 		when:
-		TimeUtil.formatDateTime(mockSession, new Date(), null)
+		TimeUtil.formatDateTime(new Date(), null)
 
 		then: 'Make sure that a null formatter causes an exception'
 		// thrown(InvalidParamException)
@@ -248,46 +244,13 @@ class TimeUtilTests extends Specification {
 		nullValueDate == null
 	}
 
-	void 'Test getUserDateFormat default value when Session is null'() {
-		when:
-		def session
-		def timeFormat = TimeUtil.getUserDateFormat(session)
-
-		then: "timeFormat should be the same than TimeUtil::getDefaultFormatType"
-		timeFormat == TimeUtil.getDefaultFormatType()
-
-		when: "session doesn't have the 'CURR_DT_FORMAT' attribute"
-		session = new GrailsHttpSession(request)
-		timeFormat = TimeUtil.getUserDateFormat(session)
-
-		then: "timeFormat should be the same than TimeUtil::getDefaultFormatType"
-		timeFormat == TimeUtil.getDefaultFormatType()
-	}
-
-	void 'Test getUserTimezone  default value when Session is null'() {
-		when:
-		def session
-		def timeZone = TimeUtil.getUserTimezone(session)
-
-		then: "timeZone should be the same than TimeUtil::defaultTimeZone"
-		timeZone == TimeUtil.defaultTimeZone
-
-		when: "session doesn't have the 'CURR_TZ' attribute"
-		session = new GrailsHttpSession(request)
-		timeZone = TimeUtil.getUserTimezone(session)
-
-		then: "timeZone should be the same than TimeUtil::defaultTimeZone"
-		timeZone == TimeUtil.defaultTimeZone
-	}
-
-	void "Test sessions without a Time Zone don't brake formatDateTime"() {
+	void "Test sessions without a Time Zone doesn't break formatDateTime"() {
 		given:
-		def mockSession = getMockSession()
 		session.removeAttribute("CURR_TZ")
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:
-		TimeUtil.formatDateTime(mockSession, new Date(), formatter) != null
+		TimeUtil.formatDateTime(new Date(), formatter) != null
 	}
 
 	void "Test formatDateTimeWithTZ with null date value"() {
@@ -295,14 +258,6 @@ class TimeUtilTests extends Specification {
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:
-		TimeUtil.formatDateTimeWithTZ("GMT", null, formatter) == null
-	}
-
-	// Mock the bullshit format of session attributes ...
-	private getMockSession() {
-		def mockSession = new GrailsHttpSession(request)
-		mockSession.setAttribute('CURR_DT_FORMAT', [CURR_DT_FORMAT: TimeUtil.MIDDLE_ENDIAN])
-		mockSession.setAttribute('CURR_TZ', [CURR_TZ: 'GMT'])
-		mockSession
+		TimeUtil.formatDateTimeWithTZ("GMT", null, formatter) == ''
 	}
 }

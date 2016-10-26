@@ -22,8 +22,8 @@
 	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Application Conflicts - ${project.name} : ${moveBundle} and App Owner:${currAppOwner}</b><br/>
-			This analysis was performed on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${session.getAttribute("LOGIN_PERSON").name }.
-		</div> 
+			This analysis was performed on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${tds.currentPersonName()}.
+		</div>
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
 		</div>
@@ -45,7 +45,7 @@
 									</tr>
 								</thead>
 								<tbody class="conflictAppBody">
-								
+
 									<g:if test="${application.supportsList.size() > 0}">
 										<tr>
 											<td class="leftCells"></td>
@@ -88,7 +88,7 @@
 											</tr>
 										</g:each>
 									</g:if>
-									
+
 									<g:if test="${application.dependsOnList.size() > 0}">
 										<tr>
 											<td class="leftCells"></td>

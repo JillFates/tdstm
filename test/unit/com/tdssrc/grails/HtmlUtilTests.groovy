@@ -21,4 +21,14 @@ class HtmlUtilTests extends Specification {
 			assert !HtmlUtil.isURL(it)
 		}
 	}
+
+	/**
+	 * Admittedly a somewhat silly test, but an earlier implementation of the method would trigger an
+	 * IllegalStateException when there was no active request. This test validates that the lack of a
+	 * current request is handled correctly.
+	 */
+	void 'check IP address without active request'() {
+		expect:
+		HtmlUtil.getRemoteIp() == 'Unknown'
+	}
 }

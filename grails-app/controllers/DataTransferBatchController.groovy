@@ -1,101 +1,81 @@
+import com.tds.asset.AssetEntity
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.eav.EavAttribute
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-
-import org.apache.commons.lang.math.NumberUtils
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.DataTransferBatch
+import net.transitionmanager.domain.DataTransferValue
+import net.transitionmanager.domain.Project
+import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.ImportService
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.service.UserPreferenceService
+import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
-import java.util.regex.Matcher
-// import org.apache.shiro.SecurityUtils
 
-import com.tds.asset.Application
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.tm.enums.domain.SizeScale
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.WebUtil
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class DataTransferBatchController implements ControllerMethods {
 
-class DataTransferBatchController {
+	static allowedMethods = [save:'POST', update:'POST']
+	static defaultAction = 'list'
 
-	// Objects to be injected
-	def sessionFactory
-	def assetEntityService
-	def assetEntityAttributeLoaderService
-	def controllerService
-	def importService
-	def jdbcTemplate
-	def securityService
-	def partyRelationshipService
-	def personService
+	private static final Map<Class, String> assetClassMap = [AssetEntity: 'device', Application: 'app',
+	                                                         Database: 'db', Files: 'files']
 
-	def messageSource
+	AssetEntityService assetEntityService
+	ControllerService controllerService
+	ImportService importService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
-	// Data used within some of the controller methods static vars bundleMoveAndClientTeams and bundleTeamRoles
-	// TODO : JPM 9/2014 : Need to remove the
-	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
-	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
-		'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
-		'sourceTeamSa':'SYS_ADMIN','targetTeamSa':'SYS_ADMIN',
-		'sourceTeamDba':'DB_ADMIN','targetTeamDba':'DB_ADMIN'
-	]
-
-	/**
-	 * The default index page loads the list page
-	 */
-	def index() { redirect(action:"list", params:params) }
-
-	// the delete, save and update actions only accept POST requests
-	def allowedMethods = [save:'POST', update:'POST']
-
-	def importResults(){
+	def importResults() {
 		def dtb = DataTransferBatch.get(params.id)
-		if(dtb){
-			render(ServiceResults.success([importResults:dtb?.importResults]) as JSON)
-		}else{
-			ServiceResults.methodFailure(response)
+		if (!dtb) {
+			sendMethodFailure()
+			return
 		}
+
+		renderSuccessJson(importResults: dtb.importResults)
 	}
 
 	/**
 	 * Return list of dataTransferBatchs for associated Project and Mode = Import
-	 * @param projectId
 	 * @return dataTransferBatchList
 	 */
 	def list() {
-		if(params.message){
+		if (params.message) {
 			flash.message = params.message
 		}
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = securityService.getUserCurrentProject()
-		if (!project) {
-			flash.message = "Please select project to view Manage Batches"
-			redirect(controller:'project',action:'list')
-			return
-		}
-		if( !params.max ) params.max = 25
-		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I",
-			[sort:"dateCreated", order:"desc", max:params.max,offset:params.offset ? params.offset : 0] )
 
-		def isMSIE = false
+		Project project = controllerService.getProjectForPage(this, 'to view Manage Batches')
+		if (!project) return
+
+		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I",
+			[sort: "dateCreated", order: "desc", max: params.int('max', 25), offset: params.int('offset', 0)])
+
 		def userAgent = request.getHeader("User-Agent")
-		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
-			isMSIE = true
-		return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId, isMSIE:isMSIE ]
+		[dataTransferBatchList: dataTransferBatchList, projectId: project.id,
+		 isMSIE: userAgent.contains("MSIE") || userAgent.contains("Firefox")]
 	}
 
 // TODO : JPM : 10/2013 - remove this function after done testing
 // Working on an improved version of the GormUtil function to get human readable error messages
-	def public static allErrorsString = { domain, separator= " : " ->
+	static allErrorsString = { domain, separator= " : " ->
 		def text = new StringBuilder()
 		def first = true
 		domain.errors.allErrors.each {
-			println message(error: it)
 //			text.append( (first ? '' : separator) + messageSource.getMessage(it, null) )
 			text.append( (first ? '' : separator) + message(error:it) )
 		}
@@ -111,51 +91,47 @@ class DataTransferBatchController {
 	def processImportBatch() {
 		String error
 		Map results
-		Project project
-		UserLogin userLogin
 
 		while (true) {
 			try {
-				(project, userLogin) = controllerService.getProjectAndUserForPage( this, 'Import' )
-				if (! project) {
+				Project project = controllerService.getProjectForPage(this)
+				if (!project || !controllerService.checkPermission(this, 'Import')) {
 					error = flash.message
 					flash.message = null
 					break
 				}
 
-				Long id = NumberUtil.toLong(params.id)
+				Long id = params.long('id')
 				if (id == null || id < 1) {
 					error = 'Invalid batch id was submitted'
 					break
 				}
 
-				def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+				String tzId = userPreferenceService.timeZone
 
 				// Call the service stub that knowns which actual service method to run
-				results = importService.invokeAssetImportProcess(project.id, userLogin.id, id, tzId, session)
+				results = importService.invokeAssetImportProcess(project.id, securityService.currentUserLoginId, id, tzId, session)
 				error = results.error
 
-			} catch (UnauthorizedException e) {
-				error = e.getMessage()
-			} catch (InvalidParamException e) {
-				error = e.getMessage()
-			} catch (DomainUpdateException e) {
-				error = e.getMessage()
+			} catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+				error = e.message
 			} catch (RuntimeException e) {
 				error = 'An error occurred while processing the import. Please contact support for assistance.'
-				if (log.isDebugEnabled()) {
-					error = "$error ${e.getMessage()}"
+				if (log.debugEnabled) {
+					error = "$error $e.message"
 				}
-				log.error "deviceProcess() failed : ${e.getMessage()} : userLogin $userLogin : batchId ${params.id}"
+				log.error "deviceProcess() failed : $e.message : userLogin $securityService.currentUsername : batchId $params.id"
 				log.error ExceptionUtil.stackTraceToString(e)
 			}
 			break
 		}
 
-		if (error)
-			render ServiceResults.errors(error) as JSON
-		else
-			render ServiceResults.success([results:results]) as JSON
+		if (error) {
+			renderErrorJson(error)
+		}
+		else {
+			renderSuccessJson(results: results)
+		}
 	}
 
 	/**
@@ -163,143 +139,136 @@ class DataTransferBatchController {
 	 * @return : list of batches process as JSON
 	 */
 	def retrieveManageBatchList() {
-		def project = securityService.getUserCurrentProject()
-
-		def result = new ArrayList()
-
+		Project project = securityService.userCurrentProject
 		if (!project) {
 			flash.message = "Please select project to view Manage Batches"
 		}
 
-		if( !params.max ) {
+		if (!params.max) {
 			params.max = 25
 		}
 
-		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", [sort:"dateCreated", order:"desc", max:params.max,offset:params.offset ? params.offset : 0] )
+		List<DataTransferBatch> dataTransferBatchList = DataTransferBatch.findAllByProjectAndTransferMode(project, "I",
+			[sort: "dateCreated", order: "desc", max: params.max, offset: params.offset ?: 0])
 
-		dataTransferBatchList.each{ entry ->
+		def result = []
+		for (DataTransferBatch entry in dataTransferBatchList) {
 
 			def domainName
 			def className
-			def assetClassMap = [ AssetEntity:'device', Application:'app', Database:'db', Files:'files' ]
 
-			if(entry.eavEntityType.domainName) {
-				if(entry.eavEntityType.domainName == 'Files'){
+			String entityTypeDomainName = entry.eavEntityType.domainName
+			if (entityTypeDomainName) {
+				if (entityTypeDomainName == 'Files') {
 					domainName = 'Logical Storage'
-				} else if(entry.eavEntityType.domainName == 'AssetEntity'){
+				} else if (entityTypeDomainName == 'AssetEntity') {
 					domainName = 'Device'
 				} else {
-					domainName = entry.eavEntityType.domainName
+					domainName = entityTypeDomainName
 				}
 
-				className = assetClassMap[entry.eavEntityType.domainName]
+				className = assetClassMap[entityTypeDomainName]
 			}
 
-			def DateFormat formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE_TIME)
+			DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 
-			result.add([
-					batchId: entry.id,
-					importedAt: (entry.dateCreated)?  TimeUtil.formatDateTime(session, entry.dateCreated, formatter)  : '',
-					importedBy: ((entry.userLogin)? (entry.userLogin.person)? entry.userLogin.person.firstName + ' ' + entry.userLogin.person.lastName  : ''  : ''),
-					attributeSet: (entry.dataTransferSet)? entry.dataTransferSet.title : '',
-					class: domainName,
-					assets: DataTransferValue.executeQuery('select count(d.id) from DataTransferValue d where d.dataTransferBatch = '+ entry.id +' group by rowId' ).size(),
-					status: fieldValue(bean:entry, field:'statusCode'),
-					action: '',
-					className: className,
-					hasErrors: entry.hasErrors,
-					importResults: (entry.importResults ? true : false)
-			])
-
+			result.add(
+				batchId: entry.id,
+				importedAt: TimeUtil.formatDateTime(entry.dateCreated, formatter),
+				importedBy: entry.userLogin?.person ? entry.userLogin.person.firstName + ' ' + entry.userLogin.person.lastName : '',
+				attributeSet: entry.dataTransferSet?.title ?: '',
+				class: domainName,
+				assets: DataTransferValue.executeQuery('''
+					select count(d.id)
+					from DataTransferValue d
+					where d.dataTransferBatch=:dataTransferBatch
+					group by rowId
+				''', [dataTransferBatch: entry.id]).size(),
+				status: fieldValue(bean: entry, field: 'statusCode'),
+				action: '',
+				className: className,
+				hasErrors: entry.hasErrors,
+				importResults: entry.importResults as Boolean)
 		}
-
-		/*def project = securityService.getUserCurrentProject()
-
-		def bundleList = MoveBundle.findAll("from MoveBundle where project =:project ",[project:project])
-
-		def result = new ArrayList()
-
-		bundleList.each{ entry ->
-			result.add([
-					bundleId: entry.id,
-					name: entry.name,
-					description: entry.description,
-					planning: entry.useForPlanning,
-					assetqty: entry.getAssetQty(),
-					startDate: entry.startTime,
-					completion: entry.completionTime
-			])
-
-		}*/
 
 		render result as JSON
 	}
 
 	/**
 	 * Called by the Asset Post page via Ajax in order to show progress of how many assets have been posted
-	 * 	@param  : processed and total assts from session
+	 * @param  : processed and total assts from session
 	 *	@return : processed data for Batch progress bar
 	 */
 	def retrieveProgress() {
-		def progressData = []
-		def total = session.getAttribute("TOTAL_BATCH_ASSETS")
-		def processed = session.getAttribute("TOTAL_PROCESSES_ASSETS")
-		progressData << [processed:processed, total:total]
+		def progressData = [[processed: session.getAttribute("TOTAL_PROCESSES_ASSETS"),
+		                     total: session.getAttribute("TOTAL_BATCH_ASSETS")]]
 		render progressData as JSON
 	 }
 
-	/* --------------------------------------
-	 * 	@author : Mallikarjun
-	 *	@return : data transfer batch error list
-	 * -------------------------------------- */
+	/**
+	 * data transfer batch error list
+	 */
 	def errorsListView() {
-		def dataTransferBatchInstance = DataTransferBatch.get( params.id )
-		def query = new StringBuffer(" select d.asset_entity_id,d.import_value,d.row_id,a.attribute_code,d.error_text FROM data_transfer_value d ")
-		query.append(" left join eav_attribute a on (d.eav_attribute_id = a.attribute_id) where d.data_transfer_batch_id = ${dataTransferBatchInstance.id} ")
-		query.append(" and has_error = 1 ")
-		def dataTransferErrorList = jdbcTemplate.queryForList( query.toString() )
+		long dataTransferBatchId = params.long('id')
+
+		List<Map<String, Object>> dataTransferErrorList = jdbcTemplate.queryForList('''\
+			select d.asset_entity_id, d.import_value, d.row_id, a.attribute_code, d.error_text
+			FROM data_transfer_value d
+			     left join eav_attribute a on (d.eav_attribute_id = a.attribute_id)
+			where d.data_transfer_batch_id = :dtbId
+			  and has_error = 1
+			''', [dtbId: dataTransferBatchId])
+
 		def completeDataTransferErrorList = []
 		def currentValues
 		dataTransferErrorList.each {
 			def assetNameId = EavAttribute.findByAttributeCode("assetName")?.id
 			def assetTagId = EavAttribute.findByAttributeCode("assetTag")?.id
-			def assetName = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetNameId "+
-													"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
-			def assetTag = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetTagId "+
-													"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
-			def assetEntity = AssetEntity.find("from AssetEntity where id=${it.asset_entity_id}")
-			if( bundleMoveAndClientTeams.contains(it.attribute_code) ) {
+
+			def assetName = DataTransferValue.executeQuery('''
+				select importValue from DataTransferValue
+				where rowId=:rowId
+				and eavAttribute=:assetNameId
+				and dataTransferBatch=:dataTransferBatchId
+			''', [rowId: it.row_id, assetNameId: assetNameId, dataTransferBatchId: dataTransferBatchId], [max: 1])[0]
+
+			def assetTag = DataTransferValue.executeQuery('''
+				select importValue from DataTransferValue
+				where rowId=:rowId
+				and eavAttribute=:assetTagId
+				and dataTransferBatch=:dataTransferBatchId
+			''', [rowId: it.row_id, assetTagId: assetTagId, dataTransferBatchId: dataTransferBatchId], [max: 1])[0]
+			AssetEntity assetEntity = AssetEntity.get(it.asset_entity_id)
+			if (AssetEntityService.bundleMoveAndClientTeams.contains(it.attribute_code) ) {
 				currentValues = assetEntity?.(it.attribute_code).name
 			} else {
 				currentValues = assetEntity?.(it.attribute_code)
 			}
-			completeDataTransferErrorList << ["assetName":assetName, "assetTag":assetTag, "attribute":it.attribute_code, "error":it.error_text,
-											  "currentValue":currentValues, "importValue":it.import_value]
+			completeDataTransferErrorList << [assetName: assetName, assetTag: assetTag, attribute: it.attribute_code,
+			                                  error: it.error_text, currentValue: currentValues,
+			                                  importValue: it.import_value]
 		}
-		completeDataTransferErrorList.sort{it.assetTag + it.attribute}
-		return [ completeDataTransferErrorList : completeDataTransferErrorList ]
-	 }
 
-	/**
-	 *     Delete the Data Transfer Batch Instance
-	 */
-	def delete() {
-		try{
-			def dataTransferBatchInstance = DataTransferBatch.get(params.batchId)
-			if(dataTransferBatchInstance) {
-				DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?",[dataTransferBatchInstance])
-
-				dataTransferBatchInstance.delete(flush:true,failOnError:true)
-				flash.message = "DataTransferBatch ${params.batchId} deleted"
-				redirect(action:"list")
-			}else {
-				flash.message = "DataTransferBatch not found with id ${params.batchId}"
-				redirect(action:"list")
-		   }
-		} catch(Exception e) {
-			log.error "Can't delete batch instance: " + e.getMessage()
-			e.printStackTrace()
-		}
+		[completeDataTransferErrorList: completeDataTransferErrorList.sort { it.assetTag + it.attribute }]
 	}
 
+	/**
+	 * Delete the Data Transfer Batch Instance
+	 */
+	def delete() {
+		try {
+			DataTransferBatch dtb = DataTransferBatch.get(params.batchId)
+			if (dtb) {
+				DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?", [dtb])
+				dtb.delete(flush:true)
+				flash.message = "DataTransferBatch $params.batchId deleted"
+			}
+			else {
+				flash.message = "DataTransferBatch not found with id $params.batchId"
+		   }
+		} catch(e) {
+			log.error "Can't delete batch instance: $e.message", e
+		}
+		redirect(action: "list")
+	}
 }

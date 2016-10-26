@@ -1,5 +1,6 @@
 
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.RackService
 
 /**
  * Used tp set default model to rack that don't have a model associated

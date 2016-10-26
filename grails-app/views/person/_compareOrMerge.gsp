@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Person" %>
 <html>
 <body>
 	<div>
@@ -29,7 +30,7 @@
 							<td class="col_${person.id}">
 								<g:each in="${person.(columnList.get(column))?.exceptionDay}" var="expDay">
 									<tds:convertDate date="${expDay}"  />,
-								</g:each> 
+								</g:each>
 							</td>
 						</g:elseif>
 						<g:elseif test="${column =='TravelOK'}">
@@ -38,8 +39,8 @@
 									<input type="checkbox" ${ person.(columnList.get(column))==1 ? 'checked="checked"' : ''} disabled="disabled" >
 								</span>
 								<span class="editAll editTarget_${person.id}" style="display: none;">
-									<input type="checkbox"  name="${columnList.get(column)}" ${person.(columnList.get(column))==1 ? 'checked="checked" value="0" ' : 'value="1"'} 
-										class="input_${person.id}"  onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/> 
+									<input type="checkbox"  name="${columnList.get(column)}" ${person.(columnList.get(column))==1 ? 'checked="checked" value="0" ' : 'value="1"'}
+										class="input_${person.id}"  onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
 								</span>
 							</td>
 						</g:elseif>
@@ -55,8 +56,8 @@
 										${columnList.get(column) ? person.(columnList.get(column)) : ''}
 									</span>
 									<span class="editAll editTarget_${person.id}" style="display: none;">
-										<input type="text" id="${columnList.get(column)+'_edit_'+person.id}" 
-											name="${columnList.get(column)}" class="input_${person.id}" 
+										<input type="text" id="${columnList.get(column)+'_edit_'+person.id}"
+											name="${columnList.get(column)}" class="input_${person.id}"
 											value="${columnList.get(column) ? person.(columnList.get(column)) : ''}"/>
 									</span>
 								</g:if>
@@ -68,13 +69,13 @@
 					</g:each>
 				</tr>
 			</g:each>
-			
+
 			<tr class="odd">
 				<td colspan="${personsMap.size() + 1}" style="text-align: center;">
 					<b>Login Information</b>
 				</td>
 			</tr>
-			
+
 			<g:each in="${loginInfoColumns.keySet()}" var="column" status="i">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>
@@ -97,7 +98,7 @@
 				</tr>
 			</g:each>
 		</table>
-		
+
 		<div class="footer_buttons">
 			<button class="btn btn-default" onclick="Person.mergePerson()"><span class="glyphicon glyphicon-save"></span> Merge</button>
 			<button class="btn btn-default" onclick="jQuery('#showOrMergeId').dialog('close')"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>

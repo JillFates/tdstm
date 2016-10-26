@@ -1,5 +1,6 @@
 
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.ProjectService
 
 /**
  * This set of database changes will create the default_bundle_id column in project table and

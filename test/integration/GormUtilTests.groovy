@@ -1,57 +1,55 @@
+import com.tds.asset.AssetDependency
 import com.tdssrc.grails.GormUtil
-
 import spock.lang.Specification
 
-class GormUtilTests extends Specification  {
-
-	// IOC variables
-	def sessionFactory
-
+class GormUtilTests extends Specification {
 
 	def "Test isDomainClass"() {
 		when:
-			def domain = new com.tds.asset.AssetDependency()
-			String prop = 'comment'
-		then:
-			GormUtil.isDomainClass(domain)
-			! GormUtil.isDomainClass(new Date())
+		def domain = new AssetDependency()
 
+		then:
+		GormUtil.isDomainClass(domain)
+		!GormUtil.isDomainClass(new Date())
 	}
 
 	def "Test the getConstraintMaxSize"() {
 		// Positive test first
 		when:
-			def domain = new com.tds.asset.AssetDependency()
-			String prop = 'comment'
+		def domain = new AssetDependency()
+		String prop = 'comment'
+
 		then: 'Accessing a property that has the constraint should return a value'
-			GormUtil.getConstraintMaxSize(domain, prop) > 0
+		GormUtil.getConstraintMaxSize(domain, prop) > 0
 
 		// Now test the various negative test cases
 		when:
-			GormUtil.getConstraintMaxSize(domain, 'nonExistentProperty')
+		GormUtil.getConstraintMaxSize(domain, 'nonExistentProperty')
+
 		then: 'Passing an invalid property name should throw an exception'
-			RuntimeException ex = thrown()
-			ex.message.contains('invalid property name')
+		RuntimeException ex = thrown()
+		ex.message.contains('invalid property name')
 
 		when:
-			GormUtil.getConstraintMaxSize(domain, 'asset')
+		GormUtil.getConstraintMaxSize(domain, 'asset')
+
 		then: 'Passing a property that does not have the maxSize constraint should throw an exception'
-			ex = thrown()
-			ex.message.contains('does not have the maxSize constraint')
+		ex = thrown()
+		ex.message.contains('does not have the maxSize constraint')
 
 		when:
-			GormUtil.getConstraintMaxSize(new Date(), prop)
-		then: 'Passing a non-domain should throw an exception'
-			ex = thrown()
-			ex.message.contains('non-domain class was provided')
+		GormUtil.getConstraintMaxSize(new Date(), prop)
 
+		then: 'Passing a non-domain should throw an exception'
+		ex = thrown()
+		ex.message.contains('non-domain class was provided')
 	}
 
 	/**
 	 *
 	void testGetDomainPropertiesWithConstraint() {
 
-		def list = []
+		def list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'nullable', true).sort()
 		assertEquals 'Test "nullable" for true', ['age', 'label'], list

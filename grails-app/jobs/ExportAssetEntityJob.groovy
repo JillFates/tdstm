@@ -1,30 +1,29 @@
-import com.tdssrc.grails.GormUtil
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.ProgressService
+import org.quartz.JobExecutionContext
 
 class ExportAssetEntityJob {
-	
-	// Quartz Properties
-	def group = 'tdstm-export-asset'
-	// def concurrent = false
-	static triggers = { }
 
-	// IOC services
-	def assetEntityService
-	def progressService
+	def group = 'tdstm-export-asset'
+	static triggers = {}
+
+	AssetEntityService assetEntityService
+	ProgressService progressService
 
 	/**
-	 * executes the AssetEntityController.basicExport
-	 * @param context
-	 * @return void
+	 * executes AssetEntityController.basicExport()
 	 */
-	 def execute(context) {
-	 	try {
-			def dataMap = context.mergedJobDataMap
-			assetEntityService.export(dataMap)
-		} catch (e) {
-			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
-			progressService.fail(progressKey, e.getMessage())
-		} finally {
+	void execute(JobExecutionContext context) {
+		try {
+			assetEntityService.export(context.mergedJobDataMap)
+		}
+		catch (e) {
+			log.error "execute() received exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
+//			progressService.fail(progressKey, e.getMessage())
+		}
+		finally {
 			GormUtil.releaseLocalThreadMemory()
 		}
 	}

@@ -1,68 +1,60 @@
-class PermissionsController {
+import com.tdsops.common.security.spring.HasPermission
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Permissions
+import net.transitionmanager.domain.RolePermissions
+import org.springframework.jdbc.core.JdbcTemplate
 
-	def jdbcTemplate
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class PermissionsController implements ControllerMethods {
 
-	def index() {
-		redirect(action:"show",params:params)
-	}
+	static defaultAction = 'list'
 
+	JdbcTemplate jdbcTemplate
+
+	@HasPermission('RolePermissionView')
 	def show() {
-		if(RolePermissions.hasPermission("RolePermissionView")){
-			def permissions = Permissions.withCriteria {
-				and {
-				   order('permissionGroup','asc')
-				   order('permissionItem','asc')
-				}
+		def permissions = Permissions.withCriteria {
+			and {
+			   order('permissionGroup','asc')
+			   order('permissionItem','asc')
 			}
-			def rolePermissions = RolePermissions.list()
-			[permissions:permissions]
-		} else {
-			flash.message = "You don't have permission to access Permission List"
-			redirect(controller:'project', action: 'list')
 		}
+		[permissions:permissions]
 	}
 
+	@HasPermission('RolePermissionView')
 	def edit() {
-		if(RolePermissions.hasPermission("RolePermissionView")){
-			def permissions = Permissions.withCriteria {
-				and {
-				   order('permissionGroup','asc')
-				   order('permissionItem','asc')
-				}
+		def permissions = Permissions.withCriteria {
+			and {
+			   order('permissionGroup','asc')
+		   order('permission    Item','asc')
 			}
-			[permissions:permissions]
-		} else {
-			flash.message = "You don't have permission to access Permission List"
-			redirect(controller:'project', action: 'list')
 		}
+		[permissions:permissions]
 	}
 
 	def update() {
 		def paramList = params.column
 		jdbcTemplate.update("delete from role_permissions")
-		def permissions = Permissions.list()
-		def roles = Permissions.Roles.values()
-		permissions.each{ permission ->
-			roles.each { role ->
-				def param = params["role_${permission.id}_${role.toString()}"]
-				if(param && param == "on"){
-					def rolePermissions = new RolePermissions(
-												role : role.toString(),
-												permission : permission,
-											)
-					if(!rolePermissions.save(flush:true)){
-						println"Error while updating rolePermissions : ${rolePermissions}"
+		for (Permissions permission in Permissions.list()) {
+			for (String role in Permissions.Roles.NAMES) {
+				def param = params['role_' + permission.id + '_' + role]
+				if (param == "on") {
+					def rolePermissions = new RolePermissions(role: role, permission: permission)
+					if (!rolePermissions.save(flush: true)) {
+						println "Error while updating rolePermissions : $rolePermissions"
 						rolePermissions.errors.each { println it }
 					}
 				}
 			}
 		}
 		for(String id in paramList){
-			def permissionInstansce = Permissions.get(id)
-			if(permissionInstansce){
-				permissionInstansce.description = params["description_"+id]
-				if(!permissionInstansce.save(flush:true)){
-					permissionInstansce.errors.allErrors.each {
+			Permissions permissions = Permissions.get(id)
+			if(permissions){
+				permissions.description = params["description_"+id]
+				if(!permissions.save(flush:true)){
+					permissions.errors.allErrors.each {
 						println it
 				    }
 			    }

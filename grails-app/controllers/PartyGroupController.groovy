@@ -1,49 +1,59 @@
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectStatus
-import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringUtils
+import org.springframework.jdbc.core.JdbcTemplate
 
-class PartyGroupController {
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class PartyGroupController implements ControllerMethods {
 
-    def controllerService
-	def partyRelationshipService
-    def securityService
-    def userPreferenceService
-	def projectService
-	def jdbcTemplate
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-	def index() { redirect(action:"list",params:params) }
+	ControllerService controllerService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	ProjectService projectService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
-	// the delete, save and update actions only accept POST requests
-	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// Will Return PartyGroup list where PartyType = COMPANY
 
 	def list() {
-		return [ listJsonUrl:HtmlUtil.createLink([controller:'person', action:'listJson']) ]
+		[listJsonUrl: createLink(controller: 'person', action: 'listJson')]
 	}
 
 	def listJson() {
 
-    	Person whom = securityService.getUserLoginPerson()
+    	Person whom = securityService.userLoginPerson
 
-		def sortIndex = params.sidx ?: 'companyName'
-		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows?:'25')
-		def currentPage = Integer.valueOf(params.page?:'1')
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		def companyInstanceList
-		def filterParams = ['companyName':params.companyName, 'dateCreated':params.dateCreated, 'lastUpdated':params.lastUpdated, 'partner':params.partner]
+		String sortIndex = params.sidx ?: 'companyName'
+		String sortOrder  = params.sord ?: 'asc'
+		int maxRows = params.int('rows', 25)
+		int currentPage = params.int('page', 1)
+		int rowOffset = (currentPage - 1) * maxRows
+		def companies
+		def filterParams = [companyName: params.companyName, dateCreated: params.dateCreated,
+		                    lastUpdated: params.lastUpdated, partner: params.partner]
 
 		// Validate that the user is sorting by a valid column
 		if( ! sortIndex in filterParams)
 			sortIndex = 'companyName'
 
-		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
-		if(!active){
-			active = 'Y'
-		}
+		String active = params.activeUsers ?: session.getAttribute("InActive") ?: 'Y'
 
 		def query = new StringBuffer("""SELECT * FROM (
 			SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
@@ -53,7 +63,7 @@ class PartyGroupController {
 			WHERE party_group_id in (
 				SELECT party_id_to_id FROM party_relationship
 				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
-				AND role_type_code_to_id='CLIENT' AND party_id_from_id=${whom.company.id}
+				AND role_type_code_to_id='CLIENT' AND party_id_from_id=$whom.company.id
 				)
 			GROUP BY party_group_id ORDER BY
 		""")
@@ -62,43 +72,43 @@ class PartyGroupController {
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 		filterParams.each {
-			if(it.getValue()) {
-				if(firstWhere){
-					query.append(" WHERE companies.${it.getKey()} LIKE '%${it.getValue()}%'")
+			if(it.value) {
+				if (firstWhere) {
+					query.append(" WHERE companies.$it.key LIKE '%$it.value%'")
 					firstWhere = false
-				} else {
-					query.append(" AND companies.${it.getKey()} LIKE '%${it.getValue()}%'")
+				}
+				else {
+					query.append(" AND companies.$it.key LIKE '%$it.value%'")
 				}
 			}
 		}
 
-		companyInstanceList = jdbcTemplate.queryForList(query.toString())
+		companies = jdbcTemplate.queryForList(query.toString())
 
 		// Limit the returned results to the user's page size and number
-		def totalRows = companyInstanceList.size()
-		def numberOfPages = Math.ceil(totalRows / maxRows)
-		if(totalRows > 0)
-			companyInstanceList = companyInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
-		else
-			companyInstanceList = []
+		int totalRows = companies.size()
+		int numberOfPages = Math.ceil(totalRows / maxRows)
+		if (totalRows > 0) {
+			companies = companies[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		}
 
-		def showUrl = HtmlUtil.createLink([controller:'partyGroup', action:'show'])
+		def showUrl = createLink(controller:'partyGroup', action:'show')
 
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
-		def results = companyInstanceList?.collect {[ cell: ['<a href="' + showUrl + '/' + it.companyId + '">'+it.companyName+'</a>', it.partner, it.dateCreated, it.lastUpdated], id: it.companyId ]}
-		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-		render jsonData as JSON
+		def results = companies?.collect { [cell: ['<a href="' + showUrl + '/' + it.companyId + '">' + it.companyName + '</a>',
+		                                          it.partner, it.dateCreated, it.lastUpdated],
+		                                   id: it.companyId] }
+		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
 	def show() {
-		def partyGroupInstance = PartyGroup.get( params.id )
-		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${partyGroupInstance?.id}" )
+		PartyGroup partyGroup = PartyGroup.get( params.id )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
 
-		if(!partyGroupInstance) {
-			flash.message = "PartyGroup not found with id ${params.id}"
-			redirect(action:"list")
-		} else {
-			return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ]
+		if (!partyGroup) {
+			flash.message = "PartyGroup not found with id $params.id"
+			redirect(action: "list")
+			return
 		}
 	}
 
@@ -166,66 +176,54 @@ class PartyGroupController {
 	}
 
 	def edit() {
-		if (!controllerService.checkPermission(this, 'CompanyEdit')) {
+		PartyGroup partyGroup = PartyGroup.get( params.id )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
+		if(!partyGroup) {
+			flash.message = "PartyGroup not found with id $params.id"
+			redirect(action:"list")
 			return
 		}
 
-		def partyGroupInstance = PartyGroup.get( params.id )
-		userPreferenceService.setPreference(PREF.PARTY_GROUP, "${partyGroupInstance?.id}" )
-		if(!partyGroupInstance) {
-			flash.message = "PartyGroup not found with id ${params.id}"
-			redirect(action:"list")
-		}
-		else {
-			return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ]
-		}
+		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup)]
 	}
 
 	def update() {
-		def partyGroupInstance = PartyGroup.get( params.id )
-		//partyGroupInstance.lastUpdated = new Date()
-		if(partyGroupInstance) {
-			partyGroupInstance.properties = params
+		PartyGroup partyGroup = PartyGroup.get( params.id )
+		//partyGroup.lastUpdated = new Date()
+		if(partyGroup) {
+			partyGroup.properties = params
 
-			if( !partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
+			if( !partyGroup.hasErrors() && partyGroup.save()) {
 
-				if (params.partner && params.partner == "Y" && !isAPartner(partyGroupInstance)) {
-					def company = partyRelationshipService.getCompanyOfStaff( securityService.getUserLogin().person )
+				if (params.partner && params.partner == "Y" && !isAPartner(partyGroup)) {
+					def company = partyRelationshipService.getCompanyOfStaff(securityService.loadCurrentPerson())
 					if (company) {
-						partyRelationshipService.savePartyRelationship( "PARTNERS", company, "COMPANY", partyGroupInstance, "PARTNER" )
+						partyRelationshipService.savePartyRelationship( "PARTNERS", company, "COMPANY", partyGroup, "PARTNER" )
 					}
 				}
 
-				flash.message = "PartyGroup ${partyGroupInstance} updated"
-				redirect(action:"show",id:partyGroupInstance.id)
+				flash.message = "PartyGroup $partyGroup updated"
+				redirect(action:"show",id:partyGroup.id)
 			} else {
-				flash.message = "Unable to update due to: " + GormUtil.errorsToUL(partyGroupInstance)
-				render(view:'edit',model:[partyGroupInstance:partyGroupInstance])
+				flash.message = "Unable to update due to: ${GormUtil.errorsToUL(partyGroup)}"
+				render(view:'edit',model:[partyGroupInstance:partyGroup])
 			}
 		}
 		else {
-			flash.message = "PartyGroup not found with id ${params.id}"
+			flash.message = "PartyGroup not found with id $params.id"
 			redirect(action:"edit",id:params.id)
 		}
 	}
 
     def create() {
-		if (!controllerService.checkPermission(this, 'CompanyCreate')) {
-			return
-		}
-
     	log.debug "**** Got to the create() method"
-        def partyGroupInstance = new PartyGroup()
-        partyGroupInstance.properties = params
-        return ['partyGroupInstance':partyGroupInstance]
+        [partyGroupInstance: new PartyGroup(params)]
     }
 
+	@HasPermission('PartyCreateView')
     def save() {
-    	if (! controllerService.checkPermission(this, 'PartyCreateView', true)) {
-    		return
-    	}
 
-    	Person whom = securityService.getUserLoginPerson()
+    	Person whom = securityService.userLoginPerson
 
     	PartyType partyType = PartyType.read(params['partyType.id'])
     	if (! partyType) {
@@ -239,22 +237,22 @@ class PartyGroupController {
         partyGroup.comment = params.comment
         partyGroup.partyType = partyType
 
-        //partyGroupInstance.dateCreated = new Date()
+        //partyGroup.dateCreated = new Date()
         if (!partyGroup.hasErrors() && partyGroup.save()) {
         	//	Statements to create CLIENT PartyRelationship with the user's Company
         	if ( partyType.id == "COMPANY" ){
 
 	        	def companyParty = whom.company
-	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroup, "CLIENT" )
+	        	partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroup, "CLIENT" )
 
 	        	if (params.partner && params.partner == "Y" ) {
-					def company = partyRelationshipService.getCompanyOfStaff( securityService.getUserLogin().person )
+					def company = partyRelationshipService.getCompanyOfStaff(securityService.loadCurrentPerson())
 					if (company) {
 						partyRelationshipService.savePartyRelationship( "PARTNERS", company, "COMPANY", partyGroup, "PARTNER" )
 					}
 				}
         	}
-            flash.message = "PartyGroup ${partyGroup} created"
+            flash.message = "PartyGroup $partyGroup created"
             redirect(action:'show',id:partyGroup.id)
         }
         else {
@@ -263,13 +261,20 @@ class PartyGroupController {
     }
 
 // TODO : JPM 3/2016 : isAPartner method should be in a service AND shoud take the company as a company instead of looking it up based on the user
-	private def isAPartner(partyGroupInstance) {
-		def partner
-		def personCompany = securityService.getUserLogin().person.company
+	private boolean isAPartner(partyGroup) {
+		def personCompany = securityService.userLoginPerson.company
 		if (personCompany) {
-			partner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $personCompany.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' and	p.partyIdTo = $partyGroupInstance.id")
+			PartyRelationship.executeQuery('''
+				select count(p) from PartyRelationship p
+				where p.partyRelationshipType = 'PARTNERS'
+				  and p.partyIdFrom.id = (select p.company.id from Person p where person.id=:currentPersonId)
+				  and p.roleTypeCodeFrom = 'COMPANY'
+				  and p.roleTypeCodeTo = 'PARTNER'
+				  and	p.partyIdTo = :partyGroup
+			''', [partyGroup: partyGroup])[0] > 0
 		}
-		return (partner != null)
+		else {
+			false
+		}
 	}
-
 }

@@ -22,8 +22,8 @@
 	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;margin-left: 10%;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Database Conflicts - ${project.name} : ${moveBundle} - Includes databases matching: ${title?:'' }</b><br/>
-			This analysis was performed on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${session.getAttribute("LOGIN_PERSON").name }.
-		</div> 
+			This analysis was performed on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${tds.currentPersonName()}.
+		</div>
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
 		</div>

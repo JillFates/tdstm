@@ -1,9 +1,10 @@
-
-
-import org.springframework.jdbc.core.JdbcTemplate
-import org.junit.Ignore
-
 import grails.test.mixin.TestFor
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.service.MoveBundleService
+
+import org.junit.Ignore
+import org.springframework.jdbc.core.JdbcTemplate
+
 import spock.lang.Specification
 
 @TestFor(MoveBundleService)
@@ -40,7 +41,7 @@ class MoveBundleServiceTests extends Specification {
 	void testgetMoveEventSummaryResults() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		def summaryResults = moveBundleService.getMoveEventSummaryResults( 1 )
-		assetEquals 5,summaryResults.size()
+		assertEquals 5,summaryResults.size()
 	}
 
 	// method to test the MoveEvent Transition Times detailed report details
@@ -48,6 +49,6 @@ class MoveBundleServiceTests extends Specification {
 	void testgetMoveEventDetailedResults() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		def detailedResults = moveBundleService.getMoveEventDetailedResults( 1 )
-		assetEquals 16,detailedResults.size()
+		assertEquals 16,detailedResults.size()
 	}
 }

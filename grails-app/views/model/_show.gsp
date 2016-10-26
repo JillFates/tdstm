@@ -20,7 +20,7 @@
 		<tr>
 			<td>Manufacturer:</td>
 			<td>${modelInstance?.manufacturer?.name}</td>
-			<td>Model Name: (<a href="#" 
+			<td>Model Name: (<a href="#"
 			 onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' technical specifications pdf'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">search</a>)
 			</td>
 			<td>${modelInstance?.modelName}</td>
@@ -61,16 +61,15 @@
 		<tr>
 			<td>Power (max/design/avg) :</td>
 			<td>
-			    <g:set var="powerType" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE ?: 'Watts'}"/>
-				<span id="namePlatePowerSpanId">${powerType !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 120)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
+				<span id="namePlatePowerSpanId">${tds.rackPower(power: modelInstance?.powerNameplate)}</span>
 				<input type="hidden" id="powerNameplateId" value="${modelInstance?.powerNameplate}" >&nbsp;
 
-				<span id="PowerDesignSpanId">${powerType !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 120)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
+				<span id="PowerDesignSpanId">${tds.rackPower(power: modelInstance?.powerDesign)}</span>
 				<input type="hidden" id="powerDesignId" value="${modelInstance?.powerDesign}" >&nbsp;
 
-				<span id="powerSpanId">${powerType !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 120)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
+				<span id="powerSpanId">${tds.rackPower(power: modelInstance?.powerUse)}</span>
 				<input type="hidden" id="powerUseId" value="${modelInstance?.powerUse}" >&nbsp;
-				<g:select id="powertype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
+				<g:select id="powertype" name='powerType' value="${tds.powerType()}" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
             </td>
         	<td>Notes:</td>
 			<td>${modelInstance?.description}</td>
@@ -88,7 +87,7 @@
         		<img src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
         		</g:if>
         	</td>
-        </tr>	
+        </tr>
 		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td>Blade Rows:</td>
 			<td>${modelInstance?.bladeRows}</td>
@@ -200,13 +199,13 @@
 	</div>
 	<tr>
 			<td colspan="2">
-				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
+				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
 					<tds:hasPermission permission="EditModel">
 						<g:form action="update" >
 							<input name="id" value="${modelInstance.id}" type="hidden"/>
 							 <input type="hidden" name="redirectTo" value="${redirectTo}" />
 							<span class="button">
-							
+
 							   <g:if test="${redirectTo=='modelDialog'}">
 									<span class="button"><input type="button" class="edit" value="Edit"
 											onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','edit','Edit')" /></span>
@@ -226,7 +225,7 @@
 							   <g:else>
 									<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
 									<g:if test="${modelRef}">
-										<g:actionSubmit class="disableButton delete" action="delete" value="Delete"  disabled="disabled" 
+										<g:actionSubmit class="disableButton delete" action="delete" value="Delete"  disabled="disabled"
 										 onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
 									</g:if>
 									<g:else>

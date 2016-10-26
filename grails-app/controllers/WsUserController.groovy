@@ -1,67 +1,48 @@
-import grails.converters.JSON
-import grails.validation.ValidationException
-import org.springframework.stereotype.Controller
+import grails.compiler.GrailsCompileStatic
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.UserPreferenceService
+
 /**
- * {@link Controller} for handling WS calls of the {@link UserService}
+ * Handles WS calls of the UserService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-class WsUserController {
+@GrailsCompileStatic
+@Secured('isAuthenticated()')
+@Slf4j(value='logger', category='grails.app.controllers.WsUserController')
+class WsUserController implements ControllerMethods {
 
-	def securityService
-	def userPreferenceService
+	UserPreferenceService userPreferenceService
 
 	/**
-	 * Used to access a list of one or more user preferences
+	 * Access a list of one or more user preferences
 	 * @param id - a comma separated list of the preference(s) to be retrieved
-	 * Check {@link UrlMappings} for the right call
 	 * @example GET ./ws/user/preferences/EVENT,BUNDLE
 	 * @return a MAP of the parameters (e.g. preferences:[EVENT:5, BUNDLE:30])
 	 */
 	def preferences() {
 		def data = [:]
-		def prefs = ( params.id ? params.id?.split(',') : [] )
-		prefs.each { p -> data[p] = userPreferenceService.getPreference(p) }
+		for (String preferenceCode in params.id?.toString()?.split(',')) {
+			data[preferenceCode] = userPreferenceService.getPreference(preferenceCode)
+		}
 
-		render(ServiceResults.success('preferences' : data) as JSON)
+		renderSuccessJson(preferences: data)
 	}
 
 	/**
-	 * Used to set a user preference through an AJAX call
+	 * Sets a user preference through an AJAX call
 	 * @param code - the preference code for the preference that is being set
 	 * @param value - the value to set the preference to
 	 */
-	def savePreference () {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def currentProject = securityService.getUserCurrentProject()
-
+	def savePreference() {
 		try {
-			def prefCode = params.code?.toString() ?: ''
-			def prefValue = params.value ?: ''
-
-			userPreferenceService.savePreference(prefCode, prefValue)
-
-			render(ServiceResults.success() as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (InvalidParamException e) {
-			ServiceResults.respondWithError(response, 'Invalid preference value')
-		} catch (InvalidRequestException e) {
-			ServiceResults.respondWithError(response, 'Invalid preference code')
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			userPreferenceService.savePreference(params.code?.toString() ?: '', params.value ?: '')
+			renderSuccessJson()
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
-
 }

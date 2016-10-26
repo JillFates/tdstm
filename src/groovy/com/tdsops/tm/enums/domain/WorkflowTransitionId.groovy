@@ -1,16 +1,17 @@
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
 /**
  * WorkflowTransitionId - represents the valid transId values for the WorkflowTransion domain property transId.
- *
  */
+@CompileStatic
 class WorkflowTransitionId {
-	static final Integer HOLD=10
-	static final Integer READY=20
-	static final Integer TRANSPORT=110
-	static final Integer COMPLETED=280
-	static final Integer TERMINATED=900
-	static final getList() {
-		return [HOLD,READY,TRANSPORT,COMPLETED,TERMINATED]
-	}
+	public static final int HOLD       = 10
+	public static final int READY      = 20
+	public static final int TRANSPORT  = 110
+	public static final int COMPLETED  = 280
+	public static final int TERMINATED = 900
+
+	static final List<Integer> list = [HOLD, READY, TRANSPORT, COMPLETED, TERMINATED].asImmutable()
 }

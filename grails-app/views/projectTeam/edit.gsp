@@ -1,21 +1,22 @@
+<%@page import="net.transitionmanager.domain.ProjectTeam" %>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Edit Move Bundle Team</title>
-        <script type="text/javascript">  
-			   $().ready(function() {  
-			    $('#add').click(function() {  
-			     return !$('#availableStaffId option:selected').remove().appendTo('#teamMembersId');  
-			    });  
-			    $('#remove').click(function() {  
-			     return !$('#teamMembersId option:selected').remove().appendTo('#availableStaffId');  
-			    });  
-			   });  
+        <script type="text/javascript">
+			   $().ready(function() {
+			    $('#add').click(function() {
+			     return !$('#availableStaffId option:selected').remove().appendTo('#teamMembersId');
+			    });
+			    $('#remove').click(function() {
+			     return !$('#teamMembersId option:selected').remove().appendTo('#availableStaffId');
+			    });
+			   });
 		</script>
     </head>
-    <body>    	
-    	
+    <body>
+
         <div class="body">
             <h1>Edit Move Bundle Team</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
@@ -47,7 +48,7 @@
 						            </g:hasErrors>
                                 </td>
                             </tr>
-                            
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name"><b>Team Name:&nbsp;<span style="color: red">*</span></b></label>
@@ -60,7 +61,7 @@
 							            </div>
 						            </g:hasErrors>
                                 </td>
-                            </tr> 
+                            </tr>
                         	<tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="role"><b>Role:&nbsp;<span style="color: red">*</span></b></label>
@@ -73,7 +74,7 @@
 						            </div>
 						            </g:hasErrors>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="comment">Comment:</label>
@@ -82,7 +83,7 @@
                                     <textarea rows="3" cols="80" id="comment" name="comment"  onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)">${fieldValue(bean:projectTeamInstance,field:'comment')}</textarea>
                                 </td>
                             </tr>
-                        
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="isDisbanded">Is Disbanded:</label>
@@ -110,7 +111,7 @@
 		                                <select name="availableStaff" id="availableStaffId" multiple="multiple" size="10" style="width: 313px;">
 			                                <g:each in="${availableStaff}" var="availableStaff">
 			                                	<option value="${availableStaff?.staff.id}"><g:if test="${availableStaff.company[0]}">${availableStaff.company[0]}:</g:if>${availableStaff?.staff?.lastNameFirstAndTitle}</option>
-			                                </g:each> 
+			                                </g:each>
 		                                </select>
 	                                </td>
 	                                <td valign="middle" style="vertical-align:middle;width: auto;"  >
@@ -125,15 +126,15 @@
 		                                <select name="teamMembers" id="teamMembersId" multiple="multiple" size="10" style="width: 313px;">
 										<g:each in="${teamMembers}" var="teamMember">
 			                                	<option value="${teamMember?.staff.id}" selected="selected"><g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if>${teamMember?.staff?.lastNameFirstAndTitle}</option>
-										</g:each>  
+										</g:each>
 		                                </select>
 	                                </td>
                                 </tr>
                                 </table>
                                 </td>
-                                
-                            </tr> 
-                        
+
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>

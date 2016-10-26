@@ -1,178 +1,110 @@
 package com.tdssrc.grails
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.util.logging.Slf4j
+import net.transitionmanager.service.UserPreferenceService
+import org.springframework.util.Assert
+
+import java.sql.Timestamp
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.sql.Timestamp
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
-import javax.servlet.http.HttpSession
 
 /**
- * The TimeUtil class contains a collection of useful Time manipulation methods 
+ * The TimeUtil class contains a collection of useful Time manipulation methods
  */
+@Slf4j(value='logger')
 class TimeUtil {
-
-	private static final log = LogFactory.getLog(TimeUtil.class)
-
-	//TODO: Remove!!!
-	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
-							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
 
 	static final String MIDDLE_ENDIAN = 'MM/DD/YYYY'	// Primarily in the US
 	static final String LITTLE_ENDIAN = 'DD/MM/YYYY'	// Used outside US and China
 	static final String BIG_ENDIAN    = 'YYYY/MM/DD'	// Used principally in China but not used in TM today
 
-	def static final dateTimeFormatTypes = [MIDDLE_ENDIAN, LITTLE_ENDIAN]
+	static final List<String> dateTimeFormatTypes = [MIDDLE_ENDIAN, LITTLE_ENDIAN]
 
-	def static final defaultTimeZone = 'GMT'
-
-	def static final String TIMEZONE_ATTR = 'CURR_TZ'
-	def static final String DATE_TIME_FORMAT_ATTR = 'CURR_DT_FORMAT'
-
+	static final String defaultTimeZone = 'GMT'
 
 	// Valid date time formats
-	def static final FORMAT_DATE         = "MM/dd/yyyy"
-	def static final FORMAT_DATE_TIME    = "MM/dd/yyyy hh:mm a"
-	def static final FORMAT_DATE_TIME_2  = "MM-dd-yyyy hh:mm:ss a"
-	def static final FORMAT_DATE_TIME_3  = "E, d MMM 'at ' hh:mm a"
-	def static final FORMAT_DATE_TIME_4  = "MM/dd kk:mm"
-	def static final FORMAT_DATE_TIME_5  = "yyyyMMdd"
-	def static final FORMAT_DATE_TIME_6  = "yyyy-MM-dd"
-	def static final FORMAT_DATE_TIME_7  = "dd-MMM"
-	def static final FORMAT_DATE_TIME_8  = "MMM dd,yyyy hh:mm a"
-	def static final FORMAT_DATE_TIME_9  = "MM-dd-yyyy hh:mm a"
-	def static final FORMAT_DATE_TIME_10 = "MMM dd"
-	def static final FORMAT_DATE_TIME_11 = "yyyy/MM/dd hh:mm:ss a"
-	def static final FORMAT_DATE_TIME_12 = "MM-dd-yyyy"
-	def static final FORMAT_DATE_TIME_13 = "MM/dd kk:mm:ss"
-	def static final FORMAT_DATE_TIME_14 = "yyyy-MM-dd hh:mm" //Used in queries
-	def static final FORMAT_DATE_TIME_15 = "yyyy-MM-dd HH:mm:ss" //Used in queries
-	def static final FORMAT_DATE_TIME_16 = "yyyy-MM-dd hh:mm a" //Used in queries
-	def static final FORMAT_DATE_TIME_17 = "MM/dd"
-	def static final FORMAT_DATE_TIME_18 = "M/d"
-	def static final FORMAT_DATE_TIME_19 = "M/d kk:mm"
-	def static final FORMAT_DATE_TIME_20 = "hh:mm"
-	def static final FORMAT_DATE_TIME_21 = "mm/dd"
-	def static final FORMAT_DATE_TIME_22 = "MM/dd/yyyy hh:mm:ss a"
-	def static final FORMAT_DATE_TIME_23 = "MM/dd/yy"
-	def static final FORMAT_DATE_TIME_24 = "MM/dd/yyyy hh:mm:ss"
-	def static final FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
+	static final String FORMAT_DATE         = "MM/dd/yyyy"
+	static final String FORMAT_DATE_TIME    = "MM/dd/yyyy hh:mm a"
+	static final String FORMAT_DATE_TIME_2  = "MM-dd-yyyy hh:mm:ss a"
+	static final String FORMAT_DATE_TIME_3  = "E, d MMM 'at ' hh:mm a"
+	static final String FORMAT_DATE_TIME_4  = "MM/dd kk:mm"
+	static final String FORMAT_DATE_TIME_5  = "yyyyMMdd"
+	static final String FORMAT_DATE_TIME_6  = "yyyy-MM-dd"
+	static final String FORMAT_DATE_TIME_7  = "dd-MMM"
+	static final String FORMAT_DATE_TIME_8  = "MMM dd,yyyy hh:mm a"
+	static final String FORMAT_DATE_TIME_9  = "MM-dd-yyyy hh:mm a"
+	static final String FORMAT_DATE_TIME_10 = "MMM dd"
+	static final String FORMAT_DATE_TIME_11 = "yyyy/MM/dd hh:mm:ss a"
+	static final String FORMAT_DATE_TIME_12 = "MM-dd-yyyy"
+	static final String FORMAT_DATE_TIME_13 = "MM/dd kk:mm:ss"
+	static final String FORMAT_DATE_TIME_14 = "yyyy-MM-dd hh:mm" //Used in queries
+	static final String FORMAT_DATE_TIME_15 = "yyyy-MM-dd HH:mm:ss" //Used in queries
+	static final String FORMAT_DATE_TIME_16 = "yyyy-MM-dd hh:mm a" //Used in queries
+	static final String FORMAT_DATE_TIME_17 = "MM/dd"
+	static final String FORMAT_DATE_TIME_18 = "M/d"
+	static final String FORMAT_DATE_TIME_19 = "M/d kk:mm"
+	static final String FORMAT_DATE_TIME_20 = "hh:mm"
+	static final String FORMAT_DATE_TIME_21 = "mm/dd"
+	static final String FORMAT_DATE_TIME_22 = "MM/dd/yyyy hh:mm:ss a"
+	static final String FORMAT_DATE_TIME_23 = "MM/dd/yy"
+	static final String FORMAT_DATE_TIME_24 = "MM/dd/yyyy hh:mm:ss"
+	static final String FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
 
-	static final String SHORT='S'
-	static final String FULL='F'
-	static final String ABBREVIATED='A'
+	static final String SHORT = 'S'
+	static final String FULL = 'F'
+	static final String ABBREVIATED = 'A'
 
 	public static final String GRANULARITY_SECONDS = "S"
 	public static final String GRANULARITY_MINUTES = "M"
 	public static final String GRANULARITY_HOURS = "H"
 	public static final String GRANULARITY_DAYS = "D"
 
-	private static String getFromHttpSession(HttpSession session, String key, String defaultValue = null) {
-		def value = null
-		if(session){
-			def map = session.getAttribute(key) ?: [:]
-			value = map[key]
-		}
-		return value ?: defaultValue
-	}
-
-	/**
-	 * Used to get the user perferred timezone
-	 * @param session - the HttpSession user session object
-	 * @return the timezone id string
-	 */
-	public static String getUserTimezone(HttpSession session) {
-		return TimeUtil.getFromHttpSession(session, TIMEZONE_ATTR, defaultTimeZone)
-	}	 
-
-	/**
-	 * Used to get the user perferred timezone
-	 * @param session - the HttpSession user session object
-	 * @return the timezone id string
-	 */
-	public static String getUserDateFormat(HttpSession session) {
-		return TimeUtil.getFromHttpSession(session, DATE_TIME_FORMAT_ATTR, getDefaultFormatType())
-	}	 
-
-	/**
-	 * Used to adjust a datetime by adding or subtracting a specified number of DAYS from an existing date
-	 * @param Date	a date to be adjusted
-	 * @param Integer	the amount to adjust either positive or negative
-	 * @return Date	the adjusted date
-	 */
-	public static Date adjustDays(date, adjustment) {
-		TimeDuration td = new TimeDuration(adjustment,0,0,0,0)
-		return TimeCategory.plus(date, td)
-	}
-	/**
-	 * Used to adjust a datetime by adding or subtracting a specified number of HOURS from an existing date
-	 * @param Date	a date to be adjusted
-	 * @param Integer	the amount to adjust either positive or negative
-	 * @return Date	the adjusted date
-	 */
-	public static Date adjustHours(date, adjustment) {
-		TimeDuration td = new TimeDuration(adjustment,0,0,0)
-		return TimeCategory.plus(date, td)
-	}
-	/**
-	 * Used to adjust a datetime by adding or subtracting a specified number of MINUTES from an existing date
-	 * @param Date	a date to be adjusted
-	 * @param Integer	the amount to adjust either positive or negative
-	 * @return Date	the adjusted date
-	 */
-	public static Date adjustMinutes(date, adjustment) {
-		TimeDuration td = new TimeDuration(0,adjustment,0,0)
-		return TimeCategory.plus(date, td)
-	}
 	/**
 	 * Used to adjust a datetime by adding or subtracting a specified number of SECONDS from an existing date
-	 * @param Date	a date to be adjusted
-	 * @param Integer	the amount to adjust either positive or negative
-	 * @return Date	the adjusted date
+	 * @param date	 a date to be adjusted
+	 * @param adjustment  the amount to adjust either positive or negative
+	 * @return the adjusted date
 	 */
-	public static Date adjustSeconds(date, adjustment) {
-		TimeDuration td = new TimeDuration(0,0,adjustment,0)
-		return TimeCategory.plus(date, td)
+	static Date adjustSeconds(Date date, int adjustment) {
+		TimeCategory.getSeconds(adjustment) + date
 	}
-	
+
 	/**
 	 * Returns the elapsed duration that occured between a start time and now
-	 * @param Date	starting Datetime
+	 * @param start  starting Datetime
 	 * @return TimeDuration
 	 */
-	public static TimeDuration elapsed(Date start) {
-		def e = elapsed(start, new Date())
-		start = new Date()  //<- this doesn't have any effect in the program since we are not changing the passed object
-		return e
+	static TimeDuration elapsed(Date start) {
+		elapsed(start, new Date())
 	}
 
 	/**
 	 * This is Supposed to get the Elapsed Time until now from a given date wrapped in a list for later updating this Date.
 	 * I dont recomend this approach since its Error prone and Mutability es the root of all evil :) rather change it in the caller.
-	 * 
+	 *
 	 * @deprecated Use {@link com.tdssrc.grails.StopWatch} or {@link org.apache.commons.lang.time.StopWatch}
 	 */
-	public static TimeDuration elapsed(List startList) {
-		def e = elapsed(startList[0], new Date())
+	static TimeDuration elapsed(List<Date> startList) {
+		TimeDuration e = elapsed(startList[0], new Date())
 		startList[0] = new Date()
-		return e
+		e
 	}
 
 	/**
-	 * Returns the elapsed duration that occured between two date objects as a groovy.time.TimeDuration
-	 * @param Date	starting Datetime
-	 * @param Date	ending datetime
-	 * @return TimeDuration
+	 * Returns the elapsed duration that occured between two date objects as a TimeDuration.
+	 * @param start  starting Datetime
+	 * @param end  ending datetime
+	 * @return the time delta
 	 */
-	public static TimeDuration elapsed(def start, def end) {
-		if (! start || ! end ) {
-			return new TimeDuration(0,0,0,0)
+	static TimeDuration elapsed(Date	start, Date	end) {
+		if (!start || !end) {
+			new TimeDuration(0, 0, 0, 0)
 		}
-		use (TimeCategory) {
-			TimeDuration duration = end - start
-			return duration
+		else {
+			TimeCategory.minus end, start
 		}
 	}
 
@@ -182,40 +114,44 @@ class TimeUtil {
 	 * > 1 hour - ##h ##m ##s
 	 * <= 90 minutes - ##m ##s
 	 * >1 minute - ##s
-	 * @param TimeDuration	The elapsed duration
+	 * @param duration  The elapsed duration
 	 * @param format - the format of the time units (SHORT- h/m/s, ABBREVIATED hr/min/sec, FULL hour/minute/second) default SHORT
 	 * @return The time formatted
 	 * @examples
 	 *     3d 4h 10m
 	 *     3-days 4-hrs 10-min
 	 *     10-min 5-sec
-	 *     3-days 4-hours 10-minutes 
-	 */ 
-	public static String ago(TimeDuration duration, String format=SHORT) {	
-		StringBuffer ago = new StringBuffer()
-		String space = ''
+	 *     3-days 4-hours 10-minutes
+	 */
+	static String ago(TimeDuration duration, String format = SHORT) {
+		StringBuilder ago = new StringBuilder()
+		String space
 
-		def days = duration.getDays()
-		def hours = duration.getHours()
-		def minutes = duration.getMinutes()
-		def seconds = duration.getSeconds()
+		int days = duration.days
+		int hours = duration.hours
+		int minutes = duration.minutes
+		int seconds = duration.seconds
 
 		// local closure to do the borrowing math on the d:h:m:s appropriately
-		def adjustForNegative = { ggrand, grand, parent, value, factor -> 
+		def adjustForNegative = { ggrand, grand, parent, value, factor ->
 			if (value < 0) {
-				if (ggrand == 0 && grand == 0 && parent == 0 ) {
+				if (ggrand == 0 && grand == 0 && parent == 0) {
 					// We stop borrowing and just flip the value from negative to positive
 					value *= -1
-				} else { 
+				}
+				else {
 					// Borrow from the parent
 					int adj = value.intdiv(factor) + 1
 					value = factor + value
-					if (parent < 0)
+					if (parent < 0) {
 						parent += adj
-					else
+					}
+					else {
 						parent -= adj
+					}
 				}
-			} else {
+			}
+			else {
 				// See if we should borrow from the parent to knock it down
 				if (parent < 0 && value > 0) {
 					parent++
@@ -230,566 +166,440 @@ class TimeUtil {
 			(minutes, hours) = adjustForNegative(0, days, hours, minutes, 60)
 			(hours, days) = adjustForNegative(0, 0, days, hours, 60)
 
-			ago.append('-')
+			ago << '-'
 		}
 
 		if (days != 0) {
-			ago.append("${days}${ ( format == SHORT ? 'd' : ( '-day' + (days == 1 ? '' : 's') ) ) }")
-		} 
+			ago          << days    << (format == SHORT ? 'd' : '-day' + (days == 1 ? '' : 's'))
+		}
 		// Hours
 		if (hours != 0) {
-			space = (ago.length() > 1 ? ' ' : '')
-			ago.append("${space}${hours}${ ( format == SHORT ? 'h' : ( format==FULL ? '-hour' : '-hr' ) + ( hours == 1 ? '' : 's') ) }") 
+			space = ago.length() > 1 ? ' ' : ''
+			ago << space << hours   << (format == SHORT ? 'h' : (format == FULL ? '-hour' : '-hr') + (hours == 1 ? '' : 's'))
 		}
 		// Minutes
-		if ( days == 0 && minutes > 0 ) {
-			space = (ago.length() > 1 ? ' ' : '')
-			ago.append("${space}${minutes}${ ( format == SHORT ? 'm' : ( format==FULL ? '-minute' : '-min' ) + (minutes == 1 ? '' : 's') ) }") 
-		} 
-				// Only show seconds if day/hr are zero
-		if ( days == 0 && hours == 0 && seconds > 0 ) {
-			space = (ago.length() > 1 ? ' ' : '')
-			ago.append("${space}${seconds}${ ( format == SHORT ? 's' : ( format==FULL ? '-second' : '-sec' ) + (seconds == 1 ? '' : 's') ) }") 
+		if (days == 0 && minutes > 0) {
+			space = ago.length() > 1 ? ' ' : ''
+			ago << space << minutes << (format == SHORT ? 'm' : (format == FULL ? '-minute' : '-min' ) + (minutes == 1 ? '' : 's'))
+		}
+		// Only show seconds if day/hr are zero
+		if (days == 0 && hours == 0 && seconds > 0) {
+			space = ago.length() > 1 ? ' ' : ''
+			ago << space << seconds << (format == SHORT ? 's' : (format == FULL ? '-second' : '-sec' ) + (seconds == 1 ? '' : 's'))
 		}
 
-		return ago.toString()
+		ago.toString()
 	}
 
 	/**
-	 * Overload variation of the ago method that accepts a integer in seconds
+	 * Overload variation of the ago method that accepts an integer in seconds
 	 * @param secs - the number of seconds
 	 * @return The time in shorthand
-	 **/
-	public static String ago(Integer secs, String format=SHORT) {
-		Date start = new Date()
-		Date end
-		use( TimeCategory ) {
-			end = start + (secs).seconds
-		}
-		return ago( elapsed(start, end), format)
+	 */
+	static String ago(int secs, String format = SHORT) {
+		Date base = new Date(0)
+		ago(base, TimeCategory.getSeconds(secs) + base, format)
 	}
 
 	/**
 	 * Overloaded variation of the ago(TimeDuration) method that accepts a start and ending time
-	 * @param Date 	a starting datetime
-	 * @param Date	an ending datetime
-	 * @return String	The elapsed time in shorthand
+	 * @param start  a starting datetime
+	 * @param end  an ending datetime
+	 * @return The elapsed time in shorthand
 	 */
-	public static String ago(Date start, Date end, String format=SHORT) {
-		return ago( elapsed(start, end), format )
+	static String ago(Date start, Date end, String format = SHORT) {
+		ago(elapsed(start, end), format)
 	}
 
 	/**
-	 * Get the current datetime in GMT
-	 * @return Date The current date set in GMT
+	 * @return the current datetime in GMT
 	 */
-	def public static nowGMT() {
-		return new Date()
-	}
-	
-	/**
-	 * Get the current datetime in GMT
-	 * @return Date The current date set in GMT in sql format date
-	 */
-	def public static nowGMTSQLFormat() {
-		SimpleDateFormat sqlFormatGmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-		sqlFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"))
-		return sqlFormatGmt.format(new Date())
+	static Date nowGMT() {
+		new Date()
 	}
 
 	/**
-	 * Get the datetime in GMT formatted to be used in a sql
-	 * @return Date The current date set in GMT in sql format date
+	 * @return  the current datetime in GMT in SQL format
 	 */
-	def public static gmtDateSQLFormat(date) {
-		SimpleDateFormat sqlFormatGmt = new SimpleDateFormat("yyyy-MM-dd")
-		sqlFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"))
-		return sqlFormatGmt.format(date)
+	static String nowGMTSQLFormat() {
+		gmtDateSQLFormat new Date()
+	}
+
+	/**
+	 * @return  the specified date in GMT in SQL format
+	 */
+	static String gmtDateSQLFormat(Date date) {
+		formatDateTimeWithTZ defaultTimeZone, date, new SimpleDateFormat(FORMAT_DATE_TIME_6)
 	}
 
 	/**
 	 * Check if value is a valid format type and if not returns default
 	 * @return The format type
 	 */
-	public static String getDateTimeFormatType(value) {
-		def result = getDefaultFormatType()
-		dateTimeFormatTypes.each{ df ->
-			if (df == value) {
-				result = df
-			}
+	static String getDateTimeFormatType(String value) {
+		if (value in dateTimeFormatTypes) {
+			value
 		}
-		return result
+		else {
+			getDefaultFormatType()
+		}
 	}
 
 	/**
 	 * Default format type
 	 * @return The default format type
-	 **/
-	public static getDefaultFormatType() {
-		return dateTimeFormatTypes[0];
+	 */
+	static String getDefaultFormatType() {
+		dateTimeFormatTypes[0]
 	}
 
 	/**
-	 * Used to format a Date into a date string format, based in the format defined in the session
-	 * 
-	 * @param dateValue the date to format
-	 * @param session the session information (to get timezone and format type)
+	 * Format a Date to a string with the user's default format.
+	 *
+	 * @param date  the date to format
 	 * @return The date formatted
-	 **/
-	public static String formatDate(HttpSession session, Date dateValue) {
-		def formatter = createFormatter(session, FORMAT_DATE)
-		return formatDate(dateValue, formatter)
+	 */
+	static String formatDate(Date date) {
+		if (!date) return ''
+		formatDate(date, createFormatter(FORMAT_DATE))
 	}
 
 	/**
-	 * Used to format a Date into a date string format, based in the format defined in the session
+	 * Format a Date to a string with the specified formatter.
 	 * For dates (without time) is not required to applied a timezone.
-	 * @param dateValue the date to format
-	 * @param session the session information (to get timezone and format type)
+	 * @param date  the date to format
 	 * @return The date formatted
-	 **/
-	public static String formatDate(Date dateValue, DateFormat formatter) {
-		return formatDateTimeWithTZ('GMT', dateValue, formatter)
+	 */
+	static String formatDate(Date date, DateFormat formatter) {
+		if (!date) return ''
+		formatDateTimeWithTZ(defaultTimeZone, date, formatter)
 	}
 
 	/**
 	 * Used to format a Date into a date string format, based in the format defined in the param
 	 * For dates (without time) is not required to applied a timezone.
-	 * @param dateValue the date to format
+	 * @param date  the date to format
 	 * @param formatType the format type to be used, valid values defined in dateTimeFormatTypes
 	 * @param formatterType defines the format to be used
 	 * @return The date formatted
-	 **/
-	public static String formatDate(String formatType, Date dateValue, String formatterType=FORMAT_DATE_TIME) {
-		def formatter = createFormatterForType(formatType, formatterType)
-		return formatDate(dateValue, formatter)
+	 */
+	static String formatDate(String formatType, Date date, String formatterType = FORMAT_DATE_TIME) {
+		if (!date) return ''
+		formatDate(date, createFormatterForType(formatType, formatterType))
 	}
 
 	/**
 	 * Used to format a Date into a date string format, based in the formatter provided plus the timezone passed
 	 * @param tzId - the timezone to render a date for
-	 * @param dateValue - the date to format
+	 * @param date - the date to format
 	 * @param formatter - the formatter to use for the conversion of the date to a string
 	 * @return The date formatted as a string
 	 * @deprecated formatting a date with a Timezone should not be used as Dates should be handled as an absolute (no time element date)
-	 **/
-	public static String formatDate(String tzId, Date dateValue, DateFormat formatter) {
-		log.warn "Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)"
-		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+	 */
+	static String formatDate(String tzId, Date date, DateFormat formatter) {
+		logger.warn 'Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)'
+		if (!date) return ''
+		formatDateTimeWithTZ(tzId, date, formatter)
 	}
 
 	/**
-	 * Used to format a Date into a string format, based in the time zone and format defined in the session
-	 * @param dateValue the date to format
-	 * @param session the session information (to get timezone and format type)
+	 * Format a Date to a string with the user's time zone and date format.
+	 * @param date the date to format
 	 * @param the formatterType defines the format to be used
 	 * @return The date formatted
-	 **/
-	public static String formatDateTime(HttpSession session, dateValue, String formatterType=FORMAT_DATE_TIME) {
-		def formatter = createFormatter(session, formatterType)
-		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
-		return formatDateTime(tzId, dateValue, formatter)
+	 */
+	static String formatDateTime(Date date, String formatterType = FORMAT_DATE_TIME) {
+		if (!date) return ''
+		formatDateTime(userPreferenceService.timeZone, date, createFormatter(formatterType))
 	}
 
 	/**
-	 * Used to format a Date into a string format, based in the time zone and format defined in the session
-	 * @param dateValue the date to format
-	 * @param session the session information (to get timezone and format type)
+	 * Format a Date to a string with the specified formatter and the user's default time zone.
+	 * @param date the date to format
 	 * @param the formatter defines the formatter to be used
 	 * @return The date formatted
-	 **/
-	public static String formatDateTime(HttpSession session, dateValue, DateFormat formatter) {
+	 */
+	static String formatDateTime(Date date, DateFormat formatter) {
 		if (!formatter) {
 			// TODO : JPM 4/2016 : formatDateTimeWithTZ should throw InvalidParamException vs RuntimeException (fix below and test cases too)
 			// throw new InvalidParamException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
 			throw new RuntimeException('formatDateTime called with missing DateFormat formatter parameter')
 		}
-		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
-		if(!tzId){
-			tzId = "GMT"
-		}
-		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+		if (!date) return ''
+		formatDateTimeWithTZ(userPreferenceService.timeZone ?: defaultTimeZone, date, formatter)
 	}
 
 	/**
 	 * Used to format a Date into a datetime string format, based in the formatter provided plus the timezone passed
 	 * @param tzId - the timezone to render a date for
-	 * @param dateValue - the date to format
+	 * @param date - the date to format
 	 * @param formatter - the formatter to use for the conversion of the date to a string
 	 * @return The date formatted as a string
 	 * @deprecated formatting a date with a Timezone should not be used as Dates should be handled as an absolute (no time element date)
-	 **/
-	public static String formatDateTime(String tzId, Date dateValue, DateFormat formatter) {
-		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+	 */
+	static String formatDateTime(String tzId, Date date, DateFormat formatter) {
+		if (!date) return ''
+		formatDateTimeWithTZ(tzId, date, formatter)
 	}
 
-	public static String formatDateTime(String tzId, Long time, DateFormat formatter) {
-		Timestamp dateTime =  new Timestamp(time)
-		return formatDateTimeWithTZ(tzId, dateTime, formatter)
+	static String formatDateTime(String tzId, long time, DateFormat formatter) {
+		formatDateTimeWithTZ(tzId, new Timestamp(time), formatter)
 	}
 
 	/**
-	 * Used to format a Date into a string format, based in the time zone and format defined as parameters
-	 * @param dateValue the date to format
+	 * Used to format a Date into a string format, based in the time zone and format defined as parameter
+	 * @param date  the date to format
 	 * @param tzId the time zone to be used
 	 * @param formatType the format type to be used, valid values defined in dateTimeFormatTypes
 	 * @param the formatterType defines the format to be used
 	 * @return The date formatted
-	 **/
-	public static String formatDateTimeWithTZ(String tzId, String formatType, dateValue, String formatterType=FORMAT_DATE_TIME) {
-		def formatter = createFormatterForType(formatType, formatterType)
-		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+	 */
+	static String formatDateTimeWithTZ(String tzId, String formatType, Date date, String formatterType = FORMAT_DATE_TIME) {
+		if (!date) return ''
+		formatDateTimeWithTZ(tzId, date, createFormatterForType(formatType, formatterType))
 	}
 
 	/**
 	 * Used to format a Date into a string format, based in the time zone and format defined as parameters
-	 * @param dateValue the date to format
+	 * @param date the date to format
 	 * @param tzId the time zone to be used
 	 * @param the formatter to be used
 	 * @return The date formatted
-	 **/
-	public static String formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter) {
-		String result = null
-		if(dateValue){
-			if (! formatter) {
-			// throw new InvalidParamException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
-			throw new RuntimeException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
-			}
-			if (tzId == null) {
-				throw new RuntimeException('formatDateTimeWithTZ called with null timezone')
-			}
+	 */
+	static String formatDateTimeWithTZ(String tzId, Date date, DateFormat formatter) {
+		if (!date) return ''
+		Assert.notNull formatter, 'formatDateTimeWithTZ called with missing DateFormat formatter parameter'
+		Assert.notNull tzId, 'formatDateTimeWithTZ called with null timezone'
 
-			formatter.setTimeZone(TimeZone.getTimeZone(tzId))
-			result = formatter.format(dateValue)	
-		}
-		
-		return result
+		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
+		formatter.format(date)
 	}
 
 	/**
 	 * Used to format a Date into a GMT format, using default format type
-	 * @param dateValue the date to format
-	 * @param the formatterType defines the format to be used
+	 * @param date  the date to format
+	 * @param formatterType  the formatterType defines the format to be used
 	 * @return The date formatted
-	 **/
-	public static String formatDateTimeAsGMT(dateValue, String formatterType=FORMAT_DATE_TIME) {
-		return formatDateTimeWithTZ(defaultTimeZone, getDefaultFormatType(), dateValue, formatterType)
+	 */
+	static String formatDateTimeAsGMT(Date date, String formatterType = FORMAT_DATE_TIME) {
+		if (!date) return ''
+		formatDateTimeWithTZ(defaultTimeZone, getDefaultFormatType(), date, formatterType)
 	}
 
 	/**
-	 * Used to parse a string value into a Date, based in the format defined in the session.
+	 * Parse a string value to a Date with the user's default format.
 	 * For dates (without time) is not required to applied a timezone.
-	 * @param dateValue the date to format
-	 * @param session the session information (to get timezone and format type)
- * @return The date
-	 **/
-	public static Date parseDate(session, dateValue) {
-		def formatter = createFormatter(session, FORMAT_DATE)
-		return parseDate(dateValue, formatter)
+	 * @param dateString the date to format
+	 * @return The date
+	 */
+	static Date parseDate(String dateString) {
+		if (StringUtil.isBlank(dateString)) return null
+		parseDate(dateString, createFormatter(FORMAT_DATE))
 	}
 
 	/**
 	 * Used to parse a string value into a Date, based in the format defined by formatType.
 	 * For dates (without time) is not required to applied a timezone.
 	 * @param formatType the format type to be used, valid values defined in dateTimeFormatTypes
-	 * @param dateValue the date to format
+	 * @param dateString the date to format
 	 * @param the formatterType defines the format to be used
 	 * @return The date
-	 **/
-	public static Date parseDate(String formatType, String dateValue, String formatterType=FORMAT_DATE) {
-		def formatter = createFormatterForType(formatType, formatterType)
-		return parseDate(dateValue, formatter)
+	 */
+	static Date parseDate(String formatType, String dateString, String formatterType=FORMAT_DATE) {
+		if (StringUtil.isBlank(dateString)) return null
+		parseDate(dateString, createFormatterForType(formatType, formatterType))
 	}
 
 	/**
-	 * Used to parse a string value into a Date using a knowed DateFormat class. If the parse fails the 
+	 * Used to parse a string value into a Date using a knowed DateFormat class. If the parse fails the
 	 * method will return a null
-	 * @param dateValue - the String value of the date to be parsed
+	 * @param dateString - the String value of the date to be parsed
 	 * @param formatter - the DateFormat object to use to parse the date
 	 * @return The date or null if unparseable
-	 **/
-	public static Date parseDate(String dateValue, DateFormat formatter) {
-		def result = null
-		if(!StringUtil.isBlank(dateValue)){
-			try {
-				result = formatter.parse(dateValue)
-				result.clearTime()	
-			} catch (Exception e) {
-				log.debug("parseDate() encountered invalid date ($dateValue) format '${formatter?.toPattern()}' : ${e.getMessage()}")
-				log.debug("Exception:",e)
-			}	
-		}
-		
-		return result
-	}
-
-	/**
-	 * Used to parse a string value into a Date, based in the time zone and format defined in the session
-	 * @param dateValue the date to format
-	 * @param session the session information (to get timezone and format type)
-	 * @param the formatterType defines the format to be used
-	 * @return The date
-	 **/
-	public static Date parseDateTime(session, dateValue, String formatterType=FORMAT_DATE_TIME) {
-		DateFormat formatter = createFormatter(session, formatterType)
-		return parseDateTimeWithFormatter(session, dateValue, formatter)
-	}
-
-	/**
-	 * Used to parse a string value into a Date, based in the time zone and format defined in the session
-	 * @param dateValue the date to format
-	 * @param session the session information (to get timezone and format type)
-	 * @param the formatter defines the format to be used
-	 * @return The date
-	 **/
-	public static Date parseDateTimeWithFormatter(session, dateValue, DateFormat formatter) {
-		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
-		return parseDateTimeWithFormatter(tzId, dateValue, formatter)
-	}
-
-	/**
-	 * Used to parse a string value into a Date, based in the time zone and format defined in the session
-	 * @param tzId - the timezone id to parse the datetime value with
-	 * @param dateValue - the datetime value to be parsed
-	 * @param formatter - the string format that defines the layout of the datetime
-	 * @return The date other null
-	 **/
-	public static Date parseDateTimeWithFormatter(String tzId, dateValue, DateFormat formatter) {
-		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
-		def result
+	 */
+	static Date parseDate(String dateString, DateFormat formatter) {
+		if (StringUtil.isBlank(dateString)) return null
 		try {
-			result = formatter.parse(dateValue)
-		} catch (Exception e) {
-			log.debug("Invalid date time: $dateValue, $tzId, ${formatter.toPattern()}")
+			Date result = formatter.parse(dateString)
+			result.clearTime()
+			return result
 		}
-		return result
+		catch (e) {
+			logger.debug "parseDate() encountered invalid date ({}) format '{}' : {}",
+					dateString, formatter?.toPattern(), e.message, e
+		}
+	}
+
+	/**
+	 * Parse a string to a Date with the user's default time zone and format type.
+	 * @param dateString the date to format
+	 * @param the formatterType defines the format to be used
+	 * @return the Date or null if there's a problem
+	 */
+	static Date parseDateTime(String dateString, String formatterType = FORMAT_DATE_TIME) {
+		if (StringUtil.isBlank(dateString)) return null
+		parseDateTimeWithFormatter(userPreferenceService.timeZone, dateString, createFormatter(formatterType))
+	}
+
+	/**
+	 * Parse a string to a Date using the specified formatter.
+	 * @param tzId - the timezone id to parse the datetime value with
+	 * @param dateString - the string to be parsed
+	 * @param formatter - the string format that defines the layout of the datetime
+	 * @return the Date or null if there's a problem
+	 */
+	static Date parseDateTimeWithFormatter(String tzId, String dateString, DateFormat formatter) {
+		if (StringUtil.isBlank(dateString)) return null
+
+		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
+		try {
+			return formatter.parse(dateString)
+		}
+		catch (e) {
+			logger.debug 'Invalid date time: {}, {}, {}', dateString, tzId, formatter.toPattern()
+		}
 	}
 
 	/**
 	 * This method determines the elapsed time between two dates and
 	 * returns the value using the given granularity (D|H|M|S).
 	 */
-	public static Integer elapsed(Date start, Date end, String granularity){
-		TimeDuration duration = TimeUtil.elapsed(start, end)
-		Integer elapsed = duration.getDays()
+	static int elapsed(Date start, Date end, String granularity) {
+		TimeDuration duration = elapsed(start, end)
+		int elapsed = duration.days
 		granularity = granularity.toUpperCase()
-		if (granularity > GRANULARITY_DAYS){
-			elapsed = elapsed * 24 + duration.getHours()
-			if(granularity > GRANULARITY_HOURS){
-				elapsed = elapsed * 60 + duration.getMinutes()
-				if(granularity > GRANULARITY_MINUTES){
-					elapsed = elapsed * 60 + duration.getSeconds()
+		if (granularity > GRANULARITY_DAYS) {
+			elapsed = elapsed * 24 + duration.hours
+			if (granularity > GRANULARITY_HOURS) {
+				elapsed = elapsed * 60 + duration.minutes
+				if (granularity > GRANULARITY_MINUTES) {
+					elapsed = elapsed * 60 + duration.seconds
 				}
-
 			}
 		}
 		return elapsed
 	}
 
-	private static DateFormat createFormatter(HttpSession session, String formatterType) {
-		String userDTFormat = TimeUtil.getUserDateFormat(session)
-		return createFormatterForType(userDTFormat, formatterType)
-	}
-
-	/**
-	 * Builder to get a Formatter based on the middle-endian or little-endian, the formatter type, and the tyme zone to use to Parse Dates
-	 * @author @tavo_luna
-	 * @param userPrefFormat - the format type to be used, valid values defined in dateTimeFormatTypes
-	 * @param formatterType - the formatter type to be used
-	 * @param timezone - timezone to set the formatter
-	 * @return formatter - the middle or little-endian version of the format desired
-	 */
-	public static DateFormat createFormatterForType(String userPrefFormat, String formatterType, String timezone) {
-		def formatter = createFormatterForType(userPrefFormat, formatterType)
-		formatter?.setTimeZone(TimeZone.getTimeZone(timezone))
-		return formatter
+	static DateFormat createFormatter(String formatterType) {
+		createFormatterForType(userPreferenceService.dateFormat, formatterType)
 	}
 
 	/**
 	 * Creates a formatter based on the options presented. Based on the formatType being set to the
-	 * user preference of MMDDYYYY or DDMMYYYY then the method will return the equivilent format for 
+	 * user preference of MMDDYYYY or DDMMYYYY then the method will return the equivilent format for
 	 * the middle-endian (US) or little-endian (most other countries)
 	 * https://en.wikipedia.org/wiki/Date_format_by_country or all others
 	 * @param userPrefFormat - the format type to be used, valid values defined in dateTimeFormatTypes
 	 * @param formatterType - the formatter type to be used
+	 * @param timezone  optional timezone to set the formatter
 	 * @return formatter - the middle or little-endian version of the format desired
 	 */
-	public static DateFormat createFormatterForType(String userPrefFormat, String formatterType) {
-		def formatter
-		def isMiddleEndian = (userPrefFormat.toString() == MIDDLE_ENDIAN)
+	static DateFormat createFormatterForType(String userPrefFormat, String formatterType, String timezone = null) {
+		String format
+		boolean isMiddleEndian = userPrefFormat == MIDDLE_ENDIAN
 		switch (formatterType) {
 			case FORMAT_DATE:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd/yyyy")
-				else
-					formatter = new SimpleDateFormat("dd/MM/yyyy")
+				format = isMiddleEndian ? FORMAT_DATE : "dd/MM/yyyy"
 				break
 			case FORMAT_DATE_TIME:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-				else
-					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm a")
+				format = isMiddleEndian ? FORMAT_DATE_TIME : "dd/MM/yyyy hh:mm a"
 				break
 			case FORMAT_DATE_TIME_2:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a")
-				else
-					formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_2 : "dd-MM-yyyy hh:mm:ss a"
 				break
 			case FORMAT_DATE_TIME_3:
-				formatter = new SimpleDateFormat("E, d MMM 'at ' hh:mm a")
+				format = FORMAT_DATE_TIME_3
 				break
 			case FORMAT_DATE_TIME_4:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd kk:mm")
-				else
-					formatter = new SimpleDateFormat("dd/MM kk:mm")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_4 : "dd/MM kk:mm"
 				break
 			case FORMAT_DATE_TIME_5:
-				formatter = new SimpleDateFormat("yyyyMMdd")
+				format = FORMAT_DATE_TIME_5
 				break
 			case FORMAT_DATE_TIME_6:
-				formatter = new SimpleDateFormat("yyyy-MM-dd")
+				format = FORMAT_DATE_TIME_6
 				break
 			case FORMAT_DATE_TIME_7:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MMM-dd")
-				else
-					formatter = new SimpleDateFormat("dd-MMM")
+				format = isMiddleEndian ? "MMM-dd" : FORMAT_DATE_TIME_7
 				break
 			case FORMAT_DATE_TIME_8:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a")
-				else
-					formatter = new SimpleDateFormat("dd MMM yyyy hh:mm a")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_8 : "dd MMM yyyy hh:mm a"
 				break
 			case FORMAT_DATE_TIME_9:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a")
-				else
-					formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm a")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_9 : "dd-MM-yyyy hh:mm a"
 				break
 			case FORMAT_DATE_TIME_10:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MMM dd")
-				else
-					formatter = new SimpleDateFormat("dd MMM")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_10 : "dd MMM"
 				break
 			case FORMAT_DATE_TIME_11:
-				formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a")
+				format = FORMAT_DATE_TIME_11
 				break
 			case FORMAT_DATE_TIME_12:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM-dd-yyyy")
-				else
-					formatter = new SimpleDateFormat("dd-MM-yyyy")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_12 : "dd-MM-yyyy"
 				break
 			case FORMAT_DATE_TIME_13:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd kk:mm:ss")
-				else
-					formatter = new SimpleDateFormat("dd/MM kk:mm:ss")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_13 : "dd/MM kk:mm:ss"
 				break
 			case FORMAT_DATE_TIME_14:
-				formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
+				format = FORMAT_DATE_TIME_14
 				break
 			case FORMAT_DATE_TIME_15:
-				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+				format = FORMAT_DATE_TIME_15
 				break
 			case FORMAT_DATE_TIME_16:
-				formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a")
+				format = FORMAT_DATE_TIME_16
 				break
-
 			case FORMAT_DATE_TIME_17:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd")
-				else
-					formatter = new SimpleDateFormat("dd/MM")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_17 : "dd/MM"
 				break
 			case FORMAT_DATE_TIME_18:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("M/d")
-				else
-					formatter = new SimpleDateFormat("d/M")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_18 : "d/M"
 				break
 			case FORMAT_DATE_TIME_19:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("M/d kk:mm")
-				else
-					formatter = new SimpleDateFormat("M/d kk:mm")
+				format = FORMAT_DATE_TIME_19
 				break
 			case FORMAT_DATE_TIME_20:
-				formatter = new SimpleDateFormat("hh:mm")
+				format = FORMAT_DATE_TIME_20
 				break
 			case FORMAT_DATE_TIME_21:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("mm/dd")
-				else
-					formatter = new SimpleDateFormat("dd/mm")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_21 : "dd/mm"
 				break
 			case FORMAT_DATE_TIME_22:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a")
-				else
-					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_22 : "dd/MM/yyyy hh:mm:ss a"
 				break
 			case FORMAT_DATE_TIME_23:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd/yy")
-				else
-					formatter = new SimpleDateFormat("dd/MM/yy")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_23 : "dd/MM/yy"
 				break
 			case FORMAT_DATE_TIME_24:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss")
-				else
-					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_24 : "dd/MM/yyyy hh:mm:ss"
 				break
 			case FORMAT_DATE_TIME_25:
-				if (isMiddleEndian)
-					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm")
-				else
-					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")
+				format = isMiddleEndian ? FORMAT_DATE_TIME_25 : "dd/MM/yyyy hh:mm"
 				break
 		}
 
-		return formatter
-	}
+		if (!format) {
+			return null
+		}
 
-	/**
-	 * Used to move a Date to GMT which will fetch the user's configured timezone
-	 * in order to determine the timezone that the date is currently in.
-	 * @param dateValue - the date to move
-	 * @param session - the session information (to get timezone and format type)
-	 * @return the adjusted date
-	 **/
-	public static Date moveDateToTZ(dateValue, HttpSession session) {
-		def result
-		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
-		return moveDateToTZ('GMT', tzId)
-	}
-
-	/**
-	 * Used to move a Date from GMT to TZ
-	 * @param dateValue - the date to move
-	 * @param session - the session information (to get timezone and format type)
-	 * @return the adjusted date
-	 **/
-	public static Date moveDateFromGMT(Date date, String toTZ) {
-		return moveDateToTZ(date, 'GMT', toTZ)
+		DateFormat formatter = new SimpleDateFormat(format)
+		if (timezone) {
+			formatter.timeZone = TimeZone.getTimeZone(timezone)
+		}
+		formatter
 	}
 
 	/**
 	 * Used to adjust a Date from GMT to a specified Timezone
-	 * @param dateValue - the date to adjust
-	 * @param session - the session information (to get timezone and format type)
+	 * @param date  the date to adjust
 	 * @return The adjusted date
-	 **/
-	public static Date moveDateToGMT(Date date, String toTZ) {
-		if (toTZ == 'GMT') {
-			return date
-		} else {
-			return moveDateToTZ(date, 'GMT', toTZ)
+	 */
+	static Date moveDateToGMT(Date date, String toTZ) {
+		if (toTZ == defaultTimeZone) {
+			date
+		}
+		else {
+			moveDateToTZ(date, defaultTimeZone, toTZ)
 		}
 	}
 
@@ -801,26 +611,19 @@ class TimeUtil {
 	 * @return the adjusted date
 	 * @author @tavo_luna
 	 */
-	public static Date moveDateToTZ(Date date, String fromTZ, String toTZ){
-		def result
-
-		if (fromTZ == toTZ) {
+	private static Date moveDateToTZ(Date date, String fromTZ, String toTZ) {
+		if (date == null || fromTZ == toTZ) {
 			return date
 		}
 
-		if (date != null) {
-			SimpleDateFormat formatter = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
-			formatter.setTimeZone(TimeZone.getTimeZone(fromTZ))
-			String dateFormatted = formatter.format(date)
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT_DATE_TIME_15)
+		formatter.setTimeZone(TimeZone.getTimeZone(fromTZ))
+		String dateFormatted = formatter.format(date)
 
-			formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
-			result = formatter.parse(dateFormatted)
-		}
-		
-		return result
+		formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
+		formatter.parse(dateFormatted)
 	}
-	
-	
+
 	/**
 	 * Creates a properly denominated TimeDuration object for the given time quantities
 	 * @param seconds - the number of seconds in the duration
@@ -829,13 +632,22 @@ class TimeUtil {
 	 * @param days - the number of days in the duration
 	 * @return TimeDuration object representing the combination of the given time denominations
 	 */
-	public static TimeDuration createProperDuration (long days = 0, long hours = 0, long minutes = 0, long seconds = 0) {
+	static TimeDuration createProperDuration(long days = 0, long hours = 0, long minutes = 0, long seconds = 0) {
 		minutes += seconds / 60
 		hours += minutes / 60
 		days += hours / 24
 		seconds %= 60
 		minutes %= 60
 		hours %= 24
-		return new TimeDuration((int)days, (int)hours, (int)minutes, (int)seconds, 0)
+
+		new TimeDuration((int)days, (int)hours, (int)minutes, (int)seconds, 0)
+	}
+
+	static TimeDuration createProperDuration(TimeDuration duration) {
+		createProperDuration duration.days, duration.hours, duration.minutes, duration.seconds
+	}
+
+	private static UserPreferenceService getUserPreferenceService() {
+		ApplicationContextHolder.getBean('userPreferenceService', UserPreferenceService)
 	}
 }

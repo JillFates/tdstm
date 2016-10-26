@@ -1,27 +1,27 @@
 package com.tdsops.tm.enums.domain
 
-import com.tdssrc.grails.EnumUtil
+import groovy.transform.CompileStatic
 
 /**
  * Define all sort types.
  *
  * @author Diego Scarpa <diego.scarpa@bairesdev.com>
- *
  */
+@CompileStatic
 enum SortOrder {
-	ASC("asc"), DESC("desc")
+
+	ASC('asc'),
+	DESC('desc')
 
 	final String value
 
-	SortOrder(String value) {
-		this.value = value
+	private SortOrder(String label) {
+		value = label
 	}
 
-	String toString() {
-		value
-	}
+	String toString() { value }
 
-	static SortOrder valueOfParam( String param ) {
-		return EnumUtil.searchfParam(values(), param)
+	static SortOrder valueOfParam(String param) {
+		values().find { it.value == param }
 	}
 }

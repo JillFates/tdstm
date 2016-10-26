@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Person" %>
 <div class="menu4">
 	<ul>
 		<li>
@@ -27,7 +28,7 @@
 								<span class="personShow" id="companyId">${company}</span>
 							</td>
 						</tr>
-						
+
 						<tr class="prop">
 							<td valign="top" class="name">
 								<label for="firstName">First Name:&nbsp;</label>
@@ -174,7 +175,7 @@
                     <span id="tdsNoteId" >${person.tdsNote}</span>
                   </td>
                 </tr>
-                
+
                 <tr class="prop">
                   <td valign="top personShow" class="name personShow">
                     <label for="tdsLink">Contact URL :</label>
@@ -200,8 +201,8 @@
                     <span id="travelOK" ><input type="checkbox" ${person.travelOK == 1 ? 'checked="checked"':''} disabled="disabled"/> </span>
                   </td>
                 </tr>
-                
-                
+
+
               </tbody>
             </table>
              </div>

@@ -1,45 +1,28 @@
-import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-import grails.validation.ValidationException
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.ProgressService
 
 /**
- * {@link Controller} for handling WS calls of the {@link ProgressService}
+ * Handles WS calls of the ProgressService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-class WsProgressController {
+@Secured('isAuthenticated()')
+@Slf4j(value='logger', category='grails.app.controllers.WsProgressController')
+class WsProgressController implements ControllerMethods {
 
-	def progressService
-	def securityService
+	ProgressService progressService
 
 	/**
 	 * Gets the status of the progress of a async task
 	 */
 	def retrieveStatus() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def progressMap = progressService.get(id)
-
-			render(ServiceResults.success(progressMap) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(progressService.get(params.id))
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
 
@@ -47,31 +30,11 @@ class WsProgressController {
 	 * Gets the status of the progress of a async task
 	 */
 	def retrieveData() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def dataKey = params.dataKey
-
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def data = progressService.getData(id, dataKey)
-
-			render(ServiceResults.success([data:data]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(progressService.getData(params.id, params.dataKey))
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
 
@@ -79,26 +42,11 @@ class WsProgressController {
 	 * Returns the list of pending progresses
 	 */
 	def list() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
 		try {
-			def progressMap = progressService.list()
-
-			render(ServiceResults.success(progressMap) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(progressService.list())
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
 
@@ -106,26 +54,11 @@ class WsProgressController {
 	 * Returns the list of pending progresses
 	 */
 	def demo() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
 		try {
-			def progressMap = progressService.demo()
-
-			render(ServiceResults.success(progressMap) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(progressService.demo())
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
 
@@ -133,26 +66,11 @@ class WsProgressController {
 	 * Returns the list of pending progresses
 	 */
 	def demoFailed() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
 		try {
-			def progressMap = progressService.demoFailed()
-
-			render(ServiceResults.success(progressMap) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(progressService.demoFailed())
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
 }

@@ -395,7 +395,7 @@ logback = {
 	}
 
 	def debugPackages = ['grails.app']
-	def auditClass = 'grails.app.services.AuditService'
+	def auditClass = 'net.transitionmanager.service.AuditService'
 
 	info 'org.codehaus.groovy.grails',
 	     'org.grails',
@@ -416,5 +416,5 @@ logback = {
 	debug applicationLog: 'grails.app', additivity: true
 
 	// Setup Audit Logging messages to go to their own log file in addition to the application log
-	info  auditLog: 'grails.app.services.AuditService', additivity: true
+	info  auditLog: 'net.transitionmanager.service.AuditService', additivity: true
 }

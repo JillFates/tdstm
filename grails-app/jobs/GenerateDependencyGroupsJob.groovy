@@ -1,42 +1,35 @@
-import org.quartz.JobExecutionContext
-import org.quartz.SimpleTrigger
-import org.quartz.Trigger
-import org.quartz.JobExecutionException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.MoveBundleService
+import net.transitionmanager.service.ProgressService
+import org.quartz.JobExecutionContext
 
 class GenerateDependencyGroupsJob {
 
-	// Quartz Properties
 	def group = 'tdstm-dependency-groups'
+	static triggers = {}
 
-	// def concurrent = false
-	static triggers = { }
-
-	// IOC services
-	def moveBundleService
-	def progressService
+	MoveBundleService moveBundleService
+	ProgressService progressService
 
 	/**
-	 * Used to invoke an asset import REVIEW process that will review the assets before they can be posted to inventory 
-	 * @param context
-	 * @return void
+	 * Invokes an asset import REVIEW process that will review the assets before
+	 * they can be posted to inventory.
 	 */
-	 void execute(context) {
-	 	String errorMsg
-	 	String progressKey
-	 	Map results
-	 	Long projectId, userLoginId
+	void execute(JobExecutionContext context) {
+		String progressKey
+		Map results
+		Long userLoginId
 
-	 	try {
+		try {
 			def dataMap = context.mergedJobDataMap
 
-			projectId = dataMap.getLongValue('projectId')
-			progressKey = dataMap.getString('key')			
-			def connectionTypes = dataMap.getString('connectionTypes')
-			def statusTypes = dataMap.getString('statusTypes')
-			def isChecked = dataMap.getString('isChecked')
-			def userLoginName = dataMap.getString('userLoginName')
+			long projectId = dataMap.getLongValue('projectId')
+			progressKey = dataMap.getString('key')
+			String connectionTypes = dataMap.getString('connectionTypes')
+			String statusTypes = dataMap.getString('statusTypes')
+			String isChecked = dataMap.getString('isChecked')
+			String userLoginName = dataMap.getString('userLoginName')
 
 			log.debug "userLoginId = ${dataMap.userLoginId}"
 
@@ -45,14 +38,16 @@ class GenerateDependencyGroupsJob {
 			log.info "execute() is about to invoke moveBundleService.generateDependencyGroups to start processing batch for project $projectId"
 
 			// Generate the Dependency Groups
-			results = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked, userLoginName, progressKey)
+			results = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes,
+					isChecked, userLoginName, progressKey)
 
 			log.info "execute() return from moveBundleService.generateDependencyGroups() : results=$results"
-		
-		} catch (e) {
-			log.error "execute() moveBundleService.generateDependencyGroups received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-			progressService.fail(progressKey, e.getMessage())
-		} finally {
+		}
+		catch (e) {
+			log.error "execute() moveBundleService.generateDependencyGroups received exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
+			progressService.fail(progressKey, e.message)
+		}
+		finally {
 			GormUtil.releaseLocalThreadMemory()
 		}
 	}

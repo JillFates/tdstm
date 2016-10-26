@@ -1,8 +1,11 @@
 package com.tds.asset
 
 import com.tdssrc.grails.GormUtil
+import groovy.transform.CompileStatic
 
-public enum AssetType {
+@CompileStatic
+enum AssetType {
+
 	SERVER('Server'),
 	VM('VM'),
 	APPLICATION('Application'),
@@ -14,165 +17,95 @@ public enum AssetType {
 	BLADE_CHASSIS('Blade Chassis'),
 	APPLIANCE('Appliance')
 
-	String name
-	AssetType(String name) {
+	final String name
+
+	private AssetType(String name) {
 		this.name = name
 	}
 
 	String toString() { name }
 
 	/**
-	 * The list of types that represent ONLY virtual servers
-	 * @return List<String>
+	 * ONLY virtual servers
 	 */
-	static List getVirtualServerTypes() {
-		return ['VM','Virtual']
-	}
+	static final List<String> virtualServerTypes = ['VM', 'Virtual'].asImmutable()
 
 	/**
-	 * The list of types represent VIRTUAL servers as a quote comma delimited string
-	 * @return String quote comma delimited list of the types
+	 * VIRTUAL servers as a quote comma delimited string
 	 */
-	static String getVirtualServerTypesAsString() {
-		GormUtil.asQuoteCommaDelimitedString(getVirtualServerTypes())
-	}
+	static final String virtualServerTypesAsString = GormUtil.asQuoteCommaDelimitedString(virtualServerTypes)
 
 	/**
-	 * The list of types that represent ONLY physical servers
-	 * @return List<String>
+	 * ONLY physical servers
 	 */
-	static List getPhysicalServerTypes() {
-		return ['Server', 'Appliance', 'Blade']
-	}
+	static final List<String> physicalServerTypes = ['Server', 'Appliance', 'Blade'].asImmutable()
 
 	/**
-	 * The list of types represent PHYSICAL servers as a quote comma delimited string
-	 * @return String quote comma delimited list of the types
+	 * PHYSICAL servers as a quote comma delimited string
 	 */
-	static String getPhysicalServerTypesAsString() {
-		GormUtil.asQuoteCommaDelimitedString(getPhysicalServerTypes())
-	}
+	static final String physicalServerTypesAsString = GormUtil.asQuoteCommaDelimitedString(physicalServerTypes)
 
 	/**
-	 * The list of types that represent blade chassis
-	 * @return List<String>
+	 * Blade chassis
 	 */
-	static List getBladeChassisTypes() {
-		return [
-			'Blade Chassis',
-			'Chassis'
-		]
-	}
+	static final List<String> bladeChassisTypes = ['Blade Chassis', 'Chassis'].asImmutable()
 
 	/**
-	 * The list of types represent Blade Chassis as a quote comma delimited string
-	 * @return String quote comma delimited list of the types
+	 * Blade Chassis as a quote comma delimited string
 	 */
-	static String getBladeChassisAsString() {
-		GormUtil.asQuoteCommaDelimitedString(getBladeChassisTypes())
-	}
+	static final String bladeChassisAsString = GormUtil.asQuoteCommaDelimitedString(bladeChassisTypes)
 
 	/**
-	 * The list of types that represent servers both physical and virtual
-	 * @return List<String>
+	 * Servers both physical and virtual
 	 */
-	static List getAllServerTypes() {
-		return AssetType.getPhysicalServerTypes() + AssetType.getVirtualServerTypes()
-	}
+	static final List<String> allServerTypes = (physicalServerTypes + virtualServerTypes).asImmutable()
 
 	/**
-	 * The list of types represent ALL Server types as a quote comma delimited string
-	 * @return String quote comma delimited list of the types
+	 * ALL Server types as a quote comma delimited string
 	 */
-	static String getAllServerTypesAsString() {
-		GormUtil.asQuoteCommaDelimitedString(getAllServerTypes())
-	}
+	static final String allServerTypesAsString = GormUtil.asQuoteCommaDelimitedString(allServerTypes)
 
 	/**
-	 * The list of types that represent storage
-	 * @return List<String>
+	 * Storage
 	 */
-	static List getStorageTypes() {
-		return [
-			'Array',
-			'Disk',
-			'NAS',
-			'SAN',
-			'SAN Switch',
-			'Storage',
-			'Tape',
-			'Tape Library',
-			'Virtual Tape Library'
-		]
-	}
+	static final List<String> storageTypes = ['Array', 'Disk', 'NAS', 'SAN', 'SAN Switch', 'Storage',
+	                                          'Tape', 'Tape Library', 'Virtual Tape Library'].asImmutable()
 
 	/**
-	 * The list of types represent storage as a quote comma delimited string
-	 * @return String quote comma delimited list of the types
+	 * Storage as a quote comma delimited string
 	 */
-	static String getStorageTypesAsString() {
-		GormUtil.asQuoteCommaDelimitedString(getStorageTypes())
-	}
+	static final String storageTypesAsString = GormUtil.asQuoteCommaDelimitedString(storageTypes)
 
 	/**
-	 * The list of types represent all non Server Types.
-	 * @return
+	 * Network devices
 	 */
-	static List getNonOtherTypes() {
-		return getStorageTypes() + getAllServerTypes() //+ getNetworkDeviceTypes()
-	}
+	static final List<String> networkDeviceTypes = ['Encoder', 'Load Balancer', 'Modem', 'Module', 'Multiplexer',
+	                                                'Network', 'Probe', 'Receiver', 'Router', 'Switch', 'Telecom',
+	                                                'Terminal Server', 'VPN'].asImmutable()
 
 	/**
-	 * The list of types represent all non Server Types.
-	 * @return
+	 * Non-server Types.
 	 */
-	static List getNonPhysicalTypes() {
-		return ['Application','Database'] + getVirtualServerTypes() + getStorageTypes() + getNetworkDeviceTypes()
-	}
+	static final List<String> nonOtherTypes = (storageTypes + allServerTypes).asImmutable()
 
 	/**
-	 * The list of types represent all Server Types which differs the physical list and ServerList.
-	 * @return
+	 * Non-server Types as a quote comma delimited string
 	 */
-	static List getServerTypes() {
-		return getPhysicalServerTypes() + getVirtualServerTypes()
-	}
+	static final String nonOtherTypesAsString = GormUtil.asQuoteCommaDelimitedString(nonOtherTypes)
 
 	/**
-	 * A list of the assetTypes that are considered to be Network devices
-	 * @return list of asset types
+	 * Non-Server Types.
 	 */
-	static List<String> getNetworkDeviceTypes() {
-		return [
-			'Encoder',
-			'Load Balancer',
-			'Modem',
-			'Module',
-			'Multiplexer',
-			'Network',
-			'Probe',
-			'Receiver',
-			'Router',
-			'Switch',
-			'Telecom',
-			'Terminal Server',
-			'VPN'
-		]
-	}
+	static final List<String> nonPhysicalTypes = (['Application', 'Database'] + virtualServerTypes +
+			storageTypes + networkDeviceTypes).asImmutable()
 
 	/**
-	 * The list of types represent all non network types
-	 * @return
+	 * Server Types which differs the physical list and ServerList.
 	 */
-	static List getNonNetworkTypes() {
-		return [
-			'Server',
-			'Application',
-			'VM',
-			'Files',
-			'Database',
-			'Blade'
-		]
-	}
+	static final List<String> serverTypes = (physicalServerTypes + virtualServerTypes).asImmutable()
 
+	/**
+	 * All non network types
+	 */
+	static final List<String> nonNetworkTypes = ['Server', 'Application', 'VM', 'Files', 'Database', 'Blade'].asImmutable()
 }

@@ -4,7 +4,7 @@ import spock.lang.Specification
 
 class ExceptionUtilTests extends Specification {
 
-	public void testOne() {
+	void testOne() {
 		String st
 		try {
 			def x = 1 / 0

@@ -1,27 +1,27 @@
 package com.tdsops.tm.asset.graph
 
+import groovy.transform.CompileStatic
+
 /**
- * Stores a asset information and his dependencies
+ * Stores asset information and its dependencies.
  */
+@CompileStatic
 class AssetNode {
 
-	def id
-	def moveBundleId
-	def deps = []
-	def assetType
+	Long id
+	Long moveBundleId
+	List<AssetDep> deps = []
+	String assetType
 	boolean checked = false
 
 	/**
-	 * Destroy method used to help GC
+	 * Help GC
 	 */
-	def destroy() {
+	void destroy() {
 		id = null
 		moveBundleId = null
 		assetType = null
-		deps.each {
-			it.destroy()
-		}
+		deps*.destroy()
 		deps = null
 	}
-
 }

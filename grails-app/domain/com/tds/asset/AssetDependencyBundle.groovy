@@ -1,6 +1,9 @@
 package com.tds.asset
 
+import net.transitionmanager.domain.Project
+
 class AssetDependencyBundle {
+
 	Integer dependencyBundle = 0
 	String dependencySource
 	Date lastUpdated
@@ -8,14 +11,14 @@ class AssetDependencyBundle {
 
 	static belongsTo = [asset: AssetEntity]
 
-    static constraints = {
-		dependencyBundle( nullable:false, unique:'asset')
-		asset( nullable:false, unique:true)
-		dependencySource( blank:false, nullable:false )
-		lastUpdated( nullable:true )
-		project( nullable:false )
-    }
-	static mapping  = {
+	static constraints = {
+		asset unique: true
+		dependencyBundle unique: 'asset'
+		dependencySource blank: false
+		lastUpdated nullable: true
+	}
+
+	static mapping = {
 		version false
 	}
 }

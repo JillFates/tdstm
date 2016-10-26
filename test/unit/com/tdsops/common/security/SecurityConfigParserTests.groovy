@@ -86,7 +86,6 @@ class SecurityConfigParserTests extends Specification {
 	*/
 	}
 
-
 	/*
 	 * Tests that after encode and decode a value the result is the same
 	 */
@@ -96,7 +95,7 @@ class SecurityConfigParserTests extends Specification {
 		String e
 
 		Map map = SecurityConfigParser.parseLDAPSettings(settings)
-		assertTrue 'LDAP undefined default to false', ! settings.enabled
+		assertTrue 'LDAP undefined default to false', !settings.enabled
 
 		settings.ldap = [:]
 		e = shouldFail(ConfigurationException) {
@@ -127,17 +126,17 @@ class SecurityConfigParserTests extends Specification {
 			map = SecurityConfigParser.parseLDAPSettings(settings)
 		}
 		println "e=$e"
-		assertTrue 'Type=ActiveDirectory is Okay', ! e.contains(tem)
+		assertTrue 'Type=ActiveDirectory is Okay', !e.contains(tem)
 
 		settings.ldap.domains[0].type = 'LDAP'
 		e = shouldFail(ConfigurationException) {
 			map = SecurityConfigParser.parseLDAPSettings(settings)
 		}
 		println "e=$e"
-		assertTrue 'Type=LDAP is Okay', ! e.contains(tem)
+		assertTrue 'Type=LDAP is Okay', !e.contains(tem)
 
 		// Validate debug correct type
-		// assertTrue 'LDAP debugging/undefined', ! settings.enabled
+		// assertTrue 'LDAP debugging/undefined', !settings.enabled
 		settings.ldap.debug = 'bad'
 		e = shouldFail(ConfigurationException) {
 			map = SecurityConfigParser.parseLDAPSettings(settings)
@@ -218,10 +217,10 @@ class SecurityConfigParserTests extends Specification {
 		settings.ldap.domains[0].type='ActiveDirectory'
 		map = SecurityConfigParser.parseLDAPSettings(settings)
 		assertTrue 'isActiveDirectory', map.domains['corp'].isActiveDirectory
-		assertTrue 'Not isLDAP', ! map.domains['corp'].isLDAP
+		assertTrue 'Not isLDAP', !map.domains['corp'].isLDAP
 		settings.ldap.domains[0].type='LDAP'
 		map = SecurityConfigParser.parseLDAPSettings(settings)
-		assertTrue 'Not isActiveDirectory', ! map.domains['corp'].isActiveDirectory
+		assertTrue 'Not isActiveDirectory', !map.domains['corp'].isActiveDirectory
 		assertTrue 'isLDAP', map.domains['corp'].isLDAP
 
 		// Test autoProvision
@@ -230,7 +229,7 @@ class SecurityConfigParserTests extends Specification {
 		println "map.domains['corp']: \n${map.domains['corp']}"
 		//[enabled:true, debug:true, domains:[[corp]:[autoProvision:false, updateUser:false, updateRoles:false, defaultRole:, defaultTimezone:EST, connector:AD, url:[ldap://ad.example.com], domain:, baseDN:dc=Accounts, searchBase:[], roleMap:[], username:, password:, company:500, defaultProject:501]]]
 
-		assertTrue 'autoProvision default', ! map.domains['corp'].autoProvision
+		assertTrue 'autoProvision default', !map.domains['corp'].autoProvision
 		settings.ldap.domains[0].autoProvision='bad'
 		e = shouldFail(ConfigurationException) {
 			map = SecurityConfigParser.parseLDAPSettings(settings)
@@ -242,7 +241,7 @@ class SecurityConfigParserTests extends Specification {
 		assertTrue 'autoProvision default', map.domains['corp'].autoProvision
 
 		// Test updateUser
-		assertTrue 'updateUserInfo default', ! map.domains['corp'].updateUserInfo
+		assertTrue 'updateUserInfo default', !map.domains['corp'].updateUserInfo
 		settings.ldap.domains[0].updateUserInfo='bad'
 		e = shouldFail(ConfigurationException) {
 			map = SecurityConfigParser.parseLDAPSettings(settings)
@@ -254,7 +253,7 @@ class SecurityConfigParserTests extends Specification {
 		assertTrue 'updateUserInfo default', map.domains['corp'].updateUserInfo
 
 		// Test updateRoles
-		assertTrue 'updateRoles default', ! map.domains['corp'].updateRoles
+		assertTrue 'updateRoles default', !map.domains['corp'].updateRoles
 		settings.ldap.domains[0].updateRoles='bad'
 		e = shouldFail(ConfigurationException) {
 			map = SecurityConfigParser.parseLDAPSettings(settings)
@@ -298,9 +297,7 @@ class SecurityConfigParserTests extends Specification {
 		assertEquals 'userSearchOn', 'SAM', map.domains['qa'].userSearchOn
 		assertEquals 'domain', 'LAB', map.domains['qa'].domain
 		assertEquals 'fqdn', 'qa.example.com', map.domains['qa'].fqdn
-
 	}
-
 	*/
 
 	private Map createDefaultLocalUserSettings() {
@@ -425,7 +422,7 @@ class SecurityConfigParserTests extends Specification {
 		5 == localUserSettings.maxLoginFailureAttempts
 		1 == localUserSettings.failedLoginLockoutPeriodMinutes
 		localUserSettings.clearLockoutsOnRestart
-		530 == localUserSettings.passwordHistoryRetentionDays
+		730 == localUserSettings.passwordHistoryRetentionDays
 		0 == localUserSettings.passwordHistoryRetentionCount
 		0 == localUserSettings.maxPasswordAgeDays
 		60 == localUserSettings.forgotMyPasswordResetTimeLimit
@@ -448,7 +445,7 @@ class SecurityConfigParserTests extends Specification {
 		5 == localUserSettings.maxLoginFailureAttempts
 		1 == localUserSettings.failedLoginLockoutPeriodMinutes
 		localUserSettings.clearLockoutsOnRestart
-		530 == localUserSettings.passwordHistoryRetentionDays
+		730 == localUserSettings.passwordHistoryRetentionDays
 		0 == localUserSettings.passwordHistoryRetentionCount
 		0 == localUserSettings.maxPasswordAgeDays
 		60 == localUserSettings.forgotMyPasswordResetTimeLimit

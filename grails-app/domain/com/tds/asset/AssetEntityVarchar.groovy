@@ -1,20 +1,20 @@
 package com.tds.asset
 
-class AssetEntityVarchar extends com.tdssrc.eav.EavEntityDatatype {
+import com.tdssrc.eav.EavEntityDatatype
+
+class AssetEntityVarchar extends EavEntityDatatype {
 
 	String value
 	String auditAction
+
+	static belongsTo = [assetEntity: AssetEntity]
+
+	static constraints = {
+		auditAction blank: false, inList: ['I', 'U', 'D']
+	}
 
 	static mapping = {
 		tablePerHierarchy false
 		version false
 	}
-
-	static constraints = {
-		value( size: 0..255 )
-		auditAction( blank:false, inList:['I', 'U', 'D'] )
-	}
-
-	static belongsTo = [ assetEntity : AssetEntity ]
-
 }

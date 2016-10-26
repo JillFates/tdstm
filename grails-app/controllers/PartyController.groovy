@@ -1,82 +1,79 @@
-class PartyController {
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Party
 
-    def index() { redirect( action:"list", params:params ) }
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class PartyController implements ControllerMethods {
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-    def list() {
-        if( !params.max ) params.max = 10
-        [ partyInstanceList: Party.list( params ) ]
-    }
+	def list() {
+		if (!params.max) params.max = 10
+		[partyInstanceList: Party.list(params)]
+	}
 
-    def show() {
-        def partyInstance = Party.get( params.id )
+	def show() {
+		Party party = fromParams()
+		if (!party) return
 
-        if ( !partyInstance ) {
-            flash.message = "Party not found with id ${params.id}"
-            redirect( action:"list" )
-        }
-        else { return [ partyInstance : partyInstance ] }
-    }
+		[partyInstance: party]
+	}
 
-    def delete() {
-        def partyInstance = Party.get( params.id )
-        if ( partyInstance ) {
-            partyInstance.delete(flush:true)
-            flash.message = "Party ${params.id} deleted"
-            redirect( action:"list" )
-        }
-        else {
-            flash.message = "Party not found with id ${params.id}"
-            redirect( action:"list" )
-        }
-    }
+	def delete() {
+		Party party = fromParams()
+		if (!party) return
 
-    def edit() {
-        def partyInstance = Party.get( params.id )
+		party.delete(flush: true)
+		flash.message = "Party ${params.id} deleted"
+		redirect(action: 'list')
+	}
 
-        if ( !partyInstance ) {
-            flash.message = "Party not found with id ${params.id}"
-            redirect(action:"list")
-        }
-        else {
-            return [ partyInstance : partyInstance ]
-        }
-    }
+	def edit() {
+		Party party = fromParams()
+		if (!party) return
 
-    def update() {
-        def partyInstance = Party.get( params.id )
-        if ( partyInstance ) {
-            partyInstance.properties = params
-            if(!partyInstance.hasErrors() && partyInstance.save()) {
-                flash.message = "Party ${params.id} updated"
-                redirect( action:"show", id:partyInstance.id )
-            }
-            else {
-                render( view:'edit', model:[partyInstance:partyInstance] )
-            }
-        }
-        else {
-            flash.message = "Party not found with id ${params.id}"
-            redirect( action:"edit", id:params.id )
-        }
-    }
+		[partyInstance: party]
+	}
 
-    def create() {
-        def partyInstance = new Party()
-        partyInstance.properties = params
-        return ['partyInstance':partyInstance]
-    }
+	def update() {
+		Party party = fromParams()
+		if (!party) return
 
-    def save() {
-        def partyInstance = new Party(params)
-        if(!partyInstance.hasErrors() && partyInstance.save()) {
-            flash.message = "Party ${partyInstance.id} created"
-            redirect( action:"show", id:partyInstance.id )
-        }
-        else {
-            render( view:'create', model:[partyInstance:partyInstance] )
-        }
-    }
+		party.properties = params
+		if (!party.hasErrors() && party.save()) {
+			flash.message = "Party ${params.id} updated"
+			redirect(action: 'show', id: party.id)
+		}
+		else {
+			render(view: 'edit', model: [partyInstance: party
+			])
+		}
+	}
+
+	def create() {
+		[partyInstance: new Party(params)]
+	}
+
+	def save() {
+		def party = new Party(params)
+		if (!partyww.hasErrors() && party.save()) {
+			flash.message = "Party ${party.id} created"
+			redirect(action: 'show', id: party.id)
+		}
+		else {
+			render(view: 'create', model: [partyInstance: party])
+		}
+	}
+
+	private Party fromParams() {
+		def party = Party.get(params.id)
+		if (party) {
+			party
+		}
+		else {
+			flash.message = "Party not found with id ${params.id}"
+			redirect(action: 'list')
+		}
+	}
 }

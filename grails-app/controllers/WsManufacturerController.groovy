@@ -1,45 +1,33 @@
-import java.util.Map;
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.ManufacturerService
 
-import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller;
-
-import grails.validation.ValidationException;
+import grails.plugin.springsecurity.annotation.Secured
 
 /**
- * {@link Controller} for handling WS calls of the {@link ManufacturerService}
+ * Handles WS calls of the ManufacturerService.
  *
  * @author Diego Scarpa
  */
-class WsManufacturerController {
+@Secured('isAuthenticated()')
+@Slf4j(value='logger', category='grails.app.controllers.WsManufacturerController')
+class WsManufacturerController implements ControllerMethods {
 
-	def controllerService
-	def manufacturerService
+	ControllerService controllerService
+	ManufacturerService manufacturerService
 
-	/*
+	/**
 	 * Merge to manufacturers
-	 *
-	 * Check {@link UrlMappings} for the right call
 	 */
 	def merge() {
 		try {
-			controllerService.checkPermissionForWS("EditModel")
-
+			controllerService.checkPermissionForWS('EditModel')
 			manufacturerService.merge(params.id, params.fromId)
-
-			render(ServiceResults.success() as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson()
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
-
 }

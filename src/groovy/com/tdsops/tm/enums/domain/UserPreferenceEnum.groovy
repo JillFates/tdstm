@@ -1,19 +1,22 @@
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 enum UserPreferenceEnum {
-	ASSET_LIST_SIZE("assetListSize"),
-	ASSET_JUST_PLANNING("assetJustPlanning"),
+	ASSET_LIST_SIZE('assetListSize'),
+	ASSET_JUST_PLANNING('assetJustPlanning'),
 	MAX_ASSET_LIST,
-	VIEW_UNPUBLISHED("viewUnpublished"),
-	LAST_MANUFACTURER("lastManufacturer"),
-	SHOW_ALL_ASSET_TASKS("showAllAssetTasks"),
+	VIEW_UNPUBLISHED('viewUnpublished'),
+	LAST_MANUFACTURER('lastManufacturer'),
+	SHOW_ALL_ASSET_TASKS('showAllAssetTasks'),
 	JUST_REMAINING,
 	MOVE_EVENT,
 	MOVE_BUNDLE,
 	TASKMGR_REFRESH,
-	DEP_GRAPH("depGraph"),
+	DEP_GRAPH('depGraph'),
 	ARCH_GRAPH('archGraph'),
-	LEGEND_TWISTIE_STATE("legendTwistieState"),
+	LEGEND_TWISTIE_STATE('legendTwistieState'),
 	CURR_PROJ,
 	CURR_TZ,
 	CURR_BUNDLE,
@@ -21,26 +24,26 @@ enum UserPreferenceEnum {
 	CURR_ROOM,
 	START_PAGE,
 	DASHBOARD_REFRESH,
-	LAST_TYPE("lastType"),
+	LAST_TYPE('lastType'),
 	MYTASKS_MOVE_EVENT_ID,
 	MYTASKS_REFRESH,
-	PRINT_LABEL_QUANTITY("printLabelQuantity"),
+	PRINT_LABEL_QUANTITY('printLabelQuantity'),
 	PRINTER_NAME,
 	AUDIT_VIEW,
-	HIGHLIGHT_TASKS("highlightTasks"),
-	ROOM_TABLE_SHOW_ALL("roomTableShowAll"),
-	DRAGGABLE_RACK("DraggableRack"),
-	SHOW_ADD_ICONS("ShowAddIcons"),
-	PARTY_GROUP("PARTYGROUP"),
+	HIGHLIGHT_TASKS('highlightTasks'),
+	ROOM_TABLE_SHOW_ALL('roomTableShowAll'),
+	DRAGGABLE_RACK('DraggableRack'),
+	SHOW_ADD_ICONS('ShowAddIcons'),
+	PARTY_GROUP('PARTYGROUP'),
 	CURR_POWER_TYPE,
-	SHOW_ASSIGNED_STAFF("ShowAssignedStaff"),
-	SHOW_CLIENT_STAFF("ShowClientStaff"),
-	STAFFING_ROLE("StaffingRole"),
-	STAFFING_LOCATION("StaffingLocation"),
-	STAFFING_PHASES("StaffingPhases"),
-	STAFFING_SCALE("StaffingScale"),
+	SHOW_ASSIGNED_STAFF('ShowAssignedStaff'),
+	SHOW_CLIENT_STAFF('ShowClientStaff'),
+	STAFFING_ROLE('StaffingRole'),
+	STAFFING_LOCATION('StaffingLocation'),
+	STAFFING_PHASES('StaffingPhases'),
+	STAFFING_SCALE('StaffingScale'),
 	DEP_CONSOLE_COMPACT('depConsoleCompact'),
-	ASSIGNED_GROUP("AssignedGroup"),
+	ASSIGNED_GROUP('AssignedGroup'),
 	ImportApplication,
 	ImportServer,
 	ImportDatabase,
@@ -69,11 +72,9 @@ enum UserPreferenceEnum {
 		this.value = value
 	}
 
-	String value(){
+	String value() {
 		value ?: name()
 	}
 
-	String toString() {
-		value()
-	}
+	String toString() { value() }
 }

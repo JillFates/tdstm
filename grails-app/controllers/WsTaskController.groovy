@@ -1,112 +1,58 @@
-import java.util.Map
-
 import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller
-
+import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.TaskService
+import net.transitionmanager.service.UnauthorizedException
 
 /**
- * {@link Controller} for handling WS calls of the {@link TaskService}
+ * Handles WS calls of the TaskService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-class WsTaskController {
+@Secured('isAuthenticated()')
+@Slf4j
+@Slf4j(value='logger', category='grails.app.controllers.WsTaskController')
+class WsTaskController implements ControllerMethods {
 
-	def taskService
-	def securityService
+	TaskService taskService
 
 	/**
-	 * Publishes a {@link TaskBatch} that has been generated before
-	 * Check {@link UrlMappings} for the right call
+	 * Publishes a TaskBatch that has been generated before
 	 */
 	def publish() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def tasksUpdated = taskService.publish(id, loginUser, currentProject)
-
-			render(ServiceResults.success(['tasksUpdated' : tasksUpdated]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(tasksUpdated: taskService.publish(params.id))
+		}
+		catch (e) {
+			preHandleException e
 		}
 	}
 
 	/**
-	 * Unpublishes a {@link TaskBatch} that has been generated before
-	 * Check {@link UrlMappings} for the right call
+	 * Unpublishes a TaskBatch that has been generated before
 	 */
 	def unpublish() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def tasksUpdated = taskService.unpublish(id, loginUser, currentProject)
-
-			render(ServiceResults.success(['tasksUpdated' : tasksUpdated]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(tasksUpdated: taskService.unpublish(params.id))
+		}
+		catch (e) {
+			preHandleException e
 		}
 	}
 
 	/**
-	 * Deletes a {@link TaskBatch}
-	 * Check {@link UrlMappings} for the right call
+	 * Deletes a TaskBatch.
 	 */
 	def deleteBatch() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			taskService.deleteBatch(id, loginUser, currentProject)
-
-			render(ServiceResults.success() as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			taskService.deleteBatch(params.id)
+			renderSuccessJson()
+		}
+		catch (e) {
+			preHandleException e
 		}
 	}
 
@@ -114,34 +60,13 @@ class WsTaskController {
 	 * Generates a set of tasks based on a recipe
 	 */
 	def generateTasks() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-		def currentProject = securityService.getUserCurrentProject()
-
-		def recipeId = params.recipeId
-		def contextId = params.contextId
-		def publishTasks = params.autoPublish == 'true'
-		def useWIP = params.useWIP == 'true'
-		def deletePrevious = params.deletePrevious == 'true'
-
-
 		try {
-			def result = taskService.initiateCreateTasksWithRecipe(loginUser, currentProject, contextId, recipeId, deletePrevious, useWIP, publishTasks)
-
-			render(ServiceResults.success('jobId' : result.jobId) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response, log, e)
-		} catch (EmptyResultException e) {
-			ServiceResults.internalError(response, log, e)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.internalError(response, log, e)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			def result = taskService.initiateCreateTasksWithRecipe(params.contextId, params.recipeId,
+					params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
+			renderSuccessJson(jobId: result.jobId)
+		}
+		catch (e) {
+			preHandleException e, true
 		}
 	}
 
@@ -152,151 +77,88 @@ class WsTaskController {
 	 * @return A taskBatch object if found or null
 	 */
 	def findTaskBatchByRecipeAndContext() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def recipeId = params.recipeId
-		def contextId = params.contextId
-		def logs = params.logs
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, logs, loginUser, currentProject)
-
-			render(ServiceResults.success('taskBatch' : result) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			def result = taskService.findTaskBatchByRecipeAndContext(params.recipeId, params.contextId, params.logs)
+			renderSuccessJson(taskBatch: result)
+		}
+		catch (e) {
+			preHandleException e
 		}
 	}
 
-
 	/**
-	 * List the {@link TaskBatch} using the parameters passed in the request
-	 * Check {@link UrlMappings} for the right call
+	 * List the TaskBatch using the parameters passed in the request
 	 */
 	def listTaskBatches() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def recipeId = params.recipeId
-		def limitDays = params.limitDays
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def result = taskService.listTaskBatches(recipeId, limitDays, loginUser, currentProject)
-
-			render(ServiceResults.success('list' : result) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(list: taskService.listTaskBatches(params.recipeId, params.limitDays))
+		}
+		catch (e) {
+			preHandleException e
 		}
 	}
 
 	/**
-	 * Gets a {@link TaskBatch} based on a id
-	 * Check {@link UrlMappings} for the right call
+	 * Gets a TaskBatch based on a id
 	 */
 	def retrieveTaskBatch() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def taskBatch = taskService.getTaskBatch(id, loginUser, currentProject)
-
-			render(ServiceResults.success(['taskBatch' : taskBatch]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(taskBatch: taskService.getTaskBatch(params.id))
+		}
+		catch (e) {
+			preHandleException e
 		}
 	}
 
 	def taskReset() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			taskService.resetTasksOfTaskBatch(id, loginUser, currentProject)
-
-			render(ServiceResults.success() as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			taskService.resetTasksOfTaskBatch(params.id)
+			renderSuccessJson()
+		}
+		catch (e) {
+			preHandleException e
 		}
 	}
 
-
 	def retrieveTasksOfTaskBatch() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def id = params.id
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def tasks = taskService.getTasksOfBatch(id, loginUser, currentProject)
-
-			render(ServiceResults.success(['tasks' : tasks]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(tasks: taskService.getTasksOfBatch(params.id))
 		}
+		catch (e) {
+			preHandleException e
+		}
+	}
 
+	private void preHandleException(Exception e, boolean includeException = false) {
+		if (e instanceof UnauthorizedException) {
+			if (includeException) {
+				ServiceResults.forbidden(response, e)
+			}
+			else {
+				ServiceResults.forbidden(response)
+			}
+		}
+		else if (e instanceof IllegalArgumentException) {
+			if (includeException) {
+				ServiceResults.internalError(response, logger, e)
+			}
+			else {
+				ServiceResults.forbidden(response)
+			}
+		}
+		else if (e instanceof EmptyResultException) {
+			if (includeException) {
+				ServiceResults.internalError(response, logger, e)
+			}
+			else {
+				ServiceResults.methodFailure(response)
+			}
+		}
+		else if (e instanceof ValidationException) {
+			render(ServiceResults.errorsInValidation(e.errors) as JSON)
+		}
+		else {
+			ServiceResults.internalError(response, logger, e)
+		}
 	}
 }

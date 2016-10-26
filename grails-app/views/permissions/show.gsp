@@ -1,3 +1,5 @@
+<%@page import="net.transitionmanager.domain.Permissions" %>
+<%@page import="net.transitionmanager.domain.RolePermissions" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -32,7 +34,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<g:each var="permissionGroup" in="${permissions}" var="permission" status="i">
+					<g:each in="${permissions}" var="permission" status="i">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
 							<td style="text-align: left;">
 								${permission.permissionGroup.key}
@@ -60,7 +62,7 @@
 		currentMenuId = "#adminMenu";
 		$('.menu-admin-role').addClass('active');
 		$('.menu-parent-admin').addClass('active');
-		
+
 		// handle the scrolling header
 		var headTable;
 		var scrollLimit;
@@ -69,7 +71,7 @@
 		$(window).scroll( function() {
 			handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
 		});
-	
+
 		$(document).ready(function() {
 			headTable = $('#buttonsDivId');
 			scrollLimit = headTable.offset().top + headTable.height();

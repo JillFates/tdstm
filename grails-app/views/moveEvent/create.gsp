@@ -1,8 +1,11 @@
+<%@page import="net.transitionmanager.domain.MoveEvent" %>
+<%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="net.transitionmanager.domain.Rack" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="topNav" />
-        <title>Create Event</title>         
+        <title>Create Event</title>
 
     <script type="text/javascript">
       function initialize(){
@@ -18,7 +21,7 @@
       	if( date && !objRegExp.test(date) ){
           	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
           	returnVal  =  false;
-      	} 
+      	}
       	return returnVal;
       }
       function validateDates(){
@@ -27,7 +30,7 @@
           var completionTime = $("#completionTime").val();
           if(isValidDate(startTime) && isValidDate(completionTime)){
         	  returnval = true;
-          } 
+          }
           return returnval;
       }
     </script>
@@ -54,10 +57,10 @@
                                     <label for="project"><b>Project:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'project','errors')}">
-                                    <g:select optionKey="id" from="${Project.list()}" name="project.id" id="projectId"  
+                                    <g:select optionKey="id" from="${Project.list()}" name="project.id" id="projectId"
                                     value="${moveEventInstance?.project?.id}" onchange="loadMoveBundles();"></g:select>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b> </label>
@@ -70,8 +73,8 @@
 						            </div>
 						            </g:hasErrors>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Description:</label>
@@ -79,8 +82,8 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'description','errors')}">
                                     <input type="text" id="description" name="description" value="${fieldValue(bean:moveEventInstance,field:'description')}"/>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td class="name">
                                     <label for="moveBundle">Bundle:</label>
@@ -89,7 +92,7 @@
 	                                <ul id="moveBundleList">
 	                                </ul>
                             	</td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="runbookStatus">Runbook Status:</label>
@@ -97,7 +100,7 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
                                     <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constraints.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Runbook bridge1 :</label>
@@ -105,7 +108,7 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge1','errors')}">
                                     <input type="text" id="runbookBridge1" name="runbookBridge1" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Runbook bridge1 :</label>
@@ -113,7 +116,7 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge2','errors')}">
                                     <input type="text" id="runbookBridge2" name="runbookBridge2" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Video Link:</label>
@@ -121,7 +124,7 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'videolink','errors')}">
                                     <input type="text" id="videolink" name="videolink" value="${fieldValue(bean:moveEventInstance,field:'videolink')}"/>
                                 </td>
-                            </tr> 
+                            </tr>
                         <tr class="prop">
 				                <td class="name">
 				                  <label for="newsBarMode"><b>News Bar Mode:&nbsp;<span style="color: red">*</span></b></label>
@@ -152,7 +155,7 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
-                            </tr> 
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -167,7 +170,7 @@
             </g:form>
         </div>
         <script type="text/javascript">
-        $("#projectId").val(${session.getAttribute("CURR_PROJ").CURR_PROJ})
+        $("#projectId").val(${tds.currentProjectId()})
         loadMoveBundles();
         function loadMoveBundles(){
             var projectId = $("#projectId").val()
@@ -180,7 +183,7 @@
         	if(length){
             	for( i = 0; i < length; i++ ){
             		var moveBundle = moveBundles[i]
-            		moveBundlesString += "<input type='checkbox' name='moveBundle' value="+moveBundle.id+"> &nbsp;"+moveBundle.name+"<br>"		
+            		moveBundlesString += "<input type='checkbox' name='moveBundle' value="+moveBundle.id+"> &nbsp;"+moveBundle.name+"<br>"
 				}
         	} else {
         		moveBundlesString = "<li> There are no Bundles associsted with selected Project</li>"

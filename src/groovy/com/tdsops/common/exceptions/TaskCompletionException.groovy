@@ -1,10 +1,13 @@
 package com.tdsops.common.exceptions
 
+import groovy.transform.CompileStatic
+
 /**
- * Exception used to signal that a task can not be completed
+ * Signals that a task can not be completed.
  */
+@CompileStatic
 class TaskCompletionException extends Exception {
-	public TaskCompletionException(String message) {
-		super(message);
+	TaskCompletionException(String message) {
+		super(message)
 	}
 }

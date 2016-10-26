@@ -1,6 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
@@ -14,7 +12,7 @@
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:render template="../layouts/responsiveAngularResources" />
-	
+
 <script type="text/javascript">
 	window.addEventListener('load', function(){
 		setTimeout(scrollTo, 0, 0, 1);
@@ -26,12 +24,12 @@
 	}
 
 	function assetSubmit(searchVal){
-		document.bundleTeamAssetForm.search.value = searchVal; 
+		document.bundleTeamAssetForm.search.value = searchVal;
 		document.bundleTeamAssetForm.submit();
 	}
-	
+
 	var timerBar;
-	
+
 	$(document).ready(function() {
 		timerBar = new TimerBar(60, 'RefreshMyTasks', null);
 	});
@@ -49,7 +47,7 @@
 		</div>
 		<div class="timebar" ><div id="timebar" ></div></div>
 		<div class="mobbodyweb">
-			<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
+			<g:form name="bundleTeamAssetForm" action="assetSearch">
 				<input name="bundleId" type="hidden" value="${bundleId}" />
 				<input name="teamId" type="hidden" value="${teamId}" />
 				<input name="location" type="hidden" value="${location}" />
@@ -58,8 +56,8 @@
 					<g:if test="${flash.message}">
 						<br />
 						<div style="color: red;"><ul>${flash.message}</ul></div>
-					</g:if> 
-				</div>		
+					</g:if>
+				</div>
 				<div style="float:left; width:220px; margin:2px 0; ">
 					<table style="border:0px;width:220px;">
 						<tr>

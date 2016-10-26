@@ -32,7 +32,7 @@ class CablingTests extends IntegrationSpec {
 			}
 
 		then: "modelInstance isCreated"
-		(modelInstance.validate() && modelInstance.save()) == true
+		modelInstance.validate() && modelInstance.save()
 /*
       def etext = "Unable to create modelInstance" +
             GormUtil.allErrorsString( modelInstance )

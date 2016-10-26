@@ -1,15 +1,12 @@
-import grails.test.*
-
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
-import com.tds.asset.CommentNote
-import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.domain.Person
 
 class TaskServiceIntTests extends IntegrationSpec {
 
@@ -28,7 +25,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 			def listAssetEntityNotNull = AssetComment.findAllByAssetEntityIsNotNull()
 
 		then:
-			listAssetEntityNotNull.each{ task ->
+			listAssetEntityNotNull.each { task ->
 				task = taskService.setTaskStatus( task, AssetCommentStatus.STARTED, whom )
 				task.actStart != null
 				task.assignedTo != null
@@ -57,7 +54,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 
 		taskService.cleanTaskData( moveEvent.id )
 
-		AssetComment.findAllByAssetEntityIsNotNull().each{ task->
+		AssetComment.findAllByAssetEntityIsNotNull().each { task->
 			assertEquals AssetCommentStatus.PENDING, task.status
 			assertNull task.actStart
 			assertNull task.actStart
@@ -81,7 +78,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 		setUp()
 		prepareMoveEventData()
 		def whom = new Person(firstName:'Robin', lastName:'Banks')
-		AssetComment.findAllByAssetEntityIsNotNull().each{ task->
+		AssetComment.findAllByAssetEntityIsNotNull().each { task->
 			task = taskService.setTaskStatus( task, AssetCommentStatus.STARTED, whom )
 			assertNotNull task.actStart
 			assertNotNull task.assignedTo
@@ -151,7 +148,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 
 		// Create Tasks for AssetEntity
 		AssetEntity.list()  // <==
-/*				.each{ assetEntity->
+/*				.each { assetEntity->
 			def assetComment = new AssetComment(
 					comment:"Sample for "+assetEntity.toString(),
 					commentType:'issue',
@@ -176,7 +173,7 @@ class TaskServiceIntTests extends IntegrationSpec {
 		}
 
 		// Create Task Dependency for all Assets tasks as event tasks as predecessor
-		AssetComment.findAllByAssetEntityIsNotNull().each{ task ->
+		AssetComment.findAllByAssetEntityIsNotNull().each { task ->
 			def taskDependency = new TaskDependency(
 					predecessor:taskForEvent,
 					assetComment:task

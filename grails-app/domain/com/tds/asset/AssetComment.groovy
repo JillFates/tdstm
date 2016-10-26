@@ -1,16 +1,30 @@
 package com.tds.asset
 
-import com.tdssrc.grails.TimeUtil
-import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
+import com.tdsops.tm.enums.domain.TimeScale
+import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.TaskBatch
+import net.transitionmanager.domain.WorkflowTransition
+import org.apache.commons.lang.StringUtils
+
+import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.DONE
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
+import static com.tdsops.tm.enums.domain.TimeScale.M
 
 class AssetComment {
 
-	String comment					// This is also the title of an issue or task
+	String comment                  // This is also the title of an issue or task
 	String commentType
-	Integer mustVerify = 0			// Flag used in MoveTech to have the user verify an instruction
+	Integer mustVerify = 0          // Flag used in MoveTech to have the user verify an instruction
 
 	// These three properties all relating the project
 	AssetEntity assetEntity
@@ -19,73 +33,64 @@ class AssetComment {
 
 	Date dateCreated
 	Date lastUpdated
-	Date statusUpdated				// Updated when the status changes so we can compute the elapsed time that a task is in a status
+	Date statusUpdated              // Updated when the status changes so we can compute the elapsed time that a task is in a status
 
 	Integer isResolved = 0
 	Date dateResolved
 	String resolution
 	Person resolvedBy
 	Person createdBy
-	Person assignedTo				// FKA owner
-	Integer hardAssigned = 0			// Flags a task that can ONLY be done by an individual TODO : constraint 1/0 default 0 type tinyint
+	Person assignedTo               // FKA owner
+	Integer hardAssigned = 0        // Flags a task that can ONLY be done by an individual TODO : constraint 1/0 default 0 type tinyint
 	String commentCode
-	String category = AssetCommentCategory.GENERAL
-	String displayOption = "U"		// Used in dashboard to control display of user entered test (comment) or a generic message
-	String attribute = 'default'	// TODO : What is attribute used for?  See if we're using and remove if not
-	String commentKey				// TODO : What is commentKey used for?  See if we're using and remove if not
+	String category = GENERAL
+	String displayOption = 'U'      // Used in dashboard to control display of user entered test (comment) or a generic message
+	String attribute = 'default'    // TODO : What is attribute used for?  See if we're using and remove if not
+	String commentKey               // TODO : What is commentKey used for?  See if we're using and remove if not
 
 	String status
 	Date dueDate
 
-	Integer duration = 0			// # of minutes/hours/days/weeks to perform task
-	TimeScale durationScale = TimeScale.M	// Scale that duration represents m)inute, h)our, d)ay, w)eek
-	Integer priority=3				// An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
+	Integer duration = 0            // # of minutes/hours/days/weeks to perform task
+	TimeScale durationScale = M     // Scale that duration represents m)inute, h)our, d)ay, w)eek
+	Integer priority = 3            // An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
 
 	Date estStart
 	Date estFinish
 	Date actStart
-	Date constraintTime				// Used for tasks that have a constraint on the time that it can start or finish (typically used for start event or start testing)
-	TimeConstraintType constraintType	// The type of constraint for time (e.g. MSO-Must Start On, )
+	Date constraintTime               // For tasks that have a constraint on the time that it can start or finish (typically used for start event or start testing)
+	TimeConstraintType constraintType // The type of constraint for time (e.g. MSO-Must Start On, )
 	// Date actFinish		// Alias of dateResolved
 
-	Integer slack					// Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
-	WorkflowTransition workflowTransition	// The transition that this task was cloned from
-	Integer workflowOverride = 0			// Flag that the Transition values (duration) has been overridden
-	String role			// This is the team that will perform the task
-	Integer taskNumber	// TODO : constraint type short int min 1, max ?, nullable
-	Integer score		// Derived property that calculates the weighted score for sorting on priority
+	Integer slack                     // Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
+	WorkflowTransition workflowTransition   // The transition that this task was cloned from
+	Integer workflowOverride = 0      // Flag that the Transition values (duration) has been overridden
+	String role                       // The team that will perform the task
+	Integer taskNumber                // TODO : constraint type short int min 1, max ?, nullable
+	Integer score                     // Derived property that calculates the weighted score for sorting on priority
 
-	/** The batch from which the task was generated */
-	TaskBatch taskBatch
-	/** Whether or not a task will send email notifications  */
-	Boolean sendNotification=false
-	/** Flag used to indicate if the task is visable to the average user */
-	Boolean isPublished=true
-	/** Flag that indicates if a task is auto generated by the system -  TODO : this will go away with the new Catalog functionality */
-	Boolean autoGenerated = false
-	/** The receipe id # that caused this task to be created - TODO : this will be replaced by the taskBatch property with Catalog functionality */
-	Integer recipe
-	Integer taskSpec				// The taskSpec id # within the receipe that caused this task to be created
+	TaskBatch taskBatch               // The batch from which the task was generated
+	Boolean sendNotification = false  // Whether or not a task will send email notifications
+	Boolean isPublished = true        // Whether or not the task is visible to the average user
+	Boolean autoGenerated = false     // Whether or not the task is auto generated by the system -  TODO : this will go away with the new Catalog functionality
+	Integer recipe                    // The recipe id # that caused this task to be created - TODO : this will be replaced by the taskBatch property with Catalog functionality
+	Integer taskSpec                  // The taskSpec id # within the recipe that caused this task to be created
 	String instructionsLink
 	Boolean durationLocked
 
-	static hasMany = [
-		notes : CommentNote,
-		taskDependencies : TaskDependency
-	]
+	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
-	static belongsTo = [ assetEntity : AssetEntity ]
+	static belongsTo = [assetEntity: AssetEntity]
 
 	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
 
 	// Grouping of the various categories
-	def static final preMoveCategories = AssetCommentCategory.getPreMoveCategories()
-	def static final moveDayCategories = AssetCommentCategory.getMoveDayCategories()
-	def static final postMoveCategories = AssetCommentCategory.getPostMoveCategories()
-	def static final discoveryCategories = AssetCommentCategory.getDiscoveryCategories()
-	def static final planningCategories = AssetCommentCategory.getPlanningCategories()
-	def static final AUTOMATIC_ROLE = 'AUTO'
-
+	static final List<String> preMoveCategories = AssetCommentCategory.preMoveCategories
+	static final List<String> moveDayCategories = AssetCommentCategory.moveDayCategories
+	static final List<String> postMoveCategories = AssetCommentCategory.postMoveCategories
+	static final List<String> discoveryCategories = AssetCommentCategory.discoveryCategories
+	static final List<String> planningCategories = AssetCommentCategory.planningCategories
+	static final String AUTOMATIC_ROLE = 'AUTO'
 
 	/* Transient properties for Task Generation. */
 	Boolean tmpIsFunnellingTask
@@ -98,83 +103,67 @@ class AssetComment {
 	/* End transient properties for Task Generation.*/
 
 	static constraints = {
-		// comment(size:255)	// TODO: add constraint for comment size
-		comment(size:0..65535)
-		assetEntity(nullable:true )
-		project(nullable:false)
-		moveEvent(nullable: true)
-		commentType(blank:false, size:0..11, inList: ['issue','instruction','comment'] )
-		mustVerify(nullable:true )
-		isResolved( nullable:true )
-		createdBy( nullable:true  )
-		lastUpdated( nullable:true )
-		assignedTo( nullable:true  )
-		resolvedBy( nullable:true  )
-		resolution( blank:true, nullable:true  )
-		dateCreated( nullable:true  )
-		lastUpdated( nullable:true  )
-		statusUpdated( nullable:true )
-		dateResolved( nullable:true )
-		dueDate( nullable:true)
-		commentCode( blank:true, nullable:true, size:0..255 )
-		category( blank:false, nullable:false, size:0..64, inList:AssetCommentCategory.getList() )
-		displayOption( blank:false, size:0..1, inList: ['G','U'] ) // Generic or User
-		attribute( blank:true, nullable:true, size:0..255 )
-		commentKey( blank:true, nullable:true, size:0..255 )
-		// TODO: remove the blank/nullable constraint for status after testing
-		status( blank:true, nullable:true, size:0..9, inList : AssetCommentStatus.getList() )
-		// TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
-		duration( )
-		durationScale(nullable:false, size:0..1, inList:TimeScale.getKeys())
-		// TODO : add constraint to priority
-		// priority(range:1..5)
-		priority( nullable:true )
-		estStart( nullable:true  )
-		actStart( nullable:true  )
-		estFinish( nullable:true  )
-		slack( nullable:true )
-		workflowTransition( nullable:true  )
-		constraintTime( nullable: true )
-		constraintType( nullable: true, size:0..4 )
-		// TODO : add range to workflowOverride constraint
-		workflowOverride( nullable:true, size:0..255)
-		hardAssigned(nullable:true)
-		sendNotification(nullable:true)
-		role( blank:true, nullable:true, size:0..255 )
-		taskNumber(nullable:true)	// Note - can't have nullable:true and min:1, the category+taskNumber should be unique
-		autoGenerated(nullable:true)
-		recipe(nullable:true)
-		taskSpec(nullable:true)
-		taskBatch(nullable:true)
-		instructionsLink(blank:true, nullable:true, size:0..255)
-		durationLocked(nullable:false)
+		actStart nullable: true
+		assetEntity nullable: true
+		assignedTo nullable: true
+		attribute nullable: true
+		autoGenerated nullable: true               // Note - can't have nullable:true and min:1, the category+taskNumber should be unique
+		category blank: false, size: 0..64, inList: AssetCommentCategory.list
+		comment size: 0..65535
+		commentCode nullable: true
+		commentKey nullable: true
+		commentType blank: false, size: 0..11, inList: ['issue', 'instruction', 'comment']
+		constraintTime nullable: true
+		constraintType nullable: true, size: 0..4
+		createdBy nullable: true
+		dateCreated nullable: true
+		dateResolved nullable: true
+		displayOption blank: false, size: 0..1, inList: ['G', 'U']  // Generic or User
+		dueDate nullable: true
+		durationScale size: 0..1, inList: TimeScale.keys     // TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
+		estFinish nullable: true
+		estStart nullable: true
+		hardAssigned nullable: true
+		instructionsLink nullable: true
+		isResolved nullable: true
+		lastUpdated nullable: true
+		moveEvent nullable: true
+		mustVerify nullable: true
+		priority nullable: true     /*,  range:1..5*/  // TODO : add constraint to priority
+		recipe nullable: true
+		resolution nullable: true
+		resolvedBy nullable: true
+		role nullable: true
+		sendNotification nullable: true
+		slack nullable: true
+		status nullable: true, size: 0..9, inList: AssetCommentStatus.list // TODO: remove the blank/nullable constraint for status after testing
+		statusUpdated nullable: true
+		taskBatch nullable: true
+		taskNumber nullable: true
+		taskSpec nullable: true
+		workflowOverride nullable: true            // TODO : add range to workflowOverride constraint
+		workflowTransition nullable: true
 	}
 
-	static mapping  = {
-		version true
+	static mapping = {
 		autoTimestamp false
-		id column: 'asset_comment_id'
-		isPublished column: 'is_published'
-		sendNotification column: 'send_notification'
-		instructionsLink column: 'instructions_link'
-		resolvedBy column: 'resolved_by'
 		createdBy column: 'created_by'
-		durationLocked column: "duration_locked"
+		id column: 'asset_comment_id'
+		resolvedBy column: 'resolved_by'
 		columns {
 			comment sqltype: 'text'
-			mustVerify sqltype: 'tinyint'
-			isResolved sqltype: 'tinyint'
-			resolution sqltype: 'text'
-			displayOption sqltype: 'char', length:1
-			priority sqltype: 'tinyint'
-			workflowOverride sqltype: 'tinyint'
-			taskNumber sqltype: 'shortint unsigned'
+			displayOption sqltype: 'char', length: 1
 			duration sqltype: 'mediumint'
-			durationScale sqltype: 'char', length:1
+			durationScale sqltype: 'char', length: 1
+			isResolved sqltype: 'tinyint'
+			mustVerify sqltype: 'tinyint'
+			priority sqltype: 'tinyint'
+			resolution sqltype: 'text'
+			taskNumber sqltype: 'shortint unsigned'
+			workflowOverride sqltype: 'tinyint'
 		}
 		/*
 			NOTE THAT THIS LOGIC IS DUPLICATED IN THE TaskService.getUserTasks method SO IT NEEDS TO BE MAINTAINED TOGETHER
-
 
 			The objectives are sort the list descending in this order:
 				- HOLD 900
@@ -205,139 +194,65 @@ class AssetComment {
 			- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
 		*/
 		// TODO : JPM 11/2015 : TM-4249 Eliminate Timezone computation 'CONVERT_TZ(SUBTIME(NOW(),'00:01:00.0')....' below
-		score formula:	"CASE status \
-			WHEN '${AssetCommentStatus.HOLD}' THEN 900 \
-			WHEN '${AssetCommentStatus.DONE}' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 800, 200) + status_updated/NOW() \
-			WHEN '${AssetCommentStatus.STARTED}' THEN 700 + 1 - IFNULL(est_start,NOW())/NOW() \
-			WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
-			WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
+		score formula: "CASE status \
+			WHEN '$HOLD' THEN 900 \
+			WHEN '$DONE' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 800, 200) + status_updated/NOW() \
+			WHEN '$STARTED' THEN 700 + 1 - IFNULL(est_start,NOW())/NOW() \
+			WHEN '$READY' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
+			WHEN '$PENDING' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
 			ELSE 0 END + \
-			IF(role='${AssetComment.AUTOMATIC_ROLE}',-100,0) + \
+			IF(role='$AUTOMATIC_ROLE',-100,0) + \
 			(6 - priority) * 5"
 	}
 
-	// List of properties that should NOT be persisted
-	static transients = ['actFinish', 'assignedToString', 'assetName', 'statusDuration', 'tmpIsFunnellingTask', 'tmpDefSucc',
-						'tmpDefPred', 'tmpHasSuccessorTaskFlag', 'tmpChainPeerTask', 'tmpAssociatedAssets', 'isImported' ]
-
-
-	public void setTmpIsFunnellingTask(boolean value){
-		tmpIsFunnellingTask = value
-	}
-
-	public Boolean getTmpIsFunnellingTask(){
-		return tmpIsFunnellingTask
-	}
-
-	public void setTmpHasSuccessorTaskFlag(boolean value){
-		tmpHasSuccessorTaskFlag = value
-	}
-
-	public Boolean getTmpHasSuccessorTaskFlag(){
-		return tmpHasSuccessorTaskFlag
-	}
-
-
-	public void setTmpDefPred(Map value){
-		tmpDefPred = value
-	}
-
-	public Map getTmpDefPred(){
-		return tmpDefSucc
-	}
-
-	public void setTmpDefSucc(Map value){
-		tmpDefSucc = value
-	}
-
-	public Map getTmpDefSucc(){
-		return tmpDefSucc
-	}
-
-	public void setTmpChainPeerTask(value){
-		tmpChainPeerTask = value
-	}
-
-	def getTmpChainPeerTask(){
-		return tmpChainPeerTask
-	}
-
-	public void setTmpAssociatedAssets(List value){
-		tmpAssociatedAssets = value
-	}
-
-	public List getTmpAssociatedAssets(){
-		return tmpAssociatedAssets
-	}
-
-
+	static transients = ['actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
+	                     'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
+	                     'tmpIsFunnellingTask']
 
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique
 
-	def getAssignedToString(){
-		return assignedTo.toString()
+	String getAssignedToString() {
+		assignedTo?.toString()
 	}
-	def getAssetName(){
-		return assetEntity.assetName
+
+	String getAssetName() {
+		assetEntity?.assetName
 	}
 
 	// The actFinish value is stored in the dateResolved column	so need setter/getter
-	def getActFinish() {
-		return dateResolved
-	}
-	public void setActFinish(Date date) {
-		setDateResolved( date )
+	Date getActFinish() {
+		dateResolved
 	}
 
-	/*
-	 * @return Boolean indicating if the tast is done
-	 */
-	def isDone() {
-		return this.status == AssetCommentStatus.DONE
+	void setActFinish(Date date) {
+		setDateResolved(date)
 	}
 
-	/*
-	 * Used to determine if an object is a runbook task
-	 * @return Boolean true if is runbook task
-	 */
-	def isRunbookTask() {
-		return moveDayCategories.contains(this.category)
+	boolean isDone() {
+		status == DONE
 	}
 
-	// Extend the dateResolved setter to also set the isResolved appropriately
-	public void setDateResolved( Date date ) {
-		this.dateResolved = date
-		this.isResolved = date ? 1 : 0
+	boolean isRunbookTask() {
+		moveDayCategories.contains(category)
 	}
 
-	/*
-	 * Returns the duration in seconds that a task has been in at particular status
-	 * @return Integer
-	 */
-	def statusDuration() {
-		if (statusDate) {
-			return groovy.time.TimeCategory.minus(new Date(), statusDate)
-		} else {
-			return null
-		}
+	void setDateResolved(Date date) {
+		dateResolved = date
+		isResolved = date ? 1 : 0
 	}
 
 	/*
 	 * Returns the remaining duration until the tasks will be completed. This tasks into account the start time
 	 * if the task is in progress otherwise returns the total duration
-	 * @return Integer duration in minutes
+	 * @return duration in minutes
 	 */
-	def durationRemaining() {
+	Integer durationRemaining() {
 		// TODO : implement durationRemaining
-		return duration
+		duration
 	}
 
-	// Returns the duration of the task in minutes
-	def durationInMinutes() {
-		def d
-		if (durationScale)
-			d = durationScale.toMinutes( duration )
-		return d
+	Integer durationInMinutes() {
+		durationScale?.toMinutes(duration)
 	}
 
 	def beforeInsert = {
@@ -352,16 +267,17 @@ class AssetComment {
 	}
 
 	String toString() {
-		 (taskNumber ? "${taskNumber}:" : '') + org.apache.commons.lang.StringUtils.left(comment,25)
+		(taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
 	}
-	// Returns task Manager column header names and its labels
-	static getTaskCustomizeFieldAndLabel(){
-		def assetCommentFields = ['actStart':'Actual Start:', 'assignedTo':'Assigned To', 'category':'Category', 'commentType': 'Comment Type', 'createdBy':'Created By',
-			 'dateCreated':'Date Created', 'dateResolved':'Date Resolved', 'displayOption':'Display Option', 'duration':'Duration', 'durationScale':'Duration Scale',
-			 'estFinish':'Estimated Finish:', 'estStart':'Estimated Start', 'hardAssigned':'Hard Assignement', 'isPublished':'Is Published', 'sendNotification':'Send Notification',
-			 'isResolved':'Is Resolved', 'priority':'Priority', 'resolution':'Resolution', 'resolvedBy':'Resolved By',
-			 'role':'Team', 'statusUpdated':'Status Updated', 'assetName':'Asset Name', 'assetType':'Asset Type','instructionsLink':'instructionsLink',
-			 "event" : "Move Event", "bundle" : "Move Bundle"]
-		return assetCommentFields
-	}
+
+	// task Manager column header names and its labels
+	static final Map<String, List<String>> taskCustomizeFieldAndLabel = [
+		actStart: 'Actual Start:', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
+		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
+		duration: 'Duration', durationScale: 'Duration Scale', estFinish: 'Estimated Finish:', estStart: 'Estimated Start',
+		hardAssigned: 'Hard Assignement', isPublished: 'Is Published', sendNotification: 'Send Notification',
+		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
+		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
+		instructionsLink: 'instructionsLink', bundle: 'Move Bundle'
+	].asImmutable()
 }

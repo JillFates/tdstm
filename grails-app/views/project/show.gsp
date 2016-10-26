@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -12,21 +13,21 @@
 
 	</head>
 	<body>
-		
+
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
-		 
+
 		<div class="body">
 			<h1>Project Details</h1>
-					
+
 				<div class="nav" style="border: 1px solid #CCCCCC; height: 20px">
 					<tds:hasPermission permission='MoveBundleEditView'>
 						<span class="menuButton"><g:link class="create" controller="moveBundle" action="planningStats">Planning Dashboard</g:link></span>
 					</tds:hasPermission>
 				</div>
 			<br/>
-			
+
 			<div class="dialog" id="updateShow">
 				<table class="show-project-table" style="border-style:solid solid none solid;">
 					<tbody>
@@ -87,7 +88,7 @@
 						<tr class="prop">
 							<td class="name">Workflow:</td>
 							<td class="valueNW" nowrap="nowrap">
-								${fieldValue(bean:projectInstance, field:'workflowCode')} 
+								${fieldValue(bean:projectInstance, field:'workflowCode')}
 							</td>
 							<td class="name">Time Zone:</td>
 							<td class="valueNW">${projectInstance.timezone?projectInstance.timezone.code:''}</td>
@@ -129,7 +130,7 @@
 			currentMenuId = "#projectMenu";
 			$('.menu-projects-current-project').addClass('active');
 			$('.menu-parent-projects').addClass('active');
-			
+
 			$(document).ready(function() {
 				var customCol = ${projectInstance.customFieldsShown}
 				showCustomFields(customCol, 4);
@@ -144,7 +145,7 @@
 							$("#custom_count_"+i).show();
 							i=i+parseInt(columnCount)
 					 }
-				 }  
+				 }
 			 }
 		</script>
 	</body>

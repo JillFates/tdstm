@@ -53,7 +53,7 @@
 				width: "75%"
 			});
 		})
-		
+
 		function formatDate (dateValue,value) {
 			var M = "" + (dateValue.getMonth()+1);
 			var MM = "0" + M;
@@ -61,7 +61,7 @@
 			var D = "" + (dateValue.getDate());
 			var DD = "0" + D;
 			DD = DD.substring(DD.length-2, DD.length);
-			var YYYY = "" + (dateValue.getFullYear()); 
+			var YYYY = "" + (dateValue.getFullYear());
 			var currentDate = MM + "/" +DD + "/" + YYYY
 			if (value == 'startDate') {
 				$("#startDateId").val(currentDate);
@@ -80,7 +80,7 @@
 					$("#custom_count_"+i).show();
 					i = i + parseInt(columnCount)
 				}
-			}  
+			}
 		}
 
 		function setCompletionDate(startDate) {
@@ -94,7 +94,7 @@
 			if ( date && !tdsCommon.isValidDate(date) ) {
 				alert("Date should be in '" + tdsCommon.defaultDateFormat() + "' format");
 				returnVal  =  false;
-			} 
+			}
 			return returnVal;
 		}
 		function validateDates() {
@@ -103,23 +103,13 @@
 			var completionDateId = $("#completionDateId").val();
 			if (isValidDate(startDateId) && isValidDate(completionDateId)) {
 				returnval = true;
-			} 
+			}
 			return returnval;
 		}
 		function validateForm() {
 			return validateDates() && Project.validSelectedPartners();
 		}
 	    </script>
-	<%
-	/*
-		def currProj = session.getAttribute("CURR_PROJ");
-		def projectId = currProj.CURR_PROJ;
-		def currProjObj;
-		if (projectId != null) {
-			currProjObj = Project.get(projectId);
-		}
-	*/
-	%>
 	<r:layoutResources/>
 </head>
 <body>
@@ -128,11 +118,11 @@
 		<br/>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
-		</g:if> 
+		</g:if>
 		<g:form action="save" method="post" name="createProjectForm" enctype="multipart/form-data">
 			<div class="dialog">
 				<table class="create-project-table">
-					<tbody>	
+					<tbody>
 						<tr>
 							<td colspan="4"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 						</tr>
@@ -141,7 +131,7 @@
 								<label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW">
-								<select id="clientId" name="client.id" tabindex="100" 
+								<select id="clientId" name="client.id" tabindex="100"
 								data-placeholder="Please select a client">
 									<option value=""></option>
 									<g:each in="${clients}" var="client" status="i">
@@ -188,7 +178,7 @@
 								<label for="description">Description:</label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
-								<textarea rows="3" cols="40" id="description" name="description" 
+								<textarea rows="3" cols="40" id="description" name="description"
 									tabindex="140"
 									placeholder="Enter a short description of the project"
 									onkeydown="Project.textCounter(this.id,200);"
@@ -223,7 +213,7 @@
 									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 								</script>
 								<input type="text" class="dateRange" tabindex="160" size="15" style="width: 138px;" name="startDate" id="startDateId"
-									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" /> 
+									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="startDate">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="startDate" />
@@ -261,13 +251,13 @@
 							<td class="valueNW">
 								<input type="file" name="projectLogo" id="projectLogo" tabindex="190" />
 								<br>
-								<span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span> 
+								<span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span>
 							</td>
 						</tr>
 
 
 						<tr class="prop">
-							<td class="name"></td><td class="valueNW"></td>	
+							<td class="name"></td><td class="valueNW"></td>
 							<td class="name">
 								<label for="client">Default Bundle:</label>
 							</td>
@@ -298,14 +288,14 @@
 								<g:select id="workflowCode" name="workflowCode"
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
-									noSelection="['STD_PROCESS':'STD_PROCESS']" 
+									noSelection="['STD_PROCESS':'STD_PROCESS']"
 									tabindex="220">
 								</g:select>
 								<g:hasErrors bean="${projectInstance}" field="workflowCode">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="workflowCode" />
 									</div>
-								</g:hasErrors> 
+								</g:hasErrors>
 							</td>
 						</tr>
 					</tbody>

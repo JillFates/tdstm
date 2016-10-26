@@ -1,33 +1,34 @@
+<%@page import="net.transitionmanager.domain.RoleType" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<meta name="layout" content="topNav" />
 		<title>Create UserLogin</title>
-		
+
 		<script type="text/javascript">
-			
+
 			$().ready(function() {
-				
+
 				$('#add').click(function() {
 					return !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
 				});
-				
+
 				$('#remove').click(function() {
 					return !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
 				});
-				
+
 				$('#username').focus();
-				
+
 			});
-			
+
 			function selectAllAssigned(){
-				
+
 				$('#assignedRoleId').each(function(){
 					$("#assignedRoleId option").attr("selected","selected");
 				});
-				
+
 			}
-			
+
 			function togglePasswordFields($me) {
 				var isChecked = $me.is(":checked")
 				if (!isChecked) {
@@ -45,15 +46,15 @@
 		</script>
 	</head>
 	<body>
-		
-		
+
+
 		<div class="body">
 			<h1>Create UserLogin</h1>
-			
+
 			<div class="nav" style="border: 1px solid #CCCCCC; height: 23px">
 				<span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
 			</div>
-			
+
 			<br/>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -64,12 +65,12 @@
 						<tbody>
 							<tr>
 								<td colspan="2">
-									<div class="required"> Fields marked ( * ) are mandatory </div> 
+									<div class="required"> Fields marked ( * ) are mandatory </div>
 									<input name="companyId" type="hidden" value="${companyId}" />
 									<input name="personId" type="hidden" value="${personInstance.id}" />
 								</td>
 							</tr>
-							
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="person">Company:</label>
@@ -78,7 +79,7 @@
 									${personInstance.company}
 								</td>
 							</tr>
-							
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="person">Person:</label>
@@ -87,7 +88,7 @@
 									${personInstance}
 								</td>
 							</tr>
-							
+
 							<tr class="prop requiredField">
 								<td valign="top" class="name">
 									<label for="username">Username (use email):</label>
@@ -115,7 +116,7 @@
 									<label for="isLocal">Local Account:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
-									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}  
+									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}
 										onchange="togglePasswordEditFields( $(this) )"/>
 								</td>
 							</tr>
@@ -135,9 +136,9 @@
 									<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" />
 								</td>
 							</tr>
-							
+
 							<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength, fromDialog:true]}" />
-							
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="expiryDate"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</label>
@@ -147,7 +148,7 @@
 										jQuery(function($){ $("#expiryDate").kendoDateTimePicker({ animation: false}); });
 									</script>
 									<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
-										value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
 									<g:hasErrors bean="${userLoginInstance}" field="expiryDate">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="expiryDate"/>
@@ -172,7 +173,7 @@
 									</g:hasErrors>
 								</td>
 							</tr>
-							
+
 							<tr class="prop requiredField">
 								<td valign="top" class="name">
 									<label for="active">Active:</label>
@@ -186,13 +187,13 @@
 									</g:hasErrors>
 								</td>
 							</tr>
-							
+
 							<tr class="prop requiredField">
 								<td valign="top" class="name">
 									<label for="active">Project:</label>
 								</td>
 								<td valign="top" class="value">
-									<g:select id="projectId" name="projectId" from="${projectList}" 
+									<g:select id="projectId" name="projectId" from="${projectList}"
 										noSelection="${['':'Select a project...']}"
 										optionKey="id" optionValue="name"/>
 								</td>
@@ -211,8 +212,8 @@
                             <%--<tr class="prop">
                               <td valign="top" class="value" >
                               	<table style="border: none;">
-                              		   
-                              		
+
+
                               	</table>
                               </td>
                             </tr>
@@ -305,10 +306,10 @@
 
                                 </td>
 
-                                
+
                             </tr> --%>
 
-                                                   
+
 						</tbody>
 					</table>
 				</div>
@@ -333,7 +334,7 @@
 					errMsg = "Email address is required!"
 				}
 			}
-		
+
 	    	if(errMsg.length > 0){
 	    		event.preventDefault()
 	    		alert(errMsg)

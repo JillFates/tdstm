@@ -1,0 +1,232 @@
+package net.transitionmanager.controller
+
+import com.tdsops.common.lang.CollectionUtils
+import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
+import grails.validation.ValidationException
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UnauthorizedException
+import org.slf4j.LoggerFactory
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.http.HttpStatus
+import org.springframework.validation.Errors
+
+import static org.springframework.http.HttpStatus.FORBIDDEN
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import static org.springframework.http.HttpStatus.NOT_FOUND
+import static org.springframework.http.HttpStatus.UNAUTHORIZED
+
+/**
+ * @author Burt Beckwith
+ */
+trait ControllerMethods {
+
+	// injected dependencies
+	MessageSource messageSource
+	SecurityService securityService
+
+	void renderAsJson(data) {
+		render(data as JSON)
+	}
+
+	void renderSuccessJson(data = [:]) {
+		renderAsJson success(data)
+	}
+
+	void renderFailureJson(data = [:]) {
+		renderAsJson fail(data)
+	}
+
+	void renderErrorJson(errorStringOrList) {
+		renderAsJson errors(errorStringOrList)
+	}
+
+	void renderWarningJson(warningStringOrList) {
+		renderAsJson warnings(warningStringOrList)
+	}
+
+	Map success(data = [:]) {
+		[status: 'success', data: data]
+	}
+
+	// TODO - JPM 5/2015 - I think that the fail() and respondWithFailure should? return list instead of map?
+	Map fail(data = [:]) {
+		[status: 'fail', data: data]
+	}
+
+	Map errors(errorStringOrList) {
+		[status: 'error', errors: CollectionUtils.asList(errorStringOrList)]
+	}
+
+	Map warnings(warnStringOrList) {
+		[status: 'warning', warnings: CollectionUtils.asList(warnStringOrList)]
+	}
+
+//	void respondAsJson(File file) {
+//		response.setStatus(200)
+//		setContentTypeJson(response)
+//
+//		response.outputStream << file.text
+//		response.flushBuffer()
+//	}
+
+	void sendUnauthorized() {
+		sendError UNAUTHORIZED // 401
+	}
+
+	void sendMethodFailure() {
+		response.sendError(424, 'Method Failure')
+	}
+
+	void sendInternalError(log, Exception e) {
+		log.error(e.message, e)
+		response.addHeader('errorMessage', e.message)
+		sendError INTERNAL_SERVER_ERROR
+	}
+
+	Map errorsInValidation(Errors validationErrors) {
+		errors(validationErrors.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) })
+	}
+
+	Map invalidParams(errorStringOrList) {
+		errors(CollectionUtils.asList(errorStringOrList))
+	}
+
+	void sendForbidden(log = null, Exception e = null) {
+		if (e) {
+			response.addHeader('errorMessage', e.message)
+		}
+		sendError FORBIDDEN // 403
+	}
+
+	void sendNotFound() {
+		sendError NOT_FOUND // 404
+	}
+
+	void setContentTypeJson() {
+		response.contentType = 'text/json'
+	}
+
+	void sendError(HttpStatus status, String message = null) {
+		response.sendError(status.value(), message ?: status.reasonPhrase)
+	}
+
+	void setStatus(HttpStatus status) {
+		response.status = status.value()
+	}
+
+	void handleException(Exception e, log) {
+		if (e instanceof UnauthorizedException || e instanceof IllegalArgumentException) {
+			sendForbidden()
+		}
+		else if (e instanceof EmptyResultException) {
+			sendMethodFailure()
+		}
+		else if (e instanceof ValidationException) {
+			renderAsJson errorsInValidation(e.errors)
+		}
+		else if (e instanceof InvalidParamException) {
+			renderErrorJson('Invalid preference value')
+		}
+		else if (e instanceof InvalidRequestException) {
+			renderErrorJson('Invalid preference code')
+		}
+		else {
+			sendInternalError(log, e)
+		}
+	}
+
+	def <T> T getFromParams(Class<T> clazz, Map params) {
+		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.long('id'))
+		if (t) {
+			t
+		}
+		else {
+			flash.message = clazz.simpleName + ' not found with id ' + params
+			redirect action: 'list'
+			null
+		}
+	}
+
+	Number convertPower(Number watts, String powerType) {
+		if (watts == null) watts = 0
+		powerType == 'Watts' ? Math.round(watts.floatValue()) : (watts / 120).toFloat().round(1)
+	}
+
+	/**
+	 * Join multiple parts with empty/null values replaced by the 'alt' attribute.
+	 * Shortens (x ?: '--') + '/' + (y ?: '--') + '/' + (z ?: '--') to safeJoinAlt('/', '--', x, y, z)
+	 *
+	 * @param separator  the string to use between parts
+	 * @param alt  the value to use if a part evaluates to Groovy-false
+	 * @param parts  the parts to join
+	 * @return  the concatenated string
+	 */
+	String safeJoinAlt(String separator, String alt, Object... parts) {
+		parts.collect { it ?: '--' }.join(separator)
+	}
+
+	/**
+	 * Join multiple parts with empty/null values ignored.
+	 * Shortens (x ?: '') + '/' + (y ?: '') + '/' + (z ?: '') to safeJoin('/', x, y, z)
+	 *
+	 * @param separator  the string to use between parts
+	 * @param alt  the value to use if a part evaluates to Groovy-false
+	 * @param parts  the parts to join
+	 * @return  the concatenated string
+	 */
+	String safeJoin(String separator, Object... parts) {
+		parts.findAll().join(separator)
+	}
+
+	/**
+	 * You shouldn't be calling this method or doing any database writes from a controller, it would
+	 * be much better to move the persistence and business logic to a transactional service. Until then
+	 * this is a convenient way to automatically log validation errors.
+	 *
+	 * save() is called on the domain class instance, optionally with flushing, and logs warnings
+	 * if there are validation errors. Returns the instance whether the save was successful or
+	 * not, so it's possible to use a syntax like
+	 *
+	 *    Person person = save new Person(firstName: '..' ..)
+	 *
+	 * or just
+	 *
+	 *    Person person = ...
+	 *    save person
+	 *
+	 * After calling this if you need to do further work depending on whether the save failed, use
+	 * the hasErrors(), method, e.g.
+	 *
+	 *    RoleType rt = save new RoleType(...)
+	 *    if (rt.hasErrors()) {
+	 *       // panic ensues
+	 *    }
+	 *    else {
+	 *       // everyone in the squire rejoiced
+	 *    }
+	 *
+	 * @param instance  the instance
+	 * @param flush  whether to flush (should be avoided until the end of the transaction, there's a lot
+	 * of expensive unnecessary flush calls in the app)
+	 * @return  the instance passed in
+	 */
+	def <T> T saveWithWarnings(T instance, boolean flush = false) {
+		if (instance == null) return null
+
+		instance.save(flush: flush)
+
+		if (instance.hasErrors()) {
+			LoggerFactory.getLogger('grails.app.controllers.' + getClass().name).error(
+					'Validation errors saving {} with id {} {}',
+					instance.getClass().simpleName, instance.id, GormUtil.allErrorsString(instance))
+		}
+
+		instance
+	}
+
+}

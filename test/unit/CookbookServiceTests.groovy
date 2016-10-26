@@ -1,3 +1,5 @@
+import grails.test.mixin.TestFor
+import net.transitionmanager.service.CookbookService
 import spock.lang.Specification
 
 @TestFor(CookbookService)
@@ -571,6 +573,6 @@ tasks: [
 		then:
 		errors
 		errors.size() == 1
-		'Recipe is missing required \'tasks\' section' == errors[0].detail
+		'''Recipe is missing required 'tasks' section''' == errors[0].detail
 	}
 }

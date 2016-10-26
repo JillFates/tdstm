@@ -1,33 +1,30 @@
-import org.apache.shiro.SecurityUtils
-
-import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.SecurityService
 
 class CustomSecurityTagLib {
+
 	static namespace = 'tds'
+
+	SecurityService securityService
+
 	/**
-	 * @param : role
-	 * @param : permission
-	 * @return : boolean true|false
+	 * @attr permission REQUIRED  the permission name
 	 */
 	def hasPermission = { attrs, body ->
-		def returnVal = false
-		def permissionItem = attrs['permission']
-		def permission = Permissions.findByPermissionItem(permissionItem)
-
-		List roles = []
-		def subject = SecurityUtils.subject
-		Permissions.Roles.values().each{
-			if(subject.hasRole(it.toString())){
-				roles << it.toString()
-			}
+		if (permitted(attrs)) {
+			out << body()
 		}
-		if(roles.size()>0){
-			def hasPermission = RolePermissions.hasPermissionToAnyRole(roles, permission)
-			if(hasPermission)
-				returnVal = true
-		}
+	}
 
-		if(returnVal)
-		  out << body()
+	/**
+	 * @attr permission REQUIRED  the permission name
+	 */
+	def lacksPermission = { attrs, body ->
+		if (!permitted(attrs)) {
+			out << body()
+		}
+	}
+
+	private boolean permitted(Map attrs) {
+		securityService.hasPermission(attrs.permission as String)
 	}
 }

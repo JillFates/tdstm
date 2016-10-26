@@ -1,117 +1,131 @@
-import org.apache.shiro.SecurityUtils
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.AuditService
+import net.transitionmanager.service.MaintService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UserService
 
 class SecurityFilters {
 
-	def securityService
-	def maintService
-	def auditService
+	// the controllers that we validate authorization on
+	private static final List<String> webSvcCtrl = ['moveEventNews', 'wsDashboard']
+
+	AuditService auditService
+	MaintService maintService
+	SecurityService securityService
+	UserService userService
 
 	def filters = {
 
-		maintModeCheck(controller:'*', action:'*'){
+		maintModeCheck(controller: '*', action: '*') {
 			before = {
-				if( controllerName == "wsSequence") return
+				if (controllerName == "wsSequence") return
 
-				def hasBackdoorAccess = maintService.hasBackdoorAccess(session)
-				if( controllerName == "auth" && actionName == "maintMode" ){
-					if(!hasBackdoorAccess ){
-						maintService.toggleUsersBackdoor( session )
-						hasBackdoorAccess = maintService.hasBackdoorAccess( session )
-						redirect(controller:'auth', action:'login')
+				boolean hasBackdoorAccess = maintService.hasBackdoorAccess(session)
+				if (controllerName == "auth" && actionName == "maintMode") {
+					if (!hasBackdoorAccess) {
+						maintService.toggleUsersBackdoor(session)
+						redirect(controller: 'auth', action: 'login')
 						return
-					} else if( MaintService.isInMaintMode()){
+					}
+
+					if (MaintService.isInMaintMode()) {
 						render(status: 503, text: '503 Service Unavailable')
 						return
 					}
 				}
 
-				if( MaintService.isInMaintMode() && !hasBackdoorAccess ){
+				if (MaintService.isInMaintMode() && !hasBackdoorAccess) {
 					render(status: 503, text: '503 Service Unavailable')
 				}
 			}
 		}
 
-		userActivityLog(controller:'*', action:'*') {
+		userActivityLog(controller: '*', action: '*') {
 			before = {
 				auditService.auditRequest(request, params)
 			}
 		}
 
-		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
-		partyCrud(controller: "(party|partyGroup)", action: "(create|edit|save|update|delete)") {
-			before = {
-				accessControl {
-					role("ADMIN")
-				}
-			}
-		}
-
-		// for delete require ADMIN role
-		crud(controller: "*", action: "delete") {
-			before = {
-				if (controllerName == "project" || controllerName == "userLogin") {
-					return true
-				}
-				accessControl {
-					role("ADMIN")
-				}
-			}
-		}
-
-		// Access to the Admin controll requires ADMIN role
-//		crud(controller: "admin", action: "*") {
+//		securityChecks(controller: '*', action: '*') {
 //			before = {
-//				accessControl {
-//					role("ADMIN")
-//				}
+//				securityService.checkAccess controllerName, actionName
 //			}
 //		}
 
-		// Check to see if the userLogin has forcePasswordChange set and only allow him to access appropriate actions
-		checkForcePasswordChange(controller:'*', action:'*'){
+		// TODO BB revisit logic
+		newAuthFilter(controller: '*', action: '*') {
 			before = {
-				def subject = SecurityUtils.subject
-				if (subject) {
-					def principal = subject.principal
-					if (principal) {
-						def userLoginInstance = UserLogin.findByUsername("$principal")//securityService.getUserLogin()
-						if ( userLoginInstance?.forcePasswordChange == 'Y' ) {
-							if (
-								(controllerName == 'auth' && ['login','signIn','signOut'].contains(actionName) ) ||
-							 	(controllerName == 'userLogin' && ['changePassword','updatePassword'].contains(actionName)  )
-							) {
-								return true
-							} else {
-								flash.message = "Your password has expired and must be changed"
-								redirect(controller:'userLogin', action:'changePassword', params:[ userLoginInstance:userLoginInstance ])
-								return false
-							}
+				request.setAttribute 'tds_initialRequest', controllerName + '/' + actionName
+
+				if (!webSvcCtrl.contains(controllerName)) {
+					return
+				}
+
+				if (securityService.loggedIn) {
+					def moveObject
+					if (params.id) {
+						if (controllerName == 'moveEventNews') {
+							moveObject = MoveEvent.get(params.id)
 						}
+						else if (controllerName == 'wsDashboard') {
+							moveObject = MoveBundle.get(params.id)
+						}
+					}
+
+					if (!/*subject. TODO BB */isAuthenticated()) {
+						response.sendError(401, 'Unauthorized')
+						return false
+					}
+
+					if (!moveObject) {
+						response.sendError(404, "Not Found")
+						return false
+					}
+
+					if (securityService.hasPermission('MoveEventStatus')) { // verify the user role as ADMIN
+						return true
+					}
+
+					def moveEventProjectClientStaff = PartyRelationship.find(
+							"from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
+									" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
+									" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = $securityService.currentPersonId")
+					if (!moveEventProjectClientStaff) {
+						// if not ADMIN check whether user is associated to the Party that is associate to
+						// the Project.client of the moveEvent / MoveBundle
+						response.sendError 403, "Forbidden"
+						return false
+					}
+				}
+			}
+
+			after = {
+				if (request.getAttribute('tds_initialRequest') != 'auth/signIn') {
+					// We don't want to update lastPageLoad when logging in
+					if (securityService.loggedIn) {
+						userService.updateLastPageLoad()
 					}
 				}
 			}
 		}
 
-		/*
-		 *   Statements to Check the Session status
-		 */
-		loginSessionCheck(controller:'*', action:'*') {
+		// Check to see if the userLogin has forcePasswordChange set and only allow him to access appropriate actions
+		checkForcePasswordChange(controller: '*', action: '*') {
 			before = {
-				def subject = SecurityUtils.subject
-				def principal = subject.principal
-				if (! principal) {
-					if (controllerName != 'auth') {
-						// Deal with remembering URI requested and then redirect to auth/signIn
-						def savedUrlForwardURI = (request.forwardURI - request.contextPath)
-						if (savedUrlForwardURI.contains("task/userTask")) {
-							session.setAttribute("savedUrlForwardURI", savedUrlForwardURI)
-						}
-						flash.message = "Your login session has expired. Please login again."
-						redirect(controller:'auth', action:'login')
-						return false
+				UserLogin userLogin = securityService.userLogin
+				if (userLogin?.forcePasswordChange == 'Y') {
+					if ((controllerName == 'auth' && ['login','signIn','signOut'].contains(actionName)) ||
+					    (controllerName == 'userLogin' && ['changePassword', 'updatePassword'].contains(actionName))) {
+						return true
 					}
+
+					flash.message = "Your password has expired and must be changed"
+					redirect(controller: 'userLogin', action: 'changePassword', params: [userLoginInstance: userLogin])
+					return false
 				}
-				return true
 			}
 		}
 	}

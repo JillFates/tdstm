@@ -1,3 +1,5 @@
+import net.transitionmanager.domain.Notice
+
 /**
  * This migration will change the column "type" to "type_id" in the "notice" table
  * @author @tavo_luna

@@ -8,12 +8,11 @@ import groovy.util.logging.Commons
 @Singleton
 class ConstraintsValidator {
 
-	static boolean validate (String value, Map constraints) {
+	static boolean validate(String value, Map<String, Object> constraints) {
 		try {
-			def passedConstraint = false
-			def validated = true
+			boolean validated = true
 
-			constraints.each { a, b ->
+			constraints.each { String a, b ->
 				switch (a) {
 					case 'type':
 						if ( b == 'boolean' && ! (value in ['y', 'n', 'yes', 'no', '1', '0', 'true', 'false', 1, 0, true, false]) )
@@ -37,10 +36,10 @@ class ConstraintsValidator {
 			}
 
 			return validated
-		} catch (Exception e) {
-			log.error "Unexpected error : ${e.class} ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
+		}
+		catch (e) {
+			log.error "Unexpected error : ${e.class} $e.message\n${ExceptionUtil.stackTraceToString(e)}"
 			throw e
-			return false
 		}
 	}
 }

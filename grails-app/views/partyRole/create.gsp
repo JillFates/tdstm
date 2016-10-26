@@ -1,8 +1,10 @@
+<%@page import="net.transitionmanager.domain.Party" %>
+<%@page import="net.transitionmanager.domain.RoleType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Create PartyRole</title>         
+        <title>Create PartyRole</title>
     </head>
     <body>
         <div class="nav">
@@ -33,8 +35,8 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="roleType">Role Type:</label>
@@ -47,8 +49,8 @@
 										</div>
 									</g:hasErrors>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>

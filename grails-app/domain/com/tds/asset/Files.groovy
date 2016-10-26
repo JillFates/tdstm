@@ -1,8 +1,5 @@
 package com.tds.asset
 
-//import org.codehaus.groovy.grails.orm.hibernate.cfg.IdentityEnumType
-
-import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.TimeUtil
 
@@ -12,29 +9,25 @@ class Files extends AssetEntity {
 	String fileFormat
 	String LUN
 
-    static constraints = {
-		fileFormat( blank:false, nullable:false )
-		LUN( blank:true, nullable:true )
-    }
-	static mapping  = {
-		version true
+	static constraints = {
+		fileFormat blank: false
+		LUN(nullable: true)
+	}
+
+	static mapping = {
 		autoTimestamp false
 		tablePerHierarchy false
-		id column:'files_id'
+		id column: 'files_id'
 	}
-	/*
-	 * Date to insert in GMT
-	 */
+
 	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
-		lastUpdated = TimeUtil.nowGMT()
-		// modifiedBy = Person.loggedInPerson
+		dateCreated = lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
-		// modifiedBy = Person.loggedInPerson
 	}
-	String toString(){
-		"id:$id name:$assetName "
+
+	String toString() {
+		"id:$id name:$assetName"
 	}
 }

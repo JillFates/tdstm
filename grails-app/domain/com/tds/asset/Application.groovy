@@ -1,15 +1,13 @@
 package com.tds.asset
 
-//import Person
-//import Project
-
-//import org.codehaus.groovy.grails.orm.hibernate.cfg.IdentityEnumType
-
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.Person
 
 class Application extends AssetEntity {
+
+	static final ContextType contextType = ContextType.A
 
 	AssetClass assetClass = AssetClass.APPLICATION
 	String appVendor
@@ -47,50 +45,47 @@ class Application extends AssetEntity {
 	Integer testingFixed = 0
 	Integer testingDuration
 
-    static constraints = {
-		appVendor( blank:true, nullable:true )
-		appVersion( blank:true, nullable:true )
-		sme( nullable:true )
-		sme2( nullable:true )
-		url( blank:true, nullable:true )
-		appTech( blank:true, nullable:true )
-		appAccess( blank:true, nullable:true )
-		appSource( blank:true, nullable:true )
-		license( blank:true, nullable:true )
-		businessUnit( blank:true, nullable:true )
-		criticality( blank:true, nullable:true, size:0..25, inList:['Mission Critical','Business Critical','Business Operational','Administrative Services','Critical','Major','Important','Minor'] )
-		appFunction( blank:true, nullable:true )
-		useFrequency( blank:true, nullable:true )
-		userLocations( blank:true, nullable:true )
-		userCount( blank:true, nullable:true )
-		latency( blank:true, nullable:true )
-		testProc( blank:true, nullable:true )
-		startupProc( blank:true, nullable:true )
+	static constraints = {
+		appAccess nullable: true
+		appFunction nullable: true
+		appSource nullable: true
+		appTech nullable: true
+		appVendor nullable: true
+		appVersion nullable: true
+		businessUnit nullable: true
+		criticality nullable: true, size: 0..25, inList: ['Mission Critical', 'Business Critical',
+		                                                  'Business Operational', 'Administrative Services',
+		                                                  'Critical', 'Major', 'Important', 'Minor']
+		drRpoDesc nullable: true
+		drRtoDesc nullable: true
+		latency nullable: true
+		license nullable: true
+		moveDowntimeTolerance nullable: true
+		shutdownBy nullable: true
+		shutdownDuration nullable: true
+		shutdownFixed nullable: true
+		sme nullable: true
+		sme2 nullable: true
+		startupBy nullable: true
+		startupDuration nullable: true
+		startupFixed nullable: true
+		startupProc nullable: true
+		testingBy nullable: true
+		testingDuration nullable: true
+		testingFixed nullable: true
+		testProc nullable: true
+		url nullable: true
+		useFrequency nullable: true
+		userCount nullable: true
+		userLocations nullable: true
+	}
 
-		drRpoDesc( blank:true, nullable:true )
-		drRtoDesc( blank:true, nullable:true )
-		moveDowntimeTolerance( blank:true, nullable:true )
-
-		shutdownBy (nullable:true )
-		shutdownFixed (nullable:true )
-		shutdownDuration (nullable:true )
-
-		startupBy (nullable:true )
-		startupFixed (nullable:true )
-		startupDuration (nullable:true )
-
-		testingBy (nullable:true )
-		testingFixed (nullable:true )
-		testingDuration (nullable:true )
-    }
-
-	static mapping  = {
-		version true
+	static mapping = {
 		autoTimestamp false
 		tablePerHierarchy false
-		id column:'app_id'
-		sme column:'sme_id'
-		sme2 column:'sme2_id'
+		id column: 'app_id'
+		sme column: 'sme_id'
+		sme2 column: 'sme2_id'
 		columns {
 			shutdownFixed sqltype: 'tinyint(1)'
 			startupFixed sqltype: 'tinyint(1)'
@@ -98,27 +93,18 @@ class Application extends AssetEntity {
 		}
 	}
 
-	static ContextType getContextType() {
-		return ContextType.A
-	}
-
-	/*
-	 * Date to insert in GMT
-	 */
 	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
-		lastUpdated = TimeUtil.nowGMT()
-		// modifiedBy = Person.loggedInPerson
+		dateCreated = lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
-		// modifiedBy = Person.loggedInPerson
 	}
-	String toString(){
+
+	String toString() {
 		"id:$id name:$assetName tag:$appVendor"
 	}
 
-	boolean belongsToClient(aClient) {
-		return this.owner.equals(aClient)
+	boolean belongsToClient(client) {
+		ownerId == client?.id
 	}
 }

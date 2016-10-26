@@ -1,7 +1,17 @@
 package com.tds.asset
 
+import groovy.transform.CompileStatic
+
 class AssetOptions {
-	static enum AssetOptionsType{STATUS_OPTION,PRIORITY_OPTION,DEPENDENCY_TYPE,DEPENDENCY_STATUS,ENVIRONMENT_OPTION}
+
+	@CompileStatic
+	static enum AssetOptionsType {
+		STATUS_OPTION,
+		PRIORITY_OPTION,
+		DEPENDENCY_TYPE,
+		DEPENDENCY_STATUS,
+		ENVIRONMENT_OPTION
+	}
 
 	AssetOptionsType type
 	String value
@@ -10,8 +20,7 @@ class AssetOptions {
 		version false
 	}
 
-    static constraints = {
-		type(nullable:false)
-		value(blank:false,nullable:false)
-    }
+	static constraints = {
+		value blank: false
+	}
 }

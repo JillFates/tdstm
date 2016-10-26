@@ -1,24 +1,41 @@
 package com.tds.asset
 
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.validators.CustomValidators
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.eav.EavEntity
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 
+import static com.tds.asset.AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
+import static com.tds.asset.AssetOptions.AssetOptionsType.PRIORITY_OPTION
+import static com.tds.asset.AssetOptions.AssetOptionsType.STATUS_OPTION
+import static com.tds.asset.AssetType.BLADE
+import static com.tds.asset.AssetType.VM
+import static com.tdsops.tm.enums.domain.AssetClass.DEVICE
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.UNKNOWN
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.VALIDATED
+import static com.tdsops.tm.enums.domain.AssetEntityPlanStatus.UNASSIGNED
+import static com.tdsops.validators.CustomValidators.inList
+import static com.tdsops.validators.CustomValidators.optionsClosure
 
-class AssetEntity extends com.tdssrc.eav.EavEntity {
+class AssetEntity extends EavEntity {
 
-	AssetClass assetClass = AssetClass.DEVICE
-	String application = ""
+	AssetClass assetClass = DEVICE
+	String application = ''
 	String assetName
 	String shortName
 	String assetType = 'Server'
 	Integer priority
-	String planStatus = AssetEntityPlanStatus.UNASSIGNED
+	String planStatus = UNASSIGNED
 	Date purchaseDate
 	Double purchasePrice
 	String department
@@ -146,7 +163,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	AssetEntity targetChassis
 	Integer targetBladePosition
 
-	String virtualHost		// TODO : JPM 9/2014 - drop the column virtualHost as this is no longer legitimate with true dependencies
+	String virtualHost      // TODO : JPM 9/2014 - drop the column virtualHost as this is no longer legitimate with true dependencies
 	String truck
 	String cart
 	String shelf
@@ -158,7 +175,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Rack rackTarget
 	Room roomTarget
 	Person appOwner
-	String appSme = ""
+	String appSme = ''
 
 	// MoveBundleAsset fields
 	String validation
@@ -171,232 +188,121 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer rateOfChange
 	Person modifiedBy
 
-	static hasMany = [
-		// assetEntityVarchars : AssetEntityVarchar,
-		comments : AssetComment
-	]
+	static hasMany = [comments: AssetComment]
 
 	static constraints = {
-		application( blank:true, nullable:true )
-		assetName( blank:false, nullable:false, size:0..255 )
-		shortName( blank:true, nullable:true )
-		assetType( blank:true, nullable:true )
-		priority( nullable:true, validator:
-			CustomValidators.inList(
-				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.PRIORITY_OPTION),
-				"priority")
-		)
-		planStatus( blank:true, nullable:true, validator:
-			CustomValidators.inList(
-				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.STATUS_OPTION),
-				"planStatus")
-		)
-		purchaseDate( nullable:true )
-		purchasePrice( nullable:true )
-		department( blank:true, nullable:true )
-		costCenter( blank:true, nullable:true )
-		maintContract( blank:true, nullable:true )
-		maintExpDate( nullable:true )
-		retireDate( nullable:true )
-		description( blank:true, nullable:true, size:0..255 )
-		supportType( blank:true, nullable:true )
-		environment( blank:true, nullable:true, size:0..20, validator:
-			CustomValidators.inList(
-				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION),
-				"environment")
-		)
-		custom1( blank:true, nullable:true )
-		custom2( blank:true, nullable:true )
-		custom3( blank:true, nullable:true )
-		custom4( blank:true, nullable:true )
-		custom5( blank:true, nullable:true )
-		custom6( blank:true, nullable:true )
-		custom7( blank:true, nullable:true )
-		custom8( blank:true, nullable:true )
-		custom9( blank:true, nullable:true )
-		custom10( blank:true, nullable:true )
-		custom11( blank:true, nullable:true )
-		custom12( blank:true, nullable:true )
-		custom13( blank:true, nullable:true )
-		custom14( blank:true, nullable:true )
-		custom15( blank:true, nullable:true )
-		custom16( blank:true, nullable:true )
-		custom17( blank:true, nullable:true )
-		custom18( blank:true, nullable:true )
-		custom19( blank:true, nullable:true )
-		custom20( blank:true, nullable:true )
-		custom21( blank:true, nullable:true )
-		custom22( blank:true, nullable:true )
-		custom23( blank:true, nullable:true )
-		custom24( blank:true, nullable:true )
-		custom25( blank:true, nullable:true )
-		custom26( blank:true, nullable:true )
-		custom27( blank:true, nullable:true )
-		custom28( blank:true, nullable:true )
-		custom29( blank:true, nullable:true )
-		custom30( blank:true, nullable:true )
-		custom31( blank:true, nullable:true )
-		custom32( blank:true, nullable:true )
-		custom33( blank:true, nullable:true )
-		custom34( blank:true, nullable:true )
-		custom35( blank:true, nullable:true )
-		custom36( blank:true, nullable:true )
-		custom37( blank:true, nullable:true )
-		custom38( blank:true, nullable:true )
-		custom39( blank:true, nullable:true )
-		custom40( blank:true, nullable:true )
-		custom41( blank:true, nullable:true )
-		custom42( blank:true, nullable:true )
-		custom43( blank:true, nullable:true )
-		custom44( blank:true, nullable:true )
-		custom45( blank:true, nullable:true )
-		custom46( blank:true, nullable:true )
-		custom47( blank:true, nullable:true )
-		custom48( blank:true, nullable:true )
-		custom49( blank:true, nullable:true )
-		custom50( blank:true, nullable:true )
-		custom51( blank:true, nullable:true )
-		custom52( blank:true, nullable:true )
-		custom53( blank:true, nullable:true )
-		custom54( blank:true, nullable:true )
-		custom55( blank:true, nullable:true )
-		custom56( blank:true, nullable:true )
-		custom57( blank:true, nullable:true )
-		custom58( blank:true, nullable:true )
-		custom59( blank:true, nullable:true )
-		custom60( blank:true, nullable:true )
-		custom61( blank:true, nullable:true )
-		custom62( blank:true, nullable:true )
-		custom63( blank:true, nullable:true )
-		custom64( blank:true, nullable:true )
-		custom65( blank:true, nullable:true )
-		custom66( blank:true, nullable:true )
-		custom67( blank:true, nullable:true )
-		custom68( blank:true, nullable:true )
-		custom69( blank:true, nullable:true )
-		custom70( blank:true, nullable:true )
-		custom71( blank:true, nullable:true )
-		custom72( blank:true, nullable:true )
-		custom73( blank:true, nullable:true )
-		custom74( blank:true, nullable:true )
-		custom75( blank:true, nullable:true )
-		custom76( blank:true, nullable:true )
-		custom77( blank:true, nullable:true )
-		custom78( blank:true, nullable:true )
-		custom79( blank:true, nullable:true )
-		custom80( blank:true, nullable:true )
-		custom81( blank:true, nullable:true )
-		custom82( blank:true, nullable:true )
-		custom83( blank:true, nullable:true )
-		custom84( blank:true, nullable:true )
-		custom85( blank:true, nullable:true )
-		custom86( blank:true, nullable:true )
-		custom87( blank:true, nullable:true )
-		custom88( blank:true, nullable:true )
-		custom89( blank:true, nullable:true )
-		custom90( blank:true, nullable:true )
-		custom91( blank:true, nullable:true )
-		custom92( blank:true, nullable:true )
-		custom93( blank:true, nullable:true )
-		custom94( blank:true, nullable:true )
-		custom95( blank:true, nullable:true )
-		custom96( blank:true, nullable:true )
+		application nullable: true
+		assetName blank: false
+		shortName nullable: true
+		assetType nullable: true
+		priority nullable: true, validator: inList(optionsClosure(PRIORITY_OPTION), 'priority')
+		planStatus nullable: true, validator: inList(optionsClosure(STATUS_OPTION), 'planStatus')
+		purchaseDate nullable: true
+		purchasePrice nullable: true
+		department nullable: true
+		costCenter nullable: true
+		maintContract nullable: true
+		maintExpDate nullable: true
+		retireDate nullable: true
+		description nullable: true
+		supportType nullable: true
+		environment nullable: true, size: 0..20, validator: inList(optionsClosure(ENVIRONMENT_OPTION), 'environment')
 
-		project( nullable:true )
+		// we can save some redundant space by dynamically setting all 96 columns to be nullable in a loop;
+		// since the constraints DSL is implemented as method calls with the property name as the method
+		// name and a single Map argument containing the data for the various contraints, it's simple
+		// to dynamically create a method call to be called on the closure's delegate:
+		Map nullableTrue = Collections.singletonMap('nullable', true)
+		(1..96).each { "custom$it"(nullableTrue) }
 
-		serialNumber( blank:true, nullable:true )
-		assetTag( blank:true, nullable:true )
-		manufacturer( nullable:true )
-		model( nullable:true )
-		ipAddress( blank:true, nullable:true )
-		os( blank:true, nullable:true )
-		usize( nullable:true )
+		project nullable: true
 
-		sourceRackPosition( nullable:true )
-		sourceChassis( nullable:true )
-		sourceBladePosition( nullable:true )
+		serialNumber nullable: true
+		assetTag nullable: true
+		manufacturer nullable: true
+		model nullable: true
+		ipAddress nullable: true
+		os nullable: true
+		usize nullable: true
 
-		targetRackPosition( nullable:true )
-		targetChassis( nullable:true )
-		targetBladePosition( nullable:true )
+		sourceRackPosition nullable: true
+		sourceChassis nullable: true
+		sourceBladePosition nullable: true
 
-		virtualHost( blank:true, nullable:true )
-		truck( blank:true, nullable:true )
-		cart( blank:true, nullable:true )
-		shelf( blank:true, nullable:true )
-		railType( blank:true, nullable:true )
+		targetRackPosition nullable: true
+		targetChassis nullable: true
+		targetBladePosition nullable: true
+
+		virtualHost nullable: true
+		truck nullable: true
+		cart nullable: true
+		shelf nullable: true
+		railType nullable: true
 
 		// TODO : owner should not be nullable - remove and test
-		owner( nullable:true )
-		roomSource( nullable:true )
-		rackSource( nullable:true )
-		roomTarget( nullable:true )
-		rackTarget( nullable:true )
-		appOwner( nullable:true )
-		appSme( blank:true, nullable:true )
+		owner nullable: true
+		roomSource nullable: true
+		rackSource nullable: true
+		roomTarget nullable: true
+		rackTarget nullable: true
+		appOwner nullable: true
+		appSme nullable: true
 
 		// MoveBundleAsset fields
-		validation( blank:true, nullable:true, size:0..20, inList:ValidationType.getList() )
-		dependencyBundle( nullable:true )
-		externalRefId( blank:true, nullable:true )
+		validation nullable: true, size: 0..20, inList: ValidationType.list
+		dependencyBundle nullable: true
+		externalRefId nullable: true
 
-		size( nullable:true )
-		scale( nullable:true, inList:SizeScale.getKeys() )
-		rateOfChange( nullable:true )
-		modifiedBy( nullable:true )
+		size nullable: true
+		scale nullable: true, inList: SizeScale.keys
+		rateOfChange nullable: true
+		modifiedBy nullable: true
 	}
 
-	static mapping  = {
-		version           true
-		autoTimestamp     false
+	static mapping = {
+		appOwner column: 'app_owner_id'
+		autoTimestamp false
+		id column: 'asset_entity_id'
+		maintExpDate sqltype: 'date'
+		modifiedBy column: 'modified_by'
+		moveBundle ignoreNotFound: true
+		os column: 'hinfo'
+		owner ignoreNotFound: true
+		rateOfChange sqltype: 'int(4)'
+		retireDate sqltype: 'date'
 		tablePerHierarchy false
-		id                column: 'asset_entity_id'
-		os                column: 'hinfo'
-		appOwner          column: 'app_owner_id'
-		modifiedBy        column: 'modified_by'
-		moveBundle        ignoreNotFound: true
-		owner             ignoreNotFound: true
-		retireDate        sqltype: 'date'
-		maintExpDate      sqltype: 'date'
-		rateOfChange      sqltype: 'int(4)'
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
 	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict']
 
-	/*
-	 * Date to insert in GMT
-	 */
 	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
-		lastUpdated = TimeUtil.nowGMT()
-		// modifiedBy = Person.loggedInPerson
-
+		dateCreated = lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
-		// modifiedBy = Person.loggedInPerson
 	}
 
-	String toString(){
+	String toString() {
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}
 
 	/*
 	 *  methods for JMESA filter/sort
 	 */
-	def getModelName(){
-		return this.model?.modelName
+	String getModelName() {
+		model?.modelName
 	}
-	def getMoveBundleName(){
-		return this.moveBundle?.name
+
+	String getMoveBundleName() {
+		moveBundle?.name
 	}
 
 	/**
-	 * Used to access the manufacturer of the asset which will return either the model.manufacturer or this.manufacturer where the model takes precedence
+	 * The manufacturer of the asset, either the model.manufacturer or this.manufacturer where the model takes precedence
 	 */
 	Manufacturer getManufacturer() {
-		return (this.model ? this.model.manufacturer : this.manufacturer)
+		model ? model.manufacturer : manufacturer
 	}
 
 	/**
@@ -406,66 +312,47 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * return AssetEntity.assetType in any other case.
 	 */
 	String getAssetType() {
-		String at = this.assetType
-		if (this.assetClass == AssetClass.DEVICE) {
-			at = this.model ?
-					 this.model.assetType :
-					 at == "Files" ? "Logical Storage" : at
+		String at = assetType
+		if (assetClass == DEVICE) {
+			at = model ? model.assetType : at == 'Files' ? 'Logical Storage' : at
 		}
-
 		return at
 	}
 
 	// Legacy accessor methods to support referencing the pre-normalized loc/room/rack information
-	def getSourceLocation() { return this.roomSource?.location }
-	def getSourceRack() { return this.rackSource?.tag }
-	def getSourceRoom() { return this.roomSource?.roomName }
-	def getTargetLocation() { return this.roomTarget?.location }
-	def getTargetRack() { return this.rackTarget?.tag }
-	def getTargetRoom() { return this.roomTarget?.roomName }
+	String getSourceLocation() { roomSource?.location }
+	String getSourceRack()     { rackSource?.tag }
+	String getSourceRoom()     { roomSource?.roomName }
+	String getTargetLocation() { roomTarget?.location }
+	String getTargetRack()     { rackTarget?.tag }
+	String getTargetRoom()     { roomTarget?.roomName }
 
 	/**
 	 * The usize is now coming from the model vs the asset directly
 	 */
 	Integer getUsize() {
-		Integer sz
-		if (this.assetClass == AssetClass.DEVICE && this.model)
-			sz = this.model.usize
-		return sz
+		if (assetClass == DEVICE && model) {
+			model.usize
+		}
 	}
 
 	/**
-	 * Use to determine if the asset is a Server / VM
-	 * @return boolean
+	 * Whether the asset is a Server / VM
 	 */
-	def isaDevice() {
-		return ( ! isaApplication() && ! isaNetwork() && ! isaStorage() && ! isaDatabase() )
+	boolean isaDevice() {
+		!isaApplication() && !isaNetwork() && !isaStorage() && !isaDatabase()
 	}
 
-	/**
-	 * Use to determine if the asset is a Database
-	 * @return boolean
-	 */
-
-	def isaDatabase() {
-		return assetType?.toLowerCase() == 'database'
+	boolean isaDatabase() {
+		assetType?.toLowerCase() == 'database'
 	}
 
-	/**
-	 * Use to determine if the asset is an Application
-	 * @return boolean
-	 */
-
-	def isaApplication() {
-		return assetType?.toLowerCase() == 'application'
+	boolean isaApplication() {
+		assetType?.toLowerCase() == 'application'
 		// return entityType == AssetEntityType.APPLICATION
 	}
 
-	/**
-	 * Use to determine if the asset is a Network (presently stubbed out to return FALSE)
-	 * @return boolean
-	 */
-	def isaNetwork() {
+	boolean isaNetwork() {
 		return false
 		// TODO - Fix isNetwork when domain is implemented
 		// return assetType.toLowerCase() == 'network'
@@ -473,44 +360,39 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	}
 
 	/**
-	 * Use to determine if the asset is a Storage
-	 * @return boolean
+	 * Whether the asset is a Storage
 	 */
-	def isaStorage() {
-		return ['files','storage'].contains(assetType?.toLowerCase())
+	boolean isaStorage() {
+		['files', 'storage'].contains(assetType?.toLowerCase())
 		// return entityType == AssetEntityType.STORAGE
 	}
 
 	/**
-	 * Used to determine if the asset is considered a logic type of object (e.g. Network, Database, Storage)
-	 * @return Boolean true if asset is logical
+	 * Whether the asset is a logic type of object (e.g. Network, Database, Storage)
 	 */
-	def isaLogicalType() {
-		return (! isaDevice() && ! isaApplication() )
+	boolean isaLogicalType() {
+		!isaDevice() && !isaApplication()
 	}
 
 	/**
-	 * Used to determine if an asset is a VM
-	 * @return Boolean true if the device is a VM
+	 * Whether the asset is a VM
 	 */
-	def isaVM() {
-		return ( assetClass==AssetClass.DEVICE && ( model?.assetType==AssetType.VM.toString() || assetType==AssetType.VM.toString() ) )
+	boolean isaVM() {
+		assetClass == DEVICE && (model?.assetType == VM.toString() || assetType == VM.toString())
 	}
 
 	/**
-	 * Used to determine if an asset is a Blade
-	 * @return Boolean true if the device is a VM
+	 * Whether the asset is a Blade
 	 */
-	def isaBlade() {
-		return ( assetClass==AssetClass.DEVICE && (model?.assetType==AssetType.BLADE.toString() || assetType==AssetType.BLADE.toString() ) )
+	boolean isaBlade() {
+		assetClass == DEVICE && (model?.assetType == BLADE.toString() || assetType == BLADE.toString())
 	}
 
 	/**
-	 * Determines if the asset is a Chassis.
-	 * @return Boolean true if the asset is a chassis, false otherwise.
+	 * Whether the asset is a Chassis.
 	 */
-	def isaChassis(){
-		return this.assetType in AssetType.getBladeChassisTypes()
+	boolean isaChassis() {
+		assetType in AssetType.bladeChassisTypes
 	}
 
 	/*
@@ -530,97 +412,48 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	*/
 
 	/**
-	 * this method is used to count of dependencies to dependent and status is not Validated.
-	 * @return dependencyUp Count
+	 * Count of dependencies to dependent and status is not Validated.
 	 */
-	def transient getDepUp(){
-		return AssetDependency.countByDependentAndStatusNotEqual(this, 'Validated')
+	int getDepUp() {
+		AssetDependency.countByDependentAndStatusNotEqual(this, 'Validated')
 	}
 
 	/**
-	 * this method is used to count of dependencies to assets and the status is not Validated.
-	 * @return dependencyDown Count
+	 * Count of dependencies to assets and the status is not Validated.
 	 */
-	def transient getDepDown(){
-		return AssetDependency.countByAssetAndStatusNotEqual(this, 'Validated')
+	int getDepDown() {
+		AssetDependency.countByAssetAndStatusNotEqual(this, 'Validated')
 	}
 
 	/**
-	 * this method is used to count of dependencies to assets where status in QUESTIONED,UNKNOWN.
-	 * @return
+	 * Count of dependencies to assets where status in QUESTIONED,UNKNOWN.
 	 */
-	def getDepToResolve(){
-		return AssetDependency.findAll(" FROM AssetDependency ad \
-				WHERE (ad.status IN (:status)) AND (ad.asset=:asset OR ad.dependent=:asset)",
-				[asset:this, status:[AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.QUESTIONED]]).size()
-		/*return AssetDependency.countByAssetAndStatusInList(this,
-			[AssetDependencyStatus.QUESTIONED,AssetDependencyStatus.UNKNOWN])*/
+	int getDepToResolve() {
+		executeQuery('''
+			SELECT COUNT(*)
+			FROM AssetDependency
+			WHERE status IN (:status)
+			  AND (asset=:asset OR dependent=:asset)
+		''', [asset: this, status: [UNKNOWN, QUESTIONED]])[0]
 	}
 
 	/**
-	 * this method is used to count of dependencies to assets where the status in QUESTIONED,UNKNOWN,VALIDATED
-	 * of different MoveBundle.
-	 * @return
+	 * Count of dependencies to assets where the status in QUESTIONED,UNKNOWN,VALIDATED
 	 */
-	def getDepToConflict(){
-		return AssetDependency.findAll(" FROM AssetDependency ad \
-				WHERE ad.status IN (:status) AND ad.asset=:asset AND ad.dependent.moveBundle!=:bundle",
-				[asset:this, bundle:this.moveBundle,
-				 status:[AssetDependencyStatus.VALIDATED, AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.QUESTIONED]]).size()
+	int getDepToConflict() {
+		executeQuery('''
+			SELECT COUNT(*)
+			FROM AssetDependency
+			WHERE status IN (:status)
+			  AND asset=:asset
+			  AND dependent.moveBundle!=:bundle
+		''', [asset: this, bundle: moveBundle, status: [VALIDATED, UNKNOWN, QUESTIONED]])[0]
 	}
 
 	/**
-	 * This method is used to set source Room and location or target Room and Location when we get request from select box
-	 * @param roomId : id of the room that we need to set
-	 * @param source : a Boolean flag to determine whether request is for source or target
-	 * @return : void
+	 * Whether a particular asset has cables.
 	 */
-	def setRoomAndLoc(def roomId, Boolean source) {
-		throw new RuntimeException("AssetEntity.setRoomAndLoc() has been eliminated - see AssetEntityService.assignAssetToRoom")
-		/*
-		def room = null
-		if(roomId && roomId !='0')
-			room = Room.read( roomId )
-
-		//If flag is source then setting all source to requested value and vice versa .
-		if( source ){
-			roomSource = room
-		//	sourceRoom = room ? room.roomName : null
-		//	sourceLocation = room ? room?.location : null
-		}
-		if( !source ){
-			roomTarget = room
-		//	targetRoom = room ? room.roomName : null
-		}
-		*/
+	boolean isCableExist() {
+		AssetCableMap.countByAssetFrom(this)
 	}
-	/**
-	 * This method is used to set source Rack  or target Rack when we get request from select box
-	 * @param rackId : id of the room that we need to set
-	 * @param source : a Boolean flag to determine whether request is for source or target
-	 * @return : void
-	 */
-	def setRack(def rackId, Boolean source) {
-		throw new RuntimeException("AssetEntity.setRack() has been eliminated - see")
-		/*
-		def rack = null
-		if(rackId && rackId !='0')
-			rack = Rack.read( rackId )
-
-		//If flag is source then setting all source to requested value and vice versa .
-		if( source ){
-			rackSource = rack
-		}
-		if( !source ){
-			rackTarget = rack
-		}
-		*/
-	}
-	/**
-	 * This method is used to know whether a particular asset having cables or not.
-	 */
-	def isCableExist(){
-		return AssetCableMap.findByAssetFrom(this)
-	}
-
 }

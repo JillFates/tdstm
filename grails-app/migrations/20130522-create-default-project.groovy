@@ -1,3 +1,10 @@
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.PartyRelationshipType
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.RoleType
+
 /**
  * The Default project will be used to handle the field preferences and more in feature.
  **/

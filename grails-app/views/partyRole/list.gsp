@@ -1,4 +1,5 @@
-
+<%@page import="net.transitionmanager.domain.PartyRole" %>
+<%@page import="net.transitionmanager.domain.PartyType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -20,19 +21,19 @@
                     <thead>
                         <tr>
                    	        <th>Party</th>
-                   	    
+
                    	        <th>Role Type</th>
-                   	    
+
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${partyRoleInstanceList}" status="i" var="partyRoleInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
+
                             <td><g:link action="show" params="[partyId:partyRoleInstance?.party.id, roleTypeId:partyRoleInstance.roleType.id]"> ${partyRoleInstance?.party}</g:link></td>
-                        
+
                             <td>${fieldValue(bean:partyRoleInstance, field:'roleType')}</td>
-                        
+
                         </tr>
                     </g:each>
                     </tbody>

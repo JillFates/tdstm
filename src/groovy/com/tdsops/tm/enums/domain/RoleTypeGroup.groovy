@@ -1,13 +1,22 @@
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 enum RoleTypeGroup {
-	STAFF('Staff'), SYSTEM('System')
+
+	STAFF('Staff'),
+	SYSTEM('System')
 
 	final String value
 
-	RoleTypeGroup(String value) { this.value = value }
+	private RoleTypeGroup(String label) {
+		value = label
+	}
 
-	static def getList() { return RoleTypeGroup.values()*.value }
+	String value() { value }
+
 	String toString() { value }
 
+	static final List<String> list = (values().collect { RoleTypeGroup it -> it.value } as List).asImmutable()
 }

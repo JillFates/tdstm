@@ -18,7 +18,7 @@
 			background-color: #ecf0f5 !important;
 		}
 	</style>
-		
+
 <script type="text/javascript">
 function onInvokeAction(id) {
     setExportToLimit(id, '');
@@ -35,7 +35,7 @@ $(document).ready(function() {
 });
 
  function getCommentDetails(id,type){
-	 
+
 	 jQuery.ajax({
 			url: contextPath+"/newsEditor/retrieveCommetOrNewsData",
 			data: {'id':id , 'commentType':type},
@@ -52,12 +52,12 @@ function showEditCommentForm(e , rowId){
 		var tbody = $("#commetAndNewsBodyId > tr");
 		tbody.each(function(n, row){
 			if(n == rowId) {
-		    	$(row).addClass('selectedRow'); 
+		    	$(row).addClass('selectedRow');
 		    } else {
 		    	$(row).removeClass('selectedRow');
-		    }		          		
+		    }
      	});
-     	
+
 		$('#commentId').val(assetComments[0].commentObject.id)
 		$('#assetTdId').val(assetComments[0].assetName)
 		$('#dateCreatedId').html(assetComments[0].dtCreated);
@@ -69,7 +69,7 @@ function showEditCommentForm(e , rowId){
 		}
 		$('#createdById').html(assetComments[0].personCreateObj);
 		$('#resolutionId').val(assetComments[0].commentObject.resolution);
-		
+
 		if(assetComments[0].commentObject.commentType != 'issue'){
 
 			$('#commentTypeId').val("news")
@@ -89,7 +89,7 @@ function showEditCommentForm(e , rowId){
 			$("#showEditCommentDialog").dialog('option','title','Edit News');
 
 		} else {
-			
+
 			$('#commentTypeId').val("issue")
 			$('#dateResolvedId').html(assetComments[0].dtResolved);
 			$('#isResolvedId').val(assetComments[0].commentObject.isResolved)
@@ -110,7 +110,7 @@ function showEditCommentForm(e , rowId){
 			$("#commentTypeOption").html("<option>Issue</option>");
 			$("#assetTrId").show();
 			$("#showEditCommentDialog").dialog('option','title','Edit Issues Comment');
-			
+
 		}
 			$("#showEditCommentDialog").dialog( "option", "modal", true );
 			$("#showEditCommentDialog").dialog("open");
@@ -146,7 +146,7 @@ function validateCreateNewsForm(){
 	var moveEvent = $("#moveEventId").val();
 	var resolveBoo = $("#isArchivedId").is(':checked');
 	var resolveVal = $("#resolutionNewsId").val();
-	
+
 	if(moveEvent){
 		if(resolveBoo && resolveVal == ""){
 			alert('Please enter Resolution');
@@ -355,7 +355,7 @@ $('#reportsMenu').hide();
 					if(moveEvent){
 						$("#moveEvent").val(moveEvent)
 					} else {
-						$("#moveEvent").val("${session.getAttribute('MOVE_EVENT')?.MOVE_EVENT}")
+						$("#moveEvent").val("${tds.currentMoveEventId()}")
 					}
 					/*------------------------------------------------------------------
 					* function to Unhighlight the Asset row when the edit DIV is closed

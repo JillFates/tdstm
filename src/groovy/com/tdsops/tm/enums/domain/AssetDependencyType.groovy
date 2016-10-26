@@ -1,19 +1,21 @@
 package com.tdsops.tm.enums.domain
 
-/**
- * AssetDependencyType - represents the valid options for the AssetDependancy.type property
- */
-class AssetDependencyType {
-	static final String BACKUP='Backup'
-	static final String BATCH='Batch'
-	static final String DB='DB'
-	static final String FILE='File'
-	static final String HOSTS='Hosts'
-	static final String RUNSON='Runs On'
-	static final String UNKNOWN='Unknown'
-	static final String WEB='Web'
+import groovy.transform.CompileStatic
 
-	static final getList() {
-		return [ BACKUP, BATCH, DB, FILE, HOSTS, RUNSON, UNKNOWN, WEB ]
-	}
+/**
+ * The valid options for the AssetDependancy.type property
+ */
+@CompileStatic
+class AssetDependencyType {
+
+	public static final String BACKUP  = 'Backup'
+	public static final String BATCH   = 'Batch'
+	public static final String DB      = 'DB'
+	public static final String FILE    = 'File'
+	public static final String HOSTS   = 'Hosts'
+	public static final String RUNSON  = 'Runs     On'
+	public static final String UNKNOWN = 'Unknown'
+	public static final String WEB     = 'Web'
+
+	static final List<String> list = [BACKUP, BATCH, DB, FILE, HOSTS, RUNSON, UNKNOWN, WEB].asImmutable()
 }

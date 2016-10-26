@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.ProjectTeam" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -54,7 +55,7 @@
 									<td><g:if test="${projectTeamInstance?.team?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.team?.projectTeam?.role}" /></g:if></td>
 									<td>
 										<g:each in="${projectTeamInstance?.team?.teamMembers}" var="teamMember">
-											<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
+											<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if>
 										</g:each>
 									</td>
 									<td><b>${projectTeamInstance?.moveBundle}</b></td>
@@ -69,7 +70,7 @@
 			</div>
 		</g:form>
 		<g:link class="mobfooter" action="list" style="color:white;" params="[ viewMode:'mobile']">Use Mobile Site</g:link>
-		
+
 		<script type="text/javascript">
 			function submitLoginForm( bundleId,teamId,role,location){
 				var form = document.forms["loginForm"] ;

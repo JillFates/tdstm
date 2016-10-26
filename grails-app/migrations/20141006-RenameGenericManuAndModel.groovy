@@ -1,3 +1,7 @@
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.Person
+
 databaseChangeLog = {
 
 	changeSet(author: "jmartin", id: "20140927 TM-3397-1") {

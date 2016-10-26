@@ -21,6 +21,6 @@
 	</table>
 
 	<div class="buttons">
-		<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetPreference(${session.getAttribute('LOGIN_PERSON').id})" value="Reset All"/> </span>
+		<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetPreference(${tds.currentPersonId()})" value="Reset All"/> </span>
 	</div>
 </form>

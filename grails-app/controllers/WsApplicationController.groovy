@@ -1,45 +1,30 @@
-import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller
-import grails.validation.ValidationException
-
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.ApplicationService
 
 /**
- * {@link Controller} for handling WS calls of the {@link ApplicationService}
+ * Handles WS calls of the ApplicationService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-class WsApplicationController {
+@Secured('isAuthenticated()')
+@Slf4j(value='logger', category='grails.app.controllers.WsApplicationController')
+class WsApplicationController implements ControllerMethods {
 
-	def securityService
-	def applicationService
+	ApplicationService applicationService
 
 	/**
 	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
 	 * applications for the user's current project
-	 * Check {@link UrlMappings} for the right call
 	 */
 	def listInBundle() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
+		try {
+			renderSuccessJson(list: applicationService.listInBundle(params.id))
 		}
 
-		def currentProject = securityService.getUserCurrentProject()
-
-		try {
-			def results = applicationService.listInBundle(params.id, loginUser, currentProject)
-			render(ServiceResults.success(['list' : results]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+		catch (e) {
+			handleException e, logger
 		}
 	}
 }

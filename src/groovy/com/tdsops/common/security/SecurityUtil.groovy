@@ -1,12 +1,19 @@
 package com.tdsops.common.security
 
-import org.apache.shiro.crypto.hash.Sha1Hash
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.security.spring.TdsUserDetails
+import org.springframework.security.authentication.AuthenticationTrustResolver
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.codec.Hex
+
+import java.security.MessageDigest
 import java.security.SecureRandom
-import com.tdssrc.grails.TimeUtil
-import org.apache.commons.codec.binary.Hex
 
 /**
- * Utility class containing general methods to aid in security functionality
+ * Utility class containing general methods to aid in security functionality.
+ *
+ * Note that all references to encryption or decryption actually involve hashing, not encryption.
  */
 class SecurityUtil {
 
@@ -17,72 +24,59 @@ class SecurityUtil {
 	 * @param guid a binary string value
 	 * @return The guid converted to a hex string
 	 */
-	static String guidToString( guid ) {
-		def addLeadingZero = { k ->
-			return (k <= 0xF ? '0' + Integer.toHexString(k) : Integer.toHexString(k))
-		}
-
+	static String guidToString(String guid) {
 		// Where GUID is a byte array returned by a previous LDAP search
 		// guid.each { b -> log.info "b is ${b.class}"; str += addLeadingZero( (int)b & 0xFF ) }
-		StringBuffer str = new StringBuffer()
-		for (int c=0; c < guid.size(); c++) {
-			Integer digit = guid.charAt(c)
-			str.append( addLeadingZero( digit & 0xFF ) )
+		StringBuilder str = new StringBuilder()
+		for (int c = 0; c < guid.size(); c++) {
+			appendWithLeadingZero guid.charAt(c), str
 		}
 		return str
 	}
 
-	/**
-	 * Encrypts a clear text password - using legacy SHA
-	 * @param String password
-	 * @return String Encripted passsword
-	 */
-	public static String encryptLegacy(String text) {
-		def etext = new Sha1Hash(text).toHex()
-		return etext.toString()
+	private static void appendWithLeadingZero(char c, StringBuilder sb) {
+		int k = (int)c & 0xFF
+		if (k <= 0xF) {
+			sb << '0'
+		}
+		sb << Integer.toHexString(k)
 	}
 
 	/**
-	 * Apply the new password to the userLogin, encrypt it and update
-	 * @param userLogin userLogin to apply the new password
-	 * @param password new password to use
+	 * Hashes a clear text password - using legacy SHA
+	 * @param text  the cleartext password
+	 * @return the hashed password
 	 */
-// TODO : 9/1/2015 : Remove references to applyPassword
-	public static applyPassword(userLogin, String password) {
-		throw new RuntimeException("replace with UserLogin")
+	static String encryptLegacy(String text) {
+		new String(Hex.encode(MessageDigest.getInstance('SHA1').digest(text.bytes)))
 	}
 
 	/**
-	 * Encrypts a clear text password - using SHA2
-	 * @param String password
-	 * @param String salt_key to use to hash the password
-	 * @return String Encrypted passsword
+	 * Hashes a clear text password - using SHA2
+	 * @param text  the cleartext password
+	 * @param salt_key  the salt to use to hash the password
+	 * @return the hashed password
 	 */
-	public static String encrypt(String text, String salt_key=null) {
+	static String encrypt(String text, String salt_key=null) {
 		return SHA2Codec.encode(text, salt_key)
-	}
-
-	/**
-	 * Encrypts a clear text password - using AES
-	 * @param String password
-	 * @return String Encrypted passsword
-	 */
-	public static String encryptAES(String text) {
-		return toHex(AESCodec.encode(text).bytes)
-	}
-
-	/**
-	 * Used to convert a byte[] to a hex string
-	 */
-	private static String toHex(byte[] bytesArray) {
-		return Hex.encodeHexString(bytesArray)
 	}
 
 	/**
 	 * Creates a random string
 	 */
-	public static String randomString(int len) {
+	static String randomString(int len) {
 		return new BigInteger(len * 8, randomGenerator).toString(16).substring(0, len)
 	}
 
+	// TODO BB clean these up
+
+	static boolean isLoggedIn() {
+		Authentication authentication = SecurityContextHolder.context?.authentication
+		AuthenticationTrustResolver atr = ApplicationContextHolder.getBean('authenticationTrustResolver', AuthenticationTrustResolver)
+		authentication && !atr.isAnonymous(authentication)
+	}
+
+	static TdsUserDetails getPrincipal() {
+		isLoggedIn() ? (TdsUserDetails) SecurityContextHolder.context?.authentication?.principal : null
+	}
 }

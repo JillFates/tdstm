@@ -1,88 +1,46 @@
 package com.tdsops.tm.enums.domain
 
-import MoveBundle
-import MoveEvent
-
 import com.tds.asset.Application
+import com.tdssrc.grails.NumberUtil
+import groovy.transform.CompileStatic
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
 
+@CompileStatic
 enum ContextType {
 
-    E('Event'),
-    B('Bundle'),
-    A('Application');
+	E('Event'),
+	B('Bundle'),
+	A('Application')
 
-	// Used to access the application's default value to use
-	static ContextType getDefault() {
-		return ContextType.E
-	}
+	static ContextType getDefault() { E }
 
-	//
-	// Boiler Plate from here down - Just swap out the enum class name
-	//
+	def getObject(contextId) {
+		Long id = NumberUtil.toLong(contextId)
+		if (!id) return null
 
-	String value
-	private static List keys
-	private static List labels
-
-	ContextType(String value) {
-		this.value = value
-	}	
-	
-	public Object getObject(contextId) {
-		//abstract methods are not supported
 		switch (this) {
-			case ContextType.A:
-				return Application.get(contextId)
-				break;
-			case ContextType.B:
-				return MoveBundle.get(contextId)
-				break;
-			case ContextType.E:
-				return MoveEvent.get(contextId)
-				break;
-			default:
-				throw new IllegalArgumentException('')
-				break;
+			case A: return Application.get(id)
+			case B: return MoveBundle.get(id)
+			case E: return MoveEvent.get(id)
 		}
 	}
 
-	String toString() { name() }
+	final String value
+
+	private ContextType(String label) {
+		value = label
+	}
+
 	String value() { value }
 
-	// Used to convert a string to the enum or null if string doesn't match any of the constants
-	static ContextType asEnum(key) {
-		def obj
-		try {
-			obj = key as ContextType
-		} catch (e) { }
-		return obj
+	static ContextType asEnum(String key) {
+		values().find { it.name() == key }
 	}
 
-	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
-			buildKeys()
-		return keys
-	}
+	static final List<ContextType> keys = (values() as List).asImmutable()
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
-		if (keys == null) {
-			keys = ContextType.values()
-		}
-	} 
+	static final List<String> labels = keys.collect { it.value }.asImmutable()
 
-	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
-			buildLabels()
-		return labels
-	}
-
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
-		if (labels == null) {
-			labels = ContextType.values()*.value
-		}
-	} 
+	static List<String> getLabels(String locale = 'en') { labels }
 }

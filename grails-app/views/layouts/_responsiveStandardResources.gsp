@@ -60,11 +60,9 @@
 
         <!-- -->
 
-
-        <%
-            def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-            moveEvent = MoveEvent.get(moveEventId)
-        %>
+<%
+def moveEvent = tds.currentMoveEvent() ?: null
+%>
 
         <g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
             <g:javascript src="crawler.js" />

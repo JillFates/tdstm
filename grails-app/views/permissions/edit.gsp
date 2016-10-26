@@ -1,3 +1,5 @@
+<%@page import="net.transitionmanager.domain.Permissions" %>
+<%@page import="net.transitionmanager.domain.RolePermissions" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -40,17 +42,17 @@
 									<g:each in="${Permissions.Roles.values()}" var='role'>
 										<g:if test="${RolePermissions.findByRoleAndPermission(role.toString(), permission)}">
 											<td style="text-align: center;background-color:lightGreen;">
-												<input type="checkbox" name="role_${permission.id}_${role.toString()}" checked="checked"> 
+												<input type="checkbox" name="role_${permission.id}_${role.toString()}" checked="checked">
 											</td>
 										</g:if>
 										<g:else>
 											<td style="text-align: center;">
-												<input type="checkbox" name="role_${permission.id}_${role.toString()}"> 
+												<input type="checkbox" name="role_${permission.id}_${role.toString()}">
 											</td>
 										</g:else>
 									</g:each>
-									<td style="text-align: center;"> 
-									  <input type="text" name="description_${permission.id}" value="${permission.description}" style="width:350px"> 
+									<td style="text-align: center;">
+									  <input type="text" name="description_${permission.id}" value="${permission.description}" style="width:350px">
 									</td>
 								</tr>
 							</g:each>
@@ -70,7 +72,7 @@
 	currentMenuId = "#adminMenu";
 	$('.menu-admin-role').addClass('active');
 	$('.menu-parent-admin').addClass('active');
-	
+
 	// handle the scrolling header
 	var headTable;
 	var scrollLimit;
@@ -79,13 +81,13 @@
 	$(window).scroll( function() {
 		handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
 	});
-	
+
 	$(document).ready(function() {
 		// for IE
 		$('#editPermissionsTableId tr').each(function (i, o) {
 			$(o).height($(o).height());
 		});
-		
+
 		headTable = $('#editPermissionsTableId');
 		scrollLimit = headTable.offset().top;
 		header = $('#headerRowId');

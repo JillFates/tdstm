@@ -26,8 +26,7 @@
 <g:javascript src="jquery-migrate-1.0.0.js"/>
 
 <%
-def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-moveEvent = MoveEvent.get(moveEventId)
+def moveEvent = tds.currentMoveEvent()
 /*Date date = new Date()
 def showCrawler = false
 if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){

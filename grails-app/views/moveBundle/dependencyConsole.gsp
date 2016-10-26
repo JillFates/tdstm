@@ -1,23 +1,21 @@
-<%@page import="com.tds.asset.AssetEntity;"%>
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 		<meta name="layout" content="topNav" />
 		<title>Dependency Analyzer</title>
-		
+
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-progressbar.css')}" />
-		
+
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="projectStaff.js" />
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="progressBar.js" />
-		
+
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.js"/>
@@ -35,7 +33,7 @@
 			<div id="dependencyTitle" style="float: left;">
 				<h1>Dependency Analyzer</h1>
 			</div>
-			
+
 			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
 				<div id="checkBoxDivId">
 					<g:form name="checkBoxForm">
@@ -72,22 +70,22 @@
 					</g:form>
 				</div>
 			</div>
-			
-			
+
+
 			<div style="clear: both;"></div>
-			
+
 			<div id = "dependencyBundleDetailsId" >
 				<g:render template="dependencyBundleDetails" />
 			</div>
-			
+
 			<div style="clear: both;"></div>
-			
+
 			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
 				<g:form name="changeBundle" action="saveAssetsToBundle" >
-						
+
 					<input type="hidden" name="assetVal" id="assetVal" />
 					<input type="hidden" name="assetType" id="assetsTypeId"  />
-					<input type="hidden" name="bundleSession" id="bundleSession" /> 
+					<input type="hidden" name="bundleSession" id="bundleSession" />
 					<table style="border: 0px;">
 						<tr>
 							<td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
@@ -204,33 +202,33 @@
 			var ajaxRequest;
 			// Used to keep track of Color By on the dependency map
 			var currentColorBy;
-			
+
 			function getList(value,dependencyBundle, force, distance, labels) {
 				$('#moveBundleSelectId').dialog("close")
 				var id = 'all'
 				if(dependencyBundle != null) id = dependencyBundle
-				
+
 				$('.depGroupSelected').removeClass('depGroupSelected').removeClass('selectedGroup')
 				$('.app_count').removeClass('app_count').removeClass('selectedGroup')
 				$('.server_count').removeClass('server_count').removeClass('selectedGroup')
 				$('.vm_count').removeClass('vm_count').removeClass('selectedGroup')
 				$('.db_count').removeClass('db_count').removeClass('selectedGroup')
 				$('.file_count').removeClass('file_count').removeClass('selectedGroup')
-				
+
 				$('#span_'+id).addClass('depGroupSelected').addClass('selectedGroup')
 				$('#app_'+id).addClass('app_count').addClass('selectedGroup')
 				$('#server_'+id).addClass('server_count').addClass('selectedGroup')
 				$('#vm_'+id).addClass('vm_count').addClass('selectedGroup')
 				$('#db_'+id).addClass('db_count').addClass('selectedGroup')
 				$('#file_'+id).addClass('file_count').addClass('selectedGroup')
-				
+
 				$('.tabs li').removeClass('active');
 				var fullscreen = GraphUtil.isFullscreen();
-				
+
 				// abort the last ajax request if it still hasn't completed
 				if (ajaxRequest)
 					ajaxRequest.abort();
-				
+
 				switch (value) {
 					case "server" :
 						$('#serverli').addClass('active');
@@ -265,7 +263,7 @@
 						$('#graphli').addClass('active');
 						break;
 				}
-				
+
 				var spinnerDiv = $('#spinnerDivId').clone().css('display','block');
 				if (value != "graph") {
 					GraphUtil.disableFullscreen();
@@ -280,12 +278,12 @@
 					}
 					$('#items1 .tabInner').html(spinnerDiv);
 				} else {
-					
+
 					var svgElement = $('#svgContainerId');
 					if (svgElement.size() > 0) {
 						var leftPosition = svgElement.offset().left,
 							topPosition = svgElement.offset().top;
-						
+
 						if (fullscreen) {
 							spinnerDiv.css('background-color', '#ffffff');
 							leftPosition = $('#toolsContainerId').offset().left;
@@ -303,7 +301,7 @@
 						$('#items1 .tabInner').html(spinnerDiv);
 					}
 				}
-				
+
 			}
 
 			function openStatusColors() {
@@ -360,14 +358,14 @@
 				var sortBy = $("#sortBy").val()
 				var orderBy = $("#orderBy").val() != 'asc' ? 'asc' : 'desc'
 				orderBy = (sortBy == sort) ? orderBy : 'asc'
-				
+
 				// abort the last ajax request if it still hasn't completed
 				if (ajaxRequest)
 					ajaxRequest.abort();
-				
+
 				ajaxRequest = ${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'"entity=" + value + "&dependencyBundle=" + dependencyBundle + "&bundle=" + bundle + "&sort=" + sort + "&orderBy=" + orderBy', onComplete:'listUpdate(XMLHttpRequest)') }
 			}
-			
+
 			function setGroupTablePosition () {
 				var windowWidth = $(window).width();
 				var dependencyDiv = $('#dependencyDivId')
@@ -379,23 +377,23 @@
 				else
 					dependencyDiv.css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
 			}
-			
+
 			$(document).ready(function () {
 				// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
 				$('#graphSVGContainer').append(appSVGShapes.getAll());
 			});
-			
+
 		</script>
-		
+
 		<script type="text/javascript">
-			
+
 			( function($) {
-				
+
 				$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
-				
+
 				$("#moveBundleSelectId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
-				
+
 				currentMenuId = "#assetMenu";
 				$(".menu-parent-assets-dependency-analyzer").addClass('active');
 				$(".menu-parent-assets").addClass('active');
@@ -404,7 +402,7 @@
 					setGroupTablePosition();
 				});
 			})(jQuery);
-			
+
 		</script>
 		<div style="display: none;" id="graphSVGContainer"></div>
 	</body>

@@ -1,11 +1,13 @@
-import grails.converters.JSON
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.UserPreferenceService
+import grails.plugin.springsecurity.annotation.Secured
 
-class CookbookController {
+@Secured('isAuthenticated()')
+class CookbookController implements ControllerMethods {
 
-	def userPreferenceService
+	UserPreferenceService userPreferenceService
 
 	def index() {
-		render(view: 'index', model: ['userPreferenceService': userPreferenceService])
+		[userPreferenceService: userPreferenceService]
 	}
-
 }

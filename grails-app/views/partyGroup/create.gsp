@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.PartyType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -49,7 +50,7 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> -->
-                        
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                 	<input  type="hidden" name="partyType.id" value="COMPANY"/>
@@ -63,8 +64,8 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="comment">Comment:</label>
@@ -77,7 +78,7 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr> 
+                            </tr>
 
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -86,7 +87,7 @@
                                 <td valign="top">
                                     <input type="checkbox" name="partner" value="Y"> <span style="padding-left: 5px"><b>Note:</b><i>Partners can participate on projects of other companies</i></span>
                                 </td>
-                            </tr> 
+                            </tr>
 
                         </tbody>
                     </table>

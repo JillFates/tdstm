@@ -1,92 +1,96 @@
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.PasswordResetType
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import org.apache.shiro.SecurityUtils
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.RoleType
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.AuditService
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.service.UserPreferenceService
+import org.springframework.jdbc.core.JdbcTemplate
 
-class UserLoginController {
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class UserLoginController implements ControllerMethods {
 
-	def partyRelationshipService
-	def userPreferenceService
-	def securityService
-	def projectService
-	def jdbcTemplate
-	def controllerService
-	def auditService
-	def personService
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-	def index() { redirect(action:"list",params:params) }
+	AuditService auditService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	ProjectService projectService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
-	// the delete, save and update actions only accept POST requests
-	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-
+	@HasPermission('UserLoginView')
 	def list() {
-		if (!controllerService.checkPermission(this, "UserLoginView"))
-			return
 
 		def listJsonUrl
 
 		def companyId = params.companyId ?: 'All'
-		if(companyId && companyId != 'All'){
-			def map = [controller:'userLogin', action:'listJson', id:"${companyId}"]
-			listJsonUrl = HtmlUtil.createLink(map)
+		if (companyId != 'All') {
+			listJsonUrl = createLink(controller: 'userLogin', action: 'listJson', id: companyId)
 		} else {
-			def map = [controller:'userLogin', action:'listJson']
-			listJsonUrl = HtmlUtil.createLink(map)+'/All'
+			listJsonUrl = createLink(controller: 'userLogin', action: 'listJson') + '/All'
 		}
 
-		if(params.activeUsers){
-			 session.setAttribute("InActive", params.activeUsers)
-		}
-		def project = securityService.getUserCurrentProject()
-		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
-		if(!active){
-			active = 'Y'
+		if (params.activeUsers) {
+			 session.setAttribute('InActive', params.activeUsers)
 		}
 
-		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort { a, b -> a.name.compareToIgnoreCase b.name }
+		def partyGroupList = PartyGroup.findAllByPartyType(PartyType.read("COMPANY")).sort { a, b -> a.name.compareToIgnoreCase b.name }
 
-		return [companyId:companyId ,partyGroupList:partyGroupList,listJsonUrl:listJsonUrl]
+		[companyId: companyId, partyGroupList: partyGroupList,listJsonUrl: listJsonUrl]
 	}
 
+	@HasPermission('UserLoginView')
 	def listJson() {
-		if (!controllerService.checkPermission(this, "UserLoginView"))
-			return
+		String sortIndex = params.sidx ?: 'username'
+		String sortOrder  = params.sord ?: 'asc'
+		int maxRows = params.int('rows', 25)
+		int currentPage = params.int('page', 1)
+		int rowOffset = (currentPage - 1) * maxRows
 
-		def sortIndex = params.sidx ?: 'username'
-		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows?:'25')
-		def currentPage = Integer.valueOf(params.page?:'1')
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def companyId
-		def userLoginInstanceList
-		def userLogin = securityService.getUserLogin()
-		def filterParams = ['username':params.username, 'fullname':params.fullname, 'roles':params.roles, 'company':params.company,
-			'lastLogin':params.lastLogin, 'dateCreated':params.dateCreated, 'expiryDate':params.expiryDate]
+		List<UserLogin> userLogins
+		def filterParams = [username: params.username, fullname: params.fullname, roles: params.roles, company: params.company,
+		                    lastLogin: params.lastLogin, dateCreated: params.dateCreated, expiryDate: params.expiryDate]
 
 		// Validate that the user is sorting by a valid column
-		if ( ! sortIndex in filterParams)
+		if (!sortIndex in filterParams) {
 			sortIndex = 'username'
+		}
 
 		def presentDate = TimeUtil.nowGMTSQLFormat()
 
-		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
+		def active = params.activeUsers ?: session.getAttribute("InActive")
 		if (!active) {
 			active = 'Y'
 		}
 
 		// Search valid roles to display
-		def systemRoles = securityService.getSecurityRoleTypes()
 		def systemRolesList = []
-		systemRoles.each { sr ->
-			systemRolesList << "'${sr.id}'"
+		for (RoleType sr in securityService.securityRoleTypes) {
+			systemRolesList << "'$sr.id'"
 		}
 
-		def query = new StringBuffer("""SELECT * FROM ( SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
+		def query = new StringBuffer("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
 			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId, u.is_local AS isLocal, u.locked_out_until AS locked, u.failed_login_attempts AS failedAttempts
 			FROM party_role pr
@@ -95,256 +99,233 @@ class UserLoginController {
 			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
 				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pr.party_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
-			WHERE role_type_id in (${systemRolesList.join(", ")}) AND u.active = '${active}'""")
+			WHERE role_type_id in (${systemRolesList.join(", ")}) AND u.active = '$active'""")
 		if (active=='Y')
-			query.append(" AND u.expiry_date > '${presentDate}' ")
+			query.append(" AND u.expiry_date > '$presentDate' ")
 		else
-			query.append(" OR u.expiry_date < '${presentDate}' ")
-		if (RolePermissions.hasPermission("ShowAllUsers")) {
+			query.append(" OR u.expiry_date < '$presentDate' ")
+		if (securityService.hasPermission("ShowAllUsers")) {
 			if (params.id && params.id != "All") {
 				// If companyId is requested
 				companyId = params.id
 			}
 			if (!companyId && params.id != "All") {
 				// Still if no companyId found trying to get companyId from the session
-				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+				companyId = userPreferenceService.getPreference(PREF.PARTY_GROUP)
 				if (!companyId) {
 					// Still if no luck setting companyId as logged-in user's companyId .
-					def person = userLogin.person
-					companyId = person.company.id
+					companyId = securityService.userLoginPerson.company.id
 				}
 			}
 			if (companyId) {
 				query.append(" AND pg.party_group_id = $companyId ")
 			}
-			//query.append(" GROUP BY pr.party_id ORDER BY pr.role_type_id, pg.name, first_name, last_name ) as users")
+			//query.append(" GROUP BY pr.party_id ORDER BY pr.role_type_id, pg.name, first_name, last_name) as users")
 			query.append(" GROUP BY pr.party_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
 
 			// Handle the filtering by each column's text field
 			def firstWhere = true
-			filterParams.each {
-				if (it.getValue())
+			for (it in filterParams) {
+				if (it.value) {
 					if (firstWhere) {
-						query.append(" WHERE users.${it.getKey()} LIKE '%${it.getValue()}%'")
+						query.append(" WHERE users.$it.key LIKE '%$it.value%'")
 						firstWhere = false
-					} else {
-						query.append(" AND users.${it.getKey()} LIKE '%${it.getValue()}%'")
 					}
+					else {
+						query.append(" AND users.$it.key LIKE '%$it.value%'")
+					}
+				}
 			}
 			log.debug "listJson() Query for User Login List: $query"
-			userLoginInstanceList = jdbcTemplate.queryForList(query.toString())
+			userLogins = jdbcTemplate.queryForList(query.toString())
 		} else {
-			userLoginInstanceList = []
+			userLogins = []
 		}
 
 		// Limit the returned results to the user's page size and number
-		def totalRows = userLoginInstanceList.size()
+		def totalRows = userLogins.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 		if (totalRows > 0)
-			userLoginInstanceList = userLoginInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+			userLogins = userLogins[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
 		else
-			userLoginInstanceList = []
+			userLogins = []
 
-		def map = [controller:'userLogin', action:'listJson', id:"${params.companyId}"]
-		def listJsonUrl = HtmlUtil.createLink(map)
-		def acceptIconUrl = HtmlUtil.resource([dir: 'icons', file: 'accept.png', absolute: false])
-		def acceptImgTag = '<img src="' + acceptIconUrl + '"></img>'
+		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
 
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
-		def results = userLoginInstanceList?.collect {
-			[ cell: [ [id:it.userLoginId, username:it.username, lockedOutUntil:it.locked, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts:it.failedAttempts],
-			'<a href="'+HtmlUtil.createLink([controller:'userLogin', action:'show', id:"${it.userLoginId}"])+'">'+it.username+'</a>',
-			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>',
-			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate ], id: it.userLoginId ]}
+		def results = userLogins?.collect {
+			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts: it.failedAttempts],
+			'<a href="' + createLink(controller: 'userLogin', action: 'show', id: it.userLoginId) + '">' + it.username + '</a>',
+			'<a href="javascript: Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.fullname + '</a>',
+			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate], id: it.userLoginId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
 	}
 
+	@HasPermission('UserLoginView')
 	def show() {
-		if (!controllerService.checkPermission(this, "UserLoginView"))
-			return
-
-		def userLoginInstance = UserLogin.get( params.id )
+		UserLogin showUser = UserLogin.get(params.id)
 		def companyId = params.companyId
-		if(!userLoginInstance) {
-			flash.message = "UserLogin not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ] )
-		} else {
-			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-			def assignedRoles = userPreferenceService.getAssignedRoles( userLoginInstance.person )
-			def canResetByAdmin = userLoginInstance.canResetPasswordByAdmin(securityService.getUserLoginPerson())
-			def cellValue = [id:userLoginInstance.id, username:userLoginInstance.username, lockedOutUntil:userLoginInstance.lockedOutUntil, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), userLoginInstance.lockedOutUntil), failedLoginAttempts:userLoginInstance.failedLoginAttempts] as JSON
-			return [ userLoginInstance : userLoginInstance, companyId:companyId, roleList:roleList, assignedRoles:assignedRoles, cellValue:cellValue, canResetPasswordByAdmin: canResetByAdmin ]
+		if (!showUser) {
+			flash.message = "UserLogin not found with id $params.id"
+			redirect(action: "list", params: [id: companyId])
+			return
 		}
+
+		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+		def cellValue = [id: showUser.id, username: showUser.username,
+		                 lockedOutUntil: showUser.lockedOutUntil,
+		                 lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), showUser.lockedOutUntil),
+		                 failedLoginAttempts: showUser.failedLoginAttempts] as JSON
+		[userLoginInstance: showUser, companyId: companyId, roleList: roleList,
+		 assignedRoles: securityService.getAssignedRoles(showUser.person),
+		 cellValue: cellValue, canResetPasswordByAdmin: showUser.canResetPasswordByAdmin()]
 	}
 
+	@HasPermission('UserLoginDelete')
 	def delete() {
-		if (!controllerService.checkPermission(this, "UserLoginDelete"))
-			return
-
-		def userLoginInstance = UserLogin.get( params.id )
+		def deleteUser = UserLogin.get(params.id)
 		def companyId = params.companyId
-		if(userLoginInstance) {
-			userPreferenceService.deleteSecurityRoles(userLoginInstance.person)
-			userLoginInstance.delete(flush:true)
-			flash.message = "UserLogin ${userLoginInstance} deleted"
-			redirect( action:"list", params:[ id:companyId ] )
+		if (deleteUser) {
+			securityService.deleteSecurityRoles(deleteUser.person)
+			deleteUser.delete(flush: true)
+			flash.message = "UserLogin $deleteUser deleted"
 		}
 		else {
-			flash.message = "UserLogin not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ] )
+			flash.message = "UserLogin not found with id $params.id"
 		}
+		redirect(action: "list", params: [id: companyId])
 	}
+
 	/*
 	 *  Return userdetails and roles to Edit form
 	 */
+	@HasPermission('EditUserLogin')
 	def edit() {
-		if (!controllerService.checkPermission(this, "EditUserLogin"))
-			return
-
-		def userLoginInstance = UserLogin.get( params.id )
+		UserLogin editUser = UserLogin.get(params.id)
 		def companyId = params.companyId
-		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
 
-		if(!userLoginInstance) {
-			flash.message = "UserLogin not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ] )
-		} else {
-			def currentUser = securityService.getUserLogin()
-			def person = userLoginInstance.person
-			def availableRoles = userPreferenceService.getAvailableRoles( person )
-			def assignedRoles = userPreferenceService.getAssignedRoles( person )
-			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-			PartyGroup company = userLoginInstance.person.getCompany()
-			def projectList = projectService.getProjectsForCompany(company)
-			def projectId = userPreferenceService.getPreferenceByUserAndCode(userLoginInstance, PREF.CURR_PROJ)
-			def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level
-			def isCurrentUserLogin = (currentUser.id == userLoginInstance.id)
-			return [ userLoginInstance : userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId, roleList:roleList,
-					projectList:projectList,  projectId:projectId, minPasswordLength:minPasswordLength, maxLevel: maxLevel, isCurrentUserLogin: isCurrentUserLogin ]
+		if (!editUser) {
+			flash.message = "UserLogin not found with id $params.id"
+			redirect(action: "list", params: [id: companyId])
+			return
 		}
+
+		def person = editUser.person
+		def availableRoles = securityService.getAvailableRoles(person)
+		def assignedRoles = securityService.getAssignedRoles(person)
+		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+		def projectList = personService.getAvailableProjects(person, null, false, new Date() - 30)
+		def projectId = userPreferenceService.getPreference(editUser, PREF.CURR_PROJ)
+		def maxLevel = securityService.getMaxAssignedRole(securityService.loadCurrentPerson()).level
+		def isCurrentUserLogin = securityService.currentUserLoginId == editUser.id
+		def minPasswordLength = securityService.userLocalConfig.minPasswordLength ?: 8
+
+		[userLoginInstance: editUser, availableRoles: availableRoles, assignedRoles: assignedRoles,
+		 companyId: companyId, roleList: roleList, projectList: projectList,  projectId: projectId,
+		 minPasswordLength: minPasswordLength, maxLevel: maxLevel, isCurrentUserLogin: isCurrentUserLogin]
 	}
 
 	/*
 	 * update user details and set the User Roles to the Person
 	 */
 	def update() {
-		UserLogin byWhom = securityService.getUserLogin()
 		UserLogin userLogin
-		String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		String errMsg
 		try {
-			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, byWhom, tzId, false)
-		} catch (UnauthorizedException e) {
-			errMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			errMsg = e.getMessage()
-		} catch (DomainUpdateException e) {
-			errMsg = e.getMessage()
-		} catch (e) {
-			log.error "update() failed : " + ExceptionUtil.stackTraceToString(e)
+			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, false)
+		}
+		catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+			errMsg = e.message
+		}
+		catch (e) {
+			log.error "update() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = 'An error occurred the prevented the update of the user'
 		}
 
 		if (errMsg) {
 			flash.message = errMsg
-			Map model = [ companyId:params.companyId, personId: params.personId, projectId: params.projectId]
-			redirect( action:"edit", id:params.id, params:model)
+			Map model = [companyId: params.companyId, personId: params.personId, projectId: params.projectId]
+			redirect(action: "edit", id: params.id, params: model)
 			/*
 			Person person = userLogin?.person
-			List availableRoles = userPreferenceService.getAvailableRoles( person )
-			List assignedRoles = userPreferenceService.getAssignedRoles( person )
-			render( view: 'edit', model: [
-				userLogin:userLogin,
-				vailableRoles:availableRoles,
-				assignedRoles:assignedRoles,
+			List availableRoles = securityService.getAvailableRoles(person)
+			List assignedRoles = securityService.getAssignedRoles(person)
+			render(view: 'edit', model: [
+				userLogin: userLogin,
+				vailableRoles: availableRoles,
+				assignedRoles: assignedRoles,
 				companyId: params.companyId
 			])
 			*/
-		} else {
-			flash.message = "UserLogin ${userLogin} updated"
-			redirect( action:"show", id:userLogin.id, params:[ companyId:params.companyId ] )
+		}
+		else {
+			flash.message = "UserLogin $userLogin updated"
+			redirect(action: "show", id: userLogin.id, params: [companyId: params.companyId])
 		}
 	}
 
 	// set the User Roles to the Person
 	def addRoles() {
-			def assignedRoles = params.assignedRoleId.split(',')
-			def person = params.person
-			def actionType = params.actionType
-			if(actionType != "remove"){
-				userPreferenceService.setUserRoles(assignedRoles, person)
-			} else {
-				userPreferenceService.removeUserRoles(assignedRoles, person)
-			}
+		List<String> assignedRoles = params.assignedRoleId.split(',') as List
+		if (params.actionType != "remove") {
+			securityService.setUserRoles(assignedRoles, params.long('person'))
+		}
+		else {
+			securityService.removeUserRoles(assignedRoles, params.person)
+		}
 		render true
 	}
 
 	// return userlogin details to create form
+	@HasPermission('CreateUserLogin')
 	def create() {
-		if (!controllerService.checkPermission(this, "CreateUserLogin"))
-			return
-
-		def personId = params.id
-		def companyId = params.companyId
-		def person
-		if ( personId != null ) {
-			person = Person.get( personId )
+		Person person
+		if (params.id) {
+			person = Person.get(params.id)
 			if (person.lastName == null) {
 				person.lastName = ""
 			}
 		}
 
-		def now = TimeUtil.nowGMT()
-
-		def userLoginInstance = new UserLogin()
-		userLoginInstance.properties = params
-		def expiryDate = new Date(now.getTime() + 7776000000) // 3 Months
-		userLoginInstance.expiryDate = expiryDate
+		UserLogin createUser = new UserLogin(params)
+		createUser.expiryDate = new Date(System.currentTimeMillis() + 7776000000) // 3 Months
 		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.level desc ")
-		def project = securityService.getUserCurrentProject()
+		Person currentPerson = securityService.userLoginPerson
 
-		def currentUser = securityService.getUserLogin()
-		PartyGroup company = currentUser.person.getCompany()
-		def projectList = projectService.getProjectsForCompany(company)
-		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
-		def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level
-		return ['userLoginInstance':userLoginInstance, personInstance:person, companyId:companyId, roleList:roleList, projectList:projectList,
-			 	project:project, minPasswordLength:minPasswordLength, maxLevel: maxLevel]
+		[userLoginInstance: createUser, personInstance: person, companyId: params.companyId,
+		 roleList: roleList, projectList: projectService.getProjectsForCompany(currentPerson.company),
+		 minPasswordLength: securityService.userLocalConfig.minPasswordLength ?: 8,
+		 project: securityService.userCurrentProject, maxLevel: securityService.getMaxAssignedRole(currentPerson).level]
 	}
+
 	/*
 	 *  Save the User details and set the user roles for Person
 	 */
+	@HasPermission('CreateUserLogin')
 	def save() {
-		if (!controllerService.checkPermission(this, "CreateUserLogin"))
-			return
-
-		UserLogin byWhom = securityService.getUserLogin()
-		UserLogin userLogin
-		String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		UserLogin newUserLogin
 		String errMsg
 
 		try {
-			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, byWhom, tzId, true)
-		} catch (UnauthorizedException e) {
-			errMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			errMsg = e.getMessage()
-		} catch (DomainUpdateException e) {
-			errMsg = e.getMessage()
-		} catch (e) {
-			log.error "save() failed : " + ExceptionUtil.stackTraceToString(e)
+			newUserLogin = securityService.createOrUpdateUserLoginAndPermissions(params, true)
+		}
+		catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+			errMsg = e.message
+		}
+		catch (e) {
+			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = 'An error occurred that prevents creates a user'
 		}
 
 		if (errMsg) {
 			flash.message = errMsg
-			Map model = [ companyId:params.companyId ]
-			redirect( action:"create", id:params.personId, params:model)
-		} else {
-			flash.message = "UserLogin ${userLogin} created"
-			redirect( action:"show", id:userLogin.id, params:[ companyId:params.companyId ] )
+			redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
+		}
+		else {
+			flash.message = "UserLogin $newUserLogin created"
+			redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
 		}
 
 	}
@@ -353,14 +334,11 @@ class UserLoginController {
 	 *  Update recent page load time into userLogin
 	 *=====================================================*/
 	def updateLastPageLoad() {
-		def principal = SecurityUtils.subject?.principal
-		if( principal ){
-			def userLogin = UserLogin.findByUsername( principal )
-			if(userLogin){
-				userLogin.lastPage = TimeUtil.nowGMT()
-				userLogin.save(flush:true)
-				session.REDIRECT_URL = params.url
-			}
+		UserLogin userLogin = securityService.userLogin
+		if (userLogin) {
+			userLogin.lastPage = TimeUtil.nowGMT()
+			userLogin.save(flush: true)
+			session.REDIRECT_URL = params.url
 		}
 		render "SUCCESS"
 	}
@@ -369,11 +347,8 @@ class UserLoginController {
 	 * The 1st phase of user changing password during the forced password change process
 	 */
 	def changePassword() {
-		def principal = SecurityUtils.subject?.principal
-		def userLoginInstance = UserLogin.findByUsername(principal)
-		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
-		render(view:'changePassword',model:[ userLoginInstance:userLoginInstance, minPasswordLength:minPasswordLength])
-		return [ userLoginInstance : userLoginInstance]
+		[userLoginInstance: securityService.userLogin,
+		 minPasswordLength: securityService.getUserLocalConfig().minPasswordLength ?: 8]
 	}
 
 	/**
@@ -381,22 +356,20 @@ class UserLoginController {
 	 * The new password will be saved during this call.
 	 */
 	def updatePassword() {
-		def subject = SecurityUtils.subject
-		def principal = subject.principal
-		def userLoginInstance = UserLogin.findByUsername(principal)
+		UserLogin userLogin = securityService.userLogin
 		String msg
 		try {
 			while (true) {
-				if (! userLoginInstance) {
+				if (!userLogin) {
 					msg = 'Failed to load your user account'
 					break
 				}
 
 				try {
 					// See if the user account is properly configured to a state that they're allowed to change their password
-					securityService.validateAllowedToChangePassword(userLoginInstance)
-				} catch (e) {
-					def emsg = e.getMessage()
+					securityService.validateAllowedToChangePassword(userLogin)
+				}
+				catch (e) {
 					msg = "You are not allowed to change your password at this time."
 					break
 				}
@@ -404,45 +377,45 @@ class UserLoginController {
 				//
 				// Made it throught the guantlet of password requirements so lets update the password
 				//
-				securityService.setUserLoginPassword(userLoginInstance, params.password)
+				securityService.setUserLoginPassword(userLogin, params.password)
 
-				if (!userLoginInstance.validate() || !userLoginInstance.save()) {
-					log.warn "updatePassword() failed to update user password for $userLoginInstance : " + GormUtil.allErrorsString(userLoginInstance)
+				if (!userLogin.save()) {
+					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
 					msg = 'An error occured while trying to save your password'
 					break
-				} else {
-					auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged(userLoginInstance))
+				}
+				else {
+					auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged())
 				}
 
 				flash.message = "Password was successfully updated"
-				redirect(controller:'project', action:'show', params:[ userLoginInstance:userLoginInstance ])
+				redirect(controller: 'project', action: 'show', params: [userLoginInstance: userLogin])
 				break
 			}
-		} catch (InvalidParamException e) {
-			msg = e.getMessage()
-		} catch (DomainUpdateException e) {
-			msg = e.getMessage()
-		} catch (e) {
+		}
+		catch (InvalidParamException | DomainUpdateException e) {
+			msg = e.message
+		}
+		catch (e) {
 			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			msg = 'An error occurred during the update process'
 		}
 
 		if (msg) {
 			flash.message = msg
-			redirect(action:'changePassword', params:[ userLoginInstance:userLoginInstance ])
+			redirect(action: 'changePassword', params: [userLoginInstance: userLogin])
 		}
 	}
 
 	/**
-	 * This method triggers the password reset on a selected account.
+	 * Triggers the password reset on a selected account.
 	 */
-	def sendPasswordReset = {
-		def userLogin = UserLogin.get(params.id)
-		if(userLogin.canResetPasswordByAdmin(securityService.getUserLoginPerson())){
-			def emailParams = [sysAdminEmail : securityService.getUserLogin().person.email, username: userLogin.username]
-			securityService.sendResetPasswordEmail(userLogin.person.email, request.getRemoteAddr(), PasswordResetType.ADMIN_RESET, emailParams)
-		}else{
-
+	def sendPasswordReset() {
+		UserLogin userLogin = UserLogin.get(params.id)
+		if (userLogin.canResetPasswordByAdmin()) {
+			def emailParams = [sysAdminEmail: securityService.userLoginPerson.email, username: userLogin.username]
+			securityService.sendResetPasswordEmail(userLogin.person.email, request.getRemoteAddr(),
+					PasswordResetType.ADMIN_RESET, emailParams)
 		}
 		def msg = [success: true]
 		render msg as JSON

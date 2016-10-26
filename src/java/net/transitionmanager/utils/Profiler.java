@@ -274,7 +274,7 @@ public class Profiler  {
 
 	private void lap(LOG_TYPE ltype, String tag, String msg, ArrayList args){
 		TimeDuration duration;
-		StringBuffer sb = new StringBuffer("[");
+		StringBuilder sb = new StringBuilder("[");
 		if (tag != null) {
 			sb.append(tag);
 			// text += tag;
@@ -292,10 +292,10 @@ public class Profiler  {
 		}
 
 		// text += "] (" + duraStr + ")";
-		sb.append("] (" + duraStr + ")");
+		sb.append("] (").append(duraStr).append(")");
 		if(StringUtils.isNotBlank(msg)) {
 			// text += ": " + msg;
-			sb.append(": " + msg);
+			sb.append(": ").append(msg);
 		}
 		// logPrefix(ltype, "LAP", text, args);
 		logPrefix(ltype, "LAP", sb.toString(), args);

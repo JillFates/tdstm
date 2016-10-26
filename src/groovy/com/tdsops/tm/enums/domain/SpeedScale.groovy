@@ -1,73 +1,39 @@
-/**
- * The SpeedScale represents the speed scale or unit of measure used to represent the speed of a resource
- */
-
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
+/**
+ * Represents the speed scale or unit of measure used to represent the speed of a resource.
+ */
+@CompileStatic
 enum SpeedScale {
 
-	Kbps ('Kilobit/sec'),
-	KBps ('KiloByte/sec'),
-	Mbps ('Megabit/sec'),
-	MBps ('MegaByte/sec'),
-	Gbps ('Gigabit/sec'),
-	GBps ('GigaByte/sec')
+	Kbps('Kilobit/sec'),
+	KBps('KiloByte/sec'),
+	Mbps('Megabit/sec'),
+	MBps('MegaByte/sec'),
+	Gbps('Gigabit/sec'),
+	GBps('GigaByte/sec')
 
-	// Used to access the application's default value to use
-	static SpeedScale getDefault() {
-		return SpeedScale.MBps
+	static SpeedScale getDefault() { MBps }
+
+	final String value
+
+	private SpeedScale(String label) {
+		value = label
 	}
 
-	//
-	// Boiler Plate from here down ('Just swap out the enum class name
-	//
-
-	String value
-	private static List keys
-	private static List labels
-
-	SpeedScale(String value) {
-		this.value = value
-	}	
-
-	String toString() { name() }
 	String value() { value }
 
-	// Used to convert a string to the enum or null if string doesn't match any of the constants
-	static SpeedScale asEnum(key) {
-		def obj
-		try {
-			obj = key as SpeedScale
-		} catch (e) { }
-		return obj
+	String toString() { name() }
+
+	static SpeedScale asEnum(String key) {
+		values().find { it.name() == key }
 	}
 
-	// Returns the keys of the enum keys
-	static List getKeys() { 
-		if (keys == null) 
-			buildKeys()
-		return keys
-	}
+	static final List<SpeedScale> keys = (values() as List).asImmutable()
 
-	// Construct the static keys 
-	private static synchronized void buildKeys() { 
-		if (keys == null) {
-			keys = SpeedScale.values()
-		}
-	} 
+	static final List<String> labels = keys.collect { it.value }.asImmutable()
 
-	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') { 
-		if (labels == null) 
-			buildLabels()
-		return labels
-	}
-
-	// Construct the static labels 
-	private static synchronized void buildLabels() { 
-		if (labels == null) {
-			labels = SpeedScale.values()*.value
-		}
-	} 
-
+	static List<String> getLabels(String locale = 'en') { labels }
 }

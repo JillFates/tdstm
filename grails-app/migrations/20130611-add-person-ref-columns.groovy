@@ -1,6 +1,9 @@
-import org.apache.commons.lang.StringUtils
-
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.PartyRelationshipType
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.RoleType
+import org.apache.commons.lang.StringUtils
 
 /**
  * This Changelog is written to add column for sme, sme2 and app_owner to use person reference. 

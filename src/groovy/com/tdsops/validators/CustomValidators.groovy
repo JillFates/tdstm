@@ -1,6 +1,8 @@
 package com.tdsops.validators
 
 import com.tds.asset.AssetOptions
+import com.tdssrc.grails.GormUtil
+import org.springframework.validation.Errors
 
 class CustomValidators {
 
@@ -11,25 +13,27 @@ class CustomValidators {
 	 * @param fieldName the field name
 	 * @return the custom validator
 	 */
-	public static inList(aListClosure, fieldName) {
+	static Closure inList(Closure aListClosure, String fieldName) {
 		// value = user input
-		// object = the domain object
+		// object = the domain instance or comment object
 		// errors = Spring error object
-		return { value, object, errors ->
+		return { value, object, Errors errors ->
 
 			// Get the list of values from the list Closure
-			def validValues = aListClosure.call()
+			List<String> validValues = aListClosure.call()
 
 			// Determine if the field supports blank and nullable
-			def blank = object.constraints[fieldName].blank
-			def nullable = object.constraints[fieldName].nullable
+			def blank = GormUtil.getConstraintValue(object.getClass(), fieldName, 'blank')
+			def nullable = GormUtil.getConstraintValue(object.getClass(), fieldName, 'nullable')
 
-			if ( (value == null && nullable && blank) || (value == '' && blank)  || validValues.contains(value.toString()) ) {
-				return true
-			} else {
-				errors.rejectValue(fieldName, "${fieldName}.notInList", "Value '${value}' for property '${fieldName}' is invalid, options are: ${validValues.join(', ')}")
-				return false
+			if ((value == null && nullable && blank) ||
+			    (value == '' && blank) ||
+			     value.toString() in validValues) {
+				return
 			}
+
+			errors.rejectValue(fieldName, fieldName + '.notInList',
+				"Value '$value' for property '$fieldName' is invalid, options are: ${validValues.join(', ')}")
 		}
 	}
 
@@ -40,9 +44,9 @@ class CustomValidators {
 	 * @param type the AssetOptions type
 	 * @return the list closure
 	 */
-	public static optionsClosure(type) {
+	static Closure optionsClosure(type) {
 		return {
-			return AssetOptions.findAllByType(type).collect { option -> option.value }
+			return AssetOptions.findAllByType(type)*.value
 		}
 	}
 }

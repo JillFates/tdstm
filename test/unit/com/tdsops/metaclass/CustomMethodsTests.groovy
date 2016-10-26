@@ -1,12 +1,13 @@
 package com.tdsops.metaclass
 
-import spock.lang.Shared
 import spock.lang.Specification
 
 class CustomMethodsTests extends Specification {
 
-	// Initialize the metaClass settings
-	@Shared customMethods = CustomMethods.initialize
+	void setupSpec() {
+		// Initialize the metaClass settings
+		CustomMethods.initialize()
+	}
 
 	void testAsYN() {
 		expect:

@@ -1,23 +1,23 @@
+import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.controller.ControllerMethods
+
 /**
  * CRUD for comments
  *
  * @author Diego Scarpa
  */
-class CommentController {
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class CommentController implements ControllerMethods {
 
-    /*
-     * This list returns comments and tasks
-     */
-    def list() {
-        render( view: "_list", model: [])
-    }
+	def list() {
+		render(view: '_list', model: [])
+	}
 
-    def editComment() {
-        render( view: "_editComment", model: [])
-    }
+	def editComment() {
+		render(view: '_editComment', model: [])
+	}
 
-    def showComment() {
-        render( view: "_showComment", model: [])
-    }
-
+	def showComment() {
+		render(view: '_showComment', model: [])
+	}
 }

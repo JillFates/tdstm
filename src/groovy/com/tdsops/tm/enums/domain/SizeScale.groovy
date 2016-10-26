@@ -1,72 +1,39 @@
-/**
- * The SizeScale represents the size scale or unit of measure
- */
-
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
+/**
+ * Represents the size scale or unit of measure.
+ */
+@CompileStatic
 enum SizeScale {
 
-	KB ('Kilobyte'),
-	MB ('Megabyte'),
-	GB ('Gigabyte'),
-	TB ('Terabyte'),
-	PB ('Petabyte')
+	KB('Kilobyte'),
+	MB('Megabyte'),
+	GB('Gigabyte'),
+	TB('Terabyte'),
+	PB('Petabyte')
 
-	// Used to access the application's default value to use
-	static SizeScale getDefault() {
-		return MB
+	static SizeScale getDefault() { MB }
+
+	final String value
+
+	private SizeScale(String label) {
+		value = label
 	}
 
-	//
-	// Boiler Plate from here down - Just swap out the enum class name
-	//
-
-	String value
-	private static List keys
-	private static List labels
-
-	SizeScale(String value) {
-		this.value = value
-	}
-
-	String toString() { name() }
 	String value() { value }
 
-	// Used to convert a string to the enum or null if string doesn't match any of the constants
-	static SizeScale asEnum(key) {
-		def obj
-		try {
-			obj = key as SizeScale
-		} catch (e) { }
-		return obj
-	}
-
-	// Returns the keys of the enum keys
-	static List getKeys() {
-		if (keys == null)
-			buildKeys()
-		return keys
-	}
-
-	// Construct the static keys
-	private static synchronized void buildKeys() {
-		if (keys == null) {
-			keys = SizeScale.values()
-		}
-	}
+	// The keys of the enum keys
+	static final List<SizeScale> keys = (values() as List).asImmutable()
 
 	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') {
-		if (labels == null)
-			buildLabels()
-		return labels
+	static final List<String> labels = keys.collect { it.value }.asImmutable()
+
+	// Convert a string to the enum or null if string doesn't match any of the constants
+	static SizeScale asEnum(String key) {
+		values().find { it.name() == key }
 	}
 
-	// Construct the static labels
-	private static synchronized void buildLabels() {
-		if (labels == null) {
-			labels = SizeScale.values()*.value
-		}
-	}
-
+	static List<String> getLabels(String locale = 'en') { labels }
 }

@@ -1,3 +1,5 @@
+<%@page import="net.transitionmanager.domain.MoveEvent" %>
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -17,7 +19,7 @@
 
 		/*
 			function to calculate the bundle duration to adjust the slider
-		*/ 
+		*/
 		function calculateMaxDuration(){
 			var start = tdsCommon.parseDateTimeString($("#startTime").val())
 			var completion = tdsCommon.parseDateTimeString($("#completionTime").val())
@@ -30,8 +32,8 @@
 				completionTime = completion
 			}
 			var durationInMinutes = completionTime.diff(startTime, 'minutes');
-			return durationInMinutes  
-		} 
+			return durationInMinutes
+		}
 	</script>
 </head>
 <body>
@@ -44,7 +46,7 @@
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      
+
         <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
         <div class="steps_table">
         <span class="span"><b> Edit Bundle </b></span>
@@ -85,7 +87,7 @@
                   <label for="sourceRoom">From:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'sourceRoom','errors')}">
-                 <g:select from="${rooms}" id="sourceRoomId" name="sourceRoom" optionKey="id" noSelection="['':'Please Select']" 
+                 <g:select from="${rooms}" id="sourceRoomId" name="sourceRoom" optionKey="id" noSelection="['':'Please Select']"
                    	value="${moveBundleInstance.sourceRoom?.id}"/>
                   <g:hasErrors bean="${moveBundleInstance}" field="sourceRoom">
                     <div class="errors">
@@ -99,7 +101,7 @@
                   <label for="targetRoom">To:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'targetRoom','errors')}">
-                 <g:select id="targetRoomId" name="targetRoom" from="${rooms}" optionKey="id" noSelection="['':'Please Select']" 
+                 <g:select id="targetRoomId" name="targetRoom" from="${rooms}" optionKey="id" noSelection="['':'Please Select']"
                  	value="${moveBundleInstance.targetRoom?.id}"/>
                   <g:hasErrors bean="${moveBundleInstance}" field="targetRoom">
                     <div class="errors">
@@ -119,7 +121,7 @@
 						$("#startTime").kendoDateTimePicker({ animation: false });
                     });
                   </script><span><input type="text" class="dateRange" size="15" style="width: 200px;" id="startTime" name="startTime"
-        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  format="12hrs" />" 
+        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  format="12hrs" />"
         					onchange="isValidDate(this.value, this.id,'startTimeImg')"/></span>
         					<span id="startTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
@@ -129,7 +131,7 @@
                   			</g:hasErrors>
                	</td>
              </tr>
-	
+
     	        <tr class="prop">
                 <td valign="top" class="name">
                   <label for="completionTime"><b>Completion Time:&nbsp;<span style="color: red">*</span></b></label>
@@ -141,7 +143,7 @@
                     });
                   </script> <span><input type="text" class="dateRange" size="15" style="width: 200px;"
                   			id="completionTime" name="completionTime"
-				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  format="12hrs" />" 
+				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  format="12hrs" />"
 				        onchange="isValidDate(this.value, this.id, 'completionTimeImg')"/></span>
 				        <span id="completionTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
@@ -185,7 +187,7 @@
                   <label for="operationalOrder">Event:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'moveEvent','errors')}">
-                  <g:select from="${MoveEvent.findAllByProject(Project.get(projectId))}" id="moveEvent" name="moveEvent.id" 
+                  <g:select from="${MoveEvent.findAllByProject(Project.get(projectId))}" id="moveEvent" name="moveEvent.id"
                   value="${moveBundleInstance?.moveEvent?.id}" optionKey="id" noSelection="['':'Please Select']"></g:select>
                   <g:hasErrors bean="${moveBundleInstance}" field="moveEvent">
                     <div class="errors">
@@ -230,10 +232,10 @@
                  <g:else>
                     <input type="checkbox" id="useForPlanning" name="useForPlanning" />
                  </g:else>
-                  
+
                 </td>
               </tr>
-			
+
             </tbody>
           </table>
         </div>
@@ -280,13 +282,13 @@
 							</td>
 							<g:if test="${dashboardStep.moveBundleStep}">
 								<td>
-								 <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
+								 <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }"
 									onclick="enableInput(${dashboardStep.step.id })" checked="checked" title="Dashboard"/>
 								</td>
 								<td>
 									<div id="labelText_${dashboardStep.step.id }" title="text" style="display: none;" >${dashboardStep.moveBundleStep?.label}</div>
 									<div id="labelInput_${dashboardStep.step.id }" title="input">
-									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
+									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }"
 									value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
 									</div>
 								</td>
@@ -308,7 +310,7 @@
 														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 														</span>
 													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
-												</div>	
+												</div>
 											</td>
 										</tr>
 										<tr>
@@ -353,19 +355,19 @@
 										<g:else>
 											<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }"/>
 										</g:else>
-										
+
 									</div>
 								</td>
 							</g:if>
 							<g:else>
 								<td>
-								<input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
+								<input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }"
 									onclick="enableInput(${dashboardStep.step.id })" title="Dashboard"/>
 								</td>
 								<td>
 									<div id="labelText_${dashboardStep.step.id }" title="text"></div>
 									<div id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
-									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
+									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }"
 									value="${dashboardStep.step?.label ? dashboardStep.step?.label : dashboardStep.step.name}"/>
 									</div>
 								</td>
@@ -375,14 +377,14 @@
 					                  	<tr>
 											<td style="padding: 0 6px;width: 310px;">
 												<div style="float: left;padding-right: 10px;">
-													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }" 
+													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
 													value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' format="12hrs" />"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
 													</span>
 													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 												</div>
 												<div style="float: left;">
-													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
+													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
 													value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' format="12hrs" />"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 													</span>
@@ -427,13 +429,13 @@
 									<div id="beGreenDiv_${dashboardStep.step.id }" style="display: none;text-align: center;">
 										<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }" />
 									</div>
-								</td>								
-							</g:else>	
+								</td>
+							</g:else>
 					</tr>
 				</g:each>
 			</tbody>
 		</table>
-		
+
 	</div>
 	</div>
 	</g:form>
@@ -441,26 +443,26 @@
 	/*
     function to invoke ESC key to abandon the field
    */
-    document.onkeypress = keyCheck;   
+    document.onkeypress = keyCheck;
 	function keyCheck( e ){
-		var keyID 
+		var keyID
 		if(window.event){
 			keyID = window.event.keyCode;
 		} else {
 			keyID = e.keyCode;
 		}
 		if(keyID == 27) {
-			$("span[title='input']").each(function(){ 
+			$("span[title='input']").each(function(){
 		    	  $(this).hide(); // hide value input field
 	    	});
-			$("span[title='text']").each(function(){ 
-		    	  $(this).show(); // show the value text 
+			$("span[title='text']").each(function(){
+		    	  $(this).show(); // show the value text
 	  		});
-			$("input[title='Dashboard']").each(function(){ 
-		    	  $(this).attr("checked",false); // show the value text 
+			$("input[title='Dashboard']").each(function(){
+		    	  $(this).attr("checked",false); // show the value text
 	  		});
 		}
-		
+
 	}
 	/*
 	Will enable the step input fields when user select the checkbox.
@@ -470,12 +472,12 @@
 			$("#labelText_"+stepId ).hide();
 			$("#labelInput_"+stepId ).show();
 			$("#startTimeInput_"+stepId ).show();
-			
+
 			$("#startTime_"+stepId ).val($("#startTime").val())
 			$("#completionTime_"+stepId ).val($("#completionTime").val())
 			$("#slider_"+stepId).slider( "option", "max", maxDuration );
 			$("#slider_"+stepId).slider( "option", "values", [getDuration($("#startTime_"+stepId).val()), getDuration($("#completionTime_"+stepId).val())] );
-			
+
 			$("#calcMethodText_"+stepId ).hide();
 			$("#calcMethodInput_"+stepId ).show();
 			if($("#calcMethod__"+stepId) == "M"){
@@ -522,15 +524,15 @@
     }
 	function getDuration( dateString ){
 		var dateTime = tdsCommon.parseDateTimeString(dateString);
-		var startTime = tdsCommon.parseDateTimeString($("#startTime").val());  
+		var startTime = tdsCommon.parseDateTimeString($("#startTime").val());
 		var duration = dateTime.diff(startTime, 'minutes');
-		return duration 
+		return duration
 	}
-    
+
 	function convertDate( date ){
 		var momentDate = moment(date);
 		return tdsCommon.formatDateTime(momentDate);
-	} 
+	}
 
 	function validateStepsData(){
 		var checked = true
@@ -568,7 +570,7 @@
 					} else if( completionTime.isAfter(bundleCompletionTime) ){
 						$("#completionTime_"+stepId).val(bundleCompletion)
 					}
-							
+
 					if ( !$("#dashboardLabel_"+stepId).val()){
 						checked =  false;
 						message ="A Dashboard Label is required for each selected step.";
@@ -582,7 +584,7 @@
 						message = "The date time format is incorrect for the highlighted fields.";
 						return false;
 					}
-						
+
 				} else {
 					uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length));
 				}
@@ -607,7 +609,7 @@
     		    if(data == "failure"){
         		    if( !confirm("You have chosen to not track dashboard status for some steps already in progress") ){
         		    	checked =  false;
-        		    } 
+        		    }
     		    }
     		 }
     	});
@@ -725,7 +727,7 @@
         var completionTime = $("#completionTime").val();
         if(isValidDate(startTime,"startTime","startTimeImg") && isValidDate(completionTime, "completionTime", "completionTimeImg")){
         	returnval = true;
-		} 
+		}
 		return returnval;
 	}
  // validate the dial manual input valueinput value
@@ -742,7 +744,7 @@
 			$("#tasksCompleted_"+stepId).removeClass("field_error");
 			$("#stepValueImg_"+stepId).hide();
 		}
-		
+
 		return check
 	}
 	</script>

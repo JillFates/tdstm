@@ -1,106 +1,103 @@
-class RoleTypeController {
-    def idCheck = 0
-    def index() { redirect( action:"list", params:params ) }
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.RoleType
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
-    // return list of Roles
-    def list() {
-        def c = RoleType.createCriteria()
-        if ( !params.max ) params.max = 25
-        def roleTypes = c.list{
-                            and{
-                                order('type','asc')
-                                order('level','desc')
-                                order('id', 'asc')
-                            }
-                        }
-        [ roleTypeInstanceList: roleTypes]
-    }
-    // return RoleType details to show form
-    def show() {
-        def roleTypeInstance = RoleType.get( params.id )
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class RoleTypeController implements ControllerMethods {
 
-        if ( !roleTypeInstance ) {
-            flash.message = "RoleType not found with id ${params.id}"
-            redirect( action:"list" )
-        }
-        else { return [ roleTypeInstance : roleTypeInstance ] }
-    }
-    // delete RoleType details
-    def delete() {
-    	try{
-    		def roleTypeInstance = RoleType.get( params.id )
-	        if ( roleTypeInstance ) {
-	            roleTypeInstance.delete(flush:true)
-	            flash.message = "RoleType ${params.id} deleted"
-	            redirect( action:"list" )
-	        }
-	        else {
-	            flash.message = "RoleType not found with id ${params.id}"
-	            redirect( action:"list" )
-	        }
-    	} catch(Exception ex){
-    		flash.message = ex
-			redirect( action:"list" )
-    	}
-    }
-    //return roleType details to update form
-    def edit() {
-        def roleTypeInstance = RoleType.get( params.id )
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-        if ( !roleTypeInstance ) {
-            flash.message = "RoleType not found with id ${params.id}"
-            redirect(action:"list")
-        }
-        else {
-            return [ roleTypeInstance : roleTypeInstance ]
-        }
-    }
-    // update RoleType details
-    def update() {
-        def roleTypeInstance = RoleType.get( params.roleTypeId )
-        if ( roleTypeInstance ) {
-            roleTypeInstance.properties = params
-            if(!roleTypeInstance.hasErrors() && roleTypeInstance.save()) {
-                flash.message = "RoleType ${params.description} updated"
-                redirect( action:"show", id:roleTypeInstance.id )
-            }
-            else {
-                render( view:'edit', model:[roleTypeInstance:roleTypeInstance] )
-            }
-        }
-        else {
-            flash.message = "RoleType not found with id ${params.id}"
-            redirect( action:"edit", id:params.id )
-        }
-    }
-    // return create form
-    def create() {
+	def list() {
+		if (!params.max) params.max = 25
 
-        def roleTypeInstance = new RoleType()
-        roleTypeInstance.properties = params
-        return ['roleTypeInstance':roleTypeInstance]
-    }
-    // save RoleType details
-    def save() {
-        RoleType roleTypeInstance = new RoleType(params)
-        roleTypeInstance.id = params.id
-        def role = RoleType.get(params.id)
-        // condition to check the id
-        if ( role != null ) {
-            flash.message = "Role Type ${role.id} already exist "
-            idCheck = 1
-        }else{
-            roleTypeInstance.level = 1
-            println("params: $params")
-            println("properties: ${roleTypeInstance.properties}")
-            if(!roleTypeInstance.hasErrors() && idCheck != 1 && roleTypeInstance.save(insert:true) ) {
-                flash.message = "RoleType ${roleTypeInstance.id} created"
-                redirect( action:"list")
-            }
-        }
+		List<RoleType> roleTypes = RoleType.createCriteria().list {
+			and {
+				order('type','asc')
+				order('level','desc')
+				order('id', 'asc')
+			}
+		}
+		[roleTypeInstanceList: roleTypes]
+	}
 
-        render( view:'create', model:[roleTypeInstance:roleTypeInstance] )
-    }
+	def show() {
+		RoleType roleType = RoleType.get(params.id)
+		if (!roleType) {
+			flash.message = "RoleType not found with id $params.id"
+			redirect(action: 'list')
+			return
+		}
+
+		[roleTypeInstance: roleType]
+	}
+
+	def delete() {
+		try{
+			RoleType roleType = RoleType.get(params.id)
+			if (roleType) {
+				roleType.delete(flush: true)
+				flash.message = "RoleType $params.id deleted"
+			}
+			else {
+				flash.message = "RoleType not found with id $params.id"
+			}
+		}
+		catch (e) {
+			flash.message = e.message
+		}
+
+		redirect(action: 'list')
+	}
+
+	def edit() {
+		RoleType roleType = RoleType.get(params.id)
+		if (!roleType) {
+			flash.message = "RoleType not found with id $params.id"
+			redirect(action: 'list')
+			return
+		}
+
+		[roleTypeInstance : roleType]
+	}
+
+	def update() {
+		RoleType roleType = RoleType.get(params.roleTypeId)
+		if (roleType) {
+			roleType.properties = params
+			if (!roleType.hasErrors() && roleType.save()) {
+				flash.message = "RoleType $params.description updated"
+				redirect(action: 'show', id: roleTypeInstance.id)
+			}
+			else {
+				render(view: 'edit', model: [roleTypeInstance: roleType])
+			}
+		}
+		else {
+			flash.message = "RoleType not found with id $params.id"
+			redirect(action: 'edit', id: params.id)
+		}
+	}
+
+	def create() {
+		[roleTypeInstance: new RoleType(params)]
+	}
+
+	def save() {
+		boolean idCheck = false
+		if (RoleType.exists(params.id)) {
+			flash.message = "Role Type $params.id already exists"
+			idCheck = true
+		}
+
+		RoleType roleType = new RoleType(params)
+		roleType.id = params.id
+		if (!idCheck && !roleType.hasErrors() && roleType.save()) {
+			flash.message = "RoleType $roleType.id created"
+			redirect(action: 'list')
+			return
+		}
+
+		render(view: 'create', model: [roleTypeInstance: roleType])
+	}
 }

@@ -1,9 +1,3 @@
-<%@page import="com.tds.asset.AssetComment"%>
-<%@page import="com.tdssrc.grails.TimeUtil"%>
-<%@page import="com.tdssrc.grails.StringUtil"%>
-<%@page import="com.tdssrc.grails.HtmlUtil"%>
-<%@page import="com.tdsops.tm.enums.domain.AssetCommentType"%>
-<%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
 <g:set var="topNavClean" value="true" scope="request"/>
 <html>
 <head>

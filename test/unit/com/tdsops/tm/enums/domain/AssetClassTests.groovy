@@ -6,8 +6,6 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import spock.lang.Specification
 
-import com.tdsops.tm.enums.domain.AssetClass
-
 class AssetClassTests extends Specification {
 
 	// Validate that domainNameFor returns the expected GORM domain class name for each AssetClass

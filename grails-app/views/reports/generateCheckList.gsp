@@ -16,7 +16,7 @@
 	<div class="generated-check-list">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Pre-Event Checklist - ${project.name} : ${moveEvent.name }</b>
-		</div> 
+		</div>
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
 		</div>
@@ -168,7 +168,7 @@
 			<tr>
 				<td></td>
 				<td>
-					${raw(blankAssets)} 
+					${raw(blankAssets)}
 					 <g:if test="${nullAssetname.size()>0 }">
 						<span style="color: red;margin-left: 50px;"> Blank names: ${nullAssetname.size()} Assets with no name-${nullAssetname.tag.toString().replace('[','').replace(']','')}</span>
 					 </g:if>
@@ -189,7 +189,7 @@
 			<tr>
 				<td></td>
 				<td>
-					${raw(blankAssetTag)} 
+					${raw(blankAssetTag)}
 					<g:if test="${nullAssetTag.size()>0 }">
 						<span style="color: red;margin-left: 50px;"> Blank names: ${nullAssetTag.size()} Assets with no tag- ${nullAssetTag.assetName.toString().replace('[','').replace(']','')}</span>
 					</g:if>
@@ -415,7 +415,7 @@
 					</div>
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td>
 					<g:if test="${allErrors.contains('Tasks')}">
@@ -485,7 +485,7 @@
 					</g:if>
 				</td>
 			</tr>
-			
+
 		</table>
 
 	</div>

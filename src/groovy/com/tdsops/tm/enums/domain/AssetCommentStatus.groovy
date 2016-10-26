@@ -1,25 +1,26 @@
 package com.tdsops.tm.enums.domain
 
+import groovy.transform.CompileStatic
+
 /**
- * AssetCommentStatus - represents the valid options for the AssetComment domain property status.
+ * Represents the valid options for the AssetComment domain property status.
  *
  * This should be an Enum but we need to first switch all of the references of a string to use the class reference
  * and then we can switch this to an Enum.
  */
+@CompileStatic
 class AssetCommentStatus {
-	static final String HOLD='Hold'
-	static final String PLANNED='Planned'
-	static final String READY='Ready'
-	static final String PENDING='Pending'
-	static final String STARTED='Started'
-	static final String COMPLETED='Completed'
-	static final String DONE='Completed'
-	static final String TERMINATED='Terminated'
-	static final String[] list = [PLANNED, PENDING, READY, STARTED, DONE, HOLD]
-	static final getList() {
-		return list as List
-	}
-	static final getTopStatusList() {
-		return [PENDING, READY, STARTED, HOLD, DONE] as List
-	}
+
+	public static final String HOLD       = 'Hold'
+	public static final String PLANNED    = 'Planned'
+	public static final String READY      = 'Ready'
+	public static final String PENDING    = 'Pending'
+	public static final String STARTED    = 'Started'
+	public static final String COMPLETED  = 'Completed'
+	public static final String DONE       = 'Completed'
+	public static final String TERMINATED = 'Terminated'
+
+	static final List<String> list = [PLANNED, PENDING, READY, STARTED, DONE, HOLD].asImmutable()
+
+	static final List<String> topStatusList = [PENDING, READY, STARTED, HOLD, DONE].asImmutable()
 }

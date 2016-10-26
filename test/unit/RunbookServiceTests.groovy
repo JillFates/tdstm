@@ -1,8 +1,9 @@
-import spock.lang.Specification
-
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
 import com.tdsops.metaclass.CustomMethods
+import grails.test.mixin.TestFor
+import net.transitionmanager.service.RunbookService
+import spock.lang.Specification
 
 @TestFor(RunbookService)
 class RunbookServiceTests extends Specification {
@@ -71,7 +72,7 @@ class RunbookServiceTests extends Specification {
 		deps.each { d -> d.id = id++ }
 
 		// Initialize various custom methods used by our application
-		CustomMethods.getInitialize(true)
+		CustomMethods.initialize(true)
 	}
 
 	// Test that the List.asMap method actually works
@@ -217,32 +218,32 @@ class RunbookServiceTests extends Specification {
 		def asset
 		def dep
 
-		asset = new AssetComment(id: ltid + 1, taskNumber: 1050, duration: 90, comment: 'Separate map Start task') // start vertex
+		asset = new AssetComment(taskNumber: 1050, duration: 90, comment: 'Separate map Start task') // start vertex
 		asset.id = ltid + 1
 		tasks << asset
 
-		asset = new AssetComment(id: ltid + 2, taskNumber: 1051, duration: 7, comment: 'Separate map Middle task')
+		asset = new AssetComment(taskNumber: 1051, duration: 7, comment: 'Separate map Middle task')
 		asset.id = ltid + 2
 		tasks << asset
 
-		asset = new AssetComment(id: ltid + 3, taskNumber: 1052, duration: 12, comment: 'Separate map Sink task') // start vertex
+		asset = new AssetComment(taskNumber: 1052, duration: 12, comment: 'Separate map Sink task') // start vertex
 		asset.id = ltid + 3
 		tasks << asset
 
-		dep = new TaskDependency(id: 200, predecessor: tasks[ltid + 1], assetComment: tasks[ltid + 2], type: 'SS')
+		dep = new TaskDependency(predecessor: tasks[ltid + 1], assetComment: tasks[ltid + 2], type: 'SS')
 		dep.id = 200
 		deps << dep
 
-		dep = new TaskDependency(id: 201, predecessor: tasks[ltid + 2], assetComment: tasks[ltid + 3], type: 'SS')
+		dep = new TaskDependency(predecessor: tasks[ltid + 2], assetComment: tasks[ltid + 3], type: 'SS')
 		dep.id = 201
 		deps << dep
 
 		// Add an additional starting vector that is shorter so we can see the counts
-		asset = new AssetComment(id: ltid + 4, taskNumber: 1060, duration: 120, comment: 'Change tire on truck')
+		asset = new AssetComment(taskNumber: 1060, duration: 120, comment: 'Change tire on truck')
 		asset.id = ltid + 4
 		tasks << asset
 
-		dep = new TaskDependency(id: 210, predecessor: tasks[ltid + 4], assetComment: tasks[5], type: 'SS')
+		dep = new TaskDependency(predecessor: tasks[ltid + 4], assetComment: tasks[5], type: 'SS')
 		dep.id = 210
 		deps << dep
 

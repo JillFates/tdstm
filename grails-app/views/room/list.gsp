@@ -1,5 +1,10 @@
-<%@page import="com.tds.asset.AssetCableMap;com.tds.asset.AssetDependency;com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
-
+<%@page import="com.tds.asset.AssetCableMap" %>
+<%@page import="com.tds.asset.AssetDependency" %>
+<%@page import="com.tds.asset.AssetEntity" %>
+<%@page import="com.tds.asset.Application" %>
+<%@page import="com.tds.asset.Database" %>
+<%@page import="com.tds.asset.Files" %>
+<%@page import="net.transitionmanager.domain.Room" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -8,7 +13,7 @@
 		<title>Data Center Room List</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
-		<g:javascript src="model.manufacturer.js"/>	
+		<g:javascript src="model.manufacturer.js"/>
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
@@ -59,7 +64,7 @@
 											<g:sortableColumn property="location" title="Data Center" />
 
 											<g:sortableColumn property="roomName" title="Room" />
-											
+
 											<th><a href="#">City</a></th>
 
 											<th><a href="#">State Prov</a></th>
@@ -79,13 +84,13 @@
 													<td><input type="checkbox" class="listCheck" name="checkbox_${roomInstance.id}" id="roomCheckBoxId" onclick="enableActions()"></td>
 												</tds:hasPermission>
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
-												
+
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "roomName")}</td>
 
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "city")}</td>
 
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "stateProv")}</td>
-												
+
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${roomInstance.getRackCountByType('Rack')}</td>
 
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "assetCount")}</td>
@@ -95,7 +100,7 @@
 										</g:each>
 									</tbody>
 								</table>
-								<div class="buttons"> 
+								<div class="buttons">
 									<span class="button">
 									 <tds:hasPermission permission='DeleteRoom'>
 										<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
@@ -157,7 +162,7 @@
 							<td>
 								<input type="text" name="city" id="cityId" value="">
 							</td>
-						</tr>	
+						</tr>
 						<tr>
 							<td>State/Prov<td/>
 							<td>
@@ -176,7 +181,7 @@
 								<input type="text" name="country" id="countryId" value="USA">
 							</td>
 						</tr>
-						
+
 						<tr>
 							<td class="buttons" colspan="4">
 								<input type="submit" class="save" value="Save" />
@@ -198,9 +203,9 @@
 					<tbody>
 						<g:each in="${roomInstanceList}" status="i" var="roomInstance">
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'} pointer" id="mergeRow_${roomInstance.id}" onclick="submitMergeForm(this.id)">
-								
+
 								<td>${fieldValue(bean: roomInstance, field: "location")}</td>
-						
+
 								<td>${fieldValue(bean: roomInstance, field: "roomName")}</td>
 
 							</tr>
@@ -253,7 +258,7 @@
 						<input type="hidden" id="previousColor"/>
 					</div>
 				</div>
-				
+
 				</g:form>
 			</div>
 			<div style="clear: both;"></div>
@@ -283,8 +288,8 @@
 
 		<input type="hidden" id="role" value="role"/>
 
-	<script type="text/javascript">   
-		
+	<script type="text/javascript">
+
 		var roomId = "${roomId}"
 		var viewType = "${viewType}"
 		if (roomId && viewType != 'list') {
@@ -319,7 +324,7 @@
 		}
 
 		function openRoomView(e,browser){
-			
+
 			var resp = e.responseText
 			$("#roomListView").hide()
 			$("#roomShowView").html(resp)
@@ -406,10 +411,10 @@
 				$("#bundleId option:selected").each(function () {
 					moveBundleId +="moveBundleId="+$(this).val()+"&"
 				});
-				
+
 				$(".objectSelected").removeClass("objectSelected")
 				$("#rack_"+rackId).addClass("objectSelected")
-				
+
 				var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
 				new Ajax.Request('../rackLayouts/generateElevations',{asynchronous:true,evalScripts:true,
 					onSuccess:function(e){updateRackPower( rackId )},
@@ -418,7 +423,7 @@
 							if (forWhom=='room') {
 								$("#auditDetailViewId").show();
 								$('#rackLayout').addClass('audit');
-								$('#rackLayout').removeClass('notAudit'); 
+								$('#rackLayout').removeClass('notAudit');
 							} else {
 								$("#auditDetailViewId").hide();
 								$('#rackLayout').addClass('notAudit');

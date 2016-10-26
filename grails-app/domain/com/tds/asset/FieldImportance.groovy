@@ -1,6 +1,7 @@
 package com.tds.asset
 
 import com.tdsops.tm.enums.domain.EntityType
+import net.transitionmanager.domain.Project
 
 class FieldImportance {
 
@@ -8,13 +9,13 @@ class FieldImportance {
 	Project project
 	String config
 
-    static constraints = {
-		entityType( nullable:false, inList:EntityType.getList())
-		project( nullable:false, unique:['entityType'])
-		config( nullable:true, blank:true )
-    }
+	static constraints = {
+		config nullable: true
+		entityType inList: EntityType.list
+		project unique: ['entityType']
+	}
 
-	static mapping  = {
+	static mapping = {
 		version false
 		columns {
 			config sqltype: 'text'

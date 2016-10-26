@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -5,13 +6,6 @@
 	<link type="text/css" rel="stylesheet"
 		href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 	<title>Edit Project</title>
-	<% def currProj = session.getAttribute("CURR_PROJ");
-				def projectId = currProj.CURR_PROJ ;
-				def currProjObj;
-				if( projectId != null) {
-				currProjObj = Project.get(projectId);
-				}
-		%>
 	<script src="${resource(dir:'js',file:'project.js')}"></script>
 </head>
 <body>
@@ -30,11 +24,11 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">Client:</td>
-					
+
 							<td class="valueNW">${projectInstance?.client}</td>
-					
+
 							<td class="name">Project Code:</td>
-					
+
 							<td class="valueNW ${hasErrors(bean:projectInstance, field:'projectCode','errors')}">
 								<input type="text" id="projectCode" name="projectCode" indextab="110" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
 								<g:hasErrors bean="${projectInstance}" field="projectCode">
@@ -43,7 +37,7 @@
 									</div>
 								</g:hasErrors>
 							</td>
-						</tr>           
+						</tr>
 						<tr class="prop">
 							<td class="name">
 								<label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label>
@@ -60,7 +54,7 @@
 								<label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
-								<g:select id="projectType" name="projectType" indextab="130" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
+								<g:select id="projectType" name="projectType" indextab="130" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"/>
 								<g:hasErrors bean="${projectInstance}" field="projectType">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="projectType" /></div>
 								</g:hasErrors>
@@ -72,7 +66,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 								<textarea rows="3" cols="40" id="description" name="description"
-									indextab="140" 
+									indextab="140"
 									placeholder="Enter a short description of the project"
 									onkeydown="Project.textCounter(this.id,200);"
 									onkeyup="Project.textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
@@ -87,7 +81,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
 								<textarea rows="3" cols="40" id="comment" name="comment"
-									indextab="150" 
+									indextab="150"
 									onkeydown="Project.textCounter(this.id,200);"
 									onkeyup="Project.textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
 								<g:hasErrors bean="${projectInstance}" field="comment">
@@ -96,7 +90,7 @@
 									</div>
 								</g:hasErrors>
 							</td>
-						</tr> 
+						</tr>
 						<tr class="prop">
 							<td class="name">
 								<label for="startDate">Start Date:</label>
@@ -129,7 +123,7 @@
 								</g:hasErrors>
 							</td>
 						</tr>
-		
+
 						<tr class="prop">
 							<td class="name">
 								<label for="projectPartners">Associated Partner(s):</label>
@@ -146,12 +140,12 @@
 									<g:link action="deleteImage" indextab="200" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'icons',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link>
 								</td>
 							</g:if>
-							<g:else>				
+							<g:else>
 								<td class="valueNW">
 									<input type="file" name="projectLogo" indextab="200" id="projectLogo" />
 									<br>
-									<span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span> 
-								</td>				
+									<span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span>
+								</td>
 							</g:else>
 						</tr>
 						<tr class="prop">
@@ -168,7 +162,7 @@
 							<td class="name">Default Bundle:</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
 								<g:select id="defaultBundle" name="defaultBundle.id"
-									indextab="220" 
+									indextab="220"
 									from="${moveBundles}" optionKey="id" optionValue="name"
 									value="${projectInstance?.defaultBundle.id}"></g:select>
 							</td>
@@ -179,7 +173,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
-									indextab="230" 
+									indextab="230"
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
 									noSelection="['':'Please Select']" onChange="warnForWorkflow()">
@@ -196,7 +190,7 @@
 								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
 								<input type="button" value="Change" indextab="240" onclick="Project.showTimeZoneSelect('timezone');">
 							</td>
-							
+
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
@@ -231,7 +225,7 @@
 	$(document).ready(function() {
 
 		$("#timeZoneSelectPopup").dialog({ autoOpen: false });
-		
+
 		var customCol = (${prevParam?.customFieldsShown?: projectInstance.customFieldsShown})?(${prevParam?.customFieldsShown?: projectInstance.customFieldsShown}):'0'
 		showCustomFields(customCol, 2);
 
@@ -276,9 +270,9 @@
 			$("#custom_count_"+i).show();
 			i=i+parseInt(columnCount)
 		 }
-		}  
+		}
 	 }
-		
+
 		function editProject(){
 			var projectPartners = []
 			<g:each status="i" in="${projectPartners}" var="partner">
@@ -298,7 +292,7 @@
 			if( date && !tdsCommon.isValidDate(date) ){
 				alert("Date should be in '" + tdsCommon.defaultDateFormat() + "' format");
 				returnVal  =  false;
-			} 
+			}
 			return returnVal;
 		}
 		function validateDates(){
@@ -307,7 +301,7 @@
 			var completionDateId = $("#completionDateId").val();
 			if(isValidDate(startDateId) && isValidDate(completionDateId)){
 				returnval = true;
-			} 
+			}
 			return returnval;
 		}
 		function warnForWorkflow(){

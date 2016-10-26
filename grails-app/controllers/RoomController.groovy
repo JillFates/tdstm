@@ -2,48 +2,57 @@ import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
-import org.hibernate.SessionFactory
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.RackService
+import net.transitionmanager.service.RoomService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.TaskService
+import net.transitionmanager.service.UserPreferenceService
 
-class RoomController {
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class RoomController implements ControllerMethods {
 
-	def assetEntityService
-	def controllerService
-	def roomService
-	def securityService
-	def taskService
-	def userPreferenceService
-	def rackService
-	SessionFactory sessionFactory
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	AssetEntityService assetEntityService
+	ControllerService controllerService
+	RackService rackService
+	RoomService roomService
+	SecurityService securityService
+	TaskService taskService
+	UserPreferenceService userPreferenceService
 
-	def index() {
-		redirect(action: "list", params: params)
-	}
-
+	@HasPermission('RackMenuView')
 	def list() {
-		def (project, user) = controllerService.getProjectAndUserForPage( this, 'RackMenuView' )
-		if (! project)
-			return
-
-		def projectId = project.id
+		Project project = controllerService.getProjectForPage(this)
+		if (!project) return
 
 		// Not sure what is being stored into the user session...
 		def rackIds = session.getAttribute("RACK_ID")
 
-		params.max = Math.min(params.max ? params.int('max') : 100, 100)
+		params.max = params.int('max', 100)
 
 		def model = [:]
 
-		def roomInstanceList = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
-		def roomId = session.getAttribute( "CURR_ROOM" )?.CURR_ROOM
-		def roomInstance = new Room()
-		def entities = assetEntityService.entityInfo( project )
+		def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project: project])
+		def roomId = userPreferenceService.getPreference(PREF.CURR_ROOM)
+		Room room = new Room()
+		def entities = assetEntityService.entityInfo(project)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 
 		model = [
@@ -55,11 +64,11 @@ class RoomController {
 			filterRackId: rackIds,
 			moveBundleList: moveBundleList,
 			networks: entities.networks,
-			projectId: projectId,
+			projectId: project.id,
 			roomId: roomId,
-			roomInstance: roomInstance,
-			roomInstanceList: roomInstanceList,
-			roomInstanceTotal: roomInstanceList.size(),
+			roomInstance: room,
+			roomInstanceList: rooms,
+			roomInstanceTotal: rooms.size(),
 			servers: entities.servers,
 			staffRoles: taskService.getRolesForStaff(),
 			viewType: params.viewType
@@ -69,126 +78,119 @@ class RoomController {
 	}
 
 	def create() {
-		def roomInstance = new Room()
-		roomInstance.properties = params
-		return [roomInstance: roomInstance]
+		[roomInstance: new Room(params)]
 	}
 
 	def save() {
-		def roomInstance = new Room(params)
-		if (roomInstance.save(flush: true)) {
-			flash.message = "Room : ${roomInstance.roomName} is created"
-			redirect(action: "list", params:[viewType : "list"])
+		Room room = new Room(params)
+		if (room.save(flush: true)) {
+			flash.message = "Room : $room.roomName is created"
 		}
 		else {
-			log.info GormUtil.allErrorsString(roomInstance)
-			if (roomInstance.roomName) {
-				flash.message = "Room : ${roomInstance.roomName} is not created"
+			log.info GormUtil.allErrorsString(room)
+			if (room.roomName) {
+				flash.message = "Room : $room.roomName is not created"
 			} else {
 				flash.message = "Room not created"
 			}
-			redirect(action: "list",params:[viewType : "list"])
 		}
+		redirect(action: "list", params: [viewType: "list"])
 	}
 
 	def show() {
 
 		session.removeAttribute("RACK_ID")
-		def roomInstance = Room.get(params.id)
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		userPreferenceService.setPreference(PREF.CURR_ROOM, "${roomInstance?.id}" )
-		def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad") ?:request.getHeader("User-Agent").toLowerCase().contains("mobile")
-		if (!roomInstance) {
+		Room room = Room.get(params.id)
+		userPreferenceService.setPreference(PREF.CURR_ROOM, room?.id)
+		if (!room) {
 			userPreferenceService.removePreference(PREF.CURR_ROOM)
 			flash.message = "Current Room not found"
 			redirect(action: "list", params:[viewType : "list"])
+			return
 		}
-		else {
-			def auditView
-			if(params.containsKey("auditView")){
-				auditView = params.auditView
-				userPreferenceService.setPreference(PREF.AUDIT_VIEW, params.auditView)
-			} else {
-				auditView = session.AUDIT_VIEW?.AUDIT_VIEW ?:(userPreferenceService.getPreference(PREF.AUDIT_VIEW)?:0 )
-			}
-			def project = Project.get( projectId )
-			def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
-			def moveBundleList = []
-			def moveBundleId = params.moveBundleId
-			def racksList = []
-			def racks = []
-			def moveBundlesMap = MoveBundle.executeQuery("SELECT m.id as bundleId , m.name from MoveBundle m \
-					where m.project =:project",[project :project])
 
-			LinkedList bundleLists = new LinkedList(moveBundlesMap)
-			bundleLists.addFirst(['taskReady', 'Active Tasks'])
-			def statusList = [:]
-			if(moveBundleId && !moveBundleId.contains("all") && !moveBundleId.contains("taskReady")){
-					userPreferenceService.removePreference(PREF.HIGHLIGHT_TASKS)
-					def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
-					moveBundleList = MoveBundle.findAllByIdInList(bundles)
-					moveBundleList.each{ moveBundle->
-						moveBundle.sourceRacks.findAll{it.room?.id == roomInstance?.id}.each{ sourceRack->
-							if( !racksList.contains( sourceRack ) )
-								racksList.add( sourceRack )
-						}
-						moveBundle.targetRacks.findAll{it.room?.id == roomInstance?.id}.each{ targetRack->
-							if( !racksList.contains( targetRack ) )
-								racksList.add( targetRack )
-						}
-					}
-			} else if ( moveBundleId?.contains("all") ) {
+		def auditView
+		if (params.containsKey("auditView")) {
+			auditView = params.auditView
+			userPreferenceService.setPreference(PREF.AUDIT_VIEW, params.auditView)
+		} else {
+			auditView = session.AUDIT_VIEW?.AUDIT_VIEW ?: userPreferenceService.getPreference(PREF.AUDIT_VIEW) ?: 0
+		}
+
+		Project project = securityService.userCurrentProject
+		List<Room> rooms = Room.findAllByProject(project, [sort: 'roomName', order: 'asc'])
+		def moveBundleList = []
+		def moveBundleId = params.moveBundleId
+		def racksList = []
+		def racks = []
+		List<Object[]> idAndNamePairs = MoveBundle.executeQuery(
+			'SELECT id, name from MoveBundle m where project=:project',
+			[project :project])
+
+		LinkedList bundleLists = new LinkedList(idAndNamePairs)
+		bundleLists.addFirst(['taskReady', 'Active Tasks'])
+		def statusList = [:]
+		if (moveBundleId && !moveBundleId.contains("all") && !moveBundleId.contains("taskReady")) {
 				userPreferenceService.removePreference(PREF.HIGHLIGHT_TASKS)
-				racksList = Rack.findAllByRoom(roomInstance)
-				moveBundleList = [id:'all']
-			} else if( userPreferenceService.getPreference(PREF.HIGHLIGHT_TASKS) || moveBundleId?.contains("taskReady") ) {
-					def roomAssets =  roomInstance.sourceAssets + roomInstance.targetAssets
-					Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,
-										[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
-					racks = assetsByStatus.rackSource +  assetsByStatus.rackTarget
-					racks.removeAll([null])
-					racks.each{
-						def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status
-						def statusCss = statuses.contains("Hold") ? "task_hold" : (statuses.contains("Started") ? "task_started" : "task_ready")
-						statusList << [(it.id) : statusCss]
+				moveBundleList = MoveBundle.getAll(moveBundleId.split(",")*.toLong()).findAll()
+				moveBundleList.each { moveBundle->
+					moveBundle.sourceRacks.findAll { it.roomId == room?.id }.each { sourceRack->
+						if (!racksList.contains(sourceRack)) {
+							racksList.add(sourceRack)
+						}
 					}
-					userPreferenceService.setPreference(PREF.HIGHLIGHT_TASKS, moveBundleId)
-					moveBundleId = 'taskReady'
+					moveBundle.targetRacks.findAll { it.roomId == room?.id }.each { targetRack->
+						if (!racksList.contains(targetRack)) {
+							racksList.add(targetRack)
+						}
+					}
+				}
+		} else if (moveBundleId?.contains("all")) {
+			userPreferenceService.removePreference(PREF.HIGHLIGHT_TASKS)
+			racksList = Rack.findAllByRoom(room)
+			moveBundleList = [id: 'all']
+		} else if (userPreferenceService.getPreference(PREF.HIGHLIGHT_TASKS) || moveBundleId?.contains("taskReady")) {
+			def roomAssets = room.sourceAssets + room.targetAssets
+			Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,
+								[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
+			racks = assetsByStatus.rackSource + assetsByStatus.rackTarget
+			racks.removeAll([null])
+			racks.each {
+				def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status
+				statusList[it.id] = statuses.contains("Hold") ? "task_hold" : statuses.contains("Started") ? "task_started" : "task_ready"
 			}
-
-			[roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
-			 racksList: racksList, source:params.source, target:params.target, projectId : projectId, capacityView:params.capView, capacityType:params.capType?:'Remaining',
-			 auditPref:auditView, browserTestiPad:browserTestiPad, statusList:statusList, bundleList:bundleLists, moveBundleId:moveBundleId]
+			userPreferenceService.setPreference(PREF.HIGHLIGHT_TASKS, moveBundleId)
+			moveBundleId = 'taskReady'
 		}
+
+		def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad") ?:
+		                      request.getHeader("User-Agent").toLowerCase().contains("mobile")
+
+		[roomInstance: room, roomInstanceList: rooms, moveBundleList: moveBundleList, project: project,
+		 racksList: racksList, source: params.source, target: params.target, projectId: project.id,
+		 capacityView: params.capView, capacityType: params.capType ?: 'Remaining', auditPref: auditView,
+		 browserTestiPad: browserTestiPad, statusList: statusList, bundleList: bundleLists, moveBundleId: moveBundleId]
 	}
 
 	def edit() {
-		def roomInstance = Room.get(params.id)
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.get( projectId )
-		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
-		def prefVal = userPreferenceService.getPreference(PREF.ROOM_TABLE_SHOW_ALL)?: 'FALSE'
-		def modelList = Model.findAllByRoomObjectAndAssetType(true, 'Rack')
-		def newRacks = []
-		for(int i = 50000 ; i<50051; i++ ){
-			newRacks << i
-		}
-		if (!roomInstance) {
+		Room room = Room.get(params.id)
+		if (!room) {
 			flash.message = "Current Room not found"
 			redirect(action: "list")
-		}
-		else {
-			def draggableRack = session.getAttribute( "DraggableRack" )?.DraggableRack
-			[roomInstance: roomInstance,
-			 rackInstanceList:rackInstanceList,
-			 newRacks : newRacks,
-			 modelList:modelList,
-			 draggableRack:draggableRack,
-			 prefVal:prefVal,
-			 defaultRackModel: rackService.getDefaultRackModel()
-			]
+			return
 		}
 
+		List<Rack> racks = Rack.findAllByRoom(room, [sort: "tag"])
+		def prefVal = userPreferenceService.getPreference(PREF.ROOM_TABLE_SHOW_ALL) ?: 'FALSE'
+		List<Model> models = Model.findAllByRoomObjectAndAssetType(true, 'Rack')
+		def newRacks = []
+		for (int i = 50000 ; i<50051; i++) {
+			newRacks << i
+		}
+
+		[roomInstance: room, rackInstanceList: racks, newRacks: newRacks, modelList: models, prefVal: prefVal,
+		 draggableRack: userPreferenceService.getPreference(PREF.DRAGGABLE_RACK),
+		 defaultRackModel: rackService.getDefaultRackModel()]
 	}
 
 	/**
@@ -197,34 +199,31 @@ class RoomController {
 	 * @return room layout
 	 */
 	def roomObject() {
-		def rack = Rack.get(params.id)
-		if(!rack) rack = new Rack()
-		render (template:"roomObject", model:[rack:rack, rackId:params.id])
+		def rack = Rack.get(params.id) ?: new Rack()
+		render(template: "roomObject", model: [rack: rack, rackId: params.id])
 	}
 
 	/**
 	 * Update Room and Rack information
 	 */
 	def update() {
-		def user = securityService.getUserLogin()
-		def project = controllerService.getProjectForPage( this )
-		if (! project)
-			return
+		Project project = controllerService.getProjectForPage(this)
+		if (! project) return
 
-		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
+		def powerType = userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)
 		def roomId = params.id
 		List rackIds = request.getParameterValues("rackId")
 
 		def msg
 		try {
-			msg = roomService.updateRoomAndRacksInfo(project, user, roomId, rackIds, params, powerType)
+			msg = roomService.updateRoomAndRacksInfo(project, roomId, rackIds, params, powerType)
 
 			// Set user preference for Show All (TODO - this should NOT be here)
-			userPreferenceService.setPreference(PREF.ROOM_TABLE_SHOW_ALL, params.showAll=='1' ? 'TRUE' : 'FALSE')
+			userPreferenceService.setPreference(PREF.ROOM_TABLE_SHOW_ALL, params.showAll == '1')
 
 		} catch (e) {
 			e.printStackTrace()
-			log.info "Calling roomService.updateRoomAndRacksInfo() failed - ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e,60)}"
+			log.info "Calling roomService.updateRoomAndRacksInfo() failed - $e.message\n${ExceptionUtil.stackTraceToString(e,60)}"
 			msg = 'An unexpected error occurred during the update'
 		}
 
@@ -232,43 +231,33 @@ class RoomController {
 		chain(action: "show", id: params.id)
 	}
 
-	private void flush() {
-		def hbSession = sessionFactory.currentSession
-		hbSession.flush()
-		hbSession.clear()
-	}
-
 	/**
 	 * Used to delete one or more rooms that do not have associated assets assigned to the room
 	 * @param checkbox_{roomId}
 	 */
 	def delete() {
-
-		def project = securityService.getUserCurrentProject()
-		def user = securityService.getUserLogin()
-
+		Project project = securityService.userCurrentProject
 		def roomIds = []
 
 		// Iterate over the params looking for the checkboxes that have been selected
 		params.each { n, v ->
-			if (n.startsWith('checkbox_')) {
-				if (params[n] == 'on')
-					roomIds << n.split(/_/)[1]
+			if (n.startsWith('checkbox_') && params[n] == 'on') {
+				roomIds << n.split(/_/)[1]
 			}
 		}
 
 		if (! roomIds.size()) {
 			flash.message "Please select at least one room to be deleted before clicking Delete"
 		} else {
-			def s = 0
+			int s = 0
 			try {
-				def results = roomService.deleteRoom(project, user, roomIds)
+				def results = roomService.deleteRoom(project, roomIds)
 				s = results.size()
 				if (s) {
 					flash.message = "$s room${s > 1 ? 's were' : ' was'} not deleted either because ${s > 1 ? 'they were' : 'it was'} associated with devices or not found"
 				}
 			} catch (e) {
-				flash.message = "The selected room${s > 1 ? 's were' : ' was'} not deleted due to: ${e.getMessage()}"
+				flash.message = "The selected room${s > 1 ? 's were' : ' was'} not deleted due to: $e.message"
 			}
 		}
 
@@ -276,147 +265,166 @@ class RoomController {
 	}
 
 	/**
-	 *  Verify if rack has associated with any assets before deleting it.
+	 * Verify if rack has associated with any assets before deleting it.
 	 */
 	def verifyRackAssociatedRecords() {
-		def id = params.rackId
-		def rack = Rack.get(id)
-		def assetEntity
-		if(rack){
-			assetEntity = AssetEntity.findByRackSourceOrRackTarget(rack,rack)
+		AssetEntity assetEntity
+		Rack rack = Rack.get(params.rackId)
+		if (rack) {
+			assetEntity = AssetEntity.findByRackSourceOrRackTarget(rack, rack)
 		}
-		if(!assetEntity)
+
+		if (!assetEntity) {
 			assetEntity = []
+		}
+
 		render assetEntity as JSON
 	}
-	/**
-	*  Verify if Room has associated with any assets before deleting it.
-	*/
-   def verifyRoomAssociatedRecords() {
-	   def id = params.roomId
-	   def room = Room.get(id)
-	   def associatedRecords
 
-	   if(room){
-		   associatedRecords = AssetEntity.findByRoomSourceOrRoomTarget(room,room)
-		   if(!associatedRecords)
-		   associatedRecords = Rack.findByRoom(room)
-	   }
-	   if(!associatedRecords)
-			associatedRecords = []
-	   render associatedRecords as JSON
-   }
 	/**
-	 *  Merge Racks and delete the selected Room and Racks
+	 * Verify if Room has associated with any assets before deleting it.
 	 */
-   def mergeRoom() {
-	   def sourceRoomId = params.sourceRoom
-	   def targetRoomId = params.targetRoom
-	   if(sourceRoomId && targetRoomId){
-		   def sourceRoom = Room.get(sourceRoomId)
-		   def targetRoom = Room.get(targetRoomId)
-		   updateAssetEntityToMergeRooms(sourceRoom,targetRoom)
-		   updateRackToMergeRooms(sourceRoom,targetRoom)
-		   sourceRoom.delete(flush:true)
-		   redirect(action: "list", params:[viewType : "list"])
-		   flash.message = "Room:${sourceRoom} is merged to Room: ${targetRoom} successfully."
-	   } else {
-		   redirect(action: "list", params:[viewType : "list"])
-	   }
-   }
-   def updateAssetEntityToMergeRooms(sourceRoom,targetRoom){
-	   AssetEntity.executeUpdate("Update AssetEntity set sourceLocation = '${targetRoom.location}', sourceRoom = '${targetRoom.roomName}', roomSource = ${targetRoom.id} where roomSource = ${sourceRoom.id}")
-	   AssetEntity.executeUpdate("Update AssetEntity set targetLocation = '${targetRoom.location}', targetRoom = '${targetRoom.roomName}', roomTarget = ${targetRoom.id} where roomTarget = ${sourceRoom.id}")
-   }
-   def updateRackToMergeRooms(sourceRoom,targetRoom){
-	   def sourceRoomRacks = Rack.findAllByRoom( sourceRoom )
-	   sourceRoomRacks.each{ sourceRack ->
-		   def rackTarget = Rack.findOrCreateWhere(source:sourceRack.source, 'project.id':sourceRack.project.id, location:sourceRack.location, 'room.id':targetRoom?.id, tag:sourceRack.tag)
-		   // Update all assets with this rack info to point to this rack
-		   if(!rackTarget){
-			   println "Unable to create rack: ${rackTarget.errors}"
-			   AssetEntity.executeUpdate("Update AssetEntity set rackSource = null where rackSource = ${sourceRack.id}")
-			   AssetEntity.executeUpdate("Update AssetEntity set rackTarget = null where rackTarget = ${sourceRack.id}")
-		   } else {
-			   AssetEntity.executeUpdate("Update AssetEntity set rackSource = ${rackTarget.id} where rackSource = ${sourceRack.id}")
-			   AssetEntity.executeUpdate("Update AssetEntity set rackTarget = ${rackTarget.id} where rackTarget = ${sourceRack.id}")
-		   }
-		   sourceRack.delete(flush:true)
-	   }
-   }
-   /**
-	*  Return Power details as string to show at room layout.
-	*/
-   def retrieveRackPowerData() {
-	   def room = Room.read(params.roomId)
-	   def racks = Rack.findAllByRoom(room)
-	   def location = room.source == 1 ? "source" : "target"
-	   def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
-	   def totalPower = 0
-	   def totalSpace = 0
-	   def spaceUsed = 0
-	   def powerUsed = 0
-	   def moveBundles = MoveBundle.findAllByProject( room.project )
-	   List bundleId = request.getParameterValues("moveBundleId")
-	   if((bundleId && !bundleId.contains("all")) && params.otherBundle != "on"){
-		   def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
-		   moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
-	   }
-	   racks.each{ obj->
-		   totalPower += obj.powerA + obj.powerB + obj.powerC
-		   totalSpace += obj.rackType == 'Rack' ? (obj.model?.usize ?: 42) : 0
-		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(obj, [sort:'sourceRackPosition']) :
-			 AssetEntity.findAllByRackTarget(obj, [sort:'targetRackPosition'])
-		   assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
-			   spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
-			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",assetEntity])
-			   def powerConnectorsAssigned = powerConnectors.size()
-			   def rackPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
-			   if(powerConnectorsAssigned){
-				   def powerUseForConnector = rackPower ? rackPower / powerConnectorsAssigned : 0
-				   powerConnectors.each{ cables ->
-					   powerUsed += powerUseForConnector
-				   }
-			   }
-		   }
-	   }
-	   if(params.capacityType != "Used") {
-		   spaceUsed = totalSpace - spaceUsed
-		   powerUsed = totalPower - powerUsed
-	   }
-	   powerUsed = powerType != "Watts" ?  powerUsed ? (powerUsed / 120).toFloat().round(1) : 0.0 : powerUsed ? Math.round(powerUsed):0
-	   totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 120).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
-	   def powerA = 0
-	   def powerB = 0
-	   def powerC = 0
-	   def powerX = 0
-	   def rackPowerA = 0
-	   def rackPowerB = 0
-	   def rackPowerC = 0
-	   def spaceString = ""
-	   def powerString = "W"
-	   if(powerType != "Watts"){
-		powerString = "Amps"
-	   }
-	   def thisRackUsedSpace = 0
-	   def thisRackTotalSpace = 42
-	   def rackId = params.rackId
-	   def rack
-	   def totalPowerInRack = 0
-	   def unassignedPowerInRack = 0
-	   if(rackId){
-		   rack = Rack.get(rackId)
-		   def assets = AssetEntity.findAllByRackSource( rack )
-		   if(rack.source != 1){
-				   assets = AssetEntity.findAllByRackTarget( rack )
-		   }
-		   thisRackTotalSpace = rack.model?.usize ?: 42
+	def verifyRoomAssociatedRecords() {
+		Room room = Room.get(params.roomId)
+		def associatedRecords
 
-		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort:'sourceRackPosition']) :
-				AssetEntity.findAllByRackTarget(rack, [sort:'targetRackPosition'])
+		if (room) {
+			associatedRecords = AssetEntity.findByRoomSourceOrRoomTarget(room, room) ?: Rack.findByRoom(room)
+		}
+
+		if (!associatedRecords) {
+			associatedRecords = []
+		}
+
+		render associatedRecords as JSON
+	}
+
+	/**
+	 * Merge Racks and delete the selected Room and Racks
+	 */
+	def mergeRoom() {
+		def sourceRoomId = params.sourceRoom
+		def targetRoomId = params.targetRoom
+		if (!sourceRoomId || !targetRoomId) {
+			redirect(action: "list", params: [viewType: "list"])
+			return
+		}
+
+		def sourceRoom = Room.get(sourceRoomId)
+		def targetRoom = Room.get(targetRoomId)
+		updateAssetEntityToMergeRooms(sourceRoom,targetRoom)
+		updateRackToMergeRooms(sourceRoom,targetRoom)
+		sourceRoom.delete(flush:true)
+		flash.message = "Room:$sourceRoom is merged to Room: $targetRoom successfully."
+		redirect(action: "list", params: [viewType: "list"])
+	}
+
+	private void updateAssetEntityToMergeRooms(Room sourceRoom, Room targetRoom) {
+		AssetEntity.executeUpdate('''
+			update AssetEntity
+			set sourceLocation=:location, sourceRoom=:roomName, roomSource=:targetRoomId
+			where roomSource=:sourceRoomId
+		''', [location: targetRoom.location, roomName: targetRoom.roomName,
+		      targetRoomId: targetRoom.id, sourceRoomId: sourceRoom.id])
+
+		AssetEntity.executeUpdate('''
+			update AssetEntity
+			set targetLocation=:targetLocation, targetRoom=:targetRoom, roomTarget=:roomTarget
+			where roomTarget=:sourceRoomId
+		''', [targetLocation: targetRoom.location, targetRoom: targetRoom.roomName,
+		      roomTarget: targetRoom.id, sourceRoomId: sourceRoom.id])
+	}
+
+	def updateRackToMergeRooms(sourceRoom,targetRoom) {
+		def sourceRoomRacks = Rack.findAllByRoom(sourceRoom)
+		sourceRoomRacks.each { sourceRack ->
+			def rackTarget = Rack.findOrCreateWhere(source: sourceRack.source, 'project.id': sourceRack.project.id,
+				                                     location: sourceRack.location, 'room.id': targetRoom?.id, tag: sourceRack.tag)
+			// Update all assets with this rack info to point to this rack
+			if (!rackTarget) {
+				println "Unable to create rack: $rackTarget.errors"
+				AssetEntity.executeUpdate('update AssetEntity set rackSource=null where rackSource=?', [sourceRack.id])
+				AssetEntity.executeUpdate('update AssetEntity set rackTarget=null where rackTarget=?', [sourceRack.id])
+			} else {
+				AssetEntity.executeUpdate('update AssetEntity set rackSource=? where rackSource=?', [rackTarget.id, sourceRack.id])
+				AssetEntity.executeUpdate('update AssetEntity set rackTarget=? where rackTarget=?', [rackTarget.id, sourceRack.id])
+			}
+			sourceRack.delete(flush:true)
+		}
+	}
+
+	/**
+	 *  Return Power details as string to show at room layout.
+	 */
+	def retrieveRackPowerData() {
+		def room = Room.read(params.roomId)
+		def racks = Rack.findAllByRoom(room)
+		def location = room.source == 1 ? "source" : "target"
+		def powerType = userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)
+		def totalPower = 0
+		def totalSpace = 0
+		def spaceUsed = 0
+		def powerUsed = 0
+		def moveBundles = MoveBundle.findAllByProject(room.project)
+		List bundleIds = request.getParameterValues("moveBundleId")
+		if (bundleIds && !bundleIds.contains("all") && params.otherBundle != "on") {
+			moveBundles = MoveBundle.getAll(bundleId*.toLong()).findAll()
+		}
+
+		racks.each { obj ->
+			totalPower += obj.powerA + obj.powerB + obj.powerC
+			totalSpace += obj.rackType == 'Rack' ? (obj.model?.usize ?: 42) : 0
+			def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(obj, [sort:'sourceRackPosition']) :
+			                                          AssetEntity.findAllByRackTarget(obj, [sort:'targetRackPosition'])
+			assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
+				spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
+				def powerConnectors = AssetCableMap.executeQuery(
+					'FROM AssetCableMap WHERE assetFromPort.type=? AND assetFrom=?', ["Power", assetEntity])
+				def powerConnectorsAssigned = powerConnectors.size()
+				def rackPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
+				if (powerConnectorsAssigned) {
+					def powerUseForConnector = rackPower ? rackPower / powerConnectorsAssigned : 0
+					powerConnectors.each { cables ->
+						powerUsed += powerUseForConnector
+					}
+				}
+			}
+		}
+
+		if (params.capacityType != "Used") {
+			spaceUsed = totalSpace - spaceUsed
+			powerUsed = totalPower - powerUsed
+		}
+
+		powerUsed = convertPower(powerUsed, powerType)
+		totalPower = convertPower(totalPower, powerType)
+		def powerA = 0
+		def powerB = 0
+		def powerC = 0
+		def powerX = 0
+		def rackPowerA = 0
+		def rackPowerB = 0
+		def rackPowerC = 0
+		def spaceString = ""
+		def powerString = powerType == "Watts" ? "W" : "Amps"
+		def thisRackUsedSpace = 0
+		def rackId = params.rackId
+		def rack
+		def totalPowerInRack = 0
+		def unassignedPowerInRack = 0
+		if (rackId) {
+			rack = Rack.get(rackId)
+			def assets = AssetEntity.findAllByRackSource(rack)
+			if (rack.source != 1) {
+				assets = AssetEntity.findAllByRackTarget(rack)
+			}
+			int thisRackTotalSpace = rack.model?.usize ?: 42
+
+		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort: 'sourceRackPosition']) :
+			                                          AssetEntity.findAllByRackTarget(rack, [sort: 'targetRackPosition'])
 		   def assetPos = 0
 		   def prevUsize = 0
-		   assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
+		   assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
 			   // Calculating current assets's position .
 			   def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 			   thisRackUsedSpace += posResult.assetUsize
@@ -425,177 +433,169 @@ class RoomController {
 			   assetPos = posResult.assetUsize > 0 ? posResult.currAssetPos : assetPos
 			   prevUsize = posResult.thisUsize > 0 ? posResult.thisUsize : prevUsize
 		   }
-		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace-thisRackUsedSpace)+" remaining of "+thisRackTotalSpace+" RU" : thisRackUsedSpace+" used of "+thisRackTotalSpace+" RU"
-		   assets.each{ asset->
-			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",asset])
+		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace - thisRackUsedSpace) +
+		   	" remaining of " + thisRackTotalSpace + " RU" :
+		   	thisRackUsedSpace + " used of " + thisRackTotalSpace + " RU"
+		   assets.each { asset->
+			   def assetPowerCabling = AssetCableMap.executeQuery(
+			   	'FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ?',["Power",asset])
 			   def powerConnectors = assetPowerCabling.size()
 			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
 
 			   def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
 			   totalPowerInRack = powerDesign + totalPowerInRack
-			   assetPowerCabling.each{
-				   if(it.toPower==null){
+			   assetPowerCabling.each {
+				   if (it.toPower==null) {
 					   unassignedPowerInRack = powerDesign/powerConnectors + unassignedPowerInRack
 					}
 				}
-			   if(powerConnectorsAssigned){
+			   if (powerConnectorsAssigned) {
 				   def powerUseForConnector = powerDesign ? (powerDesign / powerConnectors) : 0
-				   assetPowerCabling.each{ cables ->
-					   if(cables.toPower){
-						   switch(cables.toPower){
-							   case "A": powerA += powerUseForConnector
-							   break
-							   case "B": powerB += powerUseForConnector
-							   break
-							   case "C": powerC += powerUseForConnector
-							   break
+				   assetPowerCabling.each { cables ->
+					   if (cables.toPower) {
+						   switch(cables.toPower) {
+							   case "A": powerA += powerUseForConnector; break
+							   case "B": powerB += powerUseForConnector; break
+							   case "C": powerC += powerUseForConnector; break
 						   }
 					   }
 				   }
 			  }
 					powerX = unassignedPowerInRack
-
 		   }
-		   powerA = powerType != "Watts" ?  powerA ? (powerA / 120).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0
-		   powerB = powerType != "Watts" ?  powerB ? (powerB / 120).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
-		   powerC = powerType != "Watts" ?  powerC ? (powerC / 120).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
-		   powerX = powerType != "Watts" ?  powerX ? (powerX / 120).toFloat().round(1) : 0.0 : powerX ? Math.round(powerX):0
 
-		   rackPowerA = powerType != "Watts" ? rack.powerA ? (rack.powerA / 120).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA) : 0
-		   rackPowerB = powerType != "Watts" ? rack.powerB ? (rack.powerB / 120).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB) : 0
-		   rackPowerC = powerType != "Watts" ? rack.powerC ? (rack.powerC / 120).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC) : 0
+			powerA = convertPower(powerA, powerType)
+			powerB = convertPower(powerB, powerType)
+			powerC = convertPower(powerC, powerType)
+			powerX = convertPower(powerX, powerType)
 
+			rackPowerA = convertPower(rack.powerA, powerType)
+			rackPowerB = convertPower(rack.powerB, powerType)
+			rackPowerC = convertPower(rack.powerC, powerType)
 	   }
 
-
 	   def redTBD = false
-	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
+	   if ((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC)) {
 		   redTBD = true
 	   }
 	   def op="""<table style='width:300px;padding:0px;border:0px;'>
 		   <tr>
 				<td class='powertable_H'>Room <br />Totals: </td>
 				<td colspan=2 class='powertable_H' >Space: (RU)<br />$spaceUsed / $totalSpace</td>
-				<td colspan=2 class='powertable_H' >Power (${powerString}):<br />$powerUsed / $totalPower</td>
+				<td colspan=2 class='powertable_H' >Power ($powerString):<br />$powerUsed / $totalPower</td>
 		   </tr>
 		   <tr><td class='powertable_L'>&nbsp;</td></tr>"""
-	   if(rack){
+	   if (rack) {
 		   op += """
 				   <tr>
 						<td colspan=2 class='powertable_L'><b>Rack : ${rack?.tag ?:""}</b></td>
-						<td colspan=3 class='powertable_L' nowrap>${spaceString}</td>
+						<td colspan=3 class='powertable_L' nowrap>$spaceString</td>
 				   </tr>
 				   <tr>
-					   <td class='powertable_L'>Power (${powerString})</td>
-					   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_R'>A</td>
-					   <td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_R'>B</td>
-					   <td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_R'>C</td>
+					   <td class='powertable_L'>Power ($powerString)</td>
+					   <td style='background:${powerA > rackPowerA ? 'red' : ''};' class='powertable_R'>A</td>
+					   <td style='background:${powerB > rackPowerB ? 'red' : ''};' class='powertable_R'>B</td>
+					   <td style='background:${powerC > rackPowerC ? 'red' : ''};' class='powertable_R'>C</td>
 					   <td style='background:${redTBD ? 'red':''};' class='powertable_R'>TBD</td>
 				   </tr>
 				   <tr>
-					   <td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rackPowerA}</td>
-					   <td class='powertable_R'>${rackPowerB}</td><td class='powertable_R'>${rackPowerC}</td>
+					   <td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>$rackPowerA</td>
+					   <td class='powertable_R'>$rackPowerB</td><td class='powertable_R'>$rackPowerC</td>
 					   <td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td>
-					   <td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td>
-					   <td class='powertable_R'>${powerX}</td>
+					   <td class='powertable_R'>$powerA</td><td class='powertable_R'>$powerB</td><td class='powertable_R'>$powerC</td>
+					   <td class='powertable_R'>$powerX</td>
 				   </tr></table>"""
 	   } else {
-		op += "</table>"
+			op += "</table>"
 	   }
-
 
 		render  op
    }
+
    /**
-	*  Return assets list as html row format to assign racks
-	*/
+	 *  Return assets list as html row format to assign racks
+	 */
    def retrieveAssetsListToAddRack() {
-	   def order = params.order ? params.order : 'asc'
-	   def project = securityService.getUserCurrentProject()
-	   def projectId = project.id
+	   def order = params.order ?: 'asc'
+	   Project project = securityService.userCurrentProject
 	   def source = params.source
-	   def assetEntityList = null
-	   def sort = params.sort ?  params.sort : 'assetName'
+	   def sort = params.sort ?: 'assetName'
 	   def assign = params.assign
 	   def excludeAssetType = ['Blade', 'Application', 'Database', 'Files', 'VM', 'Virtual', 'Virtual Machine']
-	   def query = "from AssetEntity where project =:projcet and assetType not in (:excludeAssetType) and assetClass =:assetClass "
-	   if(assign != 'all') {
-		   query += " and (${source == '1' ? 'rackSource' : 'rackTarget'}) is null"
+	   def query = "from AssetEntity where project =:project and assetType not in (:excludeAssetType) and assetClass =:assetClass "
+	   if (assign != 'all') {
+		   query += ' and (rack' + (source == '1' ? 'Source' : 'Target') + ') is null'
 	   }
 	   order = order == 'asc' ? 'desc' : 'asc'
-	   query += " order by ${sort} ${order}"
-	   assetEntityList = AssetEntity.findAll(query,[projcet:project, excludeAssetType:excludeAssetType, assetClass: AssetClass.DEVICE ])
+	   query += " order by $sort $order"
+	   def entities = AssetEntity.findAll(query,[project:project, excludeAssetType:excludeAssetType, assetClass: AssetClass.DEVICE ])
 
-	   def stringToReturn = new StringBuffer()
-	   stringToReturn.append("""
+	   def html = new StringBuffer()
+	   html.append("""
 			<div class="dialog" >
 			<table id="listDiv">
 			<thead>
 				<tr>
-					<th class="sortable ${sort=='assetName' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetName','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Name</a></th>
-					<th class="sortable ${sort=='assetTag' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetTag','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Tag</a></th>
-					<th class="sortable ${sort=='model' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'model','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Model</a></th>
+					<th class="sortable ${sort=='assetName' ? 'sorted '+order :''}"><a href="javascript:listDialog('$assign', 'assetName','$order','$source','$params.rack','$params.roomName','$params.location','$params.position')">Asset Name</a></th>
+					<th class="sortable ${sort=='assetTag' ? 'sorted '+order :''}"><a href="javascript:listDialog('$assign', 'assetTag','$order','$source','$params.rack','$params.roomName','$params.location','$params.position')">Asset Tag</a></th>
+					<th class="sortable ${sort=='model' ? 'sorted '+order :''}"><a href="javascript:listDialog('$assign', 'model','$order','$source','$params.rack','$params.roomName','$params.location','$params.position')">Model</a></th>
 				</tr>
 			</thead>
 			<tbody class="tbody" >
 			""")
-	   if (assetEntityList.size() > 0) {
-		   assetEntityList.eachWithIndex{ obj, i ->
-			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('${obj.assetClass}',${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}');closeAssignAssetListDialog();">
-					<td>${obj.assetName}</td>
-					<td>${obj.assetTag}</td>
+	   if (entities) {
+		   entities.eachWithIndex{ obj, i ->
+			   html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('$obj.assetClass',$obj.id,'$source','$params.rack','$params.roomName','$params.location','$params.position');closeAssignAssetListDialog();">
+					<td>$obj.assetName</td>
+					<td>$obj.assetTag</td>
 					<td>${obj.model ? obj.model.modelName : ''}</td>
 				</tr>""")
 		   }
 	   } else {
-			stringToReturn.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
+			html.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
 	   }
-	   stringToReturn.append("</tbody></table></div>")
-	   render stringToReturn
+	   html.append("</tbody></table></div>")
+
+	   render html.toString()
    }
+
    /**
-	*  Return blades list as html row format to assign blade chassis
-	*/
+	 *  Return blades list as html row format to assign blade chassis
+	 */
    def retrieveBladeAssetsListToAddRack() {
-	   def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 	   def source = params.source
-	   def assetEntityList = null
-	   if(params.assign == 'assign'){
-		   if(source == '1'){
-				   assetEntityList = AssetEntity.findAll("from AssetEntity where sourceChassis is null and project = ${projectId} and assetType = 'Blade'")
-		   } else {
-				   assetEntityList = AssetEntity.findAll("from AssetEntity where targetChassis is null and project = ${projectId} and assetType = 'Blade'")
-		   }
-	   } else {
-		   if(source == '1'){
-				   assetEntityList = AssetEntity.findAll("from AssetEntity where project = ${projectId} and assetType = 'Blade'")
-		   } else {
-				   assetEntityList = AssetEntity.findAll("from AssetEntity where project = ${projectId} and assetType = 'Blade'")
-		   }
+
+		String middle = ''
+	   if (params.assign == 'assign') {
+	   	middle = (source == '1' ? 'source' : 'target') + 'Chassis is null and '
 	   }
-	   def stringToReturn = new StringBuffer()
+		String hql = 'from AssetEntity where ' + middle + "project=:projectId and assetType = 'Blade'"
+	   List<AssetEntity> entities = AssetEntity.executeQuery(hql, [projectId: securityService.userCurrentProjectId])
+
+	   def html = new StringBuffer()
 
 	   def bladeAsset = AssetEntity.get(params.blade)
 	   def bladeAssetId = bladeAsset?.id
-	   def bundleId = bladeAsset?.moveBundle?.id
-		stringToReturn.append("""
+	   def bundleId = bladeAsset?.moveBundleId
+		html.append("""
 			<div class="dialog" >
 			<table id="listDiv">
 			<tbody class="tbody" >
 			""")
-	   if(assetEntityList.size() > 0){
-		   assetEntityList.eachWithIndex{ obj, i ->
-			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editBladeDialog('${obj.assetClass}',${obj.id},'${source}','${bladeAssetId}','${params.roomName}','${params.location}','${params.position}')">
-											<td>${obj.assetName}</td>
-											<td>${obj.assetTag}</td>
+	   if (entities) {
+		   entities.eachWithIndex{ obj, i ->
+			   html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="editBladeDialog('$obj.assetClass',$obj.id,'$source','$bladeAssetId','$params.roomName','$params.location','$params.position')">
+											<td>$obj.assetName</td>
+											<td>$obj.assetTag</td>
 											<td>${obj.model ? obj.model.modelName : ''}</td>
 										</tr>""")
 		   }
 	   } else {
-			   stringToReturn.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
+		   html.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
 	   }
-	   stringToReturn.append("</tbody></table></div>")
-	   render stringToReturn
+	   html.append("</tbody></table></div>")
+
+	   render html.toString()
    }
 	/**
 	 * Room Capacity Scaling
@@ -611,10 +611,10 @@ class RoomController {
 		def maxPower = 1
 		def location = room?.source == 1 ? "source" : "target"
 		def rackCountMap = [:]
-		racks.each{rack->
+		racks.each { rack ->
 			def rackUsize = rack.model?.usize ?:42
 			def rackPower = rack.powerA + rack.powerB + rack.powerC
-			if( rackPower && maxPower < rackPower ){
+			if (rackPower && maxPower < rackPower) {
 				maxPower = rackPower
 			}
 
@@ -624,7 +624,7 @@ class RoomController {
 			def powerUsed = 0
 			def assetPos = 0 // a flag to determine the previous asset's  rack position .
 			def prevUsize = 0 // a flag to determine the previous asset's  usize .
-			assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
+			assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
 
 			def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 				usedRacks += posResult.assetUsize
@@ -632,9 +632,9 @@ class RoomController {
 				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
 				def totalPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
-				if(powerConnectorsAssigned){
+				if (powerConnectorsAssigned) {
 					def powerUseForConnector = totalPower ? totalPower / powerConnectorsAssigned : 0
-					powerConnectors.each{ cables ->
+					powerConnectors.each { cables ->
 						powerUsed += powerUseForConnector
 					}
 				}
@@ -642,79 +642,91 @@ class RoomController {
 				assetPos = posResult.assetUsize > 0 ? posResult.currAssetPos : assetPos
 				prevUsize = posResult.thisUsize > 0 ? posResult.thisUsize : prevUsize
 			}
-			switch(capacityView){
+			switch(capacityView) {
 				case "Space":
-					if(capacityType != "Used"){
+					if (capacityType != "Used") {
 						usedRacks = rackUsize - usedRacks
-						if(usedRacks <= Math.round(maxU*0.2)){
-							rackData["${rack.id}"] = "rack_cap100"
-						}else if(usedRacks <= Math.round(maxU*0.32)){
-							rackData["${rack.id}"] = "rack_cap80"
-						}else if(usedRacks <= Math.round(maxU*0.44)){
-							rackData["${rack.id}"] = "rack_cap68"
-						}else if(usedRacks <= Math.round(maxU*0.56)){
-							rackData["${rack.id}"] = "rack_cap56"
-						}else if(usedRacks <= Math.round(maxU*0.68)){
-							rackData["${rack.id}"] = "rack_cap44"
-						}else if(usedRacks <=  Math.round(maxU*0.80)){
-							rackData["${rack.id}"] = "rack_cap32"
-						}else{
-							rackData["${rack.id}"] = "rack_cap20"
+						String value
+						if (usedRacks <= Math.round(maxU*0.2)) {
+							value = "rack_cap100"
+						} else if (usedRacks <= Math.round(maxU*0.32)) {
+							value = "rack_cap80"
+						} else if (usedRacks <= Math.round(maxU*0.44)) {
+							value = "rack_cap68"
+						} else if (usedRacks <= Math.round(maxU*0.56)) {
+							value = "rack_cap56"
+						} else if (usedRacks <= Math.round(maxU*0.68)) {
+							value = "rack_cap44"
+						} else if (usedRacks <=  Math.round(maxU*0.80)) {
+							value = "rack_cap32"
+						} else {
+							value = "rack_cap20"
 						}
-						rackCountMap << [("rack_"+rack.id) : usedRacks]
-
-					}else{
-						if(usedRacks <= Math.round(maxU*0.2)){
-							rackData["${rack.id}"] = "rack_cap20"
-						}else if(usedRacks <= Math.round(maxU*0.32)){
-							rackData["${rack.id}"] = "rack_cap32"
-						}else if(usedRacks <= Math.round(maxU*0.44)){
-							rackData["${rack.id}"] = "rack_cap44"
-						}else if(usedRacks <= Math.round(maxU*0.56)){
-							rackData["${rack.id}"] = "rack_cap56"
-						}else if(usedRacks <= Math.round(maxU*0.68)){
-							rackData["${rack.id}"] = "rack_cap68"
-						}else if(usedRacks <= Math.round(maxU*0.80)){
-							rackData["${rack.id}"] = "rack_cap80"
-						}else{
-							rackData["${rack.id}"] = "rack_cap100"
+						rackData[rack.id.toString()] = value
+						rackCountMap["rack_" + rack.id] = usedRacks
+					} else {
+						String value
+						if (usedRacks <= Math.round(maxU*0.2)) {
+							value = "rack_cap20"
+						} else if (usedRacks <= Math.round(maxU*0.32)) {
+							value = "rack_cap32"
+						} else if (usedRacks <= Math.round(maxU*0.44)) {
+							value = "rack_cap44"
+						} else if (usedRacks <= Math.round(maxU*0.56)) {
+							value = "rack_cap56"
+						} else if (usedRacks <= Math.round(maxU*0.68)) {
+							value = "rack_cap68"
+						} else if (usedRacks <= Math.round(maxU*0.80)) {
+							value = "rack_cap80"
+						} else {
+							value = "rack_cap100"
 						}
-						rackCountMap << [("rack_"+rack.id) : usedRacks]
+						rackData[rack.id.toString()] = value
+						rackCountMap["rack_" + rack.id] = usedRacks
 					}
 					break
 			  case "Power":
-					 if(capacityType != "Used"){
-						powerUsed = rackPower - powerUsed
-						if(powerUsed <= Math.round(rackPower*0.2) ){
-							rackData["${rack.id}"] = "rack_cap100"
-						}else if (powerUsed  <= Math.round(rackPower*0.32) ){
-							rackData["${rack.id}"] = "rack_cap80"
-						}else if (powerUsed <= Math.round(rackPower*0.44) ){
-							rackData["${rack.id}"] = "rack_cap68"
-						}else if (powerUsed <= Math.round(rackPower*0.56) ){
-							rackData["${rack.id}"] = "rack_cap56"
-						}else if (powerUsed <= Math.round(rackPower*0.68) ){
-							rackData["${rack.id}"] = "rack_cap44"
-						}else if (powerUsed <= Math.round(rackPower*0.80) ){
-							rackData["${rack.id}"] = "rack_cap32"
+				 if (capacityType != "Used") {
+					powerUsed = rackPower - powerUsed
+					int value
+					if (powerUsed <= Math.round(rackPower*0.2)) {
+						value = 100
+					}
+					else if (powerUsed <= Math.round(rackPower*0.32)) {
+						value = 80
+					}
+					else if (powerUsed <= Math.round(rackPower*0.44)) {
+						value = 68
+					}
+					else if (powerUsed <= Math.round(rackPower*0.56)) {
+						value = 56
+					}
+					else if (powerUsed <= Math.round(rackPower*0.68)) {
+						value = 44
+					}
+					else if (powerUsed <= Math.round(rackPower*0.80)) {
+						value = 32
+					}
+					else {
+						value = 20
+					}
+					rackData[rack.id.toString()] = 'rack_cap' + value
+				}
+				else {
+						if (powerUsed <= Math.round(rackPower*0.2)) {
+							rackData[rack.id.toString()] = "rack_cap20"
+						}else if (powerUsed <= Math.round(rackPower*0.32)) {
+							rackData[rack.id.toString()] = "rack_cap32"
+						}else if (powerUsed <= Math.round(rackPower*0.44)) {
+							rackData[rack.id.toString()] = "rack_cap44"
+						}else if (powerUsed <= Math.round(rackPower*0.56)) {
+							rackData[rack.id.toString()] = "rack_cap56"
+						}else if (powerUsed <= Math.round(rackPower*0.68)) {
+							rackData[rack.id.toString()] = "rack_cap68"
+						}else if (powerUsed <= Math.round(rackPower*0.80)) {
+							rackData[rack.id.toString()] = "rack_cap80"
 						}else{
-							rackData["${rack.id}"] = "rack_cap20"
-						}
-					}else{
-						if(powerUsed <= Math.round(rackPower*0.2) ){
-							rackData["${rack.id}"] = "rack_cap20"
-						}else if (powerUsed <= Math.round(rackPower*0.32) ){
-							rackData["${rack.id}"] = "rack_cap32"
-						}else if (powerUsed <= Math.round(rackPower*0.44) ){
-							rackData["${rack.id}"] = "rack_cap44"
-						}else if (powerUsed <= Math.round(rackPower*0.56) ){
-							rackData["${rack.id}"] = "rack_cap56"
-						}else if (powerUsed <= Math.round(rackPower*0.68) ){
-							rackData["${rack.id}"] = "rack_cap68"
-						}else if (powerUsed <= Math.round(rackPower*0.80) ){
-							rackData["${rack.id}"] = "rack_cap80"
-						}else{
-							rackData["${rack.id}"] = "rack_cap100"
+							rackData[rack.id.toString()] = "rack_cap100"
 						}
 					}
 					break
@@ -726,13 +738,12 @@ class RoomController {
 		capacityData.racks = racks.id
 		capacityData.rackCountMap = rackCountMap
 
-		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
-		powerType = powerType ?: "Watts"
-		maxPower = powerType != "Watts" ? Math.round(maxPower / 120) : maxPower
+		def powerType = userPreferenceService.getPreference(PREF.CURR_POWER_TYPE) ?: "Watts"
+		maxPower = convertPower(maxPower, powerType)
 		// Added switch to use if we use other capacityViews
-		switch(capacityView){
+		switch(capacityView) {
 			case "Space":
-				if(capacityType != "Used"){
+				if (capacityType != "Used") {
 					capacityData.view = [
 							cap20:"${Math.round(maxU*0.80)}+ RU",
 							cap32:"${Math.round(maxU*0.68)}+ RU",
@@ -755,30 +766,30 @@ class RoomController {
 				}
 				break
 			case "Power":
-				if(capacityType != "Used"){
+				if (capacityType != "Used") {
 					capacityData.view = [
-							cap20:"${Math.round(maxPower*0.80)}+ ${powerType}",
-							cap32:"${Math.round(maxPower*0.68)}+ ${powerType}",
-							cap44:"${Math.round(maxPower*0.56)}+ ${powerType}",
-							cap56:"${Math.round(maxPower*0.44)}+ ${powerType}",
-							cap68:"${Math.round(maxPower*0.32)}+ ${powerType}",
-							cap80:"${Math.round(maxPower*0.20)}+ ${powerType}",
-							cap100:"< ${Math.round(maxPower*0.2)} ${powerType}"
+							cap20:"${Math.round(maxPower*0.80)}+ $powerType",
+							cap32:"${Math.round(maxPower*0.68)}+ $powerType",
+							cap44:"${Math.round(maxPower*0.56)}+ $powerType",
+							cap56:"${Math.round(maxPower*0.44)}+ $powerType",
+							cap68:"${Math.round(maxPower*0.32)}+ $powerType",
+							cap80:"${Math.round(maxPower*0.20)}+ $powerType",
+							cap100:"< ${Math.round(maxPower*0.2)} $powerType"
 						]
 				} else {
 					capacityData.view = [
-							cap20:"< ${Math.round(maxPower*0.2)} ${powerType}",
-							cap32:"${Math.round(maxPower*0.20)}+ ${powerType}",
-							cap44:"${Math.round(maxPower*0.32)}+ ${powerType}",
-							cap56:"${Math.round(maxPower*0.44)}+ ${powerType}",
-							cap68:"${Math.round(maxPower*0.56)}+ ${powerType}",
-							cap80:"${Math.round(maxPower*0.68)}+ ${powerType}",
-							cap100:"${Math.round(maxPower*0.8)}+ ${powerType}"
+							cap20:"< ${Math.round(maxPower*0.2)} $powerType",
+							cap32:"${Math.round(maxPower*0.20)}+ $powerType",
+							cap44:"${Math.round(maxPower*0.32)}+ $powerType",
+							cap56:"${Math.round(maxPower*0.44)}+ $powerType",
+							cap68:"${Math.round(maxPower*0.56)}+ $powerType",
+							cap80:"${Math.round(maxPower*0.68)}+ $powerType",
+							cap100:"${Math.round(maxPower*0.8)}+ $powerType"
 						]
 				}
 				break
 		}
-		if(capacityData.view){
+		if (capacityData.view) {
 			render capacityData as JSON
 		} else {
 			render "None"
@@ -786,8 +797,7 @@ class RoomController {
 	}
 
 	def setDraggableRackPref() {
-		def prefVal = params.prefVal
-		userPreferenceService.setPreference(PREF.DRAGGABLE_RACK, prefVal)
+		userPreferenceService.setPreference(PREF.DRAGGABLE_RACK, params.prefVal)
 		render 'success'
 	}
 
@@ -798,15 +808,13 @@ class RoomController {
 	 * @param rackPos - the position of rack where we are requesting this method to fetch the assets
 	 * @return - list of assets at requested position
 	 */
-	def retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity) {
-		def assetsAtThisPos = location == "source" ? AssetEntity.findAllBySourceRackPositionAndRackSource(assetEntity.sourceRackPosition, rack) :
-			AssetEntity.findAllByTargetRackPositionAndRackTarget(assetEntity.targetRackPosition , rack)
-
-		return assetsAtThisPos
+	private List<AssetEntity> retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity) {
+		location == "source" ? AssetEntity.findAllBySourceRackPositionAndRackSource(assetEntity.sourceRackPosition, rack) :
+		                       AssetEntity.findAllByTargetRackPositionAndRackTarget(assetEntity.targetRackPosition, rack)
 	}
 
    /**
-	 * This method is used to get information of assets and there relevant pos., and usize to count rack used count .
+	 * Get information of assets and there relevant pos., and usize to count rack used count .
 	 * @param assetEntity : instance of assetEntity .
 	 * @param assetPos : previous asset rack position .
 	 * @param prevUsize : previous asset's model usize .
@@ -814,27 +822,27 @@ class RoomController {
 	 * @param rack : instance of rack .
 	 * @return : a map contains info like current and previous asset's usize and like current and previous asset's rack position .
 	 */
-	def retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack){
+	private Map retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack) {
 		def currAssetPos = location == "source" ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
 		def assetUsize = 0  // Initialized  to 0 to take the count of usize 0 if assets are overlapping.
 		// if assets are not overLapping then it should go inside condition to calculate asset's max usize.
 		def thisUsize
-		if( assetPos != currAssetPos &&  currAssetPos > (assetPos+prevUsize-1) ){ // if assets are not overlapping
+		if (assetPos != currAssetPos &&  currAssetPos > (assetPos + prevUsize - 1)) { // if assets are not overlapping
 			// fetching  all assets  of current rack position .
 			def assetsAtPos = retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity)
 			// Assigning usize of that assets which has max usize .
-			thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
+			thisUsize = assetsAtPos.model?.usize.sort().reverse()[0] ?: 1
 			assetUsize = thisUsize
-		} else if (currAssetPos > assetPos && currAssetPos < (assetPos+prevUsize)){ // If assets are overlapping
-				def assetsAtPos = retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity)
-				//Assigning usize of that assets which has max usize .
-				thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
-				if((assetPos + prevUsize) < (currAssetPos + thisUsize)){
-					assetUsize =  thisUsize - ((assetPos + prevUsize ) - (currAssetPos))
-				} else {
-					thisUsize = thisUsize > prevUsize ? thisUsize : prevUsize
-				}
+		} else if (currAssetPos > assetPos && currAssetPos < (assetPos+prevUsize)) { // If assets are overlapping
+			def assetsAtPos = retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity)
+			//Assigning usize of that assets which has max usize .
+			thisUsize = assetsAtPos.model?.usize.sort().reverse()[0] ?: 1
+			if ((assetPos + prevUsize) < (currAssetPos + thisUsize)) {
+				assetUsize =  thisUsize - ((assetPos + prevUsize) - (currAssetPos))
+			} else {
+				thisUsize = thisUsize > prevUsize ? thisUsize : prevUsize
+			}
 		}
-		return [thisUsize:thisUsize, prevUsize:prevUsize, assetUsize:assetUsize, currAssetPos:currAssetPos]
+		[thisUsize: thisUsize, prevUsize: prevUsize, assetUsize: assetUsize, currAssetPos: currAssetPos]
 	}
 }

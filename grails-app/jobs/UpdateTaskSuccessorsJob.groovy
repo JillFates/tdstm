@@ -1,39 +1,35 @@
-import org.quartz.JobExecutionContext
-import org.quartz.Trigger
-import org.quartz.JobExecutionException
-import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.TaskNonTranService
+import org.quartz.JobDataMap
+import org.quartz.JobExecutionContext
+import org.quartz.spi.MutableTrigger
 
 /**
- * 
- * A Quartz Job that is used to invoking the TaskService.sendTaskEmail(params) with the context parameters. This 
- * uses the TDSTM-Email Quartz group that will allow several emails to be sent concurrently. 
+ * Invokes TaskService.sendTaskEmail(params) with the context parameters. This
+ * uses the TDSTM-Email Quartz group that will allow several emails to be sent concurrently.
  */
 class UpdateTaskSuccessorsJob {
 
-    // Quartz Properties
-    def group = 'tdstm-task-update'
+	def group = 'tdstm-task-update'
 	def concurrent = false
-    static triggers = { }
+	static triggers = {}
 
-	// IOC services
-    def taskNonTranService 
-	def securityService
+	TaskNonTranService taskNonTranService
+	SecurityService securityService
 
-    /**
-	 * executes the TaskService.updateTaskSuccessors
-     * @param context
-     * @return void
-     */
- 	def execute(context) {
- 		try {
-			def dataMap = context.mergedJobDataMap
-			def taskId = dataMap.getLongValue('taskId')
-			def whomId = dataMap.getLongValue('whomId')
-			def status = dataMap.getString('status')
-			def isPM = dataMap.getBoolean('isPM')
-			long tries = dataMap.getLongValue('tries') + 1
-			
+	/**
+	 * Executes TaskService.updateTaskSuccessors().
+	 */
+	void execute(JobExecutionContext context) {
+		try {
+			JobDataMap dataMap = context.mergedJobDataMap
+			long taskId = dataMap.getLongValue('taskId')
+			long whomId = dataMap.getLongValue('whomId')
+			String status = dataMap.getString('status')
+			boolean isPM = dataMap.getBoolean('isPM')
+			int tries = dataMap.getIntValue('tries') + 1
+
 			log.info "updateTaskSuccessors Job started for task id $taskId (attempt #$tries)"
 
 			// Invoke the service method
@@ -48,21 +44,21 @@ class UpdateTaskSuccessorsJob {
 				// Reschedule the job for 500ms
 				long nextFiring = System.currentTimeMillis() + 2000    // in 100ms
 				Date nextFiringDate = new Date(nextFiring)
-				Trigger trigger = context.getTrigger()
+				MutableTrigger trigger = (MutableTrigger) context.getTrigger()
 				trigger.setStartTime(nextFiringDate)
 
 				// Update the retries count
-				def map = context.getJobDetail().getJobDataMap()
-				map.put("tries", tries)
+				JobDataMap map = context.jobDetail.jobDataMap
+				map.tries = tries
 				trigger.jobDataMap.putAll(map)
 				log.info "JobDataMap = $map"
 
 				// reschedule the job
-				String triggerName = trigger.getName()
-				context.getScheduler().rescheduleJob(triggerName, trigger.getGroup(), trigger)
-				log.info("Rescheduled job ${triggerName} for ${nextFiringDate}")
+				context.scheduler.rescheduleJob(trigger.key, trigger)
+				log.info("Rescheduled job $trigger.key for ${nextFiringDate}")
 			}
-		} finally {
+		}
+		finally {
 			GormUtil.releaseLocalThreadMemory()
 		}
 	}

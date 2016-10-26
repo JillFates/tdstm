@@ -9,13 +9,13 @@
 		<g:form name="moveEventForm" action="exportRunbookToExcel">
 			<div class="body">
 				<h1>Export Runbook</h1>
-				
+
 				<div class="dialog">
 					<table>
 						<tr><td>
-							<g:select from="${moveEventList}" name="eventId" id="eventList" optionKey="id" optionValue="name" noSelection="['':'please select']" value="${ session.getAttribute('MOVE_EVENT')?.MOVE_EVENT }"/>
+							<g:select from="${moveEventList}" name="eventId" id="eventList" optionKey="id" optionValue="name" noSelection="['':'please select']" value="${tds.currentMoveEventId()}"/>
 						</td></tr>
-						
+
 						<tds:hasPermission permission="PublishTasks">
 							<tr>
 								<td>
@@ -34,7 +34,7 @@
 						</tr>
 					</table>
 				</div>
-				
+
 			</div>
 			<div id="exportResultId" style="float: left ; display: none; margin-top: 39px ; margin-left: 40px"></div>
 		</g:form>
@@ -62,7 +62,7 @@
 			}
 			return boo;
 		}
-		
+
 		function clearResults () {
 			$('#exportResultId').html('');
 			$('#exportResultId').css('display','none');

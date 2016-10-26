@@ -22,7 +22,7 @@
 							</td>
 						</tr>
 						<tr class="prop" id="assignedToTrEditId">
-							<td valign="middle" class="name"><label for="assignedTo">Person/Team:</label></td>
+							<td valign="middle" class="name"><label for="assignedToEditTdId">Person/Team:</label></td>
 							<td valign="middle" id="assignedToEditTdId" nowrap="nowrap">
 								<span>
 									<assigned-to-select comment-id='ac.commentId' ng-model='ac.assignedTo' ng-change="checkHardAssigned()"></assigned-to-select>
@@ -38,8 +38,8 @@
 					<tr class="prop" id="moveEventEditTrId">
 						<td valign="top" class="name"><label for="moveEvent">Event:</label></td>
 						<td valign="top">
-							<tds:select ng-model="ac.moveEvent" ng-disabled="!enableMoveEvent" datasource="ds.moveEvents" id="moveEvent" name="moveEvent"  from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
-							optionKey='id' optionValue="name" noSelection="['':'please select']"></tds:select>
+							<tds:select ng-model="ac.moveEvent" ng-disabled="!enableMoveEvent" datasource="ds.moveEvents" id="moveEvent" name="moveEvent"  from="${tds.currentProjectMoveEvents()}"
+							optionKey='id' optionValue="name" noSelection="['':'please select']" />
 						</td>
 					</tr>
 					<tr class="prop">
@@ -47,8 +47,7 @@
 							<label for="category">Category:</label>
 						</td>
 						<td>
-							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}"
-							noSelection="['':'please select']"></tds:select>
+							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" noSelection="['':'please select']" />
 						</td>
 					</tr>
 					<tr class="prop" id="workFlowTransitionEditTrId" ng-show="ds.workflows.length > 0">
@@ -60,7 +59,7 @@
 							</span>
 							<input type="checkbox" ng-model="ac.override" id="override" name="override" value="0"
 						ng-true-value="1" ng-false-value="0" />
-							<label for="overrideEdit">Overridden</label>
+							<label for="override">Overridden</label>
 						</td>
 					</tr>
 					<tr>
@@ -83,7 +82,7 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name" style="vertical-align: middle"><label for="dueDateEditId">Due Date</label></td>
+						<td valign="top" class="name" style="vertical-align: middle"><label for="dueDateEditSpanId">Due Date</label></td>
 						<td valign="top" class="value" colspan="4">
 							<span id="dueDateEditSpanId">
 								<input kendo-date-picker class="dateEditRange" name="dueDate" id="dueDate" k-ng-model="ac.dueDate"  k-format="'MM/dd/yyyy'" k-parse-formats ="['MM/dd/yyyy']" />
@@ -92,7 +91,7 @@
 						</td>
 					</tr>
 					<tr class="prop" id="durationEditId">
-						<td valign="top" class="name" style="vertical-align: middle"><label for="durationEdit">Estimated Duration:</label></td>
+						<td valign="top" class="name" style="vertical-align: middle"><label for="durationEditId">Estimated Duration:</label></td>
 						<td valign="top" class="value">
 							<tdsdurationpicker ng-model="acData.durationTime" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" duration-locked="ac.durationLocked" ng-change="updateEstFinish()"></tdsdurationpicker>
 							<div class="daterangepicker_action daterangepicker_lock_icon" title="" data-toggle="popover" data-placement="top" data-trigger="hover" data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration.">
@@ -102,7 +101,7 @@
 						</td>
 					</tr>
 					<tr class="prop" id="estStartEditTrId">
-						<td valign="top" class="name"><label for="estStartTrId">Estimated Start/Finish:</label></td>
+						<td valign="top" class="name"><label for="estStartEditTrId">Estimated Start/Finish:</label></td>
 						<td valign="top" class="value" nowrap="nowrap">
 							<input type="text" id-html-parent-container="'editTaskPopup'" duration="ac.duration" scale="ac.durationScale" scales="ds.durationScales" date-begin="ac.estStart" date-end="ac.estFinish" duration-locked="ac.durationLocked" ng-model="acData.estRange" ng-change="updateDuration()" class="ctrl-rangepicker" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker readonly />
 							<div class="daterangepicker_action daterangepicker_clear_filter" ng-click="clearDateRangePickerValue('estRange')"><span class="clear_filter">×</span></div>
@@ -124,7 +123,7 @@
 					<%-- Dependencies section --%>
 					<tr class="prop">
 						<td valign="top" class="name">
-							<label for="dependencies">Dependencies:</label>
+							<label for="predecessorHeadTrId">Dependencies:</label>
 						</td>
 						<td>
 						    <table style="border: none;">
@@ -154,7 +153,7 @@
 						<td><img id="processingId" src="${resource(dir:'images',file:'processing.gif')}" ng-show="!predecessorLoaded" /></td>
 					</tr>
 					<tr ng-show="isEdit">
-						<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+						<td valign="top" class="name"><label for="createdById">Created By:</label></td>
 						<td valign="top" class="value" id="createdById">{{acData.personCreateObj?(acData.personCreateObj+" at "+acData.dtCreated):""}}</td>
 					</tr>
 				</table>
@@ -162,7 +161,7 @@
 			<div id="editResolveDiv" ng-show="isEdit">
 				<table id="updateResolveTable" style="border: 0px;">
 					<tr class="prop" ng-show="acData.notes.length > 0">
-						<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
+						<td valign="top" class="name"><label for="previousNote">Previous Notes:</label></td>
 						<td valign="top" class="value" colspan="3">
 							<div id="previousNote" style="width: 100%;">
 								<table style="border:0px">
@@ -174,7 +173,7 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name"><label for="notes">Note:</label></td>
+						<td valign="top" class="name"><label for="noteEditId">Note:</label></td>
 						<td valign="top" class="value" colspan="3">
 							<textarea cols="80" rows="4" id="noteEditId" name="note" ng-model="ac.note"></textarea>
 						</td>

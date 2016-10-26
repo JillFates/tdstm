@@ -5,11 +5,8 @@
  */
 class AppController {
 
-    /*
-     * It show the module.html that draw the AngularJs App
-     */
-    def index() {
-        render( view: "index", model: [])
-    }
-
+	/*
+	 * It show the module.html that draw the AngularJs App
+	 */
+	def index() {}
 }

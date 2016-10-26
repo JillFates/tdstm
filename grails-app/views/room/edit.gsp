@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Rack" %>
 <html>
 <head>
 </head>
@@ -150,11 +151,11 @@
 					<th>X</th>
 					<th>Y</th>
 					<th>Front</th>
-					<th>A(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})
+					<th>A(${tds.powerTypeShort()})
 					</th>
-					<th>B(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})
+					<th>B(${tds.powerTypeShort()})
 					</th>
-					<th>C(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})
+					<th>C(${tds.powerTypeShort()})
 					</th>
 					<th>Type</th>
 					<th>Model</th>
@@ -179,30 +180,21 @@
 						<td><g:select id="frontId_${rack.id}" name="front_${rack.id}"
 								from="${Rack.constraints.front.inList}" value="${rack.front}"
 								onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())"
-								style="width:40px;"></g:select></td>
-						<td><input type="text" class="focusShadow"
-							id="powerA_${rack.id}" name="powerA_${rack.id}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 120).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}"
-							size="3" /></td>
-						<td><input type="text" class="focusShadow"
-							id="powerB_${rack.id}" name="powerB_${rack.id}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 120).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}"
-							size="3" /></td>
-						<td><input type="text" class="focusShadow"
-							id="powerC_${rack.id}" name="powerC_${rack.id}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 120).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}"
-							size="3" /></td>
+								style="width:40px;"/></td>
+						<td><input type="text" class="focusShadow" id="powerA_${rack.id}" name="powerA_${rack.id}" value="${tds.rackPower(power: rack.powerA)}" size="3" /></td>
+						<td><input type="text" class="focusShadow" id="powerB_${rack.id}" name="powerB_${rack.id}" value="${tds.rackPower(power: rack.powerB)}" size="3" /></td>
+						<td><input type="text" class="focusShadow" id="powerC_${rack.id}" name="powerC_${rack.id}" value="${tds.rackPower(power: rack.powerC)}" size="3" /></td>
 						<td><g:select id="rackTypeId_${rack.id}"
 								name="rackType_${rack.id}"
 								from="${Rack.constraints.rackType.inList}"
 								value="${rack.rackType}"
 								onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"
-								style="width:100px;"></g:select></td>
+								style="width:100px;"/></td>
 						<td><span id="modelSpan_${rack.id}"><g:select
 									class="rackModel" id="model_${rack.id}" name="model_${rack.id}"
 									from="${modelList}" noSelection="[null:'Select Model']"
 									value="${rack.model?.id}" optionKey="id"
-									optionValue="${{it.manufacturer.name+' / '+it.modelName} }"></g:select></span>
+									optionValue="${{it.manufacturer.name+' / '+it.modelName} }"/></span>
 						</td>
 						<td>
 							${rack.assets.size()}&nbsp;&nbsp;&nbsp; <g:if
@@ -229,28 +221,19 @@
 						<td><g:select id="frontId_${rack}" name="front_${rack}"
 								from="${Rack.constraints.front.inList}"
 								onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"
-								style="width:40px;"></g:select></td>
-						<td><input type="text" class="focusShadow"
-							id="newPowerA_${rack}" name="powerA_${rack}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 120 ).toFloat().round(1) : new Rack().powerA}"
-							size="3" /></td>
-						<td><input type="text" class="focusShadow"
-							id="newPowerB_${rack}" name="powerB_${rack}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 120 ).toFloat().round(1) : new Rack().powerB}"
-							size="3" /></td>
-						<td><input type="text" class="focusShadow"
-							id="newPowerC_${rack}" name="powerC_${rack}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 120 ).toFloat().round(1) : new Rack().powerC}"
-							size="3" /></td>
+								style="width:40px;"/></td>
+						<td><input type="text" class="focusShadow" id="newPowerA_${rack}" name="powerA_${rack}" value="${tds.rackPower(powerProperty: 'powerA')}" size="3" /></td>
+						<td><input type="text" class="focusShadow" id="newPowerB_${rack}" name="powerB_${rack}" value="${tds.rackPower(powerProperty: 'powerB')}" size="3" /></td>
+						<td><input type="text" class="focusShadow" id="newPowerC_${rack}" name="powerC_${rack}" value="${tds.rackPower(powerProperty: 'powerC')}" size="3" /></td>
 						<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}"
 								from="${Rack.constraints.rackType.inList}" value="Rack"
 								onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"
-								style="width:100px;"></g:select></td>
+								style="width:100px;"/></td>
 						<td><span id="modelSpan_${rack}"><g:select
 									class="rackModel" id="model_${rack}" name="model_${rack}"
 									from="${modelList}" noSelection="[null:'Select Model']"
 									value="${defaultRackModel?.id}" optionKey="id"
-									optionValue="${{it.manufacturer.name+' / '+it.modelName} }"></g:select></span></td>
+									optionValue="${{it.manufacturer.name+' / '+it.modelName} }"/></span></td>
 						<td>0&nbsp;&nbsp;&nbsp;<a
 							href="javascript:verifyAndDeleteRacks(${rack})"><span
 								class="clear_filter"><u>X</u></span></a></td>
@@ -263,64 +246,64 @@
 	</div>
 	<script type="text/javascript">
 
-	var isClicking = false
-	
+	var isClicking = false;
+
 $(document).ready(function() {
-	
-	var prefVal = '${prefVal}'
+
+	var prefVal = '${prefVal}';
 	if(prefVal=='FALSE'){
-		$("#roomObjects").hide()
+		$("#roomObjects").hide();
 	}
 	$(".focusShadow").bind("focus", function(e) {
 		addShadowCss($(this).attr("id"));
 	});
 	$(".focusShadow").bind("blur", function(e) {
-		delShadowCss($(this).attr("id"))
+		delShadowCss($(this).attr("id"));
 	});
 	$(".dragRack").mousedown(function(event){
-		isClicking = true
+		isClicking = true;
 	});
 	$(".dragRack").mouseup(function(event){
 		if(isClicking) {
-			selectRack($(this), event.shiftKey)
+			selectRack($(this), event.shiftKey);
 		} else {
 			$(".objectSelected").each(function(i) {
-				delShadowCss($(this).attr("id"))
+				delShadowCss($(this).attr("id"));
 			});
-			showRoomObjectsDiv($(this).attr("id"))
+			showRoomObjectsDiv($(this).attr("id"));
 		}
-		isClicking = false
+		isClicking = false;
 	});
-	
-	$("#roomObjects").height($("#rackTableId").height())
-	
-})
+
+	$("#roomObjects").height($("#rackTableId").height());
+
+});
 
 // Selects @param rack, a clicked rack, and deselects all other racks if @param multi is false
 function selectRack (rack, multi) {
-	var selected = rack.hasClass('objectSelected')
-	
+	var selected = rack.hasClass('objectSelected');
+
 	if(! multi){
-		deselectAll()
+		deselectAll();
 		if($("#showAll").val() == '0')
-			$("#roomObjects").hide()
+			$("#roomObjects").hide();
 	} else {
-		$("#roomObjects").show()
+		$("#roomObjects").show();
 	}
-	
+
 	if(selected)
 		delShadowCss(rack.attr("id"));
 	else
 		addShadowCss(rack.attr("id"));
-		
+
 	if($("#showAll").val()=='0' && $(".objectSelected").length > 0)
-		showRackTable()
+		showRackTable();
 	else
-		$("#roomObjects").hide()
+		$("#roomObjects").hide();
 }
 
 function showRoomObjectsDiv(rackId){
-	var draggable = $("#showAll:checkbox")
+	var draggable = $("#showAll:checkbox");
 	if( draggable.val() != 1){
 		var id=rackId.split("_")[1];
 		$.ajax({
@@ -329,16 +312,16 @@ function showRoomObjectsDiv(rackId){
 			type:'POST',
 			datatype:'json',
 			success: function(data) {
-				var x = $("#"+rackId).css("left")
-				var y = $("#"+rackId).css("top")
-				x = x.substring(0,x.indexOf('px'))
-				y = y.substring(0,y.indexOf('px'))
+				var x = $("#"+rackId).css("left");
+				var y = $("#"+rackId).css("top");
+				x = x.substring(0,x.indexOf('px'));
+				y = y.substring(0,y.indexOf('px'));
 				$(".rackDetailDiv").hide();
 				$("#rackDetailDiv_"+id).html(data);
 				$("#rackDetailDivv_"+id).html(data);
-				$("#rackDetailDiv_"+id).css("left",(parseInt(x)+70)+"px")
-				$("#rackDetailDiv_"+id).css("top",(parseInt(y)+50)+"px")
-				$("#rackDetailDiv_"+id).show("fold", {horizFirst: true }, 1000);	
+				$("#rackDetailDiv_"+id).css("left",(parseInt(x)+70)+"px");
+				$("#rackDetailDiv_"+id).css("top",(parseInt(y)+50)+"px");
+				$("#rackDetailDiv_"+id).show("fold", {horizFirst: true }, 1000);
 				$("#rackDetailDivv_"+id).show("fold", {horizFirst: true }, 1000);
 				updateXYPositions(rackId)
 			}
@@ -347,23 +330,23 @@ function showRoomObjectsDiv(rackId){
 }
 
 function showRackTable(){
-   $(".rackDetailDiv").hide()
-   var rackIdArr = new Array();
-   
+   $(".rackDetailDiv").hide();
+   var rackIdArr = [];
+
    $('.objectSelected').each(function(){
- 		var rackId = $(this).attr('id').split("_")[1]
+ 		var rackId = $(this).attr('id').split("_")[1];
  		rackIdArr.push(rackId)
-   })
+   });
    if($("#showAll").val() == "1"){
-	    $('.rowShow').show()
-	    $("#roomObjects").show()
+	    $('.rowShow').show();
+	    $("#roomObjects").show();
    } else {
-	    $('.rowShow').hide()
+	    $('.rowShow').hide();
    }
    for(i=0; i<rackIdArr.length; i++){
-	   $("#rackEditRow_"+rackIdArr[i]).show()
+	   $("#rackEditRow_"+rackIdArr[i]).show();
    }
-   $("#roomObjects").height($("#rackTableId").height())
+   $("#roomObjects").height($("#rackTableId").height());
 }
 
 /**
@@ -373,17 +356,17 @@ $(".draggable").draggable({
 	start: function(event, ui) {
 		posTopArray = [];
 		posLeftArray = [];
-		isClicking = false
-		
+		isClicking = false;
+
 		if(! $(this).hasClass("objectSelected"))
-			selectRack($(this), false)
-		
+			selectRack($(this), false);
+
 		$(".objectSelected").each(function(i) {
 			thiscsstop = $(this).css('top');
-			if (thiscsstop == 'auto') thiscsstop = 0; 
+			if (thiscsstop == 'auto') thiscsstop = 0;
 
 			thiscssleft = $(this).css('left');
-			if (thiscssleft == 'auto') thiscssleft = 0; 
+			if (thiscssleft == 'auto') thiscssleft = 0;
 
 			posTopArray[i] = parseInt(thiscsstop);
 			posLeftArray[i] = parseInt(thiscssleft);
@@ -401,10 +384,10 @@ $(".draggable").draggable({
 				$(this).css('top', posTopArray[i] + topdiff);
 				$(this).css('left', posLeftArray[i] + leftdiff);
 
-				var rackId = $(this).attr("id").split("_")[1]
-				
-				$("#roomXId_"+rackId).val(posLeftArray[i] + leftdiff)
-			 	$("#roomYId_"+rackId).val(posTopArray[i] + topdiff)
+				var rackId = $(this).attr("id").split("_")[1];
+
+				$("#roomXId_"+rackId).val(posLeftArray[i] + leftdiff);
+			 	$("#roomYId_"+rackId).val(posTopArray[i] + topdiff);
 			});
 		}
 	}
@@ -414,52 +397,52 @@ $(".draggable").draggable({
  *  using this method for NUDGING : move div(s) 1 px to all direction using arrow keys.
  */
 $(document).bind('keydown',function(evt) {
-	var focusedClass = $("*:focus").parent().parent().attr('class')
+	var focusedClass = $("*:focus").parent().parent().attr('class');
 	if(focusedClass && focusedClass.indexOf('objectRowSelected') == -1){
 	 $(".objectSelected").each(function(i) {
-		 var x = $(this).css('top')
-		 var y = $(this).css('left')
-		 var top = x.substring(0,x.indexOf('px'))
-	     var left = y.substring(0,y.indexOf('px'))
-	     var rackId = $(this).attr("id").split("_")[1]
+		 var x = $(this).css('top');
+		 var y = $(this).css('left');
+		 var top = x.substring(0,x.indexOf('px'));
+	     var left = y.substring(0,y.indexOf('px'));
+	     var rackId = $(this).attr("id").split("_")[1];
 		 switch(evt.keyCode) {
 		    case 37:
 		    	evt.preventDefault();
-		    	$(this).css('left', (parseInt(left)-1)+"px"); 
-                
-                $("#roomXId_"+rackId).val((parseInt(left)-1))
-            	$("#roomYId_"+rackId).val(top)
+		    	$(this).css('left', (parseInt(left)-1)+"px");
+
+                $("#roomXId_"+rackId).val((parseInt(left)-1));
+            	$("#roomYId_"+rackId).val(top);
 		        break;
 			case 38:
 				evt.preventDefault();
-				$(this).css('top', (parseInt(top)-1)+"px"); 
-                
-                $("#roomXId_"+rackId).val(left)
-            	$("#roomYId_"+rackId).val((parseInt(top)-1))
+				$(this).css('top', (parseInt(top)-1)+"px");
+
+                $("#roomXId_"+rackId).val(left);
+            	$("#roomYId_"+rackId).val((parseInt(top)-1));
 			    break;
 			case 39:
 				evt.preventDefault();
-				$(this).css('left', (parseInt(left)+1)+"px"); 
-                
-                $("#roomXId_"+rackId).val((parseInt(left)+1))
-            	$("#roomYId_"+rackId).val(top)
+				$(this).css('left', (parseInt(left)+1)+"px");
+
+                $("#roomXId_"+rackId).val((parseInt(left)+1));
+            	$("#roomYId_"+rackId).val(top);
 			    break;
 			case 40:
 				evt.preventDefault();
-				$(this).css('top', (parseInt(top)+1)+"px"); 
-                
-                $("#roomXId_"+rackId).val(left)
-            	$("#roomYId_"+rackId).val((parseInt(top)+1))
+				$(this).css('top', (parseInt(top)+1)+"px");
+
+                $("#roomXId_"+rackId).val(left);
+            	$("#roomYId_"+rackId).val((parseInt(top)+1));
 			    break;
 			    break;
 			}
      });
      }
 });
-   
+
 function enableDraggableRack(){
-	  var showDrag = $("#showRoomObjects").is(':checked')
-	  var drag = 'off'
+	  var showDrag = $("#showRoomObjects").is(':checked');
+	  var drag = 'off';
 	  if(showDrag){
 		$("#roomObjects").draggable({
 			start: function() {
@@ -476,10 +459,10 @@ function enableDraggableRack(){
 		  data:"prefVal="+drag
 	  });
 }
-enableDraggableRack()
-initializeRacksInRoom( ${rackInstanceList.id} )
+enableDraggableRack();
+initializeRacksInRoom( ${rackInstanceList.id} );
 function submitForm(form){
-	
+
  	if($("#locationId").val() == '') {
  		alert("Please enter location")
  	} else if($("#roomNameId").val() == '') {
@@ -490,9 +473,9 @@ function submitForm(form){
 			data: $(form).serialize(),
 			type:'POST',
 			success: function(data) {
-				$("#roomShowView").html(data)
-				$("#roomShowView").show()
-				$("#roomListView").hide()
+				$("#roomShowView").html(data);
+				$("#roomShowView").show();
+				$("#roomListView").hide();
 			 	$("#room_layout").css("height","auto")
 			}
 		});
@@ -500,48 +483,48 @@ function submitForm(form){
  	return false;
  }
 function updateXYPositions(id){
-	var rackId = id.split("_")[1]
-	
-	var width = $("#"+id).css("width")
-	
-	var x = $("#"+id).css("left")
-	var y = $("#"+id).css("top")
-	x = x.substring(0,x.indexOf('px'))
-	y = y.substring(0,y.indexOf('px'))
-	
-	var left = $("#room_layout_table").css("width")
-	left = left.substring(0,left.indexOf('px'))	- parseInt(width)
-	
+	var rackId = id.split("_")[1];
+
+	var width = $("#"+id).css("width");
+
+	var x = $("#"+id).css("left");
+	var y = $("#"+id).css("top");
+	x = x.substring(0,x.indexOf('px'));
+	y = y.substring(0,y.indexOf('px'));
+
+	var left = $("#room_layout_table").css("width");
+	left = left.substring(0,left.indexOf('px'))	- parseInt(width);
+
 	if(parseInt(left) <= parseInt(x)){
 		x = left-3
 		$("#"+id).css("left",x+"px")
 	}
-	
-	$("#roomXId_"+rackId).val(x)
-	$("#roomYId_"+rackId).val(y)
-	$("#roomXDivId_"+rackId).val(x)
-	$("#roomYDivId_"+rackId).val(y)
-	
+
+	$("#roomXId_"+rackId).val(x);
+	$("#roomYId_"+rackId).val(y);
+	$("#roomXDivId_"+rackId).val(x);
+	$("#roomYDivId_"+rackId).val(y);
+
 }
 
 function addShadowCss(id, event){
-	var rackId = id.split("_")[1]
-	
-	$("#rackEditRow_"+rackId).addClass("objectRowSelected")
-	$("#rack_"+rackId).addClass("objectSelected")
-	
+	var rackId = id.split("_")[1];
+
+	$("#rackEditRow_"+rackId).addClass("objectRowSelected");
+	$("#rack_"+rackId).addClass("objectSelected");
+
 }
 function deselectAll(){
-	$(".objectRowSelected").removeClass("objectRowSelected")
-	$(".objectSelected").removeClass("objectSelected")
-	$(".multiSelect").removeClass("multiSelect")
+	$(".objectRowSelected").removeClass("objectRowSelected");
+	$(".objectSelected").removeClass("objectSelected");
+	$(".multiSelect").removeClass("multiSelect");
 	$(".rackDetailDiv").hide("fold", {horizFirst: true }, 1000);
 	$(".rackDetailDivv").hide("fold", {horizFirst: true }, 1000);
 }
 function delShadowCss(id){
-	var rackId = id.split("_")[1]
-	$("#rack_"+rackId).removeClass("objectSelected")
-	$("#rackEditRow_"+rackId).removeClass("objectRowSelected")
+	var rackId = id.split("_")[1];
+	$("#rack_"+rackId).removeClass("objectSelected");
+	$("#rackEditRow_"+rackId).removeClass("objectRowSelected");
 }
 function verifyAndDeleteRacks(id){
 	jQuery.ajax({
@@ -551,40 +534,40 @@ function verifyAndDeleteRacks(id){
 		success: function(data) {
 			if(data != null && data != ""){
 				if(confirm("Some assets used this Rack. Be sure you want to remove it before proceeding")){
-					$("#rackEditRow_"+id).remove() // Remove row from table
-					$("#rack_"+id).hide("explode", 1000) // Remove the image from model panel
-					$("#rackDetailDiv_"+id).hide("explode", 1000);			
+					$("#rackEditRow_"+id).remove(); // Remove row from table
+					$("#rack_"+id).hide("explode", 1000); // Remove the image from model panel
+					$("#rackDetailDiv_"+id).hide("explode", 1000);
 					} }else {
-				$("#rackEditRow_"+id).remove() // Remove row from table
-				$("#rack_"+id).hide("explode", 1000) // Remove the image from model panel
-				$("#rackDetailDiv_"+id).hide("explode", 1000);	
+				$("#rackEditRow_"+id).remove(); // Remove row from table
+				$("#rack_"+id).hide("explode", 1000); // Remove the image from model panel
+				$("#rackDetailDiv_"+id).hide("explode", 1000);
 				$("#rackDetailDivv_"+id).hide("explode", 1000);
 			}
 		}
 	});
 }
-function createRack(value){	
-	var newRackId = $("#rackCount").val()
-	$("#rackEditRow_"+newRackId).show()
-	
-	$("#rackCount").val( parseInt(newRackId)+1 )
+function createRack(value){
+	var newRackId = $("#rackCount").val();
+	$("#rackEditRow_"+newRackId).show();
+
+	$("#rackCount").val( parseInt(newRackId)+1 );
 	if(value=="CRAC"){
-		$("#rackTypeId_"+newRackId).val('CRAC')
-		updateRackStyle(newRackId,'L','CRAC')
-		$("#newPowerA_"+newRackId).val('0')
+		$("#rackTypeId_"+newRackId).val('CRAC');
+		updateRackStyle(newRackId,'L','CRAC');
+		$("#newPowerA_"+newRackId).val('0');
 		$("#newPowerB_"+newRackId).val('0')
 	}else if(value=="UPS"){
-		$("#rackTypeId_"+newRackId).val('UPS')
-		updateRackStyle(newRackId,'L','UPS')
-		$("#newPowerA_"+newRackId).val('0')
-		$("#newPowerB_"+newRackId).val('0')
+		$("#rackTypeId_"+newRackId).val('UPS');
+		updateRackStyle(newRackId,'L','UPS');
+		$("#newPowerA_"+newRackId).val('0');
+		$("#newPowerB_"+newRackId).val('0');
 	}else if(value=="Object"){
-		$("#rackTypeId_"+newRackId).val('Object')
-		updateRackStyle(newRackId,'L','Object')
-		$("#newPowerA_"+newRackId).val('0')
-		$("#newPowerB_"+newRackId).val('0')
+		$("#rackTypeId_"+newRackId).val('Object');
+		updateRackStyle(newRackId,'L','Object');
+		$("#newPowerA_"+newRackId).val('0');
+		$("#newPowerB_"+newRackId).val('0');
 	}
-	$("#rack_"+newRackId).show()
+	$("#rack_"+newRackId).show();
 	$("#rack_"+newRackId).effect( "shake", {times:3}, 1000 );
 	$("#roomObjects").height($("#rackTableId").height())
 }
@@ -606,20 +589,20 @@ function objectSelectedOff(id){
 }
 
 function updateRackStyle(id, frontValue, rackTypeValue){
-	$("#rack_"+id).removeAttr("class")
+	$("#rack_"+id).removeAttr("class");
 	if(rackTypeValue == "Rack"){
-		$("#rack_"+id).addClass("rack_highlight_no_"+frontValue)
+		$("#rack_"+id).addClass("rack_highlight_no_"+frontValue);
 	} else {
-		$("#rack_"+id).addClass("room_"+rackTypeValue+"_"+frontValue )
+		$("#rack_"+id).addClass("room_"+rackTypeValue+"_"+frontValue );
 	}
 	updateXYPositions("rack_"+id)
 }
 
 function changeRackPosition(rackId, value, position){
 	if(!isNaN(value)){
-		$("#rack_"+rackId).css(position,value+"px")
-		$("#rackDetailDiv_"+rackId).css(position,value+"px")
-		$("#rackDetailDiv_"+rackId).css(position,value+"px")
+		$("#rack_"+rackId).css(position,value+"px");
+		$("#rackDetailDiv_"+rackId).css(position,value+"px");
+		$("#rackDetailDiv_"+rackId).css(position,value+"px");
 	} else {
 		alert("Please enter Numerics")
 	}
@@ -632,7 +615,7 @@ function changeRackDetails(rackId,value,type){
 $("#"+type+"_"+rackId).val(value)
 }
 function roundValue(value,id){
-	var chndValue = Math.round(value)
+	var chndValue = Math.round(value);
 	$("#"+id).val( chndValue )
 }
 

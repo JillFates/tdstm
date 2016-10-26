@@ -1,338 +1,317 @@
-
 import com.tds.asset.AssetComment
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import org.apache.shiro.SecurityUtils
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventNews
+import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UserPreferenceService
+import org.springframework.jdbc.core.JdbcTemplate
 
-class NewsEditorController {
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class NewsEditorController implements ControllerMethods {
 
-	def jdbcTemplate
+	ControllerService controllerService
+	JdbcTemplate jdbcTemplate
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
-	def controllerService
-	def securityService
-	def userPreferenceService
+	static defaultAction = 'newsEditorList'
 
-    def index() {
-    	redirect( action:"newsEditorList", params:params )
-	}
-
-    /*---------------------------------------------------------
-     * @author : Lokanada Reddy
-     * @param  : project, bundle, and filters
-     * @return : Union of assets issues and move event news
-     *--------------------------------------------------------*/
+	/**
+	 * Union of assets issues and move event news
+	 */
 	def newsEditorList() {
+		Project project = controllerService.getProjectForPage(this, 'to view News')
+		if (!project) return
 
-		def projectId =  session.getAttribute('CURR_PROJ').CURR_PROJ
-		def projectInstance = securityService.getUserCurrentProject()
-		if (!projectInstance) {
-			flash.message = "Please select project to view News"
-			redirect(controller:'project',action:'list')
-			return
-		}
-		def moveEventsList = MoveEvent.findAllByProject(projectInstance)
-		def moveBundlesList
 		def moveEventId = params.moveEvent
 		def moveEvent
-		if(moveEventId){
-			userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEventId}" )
+		if (moveEventId) {
+			userPreferenceService.setUserCurrentMoveEventId(moveEventId.toString())
 			moveEvent = MoveEvent.get(moveEventId)
-		} else {
-			userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
-			def defaultEvent = session.getAttribute("MOVE_EVENT")
-			if(defaultEvent?.MOVE_EVENT){
-				moveEvent = MoveEvent.get(defaultEvent.MOVE_EVENT)
-				if( moveEvent?.project?.id != Integer.parseInt(projectId) ){
-					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+		}
+		else {
+			def defaultEvent = userPreferenceService.getPreference(PREF.MOVE_EVENT)
+			if (defaultEvent) {
+				moveEvent = MoveEvent.get(defaultEvent)
+				if (moveEvent?.projectId != project.id) {
+					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
 				}
 			} else {
-				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
 			}
 		}
 
-		if(moveEvent){
-			moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ${moveEvent?.id} order by mb.name asc")
+		List<MoveBundle> moveBundles
+		if (moveEvent) {
+			moveBundles = MoveBundle.executeQuery(
+					'from MoveBundle where moveEvent=:moveEvent order by name asc',
+					[moveEvent: moveEvent])
 		} else {
-			moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectId} order by mb.name asc")
+			moveBundles = MoveBundle.executeQuery(
+					'from MoveBundle where project=:project order by name asc',
+					[project: project]
+			)
 		}
-		return [moveEventId : moveEvent.id, viewFilter : params.viewFilter,  bundleId :  params.moveBundle, moveBundlesList:moveBundlesList,
-			moveEventsList:moveEventsList]
+
+		[moveEventId: moveEvent.id, viewFilter: params.viewFilter, bundleId: params.moveBundle,
+		 moveBundlesList: moveBundles, moveEventsList: MoveEvent.findAllByProject(project)]
     }
 
-	/**
-	 *
-	 *
-	 */
 	def listEventNewsJson() {
 
-		def projectId =  session.getAttribute('CURR_PROJ').CURR_PROJ
-		def projectInstance = Project.get( projectId )
-		def bundleId = params.moveBundle
-		def viewFilter = params.viewFilter
-		def moveBundleInstance = null
-		def assetCommentsList
-		def moveEventNewsList
-		def offset = params.offset
-		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
-		def defaultBundle = session.getAttribute("CURR_BUNDLE")
-		def moveEventsList = MoveEvent.findAllByProject(projectInstance)
-		def moveEvent = MoveEvent.read(params.moveEvent)
-		def moveBundlesList
-		if(bundleId){
-			moveBundleInstance = MoveBundle.get(bundleId)
-		}
-		def sortIndex = params.sidx ?: 'comment'
-		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows)
-		def currentPage = Integer.valueOf(params.page) ?: 1
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		Project project = securityService.userCurrentProject
+		String viewFilter = params.viewFilter
+		MoveEvent moveEvent = MoveEvent.read(params.moveEvent)
+		MoveBundle moveBundle = params.moveBundle ? MoveBundle.get(params.moveBundle) : null
 
-		def assetCommentsQuery = new StringBuffer( """select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption,
-									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
-									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
-									from asset_comment ac
-									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
-									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
-									left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
-									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """ )
+		String sortIndex = params.sidx ?: 'comment'
+		String sortOrder  = params.sord ?: 'asc'
+		int maxRows = params.int('rows')
+		int currentPage = params.int('page', 1)
 
-		def moveEventNewsQuery = new StringBuffer( """select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption,
-											CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
-											'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity
-											from move_event_news mn
-											left join move_event me on ( me.move_event_id = mn.move_event_id )
-											left join project p on (p.project_id = me.project_id) left join person p1 on (p1.person_id = mn.created_by)
-											left join person p2 on (p2.person_id = mn.archived_by) where """ )
+		def assetCommentsQuery = new StringBuffer('''\
+			select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption, comment,
+			       CONCAT_WS(' ', p1.first_name, p1.last_name) as createdBy, ac.comment_type as commentType,
+			       CONCAT_WS(' ', p2.first_name, p2.last_name) as resolvedBy, date_resolved as resolvedAt,
+			       resolution, ae.asset_entity_id as assetEntity
+			from asset_comment ac
+			     left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
+			     left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
+			     left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
+			     left join person p2 on (p2.person_id = ac.resolved_by)
+			where ac.comment_type = 'issue'
+			  and ''')
 
+		def moveEventNewsQuery = new StringBuffer('''\
+			select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption,
+			       CONCAT_WS(' ', p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ', p2.first_name, p2.last_name) as resolvedBy,
+			       'news' as commentType, message as comment, resolution, date_archived as resolvedAt, null as assetEntity
+			from move_event_news mn
+			     left join move_event me on (me.move_event_id = mn.move_event_id)
+			     left join project p on (p.project_id = me.project_id)
+			     left join person p1 on (p1.person_id = mn.created_by)
+			     left join person p2 on (p2.person_id = mn.archived_by)
+			where ''')
 
-		if(moveBundleInstance != null){
-			assetCommentsQuery.append(" mb.move_bundle_id = ${moveBundleInstance.id}  ")
+		if (moveBundle) {
+			assetCommentsQuery.append(" mb.move_bundle_id = $moveBundle.id  ")
 		} else {
-			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id} )")
+			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id})")
 		}
 
-		if(moveEvent){
-			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent?.id}  and p.project_id = ${projectInstance.id} ")
+		if (moveEvent) {
+			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent.id}  and p.project_id = $project.id ")
 		} else {
-			moveEventNewsQuery.append(" p.project_id = ${projectInstance.id} ")
+			moveEventNewsQuery.append(" p.project_id = $project.id ")
 		}
-		if(viewFilter == "active"){
+		if (viewFilter == "active") {
 			assetCommentsQuery.append(" and ac.is_resolved = 0 ")
 			moveEventNewsQuery.append(" and mn.is_archived = 0 ")
-		} else if(viewFilter == "archived"){
+		} else if (viewFilter == "archived") {
 			assetCommentsQuery.append(" and ac.is_resolved = 1 ")
 			moveEventNewsQuery.append(" and mn.is_archived = 1 ")
 		}
-		if(params.comment){
-			assetCommentsQuery.append("and ac.comment like '%${params.comment}%'")
-			moveEventNewsQuery.append("and mn.message like '%${params.comment}%'")
+		if (params.comment) {
+			assetCommentsQuery.append("and ac.comment like '%$params.comment%'")
+			moveEventNewsQuery.append("and mn.message like '%$params.comment%'")
 		}
-		if(params.createdAt){
-			assetCommentsQuery.append("and ac.date_created like '%${params.createdAt}%'")
-			moveEventNewsQuery.append("and mn.date_created like '%${params.createdAt}%'")
+		if (params.createdAt) {
+			assetCommentsQuery.append("and ac.date_created like '%$params.createdAt%'")
+			moveEventNewsQuery.append("and mn.date_created like '%$params.createdAt%'")
 		}
-		if(params.resolvedAt){
-			assetCommentsQuery.append("and ac.date_resolved like '%${params.resolvedAt}%'")
-			moveEventNewsQuery.append("and mn.date_archived like '%${params.resolvedAt}%'")
+		if (params.resolvedAt) {
+			assetCommentsQuery.append("and ac.date_resolved like '%$params.resolvedAt%'")
+			moveEventNewsQuery.append("and mn.date_archived like '%$params.resolvedAt%'")
 		}
-		if(params.createdBy ){
-			assetCommentsQuery.append("and p1.first_name like '%${params.createdBy}%'")
-			moveEventNewsQuery.append("and p1.first_name like '%${params.createdBy}%'")
+		if (params.createdBy) {
+			assetCommentsQuery.append("and p1.first_name like '%$params.createdBy%'")
+			moveEventNewsQuery.append("and p1.first_name like '%$params.createdBy%'")
 		}
-		if(params.resolvedBy ){
-			assetCommentsQuery.append("and p2.first_name like '%${params.resolvedBy}%'")
-			moveEventNewsQuery.append("and p2.first_name like '%${params.resolvedBy}%'")
+		if (params.resolvedBy) {
+			assetCommentsQuery.append("and p2.first_name like '%$params.resolvedBy%'")
+			moveEventNewsQuery.append("and p2.first_name like '%$params.resolvedBy%'")
 		}
-		if(params.commentType){
-			assetCommentsQuery.append("and ac.comment_type like '%${params.commentType}%'")
-			moveEventNewsQuery.append("and news like '%${params.commentType}%'")
+		if (params.commentType) {
+			assetCommentsQuery.append("and ac.comment_type like '%$params.commentType%'")
+			moveEventNewsQuery.append("and news like '%$params.commentType%'")
 		}
-		if(params.resolution){
-			assetCommentsQuery.append("and ac.resolution like '%${params.resolution}%'")
-			moveEventNewsQuery.append("and mn.resolution like '%${params.resolution}%'")
+		if (params.resolution) {
+			assetCommentsQuery.append("and ac.resolution like '%$params.resolution%'")
+			moveEventNewsQuery.append("and mn.resolution like '%$params.resolution%'")
 		}
 
 		assetCommentsQuery.append(" and ac.comment_type = 'news' ")
 
-		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery.toString())
+		def queryForCommentsList = new StringBuffer()
+		queryForCommentsList << assetCommentsQuery << " union all " << moveEventNewsQuery
+		queryForCommentsList << 'order by ' << sortIndex << ' ' << sortOrder
+		def totalComments = jdbcTemplate.queryForList(queryForCommentsList.toString())
 
-		queryForCommentsList.append("order by $sortIndex $sortOrder ")
-		def totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
+		int totalRows = totalComments.size()
+		int numberOfPages = Math.ceil(totalRows / maxRows)
 
-		def totalRows = totalComments.size()
-		def numberOfPages = Math.ceil(totalRows / maxRows)
-
-		def results = totalComments?.collect {
-			[ cell: [ it.createdAt ? TimeUtil.formatDate(session, it.createdAt):'',
-					it.createdBy, it.commentType, it.comment, it.resolution,
-					it.resolvedAt ? TimeUtil.formatDate(session, it.resolvedAt):'',
-					it.resolvedBy], id: it.id]
-			}
+		def results = totalComments.collect {
+			[cell: [TimeUtil.formatDate(it.createdAt),
+			        it.createdBy, it.commentType, it.comment, it.resolution,
+			        TimeUtil.formatDate(it.resolvedAt),
+			        it.resolvedBy],
+			 id: it.id]
+		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON
 	}
 
-	/**
-	 *
-	 *
-	 */
 	def getEventNewsList() {
 
-		def projectId =  session.getAttribute('CURR_PROJ').CURR_PROJ
-		def projectInstance = Project.get( projectId )
+		Project project = securityService.userCurrentProject
+		String viewFilter = params.viewFilter
+		MoveEvent moveEvent = MoveEvent.read(params.moveEvent)
 		def bundleId = params.moveBundle
-		def viewFilter = params.viewFilter
-		def moveBundleInstance = null
-		userPreferenceService.loadPreferences(PREF.CURR_BUNDLE)
-		def moveEvent = MoveEvent.read(params.moveEvent)
-		if(bundleId){
-			moveBundleInstance = MoveBundle.get(bundleId)
-		}
+		MoveBundle moveBundle = bundleId ? MoveBundle.get(bundleId) : null
 
-		def assetCommentsQuery = new StringBuffer( """select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption,
+		def assetCommentsQuery = new StringBuffer("""select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption,
 									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
 									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
 									from asset_comment ac
 									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
 									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
 									left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
-									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """ )
+									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """)
 
-		def moveEventNewsQuery = new StringBuffer( """select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption,
+		def moveEventNewsQuery = new StringBuffer("""select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption,
 											CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
 											'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity
 											from move_event_news mn
-											left join move_event me on ( me.move_event_id = mn.move_event_id )
+											left join move_event me on (me.move_event_id = mn.move_event_id)
 											left join project p on (p.project_id = me.project_id) left join person p1 on (p1.person_id = mn.created_by)
-											left join person p2 on (p2.person_id = mn.archived_by) where """ )
+											left join person p2 on (p2.person_id = mn.archived_by) where """)
 
 
-		if(moveBundleInstance != null){
-			assetCommentsQuery.append(" mb.move_bundle_id = ${moveBundleInstance.id}  ")
+		if (moveBundle) {
+			assetCommentsQuery.append(" mb.move_bundle_id = $moveBundle.id  ")
 		} else {
-			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id} )")
+			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id})")
 		}
 
-		if(moveEvent){
-			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent?.id}  and p.project_id = ${projectInstance.id} ")
+		if (moveEvent) {
+			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent.id}  and p.project_id = $project.id ")
 		} else {
-			moveEventNewsQuery.append(" p.project_id = ${projectInstance.id} ")
+			moveEventNewsQuery.append(" p.project_id = $project.id ")
 		}
 
-		if(viewFilter == "active"){
+		if (viewFilter == "active") {
 			assetCommentsQuery.append(" and ac.is_resolved = 0 ")
 			moveEventNewsQuery.append(" and mn.is_archived = 0 ")
-		} else if(viewFilter == "archived"){
+		}
+		else if (viewFilter == "archived") {
 			assetCommentsQuery.append(" and ac.is_resolved = 1 ")
 			moveEventNewsQuery.append(" and mn.is_archived = 1 ")
 		}
 
 		assetCommentsQuery.append(" and ac.comment_type = 'news' ")
 
-		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery.toString())
+		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery)
 
-		def totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
-
-		def result = totalComments?.collect {
-			[
-			  createdAt: it.createdAt ? TimeUtil.formatDate(session, it.createdAt):'',
-			  createdBy: it.createdBy,
-			  commentType: it.commentType,
-			  comment: it.comment,
-			  resolution: it.resolution,
-			  resolvedAt: it.resolvedAt ? TimeUtil.formatDate(session, it.resolvedAt):'',
-			  resolvedBy: it.resolvedBy,
-			  newsId: it.id
-			]
-		}
-
+		def result = jdbcTemplate.queryForList(queryForCommentsList.toString()).collect {[
+			createdAt: TimeUtil.formatDate(it.createdAt),
+			createdBy: it.createdBy,
+			commentType: it.commentType,
+			comment: it.comment,
+			resolution: it.resolution,
+			resolvedAt: TimeUtil.formatDate(it.resolvedAt),
+			resolvedBy: it.resolvedBy,
+			newsId: it.id
+		]}
 		render result as JSON
 	}
-	/*-------------------------------------------------------------------
-	 * @author : Lokanada Reddy
-	 * @param  : id and comment type
-	 * @return : assetComment / moveEventNews object based on comment Type as JSON object
-	 *-------------------------------------------------------------------*/
+
+	/**
+	 * @return assetComment / moveEventNews object based on comment Type as JSON object
+	 */
 	def retrieveCommetOrNewsData() {
-		def commentList = []
 		def personResolvedObj
 		def personCreateObj
 		def dtCreated
 		def dtResolved
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetName
 		def commentType = params.commentType
-		def commentObject
-		if( commentType == 'issue' || commentType == 'I'){
-			commentObject = AssetComment.get( params.id )
-			if(commentObject?.resolvedBy){
-				personResolvedObj = Person.find("from Person p where p.id = $commentObject.resolvedBy.id")?.toString()
-				dtResolved = TimeUtil.formatDateTime(session, commentObject.dateResolved, TimeUtil.FORMAT_DATE_TIME_9)
+		AssetComment commentObject
+		if (commentType == 'issue' || commentType == 'I') {
+			commentObject = AssetComment.get(params.id)
+			if (commentObject?.resolvedBy) {
+				personResolvedObj = commentObject.resolvedBy?.toString()
+				dtResolved = TimeUtil.formatDateTime(commentObject.dateResolved, TimeUtil.FORMAT_DATE_TIME_9)
 			}
 			assetName = commentObject.assetEntity.assetName
 		} else {
-			commentObject = MoveEventNews.get( params.id )
-			if(commentObject?.archivedBy){
-				personResolvedObj = Person.find("from Person p where p.id = $commentObject.archivedBy.id")?.toString()
-				dtResolved = TimeUtil.formatDateTime(session, commentObject.dateArchived, TimeUtil.FORMAT_DATE_TIME_9)
+			commentObject = MoveEventNews.get(params.id)
+			if (commentObject?.archivedBy) {
+				personResolvedObj = commentObject.archivedBy?.toString()
+				dtResolved = TimeUtil.formatDateTime(commentObject.dateArchived, TimeUtil.FORMAT_DATE_TIME_9)
 			}
 		}
-		if(commentObject?.createdBy){
-			personCreateObj = Person.find("from Person p where p.id = $commentObject.createdBy.id")?.toString()
-			dtCreated = TimeUtil.formatDateTime(session, commentObject.dateCreated, TimeUtil.FORMAT_DATE_TIME_9)
+
+		if (commentObject?.createdBy) {
+			personCreateObj = commentObject.createdBy?.toString()
+			dtCreated = TimeUtil.formatDateTime(commentObject.dateCreated, TimeUtil.FORMAT_DATE_TIME_9)
 		}
-		commentList<<[ commentObject:commentObject,personCreateObj:personCreateObj,
-					   personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
-					   dtResolved:dtResolved?dtResolved:"",assetName : assetName]
+
+		List commentList = [[commentObject: commentObject, personCreateObj: personCreateObj,
+		                     personResolvedObj: personResolvedObj, dtCreated: dtCreated ?: '',
+		                     dtResolved: dtResolved ?: '', assetName: assetName]]
 		render commentList as JSON
 	}
 
-	/*---------------------------------------------------------
-     * @author : Lokanada Reddy
-     * @param  : project, bundle, and filters, assetComment / moveEventNews updated data
-     * @return : will save the data and redirect to action : newsEditorList
-     *--------------------------------------------------------*/
+	/**
+	 * Saves the data and redirects to action newsEditorList
+    */
 	def updateNewsOrComment() {
-		def principal = SecurityUtils.subject.principal
-		def loginUser = UserLogin.findByUsername(principal)
-		def commentType = params.commentType
-		if(commentType == "issue"){
-			def assetCommentInstance = AssetComment.get(params.id)
-			if(params.isResolved == '1' && assetCommentInstance.isResolved == 0 ){
-				assetCommentInstance.resolvedBy = loginUser.person
-				assetCommentInstance.dateResolved = new Date()
-			}else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
-			}else{
-				assetCommentInstance.resolvedBy = null
-				assetCommentInstance.dateResolved = null
+		String commentType = params.commentType
+		if (commentType == "issue") {
+			AssetComment assetComment = AssetComment.get(params.id)
+			if (params.isResolved == '1' && assetComment.isResolved == 0) {
+				assetComment.resolvedBy = securityService.loadCurrentPerson()
+				assetComment.dateResolved = new Date()
 			}
-			assetCommentInstance.properties = params
-			assetCommentInstance.save(flush:true)
-		} else if(commentType == "news"){
-
-			def moveEventNewsInstance = MoveEventNews.get(params.id)
-			if(params.isResolved == '1' && moveEventNewsInstance.isArchived == 0 ){
-				moveEventNewsInstance.isArchived = 1
-				moveEventNewsInstance.archivedBy = loginUser.person
-				moveEventNewsInstance.dateArchived = new Date()
-			}else if(params.isResolved == '1' && moveEventNewsInstance.isArchived == 1){
-			}else{
-				moveEventNewsInstance.isArchived = 0
-				moveEventNewsInstance.archivedBy = null
-				moveEventNewsInstance.dateArchived = null
+			else if (!(params.isResolved == '1' && assetComment.isResolved == 1)) {
+				assetComment.resolvedBy = null
+				assetComment.dateResolved = null
 			}
-			moveEventNewsInstance.message = params.comment
-			moveEventNewsInstance.resolution = params.resolution
-			moveEventNewsInstance.save(flush:true)
 
+			assetComment.properties = params
+			assetComment.save(flush:true)
+		}
+		else if (commentType == "news") {
+			MoveEventNews moveEventNews = MoveEventNews.get(params.id)
+			if (params.isResolved == '1' && moveEventNews.isArchived == 0) {
+				moveEventNews.isArchived = 1
+				moveEventNews.archivedBy = securityService.loadCurrentPerson()
+				moveEventNews.dateArchived = new Date()
+			}
+			else if (!(params.isResolved == '1' && moveEventNews.isArchived == 1)) {
+				moveEventNews.isArchived = 0
+				moveEventNews.archivedBy = null
+				moveEventNews.dateArchived = null
+			}
+			moveEventNews.message = params.comment
+			moveEventNews.resolution = params.resolution
+			moveEventNews.save(flush:true)
 		}
 
-		redirect(action:"newsEditorList", params:[moveBundle : params.moveBundle, viewFilter:params.viewFilter])
+		redirect(action: "newsEditorList",
+			      params: [moveBundle: params.moveBundle, viewFilter: params.viewFilter])
 	}
 
 	/**
@@ -344,17 +323,11 @@ class NewsEditorController {
 	 * @param isArchived
 	 * @param resolution
 	 */
+	@HasPermission('CreateNews')
 	def saveNews() {
-
-		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
 			flash.message = null
-			return
-		}
-
-		// Check for permission
-		if (! securityService.hasPermission(userLogin, 'CreateNews') ) {
-			ServiceResults.unauthorized(response)
 			return
 		}
 
@@ -362,34 +335,32 @@ class NewsEditorController {
 		MoveEvent me
 
 		// Check to make sure that the moveEvent id exists and is associated to the project
-		Long meId = NumberUtil.toLong(params['moveEvent.id'])
+		Long meId = params.long('moveEvent.id')
 		if (meId == null || meId < 1) {
 			error = 'Invalid move event id specified'
-		} else {
+		}
+		else {
 			// Check that the move event exists and is assoicated to the user's project
 			me = MoveEvent.get(meId)
 			if (!me) {
 				error = 'Move event was not found'
-			} else {
-				if (me.project.id != project.id) {
-					securityService.reportViolation("Accessing move event ($meId) not associated with project (${project.id})", userLogin)
-					error = 'Invalid move event id specified'
-				}
+			}
+			else if (me.projectId != project.id) {
+				securityService.reportViolation("Accessing move event ($meId) not associated with project ($project.id)")
+				error = 'Invalid move event id specified'
 			}
 		}
+
 		if (error) {
-			render ServiceResults.errors(error) as JSON
+			renderErrorJson(error)
 			return
 		}
 
 		// Create the new news domain
-		def men = new MoveEventNews()
-		men.moveEvent = me
-		men.createdBy = userLogin.person
+		def men = new MoveEventNews(moveEvent: me, createdBy: securityService.loadCurrentPerson())
 
-		saveUpdateNewsHandler(project, userLogin, men, params, this)
+		saveUpdateNewsHandler(project, men, params, this)
 	}
-
 
 	/**
 	 * Used to update an exiting MoveEventNews record that returns AJax Response
@@ -398,17 +369,11 @@ class NewsEditorController {
 	 * @param isArchived
 	 * @param resolution
 	 */
+	@HasPermission('CreateNews')
 	def updateNews() {
-
-		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
 			flash.message = null
-			return
-		}
-
-		// Check for permission
-		if (! securityService.hasPermission(userLogin, 'CreateNews') ) {
-			ServiceResults.unauthorized(response)
 			return
 		}
 
@@ -426,71 +391,65 @@ class NewsEditorController {
 				error = 'News id was not found'
 			} else {
 				if (men.moveEvent.project.id != project.id) {
-					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project (${project.id})", userLogin)
+					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project ($project.id)")
 					error = 'Invalid news id specified'
 				}
 			}
 		}
 		if (error) {
-			render ServiceResults.errors(error) as JSON
+			renderErrorJson(error)
 			return
 		}
 
-		saveUpdateNewsHandler(project, userLogin, men, params, this)
+		saveUpdateNewsHandler(project, men, params, this)
 	}
 
 	/**
 	 * Used by the saveNews and updateNews controller methods to perform the actual update of the new or existing MoveEventNews domain record
 	 */
-	private void saveUpdateNewsHandler(Project project, UserLogin userLogin, MoveEventNews men, params, controller) {
+	private void saveUpdateNewsHandler(Project project, MoveEventNews men, params, controller) {
 
 		men.message = params.message
 		men.resolution = params.resolution
 
 		if (params.isArchived == '1') {
 			men.isArchived = 1
-			men.archivedBy = userLogin.person
+			men.archivedBy = securityService.loadCurrentPerson()
 			men.dateArchived = TimeUtil.nowGMT()
 		} else {
 			men.isArchived = 0
 		}
 
-		if (! men.validate() || !men.save(flush:true) ) {
+		if (!men.validate() || !men.save(flush:true)) {
 			error = "Error saving news : ${GormUtil.allErrorsString(men)}"
-			log.info "saveNews() user:$userLogin, project:${project.id} - $error"
-			render ServiceResults.errors(error) as JSON
+			log.info "saveNews() user:$securityService.currentUsername, project:$project.id - $error"
+			renderErrorJson(error)
 			return
 		}
 
 		String mode = params.mode ?: 'redirect'
 
 		if (mode == 'ajax') {
-			Map menModel = [id:men.id, message:men.message, resolution:men.resolution, isArchived:men.isArchived, moveEventId: men.moveEvent.id]
-			render ServiceResults.success([moveEventNews: menModel]) as JSON
+			Map menModel = [id:men.id, message:men.message, resolution:men.resolution,
+			                isArchived:men.isArchived, moveEventId: men.moveEvent.id]
+			renderSuccessJson(moveEventNews: menModel)
 		} else {
 			controller.redirect(
 				action: "newsEditorList",
 				params: [ moveBundle: params.moveBundle, viewFilter:params.viewFilter, moveEvent:params.moveEvent.id]
 			)
 		}
-
 	}
 
 	/**
 	 * Used to update an exiting MoveEventNews record that returns AJax Response
 	 * @param id
 	 */
+	@HasPermission('CreateNews')
 	def deleteNews() {
-
-		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
 			flash.message = null
-			return
-		}
-
-		// Check for permission
-		if (! securityService.hasPermission(userLogin, 'CreateNews') ) {
-			ServiceResults.unauthorized(response)
 			return
 		}
 
@@ -508,13 +467,13 @@ class NewsEditorController {
 				error = 'News id was not found'
 			} else {
 				if (men.moveEvent.project.id != project.id) {
-					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project (${project.id})", userLogin)
+					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project ($project.id)")
 					error = 'Invalid news id specified'
 				}
 			}
 		}
 
-		if (! error) {
+		if (!error) {
 			try {
 				men.delete(flush:true)
 			} catch (e) {
@@ -523,10 +482,10 @@ class NewsEditorController {
 		}
 
 		if (error) {
-			render ServiceResults.errors(error) as JSON
+			renderErrorJson(error)
 			return
 		}
 
-		render ServiceResults.success() as JSON
+		renderSuccessJson()
 	}
 }

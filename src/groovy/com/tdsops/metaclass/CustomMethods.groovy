@@ -3,13 +3,12 @@ package com.tdsops.metaclass
 /*
  * Initialize various dynamic method injections on various classes that will be used within the application
  */
-
 class CustomMethods {
 
  	// Setup a Singleton pattern so we only initialize the methods once
-	private static INSTANCE
+	private static CustomMethods INSTANCE
 
-	static getInitialize(force=false) {
+	static CustomMethods initialize(boolean force = false) {
 		if (INSTANCE == null || force) {
 			INSTANCE = new CustomMethods()
 		}
@@ -60,8 +59,7 @@ class CustomMethods {
 		 * Boolean.asYN - used to convert a Boolean to a String consisting of 'Y' for true or 'N' for false
 		 */
 		Boolean.metaClass.asYN {
-			return (delegate ? 'Y' : 'N')
+			delegate ? 'Y' : 'N'
 		}
-
 	}
 }

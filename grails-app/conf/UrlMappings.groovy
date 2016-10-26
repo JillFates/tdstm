@@ -11,15 +11,12 @@ class UrlMappings {
 		}
 
 		/*
-		TM-5299 Commenting out the line below because it's interfering 
+		TM-5299 Commenting out the line below because it's interfering
 		with requests that pass a 'format' parameter.
 		*/
 		// "/$controller/$action?/$id?(.$format)?" {
-		"/$controller/$action?/$id?"{
-			constraints {
-			 // apply constraints here
-			}
-		}
+		"/$controller/$action?/$id?" {}
+
 		/**
 		 * Web Service Controller
 		 */

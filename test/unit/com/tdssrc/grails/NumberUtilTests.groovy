@@ -19,19 +19,14 @@ class NumberUtilTests extends Specification {
 		NumberUtil.toLong('') == null
 	}
 
-	void 'Test toLong with min/max'() {
-		int four = 4
-
+	void testLimit() {
 		expect:
-		10L == NumberUtil.toLong('500', 12, 1, 10)
-		1L == NumberUtil.toLong("-2", 10, 1, 50)
-		3L == NumberUtil.toLong(3L, 12, 1, 10)
+		10 == NumberUtil.limit(12, 1, 10)
+		10 == NumberUtil.limit(1, 10, 50)
+		3 == NumberUtil.limit(3, 1, 10)
 	}
 
 	void testToPositiveLong() {
-		given:
-		int four = 4
-
 		expect:
 		1L == NumberUtil.toPositiveLong('1')
 		5L == NumberUtil.toPositiveLong(-3L, 5L)

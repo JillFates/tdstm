@@ -1,4 +1,5 @@
 <%@page expressionCodec="none" %>
+<%@page import="net.transitionmanager.domain.Rack" %>
 <html>
 <body>
 <div class="body" style="width:98%;">
@@ -190,7 +191,7 @@
 			<tr><td class='rack_upos'>2</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 			<tr><td class='rack_upos'>1</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 		</table>
-		
+
 	</div>
 	<div id="auditDetailViewId" class="table.rack_elevation.back" style="display: none;">
 	</div>
@@ -255,9 +256,9 @@ function capacityView(){
  					}else {
  						$('#cap_count_'+divId).html("&nbsp;")
  						$('#cap_count_'+divId).hide()
- 						
+
  					}
- 					
+
 				})
 				$("#cap20").addClass("rack_cap20").html(data.view["cap20"])
 				$("#cap32").addClass("rack_cap32").html(data.view["cap32"])
@@ -266,7 +267,7 @@ function capacityView(){
 				$("#cap68").addClass("rack_cap68").html(data.view["cap68"])
 				$("#cap80").addClass("rack_cap80").html(data.view["cap80"])
 				$("#cap100").addClass("rack_cap100").html(data.view["cap100"])
-				
+
 				$("#scale_div").show()
 				for(i=0; i< racks.length; i++){
 					$("#rack_"+racks[i]).removeClass("rack_cap20")
@@ -290,7 +291,7 @@ function capacityView(){
 				$(".adjustRack").each(function(){
  					var divId = $(this).attr('id').split("_")[1]
  		 		    $('#cap_count_'+divId).html("&nbsp;")
- 					
+
 				})
 			}
 			 updateRackPower($("#selectedRackId").val())

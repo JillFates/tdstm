@@ -59,10 +59,8 @@
 
 <!-- -->
 
-
 <%
-    def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-    moveEvent = MoveEvent.get(moveEventId)
+def moveEvent = tds.currentMoveEvent() ?: null
 %>
 
 <g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
@@ -80,7 +78,7 @@
 <g:javascript src="person.js"/>
 
 
-<% // What is this for?  %>
+<%-- What is this for?  --%>
 <script type="text/javascript">
     var currentURL = '';
     (function ($) {

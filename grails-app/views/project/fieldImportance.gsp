@@ -1,5 +1,6 @@
-<!doctype html>
 <%@page import="com.tdsops.tm.enums.domain.EntityType"%>
+<%@page import="net.transitionmanager.domain.Project" %>
+<!doctype html>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -17,7 +18,7 @@
 		<div style="margin-left:20px;">
 			<h2>Custom Fields Shown in Selectors:
 				<g:if test="${hasEditProjectFieldSettingsPermission}">
-					<g:select ng-model="customShown" name="customFieldSelect" from="${Project.constraints.customFieldsShown.inList}" 
+					<g:select ng-model="customShown" name="customFieldSelect" from="${Project.constraints.customFieldsShown.inList}"
 							 value="customShown" ng-change="updateCustomFieldsShown();" />
 				</g:if>
 				<g:else>
@@ -28,8 +29,8 @@
 		<div>
 			<div class="legend" >
 				<h1 class="assetImage" ng-click="toggleLegend()">Legend
-					<img ng-hide="showLegend()" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
-					<img ng-show="showLegend()" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
+					<img ng-hide="showLegend()" src="${resource(dir:'images',file:'triangle_right.png')}" />
+					<img ng-show="showLegend()" src="${resource(dir:'images',file:'triangle_down.png')}" />
 				</h1>
 				<table class="legendTable field-importance-table" ng-show="showLegend()">
 					<tr ng-repeat="note in notes">
@@ -40,7 +41,7 @@
 				</table>
 			</div>
 			<div data-ng-init="types=[{'id':'Application','name':'Application'},{'id':'Device','name':'AssetEntity'},{'id':'Database','name':'Database'},{'id':'Storage','name':'Files'}]">
-			
+
 				<tabset>
 					 <tab ng-repeat="type in types" ng-click="toggleSection(type.name)" heading="{{type.id}}">
 						<table class="fieldTable field-importance-table">
@@ -55,7 +56,7 @@
 						</table>
 					</tab>
 				</tabset>
-			
+
 			</div>
 			<input type="hidden" id="customfieldShown" name="customfieldShown" value="${Project.CUSTOM_FIELD_COUNT}" />
 			<input type="hidden" id="projectCustomShown" name="projectCustomShown" value="${project.customFieldsShown}" />
@@ -66,7 +67,7 @@
 	$('.menu-projects-field-settings').addClass('active');
 	$('.menu-parent-projects').addClass('active');
 	$(".legend").css('margin-left',$(window).width()-375+"px")
-	
+
 	// handle the scrolling header
 	$(window).scroll( function() {
 		var headTable = $('.tab-pane.active .fieldsPane:not(.ng-hide) #buttonRowId');
@@ -76,6 +77,6 @@
 		handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
 	});
 	</script>
-	
+
 </body>
 </html>

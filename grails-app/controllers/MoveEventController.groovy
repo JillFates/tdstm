@@ -1,358 +1,310 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.AppMoveEvent
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventSnapshot
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.Project
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.MoveBundleService
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.ReportsService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.TaskService
+import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringUtils
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.Sheet
 import org.hibernate.criterion.Order
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import org.springframework.jdbc.core.JdbcTemplate
 
-class MoveEventController {
+import java.sql.Timestamp
 
-	protected static Log log = LogFactory.getLog( MoveEventController.class )
+import static net.transitionmanager.domain.Permissions.Roles.ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
 
-    // Service initialization IOC
-	def controllerService
-	def cookbookService
-	def jdbcTemplate
-	def moveBundleService
-	def projectService
-	def reportsService
-	def runbookService
-	def securityService
-	def taskService
-	def userPreferenceService
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+@Slf4j(value='logger', category='grails.app.controllers.MoveEventController')
+class MoveEventController implements ControllerMethods {
 
-    def index() { redirect(action:"list",params:params) }
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-	/*
-	 * will return the list of MoveEvents
-	 */
-    def list() {
-    }
+	ControllerService controllerService
+	JdbcTemplate jdbcTemplate
+	MoveBundleService moveBundleService
+	ProjectService projectService
+	ReportsService reportsService
+	SecurityService securityService
+	TaskService taskService
+	UserPreferenceService userPreferenceService
 
-	/**
-	 *
-	 */
+	private static final List<String> preMoveCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'assignedTo',
+	                                                 'status', 'estStart', '', '', 'notes', 'duration', 'estStart',
+	                                                 'estFinish', 'actStart', 'actFinish', 'workflow']
+	private static final List<String> serverCols = ['id', 'application', 'assetName', '','serialNumber', 'assetTag',
+	                                                'manufacturer', 'model', 'assetType', '', '', '']
+	private static final List<String> scheduleCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role',
+	                                                  'assignedTo', 'instructionsLink' , '', 'duration', 'estStart',
+	                                                  'estFinish', 'actStart', 'actFinish', 'workflow']
+	private static final List<String> postMoveCols = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status',
+	                                                  'estFinish', 'dateResolved' , 'notes', 'taskDependencies', 'duration',
+	                                                  'estStart', ' estFinish', ' actStart', 'actFinish', 'workflow']
+	private static final List<String> impactedCols = ['id', 'assetName', '', 'startupProc', 'description',
+	                                                  'sme', '' ,'' ,'' ,'' ,'' ,'' ]
+	private static final List<String> dbCols = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType',
+	                                            'retireDate', 'maintExpDate', 'environment', 'ipAddress', 'planStatus',
+	                                            'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6',
+	                                            'custom7', 'custom8']
+	private static final List<String> fileCols = ['id', 'assetName', 'fileFormat', 'size', 'description', 'supportType',
+	                                              'retireDate', 'maintExpDate', 'environment', 'ipAddress', 'planStatus',
+	                                              'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6',
+	                                              'custom7', 'custom8']
+
+	private static final List<String> otherCols = ['id', 'application', 'assetName', 'shortName', 'serialNumber',
+	                                               'assetTag', 'manufacturer', 'model', 'assetType', 'ipAddress', 'os',
+	                                               'sourceLocation', 'sourceLocation', 'sourceRack', 'sourceRackPosition',
+	                                               'sourceChassis', 'sourceBladePosition', 'targetLocation', 'targetRoom',
+	                                               'targetRack', 'targetRackPosition', 'targetChassis',
+	                                               'targetBladePosition', 'custom1', 'custom2', 'custom3', 'custom4',
+	                                               'custom5', 'custom6', 'custom7', 'custom8', 'moveBundle', 'truck',
+	                                               'cart', 'shelf', 'railType', 'priority', 'planStatus', 'usize']
+
+	private static final List<String> unresolvedCols = ['id', 'comment', 'commentType', 'commentAssetEntity',
+	                                                    'resolution', 'resolvedBy', 'createdBy', 'dueDate', 'assignedTo',
+	                                                    'category', 'dateCreated', 'dateResolved', 'assignedTo', 'status',
+	                                                    'taskDependencies', 'duration', 'estStart', 'estFinish',
+	                                                    'actStart', 'actFinish', 'workflow']
+
+	def list() {}
+
 	def listJson() {
 
-		def sortIndex = params.sidx ?: 'name'
-		def sortOrder  = params.sord ?: 'asc'
-		def maxRows =  Integer.valueOf(params.rows)
-		def currentPage = Integer.valueOf(params.page) ?: 1
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		String sortIndex = params.sidx ?: 'assetName'
+		int maxRows = params.int('rows', 25)
+		int currentPage = params.int('page', 1)
+		int rowOffset = (currentPage - 1) * maxRows
 
-		def project = securityService.getUserCurrentProject()
-		def newsBM = params.newsBarMode ? retrieveNewsBMList(params.newsBarMode) : null
-
-		def events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
-			eq("project", project)
-			if (params.name)
+		List<MoveEvent> events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
+			eq("project", securityService.loadUserCurrentProject())
+			if (params.name) {
 				ilike('name', "%${params.name.trim()}%")
-			if (params.description)
-				ilike('description', "%${params.description}%")
-			if (params.runbookStatus)
-				ilike('runbookStatus', "%${params.runbookStatus}%")
-			if (newsBM)
+			}
+			if (params.description) {
+				ilike('description', "%$params.description%")
+			}
+			if (params.runbookStatus) {
+				ilike('runbookStatus', "%$params.runbookStatus%")
+			}
+			def newsBM = retrieveNewsBMList(params.newsBarMode)
+			if (newsBM) {
 				'in'('newsBarMode', newsBM)
-
-			order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
+			}
+			order(Order.asc(sortIndex).ignoreCase())
 		}
 
-		def totalRows = events.totalCount
-		def numberOfPages = Math.ceil(totalRows / maxRows)
+		int totalRows = events.totalCount
+		int numberOfPages = Math.ceil(totalRows / maxRows)
 
-		def results = events?.collect { [ cell: [it.name, it.description, g.message(code: "event.newsBarMode.${it.newsBarMode}"), it.runbookStatus,
-					it.moveBundlesString], id: it.id,
-			]}
+		def results = events.collect {
+			[cell: [it.name, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
+			        it.runbookStatus, it.moveBundlesString], id: it.id]
+		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON
 	}
 
-	/*
-	 * return the MoveEvent details for selected MoveEvent
-	 * @param : MoveEvent Id
-	 * @return : MoveEvent details
-	 */
-    def show() {
-		userPreferenceService.loadPreferences(PREF.MOVE_EVENT)
-		def moveEventId = params.id
-		if(moveEventId){
-			userPreferenceService.setPreference(PREF.MOVE_EVENT, "${moveEventId}" )
-			def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
-			if(moveBundleId){
-				def moveBundle = MoveBundle.get( moveBundleId )
-				if(moveBundle?.moveEvent?.id != Integer.parseInt(moveEventId)){
+	def show() {
+		String moveEventId = params.id
+		if (moveEventId) {
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, moveEventId)
+			def moveBundleId = userPreferenceService.moveBundleId
+			if (moveBundleId) {
+				def moveBundle = MoveBundle.get(moveBundleId)
+				if (moveBundle?.moveEvent?.id != Integer.parseInt(moveEventId)) {
 					userPreferenceService.removePreference(PREF.CURR_BUNDLE)
 				}
 			}
-		} else {
-			moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT
+		}
+		else {
+			moveEventId = userPreferenceService.getPreference(PREF.MOVE_EVENT)
 		}
 
-		if(moveEventId){
-	        def moveEventInstance = MoveEvent.get( moveEventId )
-
-	        if(!moveEventInstance) {
-	            flash.message = "MoveEvent not found with id ${moveEventId}"
-	            redirect(action:"list")
-	        } else {
-	        	return [ moveEventInstance : moveEventInstance ]
-	        }
-		} else {
-		    redirect(action:"list")
+		if (!moveEventId) {
+			redirect(action: 'list')
+			return
 		}
-    }
-	/*
+
+		MoveEvent moveEvent = MoveEvent.get(moveEventId)
+		if (!moveEvent) {
+			flash.message = "MoveEvent not found with id $moveEventId"
+			redirect(action: 'list')
+			return
+		}
+
+		[moveEventInstance: moveEvent]
+	}
+
+	/**
 	 * redirect to list once selected record deleted
 	 * @param : MoveEvent Id
 	 * @return : list of remaining MoveEvents
 	 */
-    def delete() {
-    	try{
-        	def moveEventInstance = MoveEvent.get( params.id )
-	        if(moveEventInstance) {
-    	    	def moveEventName = moveEventInstance.name
-    	    	jdbcTemplate.update("DELETE FROM move_event_snapshot WHERE move_event_id = ${moveEventInstance?.id} " )
-				jdbcTemplate.update("DELETE FROM move_event_news WHERE move_event_id = ${moveEventInstance?.id} " )
-				jdbcTemplate.update("UPDATE move_bundle SET move_event_id = null WHERE move_event_id = ${moveEventInstance?.id} " )
-				jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveEventInstance?.id}")
-				AppMoveEvent.executeUpdate("DELETE FROM AppMoveEvent where move_event_id = ${moveEventInstance?.id} ")
-        	    moveEventInstance.delete()
-            	flash.message = "MoveEvent ${moveEventName} deleted"
-        	} else {
-	            flash.message = "MoveEvent not found with id ${params.id}"
+	def delete() {
+		try {
+			MoveEvent moveEvent = MoveEvent.get(params.id)
+			if (moveEvent) {
+				long moveEventId = moveEvent.id
+				String moveEventName = moveEvent.name
+				jdbcTemplate.update('DELETE FROM move_event_snapshot             WHERE move_event_id = ?', moveEventId)
+				jdbcTemplate.update('DELETE FROM move_event_news                 WHERE move_event_id = ?', moveEventId)
+				jdbcTemplate.update('UPDATE move_bundle SET move_event_id = NULL WHERE move_event_id = ?', moveEventId)
+				jdbcTemplate.update('DELETE FROM user_preference                 WHERE value =         ?', moveEventId)
+				AppMoveEvent.executeUpdate('DELETE AppMoveEvent                  WHERE moveEvent.id =  ?', [moveEventId])
+
+				moveEvent.delete()
+				flash.message = "MoveEvent $moveEventName deleted"
+			}
+			else {
+				flash.message = "MoveEvent not found with id $params.id"
         	}
-    	} catch(Exception ex){
-    		flash.message = ex
-    	}
-    	redirect(action:"list")
-    }
-    /*
-	 * return the MoveEvent details for selected MoveEvent to the edit form
-	 * @param : MoveEvent Id
-	 * @return : MoveEvent details
-	 */
-    def edit() {
-        def moveEventInstance = MoveEvent.get( params.id )
-
-        if(!moveEventInstance) {
-            flash.message = "MoveEvent not found with id ${params.id}"
-            redirect(action:"list")
-        } else {
-        	def moveBundles = MoveBundle.findAllByProject( moveEventInstance.project )
-        	return [ moveEventInstance : moveEventInstance, moveBundles : moveBundles ]
-        }
-    }
-    /*
-	 * update the MoveEvent details
-	 * @param : MoveEvent Id
-	 * @return : redirect to the show method
-	 */
-    def update() {
-        def moveEventInstance = MoveEvent.get( params.id )
-
-		if(moveEventInstance) {
-			def estStartTime = params.estStartTime
-			if(estStartTime){
-				params.estStartTime = TimeUtil.parseDateTime(session, estStartTime)
-			}
-
-            moveEventInstance.properties = params
-
-            def moveBundles = request.getParameterValues("moveBundle")
-
-            if(!moveEventInstance.hasErrors() && moveEventInstance.save()) {
-
-            	moveBundleService.assignMoveEvent( moveEventInstance, moveBundles )
-
-                flash.message = "MoveEvent '${moveEventInstance.name}' updated"
-                redirect(action:"show",id:moveEventInstance.id)
-            }
-            else {
-                render(view:'edit',model:[moveEventInstance:moveEventInstance])
-            }
-        } else {
-            flash.message = "MoveEvent not found with id ${params.id}"
-            redirect(action:"edit",id:params.id)
-        }
-    }
-    /*
-	 * return blank create page
-	 */
-    def create() {
-        def moveEventInstance = new MoveEvent()
-        moveEventInstance.properties = params
-        return ['moveEventInstance':moveEventInstance]
-    }
-    /*
-	 * Save the MoveEvent details
-	 * @param : MoveEvent Id
-	 * @return : redirect to the show method
-	 */
-    def save() {
-		def estStartTime = params.estStartTime
-		if(estStartTime){
-			params.estStartTime = TimeUtil.parseDateTime(session, estStartTime)
 		}
-
-        def moveEventInstance = new MoveEvent(params)
-        def moveBundles = request.getParameterValues("moveBundle")
-        if(moveEventInstance.project.runbookOn ==1){
-            moveEventInstance.calcMethod = MoveEvent.METHOD_MANUAL
-        }
-		if(!moveEventInstance.hasErrors() && moveEventInstance.save()) {
-
-			moveBundleService.assignMoveEvent( moveEventInstance, moveBundles )
-            moveBundleService.createManualMoveEventSnapshot( moveEventInstance )
-			flash.message = "MoveEvent ${moveEventInstance.name} created"
-            redirect(action:"show",id:moveEventInstance.id)
-        } else {
-            render(view:'create',model:[moveEventInstance:moveEventInstance])
-        }
-    }
-    /*
-	 * return the list of MoveBundles which are associated to the selected Project
-	 * @param : projectId
-	 * @return : return the list of MoveBundles as JSON object
-	 */
-    def retrieveMoveBundles() {
-    	def projectId = session.CURR_PROJ.CURR_PROJ
-		def moveBundles
-		def project
-		if( projectId ){
-			project = Project.get( projectId )
-			moveBundles = MoveBundle.findAllByProject( project )
+		catch (e) {
+			flash.message = e
 		}
-    	render moveBundles as JSON
-    }
+		redirect(action: 'list')
+	}
 
-    /*---------------------------------------------------------
-     * Will export MoveEvent Transition time results data in XLS based on user input
-     * @author : lokanada Reddy
-     * @param  : moveEvent and reportType.
-     * @return : redirect to same page once data exported to Excel.
-     *-------------------------------------------------------*/
-	def retrieveMoveResults() {
-    	def workbook
-		def book
-		def moveEvent = params.moveEvent
-		def reportType = params.reportType
-		if(moveEvent && reportType){
-			def moveEventInstance = MoveEvent.get( moveEvent  )
-			try {
-				def moveEventResults
-				File file
-				if(reportType != "SUMMARY"){
-					file = grailsApplication.parentContext.getResource( "/templates/MoveResults_Detailed.xls" ).getFile()
-				} else {
-					file = grailsApplication.parentContext.getResource( "/templates/MoveResults_Summary.xls" ).getFile()
-				}
-
-				//set MIME TYPE as Excel
-				response.setContentType( "application/vnd.ms-excel" )
-
-				def type = params.reportType == "SUMMARY" ? "summary" : "detailed"
-				def filename = 	"MoveResults-${moveEventInstance?.project?.name}-${moveEventInstance?.name}-${type}.xls"
-					filename = filename.replace(" ", "_")
-				response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
-
-				book = new HSSFWorkbook(new FileInputStream( file ))
-				def sheet = book.getSheet("moveEvent_results")
-				def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-
-				if(reportType != "SUMMARY"){
-					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
-					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
-						WorkbookUtil.addCell(sheet, 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id ))
-						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(moveEventResults[r-1].bundle_name ))
-						WorkbookUtil.addCell(sheet, 2, r, String.valueOf(moveEventResults[r-1].asset_id ))
-						WorkbookUtil.addCell(sheet, 3, r, String.valueOf(moveEventResults[r-1].asset_name ))
-						WorkbookUtil.addCell(sheet, 4, r, String.valueOf(moveEventResults[r-1].voided ))
-						WorkbookUtil.addCell(sheet, 5, r, String.valueOf(moveEventResults[r-1].from_name ))
-						WorkbookUtil.addCell(sheet, 6, r, String.valueOf(moveEventResults[r-1].to_name ))
-						WorkbookUtil.addCell(sheet, 7, r, String.valueOf( TimeUtil.formatDateTime(session, moveEventResults[r-1].transition_time) ))
-						WorkbookUtil.addCell(sheet, 8, r, String.valueOf(moveEventResults[r-1].username ))
-						WorkbookUtil.addCell(sheet, 9, r, String.valueOf(moveEventResults[r-1].team_name ))
-					}
-				} else {
-					moveEventResults = moveBundleService.getMoveEventSummaryResults( moveEvent )
-					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
-						WorkbookUtil.addCell(sheet, 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id ))
-						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(moveEventResults[r-1].bundle_name ))
-						WorkbookUtil.addCell(sheet, 2, r, String.valueOf(moveEventResults[r-1].state_to ))
-						WorkbookUtil.addCell(sheet, 3, r, String.valueOf(moveEventResults[r-1].name ))
-						WorkbookUtil.addCell(sheet, 4, r, String.valueOf( TimeUtil.formatDateTime(session, moveEventResults[r-1].started) ))
-						WorkbookUtil.addCell(sheet, 5, r, String.valueOf( TimeUtil.formatDateTime(session, moveEventResults[r-1].completed) ))
-					}
-				}
-				WorkbookUtil.addCell(sheet, 0, moveEventResults.size() + 2, "Note: All times are in $tzId time zone")
-
-				book.write(response.getOutputStream())
-
-			} catch( Exception ex ) {
-				flash.message = "Exception occurred while exporting data"
-				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
-				return
-			}
-		} else {
-			flash.message = "Please select MoveEvent and report type. "
-			redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+	def edit() {
+		MoveEvent moveEvent = MoveEvent.get(params.id)
+		if (!moveEvent) {
+			flash.message = "MoveEvent not found with id $params.id"
+			redirect(action: 'list')
 			return
 		}
-    }
 
-    /*------------------------------------------------------
-     * Clear out any snapshot data records and reset any summary steps for given event.
-     * @author : Lokanada Reddy
-     * @param  : moveEventId
-     *----------------------------------------------------*/
+		[moveEvent: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
+	}
+
+	def update() {
+		MoveEvent moveEvent = MoveEvent.get(params.id)
+		if (!moveEvent) {
+			flash.message = "MoveEvent not found with id $params.id"
+			redirect(action: 'edit', id: params.id)
+			return
+		}
+
+		moveEvent.properties = params
+		if (params.estStartTime) {
+			moveEvent.estStartTime = TimeUtil.parseDateTime(params.estStartTime)
+		}
+
+		if (!moveEvent.hasErrors() && moveEvent.save()) {
+			moveBundleService.assignMoveEvent(moveEvent, request.getParameterValues('moveBundle') as List)
+			flash.message = "MoveEvent '$moveEvent.name' updated"
+			redirect(action: 'show', id: moveEvent.id)
+		}
+		else {
+			render(view: 'edit', model: [moveEventInstance: moveEvent])
+		}
+	}
+
+	def create() {
+		[moveEventInstance: new MoveEvent(params)]
+	}
+
+	def save() {
+		MoveEvent moveEvent = new MoveEvent(params)
+		if (params.estStartTime) {
+			moveEvent.estStartTime = TimeUtil.parseDateTime(params.estStartTime)
+		}
+
+		if (moveEvent.project.runbookOn == 1) {
+			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
+		}
+		if (!moveEvent.hasErrors() && moveEvent.save()) {
+			moveBundleService.assignMoveEvent(moveEvent, request.getParameterValues("moveBundle") as List)
+			moveBundleService.createManualMoveEventSnapshot(moveEvent)
+			flash.message = "MoveEvent $moveEvent.name created"
+			redirect(action: "show", id: moveEvent.id)
+		}
+		else {
+			render(view: 'create', model: [moveEventInstance: moveEvent])
+		}
+   }
+
+   /*
+	 * return the list of MoveBundles which are associated to the selected Project
+	 * @return : return the list of MoveBundles as JSON object
+	 */
+   def retrieveMoveBundles() {
+		def moveBundles
+		Project project = securityService.userCurrentProject
+		if (project) {
+			moveBundles = MoveBundle.findAllByProject(project)
+		}
+   	render moveBundles as JSON
+   }
+
+   /**
+    * Clear out any snapshot data records and reset any summary steps for given event.
+    */
 	def clearHistoricData() {
-		def moveEventId = params.moveEventId
-		if(moveEventId ){
-			jdbcTemplate.update("DELETE FROM move_event_snapshot WHERE move_event_id = $moveEventId " )
-			def moveBundleSteps = jdbcTemplate.queryForList("""SELECT mbs.id FROM move_bundle_step mbs LEFT JOIN move_bundle mb
-										ON (mb.move_bundle_id = mbs.move_bundle_id) WHERE mb.move_event_id = $moveEventId """)
-			if(moveBundleSteps.size() > 0){
-				def ids = (moveBundleSteps.id).toString().replace("[","(").replace("]",")")
-				jdbcTemplate.update("DELETE FROM step_snapshot WHERE move_bundle_step_id in $ids " )
+		Long moveEventId = params.long('moveEventId')
+		if (moveEventId) {
+			jdbcTemplate.update('DELETE FROM move_event_snapshot WHERE move_event_id=?', moveEventId)
+			def moveBundleSteps = jdbcTemplate.queryForList('''
+				SELECT mbs.id FROM move_bundle_step mbs
+				LEFT JOIN move_bundle mb ON (mb.move_bundle_id = mbs.move_bundle_id)
+				WHERE mb.move_event_id=?''', moveEventId)
+			if (moveBundleSteps) {
+				jdbcTemplate.update('DELETE FROM step_snapshot ' +
+				                    'WHERE move_bundle_step_id in (' + moveBundleSteps.id.join(',') + ')')
 			}
-			jdbcTemplate.update("""UPDATE move_bundle_step mbs SET mbs.actual_start_time = null, mbs.actual_completion_time = null
-						WHERE move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEventId )""" )
+			jdbcTemplate.update('''
+					UPDATE move_bundle_step
+					SET actual_start_time=null,
+					    actual_completion_time=null
+					WHERE move_bundle_id in (SELECT move_bundle_id FROM move_bundle WHERE move_event_id=?)''',
+				moveEventId)
 		}
 		render "success"
-    }
+   }
 
 	/**
 	 * Used to clear or reset any Task data for selected event.
-     * @param moveEventId
-     * @param type (delete/clear)
+    * @param moveEventId
+    * @param type (delete/clear)
 	 * @return text
 	 * @usage ajax
 	 */
 	def clearTaskData() {
-		def project = securityService.getUserCurrentProject()
+		Project project = securityService.userCurrentProject
 		def moveEvent
 		def msg = ""
 
 		// TODO - Need to create an ACL instead of using roles for this
-		if (!securityService.hasRole(['ADMIN','CLIENT_ADMIN','CLIENT_MGR']) ) {
+		if (!securityService.hasRole([ADMIN, CLIENT_ADMIN, CLIENT_MGR])) {
 			msg = "You do not have the proper permissions to perform this task"
 		} else {
 			if (params.moveEventId.isNumber()) {
-				moveEvent = MoveEvent.findByIdAndProject( params.moveEventId, project)
+				moveEvent = MoveEvent.findByIdAndProject(params.moveEventId, project)
 				if (! moveEvent) {
 					msg = "You present do not have access to the event"
 				}
@@ -362,37 +314,37 @@ class MoveEventController {
 		}
 		if (! msg) {
 			try {
-				if(params.type == 'reset'){
+				if (params.type == 'reset') {
 					msg = taskService.resetTaskData(moveEvent)
-				} else if(params.type == 'delete'){
+				} else if (params.type == 'delete') {
 					msg = taskService.deleteTaskData(moveEvent)
 				}
 			} catch(e) {
-				msg = e.getMessage()
+				msg = e.message
 			}
 		}
 		render msg
 	}
 
-    /**
-      * Return the list of active news for a selected moveEvent and status of that evnt.
-      * @param id - the moveEvent to get the news for
-      */
-    def retrieveMoveEventNewsAndStatus() {
+   /**
+     * Return the list of active news for a selected moveEvent and status of that evnt.
+     * @param id - the moveEvent to get the news for
+     */
+   def retrieveMoveEventNewsAndStatus() {
 
 		// Make sure that the user is trying to access a valid event
-		def (project, user) = controllerService.getProjectAndUserForPage(this)
+		Project project = controllerService.getProjectForPage(this)
 		if (! project) {
 			// TODO - switch to getProjectAndUserForWS when available to avoid the flash.message
 			flash.message = ''
-			ServiceResults.respondWithWarning(response, "User presently has no selected project")
+			renderWarningJson("User presently has no selected project")
 			return
-    	}
-    	def moveEvent = controllerService.getEventForPage(this, project, user, params.id)
-    	if (!moveEvent) {
+   	}
+   	def moveEvent = controllerService.getEventForPage(this, project, params.id)
+   	if (!moveEvent) {
 			// TODO - switch to getEventForWS when available to avoid the flash.message
 			flash.message = ''
-			ServiceResults.respondWithWarning(response, "Event id was not found")
+			renderWarningJson("Event id was not found")
 			return
 		}
 
@@ -400,95 +352,93 @@ class MoveEventController {
 		if (moveEvent) {
 
 	    	def moveEventNewsQuery = """SELECT mn.date_created as created, mn.message as message from move_event_news mn
-				left join move_event me on ( me.move_event_id = mn.move_event_id )
+				left join move_event me on (me.move_event_id = mn.move_event_id
 				left join project p on (p.project_id = me.project_id)
-				where mn.is_archived = 0 and mn.move_event_id = ${moveEvent.id} and p.project_id = ${moveEvent.project.id} order by created desc"""
+				where mn.is_archived = 0 and mn.move_event_id = $moveEvent.id and p.project_id = $moveEvent.project.id order by created desc"""
 
-			def moveEventNews = jdbcTemplate.queryForList( moveEventNewsQuery )
+			def moveEventNews = jdbcTemplate.queryForList(moveEventNewsQuery)
 
 			def news = new StringBuffer()
 
-			moveEventNews.each{
-	    		news.append(String.valueOf( TimeUtil.formatDateTime(session, it.created) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;"))
+			moveEventNews.each {
+	    		news.append(String.valueOf(TimeUtil.formatDateTime(it.created) + "&nbsp;:&nbsp;" + it.message + ".&nbsp;&nbsp;"))
 	    	}
 
 			// append recent tasks  whose status is completed, moveEvent is newsBarMode
 			def transitionComment = new StringBuffer()
-			if(moveEvent.newsBarMode =="on"){
+			if (moveEvent.newsBarMode == "on") {
 				def today = new Date()
-				def currentPoolTime = new java.sql.Timestamp(today.getTime())
-				def tasksCompQuery="""SELECT comment,date_resolved AS dateResolved FROM asset_comment WHERE project_id= ${moveEvent.project.id} AND
-					move_event_id=${moveEvent.id} AND status='Completed' AND
-					(date_resolved BETWEEN SUBTIME('$currentPoolTime','00:15:00') AND '$currentPoolTime')"""
-				def tasksCompList=jdbcTemplate.queryForList( tasksCompQuery )
-				tasksCompList.each{
-				 	def comment = it.comment
-					def dateResolved = it.dateResolved ? TimeUtil.formatDateTime(session, it.dateResolved) : ''
-					transitionComment.append(comment+":&nbsp;&nbsp;"+dateResolved+".&nbsp;&nbsp;")
+				def currentPoolTime = new Timestamp(today.getTime())
+				def tasksCompList = jdbcTemplate.queryForList("""
+					SELECT comment, date_resolved AS dateResolved FROM asset_comment
+					WHERE project_id=?
+					  AND move_event_id=?
+					  AND status='Completed'
+					  AND (date_resolved BETWEEN SUBTIME(?, '00:15:00') AND ?)
+				""", moveEvent.projectId, moveEvent.id, currentPoolTime, currentPoolTime)
+				tasksCompList.each {
+					transitionComment << it.comment << ":&nbsp;&nbsp;" << TimeUtil.formatDateTime(it.dateResolved) << ".&nbsp;&nbsp;"
 				}
 			}
 
-			def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
-	    	def moveEventSnapshot = MoveEventSnapshot.findAll( query , [moveEvent , "P"] )[0]
+	    	def moveEventSnapshot = MoveEventSnapshot.executeQuery('''
+				FROM MoveEventSnapshot WHERE moveEvent=? AND type=?
+				ORDER BY dateCreated DESC
+			''', [moveEvent , "P"])[0]
 	    	def cssClass = "statusbar_good"
 			def status = "GREEN"
 			def dialInd = moveEventSnapshot?.dialIndicator
 			dialInd = dialInd || dialInd == 0 ? dialInd : 100
-			if(dialInd < 25){
+			if (dialInd < 25) {
 				cssClass = "statusbar_bad"
 				status = "RED"
-			} else if(dialInd >= 25 && dialInd < 50){
+			} else if (dialInd >= 25 && dialInd < 50) {
 				cssClass = "statusbar_yellow"
 				status = "YELLOW"
 			}
-	    	statusAndNewsList << ['news':news.toString()+ "<span style='font-weight:normal'>"+transitionComment.toString()+"</span>", 'cssClass':cssClass, 'status':status]
+	    	statusAndNewsList << [news: news.toString() + "<span style='font-weight:normal'>" + transitionComment + "</span>",
+	                            cssClass: cssClass, status: status]
 
 		}
 		render statusAndNewsList as JSON
-    }
-    /*
-     * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
-     * @author : Lokanada Reddy
-     * @param  : moveEventId and moveEvent dialIndicatorValue
-     */
-    def updateEventSumamry() {
-    	def moveEvent = MoveEvent.get( params.moveEventId )
-    	def dialIndicator
-    	def checkbox = params.checkbox
-    	if(checkbox == "true") {
-			dialIndicator = params.value
-		}
-		if(dialIndicator  || dialIndicator == 0){
-			def moveEventSnapshot = new MoveEventSnapshot(moveEvent : moveEvent, planDelta:0, dialIndicator:dialIndicator, type:"P")
-	    	if ( ! moveEventSnapshot.save( flush : true ) )
-	    		log.errlor("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
+   }
 
-			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
-		} else {
-			moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
-		}
-    	if ( ! moveEvent.save( flush : true ) ) {
-    		log.error("Unable to save changes to MoveEvent: ${moveEvent}")
-    	}
-		render "success"
-     }
+   /*
+    * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
+    * @author : Lokanada Reddy
+    * @param  : moveEventId and moveEvent dialIndicatorValue
+    */
+   def updateEventSumamry() {
+	   MoveEvent moveEvent = MoveEvent.get(params.moveEventId)
+   	def dialIndicator
+	   if (params.checkbox == 'true') {
+		   dialIndicator = params.value
+	   }
+ 		if (dialIndicator  || dialIndicator == 0) {
+		   MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent, planDelta: 0,
+				   dialIndicator: dialIndicator, type: 'P')
+		   saveWithWarnings moveEventSnapshot
+	    	if (moveEventSnapshot.hasErrors()) {
+				moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
+			}
+	      else {
+				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
+			}
+
+      	saveWithWarnings moveEvent
+			render "success"
+	   }
+    }
 
 	/**
 	 * The front-end UI to exporting a Runbook spreadsheet
 	 */
-	def exportRunbook = {
-		def projectId =  session.CURR_PROJ.CURR_PROJ
-		def project = securityService.getUserCurrentProject()
-		if (!project) {
-			flash.message = "Please select project to view Export Runbook"
-			redirect(controller:'project',action:'list')
-			return
-		}
-		def moveEventList = MoveEvent.findAllByProject(project)
+	def exportRunbook() {
+		Project project = controllerService.getProjectForPage(this, 'to view Export Runbook')
+		if (!project) return
 
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
-
-		return [moveEventList:moveEventList, viewUnpublished:(viewUnpublished ? '1' : '0')]
+		[moveEventList: MoveEvent.findAllByProject(project),
+		 viewUnpublished: securityService.viewUnpublished() ? '1' : '0']
 	}
 
 	/**
@@ -496,44 +446,39 @@ class MoveEventController {
 	 */
 	def runbookStats() {
 		def moveEventId = params.id
-		def projectId =  session.CURR_PROJ.CURR_PROJ
-		def project = Project.get(projectId)
-		def moveEventInstance = MoveEvent.get(moveEventId)
-		def bundles = moveEventInstance.moveBundles
-		def applcationAssigned = 0
-		def assetCount = 0
-		def databaseCount = 0
-		def fileCount = 0
-		def otherAssetCount = 0
+		Project project = securityService.userCurrentProject
+		MoveEvent moveEvent = MoveEvent.get(moveEventId)
+		def bundles = moveEvent.moveBundles
+		int applcationAssigned = 0
+		int assetCount = 0
+		int databaseCount = 0
+		int fileCount = 0
+		int otherAssetCount = 0
 
-		if (bundles?.size() > 0) {
-			applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
-			assetCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'],params).size()
-			databaseCount = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles).size()
-			fileCount = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles).size()
-			otherAssetCount = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles).size()
+		if (bundles) {
+			List bundlesList = bundles as List
+			applcationAssigned = Application.countByMoveBundleInListAndProject(bundlesList, project)
+			assetCount = AssetEntity.countByMoveBundleInListAndAssetTypeNotInList(bundlesList,
+					['Application', 'Database', 'Files'], params)
+			databaseCount = AssetEntity.countByAssetTypeAndMoveBundleInList('Database', bundlesList)
+			fileCount = AssetEntity.countByAssetTypeAndMoveBundleInList('Files', bundlesList)
+			otherAssetCount = AssetEntity.countByAssetTypeNotInListAndMoveBundleInList(
+					['Server','VM','Blade','Application','Files','Database'], bundlesList)
 		}
 
 		if (params.containsKey('viewUnpublished')) {
-			if (params.viewUnpublished == '1')
-				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'true')
-			else
-				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, 'false')
+			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
 		}
 
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
-		def publishedValues = [true]
-		if (viewUnpublished)
-			publishedValues = [true, false]
+		def publishedValues = securityService.viewUnpublished() ? [true, false] : [true]
 
-		def preMoveSize = AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'premove', publishedValues)
-		def scheduleSize = AssetComment.countByMoveEventAndCategoryInListAndIsPublishedInList(moveEventInstance, ['shutdown','physical','moveday','startup'], publishedValues)
-		def postMoveSize = AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'postmove', publishedValues)
-
-
-		return [applcationAssigned:applcationAssigned, assetCount:assetCount, databaseCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount,
-			    preMoveSize: preMoveSize, scheduleSize:scheduleSize, postMoveSize:postMoveSize, bundles:bundles,moveEventInstance:moveEventInstance]
-
+		[applcationAssigned: applcationAssigned, assetCount: assetCount, databaseCount: databaseCount,
+		 fileCount: fileCount, otherAssetCount: otherAssetCount,
+		 preMoveSize: AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEvent, 'premove', publishedValues),
+		 scheduleSize: AssetComment.countByMoveEventAndCategoryInListAndIsPublishedInList(
+				 moveEvent, ['shutdown','physical','moveday','startup'], publishedValues),
+		 postMoveSize: AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEvent, 'postmove', publishedValues),
+		 bundles: bundles, moveEventInstance: moveEvent]
 	}
 
 	/**
@@ -541,20 +486,17 @@ class MoveEventController {
 	 */
 	def exportRunbookToExcel() {
 
-		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
-		if (! project) {
-			return
-		}
-		def moveEvent = controllerService.getEventForPage(this, project, userLogin, params.eventId)
-		if (! moveEvent) {
-			return
-		}
+		Project project = controllerService.getProjectForPage(this)
+		if (! project) return
+
+		def moveEvent = controllerService.getEventForPage(this, project, params.eventId)
+		if (! moveEvent) return
 
 		def currentVersion = moveEvent.runbookVersion
 
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def userDTFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
-		if (params.version=='on'){
+		String tzId = userPreferenceService.timeZone
+		String userDTFormat = userPreferenceService.dateFormat
+		if (params.version == 'on') {
 			if (moveEvent.runbookVersion) {
 				moveEvent.runbookVersion = currentVersion + 1
 				currentVersion = currentVersion + 1
@@ -566,13 +508,7 @@ class MoveEventController {
 		}
 
 		def bundles = moveEvent.moveBundles
-		def today = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_6)
-		def moveEventList = MoveEvent.findAllByProject(project)
-		def applcationAssigned = 0
-		def assetCount = 0
-		def databaseCount = 0
-		def fileCount = 0
-		def otherAssetCount = 0
+		def today = TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_6)
 		def applications = []
 		def assets = []
 		def databases = []
@@ -582,225 +518,163 @@ class MoveEventController {
 		def preMoveIssue = []
 		def postMoveIssue = []
 
-		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true')
-		def publishedValues = [true]
-		if (viewUnpublished)
-			publishedValues = [true, false]
+		boolean viewUnpublished = securityService.viewUnpublished()
+		List<Boolean> publishedValues = viewUnpublished ? [true, false] : [true]
 
-		if (bundles?.size() > 0) {
-			applications = Application.findAllByMoveBundleInListAndProject(bundles,project)
-			applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
-			assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'])
-			assetCount = assets.size()
-			databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles)
-			databaseCount = databases.size()
-			files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles)
-			fileCount = files.size()
-			others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles)
-			otherAssetCount = others.size()
-			def allAssets = AssetEntity.findAllByMoveBundleInListAndProject(bundles,project).id
-			String asset = allAssets.toString().replace("[","('").replace(",","','").replace("]","')")
-			unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = :isResolved and a.commentType = :commentType and a.category in ('general', 'discovery', 'planning','walkthru') AND a.isPublished IN :publishedValues",[isResolved:0, commentType:'issue', publishedValues:publishedValues])
+		if (bundles) {
+			List bundlesList = bundles as List
+			applications = Application.findAllByMoveBundleInListAndProject(bundlesList, project)
+			assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(
+					bundlesList, ['Application','Database','Files'])
+			databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database', bundlesList)
+			files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files', bundlesList)
+			others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(
+					['Server','VM','Blade','Application','Files','Database'], bundlesList)
+			List<Long> allAssetIds = AssetEntity.findAllByMoveBundleInListAndProject(bundlesList, project).id
 
+			unresolvedIssues = AssetComment.executeQuery('''
+				from AssetComment
+				where assetEntity.id in (:assetIds)
+				  and isResolved=:isResolved
+				  and commentType=:commentType
+				  and category in ('general', 'discovery', 'planning', 'walkthru')
+				  AND isPublished IN (:publishedValues)
+			''', [assetIds: allAssetIds, isResolved: 0, commentType: AssetCommentType.ISSUE,
+			      publishedValues: publishedValues])
 		}
 
-		preMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEvent, 'premove', publishedValues)
-		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInListAndIsPublishedInList(moveEvent, ['shutdown','physical','moveday','startup'], publishedValues)
-		postMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEvent, 'postmove', publishedValues)
+		preMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(
+				moveEvent, 'premove', publishedValues)
+		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInListAndIsPublishedInList(
+				moveEvent, ['shutdown','physical','moveday','startup'], publishedValues)
+		postMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(
+				moveEvent, 'postmove', publishedValues)
 
 		//TODO - Move controller code into Service .
 		def preMoveCheckListError = reportsService.generatePreMoveCheckList(project.id, moveEvent, viewUnpublished).allErrors.size()
 
 		try {
 			def book = ExportUtil.loadSpreadsheetTemplate("/templates/Runbook.xlsx")
-			def filename = 	"${project.name} - ${moveEvent.name} Runbook v${currentVersion} -${today}"
-			filename += "." + ExportUtil.getWorkbookExtension(book)
 
-			ExportUtil.setContentType(response, filename)
-
-			def serverSheet = book.getSheet("Servers")
-			def personelSheet = book.getSheet("Staff")
-			def preMoveSheet = book.getSheet("Pre-move")
-			def dbSheet = book.getSheet("Database")
-			def filesSheet = book.getSheet("Storage")
-			def otherSheet = book.getSheet("Other")
-			def issueSheet = book.getSheet("Issues")
-			def appSheet = book.getSheet("Applications")
-			def postMoveSheet = book.getSheet("Post-move")
-			def summarySheet = book.getSheet("Index")
-
-			def scheduleSheet = book.getSheet("Schedule")
-
-			def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','','', 'notes',
-					         				'duration', 'estStart','estFinish','actStart',
-					         				'actFinish', 'workflow']
-
-			def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', 'instructionsLink' ,'',
-					        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
-				        				]
-
-			def scheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
-				{ it.durationInMinutes() }, '',
-				'estStart', 'estFinish', 'actStart', 'actFinish', 'workflow'
-			]
-
-			def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes',
-				'taskDependencies','duration','estStart','estFinish','actStart',
-				'actFinish','workflow'
-			]
-
-			def serverColumnList = ['id', 'application', 'assetName', '','serialNumber', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
-
-			def appColumnList = ['assetName', 'appVendor', 'appVersion', 'appTech', 'appAccess', 'appSource','license','description',
-				'supportType', 'sme', 'sme2', 'businessUnit','','retireDate','maintExpDate','appFunction',
-				'environment','criticality','moveBundle', 'planStatus','userCount','userLocations','useFrequency',
-				'drRpoDesc','drRtoDesc','moveDowntimeTolerance','validation','latency','testProc','startupProc',
-				'url','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8'
-			]
-
-			def impactedAppColumnList =['id' ,'assetName' ,'' ,'startupProc' ,'description' ,'sme' ,'' ,'' ,'' ,'' ,'' ,'' ]
-
-			def dbColumnList = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType','retireDate', 'maintExpDate',
-				'environment','ipAddress', 'planStatus','custom1','custom2', 'custom3', 'custom4','custom5',
-				'custom6','custom7','custom8'
-			]
-
-			def filesColumnList = ['id', 'assetName', 'fileFormat', 'size', 'description', 'supportType','retireDate', 'maintExpDate',
-				'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
-				'custom6','custom7','custom8'
-			]
-
-			def othersColumnList = ['id','application','assetName', 'shortName', 'serialNumber', 'assetTag', 'manufacturer',
-				'model','assetType','ipAddress', 'os', 'sourceLocation', 'sourceLocation','sourceRack',
-				'sourceRackPosition','sourceChassis','sourceBladePosition',
-				'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetChassis',
-				'targetBladePosition','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8',
-				'moveBundle','truck','cart','shelf','railType','priority','planStatus','usize'
-			]
-
-			def unresolvedIssueColumnList = ['id', 'comment', 'commentType','commentAssetEntity','resolution','resolvedBy','createdBy',
-				'dueDate','assignedTo','category','dateCreated','dateResolved', 'assignedTo','status','taskDependencies','duration','estStart','estFinish','actStart',
-				'actFinish','workflow'
-			]
+			Sheet personelSheet = book.getSheet('Staff')
+			Sheet postMoveSheet = book.getSheet('Post-move')
+			Sheet summarySheet = book.getSheet('Index')
+			Sheet scheduleSheet = book.getSheet('Schedule')
 
 			List projManagers = projectService.getProjectManagers(project)
 
-			def projectNameFont = book.createFont()
-			projectNameFont.setFontHeightInPoints((short)14)
-			projectNameFont.setFontName("Arial")
-			projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+			Font projectNameFont = book.createFont()
+			projectNameFont.fontHeightInPoints = (short)14
+			projectNameFont.fontName = 'Arial'
+			projectNameFont.boldweight = Font.BOLDWEIGHT_BOLD
 
-			def projectNameCellStyle
-			projectNameCellStyle = book.createCellStyle()
-			projectNameCellStyle.setFont(projectNameFont)
-			projectNameCellStyle.setFillBackgroundColor(IndexedColors.SEA_GREEN .getIndex())
-			projectNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND)
+			CellStyle projectNameCellStyle = book.createCellStyle()
+			projectNameCellStyle.font = projectNameFont
+			projectNameCellStyle.fillBackgroundColor = IndexedColors.SEA_GREEN.index
+			projectNameCellStyle.fillPattern = CellStyle.SOLID_FOREGROUND
 
-			WorkbookUtil.addCell(summarySheet, 1, 1, String.valueOf(project.name ))
+			WorkbookUtil.addCell(summarySheet, 1, 1, project.name)
 			WorkbookUtil.applyStyleToCell(summarySheet, 1, 1, projectNameCellStyle)
-			WorkbookUtil.addCell(summarySheet, 2, 3, String.valueOf(project.name ))
-			WorkbookUtil.addCell(summarySheet, 2, 6, String.valueOf(projManagers.join(",")))
-			WorkbookUtil.addCell(summarySheet, 4, 6, String.valueOf(""))
-			WorkbookUtil.addCell(summarySheet, 2, 4, String.valueOf(moveEvent.name ))
-			WorkbookUtil.addCell(summarySheet, 2, 10, String.valueOf(moveEvent.name ))
+			WorkbookUtil.addCell(summarySheet, 2, 3, project.name)
+			WorkbookUtil.addCell(summarySheet, 2, 6, projManagers.join(','))
+			WorkbookUtil.addCell(summarySheet, 4, 6, '')
+			WorkbookUtil.addCell(summarySheet, 2, 4, moveEvent.name)
+			WorkbookUtil.addCell(summarySheet, 2, 10, moveEvent.name)
 
-			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, userDTFormat, 5, viewUnpublished)
-
-			moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, userDTFormat, 5, viewUnpublished)
-
-			moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, userDTFormat, 4, viewUnpublished)
-
-			moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, userDTFormat, 1, viewUnpublished)
-
-			moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, userDTFormat, 1, viewUnpublished)
-
-			moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, userDTFormat, 1, viewUnpublished)
-
-			moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, userDTFormat, 7, viewUnpublished)
-
-			moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, userDTFormat, 7, viewUnpublished)
-
-			moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, userDTFormat, 7, viewUnpublished)
+			moveBundleService.issueExport(assets,           serverCols,     book.getSheet('Servers'),      tzId, userDTFormat, 5, viewUnpublished)
+			moveBundleService.issueExport(applications,     impactedCols,   book.getSheet('Applications'), tzId, userDTFormat, 5, viewUnpublished)
+			moveBundleService.issueExport(databases,        dbCols,         book.getSheet('Database'),     tzId, userDTFormat, 4, viewUnpublished)
+			moveBundleService.issueExport(files,            fileCols,       book.getSheet('Storage'),      tzId, userDTFormat, 1, viewUnpublished)
+			moveBundleService.issueExport(others,           otherCols,      book.getSheet('Other'),        tzId, userDTFormat, 1, viewUnpublished)
+			moveBundleService.issueExport(unresolvedIssues, unresolvedCols, book.getSheet('Issues'),       tzId, userDTFormat, 1, viewUnpublished)
+			moveBundleService.issueExport(sheduleIssue,     scheduleCols,   scheduleSheet,                 tzId, userDTFormat, 7, viewUnpublished)
+			moveBundleService.issueExport(preMoveIssue,     preMoveCols,    book.getSheet('Pre-move'),     tzId, userDTFormat, 7, viewUnpublished)
+			moveBundleService.issueExport(postMoveIssue,    postMoveCols,   postMoveSheet,                 tzId, userDTFormat, 7, viewUnpublished)
 
 			// Update the Schedule/Tasks Sheet with the correct start/end times
-			Map times = moveEvent.getEventTimes()
-			WorkbookUtil.addCell(scheduleSheet, 5, 1, TimeUtil.formatDateTime(session, times.start))
-			WorkbookUtil.addCell(scheduleSheet, 5, 3, TimeUtil.formatDateTime(session, times.completion))
+			Map<String, Date> times = moveEvent.getEventTimes()
+			WorkbookUtil.addCell(scheduleSheet, 5, 1, TimeUtil.formatDateTime(times.start))
+			WorkbookUtil.addCell(scheduleSheet, 5, 3, TimeUtil.formatDateTime(times.completion))
 
 			// Update the project staff
 			// TODO : JPM 11/2015 : Project staff should get list from ProjectService instead of querying PartyRelationship
-			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = ${project.id} and p.roleTypeCodeFrom = 'PROJECT' ")
+			def projectStaff = PartyRelationship.executeQuery('''
+					from PartyRelationship
+					where partyRelationshipType='PROJ_STAFF'
+					  and partyIdFrom=:project
+					  and roleTypeCodeFrom='PROJECT'
+			''', [project: project])
 
-			for ( int r = 8; r <= (projectStaff.size()+7); r++ ) {
-				def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-				WorkbookUtil.addCell(personelSheet, 1, r, String.valueOf( projectStaff[r-8].partyIdTo?.toString() ))
-				WorkbookUtil.addCell(personelSheet, 2, r, String.valueOf(projectStaff[r-8].roleTypeCodeTo ))
-				WorkbookUtil.addCell(personelSheet, 5, r, String.valueOf(projectStaff[r-8].partyIdTo?.email ? projectStaff[r-8].partyIdTo?.email : ''))
+			for (int r = 8; r <= projectStaff.size() + 7; r++) {
+				WorkbookUtil.addCell(personelSheet, 1, r, projectStaff[r - 8].partyIdTo?.toString())
+				WorkbookUtil.addCell(personelSheet, 2, r, projectStaff[r-8].roleTypeCodeTo.toString())
+				WorkbookUtil.addCell(personelSheet, 5, r, projectStaff[r-8].partyIdTo?.email ?: '')
 			}
 
-			book.write(response.getOutputStream())
-		} catch( Exception ex ) {
-			println "Exception occurred while exporting data: "+ex.printStackTrace()
-
-			return
+			String filename = project.name + ' - ' + moveEvent.name + ' Runbook v' + currentVersion + ' -' + today +
+					'.' + ExportUtil.getWorkbookExtension(book)
+			ExportUtil.sendWorkbook(book, response, filename)
 		}
-		return
-
+		catch(e) {
+			logger.error 'Exception occurred while exporting data: {}', e.message, e
+		}
 	}
 
 	/**
-	 * Used to set asset's plan-status to 'Moved' for the specified event
+	 * Set asset's plan-status to 'Moved' for the specified event.
 	 * @usage Ajax
 	 * @param moveEventId
 	 * @return  Count of record affected with this update or Error Message if any
-	 *
 	 */
 	def markEventAssetAsMoved() {
-		def assetAffected
-		def errorMsg
-		def project = securityService.getUserCurrentProject()
-		if(params.containsKey("moveEventId")){
-			if(params.moveEventId.isNumber()){
-				def moveEvent = MoveEvent.get(params.moveEventId)
-				if(moveEvent){
-					if (moveEvent.project.id != project.id) {
-						log.error "markEventAssetAsMoved: moveEvent.project (${moveEvent.id}) does not match user's current project (${project.id})"
-						errorMsg = "An unexpected condition with the event occurred that is preventing an update"
-					}else{
-						def bundleForEvent = moveEvent.moveBundles
-						assetAffected = bundleForEvent ? jdbcTemplate.update("update asset_entity  \
-							set plan_status = 'Moved', source_location = target_location, room_source_id = room_target_id ,\
-								rack_source_id = rack_target_id, source_rack_position = target_rack_position, \
-								source_blade_chassis = target_blade_chassis, source_blade_position = target_blade_position, \
-								target_location = null, room_target_id = null, rack_target_id = null, target_rack_position = null,\
-								target_blade_chassis = null, target_blade_position = null\
-							where move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEvent.id) \
-								and plan_status != 'Moved' ") : 0
-					}
-				} else {
-					log.error "markEventAssetAsMoved: Specified moveEvent (${params.moveEventId}) was not found})"
-					errorMsg = "An unexpected condition with the event occurred that is preventing an update."
-			    }
-			}
+		// if (params.containsKey("moveEventId")) {
+		// 	if (params.moveEventId.isNumber()) {
+		def moveEvent = MoveEvent.get(params.moveEventId)
+		if (!moveEvent) {
+			logger.error 'markEventAssetAsMoved: Specified moveEvent ({}) was not found})', params.moveEventId
+
+			render 'An unexpected condition with the event occurred that is preventing an update.'
+			return
 		}
-		render errorMsg ? errorMsg : assetAffected
+
+		if (!securityService.isCurrentProjectId(moveEvent.project.id)) {
+			logger.error 'markEventAssetAsMoved: moveEvent.project ({}) does not match current project ({})', moveEvent.id, securityService.userCurrentProjectId
+			render 'An unexpected condition with the event occurred that is preventing an update'
+			return
+		}
+
+		int assetAffected = 0
+
+		if (moveEvent.moveBundles) {
+			assetAffected = jdbcTemplate.update("update asset_entity  \
+			set plan_status = 'Moved', source_location = target_location, room_source_id = room_target_id ,\
+				rack_source_id = rack_target_id, source_rack_position = target_rack_position, \
+				source_blade_chassis = target_blade_chassis, source_blade_position = target_blade_position, \
+				target_location = null, room_target_id = null, rack_target_id = null, target_rack_position = null,\
+				target_blade_chassis = null, target_blade_position = null\
+			where move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEvent.id) \
+				and plan_status != 'Moved' ")
+		}
+
+		render assetAffected
 	}
 
 	/**
-	 * This method is used to filter newsBarMode property , As we are displaying different label in list so user may serch according to
-	 * displayed label but in DB we have different values what we are displaying in label
+	 * Filters newsBarMode property]; as we are displaying different label in list so user may search
+	 * according to displayed label but in DB we have different values what we are displaying in label
 	 * e.g. for auto - Auto Start, true - Started ..
 	 * @param newsBarMode with what character user filterd newsBarMode property
 	 * @return matched db property of newsBarMode
 	 */
-	def retrieveNewsBMList(newsBarMode){
-		def progList = ['Auto Start':'auto', 'Started':'on', 'Stopped':'off']
-		def returnList = []
-		progList.each{key, value->
-			if(StringUtils.containsIgnoreCase(key, newsBarMode))
-				returnList <<  value
+	private List<String> retrieveNewsBMList(String newsBarMode) {
+		if (!newsBarMode) return null
+
+		List<String> returnList = []
+		['Auto Start': 'auto', Started: 'on', Stopped: 'off'].each { String key, String value ->
+			if (StringUtils.containsIgnoreCase(key, newsBarMode)) {
+				returnList << value
+			}
 		}
 		return returnList
 	}
-
 }

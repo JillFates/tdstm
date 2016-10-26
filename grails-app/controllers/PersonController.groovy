@@ -1,107 +1,124 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdssrc.grails.*
-import grails.converters.JSON
-import grails.validation.ValidationException
-import org.apache.shiro.SecurityUtils
-
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import grails.converters.JSON
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventStaff
+import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.RoleType
+import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.Timezone
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.service.UserService
+import org.springframework.jdbc.core.JdbcTemplate
 
-class PersonController {
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class PersonController implements ControllerMethods {
 
-	def partyRelationshipService
-	def userPreferenceService
-	def securityService
-	def personService
-	def projectService
-	def sessionFactory
-	def jdbcTemplate
-	def controllerService
-	def userService
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-	def index() { redirect(action:"list",params:params) }
+	ControllerService controllerService
+	JdbcTemplate jdbcTemplate
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	ProjectService projectService
+	SecurityService securityService
+	UserPreferenceService userPreferenceService
+	UserService userService
 
-	// the delete, save and update actions only accept POST requests
-	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-
-
-
-def test = {
-	Person byWhom = securityService.getUserLoginPerson()
+def test() {
+	Person currentPerson = securityService.userLoginPerson
 	Project project = Project.get(2445)
-	//List suitableTeams = getSuitableTeams(byWhom)
-	//List assignedTeams = getAssignedTeams(project, byWhom)
-	render "Person $byWhom" +
-		"<br>Assigned Projects: ${byWhom.assignedProjects}<br>" +
-		"<br>Assigned Teams:${byWhom.getAssignedTeams(project)}" +
-//		"<br>Assigned Teams:${assignedTeams}" +
+	//List suitableTeams = getSuitableTeams(currentPerson)
+	//List assignedTeams = getAssignedTeams(project, currentPerson)
+	render "Person $currentPerson" +
+		"<br>Assigned Projects: $currentPerson.assignedProjects<br>" +
+		"<br>Assigned Teams:${currentPerson.getAssignedTeams(project)}" +
+//		"<br>Assigned Teams:$assignedTeams" +
 
 
-		"<br>Suitable Teams: ${byWhom.suitableTeams}" +
-//		"<br>Suitable Teams: ${suitableTeams}" +
-		"<br>Company:${byWhom.company}"
+		"<br>Suitable Teams: $currentPerson.suitableTeams" +
+//		"<br>Suitable Teams: $suitableTeams" +
+		"<br>Company:$currentPerson.company"
 }
 	/**
 	 * Generates a list view of persons related to company
 	 * @param id - company id
 	 * @param companyName - optional search by name or 'ALL'
 	 */
+	@HasPermission('PersonListView')
 	def list() {
-		if (!controllerService.checkPermission(this, 'PersonListView', true))
-			return
 
 		def listJsonUrl
 		def company
-		def currentCompany = securityService.getUserCurrentProject()?.client
-		def companyId = params.companyId ?: (currentCompany? currentCompany.id : 'All')
-		if(companyId && companyId != 'All'){
-			def map = [controller:'person', action:'listJson', id:"${companyId}"]
-			listJsonUrl = HtmlUtil.createLink(map)
+		def currentCompany = securityService.userCurrentProject?.client
+		String companyId = params.companyId ?: currentCompany?.id ?: 'All'
+		if (companyId && companyId != 'All') {
+			listJsonUrl = createLink(controller: 'person', action: 'listJson', id: companyId)
 		} else {
-			def map = [controller:'person', action:'listJson']
-			listJsonUrl = HtmlUtil.createLink(map)+'/All'
+			listJsonUrl = createLink(controller: 'person', action: 'listJson') + '/All'
 		}
 
-		//def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
-		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.getUserLoginPerson())
+		//def partyGroupList = PartyGroup.findAllByPartyType(PartyType.read("COMPANY")).sort{it.name}
+		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.userLoginPerson)
 		// Used to set the default value of company select in the create staff dialog
-		if(companyId && companyId != 'All')
-			company = PartyGroup.find( "from PartyGroup as p where partyType = 'COMPANY' AND p.id = ?", [companyId.toLong()] )
-		else
+		if (companyId && companyId != 'All') {
+			company = PartyGroup.findByPartyTypeAndId(PartyType.load('COMPANY'), companyId.toLong())
+		}
+		else {
 			company = currentCompany
+		}
 
-		userPreferenceService.setPreference(PREF.PARTY_GROUP, companyId.toString() )
+		userPreferenceService.setPreference(PREF.PARTY_GROUP, companyId)
 
-		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 		//used to show roles in addTeam select
-		def availabaleRoles = partyRelationshipService.getStaffingRoles(false)
-		return [companyId:companyId?:'All', company:company, partyGroupList:partyGroupList,
-					listJsonUrl:listJsonUrl, availabaleRoles:availabaleRoles]
+		[companyId: companyId ?: 'All', company: company, partyGroupList: partyGroupList,
+		 listJsonUrl: listJsonUrl, availabaleRoles: partyRelationshipService.getStaffingRoles(false)]
 	}
 
+	@HasPermission('PersonListView')
 	def listJson() {
-		if (!controllerService.checkPermission(this, 'PersonListView', true))
-			return
 
-		def sortIndex = params.sidx ?: 'lastname'
-		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows?:'25')
-		def currentPage = Integer.valueOf(params.page?:'1')
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		String sortIndex = params.sidx ?: 'lastname'
+		String sortOrder  = params.sord ?: 'asc'
+		int maxRows = params.int('rows', 25)
+		int currentPage = params.int('page', 1)
+		int rowOffset = (currentPage - 1) * maxRows
 		def companyId
 		def personInstanceList
-		def filterParams = ['firstname':params.firstname, 'middlename':params.middlename, 'lastname':params.lastname, 'userLogin':params.userLogin, 'company':params.company, 'dateCreated':params.dateCreated, 'lastUpdated':params.lastUpdated, 'modelScore':params.modelScore]
+		def filterParams = [firstname: params.firstname, middlename: params.middlename, lastname: params.lastname,
+		                    userLogin: params.userLogin, company: params.company, dateCreated: params.dateCreated,
+		                    lastUpdated: params.lastUpdated, modelScore: params.modelScore]
 
 		// Validate that the user is sorting by a valid column
-		if( ! sortIndex in filterParams)
+		if (!(sortIndex in filterParams)) {
 			sortIndex = 'lastname'
-
-		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
-		if(!active){
-			active = 'Y'
 		}
 
-		def query = new StringBuffer("""SELECT * FROM ( SELECT p.person_id AS personId, p.first_name AS firstName,
+		def query = new StringBuilder("""SELECT * FROM (SELECT p.person_id AS personId, p.first_name AS firstName,
 			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, pg.name AS company, u.active,
 			date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId, IFNULL(p.model_score, 0) AS modelScore
 			FROM person p
@@ -112,88 +129,85 @@ def test = {
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
 			""")
 
-		if(params.id && params.id != "All" ){
+		if (params.id && params.id != "All") {
 			// If companyId is requested
 			companyId = params.id
 		}
-		if( !companyId && params.id != "All" ){
+		if (!companyId && params.id != "All") {
 			// Still if no companyId found trying to get companyId from the session
-			companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
-			if(!companyId){
+			companyId = userPreferenceService.getPreference(PREF.PARTY_GROUP)
+			if (!companyId) {
 				// Still if no luck setting companyId as logged-in user's companyId .
-				def person = securityService.getUserLogin().person
-				companyId = person.company.id
+				companyId = securityService.userLoginPerson.company.id
 			}
 		}
-		if(companyId){
+		if (companyId) {
 			query.append(" WHERE pg.party_group_id = $companyId ")
 		}
 
-		query.append(" GROUP BY pa.party_id ORDER BY " + sortIndex + " " + sortOrder + ", IFNULL(p.last_name,'') DESC, p.first_name DESC) as people")
+		query.append(" GROUP BY pa.party_id ORDER BY " + sortIndex + " " + sortOrder +
+				", IFNULL(p.last_name,'') DESC, p.first_name DESC) as people")
 
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 		filterParams.each {
-			if(it.getValue())
-				if(firstWhere){
-					query.append(" WHERE people.${it.getKey()} LIKE '%${it.getValue()}%'")
+			if (it.value) {
+				if (firstWhere) {
+					query.append(" WHERE people.$it.key LIKE '%$it.value%'")
 					firstWhere = false
-				} else {
-					query.append(" AND people.${it.getKey()} LIKE '%${it.getValue()}%'")
 				}
+				else {
+					query.append(" AND people.$it.key LIKE '%$it.value%'")
+				}
+			}
 		}
 
 		personInstanceList = jdbcTemplate.queryForList(query.toString())
 
 		// Limit the returned results to the user's page size and number
-		def totalRows = personInstanceList.size()
-		def numberOfPages = Math.ceil(totalRows / maxRows)
-		if(totalRows > 0)
-			personInstanceList = personInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
-		else
-			personInstanceList = []
+		int totalRows = personInstanceList.size()
+		int numberOfPages = Math.ceil(totalRows / maxRows)
+		if (totalRows > 0) {
+			personInstanceList = personInstanceList[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
+		}
 
-		def haveCreateUserLoginPerm = controllerService.checkPermission(this, "CreateUserLogin", false)
-		def haveEditUserLoginPerm = controllerService.checkPermission(this, "EditUserLogin", false)
-
-		def map = [controller:'person', action:'listJson', id:"${params.companyId}"]
-		def listJsonUrl = HtmlUtil.createLink(map)
-		def createUrl = HtmlUtil.createLink([controller:'userLogin', action:'create'])
-		def showUrl = HtmlUtil.createLink([controller:'userLogin', action:'show'])
-		def addUserIconUrl = HtmlUtil.resource([dir: 'icons', file: 'user_add.png', absolute: false])
-
-		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
+		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the
+		// only simple way to have the links work correctly
+		boolean canCreate = securityService.hasPermission('CreateUserLogin')
+		boolean canEdit = securityService.hasPermission('EditUserLogin')
+		String userLoginCreateLink = createLink(controller: 'userLogin', action: 'create')
+		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
+		String userAddPng = resource(dir: 'icons', file: 'user_add.png', absolute: false)
 		def results = personInstanceList?.collect {
-			[ cell: ['<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.firstname+'</a>',
-			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.middlename+'</a>',
-			'<a href="javascript:Person.showPersonDialog('+it.personId+',\'generalInfoShow\')">'+it.lastname+'</a>',
-			genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, showUrl, addUserIconUrl, it),
+			[ cell: ['<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
+			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.middlename + '</a>',
+			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.lastname + '</a>',
+			genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
 			it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
-		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-		render jsonData as JSON
-
+		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
 	/**
 	 * Creates an anchor for specific user based on user permission
 	 *
-	 * @param haveCreateUserLoginPerm boolean value that indicates if the user have CreateUserLoginPerm
-	 * @param haveEditUserLoginPerm boolean value that indicates if the user have EditUserLoginPerm
-	 * @param createUrl url used to create a new login for the current person
-	 * @param showUrl url used to edit login configuration for the current person
-	 * @param person person object to be displayed
+	 * @param haveCreateUserLoginPerm  if the user has CreateUserLoginPerm
+	 * @param haveEditUserLoginPerm  if the user has EditUserLoginPerm
+	 * @param createUrl  url used to create a new login for the current person
+	 * @param editUrl url used to edit login configuration for the current person
+	 * @param personData person data from the database query
 	 */
-	private def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, showUrl, addUserIconUrl, person) {
-		def element = ""
-		if (person.userLoginId) {
+	private String genCreateEditLink(boolean haveCreateUserLoginPerm, boolean haveEditUserLoginPerm, String createUrl,
+	                                 String editUrl, String addUserIconUrl, Map personData) {
+		String element
+		if (personData.userLoginId) {
 			if (haveEditUserLoginPerm) {
-				element = '<a href="' + showUrl + '/' + person.userLoginId + '">' + person.userLogin + '</a>'
+				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + personData.userLogin + '</a>'
 			} else {
-				element = person.userLogin
+				element = personData.userLogin
 			}
 		} else {
 			if (haveCreateUserLoginPerm) {
-				element = '<a href="' + createUrl + '/' + person.personId + '"><img src="' + addUserIconUrl + '" /> Create User</a>'
+				element = '<a href="' + createUrl + '/' + personData.personId + '"><img src="' + addUserIconUrl + '" /> Create User</a>'
 			} else {
 				element = ''
 			}
@@ -202,12 +216,12 @@ def test = {
 	}
 
 	/**
-	 * Used to bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
+	 * Bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
 	 */
 	def bulkDelete() {
 		def ids = params.get("ids[]")
 		if (!ids) {
-			render(ServiceResults.invalidParams('Please select at least one person to be be bulk deleted.') as JSON)
+			renderErrorJson('Please select at least one person to be be bulk deleted.')
 			return
 		}
 
@@ -221,86 +235,68 @@ def test = {
 			controllerService.checkPermissionForWS('BulkDeletePerson')
 			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'true'
 			def data = personService.bulkDelete(ids, deleteIfAssocWithAssets)
-			render(ServiceResults.success(data) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (InvalidParamException e) {
-			render(ServiceResults.invalidParams(e.getMessage()) as JSON)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			e.printStackTrace()
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(data)
+		}
+		catch (e) {
+			handleException e, log
 		}
 	}
 
 	/**
 	 * Note: No reference found to this method
 	 */
+	@HasPermission('PersonEditView')
 	def show() {
-		if (!controllerService.checkPermission(this, 'PersonEditView'))
-			return
-
-		def personInstance = Person.get( params.id )
+		Person person = Person.get(params.id)
 		def companyId = params.companyId
-		if(!personInstance) {
-			flash.message = "Person not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ] )
+		if (!person) {
+			flash.message = "Person not found with id $params.id"
+			redirect(action:"list", params:[ id:companyId ])
 		} else {
-			def company = personInstance.company
-
-			return [ personInstance : personInstance, companyId:company.id ]
+			[personInstance: person, companyId: person.company.id]
 		}
 	}
 
 	/**
 	 * Note: No reference found to this method
 	 */
+	@HasPermission('PersonDeleteView')
 	def delete() {
-		if (!controllerService.checkPermission(this, 'PersonDeleteView'))
-			return
-
-		def personInstance = Person.get( params.id )
+		Person person = Person.get(params.id)
 		def companyId = params.companyId
-		if ( personInstance ) {
-			Map deleteResultMap = personService.deletePerson(personInstance, true, true)
-			if(deleteResultMap["deleted"]){
-				flash.message = "Person ${personInstance} deleted"
+		if (person) {
+			Map deleteResultMap = personService.deletePerson(person, true, true)
+			if (deleteResultMap["deleted"]) {
+				flash.message = "Person $person deleted"
 			}else{
-				StringBuffer message = new StringBuffer("")
-				deleteResultMap["messages"].each{
+				StringBuilder message = new StringBuilder()
+				deleteResultMap["messages"].each {
 					message.append("it\n")
 				}
 				flash.message = message.toString()
 			}
-
 		}
 		else {
-			flash.message = "Person not found with id ${params.id}"
-
+			flash.message = "Person not found with id $params.id"
 		}
-		redirect( action:"list", params:[ id:companyId ] )
+
+		redirect(action:"list", params:[ id:companyId ])
 	}
 
 	/**
 	 * return person details to EDIT form
 	 * Note: No reference found to this method
 	 */
+	@HasPermission('PersonEditView')
 	def edit() {
-		if (!controllerService.checkPermission(this, 'PersonEditView'))
-			return
-
-		def personInstance = Person.get( params.id )
+		Person person = Person.get(params.id)
 		def companyId = params.companyId
-		if(!personInstance) {
-			flash.message = "Person not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ] )
+		if (!person) {
+			flash.message = "Person not found with id $params.id"
+			redirect(action:"list", params:[ id:companyId ])
 		}
 		else {
-
-			return [ personInstance : personInstance, companyId:companyId ]
+			[personInstance: person, companyId: companyId]
 		}
 	}
 
@@ -308,36 +304,34 @@ def test = {
 	 * Used to update the Person domain objects
 	 * Note: No reference found to this method
 	 */
+	@HasPermission('PersonEditView')
 	def update() {
-		if (!controllerService.checkPermission(this, 'PersonEditView'))
-			return
-
-		def person = Person.get( params.id )
+		def person = Person.get(params.id)
 
 		def companyId = params.company
 
 		// TODO : Security - Need to harden this
 
-		if(person) {
+		if (person) {
 			person.properties = params
-			if ( person.validate() && person.save() ) {
-				def userLogin = UserLogin.findByPerson(person)
+			if (person.validate() && person.save()) {
+				UserLogin userLogin = person.userLogin
 				userLogin.active = person.active
-				if (companyId != null ){
+				if (companyId != null) {
 					def companyParty = Party.get(companyId)
 					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
 				}
 				flash.message = "Person '$person' was updated"
-				redirect( action:"list", params:[ id:companyId ])
+				redirect(action:"list", params:[ id:companyId ])
 			}
 			else {
-				flash.message = "Person '$person' not updated due to: " + GormUtil.errorsToUL(person)
-				redirect( action:"list", params:[ id:companyId ])
+				flash.message = "Person '$person' not updated due to: ${GormUtil.errorsToUL(person)}"
+				redirect(action:"list", params:[ id:companyId ])
 			}
 		}
 		else {
-			flash.message = "Person not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ])
+			flash.message = "Person not found with id $params.id"
+			redirect(action:"list", params:[ id:companyId ])
 		}
 	}
 
@@ -345,11 +339,10 @@ def test = {
 	 * Used to save a new Person domain object
 	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
 	 */
+	@HasPermission('PersonCreateView')
 	def save() {
-		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonCreateView')
-		if (! project) {
-			return
-		}
+		Project project = controllerService.getProjectForPage(this)
+		if (!project) return
 
 		// When forWhom == 'person' we're working with the company submitted with the form otherwise we're
 		// going to use the company associated with the current project.
@@ -362,36 +355,35 @@ def test = {
 		}
 
 		def errMsg
-		def isExistingPerson = false
 		def person
 
 		try {
-			Person byWhom = user.person
-			person = personService.savePerson(params, byWhom, companyId, project, true)
-		}catch (DomainUpdateException e){
-			def exceptionMsg = e.getMessage()
-			log.error(exceptionMsg)
+			person = personService.savePerson(params, companyId, project, true)
+		}catch (DomainUpdateException e) {
+			def exceptionMsg = e.message
+			log.error(exceptionMsg, e)
 			// The line below is a hack to avoid querying the database.
 			def personId = exceptionMsg.substring(exceptionMsg.indexOf(":") + 1).toInteger()
 			errMsg = "A person with the same name already exists. Click"
-			errMsg += "<a href=\"javascript:Person.showPersonDialog(${personId},'generalInfoShow')\"> here </a>"//e.getMessage()
+			errMsg += "<a href=\"javascript:Person.showPersonDialog($personId,'generalInfoShow')\"> here </a>"//e.message
 			errMsg += "to view the person."
 		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			errMsg = e.getMessage()
+			errMsg = e.message
 		}
 
 		if (isAjaxCall) {
-			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:person.lastNameFirst, isExistingPerson: false, fieldName:params.fieldName]
+			def map = errMsg ? [errMsg : errMsg] :
+					             [id: person.id, name:person.lastNameFirst, isExistingPerson: false, fieldName:params.fieldName]
 			render map as JSON
 		} else {
 			if (errMsg) {
 				flash.message = errMsg
 			} else {
 				// Just add a message for the form submission to know that the person was created
-				flash.message = "A record for ${person.toString()} was created"
+				flash.message = "A record for $person was created"
 			}
-			redirect( action:"list", params:[ companyId:companyId ] )
+			redirect(action:"list", params:[ companyId:companyId ])
 		}
 	}
 
@@ -399,140 +391,118 @@ def test = {
 	 *  Remote method to edit Staff Details
 	 *  Note: No reference found to this method
 	 */
-	def editShow() {
-		if (!controllerService.checkPermission(this, 'PersonEditView'))
+	@HasPermission('PersonEditView')
+	def editShow(String companyId) {
+		Person person = Person.get(params.id)
+		if (!person) {
+			flash.message = "Person not found with id $params.id"
+			redirect(action: "list", params: [id: params.companyId])
 			return
-
-		def personInstance = Person.get( params.id )
-		def companyId = params.companyId
-		def companyParty = Party.get(companyId)
-		def dateCreatedByFormat = TimeUtil.formatDateTime(session, personInstance.dateCreated)
-		def lastUpdatedFormat = TimeUtil.formatDateTime(session, personInstance.lastUpdated)
-		if(!personInstance) {
-			flash.message = "Person not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ] )
 		}
-		else {
 
-			def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName,
-						 nickName: personInstance.nickName, title: personInstance.title, active: personInstance.active,
-						 dateCreated: dateCreatedByFormat, lastUpdated: lastUpdatedFormat, companyId: companyId,
-						 companyParty:companyParty, email: personInstance.email, department: personInstance.department,
-						 location: personInstance.location, workPhone: personInstance.workPhone, mobilePhone: personInstance.mobilePhone]
-			render items as JSON
-		}
+		renderAsJson(id: person.id, firstName: person.firstName, lastName: person.lastName, nickName: person.nickName,
+		             title: person.title, active: person.active, dateCreated: TimeUtil.formatDateTime(person.dateCreated),
+		             lastUpdated: TimeUtil.formatDateTime(person.lastUpdated), companyId: companyId,
+		             companyParty: Party.get(companyId), email: person.email, department: person.department,
+		             location: person.location, workPhone: person.workPhone, mobilePhone: person.mobilePhone)
 	}
+
 	/*
 	 *  Remote method to edit Staff Details
 	 *  Note: Used only in projectStaff.gsp
 	 */
+	@HasPermission('EditProjectStaff')
 	def editStaff() {
-		if (!controllerService.checkPermission(this, 'EditProjectStaff'))
-			return
-
-		def map = new HashMap()
-		def personInstance = Person.read( params.id )
+		Person person = Person.read(params.id)
 		def role = params.role
-		def company = personInstance.company
-		if(company == null){
-			map.put("companyId","")
-		}else{
-			map.put("companyId",company.id)
-			map.put("companyName",company.name)
+		def company = person.company
+		Map map = [id: person.id, firstName: person.firstName, lastName: person.lastName, nickName: person.nickName,
+		           title: person.title, email: person.email, active: person.active, role: role]
+		if (company) {
+			map.companyId = company.id
+			map.companyName = company.name
 		}
-		map.put("id", personInstance.id)
-		map.put("firstName", personInstance.firstName)
-		map.put("lastName", personInstance.lastName)
-		map.put("nickName", personInstance.nickName)
-		map.put("title", personInstance.title)
-		map.put("email", personInstance.email)
-		map.put("active", personInstance.active)
-		map.put("role", role)
-		render map as JSON
+		else {
+			map.companyId = ''
+		}
+		renderAsJson map
 	}
+
 	/*
 	 *  Remote method to update Staff Details
 	 *  Note: Used only in projectStaff.gsp
 	 */
+	@HasPermission('EditProjectStaff')
 	def updateStaff() {
-		if (!controllerService.checkPermission(this, 'EditProjectStaff'))
-			return
-
-		def personInstance = Person.get( params.id )
-		def projectId = session.CURR_PROJ.CURR_PROJ
+		Person person = Person.get(params.id)
+		def projectId = securityService.userCurrentProjectId
 		def roleType = params.roleType
 		def companyId = params.company
-		//personInstance.lastUpdated = new Date()
-		if(personInstance) {
-			personInstance.properties = params
-			if(personInstance.lastName == null){
-				personInstance.lastName = ""
+		//person.lastUpdated = new Date()
+		if (person) {
+			person.properties = params
+			if (person.lastName == null) {
+				person.lastName = ""
 			}
-			if ( !personInstance.hasErrors() && personInstance.save() ) {
-				def projectParty = Project.get(projectId)
-				if(companyId != ""){
+			if (!person.hasErrors() && person.save()) {
+				if (companyId != "") {
 					def companyParty = Party.get(companyId)
-					if(!personService.isAssociatedTo(personInstance, companyParty)){
-						throw new DomainUpdateException("The person ${personInstance} is not associated with the company ${companyParty}")
+					if (!personService.isAssociatedTo(person, companyParty)) {
+						throw new DomainUpdateException("The person $person is not associated with the company $companyParty")
 					}
-					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
+					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
 				}
-				def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
+				partyRelationshipService.updatePartyRelationshipRoleTypeTo(
+					"PROJ_STAFF", securityService.userCurrentProject, 'PROJECT', person, roleType)
 
-				flash.message = "Person ${personInstance} updated"
-				redirect( action:"projectStaff", params:[ projectId:projectId ])
+				flash.message = "Person $person updated"
+				redirect(action:"projectStaff", params:[ projectId:projectId ])
 			} else {
-				flash.message = "Person ${personInstance} not updated"
-				redirect( action:"projectStaff", params:[ projectId:projectId ])
+				flash.message = "Person $person not updated"
+				redirect(action:"projectStaff", params:[ projectId:projectId ])
 			}
 		} else {
-			flash.message = "Person not found with id ${params.id}"
-			redirect( action:"projectStaff", params:[ projectId:projectId ])
+			flash.message = "Person not found with id $params.id"
+			redirect(action:"projectStaff", params:[ projectId:projectId ])
 		}
 	}
 	/*
 	 *  Return Project Staff
 	 *  Note: there is no direct call to this method
 	 */
+	@HasPermission('ProjectStaffList')
 	def projectStaff() {
-		if (!controllerService.checkPermission(this, 'ProjectStaffList'))
-			return
-
-		def projectId = session.CURR_PROJ.CURR_PROJ
+		def projectId = securityService.userCurrentProjectId
 		def submit = params.submit
-		def role = ""
-		def subject = SecurityUtils.subject
-		def projectStaff = partyRelationshipService.getProjectStaff( projectId )
-		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId,'' )
-		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
-		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies,
-				projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
+		def projectStaff = partyRelationshipService.getProjectStaff(projectId)
+		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff(projectId,'')
+		def projectCompanies = partyRelationshipService.getProjectCompanies(projectId)
+		[projectStaff: projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies,
+		 projectId: projectId, submit: submit, personHasPermission: securityService.hasPermission("AddPerson")]
 	}
 
 	/*
 	 * Method to add Staff to project through Ajax Overlay
 	 */
+	@HasPermission('EditProjectStaff')
 	def saveProjectStaff() {
-		if (!controllerService.checkPermission(this, 'EditProjectStaff'))
-			return
-
 		def flag = false
 		def message = ''
 
-		if(request.JSON.personId){
+		if (request.JSON.personId) {
 			def personId = request.JSON.personId
-			def roleType = request.JSON.roleType
-			def projectId = request.JSON.projectId
-			//def projectParty = Project.get( projectId )
-			def projectParty = securityService.getUserCurrentProject()
-			def personParty = Person.get( personId )
-			def projectStaff
-			if(NumberUtil.toInteger(request.JSON.val) == 1) {
-				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
-				def moveEvents = MoveEvent.findAllByProject(projectParty)
-				def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
-			} else if(personService.hasAccessToProject(personParty, projectParty) ||  ( ! ( partyRelationshipService.isTdsEmployee(personId) && ! RolePermissions.hasPermission("EditTDSPerson") ) )){
-				projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+			String roleType = request.JSON.roleType
+			Project project = securityService.userCurrentProject
+			def personParty = Person.get(personId)
+			if (NumberUtil.toInteger(request.JSON.val) == 1) {
+				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", project, "PROJECT", personParty, roleType)
+				def moveEvents = MoveEvent.findAllByProject(project)
+				MoveEventStaff.executeUpdate(
+						"delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",
+						[moveEvents:moveEvents, person:personParty,role:RoleType.load(roleType)])
+			} else if (personService.hasAccessToProject(personParty, project) ||
+				        (!(partyRelationshipService.isTdsEmployee(personId) && !securityService.hasPermission("EditTDSPerson")))) {
+				partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", personParty, roleType)
 			}else{
 				message = "This person doesn't have access to the selected project"
 			}
@@ -540,57 +510,43 @@ def test = {
 			flag = message.size() == 0
 		}
 
-		def data = ['flag':flag, 'message':message]
 		try{
-			render(ServiceResults.success(['flag':flag, 'message':message]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (InvalidParamException e) {
-			render(ServiceResults.fail(e.getMessage()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(flag: flag, message: message)
+		}
+		catch (e) {
+			handleException e, log
 		}
 	}
 	/*
 	 * Method to save person details and create party relation with Project as well
 	 * Note: Used only in projectStaff.gsp
 	 */
+	@HasPermission('PersonCreateView')
 	def savePerson() {
-		if (! controllerService.checkPermission(this, 'PersonCreateView')) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def person = new Person( params )
-
+		Person person = new Person(params)
 		if (person.lastName == null) {
 			person.lastName = ""
 		}
 
 		def companyId = params.company
-		def projectId = session.CURR_PROJ.CURR_PROJ
+		def projectId = securityService.userCurrentProjectId
 		def roleType = params.roleType
-		if ( !person.hasErrors() && person.save() ) {
+		if (!person.hasErrors() && person.save()) {
 
-			if ( companyId != null && companyId != "" ) {
-				def companyParty = Party.get( companyId )
-				def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
+			if (companyId) {
+				partyRelationshipService.savePartyRelationship("STAFF", Party.get(companyId), "COMPANY", person, "STAFF")
 			}
 
-			if ( projectId != null && projectId != "" && roleType != null) {
-				def projectParty = Party.get( projectId )
-				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
+			if (projectId && roleType != null) {
+				partyRelationshipService.savePartyRelationship("PROJ_STAFF",
+						securityService.userCurrentProject, "PROJECT", person, roleType)
 			}
 
-			flash.message = "Person ${person} created"
-			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
+			flash.message = "Person $person created"
+			redirect(action:'projectStaff', params:[ projectId:projectId, submit:'Add' ])
 		} else {
 			flash.message = " Person FirstName cannot be blank. "
-			redirect( action:'projectStaff', params:[ projectId:projectId,submit:'Add' ] )
+			redirect(action:'projectStaff', params:[ projectId:projectId,submit:'Add' ])
 		}
 	}
 
@@ -600,30 +556,21 @@ def test = {
 	 * @return : person firstname
 	 */
 	def updatePerson() {
-
 		try {
-			Person byWhom = securityService.getUserLoginPerson()
-			String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+			String tzId = userPreferenceService.timeZone
 			/*Party newCompany = Party.findByName(params["Company"])
-			if(!personService.isAssociatedTo(person, newCompany)){
-				throw new DomainUpdateException("The person ${personInstance} is not associated with the company ${newCompany}")
+			if (!personService.isAssociatedTo(person, newCompany)) {
+				throw new DomainUpdateException("The person $person is not associated with the company $newCompany")
 			}*/
-			Person person = personService.updatePerson(params, byWhom, tzId, true)
+			Person person = personService.updatePerson(params, tzId, true)
 			if (params.tab) {
-				forward( action:'loadGeneral', params:[tab: params.tab, personId:person.id])
+				forward(action: 'loadGeneral', params :[tab: params.tab, personId:person.id])
 			} else {
-				List results = [ name:person.firstName, tz:session.getAttribute( "CURR_TZ" )?.CURR_TZ ]
-				render results as JSON
+				renderAsJson(name: person.firstName, tz: tzId)
 			}
 		} catch (e) {
-			if (log.isDebugEnabled()) {
-				log.debug "updatePerson() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			}
-
-			userPreferenceService.loadPreferences(PREF.CURR_TZ)
-
-			ServiceResults.respondWithError(response, e.getMessage())
-
+			log.debug "updatePerson() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			renderErrorJson(e.message)
 		}
 	}
 
@@ -634,19 +581,14 @@ def test = {
 	 */
 	def retrievePersonDetails() {
 		try {
-			Person currentPerson = securityService.getUserLoginPerson()
-			Person person = personService.validatePersonAccess(params.id, currentPerson)
-			UserLogin userLogin = securityService.getPersonUserLogin( person )
-
-			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-
-			def expiryDate = userLogin.expiryDate ? TimeUtil.formatDateTime(session, userLogin.expiryDate) : ""
+			Person person = personService.validatePersonAccess(params.id)
+			UserLogin userLogin = securityService.getPersonUserLogin(person)
+			def expiryDate = TimeUtil.formatDateTime(userLogin.expiryDate)
 
 			def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
-
 			render personDetails as JSON
 		} catch (e) {
-			ServiceResults.respondWithError(response, e.getMessage())
+			renderErrorJson(e.message)
 		}
 	}
 
@@ -655,36 +597,33 @@ def test = {
 	 * @param  : person id and input password
 	 * @return : pass:"no" or the return of the update method
 	 */
-	def updateAccount = {
+	def updateAccount() {
 		String errMsg = ''
 		Map results = [:]
 		try {
-			Person byWhom = securityService.getUserLoginPerson()
-			params.id = byWhom.id
-			String tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-			Person person = personService.updatePerson(params, byWhom, tzId, false)
+			params.id = securityService.currentUserLoginId
+			String tzId = userPreferenceService.timeZone
+			Person person = personService.updatePerson(params, tzId, false)
 
 			if (params.tab) {
 				// Funky use-case that we should try to get rid of
-				forward( action:'loadGeneral', params:[tab: params.tab, personId:person.id])
+				forward(action:'loadGeneral', params:[tab: params.tab, personId:person.id])
 				return
 			} else {
 				results = [ name:person.firstName, tz:tzId ]
 			}
 
-		} catch (InvalidParamException e) {
-			errMsg = e.getMessage()
-		} catch (DomainUpdateException e) {
-			errMsg = e.getMessage()
+		} catch (InvalidParamException | DomainUpdateException e) {
+			errMsg = e.message
 		} catch (e) {
 			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = 'An error occurred during the update process'
 		}
 
 		if (errMsg) {
-			ServiceResults.respondWithError(response, errMsg)
+			renderErrorJson(errMsg)
 		} else {
-			ServiceResults.respondWithSuccess(response, results)
+			renderSuccessJson(results)
 		}
 	}
 
@@ -692,42 +631,40 @@ def test = {
 	 * Used to clear out person's preferences. User can clear out own or requires permission
 	 */
 // TODO : JPM 8/31/2015 : Need to test
-	def resetPreferences = {
+	def resetPreferences() {
 		try {
-			Person currentPerson = securityService.getUserLoginPerson()
-			Person person = personService.validatePersonAccess(params.user, currentPerson)
-
+			Person person = personService.validatePersonAccess(params.user)
 			UserLogin userLogin = securityService.getPersonUserLogin(person)
-			if (! userLogin) {
+			if (!userLogin) {
 				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
-				ServiceResults.notFound(response)
+				sendNotFound()
 				return
 			}
 
 			// if dateTimezoneOnly is specified, only reset the timezone and date format preferences if they exist
 			if (params.dateTimezoneOnly) {
-				userPreferenceService.removePreference(TimeUtil.TIMEZONE_ATTR)
-				userPreferenceService.removePreference(TimeUtil.DATE_TIME_FORMAT_ATTR)
+				userPreferenceService.removePreference(PREF.CURR_TZ)
+				userPreferenceService.removePreference(PREF.CURR_DT_FORMAT)
 
 			// else reset all preferences
 			} else {
 				// TODO : JPM 5/2015 : Change the way that the delete is occurring
 				def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-				prePreference.each{ preference->
+				prePreference.each { preference ->
 					def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
 						// When clearing preference, the RefreshMyTasks should be the same.
-						if(preferenceInstance.preferenceCode != 'RefreshMyTasks') {
+						if (preferenceInstance.preferenceCode != 'RefreshMyTasks') {
 							preferenceInstance.delete()
 						}
 				}
 
-				userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard" )
+				userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard")
 			}
 
 			// Is there any reason to return an object? can't be just a POST/UPDATE -no return- operation?
 			render person
 		} catch (e) {
-			ServiceResults.respondWithError(response, e.getMessage())
+			renderErrorJson(e.message)
 		}
 	}
 
@@ -736,55 +673,27 @@ def test = {
 	 * leverages the loadFilteredStaff method to populate list in an Ajax call
 	 * @return The HTML for the controls at the top of the form and the Javascript to load the data.
 	 */
+	@HasPermission('ProjectStaffList')
 	def manageProjectStaff() {
-		def (project, loginUser) = controllerService.getProjectAndUserForPage(this, 'ProjectStaffList')
-		if (!project) {
-			return
-		}
+		Project project = controllerService.getProjectForPage(this)
+		if (!project) return
 
-		def loginPerson = loginUser.person
 		def start = new Date()
 
-		def hasShowAllProjectsPerm = RolePermissions.hasPermission("ShowAllProjects")
-
-		def now = TimeUtil.nowGMT()
-
 		List roleTypes = partyRelationshipService.getStaffingRoles()
-
-		// If no role then default it to ALL (0)
-		String role = params.role ? params.role : "0"
-
-		def moveEventList = []
 
 		// set the defaults for the checkboxes
 
 		def assigned = userPreferenceService.getPreference(PREF.SHOW_ASSIGNED_STAFF) ?: '1'
 		def onlyClientStaff = userPreferenceService.getPreference(PREF.SHOW_CLIENT_STAFF) ?: '1'
-
-		def currRole = params.role ? params.role : (userPreferenceService.getPreference(PREF.STAFFING_ROLE)?:"0")
-		def currLoc = userPreferenceService.getPreference(PREF.STAFFING_LOCATION)?:"All"
-		def currPhase = userPreferenceService.getPreference(PREF.STAFFING_PHASES)?:"All"
-		def currScale = userPreferenceService.getPreference(PREF.STAFFING_SCALE)?:"6"
-		def moveEvents
-		def projectId = Project.get( project.id) ? project.id : 0
-		def reqProjects = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectsPerm, ProjectStatus.ACTIVE)
-
-		List projects = personService.getAvailableProjects(loginPerson)
-
-		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
-
-		return [
-			project: project,
-			projects: projects,
-			projectId: project.id,
-			roleTypes: roleTypes,
-			currRole: currRole,
-			editPermission: editPermission,
-			assigned: assigned,
-			onlyClientStaff: onlyClientStaff
-		]
+		def currRole = params.role ?: userPreferenceService.getPreference(PREF.STAFFING_ROLE) ?: "0"
+		List projects = personService.getAvailableProjects(securityService.userLoginPerson)
 
 		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
+
+		[project: project, projects: projects, projectId: project.id, roleTypes: roleTypes,
+		 editPermission: securityService.hasPermission('EditProjectStaff'), assigned: assigned,
+		 onlyClientStaff: onlyClientStaff, currRole: currRole]
 	}
 
 	/*
@@ -800,20 +709,11 @@ def test = {
 	 * @param onlyClientStaff - flag if 1 indicates only include staff of the client, 0 indicates all available staff
 	 * @return HTML table of the data
 	 */
+	@HasPermission('ProjectStaffList')
 	def loadFilteredStaff() {
-
-		if (!controllerService.checkPermission(this, 'ProjectStaffList')) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
 		//Date start = new Date()
 
-		UserLogin userLogin = securityService.getUserLogin()
-		Person loginPerson = userLogin.person
-
-
-		def currentProject = securityService.getUserCurrentProject()
+		Person loginPerson = securityService.userLoginPerson
 
 		//
 		// Deal with filter parameters
@@ -826,24 +726,21 @@ def test = {
 		}
 
 		Project project = Project.read(projectId)
-		if (! project) {
+		if (!project) {
 			render 'Specified Project was not found'
 			return
 		}
 
-
-
-		if(currentProject.id != projectId){
-			userService.changeProjectContext(userLogin, projectId)
+		if (!securityService.isCurrentProjectId(projectId)) {
+			userService.changeProjectContext(projectId)
 		}
-
 
 		// log.debug "loadFilteredStaff() phase 1 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
 		List accessibleProjects = personService.getAvailableProjects(loginPerson)
-		if (! accessibleProjects.find {it.id == projectId } ) {
-			securityService.reportViolation("attempted to access project staffing for project $project without necessary access rights", userLogin)
+		if (!accessibleProjects.find {it.id == projectId }) {
+			securityService.reportViolation("attempted to access project staffing for project $project without necessary access rights")
 			render 'Specified Project was not found'
 			return
 		}
@@ -851,12 +748,10 @@ def test = {
 		// log.debug "loadFilteredStaff() phase 2 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
-		def assigned = ( params.containsKey('assigned') && '01'.contains(params.assigned) ? params.assigned : '1' )
-		def onlyClientStaff = ( params.containsKey('onlyClientStaff') && '01'.contains(params.onlyClientStaff) ? params.onlyClientStaff : '1' )
-		def location = params.location
-
+		String assigned = params.containsKey('assigned') && '01'.contains(params.assigned) ? params.assigned : '1'
+		String onlyClientStaff = params.containsKey('onlyClientStaff') && '01'.contains(params.onlyClientStaff) ?
+				params.onlyClientStaff : '1'
 		def sortableProps = ['fullName', 'company', 'team']
-
 		def orders = ['asc', 'desc']
 
 		// code which is used to resolve the bug in TM-2585:
@@ -865,8 +760,8 @@ def test = {
 			session.setAttribute("Staff_OrderBy", params.orderBy)
 			session.setAttribute("Staff_SortOn", params.sortOn)
 		} else {
-			params.orderBy = session.getAttribute("Staff_OrderBy")?:'asc'
-			params.sortOn = session.getAttribute("Staff_SortOn")?:'fullName'
+			params.orderBy = session.getAttribute("Staff_OrderBy") ?: 'asc'
+			params.sortOn = session.getAttribute("Staff_SortOn") ?: 'fullName'
 		}
 
 		// TODO : JPM 11/2015 : Do not believe the firstProp is used in method loadFilteredStaff
@@ -876,9 +771,9 @@ def test = {
 			orderBy : params.orderBy in orders ? params.orderBy : 'asc'
 		]
 
-		def sortString = "${paramsMap.sortOn} ${paramsMap.orderBy}"
+		String sortString = "$paramsMap.sortOn $paramsMap.orderBy"
 		sortableProps.each {
-			sortString = sortString + ', ' + it + ' asc'
+			sortString += ', ' + it + ' asc'
 		}
 
 		// log.debug "loadFilteredStaff() phase 3 took ${TimeUtil.elapsed(start)}"
@@ -886,23 +781,20 @@ def test = {
 
 		// Save the user preferences from the filter if the preference has changed
 		String prefValue
-		Map prefMap = [
+		Map<String, String> prefMap = [
 			StaffingRole: role,
-			ShowClientStaff: onlyClientStaff.toString(),
-			ShowAssignedStaff: assigned.toString()
+			ShowClientStaff: onlyClientStaff,
+			ShowAssignedStaff: assigned
 		]
-		prefMap.each {k,v ->
-			prefValue = userPreferenceService.getPreference(k, userLogin)
+		prefMap.each { String k, String v ->
+			prefValue = userPreferenceService.getPreference(k)
 			if (prefValue != v) {
-				userPreferenceService.setPreference(userLogin, k, v)
+				userPreferenceService.setPreference(k, v)
 			}
 		}
 
 		// log.debug "loadFilteredStaff() phase 4 took ${TimeUtil.elapsed(start)} (user preferences)"
 		// start = new Date()
-
-		def hasShowAllProjectPerm = RolePermissions.hasPermission("ShowAllProjects")
-		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 
 		// log.debug "loadFilteredStaff() phase 4b took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
@@ -913,22 +805,23 @@ def test = {
 		// Find all Events for one or more Projects and the Staffing for the projects
 		// Limit the list of events to those that completed within the past 30 days or have no completion and have started
 		// in the past 90 days
-		if (projectList.size() > 0) {
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",
-				[project:projectList])
-			def now = TimeUtil.nowGMT()
+		if (projectList) {
+			moveEvents = MoveEvent.executeQuery("from MoveEvent where project in (:projects) order by project.name, name asc",
+				[projects:projectList])
+			Date now = TimeUtil.nowGMT()
 
 			def eventsOption = params.eventsOption
 
-			if(eventsOption in ["A", "C"])
+			if (eventsOption in ["A", "C"])
 			moveEvents = moveEvents.findAll {
 				def eventTimes = it.eventTimes
-				if ( eventTimes){
-					if(eventsOption == "A"){
-						return (( eventTimes.completion && eventTimes.completion > now.minus(30) ) ||
-						( ! eventTimes.completion && eventTimes.start && eventTimes.start > now.minus(90) ))
-					}else{
-						return (eventTimes.completion && eventTimes.completion < now)
+				if (eventTimes) {
+					if (eventsOption == "A") {
+						(eventTimes.completion && eventTimes.completion > now - 30) ||
+						(!eventTimes.completion && eventTimes.start && eventTimes.start > now - 90)
+					}
+					else {
+						eventTimes.completion && eventTimes.completion < now
 					}
 				}
 
@@ -937,11 +830,11 @@ def test = {
 		// log.debug "loadFilteredStaff() phase 5 took ${TimeUtil.elapsed(start)} Get Events"
 		// start = new Date()
 
-		String projects = "${project.id}"
-		StringBuffer companies = new StringBuffer("${project.client.id}")
+		String projects = project.id.toString()
+		StringBuilder companies = new StringBuilder(project.clientId.toString())
 		if (onlyClientStaff == '0') {
 			// Add the owner company and any partner companies associated with the project
-			companies.append(", ${project.owner.id}")
+			companies.append(', ').append(project.owner.id)
 			def projectPartners = projectService.getPartners(project)
 
 			// log.debug "loadFilteredStaff() phase 5b took ${TimeUtil.elapsed(start)} Get Partners"
@@ -962,17 +855,15 @@ def test = {
 			} else {
 				staff = projectService.getAssignedStaff(project, role)
 			}
-
 		} else {
 			staff = projectService.getAssignableStaff(project, loginPerson)
 		}
 
-		List staffList
-
 		// log.debug "loadFilteredStaff() phase 6 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
-		// If there is no staff then there is no need to perform the query
+		List staffList
+
 		if (staff) {
 			// The staffIds will help filter down who can appear in the list
 			String staffIds = staff.id.join(',')
@@ -981,11 +872,11 @@ def test = {
 				SELECT * FROM (
 					SELECT pr.party_id_to_id AS personId,
 						p.last_name AS lastName,
-						CONCAT( COALESCE(p.first_name,''),
-							IF(p.middle_name IS NULL OR p.middle_name = '', '', ' '),
+						CONCAT(COALESCE(p.first_name,''),
+							if (p.middle_name IS NULL OR p.middle_name = '', '', ' '),
 							COALESCE(p.middle_name, ''),
-							IF(p.last_name IS NULL OR p.last_name = '', '', ' '),
-							COALESCE(p.last_name, '') ) AS fullName,
+							if (p.last_name IS NULL OR p.last_name = '', '', ' '),
+							COALESCE(p.last_name, '')) AS fullName,
 						company.name AS company,
 						pr.role_type_code_to_id AS role,
 						SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team,
@@ -999,15 +890,15 @@ def test = {
 						LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id
 						LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
 							AND pr2.role_type_code_to_id = pr.role_type_code_to_id
-							AND pr2.party_id_from_id IN (${projects})
+							AND pr2.party_id_from_id IN ($projects)
 							AND pr2.role_type_code_from_id = 'PROJECT'
 						LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id
 							AND mes.role_id = pr.role_type_code_to_id
 					WHERE pr.role_type_code_from_id in ('COMPANY')
 						AND pr.party_relationship_type_id in ('STAFF')
-						AND pr.party_id_from_id IN (${companies})
+						AND pr.party_id_from_id IN ($companies)
 						AND p.active = 'Y'
-						AND pr.party_id_to_id IN (${staffIds})
+						AND pr.party_id_to_id IN ($staffIds)
 					GROUP BY role, personId
 					ORDER BY fullName ASC
 				) AS companyStaff
@@ -1015,101 +906,26 @@ def test = {
 			""")
 
 			// Filter on the role (aka teams) if there is a filter for it
-			if (role != '0')
-				query.append("AND companyStaff.role = '${role}' ")
+			if (role != '0') {
+				query.append("AND companyStaff.role = '$role' ")
+			}
 
 			query.append(" ORDER BY fullName ASC, team ASC ")
 
 			// log.debug "loadFilteredStaff() query=$query"
 			staffList = jdbcTemplate.queryForList(query.toString())
+
+			// The template uses this value for the checkboxes
+			staffList.each { it -> it.inProjectValue = it.project ? '1' : '0' }
 		}
 
 		// log.debug "loadFilteredStaff() phase 7 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
-		// The template uses this value for the checkboxes
-		staffList.each { it ->
-			it.put('inProjectValue', (it.project ? '1' : '0'))
-		}
-
-		render(
-			template: "projectStaffTable",
-			model:[
-				staffList:staffList,
-				moveEventList:retrieveBundleHeader(moveEvents),
-				projectId:projectId,
-				project:project,
-				editPermission:editPermission,
-				sortOn: params.sortOn,
-				firstProp: params.firstProp,
-				orderBy: paramsMap.orderBy != 'asc' ? 'asc' :'desc']
-		)
-
-	}
-
-	/*
-	 * An internal function used to retrieve staffing for specified project, roles, etc.
-	 *@param projectList - array of Projects to get staffing for
-	 *@param role - type of role to filter staff list
-	 *@param scale - duration in month  to filter staff list
-	 *@param location - location to filter staff list
-	 *TODO : JPM 11/2015 : There is no reference to PersonController.getStaffList method so it should be removed
-	 */
-	def retrieveStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
-		if (!controllerService.checkPermission(this, 'ProjectStaffList')) {
-			return
-		}
-
-		def sortOn = paramsMap.sortOn ?:"fullName"
-		def orderBy = paramsMap.orderBy?:'asc'
-		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
-
-		// Adding Company TDS and Project partner in all companies list
-		Party tdsCompany = PartyGroup.findByName('TDS')
-		def partner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
-				and p.partyIdFrom in ( :projects ) and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",[projects:projectList])?.partyIdToId
-		def companies = projectList.client
-		companies << tdsCompany
-
-
-		def staffRelations = partyRelationshipService.getAllCompaniesStaff( companies )
-		def c=staffRelations.size()
-
-		if (role != '0') {
-			// Filter out only the roles requested
-			staffRelations = staffRelations.findAll { it.role.id == role }
-		}
-
-		def staffList = []
-
-		def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' "+
-			"and p.partyIdFrom  in (:projects) and p.roleTypeCodeFrom = 'PROJECT' ",[projects:projectList])
-
-		staffRelations.each { staff ->
-			// Add additional properties that aren't part of the Staff Relationships
-			// TODO - WHAT ARE THIS FIELDS???
-			def person = Person.read(staff.staff.id)
-			if(person.active=='Y' ){
-				def hasAssociation =  projectStaff.find{it.partyIdTo.id == staff.staff.id && it.roleTypeCodeTo.id == staff.role.id }
-				if (assigned=="0" || (assigned=="1" && hasAssociation)){
-					staff.roleId = 'roleId?'	// I believe that this should be the ROLE code (e.g. MOVE_MGR)
-					staff.staffProject = 'staffProj.name?'	// This is the name of the project.
-
-					staffList << staff
-				}
-			}
-		}
-
-		staffList.sort{ a,b->
-			if(orderBy == 'asc'){
-				firstProp ? (a."${firstProp}"?."${sortOn}" <=> b."${firstProp}"."${sortOn}") : ((a."${sortOn}").toString() <=> b."${sortOn}".toString())
-			} else {
-				firstProp ? (b."${firstProp}"."${sortOn}" <=> a."${firstProp}"?."${sortOn}") : (b."${sortOn}".toString() <=> a."${sortOn}".toString())
-			}
-		}
-
-		return staffList
-
+		render(template: "projectStaffTable",
+		       model: [staffList: staffList, moveEventList: retrieveBundleHeader(moveEvents), projectId: projectId,
+		               firstProp: params.firstProp, editPermission: securityService.hasPermission('EditProjectStaff'),
+		               project: project, sortOn: params.sortOn, orderBy: paramsMap.orderBy != 'asc' ? 'asc' : 'desc'])
 	}
 
 	/*
@@ -1117,38 +933,22 @@ def test = {
 	 *@param person Id is id of person
 	 *@return NA
 	 */
+	@HasPermission('ProjectStaffShow')
 	def loadGeneral() {
-		if (!controllerService.checkPermission(this, 'ProjectStaffShow')) {
-			ServiceResults.unauthorized(response)
-			return
-		}
+		log.debug "loadGeneral() class: ${params.personId.getClass()} value: $params.personId"
 
-		log.debug "loadGeneral() class: ${params.personId.class} value: ${params.personId}"
-		def tab = params.tab ?: 'generalInfoShow'
-		def person = Person.get(params.personId)
-
-		if(person.isSystemUser()){ //This person can't be managed because is part of the system
-			render(text: "<div>This is a System User and can't be Managed</div>", contentType: "text/html", encoding: "UTF-8")
-			return
-		}
+		Person person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
-		def subject = SecurityUtils.subject
 		def company = person.company
-		def companyProject = Project.findByClient( company )
-		def personFunctions = []
-		personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
-
+		def personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
 		def availabaleFunctions = partyRelationshipService.getStaffingRoles()
+		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.userLoginPerson)
 
-		def isProjMgr = false
-		if( subject.hasRole("PROJ_MGR")){
-			isProjMgr = true
-		}
-		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.getUserLoginPerson())
-
-		render(template:tab ,model:[person:person, company:company, personFunctions:personFunctions, availabaleFunctions:availabaleFunctions,
-			sizeOfassigned:(personFunctions.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr, partyGroupList:partyGroupList])
-
+		render(template: params.tab ?: 'generalInfoShow',
+		       model: [person: person, company: company, personFunctions: personFunctions,
+		               availabaleFunctions: availabaleFunctions, sizeOfassigned: personFunctions.size() + 1,
+		               blackOutdays: blackOutdays, isProjMgr: securityService.hasRole("PROJ_MGR"),
+		               partyGroupList: partyGroupList])
 	}
 
 	/*
@@ -1156,32 +956,25 @@ def test = {
 	 *@param moveEvents list of moveEvent for selected project
 	 *@return MAP of bundle header containing projectName ,event name, start time and event id
 	 */
-	private def retrieveBundleHeader(moveEvents) {
+	private List<Map> retrieveBundleHeader(moveEvents) {
 		// TODO : JPM 5/2015 : Need to add security controls
-		def project = securityService.getUserCurrentProject()
+		Project project = securityService.userCurrentProject
 		def moveEventList = []
 		if (project) {
-			def bundleStartDate = ""
-			def personAssignedToME = []
-			moveEvents.each{ moveEvent->
-				def moveMap = new HashMap()
-				def moveBundle = moveEvent?.moveBundles
-				def startDate = moveBundle.startTime.sort()
+			String bundleStartDate = ''
+			for (MoveEvent moveEvent in moveEvents) {
+				Collection<MoveBundle> moveBundles = moveEvent?.moveBundles ?: []
+				List<Date> startDates = moveBundles*.startTime.sort()
 				def eventTimes = moveEvent.eventTimes
-				startDate?.removeAll([null])
-				if (startDate.size()>0) {
-					if (startDate[0]) {
-						bundleStartDate = TimeUtil.formatDateTime(session, startDate[0], TimeUtil.FORMAT_DATE_TIME_10)
+				startDates?.removeAll([null])
+				if (startDates) {
+					if (startDates[0]) {
+						bundleStartDate = TimeUtil.formatDateTime(startDates[0], TimeUtil.FORMAT_DATE_TIME_10)
 					}
 				}
-				moveMap.put("project", moveEvent.project.name)
-				moveMap.put("name", moveEvent.name)
-				moveMap.put("startTime", bundleStartDate)
-				moveMap.put("startDate", (eventTimes.start ? TimeUtil.formatDateTime(session, eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6) : '') )
-				moveMap.put("id", moveEvent.id)
-
-				moveEventList << moveMap
-
+				moveEventList << [project: moveEvent.project.name, name: moveEvent.name, startTime: bundleStartDate,
+				                  startDate: TimeUtil.formatDateTime(eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6),
+				                  id: moveEvent.id]
 			}
 		}
 		return moveEventList
@@ -1195,249 +988,197 @@ def test = {
 	def saveEventStaff() {
 		// Security is checked in the service method
 		try {
-			UserLogin byWhom = securityService.getUserLogin()
-			String message = personService.assignToProjectEvent(byWhom, request.JSON.personId, request.JSON.eventId, request.JSON.roleType, NumberUtil.toInteger(request.JSON.val))
-			def flag = message.size() == 0
-			render(ServiceResults.success(['flag':flag, 'message':message]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (InvalidParamException e) {
-			render(ServiceResults.fail(e.getMessage()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			Map json = request.JSON
+			String message = personService.assignToProjectEvent(json.personId, json.eventId,
+					json.roleType, NumberUtil.toInteger(json.val))
+			renderSuccessJson(flag: message.size() == 0, message: message)
 		}
-
+		catch (e) {
+			handleException e, log
+		}
 	}
 
 	/**
-	 * This action is used to handle ajax request and to delete current user's individual preferences except 'Current Dashboard'
+	 * Handle Ajax request to delete current user's individual preferences except 'Current Dashboard'
 	 * @param prefCode : Preference Code that is requested for being deleted
 	 * @return : boolean
 	 */
 	def removeUserPreference() {
 		// TODO : JPM 5/2015 : Improve removeUserPreference - validate it was successful, return SecurityService.success
-		def prefCode = params.prefCode
-		if (prefCode != "Current Dashboard")
+		String prefCode = params.prefCode
+		if (prefCode != "Current Dashboard") {
 			userPreferenceService.removePreference(prefCode)
+		}
 
 		render true
 	}
 
 	def savePreferences() {
-		def timezoneValue = params.timezone
-		def datetimeFormatValue = params.datetimeFormat
-
 		// Checks that timezone is valid
-		def timezone = TimeZone.getTimeZone(timezoneValue)
+		def timezone = TimeZone.getTimeZone(params.timezone)
+		userPreferenceService.setTimeZone timezone.getID()
 
 		// Validate date time format
-		def datetimeFormat = TimeUtil.getDateTimeFormatType(datetimeFormatValue)
+		def datetimeFormat = TimeUtil.getDateTimeFormatType(params.datetimeFormat)
+		userPreferenceService.setDateFormat datetimeFormat
 
-		userPreferenceService.setPreference( TimeUtil.TIMEZONE_ATTR, timezone.getID() )
-		userPreferenceService.setPreference( TimeUtil.DATE_TIME_FORMAT_ATTR, datetimeFormat )
-
-		def model = [
-			'timezone' : timezone.getID(),
-			'datetimeFormat' : datetimeFormat
-		]
-
-		render(ServiceResults.success(model) as JSON)
+		renderSuccessJson(timezone: timezone.getID(), datetimeFormat: datetimeFormat)
 	}
 
 	/**
-	 * This action is used to display Current logged user's Preferences with preference code (converted to comprehensive words)
-	 * with their corresponding value
-	 * @param N/A :
+	 * Display current logged user's Preferences with preference
+	 * code (converted to comprehensive words) with their corresponding value.
+	 *
 	 * @return : A Map containing key as preference code and value as map'svalue.
 	 */
 	def editPreference() {
 
-		def timezones = Timezone.findAll()
-		def areas = userPreferenceService.timezonePickerAreas()
-		def loggedUser = securityService.getUserLogin()
-		def prefs = UserPreference.findAllByUserLogin( loggedUser ,[sort:"preferenceCode"])
 		def prefMap = [:]
-		def labelMap = ["CONSOLE_TEAM_TYPE" : "Console Team Type", "SUPER_CONSOLE_REFRESH" : "Console Refresh Time",
-			"CART_TRACKING_REFRESH" : "Cart tarcking Refresh Time", "BULK_WARNING" : "Bulk Warning",
-			"DASHBOARD_REFRESH" : "Dashboard Refresh Time", "CURR_TZ" : "Time Zone","CURR_POWER_TYPE" : "Power Type",
-			"START_PAGE" : "Welcome Page", "StaffingRole" : "Default Project Staffing Role",
-			"StaffingLocation" : "Default Project Staffing Location", "StaffingPhases" : "Default Project Staffing Phase",
-			"StaffingScale" : "Default Project Staffing Scale", "preference" : "Preference", "DraggableRack" : "Draggable Rack",
-			"PMO_COLUMN1" : "PMO Column 1 Filter", "PMO_COLUMN2" : "PMO Column 2 Filter", "PMO_COLUMN3" : "PMO Column 3 Filter",
-			"PMO_COLUMN4" : "PMO Column 4 Filter", "ShowAddIcons" : "Rack Add Icons", "MY_TASK":"My Task Refresh Time"
-		]
+		def labelMap = [CONSOLE_TEAM_TYPE: "Console Team Type", SUPER_CONSOLE_REFRESH: "Console Refresh Time",
+		                CART_TRACKING_REFRESH: "Cart tarcking Refresh Time", BULK_WARNING: "Bulk Warning",
+		                (PREF.DASHBOARD_REFRESH.value()): "Dashboard Refresh Time", (PREF.CURR_TZ.value()): "Time Zone",
+		                (PREF.CURR_POWER_TYPE.value()): "Power Type", (PREF.START_PAGE.value()): "Welcome Page",
+		                (PREF.STAFFING_ROLE.value()): "Default Project Staffing Role",
+		                (PREF.STAFFING_LOCATION.value()): "Default Project Staffing Location",
+		                (PREF.STAFFING_PHASES.value()): "Default Project Staffing Phase",
+		                (PREF.STAFFING_SCALE.value()): "Default Project Staffing Scale", preference: "Preference",
+		                (PREF.DRAGGABLE_RACK.value()): "Draggable Rack", PMO_COLUMN1: "PMO Column 1 Filter",
+		                PMO_COLUMN2: "PMO Column 2 Filter", PMO_COLUMN3: "PMO Column 3 Filter",
+		                PMO_COLUMN4: "PMO Column 4 Filter", (PREF.SHOW_ADD_ICONS.value()): "Rack Add Icons",
+		                MY_TASK: "My Task Refresh Time"]
 
-		def currTimeZone = TimeUtil.defaultTimeZone
-		def currDateTimeFormat = TimeUtil.dateTimeFormatTypes[0]
+		String currTimeZone = TimeUtil.defaultTimeZone
+		String currDateTimeFormat = TimeUtil.getDefaultFormatType()
 
-		prefs.each { pref->
-			switch( pref.preferenceCode ) {
-				case "MOVE_EVENT" :
-					prefMap.put((pref.preferenceCode), "Event / "+MoveEvent.get(pref.value).name)
+		def prefs = UserPreference.findAllByUserLogin(securityService.loadCurrentUserLogin(), [sort:"preferenceCode"])
+		for (pref in prefs) {
+			switch (pref.preferenceCode) {
+				case PREF.MOVE_EVENT.value():
+					prefMap[pref.preferenceCode] = "Event / " + MoveEvent.get(pref.value).name
 					break
 
-				case "CURR_PROJ" :
-					prefMap.put((pref.preferenceCode), "Project / "+Project.get(pref.value).name)
+				case PREF.CURR_PROJ.value():
+					prefMap[pref.preferenceCode] = "Project / " + Project.get(pref.value).name
 					break
 
-				case "CURR_BUNDLE" :
-					prefMap.put((pref.preferenceCode), "Bundle / "+MoveBundle.get(pref.value).name)
+				case PREF.CURR_BUNDLE.value():
+					prefMap[pref.preferenceCode] = "Bundle / " + MoveBundle.get(pref.value).name
 					break
 
-				case "PARTYGROUP" :
-					prefMap.put((pref.preferenceCode), "Company / "+ (!pref.value.equalsIgnoreCase("All")  ? PartyGroup.get(pref.value).name : 'All'))
+				case PREF.PARTY_GROUP.value():
+					prefMap[pref.preferenceCode] = "Company / " + (!pref.value.equalsIgnoreCase("All") ?
+							PartyGroup.get(pref.value).name : 'All')
 					break
 
-				case "CURR_ROOM" :
-					prefMap.put((pref.preferenceCode), "Room / "+Room.get(pref.value).roomName)
+				case PREF.CURR_ROOM.value():
+					prefMap[pref.preferenceCode] = "Room / " + Room.get(pref.value).roomName
 					break
 
-				case "StaffingRole" :
+				case PREF.STAFFING_ROLE.value():
 					def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
-					prefMap.put((pref.preferenceCode), "Default Project Staffing Role / "+role.substring(role.lastIndexOf(':') +1))
+					prefMap[pref.preferenceCode] = "Default Project Staffing Role / " + role.substring(role.lastIndexOf(':') + 1)
 					break
 
-				case "AUDIT_VIEW" :
+				case PREF.AUDIT_VIEW.value():
 					def value = pref.value == "0" ? "False" : "True"
-					prefMap.put((pref.preferenceCode), "Room Audit View / "+value)
+					prefMap[pref.preferenceCode] = "Room Audit View / " + value
 					break
 
-				case "JUST_REMAINING" :
+				case PREF.JUST_REMAINING.value():
 					def value = pref.value == "0" ? "False" : "True"
-					prefMap.put((pref.preferenceCode), "Just Remaining Check / "+value)
+					prefMap[pref.preferenceCode] = "Just Remaining Check / " + value
 					break
 
-				case TimeUtil.DATE_TIME_FORMAT_ATTR:
+				case PREF.CURR_DT_FORMAT:
 					currDateTimeFormat = pref.value
 					break
 
-				case TimeUtil.TIMEZONE_ATTR:
+				case PREF.CURR_TZ:
 					currTimeZone = pref.value
 					break
 
-				default :
-					prefMap.put((pref.preferenceCode), (labelMap[pref.preferenceCode] ?: pref.preferenceCode )+" / "+ pref.value)
+				default:
+					prefMap[pref.preferenceCode] = (labelMap[pref.preferenceCode] ?: pref.preferenceCode) + " / " + pref.value
 					break
 			}
 		}
 
-
-		render(template:"showPreference",model:[prefMap:prefMap.sort{it.value}, areas: areas,
-				timezones: timezones, currTimeZone: currTimeZone, currDateTimeFormat: currDateTimeFormat])
+		render(template: "showPreference",
+		       model: [prefMap: prefMap.sort{it.value}, areas: userPreferenceService.timezonePickerAreas(),
+		               timezones: Timezone.findAll(), currTimeZone: currTimeZone,
+		               currDateTimeFormat: currDateTimeFormat])
 	}
 
 	/**
-	 * This action is used to display the edit form for the current logged user's date format and timezone Preferences
+	 * Display the edit form for the current logged user's date format and timezone Preferences
 	 * @param N/A :
 	 * @return : A Map containing key as preference code and value as map'svalue.
 	 */
 	def editTimezone () {
-		def timezones = Timezone.findAll()
-		def areas = userPreferenceService.timezonePickerAreas()
+		def currDateTimeFormat = userPreferenceService.dateFormat ?: TimeUtil.getDefaultFormatType()
 
-		def currTimeZone = userPreferenceService.getPreference(TimeUtil.TIMEZONE_ATTR) ?: TimeUtil.defaultTimeZone
-		def currDateTimeFormat = userPreferenceService.getPreference(TimeUtil.DATE_TIME_FORMAT_ATTR) ?: TimeUtil.dateTimeFormatTypes[0]
-
-		render(template:"../project/showTimeZoneSelect",model:[areas: areas, timezones: timezones, currTimeZone: currTimeZone, currDateTimeFormat: currDateTimeFormat, userPref:true])
+		render(template: "../project/showTimeZoneSelect",
+		       model: [areas: userPreferenceService.timezonePickerAreas(), timezones: Timezone.findAll(), userPref: true,
+		               currTimeZone: userPreferenceService.timeZone, currDateTimeFormat: currDateTimeFormat])
 	}
 
 	/**
-	 * This action is Used to populate CompareOrMergePerson dialog.
+	 * Populate CompareOrMergePerson dialog.
 	 * @param : ids[] is array of 2 id which user want to compare or merge
 	 * @return : all column list , person list and userlogin list which we are display at client side
 	 */
+	@HasPermission('PersonEditView')
 	def compareOrMerge() {
-		if (!controllerService.checkPermission(this, 'PersonEditView')) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def ids = params.list("ids[]")
-		def personsMap = [:]
-		def userLogins= []
-		ids.each{
-			def id = it.isLong()?Long.parseLong(it):null
-			def person = id?Person.get(id):null
-
-			if(person){
-				if(person.isSystemUser()){ //This person can't be managed because is part of the system
-					log.warn("${person}: is a System User and can't be Changed")
-				}else {
-					personsMap << [(person): person.company.id]
-					def userLogin = UserLogin.findByPerson(person)
-					userLogins << userLogin
-				}
+		Map<Person, Long> personsMap = [:]
+		List<UserLogin> userLogins = []
+		params.list("ids[]").each {
+			Person person = Person.get(it.isLong() ? Long.parseLong(it) : null)
+			if (person) {
+				personsMap[person] = person.company.id
+				userLogins << person.userLogin
 			}
 		}
 
-		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label for Person .
-		def columnList =  [ 'Merge To':'','First Name': 'firstName', 'Middle Name': 'middleName', 'Last Name': 'lastName', 'Nick Name': 'nickName' , 'Active':'active','Title':'title',
-							'Email':'email', 'Department':'department', 'Location':'location', 'State Prov':'stateProv',
-							'Country':'country', 'Work Phone':'workPhone','Mobile Phone':'mobilePhone',
-							'Model Score':'modelScore','Model Score Bonus':'modelScoreBonus', 'Person Image URL':'personImageURL',
-							'KeyWords':'keyWords', 'Tds Note':'tdsNote','Tds Link':'tdsLink', 'Staff Type':'staffType',
-							'TravelOK':'travelOK', 'Black Out Dates':'blackOutDates', 'Roles':''
-						  ]
+		// Defined a Map as 'columnList' where key is displaying label and value is property of label for Person .
+		def columnList =  ['Merge To': '', 'First Name': 'firstName', 'Last Name': 'lastName',
+		                   'Nick Name': 'nickName', 'Active': 'active', 'Title': 'title', 'Email': 'email',
+		                   'Department': 'department', 'Location': 'location', 'State Prov': 'stateProv',
+		                   'Country': 'country', 'Work Phone': 'workPhone', 'Mobile Phone': 'mobilePhone',
+		                   'Model Score': 'modelScore', 'Model Score Bonus': 'modelScoreBonus',
+		                   'Person Image URL': 'personImageURL', 'KeyWords': 'keyWords', 'Tds Note': 'tdsNote',
+		                   'Tds Link': 'tdsLink', 'Staff Type': 'staffType', 'TravelOK': 'travelOK',
+		                   'Black Out Dates': 'blackOutDates', 'Roles': '']
 
-		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label for UserLogin .
-		def loginInfoColumns = ['Username':'username', 'Active':'active', 'Created Date':'createdDate', 'Last Login':'lastLogin',
-								'Last Page':'lastPage', 'Expiry Date':'expiryDate'
-							   ]
+		// Defined a Map as 'columnList' where key is displaying label and value is property of label for UserLogin .
+		def loginInfoColumns = ['Username': 'username', 'Active': 'active', 'Created Date': 'createdDate',
+		                        'Last Login': 'lastLogin', 'Last Page': 'lastPage', 'Expiry Date': 'expiryDate']
 
-		render(template:"compareOrMerge", model:[personsMap:personsMap, columnList:columnList, loginInfoColumns:loginInfoColumns,
-					userLogins:userLogins])
+		render(template: "compareOrMerge",
+		       model: [personsMap: personsMap, columnList: columnList, loginInfoColumns: loginInfoColumns,
+		               userLogins: userLogins])
 	}
 
 	/**
-	 * This action is used  to merge Person
+	 * Merge two persons
 	 * @param : toId is requested id of person into which second person will get merge
 	 * @param : fromId is requested id of person which will be merged
 	 * @return : Appropriate message after merging
 	 */
-
+	@HasPermission('PersonEditView')
 	def mergePerson() {
-		if (!controllerService.checkPermission(this, 'PersonEditView')) {
-			ServiceResults.unauthorized(response)
-			return
-		}
 
 		def toPerson = Person.get(params.toId)
-		def fromPersonIds = params.list("fromId[]")
-
-		def fromPersons = fromPersonIds.collect { id ->
-			return Person.get(id)
-		}
-
-		def foundSystemUser = toPerson.isSystemUser()
-		if(!foundSystemUser){
-			foundSystemUser = ( (fromPersons.find{ it.isSystemUser() }) != null)
-		}
-
-
-		if(foundSystemUser){ //This person can't be managed because is part of the system
-			def msg = "one of the users in the merge is a System User and can't be Changed"
-			log.warn(msg)
-			render msg
-			return
-		}
-
-		def personMerged = []
-		def msg = ""
-
 		toPerson.properties = params
-
 		if (!toPerson.save(flush:true)) {
-			toPerson.errors.allErrors.each{ println it }
+			toPerson.errors.allErrors.each { println it }
 		}
-		fromPersons.each { fromPerson ->
-			personMerged += personService.mergePerson(fromPerson, toPerson)
+
+		List<Person> personMerged = []
+		params.list("fromId[]").each {
+			personMerged << personService.mergePerson(Person.get(it), toPerson)
 		}
-		msg += "${personMerged.size() ? WebUtil.listAsMultiValueString(personMerged) : 'None of Person '} Merged to ${toPerson}"
-		render msg
+
+		render "${personMerged.size() ? WebUtil.listAsMultiValueString(personMerged) : 'None of Person '} Merged to $toPerson"
 	}
 
 	/*
@@ -1449,28 +1190,20 @@ def test = {
 	def addProjectStaff() {
 		String userMsg
 		try {
-			UserLogin userLogin = securityService.getUserLogin()
-
 			// Make the service call - note that the Permission is checked within the service
-			personService.addToProject(userLogin, params.projectId, params.personId)
+			personService.addToProject(params.projectId, params.personId)
 
-			ServiceResults.respondWithSuccess(response)
+			renderSuccessJson()
 
-		} catch (DomainUpdateException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidRequestException e) {
-			userMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			userMsg = e.getMessage()
+		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
+			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace("addProjectTeam()", e)
-			ServiceResults.respondWithError(response, ['An error occurred while trying to add the person to the project', e.getMessage()])
+			renderErrorJson(['An error occurred while trying to add the person to the project', e.message])
 		}
 
 		if (userMsg) {
-			ServiceResults.respondWithError(response, userMsg)
+			renderErrorJson(userMsg)
 		}
 	}
 
@@ -1482,31 +1215,20 @@ def test = {
 	 */
 	def removeProjectStaff() {
 		String userMsg
-		UserLogin userLogin
 		try {
-			userLogin = securityService.getUserLogin()
-
 			// Make the service call - note that the Permission is checked within the service
-			personService.removeFromProject(userLogin, params.projectId, params.personId)
-
-			ServiceResults.respondWithSuccess(response)
-
-		} catch (DomainUpdateException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidRequestException e) {
-			userMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			userMsg = e.getMessage()
+			personService.removeFromProject(params.projectId, params.personId)
+			renderSuccessJson()
+		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
+			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace("removeProjectStaff()", e)
-			ServiceResults.respondWithError(response, ['An error occurred while trying to unassign the person from the project', e.getMessage()])
+			renderErrorJson(['An error occurred while trying to unassign the person from the project', e.message])
 		}
 
 		if (userMsg) {
-			log.debug "removeFromProject($userLogin, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
-			ServiceResults.respondWithError(response, userMsg)
+			log.debug "removeFromProject($securityService.currentUsername, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
+			renderErrorJson(userMsg)
 		}
 	}
 
@@ -1520,28 +1242,19 @@ def test = {
 	def addProjectTeam() {
 		String userMsg
 		try {
-			UserLogin userLogin = securityService.getUserLogin()
-
 			// Make the service call - note that the Permission is checked within the service
-			personService.addToProjectTeam(userLogin, params.projectId, params.personId, params.teamCode)
+			personService.addToProjectTeam(params.projectId, params.personId, params.teamCode)
+			renderSuccessJson()
 
-			ServiceResults.respondWithSuccess(response)
-
-		} catch (DomainUpdateException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidRequestException e) {
-			userMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			userMsg = e.getMessage()
+		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
+			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace("addProjectTeam()", e)
-			ServiceResults.respondWithError(response, ['An error occurred while trying to add the person to the project', e.getMessage()])
+			renderErrorJson(['An error occurred while trying to add the person to the project', e.message])
 		}
 
 		if (userMsg) {
-			ServiceResults.respondWithError(response, userMsg)
+			renderErrorJson(userMsg)
 		}
 	}
 
@@ -1554,31 +1267,20 @@ def test = {
 	 */
 	def removeProjectTeam() {
 		String userMsg
-		UserLogin userLogin
 		try {
-			userLogin = securityService.getUserLogin()
-
 			// Make the service call - note that the Permission is checked within the service
-			personService.removeFromProjectTeam(userLogin, params.projectId, params.personId, params.teamCode)
-
-			ServiceResults.respondWithSuccess(response)
-
-		} catch (DomainUpdateException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidRequestException e) {
-			userMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			userMsg = e.getMessage()
+			personService.removeFromProjectTeam(params.projectId, params.personId, params.teamCode)
+			renderSuccessJson()
+		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
+			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace("removeProjectTeam()", e)
-			ServiceResults.respondWithError(response, ['An error occurred while trying to unassign the person from the project', e.getMessage()])
+			renderErrorJson(['An error occurred while trying to unassign the person from the project', e.message])
 		}
 
 		if (userMsg) {
-			log.debug "removeProjectTeam($userLogin, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
-			ServiceResults.respondWithError(response, userMsg)
+			log.debug "removeProjectTeam($securityService.currentUsername, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
+			renderErrorJson(userMsg)
 		}
 	}
 
@@ -1589,27 +1291,18 @@ def test = {
 	def addEventStaff() {
 		String userMsg
 		try {
-			UserLogin userLogin = securityService.getUserLogin()
-
 			// Make the service call - note that the Permission is checked within the service
-			personService.addToEvent(userLogin, params.projectId, params.eventId, params.personId, params.teamCode)
-			ServiceResults.respondWithSuccess(response)
-
-		} catch (DomainUpdateException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidRequestException e) {
-			userMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			userMsg = e.getMessage()
+			personService.addToEvent(params.projectId, params.eventId, params.personId, params.teamCode)
+			renderSuccessJson()
+		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
+			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.stackTraceToString(e)
-			ServiceResults.respondWithError(response, ['An error occurred while trying to add the person to the event', e.getMessage()])
+			renderErrorJson(['An error occurred while trying to add the person to the event', e.message])
 		}
 
 		if (userMsg) {
-			ServiceResults.respondWithError(response, userMsg)
+			renderErrorJson(userMsg)
 		}
 	}
 
@@ -1620,28 +1313,18 @@ def test = {
 	def removeEventStaff() {
 		String userMsg
 		try {
-			UserLogin userLogin = securityService.getUserLogin()
-
 			// Make the service call - note that the Permission is checked within the service
-			personService.removeFromEvent(userLogin, params.projectId, params.eventId, params.personId, params.teamCode)
-			ServiceResults.respondWithSuccess(response)
-
-		} catch (DomainUpdateException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidParamException e) {
-			userMsg = e.getMessage()
-		} catch (InvalidRequestException e) {
-			userMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			userMsg = e.getMessage()
+			personService.removeFromEvent(params.projectId, params.eventId, params.personId, params.teamCode)
+			renderSuccessJson()
+		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
+			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace("removeEventStaff()", e)
-			ServiceResults.respondWithError(response, ['An error occurred while trying to unassign the person from the event', e.getMessage()])
+			renderErrorJson(['An error occurred while trying to unassign the person from the event', e.message])
 		}
 
 		if (userMsg) {
-			ServiceResults.respondWithError(response, userMsg)
+			renderErrorJson(userMsg)
 		}
 	}
-
 }

@@ -1,143 +1,137 @@
 import com.tds.asset.AssetEntity
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.ProjectTeam
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.SecurityService
 
-class ProjectTeamController {
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+class ProjectTeamController implements ControllerMethods {
 
-	def partyRelationshipService
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static defaultAction = 'list'
 
-    def index() { redirect(action:"list",params:params) }
+	PartyRelationshipService partyRelationshipService
+	SecurityService securityService
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-    /*
-     * 	Return all of the teams associated to the project
-     */
-    def list() {
-        def bundleId = params.bundleId
-		def bundleInstance = MoveBundle.get(bundleId)
-        if(!bundleId){
-           def project = Project.get(session.getAttribute( "CURR_PROJ" ).CURR_PROJ)
-		   bundleInstance = MoveBundle.findByProject(project)
-        }
-        def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )
-        //ProjectTeam.findAllByProject(projectInstance)
+	def list(Long bundleId) {
+		MoveBundle moveBundle = bundleId ?
+			MoveBundle.get(bundleId) :
+			MoveBundle.findByProject(securityService.userCurrentProject)
+		[projectTeamInstanceList: partyRelationshipService.getBundleTeamInstanceList(moveBundle),
+		 bundleInstance: moveBundle]
+	}
 
-        return [ projectTeamInstanceList: projectTeamInstanceList, bundleInstance:bundleInstance ]
-    }
-	/*
-	 *  Return the Project Team Details
-	 */
-    def show() {
-		def bundleId = params.bundleId
-		def bundleInstance = MoveBundle.get( bundleId )
-        def projectTeamInstance = ProjectTeam.get( params.id )
+	def show(Long bundleId) {
+		ProjectTeam projectTeam = projectTeamFromParams()
+		if (!projectTeam) return
 
-        if(!projectTeamInstance) {
-            flash.message = "ProjectTeam not found with id ${params.id}"
-            redirect( action:"list", params:[bundleId:bundleId] )
-        }
-        else {
-        	def teamMembers = partyRelationshipService.getBundleTeamMembers( projectTeamInstance )
-        	return [ projectTeamInstance : projectTeamInstance, bundleInstance:bundleInstance, teamMembers:teamMembers ] }
-    }
-	/*
-	 *  Delated the ProjectTeam Deatils
-	 */
-    def delete() {
-        def projectTeamInstance = ProjectTeam.get( params.id )
+		[projectTeamInstance: projectTeam, bundleInstance: MoveBundle.get(bundleId),
+		 teamMembers: partyRelationshipService.getBundleTeamMembers(projectTeam)]
+	}
 
-        def bundleId = params.bundleId
-        if(projectTeamInstance) {
-        	PartyRelationship.executeUpdate("delete from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $projectTeamInstance.id and p.roleTypeCodeFrom = 'TEAM' ")
-        	projectTeamInstance.delete(flush:true)
-            flash.message = "ProjectTeam ${projectTeamInstance} deleted"
-            redirect( action:"list", params:[bundleId:bundleId] )
-        }
-        else {
-            flash.message = "ProjectTeam not found with id ${params.id}"
-            redirect( action:"list", params:[bundleId:bundleId] )
-        }
-    }
-	/*
-	 *  return Project Team Details to Edit page
-	 */
-    def edit() {
-        def projectTeamInstance = ProjectTeam.get( params.id )
-        def bundleId = params.bundleId
-        def bundleInstance = MoveBundle.get( bundleId )
-        if(!projectTeamInstance) {
-            flash.message = "ProjectTeam not found with id ${params.id}"
-            redirect( action:"list", params:[bundleId:bundleId] )
-        }
-        else {
-        	def availableStaff = partyRelationshipService.getAvailableTeamMembers( bundleInstance.project.id, projectTeamInstance )
-        	def teamMembers = partyRelationshipService.getBundleTeamMembers( projectTeamInstance )
-            return [ projectTeamInstance : projectTeamInstance, bundleInstance:bundleInstance, availableStaff:availableStaff, teamMembers:teamMembers ]
-        }
-    }
-	/*
-	 *  Update the Project Team Details
-	 */
-    def update() {
+	def delete() {
+		ProjectTeam projectTeam = projectTeamFromParams()
+		if (!projectTeam) return
 
-        // TODO : Security : Need to check to see if the person is associated to the project and has permissions.
+		Map args = [projectTeam: projectTeam]
 
-        def projectTeamInstance = ProjectTeam.get( params.id )
-        //projectTeamInstance.lastUpdated = new Date()
-        def bundleId = params.bundleId
-        def bundleInstance = MoveBundle.get( bundleId )
-        def teamMembers = request.getParameterValues("teamMembers")
+		PartyRelationship.executeUpdate('''\
+			delete from PartyRelationship
+			where partyRelationshipType.id = 'PROJ_TEAM'
+			  and partyIdFrom = : projectTeam
+			  and roleTypeCodeFrom.id = 'TEAM'
+		''', args)
 
-        if(projectTeamInstance) {
-            projectTeamInstance.properties = params
+		for (String property in ['sourceTeamMt', 'targetTeamMt', 'sourceTeamLog', 'targetTeamLog',
+		                         'sourceTeamSa', 'targetTeamSa', 'sourceTeamDba', 'targetTeamDba']) {
+			AssetEntity.executeUpdate('update AssetEntity ae set ae.' + property + ' = null ' +
+			                          'where ae.' + property + ' = :projectTeam', args)
+		}
 
-            if(!projectTeamInstance.hasErrors() && projectTeamInstance.save(flush:true)) {
-            	PartyRelationship.executeUpdate("delete from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $projectTeamInstance.id and p.roleTypeCodeFrom = 'TEAM' ")
-            	partyRelationshipService.createBundleTeamMembers( projectTeamInstance, teamMembers )
-                flash.message = "ProjectTeam ${projectTeamInstance} updated"
-                redirect( action:"show", id:projectTeamInstance.id, params:[bundleId:bundleId] )
-            }
-            else {
-            	projectTeamInstance.discard()
-            	def availableStaff = partyRelationshipService.getAvailableProjectStaff( bundleInstance.project, teamMembers )
-            	def projectTeamStaff = partyRelationshipService.getProjectTeamStaff( bundleInstance.project, teamMembers )
-                render( view:'edit', model:[projectTeamInstance:projectTeamInstance, bundleInstance:bundleInstance, availableStaff:availableStaff, teamMembers:projectTeamStaff  ] )
-            }
-        }
-        else {
-            flash.message = "ProjectTeam not found with id ${params.id}"
-            redirect( action:"edit", id:params.id, params:[bundleId:bundleId] )
-        }
-    }
-    /*
-     *  Return the project team details to create form
-     */
-    def create() {
+		projectTeam.delete()
 
-        def projectTeamInstance = new ProjectTeam()
-        def bundleId = params.bundleId
-        def bundleInstance = MoveBundle.get( bundleId )
-        projectTeamInstance.properties = params
-        def projectStaff = partyRelationshipService.getProjectStaff( bundleInstance.project.id )
-        return [ 'projectTeamInstance':projectTeamInstance, bundleInstance:bundleInstance, availableStaff :projectStaff ]
+		flash.message = "ProjectTeam $projectTeam deleted"
+		redirect(action: 'list', params: [bundleId: params.bundleId])
+	}
 
-    }
-	/*
-	 *  Save the project team details
-	 */
-    def save() {
-		def bundleId = params.bundleId
-		def bundleInstance = MoveBundle.get( bundleId )
-        def projectTeamInstance = new ProjectTeam(params)
-		def teamMembers = request.getParameterValues("teamMembers")
-		if ( !projectTeamInstance.hasErrors() && projectTeamInstance.save() ) {
-	    	partyRelationshipService.createBundleTeamMembers( projectTeamInstance, teamMembers )
-            flash.message = "ProjectTeam ${projectTeamInstance} created"
-            redirect( action:"show", id:projectTeamInstance.id, params:[bundleId:bundleId])
-        }
-        else {
-        	def availableStaff = partyRelationshipService.getAvailableProjectStaff( bundleInstance.project, teamMembers )
-        	def projectTeamStaff = partyRelationshipService.getProjectTeamStaff( bundleInstance.project, teamMembers )
-            render( view:'create',model:[ projectTeamInstance:projectTeamInstance, bundleInstance:bundleInstance, availableStaff:availableStaff, teamMembers:projectTeamStaff ] )
-        }
-    }
+	def edit(Long bundleId, Long id) {
+		ProjectTeam projectTeam = projectTeamFromParams()
+		if (!projectTeam) return
+
+		MoveBundle moveBundle = MoveBundle.get(bundleId)
+
+		[projectTeamInstance : projectTeam, bundleInstance: moveBundle,
+		 availableStaff: partyRelationshipService.getAvailableTeamMembers(moveBundle.projectId, projectTeam),
+		 teamMembers: partyRelationshipService.getBundleTeamMembers(projectTeam)]
+	}
+
+	def update(Long bundleId, Long id) {
+
+		// TODO : Security : Need to check to see if the person is associated to the project and has permissions.
+
+		ProjectTeam projectTeam = projectTeamFromParams()
+		if (!projectTeam) return
+
+		List teamMemberIds = params.list('teamMembers')
+
+		projectTeam.properties = params
+		if (!projectTeam.hasErrors() && projectTeam.save(flush: true)) {
+
+			PartyRelationship.executeUpdate('''\
+				delete from PartyRelationship
+				where partyRelationshipType.id = 'PROJ_TEAM'
+				  and partyIdFrom.id = : projectTeamId
+				  and roleTypeCodeFrom.id = 'TEAM'
+			''', [projectTeamId: projectTeam.id])
+
+			partyRelationshipService.createBundleTeamMembers(projectTeam, teamMemberIds)
+			flash.message = "ProjectTeam $projectTeam updated"
+			redirect(action: 'show', id: projectTeam.id, params: [bundleId: bundleId])
+		}
+		else {
+			render view: 'edit', model: modelForCreateOrEdit(projectTeam, MoveBundle.get(bundleId), teamMemberIds)
+		}
+	}
+
+	def create() {
+		MoveBundle moveBundle = MoveBundle.get(params.bundleId)
+		[projectTeamInstance: new ProjectTeam(params), bundleInstance: moveBundle,
+		 availableStaff: partyRelationshipService.getProjectStaff(moveBundle.projectId)]
+	}
+
+	def save(Long bundleId) {
+		MoveBundle moveBundle = MoveBundle.get(bundleId)
+		ProjectTeam projectTeam = new ProjectTeam(params)
+		List teamMemberIds = params.list('teamMembers')
+
+		if (projectTeam.hasErrors() || !projectTeam.save()) {
+			render view: 'create', model: modelForCreateOrEdit(projectTeam, moveBundle, teamMemberIds)
+			return
+		}
+
+		partyRelationshipService.createBundleTeamMembers(projectTeam, teamMemberIds)
+		flash.message = "ProjectTeam $projectTeam created"
+		redirect(action: 'show', id: projectTeam.id, params: [bundleId: bundleId])
+	}
+
+	private ProjectTeam projectTeamFromParams() {
+		ProjectTeam projectTeam = ProjectTeam.get(params.id)
+		if (projectTeam) {
+			projectTeam
+		}
+		else {
+			flash.message = "ProjectTeam not found with id $params.id"
+			redirect action: 'list', params: [bundleId: params.bundleId]
+			null
+		}
+	}
+
+	private Map modelForCreateOrEdit(ProjectTeam projectTeam, MoveBundle moveBundle, List teamMemberIds) {
+		[projectTeamInstance: projectTeam, bundleInstance: moveBundle,
+		 availableStaff: partyRelationshipService.getAvailableProjectStaff(moveBundle.project, teamMemberIds),
+		 teamMembers: partyRelationshipService.getProjectTeamStaff(moveBundle.project, teamMemberIds)]
+	}
 }

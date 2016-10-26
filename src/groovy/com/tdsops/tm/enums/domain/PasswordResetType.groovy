@@ -1,20 +1,15 @@
 package com.tdsops.tm.enums.domain
 
-/**
- * Password Reset Type
- */
+import groovy.transform.CompileStatic
+
+@CompileStatic
 enum PasswordResetType {
 
 	FORGOT_MY_PASSWORD,
 	ADMIN_RESET,
-	WELCOME;
+	WELCOME
 
 	static PasswordResetType safeValueOf(String key) {
-		PasswordResetType obj
-		try {
-			obj = key as PasswordResetType
-		} catch (e) { }
-		return obj
+		values().find { it.name() == key }
 	}
-
 }

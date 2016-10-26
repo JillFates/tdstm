@@ -1,6 +1,11 @@
 import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.security.shiro.FirstExceptionStrategy
-import com.tdsops.common.security.shiro.SHA2CredentialsMatcher
+import com.tdsops.common.security.spring.SecurityBeanFactoryPostProcessor
+import com.tdsops.common.security.spring.TdsPasswordEncoder
+import com.tdsops.common.security.spring.TdsPermissionEvaluator
+import com.tdsops.common.security.spring.TdsPostAuthenticationChecks
+import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
+import com.tdsops.common.security.spring.TdsSaltSource
+import com.tdsops.common.security.spring.TdsUserDetailsService
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -17,7 +22,25 @@ beans = {
 		bean.factoryMethod = 'getInstance'
 	}
 
-	credentialMatcher(SHA2CredentialsMatcher)
+	permissionEvaluator(TdsPermissionEvaluator)
 
-	shiroAuthenticationStrategy(FirstExceptionStrategy)
+	preAuthenticationChecks(TdsPreAuthenticationChecks) {
+		auditService = ref('auditService')
+		securityService = ref('securityService')
+		userPreferenceService = ref('userPreferenceService')
+	}
+
+	postAuthenticationChecks(TdsPostAuthenticationChecks) {
+		securityService = ref('securityService')
+	}
+
+	passwordEncoder(TdsPasswordEncoder) {
+		securityService = ref('securityService')
+	}
+
+	saltSource(TdsSaltSource)
+
+	userDetailsService(TdsUserDetailsService)
+
+	securityBeanFactoryPostProcessor(SecurityBeanFactoryPostProcessor)
 }

@@ -10,9 +10,9 @@
 	<body>
   		<div class="body">
   		<div id="createNewsDialog" title="Create News"  style="display: none;">
-			<input name="projectId" value="${session.getAttribute("CURR_PROJ").CURR_PROJ}" type="hidden"/>
-			<input name="moveBundle" value="${session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE}" type="hidden"/>
-			<input name="moveEvent.id" value="${session.getAttribute("MOVE_EVENT")?.MOVE_EVENT}" type="hidden" id="moveEventId"/>
+			<input name="projectId" value="${tds.currentProjectId()}" type="hidden"/>
+			<input name="moveBundle" value="${tds.currentMoveBundleId()}" type="hidden"/>
+			<input name="moveEvent.id" value="${tds.currentMoveEventId()}" type="hidden" id="moveEventId"/>
 			<div class="dialog" style="border: 1px solid #5F9FCF">
 				<table id="createCommentTable" style="border: 0px">
 					<tr>
@@ -20,7 +20,7 @@
 					</tr>
 					<tr>
 						<td valign="top" class="name"><label>Comment Type${currProjObj?.id}:</label></td>
-						<td valign="top" class="value" > 
+						<td valign="top" class="value" >
 							<select disabled="disabled">
 								<option>News</option>
 							</select>
@@ -44,10 +44,10 @@
 				</table>
 			</div>
 			<div class="buttons">
-				<span class="button"> 
+				<span class="button">
 					<input class="save" type="submit" value="Save" onclick="return validateCreateNewsForm()"/>
 				</span>
-				<span class="button"> 
+				<span class="button">
 					<input class="cancel" type="button" value="Cancel" onclick="this.form.reset();$('#createNewsDialog').dialog('close');"/>
 				</span>
 			</div>

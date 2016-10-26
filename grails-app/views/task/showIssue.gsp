@@ -1,5 +1,3 @@
-<%@page import="com.tds.asset.TaskDependency;"%>
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Task Details</title>
@@ -12,7 +10,7 @@
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
 				<div style="color: red; font-size:15px"><ul>${flash.message}</ul></div>
-			</g:if> 
+			</g:if>
 		</div>
 	<g:form name="issueUpdateForm" controller="task" action="update">
 		<a name="comments"></a>
@@ -27,20 +25,20 @@
 			<tr>
 				<td colspan="2">
 			</td>
-			</tr>		
+			</tr>
 			<tr>
 				<td valign="top" class="name"><label for="comment">Task:</label></td>
 				<td>
 					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 100%" />
 				</td>
 			</tr>
-			<g:if test="${predCount > 0 || sucCount > 0}">	
+			<g:if test="${predCount > 0 || sucCount > 0}">
 				<tr>
 					<td valign="middle" class="name"><label>Dependencies:</label></td>
 					<td valign="top" class="name">
 					<div id="predsTable_${assetComment.id}" class='assetImage' ${predCount <= 5 && sucCount <= 5 ? 'style="display:none;"' : '' }>
-						<h4 onclick="javascript:toogleGenDetails('${assetComment.id}')">Dependency details 
-						<img id="rightTriangle_${assetComment.id}" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
+						<h4 onclick="javascript:toogleGenDetails('${assetComment.id}')">Dependency details
+						<img id="rightTriangle_${assetComment.id}" src="${resource(dir:'images',file:'triangle_right.png')}" />
 						<img id="downTriangle_${assetComment.id}" style="display: none;" src="${resource(dir:'images',file:'triangle_down.png')}" />
 						</h4>
 					</div>
@@ -80,15 +78,15 @@
 				<td valign="top" id="assignedToEditTdId" >
 					${raw(assignToSelect)}
 				</td>
-			</tr> 
-			<g:if test="${assetComment.estStart}">	
+			</tr>
+			<g:if test="${assetComment.estStart}">
 				<tr class="prop issue" id="estStartShowId"  >
 					<td valign="top" class="name"><label for="estStart">Est. Start:</label></td>
 					<td valign="top" class="value" id="estStartShowId_${assetComment.id}" nowrap="nowrap">
 					<tds:convertDate date="${assetComment.estStart}" format="M/d kk:mm" /></td>
 				</tr>
 			</g:if>
-			<g:if test="${assetComment.estFinish}">	
+			<g:if test="${assetComment.estFinish}">
 				<tr class="prop issue" id="estFinishShowId"  >
 					<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
 					<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" nowrap="nowrap">
@@ -124,7 +122,7 @@
 		   	</tr>
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on 
+				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on
 				<tds:convertDate date="${assetComment?.dateCreated}" format="M/d" /></span></td>
 			</tr>
 			<tr class="prop" >
@@ -142,7 +140,7 @@
 						noSelection="['':'please select']" onChange="showResolve()"></g:select>
 					</g:else>
 				</td>
-			</tr>				
+			</tr>
 			 <tr class="prop">
 				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
 				<td valign="top" class="value"><div id="previousNote">
@@ -168,15 +166,15 @@
 				<td valign="top" class="value">
 					<textarea cols="100" rows="4" style="width:100%;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
-			</tr> 
+			</tr>
 			<g:if test="${assetComment.resolvedBy}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
 					<td valign="top" class="value">
-						<span id="resolvedByTd" >${assetComment.resolvedBy} on 
+						<span id="resolvedByTd" >${assetComment.resolvedBy} on
 						<tds:convertDate date="${assetComment?.dateResolved}" format="M/d" /></span>
 					</td>
-				</tr> 
+				</tr>
 			</g:if>
 			<tr>
 			    <td class="buttonR" >
@@ -185,7 +183,7 @@
 				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
 					<button type="button" class="btn btn-default save"  onclick="validateComment(${assetComment.id})"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Update Task</button>
 				</td>
-			</tr>	
+			</tr>
 		</table>
 </g:form>
 
@@ -216,8 +214,8 @@
 		   		<dt>Status:</dt><dd>&nbsp;${assetComment?.status}</dd>
 		   		<dt>Resolution:</dt><dd>&nbsp;${assetComment?.resolution}</dd>
 		   		<dt>Resolved At:</dt><dd>&nbsp;${assetComment?.dateResolved}</dd>
-				<dt>Resolved By:</dt><dd>&nbsp;${assetComment?.resolvedBy}</dd>  			   	
-			
+				<dt>Resolved By:</dt><dd>&nbsp;${assetComment?.resolvedBy}</dd>
+
 				</dl>
 		</tr>
 		</table>
@@ -261,15 +259,15 @@
 						  <dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
 							<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
 							<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
-							<g:if test="${location == 'source'}">			   	
+							<g:if test="${location == 'source'}">
 						   	<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>
 							</g:if>
-							<g:else>				
+							<g:else>
 						   		<dt>Truck:</dt><dd>&nbsp;${assetComment?.assetEntity.truck}</dd>
 						   		<dt>Cart/Shelf:</dt><dd>&nbsp;${assetComment?.assetEntity.cart}/${assetComment?.assetEntity.shelf}</dd>
 						   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>
 							</g:else>
 					</g:else>
 					<g:if test="${project.customFieldsShown > 0}">
@@ -283,7 +281,7 @@
 				</dl>
 			</tr>
 			</table>
-			
+
 			</div>
 		</g:if>
 </div>
@@ -300,7 +298,7 @@ $( function() {
 	if (!editAssignTo) {
 		$('#assignedToEditId_'+objId).attr('disabled', 'disabled');
 	}
-	
+
 	/*
 	var updatePerm = ${permissionForUpdate}
 	$("#editComment_"+objId).keypress(function(e){
@@ -321,9 +319,9 @@ function showResolve(){
 }
 function validateComment(objId){
 	var status = $('#statusEditId_'+objId).val()
-	var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
+	var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(),
 		'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
-		'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
+		'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(),
 		'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val(),
 		'dueDate':$("#dueDateCreateId").val()
 	}
@@ -346,7 +344,7 @@ function validateComment(objId){
 				if (status=='Started') {
 					$('#started_'+objId).hide()
 				}
-				
+
 				if (typeof timerBar !== 'undefined')
 					timerBar.Restart();
 			}

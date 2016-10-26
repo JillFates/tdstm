@@ -1,8 +1,10 @@
 package net.transitionmanager
 
-import com.tdsops.tm.enums.domain.UserAuditSeverity
 import com.tdsops.tm.enums.domain.UserAuditClassification
+import com.tdsops.tm.enums.domain.UserAuditSeverity
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
 
 class UserAudit {
 
@@ -16,19 +18,16 @@ class UserAudit {
 	String message
 
 	static constraints = {
-		userLogin nullable:false
-		createdDate nullable:true
-		project nullable:true
-		message nullable:false
-		ipAddress nullable:true
+		createdDate nullable: true
+		ipAddress nullable: true
+		project nullable: true
 	}
 
-	static mapping  = {
+	static mapping = {
 		version false
 		autoTimestamp false
-		id column:'user_audit_id'
+		id column: 'user_audit_id'
 		createdDate sqltype: 'DateTime'
-		message sqlType: 'varchar(255)'
 		ipAddress sqlType: 'varchar(15)'
 	}
 
@@ -37,6 +36,6 @@ class UserAudit {
 	}
 
 	String toString() {
-		return "UserAudit user (${ (userLogin ? userLogin.username : 'Unknown')}) '$message'"
+		"UserAudit user (${userLogin?.username ?: 'Unknown'}) '$message'"
 	}
 }

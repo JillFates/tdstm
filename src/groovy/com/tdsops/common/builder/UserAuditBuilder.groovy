@@ -1,98 +1,74 @@
 package com.tdsops.common.builder
 
-import net.transitionmanager.UserAudit
-import com.tdsops.tm.enums.domain.UserAuditSeverity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.UserAuditClassification
+import com.tdsops.tm.enums.domain.UserAuditSeverity
+import net.transitionmanager.UserAudit
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.SecurityService
 import org.springframework.web.context.request.RequestContextHolder
 
+import static com.tdsops.tm.enums.domain.UserAuditClassification.ADMIN
+import static com.tdsops.tm.enums.domain.UserAuditClassification.LOGIN
+import static com.tdsops.tm.enums.domain.UserAuditClassification.USER_MGMT
+
 /**
- * This class defines the different UserAudit instances that can be created
+ * Defines the different UserAudit instances that can be created
  */
 class UserAuditBuilder {
+
+	@Lazy
+	private static SecurityService securityService = { -> ApplicationContextHolder.getBean('securityService', SecurityService) }()
 
 	/**
 	 * Creates an UserAudit to indicate that the user login in to the system
 	 */
-	public static login(userLogin) {
-		UserAudit userAudit = new UserAudit()
-
-		userAudit.userLogin = userLogin
-		userAudit.project = null
-		userAudit.ipAddress = RequestContextHolder.currentRequestAttributes().request.remoteAddr
-		userAudit.severity = UserAuditSeverity.INFO
-		userAudit.securityRelevant = false
-		userAudit.classification = UserAuditClassification.LOGIN
-		userAudit.message = "User login"
-
-		return userAudit
+	static UserAudit login() {
+		create LOGIN, 'User login'
 	}
 
 	/**
 	 * Creates an UserAudit to indicate that the user logout in to the system
 	 */
-	public static logout(userLogin) {
-		UserAudit userAudit = new UserAudit()
-
-		userAudit.userLogin = userLogin
-		userAudit.project = null
-		userAudit.ipAddress = RequestContextHolder.currentRequestAttributes().request.remoteAddr
-		userAudit.severity = UserAuditSeverity.INFO
-		userAudit.securityRelevant = false
-		userAudit.classification = UserAuditClassification.LOGIN
-		userAudit.message = "User logout"
-
-		return userAudit
+	static UserAudit logout() {
+		create LOGIN, 'User logout'
 	}
 
 	/**
 	 * Creates an UserAudit to indicate that a new user was created
 	 */
-	public static newUserLogin(userLogin, newUserName) {
-		UserAudit userAudit = new UserAudit()
-
-		userAudit.userLogin = userLogin
-		userAudit.project = null
-		userAudit.ipAddress = RequestContextHolder.currentRequestAttributes().request.remoteAddr
-		userAudit.severity = UserAuditSeverity.INFO
-		userAudit.securityRelevant = false
-		userAudit.classification = UserAuditClassification.USER_MGMT
-		userAudit.message = "New user login created: " + newUserName
-
-		return userAudit
+	static UserAudit newUserLogin(String newUserName) {
+		create USER_MGMT, 'New user login created: ' + newUserName
 	}
 
 	/**
 	 * Creates an UserAudit to indicate that the user changed his password
 	 */
-	public static userLoginPasswordChanged(userLogin) {
-		UserAudit userAudit = new UserAudit()
-
-		userAudit.userLogin = userLogin
-		userAudit.project = null
-		userAudit.ipAddress = RequestContextHolder.currentRequestAttributes().request.remoteAddr
-		userAudit.severity = UserAuditSeverity.INFO
-		userAudit.securityRelevant = false
-		userAudit.classification = UserAuditClassification.USER_MGMT
-		userAudit.message = "User password changed"
-
-		return userAudit
+	static UserAudit userLoginPasswordChanged(UserLogin userLogin = null) {
+		create USER_MGMT, 'User password changed', null, userLogin
 	}
 
 	/**
 	 * Creates an UserAudit to indicate that the user changed a project configuration
 	 */
-	public static projectConfig(userLogin, project) {
-		UserAudit userAudit = new UserAudit()
-
-		userAudit.userLogin = userLogin
-		userAudit.project = project
-		userAudit.ipAddress = RequestContextHolder.currentRequestAttributes().request.remoteAddr
-		userAudit.severity = UserAuditSeverity.INFO
-		userAudit.securityRelevant = false
-		userAudit.classification = UserAuditClassification.ADMIN
-		userAudit.message = "Project configuration changed"
-
-		return userAudit
+	static UserAudit projectConfig(Project project) {
+		create ADMIN, 'Project configuration changed', project
 	}
 
+	private static UserAudit create(UserAuditClassification classification, String message,
+	                                Project project = null, UserLogin userLogin = null) {
+		new UserAudit(
+				userLogin: userLogin ?: loadCurrentUserLogin(),
+				project: project,
+				ipAddress: RequestContextHolder.currentRequestAttributes().request.remoteAddr,
+				severity: UserAuditSeverity.INFO,
+				securityRelevant: false,
+				classification: classification,
+				message: message)
+	}
+
+	private static UserLogin loadCurrentUserLogin() {
+		securityService.loadCurrentUserLogin()
+	}
 }

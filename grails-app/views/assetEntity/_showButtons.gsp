@@ -31,7 +31,7 @@
 </tds:hasPermission>
 
 <%-- TODO : JPM 10/2014 : Refactor logic for cable button test to be in domain --%>
-<g:if test="${assetEntity && assetEntity?.assetType in AssetType.getPhysicalServerTypes() && assetEntity?.model && assetEntity.isCableExist()}">
+<g:if test="${assetEntity && assetEntity?.assetType in AssetType.physicalServerTypes && assetEntity?.model && assetEntity.isCableExist()}">
     <button class="btn btn-default" type="button" onclick="openCablingDiv(${assetEntity?.id},'S')">
         <img src="${resource(dir:'icons',file:'disconnect.png')}" border="0px"/> Cable
     </button>

@@ -13,8 +13,8 @@ class StopWatchTests extends Specification {
 		Date started = stopWatch.begin()
 		Date startedTag = stopWatch.begin(tag)
 		then:
-		stopWatch.hasTag() == true
-		stopWatch.hasTag(tag) == true
+		stopWatch.hasTag()
+		stopWatch.hasTag(tag)
 		stopWatch.getStartTime().getTime() == started.getTime()
 		stopWatch.getStartTime(tag).getTime() == startedTag.getTime()
 
@@ -23,8 +23,8 @@ class StopWatchTests extends Specification {
 		stopWatch.endDuration()
 		stopWatch.endDuration(tag)
 		then:
-		stopWatch.hasTag() == false
-		stopWatch.hasTag(tag) == false
+		!stopWatch.hasTag()
+		!stopWatch.hasTag(tag)
 	}
 
 	void 'Exercise the StopWatch Class'() {
@@ -35,6 +35,7 @@ class StopWatchTests extends Specification {
 		sleep(50)
 		TimeDuration lap = stopWatch.lap()
 		TimeDuration lapTag = stopWatch.lap(tag)
+
 		then:
 		lap.toMilliseconds() >= 50 && lap.toMilliseconds() <= 500
 		lapTag.toMilliseconds() >= 50 && lapTag.toMilliseconds() <= 500
@@ -45,25 +46,27 @@ class StopWatchTests extends Specification {
 		lapTag = stopWatch.lap(tag)
 		TimeDuration lastLap = stopWatch.getLastLap()
 		TimeDuration lastLapTag = stopWatch.getLastLap(tag)
+
 		then:
 		lastLap == lap
 		lastLapTag == lapTag
-		lastLap.toMilliseconds() > 500 && lastLap.toMilliseconds() < 1000
-		lastLapTag.toMilliseconds() > 500 && lastLapTag.toMilliseconds() < 1000
+		lastLap.toMilliseconds() >= 500 && lastLap.toMilliseconds() < 1000
+		lastLapTag.toMilliseconds() >= 500 && lastLapTag.toMilliseconds() < 1000
 
 		when:
 		// Check out the getSinceStart
 		TimeDuration since = stopWatch.getSinceStart()
 		TimeDuration sinceTag = stopWatch.getSinceStart(tag)
-		then:
-		since.toMilliseconds() > 500 && since.toMilliseconds() < 1000
-		sinceTag.toMilliseconds() > 500 && sinceTag.toMilliseconds() < 1000
 
+		then:
+		since.toMilliseconds() >= 500 && since.toMilliseconds() < 1000
+		sinceTag.toMilliseconds() >= 500 && sinceTag.toMilliseconds() < 1000
 
 		when:
 		sleep(1000)
 		TimeDuration since2 = stopWatch.getSinceStart()
 		TimeDuration since2Tag = stopWatch.getSinceStart(tag)
+
 		then:
 		since2 > since
 		since2Tag > sinceTag
@@ -83,28 +86,28 @@ class StopWatchTests extends Specification {
 
 	void 'Test Multiple Time Lap'() {
 		setup:
-		def max = 5
-		def startT = System.currentTimeMillis()
+		int max = 5
+		long startT = System.currentTimeMillis()
 		def stopWatch = new StopWatch()
 		def rand = new Random()
 
 		int totalSecs = 0
-		def steps = (1..max).inject([]) { result, i ->
-			def secs = rand.nextInt(max + 1)
+		List<Integer> steps = (1..max).inject([]) { result, i ->
+			int secs = rand.nextInt(max + 1)
 			totalSecs += secs
 			result << secs
 		}
 
 		expect: "that all steps last the computed interval"
-		steps.each { secs ->
+		steps.each { int secs ->
 			sleep(secs * 1000)
 			stopWatch.lap()
 			assert stopWatch.lastLap.seconds == secs
 		}
 
-		def stopT = System.currentTimeMillis()
+		long stopT = System.currentTimeMillis()
 
 		and: "the duration of the Stopwatch is the same that the time consumed for the test"
-		stopWatch.sinceStart.seconds == (stopT - startT).intdiv(1000)
+		stopWatch.sinceStart.seconds == (stopT - startT).intdiv(1000).intValue()
 	}
 }

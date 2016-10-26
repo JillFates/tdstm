@@ -61,36 +61,15 @@
     </script>
 </head>
 <%
-    def currProj = session.getAttribute("CURR_PROJ");
-
-    def projectId = currProj?.CURR_PROJ ;
-    def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-    def moveEventName = moveEventId ? MoveEvent.get( moveEventId ) : ''
-    def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
-    def roomId = session.getAttribute("CURR_ROOM")?.CURR_ROOM;
-    def room = Room.get(roomId)
-    def moveBundleName = moveBundleId ? MoveBundle.get( moveBundleId ) : ''
-    def currProjObj;
-    def moveEvent;
-    def personId = session.getAttribute("LOGIN_PERSON").id
-    def person = Person.get(personId)
-    if (projectId != null) {
-        currProjObj = Project.get(projectId)
-    }
-    if (moveEventId != null) {
-        moveEvent = MoveEvent.get(moveEventId)
-    }
-    def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
-    def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
-    def isIE7 = request.getHeader("User-Agent").contains("MSIE 7");
-    def isMDev = request.getHeader("User-Agent").contains("Mobile");
-
-    def setImage = session.getAttribute("setImage")?:(currProjObj ? ProjectLogo.findByProject(currProjObj)?.id:'');
-    def user = UserLogin.findByPerson( person )
-    def username = user.username
-    def userPrefs = UserPreference.findAllByUserLogin(user)
-    def securityService = application.getAttribute("org.codehaus.groovy.grails.APPLICATION_CONTEXT").getBean("securityService")
-    def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
+	def moveBundle = tds.currentMoveBundle() ?: null
+	def moveEvent = tds.currentMoveEvent() ?: null
+	def currProject = tds.currentProject() ?: null
+	def room = tds.currentRoom() ?: null
+	def person = tds.currentPerson() ?: null
+	String partyGroup = tds.partyGroup() ?: null
+	String setImage = tds.setImage() ?: null
+	def userLogin = tds.userLogin() ?: null
+	int minPasswordLength = tds.minPasswordLength()
 %>
 
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
@@ -98,8 +77,8 @@
 <div class="wrapper">
     <header class="main-header">
         <input id="contextPath" type="hidden" value="${request.contextPath}"/>
-        <input id="tzId" type="hidden" value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
-        <input id="userDTFormat" type="hidden" value="${session.getAttribute('CURR_DT_FORMAT')?.CURR_DT_FORMAT}"/>
+        <input id="tzId" type="hidden" value="${tds.timeZone()}"/>
+        <input id="userDTFormat" type="hidden" value="${tds.dateFormat()}"/>
         <nav class="navbar navbar-static-top">
             <div class="container menu-top-container">
                 <div class="navbar-header">
@@ -116,7 +95,7 @@
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse pull-left navbar-ul-container" id="navbar-collapse">
-                    <g:if test="${currProj}">
+                    <g:if test="${currProject}">
                         <ul class="nav navbar-nav">
                             <tds:hasPermission permission='AdminMenuView'>
                                 <li class="dropdown menu-parent-admin">
@@ -186,8 +165,8 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
                                     <li class="menu-child-item menu-projects-active-projects"><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Active Projects</g:link></li>
-                                    <g:if test="${currProjObj}">
-                                        <li class="menu-child-item menu-projects-current-project"><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Details</g:link></li>
+                                    <g:if test="${currProject}">
+                                        <li class="menu-child-item menu-projects-current-project"><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProject.name.size()>20}">${currProject.name.substring(0,20)+'...'}</g:if><g:else>${currProject.name}</g:else> Details</g:link></li>
                                         <li class="menu-child-item menu-projects-project-staff"><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
                                         <tds:hasPermission permission='SendUserActivations'>
                                             <li class="menu-child-item menu-projects-user-activation"><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link></li>
@@ -207,8 +186,8 @@
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
                                     <li class="menu-parent-item">Rooms and Racks</li>
                                     <li class="menu-child-item menu-parent-data-centers-list-rooms" ><g:link  params="[viewType:'list']" controller="room" >List Rooms</g:link></li>
-                                    <g:if test="${roomId}">
-                                        <li class="menu-child-item menu-parent-data-centers-selected-center"><g:link params="[roomId:roomId]" controller="room">Room ${room?.location}/${room?.roomName}</g:link></li>
+                                    <g:if test="${room}">
+                                        <li class="menu-child-item menu-parent-data-centers-selected-center"><g:link params="[roomId:room.id]" controller="room">Room ${room.location}/${room.roomName}</g:link></li>
                                     </g:if>
                                     <tds:hasPermission permission='AssetEdit'>
                                         <li class="menu-child-item menu-parent-data-centers-rack-elevation"><g:link controller="rackLayouts" action="create" >Rack Elevations</g:link></li>
@@ -319,8 +298,8 @@
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Events</li>
                                         <li class="menu-child-item menu-parent-planning-event-list"><g:link controller="moveEvent" action="list" >List Events</g:link> </li>
-                                        <g:if test="${currProjObj && moveEvent}">
-                                            <li class="menu-child-item menu-parent-planning-event-detail-list"><g:link controller="moveEvent" action="show" id="${moveEventId}">${moveEventName} Event Details</g:link></li>
+                                        <g:if test="${currProject && moveEvent}">
+                                            <li class="menu-child-item menu-parent-planning-event-detail-list"><g:link controller="moveEvent" action="show" id="${moveEvent.id}">${moveEvent.name} Event Details</g:link></li>
                                         </g:if>
                                         <tds:hasPermission permission='ShowListNews'>
                                             <li class="menu-child-item menu-parent-planning-event-news"><g:link controller="newsEditor" >List Event News</g:link></li>
@@ -335,9 +314,9 @@
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Bundles</li>
                                         <li class="menu-child-item menu-parent-planning-list-bundles"><g:link controller="moveBundle" action="list">List Bundles</g:link> </li>
-                                        <g:if test="${currProjObj && moveBundleId}">
-                                            <li class="menu-child-item menu-parent-planning-selected-bundle"><g:link controller="moveBundle" action="show">${moveBundleName} Bundle Details</g:link></li>
-                                            <li class="menu-child-item menu-parent-planning-bundled-assets"><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]">Bundled Assets</g:link> </li>
+                                        <g:if test="${currProject && moveBundle}">
+                                            <li class="menu-child-item menu-parent-planning-selected-bundle"><g:link controller="moveBundle" action="show">${moveBundle.name} Bundle Details</g:link></li>
+                                            <li class="menu-child-item menu-parent-planning-bundled-assets"><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle.id]">Bundled Assets</g:link> </li>
                                         </g:if>
                                         <tds:hasPermission permission='HelpMenuView'>
                                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a></li>
@@ -424,7 +403,7 @@
                                         <tds:hasPermission permission='ShowPlanning'>
                                             <li class="menu-child-item menu-reports-task-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
                                         </tds:hasPermission>
-                                        <li class="menu-child-item menu-reports-report-summary"><g:link controller="reports" params="[projectId:currProjObj?.id]">Report Summary</g:link></li>
+                                        <li class="menu-child-item menu-reports-report-summary"><g:link controller="reports" params="[projectId:currProject?.id]">Report Summary</g:link></li>
                                         <tds:hasPermission permission='ShowProjectDailyMetrics'>
                                             <li class="menu-child-item menu-reports-activity-metrics"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
                                         </tds:hasPermission>
@@ -464,12 +443,12 @@
                         <li class="dropdown notifications-menu">
                             <!-- Menu toggle button -->
                             <a href="#" id="nav-project-name" class="dropdown-toggle" data-toggle="dropdown">
-                                <g:if test="${currProjObj}"> ${currProjObj.name} </g:if>
-                                <g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
-                                <g:if test="${moveBundleId}"> : ${moveBundleName}</g:if>
+                                <g:if test="${currProject}"> ${currProject.name} </g:if>
+                                <g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>
+                                <g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>
                             </a>
                         </li>
-                        <shiro:isLoggedIn>
+                        <sec:ifLoggedIn>
                             <!-- User Account Menu -->
                             <li class="dropdown user user-menu">
                                 <!-- Menu Toggle Button -->
@@ -477,15 +456,15 @@
                                     <!-- The user image in the navbar-->
                                     <img src="${resource(dir:'images',file:'personIcon.png')}" class="user-image" alt="${session.getAttribute("LOGIN_PERSON").name }">
                                     <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                                    <span class="hidden-xs user-name">${session.getAttribute("LOGIN_PERSON").name }</span>
+                                    <span class="hidden-xs user-name">${tds.currentPersonName()}</span>
                                 </a>
                                 <ul class="dropdown-menu user-dialog-dropdown-menu">
                                     <!-- Menu Body -->
                                     <li class="user-body">
                                         <ul class="list-group">
-                                            <li class="list-group-item"><g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink></li>
-                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${user}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
-                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit preferences</a></li>
+                                            <li class="list-group-item"><g:remoteLink controller="person" action="retrievePersonDetails" id="${person?.id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink></li>
+                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
+                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit preferences</a></li>
                                         <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
                                             <g:if test="${person?.modelScore}">
                                                 <li class="list-group-item"><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc"><span class="glyphicon glyphicon-info-sign user-menu-icon-badge"></span> Model Score <span class="badge">${person?.modelScore}</span></a></li>
@@ -500,7 +479,7 @@
                                     </li>
                                 </ul>
                             </li>
-                        </shiro:isLoggedIn>
+                        </sec:ifLoggedIn>
                     </ul>
                 </div><!-- /.navbar-custom-menu -->
             </div><!-- /.container-fluid -->
@@ -550,13 +529,13 @@
 </div>
 
     <%-- DIV for editing User Profile --%>
-    <g:render template="../person/personEdit" model="[user:user, minPasswordLength:minPasswordLength]" />
+    <g:render template="../person/personEdit" model="[user:userLogin, minPasswordLength:minPasswordLength]" />
 
     <%-- DIV for editing User Preferences --%>
-    <div id="userPrefDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
+    <div id="userPrefDivId" style="display: none;" title="${tds.currentPersonName()} Preferences"></div>
 
 	<%-- DIV for editing User date and timezone --%>
-	<div id="userTimezoneDivId" style="display: none;" title="${session.getAttribute("LOGIN_PERSON").name } Date and Timezone"></div>
+	<div id="userTimezoneDivId" style="display: none;" title="${tds.currentPersonName()} Date and Timezone"></div>
 
 </body>
 </html>

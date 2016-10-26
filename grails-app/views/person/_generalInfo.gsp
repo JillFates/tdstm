@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.domain.Person" %>
 <div class="menu4">
 	<ul>
 		<li>

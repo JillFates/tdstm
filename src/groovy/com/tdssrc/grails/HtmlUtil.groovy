@@ -1,10 +1,13 @@
 package com.tdssrc.grails
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import org.apache.commons.validator.UrlValidator
-import org.codehaus.groovy.grails.web.util.WebUtils
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
-import com.tdsops.common.grails.ApplicationContextHolder
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
+
+import javax.servlet.http.HttpServletRequest
 
 /**
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
@@ -32,7 +35,7 @@ class HtmlUtil {
 	 * @return String HTML selectBox
 	 */
 
-	def public static generateSelect(def params) {
+	static generateSelect(params) {
 		def optionKey = params.optionKey
 		def optionValue = params.optionValue
 		def optionSelected = params.optionSelected
@@ -65,10 +68,10 @@ class HtmlUtil {
 	 * @param onClick - javascript to embed into the onclick event
 	 * @return String - HTML for the button
 	 */
-	def public static actionButton(label, icon, id, onclick, def href='javascript:') {
-		def name = label.toLowerCase().replace(' ', '').replace('.','')
-		def buttonId = name + "_button_" + id
-		def labelId = name + "_text_" + id
+	static actionButton(label, icon, id, onclick, href='javascript:') {
+		String name = label.toLowerCase().replace(' ', '').replace('.','')
+		String buttonId = name + "_button_" + id
+		String labelId = name + "_text_" + id
 		return """<a id="${buttonId}" href="${href}" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action btn_${name}"
 			onclick="${onclick}">
 			<span class="ui-button-icon-primary ui-icon ${icon} task_icon"></span>
@@ -83,8 +86,8 @@ class HtmlUtil {
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
 	//TODO : Overriding the service method here since facing some issue to inject service class here,  need to clean up ASAP in HtmlUilt
-	def public static getCssClassForStatus( status ) {
-		def css = 'task_na'
+	static getCssClassForStatus( status ) {
+		String css = 'task_na'
 
 		if (AssetCommentStatus.list.contains(status)) {
 			css = "task_${status.toLowerCase()}"
@@ -95,30 +98,25 @@ class HtmlUtil {
 
 	/**
 	 * Access the remote IP address from the web request or the X-Forwarded-For header content. If the request is
-	 * unavailible then 'IP.Unknown' is returned.
+	 * unavailable then 'IP.Unknown' is returned.
 	 * @param request - the HttpRequest object which if null is then attempted to be looked up
 	 * @return String The remote IP address that made the web request
 	 */
- 	public static String getRemoteIp(request = null) {
-		def remoteIp
+ 	static String getRemoteIp(HttpServletRequest request = null) {
 
  		if (!request) {
- 			def webUtils = WebUtils.retrieveGrailsWebRequest()
- 			//Getting the Request object
-			request = webUtils?.getCurrentRequest()
+			request = ((ServletRequestAttributes)RequestContextHolder.requestAttributes)?.request
  		}
 
-		if (request) {
-			// Now try and figure out the IP
-			remoteIp = request.getHeader("X-Forwarded-For")
-			if (! remoteIp) {
-				remoteIp = request.getRemoteAddr()
-			}
-		} else {
-			remoteIp = 'Unknown'
+		if (!request) {
+			return 'Unknown'
 		}
 
-		return remoteIp.toString()
+	   String remoteIp = request.getHeader("X-Forwarded-For")
+		if (!remoteIp) {
+			remoteIp = request.getRemoteAddr()
+		}
+		return remoteIp
 	}
 
 	/**
@@ -126,8 +124,8 @@ class HtmlUtil {
 	 * @param Map parameters used by the g:createLink tag
 	 * @return String URL
 	 */
-	def public static createLink(map) {
-		def link =  getTagLib().createLink(map)
+	static String createLink(map) {
+		String link =  getTagLib().createLink(map)
 		String result = ''
 		if (link) {
 			result = link.toString()
@@ -143,8 +141,8 @@ class HtmlUtil {
 	 * @param map - parameters to g:resource
 	 * @return url as String
 	 */
-	def public static createLinkToResource(map){
-		def link = getTagLib().resource(map)
+	static String createLinkToResource(map){
+		String link = getTagLib().resource(map)
 		String resourceUrl = ""
 		if(link){
 			resourceUrl = link.toString()
@@ -159,8 +157,7 @@ class HtmlUtil {
 	* @param input to be checked for correct format
 	* @return boolean value for whether or not the string is in URL format
 	*/
-	public static boolean isURL(String input)
-	{
+	static boolean isURL(String input) {
 		input = input?.trim()
 		if (input) {
 			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray()
@@ -171,19 +168,19 @@ class HtmlUtil {
 		return false
 	}
 
-	public static boolean isMarkupURL(String input){
-		def isValidURL = false
+	static boolean isMarkupURL(String input){
+		boolean  isValidURL = false
 		if(input){
 			def tokens = input.tokenize('|')
-			def url = tokens.size() > 1 ? tokens[1] : tokens[0]
+			String url = tokens.size() > 1 ? tokens[1] : tokens[0]
 			isValidURL = isURL(url)
 		}
 		return isValidURL
 	}
 
-	public static List parseMarkupURL(String input, String defaultLabel = ""){
-		def url = ""
-		def label = ""
+	static List parseMarkupURL(String input, String defaultLabel = ""){
+		String url = ""
+		String label = ""
 		def result = null
 		// If input isn't null
 		if(input){
@@ -209,7 +206,7 @@ class HtmlUtil {
 	 * @param map of the parameters
 	 * @return A string representing the resource as HTML resource
 	 */
-	public static String resource(Map map) {
+	static String resource(Map map) {
 		getTagLib().resource(map).toString()
 	}
 
@@ -218,7 +215,7 @@ class HtmlUtil {
 	 * @param List to be converted to HTML
 	 * @return The HTML of an UL list
 	 */
-	public static String asUL(List list) {
+	static String asUL(List list) {
 		StringBuilder text = new StringBuilder('<ul>')
 		list.each { text.append( '<li>' + it)}
 		text.append('</ul>')
@@ -233,9 +230,7 @@ class HtmlUtil {
 	 * @param absolute - boolean flag if true will create
 	 * @return The constructed URI or URL if absolute is true
 	 */
-	def public static appUrl(String controller, String action='', String fragment='', Boolean absolute=false) {
-		String url = "/tdstm/app#$controller" + ((action)?: "/$action") + fragment
-		return url
+	static String appUrl(String controller, String action='', String fragment='', Boolean absolute=false) {
+		'/tdstm/app#' + controller + (action ?: '/' + action) + fragment
 	}
-
 }

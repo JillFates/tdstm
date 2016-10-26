@@ -1,9 +1,10 @@
+<%@page import="net.transitionmanager.domain.Person" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
 		<title>Staff List</title>
-		
+
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
@@ -34,7 +35,7 @@
 			setExportToLimit(id, '');
 			createHiddenInputFieldsForLimitAndSubmit(id);
 		}
-		 
+
 		</script>
 		<script type="text/javascript">
 			 $(document).ready(function() {
@@ -43,7 +44,7 @@
 					$("#formId").submit();
 				  });
 			 })
-			
+
 		</script>
 		<script type="text/javascript">
 			$(document).ready(function() {
@@ -71,7 +72,7 @@
 				</tds:hasPermission>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
-				
+
 				$("#filterSelect").change(function(ev) {
 					ev.preventDefault();
 					$("#formId").submit();
@@ -98,12 +99,12 @@
 				TDS.jqGridFilterToolbar('personId');
 
 				$.jgrid.formatter.integer.thousandsSeparator='';
-				
+
 			})
 		</script>
 	</head>
 	<body>
-	
+
 	<!-- BULK DELETE model -->
 	<div class="modal fade" id="bulkDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
@@ -113,10 +114,10 @@
 	      </div>
 	      <div class="modal-body">
 	      	<p>
-	      	This process will delete the persons selected as long as they are not associated to a UserLogin or Tasks. By default it will 
+	      	This process will delete the persons selected as long as they are not associated to a UserLogin or Tasks. By default it will
 	      	also skip persons associated as the App Owner or SME for one or more applications.
 	      	</p>
-	      	<p> 
+	      	<p>
 	        <input type="checkbox" id="deleteIfAssocWithAssets">&nbsp;<label for="deleteIfAssocWithAssets">Delete persons associated as App Owner or SMEs?</label>
 	        </p>
 	        <p id="bulkDeleteMessages"></p>
@@ -124,13 +125,13 @@
 	      <div class="modal-footer">
 	        <button id="bulkModalDeleteBtn" type="button" class="btn btn-danger" onclick='Person.bulkDelete()'>Delete</button>
 	        <button id="bulkModalCancelBtn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-	        <button id="bulkModalCloseBtn" type="button" class="btn btn-default" onclick='Person.closePopup()'>Close</button>	        
+	        <button id="bulkModalCloseBtn" type="button" class="btn btn-default" onclick='Person.closePopup()'>Close</button>
 	      </div>
 	    </div>
 	  </div>
 	</div>
-	
-	
+
+
 	<div class="body fluid">
 		<h1>Staff List</h1>
 		<g:if test="${flash.message}">
@@ -145,7 +146,7 @@
 			<jqgrid:wrapper id="personId" />
 		</div>
 	</div>
-	
+
 	<div id="createStaffDialog" title="Create Staff" style="display:none;" class="static-dialog">
 		<g:render template="createStaff" model="[forWhom:'person']"></g:render>
 	</div>

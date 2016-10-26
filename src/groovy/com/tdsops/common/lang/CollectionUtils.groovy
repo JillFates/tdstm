@@ -1,23 +1,18 @@
 package com.tdsops.common.lang
 
-import java.util.Collection
-import java.util.ArrayList
-import java.util.LinkedHashMap
-
 /**
  * CollectionUtils class provides some useful collection related manipulation and testing methods
  */
 class CollectionUtils {
 
 	/**
-	 * Used to convert an object to a java.util.ArrayList if not already an ArrayList
+	 * Converts an object to a List if not already a List
 	 * @param Any type of object
-	 * @return the object contained within an array
+	 * @return the object contained within a list
 	 */
-	static ArrayList asList(Object object) {
-		if (! ( object instanceof ArrayList ) )
-			object = [ object ]
-		return object
+	static List asList(object) {
+		(object == null || object instanceof List) ? object :
+				isCollectionOrArray(object) ? (object as List) : [object]
 	}
 
 	/**
@@ -26,8 +21,8 @@ class CollectionUtils {
 	 * @param object the object to transform
 	 * @return Collection Object
 	 */
-	static Collection asCollection(object){
-		return isCollectionOrArray(object)?object:[object]
+	static Collection asCollection(object) {
+		isCollectionOrArray(object) ? object : [object]
 	}
 
 	/**
@@ -38,24 +33,6 @@ class CollectionUtils {
 	 */
 	static boolean isCollectionOrArray(object) {
     (object instanceof Collection) || object.getClass().isArray()
-	}
-
-	/**
-	 * Used to determine if an object is a List
-	 * @param object - the object being tested
-	 * @return true if the object is a java.util.ArrayList
-	 */
-	static boolean isaList( Object object ) {
-		return (object instanceof ArrayList)
-	}
-
-	/**
-	 * Used to determine if an object is a java.util.LinkedHashMap
-	 * @param object - the object being tested
-	 * @return true if the object is a java.util.LinkedHashMap
-	 */
-	static boolean isaMap( Object object ) {
-		return (object instanceof LinkedHashMap)
 	}
 
 	/**

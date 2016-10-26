@@ -1,10 +1,8 @@
-/**
- * Class TestDomain
- * Used by the integrated testing
- */
-
 package com.tds.test
 
+/**
+ * For integration testing.
+ */
 class TestDomain {
 
 	String name
@@ -18,15 +16,14 @@ class TestDomain {
 		// Defaults:
 		//    nullable false
 		//    blank true
-		name  	blank:false, unique:true
-		color 	blank:true, inList:['red','green','blue','yellow','orange']
-		label 	nullable:true
-		note ()
-		age 	nullable:true
-		score 	range: 1..5
+		name blank: false, unique: true
+		color inList: ['red', 'green', 'blue', 'yellow', 'orange']
+		label nullable: true
+		age nullable: true
+		score range: 1..5
 	}
 
-	static mapping  = {
+	static mapping = {
 		columns {
 			name sqlType: 'varchar(30)'
 			color sqlType: 'varchar(10)'

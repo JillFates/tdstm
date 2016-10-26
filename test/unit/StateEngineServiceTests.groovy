@@ -1,3 +1,4 @@
+import net.transitionmanager.service.StateEngineService
 import org.junit.Ignore
 import org.springframework.jdbc.core.JdbcTemplate
 import grails.test.mixin.TestFor

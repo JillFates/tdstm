@@ -1,4 +1,7 @@
 <%@page import="com.tds.asset.AssetComment"%>
+<%@page import="net.transitionmanager.domain.Manufacturer" %>
+<%@page import="net.transitionmanager.domain.Model" %>
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
 <title>Walkthru&gt; Asset Menu</title>
@@ -64,15 +67,15 @@ function filterByCommentType(val) {
 	var sort = document.commentsViewForm.sort.value;
 	var orderType = document.commentsViewForm.orderType.value;
 	sendCommentRequest()
-	${remoteFunction(action:'retrieveComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( XMLHttpRequest )')}; 
-	return false;	
+	${remoteFunction(action:'retrieveComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( XMLHttpRequest )')};
+	return false;
 } --%>
 function missingAsset( type, id, message ){
 	if( validChanges() == true ) {
 		getObject("mustSaveId").value = 'false'
 		if(confirm(message)){
 			document.auditForm.action = "missingAsset"
-			document.auditForm.submit(); 
+			document.auditForm.submit();
 		<%--var xmlHttpReq = createXMLHttpRequest()
 		xmlHttpReq.open("post", "missingAsset?id="+id+"&type="+type, false);
 		xmlHttpReq.send(null);
@@ -101,7 +104,7 @@ function commentSelect( cmtVal ) {
 		document.commentForm.comments.value = cmtVal;
 	}
 }
-    
+
 function callUpdateComment( e, type ) {
 	var data = eval('(' + e.responseText + ')');
 	if ( data ) {
@@ -121,7 +124,7 @@ function callUpdateComment( e, type ) {
 		return false;
     }
 }
-    
+
 function validateCommentSelect() {
 	var commentValue = document.commentForm.comments.value;
 	if ( commentValue ) {
@@ -133,7 +136,7 @@ function validateCommentSelect() {
 }
 var mustSave = false;
 function setMustSave( changed, actual, type, attribute ){
-	
+
 	if( changed != actual ) {
 		mustSave = true;
 		getObject("mustSaveId").value = mustSave;
@@ -171,20 +174,20 @@ function moveOption( objectId, actual, type, actionType ){
     } else {
     	if(selectOption(selectedObject, Number(selectedValue)-1) != true ){
     		selectOption(selectedObject, Number(selectedValue)-8)
-    	}		
+    	}
     }
     setMustSave( getObject(objectId+'Id').value, actual, type ,objectId )
 }
 //To change the selected option in listBoxes
 function selectOption(selectedObject, selectedValue) {
 	var flag = false
-	for (var x = 0; x < selectedObject.length; x++) { 
-		if (selectedObject.options[x].value == (selectedValue) ) { 
-			selectedObject.options[x].selected = true; 
+	for (var x = 0; x < selectedObject.length; x++) {
+		if (selectedObject.options[x].value == (selectedValue) ) {
+			selectedObject.options[x].selected = true;
 			flag = true
-	    } 
+	    }
 	}
-	return flag 
+	return flag
 }
 <%--
 function callAssetMenu() {
@@ -211,8 +214,8 @@ function populateComments() {
 	} else {
 		return false
 	}
-	//${remoteFunction(action:'retrieveComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( XMLHttpRequest )')}; 
-	
+	//${remoteFunction(action:'retrieveComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( XMLHttpRequest )')};
+
 }
 
 function updateViewComment( e ) {
@@ -260,11 +263,11 @@ function updateModels( e ){
 			option.value = model.name
 			option.innerHTML = model.name
 			modelObj.append(option)
-		} 
+		}
 	} else {
 		document.auditForm.modelTdId.innerHtml = "<input type=\"text\" name=\"model\" id=\"modelId\" >"
 	}
-} 
+}
 function sendCommentRequest(){
 	var assetId = document.commentForm.assetId.value;
 	var commentType = document.commentsViewForm.commentType.value;
@@ -327,7 +330,7 @@ function checkComments(type) {
 			<g:else>
 				<a class="button big" href="#asset_front1">Front Audit</a> <BR /><BR />
 				<a class="button big" href="#asset_rear1">Rear Audit</a> <BR /><BR />
-				<a class="button big" href="retrieveComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments" 
+				<a class="button big" href="retrieveComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments"
 					onclick="return validChanges();">Issues/Comments</a> <BR /><BR />
 				<input name="type" value="create" type="hidden"/>
 				<a href="#" class="button big" onclick="missingAsset('create', '${assetEntity?.id}','Mark asset as missing. Are you sure?')">Mark Asset Missing </a>
@@ -359,31 +362,31 @@ function checkComments(type) {
 				<td class="label">Asset Tag:</td>
 				<td class="field">${assetEntity?.assetTag}</td>
 			</tr>
-			
+
 			<tr>
 				<td class="label">Name:</td>
 				<td class="field">
-					<input type="text" class="text" name="assetName" value="${assetEntity?.assetName}" size=20 maxlength="50" 
+					<input type="text" class="text" name="assetName" value="${assetEntity?.assetName}" size=20 maxlength="50"
 							onchange="setMustSave(this.value,'${assetEntity?.assetName}','front1', this.name)">
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td class="label">Serial #:</td>
 				<td class="field">
-					<input type="text" class="text" name="serialNumber" value="${assetEntity?.serialNumber}" size=20 maxlength=50 
+					<input type="text" class="text" name="serialNumber" value="${assetEntity?.serialNumber}" size=20 maxlength=50
 							onchange="setMustSave(this.value,'${assetEntity?.serialNumber}','front1', this.name)">
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td class="label">Type:</td>
 				<td class="field">
-				
-				 <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Undef']" id="kvmDeviceId" name="assetType" value="${assetEntity?.assetType}" 
+
+				 <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Undef']" id="kvmDeviceId" name="assetType" value="${assetEntity?.assetType}"
 						onchange="setMustSave(this.value,'${assetEntity?.assetType}','front1', this.name);"/>
 			</tr>
-			
+
 			<tr>
 				<td class="label">Manufact:</td>
 				<td class="field">
@@ -391,7 +394,7 @@ function checkComments(type) {
 					noSelection="['':'Unassigned']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer.id}','front1', this.name);getModels( this.value );"/>
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td class="label">Model:</td>
 				<td class="field" id="modelTdId">
@@ -400,22 +403,22 @@ function checkComments(type) {
 					onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/>
 				</g:if>
 				<g:else>
-				<g:select name="model" from="${assetEntity?.manufacturer}" id="modelId" noSelection="['':'Unassigned']" 
+				<g:select name="model" from="${assetEntity?.manufacturer}" id="modelId" noSelection="['':'Unassigned']"
 					value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model.id}','front1', this.name)"/>
 				</g:else>
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td class="label">Rails:</td>
 				<td class="field">
-				 <g:select noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('railType'))?.value}" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
-				 onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> 
+				 <g:select noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('railType'))?.value}" id="railTypeId" name="railType" value="${assetEntity?.railType}"
+				 onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/>
 				<!-- <input type="text" name="railType" value="${assetEntity?.railType}" id="railTypeId" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)" >-->
 				</td>
 			</tr>
 			</table>
-			
+
 			<div style="margin-top:10px;">
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_front2">Next</a>&nbsp;&nbsp;&nbsp;
@@ -423,7 +426,7 @@ function checkComments(type) {
 			      <a class="button" href="#select_asset" id="front1CompleteId" onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
-			
+
 			</div>
 		</div>
 		<!-- end of Walkthru Asset:Front (1) -->
@@ -433,11 +436,11 @@ function checkComments(type) {
 			<a name="asset_front2"></a>
 			<div class="title">Walkthru&gt; Front (2)</div>
 			<div class="input_area">
-			
+
 			<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 			<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 			<br class="clear"/>
-			
+
 			<table>
 			<tr>
 				<td class="label">Room:</td>
@@ -447,17 +450,17 @@ function checkComments(type) {
 				<td class="label">Rack:</td>
 				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}" size="8" maxlength="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRack}','front2', this.name)"/></td>
 			</tr>
-			
+
 			<tr>
 				<td class="label">U-Position:</td>
 				<td class="field" nowrap>
-				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undef']}" 
+				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undef']}"
 							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.name)"/>
 				<img src="${resource(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
 				<img src="${resource(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td class="label">Need Asset Tag?</td>
 				<td class="field">
@@ -491,7 +494,7 @@ function checkComments(type) {
 				</td>
 			</tr>
 			</table>
-			
+
 			<div style="margin-top:10px;">
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_rear1">Next</a>&nbsp;&nbsp;
@@ -500,23 +503,23 @@ function checkComments(type) {
 			      <a class="button" href="#select_asset"  id="front2CompleteId" onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
-			
+
 			</div>
 		</div>
 		<!-- end of Walkthru Asset:Front (2) -->
-		
+
 		<div class="gap"></div>
-		
+
 		<!-- Walkthru Asset:Rear  -->
 		<div class="qvga_border">
 		<a name="asset_rear1"></a>
 		<div class="title">Walkthru&gt; Rear</div>
 		<div class="input_area">
-		
+
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 		<br class="clear"/>
-		
+
 		<table>
 		<tr>
 			<td class="label">Asset Tag:</td>
@@ -532,8 +535,8 @@ function checkComments(type) {
 		                <input type="radio" name="hasObstruction" id="hasObstructionNo" value="N" onclick="setMustSave(this.value,'1','rear', this.name)" checked><label for="hasObstructionNo">No</label>
 		        </td>
 		</tr>
-		</table>      
-		
+		</table>
+
 		<div style="margin-top:20px;">
 		   <div class="thefield" align="center">
 		      <a class="button" href="#asset_front2">Back</a>&nbsp;&nbsp;
@@ -541,25 +544,25 @@ function checkComments(type) {
 			  <a class="button" href="#select_asset" id="rearCompleteId" onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
 		   </div>
 		</div>
-		
+
 		</div>
 		</div>
 		<!-- end of Walkthru Asset:Back -->
 		</g:form>
 		<g:if test="${request.getHeader ( 'User-Agent' ).contains ( 'MSIE' )}">
 		<div class="gap"></div>
-		
+
 		<!-- Walkthru Asset:Generate Label  -->
 		<div class="qvga_border">
 		<a name="generate_label"></a>
 		<div class="title">Walkthru&gt; Generate Label</div>
 		<div class="input_area">
-		
+
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 		<br class="clear"/>
 		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${resource(dir:'resource',file:'TFORMer60.cab')}"></object>
-		
+
 		<g:form name="assetTagLabelForm">
 		<table>
 		<tr>
@@ -586,7 +589,7 @@ function checkComments(type) {
 			<td class="label">U-Position:</td>
 			<td class="field">${assetEntity?.sourceRackPosition}</td>
 		</tr>
-		
+
 		<tr>
 			<td class="label">Manufacturer:</td>
 			<td class="field">${assetEntity?.manufacturer}</td>
@@ -600,7 +603,7 @@ function checkComments(type) {
 			<td class="field"><select type= "hidden" id="Printers" name="Printers"  onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName"></td>
 		</tr>
-		</table>      
+		</table>
 		<div style="margin-top:20px;">
 		   <div class="thefield" align="center">
 		      <a class="button" id="printButton" href="javascript:startprintjob();">Print</a>
@@ -617,29 +620,29 @@ function checkComments(type) {
 		var job = window.TF.CreateJob();
 		var form = window.document.assetTagLabelForm;
 		var jobdata = job.NewJobDataRecordSet();
-		    job.RepositoryName = document.getElementById('urlPath').value;       			 
-		    job.ProjectName = form.PrjName.value;     
-		    job.FormName = form.FormName.value;                   
+		    job.RepositoryName = document.getElementById('urlPath').value;
+		    job.ProjectName = form.PrjName.value;
+		    job.FormName = form.FormName.value;
 		    job.PrinterName = form.PrinterName.value;
 		    // THIS IS THE PLACE TO ADD YOUR DATA
-		    jobdata.ClearRecords();  
-		   	jobdata.AddNewRecord();                					
-		   	jobdata.SetDataField('assetName', "${assetEntity?.assetName}");       
-		   	jobdata.SetDataField('assetTag', "${assetEntity?.assetTag}"); 
+		    jobdata.ClearRecords();
+		   	jobdata.AddNewRecord();
+		   	jobdata.SetDataField('assetName', "${assetEntity?.assetName}");
+		   	jobdata.SetDataField('assetTag', "${assetEntity?.assetTag}");
 		   	jobdata.SetDataField('rack', "${assetEntity?.sourceRack}");
-		   	jobdata.SetDataField('upos', "${assetEntity?.sourceRackPosition}");  	   		
-		    	
+		   	jobdata.SetDataField('upos', "${assetEntity?.sourceRackPosition}");
+
 		    // now we print one copy of the label with default settings
-		    try 
+		    try
 		    {
 		    	job.PrintForm();
 		    }
 		    catch (e)
 		    {
-			    alert ("TFORMer returned an error!" + 
-			           "\nError description: " + e.description + 
-			           "\nError name: " + e.name + 
-			           "\nError number: " + e.number + 
+			    alert ("TFORMer returned an error!" +
+			           "\nError description: " + e.description +
+			           "\nError name: " + e.name +
+			           "\nError number: " + e.number +
 			           "\nError message: " + e.message);
 		    }
 
@@ -650,7 +653,7 @@ function checkComments(type) {
 		function mySelect(x)
 		{
 			document.getElementById("PrinterName").value = x.options[x.selectedIndex].value;
-			
+
 		}
 		//=============================================================================
 		// Add a new option to select element
@@ -684,12 +687,12 @@ function checkComments(type) {
 		    form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  	// repository name
 		    form.PrjName.value 	= 'TFORMer_Runtime_Examples';				// project name
 		    form.FormName.value = 'BarcodeLabels';							// form name
-		    form.PrinterName.value = ''	
+		    form.PrinterName.value = ''
 			// get list of installed printers
 			var dropdown = document.getElementById("Printers");
 			window.TF.RefreshOSPrinters();
 			var def = 0;
-			for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
+			for (i = 0; i < window.TF.GetOSPrintersCount(); i++)
 			{
 			  AddOption (dropdown, window.TF.GetOSPrinter(i), window.TF.GetOSPrinter(i));
 			  if (window.TF.GetOSPrinter(i) == window.TF.GetOSDefaultPrinter())
@@ -697,7 +700,7 @@ function checkComments(type) {
 			}
 			dropdown.options[def].selected = true;
 		}
-		
+
 
 		InitData()
 		</script>
@@ -709,11 +712,11 @@ function checkComments(type) {
 		<a name="comments"></a>
 		<div class="title">Walkthru&gt; Issues &amp; Comments</div>
 		<div class="input_area">
-		
+
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 		<br class="clear"/>
-		<g:form name="commentForm" action="saveComment" method="get">	
+		<g:form name="commentForm" action="saveComment" method="get">
 			<table>
 			<tr>
 				<td class="label">Asset Tag:
@@ -737,11 +740,11 @@ function checkComments(type) {
 				</g:each>
 			</select>
 			<br/>
-			
+
 			<textarea name="comments" id="comments" rows="6" cols="8" ></textarea>
 			<br />
 			<br />
-			
+
 			<label>Save As:</label>
 			<br />
 			<div style="float:center;">
@@ -750,22 +753,22 @@ function checkComments(type) {
 				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm) checkComments('issue');">ISSUE</a>
 			</div>
 			<br class="clear"/>
-			
+
 			<br />
-			
+
 			<a class="button" href="retrieveComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">View Issues &amp; Comments</a>
 		</g:form>
 		</div>
 		</div>
 		<!-- end of Walkthru Asset -Comments-->
-		
+
 		<div class="gap"></div>
 		<!-- Walkthru Asset:View Comments -->
 		<div class="qvga_border">
 		<a name="view_comments"></a>
 		<div class="title">Walkthru&gt; View Issue&amp;Comments</div>
 		<div class="input_area">
-		
+
 		<div style="FLOAT: left"><a class=button href="#asset_menu">Asset Menu</a></div>
 		<div style="float:right;"><a class="button" href="#comments">Add Comments</a></div>
 		<br class="clear"/>
@@ -779,7 +782,7 @@ function checkComments(type) {
 		<input type="hidden" name="location" value="${location}">
 		<input type="hidden" name="moveBundle" value="${moveBundle}">
 		<table>
-		
+
 			<tr>
 			    <th class="container" onclick="sortCommentList('commentType');">Type</th>
 				<th onclick="sortCommentList('comment');">Text</th>
@@ -811,21 +814,21 @@ function checkComments(type) {
 						<tr class="comment_font"><td colSpan="3" align="center" class="norecords_display">No records found</td></tr>
 					</g:else>
 				</g:each>
-			</g:else>	
+			</g:else>
 		</tbody>
 		</table>
 		</g:form>
         </div>
         </div>
 		<div class="gap"></div>
-		
+
 			<ul id="myMenu" class="SimpleContextMenu">
 				<li><a href="retrieveComments?commentType=all&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">All</a></li>
 				<li><a href="retrieveComments?commentType=comment&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Comment</a></li>
 				<li><a href="retrieveComments?commentType=instruction&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Instruction</a></li>
 				<li><a href="retrieveComments?commentType=issue&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Issue</a></li>
 		   </ul>
-		   
+
 	<script type="text/javascript">
 	if('${commentCodes.needAssetTag}'){
 		getObject('needAssetTagYes').checked = true
@@ -847,7 +850,7 @@ function checkComments(type) {
 		getObject("hasObstructionYes").checked =true
 		getObject("hasObstructionNo").checked = false
 	}
-	
+
 	if("${location}" != "${assetEntity.sourceLocation}"){
 		setMustSave( "${location}", "${assetEntity.sourceLocation}", "", "sourceLocation");
 	}
@@ -878,13 +881,13 @@ function checkComments(type) {
 				getObject("modelTdId").innerHTML = inputField
 				}catch(e){
 					//alert(e.message)
-				}	
+				}
 		    }
 		}
 		xmlhttp.open("POST","../model/retrieveModelsListAsJSON?manufacturer="+manufacturerId,true);
 		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		xmlhttp.send();
-	} 
+	}
 </script>
 
 </body>

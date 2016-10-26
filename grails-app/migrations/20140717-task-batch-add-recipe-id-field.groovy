@@ -1,5 +1,6 @@
 
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.ProjectService
 
 /**
  * This set of database changes will:

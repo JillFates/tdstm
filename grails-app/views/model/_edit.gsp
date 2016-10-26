@@ -1,3 +1,5 @@
+<%@page import="net.transitionmanager.domain.Manufacturer" %>
+<%@page import="net.transitionmanager.domain.ModelConnector" %>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -21,7 +23,7 @@
 	<tbody>
 		<tr>
 			<td>Manufacturer:</td>
-			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer.id}"></g:select></td>
+			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer.id}"/></td>
 		    <td>Model Name:</td>
 			<td><input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}">
 				<g:hasErrors bean="${modelInstance}" field="modelName">
@@ -117,17 +119,15 @@
 		<tr>
 			<td>Power (Max/Design/Avg):</td>
 			<td>
-			    <g:set var="powerType" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE ?: 'Watts'}"/>
-				<input type="text" size="4" name="powerNameplate" id="powerNameplateEditId"
-				 	value="${powerType != 'Watts' ? ( modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 120 ).toFloat().round(1) : '' ): modelInstance?.powerNameplate}" 
-					onblur="changePowerValue('Edit')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;" 
+				<input type="text" size="4" name="powerNameplate" id="powerNameplateEditId" value="${tds.rackPower(power: modelInstance?.powerNameplate, blankZero: true)}"
+					onblur="changePowerValue('Edit')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;"
 					onclick="setStanderdPower('Edit')"> >> </a>
 				<input type="hidden" id="powerNameplateIdH" value="${modelInstance?.powerNameplate}">
-				<input type="text" size="4" name="powerDesign" id="powerDesignEditId" value="${powerType != 'Watts' ? ( modelInstance?.powerDesign ?  (modelInstance?.powerDesign / 120 ).toFloat().round(1) : '' ) : modelInstance?.powerDesign}" >&nbsp;
+				<input type="text" size="4" name="powerDesign" id="powerDesignEditId" value="${tds.rackPower(power: modelInstance?.powerDesign, blankZero: true)}" >&nbsp;
 				<input type="hidden" id="powerDesignIdH" value="${modelInstance?.powerDesign}" >
-                <input type="text" size="4" name="powerUse" id="powerUseEditId" value="${powerType != 'Watts' ?  ( modelInstance?.powerUse ? (modelInstance?.powerUse / 120 ).toFloat().round(1) : '') : modelInstance?.powerUse}" >&nbsp;
-                <input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
-				<g:select id="ptype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value,'Edit')"></g:select>
+				<input type="text" size="4" name="powerUse" id="powerUseEditId" value="${tds.rackPower(power: modelInstance?.powerUse, blankZero: true)}" >&nbsp;
+				<input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
+				<g:select id="ptype" name='powerType' value="${tds.powerType()}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value,'Edit')"/>
 			</td>
 			<td>Notes:</td>
 			<td>
@@ -163,7 +163,7 @@
 			<td><input type="text" name="bladeRows" value="${modelInstance.bladeRows}" >
 				<g:hasErrors bean="${modelInstance}" field="bladeRows">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeRows" /></div>
-				</g:hasErrors> 
+				</g:hasErrors>
 			</td>
 		</tr>
 		<tr id="bladeCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
@@ -171,7 +171,7 @@
 			<td><input type="text" name="bladeCount" value="${modelInstance.bladeCount}" >
 			<g:hasErrors bean="${modelInstance}" field="bladeRows">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeCount" /></div>
-				</g:hasErrors> 
+				</g:hasErrors>
 			</td>
 		</tr>
 		<tr id="bladeLabelCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
@@ -179,7 +179,7 @@
 			<td><input type="text" name="bladeLabelCount" value="${modelInstance.bladeLabelCount}" >
 			<g:hasErrors bean="${modelInstance}" field="bladeRows">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeLabelCount" /></div>
-				</g:hasErrors> 
+				</g:hasErrors>
 			</td>
 		</tr>
 		<tr id="bladeHeightId" style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
@@ -309,7 +309,7 @@
 	</div>
 	<tr>
 			<td colspan="2">
-				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
+				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
 					<tds:hasPermission permission="EditModel">
 						<input name="id" value="${modelInstance.id}" type="hidden"/>
 						<input type="hidden" name="redirectTo" value="${redirectTo }" />
@@ -332,8 +332,8 @@
 <input type="hidden" name="deletedAka" id="deletedAka" />
 </g:form>
 </fieldset>
-<div id="akaDiv" style="display:none;"> 
-	<input type="text" name="aka" id="akaId" value="" 
+<div id="akaDiv" style="display:none;">
+	<input type="text" name="aka" id="akaId" value=""
 	onchange="validateAKA(this.value,'${modelInstance.id}', 'errSpan', 'model' )"/>
 </div>
 <input type="hidden" id="manageAkaId" value="-1" >
@@ -370,12 +370,12 @@
 			$("#connectorModelBody input[id=labelId"+count+"]").val("Connector"+count)
 			$("#connectorModelBody select[id=labelPositionId"+count+"]").attr("name","labelPosition"+count)
 			$("#connectorModelBody input[id=connectorPosXId"+count+"]").attr("name","connectorPosX"+count)
-			$("#connectorModelBody input[id=connectorPosYId"+count+"]").attr("name","connectorPosY"+count)			
+			$("#connectorModelBody input[id=connectorPosYId"+count+"]").attr("name","connectorPosY"+count)
 			$("#connectorModelBody input[id=connectorPosXId"+count+"]").val(0)
 			$("#connectorModelBody input[id=connectorPosYId"+count+"]").val(0)
-			$("#connectorModelBody input[id=statusId"+count+"]").attr("name","status"+count)			
+			$("#connectorModelBody input[id=statusId"+count+"]").attr("name","status"+count)
 			$("#connectorModelBody input[id=statusId"+count+"]").val(type)
-			
+
 		} else {
 			alert("You are attempt to create more than 50 connectors")
 		}
@@ -389,7 +389,7 @@
 				var connectorI = $("#labelId"+i)
 				if((connectorJ.length > 0) && (connectorI.length > 0) &&
 					(connectorJ.val().toLowerCase() == connectorI.val().toLowerCase())) {
-					matchConnectors = matchConnectors + 1 
+					matchConnectors = matchConnectors + 1
 				}
 			}
 			if(matchConnectors > 1){
@@ -401,7 +401,7 @@
 		}
 		$("#connectorLabelText"+id).html(value)
 		if($("#labelPositionId"+id).val() == "Left"){
-			$("#labelPositionDiv"+id).attr("style","margin-left:-"+$('#connectorLabelText'+id).outerWidth()+"px")	
+			$("#labelPositionDiv"+id).attr("style","margin-left:-"+$('#connectorLabelText'+id).outerWidth()+"px")
 		}
 	}
 	function changeLabelPosition(count, value){
@@ -409,7 +409,7 @@
 		$("#labelPositionDiv"+count).removeAttr("style")
 		$("#labelPositionDiv"+count).addClass("connector_"+value)
 		if(value == "Left"){
-			$("#labelPositionDiv"+count).attr("style","margin-left:-"+$('#connectorLabelText'+count).outerWidth()+"px")	
+			$("#labelPositionDiv"+count).attr("style","margin-left:-"+$('#connectorLabelText'+count).outerWidth()+"px")
 		}
 	}
 	function showImage( value ){
@@ -450,7 +450,7 @@
 		}
 	}
 	showBladeFields($("#assetTypeId").val())
-	
+
 	function verifyAndDeleteConnector( connector ){
 		var modelId = "${modelInstance.id}"
 		jQuery.ajax({
@@ -470,12 +470,12 @@
 			}
 		});
 	}
-	
+
 	function updatePowerType( value , whom){
 		convertPowerType(value, whom)
 		${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
-	}	
-	
+	}
+
 </script>
 <script>
 	currentMenuId = "#adminMenu";

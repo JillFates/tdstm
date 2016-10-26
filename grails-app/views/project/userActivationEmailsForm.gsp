@@ -1,4 +1,5 @@
 <%@page expressionCodec="none" %>
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -39,8 +40,8 @@
 					<tbody>
 						<g:each in="${accounts}" var='account'>
 							<tr>
-								<td style="text-align: center;"> 
-								  <input type="checkbox" name="person" value="${account.personId}"> 
+								<td style="text-align: center;">
+								  <input type="checkbox" name="person" value="${account.personId}">
 								</td>
 
 								<td style="text-align: left;">
@@ -50,19 +51,19 @@
 								<td style="text-align: left;">
 									${account.lastName}
 								</td>
-								
+
 								<td style="text-align: left;">
 									${account.email}
 								</td>
-								
+
 								<td style="text-align: left;">
 									${account.company}
 								</td>
-								
+
 								<td style="text-align: left;">
 									${account.currentProject ? account.currentProject.projectCode : '' }
 								</td>
-								
+
 								<td style="text-align: left;">
 									${account.roles ? account.roles.join(', ') : ''}
 								</td>
@@ -70,13 +71,13 @@
 								<td style="text-align: left;">
 									${account.expiry}
 								</td>
-								
+
 								<td style="text-align: left;">
-									<tds:convertDateTime date="${account?.lastActivationNotice}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}" />
+									<tds:convertDateTime date="${account?.lastActivationNotice}" timeZone="${tds.timeZone()}" />
 								</td>
 
 								<td style="text-align: left;">
-									<tds:convertDateTime date="${account?.dateCreated}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}" />
+									<tds:convertDateTime date="${account?.dateCreated}" timeZone="${tds.timeZone()}" />
 								</td>
 							</tr>
 						</g:each>

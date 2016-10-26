@@ -24,7 +24,7 @@
         if( date && !tdsCommon.isValidDateTime(date) ){
           alert("Date should be in '" + tdsCommon.defaultDateTimeFormat() + "' format");
           returnVal  =  false;
-      	} 
+      	}
       	return returnVal;
       }
       function validateDates(){
@@ -33,13 +33,13 @@
           var completionTime = $("#completionTime").val();
           if(isValidDate(startTime) && isValidDate(completionTime)){
         	  returnval = true;
-          } 
+          }
           return returnval;
       }
     </script>
   </head>
   <body>
-   
+
     <div class="body">
       <h1>Create Bundle</h1>
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px;">
@@ -121,7 +121,7 @@
                       $("#startTime").kendoDateTimePicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="startTime" name="startTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" format="12hrs" />" 
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" format="12hrs" />"
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     <div class="errors">
@@ -141,7 +141,7 @@
                       $("#completionTime").kendoDateTimePicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="completionTime" name="completionTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" format="12hrs" />" 
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" format="12hrs" />"
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
                     <div class="errors">
@@ -202,7 +202,7 @@
 						as="list" field="workflowCode" /></div>
 				</g:hasErrors></td>
               </tr>
-              
+
                <tr class="prop">
                 <td valign="top" class="name"><label for="useForPlanning">Use for Planning:</label></td>
                <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" checked="checked"/></td>
@@ -211,8 +211,8 @@
           </table>
         </div>
         <div class="buttons">
-          <input type="hidden"  name="project.id" value="${session.getAttribute( 'CURR_PROJ' ).CURR_PROJ}"/>
-          <input type="hidden"  name="projectId" value="${session.getAttribute( 'CURR_PROJ' ).CURR_PROJ}"/>
+          <input type="hidden"  name="project.id" value="${tds.currentProjectId()}"/>
+          <input type="hidden"  name="projectId" value="${tds.currentProjectId()}"/>
           <span class="button"><input class="save" type="submit" value="Save" onclick="return validateDates()"/></span>
         </div>
       </g:form>

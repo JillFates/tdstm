@@ -1,13 +1,12 @@
-
-
+<%@page import="net.transitionmanager.domain.ProjectTeam" %>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Show Move Bundle Team</title>
     </head>
-    <body>        
-        
+    <body>
+
         <div class="body">
             <h1>Show Move Bundle Team</h1>
              <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
@@ -23,62 +22,62 @@
 
                         <tr class="prop">
                             <td valign="top" class="name">Team Code:</td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean:projectTeamInstance, field:'teamCode')}</td>
-                            
+
                         </tr>
-                        
+
                         <tr class="prop">
                             <td valign="top" class="name">Team Name:</td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean:projectTeamInstance, field:'name')}</td>
-                            
+
                         </tr>
                         <tr class="prop">
 				            <td valign="top" class="name">Role:</td>
-				
+
 				            <td valign="top" class="value"><g:if test="${projectTeamInstance?.role}"> <g:message code="ProjectTeam.role.${projectTeamInstance?.role}" /></g:if></td>
 						</tr>
 						<tr class="prop">
                             <td valign="top" class="name">Comment:</td>
-                            
+
                             <td valign="top" class="value">
                             <textarea rows="3" cols="80" readonly="readonly">${fieldValue(bean:projectTeamInstance, field:'comment')}</textarea>
                             </td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name">Is Disbanded:</td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean:projectTeamInstance, field:'isDisbanded')}</td>
-                            
+
                         </tr>
                         <tr class="prop">
                             <td valign="top" class="name">Team Members:</td>
-                            
+
                             <td valign="top" class="value">
                             <g:each in="${teamMembers}" var="teamMember">
 			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if>${teamMember?.staff?.lastNameFirstAndTitle}<br/>
 							</g:each>
                             </td>
-                            
+
                         </tr>
-                        
+
                         <tr class="prop">
                             <td valign="top" class="name">Date Created:</td>
-                            
+
                             <td valign="top" class="value"><tds:convertDateTime date="${projectTeamInstance?.dateCreated}" /> </td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name">Last Updated:</td>
-                            
+
                             <td valign="top" class="value"><tds:convertDateTime date="${projectTeamInstance?.lastUpdated}" /></td>
-                            
+
                         </tr>
-                    
+
                     </tbody>
                 </table>
             </div>

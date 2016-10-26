@@ -1,6 +1,7 @@
 package com.tdssrc.eav
 
 abstract class EavEntityDatatypeAuditable extends EavEntityDatatype {
+
 	String auditAction
 
 	static mapping = {
@@ -9,7 +10,6 @@ abstract class EavEntityDatatypeAuditable extends EavEntityDatatype {
 	}
 
 	static constraints = {
-		auditAction( blank:false, inList:['I', 'U', 'D'] )
+		auditAction blank: false, inList: ['I', 'U', 'D']
 	}
-
 }

@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -9,9 +10,9 @@
 <div class="body">
 <g:form name="myForm" action="updateWorkflowRoles" >
 <div class="steps_table" style="text-align: left;">
-	<span class="span"><b>Workflow Rolesssssssssssssss</b></span>
+	<span class="span"><b>Workflow Roles</b></span>
 
-<div class="buttons" style="margin-left: 10px;margin-right: 10px;text-align: left;"> 
+<div class="buttons" style="margin-left: 10px;margin-right: 10px;text-align: left;">
 	<input type="hidden" name="workflow" value="${workflow?.id}" />
     <input type="hidden" name="currentStatus" value="${workflowTransition?.id}" />
 	<span class="button"><input type="submit" class="edit" value="Update" /></span>
@@ -59,15 +60,15 @@
 	<thead>
 		<tr>
 			<th style="padding: 5px 6px">Transitions</th>
-			
+
 			<g:each status="i" in="${swimlanes}"  var="swimlane">
-				<th> <input type="text" style= " border:none ;  width: 100px; background-color:inherit; padding: 5px 6px; font-weight: bold; "  value='${swimlane?.actorId}' readOnly=true id='textBox${i}' class="name"  onclick= "changeTitle(this.id,'button${i}')" ></input>   
+				<th> <input type="text" style= " border:none ;  width: 100px; background-color:inherit; padding: 5px 6px; font-weight: bold; "  value='${swimlane?.actorId}' readOnly=true id='textBox${i}' class="name"  onclick= "changeTitle(this.id,'button${i}')" ></input>
 				     <input type="hidden" name="id" id="workFlow${i}" value="${workflow?.id}" />
 				     <input type="hidden" name="name" id="name${i}" value="${swimlane?.name}" />
 				     <input type='button' id='button${i}' value="save" style='display:none' onclick="saveWorkflowId('textBox${i}',this.id,'workFlow${i}','name${i}')"/>
 				     </th>
 			</g:each>
-			
+
 		</tr>
 	</thead>
 	<tbody id="workflowRolesBody">
@@ -83,7 +84,7 @@
 				<td id="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.transId}" nowrap="nowrap">
 					<g:if test="${workflowTransition?.id != roleWiseTransition?.transition.id }">
 						<g:if test="${transitionMap.workflowTransitionMap}">
-							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" checked="checked"/>	
+							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" checked="checked"/>
 							<input type="text" name="flag_${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" value="${transitionMap.workflowTransitionMap.flag}" />
 						</g:if>
 						<g:else>
@@ -101,7 +102,7 @@
 		</g:if>
 		<g:else>
 			<tr><td colspan="40" class="no_records">No records found</td></tr>
-		</g:else>	
+		</g:else>
 	</tbody>
 </table>
 </div>

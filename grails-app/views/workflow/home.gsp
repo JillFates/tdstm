@@ -48,7 +48,7 @@
                     <tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowList('${workflows?.id}')">
 
                         <td nowrap="nowrap">${workflows?.process}</td>
-                        <td>${Project.findAllByWorkflowCode(workflows?.process)?.name.toString().replace("[", "").replace("]", "")}</td>
+                        <td>${net.transitionmanager.domain.Project.findAllByWorkflowCode(workflows?.process)?.name.toString().replace("[", "").replace("]", "")}</td>
                         <td nowrap="nowrap">
                             <tds:convertDateTime date="${workflows?.dateCreated}"/>
                         </td>
@@ -85,4 +85,3 @@
 </div>
 </body>
 </html>
-				

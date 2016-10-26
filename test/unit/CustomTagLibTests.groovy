@@ -1,11 +1,16 @@
 import com.tdssrc.grails.TimeUtil
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import spock.lang.Specification
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.service.UserPreferenceService
+import test.AbstractUnitSpec
 
 import java.text.SimpleDateFormat
 
 @TestFor(CustomTagLib)
-class CustomTagLibTests extends Specification {
+@Mock([UserLogin, UserPreference])
+class CustomTagLibTests extends AbstractUnitSpec {
 
 	// the <tds:convertDate> taglet HTML mockup
 	private static final String convertDateTag = '<tds:convertDate date="${date}" format="${format}"/>'
@@ -17,6 +22,17 @@ class CustomTagLibTests extends Specification {
 
 	void setup() {
 		testDate = TimeUtil.parseDateTimeWithFormatter('GMT', '2012-08-21T01:00:00-0000', new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"))
+
+		login()
+	}
+
+	// occasionally (I haven't gotten much of a clue about what combination of factors causes this)
+	// the first test will fail because something internal doesn't get correctly configured during
+	// setup. in those cases having a dummy first test that doesn't use any of the configured test
+	// infrastructure allows it to be 'misconfigured' but have no effect
+	void 'test nothing'() {
+		expect:
+		'free beer'
 	}
 
 	void 'Test tds:convertDate tag with MIDDLE_ENDIAN'() {
@@ -24,7 +40,7 @@ class CustomTagLibTests extends Specification {
 		setUserDateFormat TimeUtil.MIDDLE_ENDIAN
 
 		when:
-		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+		setTimeZone timezone
 
 		then: 'Test DateTime with MIDDLE_ENDIAN'
 		applyTemplate(convertDateTag, [date: testDate, format: format]) == expectedValue
@@ -41,7 +57,7 @@ class CustomTagLibTests extends Specification {
 		setUserDateFormat(TimeUtil.LITTLE_ENDIAN)
 
 		when:
-		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+		setTimeZone timezone
 
 		then: 'Test DateTime with LITTLE_ENDIAN'
 		applyTemplate(convertDateTag, [date: testDate, format: format]) == expectedValue
@@ -58,7 +74,7 @@ class CustomTagLibTests extends Specification {
 		setUserDateFormat(TimeUtil.MIDDLE_ENDIAN)
 
 		when:
-		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+		setTimeZone timezone
 
 		then: 'Test DateTime with MIDDLE_ENDIAN'
 		applyTemplate(convertDateTimeTag, [date: testDate, format: format]) == expectedValue
@@ -75,7 +91,7 @@ class CustomTagLibTests extends Specification {
 		setUserDateFormat(TimeUtil.LITTLE_ENDIAN)
 
 		when:
-		session.setAttribute 'CURR_TZ', [CURR_TZ: timezone]
+		setTimeZone timezone
 
 		then: 'Test DateTime with MIDDLE_ENDIAN'
 		applyTemplate(convertDateTimeTag, [date: testDate, format: format]) == expectedValue
@@ -158,5 +174,9 @@ class CustomTagLibTests extends Specification {
 
 	private void setUserDateFormat(String userDateFormat) {
 		session.setAttribute 'CURR_DT_FORMAT', [CURR_DT_FORMAT: userDateFormat]
+	}
+
+	private void setTimeZone(String timeZoneId) {
+		session.setAttribute 'CURR_TZ', [CURR_TZ: timeZoneId]
 	}
 }

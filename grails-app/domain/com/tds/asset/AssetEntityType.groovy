@@ -1,62 +1,31 @@
 package com.tds.asset
 
-public enum AssetEntityType {
+import groovy.transform.CompileStatic
+
+@CompileStatic
+enum AssetEntityType {
+
 	APPLICATION('A'),
 	DATABASE('B'),
 	DEVICE('D'),
 	NETWORK('N'),
 	STORAGE('S')
 
-	//
-	// Boiler Plate from here down - Just swap out the enum class name
-	//
+	final String value
 
-	String value
-	private static List keys
-	private static List labels
-
-	AssetEntityType(String value) {
-		this.value = value
+	private AssetEntityType(String label) {
+		value = label
 	}
 
-	String toString() { name() }
-	String value() { return value }
+	String value() { value }
 
-	// Used to convert a string to the enum or null if string doesn't match any of the constants
-	static AssetEntityType asEnum(key) {
-		def obj
-		try {
-			obj = key as AssetEntityType
-		} catch (e) { }
-		return obj
+	static AssetEntityType asEnum(String key) {
+		values().find { it.name() == key }
 	}
 
-	// Returns the keys of the enum keys
-	static List getKeys() {
-		if (keys == null)
-			buildKeys()
+	static final List<AssetEntityType> keys = (values() as List).asImmutable()
 
-		return keys
-	}
+	static final List<String> labels = keys.collect { it.value }.asImmutable()
 
-	// Construct the static keys
-	private static synchronized void buildKeys() {
-		if (keys == null)
-			keys = AssetEntityType.values()
-	}
-
-	// Returns the labels of the enum labels
-	static List getLabels(String locale='en') {
-		if (labels == null)
-			buildLabels()
-		return labels
-	}
-
-	// Construct the static labels
-	private static synchronized void buildLabels() {
-		if (labels == null) {
-			labels = AssetEntityType.values()*.value
-		}
-	}
-
+	static List<String> getLabels(String locale = 'en') { labels }
 }

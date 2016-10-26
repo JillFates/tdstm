@@ -1,3 +1,4 @@
+import net.transitionmanager.domain.Person
 
 /**
  * Deletes orphaned persons.

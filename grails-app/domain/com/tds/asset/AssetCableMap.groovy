@@ -1,6 +1,9 @@
 package com.tds.asset
 
+import net.transitionmanager.domain.ModelConnector
+
 class AssetCableMap {
+
 	String cable
 	String cableComment
 	AssetEntity assetFrom
@@ -14,17 +17,16 @@ class AssetCableMap {
 	String assetLoc = 'S'
 
 	static constraints = {
-		cable( nullable:false, blank:false )
-		cableComment( nullable:true, blank:true )
-		assetFrom( nullable:false )
-		assetTo( nullable:true )
-		assetFromPort( nullable:false )
-		assetToPort( nullable:true )
-		cableStatus( nullable:false, blank:false)
-		cableColor( nullable:true, blank:true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange', 'Red', 'Blue', 'Purple', 'Black'] )
-		cableLength( nullable:true )
-		toPower( nullable:true, blank:true)
-		assetLoc( nullable: true , inList:['S', 'T'])
+		assetLoc nullable: true, inList: ['S', 'T']
+		assetTo nullable: true
+		assetToPort nullable: true
+		cable blank: false
+		cableColor nullable: true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange',
+		                                    'Red', 'Blue', 'Purple', 'Black']
+		cableComment nullable: true
+		cableLength nullable: true
+		cableStatus blank: false
+		toPower nullable: true
 	}
 
 	static mapping = {
@@ -34,6 +36,6 @@ class AssetCableMap {
 	}
 
 	String toString() {
-		"${cable} : from ${assetFrom} to ${assetTo}"
+		"$cable : from $assetFrom to $assetTo"
 	}
 }

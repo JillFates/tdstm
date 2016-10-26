@@ -39,7 +39,7 @@
 				</td>
 				<td style="width:auto;">
 					<input type="text" class="dateRange" size="15" style="width: 138px;" name="startDate" id="startDate" tabindex="26"
-						value="<tds:convertDate date="${startDate}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>" /> 
+						value="${tds.convertDate(date: startDate, timeZone: tds.timeZone())}" />
 				</td>
 			</tr>
 			<tr>
@@ -48,7 +48,7 @@
 				</td>
 				<td style="width:auto;">
 					<input type="text" class="dateRange" size="15" style="width: 138px;" name="endDate" id="endDate" tabindex="26"
-						value="<tds:convertDate date="${endDate}" timeZone="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>" /> 
+						value="${tds.convertDate(date: endDate, timeZone: tds.timeZone())}" />
 				</td>
 			</tr>
 			<tr>

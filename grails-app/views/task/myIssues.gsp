@@ -1,5 +1,3 @@
-<%@page import="com.tdssrc.grails.TimeUtil" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -59,11 +57,11 @@
 				}]
 
 			}).data("kendoNotification");
-		});		
+		});
 	</script>
 <%-- END: NOTIFICATIONS SCRIPT --%>
 	<input type="hidden" id="timeBarValueId" value="0"/>
-	
+
 	<div class="taskTimebar hide" id="issueTimebar" >
 		<div id="issueTimebarId"></div>
 	</div>
@@ -109,11 +107,11 @@
 				<input type="hidden" name="tab" id="tabId" value="${tab}" />
 				<input type="hidden" id="myPage" value="mytask" />
 				<input type="hidden" id="searchExecuted" value="true" />
-				<span style="color: white;">Event : 
+				<span style="color: white;">Event :
 					<g:select name='event' value="${moveEvent?.id}" class="slc-event"
 						noSelection="${['null':'All Events']}"
 						from='${moveEventList}'
-						optionKey="id" 
+						optionKey="id"
 						optionValue="name"
 						onfocus="changeAction()" onblur="retainAction()"
 						onchange="submit()">
@@ -252,7 +250,7 @@
 			$('#detailTdId_'+id).hide();
 		}
 	});
-	
+
 	function setFocus() {
 		$("#search").focus();
 	}
@@ -399,10 +397,10 @@ setFocus();
 <script>
 	currentMenuId = "#teamMenuId";
 	var progressTimer;
-	
+
 	$(document).ready(function() {
 		progressTimer = new ProgressTimer(40, 'RefreshMyTasks', null);
-		
+
 		$("#showEntityView").dialog({ autoOpen: false })
 		$("#createEntityView").dialog({ autoOpen: false })
 		$("#editEntityView").dialog({ autoOpen: false })

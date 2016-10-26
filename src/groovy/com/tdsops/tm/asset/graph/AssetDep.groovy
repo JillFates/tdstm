@@ -1,8 +1,11 @@
 package com.tdsops.tm.asset.graph
 
+import groovy.transform.CompileStatic
+
 /**
- * Stores a asset dependency reference
+ * Stores a asset dependency reference.
  */
+@CompileStatic
 class AssetDep {
 
 	def status
@@ -12,10 +15,9 @@ class AssetDep {
 	/**
 	 * Destroy method used to help GC
 	 */
-	def destroy() {
+	void destroy() {
 		status = null
 		type = null
 		depId = null
 	}
-
 }

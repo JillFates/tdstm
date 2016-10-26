@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -10,7 +11,7 @@
 
 <div class="steps_table">
 	<span class="span"><b>Workflow</b></span>
-<div class="buttons" style="margin-left: 10px;margin-right: 10px;" id="showWorkflowActionButtons"> 
+<div class="buttons" style="margin-left: 10px;margin-right: 10px;" id="showWorkflowActionButtons">
 	<div class="menuButton" style="float: left;padding-top: 5px;">
 		<g:link class="list" action="home">Workflow List</g:link>
 		<a class="create" href="#" onclick="openWorkflowDialog()">Copy Workflow</a>
@@ -28,7 +29,7 @@
 	</g:form>
 	</div>
 </div>
-<div class="buttons" style="margin-left: 10px;margin-right: 10px;display: none;" id="editWorkflowActionButtons"> 
+<div class="buttons" style="margin-left: 10px;margin-right: 10px;display: none;" id="editWorkflowActionButtons">
 	<div class="menuButton" style="float: left;padding-top: 5px;">
 		<g:link class="list" action="home">Workflow List</g:link>
 		<a class="create" href="#" onclick="openWorkflowDialog()">Copy Workflow</a>
@@ -94,23 +95,23 @@
 <table>
 	<thead>
 		<tr>
-			
+
 			<th class="sortable">Step Code<span style="color: red">*</span></th>
-			
+
 			<th class="sortable">Label<span style="color: red">*</span></th>
-			
+
 			<th class="sortable">Dashboard Label</th>
-			
+
 			<th class="sortable">Sequence<span style="color: red">*</span></th>
-			
+
 			<th class="sortable">Category</th>
-			
+
 			<th class="sortable">Team</th>
-			
+
 			<th class="sortable">Duration</th>
-			
+
 			<th class="sortable">Action</th>
-			
+
 		</tr>
 	</thead>
 	<tbody>
@@ -119,19 +120,19 @@
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 				<td class="name">${transitions.transition?.code}</td>
-				
+
 				<td class="name">${transitions.transition?.name}</td>
-				
+
 				<td class="name">${transitions.transition?.dashboardLabel}</td>
-				
+
 				<td class="name">${transitions.transition?.transId}</td>
-			
+
 				<td class="name">${transitions.transition?.category}</td>
-				
+
 				<td class="name">${transitions.transition?.role?.description ? transitions.transition?.role?.description?.substring(transitions.transition?.role?.description.lastIndexOf(':') +1).trim() : ''}</td>
 
 				<td class="name">${transitions.transition?.duration}</td>
-				
+
 				<td class="name">
 				<g:if test="${transitions.donotDelete}">
 					<a href="javascript:deleteWorkflowStep(${workflow.id}, ${transitions.transition.id})">
@@ -161,23 +162,23 @@
 <table>
 	<thead>
 		<tr>
-			
+
 			<th class="sortable">Step Code<span style="color: red">*</span></th>
-			
+
 			<th class="sortable">Label<span style="color: red">*</span></th>
-			
+
 			<th class="sortable">Dashboard Label</th>
-			
+
 			<th class="sortable">Sequence<span style="color: red">*</span></th>
 
 			<th class="sortable">Category</th>
-			
+
 			<th class="sortable">Team</th>
-			
+
 			<th class="sortable">Duration</th>
-			
+
 			<th class="sortable">Action</th>
-			
+
 		</tr>
 	</thead>
 	<tbody id="editWorkflowStepsTbody">
@@ -188,19 +189,19 @@
 				<td nowrap="nowrap">
 					<input type="text" name="code_${transitions.transition.id}" id="codeId_${transitions.transition.id}" value="${transitions.transition?.code}" onchange="validateField(this.value, this.id, 'Code')" style="width: 100px;"/>
 				</td>
-				
+
 				<td nowrap="nowrap">
 					<input type="text" name="name_${transitions.transition.id}" id="nameId_${transitions.transition.id}" value="${transitions.transition?.name}"  onchange="validateField(this.value, this.id, 'Name')" style="width: 100px;"/>
 				</td>
-				
+
 				<td nowrap="nowrap">
 					<input type="text" name="dashboardLabel_${transitions.transition.id}" id="dashboardLabelId_${transitions.transition.id}" value="${transitions.transition?.dashboardLabel}" style="width: 100px;"/>
 				</td>
-				
+
 				<td nowrap="nowrap">
 					<input type="text" name="transId_${transitions.transition.id}" id="transIdId_${transitions.transition.id}" value="${transitions.transition?.transId}" style="width: 60px;" maxlength="3"  onchange="validateField(this.value, this.id, 'transId')"/>
 				</td>
-				
+
 				<td nowrap="nowrap">
 					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tds.asset.AssetComment.constraints.category.inList}" optionValue="${{ e -> e.capitalize() }}" value="${transitions.transition.category}"  noSelection="['':'Please select']" ></g:select>
 				</td>
@@ -237,7 +238,7 @@
 </div>
 </div>
 
-<div class="buttons" style="margin-left: 10px;margin-right: 10px;display: none;" id="editWorkflowActionButtons"> 
+<div class="buttons" style="margin-left: 10px;margin-right: 10px;display: none;" id="editWorkflowActionButtons">
 	<g:form action="workflowList">
 		<input type="hidden" name="workflow" value="${workflow?.id}" />
 		<span class="button"><input type="button" class="save" value="Update" onclick="validateAndSubmitUpdateForm()"/></span>
@@ -282,7 +283,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	$("#copyWorkflowDialog").dialog({ autoOpen: false })
-})    	
+})
 /*=========================================
  * redirect to steps roles form
  *========================================*/
@@ -307,7 +308,7 @@ if(showOption == "edit"){editWorkflowList()}
  *========================================*/
 function validateAndSubmitUpdateForm(){
 	if($(".field_error").length > 0){
-		alert("Input entry problem. Please correct highlighted fields before saving")	
+		alert("Input entry problem. Please correct highlighted fields before saving")
 	} else {
 		$("form[name=updateWorkflowStepsForm]").submit();
 	}
@@ -383,7 +384,7 @@ function checkInputData(){
 	var returnVal = true
 	if( !process ) {
 		alert("Workflow should not be blank ")
-		returnVal = false 
+		returnVal = false
 	}
 	return returnVal
 }

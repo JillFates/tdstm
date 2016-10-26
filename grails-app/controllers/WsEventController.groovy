@@ -1,75 +1,38 @@
-import grails.converters.JSON
-
-import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller
-import grails.validation.ValidationException
-
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.service.EventService
 
 /**
- * {@link Controller} for handling WS calls of the {@link EventService}
+ * Handles WS calls of the EventService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-class WsEventController {
+@Secured('isAuthenticated()')
+@Slf4j(value='logger', category='grails.app.controllers.WsEventController')
+class WsEventController implements ControllerMethods {
 
-	def securityService
-	def eventService
+	EventService eventService
 
-	/**
-	 * Provides a list all events and associate bundles for the user's current project
-	 * Check {@link UrlMappings} for the right call
-	 */
 	def listEventsAndBundles() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def currentProject = securityService.getUserCurrentProject()
-
 		try {
-			def results = eventService.listEventsAndBundles(loginUser, currentProject)
-			render(ServiceResults.success(['list' : results]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(list: eventService.listEventsAndBundles())
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
 
-
 	/**
-	 * Provides a list all bundles associated to a specified move event or if id=0 then unassigned bundles
+	 * All bundles associated to a specified move event or if id=0 then unassigned bundles
 	 * for the user's current project
-	 * Check {@link UrlMappings} for the right call
 	 */
 	def listBundles() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		def currentProject = securityService.getUserCurrentProject()
-		def id = params.id
-		def useForPlanning = params.useForPlanning
-
 		try {
-			def results = eventService.listBundles(id, useForPlanning, loginUser, currentProject)
-			render(ServiceResults.success(['list' : results]) as JSON)
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+			renderSuccessJson(list: eventService.listBundles(params.id, params.useForPlanning))
+		}
+		catch (e) {
+			handleException e, logger
 		}
 	}
 }

@@ -1,29 +1,56 @@
-import org.apache.shiro.crypto.hash.Sha1Hash
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdssrc.eav.*
+import com.tdsops.metaclass.CustomMethods
+import com.tdssrc.eav.EavAttributeSet
+import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
-import groovy.sql.Sql
-
-import org.apache.shiro.crypto.hash.Sha256Hash
 import grails.util.Environment
+import net.transitionmanager.domain.DataTransferSet
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventNews
+import net.transitionmanager.domain.Notice
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.PartyRelationshipType
+import net.transitionmanager.domain.PartyRole
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.ProjectAssetMap
+import net.transitionmanager.domain.ProjectTeam
+import net.transitionmanager.domain.RoleType
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.domain.Workflow
+import net.transitionmanager.service.AssetEntityAttributeLoaderService
+import net.transitionmanager.service.StateEngineService
+import net.transitionmanager.service.TaskService
 import org.grails.refcode.RefCode
+
 import java.lang.management.ManagementFactory
 
 class BootStrap {
-	def assetEntityAttributeLoaderService
-	def stateEngineService
+
+	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
+	StateEngineService stateEngineService
+	TaskService taskService
+
 	def init = { servletContext ->
 		checkForBlacklistedVMParameters()
 
-		// Initialize various custom metaclass methods used by the application
-		com.tdsops.metaclass.CustomMethods.initialize
+		CustomMethods.initialize()
 
 		// Load all of the Workflow definitions into the StateEngine service
-		def workflowList = Workflow.list()
-		workflowList.each { wf ->
+		Workflow.list().each { wf ->
 			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
 		}
+
+		taskService.init()
+
+		Notice.registerObjectMarshaller()
 
 		if (Environment.current == Environment.PRODUCTION) return
 
@@ -33,13 +60,23 @@ class BootStrap {
 		//testMemoryAllocation()
 	}
 
-	def destroy = {
-	}
-
-	/**
-	 * Create Initial Datasets
-	 */
 	private void createInitialData() {
+
+		def save = { instance ->
+			instance.save()
+			if (instance.hasErrors()) {
+				String error = 'Unable to create ' + instance.getClass().simpleName + GormUtil.allErrorsString(instance)
+				println error
+				log.error error
+			}
+			instance
+		}
+
+		def createAssignedId = { Class type, String id, Map data ->
+			def instance = type.newInstance(data)
+			instance.id = id
+			save instance
+		}
 
 		// -------------------------------
 		// Role Types
@@ -47,410 +84,287 @@ class BootStrap {
 		// like ofBiz where there is a parent id.
 		// -------------------------------
 		println "ROLE TYPES "
-		def adminRole = new RoleType( description:"System : Administrator" )
-		adminRole.id = "ADMIN"
-		adminRole.save( insert:true )
 
-		def userRole = new RoleType( description:"System : User" )
-		userRole.id = "USER"
-		userRole.save( insert:true )
-
-		def managerRole = new RoleType( description:"System : Manager" )
-		managerRole.id = "MANAGER"
-		managerRole.save( insert:true )
-
-		def observerRole = new RoleType( description:"System : Observer" )
-		observerRole.id = "OBSERVER"
-		observerRole.save( insert:true )
-
-		def workStationRole = new RoleType( description:"System : Work Station" )
-		workStationRole.id = "WORKSTATION"
-		workStationRole.save( insert:true )
-
-		def clientRole = new RoleType( description:"Party : Client" )
-		clientRole.id = "CLIENT"
-		clientRole.save( insert:true )
-
-		def partnerRole = new RoleType( description:"Party : Partner" )
-		partnerRole.id = "PARTNER"
-		partnerRole.save( insert:true )
-
-		def staffRole = new RoleType( description:"Party : Staff" )
-		staffRole.id = "STAFF"
-		staffRole.save( insert:true )
-
-		def companyRole = new RoleType( description:"Party : Company" )
-		companyRole.id ="COMPANY"
-		companyRole.save( insert:true )
-
-		def vendorRole = new RoleType( description:"Party : Vendor" )
-		vendorRole.id = "VENDOR"
-		vendorRole.save( insert:true )
-
-		def projectRole = new RoleType( description:"Party : Project" )
-		projectRole.id ="PROJECT"
-		projectRole.save( insert:true )
-
-		def applicationRole = new RoleType( description:"Party : Application" )
-		applicationRole.id ="APP_ROLE"
-		applicationRole.save( insert:true )
-
-		def teamRole = new RoleType( description:"Party : Team" )
-		teamRole.id ="TEAM"
-		teamRole.save( insert:true )
-
-		def teamMemberRole = new RoleType( description:"Team : Team Member" )
-		teamMemberRole.id ="TEAM_MEMBER"
-		teamMemberRole.save( insert:true )
-
-		def techRole = new RoleType( description:"Staff : Technician" )
-		techRole.id = "TECH"
-		techRole.save( insert:true )
-
-		def pmRole = new RoleType( description:"Staff : Project Manager" )
-		pmRole.id = "PROJ_MGR"
-		pmRole.save( insert:true )
-
-		def moveMgrRole = new RoleType( description:"Staff : Move Manager" )
-		moveMgrRole.id = "MOVE_MGR"
-		moveMgrRole.save( insert:true )
-
-		def sysAdminRole = new RoleType( description:"Staff : System Administrator" )
-		sysAdminRole.id = "SYS_ADMIN"
-		sysAdminRole.save( insert:true )
-
-		def dbAdminRole = new RoleType( description:"Staff : Database Administrator" )
-		dbAdminRole.id = "DB_ADMIN"
-		dbAdminRole.save( insert:true )
-
-		def networkAdminRole = new RoleType( description:"Staff : Network Administrator" )
-		networkAdminRole.id = "NETWORK_ADMIN"
-		networkAdminRole.save( insert:true )
-
-		def accountMgrRole = new RoleType( description:"Staff : Account Manager" )
-		accountMgrRole.id = "ACCT_MGR"
-		accountMgrRole.save( insert:true )
-
-		def projectAdminRole = new RoleType( description:"Staff : Project Administrator" )
-		projectAdminRole.id = "PROJECT_ADMIN"
-		projectAdminRole.save( insert:true )
-
-		def appOwnerRole = new RoleType( description:"App : Application Owner" )
-		appOwnerRole.id = "APP_OWNER"
-		appOwnerRole.save( insert:true )
-
-		def appSMERole = new RoleType( description:"App : Subject Matter Expert" )
-		appSMERole.id = "APP_SME"
-		appSMERole.save( insert:true )
-
-		def appPCRole = new RoleType( description:"App : Primary Contact" )
-		appPCRole.id = "APP_1ST_CONTACT"
-		appPCRole.save( insert:true )
-
-		def appSCRole = new RoleType( description:"App : Secondary Contact" )
-		appSCRole.id = "APP_2ND_CONTACT"
-		appSCRole.save( insert:true )
-
-		def bundleRole = new RoleType( description:"Proj: Move Bundle" )
-		bundleRole.id = "MOVE_BUNDLE"
-		bundleRole.save( insert:true )
-
-		def companyAdmin = new RoleType( description:"Staff: Company Administrator" )
-		companyAdmin.id = "COMPANY_ADMIN"
-		companyAdmin.save( insert:true )
+		[
+			["ADMIN",           "System : Administrator"],
+			["USER",            "System : User"],
+			["MANAGER",         "System : Manager"],
+			["OBSERVER",        "System : Observer"],
+			["WORKSTATION",     "System : Work Station"],
+			["CLIENT",          "Party : Client"],
+			["PARTNER",         "Party : Partner"],
+			["STAFF",           "Party : Staff"],
+			["COMPANY",         "Party : Company"],
+			["VENDOR",          "Party : Vendor"],
+			["PROJECT",         "Party : Project"],
+			["APP_ROLE",        "Party : Application"],
+			["TEAM",            "Party : Team"],
+			["TEAM_MEMBER",     "Team : Team Member"],
+			["TECH",            "Staff : Technician"],
+			["PROJ_MGR",        "Staff : Project Manager"],
+			["MOVE_MGR",        "Staff : Move Manager"],
+			["SYS_ADMIN",       "Staff : System Administrator"],
+			["DB_ADMIN",        "Staff : Database Administrator"],
+			["NETWORK_ADMIN",   "Staff : Network Administrator"],
+			["ACCT_MGR",        "Staff : Account Manager"],
+			["PROJECT_ADMIN",   "Staff : Project Administrator"],
+			["APP_OWNER",       "App : Application Owner"],
+			["APP_SME",         "App : Subject Matter Expert"],
+			["APP_1ST_CONTACT", "App : Primary Contact"],
+			["APP_2ND_CONTACT", "App : Secondary Contact"],
+			["MOVE_BUNDLE",     "Proj: Move Bundle"],
+			["COMPANY_ADMIN",   "Staff: Company Administrator"]
+		].each {
+			createAssignedId RoleType, it[0], [description: it[1]]
+		}
 
 		// -------------------------------
 		// Party Types
 		// -------------------------------
 		println "PARTY TYPES"
-		def personPartyType = new PartyType( description:"Person" )
-		personPartyType.id = "PERSON"
-		personPartyType.save( insert:true )
 
-		def groupPartyType = new PartyType( description:"PartyGroup" )
-		groupPartyType.id = "PARTY_GROUP"
-		groupPartyType.save( insert:true )
-
-		def companyType = new PartyType( description:"Company" )
-		companyType.id = "COMPANY"
-		companyType.save( insert:true )
-
-		def projectType = new PartyType( description:"Project" )
-		projectType.id = "PROJECT"
-		projectType.save( insert:true )
-
-		def appType = new PartyType( description:"Application" )
-		appType.id = "APP_TYPE"
-		appType.save( insert:true )
+		[
+			["PERSON",      "Person"],
+			["PARTY_GROUP", "PartyGroup"],
+			["COMPANY",     "Company"],
+			["PROJECT",     "Project"],
+			["APP_TYPE",    "Application"],
+		].each {
+			createAssignedId PartyType, it[0], [description: it[1]]
+		}
 
 		// -----------------------------------------
 		// Create PartyRelationshipType Details
 		// -----------------------------------------
 		println "PARTY RELATIONSHIP TYPES"
-		def staffType = new PartyRelationshipType( description:"Staff" )
-		staffType.id = "STAFF"
-		staffType.save( insert:true )
 
-		def projStaffType = new PartyRelationshipType( description:"Project Staff" )
-		projStaffType.id = "PROJ_STAFF"
-		projStaffType.save( insert:true )
-
-		def projCompanyType = new PartyRelationshipType( description:"Project Company" )
-		projCompanyType.id = "PROJ_COMPANY"
-		projCompanyType.save( insert:true )
-
-		def teamType = new PartyRelationshipType( description:"Project Team" )
-		teamType.id = "PROJ_TEAM"
-		teamType.save( insert:true )
-
-		def projPartnerType = new PartyRelationshipType( description:"Project Partner" )
-		projPartnerType.id = "PROJ_PARTNER"
-		projPartnerType.save( insert:true )
-
-		def projClientType = new PartyRelationshipType( description:"Project Client" )
-		projClientType.id = "PROJ_CLIENT"
-		projClientType.save( insert:true )
-
-		def clientType = new PartyRelationshipType( description:"Clients" )
-		clientType.id = "CLIENTS"
-		clientType.save( insert:true )
-
-		def partnerType = new PartyRelationshipType( description:"Partners" )
-		partnerType.id = "PARTNERS"
-		partnerType.save( insert:true )
-
-		def vendorType = new PartyRelationshipType( description:"Vendors" )
-		vendorType.id = "VENDORS"
-		vendorType.save( insert:true )
-
-		def projBundleStaffType = new PartyRelationshipType( description:"Bundle Staff" )
-		projBundleStaffType.id = "PROJ_BUNDLE_STAFF"
-		projBundleStaffType.save( insert:true )
+		[
+			["STAFF",             "Staff"],
+			["PROJ_STAFF",        "Project Staff"],
+			["PROJ_COMPANY",      "Project Company"],
+			["PROJ_TEAM",         "Project Team"],
+			["PROJ_PARTNER",      "Project Partner"],
+			["PROJ_CLIENT",       "Project Client"],
+			["CLIENTS",           "Clients"],
+			["PARTNERS",          "Partners"],
+			["VENDORS",           "Vendors"],
+			["PROJ_BUNDLE_STAFF", "Bundle Staff"],
+			["APPLICATION",       "Application"]
+		].each {
+			createAssignedId PartyRelationshipType, it[0], [description: it[1]]
+		}
 
 		// Don't think we need this (John)
 		//	    def projectRelaType = new PartyRelationshipType( description:"Project" )
 		//        projectRelaType.id = "PROJECT"
-		//        projectRelaType.save( insert:true )
-
-		def appRelaType = new PartyRelationshipType( description:"Application" )
-		appRelaType.id = "APPLICATION"
-		appRelaType.save( insert:true )
+		//        projectRelaType.save()
 
 		// -------------------------------
 		// Persons
 		// -------------------------------
 		println "PERSONS"
-		def personJohn = new Person( firstName:'John', lastName:'Doherty', title:'Project Manager',
-					partyType:personPartyType ).save()
-		def personJimL = new Person( firstName:'Jim', lastName:'Laucher', title:'Tech',
-					partyType:personPartyType ).save()
-		def personLisa = new Person( firstName:'Lisa', lastName:'Carr', title:'Move Manager',
-					partyType:personPartyType ).save()
-		def personGenePoole = new Person( firstName:'Gene', lastName:'Poole', title:'Move Manager',
-					active:'N', partyType:personPartyType ).save()
-		def personTim = new Person( firstName:'Tim', lastName:'Schutt', title:'Project Manager',
-					partyType:personPartyType ).save()
-		def personRobin = new Person( firstName:'Robin', lastName:'Banks', title:'Project Manager',
-					partyType:personPartyType ).save()
-		def personAnna = new Person( firstName:'Anna', lastName:'Graham',title:'Sys Opp',
-					partyType:personPartyType ).save()
-		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead',
-					partyType:personPartyType ).save()
-		def personBrock = new Person( firstName:'Brock', lastName:'Lee',title:'Tech',
-					partyType:personPartyType ).save()
-		def personTransport = new Person( firstName:'Tran', lastName:'Sport',title:'Transport',
-					partyType:personPartyType ).save()
-		def personRita = new Person( firstName:'Rita', lastName:'Booke', title:'MANAGER',
-					partyType:personPartyType ).save()
-		def personWarren = new Person( firstName:'Warren', lastName:'Peace', title:'OBSERVER ',
-					partyType:personPartyType ).save()
 
+		def createPerson = { String firstName, String lastName, String title, String active = 'Y' ->
+			save new Person(firstName: firstName, lastName: lastName, title: title, active: active, partyType: personPartyType)
+		}
+
+		def personJohn = createPerson('John', 'Doherty', 'Project Manager')
+		def personJimL = createPerson('Jim', 'Laucher', 'Tech')
+		def personLisa = createPerson('Lisa', 'Carr', 'Move Manager')
+		def personGenePoole = createPerson('Gene', 'Poole', 'Move Manager', 'N')
+		def personTim = createPerson('Tim', 'Schutt', 'Project Manager')
+		def personRobin = createPerson('Robin', 'Banks', 'Project Manager')
+		def personAnna = createPerson('Anna', 'Graham', 'Sys Opp')
+		def personReddy = createPerson('Lokanath', 'Reddy', 'Tech Lead')
+		def personBrock = createPerson('Brock', 'Lee', 'Tech')
+		def personTransport = createPerson('Tran', 'Sport', 'Transport')
+		def personRita = createPerson('Rita', 'Booke', 'MANAGER')
+		def personWarren = createPerson('Warren', 'Peace', 'OBSERVER')
 
 		// This person account will actual share 3 logins (move tech, clean tech, and mover)
-		def personWorkStation = new Person( firstName:'Work', lastName:'Station', title:'Work Station User',
-					partyType:personPartyType ).save()
+		def personWorkStation = createPerson('Work', 'Station', 'Work Station User')
 
 		// Cedars staff for Raiser's Edge application
-		def personNBonner = new Person( firstName:'Nancy', lastName:'Bonner', title:'',
-					partyType:personPartyType  ).save()
-		def personAMaslac = new Person( firstName:'Alan', lastName:'Maslac', title:'',
-					partyType:personPartyType  ).save()
-		def personHKim = new Person( firstName:'Hongki', lastName:'Kim', title:'',
-					partyType:personPartyType  ).save()
-		def personLCoronado = new Person( firstName:'Leo', lastName:'Coronado', title:'',
-					partyType:personPartyType  ).save()
+		def personNBonner = createPerson('Nancy', 'Bonner', '')
+		def personAMaslac = createPerson('Alan', 'Maslac', '')
+		def personHKim = createPerson('Hongki', 'Kim', '')
+		def personLCoronado = createPerson('Leo', 'Coronado', '')
 
 		// -------------------------------
 		// Create User Login.
 		// -------------------------------
 		println "USER LOGIN"
-		def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex(), active:'Y'  ).save()
-		def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex(), active:'Y' ).save()
-		def normalUserRalph = new UserLogin( person:personJimL, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
-		def userRita = new UserLogin( person:personRita, username: "rbooke", password:new Sha1Hash("manager").toHex(), active:'Y' ).save()
-		def userWarren = new UserLogin( person:personWarren, username: "wpeace", password:new Sha1Hash("observer").toHex(), active:'Y' ).save()
+
+		def createUserLogin = { Person person, String username, String password ->
+			save new UserLogin(person: person, username: username, password: SecurityUtil.encryptLegacy(password), active: 'Y')
+		}
+
+		def adminUserLisa = createUserLogin(personLisa, "lisa", 'admin')
+		def userJohn = createUserLogin(personJohn, "john", 'admin')
+		def normalUserRalph = createUserLogin(personJimL, "ralph", 'user')
+		def userRita = createUserLogin(personRita, "rbooke", 'manager')
+		def userWarren = createUserLogin(personWarren, "wpeace", 'observer')
 		// Create the Move Tech, Logistics Tech and Mover (keep short for barcode)
-		def userMoveTech = new UserLogin( person:personWorkStation, username:"mt", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
-		def userCleanTech = new UserLogin( person:personWorkStation, username:"ct", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
-		def userMover = new UserLogin( person:personWorkStation, username:"mv", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
+		def userMoveTech = createUserLogin(personWorkStation, "mt", 'xyzzy')
+		def userCleanTech = createUserLogin(personWorkStation, "ct", 'xyzzy')
+		def userMover = createUserLogin(personWorkStation, "mv", 'xyzzy')
 
 		// -------------------------------
 		// Create Party Group (Companies)
 		// -------------------------------
 		println "PARTY GROUPS "
-		def tds = new PartyGroup( name:"TDS", partyType:companyType ).save()
-		def emc = new PartyGroup( name:"EMC", partyType:companyType ).save()
-		def timeWarner = new PartyGroup( name:"Time Warner", partyType:companyType ).save()
-		def cedars = new PartyGroup( name:"Cedars-Sinai", partyType:companyType ).save()
-		def sigma = new PartyGroup( name:"SIGMA", partyType:companyType ).save()
-		def trucks = new PartyGroup( name:"TrucksRUs", partyType:companyType ).save()
+		def tds = save new PartyGroup(name: "TDS", partyType: companyType)
+		def emc = save new PartyGroup(name: "EMC", partyType: companyType)
+		def timeWarner = save new PartyGroup(name: "Time Warner", partyType: companyType)
+		def cedars = save new PartyGroup(name: "Cedars-Sinai", partyType: companyType)
+		def sigma = save new PartyGroup(name: "SIGMA", partyType: companyType)
+		def trucks = save new PartyGroup(name: "TrucksRUs", partyType: companyType)
 
 		// -------------------------------
 		// Create PartyRole for Companies
 		// -------------------------------
-		def companies = [tds, emc, timeWarner, cedars, sigma, trucks]
-		companies.each {
-			new PartyRole( party: it, roleType: companyRole).save(insert: true)
+		[tds, emc, timeWarner, cedars, sigma, trucks].each {
+			save new PartyRole(party: it, roleType: companyRole)
 		}
 
 		// -------------------------------
 		// Create Projects
 		// -------------------------------
 		println "PROJECTS "
-		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
-					description:'100 servers', partyType:groupPartyType,
-					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save()
-		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
-					description:'500 servers', partyType:groupPartyType,
-					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save()
-
+		def cedarsProject = save new Project(name: "Cedars-Sinai Move 1", projectCode: 'CS1', client: cedars,
+				description: '100 servers', partyType: groupPartyType,
+				startDate: new Date(), completionDate: new Date() + 10, workflowCode: 'STD_PROCESS')
+		def twProject = save new Project(name: "Time Warner VA Move", projectCode: 'TM-VA-1', client: timeWarner,
+				description: '500 servers', partyType: groupPartyType,
+				startDate: new Date(), completionDate: new Date() + 10, workflowCode: 'STD_PROCESS')
 
 		// -------------------------------
 		// Create moveEvent Details
 		// -------------------------------
 		println "MOVE EVENT"
-		def moveEvent =  new MoveEvent(project:cedarsProject, name:"Move Event 1").save( insert : true )
+		def moveEvent = save new MoveEvent(project: cedarsProject, name: "Move Event 1")
+
 		// -------------------------------
 		// Create MoveBundle Details
 		// -------------------------------
 		println "MOVE BUNDLE"
-		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Bundle 1", moveEvent : moveEvent,
-					startTime: new Date(), completionTime: new Date()+1, operationalOrder:1 ).save( insert:true )
-		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Bundle 2",
-					startTime: new Date()+1, completionTime: new Date()+2, operationalOrder:1 ).save( insert:true )
-		def cedarsProjectMoveBundle3 = new MoveBundle( project: cedarsProject, name: "Bundle 3",
-					startTime: new Date()+2, completionTime: new Date()+3, operationalOrder:1 ).save( insert:true )
-		def cedarsProjectMoveBundle4 = new MoveBundle( project: cedarsProject, name: "Bundle 4",
-					startTime: new Date()+3, completionTime: new Date()+4, operationalOrder:1 ).save( insert:true )
-		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle",
-					startTime: new Date()+12, completionTime: new Date()+15, operationalOrder:2 ).save( insert:true )
+
+		def createMoveBundle = { Project project, String name, int stDelta, int ctDelta, int order, MoveEvent event = null ->
+			save new MoveBundle(project: project, name: name, moveEvent: event, startTime: new Date() + stDelta,
+			                    completionTime: new Date() + ctDelta, operationalOrder: order)
+		}
+		def cedarsProjectMoveBundle1 = createMoveBundle(cedarsProject, "Bundle 1", 0, 1, 1, moveEvent)
+		def cedarsProjectMoveBundle2 = createMoveBundle(cedarsProject, "Bundle 2", 1, 2, 1)
+		def cedarsProjectMoveBundle3 = createMoveBundle(cedarsProject, "Bundle 3", 2, 3, 1)
+		def cedarsProjectMoveBundle4 = createMoveBundle(cedarsProject, "Bundle 4", 3, 4, 1)
+		def twProjectMoveBundle = createMoveBundle(twProject, "TW Bundle", 12, 15, 2)
 
 		// -------------------------------
 		// Create ProjectTeam
 		// -------------------------------
 		println "PROJECT TEAM"
-		def cedarsGreenProjectTeam = new ProjectTeam( name: "MoveTeam 1",	teamCode: "1", moveBundle:cedarsProjectMoveBundle1 ).save()
-		def cedarsRedProjectTeam = new ProjectTeam( name: "MoveTeam 2",	teamCode: "2", moveBundle:cedarsProjectMoveBundle1 ).save()
-		def cedarsCleanProjectTeam = new ProjectTeam( name: "Logistics",	teamCode: "Logistics", moveBundle:cedarsProjectMoveBundle1 ).save()
-		def cedarsTransportProjectTeam = new ProjectTeam( name: "Transport",	teamCode: "Transport", moveBundle:cedarsProjectMoveBundle1 ).save()
-		def twGreenProjectTeam = new ProjectTeam( name: "MoveTeam 1",	teamCode: "1", moveBundle:twProjectMoveBundle ).save()
-		def twRedProjectTeam = new ProjectTeam( name: "MoveTeam 2",	teamCode: "2", moveBundle:twProjectMoveBundle ).save()
+		def cedarsGreenProjectTeam = save new ProjectTeam(name: "MoveTeam 1", teamCode: "1", moveBundle: cedarsProjectMoveBundle1)
+		def cedarsRedProjectTeam = save new ProjectTeam(name: "MoveTeam 2", teamCode: "2", moveBundle: cedarsProjectMoveBundle1)
+		def cedarsCleanProjectTeam = save new ProjectTeam(name: "Logistics", teamCode: "Logistics", moveBundle: cedarsProjectMoveBundle1)
+		def cedarsTransportProjectTeam = save new ProjectTeam(name: "Transport", teamCode: "Transport", moveBundle: cedarsProjectMoveBundle1)
+		def twGreenProjectTeam = save new ProjectTeam(name: "MoveTeam 1", teamCode: "1", moveBundle: twProjectMoveBundle)
+		def twRedProjectTeam = save new ProjectTeam(name: "MoveTeam 2", teamCode: "2", moveBundle: twProjectMoveBundle)
 
 		// -------------------------------
 		// Create default Preference
 		// -------------------------------
 		println "USER PREFERENCES"
-		def johnPref = new UserPreference( value: cedarsProject.id )
-		johnPref.userLogin = userJohn
-		johnPref.preferenceCode = "CURR_PROJ"
-		johnPref.save( insert: true)
+		def johnPref = save new UserPreference(value: cedarsProject.id, userLogin: userJohn, preferenceCode: "CURR_PROJ")
 
 		// -------------------------------
 		// Create PartyRole Details
 		// -------------------------------
 		println "PARTY ROLES"
-		new PartyRole( party:personJimL, roleType:userRole ).save( insert:true )
-		new PartyRole( party:personLisa, roleType:userRole ).save( insert:true )
-		new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
-		new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
-		new PartyRole( party:personJohn, roleType:companyAdmin ).save( insert:true )
-		new PartyRole( party:personWorkStation, roleType:workStationRole).save( insert:true )
-		new PartyRole( party:personRita, roleType:managerRole ).save( insert:true )
-		new PartyRole( party:personWarren, roleType:observerRole ).save( insert:true )
+		[
+			[personJimL,        userRole],
+			[personLisa,        userRole],
+			[personJohn,        adminRole],
+			[personJohn,        projectAdminRole],
+			[personJohn,        companyAdmin],
+			[personWorkStation, workStationRole],
+			[personRita,        managerRole],
+			[personWarren,      observerRole]
+		].each {
+			save new PartyRole(party: it[0], roleType: it[1])
+		}
 
 		// -------------------------------
 		// create Party Relationship
 		// -------------------------------
 		println "PARTY RELATIONSHIPS "
 		// Save all the rows in list
-		def i = 0
+		int i = 0
 		def pr = [
 			// Partners, Clients and Vendors
-			[ partnerType, tds, companyRole, emc, partnerRole ],
-			[ partnerType, tds, companyRole, sigma, partnerRole ],
-			[ vendorType, tds, companyRole, trucks, vendorRole ],
-			[ clientType, tds, companyRole, cedars, clientRole ],
-			[ clientType, tds, companyRole, timeWarner, clientRole ],
+			[partnerType, tds, companyRole, emc, partnerRole],
+			[partnerType, tds, companyRole, sigma, partnerRole],
+			[vendorType, tds, companyRole, trucks, vendorRole],
+			[clientType, tds, companyRole, cedars, clientRole],
+			[clientType, tds, companyRole, timeWarner, clientRole],
 
 			// Staff
-			[ staffType, tds, companyRole, personJohn, staffRole ],
-			[ staffType, tds, companyRole, personTim, staffRole ],
-			[ staffType, tds, companyRole, personJimL, staffRole ],
-			[ staffType, tds, companyRole, personAnna, staffRole ],
-			[ staffType, tds, companyRole, personBrock, staffRole ],
-			[ staffType, tds, companyRole, personTransport, staffRole ],
-			[ staffType, emc, companyRole, personLisa, staffRole ],
-			[ staffType, emc, companyRole, personRobin, staffRole ],
-			[ staffType, sigma, companyRole, personReddy, staffRole ],
-			[ staffType, cedars, companyRole, personGenePoole, staffRole ],
-			[ staffType, cedars, companyRole, personNBonner, staffRole ],
-			[ staffType, cedars, companyRole, personAMaslac, staffRole ],
-			[ staffType, cedars, companyRole, personHKim, staffRole ],
-			[ staffType, cedars, companyRole, personLCoronado, staffRole ],
+			[staffType, tds, companyRole, personJohn, staffRole],
+			[staffType, tds, companyRole, personTim, staffRole],
+			[staffType, tds, companyRole, personJimL, staffRole],
+			[staffType, tds, companyRole, personAnna, staffRole],
+			[staffType, tds, companyRole, personBrock, staffRole],
+			[staffType, tds, companyRole, personTransport, staffRole],
+			[staffType, emc, companyRole, personLisa, staffRole],
+			[staffType, emc, companyRole, personRobin, staffRole],
+			[staffType, sigma, companyRole, personReddy, staffRole],
+			[staffType, cedars, companyRole, personGenePoole, staffRole],
+			[staffType, cedars, companyRole, personNBonner, staffRole],
+			[staffType, cedars, companyRole, personAMaslac, staffRole],
+			[staffType, cedars, companyRole, personHKim, staffRole],
+			[staffType, cedars, companyRole, personLCoronado, staffRole],
 
 			// cedars-Sinai Relationships
-			[ projCompanyType, cedarsProject, projectRole, tds, companyRole ],
-			[ projClientType, cedarsProject, projectRole, cedars, clientRole ],
-			[ projPartnerType, cedarsProject, projectRole, emc, partnerRole ],
+			[projCompanyType, cedarsProject, projectRole, tds, companyRole],
+			[projClientType, cedarsProject, projectRole, cedars, clientRole],
+			[projPartnerType, cedarsProject, projectRole, emc, partnerRole],
 			// Project Staff roles
-			[ projStaffType, cedarsProject, projectRole, personRobin, pmRole ],
-			[ projStaffType, cedarsProject, projectRole, personJohn, moveMgrRole ],
-			[ projStaffType, cedarsProject, projectRole, personGenePoole, networkAdminRole ],
-			[ projStaffType, cedarsProject, projectRole, personAnna, techRole ],
-			[ projStaffType, cedarsProject, projectRole, personJimL, techRole ],
-			[ projStaffType, cedarsProject, projectRole, personBrock, techRole ],
-			[ projStaffType, cedarsProject, projectRole, personTransport, techRole ],
-			[ projStaffType, cedarsProject, projectRole, personRita, managerRole ],
-			[ projStaffType, cedarsProject, projectRole, personWarren, observerRole ],
+			[projStaffType, cedarsProject, projectRole, personRobin, pmRole],
+			[projStaffType, cedarsProject, projectRole, personJohn, moveMgrRole],
+			[projStaffType, cedarsProject, projectRole, personGenePoole, networkAdminRole],
+			[projStaffType, cedarsProject, projectRole, personAnna, techRole],
+			[projStaffType, cedarsProject, projectRole, personJimL, techRole],
+			[projStaffType, cedarsProject, projectRole, personBrock, techRole],
+			[projStaffType, cedarsProject, projectRole, personTransport, techRole],
+			[projStaffType, cedarsProject, projectRole, personRita, managerRole],
+			[projStaffType, cedarsProject, projectRole, personWarren, observerRole],
 
 			// TimeWarner Relationships
-			[ projCompanyType, twProject, projectRole, tds, companyRole ],
-			[ projClientType, twProject, projectRole, timeWarner, clientRole ],
-			[ projStaffType, twProject, projectRole, personTim, pmRole ],
-			[ projStaffType, twProject, projectRole, personJohn, moveMgrRole ],
+			[projCompanyType, twProject, projectRole, tds, companyRole],
+			[projClientType, twProject, projectRole, timeWarner, clientRole],
+			[projStaffType, twProject, projectRole, personTim, pmRole],
+			[projStaffType, twProject, projectRole, personJohn, moveMgrRole],
 
 			// Project Team Relationships with staff
-			[ teamType, cedarsGreenProjectTeam, teamRole, personJimL, teamMemberRole ],
-			[ teamType, cedarsGreenProjectTeam, teamRole, personAnna, teamMemberRole ],
-			[ teamType, cedarsRedProjectTeam, teamRole, personJimL, teamMemberRole ],
-			[ teamType, cedarsCleanProjectTeam, teamRole, personBrock, teamMemberRole ],
-			[ teamType, cedarsTransportProjectTeam, teamRole, personTransport, teamMemberRole ],
-			[ teamType, cedarsRedProjectTeam, teamRole, personJohn, teamMemberRole ],
-			[ teamType, twGreenProjectTeam, teamRole, personTim, teamMemberRole ],
-			[ teamType, twGreenProjectTeam, teamRole, personJohn, teamMemberRole ]
+			[teamType, cedarsGreenProjectTeam, teamRole, personJimL, teamMemberRole],
+			[teamType, cedarsGreenProjectTeam, teamRole, personAnna, teamMemberRole],
+			[teamType, cedarsRedProjectTeam, teamRole, personJimL, teamMemberRole],
+			[teamType, cedarsCleanProjectTeam, teamRole, personBrock, teamMemberRole],
+			[teamType, cedarsTransportProjectTeam, teamRole, personTransport, teamMemberRole],
+			[teamType, cedarsRedProjectTeam, teamRole, personJohn, teamMemberRole],
+			[teamType, twGreenProjectTeam, teamRole, personTim, teamMemberRole],
+			[teamType, twGreenProjectTeam, teamRole, personJohn, teamMemberRole]
 		]
 		pr.each {
 			// println "row $i"
 			i++
 			// println "${it[0].id} : ${it[1].id} : ${it[2].id} : ${it[3].id} : ${it[4].id}"
 
-			new PartyRelationship(
-						partyRelationshipType: it[0],
-						partyIdFrom: it[1],
-						roleTypeCodeFrom: it[2],
-						partyIdTo: it[3],
-						roleTypeCodeTo: it[4]
-						).save( insert:true )
+			save new PartyRelationship(
+					partyRelationshipType: it[0],
+					partyIdFrom: it[1],
+					roleTypeCodeFrom: it[2],
+					partyIdTo: it[3],
+					roleTypeCodeTo: it[4])
 		}
 
 		//--------------------------------
@@ -458,191 +372,165 @@ class BootStrap {
 		//--------------------------------
 		println "ENTITY TYPE & ATTRIBUTE SET"
 
-		def entityType = new EavEntityType( entityTypeCode:'AssetEntity', domainName:'AssetEntity', isAuditable:1  ).save()
+		def entityType = save new EavEntityType(entityTypeCode: 'AssetEntity', domainName: 'AssetEntity', isAuditable: 1)
 
 		// This line was causing RTE because table is not created
-		def attributeSet = new EavAttributeSet( attributeSetName:'Server', entityType:entityType, sortOrder:10 ).save()
+		def attributeSet = save new EavAttributeSet(attributeSetName: 'Server', entityType: entityType, sortOrder: 10)
+
 		//---------------------------------
 		//  Create Models
 		//---------------------------------
 		println "MODEL"
-		def refCodeList = [
-			[ "railType", "StorageWorks", 0 ],
-			[ "railType", "Ultrium Tape", 0 ]
-		]
-		refCodeList.each {
-			def refCode = new RefCode(
-						domain: it[0],
-						value: it[1],
-						sortOrder : it[2]
-						)
-			if ( !refCode.validate() || !refCode.save() ) {
-				def etext = "Unable to create refCode" +
-							GormUtil.allErrorsString( refCode )
-				println etext
-				log.error( etext )
-			}
+		[
+			["railType", "StorageWorks", 0],
+			["railType", "Ultrium Tape", 0]
+		].each {
+			save new RefCode(
+					domain: it[0],
+					value: it[1],
+					sortOrder: it[2])
 		}
 
-		def dellManu = new Manufacturer(name:"DELL").save()
-		def hclManu = new Manufacturer(name:"HCL").save()
-		def modelList = [
-			[ "server", dellManu ],
-			[ "leaptop", dellManu ],
-			[ "mouse", dellManu ],
-			[ "hardisk", dellManu ],
-			[ "monitor", hclManu ],
-			[ "keyboard", hclManu ],
-			[ "cpu", hclManu ],
-			[ "charger", hclManu ]
-		]
-		modelList.each {
-			def model = new Model(
-						modeName: it[0],
-						manufacturer : it[1]
-						)
-			if ( !model.validate() || !model.save() ) {
-				def etext = "Unable to create model" +
-							GormUtil.allErrorsString( model )
-				println etext
-				log.error( etext )
-			}
+		def dellManu = save new Manufacturer(name: "DELL")
+		def hclManu = save new Manufacturer(name: "HCL")
+
+		[
+			["server", dellManu],
+			["leaptop", dellManu],
+			["mouse", dellManu],
+			["hardisk", dellManu],
+			["monitor", hclManu],
+			["keyboard", hclManu],
+			["cpu", hclManu],
+			["charger", hclManu]
+		].each {
+			save new Model(
+					modeName: it[0],
+					manufacturer: it[1])
 		}
+
 		//---------------------------------
 		//  Create Asset Entity
 		//---------------------------------
 		println "ASSET ENTITY"
-		def assetEntityList = [
-			["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1 ],
-			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1", 2 ],
-			["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1", 3 ],
-			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1", 1 ],
-			["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-			["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, "KVM Switch", "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1]
-		]
-
-		// Insert the List of assetEntity
-		assetEntityList.each {
-			def assetEntity = new AssetEntity(
-						assetName: it[0],
-						model: it[1],
-						sourceLocation: it[2],
-						targetLocation: it[3],
-						sourceRack: it[4],
-						targetRack: it[5],
-						sourceRackPosition: it[6],
-						targetRackPosition: it[7],
-						attributeSet: it[9],
-						project: it[10],
-						assetType: it[11],
-						assetTag: it[12],
-						serialNumber: it[13],
-						application: it[14],
-						owner: it[15],
-						moveBundle: it[16],
-						cart:it[19],
-						shelf:it[20],
-						priority:it[21]
-						)
-			if ( ! assetEntity.validate() || ! assetEntity.save() ) {
-				def etext = "Unable to create asset ${it[0]}" +
-							GormUtil.allErrorsString( assetEntity )
-				println etext
-				log.error( etext )
-			}
+		[
+			["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12",
+			 attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client,
+			 cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1],
+			["105D74C CSMEDI", "7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22", "12",
+			 attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client,
+			 cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1", 2],
+			["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet,
+			 cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1,
+			 cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1", 3],
+			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1",
+			 attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client,
+			 cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1", 1],
+			["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet,
+			 cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1,
+			 cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1],
+			["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet,
+			 cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1,
+			 cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1],
+			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet,
+			 cedarsProject, "KVM Switch", "ASD12345", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2,
+			 cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1],
+			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet,
+			 cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2,
+			 cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1],
+			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99",
+			 "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client,
+			 cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1]
+		].each {
+			save new AssetEntity(
+					assetName: it[0],
+					model: it[1],
+					sourceLocation: it[2],
+					targetLocation: it[3],
+					sourceRack: it[4],
+					targetRack: it[5],
+					sourceRackPosition: it[6],
+					targetRackPosition: it[7],
+					attributeSet: it[9],
+					project: it[10],
+					assetType: it[11],
+					assetTag: it[12],
+					serialNumber: it[13],
+					application: it[14],
+					owner: it[15],
+					moveBundle: it[16],
+					cart: it[19],
+					shelf: it[20],
+					priority: it[21])
 		}
 		//--------------------------------
 		// Create ProjectAssetMap for Development Process
 		//--------------------------------
 		println "PROJECT_ASSET_MAP"
-		def projectAssetMapList = [
-			[ cedarsProject, AssetEntity.get(1), 10 ],
-			[ cedarsProject, AssetEntity.get(2), 60 ],
-			[ cedarsProject, AssetEntity.get(3), 60 ],
-			[ cedarsProject, AssetEntity.get(4), 10 ],
-			[ cedarsProject, AssetEntity.get(5), 150 ],
-			[ cedarsProject, AssetEntity.get(6), 60 ],
-			[ cedarsProject, AssetEntity.get(7), 150 ],
-			[ cedarsProject, AssetEntity.get(8), 60 ],
-			[ cedarsProject, AssetEntity.get(9), 10 ]
-		]
-
-		//	Insert the List of assetEntity
-		projectAssetMapList.each {
-			def projectAssetMap = new ProjectAssetMap(
-						project: it[0],
-						asset: it[1],
-						currentStateId: it[2]
-						)
-			if ( !projectAssetMap.validate() || !projectAssetMap.save() ) {
-				def etext = "Unable to create ProjectAssetMap" +
-							GormUtil.allErrorsString( projectAssetMap )
-				println etext
-				log.error( etext )
-			}
+		[
+			[cedarsProject, AssetEntity.get(1), 10],
+			[cedarsProject, AssetEntity.get(2), 60],
+			[cedarsProject, AssetEntity.get(3), 60],
+			[cedarsProject, AssetEntity.get(4), 10],
+			[cedarsProject, AssetEntity.get(5), 150],
+			[cedarsProject, AssetEntity.get(6), 60],
+			[cedarsProject, AssetEntity.get(7), 150],
+			[cedarsProject, AssetEntity.get(8), 60],
+			[cedarsProject, AssetEntity.get(9), 10]
+		].each {
+			save new ProjectAssetMap(
+					project: it[0],
+					asset: it[1],
+					currentStateId: it[2])
 		}
-
 
 		//--------------------------------
 		// Create DataTransferSet
 		//--------------------------------
-		def dataTransferSetList = [
+		[
 			// project, type, name, asset tag, s/n, AssetOwner
-			["TDS Master Spreadsheet", "B", "/templates/TDSMaster_template.xls", "MASTER" ],
-			["TDS Walkthru", "B", "/templates/walkthrough_template.xls", "WALKTHROUGH" ]
-		]
-
-		// Insert the List of DataTransferSet
-		dataTransferSetList.each {
-			def dataTransferSet = new DataTransferSet(
-						title: it[0],
-						transferMode: it[1],
-						templateFilename: it[2],
-						setCode: it[3]
-						).save()
+			["TDS Master Spreadsheet", "B", "/templates/TDSMaster_template.xls", "MASTER"],
+			["TDS Walkthru", "B", "/templates/walkthrough_template.xls", "WALKTHROUGH"]
+		].each {
+			save new DataTransferSet(
+					title: it[0],
+					transferMode: it[1],
+					templateFilename: it[2],
+					setCode: it[3])
 		}
 
 		//--------------------------------
 		// Create AssetComment
 		//--------------------------------
-		def assetCommentList = [
-
+		[
 			["Switch powersupply to 220V", "instruction", 1, AssetEntity.get(1), personJohn],
 			["Tape the SCSI cable to the server", "instruction", 1, AssetEntity.get(1), personJohn],
 			["After move we should upgrade this", "comment", 0, AssetEntity.get(1), personJohn],
 			["The server is going to moved right after the move so don't bother dressing the cabling.", "issue", 0, AssetEntity.get(2), personJohn]
-		]
-		//Insert the List of AssetComment
-		assetCommentList.each {
-			def assetComment = new AssetComment(
-						comment: it[0],
-						commentType: it[1],
-						mustVerify: it[2],
-						assetEntity: it[3],
-						createdBy: it[4]
-						).save()
+		].each {
+			save new AssetComment(
+					comment: it[0],
+					commentType: it[1],
+					mustVerify: it[2],
+					assetEntity: it[3],
+					createdBy: it[4])
 		}
+
 		//		--------------------------------
 		// Create MoveEventNews
 		//--------------------------------
-		def eventNewsList = [
-
-			[moveEvent,'The truck has just arrived',personJohn],
-			[moveEvent,'Customer backups are delaying more start',personJohn],
-			[moveEvent,'After move we should upgrade this',personJohn],
-			[moveEvent,'The server is going to moved right after the move',personJohn]
-		]
-		//Insert the List of AssetComment
-		eventNewsList.each {
-			def moveEventNews = new MoveEventNews(
-						moveEvent: it[0],
-						message: it[1],
-						createdBy: it[2]
-						).save()
+		[
+			[moveEvent, 'The truck has just arrived', personJohn],
+			[moveEvent, 'Customer backups are delaying more start', personJohn],
+			[moveEvent, 'After move we should upgrade this', personJohn],
+			[moveEvent, 'The server is going to moved right after the move', personJohn]
+		].each {
+			save new MoveEventNews(
+					moveEvent: it[0],
+					message: it[1],
+					createdBy: it[2])
 		}
+
 		/*
 		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database
 		 * using assetEntityAttributeLoaderService
@@ -650,64 +538,62 @@ class BootStrap {
 		InputStream stream
 		try {
 			stream = servletContext.getResourceAsStream("/resource/AssetEntity_Attributes.xls")
-
-		} catch (Exception ex) {
+		}
+		catch (e) {
 			println "exception while reading AssetEntity_Attributes file"
 
 		}
 		assetEntityAttributeLoaderService.uploadEavAttribute(stream)
 	}
 
-	private checkForBlacklistedVMParameters(){
+	private checkForBlacklistedVMParameters() {
 		def blacklist = ["-Xnoclassgc"]
 
 		def inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments()
-		def blackListArgs = inputArguments.grep{arg->
-			def result = blacklist.find{ el ->
-				arg.contains(el)
-			}
-			return result != null
+		def blackListArgs = inputArguments.grep { arg ->
+			return blacklist.any { el -> arg.contains(el) }
 		}
 
-		if(blackListArgs.size() > 0){
+		if (blackListArgs.size() > 0) {
 			log.warn "*** WARNING ***\n BLACK LISTED ARGUMENTS FOUND IN THE CONFIGURATION!\n This can cause unexpected behaviour on the application, please check that you really want to do this: \n\t $blacklist\n***********************************************************"
 		}
 	}
-
 
 	/** SOME LOAD TEST ***********/
 	/**
 	 * This test is to check the memory allocation and the PermGen, don't use in production
 	 * related to: TM-4157 (https://support.transitionmanager.com/browse/TM-4157)
 	 */
-	private testMemoryAllocation(){
+	private testMemoryAllocation() {
 		//Use only in development mode
 		if (Environment.current != Environment.DEVELOPMENT) return
 
-	  log.info "THREAD INICIALIZANDO!!!! LETS KILL THIS GUY"
+		log.info "THREAD INICIALIZANDO!!!! LETS KILL THIS GUY"
 		Thread.start {
-		  log.info "Generate a very Big MAP groovy String Code"
-		  def strMap = "["
-			for (int i = 0; i < 1000; i++){
-				if(i>0) strMap += ","
+			log.info "Generate a very Big MAP groovy String Code"
+			def strMap = "["
+			for (int i = 0; i < 1000; i++) {
+				if (i > 0) {
+					strMap += ","
+				}
 				strMap += "'$i':'value $i'"
 			}
 			strMap += "]"
 
 			log.info "sz: ${strMap.size()}"
 
-		  for (int i = 10; i > 0; i--){
-		    log.info "THREAD will start in T - $i seconds"
-		    Thread.sleep(1000)
-		  }
+			for (int i = 10; i > 0; i--) {
+				log.info "THREAD will start in T - $i seconds"
+				Thread.sleep(1000)
+			}
 
-		  for (int i = 0; i < 100000; i++) {
-		    //new Person(firstName:'Octavio', lastName:'Luna',title:'Dev')
-        def daMap = Eval.me(strMap)
-		    Thread.sleep(50)
-		  }
+			for (int i = 0; i < 100000; i++) {
+				//new Person(firstName:'Octavio', lastName:'Luna',title:'Dev')
+				def daMap = Eval.me(strMap)
+				Thread.sleep(50)
+			}
 
-		  log.info "THREAD TERMINADO!"
+			log.info "THREAD TERMINADO!"
 		}
 	}
 }

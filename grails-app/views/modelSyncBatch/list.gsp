@@ -1,3 +1,6 @@
+<%@page import="net.transitionmanager.domain.Manufacturer" %>
+<%@page import="net.transitionmanager.domain.ModelConnector" %>
+<%@page import="net.transitionmanager.domain.ModelSync" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -16,43 +19,43 @@
                 <table>
                     <thead>
                         <tr>
-                        
+
                    	        <th>Batch Id</th>
-                        
+
                    	       	<th>Date</th>
-                        
+
                    	        <th>Created By</th>
-                        
+
                    	        <th>Manufacturers</th>
-                   	        
+
                    	        <th>Models</th>
-                        
+
                    	        <th>Connectors</th>
-                   	        
+
                    	        <th>Status</th>
-                   	        
+
                    	        <th>Action</th>
-                        
+
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${modelSyncBatchInstanceList}" status="i" var="modelSyncBatchInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
+
                             <td>${fieldValue(bean:modelSyncBatchInstance, field:'id')}</td>
-                        
+
                             <td><tds:convertDate date="${modelSyncBatchInstance?.dateCreated}" /></td>
-                        
+
                             <td>${modelSyncBatchInstance?.createdBy?.person?.lastNameFirst}</td>
-                        
+
                             <td>${ManufacturerSync.countByBatch(modelSyncBatchInstance)}</td>
-                        
+
                             <td>${ModelSync.countByBatch(modelSyncBatchInstance)}</td>
-                            
+
                             <td>${ModelConnectorSync.countByBatch(modelSyncBatchInstance)}</td>
-                            
+
                             <td>${fieldValue(bean:modelSyncBatchInstance, field:'statusCode')}</td>
-                            
+
                             <td>
 	                            <g:if test="${modelSyncBatchInstance?.statusCode == 'PENDING'}">
 	                            	<g:link action="process" params="[batchId:modelSyncBatchInstance.id]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
@@ -61,7 +64,7 @@
 	                            	<a href="#">Remove</a>
 	                            </g:else>
                             </td>
-                        
+
                         </tr>
                     </g:each>
                     </tbody>
