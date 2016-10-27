@@ -700,7 +700,7 @@ class ProjectController implements ControllerMethods {
 					if (params.sendFrom == "DEFAULT") {
 						fromEmail = grailsApplication.config.grails.mail.default.from
 					} else {
-						fromEmail = securityService.userCurrentProject.email
+						fromEmail = securityService.userLoginPerson?.email
 					}
 					fromEmail = StringEscapeUtils.escapeHtml(fromEmail)
 					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params.customMessage, fromEmail, request.getRemoteAddr())
