@@ -103,7 +103,7 @@
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Administration</li>
                                         <li class="menu-child-item menu-admin-portal"><g:link controller="admin" action="home">Admin Portal</g:link> </li>
-                                        <!-- <li class="menu-child-item menu-admin-license-manager"><a href="/tdstm/app/#/license/list">License Manager</a></li> -->
+                                        <li class="menu-child-item menu-admin-license-manager"><a href="/tdstm/app/#/license/list">License Manager</a></li>
                                         <li class="menu-child-item menu-admin-license-manager"><a href="/tdstm/app/#/notice/list">Notices</a></li>
                                         <li class="menu-child-item menu-admin-role">
                                             <tds:hasPermission permission='RolePermissionView'>
