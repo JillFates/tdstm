@@ -249,16 +249,17 @@ grails {
 			failureHandler.defaultFailureUrl = '/auth/login'
 
 			controllerAnnotations.staticRules = [
-				'/':               'permitAll',
-				'/index':          'permitAll',
-				'/index.gsp':      'permitAll',
-				'/assets/**':      'permitAll',
-				'/**/js/**':       'permitAll',
-				'/**/css/**':      'permitAll',
-				'/**/images/**':   'permitAll',
-				'/**/favicon.ico': 'permitAll',
+				'/'					:'permitAll',
+				'/index'			:'permitAll',
+				'/index.gsp'		:'permitAll',
+				'/assets/**'		:'permitAll',
+				'/**/js/**'			:'permitAll',
+				'/**/css/**'		:'permitAll',
+				'/**/images/**'		:'permitAll',
+				'/**/favicon.ico'	:'permitAll',
+				'/app-js/**'		:'permitAll',
 
-				'/monitoring':     'hasPermission(request, "ViewAdminTools")'
+				'/monitoring'		:'hasPermission(request, "ViewAdminTools")'
 			]
 		}
 	}
