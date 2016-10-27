@@ -99,7 +99,7 @@ def moveEvent = tds.currentMoveEvent() ?: null
 <!-- Vendors -->
 <script src="${resource(dir:'dist',file:'Vendors.js')}"></script>
 <!-- Single Page Logic -->
-<g:javascript src="../dist/App.js"/>
+<script src="${resource(dir:'dist',file:'App.js')}"></script>
 <!-- Kendo Directives -->
 <script src="${resource(dir: 'dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
 <!-- Boosttrap -->
