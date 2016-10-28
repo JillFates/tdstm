@@ -105,6 +105,9 @@ class ProjectService implements ServiceMethods {
 		if (!userLogin) {
 			userLogin = securityService.userLogin
 		}
+		if (projectStatus == null) {
+			projectStatus=ProjectStatus.ANY
+		}
 		searchParams = searchParams ?: [:]
 		int maxRows = searchParams.maxRows ? searchParams.maxRows.toInteger() : Project.count()
 		int currentPage = searchParams.currentPage ? searchParams.currentPage.toInteger() : 1
@@ -138,6 +141,7 @@ class ProjectService implements ServiceMethods {
 		// If projectState = active, filter ge("completionDate", timeNow)
 		// If projectState = completed then filter lt('completionDate', timeNow)
 		// if params has pagination params, then add to the filtering
+
 		Project.createCriteria().list(max: maxRows, offset: rowOffset) {
 			if (projectIds){
 				'in'('id', projectIds)
@@ -173,6 +177,7 @@ class ProjectService implements ServiceMethods {
 
 			order(sortOn.toString(), sortOrder.toString())
 		}
+
 	}
 
 	/**
@@ -1471,6 +1476,6 @@ class ProjectService implements ServiceMethods {
 	}
 
 	boolean hasAccessToProject(UserLogin userLogin = null, long projectId) {
-		return projectId in getUserProjects(securityService.hasPermission("ShowAllProjects"), null, null, userLogin)*.id
+		return projectId in (getUserProjects(securityService.hasPermission("ShowAllProjects"), null, null, userLogin)*.id)
 	}
 }
