@@ -13,7 +13,7 @@ export default class LicenseList {
         this.uibModal = $uibModal;
 
         this.getDataSource();
-        this.getLicenseList();
+        //this.getLicenseList();
         this.log.debug('LicenseList Instanced');
     }
 
@@ -43,9 +43,39 @@ export default class LicenseList {
                 pageSize: 10,
                 transport: {
                     read: (e) => {
-                        this.licenseManagerService.testService((data) => {
+                        /*this.licenseManagerService.testService((data) => {*/
+                            var data = [
+                                {
+                                    licenseId: 1,
+                                    action: '',
+                                    client: 'n/a',
+                                    project: 'n/a',
+                                    contact_email: 'west.coast@xyyy.com',
+                                    status: 'Active',
+                                    type: 'Multi-Project',
+                                    method: 'Server',
+                                    servers_tokens: '8000',
+                                    inception: '2016-09-15',
+                                    expiration: '2016-12-01',
+                                    environment: 'Production'
+                                },
+                                {
+                                    licenseId: 2,
+                                    action: '',
+                                    client: 'Acme Inc.',
+                                    project: 'DR Relo',
+                                    contact_email: 'jim.laucher@acme.com',
+                                    status: 'Pending',
+                                    type: 'Project',
+                                    method: 'Token',
+                                    servers_tokens: '15000',
+                                    inception: '2016-09-01',
+                                    expiration: '2016-10-01',
+                                    environment: 'Demo'
+                                }
+                            ];
                             e.success(data);
-                        });
+                       /* });*/
                     }
                 }
             }
