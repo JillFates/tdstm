@@ -718,7 +718,7 @@ class ProjectController implements ControllerMethods {
 		}
 
 		flash.message = message
-		return userActivationEmailsForm()
+		forward action: 'userActivationEmailsForm'
 	}
 
 }
