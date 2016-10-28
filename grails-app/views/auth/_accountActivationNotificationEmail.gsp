@@ -1,3 +1,4 @@
+<%@page expressionCodec="none" %>
 <%@ page contentType="text/html" %>
 <html>
 <head></head>
