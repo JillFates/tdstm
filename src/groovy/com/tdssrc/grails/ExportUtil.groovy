@@ -18,23 +18,23 @@ class ExportUtil {
 
 	/**
 	 * Used to load a spreadsheet template file
-	 * @param templateFilename - the filename relative to '/templates/' of the spreadsheet template to open
+	 * @param templateFilename - the filename of the spreadsheet template to open
 	 * @return the spreadsheet workbook
 	 */
 	static Workbook loadSpreadsheetTemplate(String templateFilename) {
 		Resource resource = getResource(templateFilename)
 		if (!resource.exists()) {
-			throw new RuntimeException("Unable to load template file /templates/$templateFilename")
+			throw new RuntimeException("Unable to load template file $templateFilename")
 		}
 		return WorkbookFactory.create(resource.inputStream)
 	}
 
 	/**
 	 * Gets a resource from the templates directory.
-	 * @param templateFilename  path relative to the '/templates/' directory.
+	 * @param templateFilename  path to the template file
 	 */
 	static Resource getResource(String templateFilename) {
-		ApplicationContextHolder.getApplicationContext().getResource('/templates/' + templateFilename)
+		ApplicationContextHolder.getApplicationContext().getResource(templateFilename)
 	}
 
 	/**
