@@ -53,7 +53,6 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.Criteria
 import org.hibernate.transform.Transformers
@@ -2152,7 +2151,7 @@ class AssetEntityService implements ServiceMethods {
 			UserLogin userLogin = UserLogin.findByUsername(params.username)
 
 			def bundle = params.bundle
-			def bundleSize = bundle.size()a
+			def bundleSize = bundle.size()
 			bundleNameList.append(bundle[0] != "" ? (bundleSize == 1 ? MoveBundle.read(bundle[0]).name : bundleSize + 'Bundles') : 'All')
 
 			def dataTransferSetInstance = DataTransferSet.get(dataTransferSet)
@@ -2174,7 +2173,7 @@ class AssetEntityService implements ServiceMethods {
 
 			Map serverMap = [:]
 			Map serverSheetColumnNames = [:]
-			Map serverColumnNameList = []
+			def serverColumnNameList = []
 			Map serverSheetNameMap = [:]
 			def serverDataTransferAttributeMapSheetName
 
@@ -2339,7 +2338,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 			profiler.lap(mainProfTag, 'Created asset dep bundles')
 
-			Workbook book = WorkbookFactory.create(ExportUtil.loadSpreadsheetTemplate('TDSMaster_template.' + fileExtension))
+			Workbook book = ExportUtil.loadSpreadsheetTemplate('/templates/TDSMaster_template.' + fileExtension)
 			profiler.lap(mainProfTag, 'Loaded workbook template')
 
 			// Helper closure used to retrieve the sheet
@@ -2463,7 +2462,7 @@ class AssetEntityService implements ServiceMethods {
 					WorkbookUtil.addCell(titleSheet, 1, 2, project.client.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 3, projectId)
 					WorkbookUtil.addCell(titleSheet, 2, 3, project.name)
-					WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(projectId).toString())
+					WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project))
 					WorkbookUtil.addCell(titleSheet, 1, 5, bundleNameList.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 6, userLogin.person.toString())
 

@@ -721,14 +721,14 @@ class PartyRelationshipService implements ServiceMethods {
 		      codes: RoleType.getAll(CollectionUtils.asCollection('MOVE_TECH')).findAll()])[0] > 0
 	}
 
-	def getProjectManagers(projectId) {
+	String getProjectManagers(Project project) {
 		def projectManagers = PartyRelationship.executeQuery('''
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and roleTypeCodeFrom='PROJECT'
-			  and partyIdFrom = :projectId
+			  and partyIdFrom = :project
 			  and roleTypeCodeTo = 'PROJ_MGR'
-		''', [projectId: projectId])
+		''', [project: project])
 
 		def managerNames = new StringBuilder()
 		projectManagers.each { PartyRelationship staff ->
@@ -738,7 +738,8 @@ class PartyRelationshipService implements ServiceMethods {
 		if (managerNames.size() > 0) {
 			managerNames = managerNames.delete(managerNames.size()-2,managerNames.size())
 		}
-		return managerNames
+
+		managerNames.toString()
 	}
 
 	/**

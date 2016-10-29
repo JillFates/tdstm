@@ -36,7 +36,7 @@ class ProgressService implements ServiceMethods {
 	void create(String key, String status=PENDING) {
 		ProgressInfo info = new ProgressInfo(key, status)
 		info.lastUpdated = System.currentTimeMillis()
-		progressInfo[key] = info
+		progressInfo.put(key, info)
 	}
 
 	// TODO : the ProgressService class will need be updated for a Clustered Tomcat configuration
