@@ -26,7 +26,7 @@ TDSTM.createDirective('toastHandler', ['$log', '$timeout', 'HTTPRequestHandlerIn
         priority: 5,
         templateUrl: '../app-js/directives/Tools/ToastHandler.html',
         restrict: 'E',
-        controller: ['$scope', function ($scope) {
+        controller: ['$scope', '$rootScope', function ($scope, $rootScope) {
             $scope.alert = {
                 success: {
                     show: false,
@@ -100,6 +100,18 @@ TDSTM.createDirective('toastHandler', ['$log', '$timeout', 'HTTPRequestHandlerIn
             $scope.onCancelPopUp = function() {
                 turnOffNotifications();
             };
+
+            /**
+             * It watch the value to show the msg if necessary
+             */
+            $rootScope.$on('broadcast-msg', function(event, args) {
+                $log.debug('broadcast-msg executed');
+                $scope.alert[args.type].show = true;
+                $scope.alert[args.type].statusText = args.text;
+                $scope.alert[args.type].status = null;
+                $timeout(turnOffNotifications, 2000);
+                $scope.$apply(); // rootScope and watch exclude the apply and needs the next cycle to run
+            });
 
             /**
              * It watch the value to show the msg if necessary

@@ -14,8 +14,8 @@ export default class RequestLicense {
         this.getProjectDataSource();
         this.newLicenseModel = {
             contactEmail: '',
-            environmentId: null,
-            projectId: null,
+            environmentId: 0,
+            projectId: 0,
             client: params,
             specialInstructions: ''
         }
@@ -36,7 +36,7 @@ export default class RequestLicense {
      */
     getProjectDataSource() {
         this.projectDataSource = [
-            {projectId: 1, name: 'n/a'},
+            {projectId: 1, name: 'Multi-Project'},
             {projectId: 2, name: 'DR Relo'}
         ];
     }

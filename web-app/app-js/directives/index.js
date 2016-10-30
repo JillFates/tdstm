@@ -4,3 +4,4 @@
  */
 
 require('./Tools/ToastHandler.js');
+require('./Tools/ModalWindowActivation.js');

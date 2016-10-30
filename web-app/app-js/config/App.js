@@ -12,6 +12,7 @@ require('angular-resource');
 require('angular-translate');
 require('angular-translate-loader-partial');
 require('angular-ui-bootstrap');
+require('ngClipboard');
 require('ui-router');
 require('rx-angular');
 
@@ -31,6 +32,7 @@ var TDSTM = angular.module('TDSTM', [
     'ngAnimate',
     'pascalprecht.translate', // 'angular-translate'
     'ui.router',
+    'ngclipboard',
     'kendo.directives',
     'rx',
     'ui.bootstrap',

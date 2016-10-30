@@ -27,13 +27,14 @@ export default class LicenseList {
             },
             columns: [
                 {field: 'licenseId', hidden: true },
-                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseList.onLicenseDetails(#=licenseId#)"><span class="glyphicon glyphicon-edit"></span></button>' },
+                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseList.onLicenseDetails(this)"><span class="glyphicon glyphicon-edit"></span></button>' },
                 {field: 'client', title: 'Client'},
                 {field: 'project', title: 'Project'},
                 {field: 'contact_email', title: 'Contact Email'},
                 {field: 'status', title: 'Status'},
                 {field: 'type', title: 'Type'},
-                {field: 'method', title: 'Method'},
+                {field: 'method.name', title: 'Method'},
+                {field: 'method.id', hidden: true},
                 {field: 'servers_tokens', title: 'Server/Tokens'},
                 {field: 'inception', title: 'Inception'},
                 {field: 'expiration', title: 'Expiration'},
@@ -47,31 +48,55 @@ export default class LicenseList {
                             var data = [
                                 {
                                     licenseId: 1,
+                                    keyId: 'ce42cfd1-1ac5-4fcc-be5c-cc7885c8f83b',
                                     action: '',
                                     client: 'n/a',
                                     project: 'n/a',
                                     contact_email: 'west.coast@xyyy.com',
                                     status: 'Active',
                                     type: 'Multi-Project',
-                                    method: 'Server',
+                                    method:  {
+                                        id: 1,
+                                        name: 'Server'
+                                    },
                                     servers_tokens: '8000',
                                     inception: '2016-09-15',
                                     expiration: '2016-12-01',
-                                    environment: 'Production'
+                                    environment: 'Production',
+                                    specialInstructions: 'Help, Help, Help',
+                                    applied: false,
+                                    replaced: {
+                                        date: new Date(),
+                                        serverUrl: 'http:blablaba.com',
+                                        name: 'aasdas54-5asd4a5sd-asd45a4sd'
+                                    },
+                                    encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
                                 },
                                 {
                                     licenseId: 2,
+                                    keyId: 'df42dge2-2bd6-5gdd-cf6d-dd8996d9g94c',
                                     action: '',
                                     client: 'Acme Inc.',
                                     project: 'DR Relo',
                                     contact_email: 'jim.laucher@acme.com',
                                     status: 'Pending',
                                     type: 'Project',
-                                    method: 'Token',
+                                    method: {
+                                        id: 2,
+                                        name: 'Token'
+                                    },
                                     servers_tokens: '15000',
                                     inception: '2016-09-01',
                                     expiration: '2016-10-01',
-                                    environment: 'Demo'
+                                    environment: 'Demo',
+                                    specialInstructions: '',
+                                    applied: true,
+                                    replaced: {
+                                        date: new Date(),
+                                        serverUrl: 'http:blablaba.com',
+                                        name: 'basfasd-2aphgosdf-asoqweqwe'
+                                    },
+                                    encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
                                 }
                             ];
                             e.success(data);
@@ -91,6 +116,7 @@ export default class LicenseList {
             templateUrl: '../app-js/modules/licenseManager/request/RequestLicense.html',
             controller: 'RequestLicense as requestLicense',
             size: 'md',
+            draggable: true,
             resolve: {
                 params: function () {
                     return { id: 50, name: 'Acme, Inc.', email: 'acme@inc.com' };
@@ -100,7 +126,7 @@ export default class LicenseList {
 
         modalInstance.result.then((license) => {
             this.log.info('New License Created: ', license);
-            this.onNewLicenseCreated();
+            this.onNewLicenseCreated(license);
         }, () => {
             this.log.info('Request Canceled.');
         });
@@ -110,8 +136,8 @@ export default class LicenseList {
      * After clicking on edit, we redirect the user to the Edition screen instead of open a dialog
      * du the size of the inputs
      */
-    onLicenseDetails(licenseId) {
-        this.log.info('Open Details for: ', licenseId);
+    onLicenseDetails(license) {
+        this.log.info('Open Details for: ', license);
         var modalInstance = this.uibModal.open({
             animation: true,
             templateUrl: '../app-js/modules/licenseManager/detail/LicenseDetail.html',
@@ -119,7 +145,8 @@ export default class LicenseList {
             size: 'lg',
             resolve: {
                 params: function () {
-                    return { licenseId: licenseId };
+                    var dataItem = license && license.dataItem;
+                    return { license: dataItem };
                 }
             }
         });

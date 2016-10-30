@@ -11,6 +11,8 @@ import LicenseList from './list/LicenseList.js';
 import LicenseManagerService from './service/LicenseManagerService.js';
 import RequestLicense from './request/RequestLicense.js';
 import CreatedLicense from './created/CreatedLicense.js';
+import ApplyLicenseKey from './applyLicenseKey/ApplyLicenseKey.js';
+import ManuallyRequest from './manuallyRequest/ManuallyRequest.js';
 import LicenseDetail from './detail/LicenseDetail.js';
 
 
@@ -40,7 +42,7 @@ var LicenceManagerModule = angular.module('TDSTM.LicenseManagerModule', [uiRoute
 }]);
 
 // Services
-LicenceManagerModule.service('LicenseManagerService', ['$log', 'RestServiceHandler', LicenseManagerService]);
+LicenceManagerModule.service('LicenseManagerService', ['$log', 'RestServiceHandler', '$rootScope', LicenseManagerService]);
 
 // Controllers
 LicenceManagerModule.controller('LicenseList', ['$log', '$state', 'LicenseManagerService', '$uibModal', LicenseList]);
@@ -48,7 +50,9 @@ LicenceManagerModule.controller('LicenseList', ['$log', '$state', 'LicenseManage
 // Modal - Controllers
 LicenceManagerModule.controller('RequestLicense', ['$log', 'LicenseManagerService', '$uibModalInstance', 'params', RequestLicense]);
 LicenceManagerModule.controller('CreatedLicense', ['$log', '$uibModalInstance', 'params', CreatedLicense]);
-LicenceManagerModule.controller('LicenseDetail', ['$log', 'LicenseManagerService', '$uibModalInstance', '$uibModal', LicenseDetail]);
+LicenceManagerModule.controller('ApplyLicenseKey', ['$log', 'LicenseManagerService', '$uibModalInstance', '$rootScope', 'params', ApplyLicenseKey]);
+LicenceManagerModule.controller('ManuallyRequest', ['$log', 'LicenseManagerService', '$uibModalInstance', 'params', ManuallyRequest]);
+LicenceManagerModule.controller('LicenseDetail', ['$log', 'LicenseManagerService', '$uibModal', '$uibModalInstance', 'params', LicenseDetail]);
 
 
 export default LicenceManagerModule;

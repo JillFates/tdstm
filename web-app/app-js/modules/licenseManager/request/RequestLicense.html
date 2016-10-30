@@ -15,13 +15,12 @@
                 <div class="form-group">
                     <label for="selectEnvironment" class="col-sm-3 control-label">Environment: <span class="required_field">*</span></label>
                     <div class="col-sm-9">
-                        <select kendo-combo-box
+                        <select kendo-drop-down-list
                                 k-placeholder="'Select an Environment'"
-                                k-filter="'contains'"
                                 k-data-text-field="'name'"
                                 k-data-value-field="'environmentId'"
                                 k-data-source="requestLicense.environmentDataSource"
-                                ng-model="requestLicense.newLicenseModel.environmentId"
+                                k-ng-model="requestLicense.newLicenseModel.environmentId"
                                 id="selectEnvironment"
                                 class="form-control"
                                 required >
@@ -31,12 +30,11 @@
                 <div class="form-group">
                     <label for="selectProject" class="col-sm-3 control-label">Project: <span class="required_field">*</span></label>
                     <div class="col-sm-9">
-                        <select kendo-combo-box
+                        <select kendo-drop-down-list
                                 k-placeholder="'Select a Project'"
-                                k-filter="'contains'"
                                 k-data-text-field="'name'"
                                 k-data-value-field="'projectId'"
-                                ng-model="requestLicense.newLicenseModel.projectId"
+                                k-ng-model="requestLicense.newLicenseModel.projectId"
                                 k-data-source="requestLicense.projectDataSource"
                                 id="selectProject"
                                 class="form-control"
@@ -55,14 +53,14 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12">
-                        <textarea id="selectSpecialInstructions" class="form-control" rows="3" placeholder="..." ng-model="requestLicense.newLicenseModel.specialInstructions" required></textarea>
+                        <textarea id="selectSpecialInstructions" class="form-control" rows="3" placeholder="" ng-model="requestLicense.newLicenseModel.specialInstructions"></textarea>
                     </div>
                 </div>
             </div><!-- /.box-body -->
         </form>
     </div>
     <div class="modal-footer" class="form-group">
-        <button ng-click="requestLicense.saveLicenseRequest()" type="submit" class="btn btn-primary pull-left" ng-disabled="newLicenseRequest.$invalid"><span class="glyphicon glyphicon-share-alt"></span> Submit Request</button>
+        <button ng-click="requestLicense.saveLicenseRequest()" type="submit" class="btn btn-primary pull-left" ng-disabled="newLicenseRequest.$invalid || requestLicense.newLicenseModel.environmentId === 0 || requestLicense.newLicenseModel.projectId === 0"><span class="glyphicon glyphicon-share-alt"></span> Submit Request</button>
         <button ng-click="requestLicense.cancelCloseDialog()" type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
 </div>

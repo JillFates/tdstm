@@ -69,7 +69,7 @@ export default class NoticeList {
             size: 'md',
             resolve: {
                 params: () => {
-                   var dataItem = notice && notice.dataItem;
+                    var dataItem = notice && notice.dataItem;
                     return { action: action, notice: dataItem, actionType: this.actionType};
                 }
             }

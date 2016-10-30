@@ -21,13 +21,11 @@
         </div>
         <div class="alert alert-warning alert-dismissable fadeIn" ng-show="alert.warning.show">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h4><i class="icon fa fa-warning"></i> Alert!</h4>
-            <div>{{alert.warning.status}} : {{alert.warning.statusText}}</div>
+            <h4><i class="icon fa fa-warning"></i><span ng-if="alert.warning.status">{{alert.warning.status}} : </span> {{alert.warning.statusText}}</h4>
         </div>
         <div class="alert alert-success alert-dismissable fadeIn" ng-show="alert.success.show">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h4><i class="icon fa fa-check"></i></h4>
-            <div><span ng-if="alert.success.status">{{alert.success.status}} : </span> {{alert.success.statusText}}</div>
+            <h4><i class="icon fa fa-check"></i><span ng-if="alert.success.status">{{alert.success.status}} : </span> {{alert.success.statusText}}</h4>
         </div>
     </div>
 </div>
