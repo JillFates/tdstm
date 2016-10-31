@@ -349,7 +349,7 @@ class ReportsService implements ServiceMethods {
 		List<String> dependencies = assetEntityList ? AssetDependency.findAllByDependentInList(assetEntityList)*.asset*.assetName : []
 		List<Long> assetIds = assetEntityList*.id
 		dependencies.sort()
-		List<AssetDependency> depsStatusNotValid = assetIds ? AssetDependency.findAll('''
+		List<AssetDependency> depsStatusNotValid = assetIds ? AssetDependency.executeQuery('''
 			from AssetDependency dependency
 			where (dependency.asset.id in (:assetIds)
 			   or dependency.dependent.id in (:assetIds))
