@@ -1376,7 +1376,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		throw new UnauthorizedException('User ' + currentUsername +
-				'does not have permission(s): ' + permissions.join(', '))
+				' does not have permission(s): ' + permissions.join(', '))
 	}
 
 	private static final List<String> PARTY_CRUD_CONTROLLERS = ['party', 'partyGroup']
