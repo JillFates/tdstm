@@ -101,7 +101,7 @@ grails {
 		adhoc {
 			excludes = ['*', '**/WEB-INF/**','**/META-INF/**']
 			includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**',
-			            '/js/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**',
+			            '/js/**', '/app-js/**', '/i18n/**', '/test/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**',
 			            '/plugins/**', '/d3/**', '/dist/**']
 			patterns = []
 		}
@@ -257,8 +257,9 @@ grails {
 				'/**/css/**'		:'permitAll',
 				'/**/images/**'		:'permitAll',
 				'/**/favicon.ico'	:'permitAll',
-				'/app-js/**'		:'permitAll',
-
+				'/app-js/**'		:'permitAll', // Angular - resources
+				'/i18n/**'			:'permitAll', // Angular - Translate
+				'/test/**'			:'permitAll', // Angular - Test
 				'/monitoring'		:'hasPermission(request, "ViewAdminTools")'
 			]
 		}

@@ -13,7 +13,7 @@ TDSTM.createDirective('modalRender', ['$log', function ($log) {
         restrict: 'EA',
         link: function() {
             $('.modal-dialog').draggable({
-                handle: ".modal-header"
+                handle: '.modal-header'
             });
         }
     };
