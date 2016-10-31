@@ -847,11 +847,11 @@ class PartyRelationshipService implements ServiceMethods {
 		List<String> teamsToRemove = teamCodes ? allTeamCodes - teamCodes : allTeamCodes
 
 		String query = '''
-			from PartyRelationship
-			where partyRelationshipType = :type
-			  and roleTypeCodeFrom = :typeFrom
-			  and partyIdTo = :person
-			  and roleTypeCodeTo in (:teams)
+			from PartyRelationship pr
+			where pr.partyRelationshipType.id = :type
+			  and pr.roleTypeCodeFrom.id = :typeFrom
+			  and pr.partyIdTo = :person
+			  and pr.roleTypeCodeTo.id in (:teams)
 		'''
 		// Remove any Team assignment that the person has assigned that are not in the teamCodes list
 		List<PartyRelationship> toDelete = PartyRelationship.executeQuery(query,
