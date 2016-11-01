@@ -158,6 +158,9 @@ class UserPreferenceService implements ServiceMethods {
 		// Date start = new Date()
 
 		if (value && value != "null" && userLogin) {
+			//remove from the session cache
+			session.removeAttribute(preferenceCode)
+
 			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 			String prefValue = userPreference?.value
 
