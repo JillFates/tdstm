@@ -295,7 +295,7 @@ class UserLoginController implements ControllerMethods {
 		Person currentPerson = securityService.userLoginPerson
 
 		[userLoginInstance: createUser, personInstance: person, companyId: params.companyId,
-		 roleList: roleList, projectList: projectService.getProjectsForCompany(currentPerson.company),
+		 roleList: roleList, projectList: partyRelationshipService.companyProjects(currentPerson.company),
 		 minPasswordLength: securityService.userLocalConfig.minPasswordLength ?: 8,
 		 project: securityService.userCurrentProject, maxLevel: securityService.getMaxAssignedRole(currentPerson).level]
 	}
