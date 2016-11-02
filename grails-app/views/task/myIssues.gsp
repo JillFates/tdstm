@@ -18,7 +18,7 @@
 		//Some Preferences
 		window.PREFS = {
 			PRINTER_NAME : "${prefPrinter}",
-			PRINTER_COPIES : ${prefPrinterCopies}
+			PRINTER_COPIES : "${prefPrinterCopies}"
 		}
 	</script>
 <%-- BEGIN: NOTIFICATIONS SCRIPT --%>
@@ -416,11 +416,12 @@ setFocus();
 
 		$('div.ui-dialog-content').on('dialogopen', function(event) {
 			$('.keyStrokesHandler').attr('status', 'disabled');
-	});
+		});
 
 		$('div.ui-dialog-content').on('dialogclose', function(event) {
 			$('.keyStrokesHandler').attr('status', 'enable');
 		});
+
 	});
 </script>
 <g:if test="${isCleaner}">

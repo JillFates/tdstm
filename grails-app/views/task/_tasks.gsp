@@ -1,3 +1,4 @@
+<%@page defaultCodec="none" %>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
