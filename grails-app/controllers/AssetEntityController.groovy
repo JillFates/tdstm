@@ -2557,7 +2557,7 @@ class AssetEntityController implements ControllerMethods {
 		switch (value) {
 			case 'assetName': result = task.assetEntity?.assetName; break
 			case 'assetType': result = task.assetEntity?.assetType; break
-			case 'assignedTo': result = (task.hardAssigned ? '*' + assignedTo : '') + (task.assignedTo?.toString() ?: ''); break
+			case 'assignedTo': result = (task.hardAssigned ? '*' + task.assignedTo : '') + (task.assignedTo?.toString() ?: ''); break
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:

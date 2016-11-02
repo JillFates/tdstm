@@ -102,7 +102,7 @@ grails {
 			excludes = ['*', '**/WEB-INF/**','**/META-INF/**']
 			includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**',
 			            '/js/**', '/app-js/**', '/i18n/**', '/test/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**',
-			            '/plugins/**', '/d3/**', '/dist/**']
+			            '/plugins/**', '/d3/**', '/dist/**', '/components/**']
 			patterns = []
 		}
 		rewrite.css = false
@@ -260,7 +260,8 @@ grails {
 				'/app-js/**'		:'permitAll', // Angular - resources
 				'/i18n/**'			:'permitAll', // Angular - Translate
 				'/test/**'			:'permitAll', // Angular - Test
-				'/monitoring'		:'hasPermission(request, "ViewAdminTools")'
+				'/monitoring'		:'hasPermission(request, "ViewAdminTools")',
+				'/components/**'			:'permitAll',
 			]
 		}
 	}
