@@ -346,19 +346,13 @@ function createSVGBindings (nodes, links) {
 				return '#' + appSVGShapes.shape[assetTypes[d.type].internalName].id;
 			})
 			.attr("class", "node")
-			.call(dragBehavior)
-			.on("dblclick", function(d) {
-				if (nodeSelected == -1)
-					toggleNodeSelection(d.index);
-				return EntityCrud.showAssetDetailView(d.assetClass, d.id);
-				if (d.assetClass == 'APPLICATION')
-					return getEntityDetails('planningConsole', 'Application', d.id);
-				else if (d.assetClass == 'STORAGE')
-					return getEntityDetails('planningConsole', 'Files', d.id);
-				else if (d.assetClass == 'DATABASE')
-					return getEntityDetails('planningConsole', 'Database', d.id);
-				return getEntityDetails('planningConsole', 'Server', d.id);
+			.attr("assetId", function (d) {
+				return d.id;
 			})
+			.attr("assetClass", function (d) {
+				return d.assetClass;
+			})
+			.call(dragBehavior)
 			.attr("id", function(d) { return 'node-'+d.index })
 			.attr("style", function(d) {
 				return "cursor:default; fill:" + GraphUtil.getFillColor(d, fill, fillMode) + ";";
@@ -777,7 +771,74 @@ function reoptimizeGraph () {
 		.translate([0, 0])
 		.scale(1)
 		.event(svgContainer)
-	setIdealGraphPosition()
+	setIdealGraphPosition();
+	drawContextMenu();
+}
+
+function drawContextMenu() {
+	// Trigger action when the contexmenu is about to be shown
+	$(document).bind("contextmenu", function (event) {
+		if (event.shiftKey)
+			return;
+		var validTags = ['use', 'svg', 'g'];
+		var target = event.target;
+		var tag = target.tagName;
+
+		if (validTags.indexOf(tag) != -1) {
+			event.preventDefault();
+
+			// remove old items
+			$(".customMenu").children(".tempItem").remove();
+
+			// node specific items
+			if (tag == 'use') {
+				debugger;
+				var data = target.__data__;
+
+				$("#consoleOutputItemId").on('click', function (a, b) {
+					closeMenu();
+					console.log(data);
+				});
+
+				var showAssetItem = '<li class="tempItem show" id="showAssetItemId">Show Asset</li>';
+				$(".customMenu").append(showAssetItem);
+				$("#showAssetItemId").on('click', function (a, b) {
+					closeMenu();
+					EntityCrud.showAssetDetailView(data.assetClass, data.id);
+				});
+
+				//<tds:hasPermission permission='AssetEdit'>
+				var editAssetItem = '<li class="tempItem edit" id="editAssetItemId">Edit Asset</li>';
+				$(".customMenu").append(editAssetItem);
+				$("#editAssetItemId").on('click', function (a, b) {
+					closeMenu();
+					EntityCrud.showAssetEditView(data.assetClass, data.id);
+				});
+				//</tds:hasPermission>
+
+			}
+
+			$(".customMenu").css({
+				top: event.pageY + "px",
+				left: event.pageX + "px",
+				display: "block"
+			})
+		}
+
+	});
+
+	// If the document is clicked somewhere
+	$(document).bind("mousedown", function (e) {
+		// If the clicked element is not the menu
+		if (!$(e.target).parents(".customMenu").length > 0) {
+			closeMenu();
+		}
+	});
+
+	// close the context menu
+	function closeMenu () {
+		$(".customMenu").css('display', "none").children(".tempItem").remove();
+	}
 }
 
 function getDimensionsForOptimizing () {
