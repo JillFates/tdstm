@@ -302,7 +302,7 @@ class CustomTagLib implements InitializingBean {
 		out << "<svg style='" << (height > 0 ? 'height: ' + height + 'px;' : '') << ' '
 		out << (width > 0 ? 'width: ' + width + 'px;' : '') << "' class='tds-svg-icons " << (attrs.styleClass ?: '') << "'"
 		out << "viewBox='0 0 115 115' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'> "
-		out << "<image x='0' y='0' height='110px' width='110px' fill='#1f77b4'  xmlns:xlink='http://www.w3.org/1999/xlink' " <<
+		out << "<image x='0' y='0' height='110px' width='110px' fill='#1f77b4'  xmlns:xlink='http://www.w3.org/1999/xlink' "
 		out << "xlink:href='" << resource(dir: 'icons/svg', file: name + '.svg') << "'></image></svg>"
 	}
 
