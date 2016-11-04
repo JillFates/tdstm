@@ -36,7 +36,7 @@
 	<g:javascript src="moment-timezone-with-data.min.js" />
 	<script type="text/javascript">
 		var userPreferences = {
-			"CURR_TZ" : "${userPreferenceService.get('CURR_TZ')}"
+			"CURR_TZ" : "${userPreferenceService.getTimeZone()}"
 		};
 
 		$(document).ready(function() {
