@@ -433,7 +433,7 @@ class CookbookService implements ServiceMethods {
 	 * @return a Map with information about the Recipe and the RecipeVersion
 	 */
 	Map getRecipe(long recipeId, Integer versionNumber) {
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		if (versionNumber == null) {
 			versionNumber = recipe.releasedVersion?.versionNumber ?: 0
 		}
