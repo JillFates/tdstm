@@ -59,7 +59,6 @@ br.page-break-after {
   top: 70px; right: 5px; bottom: 25px;
   margin: 0;
   padding-right: 18px;
-  float: left !important;
   overflow-y: auto !important;
   background-color: white;
 }
