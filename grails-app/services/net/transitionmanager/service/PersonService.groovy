@@ -295,9 +295,9 @@ class PersonService implements ServiceMethods {
 		String hql = '''
 			from PartyRelationship PR
 			inner join PR.partyIdTo P
-			where PR.partyRelationshipType='STAFF'
-			  and PR.roleTypeCodeFrom='COMPANY'
-			  and PR.roleTypeCodeTo='STAFF'
+			where PR.partyRelationshipType.id='STAFF'
+			  and PR.roleTypeCodeFrom.id='COMPANY'
+			  and PR.roleTypeCodeTo.id='STAFF'
 			  and PR.partyIdFrom IN (:companies)
 		'''
 		List companies = [project.client]
@@ -321,7 +321,7 @@ class PersonService implements ServiceMethods {
 		}
 
 		// Try finding the person with an exact match
-		List persons = Person.findAll(hql + where, queryParams)
+		List persons = Person.executeQuery(hql + where, queryParams)
 		if (persons) {
 			persons = persons.collect({ it[1] })
 		}
