@@ -352,8 +352,9 @@ class TaskService implements ServiceMethods {
 	 */
 	// Refactor to accept the Person
 	def setTaskStatus(AssetComment task, String status) {
-		boolean isPM = partyRelationshipService.staffHasFunction(task.project, securityService.userLoginPerson, 'PROJ_MGR')
-		return setTaskStatus(task, status, isPM)
+		def currentPerson = securityService.getUserLoginPerson()
+		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'PROJ_MGR')
+		return setTaskStatus(task, status, currentPerson, isPM)
 	}
 
 	/**
