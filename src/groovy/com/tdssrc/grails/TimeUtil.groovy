@@ -314,6 +314,15 @@ class TimeUtil {
 	}
 
 	/**
+	 * Format a Date to a string with the user's time zone and date format (using a Long EPOC Date representation).
+	 * @param ldate long date representation (EPOC)
+	 */
+	static String formatDateTime(Long ldate, String formatterType = FORMAT_DATE_TIME) {
+		if (!ldate) return ''
+		formatDateTime(new Date(ldate), formatterType)
+	}
+
+	/**
 	 * Format a Date to a string with the specified formatter and the user's default time zone.
 	 * @param date the date to format
 	 * @param the formatter defines the formatter to be used
