@@ -1047,7 +1047,7 @@ class ReportsController implements ControllerMethods {
 			//Generating XLS Sheet
 			switch(params._action_tasksReport){
 				case "Generate Xls" :
-					  exportTaskReportExcel(taskList, tzId, userDTFormat, project)
+					  exportTaskReportExcel(taskList, tzId, userDTFormat, project, reqEvents)
 					  break
 
 				case "Generate Pdf" :
@@ -1071,26 +1071,65 @@ class ReportsController implements ControllerMethods {
 	 * @param taskList : list of tasks
 	 * @param tzId : timezone
 	 * @param project : project instance
+	 * @param reqEvents : list of requested events.
 	 * @return : will generate a XLS file having task task list
 	 */
-	def exportTaskReportExcel(taskList, tzId, userDTFormat, project){
+	def exportTaskReportExcel(taskList, tzId, userDTFormat, project, reqEvents){
 		File file = grailsApplication.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
-		String filename = project.name + '-TaskReport'
+
+		def currDate = TimeUtil.nowGMT()
+		String eventsFileName = "ALL"
+		String eventsTitleSheet = eventsFileName
+		if(reqEvents.size() > 1 || reqEvents[0] != "all"){
+			def moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+			def eventNames = moveEvents.collect{it.name}
+			eventsFileName = eventNames.join("-")
+			eventsTitleSheet = eventNames.join(", ")
+		}
+		def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
+		String filename = project.client.name + '-' + ( project.name ?: project.id ) + "-${eventsFileName}-${exportDate}"
+
 
 		//set MIME TYPE as Excel
 		response.setContentType( "application/vnd.ms-excel" )
 		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
 
+
 		def book = new HSSFWorkbook(new FileInputStream( file ))
 
 		def tasksSheet = book.getSheet("tasks")
-		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo',
-		                         'instructionsLink', 'role', 'status', 'estStart','','', 'notes', 'duration',
-		                         'durationScale', 'estStart','estFinish','actStart', 'dateResolved',
-		                         'workflow', 'category', 'dueDate', 'dateCreated', 'createdBy', 'moveEvent']
+
+		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
+								'','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
+								'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId,
 			userDTFormat, 7, securityService.viewUnpublished())
+
+
+	
+		def exportTitleSheet = {
+			def userLogin = securityService.getUserLogin()
+			def titleSheet = book.getSheet("Title")
+			WorkbookUtil.addCell(titleSheet, 1, 2, project.client.toString())
+			WorkbookUtil.addCell(titleSheet, 1, 3, project.id.toString())
+			WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
+			WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project).toString())
+			WorkbookUtil.addCell(titleSheet, 1, 5, eventsTitleSheet)
+			WorkbookUtil.addCell(titleSheet, 1, 6, userLogin.person.toString())
+	
+			def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
+			WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
+			WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
+			WorkbookUtil.addCell(titleSheet, 1, 9, userDTFormat)
+	
+			WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
+		}
+	
+		exportTitleSheet()
+	
+	
+
 
 		book.write(response.getOutputStream())
 	}
