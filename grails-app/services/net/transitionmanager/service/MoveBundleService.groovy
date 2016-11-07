@@ -530,6 +530,13 @@ class MoveBundleService implements ServiceMethods {
 					case "workflow":
 						cellValue = exportList[rowIdx].workflowTransition ? String.valueOf(exportList[rowIdx].workflowTransition?.name) : ''
 						 break
+
+					case "assetClass":
+						cellValue = exportList[rowIdx]["assetEntity"]? String.valueOf(exportList[rowIdx]["assetEntity"]?.assetType) : ''
+						break
+					case "assetId":
+						cellValue = exportList[rowIdx]["assetEntity"]? String.valueOf(exportList[rowIdx]["assetEntity"]?.id) : ''
+						break
 					/*
 					case "estStart":
 						 cellValue = formatDateForExport(exportList[rowIdx].estStart)
