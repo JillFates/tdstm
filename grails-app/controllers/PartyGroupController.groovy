@@ -1,13 +1,15 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
@@ -16,7 +18,6 @@ import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PartyGroupController implements ControllerMethods {
 
@@ -102,7 +103,7 @@ class PartyGroupController implements ControllerMethods {
 	}
 
 	def show() {
-		PartyGroup partyGroup = PartyGroup.get( params.id )
+		PartyGroup partyGroup = PartyGroup.get(params.id)
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
 
 		if (!partyGroup) {
@@ -110,6 +111,8 @@ class PartyGroupController implements ControllerMethods {
 			redirect(action: "list")
 			return
 		}
+
+		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup)]
 	}
 
 	def delete() {
@@ -261,17 +264,17 @@ class PartyGroupController implements ControllerMethods {
     }
 
 // TODO : JPM 3/2016 : isAPartner method should be in a service AND shoud take the company as a company instead of looking it up based on the user
-	private boolean isAPartner(partyGroup) {
-		def personCompany = securityService.userLoginPerson.company
+	private boolean isAPartner(PartyGroup partyGroup) {
+		Party personCompany = securityService.userLoginPerson.company
 		if (personCompany) {
 			PartyRelationship.executeQuery('''
 				select count(p) from PartyRelationship p
 				where p.partyRelationshipType = 'PARTNERS'
-				  and p.partyIdFrom.id = (select p.company.id from Person p where person.id=:currentPersonId)
-				  and p.roleTypeCodeFrom = 'COMPANY'
-				  and p.roleTypeCodeTo = 'PARTNER'
+				  and p.partyIdFrom.id = :companyId
+				  and p.roleTypeCodeFrom.id = 'COMPANY'
+				  and p.roleTypeCodeTo.id = 'PARTNER'
 				  and	p.partyIdTo = :partyGroup
-			''', [partyGroup: partyGroup])[0] > 0
+			''', [partyGroup: partyGroup, companyId: personCompany.id])[0] > 0
 		}
 		else {
 			false
