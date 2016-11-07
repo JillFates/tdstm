@@ -316,7 +316,7 @@ class PartyRelationshipService implements ServiceMethods {
 		if (!partyRelationship) {
 			partyRelationship = new PartyRelationship(args)
 			partyRelationship.statusCode = 'ENABLED'
-			save partyRelationship
+			save partyRelationship, true
 			if (partyRelationship.hasErrors()) {
 				throw new DomainUpdateException('Unable to update party relationship')
 			}
@@ -592,12 +592,12 @@ class PartyRelationshipService implements ServiceMethods {
 	                                         String roleTypeFrom, String roleTypeTo) {
 		PartyRelationship.executeQuery('''
 			from PartyRelationship
-			where partyRelationshipType = :partyRelationshipType
+			where partyRelationshipType.id = :partyRelationshipTypeId
 			  and partyIdFrom = :partyIdFrom
-			  and roleTypeCodeFrom = :roleTypeFrom
-			  and roleTypeCodeTo = :roleTypeTo
-		''', [partyRelationshipType: partyRelationshipType, partyIdFrom: partyIdFrom,
-		      roleTypeFrom: roleTypeFrom, roleTypeTo: roleTypeTo], [max: 1])[0]
+			  and roleTypeCodeFrom.id = :roleTypeFromId
+			  and roleTypeCodeTo.id = :roleTypeToId
+		''', [partyRelationshipTypeId: partyRelationshipType, partyIdFrom: partyIdFrom,
+		      roleTypeFromId: roleTypeFrom, roleTypeToId: roleTypeTo], [max: 1])[0]
 	}
 
 	/**
@@ -887,7 +887,7 @@ class PartyRelationshipService implements ServiceMethods {
 		// Now get the list of Teams that the person is assigned to and determine if we need to assign them to any new ones
 		if (teamCodes) {
 			Party personCompany = person.company 	// lazy loading
-			List<String> existingTeamCodes = getCompanyStaffFunctions(personCompany.id, person.id)*.id
+			List<String> existingTeamCodes = getCompanyStaffFunctions(personCompany?.id, person.id)*.id
 			List<String> teamsToAssign = teamCodes - existingTeamCodes
 			if (teamsToAssign) {
 				logger.debug 'updateAssignedTeams() for {} - adding team assignments {}', person, teamsToAssign
