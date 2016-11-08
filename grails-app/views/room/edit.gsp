@@ -141,103 +141,105 @@
 				</div>
 		</div>
 		<div style="left: 580px;" id="roomObjects" >
-
-			<table border="0" id="rackTableId">
-				<tr>
-					<th>Rack<input type="hidden" id="rackCount" name="rackCount"
-						value="50000"></th>
-					<th>X</th>
-					<th>Y</th>
-					<th>Front</th>
-					<th>A(${tds.powerTypeShort()})
-					</th>
-					<th>B(${tds.powerTypeShort()})
-					</th>
-					<th>C(${tds.powerTypeShort()})
-					</th>
-					<th>Type</th>
-					<th>Model</th>
-					<th>Assets</th>
-				</tr>
-				<g:each in="${rackInstanceList}" var="rack" status="i">
-					<tr id="rackEditRow_${rack.id}"
-						class="${(i % 2) == 0 ? 'odd' : 'even'} rowShow">
-						<td><input type="hidden" name="rackId" value="${rack.id}" />
-							${rack.source == 1 ? 'S' : 'T' } <input type="text"
-							class="focusShadow" id="tag_${rack.id}" name="tag_${rack.id}"
-							value="${rack.tag}" size="10"
-							onchange="changeLabel(${rack.id},this.value)" /></td>
-						<td><input type="text" class="focusShadow"
-							id="roomXId_${rack.id}" name="roomX_${rack.id}"
-							value="${rack.roomX}" size="3"
-							onkeyup="changeRackPosition(${rack.id},this.value, 'left')" /></td>
-						<td><input type="text" class="focusShadow"
-							id="roomYId_${rack.id}" name="roomY_${rack.id}"
-							value="${rack.roomY}" size="3"
-							onkeyup="changeRackPosition(${rack.id},this.value, 'top')" /></td>
-						<td><g:select id="frontId_${rack.id}" name="front_${rack.id}"
-								from="${Rack.constraints.front.inList}" value="${rack.front}"
-								onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())"
-								style="width:40px;"/></td>
-						<td><input type="text" class="focusShadow" id="powerA_${rack.id}" name="powerA_${rack.id}" value="${tds.rackPower(power: rack.powerA)}" size="3" /></td>
-						<td><input type="text" class="focusShadow" id="powerB_${rack.id}" name="powerB_${rack.id}" value="${tds.rackPower(power: rack.powerB)}" size="3" /></td>
-						<td><input type="text" class="focusShadow" id="powerC_${rack.id}" name="powerC_${rack.id}" value="${tds.rackPower(power: rack.powerC)}" size="3" /></td>
-						<td><g:select id="rackTypeId_${rack.id}"
-								name="rackType_${rack.id}"
-								from="${Rack.constraints.rackType.inList}"
-								value="${rack.rackType}"
-								onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"
-								style="width:100px;"/></td>
-						<td><span id="modelSpan_${rack.id}"><g:select
-									class="rackModel" id="model_${rack.id}" name="model_${rack.id}"
-									from="${modelList}" noSelection="[null:'Select Model']"
-									value="${rack.model?.id}" optionKey="id"
-									optionValue="${{it.manufacturer.name+' / '+it.modelName} }"/></span>
-						</td>
-						<td>
-							${rack.assets.size()}&nbsp;&nbsp;&nbsp; <g:if
-								test="${rack.assets.size() == 0}">
-								<a href="javascript:verifyAndDeleteRacks(${rack.id})"><span
-									class="clear_filter"><u>X</u></span></a>
-							</g:if>
-						</td>
+			<div style="background-color: rgb(95, 159, 207); height: 26px; padding-top: 6px; padding-left: 7px; color: white; cursor: pointer;"><span class="glyphicon glyphicon-move"></span></div>
+			<div>
+				<table border="0" id="rackTableId">
+					<tr>
+						<th>Rack<input type="hidden" id="rackCount" name="rackCount"
+							value="50000"></th>
+						<th>X</th>
+						<th>Y</th>
+						<th>Front</th>
+						<th>A(${tds.powerTypeShort()})
+						</th>
+						<th>B(${tds.powerTypeShort()})
+						</th>
+						<th>C(${tds.powerTypeShort()})
+						</th>
+						<th>Type</th>
+						<th>Model</th>
+						<th>Assets</th>
 					</tr>
-				</g:each>
-				<g:each in="${newRacks}" var="rack" status="i">
-					<tr id="rackEditRow_${rack}"
-						class="${(i % 2) == 0 ? 'odd' : 'even'}" style="display: none;">
-						<td><input type="hidden" name="rackId" value="${rack}" /> <input
-							type="text" class="focusShadow" id="tag_${rack}"
-							name="tag_${rack}" value="" size="10"
-							onchange="changeLabel(${rack},this.value)" /></td>
-						<td><input type="text" class="focusShadow"
-							id="roomXId_${rack}" name="roomX_${rack}" value="" size="3"
-							onkeyup="changeRackPosition(${rack},this.value, 'left')" /></td>
-						<td><input type="text" class="focusShadow"
-							id="roomYId_${rack}" name="roomY_${rack}" value="" size="3"
-							onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
-						<td><g:select id="frontId_${rack}" name="front_${rack}"
-								from="${Rack.constraints.front.inList}"
-								onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"
-								style="width:40px;"/></td>
-						<td><input type="text" class="focusShadow" id="newPowerA_${rack}" name="powerA_${rack}" value="${tds.rackPower(powerProperty: 'powerA')}" size="3" /></td>
-						<td><input type="text" class="focusShadow" id="newPowerB_${rack}" name="powerB_${rack}" value="${tds.rackPower(powerProperty: 'powerB')}" size="3" /></td>
-						<td><input type="text" class="focusShadow" id="newPowerC_${rack}" name="powerC_${rack}" value="${tds.rackPower(powerProperty: 'powerC')}" size="3" /></td>
-						<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}"
-								from="${Rack.constraints.rackType.inList}" value="Rack"
-								onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"
-								style="width:100px;"/></td>
-						<td><span id="modelSpan_${rack}"><g:select
-									class="rackModel" id="model_${rack}" name="model_${rack}"
-									from="${modelList}" noSelection="[null:'Select Model']"
-									value="${defaultRackModel?.id}" optionKey="id"
-									optionValue="${{it.manufacturer.name+' / '+it.modelName} }"/></span></td>
-						<td>0&nbsp;&nbsp;&nbsp;<a
-							href="javascript:verifyAndDeleteRacks(${rack})"><span
-								class="clear_filter"><u>X</u></span></a></td>
-					</tr>
-				</g:each>
-			</table>
+					<g:each in="${rackInstanceList}" var="rack" status="i">
+						<tr id="rackEditRow_${rack.id}"
+							class="${(i % 2) == 0 ? 'odd' : 'even'} rowShow">
+							<td><input type="hidden" name="rackId" value="${rack.id}" />
+								${rack.source == 1 ? 'S' : 'T' } <input type="text"
+								class="focusShadow" id="tag_${rack.id}" name="tag_${rack.id}"
+								value="${rack.tag}" size="10"
+								onchange="changeLabel(${rack.id},this.value)" /></td>
+							<td><input type="text" class="focusShadow"
+								id="roomXId_${rack.id}" name="roomX_${rack.id}"
+								value="${rack.roomX}" size="3"
+								onkeyup="changeRackPosition(${rack.id},this.value, 'left')" /></td>
+							<td><input type="text" class="focusShadow"
+								id="roomYId_${rack.id}" name="roomY_${rack.id}"
+								value="${rack.roomY}" size="3"
+								onkeyup="changeRackPosition(${rack.id},this.value, 'top')" /></td>
+							<td><g:select id="frontId_${rack.id}" name="front_${rack.id}"
+									from="${Rack.constraints.front.inList}" value="${rack.front}"
+									onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())"
+									style="width:40px;"/></td>
+							<td><input type="text" class="focusShadow" id="powerA_${rack.id}" name="powerA_${rack.id}" value="${tds.rackPower(power: rack.powerA)}" size="3" /></td>
+							<td><input type="text" class="focusShadow" id="powerB_${rack.id}" name="powerB_${rack.id}" value="${tds.rackPower(power: rack.powerB)}" size="3" /></td>
+							<td><input type="text" class="focusShadow" id="powerC_${rack.id}" name="powerC_${rack.id}" value="${tds.rackPower(power: rack.powerC)}" size="3" /></td>
+							<td><g:select id="rackTypeId_${rack.id}"
+									name="rackType_${rack.id}"
+									from="${Rack.constraints.rackType.inList}"
+									value="${rack.rackType}"
+									onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"
+									style="width:100px;"/></td>
+							<td><span id="modelSpan_${rack.id}"><g:select
+										class="rackModel" id="model_${rack.id}" name="model_${rack.id}"
+										from="${modelList}" noSelection="[null:'Select Model']"
+										value="${rack.model?.id}" optionKey="id"
+										optionValue="${{it.manufacturer.name+' / '+it.modelName} }"/></span>
+							</td>
+							<td>
+								${rack.assets.size()}&nbsp;&nbsp;&nbsp; <g:if
+									test="${rack.assets.size() == 0}">
+									<a href="javascript:verifyAndDeleteRacks(${rack.id})"><span
+										class="clear_filter"><u>X</u></span></a>
+								</g:if>
+							</td>
+						</tr>
+					</g:each>
+					<g:each in="${newRacks}" var="rack" status="i">
+						<tr id="rackEditRow_${rack}"
+							class="${(i % 2) == 0 ? 'odd' : 'even'}" style="display: none;">
+							<td><input type="hidden" name="rackId" value="${rack}" /> <input
+								type="text" class="focusShadow" id="tag_${rack}"
+								name="tag_${rack}" value="" size="10"
+								onchange="changeLabel(${rack},this.value)" /></td>
+							<td><input type="text" class="focusShadow"
+								id="roomXId_${rack}" name="roomX_${rack}" value="" size="3"
+								onkeyup="changeRackPosition(${rack},this.value, 'left')" /></td>
+							<td><input type="text" class="focusShadow"
+								id="roomYId_${rack}" name="roomY_${rack}" value="" size="3"
+								onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
+							<td><g:select id="frontId_${rack}" name="front_${rack}"
+									from="${Rack.constraints.front.inList}"
+									onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"
+									style="width:40px;"/></td>
+							<td><input type="text" class="focusShadow" id="newPowerA_${rack}" name="powerA_${rack}" value="${tds.rackPower(powerProperty: 'powerA')}" size="3" /></td>
+							<td><input type="text" class="focusShadow" id="newPowerB_${rack}" name="powerB_${rack}" value="${tds.rackPower(powerProperty: 'powerB')}" size="3" /></td>
+							<td><input type="text" class="focusShadow" id="newPowerC_${rack}" name="powerC_${rack}" value="${tds.rackPower(powerProperty: 'powerC')}" size="3" /></td>
+							<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}"
+									from="${Rack.constraints.rackType.inList}" value="Rack"
+									onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"
+									style="width:100px;"/></td>
+							<td><span id="modelSpan_${rack}"><g:select
+										class="rackModel" id="model_${rack}" name="model_${rack}"
+										from="${modelList}" noSelection="[null:'Select Model']"
+										value="${defaultRackModel?.id}" optionKey="id"
+										optionValue="${{it.manufacturer.name+' / '+it.modelName} }"/></span></td>
+							<td>0&nbsp;&nbsp;&nbsp;<a
+								href="javascript:verifyAndDeleteRacks(${rack})"><span
+									class="clear_filter"><u>X</u></span></a></td>
+						</tr>
+					</g:each>
+				</table>
+			</div>
 		</div>
 		</g:form>
 	</div>
@@ -449,7 +451,7 @@ function enableDraggableRack(){
 	  	});
 		drag = 'on'
 	  } else {
-		$("#roomObjects").css({ 'top':'170','left':'580px' });
+		$("#roomObjects").css({ 'top':'170','left':'280px' });
 		$("#roomObjects").draggable('destroy')
 	  }
 	  jQuery.ajax({
