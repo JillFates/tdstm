@@ -14,7 +14,7 @@
 <div class="steps_table" style="border: 0px;">
 <fieldset>
 <legend><b>Create Model</b></legend>
-<g:form action="list" enctype="multipart/form-data">
+<g:form action="list" enctype="multipart/form-data" name="modelDialogForm" onsubmit="return validateForm('modelDialogForm')">
 <div style="margin-left: 10px;margin-right: 10px; width: auto;">
 <table>
 	<tbody>
@@ -267,7 +267,7 @@
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
 					<tds:hasPermission permission="EditModel">
 					<span class="button">
-						<g:actionSubmit class="save" action="save" value="Save" onclick="return validateForm()"></g:actionSubmit>
+						<g:actionSubmit class="save" action="save" value="Save"></g:actionSubmit>
 					</span>
 					</tds:hasPermission>
 				</div>
@@ -366,8 +366,14 @@
 			initializeConnectors( usize, null )
 		}
 	}
-	function validateForm(){
+	function validateForm(form){
 		var isValid = true
+		var modelName = $("form[name = "+form+"] input[name = 'modelName']").val()
+		if(!modelName){
+			alert("The model name cannot be null.")
+			isValid = false
+		}
+
 		if($(".field_error").length){
 			isValid = false
 			alert("WARNING : Connector labels should be unique")
