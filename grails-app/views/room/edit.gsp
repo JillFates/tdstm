@@ -25,20 +25,20 @@
 									id="roomWidthId" value="${roomInstance.roomWidth}" size="4"
 									onblur="roundValue(this.value,'roomWidthId')">
 								</td>
-								<td>Depth (ft)<br /> <input type="text" name="roomDepth"
+								<td style="width: 78px;">Depth (ft)<br /> <input type="text" name="roomDepth"
 									id="roomDepthId" value="${roomInstance.roomDepth}" size="4"
 									onblur="roundValue(this.value,'roomDepthId')">
 								</td>
-								<td>Address<br /> <input type="text" name="address"
+								<td style="width: 190px;">Address<br /> <input type="text" name="address"
 									id="addressId" value="${roomInstance?.address}" size="20">
 								</td>
-								<td>City <br /> <input type="text" name="city" id="cityId"
+								<td style="width: 120px;">City <br /> <input type="text" name="city" id="cityId"
 									value="${roomInstance?.city}" size="10">
 								</td>
-								<td>stateProv <br /> <input type="text" name="stateProv"
+								<td style="width: 79px;">stateProv <br /> <input type="text" name="stateProv"
 									id="stateProvId" value="${roomInstance?.stateProv}" size="4">
 								</td>
-								<td>Postal Code <br /> <input type="text"
+								<td style="width: 80px;">Postal Code <br /> <input type="text"
 									name="postalCode" id="postalCodeId"
 									value="${roomInstance?.postalCode}" size="4">
 								</td>
@@ -52,7 +52,7 @@
 									<button type="submit" value="Update" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Update</button>
 								</td>
 								<td class="buttonR"
-									style="padding-left: 115px; vertical-align: top;" colspan="6"
+									style="vertical-align: top;" colspan="6"
 									nowrap="nowrap"><span> <label for="addTargetRoom"><b>Target
 												room:</b></label> <input type="checkbox" id="addTargetRoom"
 										name="addTargetRoom" ${roomInstance?.source== 0 ? 'checked="checked"' : ''}/>&nbsp;
