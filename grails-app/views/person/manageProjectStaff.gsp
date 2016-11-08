@@ -42,10 +42,10 @@
 		
 	</head>
 	<body>
-		<div class="body" ng-app="tdsProjectStaff" ng-controller="tds.staffing.controller.MainController as staffing">
+		<div class="body" ng-app="tdsProjectStaff" ng-controller="tds.staffing.controller.MainController as staffing" style="float:none;">
 			<h1>Project Staff</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
-			<div id="staffSelectId" >
+			<div id="staffSelectId" style=" overflow-x: auto; ">
 				<table id="staffFilterId" style="border: 0px;width: 100%;" >
 					<tr>
 						<td>
@@ -127,7 +127,7 @@
 					}, 100);
 				});
 
-				$(window).scroll(function() {
+				$('#staffSelectId').scroll(function() {
 					var position = 31 - $(this).scrollLeft();
 					$('.floatingHeader').css('left', position + "px");
 				});
