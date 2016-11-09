@@ -425,8 +425,10 @@ setFocus();
 	});
 </script>
 <g:if test="${isCleaner}">
-<script type="text/javascript" src="${resource(dir:'js/qz-print/js',file:'deployJava.js')}"></script>
-<script type="text/javascript" src="${resource(dir:'js/qz-print',file:'qzShowCleanerTasks.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'js/qz-tray/lib/dependencies',file:'rsvp-3.1.0.min.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'js/qz-tray/lib/dependencies',file:'sha-256.min.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'js/qz-tray/lib',file:'qz-tray.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'js/qz-tray',file:'qzShowCleanerTasks.js')}"></script>
 <script type="text/javascript">
 	jQuery(function(){
 		function loadPrinters(){
@@ -454,17 +456,20 @@ setFocus();
 
 
 		QZ({
-			codebase: "${resource(dir:'js/qz-print')}",
+			codebase: "${resource(dir:'js/qz-tray')}",
+			signaturePath:  "${createLink(mapping:'qzSignLink')}",
 			onSuccess: function () {
 				$(".printView").show();
 				$(".printViewError").hide();
 				window.QZObj.loadPrinters = loadPrinters;
-				console.log("load Print");
 				loadPrinters();
 			},
 			onFail: function (error) {
 				if (error) {
-					alert(error);
+					window.NOTIFICATION.show({
+						title: "Error",
+						message: error
+					}, "error");
 				}
 			}
 		});

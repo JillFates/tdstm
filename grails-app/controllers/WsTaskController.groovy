@@ -4,6 +4,7 @@ import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 
@@ -18,6 +19,7 @@ import net.transitionmanager.service.UnauthorizedException
 class WsTaskController implements ControllerMethods {
 
 	TaskService taskService
+	QzSignService qzSignService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -125,6 +127,22 @@ class WsTaskController implements ControllerMethods {
 			renderSuccessJson(tasks: taskService.getTasksOfBatch(params.id))
 		}
 		catch (e) {
+			preHandleException e
+		}
+	}
+
+	/**
+	 * Sign a Provided Message using the QZCertificate
+	 * @see https://qz.io/wiki/2.0-signing-messages
+	 */
+	def qzSignMessage() {
+		try {
+			String message = params.request
+
+			String signatureBase64 = qzSignService.sign(message)
+
+			renderSuccessJson(signed_message: signatureBase64)
+		} catch (e) {
 			preHandleException e
 		}
 	}

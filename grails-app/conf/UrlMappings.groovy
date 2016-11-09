@@ -105,6 +105,12 @@ class UrlMappings {
 			action = [GET:"listEventsAndBundles"]
 		}
 
+		//Named link to render the actual URLMapping
+		name qzSignLink: "/ws/task/qzsign" {
+			controller = "wsTask"
+			action = [GET:"qzSignMessage", POST:"qzSignMessage"]
+		}
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]

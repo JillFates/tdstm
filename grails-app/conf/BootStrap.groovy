@@ -28,18 +28,22 @@ import net.transitionmanager.domain.Workflow
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.refcode.RefCode
 
 import java.lang.management.ManagementFactory
 
 class BootStrap {
-
+	GrailsApplication grailsApplication
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	StateEngineService stateEngineService
 	TaskService taskService
 
 	def init = { servletContext ->
 		checkForBlacklistedVMParameters()
+
+		//Check required default Config Info
+		checkConfigInfo()
 
 		CustomMethods.initialize()
 
@@ -58,6 +62,21 @@ class BootStrap {
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
+	}
+
+	/**
+	 * Check Config flags or alert about required information
+	 */
+	private checkConfigInfo(){
+		if(!grailsApplication.config.tdstm.qztray.passphrase) {
+			log.warn("'qztray.passphrase' not defined on Config.groovy, using default")
+			grailsApplication.config.tdstm.qztray.passphrase = "3#AKk3XHTc"
+		}
+
+		if(!grailsApplication.config.tdstm.qztray.keypath){
+			log.warn("'qztray.keyPath' not defined on Config.groovy, using default")
+			grailsApplication.config.tdstm.qztray.keypath = "qztray.transitionmanager.net.key"
+		}
 	}
 
 	private void createInitialData() {
