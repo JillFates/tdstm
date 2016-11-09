@@ -44,7 +44,7 @@
 		$(function(){
 			//Init Notifications
 			window.NOTIFICATION = $("#notification").kendoNotification({
-				autoHideAfter: 4000
+				autoHideAfter: 4000,
 				stacking: "down",
 				templates: [{
 					type: "success",
