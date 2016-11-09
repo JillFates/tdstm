@@ -2871,7 +2871,7 @@ class AssetEntityController implements ControllerMethods {
 				def moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
 				Set uniqueMoveEventList = moveBundleList.moveEvent
 				uniqueMoveEventList.remove(null)
-				List moveEventList = moveEventList = uniqueMoveEventList.toList()
+				List moveEventList = uniqueMoveEventList.toList()
 				moveEventList.sort { it?.name }
 
 				def defaultPrefs = [colorBy: 'group', appLbl: 'true', maxEdgeCount: '4']
