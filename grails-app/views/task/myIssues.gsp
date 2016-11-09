@@ -24,29 +24,27 @@
 <%-- BEGIN: NOTIFICATIONS SCRIPT --%>
 	<span id="notification" style="display:none;"></span>
 	<script id="successTemplate" type="text/x-kendo-template">
-		<div class="upload-success" style="width:240px;padding:20px 30px;line-height:1.5em;">
-			<!--img src="../content/web/notification/success-icon.png" /-->
-			<h3>#= title #</h3>
-			<p>#= message #</p>
+		<div class="alert alert-success alert-dismissable fadeIn" ng-show="alert.success.show">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<h4><i class="icon fa fa-check"></i><span ng-if="alert.success.status">#= title #:</span> #= message #</h4>
 		</div>
 	</script>
 	<script id="errorTemplate" type="text/x-kendo-template">
-		<div class="wrong-pass">
-			<!--img src="../content/web/notification/error-icon.png" /-->
-			<h3>#= title #</h3>
-			<p>#= message #</p>
+		<div class="alert alert-danger alert-dismissable fadeIn">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<h4><i class="icon fa fa-info"></i><span ng-if="alert.info.status">#= title #: </span></h4>
+			<div>
+				<ul>
+					<li >#= message #</li>
+				</ul>
+			</div>
 		</div>
 	</script>
 	<script type="application/javascript">
 		$(function(){
 			//Init Notifications
 			window.NOTIFICATION = $("#notification").kendoNotification({
-				position: {
-					pinned: true,
-					top: 30,
-					right: 30
-				},
-				autoHideAfter: 4000,
+				autoHideAfter: 4000
 				stacking: "down",
 				templates: [{
 					type: "success",
