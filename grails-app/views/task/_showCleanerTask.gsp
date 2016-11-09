@@ -147,7 +147,7 @@
 			</g:if>
 			<tr class="prop printView">
 					<td valign="top" class="name"><label for="resolution">Label Settings:</label></td>
-					<td nowrap="nowrap">
+					<td nowrap="nowrap" colspan="3">
 						<select id="printers" ${canPrint ? '' : 'disabled="disabled"' }>
 						</select> 
 						<b>Quantity: </b>
