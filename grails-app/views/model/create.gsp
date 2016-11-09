@@ -1,3 +1,4 @@
+<%@page expressionCodec="none" %>
 <%@page import="net.transitionmanager.domain.Manufacturer" %>
 <%@page import="net.transitionmanager.domain.ModelConnector" %>
 <html>
@@ -205,7 +206,7 @@
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
-						<img src="${resource(dir:'i/cabling',file:modelConnector.status + '.png')}"/>
+						<img src="${resource(dir:'i/cabling',file: '' + modelConnector.status + '.png')}"/>
 					</div>
 					<div id="labelPositionDiv${modelConnector.connector}" class="connector_${modelConnector.labelPosition}">
 						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
@@ -300,7 +301,7 @@
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
 		if(count < 51 ){
-			var connector = "<div><img src=\"../i/cabling/"+ type +".png\"/></div><div id='labelPositionDiv"+count+"' class='connector_Right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>";
+			var connector = "<div><img src=\"${resource(dir:'i/cabling',file:'"+type +".png')}\"/></div><div id='labelPositionDiv"+count+"' class='connector_Right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>";
 			$("#connector"+count).html(connector)
 			var modelConnector = $("#connectorTabe tbody").html()
 			$("#connectorModelBody").append(modelConnector)
