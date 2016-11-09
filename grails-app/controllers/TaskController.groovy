@@ -1412,7 +1412,7 @@ function goBack() { window.history.back() }
 		}
 
 		def isCleaner = partyRelationshipService.staffHasFunction(project, securityService.currentPersonId, 'CLEANER')
-		def canPrint = request.getHeader ("User-Agent").contains ("MSIE") && isCleaner
+		def canPrint = isCleaner
 
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
