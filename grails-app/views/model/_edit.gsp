@@ -1,3 +1,4 @@
+<%@page expressionCodec="none" %>
 <%@page import="net.transitionmanager.domain.Manufacturer" %>
 <%@page import="net.transitionmanager.domain.ModelConnector" %>
 <html>
@@ -250,7 +251,7 @@
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
-						<img src="${resource(dir:'i/cabling',file:modelConnector.status+'.png')}"/>
+						<img src="${resource(dir:'i/cabling',file: '' + modelConnector.status + '.png')}"/>
 					</div>
 					<div id="labelPositionDiv${modelConnector.connector}" class="connector_${modelConnector.labelPosition}">
 						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>

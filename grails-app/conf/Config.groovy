@@ -256,6 +256,7 @@ grails {
 				'/**/js/**'			:'permitAll',
 				'/**/css/**'		:'permitAll',
 				'/**/images/**'		:'permitAll',
+				'/i/**'				:'permitAll',
 				'/**/icons/**'		:'permitAll',
 				'/**/favicon.ico'	:'permitAll',
 				'/app-js/**'		:'permitAll', // Angular - resources
