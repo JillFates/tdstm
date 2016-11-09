@@ -30,10 +30,10 @@
 		<input type="hidden" name="cartQty" id="cartQty" value="${cartQty}" />
 		<table style="margin-left: -2px;">
 			<tr>
-				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
+				<td class="heading" colspan=4><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
 			<tr>
-			<td colspan="3">
+				<td colspan="4">
 			</td>
 			</tr>		
 			<tr>	
