@@ -9,7 +9,12 @@
 		<g:if test="${canPrint}">
 			<div class="printViewError">
 				<ul>
-					<li>Please note that in order to print barcode labels you will need the to use a Java (1.7+) Applet enabled Browser like FireFox or IE/Edge and the plugin to allow Applets to run in the browser. <a href="https://java.com/en/download/help/enable_browser.xml" target="_blank"> More ... </a></li>
+					<li>
+						Please note that in order to print barcode labels you will need to use the
+						<strong><a href="https://qz.io/download/" target="_blank">QZ Tray 2.0</a></strong>
+						that can be downloaded from
+						<a href="https://qz.io/download/" target="_blank">https://qz.io/download/</a>
+					</li>
 				</ul>
 			</div>
 		</g:if>

@@ -3,6 +3,7 @@ QZ = function(opts){
 
   var onSuccess = opts.onSuccess || NOP;
   var onFail = opts.onFail || NOP;
+  var onConnectionError = opts.onConnectionError || NOP;
   var codebase = opts.codebase || ".";
   var signaturePath = opts.signaturePath || ".";
 
@@ -152,7 +153,7 @@ QZ = function(opts){
     } else {
       displayError(err);
     }
-    onFail(err)
+    onConnectionError(err);
   }
 
   function displayError(err) {

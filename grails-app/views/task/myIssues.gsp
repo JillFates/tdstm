@@ -469,6 +469,9 @@ setFocus();
 						message: error
 					}, "error");
 				}
+			},
+			onConnectionError: function (error){
+				//swallow Error
 			}
 		});
 	});
