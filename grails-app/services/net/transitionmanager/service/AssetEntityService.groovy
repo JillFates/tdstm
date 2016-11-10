@@ -1454,11 +1454,14 @@ class AssetEntityService implements ServiceMethods {
 
 		roomId = NumberUtil.toLong(roomId)
 		if (roomId) {
-			Rack.executeQuery('''
+			def racks = Rack.executeQuery('''
 				from Rack r inner join r.model m
 				where r.project=:p and r.room.id=:r and m.assetType=:t
 				order by r.tag
-			''', [p: project, r: roomId, t: 'Rack']).each { Rack rack -> rsl << [id: rack.id, value: rack.tag] }
+			''', [p: project, r: roomId, t: 'Rack'])
+			racks.each { rack -> 
+					rsl << [id: rack[0].id, value: rack[0].tag] 
+			}
 		}
 
 		return rsl
@@ -2011,11 +2014,7 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	List<Manufacturer> getManufacturers(assetType) {
-		Model.executeQuery('''
-			select manufacturer from Model
-			where assetType=?
-			group by manufacturer
-			order by manufacturer.name''', [assetType])
+		return Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 	}
 
 	/**
