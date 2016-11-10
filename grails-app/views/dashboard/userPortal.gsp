@@ -8,7 +8,6 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'userPortal.css')}"/>
     <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'ui.datepicker.css')}"/>
 
-    <script src="${resource(dir: '/dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
     <g:javascript src="asset.comment.js"/>
     <g:javascript src="asset.tranman.js"/>
     <g:javascript src="entity.crud.js"/>
