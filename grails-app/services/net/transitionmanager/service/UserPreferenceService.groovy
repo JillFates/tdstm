@@ -292,7 +292,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * Return the File Stored Timezones
 	 */
 	def timezonePickerAreas() {
-		JSON.parse(ExportUtil.getResource('timezone/world_map_areas.json').inputStream.text)
+		JSON.parse(ExportUtil.getResource('templates/timezone/world_map_areas.json').inputStream.text)
 	}
 
 	private UserLogin resolve(UserLogin userLogin) {
