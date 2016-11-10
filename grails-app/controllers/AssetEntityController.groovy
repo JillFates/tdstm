@@ -62,7 +62,10 @@ import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskImportExportService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.UserService
 import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
@@ -715,7 +718,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 
 			// Set flag so user is later prompted to process the batch(es)
-			if (added > 0) {
+			if (theResults.added > 0) {
 				flagToManageBatches = true
 			}
 		}
