@@ -836,8 +836,14 @@ class RackLayoutsController implements ControllerMethods {
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def currentBundle = userPreferenceService.moveBundleId
 		/* set first bundle as default if user pref not exist */
-		List<Model> models = AssetEntity.executeQuery('SELECT ae.model FROM ae.AssetEntity WHERE ae.project=? GROUP BY ae.model', [project])
-
+		List<Model> models = AssetEntity.withCriteria{
+			projections{
+				distinct("model")
+			}
+			and{
+				eq("project", project)
+			}
+		}
 		if (!currentBundle) {
 			currentBundle = moveBundleList[0]?.id?.toString()
 		}
