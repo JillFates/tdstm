@@ -26,7 +26,7 @@
 		}
 		function redirectToListStaff() {
 			if (confirm("Please click on the CREATE button of existing staff in the Admin > List Staff to create users. Click OK to go there now or Cancel to do nothing.")) {
-				window.location.href = tdsCommon.createAppURL("/person/index");
+				window.location.href = tdsCommon.createAppURL("/person/list");
 			}
 		}
 		</script>
