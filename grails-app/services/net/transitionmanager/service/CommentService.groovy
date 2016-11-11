@@ -43,16 +43,6 @@ class CommentService implements ServiceMethods {
 	SequenceService sequenceService
 	UserPreferenceService userPreferenceService
 
-	// TODO : This should use an array defined in AssetCommentCategory instead as that is where people will add new statuses
-	private final List<String> statusToSendEmailFor = [
-		AssetCommentCategory.GENERAL,
-		AssetCommentCategory.DISCOVERY,
-		AssetCommentCategory.PLANNING,
-		AssetCommentCategory.WALKTHRU,
-		AssetCommentCategory.PREMOVE,
-		AssetCommentCategory.POSTMOVE
-	]
-
 	/**
 	 * Used to persist changes to the AssetComment and CommentNote from various forms for both Tasks and Comments
 	 * @param tzId - the user's time zone id
@@ -499,7 +489,7 @@ class CommentService implements ServiceMethods {
 		// log.info "sendTaskEMail: commentType: $assetComment.commentType, category: $assetComment.category"
 
 		// Only send emails out for issues in the categories up to premove
-		if (assetComment.commentType != AssetCommentType.TASK || !statusToSendEmailFor.contains(assetComment.category)) {
+		if (assetComment.commentType != AssetCommentType.TASK ) {
 			return
 		}
 
