@@ -155,7 +155,7 @@
 	</script>
 </head>
 <body class="hold-transition login-page" onload="setFieldFocus()">
-<div class="login-box">
+<div class="login-box ${(preLoginList && preLoginList.size > 0)? "login-notice" : ""}">
 
 	<div class="login-box-body">
 		<div class="login-logo">
@@ -163,13 +163,11 @@
 				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
 			</a>
 		</div>
-		<g:if test="${noticeList && noticeList.size() > 0}">
-			<g:each var="notice" in="${noticeList}">
-				<g:if test="${notice.typeId == noticeType.Prelogin && notice.active}" >
-					<div class="callout pre-login-message">
-						${notice.htmlText}
-					</div>
-				</g:if>
+		<g:if test="${preLoginList && preLoginList.size() > 0}">
+			<g:each var="notice" in="${preLoginList}">
+				<div class="callout pre-login-message">
+					${notice.htmlText}
+				</div>
 			</g:each>
 		</g:if>
 		<h1 class="login-box-msg">Sign in to start your session</h1>
@@ -259,12 +257,10 @@
 	</div>
 
 	<div id="postLoginMessages" title="Confirmation Required" style="display: none;">
-			<g:if test="${noticeList && noticeList.size() > 0}">
-				<g:each var="notice" in="${noticeList}">
-					<g:if test="${notice.typeId == noticeType.Postlogin && notice.active}" >
-						<h4>${notice.title}</h4>
-						${notice.htmlText}
-					</g:if>
+			<g:if test="${postLoginList && postLoginList.size() > 0}">
+				<g:each var="notice" in="${postLoginList}">
+					<h4>${notice.title}</h4>
+					${notice.htmlText}
 				</g:each>
 			</g:if>
 			<div class="modal-footer">

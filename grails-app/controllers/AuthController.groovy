@@ -53,9 +53,24 @@ class AuthController implements ControllerMethods {
 		// Adding the X-Login-URL header so that we can catch it in Ajax calls
 		response.setHeader('X-Login-URL', createLink(controller: 'auth', action: 'login', absolute: true).toString())
 
+		def noticeList = noticeService.fetch();
+		def preLoginList = [];
+		def postLoginList = [];
+		noticeList.each {
+			if (it.typeId == Notice.NoticeType.Prelogin && it.active) {
+				preLoginList.push(it)
+			}
+
+			if (it.typeId == Notice.NoticeType.Postlogin && it.active) {
+				postLoginList.push(it)
+			}
+		}
+
+		//notice.typeId == noticeType.Postlogin && notice.active
+
 		[username: params.username, authority: params.authority, rememberMe: params.rememberMe != null,
 		 loginConfig: securityService.getLoginConfig(), buildInfo: environmentService.getVersionText(),
-		 noticeList: noticeService.fetch(), noticeType: Notice.NoticeType]
+		 preLoginList: preLoginList, postLoginList: postLoginList]
 	}
 
 	private void redirectToPrefPage() {
