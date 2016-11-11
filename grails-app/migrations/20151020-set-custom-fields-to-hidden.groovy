@@ -1,6 +1,7 @@
 import grails.converters.JSON
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tds.asset.FieldImportance
+import net.transitionmanager.domain.Project
 
 /**
  * Set custom fields to hidden by default in default project
