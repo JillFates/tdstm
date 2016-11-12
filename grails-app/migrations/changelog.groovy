@@ -138,4 +138,5 @@ databaseChangeLog = {
 	include file: "20161006-update-user-preference-code-legendTwistieState.groovy"
 	include file: "20161010-notice-support.groovy"
 	include file: "20161010-notice-support-change-noticetype-column.groovy"
+	include file: "20161111-delete-asset-dependency-orphans.groovy"
 }

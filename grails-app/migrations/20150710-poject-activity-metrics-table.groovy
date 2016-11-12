@@ -101,6 +101,11 @@ databaseChangeLog = {
 
 	changeSet(author: "dscarpa", id: "20150719 TM-3965-3") {
 		comment('Add FKs to project activity metrics table')
+		preConditions( onFail:'MARK_RAN', onFailMessage: 'Sorry, the foreign key fk_projectDailyMetric_project already exist in the database' ){
+			not {
+				foreignKeyConstraintExists(schemaName:'tdstm', foreignKeyName: 'fk_projectDailyMetric_project')
+			}
+		}
         sql("""ALTER TABLE `project_daily_metric`
                  ADD CONSTRAINT `fk_projectDailyMetric_project` FOREIGN KEY (`project_id`)
                     REFERENCES `project` (`project_id`)
