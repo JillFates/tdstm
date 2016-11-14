@@ -244,6 +244,36 @@ class UrlMappings {
 			]
 		}
 
+		//Licencias Activas/"Cargadas"
+		"/ws/licenses" {
+			controller = "wsLicenseController"
+			action = [
+					GET: "getLicenses"
+			]
+		}
+
+		//Requests
+		"/ws/licenses/requests" {
+			controller = "wsLicenseController"
+			action = [
+			        POST: "generateRequest"
+			]
+		}
+
+		"/ws/licenses/environments" {
+			controller = "wsLicenseController"
+			action = [
+			        GET: "getEnvironments"
+			]
+		}
+
+		"/ws/licenses/projects" {
+			controller = "wsLicenseController"
+			action = [
+					GET: "getProjects"
+			]
+		}
+
 
 		//ROOT map to the auth/index action
 		"/"(controller: "auth")

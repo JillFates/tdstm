@@ -7,7 +7,7 @@ class License {
 	String id = UUID.randomUUID().toString()
 	String instalationNum
 	String email
-	String environment
+	Environment environment
 	String project
 	String method = ""
 	int    max = 0
@@ -35,5 +35,18 @@ class License {
 
 	public boolean isActive(){
 		return (hash)? true : false
+	}
+
+
+	enum Environment {
+		Engineering(1),
+		Training(2),
+		Demo(3),
+		Production(4)
+
+		int id
+		Environment(int id) {
+			this.id = id
+		}
 	}
 }

@@ -30,4 +30,11 @@ databaseChangeLog = {
 			)
 		""")
 	}
+
+	changeSet(author: "oluna", id: "20160920 TM-3776-A2") {
+		sql("""
+			ALTER TABLE `tdstm`.`license`
+			CHANGE COLUMN `environment` `environment` INT NOT NULL COMMENT '' ;
+		""")
+	}
 }
