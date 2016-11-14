@@ -1292,7 +1292,7 @@ class AssetEntityService implements ServiceMethods {
 
 		def assetComment
 		if (AssetComment.executeQuery('select count(*) from AssetComment ' +
-		                              'where assetEntity=:assetEntity and commentType=? and isResolved=?',
+		                              'where assetEntity=? and commentType=? and isResolved=?',
 		                              [assetEntity, 'issue', 0])[0]) {
 			assetComment = "issue"
 		} else if (assetEntity && AssetComment.countByAssetEntity(assetEntity)) {
