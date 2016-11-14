@@ -1,5 +1,10 @@
 import grails.util.Environment
 
+tdstm.license = [
+		password: "sampleKey1984",
+		enabled : true
+]
+
 // copy binding variables into properties in the config for visibility in external scripts; as of 2.5.4 the
 // vars are: appName, appVersion, basedir, baseFile, baseName, grailsHome,
 //           grailsSettings, grailsVersion, groovyVersion, springVersion, userHome

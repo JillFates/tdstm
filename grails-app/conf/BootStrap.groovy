@@ -28,6 +28,7 @@ import net.transitionmanager.domain.Workflow
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
+import net.transitionmanager.service.license.LicenseService
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.refcode.RefCode
 
@@ -38,12 +39,16 @@ class BootStrap {
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	StateEngineService stateEngineService
 	TaskService taskService
+	LicenseService licenseService
 
 	def init = { servletContext ->
 		checkForBlacklistedVMParameters()
 
 		//Check required default Config Info
 		checkConfigInfo()
+
+		//initialize License service to use
+		licenseService.initialize()
 
 		CustomMethods.initialize()
 
