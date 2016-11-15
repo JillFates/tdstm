@@ -75,7 +75,7 @@
 				<tr title="Sets the criteria used to determine node fill color">
 					<td colspan="3" style="padding-left :0px">
 						<span class="checkboxContainer">
-							<g:select name="colorBy" id="colorBySelectId" from="${colorByGroupLabels.values()}" keys="${colorByGroupLabels.keySet()}" value="${graphPrefs.colorBy ? graphPrefs.colorBy : defaultPrefs.colorBy}"></g:select>
+							<g:select name="colorBy" id="colorBySelectId" from="${colorByGroupLabels?.values()}" keys="${colorByGroupLabels?.keySet()}" value="${graphPrefs.colorBy ? graphPrefs.colorBy : defaultPrefs.colorBy}"></g:select>
 							<label for="colorBySelectId">&nbsp;Color By</label>
 						</span>
 					</td>

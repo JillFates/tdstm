@@ -2976,6 +2976,9 @@ class AssetEntityController implements ControllerMethods {
 				// Query for only the dependencies that will be shown
 				def depBundle = params.dependencyBundle.isNumber() ? params.dependencyBundle : 0
 
+				//map Groups array String values to Integer
+				depGroups = depGroups*.toInteger()
+
 				def assetDependencies = AssetDependency.executeQuery('''
 					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future,
 					                ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
@@ -2992,8 +2995,11 @@ class AssetEntityController implements ControllerMethods {
 						AND adb2.project = p
 						AND p.id = :projectId
 					GROUP BY ad.id
-				''', [statuses: [AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.VALIDATED, AssetDependencyStatus.QUESTIONED],
-				      depGroups: depGroups, projectId: project.id])
+				''', [
+						statuses: [AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.VALIDATED, AssetDependencyStatus.QUESTIONED],
+						depGroups: depGroups,
+						projectId: project.id
+				])
 
 				def multiCheck = new Date()
 
