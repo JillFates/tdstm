@@ -551,6 +551,9 @@ function updateElementPositions () {
 	
 	if (isIE)
 		vis.style('line-height', Math.random())
+
+	drawContextMenu();
+
 }
 
 
@@ -663,7 +666,7 @@ function resizeGraph (width, height) {
 	
 	GraphUtil.force.size([width, height])
 	GraphUtil.startForce()
-	
+
 	reoptimizeGraph()
 }
 
@@ -1278,4 +1281,5 @@ function setGraphDimensions (width, height) {
 		.attr("height", height)
 }
 </script>
+<ul class="customMenu"></ul>
 </div>
