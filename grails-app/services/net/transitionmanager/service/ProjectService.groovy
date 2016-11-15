@@ -1478,4 +1478,26 @@ class ProjectService implements ServiceMethods {
 	boolean hasAccessToProject(UserLogin userLogin = null, long projectId) {
 		return projectId in (getUserProjects(securityService.hasPermission("ShowAllProjects"), null, null, userLogin)*.id)
 	}
+
+	        /**
+        * Get List of projects by the Owner
+        * @param owner
+        * @return
+        */
+    List<Project> getProjectsWhereOwner(PartyGroup owner){
+        assert owner != null
+        def params = [
+                owner:owner
+           ]
+        def projects = PartyRelationship.executeQuery(
+						"select partyIdFrom from PartyRelationship pr where \
+						pr.partyRelationshipType.id = 'PROJ_COMPANY' and \
+						pr.roleTypeCodeFrom.id = 'PROJECT' and \
+                        pr.roleTypeCodeTo.id = 'COMPANY' and \
+						pr.partyIdTo = :owner", params)
+
+               return projects
+       }
+
+ 
 }
