@@ -1,6 +1,11 @@
 import grails.util.Environment
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 
+tdstm.license = [
+	password: 'sampleKey1984',
+	enabled : true
+]
+
 // This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
 println ""
 
@@ -43,7 +48,11 @@ for (appConfigLocation in candidates) {
 	foundAppConfig = true
 }
 if (!foundAppConfig) {
-	throw new IllegalArgumentException("The application configuration file was not found in the following locations: ${candidates}")
+	if (Environment.current.name == 'test') {
+		println "ERROR The application configuration file was not found in the following locations: ${candidates}"
+	} else {
+		throw new IllegalArgumentException("The application configuration file was not found in the following locations: ${candidates}")
+	}
 }
 
 grails {
