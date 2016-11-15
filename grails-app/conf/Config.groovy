@@ -5,6 +5,9 @@ tdstm.license = [
 		enabled : true
 ]
 
+// This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
+println ""
+
 // copy binding variables into properties in the config for visibility in external scripts; as of 2.5.4 the
 // vars are: appName, appVersion, basedir, baseFile, baseName, grailsHome,
 //           grailsSettings, grailsVersion, groovyVersion, springVersion, userHome
@@ -12,34 +15,39 @@ getBinding().variables.each { name, value -> setProperty name, value }
 String appName = this.appName ?: null
 
 grails.config.locations = []
-def candidates = [System.getProperty("${appName}.config.location"),
-                  "$userHome/.grails/${appName}-config.groovy"]
-for (appConfigLocation in candidates) {
-	if (!appConfigLocation) continue
 
+List candidates = []
+String configFileFromJavaOpts = System.getProperty("${appName}.config.location")
+if (configFileFromJavaOpts) candidates << configFileFromJavaOpts
+candidates << "$userHome/.grails/${appName}-config.groovy"
+
+boolean foundAppConfig=false
+for (appConfigLocation in candidates) {
 	File f
 	try {
 		f = new File(appConfigLocation)
 	}
 	catch (e) {
-		throw new IllegalArgumentException("Invalid application configuration file path '$appConfigLocation'")
+		throw new IllegalArgumentException("ERROR Invalid application configuration file path '$appConfigLocation'")
 	}
 
-	if (!f.exists()) {
-		// write to console, Log4j isn't initialized yet
-		System.err.println "Application properties file '$appConfigLocation' not found"
-		continue
-	}
+	if (!f.exists()) continue
 
 	try {
 		// Test that there are no errors in the config syntax
 		new ConfigSlurper(Environment.current.name).parse(f.toURI().toURL())
 	}
 	catch (e) {
-		throw new IllegalArgumentException("There appears to be an error in the $appConfigLocation application configuration file: $e.message")
+		throw new IllegalArgumentException("ERROR There appears to be an error in the $appConfigLocation application configuration file: $e.message")
 	}
 
 	grails.config.locations << 'file:' + appConfigLocation
+	println "INFO The application config was loaded from ${appConfigLocation}"
+
+	foundAppConfig = true
+}
+if (!foundAppConfig) {
+	throw new IllegalArgumentException("The application configuration file was not found in the following locations: ${candidates}")
 }
 
 grails {
