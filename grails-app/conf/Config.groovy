@@ -1,8 +1,8 @@
 import grails.util.Environment
 
 tdstm.license = [
-		password: "sampleKey1984",
-		enabled : true
+	password: 'sampleKey1984',
+	enabled : true
 ]
 
 // This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
@@ -47,7 +47,11 @@ for (appConfigLocation in candidates) {
 	foundAppConfig = true
 }
 if (!foundAppConfig) {
-	throw new IllegalArgumentException("The application configuration file was not found in the following locations: ${candidates}")
+	if (Environment.current.name == 'test') {
+		println "ERROR The application configuration file was not found in the following locations: ${candidates}"
+	} else {
+		throw new IllegalArgumentException("The application configuration file was not found in the following locations: ${candidates}")
+	}
 }
 
 grails {
