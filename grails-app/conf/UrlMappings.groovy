@@ -223,7 +223,7 @@ class UrlMappings {
 		"/ws/notices/$id" {
 			controller = "wsNotice"
 			action = [
-					GET:  "get",
+					GET:  "fetchById",
 					DELETE: "delete",
 					PUT: "update"
 			]
@@ -244,7 +244,7 @@ class UrlMappings {
 			]
 		}
 
-		//Licencias Activas/"Cargadas"
+		///// LICENSES API /////////
 		"/ws/licenses" {
 			controller = "wsLicenseController"
 			action = [
@@ -263,7 +263,7 @@ class UrlMappings {
 		"/ws/licenses/environments" {
 			controller = "wsLicenseController"
 			action = [
-			        GET: "getEnvironments"
+			        GET: "fetchEnvironments"
 			]
 		}
 

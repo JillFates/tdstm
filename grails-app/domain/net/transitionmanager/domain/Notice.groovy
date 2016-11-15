@@ -66,6 +66,10 @@ class Notice {
 		executeUpdate('delete NoticeAcknowledgment where notice = ?', [this])
 	}
 
+	def beforeValidate() {
+		lastModified = new Date()
+	}
+
 	private static final Map<String, Class> MARSHALLER_TYPES = [
 		acknowledgeable: Object,
 		active:          Object,

@@ -13,7 +13,7 @@ class WsNoticeController implements ControllerMethods {
 
 	/**
 	 * Fetch using pType
-	 * We might expand this to add different tipe of filters
+	 * We might expand this to add different type of filters
 	 */
 	def fetch(Integer typeId) {
 		try {
@@ -32,7 +32,7 @@ class WsNoticeController implements ControllerMethods {
 	/**
 	 * Get Notice By ID
 	 */
-	def get(Long id) {
+	def fetchById(Long id) {
 		try {
 			Notice notice = noticeService.get(id)
 			if (!notice) {
