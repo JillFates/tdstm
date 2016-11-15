@@ -111,7 +111,7 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="description">Runbook bridge1 :</label>
+                                    <label for="description">Runbook bridge2 :</label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge2','errors')}">
                                     <input type="text" id="runbookBridge2" name="runbookBridge2" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
