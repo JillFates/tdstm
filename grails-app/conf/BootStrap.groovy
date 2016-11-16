@@ -85,8 +85,9 @@ class BootStrap {
 			grailsApplication.config.tdstm.qztray.keypath = "tdstm/qztray.transitionmanager.net.key"
 		}
 
-		if(!(qzSignService.findPrivateKeyFile().exists())){
-			log.warn("QZ Tray key file '${grailsApplication.config.tdstm.qztray.keypath}' was not found")
+		File keyFile = qzSignService.findPrivateKeyFile()
+		if(!keyFile.exists()){
+			log.warn("QZ Tray key file '${keyFile}' was not found")
 		}
 	}
 
