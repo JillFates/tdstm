@@ -30,7 +30,7 @@ export default class LicenseManagerList {
             },
             columns: [
                 {field: 'licenseId', hidden: true },
-                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseDetails(this)"><span class="glyphicon glyphicon-edit"></span></button>' },
+                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-edit"></span></button>' },
                 {field: 'principal', title: 'Principal'},
                 {field: 'client', title: 'Client'},
                 {field: 'project', title: 'Project'},
@@ -105,7 +105,6 @@ export default class LicenseManagerList {
                                     encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
                                 }
                             ];
-                            this.licenseGridOptions.dataSource.data = data;
                             e.success(data);
                        /* });*/
                     }
@@ -118,7 +117,7 @@ export default class LicenseManagerList {
                         });
 
                         if(newLicenseCreated) {
-                            this.onLicenseDetails(newLicenseCreated);
+                            this.onLicenseManagerDetails(newLicenseCreated);
                         }
                     }
                 }
@@ -147,16 +146,21 @@ export default class LicenseManagerList {
      * After clicking on edit, we redirect the user to the Edition screen instead of open a dialog
      * du the size of the inputs
      */
-    onLicenseDetails(license) {
+    onLicenseManagerDetails(license) {
         this.log.info('Open Details for: ', license);
-        /*var modalInstance = this.uibModal.open({
+        var modalInstance = this.uibModal.open({
             animation: true,
-            templateUrl: '../app-js/modules/licenseAdmin/detail/LicenseDetail.html',
-            controller: 'LicenseDetail as licenseDetail',
+            templateUrl: '../app-js/modules/licenseManager/detail/LicenseManagerDetail.html',
+            controller: 'LicenseManagerDetail as licenseManagerDetail',
             size: 'lg',
             resolve: {
                 params: function () {
-                    var dataItem = license && license.dataItem;
+                    var dataItem = {};
+                    if(license && license.dataItem) {
+                        dataItem = license.dataItem;
+                    } else {
+                        dataItem = license;
+                    }
                     return { license: dataItem };
                 }
             }
@@ -166,22 +170,9 @@ export default class LicenseManagerList {
 
         }, () => {
             this.log.info('Request Canceled.');
-        });*/
-    }
-
-    onNewLicenseCreated() {
-        this.uibModal.open({
-            animation: true,
-            templateUrl: '../app-js/modules/licenseAdmin/created/CreatedLicense.html',
-            size: 'md',
-            controller: 'CreatedLicense as createdLicense',
-            resolve: {
-                params: function () {
-                    return { id: 50, name: 'Acme, Inc.', email: 'acme@inc.com'  };
-                }
-            }
         });
     }
+
 
     reloadLicenseManagerList() {
         if(this.licenseGrid.dataSource) {

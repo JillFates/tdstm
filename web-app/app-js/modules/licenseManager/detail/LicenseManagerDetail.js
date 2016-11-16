@@ -4,7 +4,7 @@
 
 'use strict';
 
-export default class LicenseDetail {
+export default class LicenseManagerDetail {
 
     constructor($log, licenseManagerService, $uibModal, $uibModalInstance, params) {
         this.licenseManagerService = licenseManagerService;
