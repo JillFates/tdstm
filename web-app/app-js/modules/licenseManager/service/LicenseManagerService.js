@@ -39,10 +39,10 @@ export default class LicenseManagerService {
         });
     }
 
-    applyLicense(license, callback) {
-        this.restService.licenseAdminServiceHandler().applyLicense(license, (data) => {
+    importLicense(license, callback) {
+        this.restService.licenseManagerServiceHandler().requestImport(license, (data) => {
             //if(data.applied) {
-                this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'License was successfully applied'});
+                this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'License was successfully Imported'});
             /*} else {
                 this.rootScope.$emit('broadcast-msg', { type: 'warning', text: 'License was successfully applied'});
             }*/

@@ -8,6 +8,7 @@ export default class LicenseAdminList {
     constructor($log, $state, licenseAdminService, $uibModal) {
         this.log = $log;
         this.state = $state;
+        this.licenseGrid = {};
         this.licenseGridOptions = {};
         this.licenseAdminService = licenseAdminService;
         this.uibModal = $uibModal;
@@ -18,7 +19,7 @@ export default class LicenseAdminList {
 
     getDataSource() {
         this.licenseGridOptions = {
-            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="licenseAdminList.onRequestNewLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Request New License</button> <div class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="licenseAdminList.onRequestNewLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Request New License</button> <div ng-click="licenseManagerList.reloadLicenseAdminList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
             pageable: {
                 refresh: true,
                 pageSizes: true,
@@ -126,6 +127,7 @@ export default class LicenseAdminList {
         modalInstance.result.then((license) => {
             this.log.info('New License Created: ', license);
             this.onNewLicenseCreated(license);
+            this.reloadLicenseAdminList();
         }, () => {
             this.log.info('Request Canceled.');
         });
@@ -169,6 +171,12 @@ export default class LicenseAdminList {
                 }
             }
         });
+    }
+
+    reloadLicenseAdminList() {
+        if(this.licenseGrid.dataSource) {
+            this.licenseGrid.dataSource.read();
+        }
     }
 
 }

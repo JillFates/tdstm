@@ -4,19 +4,21 @@
 
 'use strict';
 
-export default class ApplyLicenseKey {
+export default class RequestImport {
 
-    constructor($log, licenseManagerService, $uibModalInstance, params) {
+    constructor($log, licenseManagerService, $uibModalInstance) {
         this.licenseManagerService = licenseManagerService;
         this.uibModalInstance = $uibModalInstance;
-        this.licenseModel = params.license;
+        this.licenseModel = {
+            license: ''
+        };
     }
 
     /**
      * Execute and validate the Key is correct
      */
-    applyKey() {
-        this.licenseManagerService.applyLicense(this.licenseModel, (data) => {
+    onImportLicense() {
+        this.licenseManagerService.importLicense(this.licenseModel, (data) => {
             this.uibModalInstance.close(data);
         });
     }

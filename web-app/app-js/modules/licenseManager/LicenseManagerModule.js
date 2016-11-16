@@ -9,6 +9,7 @@ import uiRouter from 'ui-router';
 
 import LicenseManagerList from './list/LicenseManagerList.js';
 import LicenseManagerService from './service/LicenseManagerService.js';
+import RequestImport from './requestImport/RequestImport.js';
 
 
 var LicenseManagerModule = angular.module('TDSTM.LicenseManagerModule', [uiRouter]).config(['$stateProvider',  '$translatePartialLoaderProvider',
@@ -30,7 +31,7 @@ var LicenseManagerModule = angular.module('TDSTM.LicenseManagerModule', [uiRoute
                 'headerView@': header,
                 'bodyView@': {
                     templateUrl: '../app-js/modules/licenseManager/list/LicenseManagerList.html',
-                    controller: 'LicenseList as licenseList'
+                    controller: 'LicenseManagerList as licenseManagerList'
                 }
             }
         });
@@ -41,7 +42,10 @@ LicenseManagerModule.service('LicenseManagerService', ['$log', 'RestServiceHandl
 
 
 // Controllers
-LicenseManagerModule.controller('LicenseList', ['$log', '$state', 'LicenseManagerService', '$uibModal', LicenseManagerList]);
+LicenseManagerModule.controller('LicenseManagerList', ['$log', '$state', 'LicenseManagerService', '$uibModal', LicenseManagerList]);
+
+// Modal - Controllers
+LicenseManagerModule.controller('RequestImport', ['$log', 'LicenseManagerService', '$uibModalInstance', RequestImport]);
 
 
 export default LicenseManagerModule;

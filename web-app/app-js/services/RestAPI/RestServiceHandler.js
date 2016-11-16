@@ -80,6 +80,17 @@ export default class RestServiceHandler {
         };
     }
 
+    licenseManagerServiceHandler() {
+        return {
+            requestImport:  (data, callback) => {
+                this.req.method = 'POST';
+                this.req.url =  '../ws/???';
+                this.req.data = data;
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
+            }
+        };
+    }
+
     noticeManagerServiceHandler() {
         return {
             getNoticeList: (onSuccess) => { // real ws example
