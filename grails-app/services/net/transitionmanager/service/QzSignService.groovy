@@ -15,15 +15,32 @@ import java.security.Signature
 class QzSignService {
 	def grailsApplication
 
+	/**
+	 *
+	 * First we look for the private key relative to the WEB-INF
+	 * If it can't be found there, fallback to the Application's Home directory
+	 * @return File object representing the configuration File (use exists() to check if its there)
+	 */
+	File findPrivateKeyFile(){
+		def keyPath = grailsApplication.config.tdstm.qztray.keypath
+		def keyFileRes = grailsApplication.parentContext.getResource("/WEB-INF/${keyPath}")
+
+		if(keyFileRes.exists()){
+			return keyFileRes.file
+		}else{
+			return new File(keyPath)
+		}
+	}
+
 	def sign(String message) {
 		def passphrase = grailsApplication.config.tdstm.qztray.passphrase
-		def keyPath = grailsApplication.config.tdstm.qztray.keypath
+
+		File privateKeyFile = findPrivateKeyFile()
 
 		char[] passph = passphrase.toCharArray()
 		Security.addProvider(new BouncyCastleProvider())
 
-		File privateKey = new File(keyPath)
-		KeyPair keyPair = readKeyPair(privateKey, passph)
+		KeyPair keyPair = readKeyPair(privateKeyFile, passph)
 		PrivateKey privKey = keyPair.getPrivate()
 
 		Signature signature = Signature.getInstance("SHA1withRSA") //Encryption Algorithm
@@ -34,8 +51,8 @@ class QzSignService {
 		return new String(Base64.encode(signatureBytes))
 	}
 
-	private static KeyPair readKeyPair(File privateKey, char [] keyPassword) throws IOException {
-		FileReader fileReader = new FileReader(privateKey)
+	private static KeyPair readKeyPair(File privateKeyFile, char [] keyPassword) throws IOException {
+		FileReader fileReader = new FileReader(privateKeyFile)
 		PEMReader r = new PEMReader(fileReader, new DefaultPasswordFinder(keyPassword))
 		try {
 			return (KeyPair) r.readObject()

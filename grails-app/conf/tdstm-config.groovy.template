@@ -35,6 +35,13 @@ tdstm {
 		serviceRestartCommand='service tomcat_tranman01 restart'
 	}
 
+  qztray{
+	  //relative to the WEB-INF, if it can't be found there, fallback to the Application's Home directory
+    keypath = 'tdstm/qztray.transitionmanager.net.key'
+    passphrase = '3#AKk3XHTc'
+  }
+
+
 	security {
 
 		// Audit configuration, valid options are: access and activity (default is access)

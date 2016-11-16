@@ -26,6 +26,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
+import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.license.LicenseService
@@ -39,6 +40,7 @@ class BootStrap {
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	StateEngineService stateEngineService
 	TaskService taskService
+	QzSignService qzSignService
 	LicenseService licenseService
 
 	def init = { servletContext ->
@@ -79,8 +81,12 @@ class BootStrap {
 		}
 
 		if(!grailsApplication.config.tdstm.qztray.keypath){
-			log.warn("'qztray.keyPath' not defined on Config.groovy, using default")
-			grailsApplication.config.tdstm.qztray.keypath = "qztray.transitionmanager.net.key"
+			log.warn("Application configuration file is missing for the QZ Tray key file property ('qztray.keyPath')")
+			grailsApplication.config.tdstm.qztray.keypath = "tdstm/qztray.transitionmanager.net.key"
+		}
+
+		if(!(qzSignService.findPrivateKeyFile().exists())){
+			log.warn("QZ Tray key file '${grailsApplication.config.tdstm.qztray.keypath}' was not found")
 		}
 	}
 
