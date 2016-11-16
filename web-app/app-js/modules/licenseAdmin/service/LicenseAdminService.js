@@ -4,7 +4,7 @@
 
 'use strict';
 
-export default class LicenseManagerService {
+export default class LicenseAdminService {
 
     constructor($log, restServiceHandler, $rootScope) {
         this.log = $log;

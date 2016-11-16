@@ -14,12 +14,12 @@ export default class LicenseList {
 
         this.getDataSource();
         //this.getLicenseList();
-        this.log.debug('LicenseList Instanced');
+        this.log.debug('LicenseManagerList Instanced');
     }
 
     getDataSource() {
         this.licenseGridOptions = {
-            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="licenseList.onRequestNewLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Request New License</button> <div onclick="loadGridBundleList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="licenseList.onRequestNewLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Import License Request</button> <div onclick="loadGridBundleList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
             pageable: {
                 refresh: true,
                 pageSizes: true,
@@ -28,6 +28,7 @@ export default class LicenseList {
             columns: [
                 {field: 'licenseId', hidden: true },
                 {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseList.onLicenseDetails(this)"><span class="glyphicon glyphicon-edit"></span></button>' },
+                {field: 'principal', title: 'Principal'},
                 {field: 'client', title: 'Client'},
                 {field: 'project', title: 'Project'},
                 {field: 'contact_email', title: 'Contact Email'},
@@ -71,32 +72,6 @@ export default class LicenseList {
                                         name: 'aasdas54-5asd4a5sd-asd45a4sd'
                                     },
                                     encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
-                                },
-                                {
-                                    licenseId: 2,
-                                    keyId: 'df42dge2-2bd6-5gdd-cf6d-dd8996d9g94c',
-                                    action: '',
-                                    client: 'Acme Inc.',
-                                    project: 'DR Relo',
-                                    contact_email: 'jim.laucher@acme.com',
-                                    status: 'Pending',
-                                    type: 'Project',
-                                    method: {
-                                        id: 2,
-                                        name: 'Token'
-                                    },
-                                    servers_tokens: '15000',
-                                    inception: '2016-09-01',
-                                    expiration: '2016-10-01',
-                                    environment: 'Demo',
-                                    specialInstructions: '',
-                                    applied: true,
-                                    replaced: {
-                                        date: new Date(),
-                                        serverUrl: 'http:blablaba.com',
-                                        name: 'basfasd-2aphgosdf-asoqweqwe'
-                                    },
-                                    encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
                                 }
                             ];
                             e.success(data);
@@ -113,7 +88,7 @@ export default class LicenseList {
     onRequestNewLicense() {
         var modalInstance = this.uibModal.open({
             animation: true,
-            templateUrl: '../app-js/modules/licenseManager/request/RequestLicense.html',
+            templateUrl: '../app-js/modules/licenseAdmin/request/RequestLicense.html',
             controller: 'RequestLicense as requestLicense',
             size: 'md',
             draggable: true,
@@ -140,7 +115,7 @@ export default class LicenseList {
         this.log.info('Open Details for: ', license);
         var modalInstance = this.uibModal.open({
             animation: true,
-            templateUrl: '../app-js/modules/licenseManager/detail/LicenseDetail.html',
+            templateUrl: '../app-js/modules/licenseAdmin/detail/LicenseDetail.html',
             controller: 'LicenseDetail as licenseDetail',
             size: 'lg',
             resolve: {
@@ -161,7 +136,7 @@ export default class LicenseList {
     onNewLicenseCreated() {
         this.uibModal.open({
             animation: true,
-            templateUrl: '../app-js/modules/licenseManager/created/CreatedLicense.html',
+            templateUrl: '../app-js/modules/licenseAdmin/created/CreatedLicense.html',
             size: 'md',
             controller: 'CreatedLicense as createdLicense',
             resolve: {

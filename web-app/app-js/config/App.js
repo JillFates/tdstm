@@ -20,6 +20,7 @@ require('rx-angular');
 import HTTPModule from '../services/http/HTTPModule.js';
 import RestAPIModule from '../services/RestAPI/RestAPIModule.js'
 import HeaderModule from '../modules/header/HeaderModule.js';
+import LicenseAdminModule from '../modules/licenseAdmin/LicenseAdminModule.js';
 import LicenseManagerModule from '../modules/licenseManager/LicenseManagerModule.js';
 import NoticeManagerModule from '../modules/noticeManager/NoticeManagerModule.js';
 import TaskManagerModule from '../modules/taskManager/TaskManagerModule.js';
@@ -40,6 +41,7 @@ var TDSTM = angular.module('TDSTM', [
     RestAPIModule.name,
     HeaderModule.name,
     TaskManagerModule.name,
+    LicenseAdminModule.name,
     LicenseManagerModule.name,
     NoticeManagerModule.name
 ]).config([

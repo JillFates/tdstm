@@ -40,37 +40,37 @@ export default class RestServiceHandler {
         };
     }
 
-    licenseManagerServiceHandler() {
+    licenseAdminServiceHandler() {
         return {
-            getLicenseList: (data, callback) => {
-                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/cookbook/recipe/list?archived=n&context=All&rand=oDFqLTpbZRj38AW'), callback);
+            getLicenseList: (data, onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license'), onSuccess);
             },
             getLicense: (callback) => { // Mockup Data for testing see url
-                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/LicenseManager/licenseManagerList.json'), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/LicenseAdmin/licenseAdminList.json'), callback);
             },
             createNewLicenseRequest: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';
                 this.req.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseManager/licenseManagerList.json', data), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
             },
             applyLicense:  (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';
                 this.req.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseManager/licenseManagerList.json', data), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
             },
             resubmitLicenseRequest: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';
                 this.req.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseManager/licenseManagerList.json', data), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
             },
             emailRequest: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';
                 this.req.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseManager/licenseManagerList.json', data), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
             },
             deleteLicense: (data, onSuccess, onError) => {
                 this.req.method = 'DELETE';
