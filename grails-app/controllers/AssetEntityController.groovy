@@ -2977,7 +2977,7 @@ class AssetEntityController implements ControllerMethods {
 				def depBundle = params.dependencyBundle.isNumber() ? params.dependencyBundle : 0
 
 				//map Groups array String values to Integer
-				depGroups = depGroups*.toInteger()
+				depGroups = NumberUtil.mapToPositiveInteger(depGroups)
 
 				def assetDependencies = AssetDependency.executeQuery('''
 					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future,

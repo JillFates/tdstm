@@ -120,4 +120,37 @@ class NumberUtil {
 			result
 		}
 	}
+
+	/**
+	 * receive an heterogeneous collection and pick only those that can be converted to a Positive Long
+	 * using a default value for those that can't be converted or rejecting them when the default is null
+	 * @param values  heterogeneous collection
+	 * @param defValue	default value to use when a value can't be mapped, if null we reject those that can't be mapped
+	 * @return new Collection of Long Values
+	 */
+	static Collection<Long> mapToPositiveLong(Collection values, Long defValue = null){
+		if(!values){
+			values = []
+		}
+		values.collectMany {
+			def v = toPositiveLong(it, defValue)
+			if(v != null){
+				[v]
+			}else{
+				[]
+			}
+		}
+	}
+
+	/**
+	 * receive an heterogeneous collection and pick only those that can be converted to a Positive Integer
+	 * using a default value for those that can't be converted or rejecting them when the default is null
+	 * @param values  heterogeneous collection
+	 * @param defValue	default value to use when a value can't be mapped, if null we reject those that can't be mapped
+	 * @return new Collection of Integer Values
+ 	 */
+	static Collection<Integer> mapToPositiveInteger(Collection values, Integer defValue = null){
+		values = mapToPositiveLong(values, defValue)
+		values*.toInteger()
+	}
 }

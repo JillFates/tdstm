@@ -95,4 +95,25 @@ class NumberUtilTests extends Specification {
 		NumberUtil.isPositiveLong(100)
 		!NumberUtil.isPositiveLong(-100L)
 	}
+
+	void testMapToPositiveInteger(){
+		def arr = ["1", "2", 3L, 4, "nada", null, "5"]
+		expect:
+			[1,2,3,4,5] == NumberUtil.mapToPositiveInteger(arr)
+			[1,2,3,4,0,0,5] == NumberUtil.mapToPositiveInteger(arr, 0)
+			NumberUtil.mapToPositiveInteger(arr).each {
+				assert it instanceof Integer
+			}
+	}
+
+	void testMapToPositiveLong(){
+		def arr = ["1", "2", 3L, 4, "nada", null, "5"]
+		expect:
+			[1L,2L,3L,4L,5L] == NumberUtil.mapToPositiveLong(arr)
+			[1L,2L,3L,4L,0L,0L,5L] == NumberUtil.mapToPositiveLong(arr, 0)
+
+			NumberUtil.mapToPositiveLong(arr).each {
+				assert it instanceof Long
+			}
+	}
 }
