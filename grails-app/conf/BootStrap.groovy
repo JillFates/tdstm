@@ -36,7 +36,6 @@ import org.grails.refcode.RefCode
 import java.lang.management.ManagementFactory
 
 class BootStrap {
-	GrailsApplication grailsApplication
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	StateEngineService stateEngineService
 	TaskService taskService
@@ -75,20 +74,9 @@ class BootStrap {
 	 * Check Config flags or alert about required information
 	 */
 	private checkConfigInfo(){
-		if(!grailsApplication.config.tdstm.qztray.passphrase) {
-			log.warn("'qztray.passphrase' not defined on Config.groovy, using default")
-			grailsApplication.config.tdstm.qztray.passphrase = "3#AKk3XHTc"
-		}
-
-		if(!grailsApplication.config.tdstm.qztray.keypath){
-			log.warn("Application configuration file is missing for the QZ Tray key file property ('qztray.keyPath')")
-			grailsApplication.config.tdstm.qztray.keypath = "tdstm/qztray.transitionmanager.net.key"
-		}
-
-		File keyFile = qzSignService.findPrivateKeyFile()
-		if(!keyFile.exists()){
-			log.warn("QZ Tray key file '${keyFile}' was not found")
-		}
+		//Call some methods to show error messages (if any) from Boot time
+		qzSignService.getPassphrase()
+		qzSignService.findPrivateKeyFile()
 	}
 
 	private void createInitialData() {

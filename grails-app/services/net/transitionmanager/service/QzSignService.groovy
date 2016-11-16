@@ -22,18 +22,39 @@ class QzSignService {
 	 * @return File object representing the configuration File (use exists() to check if its there)
 	 */
 	File findPrivateKeyFile(){
+		if(!grailsApplication.config.tdstm.qztray.keypath){
+			log.warn("Application configuration file is missing for the QZ Tray key file property ('qztray.keyPath')")
+			grailsApplication.config.tdstm.qztray.keypath = "tdstm/qztray.transitionmanager.net.key"
+		}
+
 		def keyPath = grailsApplication.config.tdstm.qztray.keypath
 		def keyFileRes = grailsApplication.parentContext.getResource("/WEB-INF/${keyPath}")
 
+		def file
 		if(keyFileRes.exists()){
-			return keyFileRes.file
+			file = keyFileRes.file
 		}else{
-			return new File(keyPath)
+			file = new File(keyPath)
 		}
+
+		if(!file.exists()){
+			log.warn("QZ Tray key file '${file}' was not found")
+		}
+
+		return file
+	}
+
+	String getPassphrase(){
+		if(!grailsApplication.config.tdstm.qztray.passphrase) {
+			log.warn("'qztray.passphrase' not defined on Config.groovy, using default")
+			grailsApplication.config.tdstm.qztray.passphrase = "3#AKk3XHTc"
+		}
+
+		return grailsApplication.config.tdstm.qztray.passphrase
 	}
 
 	def sign(String message) {
-		def passphrase = grailsApplication.config.tdstm.qztray.passphrase
+		String passphrase = getPassphrase()
 
 		File privateKeyFile = findPrivateKeyFile()
 
