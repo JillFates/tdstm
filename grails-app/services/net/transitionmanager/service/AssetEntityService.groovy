@@ -1734,7 +1734,7 @@ class AssetEntityService implements ServiceMethods {
 			addCell(cablingSheet, idx + 2, 4, currentCabling.assetTo?.id ?: '', Cell.CELL_TYPE_NUMERIC)
 			addCell(cablingSheet, idx + 2, 5, String.valueOf(currentCabling.assetTo?.assetName ?: ''))
 			if (currentCabling.assetFromPort?.type && currentCabling.assetFromPort.type !='Power') {
-				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.assetToPort.label ?: ''))
+				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.assetToPort?.label ?: ''))
 			} else {
 				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.toPower ?: ''))
 			}
