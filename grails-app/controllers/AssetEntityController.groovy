@@ -2881,6 +2881,11 @@ class AssetEntityController implements ControllerMethods {
 				def graphPrefs = userPreferenceService.getPreference(PREF.DEP_GRAPH)
 				def prefsObject = graphPrefs ? JSON.parse(graphPrefs) : defaultPrefs
 
+				// front end labels for the Color By groups
+				def colorByGroupLabels = ['group': 'Group', 'bundle': 'Bundle', 'event': 'Event', 'environment': 'Environment', 'sourceLocation': 'Source Location', 'targetLocation': 'Target Location']
+				// contains all the subgroups found in the Color By groups of this dependency group
+				def colorByGroups = [:]
+
 				// Create the Nodes
 				def graphNodes = []
 				def name = ''
@@ -2922,10 +2927,45 @@ class AssetEntityController implements ControllerMethods {
 						moveEventMap[moveEventId] = moveEventName
 					}
 
+
+					// get the label for this node's environment
+					def environment = it.environment
+					if (environment == null || environment == '')
+						environment = 'Unassigned'
+
+					// get the id and label for the target room
+					def targetRoomId = it.targetRoomId ?: (long) 0
+					def targetLocationName = 'Unassigned'
+					if (targetRoomId != 0)
+						targetLocationName = it.targetLocation + ' / ' + it.targetRoomName
+
+					// get the id and label for the source room
+					def sourceRoomId = it.sourceRoomId ?: (long) 0
+					def sourceLocationName = 'Unassigned'
+					if (sourceRoomId != 0)
+						sourceLocationName = it.sourceLocation + ' / ' + it.sourceRoomName
+
+					// map the query parameters to the ids and names of the Color By groups
+					def colorByGroupIds = [group: it.bundle, bundle: it.moveBundleId, event: moveEventId, environment: environment, sourceLocation: sourceRoomId, targetLocation: targetRoomId]
+					def colorByGroupNames = [group: 'Group ' + it.bundle, bundle: it.moveBundleName, event: moveEventName, environment: environment, sourceLocation: sourceLocationName, targetLocation: targetLocationName]
+
+
+					// add these groups to the master group set
+					colorByGroupLabels.each {
+						// create this group category if it doesn't exist in the master set yet
+						def prop = it.getKey()
+						if (colorByGroups[prop] == null)
+							colorByGroups[prop] = [:]
+
+						// add this group to the master set
+						def id = colorByGroupIds[prop]
+						colorByGroups[prop][id] = colorByGroupNames[prop]
+					}
+
 					graphNodes << [id: it.assetId, name: it.assetName, type: type, depBundleId: it.bundle,
 					               moveBundleId: it.moveBundleId, moveEventId: moveEventId, hasMoveEvent: hasMoveEvent,
 					               shape: shape, size: size, title: it.assetName, color: color, dependsOn: [],
-					               supports: [], assetClass: it.assetClass, cutGroup: -1]
+					               supports: [], assetClass: it.assetClass, cutGroup: -1, colorByProperties: colorByGroupIds]
 				}
 
 				// set the dep bundle, move bundle, and move event properties to indices
@@ -3058,6 +3098,9 @@ class AssetEntityController implements ControllerMethods {
 				model.multiple = multiple
 				model.assetTypes = assetTypes
 				model.assetTypesJson = assetTypes as JSON
+				model.colorByGroups = colorByGroups as JSON
+				model.colorByGroupLabels = colorByGroupLabels
+				model.colorByGroupLabelsJson = colorByGroupLabels as JSON
 				model.depBundleMap = dependencyGroupIndexMap as JSON
 				model.moveBundleMap = moveBundleIndexMap as JSON
 				model.moveEventMap = moveEventIndexMap as JSON
@@ -4390,8 +4433,8 @@ class AssetEntityController implements ControllerMethods {
 
 	private String getImageName(String assetClassId, String type) {
 		switch (assetClassId) {
-			case AssetClass.APPLICATION.toString():
-			case AssetClass.DATABASE.toString(): return assetClassId
+			case AssetClass.APPLICATION.toString(): return AssetType.APPLICATION.toString()
+			case AssetClass.DATABASE.toString(): return AssetType.DATABASE.toString()
 			case AssetClass.STORAGE.toString(): return AssetType.FILES.toString()
 			case AssetClass.DEVICE.toString():
 				if (type in AssetType.virtualServerTypes) {
