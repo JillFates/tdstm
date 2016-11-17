@@ -3259,7 +3259,7 @@ class AssetEntityService implements ServiceMethods {
 				if (commentSize > 0) {
 					def commentSheet = getWorksheet("Comments")
 
-					List commentList = AssetComment.createCriteria {
+					List commentList = AssetComment.createCriteria().list {
 						and {
 							eq('project', project)
 							eq('commentType', 'comment')
