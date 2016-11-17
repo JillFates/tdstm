@@ -1653,7 +1653,7 @@ class ImportService implements ServiceMethods {
 	 */
 	Project flushAndClearSession(int rowsProcessed, Project project) {
 		if (GormUtil.flushAndClearSession(rowsProcessed, HIBERNATE_BATCH_SIZE)) {
-			project = GormUtil.mergeWithSession([project])[0]
+			project = GormUtil.mergeWithSession(project)
 		}
 		return project
 	}
