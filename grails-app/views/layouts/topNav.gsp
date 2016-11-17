@@ -86,7 +86,7 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <g:if test="${setImage}">
-                        <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProjObj.name} project" style="height: 30px;  margin-top: 8px;"/>
+                        <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
                     </g:if>
                     <g:else>
                         <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
@@ -282,7 +282,7 @@
                                             <li class="menu-child-item menu-parent-assets-import-assets"><g:link controller="assetEntity" action="assetImport" >Import Assets</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='Import'>
-                                            <li class="menu-child-item menu-parent-assets-manage-batches"><g:link controller="dataTransferBatch" action="index" >Manage Batches</g:link></li>
+                                            <li class="menu-child-item menu-parent-assets-manage-batches"><g:link controller="dataTransferBatch" action="list" >Manage Batches</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='Export'>
                                             <li class="menu-child-item menu-parent-assets-export-assets"><g:link controller="assetEntity" action="exportAssets" >Export Assets</g:link></li>
@@ -488,9 +488,9 @@
     </header>
     <!-- Full Width Column -->
     <div class="content-wrapper">
-        <g:if test="${currProj}">
+        <g:if test="${currProject}">
         <%-- Include the News crawler if there is an event in progress --%>
-            <g:if test="${currProjObj?.runbookOn && moveEvent && (moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime))}">
+            <g:if test="${currProject?.runbookOn && moveEvent && (moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime))}">
                 <g:if test="${moveEvent?.newsBarMode == 'auto'}">
                     <g:if test="${moveEvent?.estStartTime.getTime() < new Date().getTime()}">
                         <g:set var="showNewsBar" value="true" />
