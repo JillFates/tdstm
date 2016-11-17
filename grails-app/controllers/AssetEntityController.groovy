@@ -1282,7 +1282,7 @@ class AssetEntityController implements ControllerMethods {
 							TimeUtil.FORMAT_DATE_TIME_25,
 							TimeUtil.FORMAT_DATE
 						]
-						def dateCreated = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, validFormats)
+						def dateCreated = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), validFormats)
 						if (!dateCreated) {
 							dateCreated = new Date()
 						}

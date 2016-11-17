@@ -73,6 +73,62 @@ class WorkbookUtil {
 		sheet.getRow(rowIndex)?.getCell(columnIndex)
 	}
 
+
+	/**
+	 * Used to read a date value from a cell in a spreadsheet using a DateFormat formatter which will use the 
+	 * user's currently configured timezone to read the values as string.
+	 *
+	 * @param sheet - the sheet to extract the value
+	 * @param columnIdx - the column to reference (offset starts at zero)
+	 * @param rowIdx - the row to reference (offset start at zero)
+	 * @param session - the HttpSession for the user
+	 * @param dateFormat - list if formats to use if parsing a string value
+	 * @return The date from the specified cell or null if empty
+	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
+	 * @throws ParseException - if the field contains an invalid formatted String value
+	 * @deprecated Please use getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) 
+	 */
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, Collection formatterTypes=null) {
+		Date result
+		Cell cell = getCell(sheet, columnIdx, rowIdx)
+
+		if (!formatterTypes) formatterTypes = [TimeUtil.FORMAT_DATE_TIME_22]
+
+		if (cell) {
+			switch (cell.getCellType()) {
+				case Cell.CELL_TYPE_NUMERIC:
+					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
+					result = cell.getDateCellValue()					
+					// result = TimeUtil.moveDateToTZ(result, session)
+					break
+				case Cell.CELL_TYPE_STRING:
+					String cellVal = cell.getStringCellValue()
+					for(def formatterType : formatterTypes) {
+						try {
+							if(formatterType == TimeUtil.FORMAT_DATE){ //Parse to DATE only
+								result = TimeUtil.parseDate(TimeUtil.getUserDateFormat(session), cellVal, formatterType)	
+							}else{
+								result = TimeUtil.parseDateTime(session, cellVal, formatterType)
+							}
+							if (result) {
+								break
+							}
+						} catch(e) {
+							// TODO : JPM 4/2016 : We should report an error that we were unable to read the date value here
+						}
+					}
+
+					if(!result){						
+						log.warn("Can't Parse '$cellVal' using any of the formatters declared in $formatterTypes")
+					}
+					break
+				default:
+					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
+			}
+		}
+		return result
+	}
+
 	/**
 	 * Read a date value from a cell in a spreadsheet using a DateFormat formatter which will make an assumption
 	 * that the date in the spreadsheet is in GMT.
