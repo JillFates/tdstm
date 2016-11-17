@@ -183,7 +183,7 @@ class DataTransferBatchController implements ControllerMethods {
 					from DataTransferValue d
 					where d.dataTransferBatch=:dataTransferBatch
 					group by rowId
-				''', [dataTransferBatch: entry.id]).size(),
+				''', [dataTransferBatch: entry]).size(),
 				status: fieldValue(bean: entry, field: 'statusCode'),
 				action: '',
 				className: className,
