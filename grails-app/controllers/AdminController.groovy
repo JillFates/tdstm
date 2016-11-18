@@ -1632,8 +1632,8 @@ class AdminController implements ControllerMethods {
 						status = color + '(' + indicator + ')'
 					}
 				}
-				moveEventsList << [moveEvent: moveEvent, status: status, startTime: moveEvent.eventTimes.start,
-				                   completionTime: moveEvent.eventTimes.completion]
+				moveEventsList << [moveEvent: moveEvent, status: status, startTime: moveEvent.eventTimes*.start,
+				                   completionTime: moveEvent.eventTimes*.completion]
 			}
 		}
 		// retrieve the list of 10 upcoming bundles
