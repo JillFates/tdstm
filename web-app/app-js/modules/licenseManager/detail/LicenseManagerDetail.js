@@ -12,7 +12,13 @@ export default class LicenseManagerDetail {
         this.uibModal =$uibModal;
         this.log = $log;
         this.licenseModel = {
-            methodId: params.license.method.id,
+            principalId: params.license.principal.id,
+            email: params.license.contact_email,
+            projectId: params.license.project.id,
+            clientId: params.license.client.id,
+            statusId: params.license.status.id,
+
+
             environment: params.license.environment,
             inception: params.license.inception,
             expiration: params.license.expiration,
@@ -23,7 +29,12 @@ export default class LicenseManagerDetail {
             encryptedDetail: params.license.encryptedDetail
         };
 
-        this. prepareMethodOptions();
+        this.getPrincipalDataSource();
+        this.getProjectsDataSource();
+        this.getClientDataSource();
+        this.getStatusDataSource();
+
+        this.prepareMethodOptions();
     }
 
     prepareMethodOptions() {
@@ -108,6 +119,46 @@ export default class LicenseManagerDetail {
                 this.uibModalInstance.close(data);
             });
         });
+    }
+
+    /**
+     * Populate values
+     */
+    getPrincipalDataSource() {
+        this.principalDataSource = [
+            {id: 1, name: 'EMC'},
+            {id: 2, name: 'IBM'}
+        ];
+    }
+
+    /**
+     * Populate values
+     */
+    getProjectsDataSource() {
+        this.projectsDataSource = [
+            {id: 1, name: 'n/a'},
+            {id: 2, name: 'Bank East'}
+        ];
+    }
+
+    /**
+     * Populate values
+     */
+    getClientDataSource() {
+        this.clientsDataSource = [
+            {id: 1, name: 'n/a'},
+            {id: 2, name: 'Gold Bank'}
+        ];
+    }
+
+    /**
+     * Populate values
+     */
+    getStatusDataSource() {
+        this.statusDataSource = [
+            {id: 1, name: 'Active'},
+            {id: 2, name: 'Pending'}
+        ];
     }
 
     /**

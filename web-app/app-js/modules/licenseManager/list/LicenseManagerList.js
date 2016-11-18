@@ -30,12 +30,12 @@ export default class LicenseManagerList {
             },
             columns: [
                 {field: 'licenseId', hidden: true },
-                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-edit"></span></button>' },
-                {field: 'principal', title: 'Principal'},
-                {field: 'client', title: 'Client'},
-                {field: 'project', title: 'Project'},
+                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
+                {field: 'principal.name', title: 'Principal'},
+                {field: 'client.name', title: 'Client'},
+                {field: 'project.name', title: 'Project'},
                 {field: 'contact_email', title: 'Contact Email'},
-                {field: 'status', title: 'Status'},
+                {field: 'status.type', title: 'Status'},
                 {field: 'type', title: 'Type'},
                 {field: 'method.name', title: 'Method'},
                 {field: 'method.id', hidden: true},
@@ -54,11 +54,23 @@ export default class LicenseManagerList {
                                     licenseId: 1,
                                     keyId: 'ce42cfd1-1ac5-4fcc-be5c-cc7885c8f83b',
                                     action: '',
-                                    principal: 'EMC',
-                                    client: 'n/a',
-                                    project: 'n/a',
+                                    principal:  {
+                                        id: 1,
+                                        name: 'EMC'
+                                    },
+                                    client: {
+                                        id: 1,
+                                        name: 'n/a',
+                                    },
+                                    project: {
+                                        id: 1,
+                                        name: 'n/a'
+                                    },
                                     contact_email: 'west.coast@xyyy.com',
-                                    status: 'Active',
+                                    status: {
+                                        id: 1,
+                                        type: 'Active'
+                                    },
                                     type: 'Multi-Project',
                                     method:  {
                                         id: 1,
@@ -81,11 +93,23 @@ export default class LicenseManagerList {
                                     licenseId: 2,
                                     keyId: 'ce42cfd1-1ac5-4fcc-be5c-cc7885c8f83b',
                                     action: '',
-                                    principal: 'IBM',
-                                    client: 'n/a',
-                                    project: 'n/a',
+                                    principal:  {
+                                        id: 2,
+                                        name: 'IBM'
+                                    },
+                                    client: {
+                                        id: 2,
+                                        name: 'Gold Bank',
+                                    },
+                                    project: {
+                                        id: 2,
+                                        name: 'Bank East'
+                                    },
                                     contact_email: 'west.coast@xyyy.com',
-                                    status: 'Pending',
+                                    status: {
+                                        id: 2,
+                                        type: 'Pending'
+                                    },
                                     type: 'Project',
                                     method:  {
                                         id: 1,

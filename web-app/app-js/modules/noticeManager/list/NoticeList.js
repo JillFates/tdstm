@@ -34,7 +34,7 @@ export default class NoticeList {
             columns: [
                 {field: 'id', hidden: true },
                 {field: 'htmlText', hidden: true },
-                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="noticeList.onEditCreateNotice(noticeList.actionType.EDIT, this)"><span class="glyphicon glyphicon-edit"></span></button>' },
+                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="noticeList.onEditCreateNotice(noticeList.actionType.EDIT, this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
                 {field: 'title', title: 'Title'},
                 {field: 'type.id', hidden: true},
                 {field: 'type.name', title: 'Type'},

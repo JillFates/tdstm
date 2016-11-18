@@ -27,7 +27,7 @@ export default class LicenseAdminList {
             },
             columns: [
                 {field: 'licenseId', hidden: true },
-                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseAdminList.onLicenseDetails(this)"><span class="glyphicon glyphicon-edit"></span></button>' },
+                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseAdminList.onLicenseDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
                 {field: 'client', title: 'Client'},
                 {field: 'project', title: 'Project'},
                 {field: 'contact_email', title: 'Contact Email'},
