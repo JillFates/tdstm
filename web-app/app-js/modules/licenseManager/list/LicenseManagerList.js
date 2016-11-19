@@ -74,12 +74,15 @@ export default class LicenseManagerList {
                                     type: 'Multi-Project',
                                     method:  {
                                         id: 1,
-                                        name: 'Server'
+                                        name: 'Server',
+                                        quantity: 4000
                                     },
-                                    servers_tokens: '5000',
                                     inception: '2016-09-15',
                                     expiration: '2016-12-01',
-                                    environment: 'Production',
+                                    environment: {
+                                        id: 1,
+                                        name: 'Production'
+                                    },
                                     specialInstructions: 'Help, Help, Help',
                                     applied: false,
                                     replaced: {
@@ -112,13 +115,16 @@ export default class LicenseManagerList {
                                     },
                                     type: 'Project',
                                     method:  {
-                                        id: 1,
-                                        name: 'Token'
+                                        id: 2,
+                                        name: 'Token',
+                                        quantity: 5000
                                     },
-                                    servers_tokens: '40000',
                                     inception: '2016-09-15',
                                     expiration: '2016-12-01',
-                                    environment: 'Production',
+                                    environment: {
+                                        id: 1,
+                                        name: 'Production'
+                                    },
                                     specialInstructions: 'Help, Help, Help',
                                     applied: false,
                                     replaced: {
@@ -139,6 +145,8 @@ export default class LicenseManagerList {
                         var newLicenseCreated = this.licenseGrid.dataSource._data.find((license) => {
                             return license.licenseId === this.openLastImportedLicenseId;
                         });
+
+                        this.openLastImportedLicenseId = 0;
 
                         if(newLicenseCreated) {
                             this.onLicenseManagerDetails(newLicenseCreated);

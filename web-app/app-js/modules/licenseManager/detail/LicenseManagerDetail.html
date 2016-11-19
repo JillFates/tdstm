@@ -4,7 +4,7 @@
         <h4 class="modal-title">License Detail</h4>
     </div>
     <div class="modal-body">
-        <form name="editLicense" role="form" data-toggle="validator" class="form-horizontal left-alignment">
+        <form name="editLicenseForm" role="form" data-toggle="validator" class="form-horizontal left-alignment">
             <div class="row">
                 <div class="col-sm-5">
                     <div class="form-group">
@@ -37,13 +37,9 @@
                     <div class="form-group">
                         <label for="selectProject" class="col-sm-3 control-label">Project: </label>
                         <div class="col-sm-9">
-                            <select kendo-drop-down-list
-                                    k-option-label="'Select a Project'"
-                                    k-data-text-field="'name'"
-                                    k-data-value-field="'id'"
-                                    k-data-source="licenseManagerDetail.projectsDataSource"
+                            <select kendo-drop-down-list="licenseManagerDetail.selectProject"
+                                    k-options="licenseManagerDetail.selectProjectListOptions"
                                     k-ng-model="licenseManagerDetail.licenseModel.projectId"
-                                    k-value-primitive="true"
                                     id="selectProject"
                                     class="form-control" >
                             </select>
@@ -102,20 +98,35 @@
                             <label for="radioGroupMethod" class="col-sm-1 control-label">Method:</label>
                             <div class="col-sm-11" id="radioGroupMethod">
                                 <label class="radio-inline" ng-repeat="methodOption in licenseManagerDetail.methodOptions">
-                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="servers" ng-model="licenseManagerDetail.licenseModel.methodId" ng-value="methodOption.id" disabled> {{methodOption.name}}
+                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="servers" ng-model="licenseManagerDetail.licenseModel.method.id" ng-value="methodOption.id"> {{methodOption.name}}
                                 </label>
                             </div>
                         </div>
-                        <div class="form-group sub-option-50" ng-if="licenseManagerDetail.licenseModel.methodId === 1">
-                            <label class="col-sm-2 control-label">Max Server:</label>
-                            <div class="col-sm-10" >
-                                <label class="control-label ">8.000</label>
+                        <div class="form-group sub-option-50" ng-if="licenseManagerDetail.licenseModel.method.id === 1">
+                            <label for="serverCount" class="col-sm-2 control-label" style="padding-top: 3px;">Max Server:</label>
+                            <div class="col-sm-2" >
+                                <input id="serverCount" type="number" ng-model="licenseManagerDetail.licenseModel.method.quantity" min="0" step="1" class="element-width-80" ng-blur="licenseManagerDetail.validateIntegerOnly($event)" required />
+                            </div>
+                        </div>
+                        <div class="form-group sub-option-50" ng-if="licenseManagerDetail.licenseModel.method.id === 2">
+                            <label for="tokenCount" class="col-sm-2 control-label" style="padding-top: 3px;">Tokens Count:</label>
+                            <div class="col-sm-2" >
+                                <input id="tokenCount" type="number" ng-model="licenseManagerDetail.licenseModel.method.quantity" min="0" step="1" class="element-width-80" ng-blur="licenseManagerDetail.validateIntegerOnly($event)" required />
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">Environment:</label>
-                            <div class="col-sm-10">
-                                <label class="control-label">{{licenseManagerDetail.licenseModel.environment}}</label>
+                            <label for="selectEnvironment" class="col-sm-2 control-label">Environment:</label>
+                            <div class="col-sm-3">
+                                <select kendo-drop-down-list
+                                        k-option-label="'Select an Environment'"
+                                        k-data-text-field="'name'"
+                                        k-data-value-field="'id'"
+                                        k-data-source="licenseManagerDetail.environmentDataSource"
+                                        k-ng-model="licenseManagerDetail.licenseModel.environmentId"
+                                        k-value-primitive="true"
+                                        id="selectEnvironment"
+                                        class="form-control">
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -166,10 +177,10 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button ng-if="!licenseManagerDetail.licenseModel.applied" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.applyLicenseKey()"><span class="glyphicon glyphicon-ok"></span> Save Changes</button>
-        <button ng-if="!licenseManagerDetail.licenseModel.applied" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.resubmitLicenseRequest()"><i class="fa fa-fw fa-key"></i> Activate License</button>
-        <button ng-if="!licenseManagerDetail.licenseModel.applied" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
-        <button ng-if="!licenseManagerDetail.licenseModel.applied" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Email License</button>
+        <button ng-disabled="editLicenseForm.$invalid" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.applyLicenseKey()"><span class="glyphicon glyphicon-ok"></span> Save Changes</button>
+        <button type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.resubmitLicenseRequest()"><i class="fa fa-fw fa-key"></i> Activate License</button>
+        <button type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
+        <button type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Email License</button>
         <button type="submit" class="btn btn-danger" ng-class="{'pull-left': licenseManagerDetail.licenseModel.applied}" ng-click="licenseManagerDetail.deleteLicense()"><span class="glyphicon glyphicon-remove"></span> Revoke License</button>
         <button ng-click="licenseManagerDetail.cancelCloseDialog()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>

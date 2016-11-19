@@ -11,15 +11,20 @@ export default class LicenseManagerDetail {
         this.uibModalInstance = $uibModalInstance;
         this.uibModal =$uibModal;
         this.log = $log;
+
         this.licenseModel = {
             principalId: params.license.principal.id,
             email: params.license.contact_email,
             projectId: params.license.project.id,
             clientId: params.license.client.id,
             statusId: params.license.status.id,
+            method: {
+                id: params.license.method.id,
+                name: params.license.method.name,
+                quantity: params.license.method.quantity
+            },
+            environmentId: params.license.environment.id,
 
-
-            environment: params.license.environment,
             inception: params.license.inception,
             expiration: params.license.expiration,
             specialInstructions: params.license.specialInstructions,
@@ -29,8 +34,22 @@ export default class LicenseManagerDetail {
             encryptedDetail: params.license.encryptedDetail
         };
 
+        // Creates the Kendo Project Select List
+        this.selectProject = {};
+        this.selectProjectListOptions = {
+            dataSource: this.getProjectsDataSource(),
+            optionLabel: 'Select a Project',
+            dataTextField: 'name',
+            dataValueField: 'id',
+            valuePrimitive: true,
+            select: ((e) => {
+                var item = this.selectProject.dataItem(e.item);
+                this.onChangeProject(item);
+            })
+        };
+
         this.getPrincipalDataSource();
-        this.getProjectsDataSource();
+        this.getEnvironmentDataSource();
         this.getClientDataSource();
         this.getStatusDataSource();
 
@@ -41,11 +60,13 @@ export default class LicenseManagerDetail {
         this.methodOptions = [
             {
                 id: 1,
-                name: 'Servers'
+                name: 'Servers',
+                quantity: 8000
             },
             {
                 id: 2,
-                name: 'Tokens'
+                name: 'Tokens',
+                quantity: 40000
             },
             {
                 id: 3,
@@ -122,6 +143,28 @@ export default class LicenseManagerDetail {
     }
 
     /**
+     * Validate the input on Server or Tokens is only integer only
+     * This will be converted in a more complex directive later
+     * TODO: Convert into a directive
+     */
+    validateIntegerOnly(e){
+        try {
+            var newVal= parseInt(this.licenseModel.method.quantity);
+            if(!isNaN(newVal)) {
+                this.licenseModel.method.quantity = newVal;
+            } else {
+                this.licenseModel.method.quantity = 0;
+            }
+
+            if(e && e.currentTarget && e.currentTarget.value) {
+                e.currentTarget.value = this.licenseModel.method.quantity;
+            }
+        } catch(e) {
+            this.$log.warn('Invalid Number Expception', this.licenseModel.method.quantity);
+        }
+    }
+
+    /**
      * Populate values
      */
     getPrincipalDataSource() {
@@ -134,8 +177,18 @@ export default class LicenseManagerDetail {
     /**
      * Populate values
      */
+    getEnvironmentDataSource() {
+        this.environmentDataSource = [
+            {id: 1, name: 'Production'},
+            {id: 2, name: 'Other'}
+        ];
+    }
+
+    /**
+     * Populate values
+     */
     getProjectsDataSource() {
-        this.projectsDataSource = [
+        return  [
             {id: 1, name: 'n/a'},
             {id: 2, name: 'Bank East'}
         ];
@@ -159,6 +212,14 @@ export default class LicenseManagerDetail {
             {id: 1, name: 'Active'},
             {id: 2, name: 'Pending'}
         ];
+    }
+
+    /**
+     * A new Project has been selected, that means we need to reload the next project section
+     * @param item
+     */
+    onChangeProject(item) {
+        this.log.info('On change Project', item);
     }
 
     /**
