@@ -10,35 +10,40 @@ export default class LicenseManagerService {
         this.log = $log;
         this.restService = restServiceHandler;
         this.rootScope = $rootScope;
-        this.log.debug('licenseAdminService Instanced');
-    }
-
-    testService(callback) {
-        this.restService.licenseAdminServiceHandler().getLicense((data) => {
-            return callback(data);
-        });
-    }
-
-    resubmitLicenseRequest(license, callback) {
-        this.restService.licenseAdminServiceHandler().resubmitLicenseRequest(license, (data) => {
-            this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'Request License was successfully.'});
-            return callback(data);
-        });
-    }
-
-    emailRequest(license, callback) {
-        this.restService.licenseAdminServiceHandler().emailRequest(license, (data) => {
-            this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'Request License was successfully.'});
-            return callback(data);
-        });
+        this.log.debug('licenseManagerService Instanced');
     }
 
     getLicenseList(callback) {
-        this.restService.licenseAdminServiceHandler().getLicenseList((data) => {
+        this.restService.licenseManagerServiceHandler().getLicenseList((data) => {
             return callback(data);
         });
     }
 
+    /**
+     * Save the License
+     */
+    saveLicense(license, callback) {
+        this.restService.licenseManagerServiceHandler().saveLicense(license, (data) => {
+            return callback(data);
+        });
+    }
+    /**
+     * Does the activation of the current license if this is not active
+     * @param license
+     * @param callback
+     */
+    activateLicense(license, callback) {
+        this.restService.licenseManagerServiceHandler().activateLicense(license, (data) => {
+            this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'Activate License was successfully.'});
+            return callback(data);
+        });
+    }
+
+    /**
+     * Make the request to Import the license, if fails, throws an exception visible for the user to take action
+     * @param license
+     * @param callback
+     */
     importLicense(license, callback) {
         this.restService.licenseManagerServiceHandler().requestImport(license, (data) => {
             //if(data.applied) {
@@ -50,8 +55,8 @@ export default class LicenseManagerService {
         });
     }
 
-    deleteLicense(license, callback) {
-        this.restService.licenseAdminServiceHandler().deleteLicense(license, (data) => {
+    revokeLicense(license, callback) {
+        this.restService.licenseManagerServiceHandler().revokeLicense(license, (data) => {
             return callback(data);
         });
     }
@@ -62,7 +67,7 @@ export default class LicenseManagerService {
      * @param callback
      */
     createNewLicenseRequest(newLicense, callback){
-        this.restService.licenseAdminServiceHandler().createNewLicenseRequest(newLicense, (data) => {
+        this.restService.licenseManagerServiceHandler().createNewLicenseRequest(newLicense, (data) => {
             return callback(data);
         });
     }

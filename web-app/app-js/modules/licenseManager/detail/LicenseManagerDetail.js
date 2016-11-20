@@ -24,14 +24,22 @@ export default class LicenseManagerDetail {
                 quantity: params.license.method.quantity
             },
             environmentId: params.license.environment.id,
-
-            inception: params.license.inception,
-            expiration: params.license.expiration,
+            requested: params.license.requested,
+            initDate: params.license.initDate,
+            endDate: params.license.endDate,
             specialInstructions: params.license.specialInstructions,
-            applied: params.license.applied,
-            keyId: params.license.keyId,
+            bannerMessage: params.license.bannerMessage,
+            requestedId: params.license.requestedId,
             replaced: params.license.replaced,
-            encryptedDetail: params.license.encryptedDetail
+            replacedId: params.license.replacedId,
+            licenseKey: params.license.licenseKey,
+            activityList: params.license.activityList,
+            hostName: params.license.hostName,
+            websiteName: params.license.websiteName,
+            hash: params.license.hash,
+
+            applied: params.license.applied,
+            keyId: params.license.keyId
         };
 
         // Creates the Kendo Project Select List
@@ -48,12 +56,32 @@ export default class LicenseManagerDetail {
             })
         };
 
+        // Init the two Kendo Dates for Init and EndDate
+        this.initDate = {};
+        this.initDateOptions = {
+            format: 'yyyy/MM/dd',
+            max: this.licenseModel.endDate,
+            change: ((e) => {
+                this.onChangeInitDate();
+            })
+        };
+
+        this.endDate = {};
+        this.endDateOptions = {
+            format: 'yyyy/MM/dd',
+            min: this.licenseModel.initDate,
+            change: ((e) => {
+                this.onChangeEndDate();
+            })
+        };
+
         this.getPrincipalDataSource();
         this.getEnvironmentDataSource();
         this.getClientDataSource();
         this.getStatusDataSource();
 
         this.prepareMethodOptions();
+        this.prepareActivityList();
     }
 
     prepareMethodOptions() {
@@ -73,6 +101,19 @@ export default class LicenseManagerDetail {
                 name: 'Custom'
             }
         ]
+    }
+
+    prepareActivityList() {
+        this.activityGrid = {};
+        this.activityGridOptions = {
+            columns: [
+                {field: 'date', title: 'Date'},
+                {field: 'whom', title: 'Whom'},
+                {field: 'action', title: 'Action'}
+            ],
+            dataSource: this.licenseModel.activityList,
+            scrollable: true
+        };
     }
 
     /**
@@ -97,32 +138,13 @@ export default class LicenseManagerDetail {
     }
 
     /**
-     * Opens a dialog and allow the user to manually send the request or copy the encripted code
-     */
-    manuallyRequest() {
-        var modalInstance = this.uibModal.open({
-            animation: true,
-            templateUrl: '../app-js/modules/licenseManager/manuallyRequest/ManuallyRequest.html',
-            controller: 'ManuallyRequest as manuallyRequest',
-            size: 'md',
-            resolve: {
-                params: () => {
-                    return { license: this.licenseModel };
-                }
-            }
-        });
-
-        modalInstance.result.then(() => {});
-    }
-
-    /**
      * If by some reason the License was not applied at first time, this will do a request for it
      */
-    resubmitLicenseRequest() {
-        this.licenseManagerService.resubmitLicenseRequest(this.licenseModel, (data) => {});
+    activateLicense() {
+        this.licenseManagerService.activateLicense(this.licenseModel, (data) => {});
     }
 
-    deleteLicense() {
+    revokeLicense() {
         var modalInstance = this.uibModal.open({
             animation: true,
             templateUrl: '../app-js/modules/dialogAction/DialogAction.html',
@@ -130,13 +152,13 @@ export default class LicenseManagerDetail {
             size: 'sm',
             resolve: {
                 params: () => {
-                    return { title: 'Confirmation Required', message: 'Are you sure you want to delete it? This action cannot be undone.'};
+                    return { title: 'Confirmation Required', message: 'Are you sure you want to revoke it? This action cannot be undone.'};
                 }
             }
         });
 
         modalInstance.result.then(() => {
-            this.licenseManagerService.deleteLicense(this.licenseModel, (data) => {
+            this.licenseManagerService.revokeLicense(this.licenseModel, (data) => {
                 this.uibModalInstance.close(data);
             });
         });
@@ -162,6 +184,16 @@ export default class LicenseManagerDetail {
         } catch(e) {
             this.$log.warn('Invalid Number Expception', this.licenseModel.method.quantity);
         }
+    }
+
+    /**
+     * Save current changes
+     */
+    saveLicense() {
+        this.licenseManagerService.saveLicense(this.licenseModel, (data) => {
+            this.uibModalInstance.close(data);
+            this.log.info('License Saved');
+        });
     }
 
     /**
@@ -220,6 +252,40 @@ export default class LicenseManagerDetail {
      */
     onChangeProject(item) {
         this.log.info('On change Project', item);
+    }
+
+    onChangeInitDate() {
+        var startDate = this.initDate.value(),
+            endDate = this.endDate.value();
+
+        if (startDate) {
+            startDate = new Date(startDate);
+            startDate.setDate(startDate.getDate());
+            this.endDate.min(startDate);
+        } else if (endDate) {
+            this.initDate.max(new Date(endDate));
+        } else {
+            endDate = new Date();
+            this.initDate.initDate.max(endDate);
+            this.endDate.min(endDate);
+        }
+    }
+
+    onChangeEndDate(){
+        var endDate = this.endDate.value(),
+            startDate = this.initDate.value();
+
+        if (endDate) {
+            endDate = new Date(endDate);
+            endDate.setDate(endDate.getDate());
+            this.initDate.max(endDate);
+        } else if (startDate) {
+            this.endDate.min(new Date(startDate));
+        } else {
+            endDate = new Date();
+            this.initDate.max(endDate);
+            this.endDate.min(endDate);
+        }
     }
 
     /**

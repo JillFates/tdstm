@@ -82,7 +82,27 @@ export default class RestServiceHandler {
 
     licenseManagerServiceHandler() {
         return {
+            getLicenseList: (data, onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license'), onSuccess);
+            },
+            saveLicense: (data, callback) => {
+                this.req.method = 'POST';
+                this.req.url =  '../ws/???';
+                this.req.data = data;
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
+            },
             requestImport:  (data, callback) => {
+                this.req.method = 'POST';
+                this.req.url =  '../ws/???';
+                this.req.data = data;
+                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
+            },
+            revokeLicense: (data, onSuccess, onError) => {
+                this.req.method = 'DELETE';
+                this.req.url =  '../ws/license/'+data.id;
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
+            },
+            activateLicense: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';
                 this.req.data = data;

@@ -48,7 +48,7 @@ export default class LicenseManagerList {
                 pageSize: 10,
                 transport: {
                     read: (e) => {
-                        /*this.licenseManagerService.testService((data) => {*/
+                        /*this.licenseManagerService.getLicenseList((data) => {*/
                             var data = [
                                 {
                                     licenseId: 1,
@@ -77,20 +77,33 @@ export default class LicenseManagerList {
                                         name: 'Server',
                                         quantity: 4000
                                     },
-                                    inception: '2016-09-15',
-                                    expiration: '2016-12-01',
+                                    initDate: '2016-09-15',
+                                    endDate: '2016-09-18',
+                                    requested: '2016-12-08',
                                     environment: {
                                         id: 1,
                                         name: 'Production'
                                     },
                                     specialInstructions: 'Help, Help, Help',
+                                    bannerMessage: 'This application should only be used for training purpose',
+                                    requestedId: '5646546546546545-asdasdasd54asd-asdas6asdasd',
                                     applied: false,
-                                    replaced: {
-                                        date: new Date(),
-                                        serverUrl: 'http:blablaba.com',
-                                        name: 'aasdas54-5asd4a5sd-asd45a4sd'
-                                    },
-                                    encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
+                                    replaced: [ {id: 1, status: '2016-05-08' + ' http:blablaba.com ' +' aasdas54-5asd4a5sd-asd45a4sd '}, {id: 2, status: '2016-05-10' + ' http:blablaba.com ' +' aasdas54-5asd4a5sd-asd45a4sd ' }],
+                                    replacedId: 1,
+                                    licenseKey: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618',
+                                    activityList: [
+                                        { date: '2016-05-08', whom: 'Harry Legs', action: 'Requested'},
+                                        { date: '2016-05-10', whom: 'Robin Banks', action: 'Imported'},
+                                        { date: '2016-05-11', whom: 'Ben D Ovar', action: 'Activated'},
+                                        { date: '2016-05-14', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-18', whom: 'Ben D Ovar', action: 'Unlocked License to modify'},
+                                        { date: '2016-05-20', whom: 'Ben D Ovar', action: 'Modified License detail'},
+                                        { date: '2016-05-21', whom: 'Ben D Ovar', action: 'Activated'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'}
+                                    ],
+                                    hostName: 'tm-acme-bigmove-.somedomaing.local',
+                                    websiteName: 'tranman.somecorp.com',
+                                    hash: 'kaskldsaldkjasda5s4a65sda65sd4a65sd46a5sd4as65d'
                                 },
                                 {
                                     licenseId: 2,
@@ -119,20 +132,39 @@ export default class LicenseManagerList {
                                         name: 'Token',
                                         quantity: 5000
                                     },
-                                    inception: '2016-09-15',
-                                    expiration: '2016-12-01',
+                                    initDate: '2016-09-15',
+                                    endDate: '2016-09-18',
+                                    requested: '2016-12-08',
                                     environment: {
                                         id: 1,
                                         name: 'Production'
                                     },
                                     specialInstructions: 'Help, Help, Help',
+                                    requestedId: '5646546546546545-asdasdasd54asd-asdas6asdasd',
                                     applied: false,
-                                    replaced: {
-                                        date: new Date(),
-                                        serverUrl: 'http:blablaba.com',
-                                        name: 'aasdas54-5asd4a5sd-asd45a4sd'
-                                    },
-                                    encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
+                                    bannerMessage: 'This application should only be used for training purpose',
+                                    replaced: [ {id: 1, status: '2016-05-08' + ' http:blablaba.com ' +' aasdas54-5asd4a5sd-asd45a4sd '}, {id: 2, status: '2016-05-10' + ' http:blablaba.com ' +' aasdas54-5asd4a5sd-asd45a4sd ' }],
+                                    replacedId: 1,
+                                    licenseKey: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618',
+                                    activityList: [
+                                        { date: '2016-05-08', whom: 'Harry Legs', action: 'Requested'},
+                                        { date: '2016-05-10', whom: 'Robin Banks', action: 'Imported'},
+                                        { date: '2016-05-11', whom: 'Ben D Ovar', action: 'Activated'},
+                                        { date: '2016-05-14', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-18', whom: 'Ben D Ovar', action: 'Unlocked License to modify'},
+                                        { date: '2016-05-20', whom: 'Ben D Ovar', action: 'Modified License detail'},
+                                        { date: '2016-05-21', whom: 'Ben D Ovar', action: 'Activated'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'},
+                                        { date: '2016-05-28', whom: 'Ben D Ovar', action: 'Emailed License'}
+                                    ],
+                                    hostName: 'tm-acme-bigmove-.somedomaing.local',
+                                    websiteName: 'tranman.somecorp.com',
+                                    hash: 'kaskldsaldkjasda5s4a65sda65sd4a65sd46a5sd4as65d'
                                 }
                             ];
                             e.success(data);
