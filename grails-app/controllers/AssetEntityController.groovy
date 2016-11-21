@@ -1469,7 +1469,7 @@ class AssetEntityController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		renderAsJson assetEntityService.getDeviceDataForList(project, session, params, userPreferenceService.timeZone)
+		renderAsJson assetEntityService.getDeviceDataForList(project, session, params)
 	}
 
 	def delete() {
