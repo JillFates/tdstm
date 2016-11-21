@@ -73,7 +73,7 @@
 											${staff.name}
 										</td>
 										<td>
-											${staff.company[0]}
+											${staff.company}
 										</td>
 										<td>
 											${staff.role}
