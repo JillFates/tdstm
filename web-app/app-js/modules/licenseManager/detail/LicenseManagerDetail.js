@@ -12,6 +12,7 @@ export default class LicenseManagerDetail {
         this.uibModal =$uibModal;
         this.log = $log;
 
+        this.editMode = false;
         this.licenseModel = {
             principalId: params.license.principal.id,
             email: params.license.contact_email,
@@ -75,6 +76,8 @@ export default class LicenseManagerDetail {
             })
         };
 
+        this.prepareControlActionButtons();
+
         this.getPrincipalDataSource();
         this.getEnvironmentDataSource();
         this.getClientDataSource();
@@ -82,6 +85,17 @@ export default class LicenseManagerDetail {
 
         this.prepareMethodOptions();
         this.prepareActivityList();
+
+
+    }
+
+    /**
+     * Controls what buttons to show
+     */
+    prepareControlActionButtons() {
+        this.pendingLicense = this.licenseModel.statusId === 2 && !this.editMode;
+        this.expiredOrTerminated = (this.licenseModel.statusId === 3 || this.licenseModel.statusId === 4);
+        this.activeShowMode = this.licenseModel.statusId === 1 && !this.expiredOrTerminated && !this.editMode;
     }
 
     prepareMethodOptions() {
@@ -197,6 +211,14 @@ export default class LicenseManagerDetail {
     }
 
     /**
+     * Change the status to Edit
+     */
+    modifyLicense() {
+        this.editMode = true;
+        this.prepareControlActionButtons();
+    }
+
+    /**
      * Populate values
      */
     getPrincipalDataSource() {
@@ -242,7 +264,9 @@ export default class LicenseManagerDetail {
     getStatusDataSource() {
         this.statusDataSource = [
             {id: 1, name: 'Active'},
-            {id: 2, name: 'Pending'}
+            {id: 2, name: 'Pending'},
+            {id: 3, name: 'Expired'},
+            {id: 4, name: 'Terminated'}
         ];
     }
 
@@ -292,7 +316,12 @@ export default class LicenseManagerDetail {
      * Dismiss the dialog, no action necessary
      */
     cancelCloseDialog() {
-        this.uibModalInstance.dismiss('cancel');
+        if(this.editMode) {
+            this.editMode = false;
+            this.prepareControlActionButtons();
+        } else {
+            this.uibModalInstance.dismiss('cancel');
+        }
     }
 
 }

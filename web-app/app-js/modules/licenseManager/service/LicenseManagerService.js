@@ -34,7 +34,7 @@ export default class LicenseManagerService {
      */
     activateLicense(license, callback) {
         this.restService.licenseManagerServiceHandler().activateLicense(license, (data) => {
-            this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'Activate License was successfully.'});
+            this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'The license was activated and the license was emailed.'});
             return callback(data);
         });
     }

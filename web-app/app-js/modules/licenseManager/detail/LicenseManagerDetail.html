@@ -211,11 +211,11 @@
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <style>
-                                    .k-grid-content {
+                                    #activityLog .k-grid-content {
                                         height: 300px; /*When is initialized on a none displayed content, it does not update correctly the height*/
                                     }
                                 </style>
-                                <div kendo-grid="licenseManagerDetail.activityGrid" k-options="licenseManagerDetail.activityGridOptions"> </div>
+                                <div id="activityLog" kendo-grid="licenseManagerDetail.activityGrid" k-options="licenseManagerDetail.activityGridOptions"> </div>
                             </div>
                         </div>
                     </div>
@@ -244,11 +244,12 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button ng-disabled="editLicenseForm.$invalid" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.saveLicense()"><span class="glyphicon glyphicon-ok"></span> Save Changes</button>
-        <button type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.activateLicense()"><i class="fa fa-fw fa-key"></i> Activate License</button>
-        <button type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
-        <button type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Email License</button>
-        <button type="submit" class="btn btn-danger" ng-class="{'pull-left': licenseManagerDetail.licenseModel.applied}" ng-click="licenseManagerDetail.revokeLicense()"><span class="glyphicon glyphicon-remove"></span> Revoke License</button>
-        <button ng-click="licenseManagerDetail.cancelCloseDialog()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+        <button ng-if="licenseManagerDetail.editMode" ng-disabled="editLicenseForm.$invalid" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.saveLicense()"><span class="glyphicon glyphicon-ok"></span> Save Changes</button>
+        <button ng-if="licenseManagerDetail.pendingLicense" ng-disabled="editLicenseForm.$invalid" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.modifyLicense()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+        <button ng-if="licenseManagerDetail.pendingLicense" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.activateLicense()"><i class="fa fa-fw fa-key"></i> Activate License</button>
+        <button ng-if="licenseManagerDetail.activeShowMode" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.modifyLicense()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
+        <button ng-if="licenseManagerDetail.activeShowMode" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Email License</button>
+        <button ng-if="licenseManagerDetail.activeShowMode || licenseManagerDetail.pendingLicense" type="submit" class="btn btn-danger" ng-class="{'pull-left': licenseManagerDetail.licenseModel.applied}" ng-click="licenseManagerDetail.revokeLicense()"><span class="glyphicon glyphicon-remove"></span> Revoke License</button>
+        <button ng-click="licenseManagerDetail.cancelCloseDialog()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> {{((licenseManagerDetail.editMode)? 'Cancel' : 'Close')}}</button>
     </div>
 </div>
