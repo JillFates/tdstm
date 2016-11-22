@@ -252,6 +252,7 @@ class CommentService implements ServiceMethods {
 			if (params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
 			if (params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
 			if (params.duration?.isInteger()) assetComment.duration = Integer.parseInt(params.duration)
+			if(params.durationLocked) assetComment.durationLocked = params.durationLocked.toBoolean()
 			if (params.durationScale) {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())
 				log.debug "saveUpdateCommentAndNotes - TimeScale=$assetComment.durationScale"
