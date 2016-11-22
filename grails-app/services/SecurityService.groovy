@@ -14,13 +14,11 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
-import grails.util.Environment
 import groovy.time.TimeCategory
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
 import org.apache.shiro.SecurityUtils
-import org.apache.shiro.UnavailableSecurityManagerException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
@@ -646,17 +644,13 @@ class SecurityService implements InitializingBean {
 	 * @return true if the period of time between password changes has been met
 	 */
 	boolean verifyMinPeriodToChangePswd(UserLogin userLogin) {
-		//Enable this test only in production, if not always send mails
-		if (Environment.current == Environment.PRODUCTION){
-			// Check to see if minimum period is a requirement first
-			if ( getUserLocalConfig().minPeriodToChangePswd > 0 && userLogin.passwordChangedDate ) {
-				int minTimeLimit = getUserLocalConfig().minPeriodToChangePswd * 60 * 60 * 1000
-				if (TimeUtil.nowGMT().time < (userLogin.passwordChangedDate.time + minTimeLimit)) {
-					return false
-				}
+		// Check to see if minimum period is a requirement first
+		if ( getUserLocalConfig().minPeriodToChangePswd > 0 && userLogin.passwordChangedDate ) {
+			int minTimeLimit = getUserLocalConfig().minPeriodToChangePswd * 60 * 60 * 1000
+			if (TimeUtil.nowGMT().time < (userLogin.passwordChangedDate.time + minTimeLimit)) {
+				return false
 			}
 		}
-
 		return true
 	}
 
