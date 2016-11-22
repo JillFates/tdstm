@@ -106,12 +106,15 @@ class AuthController {
 
 			try {
 				// Perform the actual login. An AuthenticationException will be thrown if the username is unrecognised or the password is incorrect
-				if (log.isDebugEnabled())
+				if (log.isDebugEnabled()) {
 					log.debug "signIn: About to call SecurityUtils.subject.login(authToken) : $authToken"
+				}
+
 				SecurityUtils.subject.login(authToken)
 
-				if (log.isDebugEnabled())
+				if (log.isDebugEnabled()) {
 					log.debug "signIn: About to call securityService.getUserLogin()"
+				}
 
 				def userLogin = securityService.getUserLogin()
 				if (! userLogin) {
@@ -382,6 +385,7 @@ class AuthController {
 
 		} catch (Exception se) {
 			flash.message = controllerService.getExceptionMessage(this, se) + '. Please contact support if you require assistances.'
+			log.error("Error applying new password: ", se)
 			resetPassword()
 		}
 

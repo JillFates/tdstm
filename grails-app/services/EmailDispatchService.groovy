@@ -41,7 +41,7 @@ class EmailDispatchService {
 		ed.toPerson = toPerson
 		ed.createdBy = createdBy
 
-		if (!ed.validate() || !ed.save(flush:true)) {
+		if (!ed.validate() || !ed.save()) {
 			log.error "Can't create email dispatch object: " + GormUtil.allErrorsString(ed)
 			ed = null
 		}

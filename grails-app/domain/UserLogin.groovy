@@ -179,7 +179,9 @@ class UserLogin {
 			ph.userLogin = this
 			ph.password = this.password
 			ph.createdDate = new Date()
-			if (! ph.save(flush:true) ) {
+
+			//TM-5601: Don't use flush:true is not needed for the transaction and we can end in a Saving Concurrent Modification due to the afterUpdate Event
+			if (!ph.save()) {
 				log.error "savePasswordHistory() failed for ${this.username} : " + GormUtil.allErrorsString(ph)
 				throw new RuntimeException('Unable to save password history')
 			}
