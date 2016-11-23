@@ -114,8 +114,8 @@ class CookbookService implements ServiceMethods {
 			}
 		}
 
-		createRecipeAndRecipeVersion(recipeName, description, recipeContext, project, defaultSourceCode,
-				defaultChangelog, clonedReleasedVersion).recipe
+		return createRecipeAndRecipeVersion(recipeName, description, recipeContext, project, defaultSourceCode,
+				defaultChangelog, clonedReleasedVersion)
 	}
 
 	/**
