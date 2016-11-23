@@ -240,7 +240,14 @@
             $(document).ready(function() {
                 $("#file").on('change', function() {
                     var fileName  = $(this).val().split(/(\\|\/)/g).pop();
-                    $("#uploadFile").val(fileName);
+                    var fileExt = fileName.split('.').pop()
+                    if(["xls", "xlsx"].indexOf(fileExt) > 0){
+                        $("#uploadFile").val(fileName);
+                    }else{
+                        alert("Please, select a valid file.")
+                        $(this).val(null)
+                    }
+                    
                 });
             });
         </script>
