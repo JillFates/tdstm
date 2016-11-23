@@ -15,19 +15,18 @@ function openCablingDiv( assetId , type){
 }
 function showCablingDetails( e, assetId ){
 	$("#cablingDialogId").empty();
-	$("#cablingDialogId").dialog({ autoOpen:false });
-	$("#cablingDialogId").dialog( "option", "width", "auto" )
+	$("#cablingDialogId").dialog({ autoOpen:false, modal: true });
+	$("#cablingDialogId").dialog( "option", "width", "auto" );
 
 	$("#cablingDialogId").append("<div></div>");
 	var currentDiv = $("#cablingDialogId").children().first();
-	currentDiv.html(e.responseText);
-	
-	$("#cablingDialogId").dialog("open")
+
+	$("#cablingDialogId").dialog("open");
 	$("#assetEntityId").val(assetId)
 	//$.getScript( "../js/angular/angular.min.js" )
 
 	$("#cableTable").show();
-
+	currentDiv.html(e.responseText);
 }
 
 
