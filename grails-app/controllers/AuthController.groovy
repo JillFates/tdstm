@@ -73,6 +73,11 @@ class AuthController implements ControllerMethods {
 		 preLoginList: preLoginList, postLoginList: postLoginList]
 	}
 
+	private signIn() {
+		// Now redirect back to the login page.
+		redirect(action: 'login')
+	}
+
 	private void redirectToPrefPage() {
 
 		String uri
@@ -251,6 +256,7 @@ class AuthController implements ControllerMethods {
 		}
 		catch (e) {
 			flash.message = controllerService.getExceptionMessage(this, e) + '. Please contact support if you require assistance.'
+			log.error("Error applying new password: ", e)
 			resetPassword()
 		}
 	}

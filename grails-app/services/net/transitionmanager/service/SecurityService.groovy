@@ -1123,9 +1123,15 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @param maxLevel - used to filter roles by the security level (default null)
 	 */
 	List<RoleType> getAllRoles(Integer maxLevel=null) {
-		RoleType.findAllByTypeAndLevelLessThan(
-				RoleType.SECURITY, maxLevel == null ? Integer.MAX_VALUE : maxLevel,
-				[sort: 'level', order: 'desc'])
+		if(maxLevel == null){
+			maxLevel = Integer.MAX_VALUE
+		}
+
+		return RoleType.findAllByTypeAndLevelLessThanEquals(
+				RoleType.SECURITY,
+				maxLevel,
+				[sort: 'level', order: 'desc']
+		)
 	}
 
 	/**
@@ -1425,7 +1431,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		for (String roleCode in roleTypes) {
 			if (!roleCode) continue
 
-			if (!isRoleAssignable(person, roleCode)) {
+			if (!isRoleAssignable(getUserLoginPerson(), roleCode)) {
 				reportViolation(
 						"Attempted to update user $person permission to assign security role $roleCode, which is not permissible")
 				return true

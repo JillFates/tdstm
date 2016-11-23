@@ -152,7 +152,8 @@ class UserLogin {
 		if (passwordWasChanged) {
 			log.debug "savePasswordHistory() for ${this}"
 			PasswordHistory ph = new PasswordHistory(userLogin: this, password: password)
-			if (!ph.save(flush: true)) {
+			//TM-5601: Don't use flush:true is not needed for the transaction and we can end in a Saving loop ConcurrentModificationException due to the afterUpdate Event
+			if (!ph.save()) {
 				log.error "savePasswordHistory() failed for $username : ${GormUtil.allErrorsString(ph)}"
 				throw new RuntimeException('Unable to save password history')
 			}
