@@ -2081,7 +2081,7 @@ class AssetEntityController implements ControllerMethods {
 			def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
-			int filterEvent = params.moveEvent ?: 0
+			long filterEvent = NumberUtil.toPositiveLong(params.moveEvent, 0L)
 			def moveEvent
 
 			if (params.containsKey("justRemaining")) {
