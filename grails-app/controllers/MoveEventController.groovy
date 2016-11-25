@@ -351,10 +351,12 @@ class MoveEventController implements ControllerMethods {
 		def statusAndNewsList = []
 		if (moveEvent) {
 
-	    	def moveEventNewsQuery = """SELECT mn.date_created as created, mn.message as message from move_event_news mn
-				left join move_event me on (me.move_event_id = mn.move_event_id
+	    	def moveEventNewsQuery = """
+				SELECT mn.date_created as created, mn.message as message from move_event_news mn
+				left join move_event me on (me.move_event_id = mn.move_event_id)
 				left join project p on (p.project_id = me.project_id)
-				where mn.is_archived = 0 and mn.move_event_id = $moveEvent.id and p.project_id = $moveEvent.project.id order by created desc"""
+				where mn.is_archived = 0 and mn.move_event_id = ${moveEvent.id} and p.project_id = ${moveEvent.project.id} order by created desc
+			"""
 
 			def moveEventNews = jdbcTemplate.queryForList(moveEventNewsQuery)
 
