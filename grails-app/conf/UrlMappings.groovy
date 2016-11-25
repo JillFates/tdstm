@@ -260,17 +260,17 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/licenses/environments" {
-			controller = "wsLicenseController"
+		"/ws/license/environment" {
+			controller = "wsLicense"
 			action = [
 			        GET: "fetchEnvironments"
 			]
 		}
 
-		"/ws/licenses/projects" {
-			controller = "wsLicenseController"
+		"/ws/license/project" {
+			controller = "wsLicense"
 			action = [
-					GET: "getProjects"
+					GET: "fetchProjects"
 			]
 		}
 

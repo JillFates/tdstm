@@ -266,6 +266,7 @@ grails {
 			failureHandler.defaultFailureUrl = '/auth/login'
 
 			controllerAnnotations.staticRules = [
+				'/ws/**'			:'isAuthenticated()',
 				'/'					:'permitAll',
 				'/index'			:'permitAll',
 				'/index.gsp'		:'permitAll',

@@ -30,7 +30,6 @@ import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.license.LicenseService
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.refcode.RefCode
 
 import java.lang.management.ManagementFactory

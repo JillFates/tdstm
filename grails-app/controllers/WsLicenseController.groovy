@@ -19,7 +19,7 @@ class WsLicenseController implements ControllerMethods {
 	ProjectService projectService
 	SecurityService securityService
 
-	def getEnvironments(){
+	def fetchEnvironments(){
 		def envs = License.Environment.values()
 
 		def envMap = envs.collect {
@@ -33,9 +33,8 @@ class WsLicenseController implements ControllerMethods {
 		renderSuccessJson(environments:envMap)
 	}
 
-	def getProjects(){
-		def userLogin = securityService.getUserLogin()
-		def projects = projectService.getUserProjects(userLogin, true)
+	def fetchProjects(){
+		def projects = projectService.getUserProjects()
 		projects = projects.inject([[id:"all", projectCode:"-- Multiple Projects --", client:[id:'', label:'']]]){ arr, p ->
 			def client = p.client
 			arr << [id:p.id, projectCode:p.projectCode, client:[id:client.id, label:client.name]]

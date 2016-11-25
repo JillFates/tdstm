@@ -49,4 +49,25 @@ class License {
 			this.id = id
 		}
 	}
+/*
+	enum Type {
+		SINGLE_PROJECT (S), MULTI_PROJECT (M)
+	}
+
+	enum LicenseMethod {
+		// Accounting based on highwater limit of the number of servers
+		MAX_SERVERS (M),
+
+		// Accounting based on average number of servers under management during the month where tokens
+				// are deducted until the tokensUsed >= tokensAllocated
+		TOKEN (T),
+
+		// Used for custom licenses where there is no limits of usage
+				CUSTOM (C)
+	}
+
+	enum LicenseStatus {
+		ACTIVE(A), EXPIRED(E), TERMINATED(T), PENDING(P)
+	}
+	*/
 }
