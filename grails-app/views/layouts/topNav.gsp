@@ -506,7 +506,7 @@
                         <div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
                     </div>
                     <script type="text/javascript">
-                        ${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
+                        ${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEvent.id+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
                     </script>
                 </g:if>
             </g:if>
