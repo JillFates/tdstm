@@ -432,18 +432,18 @@ digraph runbook {
 					label = (label.size() < 31) ? label : label[0..30]
 
 					def tooltip = "$task.taskNumber:" + StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
-					def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
-					def fillcolor = taskService.taskStatusColorMap[colorKey][1]
+					def colorKey = taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
+					def fillcolor = taskStatusColorMap[colorKey][1]
 					//def url = createLink(controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false)
 
 					// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
 					if ("${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
-						fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0]
-						color = taskService.taskStatusColorMap['AUTO_TASK'][1]
+						fontcolor = taskStatusColorMap['AUTO_TASK'][0]
+						color = taskStatusColorMap['AUTO_TASK'][1]
 						fontsize = '8'
 					}
 					else {
-						fontcolor = taskService.taskStatusColorMap[colorKey][0]
+						fontcolor = taskStatusColorMap[colorKey][0]
 						color = 'black'	// edge color
 						fontsize = '10'
 					}
@@ -575,8 +575,8 @@ digraph runbook {
 				log.warn "The wrong mode [$mode] was specified"
 			}
 
-			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED,
-				securityService.hasPermission("PublishTasks") && params.viewUnpublished == '1')
+			def viewUnpublished = securityService.hasPermission("PublishTasks") && params.viewUnpublished == '1'
+			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished)
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, moveEventId)
 
 			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
@@ -652,23 +652,23 @@ digraph runbook {
 				def task = "$it.task_number:" + it.task.encodeAsJSON()
 			    def tooltip  = "$it.task_number:" + it.task.encodeAsJSON()
 
-				def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
+				def colorKey = taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
 
-				fillcolor = taskService.taskStatusColorMap[colorKey][1]
+				fillcolor = taskStatusColorMap[colorKey][1]
 
 				// log.info "task $it.task: role $it.role, $AssetComment.AUTOMATIC_ROLE, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
 				// if ("$it.roll" == "$AssetComment.AUTOMATIC_ROLE") {
 				if ("${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
-					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0]
-					color = taskService.taskStatusColorMap['AUTO_TASK'][1]
+					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
+					color = taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'
 				} else {
-					fontcolor = taskService.taskStatusColorMap[colorKey][0]
+					fontcolor = taskStatusColorMap[colorKey][0]
 					fontsize = '10'
 					color = 'black'
 				}
 
-				// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"$fontcolor\", fontsize=\"$fontsize\", style=filled" : ''
+				// style = mode == 's' ? "fillcolor=\"${taskStatusColorMap[colorKey][1]}\", fontcolor=\"$fontcolor\", fontsize=\"$fontsize\", style=filled" : ''
 				attribs = """id="$it.id", color="$color", fillcolor="$fillcolor", fontcolor="$fontcolor", fontsize="$fontsize" """
 
 				//def url = createLink(controller:'task', action:'neighborhoodGraph', id:"$it.id", absolute:false)
