@@ -781,21 +781,22 @@ function reoptimizeGraph () {
 function drawContextMenu() {
 	// Trigger action when the contexmenu is about to be shown
 	$(document).bind("contextmenu", function (event) {
+		/*debugger;*/
 		if (event.shiftKey)
 			return;
 		var validTags = ['use', 'svg', 'g'];
-		var target = event.target;
+		var target = event.target.correspondingUseElement || event.target;
 		var tag = target.tagName;
 
 		if (validTags.indexOf(tag) != -1) {
 			event.preventDefault();
-
+			//debugger;
 			// remove old items
 			$(".customMenu").children(".tempItem").remove();
 
 			// node specific items
 			if (tag == 'use') {
-				debugger;
+
 				var data = target.__data__;
 
 				$("#consoleOutputItemId").on('click', function (a, b) {
