@@ -13,6 +13,18 @@ export default class LicenseAdminService {
         this.log.debug('licenseAdminService Instanced');
     }
 
+    getEnvironmentDataSource(onSuccess) {
+        this.restService.licenseAdminServiceHandler().getEnvironmentDataSource((data) => {
+            return onSuccess(data);
+        });
+    }
+
+    getProjectDataSource(onSuccess) {
+        this.restService.licenseAdminServiceHandler().getProjectDataSource((data) => {
+            return onSuccess(data);
+        });
+    }
+
     testService(callback) {
         this.restService.licenseAdminServiceHandler().getLicense((data) => {
             return callback(data);

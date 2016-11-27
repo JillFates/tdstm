@@ -116,12 +116,7 @@ export default class LicenseAdminList {
             templateUrl: '../app-js/modules/licenseAdmin/request/RequestLicense.html',
             controller: 'RequestLicense as requestLicense',
             size: 'md',
-            draggable: true,
-            resolve: {
-                params: function () {
-                    return { id: 50, name: 'Acme, Inc.', email: 'acme@inc.com' };
-                }
-            }
+            draggable: true
         });
 
         modalInstance.result.then((license) => {

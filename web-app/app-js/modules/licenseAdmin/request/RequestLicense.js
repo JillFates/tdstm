@@ -1,22 +1,38 @@
 /**
  * Created by Jorge Morayta on 09/26/2016.
+ * Create a new Request to get a License
  */
 
 'use strict';
 
 export default class RequestLicense {
 
-    constructor($log, licenseAdminService, $uibModalInstance, params) {
+    /**
+     * Initialize all the properties
+     * @param $log
+     * @param licenseAdminService
+     * @param $uibModalInstance
+     */
+    constructor($log, licenseAdminService, $uibModalInstance) {
         this.licenseAdminService = licenseAdminService;
         this.uibModalInstance = $uibModalInstance;
         this.log = $log;
+
+        // Defined the Environment Select
+        this.environmentDataSource = [];
+        // Define the Project Select
+        this.selectProject = {};
+        this.selectProjectListOptions = [];
+
         this.getEnvironmentDataSource();
         this.getProjectDataSource();
+
+        // Create the Model for the New License
         this.newLicenseModel = {
             contactEmail: '',
             environmentId: 0,
             projectId: 0,
-            client: params,
+            clientName: '',
             specialInstructions: ''
         }
     }
@@ -25,20 +41,36 @@ export default class RequestLicense {
      * Populate the Environment dropdown values
      */
     getEnvironmentDataSource() {
-        this.environmentDataSource = [
-            {environmentId: 1, name: 'Production'},
-            {environmentId: 2, name: 'Demo'}
-        ];
+        this.licenseAdminService.getEnvironmentDataSource((data)=>{
+            this.environmentDataSource = data;
+            this.newLicenseModel.environmentId = data[0].id;
+        });
     }
 
     /**
      * Populate the Project dropdown values
      */
     getProjectDataSource() {
-        this.projectDataSource = [
-            {projectId: 1, name: 'Multi-Project'},
-            {projectId: 2, name: 'DR Relo'}
-        ];
+        this.selectProjectListOptions = {
+            dataSource: {
+                transport: {
+                    read: (e) => {
+                        this.licenseAdminService.getProjectDataSource((data) => {
+                            this.newLicenseModel.projectId = data[0].id;
+                            return e.success(data);
+                        })
+                    }
+                }
+            },
+            dataTextField: 'name',
+            dataValueField: 'id',
+            valuePrimitive: true,
+            select: ((e) => {
+                // On Project Change, select the Client Name
+                var item = this.selectProject.dataItem(e.item);
+                this.newLicenseModel.clientName = item.client.name;
+            })
+        };
     }
 
     /**

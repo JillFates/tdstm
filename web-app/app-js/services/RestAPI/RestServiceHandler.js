@@ -42,6 +42,12 @@ export default class RestServiceHandler {
 
     licenseAdminServiceHandler() {
         return {
+            getEnvironmentDataSource: (onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/environment'), onSuccess);
+            },
+            getProjectDataSource: (onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/project'), onSuccess);
+            },
             getLicenseList: (data, onSuccess) => {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license'), onSuccess);
             },

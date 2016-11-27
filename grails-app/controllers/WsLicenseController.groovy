@@ -33,12 +33,27 @@ class WsLicenseController implements ControllerMethods {
 		renderSuccessJson(environments:envMap)
 	}
 
+	/**
+	 * Get the List of projects attached with the clients, this is being used to select Client as well
+	 * @return
+     */
 	def fetchProjects(){
 		def projects = projectService.getUserProjects()
-		projects = projects.inject([[id:"all", projectCode:"-- Multiple Projects --", client:[id:'', label:'']]]){ arr, p ->
+		projects = projects.inject([[id:"all", projectCode:"-- Multiple Projects --", client:[id:'', name:'']]]){ arr, p ->
 			def client = p.client
-			arr << [id:p.id, projectCode:p.projectCode, client:[id:client.id, label:client.name]]
+			arr << [id:p.id, projectCode:p.projectCode, client:[id:client.id, name:client.name]]
 		}
+
+		// Return a Map with each project with the client it belongs
+		def projMap = projects.collect {
+			[
+					id:it.id,
+					name:it.projectCode,
+					client: it.client
+			]
+		}
+
+		renderAsJson projMap
 
 		renderSuccessJson(projects:projects)
 	}
