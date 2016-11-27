@@ -13,6 +13,12 @@ export default class LicenseAdminService {
         this.log.debug('licenseAdminService Instanced');
     }
 
+    getLicenseList(callback) {
+        this.restService.licenseAdminServiceHandler().getLicenseList((data) => {
+            return callback(data);
+        });
+    }
+
     getEnvironmentDataSource(onSuccess) {
         this.restService.licenseAdminServiceHandler().getEnvironmentDataSource((data) => {
             return onSuccess(data);
@@ -25,9 +31,14 @@ export default class LicenseAdminService {
         });
     }
 
-    testService(callback) {
-        this.restService.licenseAdminServiceHandler().getLicense((data) => {
-            return callback(data);
+    /**
+     * Create a New License passing params
+     * @param newLicense
+     * @param callback
+     */
+    createNewLicenseRequest(newLicense, onSuccess){
+        this.restService.licenseAdminServiceHandler().createNewLicenseRequest(newLicense, (data) => {
+            return onSuccess(data);
         });
     }
 
@@ -45,12 +56,6 @@ export default class LicenseAdminService {
         });
     }
 
-    getLicenseList(callback) {
-        this.restService.licenseAdminServiceHandler().getLicenseList((data) => {
-            return callback(data);
-        });
-    }
-
     applyLicense(license, callback) {
         this.restService.licenseAdminServiceHandler().applyLicense(license, (data) => {
             //if(data.applied) {
@@ -64,17 +69,6 @@ export default class LicenseAdminService {
 
     deleteLicense(license, callback) {
         this.restService.licenseAdminServiceHandler().deleteLicense(license, (data) => {
-            return callback(data);
-        });
-    }
-
-    /**
-     * Create a New License passing params
-     * @param newLicense
-     * @param callback
-     */
-    createNewLicenseRequest(newLicense, callback){
-        this.restService.licenseAdminServiceHandler().createNewLicenseRequest(newLicense, (data) => {
             return callback(data);
         });
     }

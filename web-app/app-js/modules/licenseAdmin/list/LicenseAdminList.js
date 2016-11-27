@@ -44,8 +44,8 @@ export default class LicenseAdminList {
                 pageSize: 10,
                 transport: {
                     read: (e) => {
-                        /*this.licenseAdminService.testService((data) => {*/
-                            var data = [
+                        this.licenseAdminService.getLicenseList((data) => {
+                            /*var data = [
                                 {
                                     licenseId: 1,
                                     keyId: 'ce42cfd1-1ac5-4fcc-be5c-cc7885c8f83b',
@@ -98,9 +98,9 @@ export default class LicenseAdminList {
                                     },
                                     encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
                                 }
-                            ];
+                            ];*/
                             e.success(data);
-                       /* });*/
+                       });
                     }
                 }
             }
