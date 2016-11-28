@@ -274,6 +274,27 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/license/type" {
+			controller = "wsLicense"
+			action = [
+					GET: "fetchTypes"
+			]
+		}
+
+		"/ws/license/status" {
+			controller = "wsLicense"
+			action = [
+					GET: "fetchStatus"
+			]
+		}
+
+		"/ws/license/method" {
+			controller = "wsLicense"
+			action = [
+					GET: "fetchMethods"
+			]
+		}
+
 
 		//ROOT map to the auth/index action
 		"/"(controller: "auth")

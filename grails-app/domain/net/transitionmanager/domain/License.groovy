@@ -8,6 +8,8 @@ class License {
 	String instalationNum
 	String email
 	Environment environment
+	Status status
+	Type   type
 	String project
 	String method = ""
 	int    max = 0
@@ -49,25 +51,43 @@ class License {
 			this.id = id
 		}
 	}
-/*
+
 	enum Type {
-		SINGLE_PROJECT (S), MULTI_PROJECT (M)
+		SINGLE_PROJECT (1),
+		MULTI_PROJECT (2)
+
+		int id
+		Type(int id) {
+			this.id = id
+		}
 	}
 
-	enum LicenseMethod {
+	enum Method {
 		// Accounting based on highwater limit of the number of servers
-		MAX_SERVERS (M),
+		MAX_SERVERS (1),
 
 		// Accounting based on average number of servers under management during the month where tokens
 				// are deducted until the tokensUsed >= tokensAllocated
-		TOKEN (T),
+		TOKEN (2),
 
 		// Used for custom licenses where there is no limits of usage
-				CUSTOM (C)
+		CUSTOM (3)
+
+		int id
+		Method(int id) {
+			this.id = id
+		}
 	}
 
-	enum LicenseStatus {
-		ACTIVE(A), EXPIRED(E), TERMINATED(T), PENDING(P)
+	enum Status {
+		ACTIVE(1),
+		EXPIRED(2),
+		TERMINATED(3),
+		PENDING(4)
+
+		int id
+		Status(int id) {
+			this.id = id
+		}
 	}
-	*/
 }

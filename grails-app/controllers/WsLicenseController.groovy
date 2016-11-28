@@ -19,20 +19,6 @@ class WsLicenseController implements ControllerMethods {
 	ProjectService projectService
 	SecurityService securityService
 
-	def fetchEnvironments(){
-		def envs = License.Environment.values()
-
-		def envMap = envs.collect {
-			[
-					id:it.id,
-					name:it.name()
-			]
-		}
-
-		renderAsJson envMap
-		renderSuccessJson(environments:envMap)
-	}
-
 	/**
 	 * Get the List of projects attached with the clients, this is being used to select Client as well
 	 * @return
@@ -56,6 +42,33 @@ class WsLicenseController implements ControllerMethods {
 		renderAsJson projMap
 
 		renderSuccessJson(projects:projects)
+	}
+
+	private renderEnum(name, daEnum){
+		def map = daEnum.values().collect {
+			[
+					id:it.id,
+					name:it.name()
+			]
+		}
+
+		//renderAsJson map
+		renderSuccessJson(name:map)
+	}
+	def fetchEnvironments(){
+		renderEnum('environments', License.Environment)
+	}
+
+	def fetchTypes(){
+		renderEnum('types', License.Type)
+	}
+
+	def fetchStatus(){
+		renderEnum('status', License.Status)
+	}
+
+	def fetchMethods(){
+		renderEnum('methods', License.Method)
 	}
 
 	/* list the licenses */
