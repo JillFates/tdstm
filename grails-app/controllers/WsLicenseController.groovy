@@ -40,11 +40,9 @@ class WsLicenseController implements ControllerMethods {
 		}
 
 		renderAsJson projMap
-
-		renderSuccessJson(projects:projects)
 	}
 
-	private renderEnum(name, daEnum){
+	private renderEnum(daEnum){
 		def map = daEnum.values().collect {
 			[
 					id:it.id,
@@ -52,19 +50,18 @@ class WsLicenseController implements ControllerMethods {
 			]
 		}
 
-		//renderAsJson map
-		renderSuccessJson(name:map)
+		renderAsJson map
 	}
 	def fetchEnvironments(){
-		renderEnum('environments', License.Environment)
+		renderEnum(License.Environment)
 	}
 
 	def fetchTypes(){
-		renderEnum('types', License.Type)
+		renderEnum(License.Type)
 	}
 
 	def fetchStatus(){
-		renderEnum('status', License.Status)
+		renderEnum(License.Status)
 	}
 
 	def fetchMethods(){
