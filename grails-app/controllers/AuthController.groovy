@@ -66,8 +66,6 @@ class AuthController implements ControllerMethods {
 			}
 		}
 
-		//notice.typeId == noticeType.Postlogin && notice.active
-
 		[username: params.username, authority: params.authority, rememberMe: params.rememberMe != null,
 		 loginConfig: securityService.getLoginConfig(), buildInfo: environmentService.getVersionText(),
 		 preLoginList: preLoginList, postLoginList: postLoginList]

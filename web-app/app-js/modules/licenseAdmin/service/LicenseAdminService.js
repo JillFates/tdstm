@@ -27,7 +27,7 @@ export default class LicenseAdminService {
 
     getProjectDataSource(onSuccess) {
         this.restService.licenseAdminServiceHandler().getProjectDataSource((data) => {
-            return onSuccess(data);
+            return onSuccess(data.data);
         });
     }
 

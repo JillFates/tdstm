@@ -21,6 +21,7 @@
                                 k-data-value-field="'id'"
                                 k-data-source="requestLicense.environmentDataSource"
                                 k-ng-model="requestLicense.newLicenseModel.environmentId"
+                                ng-model="requestLicense.newLicenseModel.environmentId"
                                 id="selectEnvironment"
                                 class="form-control"
                                 required >
@@ -33,6 +34,7 @@
                         <select kendo-drop-down-list="requestLicense.selectProject"
                                 k-options="requestLicense.selectProjectListOptions"
                                 k-ng-model="requestLicense.newLicenseModel.projectId"
+                                ng-model="requestLicense.newLicenseModel.projectId"
                                 id="selectProject"
                                 class="form-control"
                                 required >
