@@ -25,23 +25,14 @@ class WsLicenseController implements ControllerMethods {
      */
 	def fetchProjects(){
 		def projects = projectService.getUserProjects()
-		projects = projects.inject([[id:"all", projectCode:"-- Multiple Projects --", client:[id:'', name:'']]]){ arr, p ->
+		projects = projects.inject([[id:"all", name:"-- Multiple Projects --", client:[id:'', name:'']]]){ arr, p ->
 			def client = p.client
-			arr << [id:p.id, projectCode:p.projectCode, client:[id:client.id, name:client.name]]
-		}
-
-		// Return a Map with each project with the client it belongs
-		def projMap = projects.collect {
-			[
-					id:it.id,
-					name:it.projectCode,
-					client: it.client
-			]
+			arr << [id:p.id, name:p.projectCode, client:[id:client.id, name:client.name]]
 		}
 
 		//OL: Should we render using RESTFull ¬¬
 		//renderAsJson projMap
-		renderSuccessJson(projects:projects)
+		renderSuccessJson(projects)
 	}
 
 	private renderEnum(daEnum){
