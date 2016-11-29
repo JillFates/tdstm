@@ -71,7 +71,7 @@ class WsLicenseController implements ControllerMethods {
 
 	/* list the licenses */
 	def getLicenses(){
-		renderSuccessJson(licenses:[])
+		renderSuccessJson(licenses:License.findAll())
 	}
 
 	/**
@@ -87,6 +87,8 @@ class WsLicenseController implements ControllerMethods {
 			}else{
 				lic = new License()
 				lic.requestDate = new Date()
+				lic.status = License.Status.PENDING
+				lic.method = License.Method.MAX_SERVERS
 				lic.instalationNum = licenseService.getInstalationId()
 			}
 
@@ -96,22 +98,28 @@ class WsLicenseController implements ControllerMethods {
 			lic.requestNote = json.requestNote
 
 			if(lic.project != "all"){
+				lic.type = License.Type.SINGLE_PROJECT
 				def project = Project.get(lic.project)
-				def client = project.client
-				lic.instalationNum = "${lic.instalationNum}|${project.name}|${client.name}"
+				if(project !=  null) {
+					def client = project.client
+					lic.instalationNum = "${lic.instalationNum}|${project.name}|${client.name}"
+				}else{
+					lic.errors.rejectValue("project", "Project (id:${lic.project}) not found")
+				}
+			}else{
+				lic.type = License.Type.MULTI_PROJECT
 			}
 
-			//if (lic.save()) {
-			if (true){
+			if (!lic.hasErrors() && lic.save(flush:true)) {
+				log.error("OLB: NDA: {}", lic.hasErrors())
 				renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
 			}else{
 				lic.errors.each {
-					log.error(it)
+					log.error("lic error: {}", it)
 				}
-				throw new Exception("Error while creating Request")
+				throw new Exception("Error while creating License Request")
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			log.error("Da error", e)
 			preHandleException e
 		}

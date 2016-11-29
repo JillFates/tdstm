@@ -15,7 +15,7 @@ class License {
 	Status status
 	Type   type
 	String project
-	String method = ""
+	Method method
 	int    max = 0
 	Date   requestDate
 	Date   validStart

@@ -141,4 +141,5 @@ databaseChangeLog = {
 	include file: "20161010-notice-support.groovy"
 	include file: "20161010-notice-support-change-noticetype-column.groovy"
 	include file: "20161111-delete-asset-dependency-orphans.groovy"
+	include file: "20161129-fix-license-columns.groovy"
 }
