@@ -55,7 +55,7 @@ br.page-break-after {
 /*CSS for RackLayout in Rack view for changed Id 'racksLayout'*/
 #racksLayout {
   position: inherit;
-  height: auto; width: auto !important;
+  height: auto;
   top: 70px; right: 5px; bottom: 25px;
   margin: 0;
   padding-right: 18px;
