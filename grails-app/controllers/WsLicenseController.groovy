@@ -101,23 +101,9 @@ class WsLicenseController implements ControllerMethods {
 				lic.instalationNum = "${lic.instalationNum}|${project.name}|${client.name}"
 			}
 
-			def jsonR = [
-					id:lic.id,
-					email:lic.email,
-					environment:lic.environment,
-					instalationNum:lic.instalationNum,
-					project: lic.project,
-					requestDate: lic.requestDate,
-					requestNote: lic.requestNote
-			]
-
-			def jsonString = new JsonBuilder( jsonR ).toString()
-
-			String encodedString = new String(Base64.encodeBase64(Smaz.compress(jsonString)))
-
 			//if (lic.save()) {
 			if (true){
-				renderSuccessJson(id:lic.id, body:encodedString)
+				renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
 			}else{
 				lic.errors.each {
 					log.error(it)

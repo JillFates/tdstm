@@ -1,5 +1,9 @@
 package net.transitionmanager.domain
 
+import com.github.icedrake.jsmaz.Smaz
+import groovy.json.JsonBuilder
+import org.apache.commons.codec.binary.Base64
+
 /**
  * Created by octavio on 9/20/16.
  */
@@ -39,7 +43,28 @@ class License {
 		return (hash)? true : false
 	}
 
+	public toJsonMap() {
+		[
+			id            : id,
+			email         : email,
+			environment   : environment,
+			instalationNum: instalationNum,
+			project       : project,
+			requestDate   : requestDate,
+			requestNote   : requestNote
+		]
+	}
 
+	public toJsonString(){
+		new JsonBuilder( toJsonMap() ).toString()
+	}
+
+	public toEncodedMessage(){
+		new String(Base64.encodeBase64(Smaz.compress(toJsonString())))
+	}
+
+
+	/** Enumerator Helpers *******************************************/
 	enum Environment {
 		Engineering(1),
 		Training(2),
@@ -64,6 +89,10 @@ class License {
 		Type(int id) {
 			this.id = id
 		}
+
+		static Type forId(int id) {
+			values().find { it.id == id }
+		}
 	}
 
 	enum Method {
@@ -81,6 +110,10 @@ class License {
 		Method(int id) {
 			this.id = id
 		}
+
+		static Method forId(int id) {
+			values().find { it.id == id }
+		}
 	}
 
 	enum Status {
@@ -92,6 +125,10 @@ class License {
 		int id
 		Status(int id) {
 			this.id = id
+		}
+
+		static Status forId(int id) {
+			values().find { it.id == id }
 		}
 	}
 }
