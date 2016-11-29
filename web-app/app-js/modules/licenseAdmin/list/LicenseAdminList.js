@@ -154,7 +154,7 @@ export default class LicenseAdminList {
         });
     }
 
-    onNewLicenseCreated() {
+    onNewLicenseCreated(license) {
         this.uibModal.open({
             animation: true,
             templateUrl: '../app-js/modules/licenseAdmin/created/CreatedLicense.html',
@@ -162,7 +162,7 @@ export default class LicenseAdminList {
             controller: 'CreatedLicense as createdLicense',
             resolve: {
                 params: function () {
-                    return { id: 50, name: 'Acme, Inc.', email: 'acme@inc.com'  };
+                    return { email: license.email  };
                 }
             }
         });

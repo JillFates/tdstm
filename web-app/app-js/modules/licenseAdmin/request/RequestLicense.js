@@ -79,7 +79,7 @@ export default class RequestLicense {
     saveLicenseRequest() {
         this.log.info('New License Requested: ', this.newLicenseModel);
         this.licenseAdminService.createNewLicenseRequest(this.newLicenseModel, (data) => {
-            this.uibModalInstance.close(data);
+            this.uibModalInstance.close(this.newLicenseModel);
         });
     }
 

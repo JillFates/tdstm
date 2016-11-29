@@ -52,7 +52,7 @@ export default class RestServiceHandler {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/project'), onSuccess);
             },
             getLicenseList: (data, onSuccess) => {
-                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/licenses'), onSuccess);
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license'), onSuccess);
             },
             createNewLicenseRequest: (data, onSuccess, onError) => {
                 this.req.method = 'POST';
