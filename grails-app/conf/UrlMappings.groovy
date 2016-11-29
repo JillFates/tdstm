@@ -245,16 +245,16 @@ class UrlMappings {
 		}
 
 		///// LICENSES API /////////
-		"/ws/licenses" {
-			controller = "wsLicenseController"
+		"/ws/license" {
+			controller = "wsLicense"
 			action = [
 					GET: "getLicenses"
 			]
 		}
 
 		//Requests
-		"/ws/licenses/requests" {
-			controller = "wsLicenseController"
+		"/ws/license/request" {
+			controller = "wsLicense"
 			action = [
 			        POST: "generateRequest"
 			]

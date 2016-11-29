@@ -50,6 +50,10 @@ class License {
 		Environment(int id) {
 			this.id = id
 		}
+
+		static Environment forId(int id) {
+			values().find { it.id == id }
+		}
 	}
 
 	enum Type {

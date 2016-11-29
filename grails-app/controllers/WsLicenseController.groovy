@@ -1,6 +1,9 @@
+import com.github.icedrake.jsmaz.Smaz
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
+import groovy.json.JsonBuilder
+import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Project
@@ -9,11 +12,14 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.license.LicenseService
+import org.apache.commons.codec.binary.Base64
 
 /**
  * Created by octavio on 11/14/16.
  */
 @Secured('isAuthenticated()')
+@Slf4j
+@Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class WsLicenseController implements ControllerMethods {
 	LicenseService licenseService
 	ProjectService projectService
@@ -85,7 +91,7 @@ class WsLicenseController implements ControllerMethods {
 			}
 
 			lic.email = json.email
-			lic.environment = json.environment
+			lic.environment = License.Environment.forId(json.environment)
 			lic.project = json.project
 			lic.requestNote = json.requestNote
 
@@ -95,9 +101,23 @@ class WsLicenseController implements ControllerMethods {
 				lic.instalationNum = "${lic.instalationNum}|${project.name}|${client.name}"
 			}
 
+			def jsonR = [
+					id:lic.id,
+					email:lic.email,
+					environment:lic.environment,
+					instalationNum:lic.instalationNum,
+					project: lic.project,
+					requestDate: lic.requestDate,
+					requestNote: lic.requestNote
+			]
+
+			def jsonString = new JsonBuilder( jsonR ).toString()
+
+			String encodedString = new String(Base64.encodeBase64(Smaz.compress(jsonString)))
+
 			//if (lic.save()) {
 			if (true){
-				renderSuccessJson(id:lic.id)
+				renderSuccessJson(id:lic.id, body:encodedString)
 			}else{
 				lic.errors.each {
 					log.error(it)
@@ -106,6 +126,7 @@ class WsLicenseController implements ControllerMethods {
 			}
 		}
 		catch (e) {
+			log.error("Da error", e)
 			preHandleException e
 		}
 
