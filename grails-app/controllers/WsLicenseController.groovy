@@ -91,8 +91,8 @@ class WsLicenseController implements ControllerMethods {
 			}
 
 			lic.email = json.email
-			lic.environment = License.Environment.forId(json.environment)
-			lic.project = json.project
+			lic.environment = License.Environment.forId(json.environmentId)
+			lic.project = json.projectId
 			lic.requestNote = json.requestNote
 
 			if(lic.project != "all"){

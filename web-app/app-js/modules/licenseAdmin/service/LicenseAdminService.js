@@ -21,7 +21,7 @@ export default class LicenseAdminService {
 
     getEnvironmentDataSource(onSuccess) {
         this.restService.licenseAdminServiceHandler().getEnvironmentDataSource((data) => {
-            return onSuccess(data);
+            return onSuccess(data.data);
         });
     }
 
@@ -37,6 +37,7 @@ export default class LicenseAdminService {
      * @param callback
      */
     createNewLicenseRequest(newLicense, onSuccess){
+        newLicense.environmentId = parseInt(newLicense.environmentId);
         this.restService.licenseAdminServiceHandler().createNewLicenseRequest(newLicense, (data) => {
             return onSuccess(data);
         });

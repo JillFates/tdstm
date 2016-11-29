@@ -56,7 +56,7 @@ export default class RestServiceHandler {
             },
             createNewLicenseRequest: (data, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/licenses/requests';
+                this.req.url =  '../ws/license/request';
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },

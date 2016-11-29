@@ -29,11 +29,11 @@ export default class RequestLicense {
 
         // Create the Model for the New License
         this.newLicenseModel = {
-            contactEmail: '',
+            email: '',
             environmentId: 0,
             projectId: 0,
             clientName: '',
-            specialInstructions: ''
+            requestNote: ''
         }
     }
 
