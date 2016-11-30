@@ -2403,7 +2403,7 @@ class AssetEntityController implements ControllerMethods {
 						sortIdx = sortIndex
 						break
 				}
-///				order((sortOrder == 'asc' ? Order.asc(sortIndex) : Order.desc(sortIndex)).ignoreCase())
+				order(sortIdx, sortOrder)
 
 			} else {
 				and {
