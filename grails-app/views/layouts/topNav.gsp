@@ -211,37 +211,37 @@
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-application-list">
                                             <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <tds:svgIcon name="application" width="16" height="16" />
+                                                <tds:svgIcon name="application_menu" width="16" height="16" />
                                                 Applications
                                             </g:link>
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-server-list">
                                             <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'server']" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <tds:svgIcon name="serverPhysical" width="16" height="16" />
+                                                <tds:svgIcon name="serverPhysical_menu" width="16" height="16" />
                                                 Servers
                                             </g:link>
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-all-list" >
                                             <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <tds:svgIcon name="other" width="16" height="16" />
+                                                <tds:svgIcon name="other_menu" width="16" height="16" />
                                                 All Devices
                                             </g:link>
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-database-list">
-                                            <g:link class="mmlink" controller="database"    action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <tds:svgIcon name="database" width="16" height="16" />
+                                            <g:link class="mmlink" controller="database"  action="list" onclick="hideMegaMenu('assetMegaMenu')">
+                                                <tds:svgIcon name="database_menu" width="16" height="16" />
                                                 Databases
                                             </g:link>
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-storage-list">
                                             <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <tds:svgIcon name="storagePhysical" width="16" height="16" />
+                                                <tds:svgIcon name="storagePhysical_menu" width="16" height="16" />
                                                 Storage-Devices
                                             </g:link>
                                         </li>
                                         <li class="menu-child-item menu-parent-assets-storage-logical-list">
-                                            <g:link class="mmlink" controller="files"       action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                                <tds:svgIcon name="storageLogical" width="16" height="16" />
+                                            <g:link class="mmlink" controller="files" action="list" onclick="hideMegaMenu('assetMegaMenu')">
+                                                <tds:svgIcon name="storageLogical_menu" width="16" height="16" />
                                                 Storage-Logical
                                             </g:link>
                                         </li>
