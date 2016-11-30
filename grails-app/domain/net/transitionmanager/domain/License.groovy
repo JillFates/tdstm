@@ -18,8 +18,8 @@ class License {
 	Method method
 	int    max = 0
 	Date   requestDate
-	Date   validStart
-	Date   validEnd
+	Date   activationDate
+	Date   expirationDate
 	String requestNote
 	String hash
 
@@ -29,21 +29,36 @@ class License {
 		hash 		type:'text'
 		version 	false
 		tablePerHierarchy false
+		activationDate column:'valid_start'
+		expirationDate column:'valid_end'
+
 	}
 
 	static constraints = {
-		method 		nullable:true
-		validStart 	nullable:true
-		validEnd 	nullable:true
-		requestNote nullable:true
-		hash 		nullable:true
+		method 			nullable:true
+		activationDate 	nullable:true
+		expirationDate 	nullable:true
+		requestNote 	nullable:true
+		hash 			nullable:true
 	}
 
 	public boolean isActive(){
 		return (hash)? true : false
 	}
 
+	public PartyGroup getClient(){
+		PartyGroup client
+		if(project != "all") {
+			def project = Project.get(project)
+			client = project?.client
+		}
+
+		return client
+	}
+
 	public toJsonMap() {
+		PartyGroup client = getClient()
+
 		[
 			id				: id,
 			email			: email,
@@ -59,12 +74,18 @@ class License {
 				id: method?.id,
 				name: method?.name()
 			],
-			status		: [
+			status			: [
 				id: status?.id,
 				name: status?.name()
 			],
 			instalationNum	: instalationNum,
 			project			: project,
+			client			: [
+			        id: client?.id,
+					name: client?.name
+			],
+			activationDate	: activationDate,
+			expirationDate : expirationDate,
 			requestDate		: requestDate,
 			requestNote		: requestNote
 		]

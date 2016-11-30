@@ -1,8 +1,6 @@
-import com.github.icedrake.jsmaz.Smaz
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
-import groovy.json.JsonBuilder
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
@@ -12,7 +10,6 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.license.LicenseService
-import org.apache.commons.codec.binary.Base64
 
 /**
  * Created by octavio on 11/14/16.
