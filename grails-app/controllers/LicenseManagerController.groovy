@@ -47,7 +47,7 @@ class LicenseManagerController {
 			lc.id = json.id
 			lc.requestDate = org.apache.tools.ant.util.DateUtils.parseIso8601DateTime((String)json.requestDate)
 			lc.email = json.email
-			lc.
+			//lc.
 			//String productKey = json.id
 			//String holder = json.email
 			//String subject = json.instalationNum

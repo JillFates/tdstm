@@ -71,7 +71,7 @@ class WsLicenseController implements ControllerMethods {
 
 	/* list the licenses */
 	def getLicenses(){
-		renderSuccessJson(licenses:License.findAll())
+		renderSuccessJson(License.findAll()*.toJsonMap())
 	}
 
 	/**

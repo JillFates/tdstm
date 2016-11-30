@@ -244,7 +244,7 @@ class UrlMappings {
 			]
 		}
 
-		///// LICENSES API /////////
+		///// LICENSES Admin API (Client Side) /////////
 		"/ws/license" {
 			controller = "wsLicense"
 			action = [
@@ -260,17 +260,27 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/license/environment" {
-			controller = "wsLicense"
-			action = [
-			        GET: "fetchEnvironments"
-			]
-		}
-
 		"/ws/license/project" {
 			controller = "wsLicense"
 			action = [
 					GET: "fetchProjects"
+			]
+		}
+
+		///// LICENSES Manager API (BackOffice) /////////
+		"/ws/manager/license/import-request" {
+			controller = "wsLicenseManager"
+			action = [
+					POST: "fetchProjects"
+			]
+		}
+
+		///// LICENSES Common API /////////
+
+		"/ws/license/environment" {
+			controller = "wsLicense"
+			action = [
+					GET: "fetchEnvironments"
 			]
 		}
 
@@ -294,6 +304,8 @@ class UrlMappings {
 					GET: "fetchMethods"
 			]
 		}
+
+		///// LICENSES Admin API (Client Side) /////////
 
 
 		//ROOT map to the auth/index action

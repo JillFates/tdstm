@@ -45,13 +45,16 @@ class License {
 
 	public toJsonMap() {
 		[
-			id            : id,
-			email         : email,
-			environment   : environment,
-			instalationNum: instalationNum,
-			project       : project,
-			requestDate   : requestDate,
-			requestNote   : requestNote
+			id				: id,
+			email			: email,
+			environmentId	: environment?.id,
+			typeId			: type?.id,
+			methodId		: method?.id,
+			statusId		: status?.id,
+			instalationNum	: instalationNum,
+			project			: project,
+			requestDate		: requestDate,
+			requestNote		: requestNote
 		]
 	}
 
