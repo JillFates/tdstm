@@ -16,7 +16,7 @@ class License {
 	Type   type
 	String project
 	Method method
-	int    max = 0
+	int    maxServers = 0
 	Date   requestDate
 	Date   activationDate
 	Date   expirationDate
@@ -29,9 +29,9 @@ class License {
 		hash 		type:'text'
 		version 	false
 		tablePerHierarchy false
-		activationDate column:'valid_start'
-		expirationDate column:'valid_end'
-
+		activationDate	column:'valid_start'
+		expirationDate	column:'valid_end'
+		maxServers		column:'max'
 	}
 
 	static constraints = {
@@ -87,7 +87,8 @@ class License {
 			activationDate	: activationDate,
 			expirationDate : expirationDate,
 			requestDate		: requestDate,
-			requestNote		: requestNote
+			requestNote		: requestNote,
+			maxServers		: maxServers
 		]
 	}
 
