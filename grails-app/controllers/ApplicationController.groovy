@@ -342,7 +342,7 @@ class ApplicationController implements ControllerMethods {
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 
 		[applicationInstance: application, availabaleRoles: partyRelationshipService.getStaffingRoles(),
-		 moveEvent: moveEvent, personList: personList] +
+		  personList: personList] +
 		 assetEntityService.getDefaultModelForEdits('Application', project, application, params)
 	}
 
