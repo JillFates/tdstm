@@ -47,10 +47,22 @@ class License {
 		[
 			id				: id,
 			email			: email,
-			environmentId	: environment?.id,
-			typeId			: type?.id,
-			methodId		: method?.id,
-			statusId		: status?.id,
+			environment		: [
+				id: environment?.id,
+				name: environment?.name()
+			],
+			type			: [
+				id: type?.id,
+				name: type?.name()
+				],
+			method			: [
+				id: method?.id,
+				name: method?.name()
+				],
+			statusId		: [
+				id: status?.id,
+				name: status?.name()
+				],
 			instalationNum	: instalationNum,
 			project			: project,
 			requestDate		: requestDate,

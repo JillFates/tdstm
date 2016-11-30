@@ -13,9 +13,9 @@ export default class LicenseAdminService {
         this.log.debug('licenseAdminService Instanced');
     }
 
-    getLicenseList(callback) {
+    getLicenseList(onSuccess) {
         this.restService.licenseAdminServiceHandler().getLicenseList((data) => {
-            return callback(data);
+            return onSuccess(data.data);
         });
     }
 

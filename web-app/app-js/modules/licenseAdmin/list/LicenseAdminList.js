@@ -19,7 +19,7 @@ export default class LicenseAdminList {
 
     getDataSource() {
         this.licenseGridOptions = {
-            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="licenseAdminList.onRequestNewLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Request New License</button> <div ng-click="licenseManagerList.reloadLicenseAdminList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+            toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" ng-click="licenseAdminList.onRequestNewLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Request New License</button> <div ng-click="licenseAdminList.reloadLicenseAdminList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
             pageable: {
                 refresh: true,
                 pageSizes: true,
@@ -45,65 +45,16 @@ export default class LicenseAdminList {
                 transport: {
                     read: (e) => {
                         this.licenseAdminService.getLicenseList((data) => {
-                            /*var data = [
-                                {
-                                    licenseId: 1,
-                                    keyId: 'ce42cfd1-1ac5-4fcc-be5c-cc7885c8f83b',
-                                    action: '',
-                                    client: 'n/a',
-                                    project: 'n/a',
-                                    contact_email: 'west.coast@xyyy.com',
-                                    status: 'Active',
-                                    type: 'Multi-Project',
-                                    method:  {
-                                        id: 1,
-                                        name: 'Server'
-                                    },
-                                    servers_tokens: '8000',
-                                    inception: '2016-09-15',
-                                    expiration: '2016-12-01',
-                                    environment: 'Production',
-                                    specialInstructions: 'Help, Help, Help',
-                                    applied: false,
-                                    replaced: {
-                                        date: new Date(),
-                                        serverUrl: 'http:blablaba.com',
-                                        name: 'aasdas54-5asd4a5sd-asd45a4sd'
-                                    },
-                                    encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
-                                },
-                                {
-                                    licenseId: 2,
-                                    keyId: 'df42dge2-2bd6-5gdd-cf6d-dd8996d9g94c',
-                                    action: '',
-                                    client: 'Acme Inc.',
-                                    project: 'DR Relo',
-                                    contact_email: 'jim.laucher@acme.com',
-                                    status: 'Pending',
-                                    type: 'Project',
-                                    method: {
-                                        id: 2,
-                                        name: 'Token'
-                                    },
-                                    servers_tokens: '15000',
-                                    inception: '2016-09-01',
-                                    expiration: '2016-10-01',
-                                    environment: 'Demo',
-                                    specialInstructions: '',
-                                    applied: true,
-                                    replaced: {
-                                        date: new Date(),
-                                        serverUrl: 'http:blablaba.com',
-                                        name: 'basfasd-2aphgosdf-asoqweqwe'
-                                    },
-                                    encryptedDetail: 'asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618asdasdasd4as56da6sd46325e4q65asd4a65sd4a65sd4as65d4864286e41286e41682e453a4sd5as4d6a8s4d61284d12684d61824d6184d61824d126d426184d6182d46182d2618'
-                                }
-                            ];*/
-                            e.success(data);
+                           e.success(data);
                        });
                     }
+                },
+                sort: {
+                    field: 'title',
+                    dir: 'asc'
                 }
-            }
+            },
+            sortable: true
         };
     }
 
