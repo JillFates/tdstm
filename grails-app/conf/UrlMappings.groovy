@@ -252,6 +252,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/license/$id" {
+			controller = "wsLicense"
+			action = [
+					GET: "getLicense"
+			]
+		}
+
 		//Requests
 		"/ws/license/request" {
 			controller = "wsLicense"

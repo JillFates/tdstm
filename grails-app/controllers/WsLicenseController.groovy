@@ -74,6 +74,22 @@ class WsLicenseController implements ControllerMethods {
 		renderSuccessJson(License.findAll()*.toJsonMap())
 	}
 
+	def getLicense(){
+		def id = params.id
+		def lic
+		if(id) {
+			lic = License.get(id)
+		}
+
+		if(lic) {
+			renderSuccessJson(lic.toJsonMap())
+		}else{
+			response.status = 404 //Not Found
+			render "${id} not found."
+		}
+
+	}
+
 	/**
 	 * Where should I check for the valid parameters?
 	 * @return
