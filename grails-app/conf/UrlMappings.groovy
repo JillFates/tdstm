@@ -255,7 +255,8 @@ class UrlMappings {
 		"/ws/license/$id" {
 			controller = "wsLicense"
 			action = [
-					GET: "getLicense"
+					GET: "getLicense",
+					DELETE: "deleteLicense"
 			]
 		}
 

@@ -87,6 +87,23 @@ class WsLicenseController implements ControllerMethods {
 
 	}
 
+	def deleteLicense(){
+		def id = params.id
+		def lic
+		if(id) {
+			lic = License.get(id)
+		}
+
+		if(lic) {
+			lic.delete()
+			renderSuccessJson("Successful Deleted")
+		}else{
+			response.status = 404 //Not Found
+			render "${id} not found."
+		}
+
+	}
+
 	/**
 	 * Where should I check for the valid parameters?
 	 * @return
