@@ -58,11 +58,11 @@ class License {
 			method			: [
 				id: method?.id,
 				name: method?.name()
-				],
-			statusId		: [
+			],
+			status		: [
 				id: status?.id,
 				name: status?.name()
-				],
+			],
 			instalationNum	: instalationNum,
 			project			: project,
 			requestDate		: requestDate,

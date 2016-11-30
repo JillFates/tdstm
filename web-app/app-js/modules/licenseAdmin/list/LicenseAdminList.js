@@ -31,14 +31,14 @@ export default class LicenseAdminList {
                 {field: 'client', title: 'Client'},
                 {field: 'project', title: 'Project'},
                 {field: 'contact_email', title: 'Contact Email'},
-                {field: 'status', title: 'Status'},
-                {field: 'type', title: 'Type'},
+                {field: 'status.name', title: 'Status'},
+                {field: 'type.name', title: 'Type'},
                 {field: 'method.name', title: 'Method'},
                 {field: 'method.id', hidden: true},
                 {field: 'servers_tokens', title: 'Server/Tokens'},
                 {field: 'inception', title: 'Inception'},
                 {field: 'expiration', title: 'Expiration'},
-                {field: 'environment', title: 'Env.'}
+                {field: 'environment.name', title: 'Env.'}
             ],
             dataSource: {
                 pageSize: 10,
