@@ -13,12 +13,13 @@ export default class LicenseDetail {
         this.log = $log;
         this.licenseModel = {
             methodId: params.license.method.id,
-            environment: params.license.environment,
-            inception: params.license.inception,
-            expiration: params.license.expiration,
-            specialInstructions: params.license.specialInstructions,
+            serversTokens: params.license.serversTokens,
+            environmentName: params.license.environment.name,
+            inception: params.license.requestDate,
+            expiration: params.license.expirationDate,
+            specialInstructions: params.license.requestNote,
             applied: params.license.applied,
-            keyId: params.license.keyId,
+            id: params.license.id,
             replaced: params.license.replaced,
             encryptedDetail: params.license.encryptedDetail
         };

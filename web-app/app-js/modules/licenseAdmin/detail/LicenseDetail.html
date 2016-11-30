@@ -23,19 +23,19 @@
                         <div class="form-group sub-option-50" ng-if="licenseDetail.licenseModel.methodId === 1">
                             <label class="col-sm-2 control-label">Max Server:</label>
                             <div class="col-sm-10" >
-                                <label class="control-label ">8.000</label>
+                                <label class="control-label ">{{licenseDetail.licenseModel.serversTokens}}</label>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">Environment:</label>
                             <div class="col-sm-10">
-                                <label class="control-label">{{licenseDetail.licenseModel.environment}}</label>
+                                <label class="control-label">{{licenseDetail.licenseModel.environmentName}}</label>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">Inception:</label>
                             <div class="col-sm-10">
-                                <label class="control-label">{{licenseDetail.licenseModel.inception}}</label>
+                                <label class="control-label">{{licenseDetail.licenseModel.inception | date}}</label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -55,7 +55,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label text-right element-width-100">Id:</label>
                             <div class="col-sm-10">
-                                <label class="control-label">{{licenseDetail.licenseModel.keyId}}</label>
+                                <label class="control-label">{{licenseDetail.licenseModel.id}}</label>
                             </div>
                         </div>
                         <div class="form-group">

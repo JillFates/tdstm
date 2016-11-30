@@ -28,16 +28,16 @@ export default class LicenseAdminList {
             columns: [
                 {field: 'licenseId', hidden: true },
                 {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseAdminList.onLicenseDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
-                {field: 'client', title: 'Client'},
+                {field: 'client.name', title: 'Client'},
                 {field: 'project', title: 'Project'},
-                {field: 'contact_email', title: 'Contact Email'},
+                {field: 'email', title: 'Contact Email'},
                 {field: 'status.name', title: 'Status'},
                 {field: 'type.name', title: 'Type'},
                 {field: 'method.name', title: 'Method'},
                 {field: 'method.id', hidden: true},
-                {field: 'servers_tokens', title: 'Server/Tokens'},
-                {field: 'inception', title: 'Inception'},
-                {field: 'expiration', title: 'Expiration'},
+                {field: 'serversTokens', title: 'Server/Tokens', template: '#:maxServers#'},
+                {field: 'requestDate', title: 'Inception', type: 'date', format : "{0:dd/MMM/yyyy}" },
+                {field: 'expirationDate', title: 'Expiration', type: 'date', format : "{0:dd/MMM/yyyy}" },
                 {field: 'environment.name', title: 'Env.'}
             ],
             dataSource: {
@@ -99,7 +99,7 @@ export default class LicenseAdminList {
         });
 
         modalInstance.result.then(() => {
-
+            this.reloadLicenseAdminList();
         }, () => {
             this.log.info('Request Canceled.');
         });
