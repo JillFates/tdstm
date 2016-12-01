@@ -167,6 +167,7 @@ class WsLicenseController implements ControllerMethods {
 					render "${id} already has a license"
 				}else {
 					lic.hash = json.hash
+					lic.status = License.Status.ACTIVE
 
 					if (lic.save()) {
 						renderSuccessJson("Ok")
