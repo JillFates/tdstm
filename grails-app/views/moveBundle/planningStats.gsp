@@ -432,7 +432,7 @@ $(document).ready(function() {
 									</thead>
 									<tbody>
 									<tr>
-										<td class="dashboard_stat_icon_td"><tds:svgIcon name="application" width="17" height="17" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="application_menu" width="17" height="17" /></td>
 										<td style="vertical-align: middle;"> <g:link controller="application" action="list" class="links">Applications</g:link></td>
 									</tr>
 
@@ -444,7 +444,7 @@ $(document).ready(function() {
 									</tr>
 
 									<tr>
-										<td class="dashboard_stat_icon_td"><tds:svgIcon name="serverPhysical" width="17" height="17" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="serverPhysical_menu" width="17" height="17" /></td>
 										<td>
 											<g:link controller="assetEntity"
 													params="[filter:'physicalServer']"
@@ -453,7 +453,7 @@ $(document).ready(function() {
 									</tr>
 
 									<tr>
-										<td class="dashboard_stat_icon_td"><tds:svgIcon name="serverVirtual" width="17" height="17" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="serverVirtual_menu" width="17" height="17" /></td>
 										<td>
 											<g:link controller="assetEntity"
 													params="[filter:'virtualServer']"
@@ -461,26 +461,26 @@ $(document).ready(function() {
 										</td>
 									</tr>
 									<tr>
-										<td class="dashboard_stat_icon_td"><tds:svgIcon name="database" width="17" height="17" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="database_menu" width="17" height="17" /></td>
 										<td><g:link controller="database" action="list"
 													class="links">Databases</g:link></td>
 									</tr>
 									<tr>
-										<td class="dashboard_stat_icon_td"><tds:svgIcon name="storagePhysical" width="17" height="17" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="storagePhysical_menu" width="17" height="17" /></td>
 										<td nowrap="nowrap"><g:link controller="assetEntity" action="list"
 																	params="[filter:'storage']"
 																	class="links">Physical Storage</g:link>
 										</td>
 									</tr>
 									<tr>
-										<td class="dashboard_stat_icon_td"><tds:svgIcon name="storageLogical" width="17" height="17" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="storageLogical_menu" width="17" height="17" /></td>
 										<td><g:link controller="files" action="list"
 													class="links">Logical Storage</g:link>
 										</td>
 									</tr>
 
 									<tr>
-										<td class="dashboard_stat_icon_td"><tds:svgIcon name="other" width="17" height="17" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="other_menu" width="17" height="17" /></td>
 										<td><g:link controller="assetEntity"
 													params="[filter:'other']"
 													action="list"
