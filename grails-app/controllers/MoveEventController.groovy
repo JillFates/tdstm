@@ -350,7 +350,6 @@ class MoveEventController implements ControllerMethods {
 
 		def statusAndNewsList = []
 		if (moveEvent) {
-
 	    	def moveEventNewsQuery = """
 				SELECT mn.date_created as created, mn.message as message from move_event_news mn
 				left join move_event me on (me.move_event_id = mn.move_event_id)
@@ -377,7 +376,7 @@ class MoveEventController implements ControllerMethods {
 					  AND move_event_id=?
 					  AND status='Completed'
 					  AND (date_resolved BETWEEN SUBTIME(?, '00:15:00') AND ?)
-				""", moveEvent.projectId, moveEvent.id, currentPoolTime, currentPoolTime)
+				""", moveEvent.project.id, moveEvent.id, currentPoolTime, currentPoolTime)
 				tasksCompList.each {
 					transitionComment << it.comment << ":&nbsp;&nbsp;" << TimeUtil.formatDateTime(it.dateResolved) << ".&nbsp;&nbsp;"
 				}
