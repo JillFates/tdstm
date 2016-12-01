@@ -60,13 +60,13 @@ export default class RestServiceHandler {
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            //--------------------------------------------
-            applyLicense:  (data, callback) => {
+            applyLicense:  (licenseId, data, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/???';
+                this.req.url =  '../ws/license/' + licenseId + '/load';
                 this.req.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
+            //--------------------------------------------
             resubmitLicenseRequest: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';

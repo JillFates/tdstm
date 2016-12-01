@@ -13,7 +13,7 @@ export default class LicenseDetail {
         this.log = $log;
         this.licenseModel = {
             methodId: params.license.method.id,
-            serversTokens: params.license.serversTokens,
+            serversTokens: params.license.serversTokens || params.license.maxServers,
             environmentName: params.license.environment.name,
             inception: params.license.requestDate,
             expiration: params.license.expirationDate,
@@ -55,6 +55,7 @@ export default class LicenseDetail {
             size: 'md',
             resolve: {
                 params: () => {
+                    console.log(this.licenseModel);
                     return { license: this.licenseModel };
                 }
             }

@@ -10,6 +10,7 @@ export default class LicenseAdminService {
         this.log = $log;
         this.restService = restServiceHandler;
         this.rootScope = $rootScope;
+        this.statusSuccess = 'success';
         this.log.debug('licenseAdminService Instanced');
     }
 
@@ -57,14 +58,24 @@ export default class LicenseAdminService {
         });
     }
 
-    applyLicense(license, callback) {
-        this.restService.licenseAdminServiceHandler().applyLicense(license, (data) => {
-            //if(data.applied) {
+    /**
+     *  Apply The Lincense
+     * @param license
+     * @param onSuccess
+     */
+    applyLicense(license, onSuccess) {
+
+        var hash =  {
+            hash: license.key
+        };
+
+        this.restService.licenseAdminServiceHandler().applyLicense(license.id, hash, (data) => {
+            if(data.status === this.statusSuccess) {
                 this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'License was successfully applied'});
-            /*} else {
+            } else {
                 this.rootScope.$emit('broadcast-msg', { type: 'warning', text: 'License was successfully applied'});
-            }*/
-            return callback(data);
+            }
+            return onSuccess(data);
         });
     }
 
