@@ -4,7 +4,7 @@
 
 <td class="dashboard_stat_icon_td">
 	<g:link controller="${assetType}" action="list" params="${linkParams}" class="links">
-		<tds:svgIcon name="${iconName}" width="17" height="17" />
+		<tds:svgIcon name="${iconName}_menu" width="17" height="17" />
 	</g:link>
 </td>
 <td class="dashboard_stat_desc_td">
