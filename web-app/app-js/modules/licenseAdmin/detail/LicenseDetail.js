@@ -13,6 +13,9 @@ export default class LicenseDetail {
         this.log = $log;
         this.licenseModel = {
             methodId: params.license.method.id,
+            projectName: params.license.project.name,
+            clientName: params.license.client.name,
+            email: params.license.email,
             serversTokens: params.license.serversTokens || params.license.maxServers,
             environmentName: params.license.environment.name,
             inception: params.license.requestDate,
