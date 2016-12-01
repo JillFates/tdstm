@@ -268,6 +268,14 @@ class UrlMappings {
 			]
 		}
 
+		//Load License
+		"/ws/license/$id/load" {
+			controller = "wsLicense"
+			action = [
+					POST: "loadLicense"
+			]
+		}
+
 		"/ws/license/project" {
 			controller = "wsLicense"
 			action = [

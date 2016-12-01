@@ -156,6 +156,34 @@ class WsLicenseController implements ControllerMethods {
 
 	}
 
+	def loadLicense(){
+		try{
+			def json = request.JSON
+			License lic = License.get(params.id)
+
+			if(lic){
+				if(lic.hash){
+					response.status = 302 //Found
+					render "${id} already has a license"
+				}else {
+					lic.hash = json.hash
+
+					if (lic.save()) {
+						renderSuccessJson("Ok")
+					} else {
+						throw new Exception("Error while creating License Request")
+					}
+				}
+			}else{
+				response.status = 404 //Not Found
+				render "${params.id} not found."
+			}
+		} catch (e) {
+			log.error("Da error", e)
+			preHandleException e
+		}
+	}
+
 	/*** HELPER *************************/
 	/* I believe that this should be on the trait  ¬¬ */
 	private void preHandleException(Exception e, boolean includeException = false) {

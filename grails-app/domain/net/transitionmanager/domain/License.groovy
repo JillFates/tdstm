@@ -58,6 +58,16 @@ class License {
 
 	public toJsonMap() {
 		PartyGroup client = getClient()
+		def dProject = [
+		        id:"",
+				name:"all"
+		]
+
+		if(project != "all"){
+			Project prj = Project.get(project)
+			dProject.id = prj?.id
+			dProject.name = prj?.name
+		}
 
 		[
 			id				: id,
@@ -79,7 +89,7 @@ class License {
 				name: status?.name()
 			],
 			instalationNum	: instalationNum,
-			project			: project,
+			project			: dProject,
 			client			: [
 			        id: client?.id,
 					name: client?.name
