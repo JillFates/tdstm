@@ -8,6 +8,7 @@ class ProjectServiceTests  extends Specification {
 	// IOC
 	def projectService
 	def personService
+	PartyRelationshipService partyRelationshipService
 
 	// Initialized by setup()
 	def projectHelper
@@ -146,5 +147,19 @@ class ProjectServiceTests  extends Specification {
 		then:
 			projectService.defaultAccountExpirationDate(project) == compDate
 
+	}
+
+	def "7. Test companyIsAssociated"() {
+		when:
+			Project p = projectHelper.createProject()
+			PartyGroup partner = projectHelper.createCompany()
+			partyRelationshipService.assignPartnerToCompany(partner, p.owner)
+			projectService.updateProjectPartners(p, partner.id)
+			PartyGroup unrelatedCompany = projectHelper.createCompany()
+		then:
+			projectService.companyIsAssociated(p, p.owner.id)
+			projectService.companyIsAssociated(p, p.client)
+			projectService.companyIsAssociated(p, partner)
+			! projectService.companyIsAssociated(p, unrelatedCompany)
 	}
 }

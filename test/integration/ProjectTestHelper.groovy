@@ -49,24 +49,24 @@ class ProjectTestHelper {
 	 */
 	Project createProject(PartyGroup company=null) {
 
-		Project project = new Project()
-		project.with {
-			client = createCompany('Owner')
-			projectCode = RSU.randomAlphabetic(10)
-			description = 'Test project created by the ProjectTestHelper'
-			startDate = new Date()
-			completionDate = startDate + 30
-			client = createClient()
-			workflowCode = 'STD_PROCESS'
-			timezone = 'GMT'
-		}
-
-		project.save(failOnError:true)
-
-		// Save the company that owns the project
 		if (!company) {
 			company = createCompany('Owner')
 		}
+
+		Project project = new Project()
+		project.with {
+			client = createClient(company)
+			projectCode = RSU.randomAlphabetic(10)
+			name = 'Project ' + projectCode
+			description = 'Test project created by the ProjectTestHelper'
+			startDate = new Date()
+			completionDate = startDate + 30
+			workflowCode = 'STD_PROCESS'
+			timezone = Timezone.findByCode('GMT')
+		}
+		project.save(failOnError:true)
+
+		// Assigning the owner to a project is done through the PartyRelationship so the project must be saved first
 		project.owner = company
 		project.save(failOnError:true)
 
@@ -82,7 +82,7 @@ class ProjectTestHelper {
 		PartyType pt = PartyType.get('COMPANY')
 		PartyGroup company = new PartyGroup()
 		company.with {
-			type = pt
+			partyType = pt
 			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
 		}
 
@@ -99,6 +99,7 @@ class ProjectTestHelper {
 
 		PartyGroup client = createCompany('Client')
 		partyRelationshipService.assignClientToCompany(client, company)
+		return client
 	}
 
 }

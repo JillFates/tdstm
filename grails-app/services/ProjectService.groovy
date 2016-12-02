@@ -252,9 +252,9 @@ class ProjectService {
 
 	/**
 	 * This action is used to get the fields, splitted fields in to two to handle common customs.
-	 * @param : entityType type of entity.
+	 * @param entityType - type of entity to get fields for
 	 * @param projectAttributes
-	 *@return
+	 * @return
 	 */
 	def getFields(def entityType, projectAttributes = null){
 		def project = securityService.getUserCurrentProject()
@@ -270,7 +270,7 @@ class ProjectService {
 	/**
 	 * This action is used to get the custom fields
 	 * @param projectAttributes
-	 *@return
+	 * @return
 	 */
 	def getCustoms(def projectAttributes = null){
 		def project = securityService.getUserCurrentProject()
@@ -548,6 +548,32 @@ class ProjectService {
 	 * Used to fetch a map of the companies associated with the project which include the owner, client and
 	 * any partners. The map key will be the name and value the company object. By default it will force to lowercase the
 	 * company name.
+	 * Used to determine if a company is associated with a project
+	 * @param company - a company object
+	 * @return true if associated otherwise false
+	 */
+	boolean companyIsAssociated(Project project, Party company) {
+		return companyIsAssociated(project, company.id)
+	}
+
+	/**
+	 * Used to determine if a company is associated with a project
+	 * @param company - a company object
+	 * @return true if associated otherwise false
+	 */
+	boolean companyIsAssociated(Project project, Long companyId) {
+		List assocCompanies = getCompanies(project)
+		if (assocCompanies.find { it.id == companyId }) {
+			true
+		} else {
+			false
+		}
+	}
+
+	/**
+	 * Used to fetch a map of the companies associated with the project which include the owner, client and
+	 * any partners. The map key will be the name and value the company object. By default it will force to lowercase the
+	 * company name.
 	 * @param project - the project to query
 	 * @param toLowercase - flag if true (default) will force the company names to lowercase otherwise they remain untouched
 	 * @return A map of [CompanyName : PartyGroup company]
@@ -780,7 +806,7 @@ class ProjectService {
 			// Make sure that the partner Id is a valid partner assoicated with the company
 			if (! ownerPartnerIds.contains(pid)) {
 				log.debug "Project $projectInstance owner $projectOwner partner ids are $ownerPartnerIds"
-				throw new InvalidParamException("Partner id specified is not associated with project ($pid)")
+				throw new InvalidParamException("Partner ID ($pid) specified is not associated with Project.Owner ($projectOwner.id)")
 			}
 			newPartnersIds << pid
 		}
@@ -891,15 +917,15 @@ class ProjectService {
 			updateProjectPartners(projectInstance, partnersIds)
 
 			if ( projectManager != null && projectManager != "" ) {
-
 				def projectManagerParty = Party.get(projectManager)
 				//	For Project to ProjectManager PartyRelationship
 				def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )
 			}
 
-			// set the projectInstance as CURR_PROJ
+			// Set the projectInstance as CURR_PROJ
 			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectInstance.id}" )
-			//Will create a bundle name TBD and set it as default bundle for project
+
+			// Will create a bundle name TBD and set it as default bundle for project
 			projectInstance.getProjectDefaultBundle()
 
 			return [message: "Project ${projectInstance} created", success: true, imageId: image.id]

@@ -8,7 +8,6 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.transaction.Transactional
 import org.apache.shiro.authc.AccountException
-import org.hibernate.SessionFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
 
@@ -23,7 +22,6 @@ class UserService {
 	PersonService personService
 	ProjectService projectService
 	SecurityService securityService
-	SessionFactory sessionFactory
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
@@ -51,6 +49,7 @@ class UserService {
 		def project
 
 		String mn = 'findOrProvisionUser:'
+		String em
 
 		Map domain = config.domains[authority.toLowerCase()]
 
@@ -70,8 +69,8 @@ class UserService {
 		String defaultRole = domain.defaultRole ?: ''
 		String defaultTimezone = domain.defaultTimezone ?: ''
 
-		def client = PartyGroup.get( userInfo.companyId )
-		if (! client) {
+		def company = PartyGroup.get( userInfo.companyId )
+		if (! company) {
 			log.error "$mn Unable to find configured company for id ${userInfo.companyId}"
 			throw new ConfigurationException("Unable to find user's company by id ${userInfo.companyId}")
 		}
@@ -79,16 +78,17 @@ class UserService {
 		project = Project.get(defaultProject)
 		if (! project) {
 			log.error "$mn Unable to find configured default project for id ${defaultProject}"
-			throw new ConfigurationException("Unable to find the default project for $client")
+			throw new ConfigurationException("Unable to find the default project for $company")
 		}
 
-		if (project.client.id != client.id) {
-			log.error "$mn Project (${defaultProject}) not associated with client $client"
-			throw new ConfigurationException("Project (${defaultProject}) not associated with client $client")
+		if (! projectService.companyIsAssociated(project, company) ) {
+			em = "User's company ($company) is not associated with the default Project (${defaultProject})"
+			log.error "$mn $me"
+			throw new ConfigurationException(em)
 		}
 
 		// Attempt to lookup the Person and their UserLogin
-		def (person, userLogin) = findPersonAndUserLogin(client, userInfo, config, authority, personIdentifier)
+		def (person, userLogin) = findPersonAndUserLogin(company, userInfo, config, authority, personIdentifier)
 
 		// Check various requirements based on the Authentication Configuration and fall out if we don't
 		// have an account and not allowed to create one.
@@ -107,7 +107,7 @@ class UserService {
 
 		if (! person) {
 
-			// Create the person and associate to the client & project if one wasn't found
+			// Create the person and associate to the company & project if one wasn't found
 
 			if (debug)
 				log.debug "$mn Creating new person"
@@ -122,11 +122,11 @@ class UserService {
 			)
 			if (! person.save(flush:true)) {
 				log.error "$mn Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(person)}"
-				throw new RuntimeException('Unexpected error while creating Person object')
+				throw new RuntimeException('Data error while creating Person object')
 			}
 			// Create Staff relationship with the Company
-			if (! partyRelationshipService.addCompanyStaff(client, person)) {
-				throw new RuntimeException('Unable to associate new person to client')
+			if (! partyRelationshipService.addCompanyStaff(company, person)) {
+				throw new RuntimeException('Unable to associate new person to company')
 			}
 			// Create Staff relationship with the default Project
 			if (! partyRelationshipService.addProjectStaff(project, person)) {
@@ -443,7 +443,9 @@ class UserService {
 	}
 
 	/**
-	 *
+	 * Gets a list of events for one or more projects
+	 * @param projects - a list of one or more projects
+	 * @param dateNow - the date to base active events (guessing here because it isn't making a lot of sense)
 	 * @param projectInstance
 	 * @return
 	 */
@@ -453,7 +455,7 @@ class UserService {
 
 		def events = [:]
 
-		moveEventList.each{event->
+		moveEventList.each{ event ->
 			def eventCompTimes = event.moveBundles.completionTime.sort().reverse()
 			def startTimes = event.moveBundles.startTime.sort()
 			startTimes.removeAll([null])
@@ -490,7 +492,6 @@ class UserService {
 	 * @return
 	 */
 	def getTaskSummary ( project ){
-
 		def timeInMin = 0
 		def issueList = []
 		def person = securityService.getUserLoginPerson()
@@ -669,13 +670,13 @@ class UserService {
 	boolean changeProjectContext(UserLogin user, long projectId){
 		def contextUpdated = false
 		def projectInstance = Project.read(projectId)
-		if(projectService.hasAccessToProject(user, projectInstance)){
+		if (projectService.hasAccessToProject(user, projectInstance)) {
 			userPreferenceService.setPreference(PREF.CURR_PROJ, "${projectId}")
 			userPreferenceService.removePreference(PREF.MOVE_EVENT)
 			userPreferenceService.removePreference(PREF.CURR_BUNDLE)
 			userPreferenceService.removePreference(PREF.CURR_ROOM)
 			contextUpdated = true
-		}else{
+		} else {
 			securityService.reportViolation("Attempted to access unavailable project $projectId", user)
 		}
 
