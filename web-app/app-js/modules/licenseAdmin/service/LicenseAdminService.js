@@ -63,7 +63,7 @@ export default class LicenseAdminService {
      * @param license
      * @param onSuccess
      */
-    applyLicense(license, onSuccess) {
+    applyLicense(license, onSuccess, onError) {
 
         var hash =  {
             hash: license.key
@@ -73,9 +73,12 @@ export default class LicenseAdminService {
             if(data.status === this.statusSuccess) {
                 this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'License was successfully applied'});
             } else {
-                this.rootScope.$emit('broadcast-msg', { type: 'warning', text: 'License was successfully applied'});
+                this.rootScope.$emit('broadcast-msg', { type: 'warning', text: 'License was not applied'});
+                return onError({ success: false});
             }
-            return onSuccess(data);
+
+            return onSuccess({ success: true});
+
         });
     }
 

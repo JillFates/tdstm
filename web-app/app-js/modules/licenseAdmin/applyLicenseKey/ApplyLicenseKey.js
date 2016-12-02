@@ -18,6 +18,8 @@ export default class ApplyLicenseKey {
     applyKey() {
         this.licenseAdminService.applyLicense(this.licenseModel, (data) => {
             this.uibModalInstance.close(data);
+        }, (data)=> {
+            this.uibModalInstance.close(data);
         });
     }
 

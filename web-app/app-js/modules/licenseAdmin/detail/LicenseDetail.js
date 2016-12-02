@@ -21,10 +21,11 @@ export default class LicenseDetail {
             inception: params.license.requestDate,
             expiration: params.license.expirationDate,
             specialInstructions: params.license.requestNote,
-            applied: params.license.applied,
+            active: params.license.status.id === 1,
             id: params.license.id,
             replaced: params.license.replaced,
-            encryptedDetail: params.license.encryptedDetail
+            encryptedDetail: params.license.encryptedDetail,
+            applied: false
         };
 
         this. prepareMethodOptions();
@@ -64,8 +65,11 @@ export default class LicenseDetail {
             }
         });
 
-        modalInstance.result.then(() => {
-            this.licenseModel.applied = true;
+        modalInstance.result.then((data) => {
+            this.licenseModel.applied = data.success;
+            if(data.success) {
+                this.licenseModel.active = data.success;
+            }
         });
     }
 
@@ -119,6 +123,9 @@ export default class LicenseDetail {
      * Dismiss the dialog, no action necessary
      */
     cancelCloseDialog() {
+        if(this.licenseModel.applied) {
+            this.uibModalInstance.close();
+        }
         this.uibModalInstance.dismiss('cancel');
     }
 
