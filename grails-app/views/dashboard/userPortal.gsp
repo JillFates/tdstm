@@ -596,7 +596,7 @@
                 }
             }
 
-            $('#appIcon').html("<tds:svgIcon name='application' width='18' height='18' />");
+            $('#appIcon').html("<tds:svgIcon name='application_menu' width='18' height='18' />");
         }
 
         function loadActivepplTable(id) {
