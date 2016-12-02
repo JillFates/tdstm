@@ -280,6 +280,15 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 					return success(data, textStatus, jqXHR);
 				}
 			} else {
+				/*
+					There're scenarios were additional actions are required,
+					even if the server responded with errors.
+
+					@see pub.saveToShow (entity.crud.js)
+				 */
+				if(typeof this.successWithErrors != "undefined"){
+					this.successWithErrors(data)
+				}
 				return false;
 			}
 		} else {
@@ -360,6 +369,7 @@ tds.core.service.AlertsService = function(rootScope, timeout) {
 	};
 
 	var closeAlert = function(index) {
+		alert("Closing")
 		index = (index) ? index : rootScope.alerts.list.length - 1;
 		// After deleting the last one, the list is empty
 		if(rootScope.alerts.list[index]){

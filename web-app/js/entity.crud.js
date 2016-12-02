@@ -590,7 +590,6 @@ var EntityCrud = ( function($) {
 		var validateOkay = pub.validateForm(assetClass, formName, true);
 		if (validateOkay)
 			validateOkay = pub.validateDependencies(formName)
-			
 		if (validateOkay) {
 			var url=$('#createEditAssetForm').attr('action');
 			jQuery.ajax({
@@ -613,14 +612,20 @@ var EntityCrud = ( function($) {
 							getRackLayout( $('#selectedRackId').val() );
 						*/
 					}
+					assetCreateInvoked=false
 					$(document).trigger('entityAssetCreated');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
+					console.log("error 2")
 					alert("The following error occurred while attempting to create asset : "+ err);
 					assetCreateInvoked=false;
 					return false;
-				}
+				},
+				// This function is executed after the interceptor displays the error message, to perform additional actions.
+				successWithErrors: function(resp){
+					assetCreateInvoked=false;
+				},
 			});
 		} else {
 			assetCreateInvoked = false;
