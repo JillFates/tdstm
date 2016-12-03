@@ -32,6 +32,12 @@ export default class LicenseAdminService {
         });
     }
 
+    getHashCode(licenseId, onSuccess) {
+        this.restService.licenseAdminServiceHandler().getHashCode(licenseId, (data) => {
+            return onSuccess(data.data);
+        });
+    }
+
     /**
      * Create a New License passing params
      * @param newLicense
@@ -59,7 +65,7 @@ export default class LicenseAdminService {
     }
 
     /**
-     *  Apply The Lincense
+     *  Apply The License
      * @param license
      * @param onSuccess
      */

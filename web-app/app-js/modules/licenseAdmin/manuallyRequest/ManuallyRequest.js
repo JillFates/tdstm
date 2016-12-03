@@ -7,9 +7,21 @@
 export default class ManuallyRequest {
 
     constructor($log, licenseAdminService, $uibModalInstance, params) {
+        this.log = $log;
         this.licenseAdminService = licenseAdminService;
         this.uibModalInstance = $uibModalInstance;
         this.licenseModel = params.license;
+        this.licenseModel.encryptedDetail = '';
+
+        // Init
+        this.getHashCode();
+    }
+
+
+    getHashCode() {
+        this.licenseAdminService.getHashCode(this.licenseModel.id, (data) => {
+            this.licenseModel.encryptedDetail = '-----BEGIN HASH-----\n' + data + '\n-----END HASH-----';
+        });
     }
 
     /**

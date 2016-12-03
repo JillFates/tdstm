@@ -16,7 +16,7 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button ng-click="manuallyRequest.emailRequest()" type="submit" class="btn btn-primary pull-left"><i class="fa fa-fw fa-envelope"></i> Email Request</button>
+        <button type="submit" class="btn btn-primary pull-left"><i class="fa fa-fw fa-envelope"></i><a style="color: #fff;" href="mailto:someone@example.com?cc={{manuallyRequest.licenseModel.email}}&subject=License%20Activation&body={{manuallyRequest.licenseModel.encryptedDetail}}" target="_top">Email Request</a></button>
         <button ngclipboard data-clipboard-text="{{manuallyRequest.licenseModel.encryptedDetail}}" type="submit" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
         <button ng-click="manuallyRequest.cancelCloseDialog()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>

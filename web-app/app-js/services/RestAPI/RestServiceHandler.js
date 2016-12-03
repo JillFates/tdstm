@@ -66,6 +66,11 @@ export default class RestServiceHandler {
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
+            getHashCode:  (licenseId,onSuccess, onError) => {
+                this.req.method = 'GET';
+                this.req.url =  '../ws/license/' + licenseId + '/hash';
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
+            },
             //--------------------------------------------
             resubmitLicenseRequest: (data, callback) => {
                 this.req.method = 'POST';
@@ -122,9 +127,6 @@ export default class RestServiceHandler {
         return {
             getNoticeList: (onSuccess) => { // real ws example
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/notices'), onSuccess);
-            },
-            getNoticeMockUp: (onSuccess) => { // Mockup Data for testing see url
-                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../test/mockupData/NoticeManager/noticeManagerList.json'), onSuccess);
             },
             createNotice: (data, onSuccess, onError) => {
                 this.req.method = 'POST';
