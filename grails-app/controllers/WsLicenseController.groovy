@@ -73,7 +73,7 @@ class WsLicenseController implements ControllerMethods {
 
 	def getLicense(){
 		def id = params.id
-		def lic
+		License lic
 		if(id) {
 			lic = License.get(id)
 		}
@@ -85,6 +85,21 @@ class WsLicenseController implements ControllerMethods {
 			render "${id} not found."
 		}
 
+	}
+
+	def getLicenseRequestHash(){
+		def id = params.id
+		License lic
+		if(id) {
+			lic = License.get(id)
+		}
+
+		if(lic) {
+			renderSuccessJson(lic.toEncodedMessage())
+		}else{
+			response.status = 404 //Not Found
+			render "${id} not found."
+		}
 	}
 
 	def deleteLicense(){

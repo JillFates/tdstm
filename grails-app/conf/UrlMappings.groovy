@@ -260,6 +260,15 @@ class UrlMappings {
 			]
 		}
 
+		//Gets que request Hash
+		"/ws/license/$id/hash" {
+			controller = "wsLicense"
+			action = [
+					GET: "getLicenseRequestHash"
+			]
+		}
+
+
 		//Requests
 		"/ws/license/request" {
 			controller = "wsLicense"
@@ -284,10 +293,12 @@ class UrlMappings {
 		}
 
 		///// LICENSES Manager API (BackOffice) /////////
-		"/ws/manager/license/import-request" {
+
+		//load a request HASH from a client, returns JSON object
+		"/ws/manager/license/request" {
 			controller = "wsLicenseManager"
 			action = [
-					POST: "fetchProjects"
+					POST: "loadRequest"
 			]
 		}
 

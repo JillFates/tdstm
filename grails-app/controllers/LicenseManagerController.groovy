@@ -1,4 +1,6 @@
 import com.github.icedrake.jsmaz.Smaz
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.license.LicenseService
@@ -9,7 +11,9 @@ import org.apache.commons.lang3.time.DateUtils
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 
-//Client Controller
+@Secured('isAuthenticated()')
+@Slf4j
+@Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class LicenseManagerController {
 
 	LicenseService  licenseService

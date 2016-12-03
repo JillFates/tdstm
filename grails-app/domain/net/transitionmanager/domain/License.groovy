@@ -95,7 +95,7 @@ class License {
 					name: client?.name
 			],
 			activationDate	: activationDate,
-			expirationDate : expirationDate,
+			expirationDate 	: expirationDate,
 			requestDate		: requestDate,
 			requestNote		: requestNote,
 			maxServers		: maxServers
