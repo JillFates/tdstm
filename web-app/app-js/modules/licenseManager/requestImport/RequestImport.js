@@ -4,23 +4,31 @@
 
 'use strict';
 
-export default class RequestImport {
+import FormValidator from '../../utils/form/FormValidator.js';
 
-    constructor($log, licenseManagerService, $uibModalInstance) {
+export default class RequestImport extends FormValidator{
+
+    constructor($log, $scope, licenseManagerService, $uibModal, $uibModalInstance) {
+        super($log, $scope, $uibModal, $uibModalInstance);
+
         this.licenseManagerService = licenseManagerService;
         this.uibModalInstance = $uibModalInstance;
         this.licenseModel = {
             license: ''
         };
+
+        this.saveForm(this.licenseModel);
     }
 
     /**
      * Execute and validate the Key is correct
      */
     onImportLicense() {
-        this.licenseManagerService.importLicense(this.licenseModel, (data) => {
-            this.uibModalInstance.close(data);
-        });
+        if(this.isDirty()) {
+            this.licenseManagerService.importLicense(this.licenseModel, (data) => {
+                this.uibModalInstance.close(data);
+            });
+        }
     }
 
     /**

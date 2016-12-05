@@ -46,7 +46,7 @@ LicenseManagerModule.service('LicenseManagerService', ['$log', 'RestServiceHandl
 LicenseManagerModule.controller('LicenseManagerList', ['$log', '$state', 'LicenseManagerService', '$uibModal', LicenseManagerList]);
 
 // Modal - Controllers
-LicenseManagerModule.controller('RequestImport', ['$log', 'LicenseManagerService', '$uibModalInstance', RequestImport]);
+LicenseManagerModule.controller('RequestImport', ['$log', '$scope', 'LicenseManagerService', '$uibModal', '$uibModalInstance', RequestImport]);
 LicenseManagerModule.controller('LicenseManagerDetail', ['$log', 'LicenseManagerService', '$uibModal', '$uibModalInstance', 'params', LicenseManagerDetail]);
 
 
