@@ -45,7 +45,7 @@ export default class FormValidator {
     // This function is only available when the Form is being called from a Dialog PopUp
     onCloseDialog(event, reason, closed) {
         this.log.info('modal.closing: ' + (closed ? 'close' : 'dismiss') + '(' + reason + ')');
-        if (this.isDirty() && reason !== 'cancel-confirmation') {
+        if (this.isDirty() && reason !== 'cancel-confirmation' && typeof reason !== 'object') {
             event.preventDefault();
             this.confirmCloseForm();
         }

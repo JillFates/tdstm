@@ -50,7 +50,7 @@ LicenseAdminModule.controller('LicenseAdminList', ['$log', '$state', 'LicenseAdm
 // Modal - Controllers
 LicenseAdminModule.controller('RequestLicense', ['$log', '$scope', 'LicenseAdminService', '$uibModal', '$uibModalInstance', RequestLicense]);
 LicenseAdminModule.controller('CreatedLicense', ['$log', '$uibModalInstance', 'params', CreatedLicense]);
-LicenseAdminModule.controller('ApplyLicenseKey', ['$log', 'LicenseAdminService', '$uibModalInstance', 'params', ApplyLicenseKey]);
+LicenseAdminModule.controller('ApplyLicenseKey', ['$log', '$scope', 'LicenseAdminService', '$uibModal', '$uibModalInstance', 'params', ApplyLicenseKey]);
 LicenseAdminModule.controller('ManuallyRequest', ['$log', 'LicenseAdminService', '$uibModalInstance', 'params', ManuallyRequest]);
 LicenseAdminModule.controller('LicenseDetail', ['$log', 'LicenseAdminService', '$uibModal', '$uibModalInstance', 'params', LicenseDetail]);
 

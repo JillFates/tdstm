@@ -4,23 +4,34 @@
 
 'use strict';
 
-export default class ApplyLicenseKey {
+import FormValidator from '../../utils/form/FormValidator.js';
 
-    constructor($log, licenseAdminService, $uibModalInstance, params) {
+export default class ApplyLicenseKey extends FormValidator{
+
+    constructor($log, $scope, licenseAdminService, $uibModal, $uibModalInstance, params) {
+        super($log, $scope, $uibModal, $uibModalInstance)
         this.licenseAdminService = licenseAdminService;
         this.uibModalInstance = $uibModalInstance;
-        this.licenseModel = params.license;
+
+        this.licenseModel = {
+            id: params.license.id,
+            key: params.license.key
+        }
+        ;
+        this.saveForm(this.licenseModel);
     }
 
     /**
      * Execute and validate the Key is correct
      */
     applyKey() {
-        this.licenseAdminService.applyLicense(this.licenseModel, (data) => {
-            this.uibModalInstance.close(data);
-        }, (data)=> {
-            this.uibModalInstance.close(data);
-        });
+        if(this.isDirty()) {
+            this.licenseAdminService.applyLicense(this.licenseModel, (data) => {
+                this.uibModalInstance.close(data);
+            }, (data)=> {
+                this.uibModalInstance.close(data);
+            });
+        }
     }
 
     /**
