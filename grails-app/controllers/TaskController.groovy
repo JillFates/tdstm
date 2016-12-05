@@ -380,8 +380,10 @@ class TaskController implements ControllerMethods {
 				break
 			}
 
+			boolean viewUnpublished = params.viewUnpublished && params.viewUnpublished == "1"
+
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED,
-				securityService.hasPermission("PublishTasks") && params.viewUnpublished == '1')
+				securityService.hasPermission("PublishTasks") && viewUnpublished)
 
 			// check if the specified task is unpubublished and the user shouldn't see it
 			if (!viewUnpublished && !rootTask.isPublished) {
