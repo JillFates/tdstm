@@ -66,8 +66,7 @@ export default class LicenseAdminList {
             animation: true,
             templateUrl: '../app-js/modules/licenseAdmin/request/RequestLicense.html',
             controller: 'RequestLicense as requestLicense',
-            size: 'md',
-            draggable: true
+            size: 'md'
         });
 
         modalInstance.result.then((license) => {

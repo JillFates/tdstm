@@ -3,5 +3,5 @@
  * It handler the index for any of the directives available
  */
 
-require('./Tools/ToastHandler.js');
-require('./Tools/ModalWindowActivation.js');
+require('./tools/ToastHandler.js');
+require('./tools/ModalWindowActivation.js');

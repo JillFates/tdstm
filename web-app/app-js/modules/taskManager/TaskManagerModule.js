@@ -11,7 +11,7 @@ import TaskManagerController from './list/TaskManagerController.js';
 import TaskManagerEdit from './edit/TaskManagerEdit.js';
 
 // Directives
-import SVGLoader from '../../directives/Svg/svgLoader.js'
+//import SVGLoaderController from '../../directives/svg/SVGLoaderController.js'
 
 var TaskManagerModule = angular.module('TDSTM.TaskManagerModule', [uiRouter]).config(['$stateProvider', function ($stateProvider) {
 
@@ -43,6 +43,6 @@ TaskManagerModule.controller('TaskManagerController', ['$log', 'taskManagerServi
 TaskManagerModule.controller('TaskManagerEdit', ['$log', TaskManagerEdit]);
 
 // Directives
-TaskManagerModule.directive('svgLoader', SVGLoader);
+//TaskManagerModule.directive('svgLoader', SVGLoaderController);
 
 export default TaskManagerModule;

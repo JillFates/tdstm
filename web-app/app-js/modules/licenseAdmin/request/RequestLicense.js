@@ -5,7 +5,9 @@
 
 'use strict';
 
-export default class RequestLicense {
+import FormValidator from '../../utils/form/FormValidator.js';
+
+export default class RequestLicense extends FormValidator{
 
     /**
      * Initialize all the properties
@@ -13,7 +15,8 @@ export default class RequestLicense {
      * @param licenseAdminService
      * @param $uibModalInstance
      */
-    constructor($log, licenseAdminService, $uibModalInstance) {
+    constructor($log, $scope, licenseAdminService, $uibModal, $uibModalInstance) {
+        super($log,  $scope, $uibModal, $uibModalInstance);
         this.licenseAdminService = licenseAdminService;
         this.uibModalInstance = $uibModalInstance;
         this.log = $log;
@@ -35,6 +38,7 @@ export default class RequestLicense {
             clientName: '',
             requestNote: ''
         }
+
     }
 
     /**
@@ -57,6 +61,7 @@ export default class RequestLicense {
                     read: (e) => {
                         this.licenseAdminService.getProjectDataSource((data) => {
                             this.newLicenseModel.projectId = data[0].id;
+                            this.saveForm(this.newLicenseModel);
                             return e.success(data);
                         })
                     }
@@ -77,10 +82,12 @@ export default class RequestLicense {
      * Execute the Service call to generate a new License request
      */
     saveLicenseRequest() {
-        this.log.info('New License Requested: ', this.newLicenseModel);
-        this.licenseAdminService.createNewLicenseRequest(this.newLicenseModel, (data) => {
-            this.uibModalInstance.close(this.newLicenseModel);
-        });
+        if(this.isDirty()) {
+            this.log.info('New License Requested: ', this.newLicenseModel);
+            this.licenseAdminService.createNewLicenseRequest(this.newLicenseModel, (data) => {
+                this.uibModalInstance.close(this.newLicenseModel);
+            });
+        }
     }
 
     /**
