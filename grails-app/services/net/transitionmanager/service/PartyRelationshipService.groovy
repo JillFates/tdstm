@@ -403,6 +403,23 @@ class PartyRelationshipService implements ServiceMethods {
 		return list
 	}
 
+	List<Project> getProjectsDependentOfParty(Party party){
+        def query = "\
+    	    from PartyRelationship p \
+            where \
+            	p.partyRelationshipType = 'PROJ_PARTNER' and \
+                p.partyIdTo = :party and \
+                p.roleTypeCodeFrom = 'PROJECT' and \
+                p.roleTypeCodeTo = 'PARTNER'\
+            "
+ 
+        def dependents = PartyRelationship.findAll( query, [party:party] )
+        List<Project> projects = dependents.collect{ it.partyIdFrom }
+ 
+        return projects
+    }
+
+
 	/**
 	 * Similar to getAvailableStaff except that this just returns the distinct list of persons instead
 	 * of the map of staff and their one or more roles.
