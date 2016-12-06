@@ -114,81 +114,81 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Task Description', template:changeTmpl('taskDescription')],
 
 		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:true,
-										label: 'Related Asset', template:changeTmpl('relatedAsset'), tansform:xfrmString],
+										label: 'Related Asset', template:changeTmpl('relatedAsset'), transform:xfrmString],
 
 		assetClass				: [type: 'string', ssPos:3, formPos:4, domain: 'A', width:120, locked:true,
-										label: 'Asset Class', template:changeTmpl('assetClass'), tansform:xfrmString],
+										label: 'Asset Class', template:changeTmpl('assetClass'), transform:xfrmString],
 
 		assetId					: [type: 'number', ssPos:4, formPos:5, domain: 'A', width:80, locked:true,
-										label: 'Asset ID', template:changeTmpl('assetId'), tansform:xfrmString],
+										label: 'Asset ID', template:changeTmpl('assetId'), transform:xfrmString],
 
 		predecessorTasks		: [type:'list',    ssPos:5,   formPos:7, domain:'T', width:190, locked:false, label:'Predecessor Task(s)',
 									template:changeTmpl('predecessorTasks'), transform: xfrmListToPipedString ],
 
 
 		responsibleResource		: [type: 'string', ssPos:6, formPos:7, domain: 'C', width:120, locked:true,
-										label: 'Responsible Resource', template:changeTmpl('responsibleResource'), tansform:xfrmString],
+										label: 'Responsible Resource', template:changeTmpl('responsibleResource'), transform:xfrmString],
 
 
 		instructionsLink		: [type: 'string', ssPos:7, formPos:8, domain: 'C', width:120, locked:true,
-										label: 'Instructions Link', template:changeTmpl('instructionsLink'), tansform:xfrmString],
+										label: 'Instructions Link', template:changeTmpl('instructionsLink'), transform:xfrmString],
 
 		team					: [type: 'string', ssPos:8, formPos:9, domain: 'C', width:120, locked:false,
-										label: 'Team', template:changeTmpl('team'), tansform:xfrmString],
+										label: 'Team', template:changeTmpl('team'), transform:xfrmString],
 
 		status					: [type: 'string', ssPos:9, formPos:10, domain: 'C', width:120, locked:true,
-										label: 'Status', template:changeTmpl('status'), tansform:xfrmString],
+										label: 'Status', template:changeTmpl('status'), transform:xfrmString],
 
 		datePlanned				: [type: 'date', ssPos:10, formPos:11, domain: 'C', width:120, locked:true,
-										label: 'Date Planned', template:changeTmpl('datePlanned'), tansform:xfrmDateToString],
+										label: 'Date Planned', template:changeTmpl('datePlanned'), transform:xfrmDateTimeToString],
 
 		outstanding				: [type: 'string', ssPos:11, formPos:12, domain: 'C', width:120, locked:true,
-										label: 'Oustanding', template:changeTmpl('outstanding'), tansform:xfrmString],
+										label: 'Oustanding', template:changeTmpl('outstanding'), transform:xfrmString],
 
 		dateRequired			: [type: 'date', ssPos:12, formPos:13, domain: 'C', width:120, locked:true,
-										label: 'Date Required', template:changeTmpl('dateRequired'), tansform:xfrmDateToString],
+										label: 'Date Required', template:changeTmpl('dateRequired'), transform:xfrmDateToString],
 
 		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:true,
-										label: 'Comments', template:changeTmpl('comments'), tansform:xfrmString],
+										label: 'Comments', template:changeTmpl('comments'), transform:xfrmString],
 
 		duration				: [type: 'string', ssPos:14, formPos:15, domain: 'C', width:120, locked:true,
-										label: 'Duration', template:changeTmpl('duration'), tansform:xfrmString],
+										label: 'Duration', template:changeTmpl('duration'), transform:xfrmString],
 
 		durationLocked			: [type: 'string', ssPos:15, formPos:16, domain: 'C', width:120, locked:true,
 										label: 'Duration Locked', transform:xfrmString],
 
 		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:true,
-										label: 'Duration Scale', template:changeTmpl('durationScale'), tansform:xfrmString],
+										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmString],
 
 		estimatedStart			: [type: 'date', ssPos:17, formPos:18, domain: 'C', width:120, locked:true,
-										label: 'Estimated Start', template:changeTmpl('estimatedStart'), tansform:xfrmDateToString],
+										label: 'Estimated Start', template:changeTmpl('estimatedStart'), transform:xfrmDateToString],
 
 		estimatedFinish			: [type: 'date', ssPos:18, formPos:19, domain: 'C', width:120, locked:true,
-										label: 'Estimated Finish', template:changeTmpl('estimatedFinish'), tansform:xfrmDateToString],
+										label: 'Estimated Finish', template:changeTmpl('estimatedFinish'), transform:xfrmDateToString],
 
 		actualStart				: [type: 'date', ssPos:19, formPos:20, domain: 'C', width:120, locked:true,
-										label: 'Actual Start', template:changeTmpl('actualStart'), tansform:xfrmDateToString],
+										label: 'Actual Start', template:changeTmpl('actualStart'), transform:xfrmDateToString],
 
 		actualFinish			: [type: 'date', ssPos:20, formPos:21, domain: 'C', width:120, locked:true,
-										label: 'Actual Finish', template:changeTmpl('actualFinish'), tansform:xfrmDateToString],
+										label: 'Actual Finish', template:changeTmpl('actualFinish'), transform:xfrmDateToString],
 
 		workflowStep			: [type: 'string', ssPos:21, formPos:22, domain: 'C', width:120, locked:true,
-										label: 'WorkFlow Step', template:changeTmpl('workflowStep'), tansform:xfrmString],
+										label: 'WorkFlow Step', template:changeTmpl('workflowStep'), transform:xfrmString],
 
 		category				: [type: 'string', ssPos:22, formPos:23, domain: 'C', width:120, locked:true,
-										label: 'Category', template:changeTmpl('category'), tansform:xfrmString],
+										label: 'Category', template:changeTmpl('category'), transform:xfrmString],
 
 		dueDate					: [type: 'date', ssPos:23, formPos:24, domain: 'C', width:120, locked:true,
-										label: 'Due Date', template:changeTmpl('dueDate'), tansform:xfrmDateToString],
+										label: 'Due Date', template:changeTmpl('dueDate'), transform:xfrmDateToString],
 
 		createdOn				: [type: 'date', ssPos:24, formPos:25, domain: 'C', width:120, locked:true,
-										label: 'Created On', template:changeTmpl('createdOn'), tansform:xfrmDateToString],
+										label: 'Created On', template:changeTmpl('createdOn'), transform:xfrmDateToString],
 
 		createdBy				: [type: 'string', ssPos:25, formPos:26, domain: 'C', width:120, locked:false,
 										label: 'Created By', template:changeTmpl('createdBy')],
 
 		moveEvent				: [type: 'string', ssPos:26, formPos:27, domain: 'A', width:120, locked:true,
-										label: 'Move Event', template:changeTmpl('moveEvent'), tansform:xfrmString],
+										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmString],
 
 		batchId 				: [type:'number', ssPos:27, formPos:28, domain:'C', width:80, locked: true,
 										label: 'Batch Id', template:changeTmpl('batchId')],
@@ -796,14 +796,12 @@ class TaskImportExportService implements ServiceMethods {
 	 */
 	private List transformTasks(List tasks, Map sheetInfoOpts) {
 		List list = []
-
 		tasks.each { row ->
 			Map task = [:]
 			taskSpreadsheetColumnMap.each { prop, info ->
 				if (info.formPos != null) {
 					// Get the transformer if one exists
 					def transformer = (info.containsKey('transform') ? info.transform : false)
-
 					def value = row[prop]
 
 					if (prop == 'errors' && value.size() > 0) {
