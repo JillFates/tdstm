@@ -29,9 +29,11 @@ class WsLicenseManagerController implements ControllerMethods {
 	}
 
 	def loadRequest(){
-		def body = request.reader.text
-
+		//def body = request.reader.text
+		def rjson = request.JSON
+		def body = rjson?.data
 		if(body){
+
 			def dateParser = {String strDate ->
 				if(strDate != null){
 					try {
