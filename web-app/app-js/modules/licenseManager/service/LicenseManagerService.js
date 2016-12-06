@@ -10,12 +10,13 @@ export default class LicenseManagerService {
         this.log = $log;
         this.restService = restServiceHandler;
         this.rootScope = $rootScope;
+        this.statusSuccess = 'success';
         this.log.debug('licenseManagerService Instanced');
     }
 
-    getLicenseList(callback) {
+    getLicenseList(onSuccess) {
         this.restService.licenseManagerServiceHandler().getLicenseList((data) => {
-            return callback(data);
+            return onSuccess(data);
         });
     }
 
@@ -44,14 +45,19 @@ export default class LicenseManagerService {
      * @param license
      * @param callback
      */
-    importLicense(license, callback) {
-        this.restService.licenseManagerServiceHandler().requestImport(license, (data) => {
-            //if(data.applied) {
+    importLicense(license, onSuccess, onError) {
+        var hash = {
+            data: license.hash
+        };
+
+        this.restService.licenseManagerServiceHandler().requestImport(hash, (data) => {
+            if(data.status === this.statusSuccess) {
                 this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'License was successfully Imported'});
-            /*} else {
-                this.rootScope.$emit('broadcast-msg', { type: 'warning', text: 'License was successfully applied'});
-            }*/
-            return callback(data);
+            } else {
+                this.rootScope.$emit('broadcast-msg', { type: 'warning', text: 'License was not applied. Review the provided License Key is correct.'});
+                return onError({ success: false});
+            }
+            return onSuccess(data);
         });
     }
 

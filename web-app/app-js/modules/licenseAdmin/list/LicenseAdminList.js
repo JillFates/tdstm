@@ -50,7 +50,7 @@ export default class LicenseAdminList {
                     }
                 },
                 sort: {
-                    field: 'title',
+                    field: 'project.name',
                     dir: 'asc'
                 }
             },

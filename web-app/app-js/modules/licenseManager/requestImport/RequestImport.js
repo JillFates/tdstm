@@ -14,7 +14,7 @@ export default class RequestImport extends FormValidator{
         this.licenseManagerService = licenseManagerService;
         this.uibModalInstance = $uibModalInstance;
         this.licenseModel = {
-            license: ''
+            hash: ''
         };
 
         this.saveForm(this.licenseModel);
@@ -26,6 +26,8 @@ export default class RequestImport extends FormValidator{
     onImportLicense() {
         if(this.isDirty()) {
             this.licenseManagerService.importLicense(this.licenseModel, (data) => {
+                this.uibModalInstance.close(data);
+            }, (data)=> {
                 this.uibModalInstance.close(data);
             });
         }
