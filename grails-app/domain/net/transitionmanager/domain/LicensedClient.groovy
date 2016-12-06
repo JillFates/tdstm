@@ -50,8 +50,8 @@ class LicensedClient {
 	}
 
 	public toJsonMap() {
-		project = JSON.parse(this.project)
-		client = JSON.parse(this.client)
+		def dProject = JSON.parse(project)
+		def dClient = JSON.parse(client)
 
 		[
 				id				: id,
@@ -73,8 +73,8 @@ class LicensedClient {
 						name: status?.name()
 				],
 				instalationNum	: instalationNum,
-				project			: project,
-				client			: client,
+				project			: dProject,
+				client			: dClient,
 				activationDate	: activationDate,
 				expirationDate 	: expirationDate,
 				requestDate		: requestDate,
