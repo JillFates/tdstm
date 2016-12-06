@@ -302,6 +302,14 @@ class UrlMappings {
 			]
 		}
 
+		//load a request HASH from a client, returns JSON object
+		"/ws/manager/license" {
+			controller = "wsLicenseManager"
+			action = [
+					GET: "getLicenses"
+			]
+		}
+
 		///// LICENSES Common API /////////
 
 		"/ws/license/environment" {
