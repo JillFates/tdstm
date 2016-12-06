@@ -44,6 +44,24 @@ class WsLicenseManagerController implements ControllerMethods {
 				return null
 			}
 
+			log.info("Body Before: {}", body)
+
+			String beginTag = "-----BEGIN HASH-----"
+			String endTag = "-----END HASH-----"
+			def idxB = body.indexOf(beginTag)
+			if(idxB >= 0){
+				def idxE = body.indexOf(endTag)
+				if(idxE < 0){
+					response.status = 400
+					render "Missing -----END HASH----- tag for request"
+					return
+				}
+				body = body.substring(idxB + beginTag.length(), idxE)
+				body = body.trim()
+			}
+
+			log.info("Body: {}", body)
+
 			String decodedString = Smaz.decompress(Base64.decodeBase64(body))
 
 			log.info("Decoded String:")
