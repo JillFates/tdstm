@@ -1100,7 +1100,7 @@ class ReportsController implements ControllerMethods {
 		def tasksSheet = book.getSheet("tasks")
 
 		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
-								'','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
+								'','','', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
 								'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId,

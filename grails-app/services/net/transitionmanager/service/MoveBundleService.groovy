@@ -493,10 +493,11 @@ class MoveBundleService implements ServiceMethods {
 				def attribName = columnList[c]
 				int rowIdx = r - startRow
 				boolean isNumber=false
+				def currentTask = exportList[rowIdx]
 				// logger.debug '*** attribName isa {} {}', attribName.getClass().name, it instanceof Closure
 				switch (attribName) {
 					case { it instanceof Closure }:
-						cellValue = attribName.call(exportList[rowIdx])
+						cellValue = attribName.call(currentTask)
 						break
 					case "taskDependencies":
 						def values = exportList[r - startRow]."${columnList[c]}"
@@ -511,62 +512,65 @@ class MoveBundleService implements ServiceMethods {
 						cellValue = StringUtil.ellipsis(cellValue, 32767)
 						break
 					case 'taskNumber':
-						cellValue = exportList[rowIdx].taskNumber
+						cellValue = currentTask.taskNumber
 						isNumber = true
 						break
 					case "assetEntity":
-						cellValue = exportList[rowIdx]."${columnList[c]}"?.assetType == "Application" ?
-								String.valueOf(exportList[rowIdx]."${columnList[c]}"?.assetName) : ''
+						cellValue = currentTask."${columnList[c]}"?.assetType == "Application" ?
+								String.valueOf(currentTask."${columnList[c]}"?.assetName) : ''
 						break
 					case "commentAssetEntity":
-						cellValue = exportList[rowIdx].assetEntity ?  String.valueOf(exportList[rowIdx].assetEntity?.assetName) : ''
+						cellValue = currentTask.assetEntity ?  String.valueOf(currentTask.assetEntity?.assetName) : ''
 						break
 					case "notes":
-						cellValue = exportList[rowIdx].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[rowIdx].notes)) : ''
+						cellValue = currentTask.notes ?  String.valueOf(WebUtil.listAsMultiValueString(currentTask.notes)) : ''
 						break
 					case "instructionsLink":
 						cellValue = exportList[r-startRow].instructionsLink ?  String.valueOf(exportList[r-startRow].instructionsLink) : ''
 						break
 					case "workflow":
-						cellValue = exportList[rowIdx].workflowTransition ? String.valueOf(exportList[rowIdx].workflowTransition?.name) : ''
+						cellValue = currentTask.workflowTransition ? String.valueOf(currentTask.workflowTransition?.name) : ''
 						 break
 
 					case "assetClass":
-						cellValue = exportList[rowIdx]["assetEntity"]? String.valueOf(exportList[rowIdx]["assetEntity"]?.assetType) : ''
+						cellValue = currentTask["assetEntity"]? String.valueOf(currentTask["assetEntity"]?.assetType) : ''
 						break
 					case "assetId":
-						cellValue = exportList[rowIdx]["assetEntity"]? String.valueOf(exportList[rowIdx]["assetEntity"]?.id) : ''
+						cellValue = currentTask["assetEntity"]? String.valueOf(currentTask["assetEntity"]?.id) : ''
+						break
+					case "durationLocked":
+						cellValue = currentTask.durationLocked? "Y" : "N"
 						break
 					/*
 					case "estStart":
-						 cellValue = formatDateForExport(exportList[rowIdx].estStart)
+						 cellValue = formatDateForExport(currentTask.estStart)
 						break
 					case "estFinish":
-						 cellValue = formatDateForExport(exportList[rowIdx].estFinish)
+						 cellValue = formatDateForExport(currentTask.estFinish)
 						 break
 					case "actStart":
-						 cellValue = formatDateForExport(exportList[rowIdx].actStart)
+						 cellValue = formatDateForExport(currentTask.actStart)
 						 break
 					case "actFinish":
-						 cellValue = formatDateForExport(exportList[rowIdx].actFinish)
+						 cellValue = formatDateForExport(currentTask.actFinish)
 						 break
 					*/
 					case ~/actStart|dateResolved|dateCreated|estStart/:
-						cellValue = formatDateTimeForExport(exportList[rowIdx][attribName])
+						cellValue = formatDateTimeForExport(currentTask[attribName])
 						 break
 
 					case "dueDate":
-						 cellValue = TimeUtil.formatDate(exportList[rowIdx].dueDate, dateFormatter)
+						 cellValue = TimeUtil.formatDate(currentTask.dueDate, dateFormatter)
 						 break
 					case "duration":
-						 def duration = exportList[rowIdx].duration
+						 def duration = currentTask.duration
 						 cellValue = duration? String.valueOf(duration):"0"
 						 break
 					case "":
 						cellValue = ""
 						break
 					default:
-						cellValue = String.valueOf(exportList[rowIdx]?."${columnList[c]}" ?:'')
+						cellValue = String.valueOf(currentTask?."${columnList[c]}" ?:'')
 						break
 				}
 
