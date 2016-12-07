@@ -14,8 +14,8 @@ export default class LicenseManagerDetail {
 
         this.editMode = false;
         this.licenseModel = {
-            principalId: params.license.principal.id,
-            email: params.license.contact_email,
+            principalId: (params.license.principal)? params.license.principal.id : {},
+            email: params.license.email,
             projectId: params.license.project.id,
             clientId: params.license.client.id,
             statusId: params.license.status.id,

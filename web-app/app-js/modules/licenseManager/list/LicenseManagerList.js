@@ -31,18 +31,18 @@ export default class LicenseManagerList {
             columns: [
                 {field: 'id', hidden: true },
                 {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
-                {field: 'principal.name', title: 'Principal'},
+                {field: 'principal', title: 'Principal'},
                 {field: 'client.name', title: 'Client'},
                 {field: 'project.name', title: 'Project'},
-                {field: 'contact_email', title: 'Contact Email'},
-                {field: 'status.type', title: 'Status'},
-                {field: 'type', title: 'Type'},
+                {field: 'email', title: 'Contact Email'},
+                {field: 'status.name', title: 'Status'},
+                {field: 'type.name', title: 'Type'},
                 {field: 'method.name', title: 'Method'},
                 {field: 'method.id', hidden: true},
-                {field: 'servers_tokens', title: 'Server/Tokens'},
-                {field: 'inception', title: 'Inception'},
-                {field: 'expiration', title: 'Expiration'},
-                {field: 'environment', title: 'Env.'}
+                {field: 'serversTokens', title: 'Server/Tokens', template: '#:maxServers#'},
+                {field: 'requestDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}' },
+                {field: 'expirationDate', title: 'Expiration', type: 'date', format : '{0:dd/MMM/yyyy}' },
+                {field: 'environment.name', title: 'Env.'}
             ],
             dataSource: {
                 pageSize: 10,
@@ -86,8 +86,8 @@ export default class LicenseManagerList {
             size: 'md'
         });
 
-        modalInstance.result.then((data) => {
-            this.openLastImportedLicenseId = 1; // take this param from the last imported license, of course
+        modalInstance.result.then((licenseImported) => {
+            this.openLastImportedLicenseId = licenseImported.id; // take this param from the last imported license, of course
             this.reloadLicenseManagerList();
         });
     }

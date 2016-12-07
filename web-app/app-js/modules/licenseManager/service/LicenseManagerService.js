@@ -16,7 +16,7 @@ export default class LicenseManagerService {
 
     getLicenseList(onSuccess) {
         this.restService.licenseManagerServiceHandler().getLicenseList((data) => {
-            return onSuccess(data);
+            return onSuccess(data.data);
         });
     }
 

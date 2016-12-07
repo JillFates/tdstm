@@ -25,10 +25,10 @@ export default class RequestImport extends FormValidator{
      */
     onImportLicense() {
         if(this.isDirty()) {
-            this.licenseManagerService.importLicense(this.licenseModel, (data) => {
-                this.uibModalInstance.close(data);
-            }, (data)=> {
-                this.uibModalInstance.close(data);
+            this.licenseManagerService.importLicense(this.licenseModel, (licenseImported) => {
+                this.uibModalInstance.close(licenseImported.data);
+            }, (licenseImported)=> {
+                this.uibModalInstance.close(licenseImported.data);
             });
         }
     }
