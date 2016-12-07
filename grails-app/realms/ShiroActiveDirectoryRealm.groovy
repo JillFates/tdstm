@@ -6,6 +6,7 @@ import org.apache.shiro.authc.UnknownAccountException
 import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.UnavailableSecurityManagerException
 
+import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.ConnectorActiveDirectory
 import com.tdsops.common.security.shiro.MissingCredentialsException
 import com.tdsops.common.security.shiro.UnhandledAuthException
@@ -143,8 +144,13 @@ class ShiroActiveDirectoryRealm {
 		def userLogin
 		try {
 			userLogin = ctx.userService.findOrProvisionUser(userInfo, config, authority)
+		} catch (ConfigurationException e) {
+			throw new DisabledAccountException(e.getMessage())
+		} catch (AccountException e) {
+			throw new DisabledAccountException(e.getMessage())
 		} catch (e) {
-			log.error "$logPrefix UserService.findOrProvisionUser failed : ${e.getMessage()}"
+			log.error "$logPrefix UserService.findOrProvisionUser failed : ${e.getMessage()} " +
+				ExceptionUtil.stackTraceToString(e)
 			throw new DisabledAccountException('Unable to find or provision your TransitionManager account')
 		}
 

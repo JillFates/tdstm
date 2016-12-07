@@ -147,17 +147,21 @@ class PersonService {
 	 */
 	// TODO : JPM 4/2016 : findByCompanyAndName is replacing findByClientAndName
 	List<Person> findByCompanyAndName(PartyGroup company, Map nameMap) {
+		if (! (nameMap.containsKey('first') && nameMap.containsKey('middle') && nameMap.containsKey('last')) ) {
+			throw new InvalidParamException("Invalid nameMap object $nameMap")
+		}
+
 		List persons = []
 		Map queryParams = [company:company.id]
 		def (first,middle,last) = [false,false,false]
 
-		StringBuffer select = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr')
+		StringBuilder select = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 			select.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 			select.append(' WHERE pr.party_id_from_id=:company')
 			select.append(' AND pr.role_type_code_from_id="COMPANY"')
 			select.append(' AND pr.role_type_code_to_id="STAFF" ')
 
-		StringBuffer query = new StringBuffer( select )
+		StringBuilder query = new StringBuilder( select )
 		if (nameMap.first) {
 			queryParams.first = nameMap.first
 			query.append(' AND p.first_name=:first' )
@@ -185,36 +189,43 @@ class PersonService {
 			query.append(select)
 			query.append(" AND p.first_name=:first AND COALESCE(p.last_name,'') = '' AND COALESCE(p.middle_name,'') = '' ")
 		}
+
 		List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		if (pIds) {
 			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug "findByCompanyAndName() query=${query.toString()}  :  params=$queryParams  :  found=${persons.size()}"
 		}
 
 		return persons
 	}
 
 	/**
-	 * Used to find a person by their name for a specified client
-	 * @param client - The client that the person would be associated as Staff
-	 * @param nameMap - a map of the person's name (map [first, last, middle])
-	 * @return A list of the person(s) found that match the name or null if none found
+	 * Used to find the staff (person) by their email address for a specified company
+	 * @param company - the company that the person is associated to as Staff
+	 * @param email - the person's email address
+	 * @return A list of the person(s) found that were found
 	 */
-	List findByClientAndEmail(PartyGroup client, String email) {
-		def map = [client:client.id, email:email]
-		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
-		query.append(' WHERE pr.party_id_from_id=:client')
-		query.append(' AND pr.role_type_code_from_id="COMPANY"')
-		query.append(' AND pr.role_type_code_to_id="STAFF"')
-		query.append(' AND p.email=:email')
+	List findByCompanyAndEmail(PartyGroup company, String email) {
+		List persons = []
+		if (email) {
+			Map map = [company:company.id, email:email]
+			StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr ')
+			query.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
+			query.append(' WHERE pr.party_id_from_id=:company')
+			query.append(' AND pr.role_type_code_from_id="COMPANY"')
+			query.append(' AND pr.role_type_code_to_id="STAFF"')
+			query.append(' AND p.email=:email')
 
-		log.debug "findByClientAndEmail: query $query, map $map"
-		def persons
-		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), map)
-		log.debug "findByClientAndEmail: query $query, map $map, found ids $pIds"
-		if (pIds) {
-			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
+			List ids = namedParameterJdbcTemplate.queryForList(query.toString(), map)
+			log.debug "findByCompanyAndEmail: query $query, map $map, found ids $ids"
+
+			if (ids) {
+				persons = Person.findAllByIdInList(ids*.id)
+			}
 		}
-
 		return persons
 	}
 
@@ -560,6 +571,7 @@ class PersonService {
 
 		sessionFactory.getCurrentSession().flush()
 		sessionFactory.getCurrentSession().clear()
+
 		fromPerson.delete()
 
 		return fromPerson
@@ -856,14 +868,13 @@ class PersonService {
 
 						// Updates variables that comput different results.
 						cleared += deleteResultMap["cleared"]
-						if(deleteResultMap["deleted"]){
+						if (deleteResultMap["deleted"]) {
 							deleted++
-						}else{
+						} else {
 							skipped++
 						}
 						log.info("MEssages: ${deleteResultMap["messages"]}")
 						messages << deleteResultMap["messages"]
-
 
 						/*
 						// Don't delete if they have a UserLogin
@@ -1160,9 +1171,9 @@ class PersonService {
 	 * @param person - the person to assign the team to
 	 * @param teamCode - the team code to associate to the person
 	 */
-	@Transactional
 	void addToTeam(UserLogin byWhom, Person person, String teamCode) {
 		if (! isAssignedToTeam(person, teamCode)) {
+			// TODO : JPM 11/2016 : addToTeam() - validate that the byWhom has necessary access to the person
 			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "COMPANY", person, teamCode)) {
 				auditService.logMessage("$byWhom assigned ${person} to team $teamCode")
 			} else {
@@ -1179,6 +1190,13 @@ class PersonService {
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
 	void addToProject(UserLogin byWhom, String projectId, String personId) {
+		// Check that the individual that is attempting to assign someone has access to the project in the first place
+		Project project = Project.get(projectId)
+		if (! hasAccessToProject(byWhom.person, project)) {
+			auditService.logSecurityViolation(byWhom, "attempted to modify staffing on project $project with proper access")
+			throw new UnauthorizedException('You do not have access to the specified project')
+		}
+
 		// The addToEvent may call this method as well
 		def	map = validateUserCanEditStaffing(byWhom, projectId, personId, null)
 		if (map.error) {
@@ -1190,7 +1208,6 @@ class PersonService {
 
 	/**
 	 * Used to associate a person to a project as staff (Secured) which is only used if permissions were already checked
-	 * if the
 	 * @param user - the user performing the action
 	 * @param projectId - the id number of the project to remove the person from
 	 * @param personId - the id of the person to update
@@ -1491,7 +1508,7 @@ class PersonService {
 			}
 		}
 
-		println "getProjectTeamReference($project, $person, $teamCode) returns $teamRef"
+		log.debug "getProjectTeamReference($project, $person, $teamCode) returns $teamRef"
 		return teamRef
 	}
 
@@ -1657,8 +1674,9 @@ class PersonService {
 	 * @return The Person record being updated or throws an exception for various issues
 	 */
 	@Transactional
-	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin = false)
+	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false)
 		throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
+
 		Person person = validatePersonAccess(params.id, byWhom)
 		def session = WebUtils.retrieveGrailsWebRequest().session
 		if(!isAssociatedTo(byWhom, person.company)){
@@ -1795,7 +1813,7 @@ class PersonService {
 	 * @return The Person record being created or throws an exception for various issues
 	 */
 	@Transactional
-	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin = false)
+	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin=false)
 		throws DomainUpdateException, InvalidParamException {
 
 		def companyParty
@@ -1874,6 +1892,7 @@ class PersonService {
 	 */
 	List<RoleType> getPersonTeamRoleTypes(Person person) {
 		List teams = partyRelationshipService.getCompanyStaffFunctions(person.company, person)
+		return teams
 	}
 
 	/**
@@ -1883,7 +1902,6 @@ class PersonService {
 	 */
 	List<String> getPersonTeamCodes(Person person) {
 		List teams = getPersonTeamRoleTypes(person)
-
 		return teams*.id
 	}
 

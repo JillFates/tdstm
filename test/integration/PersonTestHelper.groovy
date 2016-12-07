@@ -8,18 +8,22 @@
  */
 
 import com.tdsops.common.grails.ApplicationContextHolder
+import org.apache.commons.lang.RandomStringUtils as RSU
 
 class PersonTestHelper {
-	def personService
-	def securityService
+	PersonService personService
+	SecurityService securityService
+	PartyRelationshipService partyRelationshipService
 
 	Long adminPersonId = 100
 
 	PersonTestHelper() {
 		personService = ApplicationContextHolder.getService('personService')
 		securityService = ApplicationContextHolder.getService('securityService')
+		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
 		assert (personService instanceof PersonService)
 		assert (securityService instanceof SecurityService)
+		assert (partyRelationshipService instanceof PartyRelationshipService)
 	}
 
 	/**
@@ -53,15 +57,75 @@ class PersonTestHelper {
 	}
 
 	/**
+	 * Used to create a person
+	 * @param firstName
+	 * @param middleName
+	 * @param lastName
+	 * @return the person that was created and assigned to the company
+	 */
+	Person createPerson(String firstName=null, String middleName=null, String lastName=null, String email=null) {
+		if (firstName == null) firstName = RSU.randomAlphabetic(10)
+		if (middleName == null) middleName = RSU.randomAlphabetic(10)
+		if (lastName == null) lastName = RSU.randomAlphabetic(10)
+		if (email == null) email = "$firstName.$lastName@" + RSU.randomAlphabetic(10) + '.com'
+
+		Person person = new Person([firstName:firstName, middleName: middleName, lastName: lastName, email:email] )
+		person.save(failOnError:true)
+
+		return person
+	}
+
+	/**
+	 * Used to create the person that will be the staff of a company. The first, middle or last name can be assigned
+	 * but if not then a random string is set for the properties.
+	 * @param company - the company to assign the staff to
+	 * @param firstName
+	 * @param middleName
+	 * @param lastName
+	 * @return the person that was created and assigned to the company
+	 */
+	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null) {
+		Person staff = createPerson(firstName, middleName, lastName, email)
+		partyRelationshipService.addCompanyStaff(company, staff)
+		return staff
+	}
+
+	/**
+	 * Used to create a user for a person and optionally assign roles
+	 * @param person - the person to create the user for
+	 * @param roles - a list of role codes to create (optionally)
+	 * @return the newly created UserLogin
+	 */
+	UserLogin createUserLogin(Person person, List roles=[]) {
+		Map map = [
+			username: RSU.randomAlphabetic(10),
+			active: 'Y',
+			expiryDate: (new Date() + 365),
+			person: person
+		]
+		UserLogin u = new UserLogin(map)
+		u.save(failOnError:true)
+		if (roles.size()) {
+			securityService.assignRoleCodes(person, roles)
+		}
+
+		return u
+	}
+
+	/**
 	 * Used to get the Admin person to use for tests
 	 * @return a Person that has Administration privileges
 	 */
-	Person getAdminPerson() {
-		Person admin = Person.get(adminPersonId)
+	Person getAdminPerson(PartyGroup company) {
+		if (! company) {
+			// Yuk -- hard-coding TDS company for tests - bad form...
+			company = PartyGroup.get(18)
+		}
+		Person admin = this.createStaff(company)
+
 		assert admin
 
-		// Make certain that the user has the permission we're expecting
-		assert securityService.assignRoleCode(admin, 'ADMIN')
+		this.createUserLogin(admin, ['ADMIN'])
 
 		return admin
 	}

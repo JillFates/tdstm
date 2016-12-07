@@ -747,15 +747,12 @@ class PartyRelationshipService {
 			and pr.roleTypeCodeFrom.id = 'COMPANY'
 			and pr.roleTypeCodeTo.id != 'STAFF'
 			and pr.partyIdFrom${companyById ? '.id' : ''} = :company
-			and pr.partyIdTo${staffById ? '.id' : ''} = :staff """)
+			and pr.partyIdTo${staffById ? '.id' : ''} = :staff""")
 		if (teamCode) {
 			query.append(" and pr.roleTypeCodeTo.id = :teamCode")
 			params.teamCode = teamCode
-		} else {
-			query.append(" and pr.roleTypeCodeTo.id != 'STAFF'")
 		}
 		query.append(" order by pr.roleTypeCodeTo.id")
-
 		List teams = PartyRelationship.executeQuery(query.toString(), params)
 
 		return teams
@@ -1040,6 +1037,7 @@ class PartyRelationshipService {
 			List existingTeamCodes = existingTeamsRoleType*.id
 
 			List teamsToAssign = teamCodes - existingTeamCodes
+
 			if (teamsToAssign) {
 				log.debug "updateAssignedTeams() for $person - adding team assignments $teamsToAssign"
 				PartyRelationshipType coStaffPRType = PartyRelationshipType.read('STAFF')
@@ -1052,7 +1050,7 @@ class PartyRelationshipService {
 					pr.roleTypeCodeTo = RoleType.read(teamCode)
 					pr.partyIdFrom = personCompany
 					pr.partyIdTo = person
-					pr.save(failOnError:true)
+					pr.save(failOnError:true, flush:true)
 				}
 			}
 		}

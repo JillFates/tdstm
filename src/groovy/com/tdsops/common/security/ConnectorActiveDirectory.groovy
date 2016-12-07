@@ -2,12 +2,9 @@ package com.tdsops.common.security
 
 import org.apache.directory.groovyldap.LDAP
 import org.apache.directory.groovyldap.SearchScope
-
 import java.util.regex.Pattern
 import java.util.regex.Matcher
-
 import groovy.util.logging.Commons
-
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.security.shiro.UnhandledAuthException
@@ -40,6 +37,7 @@ class ConnectorActiveDirectory {
 	 *		roles - a list of roles (e.g. User, Editor, Manager, Admin)
 	 * @throws UnhandledAuthException
 	 */
+
 	static Map getUserInfo(String authority, String username, String password, Map ldapConfig) {
 		String emsg = ''
 		String logPrefix = 'getUserInfo()'
@@ -74,6 +72,8 @@ class ConnectorActiveDirectory {
 					 * then we can remove this.
 					 * TODO : JPM 10/2015 : Remove this code in 3.2.0
 					 *
+					 */
+					/*
 					if (false && domain.domain) {
 						if (! queryUsername.contains('\\')) {
 							queryUsername = domain.domain + '\\' + username

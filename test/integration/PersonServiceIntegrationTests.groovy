@@ -1,8 +1,9 @@
 import spock.lang.*
+import org.apache.commons.lang.RandomStringUtils as RSU
 
 class PersonServiceIntegrationTests extends Specification {
 
-	def partyRelationshipService	
+	def partyRelationshipService
 	def personService
 	def projectService
 	def project
@@ -19,8 +20,11 @@ class PersonServiceIntegrationTests extends Specification {
 		adminPerson = personHelper.getAdminPerson()
 	}
 
-	def "1. Test the savePerson method with NO default project "() {
-		when:
+	def '1. Test the savePerson method with NO default project'() {
+		setup:
+			personService.addToProjectSecured(adminPerson.userLogin, project, adminPerson)
+
+		when: 'Creating a person they should not have access or be assigned to the project'
 			Person newPerson = personHelper.createPerson(adminPerson, project.client)
 		then:
 			newPerson != null
@@ -33,11 +37,11 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.addToProject(adminPerson.userLogin, project.id.toString(), newPerson.id.toString())
 		then:
 			personService.hasAccessToProject(newPerson, project)
-			personService.isAssignedToProject(project, newPerson)			
+			personService.isAssignedToProject(project, newPerson)
 
 	}
 
-	def "2. Test the savePerson method with default project "() {
+	def '2. Test the savePerson method with default project'() {
 		when:
 			Person newPerson = personHelper.createPerson(adminPerson, project.client, project)
 		then:
@@ -46,7 +50,7 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.hasAccessToProject(newPerson, project)
 	}
 
-	def "3. Test finding persons by their name using a string that must be parsed "() {
+	def '3. Test finding persons by their name using a string that must be parsed'() {
 		// Know person for the project
 		when:
 			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Lantern', firstName:'Green'])
@@ -78,9 +82,9 @@ class PersonServiceIntegrationTests extends Specification {
 			results.person == null
 	}
 
-	def "4. Test finding persons by their name using a mapped name "() {
+	def '4. Test finding persons by their name using a mapped name'() {
 		// Know person for the project
-		when: 
+		when:
 			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin'])
 			Map results = personService.findPerson([first:'Robin', last:'Banks'], project)
 		then:
@@ -111,20 +115,19 @@ class PersonServiceIntegrationTests extends Specification {
 
 		// Ambiguous search with middle initial where there are two persons (one with and one without middle initial)
 		// TODO : JPM 3/2016 : TM-4756 Fix ambiguous person search
-		/*
-		when:
-			results = personService.findPerson("Robin Banks", project)
-		then:
-			results.isAmbiguous
-			results.person == null
-		*/
+		//when:
+		//	results = personService.findPerson("Robin Banks", project)
+		//then:
+		//	results.isAmbiguous
+		//	results.person == null
 	}
 
-	def "5. Test project team assignment when creating person "() {
-		when: 
-			Person person = personHelper.createPerson(adminPerson, project.client, null, 
-				[lastName:'Buster', firstName:'Block'], 
-				['SYS_ADMIN', 'DB_ADMIN'])
+	def '5. Test project team assignment when creating person'() {
+		when:
+			Person person = personHelper.createPerson(adminPerson, project.client, null,
+				[lastName:'Buster', firstName:'Brock'],
+				['SYS_ADMIN', 'DB_ADMIN'],
+				['editor'])
 			List teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 2
@@ -136,7 +139,7 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.isAssignedToTeam(person, 'DB_ADMIN')
 			! personService.isAssignedToTeam(person, 'PROJ_MGR')
 
-		// Add a new team to the person's repertoire 
+		// Add a new team to the person's repertoire
 		when:
 			Map results = [:]
 			personService.addToProjectTeam(adminPerson.userLogin, project.id.toString(), person.id.toString(), 'PROJ_MGR', results)
@@ -150,9 +153,10 @@ class PersonServiceIntegrationTests extends Specification {
 
 	}
 
-	def "6. Test assigning a person to a move event team directly by an admin user"() {
+	def '6. Test assigning a person to a move event team directly by an admin user'() {
 		setup:
 			String errMsg
+			personService.addToProjectSecured(adminPerson.userLogin, project, adminPerson)
 
 		when: 'setting up the new person and getting an event to work with'
 			Person person = personHelper.createPerson(adminPerson, project.client)
@@ -165,37 +169,122 @@ class PersonServiceIntegrationTests extends Specification {
 		when: 'getting the params needed'
 			String meId = moveEvent.id.toString()
 			String personId = person.id.toString()
-		then: """attempt to assign a person as a SYS_ADMIN to the first MoveEvent of the project before the person 
+		then: """attempt to assign a person as a SYS_ADMIN to the first MoveEvent of the project before the person
 			is assigned to the project"""
 			personService.assignToProjectEvent(adminPerson.userLogin, personId, meId, 'SYS_ADMIN', '1') == ''
 
 		then: 'validate that the person is assigned at the project and event level'
 			personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
 			personService.isAssignedToEventTeam(moveEvent, person, 'SYS_ADMIN')
-		
+
 		then: 'Do a negative check for a team that were not assigned'
 			! personService.isAssignedToProjectTeam(project, person, 'DB_ADMIN')
 			! personService.isAssignedToEventTeam(moveEvent, person, 'DB_ADMIN')
 
-			
+
 	}
 
 	/*
 		TODO : JPM 3/2016 : personService.hasAccessToPerson() does not work correctly
-	def "7. Test if a person has access to another person based on who they are "() {
-		when: 
+	def '7. Test if a person has access to another person based on who they are'() {
+		when:
 			// Make sure that the adminPerson is assigned to the project
 			Map results = [:]
 			personService.addToProjectTeam(adminPerson.userLogin, project.id.toString(), adminPerson.id.toString(), 'PROJ_MGR', results)
 			Person person = personHelper.createPerson(adminPerson, project.client)
-		then: 
+		then:
 			// Admin should be able to access the person
-			personService.hasAccessToPerson(adminPerson, person, true, false) 
+			personService.hasAccessToPerson(adminPerson, person, true, false)
 
 			// client person should not have access to admin
-			! personService.hasAccessToPerson(person, adminPerson, true, false) 
-			! personService.hasAccessToPerson(person, adminPerson, false, false) 
+			! personService.hasAccessToPerson(person, adminPerson, true, false)
+			! personService.hasAccessToPerson(person, adminPerson, false, false)
 
 	}
 	*/
+
+	def '8. Test findByCompanyAndEmail method'() {
+		when:
+			def company = projectHelper.createCompany()
+			Person p1 = personHelper.createStaff(company, null, null, null, null)
+			Person p2 = personHelper.createStaff(company, null, null, null, null)
+			List lp1 = personService.findByCompanyAndEmail(company, p1.email)
+			List lp2 = personService.findByCompanyAndEmail(company, p2.email)
+		then:
+			lp1.size() == 1
+			lp1[0].id == p1.id
+			lp1[0].email
+			lp2.size() == 1
+			lp2[0].id == p2.id
+			personService.findByCompanyAndEmail(company, null) == []
+			personService.findByCompanyAndEmail(company, 'bogus@email_address.test') == []
+
+		when: 'Check for same email across companies which probably would never happen anyways'
+			def c2 = projectHelper.createCompany()
+			Person p3 = personHelper.createStaff(c2, null, null, null, p1.email)
+			lp1 = personService.findByCompanyAndEmail(c2, p1.email)
+		then:
+			lp1.size() == 1
+			lp1[0].id == p3.id
+
+		expect: 'calling findByCompanyAndEmail with blank or null should return empty list'
+			personService.findByCompanyAndEmail(company, '') == []
+			personService.findByCompanyAndEmail(company, null) == []
+	}
+
+	def '9. Test findByCompanyAndName method'() {
+		when: 'Try finding a single exact match on full name'
+			def company = projectHelper.createCompany()
+			Person p1 = personHelper.createStaff(company)
+			Person p2 = personHelper.createStaff(company)
+			Person p3 = personHelper.createStaff(company, p1.firstName, '')
+			Map nm = personToNameMap(p1)
+			List lp1 = personService.findByCompanyAndName(company, nm)
+		then:
+			lp1.size() == 1
+			lp1[0].id == p1.id
+
+		when: 'Try finding a person that does not exist'
+			nm = emptyNameMap()
+			nm.first=RSU.randomAlphabetic(10)
+			nm.middle=RSU.randomAlphabetic(10)
+			nm.last=RSU.randomAlphabetic(10)
+			lp1 = personService.findByCompanyAndName(company, nm)
+		then:
+			lp1.size() == 0
+
+		when: 'Try searching where the middle name is missing'
+			nm = personToNameMap(p1)
+			nm.middle = ''
+			lp1 = personService.findByCompanyAndName(company, nm)
+		then:
+			lp1.size() == 1
+			lp1[0].id == p1.id
+
+		when: 'Find just by first name should result in multiple hits'
+			nm = emptyNameMap()
+			nm.first = p1.firstName
+			lp1 = personService.findByCompanyAndName(company, nm)
+		then:
+			lp1.size() == 2
+			lp1.find { it.id == p1.id }
+			lp1.find { it.id == p3.id }
+
+		when: 'Called with an invalid NameMap it should throw an exception'
+			personService.findByCompanyAndName(company, [bogusMap:true])
+		then:
+			// TODO : Change to InvalidParamException when updating 4.x
+			// thrown InvalidParamException
+			thrown RuntimeException
+
+	}
+
+	// Used to convert a person object into a map used by the PersonService
+	private Map personToNameMap(Person p) {
+		[first:p.firstName, middle:p.middleName, last:p.lastName]
+	}
+	private Map emptyNameMap() {
+		[first:'', middle:'', last:'']
+	}
+
 }

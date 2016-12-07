@@ -72,7 +72,7 @@ class UserService {
 		def company = PartyGroup.get( userInfo.companyId )
 		if (! company) {
 			log.error "$mn Unable to find configured company for id ${userInfo.companyId}"
-			throw new ConfigurationException("Unable to find user's company by id ${userInfo.companyId}")
+			throw new ConfigurationException("Unable to find the configured company id (${userInfo.companyId}) in security settings ")
 		}
 
 		project = Project.get(defaultProject)
@@ -82,7 +82,7 @@ class UserService {
 		}
 
 		if (! projectService.companyIsAssociated(project, company) ) {
-			em = "User's company ($company) is not associated with the default Project (${defaultProject})"
+			em = "The configured default project is not associated with the company in security settings"
 			log.error "$mn $me"
 			throw new ConfigurationException(em)
 		}
@@ -93,14 +93,10 @@ class UserService {
 		// Check various requirements based on the Authentication Configuration and fall out if we don't
 		// have an account and not allowed to create one.
 		if (! userLogin && ! userInfo.roles && ! domain.defaultRole) {
-			throw new AccountException('No roles defined for the user')
-		}
-		if (! userLogin && ! person && ! autoProvision) {
-			throw new AccountException('UserLogin and/or Person not found and autoProvision is disabled')
+			throw new AccountException('No security roles have been assigned to your user account')
 		}
 		if ( (! person || ! userLogin) && ! autoProvision ) {
-			log.warn "findOrProvisionUser: User attempted login but autoProvision is diabled ($personIdentifier)"
-			throw new RuntimeException('Auto provisioning is disabled')
+			throw new AccountException('Your account needs to be manually provisioned in the application')
 		}
 
 		Map nameMap = this.userInfoToNameMap(userInfo)
@@ -122,15 +118,15 @@ class UserService {
 			)
 			if (! person.save(flush:true)) {
 				log.error "$mn Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(person)}"
-				throw new RuntimeException('Data error while creating Person object')
+				throw new AccountException('Data error while creating Person object')
 			}
 			// Create Staff relationship with the Company
 			if (! partyRelationshipService.addCompanyStaff(company, person)) {
-				throw new RuntimeException('Unable to associate new person to company')
+				throw new AccountException('Unable to associate new person to company')
 			}
 			// Create Staff relationship with the default Project
 			if (! partyRelationshipService.addProjectStaff(project, person)) {
-				throw new RuntimeException('Unable to associate new person to project')
+				throw new AccountException('Unable to associate new person to project')
 			}
 		} else {
 
@@ -148,7 +144,7 @@ class UserService {
 						log.debug "$mn Updating existing person record : ${person.dirtyPropertyNames}"
 					if (! person.save(flush:true)) {
 						log.error "$mn Failed updating Person ($person) due to ${GormUtil.allErrorsString(person)}"
-						throw new DomainUpdateException("Unexpected error while updating Person object")
+						throw new AccountException("Unexpected error while updating Person object")
 					}
 				}
 			}
@@ -188,7 +184,7 @@ class UserService {
 			if (! userLogin.save(flush:true)) {
 				def action = createUser ? 'creating' : 'updating'
 				log.error "findOrProvisionUser: Failed $action UserLogin failed due to ${GormUtil.allErrorsString(userLogin)}"
-				throw new RuntimeException("Unexpected error while $action UserLogin object")
+				throw new AccountException("Unexpected error while $action UserLogin object")
 			}
 		}
 
@@ -212,7 +208,7 @@ class UserService {
 				def pr = new PartyRole(party:person, roleType:rt)
 				if (! pr.save(flush:true)) {
 					log.error "$mn Unable to add new role for person ${GormUtil.allErrorsString(userLogin)}"
-					throw new RuntimeException("Unexpected error while assigning security role")
+					throw new AccountException("Unexpected error while assigning security role")
 				}
 			}
 		} else {
@@ -249,7 +245,7 @@ class UserService {
 						def pr = new PartyRole(party:person, roleType:rt)
 						if (! pr.save(flush:true)) {
 							log.error "$mn Unable to update new role for person ${GormUtil.allErrorsString(userLogin)}"
-							throw new RuntimeException("Unexpected error while assigning security role")
+							throw new AccountException("Unexpected error while assigning security role")
 						}
 					}
 				}
@@ -312,7 +308,7 @@ class UserService {
 	 * @return a with [Person, UserLogin] account that was found or provisioned
 	 * @throws ConfigurationException, RuntimeException
 	 */
-	List findPersonAndUserLogin( PartyGroup client, Map userInfo, Map config, String authority, String personIdentifier ) {
+	List findPersonAndUserLogin( PartyGroup company, Map userInfo, Map config, String authority, String personIdentifier ) {
 
 		// The first step is to attempt to find the user/person based on the following search patterns:
 		//    1. The UserLogin.externalGuid code matches the person's AD objectguid property
@@ -320,11 +316,11 @@ class UserService {
 		//    3. The Person.firstName+lastName match the person's AD givenname + sn properties
 
 		def person
-		def persons
+		List persons=[]
 		def userLogin
 
 		// method name
-		String mn = 'findUser:'
+		String mn = 'findPersonAndUserLogin:'
 
 		// Flag for debugging
 		boolean debug = log.isDebugEnabled() || config.debug
@@ -354,29 +350,30 @@ class UserService {
 			if (userInfo.email) {
 				if (debug)
 					log.debug "$mn Looking up person by email"
-				persons = personService.findByClientAndEmail(client, userInfo.email )
+				persons = personService.findByCompanyAndEmail(company, userInfo.email )
 			}
 
 			// Then try to find by their name
-			if (! persons) {
+			if (persons.size()==0) {
 				if (debug)
 					log.debug "$mn Looking up person by name"
 
 				// The nameMap was first,middle,last but throughout the code we refer to firstName,...
 				Map correctNameMap = [firstName:nameMap.first, middleName:nameMap.middle, lastName:nameMap.last]
-				persons = personService.findByCompanyAndName(client, correctNameMap)
+				// persons = personService.findByCompanyAndName(company, correctNameMap)
+				persons = personService.findByCompanyAndName(company, nameMap)
 				if (debug)
 					log.debug "$mn personService.findByCompanyAndName found ${persons?.size()} people"
 			}
 
 			// If we have any persons, try to find their respective user accounts
-			if (persons) {
-				def users = UserLogin.findAllByPersonInList(persons)
+			if (persons.size() > 0) {
+				List users = UserLogin.findAllByPersonInList(persons)
 				if (debug)
 					log.debug "$mn Found these users: $users"
 
 				// If we find more than one account we don't know which to use
-				def size = users.size()
+				int size = users.size()
 				if (size == 1) {
 					userLogin = users[0]
 				} else if (size > 1) {
