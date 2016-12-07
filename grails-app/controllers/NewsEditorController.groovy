@@ -345,7 +345,7 @@ class NewsEditorController implements ControllerMethods {
 			if (!me) {
 				error = 'Move event was not found'
 			}
-			else if (me.projectId != project.id) {
+			else if (me.project.id != project.id) {
 				securityService.reportViolation("Accessing move event ($meId) not associated with project ($project.id)")
 				error = 'Invalid move event id specified'
 			}
