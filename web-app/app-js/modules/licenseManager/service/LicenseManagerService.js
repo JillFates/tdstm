@@ -20,6 +20,13 @@ export default class LicenseManagerService {
         });
     }
 
+
+    getProjectDataSource(onSuccess) {
+        this.restService.licenseManagerServiceHandler().getProjectDataSource((data) => {
+            return onSuccess(data.data);
+        });
+    }
+
     /**
      * Save the License
      */

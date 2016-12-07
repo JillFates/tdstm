@@ -31,7 +31,7 @@ export default class LicenseManagerList {
             columns: [
                 {field: 'id', hidden: true },
                 {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
-                {field: 'principal', title: 'Principal'},
+                {field: 'owner', title: 'Owner'},
                 {field: 'client.name', title: 'Client'},
                 {field: 'project.name', title: 'Project'},
                 {field: 'email', title: 'Contact Email'},

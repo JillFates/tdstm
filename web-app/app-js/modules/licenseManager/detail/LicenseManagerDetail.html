@@ -8,18 +8,9 @@
             <div class="row">
                 <div class="col-sm-5">
                     <div class="form-group">
-                        <label for="selectPrincipal" class="col-sm-3 control-label">Principal: </label>
+                        <label for="selectClient" class="col-sm-3 control-label">Owner: </label>
                         <div class="col-sm-9">
-                            <select kendo-drop-down-list
-                                    k-option-label="'Select a Principal'"
-                                    k-data-text-field="'name'"
-                                    k-data-value-field="'id'"
-                                    k-data-source="licenseManagerDetail.principalDataSource"
-                                    k-ng-model="licenseManagerDetail.licenseModel.principalId"
-                                    k-value-primitive="true"
-                                    id="selectPrincipal"
-                                    class="form-control" >
-                            </select>
+                            <label id="selectClient" class="control-label">{{licenseManagerDetail.licenseModel.owner}}</label>
                         </div>
                     </div>
                 </div>
@@ -69,22 +60,11 @@
                     <div class="form-group">
                         <label for="selectClient" class="col-sm-3 control-label">Client: </label>
                         <div class="col-sm-9">
-                            <select kendo-drop-down-list
-                                    k-option-label="'Select a Client'"
-                                    k-data-text-field="'name'"
-                                    k-data-value-field="'id'"
-                                    k-data-source="licenseManagerDetail.clientsDataSource"
-                                    k-ng-model="licenseManagerDetail.licenseModel.clientId"
-                                    k-value-primitive="true"
-                                    id="selectClient"
-                                    class="form-control"
-                                    readonly>
-                            </select>
+                            <label class="control-label">{{licenseManagerDetail.licenseModel.clientName}}</label>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#tab_1" data-toggle="tab">Details</a></li>

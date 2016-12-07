@@ -103,6 +103,9 @@ export default class RestServiceHandler {
             getLicenseList: (onSuccess) => {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/manager/license'), onSuccess);
             },
+            getProjectDataSource: (onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/project'), onSuccess);
+            },
             saveLicense: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';

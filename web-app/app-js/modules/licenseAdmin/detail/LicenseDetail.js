@@ -28,7 +28,7 @@ export default class LicenseDetail {
             applied: false
         };
 
-        this. prepareMethodOptions();
+        this.prepareMethodOptions();
     }
 
     prepareMethodOptions() {

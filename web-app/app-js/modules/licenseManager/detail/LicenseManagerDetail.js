@@ -18,6 +18,7 @@ export default class LicenseManagerDetail {
             email: params.license.email,
             projectId: params.license.project.id,
             clientId: params.license.client.id,
+            clientName: params.license.client.name,
             statusId: params.license.status.id,
             method: {
                 id: params.license.method.id,
@@ -44,18 +45,10 @@ export default class LicenseManagerDetail {
         };
 
         // Creates the Kendo Project Select List
+        // Define the Project Select
         this.selectProject = {};
-        this.selectProjectListOptions = {
-            dataSource: this.getProjectsDataSource(),
-            optionLabel: 'Select a Project',
-            dataTextField: 'name',
-            dataValueField: 'id',
-            valuePrimitive: true,
-            select: ((e) => {
-                var item = this.selectProject.dataItem(e.item);
-                this.onChangeProject(item);
-            })
-        };
+        this.selectProjectListOptions = [];
+        this.getProjectDataSource();
 
         // Init the two Kendo Dates for Init and EndDate
         this.initDate = {};
@@ -87,6 +80,34 @@ export default class LicenseManagerDetail {
         this.prepareActivityList();
 
 
+    }
+
+    /**
+     * Populate the Project dropdown values
+     */
+    getProjectDataSource() {
+        this.selectProjectListOptions = {
+            dataSource: {
+                transport: {
+                    read: (e) => {
+                        this.licenseManagerService.getProjectDataSource((data) => {
+                            if(!this.licenseModel.projectId) {
+                                this.licenseModel.projectId = data[0].id;
+                            }
+                            return e.success(data);
+                        })
+                    }
+                }
+            },
+            dataTextField: 'name',
+            dataValueField: 'id',
+            valuePrimitive: true,
+            select: ((e) => {
+                // On Project Change, select the Client Name
+                var item = this.selectProject.dataItem(e.item);
+                this.licenseModel.clientName = item.client.name;
+            })
+        };
     }
 
     /**
@@ -241,16 +262,6 @@ export default class LicenseManagerDetail {
     /**
      * Populate values
      */
-    getProjectsDataSource() {
-        return  [
-            {id: 1, name: 'n/a'},
-            {id: 2, name: 'Bank East'}
-        ];
-    }
-
-    /**
-     * Populate values
-     */
     getClientDataSource() {
         this.clientsDataSource = [
             {id: 1, name: 'n/a'},
@@ -264,9 +275,9 @@ export default class LicenseManagerDetail {
     getStatusDataSource() {
         this.statusDataSource = [
             {id: 1, name: 'Active'},
-            {id: 2, name: 'Pending'},
-            {id: 3, name: 'Expired'},
-            {id: 4, name: 'Terminated'}
+            {id: 2, name: 'Expired'},
+            {id: 3, name: 'Terminated'},
+            {id: 4, name: 'Pending'}
         ];
     }
 
