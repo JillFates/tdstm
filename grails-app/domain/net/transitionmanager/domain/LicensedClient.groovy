@@ -22,8 +22,9 @@ class LicensedClient {
 	Type   type
 	String project
 	String client
+	String owner
 	Method method
-	int    maxServers = 0
+	int    max = 0
 	Date   requestDate
 	Date   activationDate
 	Date   expirationDate
@@ -38,7 +39,6 @@ class LicensedClient {
 		tablePerHierarchy false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
-		maxServers		column:'max'
 	}
 
 	static constraints = {
@@ -52,6 +52,7 @@ class LicensedClient {
 	public toJsonMap() {
 		def dProject = JSON.parse(project)
 		def dClient = JSON.parse(client)
+		def dOwner = JSON.parse(owner)
 
 		[
 				id				: id,
@@ -66,7 +67,8 @@ class LicensedClient {
 				],
 				method			: [
 						id: method?.id,
-						name: method?.name()
+						name: method?.name(),
+						max: max
 				],
 				status			: [
 						id: status?.id,
@@ -75,11 +77,11 @@ class LicensedClient {
 				instalationNum	: instalationNum,
 				project			: dProject,
 				client			: dClient,
+				owner			: dOwner,
 				activationDate	: activationDate,
 				expirationDate 	: expirationDate,
 				requestDate		: requestDate,
-				requestNote		: requestNote,
-				maxServers		: maxServers
+				requestNote		: requestNote
 		]
 	}
 

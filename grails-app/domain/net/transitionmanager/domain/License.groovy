@@ -11,12 +11,13 @@ class License {
 	String id = UUID.randomUUID().toString()
 	String instalationNum
 	String email
+	PartyGroup owner
 	Environment environment
 	Status status
 	Type   type
 	String project
 	Method method
-	int    maxServers = 0
+	int    max = 0
 	Date   requestDate
 	Date   activationDate
 	Date   expirationDate
@@ -31,7 +32,6 @@ class License {
 		tablePerHierarchy false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
-		maxServers		column:'max'
 	}
 
 	static constraints = {
@@ -76,13 +76,18 @@ class License {
 				id: environment?.id,
 				name: environment?.name()
 			],
+			owner: [
+				id: owner?.id,
+				name: owner?.name
+			],
 			type			: [
 				id: type?.id,
 				name: type?.name()
 				],
 			method			: [
 				id: method?.id,
-				name: method?.name()
+				name: method?.name(),
+				max : max
 			],
 			status			: [
 				id: status?.id,
@@ -97,8 +102,7 @@ class License {
 			activationDate	: activationDate,
 			expirationDate 	: expirationDate,
 			requestDate		: requestDate,
-			requestNote		: requestNote,
-			maxServers		: maxServers
+			requestNote		: requestNote
 		]
 	}
 

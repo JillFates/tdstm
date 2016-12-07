@@ -113,18 +113,19 @@ class WsLicenseManagerController implements ControllerMethods {
 			lc.activationDate = dateParser(json.activationDate)
 			lc.requestDate = dateParser(json.requestDate)
 
-			lc.maxServers = json.maxServers
 			lc.environment = License.Environment.forId(json.environment?.id)
 			lc.method = License.Method.forId(json.method?.id)
+			lc.max = (json.method?.max)?:0
 			lc.type = License.Type.forId(json.type?.id)
 			lc.status = License.Status.forId(json.status?.id)
 			lc.project = json.project?.toString()
 			lc.client = json.client?.toString()
+			lc.owner = json.owner?.toString()
 
 			lc.save()
 
 			if(lc.hasErrors()){
-				errors = ""
+				def errors = ""
 				lc.errors.each {err->
 					errors += "${err}/n";
 				}
@@ -154,7 +155,7 @@ class WsLicenseManagerController implements ControllerMethods {
 
 			//Date validAfter = org.apache.tools.ant.util.DateUtils.parseIso8601DateTime((String)json.activationDate)
 			//Date validBefore  = org.apache.tools.ant.util.DateUtils.parseIso8601DateTime((String)json.expirationDate)
-			int numberOfInstances = lic.maxServers
+			int numberOfInstances = lic.max
 
 			String licString = licenseService.generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
 

@@ -4,6 +4,7 @@ import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
+import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ProjectService
@@ -131,6 +132,7 @@ class WsLicenseController implements ControllerMethods {
 				lic = License.get(json.id)
 			}else{
 				lic = new License()
+				lic.owner = securityService.loadCurrentPerson().company
 				lic.requestDate = new Date()
 				lic.status = License.Status.PENDING
 				lic.method = License.Method.MAX_SERVERS
