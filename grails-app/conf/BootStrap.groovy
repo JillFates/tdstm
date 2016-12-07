@@ -48,7 +48,7 @@ class BootStrap {
 		checkConfigInfo()
 
 		//initialize License service to use
-		licenseService.initialize()
+		//licenseService.initialize()
 
 		CustomMethods.initialize()
 
