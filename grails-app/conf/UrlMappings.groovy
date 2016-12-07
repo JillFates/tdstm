@@ -302,6 +302,14 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/manager/license/$id" {
+			controller = "wsLicense"
+			action = [
+					GET: "getLicense",
+					DELETE: "deleteLicense"
+			]
+		}
+
 		//load a request HASH from a client, returns JSON object
 		"/ws/manager/license" {
 			controller = "wsLicenseManager"

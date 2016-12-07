@@ -28,6 +28,38 @@ class WsLicenseManagerController implements ControllerMethods {
 		renderSuccessJson(LicensedClient.findAll()*.toJsonMap())
 	}
 
+	def getLicense(){
+		def id = params.id
+		License lic
+		if(id) {
+			lic = LicensedClient.get(id)
+		}
+
+		if(lic) {
+			renderSuccessJson(lic.toJsonMap())
+		}else{
+			response.status = 404 //Not Found
+			render "${id} not found."
+		}
+
+	}
+
+	def deleteLicense(){
+		def id = params.id
+		def lic
+		if(id) {
+			lic = LicenseClient.get(id)
+		}
+
+		if(lic) {
+			lic.delete()
+			renderSuccessJson("Successful Deleted")
+		}else{
+			response.status = 404 //Not Found
+			render "${id} not found."
+		}
+	}
+
 	def loadRequest(){
 		//def body = request.reader.text
 		def rjson = request.JSON
