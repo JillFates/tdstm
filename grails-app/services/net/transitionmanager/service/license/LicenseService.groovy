@@ -56,6 +56,8 @@ class LicenseService {
 			LicenseCreator.getInstance().signAndSerializeLicense(license)
 		}
 	}
+
+	//Installation  <--
 	public String getInstalationId(){
 		String hostname = getHostName()
 		String fqdn = getFQDN()
@@ -83,11 +85,20 @@ class LicenseService {
 		return addr.getHostName()  //always return the name, no chek performed
 	}
 
+	/**
+	 * Not in current use
+	 * @return
+	 */
 	private String getApplicationPath(){
 		File layoutFolder = grailsApplication.parentContext.getResource("/").file
 		return layoutFolder.absolutePath
 	}
 
+	/**
+	 * Not in current use
+	 * @param divider
+	 * @return
+	 */
 	private String getMacAddresses(divider='|'){
 		def macs = NetworkInterface.networkInterfaces.collect { iface ->
 			iface.hardwareAddress?.encodeHex().toString()
@@ -166,7 +177,7 @@ class LicenseService {
 		licenseProvider.addLicense(license)
 	}
 
-	public void useLicense() {
+	public License useLicense() {
 		initialize()
 		LicenseManager manager = LicenseManager.getInstance()
 		License license = manager.getLicense("")
@@ -181,6 +192,8 @@ class LicenseService {
 
 		int seats = license.getNumberOfLicenses()
 		log.info("SEATS: $seats")
+
+		return license
 
 	}
 

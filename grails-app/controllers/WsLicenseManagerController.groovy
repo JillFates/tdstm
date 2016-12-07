@@ -30,7 +30,7 @@ class WsLicenseManagerController implements ControllerMethods {
 
 	def getLicense(){
 		def id = params.id
-		License lic
+		def lic
 		if(id) {
 			lic = LicensedClient.get(id)
 		}
@@ -46,7 +46,7 @@ class WsLicenseManagerController implements ControllerMethods {
 
 	def deleteLicense(){
 		def id = params.id
-		def lic
+		LicensedClient lic
 		if(id) {
 			lic = LicenseClient.get(id)
 		}
@@ -68,6 +68,7 @@ class WsLicenseManagerController implements ControllerMethods {
 
 			def dateParser = {String strDate ->
 				if(strDate != null){
+
 					try {
 						return DateUtils.parseDate(strDate, "yyyy-MM-dd'T'HH:mm:ssZ")
 					}catch(ParseException pe){}
@@ -85,7 +86,7 @@ class WsLicenseManagerController implements ControllerMethods {
 				def idxE = body.indexOf(endTag)
 				if(idxE < 0){
 					response.status = 400
-					render "Missing -----END HASH----- tag for request"
+					render "Missing ${endTag} tag for request"
 					return
 				}
 				body = body.substring(idxB + beginTag.length(), idxE)
@@ -133,22 +134,35 @@ class WsLicenseManagerController implements ControllerMethods {
 				renderSuccessJson(json)
 			}
 
-			/*
-			String productKey = json.id
-			String holder = json.email
-			String subject = json.instalationNum
-
-
-			Date validAfter = org.apache.tools.ant.util.DateUtils.parseIso8601DateTime((String)json.activationDate)
-			Date validBefore  = org.apache.tools.ant.util.DateUtils.parseIso8601DateTime((String)json.expirationDate)
-			int numberOfInstances = json.max
-
-			String lic = licenseService.generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
-			*/
-
 		}else{
 			response.status = 400 //bad Request
 			render "Wrong format on License Request"
+		}
+	}
+
+	def getLicenseKey(){
+		def id = params.id
+		def lic = LicensedClient.get(id)
+
+		if(lic) {
+			String productKey = lic.id
+			String holder = lic.email
+			String subject = lic.instalationNum
+
+			Date validAfter = lic.requestDate //lic.activationDate
+			Date validBefore  = lic.requestDate //lic.expirationDate
+
+			//Date validAfter = org.apache.tools.ant.util.DateUtils.parseIso8601DateTime((String)json.activationDate)
+			//Date validBefore  = org.apache.tools.ant.util.DateUtils.parseIso8601DateTime((String)json.expirationDate)
+			int numberOfInstances = lic.maxServers
+
+			String licString = licenseService.generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
+
+			log.info("licString: {}", licString)
+			renderSuccessJson(licString)
+		}else{
+			response.status = 404 //Not Found
+			render "${id} not found."
 		}
 	}
 }
