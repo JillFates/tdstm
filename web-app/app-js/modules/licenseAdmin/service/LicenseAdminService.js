@@ -88,9 +88,9 @@ export default class LicenseAdminService {
         });
     }
 
-    deleteLicense(license, callback) {
+    deleteLicense(license, onSuccess) {
         this.restService.licenseAdminServiceHandler().deleteLicense(license, (data) => {
-            return callback(data);
+            return onSuccess(data);
         });
     }
 }

@@ -15,7 +15,7 @@ export default class LicenseManagerDetail {
         this.editMode = false;
         this.licenseModel = {
             id: params.license.id,
-            principalId: (params.license.principal)? params.license.principal.id : {},
+            ownerName: params.license.owner.name,
             email: params.license.email,
             projectId: params.license.project.id,
             clientId: params.license.client.id,
@@ -35,7 +35,6 @@ export default class LicenseManagerDetail {
             requestedId: params.license.requestedId,
             replaced: params.license.replaced,
             replacedId: params.license.replacedId,
-            licenseKey: params.license.licenseKey,
             activityList: params.license.activityList,
             hostName: params.license.hostName,
             websiteName: params.license.websiteName,
@@ -74,14 +73,15 @@ export default class LicenseManagerDetail {
             })
         };
 
-        this.prepareControlActionButtons();
 
 
         this.getStatusDataSource();
 
         this.prepareMethodOptions();
+        this.prepareLicenseKey();
         this.prepareActivityList();
 
+        this.prepareControlActionButtons();
 
     }
 
@@ -139,6 +139,12 @@ export default class LicenseManagerDetail {
                 name: 'Custom'
             }
         ]
+    }
+
+    prepareLicenseKey() {
+        this.licenseManagerService.getKeyCode(this.licenseModel.id, (data) => {
+            this.licenseKey = '-----BEGIN HASH-----\n' + data + '\n-----END HASH-----';
+        });
     }
 
     prepareActivityList() {

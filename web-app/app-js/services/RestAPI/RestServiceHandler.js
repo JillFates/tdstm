@@ -66,7 +66,7 @@ export default class RestServiceHandler {
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            getHashCode:  (licenseId,onSuccess, onError) => {
+            getHashCode:  (licenseId, onSuccess, onError) => {
                 this.req.method = 'GET';
                 this.req.url =  '../ws/license/' + licenseId + '/hash';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
@@ -109,6 +109,11 @@ export default class RestServiceHandler {
             getEnvironmentDataSource: (onSuccess) => {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/environment'), onSuccess);
             },
+            getKeyCode:  (licenseId, onSuccess, onError) => {
+                this.req.method = 'GET';
+                this.req.url =  '../ws/manager/license/' + licenseId + '/key';
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
+            },
             saveLicense: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';
@@ -117,7 +122,7 @@ export default class RestServiceHandler {
             },
             revokeLicense: (data, onSuccess, onError) => {
                 this.req.method = 'DELETE';
-                this.req.url =  '../ws/license/'+data.id;
+                this.req.url =  '../ws/manager/license/'+data.id;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             activateLicense: (data, callback) => {

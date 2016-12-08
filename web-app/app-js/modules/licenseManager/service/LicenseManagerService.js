@@ -33,6 +33,12 @@ export default class LicenseManagerService {
         });
     }
 
+    getKeyCode(licenseId, onSuccess) {
+        this.restService.licenseManagerServiceHandler().getKeyCode(licenseId, (data) => {
+            return onSuccess(data.data);
+        });
+    }
+
     /**
      * Save the License
      */
@@ -74,9 +80,9 @@ export default class LicenseManagerService {
         });
     }
 
-    revokeLicense(license, callback) {
+    revokeLicense(license, onSuccess) {
         this.restService.licenseManagerServiceHandler().revokeLicense(license, (data) => {
-            return callback(data);
+            return onSuccess(data);
         });
     }
 
