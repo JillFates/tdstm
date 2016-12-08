@@ -81,7 +81,8 @@ class LicensedClient {
 				activationDate	: activationDate,
 				expirationDate 	: expirationDate,
 				requestDate		: requestDate,
-				requestNote		: requestNote
+				requestNote		: requestNote,
+				activityList	: []
 		]
 	}
 

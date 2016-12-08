@@ -311,6 +311,7 @@ class UrlMappings {
 			controller = "wsLicenseManager"
 			action = [
 					GET: "getLicense",
+					PUT: "updateLicense",
 					DELETE: "deleteLicense"
 			]
 		}
