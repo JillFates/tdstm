@@ -101,7 +101,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label text-right">Id:</label>
                                     <div class="col-sm-10">
-                                        <label class="control-label">{{licenseManagerDetail.licenseModel.requestedId}}</label>
+                                        <label class="control-label">{{licenseManagerDetail.licenseModel.id}}</label>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -125,12 +125,8 @@
                             <label for="selectEnvironment" class="col-sm-2 control-label">Environment:</label>
                             <div class="col-sm-3">
                                 <select kendo-drop-down-list
-                                        k-option-label="'Select an Environment'"
-                                        k-data-text-field="'name'"
-                                        k-data-value-field="'id'"
-                                        k-data-source="licenseManagerDetail.environmentDataSource"
+                                        k-options="licenseManagerDetail.selectEnvironmentListOptions"
                                         k-ng-model="licenseManagerDetail.licenseModel.environmentId"
-                                        k-value-primitive="true"
                                         id="selectEnvironment"
                                         class="form-control"
                                         required>
@@ -152,7 +148,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">Request Date:</label>
                             <div class="col-sm-10">
-                                <label class="control-label">{{licenseManagerDetail.licenseModel.requested}}</label>
+                                <label class="control-label">{{licenseManagerDetail.licenseModel.requestDate | date}}</label>
                             </div>
                         </div>
                         <div class="form-group">

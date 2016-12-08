@@ -35,7 +35,7 @@ export default class LicenseAdminList {
                 {field: 'type.name', title: 'Type'},
                 {field: 'method.name', title: 'Method'},
                 {field: 'method.id', hidden: true},
-                {field: 'serversTokens', title: 'Server/Tokens', template: '#:maxServers#'},
+                {field: 'method.max', title: 'Server/Tokens'},
                 {field: 'requestDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}' },
                 {field: 'expirationDate', title: 'Expiration', type: 'date', format : '{0:dd/MMM/yyyy}' },
                 {field: 'environment.name', title: 'Env.'}

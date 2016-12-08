@@ -14,6 +14,7 @@ export default class LicenseManagerDetail {
 
         this.editMode = false;
         this.licenseModel = {
+            id: params.license.id,
             principalId: (params.license.principal)? params.license.principal.id : {},
             email: params.license.email,
             projectId: params.license.project.id,
@@ -23,13 +24,13 @@ export default class LicenseManagerDetail {
             method: {
                 id: params.license.method.id,
                 name: params.license.method.name,
-                quantity: params.license.method.quantity
+                quantity: params.license.method.max,
             },
             environmentId: params.license.environment.id,
-            requested: params.license.requested,
+            requestDate: params.license.requestDate,
             initDate: params.license.initDate,
             endDate: params.license.endDate,
-            specialInstructions: params.license.specialInstructions,
+            specialInstructions: params.license.requestNote,
             bannerMessage: params.license.bannerMessage,
             requestedId: params.license.requestedId,
             replaced: params.license.replaced,
@@ -49,6 +50,10 @@ export default class LicenseManagerDetail {
         this.selectProject = {};
         this.selectProjectListOptions = [];
         this.getProjectDataSource();
+
+        // Defined the Environment Select
+        this.selectEnvironmentListOptions = [];
+        this.getEnvironmentDataSource();
 
         // Init the two Kendo Dates for Init and EndDate
         this.initDate = {};
@@ -71,9 +76,7 @@ export default class LicenseManagerDetail {
 
         this.prepareControlActionButtons();
 
-        this.getPrincipalDataSource();
-        this.getEnvironmentDataSource();
-        this.getClientDataSource();
+
         this.getStatusDataSource();
 
         this.prepareMethodOptions();
@@ -114,8 +117,8 @@ export default class LicenseManagerDetail {
      * Controls what buttons to show
      */
     prepareControlActionButtons() {
-        this.pendingLicense = this.licenseModel.statusId === 2 && !this.editMode;
-        this.expiredOrTerminated = (this.licenseModel.statusId === 3 || this.licenseModel.statusId === 4);
+        this.pendingLicense = this.licenseModel.statusId === 4 && !this.editMode;
+        this.expiredOrTerminated = (this.licenseModel.statusId === 2 || this.licenseModel.statusId === 3);
         this.activeShowMode = this.licenseModel.statusId === 1 && !this.expiredOrTerminated && !this.editMode;
     }
 
@@ -124,12 +127,12 @@ export default class LicenseManagerDetail {
             {
                 id: 1,
                 name: 'Servers',
-                quantity: 8000
+                quantity: 0
             },
             {
                 id: 2,
                 name: 'Tokens',
-                quantity: 40000
+                quantity: 0
             },
             {
                 id: 3,
@@ -242,31 +245,24 @@ export default class LicenseManagerDetail {
     /**
      * Populate values
      */
-    getPrincipalDataSource() {
-        this.principalDataSource = [
-            {id: 1, name: 'EMC'},
-            {id: 2, name: 'IBM'}
-        ];
-    }
-
-    /**
-     * Populate values
-     */
     getEnvironmentDataSource() {
-        this.environmentDataSource = [
-            {id: 1, name: 'Production'},
-            {id: 2, name: 'Other'}
-        ];
-    }
-
-    /**
-     * Populate values
-     */
-    getClientDataSource() {
-        this.clientsDataSource = [
-            {id: 1, name: 'n/a'},
-            {id: 2, name: 'Gold Bank'}
-        ];
+        this.selectEnvironmentListOptions = {
+            dataSource: {
+                transport: {
+                    read: (e) => {
+                        this.licenseManagerService.getEnvironmentDataSource((data) => {
+                            if(!this.licenseModel.environmentId) {
+                                this.licenseModel.environmentId = data[0].id;
+                            }
+                            return e.success(data);
+                        })
+                    }
+                }
+            },
+            dataTextField: 'name',
+            dataValueField: 'id',
+            valuePrimitive: true
+        };
     }
 
     /**

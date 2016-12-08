@@ -27,6 +27,12 @@ export default class LicenseManagerService {
         });
     }
 
+    getEnvironmentDataSource(onSuccess) {
+        this.restService.licenseManagerServiceHandler().getEnvironmentDataSource((data) => {
+            return onSuccess(data.data);
+        });
+    }
+
     /**
      * Save the License
      */

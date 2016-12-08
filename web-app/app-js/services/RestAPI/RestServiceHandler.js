@@ -106,6 +106,9 @@ export default class RestServiceHandler {
             getProjectDataSource: (onSuccess) => {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/project'), onSuccess);
             },
+            getEnvironmentDataSource: (onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/environment'), onSuccess);
+            },
             saveLicense: (data, callback) => {
                 this.req.method = 'POST';
                 this.req.url =  '../ws/???';
