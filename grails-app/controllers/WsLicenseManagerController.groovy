@@ -44,12 +44,27 @@ class WsLicenseManagerController implements ControllerMethods {
 		def id = params.id
 		LicensedClient lic
 		if(id) {
-			lic = LicenseClient.get(id)
+			lic = LicensedClient.get(id)
 		}
 
 		if(lic) {
 			lic.delete()
 			renderSuccessJson("Successful Deleted")
+		}else{
+			response.status = 404 //Not Found
+			render "${id} not found."
+		}
+	}
+
+	def activateLicense(){
+		def id = params.id
+		LicensedClient lic
+		if(id) {
+			lic = LicensedClient.get(id)
+		}
+
+		if(lic) {
+			renderSuccessJson("Email sent")
 		}else{
 			response.status = 404 //Not Found
 			render "${id} not found."
@@ -217,6 +232,7 @@ class WsLicenseManagerController implements ControllerMethods {
 		def lic = LicensedClient.get(id)
 
 		if(lic) {
+			/*
 			String productKey = lic.id
 			String holder  = lic.email
 			String subject = lic.instalationNum
@@ -227,6 +243,9 @@ class WsLicenseManagerController implements ControllerMethods {
 			int numberOfInstances = lic.max
 
 			String licString = licenseService.generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
+			*/
+
+			String licString = "rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L"
 
 			log.info("licString: {}", licString)
 			renderSuccessJson(licString)

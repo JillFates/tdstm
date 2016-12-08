@@ -323,6 +323,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/manager/license/${id}/activate" {
+			controller = "wsLicenseManager"
+			action = [
+					POST: "activateLicense"
+			]
+		}
+
 		///// LICENSES Common API /////////
 
 		"/ws/license/environment" {
