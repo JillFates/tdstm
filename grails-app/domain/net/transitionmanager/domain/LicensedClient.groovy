@@ -50,9 +50,9 @@ class LicensedClient {
 	}
 
 	public toJsonMap() {
-		def dProject = JSON.parse(project)
-		def dClient = JSON.parse(client)
-		def dOwner = JSON.parse(owner)
+		def dProject = project ? JSON.parse(project) : null
+		def dClient = client ? JSON.parse(client) : null
+		def dOwner = owner ? JSON.parse(owner) : null
 
 		[
 				id				: id,
