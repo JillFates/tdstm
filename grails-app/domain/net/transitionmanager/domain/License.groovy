@@ -23,6 +23,8 @@ class License {
 	Date   expirationDate
 	String requestNote
 	String hash
+	String hostName
+	String websitename
 
 	static mapping = {
 		id 			generator: 'assigned'
@@ -102,7 +104,9 @@ class License {
 			activationDate	: activationDate,
 			expirationDate 	: expirationDate,
 			requestDate		: requestDate,
-			requestNote		: requestNote
+			requestNote		: requestNote,
+			hostName		: hostName,
+			websitename		: websitename
 		]
 	}
 

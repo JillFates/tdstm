@@ -137,6 +137,8 @@ class WsLicenseController implements ControllerMethods {
 				lic.status = License.Status.PENDING
 				lic.method = License.Method.MAX_SERVERS
 				lic.instalationNum = licenseService.getInstalationId()
+				lic.hostName = licenseService.hostName
+				lic.websitename = licenseService.FQDN
 			}
 
 			lic.email = json.email

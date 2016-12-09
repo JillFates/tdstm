@@ -29,6 +29,8 @@ class LicensedClient {
 	Date   activationDate
 	Date   expirationDate
 	String requestNote
+	String hostName
+	String websitename
 	String hash
 
 	static mapping = {
@@ -82,6 +84,8 @@ class LicensedClient {
 				expirationDate 	: expirationDate,
 				requestDate		: requestDate,
 				requestNote		: requestNote,
+				hostName		: hostName,
+				websitename		: websitename,
 				activityList	: []
 		]
 	}

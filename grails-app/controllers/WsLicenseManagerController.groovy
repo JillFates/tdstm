@@ -108,6 +108,12 @@ class WsLicenseManagerController implements ControllerMethods {
 		if(json.requestNote != null) {
 			lc.requestNote = json.requestNote
 		}
+		if(json.hostName != null) {
+			lc.hostName = json.hostName
+		}
+		if(json.websitename != null) {
+			lc.websitename = json.websitename
+		}
 		if(json.expirationDate != null) {
 			lc.expirationDate = dateParser(json.expirationDate)
 		}
@@ -134,6 +140,9 @@ class WsLicenseManagerController implements ControllerMethods {
 		}
 		if(json.status?.id != null) {
 			lc.status = License.Status.forId(json.status?.id)
+		}
+		if(json.environment?.id != null) {
+			lc.environment = License.Environment.forId(json.environment?.id)
 		}
 		if(json.project != null) {
 			lc.project = json.project?.toString()

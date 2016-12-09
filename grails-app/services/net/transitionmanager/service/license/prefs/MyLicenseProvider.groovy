@@ -30,9 +30,9 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 			return null
 		}
 	}
-/*
-	public void addLicense(String name, String license){
+
+	public void addLicense(String license){
 		this.license = license
 	}
-	*/
+
 }
