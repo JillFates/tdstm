@@ -26,7 +26,7 @@ export default class LicenseManagerDetail {
                 name: params.license.method.name,
                 quantity: params.license.method.max,
             },
-            environmentId: params.license.environment.id,
+            environment: { id: params.license.environment.id },
             requestDate: params.license.requestDate,
             initDate: params.license.initDate,
             endDate: params.license.endDate,

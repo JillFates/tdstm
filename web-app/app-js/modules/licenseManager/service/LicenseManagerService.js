@@ -42,9 +42,14 @@ export default class LicenseManagerService {
     /**
      * Save the License
      */
-    saveLicense(license, callback) {
-        this.restService.licenseManagerServiceHandler().saveLicense(license, (data) => {
-            return callback(data);
+    saveLicense(license, onSuccess) {
+
+        var licenseModified = {
+            environment: { id: parseInt(license.environment.id) }
+        };
+
+        this.restService.licenseManagerServiceHandler().saveLicense(license.id, licenseModified, (data) => {
+            return onSuccess(data);
         });
     }
     /**

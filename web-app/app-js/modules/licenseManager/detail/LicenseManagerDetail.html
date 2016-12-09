@@ -129,7 +129,7 @@
                             <div class="col-sm-3">
                                 <select kendo-drop-down-list
                                         k-options="licenseManagerDetail.selectEnvironmentListOptions"
-                                        k-ng-model="licenseManagerDetail.licenseModel.environmentId"
+                                        k-ng-model="licenseManagerDetail.licenseModel.environment.id"
                                         id="selectEnvironment"
                                         class="form-control"
                                         required
@@ -183,7 +183,7 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-8">
-                                <button ngclipboard data-clipboard-text="{{licenseManagerDetail.licenseModel.licenseKey}}" type="submit" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
+                                <button ngclipboard data-clipboard-text="{{licenseManagerDetail.licenseKey}}" type="submit" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
                             </div>
                         </div>
                     </div>
