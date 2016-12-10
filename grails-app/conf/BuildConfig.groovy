@@ -30,7 +30,7 @@ grails.project.dependency.resolution = {
 		compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
 		compile 'org.apache.poi:poi:3.14'
 
-		runtime 'mysql:mysql-connector-java:5.1.39'
+		runtime 'mysql:mysql-connector-java:5.1.40'
 		runtime 'org.apache.commons:commons-lang3:3.1'
 
 		// test 'com.canoo.webtest:webtest:3.0'
