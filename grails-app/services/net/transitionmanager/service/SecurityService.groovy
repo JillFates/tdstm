@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
@@ -35,6 +36,11 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserCache
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.util.Assert
 
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
@@ -1489,6 +1495,31 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		if (toRemoveRoles) {
 			removeUserRoles(toRemoveRoles, person.id)
 		}
+	}
+
+
+	/**
+	 * assumeUserIdentity provides the ability to load a User's identity into the current
+	 * security context by their username along with their security roles
+	 * WARNING - this is a major security concern and should ONLY be called for the following
+	 * use-cases:
+	 *    1. Integration tests that do not have a user session
+	 *    2. Quartz Jobs that do not have a user session
+	 * @param username - the username of the UserLogin to be loaded into the Spring Security context
+	 */
+	void assumeUserIdentity(final String username) {
+		log.info "SECURITY: assumeUserIdentity called for user $username"
+
+		UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
+		UserCache userCache = ApplicationContextHolder.getBean("userCache")
+		UserDetails userDetails = userDetailsService.loadUserByUsername(username)
+
+		UsernamePasswordAuthenticationToken upwt = new UsernamePasswordAuthenticationToken(
+			userDetails, userDetails.getPassword(), userDetails.getAuthorities() )
+
+		SecurityContextHolder.getContext().setAuthentication(upwt)
+
+		userCache.removeUserFromCache(username)
 	}
 
 	private Person resolve(Person person) {
