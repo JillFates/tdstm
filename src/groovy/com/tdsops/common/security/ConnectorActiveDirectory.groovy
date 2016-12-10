@@ -4,14 +4,11 @@ import com.tdsops.common.lang.CollectionUtils
 import groovy.util.logging.Commons
 import org.apache.directory.groovyldap.LDAP
 import org.apache.directory.groovyldap.SearchScope
-
 import com.tdsops.common.lang.ExceptionUtil
-
 import javax.naming.AuthenticationException
 import javax.naming.InvalidNameException
 import javax.naming.NameNotFoundException
 import javax.naming.directory.InvalidSearchFilterException
-
 /**
  * Authenticates with Active Directory via LDAP protocol.
  */
@@ -37,6 +34,7 @@ class ConnectorActiveDirectory {
 	 * 		mobile
 	 * 		roles - a list of roles (e.g. User, Editor, Manager, Admin)
 	 */
+
 	static Map getUserInfo(String authority, String username, String password, Map ldapConfig) {
 		String emsg = ''
 		String logPrefix = 'getUserInfo()'
@@ -71,11 +69,24 @@ class ConnectorActiveDirectory {
 					 * then we can remove this.
 					 * TODO : JPM 10/2015 : Remove this code in 3.2.0
 					 *
-					 if (false && domain.domain) {if (! queryUsername.contains('\\')) {queryUsername = domain.domain + '\\' + username} else {// validate that the domain is the same as what is defined
-					 String userEnteredDomain = queryUsername.split(/\\+/)[0]
-					 if (! userEnteredDomain || userEnteredDomain.toLowerCase() == domain.domain.toLowerCase()) {queryUsername = domain.domain = '\\' + username} else {emsg = 'Invalid domain specified'
-					 log.info "$logPrefix $emsg by user $username, domain $userEnteredDomain"
-					 throw new UnhandledAuthException(emsg)}}}*/
+					 */
+					/*
+					if (false && domain.domain) {
+						if (! queryUsername.contains('\\')) {
+							queryUsername = domain.domain + '\\' + username
+						} else {
+							// validate that the domain is the same as what is defined
+							String userEnteredDomain = queryUsername.split(/\\+/)[0]
+							if (! userEnteredDomain || userEnteredDomain.toLowerCase() == domain.domain.toLowerCase()) {
+								queryUsername = domain.domain = '\\' + username
+							} else {
+								emsg = 'Invalid domain specified'
+								log.info "$logPrefix $emsg by user $username, domain $userEnteredDomain"
+								throw new UnhandledAuthException(emsg)
+							}
+						}
+					}
+					*/
 					queryForUser = "(sAMAccountName=$queryUsername)"
 					break
 				default:

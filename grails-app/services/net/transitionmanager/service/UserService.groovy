@@ -59,6 +59,7 @@ class UserService implements ServiceMethods {
 		def project
 
 		String mn = 'findOrProvisionUser:'
+		String em
 
 		Map domain = config.domains[authority.toLowerCase()]
 
@@ -77,33 +78,36 @@ class UserService implements ServiceMethods {
 		String defaultRole = domain.defaultRole ?: ''
 		String defaultTimezone = domain.defaultTimezone ?: ''
 
-		def client = PartyGroup.get(userInfo.companyId )
-		if (!client) {
+		PartyGroup company = PartyGroup.get(userInfo.companyId)
+		if (!company) {
 			log.error "$mn Unable to find configured company for id $userInfo.companyId"
-			throw new ConfigurationException("Unable to find user's company by id $userInfo.companyId")
+			throw new ConfigurationException("Unable to find user's company by id (${userInfo.companyId})")
 		}
 
 		project = Project.get(defaultProject)
 		if (!project) {
 			log.error "$mn Unable to find configured default project for id $defaultProject"
-			throw new ConfigurationException("Unable to find the default project for $client")
+			throw new ConfigurationException("Unable to find the default project for $company")
 		}
 
-		if (project.clientId != client.id) {
-			log.error "$mn Project ($defaultProject) not associatetawith client $client"
-			throw new ConfigurationException("Project ($defaultProject) not associated with client $client")
+		if (! projectService.companyIsAssociated(project, company) ) {
+			em = "The configured default project is not associated with the company in security settings"
+			log.error "$mn $me : project=${project.id}, company=${company.id}"
+			throw new ConfigurationException(em)
 		}
 
 		// Attempt to lookup the Person and their UserLogin
-		def (Person person, UserLogin userLogin) = findPersonAndUserLogin(client, userInfo, config, authority, personIdentifier)
+		def (Person person, UserLogin userLogin) = findPersonAndUserLogin(company, userInfo, config, authority, personIdentifier)
 
 		// Check various requirements based on the Authentication Configuration and fall out if we don't
 		// have an account and not allowed to create one.
 		if (!userLogin && !userInfo.roles && !domain.defaultRole) {
 			////// TODO BB throw new AccountException('No roles defined for the user')
+			throw new RuntimeException('No security roles have been assigned to your user account')
 		}
 		if (!userLogin && !person && !autoProvision) {
 			////// TODO BB throw new AccountException('UserLogin and/or Person not found and autoProvision is disabled')
+			throw new RuntimeException('UserLogin and/or Person not found and autoProvision is disabled')
 		}
 		if ((!person || !userLogin) && !autoProvision ) {
 			log.warn "findOrProvisionUser: User attempted login but autoProvision is diabled ($personIdentifier)"
@@ -114,7 +118,7 @@ class UserService implements ServiceMethods {
 
 		if (!person) {
 
-			// Create the person and associate to the client & project if one wasn't found
+			// Create the person and associate to the company & project if one wasn't found
 
 			log.debug "$mn Creating new person"
 
@@ -128,11 +132,11 @@ class UserService implements ServiceMethods {
 			)
 			if (!person.save(flush:true)) {
 				log.error "$mn Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(person)}"
-				throw new RuntimeException('Unexpected error while creating Person object')
+				throw new RuntimeException('Data error while creating Person object')
 			}
 			// Create Staff relationship with the Company
-			if (!partyRelationshipService.addCompanyStaff(client, person)) {
-				throw new RuntimeException('Unable to associate new person to client')
+			if (!partyRelationshipService.addCompanyStaff(company, person)) {
+				throw new RuntimeException('Unable to associate new person to company')
 			}
 			// Create Staff relationship with the default Project
 			if (!partyRelationshipService.addProjectStaff(project, person)) {
@@ -317,7 +321,7 @@ class UserService implements ServiceMethods {
 	 * @return a with [Person, UserLogin] account that was found or provisioned
 	 * @throws ConfigurationException, RuntimeException
 	 */
-	List findPersonAndUserLogin(PartyGroup client, Map userInfo, Map config, String authority, String personIdentifier) {
+	List findPersonAndUserLogin(PartyGroup company, Map userInfo, Map config, String authority, String personIdentifier) {
 
 		// The first step is to attempt to find the user/person based on the following search patterns:
 		//    1. The UserLogin.externalGuid code matches the person's AD objectguid property
@@ -325,11 +329,11 @@ class UserService implements ServiceMethods {
 		//    3. The Person.firstName+lastName match the person's AD givenname + sn properties
 
 		Person person
-		def persons
+		List persons
 		UserLogin userLogin
 
 		// method name
-		String mn = 'findUser:'
+		String mn = 'findPersonAndUserLogin:'
 
 		// Flag for debugging
 		boolean debug = log.debugEnabled || config.debug
@@ -356,26 +360,25 @@ class UserService implements ServiceMethods {
 			// First try to find by their email
 			if (userInfo.email) {
 				log.debug "$mn Looking up person by email"
-				persons = personService.findByClientAndEmail(client, userInfo.email)
+				persons = personService.findByCompanyAndEmail(company, userInfo.email)
 			}
 
 			// Then try to find by their name
-			if (!persons) {
+			if (persons.size() == 0) {
 				log.debug "$mn Looking up person by name"
 
-				// The nameMap was first,middle,last but throughout the code we refer to firstName,...
-				Map correctNameMap = [firstName:nameMap.first, middleName:nameMap.middle, lastName:nameMap.last]
-				persons = personService.findByCompanyAndName(client, correctNameMap)
-				log.debug "$mn personService.findByCompanyAndName found ${persons?.size()} people"
+				persons = personService.findByCompanyAndName(company, nameMap)
+				if (debug)
+					log.debug "$mn personService.findByCompanyAndName found ${persons?.size()} people"
 			}
 
 			// If we have any persons, try to find their respective user accounts
-			if (persons) {
+			if (persons.size() > 0) {
 				def users = UserLogin.findAllByPersonInList(persons)
 				log.debug "$mn Found these users: $users"
 
 				// If we find more than one account we don't know which to use
-				def size = users.size()
+				int size = users.size()
 				if (size > 1) {
 					log.error "$mn found $size users that matched $personIdentifier"
 					throw new RuntimeException('Unable to resolve UserLogin account due to multiple matches')
@@ -413,10 +416,11 @@ class UserService implements ServiceMethods {
 
 		getEvents(projects, dateNow).each { event, startTime->
 			def teams = MoveEventStaff.findAllByMoveEventAndPerson(event, securityService.loadCurrentPerson()).role
-			if(teams){
+			if (teams){
 				upcomingEvents[event.id] = [moveEvent: event,
-				                            teams: WebUtil.listAsMultiValueString(teams.collect {team-> team.description.replaceFirst("Staff : ", "")}),
-				                            daysToGo: startTime > dateNow ? startTime - dateNow : (" + " + (dateNow - startTime))]
+                    teams: WebUtil.listAsMultiValueString(teams.collect {team-> team.description.replaceFirst("Staff : ", "")}),
+                    daysToGo: startTime > dateNow ? startTime - dateNow : (" + " + (dateNow - startTime))
+				]
 			}
 		}
 
@@ -466,7 +470,6 @@ class UserService implements ServiceMethods {
 	}
 
 	def getTaskSummary(Project project) {
-
 		def timeInMin = 0
 		def issueList = []
 

@@ -117,7 +117,7 @@ class PersonService implements ServiceMethods {
 		Map queryParams = [company: company.id]
 		def (first, middle, last) = [false, false, false]
 
-		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr')
+		StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 		query.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 		query.append(' WHERE pr.party_id_from_id=:company')
 		query.append(' AND pr.role_type_code_from_id="COMPANY"')
@@ -157,17 +157,21 @@ class PersonService implements ServiceMethods {
 	 */
 	// TODO : JPM 4/2016 : findByCompanyAndName is replacing findByClientAndName
 	List<Person> findByCompanyAndName(PartyGroup company, Map nameMap) {
+		if (! (nameMap.containsKey('first') && nameMap.containsKey('middle') && nameMap.containsKey('last')) ) {
+			throw new InvalidParamException("Invalid nameMap object $nameMap")
+		}
+
 		List persons = []
 		Map queryParams = [companyId: company.id]
 		def (first, middle, last) = [false, false, false]
 
-		StringBuffer select = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr')
+		StringBuilder select = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 		select.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 		select.append(' WHERE pr.party_id_from_id=:companyId')
 		select.append(' AND pr.role_type_code_from_id="COMPANY"')
 		select.append(' AND pr.role_type_code_to_id="STAFF" ')
 
-		StringBuffer query = new StringBuffer(select)
+		StringBuilder query = new StringBuilder(select)
 		if (nameMap.first) {
 			queryParams.first = nameMap.first
 			query.append(' AND p.first_name=:first')
@@ -205,26 +209,27 @@ class PersonService implements ServiceMethods {
 
 	/**
 	 * Find a person by their name for a specified client
-	 * @param client - The client that the person would be associated as Staff
+	 * @param company - The company that the person would be associated as Staff
 	 * @param nameMap - a map of the person's name (map [first, last, middle])
 	 * @return A list of the person(s) found that match the name or null if none found
 	 */
-	List<Person> findByClientAndEmail(PartyGroup client, String email) {
-		Map args = [client: client.id, email: email]
-		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
-		query.append(' WHERE pr.party_id_from_id=:client')
-		query.append(' AND pr.role_type_code_from_id="COMPANY"')
-		query.append(' AND pr.role_type_code_to_id="STAFF"')
-		query.append(' AND p.email=:email')
+	List<Person> findByCompanyAndEmail(PartyGroup company, String email) {
+		List<Person> persons = []
+		if (email) {
+			Map args = [company: company.id, email: email]
+			StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
+			query.append(' WHERE pr.party_id_from_id=:company')
+			query.append(' AND pr.role_type_code_from_id="COMPANY"')
+			query.append(' AND pr.role_type_code_to_id="STAFF"')
+			query.append(' AND p.email=:email')
 
-		logger.debug 'findByClientAndEmail: query {}, map {}', query, args
-		List<Person> persons
-		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), args)
-		logger.debug 'findByClientAndEmail: query {}, map {}, found ids {}', query, args, pIds
-		if (pIds) {
-			persons = Person.getAll(pIds*.id).findAll()
+			logger.debug 'findByCompanyAndEmail: query {}, map {}', query, args
+			List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), args)
+			logger.debug 'findByCompanyAndEmail: query {}, map {}, found ids {}', query, args, pIds
+			if (pIds) {
+				persons = Person.getAll(pIds*.id).findAll()
+			}
 		}
-
 		return persons
 	}
 
@@ -278,11 +283,11 @@ class PersonService implements ServiceMethods {
 	 * @param staffList - deprecated argument that is no longer used
 	 * @param clientStaffOnly - a flag to indicate if the search should only look at staff of the client or all persons associated to the project
 	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is
-	 * found then isAmbiguous will be set to true.
+	 * found then isAmbiguous will be set to true and person will be null.
 	 */
 	Map findPerson(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true) {
 		String mn = 'findPerson()'
-		def results = [person: null, isAmbiguous: false]
+		Map results = [person: null, isAmbiguous: false]
 
 		logger.debug 'findPersion() attempting to find nameMap={} in project {}', nameMap, project
 
@@ -292,14 +297,9 @@ class PersonService implements ServiceMethods {
 			return results
 		}
 
-		String hql = '''
-			from PartyRelationship PR
-			inner join PR.partyIdTo P
-			where PR.partyRelationshipType.id='STAFF'
-			  and PR.roleTypeCodeFrom.id='COMPANY'
-			  and PR.roleTypeCodeTo.id='STAFF'
-			  and PR.partyIdFrom IN (:companies)
-		'''
+		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType.id='STAFF' " +
+			  "and PR.roleTypeCodeFrom.id='COMPANY' and PR.roleTypeCodeTo.id='STAFF' and PR.partyIdFrom IN (:companies)"
+
 		List companies = [project.client]
 
 		String where = ' and P.firstName=:firstName'
@@ -325,18 +325,16 @@ class PersonService implements ServiceMethods {
 		if (persons) {
 			persons = persons.collect({ it[1] })
 		}
-		logger.debug '{} Initial search found {} {}', mn, persons.size(), nameMap
+		logger.debug '{} findPerson() Initial search found {} {}', mn, persons.size(), nameMap
 
 		int s = persons.size()
 		if (s > 1) {
-			persons.each { person -> logger.debug 'person {} {}', person.id, person }
-			results.person = persons[0]
+			persons.each { person -> logger.debug '{} person {} {}', mn, person.id, person }
+			// results.person = persons[0]
 			results.isAmbiguous = true
-		}
-		else if (s == 1) {
+		} else if (s == 1) {
 			results.person = persons[0]
-		}
-		else {
+		} else {
 
 			// Try to find match on partial
 
@@ -364,8 +362,7 @@ class PersonService implements ServiceMethods {
 			s = persons.size()
 			if (s > 1) {
 				results.isAmbiguous = true
-			}
-			else if (s == 1) {
+			} else if (s == 1) {
 				results.person = persons[0]
 				results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
 			}
@@ -1134,7 +1131,6 @@ class PersonService implements ServiceMethods {
 	 * @param person - the person to assign the team to
 	 * @param teamCode - the team code to associate to the person
 	 */
-	@Transactional
 	void addToTeam(Person person, String teamCode) {
 		if (!isAssignedToTeam(person, teamCode)) {
 			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "COMPANY", person, teamCode)) {
@@ -1148,11 +1144,19 @@ class PersonService implements ServiceMethods {
 
 	/**
 	 * Associate a person to a project as staff
+	 * @param byWhom - The person that is performing the update
 	 * @param projectId - the id number of the project to add the person to
 	 * @param personId - the id of the person to update
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
-	void addToProject(String projectId, String personId) {
+	void addToProject(UserLogin byWhom, String projectId, String personId) {
+		// Check that the individual that is attempting to assign someone has access to the project in the first place
+		Project project = Project.get(projectId)
+		if (! hasAccessToProject(byWhom.person, project)) {
+			auditService.logSecurityViolation(byWhom, "attempted to modify staffing on project $project with proper access")
+			throw new UnauthorizedException('You do not have access to the specified project')
+		}
+
 		// The addToEvent may call this method as well
 		def map = validateUserCanEditStaffing(projectId, personId, null)
 		if (map.error) {
@@ -1164,7 +1168,6 @@ class PersonService implements ServiceMethods {
 
 	/**
 	 * Associate a person to a project as staff (Secured) which is only used if permissions were already checked
-	 * if the
 	 * @param projectId - the id number of the project to remove the person from
 	 * @param personId - the id of the person to update
 	 * @return String - any value indicates an error otherwise blank means succes
@@ -1174,8 +1177,7 @@ class PersonService implements ServiceMethods {
 		if (!isAssignedToProject(project, person)) {
 			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, 'STAFF')) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project $project.name as STAFF")
-			}
-			else {
+			} else {
 				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
 			}
 		}
@@ -1364,7 +1366,7 @@ class PersonService implements ServiceMethods {
 			MoveEventStaff mes = new MoveEventStaff([person: map.person, moveEvent: event, role: map.teamRoleType])
 			save mes
 			if (!mes.hasErrors()) {
-				auditService.logMessage("$user assigned $map.person to project '$map.project.name' event '$event.name' as $teamCode")
+				auditService.logMessage("assigned $map.person to project '$map.project.name' event '$event.name' as $teamCode")
 			}
 			else {
 				logger.error 'addToEvent() Unable to save MoveEventStaff record for person {}, project {}, event {}, team {}',
@@ -1393,7 +1395,7 @@ class PersonService implements ServiceMethods {
 
 		deleteFromEvent(map.project, event, map.person, map.teamRoleType)
 
-		auditService.logMessage("$securityService.currentUsername unassigned $map.person from team $teamCode for event $event of project $map.project.name")
+		auditService.logMessage("${securityService.currentUsername} unassigned $map.person from team $teamCode for event $event of project $map.project.name")
 	}
 
 	/**
@@ -1574,7 +1576,7 @@ class PersonService implements ServiceMethods {
 	 */
 	boolean hasAccessToProject(Person person = null, Project project) {
 		long personId = person ? person.id : securityService.currentPersonId
-		def projects = projectService.getUserProjects(false, ProjectStatus.ANY, [personId: personId])
+		List projects = projectService.getUserProjects(false, ProjectStatus.ANY, [personId: personId])
 		if (projects) {
 			return projects.any { it.id == project.id }
 		}
@@ -1742,13 +1744,14 @@ class PersonService implements ServiceMethods {
 	/**
 	 * Used by controller to create a Person.
 	 * @param params - request params
+	 * @param byWhom - The person that is performing the update
 	 * @param companyId - The person company
 	 * @param defaultProject - this is the current user's currentProject that the person will be assigned to if the company is the project.client
 	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
 	 * @return The Person record being created or throws an exception for various issues
 	 */
 	@Transactional
-	Person savePerson(Map params, Long companyId, Project defaultProject, boolean byAdmin = false)
+	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin = false)
 			throws DomainUpdateException, InvalidParamException {
 
 		def companyParty
@@ -1849,6 +1852,11 @@ class PersonService implements ServiceMethods {
 		partyRelationshipService.associatedCompanies(whom).find { it.id == company.id }
 	}
 
+	/**
+	 * Used to find the person by their username
+	 * @param username - the user's username to search on
+	 * @return the Person domain object if found otherwise null
+	 */
 	Person findByUsername(String username) {
 		Person.executeQuery('select u.person from UserLogin u where u.username=:username',
 			[username: username])[0]

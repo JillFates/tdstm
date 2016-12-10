@@ -30,34 +30,33 @@ class PartyRelationshipService implements ServiceMethods {
 	ProjectService projectService
 	SecurityService securityService
 
-	PartyRelationship savePartyRelationship(String relationshipTypeId, Party from,
-	                                        String fromRoleTypeId, Party to, String toRoleTypeId) {
+	PartyRelationship savePartyRelationship(
+		String relationshipTypeId,
+		Party from, String fromRoleTypeId,
+		Party to, String toRoleTypeId
+	) {
 		try {
-//			 logger.debug 'savePartyRelationship() partyRelationshipType={}, roleTypeFrom={}, roleTypeTo={}, partyIdFrom={}, partyIdTo={}',
-//			    relationshipTypeId, fromRoleTypeId, toRoleTypeId, from, to
-
 			PartyRelationship partyRelationship = new PartyRelationship(
-					partyRelationshipType: PartyRelationshipType.get(relationshipTypeId),
-					partyIdFrom: from,
-					roleTypeCodeFrom: RoleType.get(fromRoleTypeId),
-					partyIdTo: to,
-					roleTypeCodeTo: RoleType.get(toRoleTypeId),
-					statusCode: 'ENABLED')
-			save partyRelationship
+				partyRelationshipType: PartyRelationshipType.get(relationshipTypeId),
+				partyIdFrom: from,
+				roleTypeCodeFrom: RoleType.get(fromRoleTypeId),
+				partyIdTo: to,
+				roleTypeCodeTo: RoleType.get(toRoleTypeId),
+				statusCode: 'ENABLED')
+			save(partyRelationship, true)
 			if (partyRelationship.hasErrors()) {
 				return null
 			}
 
 			return partyRelationship
-		}
-		catch (e) {
+		} catch (e) {
 			logger.error 'savePartyRelationship() had exception {}: {}',
-					e.message, ExceptionUtil.stackTraceToString(e)
+				e.message, ExceptionUtil.stackTraceToString(e)
 		}
 	}
 
 	void deletePartyRelationship(String relationshipTypeId, Project project, String fromRoleTypeId,
-	                             Person person, String toRoleTypeId) {
+		Person person, String toRoleTypeId) {
 
 		PartyRelationship.executeUpdate('''
 			delete PartyRelationship pr
@@ -147,14 +146,18 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @param staff  the staff member instance or id
 	 * @return Party - the company Staff is associated with or NULL if no associations
 	 */
-	PartyGroup getCompanyOfStaff(Person staff) {
-		PartyGroup.executeQuery('''
-			select pr.partyIdFrom from PartyRelationship pr
-			where pr.partyRelationshipType = 'STAFF'
-			  and pr.roleTypeCodeFrom = 'COMPANY'
-			  and pr.roleTypeCodeTo = 'STAFF'
-			  and pr.partyIdTo=:staff
-		''', [staff: staff])[0]
+	PartyGroup getCompanyOfStaff(def staff) {
+		def staffRef = StringUtil.toLongIfString(staff)
+		boolean byId = (staffRef instanceof Long)
+		String query = """select pr.partyIdFrom from
+			PartyRelationship pr where
+			pr.partyRelationshipType.id = 'STAFF'
+			and pr.roleTypeCodeFrom.id = 'COMPANY'
+			and pr.roleTypeCodeTo.id = 'STAFF'
+			and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
+		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff:staffRef])
+
+		return (company ? company[0] : null)
 	}
 
 	/**
@@ -167,10 +170,10 @@ class PartyRelationshipService implements ServiceMethods {
 		company = StringUtil.toLongIfString(company)
 		def list = Person.executeQuery('''
 			from Person where id in (select partyIdTo.id from PartyRelationship
-			                         where partyRelationshipType = 'STAFF'
-			                           and partyIdFrom.id = :companyId
-			                           and roleTypeCodeFrom = 'COMPANY'
-			                           and roleTypeCodeTo = 'STAFF')
+				where partyRelationshipType = 'STAFF'
+					and partyIdFrom.id = :companyId
+					and roleTypeCodeFrom = 'COMPANY'
+					and roleTypeCodeTo = 'STAFF')
 			order by lastName, firstName
 		''', [companyId: company instanceof Long ? company : company.id])
 
@@ -655,8 +658,11 @@ class PartyRelationshipService implements ServiceMethods {
 		company = StringUtil.toLongIfString(company)
 		staff = StringUtil.toLongIfString(staff)
 
-		Map<String, Object> args = [companyId: company instanceof Long ? company : company.id,
-		                            staffId: staff instanceof Long ? staff : staff.id]
+		Map<String, Object> args = [
+			companyId: company instanceof Long ? company : company.id,
+		    staffId: staff instanceof Long ? staff : staff.id
+		]
+
 		StringBuilder query = new StringBuilder('''
 			select pr.roleTypeCodeTo
 			from PartyRelationship pr
@@ -670,8 +676,6 @@ class PartyRelationshipService implements ServiceMethods {
 		if (teamCode) {
 			query.append(" and pr.roleTypeCodeTo.id = :teamCode")
 			args.teamCode = teamCode
-		} else {
-			query.append(" and pr.roleTypeCodeTo.id != 'STAFF'")
 		}
 		query.append(" order by pr.roleTypeCodeTo.id")
 
@@ -817,7 +821,7 @@ class PartyRelationshipService implements ServiceMethods {
 				partyIdTo: person,
 				roleTypeCodeTo: functionRoleType
 			)
-			if (! pr.validate() || ! pr.save(flush:true)) {
+			if (! pr.save(flush:true)) {
 				msg = "Unable to create Company/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
 				logger.error 'AddStaffFunction() {}', msg
 				throw new RuntimeException(msg)
@@ -834,7 +838,7 @@ class PartyRelationshipService implements ServiceMethods {
 					partyIdTo: person,
 					roleTypeCodeTo: functionRoleType
 				)
-				if (! pr.validate() || ! pr.save(flush:true)) {
+				if (! pr.save(flush:true)) {
 					msg = "Unable to create Project/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
 					logger.error 'AddStaffFunction() {}', msg
 					throw new RuntimeException(msg)
@@ -863,13 +867,12 @@ class PartyRelationshipService implements ServiceMethods {
 
 		List<String> teamsToRemove = teamCodes ? allTeamCodes - teamCodes : allTeamCodes
 
-		String query = '''
-			from PartyRelationship pr
-			where pr.partyRelationshipType.id = :type
-			  and pr.roleTypeCodeFrom.id = :typeFrom
-			  and pr.partyIdTo = :person
-			  and pr.roleTypeCodeTo.id in (:teams)
-		'''
+		String query = "from PartyRelationship pr where " +
+			"pr.partyRelationshipType.id = :type and " +
+			"pr.roleTypeCodeFrom.id = :typeFrom and " +
+			"pr.partyIdTo = :person and " +
+			"pr.roleTypeCodeTo.id in (:teams)"
+
 		// Remove any Team assignment that the person has assigned that are not in the teamCodes list
 		List<PartyRelationship> toDelete = PartyRelationship.executeQuery(query,
 				[type: 'STAFF', typeFrom: 'COMPANY', person: person, teams: teamsToRemove])
@@ -886,7 +889,7 @@ class PartyRelationshipService implements ServiceMethods {
 				List deleteDetail = toDelete.collect { "Project: $it.partyIdFrom Team: $it.roleTypeCodeTo.id" }
 				logger.debug 'updateAssignedTeams() for {} - removing Project Team assignments {}', person, deleteDetail
 			}
-			toDelete*.delete()
+			toDelete*.delete(flush:true)
 		}
 
 		// Remove any MoveEvent assignments
@@ -898,7 +901,7 @@ class PartyRelationshipService implements ServiceMethods {
 				List deleteDetails = moveEventsToDelete.collect { "Event: $it.moveEvent Team: $it.role.id" }
 				logger.debug 'updateAssignedTeams() for {} - removing team event assignments {}', person, deleteDetails
 			}
-			moveEventsToDelete*.delete()
+			moveEventsToDelete*.delete(flush:true)
 		}
 
 		// Now get the list of Teams that the person is assigned to and determine if we need to assign them to any new ones
@@ -913,11 +916,11 @@ class PartyRelationshipService implements ServiceMethods {
 
 				for (String teamCode in teamsToAssign) {
 					new PartyRelationship(
-							partyRelationshipType: coStaffPRType,
-							roleTypeCodeFrom: coRoleType,
-							roleTypeCodeTo: RoleType.load(teamCode),
-							partyIdFrom: personCompany,
-							partyIdTo: person).save(failOnError: true)
+						partyRelationshipType: coStaffPRType,
+						roleTypeCodeFrom: coRoleType,
+						roleTypeCodeTo: RoleType.load(teamCode),
+						partyIdFrom: personCompany,
+						partyIdTo: person).save(failOnError: true, flush:true)
 				}
 			}
 		}

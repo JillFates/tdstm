@@ -35,6 +35,6 @@ class PartyRelationship implements Serializable {
 	}
 
 	String toString() {
-		"$partyRelationshipType : $roleTypeCodeFrom $partyIdFromId : $roleTypeCodeTo $partyIdToId"
+		"$partyRelationshipType : ${roleTypeCodeFrom.id}/${partyIdFrom.id} : ${roleTypeCodeTo.id}/${partyIdTo.id}"
 	}
 }

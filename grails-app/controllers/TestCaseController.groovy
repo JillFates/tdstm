@@ -151,10 +151,10 @@ class TestCaseController implements ControllerMethods {
 	def findPerson() {
 		def nameMap = [first:'John', last:'Martin']
 
-		def client = PartyGroup.read(18)
-		def fullname = personService.findByClientAndName(client, nameMap)
-		def firstname = personService.findByClientAndName(client, [first:'John'])
-		def email = personService.findByClientAndEmail(client, 'jmartin@transitionaldata.com')
+		def company = PartyGroup.read(18)
+		def fullname = personService.findByCompanyAndName(company, nameMap)
+		def firstname = personService.findByCompanyAndName(company, [first:'John'])
+		def email = personService.findByCompanyAndEmail(company, 'jmartin@transitionaldata.com')
 		def login = UserLogin.findAllByPersonInList(firstname)
 
 		render "Found by:<br>fullname: $fullname<br>firstname: $firstname<br>email: $email<br>logins: $login".toString()
