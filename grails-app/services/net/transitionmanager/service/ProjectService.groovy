@@ -217,8 +217,11 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get the fields, splitted fields in to two to handle common customs.
-	 * @param : entityType type of entity.
+	 * Used to get the fields by splitting fields into name/value pairs for the customs field settings
+	 * TODO - validate exactly what this definition means...
+	 * @param entityType - the class type to get the field setting for
+	 * @param projectAttributes - the list of attributes to parse apart
+	 * @return a List containing key/value pairs of all of the projectAttributes
 	 */
 	List<Map<String, String>> getFields(String entityType, List<EavAttribute> projectAttributes = null){
 		if (!projectAttributes) {
@@ -512,6 +515,29 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/*
+	 * Used to determine if a company is associated with a project
+	 * @param company - a company object
+	 * @return true if associated otherwise false
+	 */
+	boolean companyIsAssociated(Project project, Party company) {
+		return companyIsAssociated(project, company.id)
+	}
+
+	/**
+	 * Used to determine if a company is associated with a project
+	 * @param company - a company object
+	 * @return true if associated otherwise false
+	 */
+	boolean companyIsAssociated(Project project, Long companyId) {
+		List assocCompanies = getCompanies(project)
+		if (assocCompanies.find { it.id == companyId }) {
+			true
+		} else {
+			false
+		}
+	}
+
+	/**
 	 *The UserPreferenceService.removeProjectAssociates is moved here and renamed as deleteProject
 	 *@param project
 	 *@param includeProject indicates if should be deleted the project too
@@ -770,8 +796,17 @@ class ProjectService implements ServiceMethods {
 		}
 	}
 
+	/**
+	 * Used to save a project along with the project logo, partners and project manager declaraitions
+	 * that come from the project create form.
+	 * @param projectInstance - the instance of the project to update
+	 * @param file - the logo for the project
+	 * @param projectPartners - a list of company ids representing partners
+	 * @param projectManager - a person object that is to be the Project Manager on the project
+	 * @return a map containing message:String and success:true|false
+	 */
 	@Transactional
-	def saveProject(Project projectInstance, file, projectPartners, projectManager) {
+	Map saveProject(Project projectInstance, file, projectPartners, projectManager) {
 
 		//projectInstance.dateCreated = new Date()
 		//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
@@ -821,6 +856,7 @@ class ProjectService implements ServiceMethods {
 			}
 
 			userPreferenceService.setCurrentProjectId(projectInstance.id)
+
 			//Will create a bundle name TBD and set it as default bundle for project
 			projectInstance.getProjectDefaultBundle()
 
@@ -1499,5 +1535,5 @@ class ProjectService implements ServiceMethods {
                return projects
        }
 
- 
+
 }

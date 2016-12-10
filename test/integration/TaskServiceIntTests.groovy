@@ -6,7 +6,10 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 
 class TaskServiceIntTests extends IntegrationSpec {
 

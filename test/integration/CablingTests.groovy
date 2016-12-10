@@ -1,6 +1,10 @@
 import com.tdssrc.grails.GormUtil
 import grails.test.spock.IntegrationSpec
 
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+
+
 class CablingTests extends IntegrationSpec {
     /***********************************
      * Test model create functionality

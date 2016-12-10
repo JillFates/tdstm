@@ -28,37 +28,44 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 
 		UserLogin userLogin = UserLogin.findWhere(username: username)
 		if (!userLogin || !userLogin.isLocal) {
-			logger.warn 'User not found: {}', username
+			logger.warn 'loadUserByUsername() User not found: {}', username
 			throw new NoStackUsernameNotFoundException()
 		}
 
-		Collection<GrantedAuthority> authorities
-		Collection<String> permissions
+		Collection<GrantedAuthority> authorities = []
+		Collection<String> permissions = []
 		if (loadRoles) {
 			Collection<String> roleNames = (Collection) UserLogin.executeQuery('''
 				select roleType.id from PartyRole
-				where party.id=?''', [userLogin['personId']])
+				where party.id=:pid''', [pid: userLogin.person.Id])
 
-			authorities = (Collection) roleNames.collect { new SimpleGrantedAuthority(it) }
+			if (roleNames) {
+				authorities = (Collection) roleNames.collect { new SimpleGrantedAuthority(it) }
 
-			permissions = (Collection) UserLogin.executeQuery('''
-				select permissionItem from Permissions
-				where id in (select permission from RolePermissions
-				             where role in (:roleNames))
-				''', [roleNames: roleNames]).unique().sort()
+				String query = '''
+					select distinct permissionItem from Permissions
+					where id in (select permission from RolePermissions
+					             where role in (:roleNames))
+					'''
+				// String query = 'select permissionItem from Permissions where id in (select permission from RolePermissions where role in (:roleNames))'
+				permissions = (Collection) UserLogin.executeQuery(query, [roleNames: roleNames]).unique().sort()
+			} else {
+				logger.warn 'loadUserByUsername() No security roles found for user: {}', username
+			}
 		}
-		else {
-			authorities = []
-			permissions = []
-		}
 
-		new TdsUserDetails(userLogin.username, userLogin.password,
-				!userLogin.isDisabled(), // enabled
-				!userLogin.hasExpired(), // accountNonExpired
-				false, // credentialsNonExpired, always false here to avoid an exception, instead
-				       // the UserLogin is set to require a password change
- 				!userLogin.isLockedOut(), // accountNonLocked
-				authorities, (long) userLogin['id'], (long) userLogin['personId'],
-				userLogin.saltPrefix, permissions)
+		new TdsUserDetails(
+			userLogin.username,
+			userLogin.password,
+			!userLogin.isDisabled(), // enabled
+			!userLogin.hasExpired(), // accountNonExpired
+			false, // credentialsNonExpired, always false here to avoid an exception, instead
+			       // the UserLogin is set to require a password change
+			!userLogin.isLockedOut(), // accountNonLocked
+			authorities,
+			(long) userLogin.id,
+			(long) userLogin.person.Id,
+			userLogin.saltPrefix,
+			permissions)
 	}
 }

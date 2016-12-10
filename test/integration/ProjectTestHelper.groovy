@@ -1,4 +1,8 @@
 import com.tdsops.common.grails.ApplicationContextHolder
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Project
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang.RandomStringUtils as RSU
@@ -17,8 +21,8 @@ class ProjectTestHelper {
 
 	// Initialize
 	ProjectTestHelper() {
-		projectService = ApplicationContextHolder.getService('projectService', ProjectService)
-		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService', PartyRelationshipService)
+		projectService = ApplicationContextHolder.getService('projectService')
+		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
 	}
 
 	/**
@@ -45,15 +49,30 @@ class ProjectTestHelper {
 	/**
 	 * Create a project
 	 */
-	Project createProject(PartyGroup company = null) {
-		new Project(client: createCompany('Owner'),
-		            projectCode: RSU.randomAlphabetic(10),
-		            description: 'Test project created by the ProjectTestHelper',
-		            startDate: new Date(),
-		            completionDate: startDate + 30,
-		            workflowCode: 'STD_PROCESS',
-		            timezone: 'GMT',
-		            owner: company ?: createCompany('Owner')).save(failOnError: true)
+	Project createProject(PartyGroup company=null) {
+
+		if (!company) {
+			company = createCompany('Owner')
+		}
+
+		Project project = new Project()
+		project.with {
+			client = createClient(company)
+			projectCode = RSU.randomAlphabetic(10)
+			name = 'Project ' + projectCode
+			description = 'Test project created by the ProjectTestHelper'
+			startDate = new Date()
+			completionDate = startDate + 30
+			workflowCode = 'STD_PROCESS'
+			timezone = Timezone.findByCode('GMT')
+		}
+		project.save(failOnError:true)
+
+		// Assigning the owner to a project is done through the PartyRelationship so the project must be saved first
+		project.owner = company
+		project.save(failOnError:true)
+
+		return project
 	}
 
 	/**
@@ -63,8 +82,14 @@ class ProjectTestHelper {
 	 * @return the company
 	 */
 	PartyGroup createCompany(String prefix) {
-		new PartyGroup(type: PartyType.get('COMPANY'),
-		               name: (prefix ? prefix + ' ' : '') + RSU.randomAlphabetic(10)).save(failOnError: true)
+		PartyType pt = PartyType.get('COMPANY')
+		PartyGroup company = new PartyGroup()
+		company.with {
+			partyType = pt
+			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
+		}
+
+		company.save(failOnError:true)
 	}
 
 	/**
@@ -77,5 +102,6 @@ class ProjectTestHelper {
 
 		PartyGroup client = createCompany('Client')
 		partyRelationshipService.assignClientToCompany(client, company)
+		return client
 	}
 }

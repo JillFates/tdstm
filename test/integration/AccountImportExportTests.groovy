@@ -4,7 +4,7 @@ import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.SecurityService
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession
 import spock.lang.Specification
-
+import org.springframework.mock.web.MockHttpServletRequest
 import java.sql.Timestamp
 
 class AccountImportExportTests extends Specification {

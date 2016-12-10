@@ -1,5 +1,6 @@
 import grails.test.mixin.TestFor
 import spock.lang.Specification
+import net.transitionmanager.domain.Project
 
 /**
  * Unit test cases for the TimeUtil class

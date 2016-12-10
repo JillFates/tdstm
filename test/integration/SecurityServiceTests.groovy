@@ -1,5 +1,6 @@
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import spock.lang.Specification

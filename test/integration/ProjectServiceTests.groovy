@@ -1,5 +1,8 @@
 import com.tdsops.tm.enums.domain.ProjectStatus
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import spock.lang.Specification
@@ -9,6 +12,7 @@ class ProjectServiceTests extends Specification {
 	// IOC
 	ProjectService projectService
 	PersonService personService
+	PartyRelationshipService partyRelationshipService
 
 	// Initialized by setup()
 	private ProjectTestHelper projectHelper = new ProjectTestHelper()
@@ -154,5 +158,19 @@ class ProjectServiceTests extends Specification {
 
 		then:
 		projectService.defaultAccountExpirationDate(project) == compDate
+	}
+
+	def "7. Test companyIsAssociated"() {
+		when:
+			Project p = projectHelper.createProject()
+			PartyGroup partner = projectHelper.createCompany()
+			partyRelationshipService.assignPartnerToCompany(partner, p.owner)
+			projectService.updateProjectPartners(p, partner.id)
+			PartyGroup unrelatedCompany = projectHelper.createCompany()
+		then:
+			projectService.companyIsAssociated(p, p.owner.id)
+			projectService.companyIsAssociated(p, p.client)
+			projectService.companyIsAssociated(p, partner)
+			! projectService.companyIsAssociated(p, unrelatedCompany)
 	}
 }

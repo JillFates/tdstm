@@ -16,9 +16,19 @@ class TdsUserDetails extends GrailsUser {
 	// since permission strings are cached at login it's important to update the cached values when they change
 	final Set<String> permissions = []
 
-	TdsUserDetails(String username, String password, boolean enabled, boolean accountNonExpired,
-	               boolean credentialsNonExpired, boolean accountNonLocked, Collection<GrantedAuthority> authorities,
-	               long id, long personId, String salt, Collection<String> permissions) {
+	TdsUserDetails(
+		String username,
+		String password,
+		boolean enabled,
+		boolean accountNonExpired,
+		boolean credentialsNonExpired,
+		boolean accountNonLocked,
+		Collection<GrantedAuthority> authorities,
+		long id,
+		long personId,
+		String salt,
+		Collection<String> permissions)
+	{
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities, id)
 		this.permissions.addAll permissions
 		this.personId = personId
