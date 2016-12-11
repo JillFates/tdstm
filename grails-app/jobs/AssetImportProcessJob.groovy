@@ -4,7 +4,7 @@ import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.ProgressService
 import org.quartz.JobExecutionContext
 
-class AssetImportProcessJob {
+class AssetImportProcessJob extends SecureJob {
 
 	def group = 'tdstm-asset-import-process'
 	static triggers = {}
@@ -18,7 +18,9 @@ class AssetImportProcessJob {
 	void execute(JobExecutionContext context) {
 		String progressKey
 		try {
-			Map dataMap = context.mergedJobDataMap
+			// Map dataMap = context.mergedJobDataMap
+			Map dataMap = initialize(context)
+
 			progressKey = dataMap.getString('progressKey')
 
 			long batchId = dataMap.getLongValue('batchId')

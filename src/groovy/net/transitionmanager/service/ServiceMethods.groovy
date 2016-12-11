@@ -2,9 +2,6 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
 import org.codehaus.groovy.grails.web.util.WebUtils
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
 import javax.servlet.http.HttpSession
 
 trait ServiceMethods {
@@ -38,8 +35,7 @@ trait ServiceMethods {
 				return doGet(type, id.toLong(), throwException)
 			}
 			catch (NumberFormatException e) {
-				throw new InvalidParamException('Unable to retrieve ' + type.simpleName +
-						' with invalid id: ' + id)
+				throw new InvalidParamException('Unable to retrieve ' + type.simpleName + ' with invalid id: ' + id)
 			}
 		}
 
@@ -73,19 +69,15 @@ trait ServiceMethods {
 			instance.save(flush: flush)
 
 			if (instance.hasErrors()) {
-				log().error('Validation errors saving {} with id {} {}',
-						instance.getClass().simpleName, instance.id, GormUtil.allErrorsString(instance))
+				log.error('Validation errors saving {} with id {} {}',
+					instance.getClass().simpleName, instance.id, GormUtil.allErrorsString(instance))
 			}
 		}
 		catch (e) {
-			log().error(e.message, e)
+			log.error(e.message, e)
 		}
 
 		instance
-	}
-
-	private Logger log() {
-		LoggerFactory.getLogger(getClass())
 	}
 
 	HttpSession getSession() {

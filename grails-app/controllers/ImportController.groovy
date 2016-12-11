@@ -184,6 +184,7 @@ class ImportController implements ControllerMethods {
 				//trigger.jobDataMap.putAll(results)
 				trigger.jobDataMap.batchId = batchId
 				trigger.jobDataMap.progressKey = progressKey
+				trigger.jobDataMap.username = securityService.currentUsername
 				trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
 				trigger.jobDataMap.projectId = project.id
 				trigger.jobDataMap.timeZoneId = userPreferenceService.timeZone

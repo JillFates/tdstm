@@ -11,6 +11,7 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
@@ -397,8 +398,11 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	}
 
 	/* To get DataTransferValue Asset MoveBundle
+	 * @param dtv - a Map or a DataTransferValue object
+	 * @param project - the project to get the bundle reference for
+	 * @return the appropriate MoveBundle
 	 */
-	 private MoveBundle getDtvMoveBundle(DataTransferValue dtv, Project project) {
+	 private MoveBundle getDtvMoveBundle(def dtv, Project project) {
 		if (dtv.correctedValue && dtv.correctedValue.toUpperCase().trim() != "NULL") {
 			return createBundleIfNotExist(dtv.correctedValue, project)
 		}
@@ -1141,16 +1145,24 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	 *   - dtvList
 	 *   - project
 	 */
-	def findAndValidateAsset(Project project, UserLogin userLogin, Class clazz, assetId,
-	                         DataTransferBatch dataTransferBatch, List<DataTransferValue> dtvList,
-	                         EavAttributeSet eavAttributeSet, int errorCount, int errorConflictCount,
-	                         List<String> ignoredAssets, int rowNum) {
+	def findAndValidateAsset(
+		Project project,
+		UserLogin userLogin,
+		Class clazz,
+		Long assetId,
+		DataTransferBatch dataTransferBatch,
+		List<DataTransferValue> dtvList,
+		EavAttributeSet eavAttributeSet,
+		Integer errorCount,
+		Integer errorConflictCount,
+		List<String> ignoredAssets,
+		Integer rowNum
+	) {
 
 		// Try loading the application and make sure it is associated to the current project
 		def asset
 		def clazzName = clazz.name.tokenize('.')[-1]
-		def clazzMap = [AssetEntity: 'Server', Database: 'Database', Application: 'Application',
-		                Files:'Files']
+		def clazzMap = [AssetEntity: 'Server', Database: 'Database', Application: 'Application', Files:'Files']
 
 		if (assetId) {
 			asset = clazz.get(assetId)
@@ -1206,7 +1218,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			if (asset.dirtyPropertyNames) {
 				// Check to see if dirty
 				logger.info '{} Updated asset {} {} - Dirty properties: {}', methodName, asset.id, asset.assetName, asset.dirtyPropertyNames
-				save asset
+				save(asset)
 				saved = !asset.hasErrors()
 				if (saved) {
 					updateCount++
@@ -1255,17 +1267,26 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 	/**
 	 * Used by the asset import process to set the various properties that a common across the various asset classes
-	 * @param project  the project that is being processed
-	 * @param Object the asset that is being updated
-	 * @param Map the DataTransferValue to update
-	 * @param rowNum  the row number being processed
-	 * @param List the list of warning messages
-	 * @param Integer the counter for error conflicts
+	 * @param project - the project that is being processed
+	 * @param asset - the asset that is being updated
+	 * @param dtv - a Map or DataTransferValue object containing the name/value to update
+	 * @param rowNum - the row number being processed
+	 * @param warnings - List the list of warning messages
+	 * @param errorConflictCount - an Integer counter for error conflicts that is updated on errors
+	 * @param tzId - the Timezone id of the user
 	 * @param dtFormat - the date time format of the current user
 	 */
 	@Transactional
-	void setCommonProperties(Project project, AssetEntity asset, dtv, int rowNum, List<String> warnings,
-	                        int errorConflictCount, String dtFormat) {
+	void setCommonProperties(
+		Project project,
+		AssetEntity asset,
+		def dtv,
+		Integer rowNum,
+		List<String> warnings,
+		Integer errorConflictCount,
+		String tzId,
+		String dtFormat
+	) {
 		// def handled = true
 		String property = dtv.eavAttribute.attributeCode
 		String value = dtv.importValue
@@ -1320,9 +1341,9 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				break
 			case 'rateOfChange':
 			case 'size':
-				newVal = NumberUtils.toDouble(value, 0).round()
-				if (asset[property]!= newVal) {
-					asset[property] = newVal
+				Integer ival = NumberUtil.toInteger(value, 0)
+				if (asset.size != ival) {
+					asset.size = ival
 				}
 				break
 			case 'scale':

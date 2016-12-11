@@ -717,7 +717,7 @@ class ImportService implements ServiceMethods {
 			dtvList?.clear()
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
-			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			application = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, Application, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 			if (application == null)
 				continue
@@ -981,7 +981,7 @@ class ImportService implements ServiceMethods {
 				dtvList?.clear()
 				dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
-				def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+				Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 				asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 				if (!asset) {
 					continue
@@ -1327,7 +1327,7 @@ class ImportService implements ServiceMethods {
 			dtvList?.clear()
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch,rowId)
 
-			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass,
 				assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 			if (!asset)
@@ -1455,10 +1455,10 @@ class ImportService implements ServiceMethods {
 
 		jobProgressUpdate(progressKey, 1, assetCount)
 
-		def nullProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'nullable', true)
-		def blankProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'blank', true)
+		List nullProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'nullable', true)
+		List blankProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'blank', true)
 
-		def dtvList
+		List dtvList
 
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++) {
 			now = new Date()
@@ -1471,7 +1471,7 @@ class ImportService implements ServiceMethods {
 			dtvList?.clear()
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
-			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 
 			if (asset == null)
@@ -1484,6 +1484,8 @@ class ImportService implements ServiceMethods {
 
 			dtvList.each {
 				def attribName = it.eavAttribute.attributeCode
+
+println "*** attribName=$attribName, ${it.getClass().getName()}"
 
 				// If trying to set to NULL - call the closure to update the property and move on
 				if (it.importValue == "NULL") {
