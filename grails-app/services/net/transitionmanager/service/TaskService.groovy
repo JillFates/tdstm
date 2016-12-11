@@ -1274,7 +1274,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						td.each { t ->
 							// Try to match up the outer dep count to the task dependency node
 							def outerDep = outerDeps?.find() { od -> od.id == t[nextProp].id }
-							def outerDepCount = outerDep ? outerDep.cnt : 0
+							Integer outerDepCount = outerDep ? outerDep.cnt : 0
 							if(isPred){
 								t.setTmpPredecessorDepCount(outerDepCount)
 							}else{
