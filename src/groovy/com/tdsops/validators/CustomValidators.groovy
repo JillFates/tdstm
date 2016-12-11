@@ -26,7 +26,7 @@ class CustomValidators {
 			def blank = GormUtil.getConstraintValue(object.getClass(), fieldName, 'blank')
 			def nullable = GormUtil.getConstraintValue(object.getClass(), fieldName, 'nullable')
 
-			if ((value == null && nullable && blank) ||
+			if ((value == null && nullable) ||
 			    (value == '' && blank) ||
 			     value.toString() in validValues) {
 				return
@@ -41,12 +41,12 @@ class CustomValidators {
 	 * Creates a closure for the first parameter of the inList method that returns
 	 * the list of {@link AssetOptions} with the specific type
 	 *
-	 * @param type the AssetOptions type
+	 * @param type - the AssetOptions type to lookup values for
 	 * @return the list closure
 	 */
 	static Closure optionsClosure(type) {
 		return {
-			return AssetOptions.findAllByType(type)*.value
+			AssetOptions.findAllByType(type)*.value
 		}
 	}
 }
