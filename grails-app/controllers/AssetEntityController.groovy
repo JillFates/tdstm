@@ -3475,35 +3475,17 @@ class AssetEntityController implements ControllerMethods {
 	 * @return : HTML code containing support and dependent edit form
 	 */
 	def populateDependency() {
-
-		Project project = securityService.userCurrentProject
-
-		// TODO : JPM 10/2014 : Move populateDependency method to a service to avoid muliple transations just to populate a model
-
-		Long id = params.long('id')
-		if (id) {
-			render "An invalid asset id was submitted"
-			return
+		try {
+			Map model = assetEntityService.dependencyEditMap(params)
+			render(template:'dependentCreateEdit', model:model)
 		}
-
-		def assetEntity = AssetEntity.findByIdAndProject(id, project)
-		if (!assetEntity) {
-			render "Unable to find requested asset"
-			return
+		catch (InvalidRequestException e) {
+			render e.message
 		}
-
-		// TODO - JPM 8/2014 - Why do we have this? Seems like we should NOT be passing that to the template...
-		def nonNetworkTypes = [AssetType.SERVER, AssetType.APPLICATION, AssetType.VM, AssetType.FILES,
-		                       AssetType.DATABASE, AssetType.BLADE]*.toString()
-
-		render(template: 'dependentCreateEdit',
-		       model: [assetClassOptions: AssetClass.classOptions, assetEntity: assetEntity,
-		               dependencyStatus: assetEntityService.getDependencyStatuses(),
-		               dependencyType: assetEntityService.getDependencyTypes(),
-		               whom: params.whom, nonNetworkTypes: nonNetworkTypes,
-		               supportAssets: assetEntityService.getSupportingAssets(assetEntity),
-		               dependentAssets: assetEntityService.getDependentAssets(assetEntity),
-		               moveBundleList: assetEntityService.getMoveBundles(project)])
+		catch (e) {
+			log.error ExceptionUtil.stackTraceToString('Unable load dependency model', e)
+			render 'Unable to load dependencies due to a run-time error'
+		}
 	}
 
 	/**
