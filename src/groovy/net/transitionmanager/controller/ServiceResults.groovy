@@ -1,3 +1,5 @@
+package net.transitionmanager.controller
+
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import grails.converters.JSON
@@ -14,7 +16,7 @@ import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 /**
- * Utility class for creating HTTP responses.
+ * Utility class for creating HTTP responses
  */
 class ServiceResults {
 

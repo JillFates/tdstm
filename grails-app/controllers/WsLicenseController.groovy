@@ -12,6 +12,8 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.license.LicenseService
 
+import net.transitionmanager.controller.ServiceResults
+
 /**
  * Created by octavio on 11/14/16.
  */

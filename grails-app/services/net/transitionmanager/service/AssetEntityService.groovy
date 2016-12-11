@@ -31,8 +31,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
-import grails.converters.JSON
-import grails.transaction.Transactional
+import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.KeyValue
@@ -48,6 +47,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.utils.Profiler
+
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
@@ -59,6 +59,8 @@ import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
+import grails.converters.JSON
+import grails.transaction.Transactional
 import javax.servlet.http.HttpSession
 import java.util.regex.Matcher
 
