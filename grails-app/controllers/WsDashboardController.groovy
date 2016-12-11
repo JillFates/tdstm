@@ -221,8 +221,12 @@ class WsDashboardController implements ControllerMethods {
 				}
 			}
 
+			int totalNumTasks = data.tskTot ? data.tskTot.intValue() : 0
+			int tasksCompleted = data.tskComp ? data.tskComp.intValue() : 0
+
 			def dialIndicator = taskService.calcStepDialIndicator(moveBundle.startTime, moveBundle.completionTime,
-				data.actStart, data.actFinish, data.tskTot ?: 0, data.tskComp)
+				data.actStart, data.actFinish, totalNumTasks, tasksCompleted)
+
 			data.dialInd = dialIndicator
 			data.startOverdueDuration = startOverdueDuration
 			data.compOverdueDuration = compOverdueDuration
@@ -277,9 +281,9 @@ class WsDashboardController implements ControllerMethods {
 				dialInd: moveEventPlannedSnapshot?.dialIndicator, 'confText' : 'High',
 				confColor: 'green', compTime: planSumCompTime,
 				dayTime: '<span><b>' +
-					${dayTime?.days ? (dayTime?.days > 10 ? dayTime?.days : '0' + dayTime?.days) : '0'} + ':' +
-					${dayTime?.hours ? (dayTime?.hours > 10 ? dayTime?.hours : '0' + dayTime?.hours) : '00'} + ':' +
-					${dayTime?.minutes ? (dayTime?.minutes > 10 ? dayTime?.minutes :'0' + dayTime?.minutes) : '00'} +
+					dayTime?.days ? (dayTime?.days > 10 ? dayTime?.days : '0' + dayTime?.days) : '0' + ':' +
+					dayTime?.hours ? (dayTime?.hours > 10 ? dayTime?.hours : '0' + dayTime?.hours) : '00' + ':' +
+					dayTime?.minutes ? (dayTime?.minutes > 10 ? dayTime?.minutes :'0' + dayTime?.minutes) : '00' +
 				'</b></span>',
 				eventDescription: moveEvent?.description, eventString: eventString,
 				eventRunbook: moveEvent?.runbookStatus

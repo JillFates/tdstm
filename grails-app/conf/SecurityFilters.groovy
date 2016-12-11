@@ -75,10 +75,11 @@ class SecurityFilters {
 						}
 					}
 
-					if (!/*subject. TODO BB */isAuthenticated()) {
-						response.sendError(401, 'Unauthorized')
-						return false
-					}
+					// If user is loggedIn then they're authenticated so this logic doesn't make sense...
+					// if (!/*subject. TODO BB */isAuthenticated()) {
+					// 	response.sendError(401, 'Unauthorized')
+					// 	return false
+					// }
 
 					if (!moveObject) {
 						response.sendError(404, "Not Found")
