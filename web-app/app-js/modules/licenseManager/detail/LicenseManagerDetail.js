@@ -4,15 +4,19 @@
 
 'use strict';
 
-export default class LicenseManagerDetail {
+import FormValidator from '../../utils/form/FormValidator.js';
 
-    constructor($log, licenseManagerService, $uibModal, $uibModalInstance, params) {
+export default class LicenseManagerDetail extends FormValidator{
+
+    constructor($log, $scope, licenseManagerService, $uibModal, $uibModalInstance, params) {
+        super($log, $scope, $uibModal, $uibModalInstance);
         this.licenseManagerService = licenseManagerService;
         this.uibModalInstance = $uibModalInstance;
         this.uibModal =$uibModal;
         this.log = $log;
 
         this.editMode = false;
+
         this.licenseModel = {
             id: params.license.id,
             ownerName: params.license.owner.name,
@@ -24,41 +28,47 @@ export default class LicenseManagerDetail {
             method: {
                 id: params.license.method.id,
                 name: params.license.method.name,
-                quantity: params.license.method.max,
+                max: params.license.method.max,
             },
             environment: { id: params.license.environment.id },
             requestDate: params.license.requestDate,
-            initDate: params.license.initDate,
-            endDate: params.license.endDate,
+            initDate: (params.license.activationDate !== null)? params.license.activationDate : '',
+            endDate: (params.license.expirationDate !== null)? params.license.expirationDate : '',
             specialInstructions: params.license.requestNote,
+            websiteName: params.license.websitename,
+
             bannerMessage: params.license.bannerMessage,
             requestedId: params.license.requestedId,
             replaced: params.license.replaced,
             replacedId: params.license.replacedId,
             activityList: params.license.activityList,
             hostName: params.license.hostName,
-            websiteName: params.license.websiteName,
             hash: params.license.hash,
 
             applied: params.license.applied,
             keyId: params.license.keyId
         };
 
-        // Creates the Kendo Project Select List
+        // Creates the Project Select List
         // Define the Project Select
         this.selectProject = {};
         this.selectProjectListOptions = [];
         this.getProjectDataSource();
 
         // Defined the Environment Select
+        this.selectEnvironment = {};
         this.selectEnvironmentListOptions = [];
         this.getEnvironmentDataSource();
+
+        // Defined the Status Select List
+        this.selectStatus = [];
+        this.getStatusDataSource();
 
         // Init the two Kendo Dates for Init and EndDate
         this.initDate = {};
         this.initDateOptions = {
             format: 'yyyy/MM/dd',
-            max: this.licenseModel.endDate,
+            max: (this.licenseModel.endDate !== null)? this.licenseModel.endDate : new Date(),
             change: ((e) => {
                 this.onChangeInitDate();
             })
@@ -67,7 +77,7 @@ export default class LicenseManagerDetail {
         this.endDate = {};
         this.endDateOptions = {
             format: 'yyyy/MM/dd',
-            min: this.licenseModel.initDate,
+            min: (this.licenseModel.initDate !== null)? this.licenseModel.initDate : new Date(),
             change: ((e) => {
                 this.onChangeEndDate();
             })
@@ -75,7 +85,7 @@ export default class LicenseManagerDetail {
 
 
 
-        this.getStatusDataSource();
+
 
         this.prepareMethodOptions();
         this.prepareLicenseKey();
@@ -97,6 +107,8 @@ export default class LicenseManagerDetail {
                             if(!this.licenseModel.projectId) {
                                 this.licenseModel.projectId = data[0].id;
                             }
+
+                            this.saveForm(this.licenseModel);
                             return e.success(data);
                         })
                     }
@@ -127,12 +139,12 @@ export default class LicenseManagerDetail {
             {
                 id: 1,
                 name: 'Servers',
-                quantity: 0
+                max: 0
             },
             {
                 id: 2,
                 name: 'Tokens',
-                quantity: 0
+                max: 0
             },
             {
                 id: 3,
@@ -215,18 +227,18 @@ export default class LicenseManagerDetail {
      */
     validateIntegerOnly(e){
         try {
-            var newVal= parseInt(this.licenseModel.method.quantity);
+            var newVal= parseInt(this.licenseModel.method.max);
             if(!isNaN(newVal)) {
-                this.licenseModel.method.quantity = newVal;
+                this.licenseModel.method.max = newVal;
             } else {
-                this.licenseModel.method.quantity = 0;
+                this.licenseModel.method.max = 0;
             }
 
             if(e && e.currentTarget && e.currentTarget.value) {
-                e.currentTarget.value = this.licenseModel.method.quantity;
+                e.currentTarget.value = this.licenseModel.method.max;
             }
         } catch(e) {
-            this.$log.warn('Invalid Number Expception', this.licenseModel.method.quantity);
+            this.$log.warn('Invalid Number Expception', this.licenseModel.method.max);
         }
     }
 
@@ -234,10 +246,15 @@ export default class LicenseManagerDetail {
      * Save current changes
      */
     saveLicense() {
-        this.licenseManagerService.saveLicense(this.licenseModel, (data) => {
-            this.uibModalInstance.close(data);
-            this.log.info('License Saved');
-        });
+        if(this.isDirty()) {
+            this.editMode = false;
+            this.prepareControlActionButtons();
+            this.licenseManagerService.saveLicense(this.licenseModel, (data) => {
+                this.reloadRequired = true;
+                this.saveForm(this.licenseModel);
+                this.log.info('License Saved');
+            });
+        }
     }
 
     /**
@@ -275,12 +292,17 @@ export default class LicenseManagerDetail {
      * Populate values
      */
     getStatusDataSource() {
-        this.statusDataSource = [
-            {id: 1, name: 'Active'},
-            {id: 2, name: 'Expired'},
-            {id: 3, name: 'Terminated'},
-            {id: 4, name: 'Pending'}
-        ];
+        this.selectStatusListOptions = {
+            dataSource: [
+                {id: 1, name: 'Active'},
+                {id: 2, name: 'Expired'},
+                {id: 3, name: 'Terminated'},
+                {id: 4, name: 'Pending'}
+            ],
+            dataTextField: 'name',
+            dataValueField: 'id',
+            valuePrimitive: true
+        }
     }
 
     /**
@@ -330,11 +352,29 @@ export default class LicenseManagerDetail {
      */
     cancelCloseDialog() {
         if(this.editMode) {
-            this.editMode = false;
-            this.prepareControlActionButtons();
+            this.resetForm(()=> {
+                this.onResetForm();
+            });
+        } else if(this.reloadRequired){
+            this.uibModalInstance.close({});
         } else {
             this.uibModalInstance.dismiss('cancel');
         }
+    }
+
+    /**
+     * Depeding the number of fields and type of field, the reset can't be on the FormValidor, at least not now
+     */
+    onResetForm() {
+        // Reset Project Selector
+        this.resetDropDown(this.selectProject, this.licenseModel.projectId);
+        this.resetDropDown(this.selectStatus, this.licenseModel.statusId);
+        this.resetDropDown(this.selectEnvironment, this.licenseModel.environment.id);
+        this.onChangeInitDate();
+        this.onChangeEndDate();
+
+        this.editMode = false;
+        this.prepareControlActionButtons();
     }
 
 }

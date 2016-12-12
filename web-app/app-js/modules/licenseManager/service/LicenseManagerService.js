@@ -45,8 +45,18 @@ export default class LicenseManagerService {
     saveLicense(license, onSuccess) {
 
         var licenseModified = {
-            environment: { id: parseInt(license.environment.id) }
+            environment: { id: parseInt(license.environment.id) },
+            method: {
+                id: parseInt(license.method.id)
+            },
+            activationDate: license.initDate,
+            expirationDate: license.endDate,
+            status: { id: license.statusId }
         };
+
+        if(license.method !== 3) {
+            licenseModified.method.max = parseInt(license.method.max);
+        }
 
         this.restService.licenseManagerServiceHandler().saveLicense(license.id, licenseModified, (data) => {
             return onSuccess(data);

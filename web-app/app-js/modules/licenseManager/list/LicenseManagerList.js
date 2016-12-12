@@ -40,7 +40,7 @@ export default class LicenseManagerList {
                 {field: 'method.name', title: 'Method'},
                 {field: 'method.id', hidden: true},
                 {field: 'method.max', title: 'Server/Tokens'},
-                {field: 'requestDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}' },
+                {field: 'activationDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}' },
                 {field: 'expirationDate', title: 'Expiration', type: 'date', format : '{0:dd/MMM/yyyy}' },
                 {field: 'environment.name', title: 'Env.'}
             ],
