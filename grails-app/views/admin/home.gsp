@@ -3,6 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
 <g:javascript src="admin.js" />
+<g:javascript src="projectStaff.js" />
 <title>TDS TransitionManager&trade; Admin Portal</title>
 <style type="text/css">
 a:hover {
