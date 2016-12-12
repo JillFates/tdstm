@@ -472,9 +472,13 @@ class ProjectController implements ControllerMethods {
 	 */
 	def showImage() {
 		if( params.id ) {
-	 		def image = ProjectLogo.get( params.id )?.partnerImage?.binaryStream
+	 		ProjectLogo logo = ProjectLogo.get( params.id )
 	 		response.contentType = 'image/jpg'
-	 		response.outputStream << image
+	 		if (logo) {
+				response.outputStream << logo.partnerImage
+			}
+			// TODO : JPM 12/2016 : showImage() should have solution for missing logos
+			response.outputStream.flush()
 		}
 	}
 

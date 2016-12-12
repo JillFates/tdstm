@@ -11,7 +11,7 @@ import java.sql.Blob
 class ProjectLogo {
 
 	String name
-	Blob partnerImage
+	byte[] partnerImage
 	Project project
 
 	static constraints = {
@@ -24,8 +24,8 @@ class ProjectLogo {
 
 	static transients = ['size', 'data']
 
-	void setData(InputStream is, long length) {
-		partnerImage = Hibernate.createBlob(is, length)
+	void setData(InputStream is) {
+		partnerImage = is.getBytes()
 	}
 
 	long getSize() {
@@ -52,7 +52,7 @@ class ProjectLogo {
 		}
 
 		ProjectLogo pl = findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
-		pl.setData file.inputStream, file.size
+		pl.setData file.inputStream
 
 		if (!pl.save(flush: true)) {
 			// TODO : JPM : 3/3/2016 : need to figure out how we are going to handle the failure case for createOrUpdate()
