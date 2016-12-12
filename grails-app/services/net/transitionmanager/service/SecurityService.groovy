@@ -742,6 +742,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			throw new InvalidParamException('A project must be selected')
 		}
 
+		UserLogin byWhom = getUserLogin()
+
 		Project project = Project.get(params.long('projectId'))
 		if (!project) {
 			throw new InvalidParamException('Specified project was not found')
@@ -929,7 +931,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		if (params.projectId) {
-			personService.addToProject((String) params.projectId, person.id.toString())
+			personService.addToProject(byWhom, (String) params.projectId, person.id.toString())
 		}
 
 		return userLogin
