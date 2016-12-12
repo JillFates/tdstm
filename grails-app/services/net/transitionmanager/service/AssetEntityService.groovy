@@ -244,10 +244,9 @@ class AssetEntityService implements ServiceMethods {
 			}
 
 			query.append(fromQuery).append(whereQuery)
-
 			query.append(' ORDER BY text')
-println "**** query=$query"
-			def assets = typeInfo.domain.executeQuery(query.toString(), qparams, additionalFilters)
+
+			List assets = typeInfo.domain.executeQuery(query.toString(), qparams, additionalFilters)
 			assets.each { a -> results << [id: a[0], name: a[1]]}
 			return results
 		}
