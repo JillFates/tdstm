@@ -4830,8 +4830,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		int taskCountByEvent = 0
 
 		if (moveEvent) {
-			def criteria = AssetComment.createCriteria()
-			taskCountByEvent = criteria.list {
+			taskCountByEvent = AssetComment.createCriteria().list {
 				projections {
 					count()
 				}
@@ -4870,20 +4869,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * This special method is used to find given event task summary (teamTaskCounts, teamTaskDoneCount)
-	 * @param MoveEvent moveEvent object
-	 * @return loadedGroups Map<List> - A mapped list of the taskCounts, teamTaskDoneCount.
+	 * Used to retrieve a breakdown of task summary by team for a given event
+	 * @param moveEvent - the event object to fetch data for
+	 * @return A map of mapped values (taskCounts, teamTaskDoneCount and role)
 	 */
-	def getMoveEventTeamTaskSummary(def moveEvent, def viewUnpublished = false){
-		def teamTaskMap =[:]
-		def publishedValues = [true]
-		if (viewUnpublished)
-			publishedValues = [true, false]
+	Map getMoveEventTeamTaskSummary(MoveEvent moveEvent, Boolean viewUnpublished = false){
+		Map teamTaskMap =[:]
+		List publishedValues = viewUnpublished ? [true,false] : [true]
 		if (moveEvent) {
 			getTeamRolesForTasks().each { role ->
 				def teamTask = AssetComment.findAllByMoveEventAndRoleAndIsPublishedInList(moveEvent, role.id, publishedValues)
 				def teamDoneTask = teamTask.findAll { it.status == 'Completed' }
-				if(teamTask){
+				if (teamTask) {
 					teamTaskMap[role.id] = [teamTaskCount:teamTask.size(), teamDoneCount:teamDoneTask.size(), role:role]
 				}
 			}
@@ -4891,6 +4888,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return teamTaskMap
 	}
 
+	/**
+	 * Used to reset the default status values for a batch of tasks
+	 * @param taskBatchId - the id of the TaskBatch to be reset
+	 */
 	def resetTasksOfTaskBatch(taskBatchId) {
 		securityService.requirePermission 'PublishTasks'
 		controllerService.getRequiredProject()
