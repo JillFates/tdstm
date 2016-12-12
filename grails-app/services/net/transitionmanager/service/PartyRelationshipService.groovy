@@ -55,18 +55,17 @@ class PartyRelationshipService implements ServiceMethods {
 		}
 	}
 
-	void deletePartyRelationship(String relationshipTypeId, Project project, String fromRoleTypeId,
-		Person person, String toRoleTypeId) {
+	void deletePartyRelationship(String relationshipTypeId, Party partyFrom, String fromRoleTypeId, Party partyTo, String toRoleTypeId) {
 
 		PartyRelationship.executeUpdate('''
 			delete PartyRelationship pr
-			where pr.partyIdTo = :person
-			  and pr.partyIdFrom = :project
+			where pr.partyIdTo = :partyTo
+			  and pr.partyIdFrom = :partyFrom
 			  and pr.roleTypeCodeTo = :roleTypeTo
 			  and pr.roleTypeCodeFrom = :roleTypeFrom
 			  and pr.partyRelationshipType = :relationshipType
 		''', [roleTypeTo: RoleType.load(toRoleTypeId), roleTypeFrom: RoleType.load(fromRoleTypeId),
-		      person: person, project: project, relationshipType: PartyRelationshipType.load(relationshipTypeId)])
+		      partyTo: partyTo, partyFrom: partyFrom, relationshipType: PartyRelationshipType.load(relationshipTypeId)])
 	}
 
 	/**
@@ -415,10 +414,10 @@ class PartyRelationshipService implements ServiceMethods {
                 p.roleTypeCodeFrom = 'PROJECT' and \
                 p.roleTypeCodeTo = 'PARTNER'\
             "
- 
+
         def dependents = PartyRelationship.findAll( query, [party:party] )
         List<Project> projects = dependents.collect{ it.partyIdFrom }
- 
+
         return projects
     }
 
