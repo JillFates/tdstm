@@ -247,7 +247,7 @@ class NewsEditorController implements ControllerMethods {
 		def dtResolved
 		def assetName
 		def commentType = params.commentType
-		AssetComment commentObject
+		Object commentObject
 		if (commentType == 'issue' || commentType == 'I') {
 			commentObject = AssetComment.get(params.id)
 			if (commentObject?.resolvedBy) {
@@ -268,9 +268,16 @@ class NewsEditorController implements ControllerMethods {
 			dtCreated = TimeUtil.formatDateTime(commentObject.dateCreated, TimeUtil.FORMAT_DATE_TIME_9)
 		}
 
-		List commentList = [[commentObject: commentObject, personCreateObj: personCreateObj,
-		                     personResolvedObj: personResolvedObj, dtCreated: dtCreated ?: '',
-		                     dtResolved: dtResolved ?: '', assetName: assetName]]
+		List commentList = [
+			[
+				commentObject: commentObject,
+				personCreateObj: personCreateObj,
+				personResolvedObj: personResolvedObj,
+				dtCreated: dtCreated ?: '',
+				dtResolved: dtResolved ?: '',
+				assetName: assetName
+			]
+		]
 		render commentList as JSON
 	}
 
