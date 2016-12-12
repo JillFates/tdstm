@@ -4835,7 +4835,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		if (moveEvent) {
-			// taskCountByEvent = AssetComment.countByMoveEventAndIsPublishedInList(moveEvent, publishedValues)
 			def criteria = AssetComment.createCriteria()
 			taskCountByEvent = criteria.list {
 				projections {
@@ -4850,7 +4849,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}[0]
 
 			for (status in ACS.topStatusList) {
-				// List tasks = AssetComment.findAllByMoveEventAndStatusAndIsPublishedInList(moveEvent, status, publishedValues)
 				List tasks = AssetComment.createCriteria().list {
 					eq 'moveEvent', moveEvent
 					and {
