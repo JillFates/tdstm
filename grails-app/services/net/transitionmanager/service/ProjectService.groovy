@@ -1042,14 +1042,23 @@ class ProjectService implements ServiceMethods {
 			ORDER BY ae.project_id, mb.use_for_planning
 		""")
 
-		jdbcTemplate.queryForList(assetsCountsQuery.toString()).each { Map<String, Object> it ->
-			ProjectDailyMetric projectDailyMetric
+		// This property will get used repeatedly in the following each iterator
+		ProjectDailyMetric projectDailyMetric
+
+		List assetsCountsList = jdbcTemplate.queryForList(assetsCountsQuery.toString())
+		assetsCountsList.each { Map<String, Object> it ->
+
 			if (project == null || project.id != it.project_id) {
 				project = Project.get(it.project_id)
 				projects << project
 				projectDailyMetric = new ProjectDailyMetric(project: project, metricDate: searchDate)
 				metricsByProject[project.id] = projectDailyMetric
 				metrics << projectDailyMetric
+			}
+
+			if (!projectDailyMetric) {
+				log.error "fillAssetsMetrics() projectDailyMetric property was not properly assigned"
+				return
 			}
 
 			assetClass = AssetClass.safeValueOf(it.asset_class)
