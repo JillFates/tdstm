@@ -4829,11 +4829,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		int totalDuration = 0
 		int taskCountByEvent = 0
 
-		boolean publishedValues = [true]
-		if (viewUnpublished) {
-			publishedValues = [true, false]
-		}
-
 		if (moveEvent) {
 			def criteria = AssetComment.createCriteria()
 			taskCountByEvent = criteria.list {
