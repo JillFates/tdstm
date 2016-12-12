@@ -2,6 +2,7 @@
 	<table>
 		<thead>
 			<tr>
+				<th>Unused</th>
 				<th>Type</th>
 				<th>Projects</th>
 				<th>Models</th>
@@ -9,8 +10,13 @@
 			</tr>
 		</thead>
 		<tbody>
-			<g:each in="${returnMap}" var="assets" status="i">
+			<g:each in="${assetTypes}" var="assets" status="i">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+					<td>
+						<g:if test="${assets[5]}">
+							<img src="${resource(dir:'icons',file:'tick.png')}" alt="Will be purged" />
+						</g:if>
+					</td>
 					<td>
 						${assets[0]}
 					</td>

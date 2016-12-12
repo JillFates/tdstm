@@ -1107,19 +1107,22 @@ class AdminController implements ControllerMethods {
 		if (!project) {
 			return
 		}
-
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute, [sort: 'value']).value
-		def returnMap = []
+		List assetTypes = []
 		assetTypeOptions.remove('Blade') // TODO : temp fix to resolve the below issue
 		assetTypeOptions.each { type ->
 			def modelCount = Model.findAllByAssetType(type)
 			def assets = AssetEntity.findAllByAssetType(type) // TODO : getting Exception when type=Blade. assuming data issue.
 			Set projects = assets?.project
-			returnMap << [type, assets.size(), modelCount.size(), assets[0]?.project?.name ?: '',
-			              projects.size() > 1 ? projects.size() - 1 : '']
+			int assetRef = assets.size()
+			int modelRef = modelCount.size()
+			String projectRef = assets[0]?.project?.name ?: ''
+			String projectCnt = projects.size() > 1 ? projects.size() - 1 : ''
+			boolean toPurge = (assetRef == 0 && modelRef == 0)
+			assetTypes << [type, assetRef, modelRef, projectRef, projectCnt, toPurge]
 		}
-		render(template: 'getAssetTypes', model: [returnMap: returnMap])
+		render(template: 'getAssetTypes', model: [assetTypes: assetTypes])
 	}
 
 	/**
@@ -1145,9 +1148,9 @@ class AdminController implements ControllerMethods {
 			}
 		}
 
-		render !deletedTypes ? '' :
-				'Removed ' + deletedTypes.size() + ' unused Types: ' +
-						WebUtil.listAsMultiValueString(deletedTypes)
+		render !deletedTypes ? 'No asset types found that are unreferenced by assets or models.' :
+			'Removed ' + deletedTypes.size() + ' unused Types: ' +
+			WebUtil.listAsMultiValueString(deletedTypes)
 	}
 
 	/**

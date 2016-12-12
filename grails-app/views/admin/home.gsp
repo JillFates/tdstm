@@ -105,15 +105,11 @@ a:hover {
 			</div>
 			<br />
 			<div>
+				<h1 style="margin-right: 0px;"><b>Misc Administrative Functions</b></h1>
 				<table class="admin-home">
-					<thead>
-						<tr>
-							<th colspan="2">Misc. Admin functions</th>
-						</tr>
-					</thead>
 					<tbody>
 						<tr class="odd">
-							<td><g:link controller="partyGroup" style="color:black">Company</g:link></td>
+							<td><g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link></td>
 							<td><g:link controller="roleType" style="color:black">Teams (Role Type) </g:link></td>
 						</tr>
 						<tr class="even">
@@ -127,27 +123,26 @@ a:hover {
 							</td>
 						</tr>
 						<tr class="even">
-							<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Show/Clean Types </a></td>
+							<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Purge Unused Asset Types </a></td>
 							<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
 						</tr>
 						<tr class="odd">
 							<td>
-								<g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link>
+								<tds:hasPermission permission='ShowProjectDailyMetrics'>
+									<g:link controller="project" action="launchProjectDailyMetricsJob" style="color:black">Launch Project Daily Metrics Job</g:link>
+								</tds:hasPermission>
 							</td>
+
 							<td>
-								<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link>
 							</td>
 						</tr>
-						<tds:hasPermission permission='ShowProjectDailyMetrics'>
-						<tr class="even">
-							<td colspan="2">
-								<g:link controller="project" action="launchProjectDailyMetricsJob" style="color:black">Launch Project Daily Metrics Job</g:link>
-							</td>
-						</tr>
-						</tds:hasPermission>
+
 					</tbody>
 				</table>
 			</div>
+
+<%-- The following section are various popup dialogs that are used by the menu items --%>
+
 			<br />
 			<div id="reconcileAssetsFormId" style="display: none;">
 				<table class="admin-home">
@@ -187,8 +182,8 @@ a:hover {
 							<td><span>Encrypt Alghoritm</span></td>
 							<td>
 								<select name="encryptAlghoritm" id="encryptAlghoritm">
-									<option value="DES" selected>DES</option>
-									<option value="AES">AES</option>
+									<option value="AES" selected>AES</option>
+									<option value="DES">DES</option>
 								</select>
 							</td>
 						</tr>
@@ -226,15 +221,19 @@ a:hover {
 	</div>
 	</div>
 </div>
-<div id="showOrCleanTypeId" title="Clean Asset Types">
+<div id="showOrCleanTypeId" title="Purge Unused Asset Types">
 	<div id="cleanProcessId" style="display: none; " >
 		Processing...<img src="${resource(dir:'images',file:'processing.gif')}" />
 	</div>
 	<div id="cleanProcessDivId" class="cleanProcessDiv">
-		<img src="${resource(dir:'images',file:'processing.gif')}" />
+		<p>
+		The following list will display existing Asset Types that are created by Device Import Process. Those that
+		have no references to models or devices will be indicated with a checkmark and can be safely purged.
+		</p>
+		<b>Loading List</b> <img src="${resource(dir:'images',file:'processing.gif')}" />
 	</div>
 	<div class="buttons">
-		<input type="button" id="cleanTypes" class="save" value="Clean" onclick="cleanTypes()"/>
+		<input type="button" id="cleanTypes" class="save" value="Purge" onclick="cleanTypes()"/>
 		<input type="button"  class="delete" value="Cancel" onclick="jQuery('#showOrCleanTypeId').dialog('close')"/>
 	</div>
 </div>

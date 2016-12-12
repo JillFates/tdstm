@@ -8,7 +8,7 @@ function processBatch () {
 			data: {'deleteHistory':value},
 			type: 'POST',
 			beforeSend: function(jqXHR) {
-				$('#processDivId').show(); 
+				$('#processDivId').show();
 				$("#respMsgId").hide();
 				$("#processDivId").show()
 			},
@@ -23,7 +23,7 @@ function processBatch () {
 		})
 	}
 }
-	
+
 function openFlushDiv () {
 	jQuery.ajax({
 		url: contextPath+'/admin/retrieveBatchRecords',
@@ -51,33 +51,34 @@ function openFlushDiv () {
 /*
  *this function is used to show the asset type table dialog
  */
-function openShowTypeDiv () {
-	$("#cleanProcessId").hide()
-	$("#cleanProcessDivId").hide()
+function openShowTypeDiv() {
+	$("#cleanProcessId").hide();
+	$("#cleanProcessDivId").hide();
 	jQuery.ajax({
 		url: contextPath+'/admin/retrieveAssetTypes',
 		type: 'POST',
 		beforeSend: function(jqXHR) {
-			$("#showOrCleanTypeId").dialog('option', 'width', '500px')
+			alert('beforeSend');
+			$("#showOrCleanTypeId").dialog('option', 'width', '550px');
 			$("#showOrCleanTypeId").dialog('option', 'position', ['center','top']);
 			$("#showOrCleanTypeId").dialog('option', 'modal', 'true');
-			$("#showOrCleanTypeId").dialog('open')
-			$("#showCleanTypeMsgId").hide()
-			$("#cleanProcessDivId").show()
+			$("#showOrCleanTypeId").dialog('open');
+			$("#showCleanTypeMsgId").hide();
+			$("#cleanProcessDivId").show();
 		},
 		success: function(data) {
-			$("#cleanProcessDivId").html(data)
+			$("#cleanProcessDivId").html(data);
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while opening Show/Clean type div. Please reload form to see if the problem persists")
+			alert("An unexpected error occurred while opening Show/Clean type div. Please reload form to see if the problem persists.");
 		}
-	})
+	});
 }
 
 /*
  *this function is used to Clean unused asset and display appropriate message.
  */
-function cleanTypes () {
+function cleanTypes() {
 	$("#cleanProcessId").show()
 	jQuery.ajax({
 		url: contextPath+'/admin/cleanAssetTypes',
@@ -87,10 +88,10 @@ function cleanTypes () {
 				$("#showCleanTypeMsgId").html(data)
 				$("#showCleanTypeMsgId").show();
 			} else {
-				$("#showCleanTypeMsgId").html("No Unused asset type found")
+				$("#showCleanTypeMsgId").html("No unreferenced asset types were found.")
 				$("#showCleanTypeMsgId").show();
 			}
-			jQuery('#showOrCleanTypeId').dialog('close')
+			jQuery('#showOrCleanTypeId').dialog('close');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while opening Show/Clean type div. Please reload form to see if the problem persists")
