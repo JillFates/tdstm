@@ -218,13 +218,13 @@ class AssetEntityService implements ServiceMethods {
 			}
 
 			// TODO: We should include more fields.
-			StringBuffer query = new StringBuffer("SELECT a.id as id, a.assetName as text")
+			StringBuilder query = new StringBuilder("SELECT a.id as id, a.assetName as text")
 
-			StringBuffer fromQuery = new StringBuffer(" FROM ")
-					.append(typeInfo.domain.name)
-					.append(" AS a")
+			StringBuilder fromQuery = new StringBuilder(" FROM ")
+				.append(typeInfo.domain.name)
+				.append(" AS a")
 
-			StringBuffer whereQuery = new StringBuffer(" WHERE a.project=:project AND a.assetClass=:assetClass")
+			StringBuilder whereQuery = new StringBuilder(" WHERE a.project=:project AND a.assetClass=:assetClass")
 
 			def qparams = [project:project, assetClass:typeInfo.assetClass]
 
@@ -244,6 +244,9 @@ class AssetEntityService implements ServiceMethods {
 			}
 
 			query.append(fromQuery).append(whereQuery)
+
+			query.append(' ORDER BY text')
+println "**** query=$query"
 			def assets = typeInfo.domain.executeQuery(query.toString(), qparams, additionalFilters)
 			assets.each { a -> results << [id: a[0], name: a[1]]}
 			return results
@@ -2148,7 +2151,7 @@ class AssetEntityService implements ServiceMethods {
 
 			//get project Id
 			def dataTransferSet = params.dataTransferSet
-			def bundleNameList = new StringBuffer()
+			def bundleNameList = new StringBuilder()
 			UserLogin userLogin = UserLogin.findByUsername(params.username)
 
 			def bundle = params.bundle
@@ -3479,8 +3482,8 @@ class AssetEntityService implements ServiceMethods {
 
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%$params.moveBundle%", project) : []
 
-		StringBuffer altColumns = new StringBuffer()
-		StringBuffer joinQuery = new StringBuffer()
+		StringBuilder altColumns = new StringBuilder()
+		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
 		altColumns.append("\n, srcRack.tag AS sourceRack, srcRoom.location AS sourceLocation")
@@ -3573,7 +3576,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
-		def query = new StringBuffer("""
+		def query = new StringBuilder("""
 			SELECT * FROM (
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName,
 				ae.asset_type AS assetType, m.name AS model,
@@ -3767,11 +3770,11 @@ class AssetEntityService implements ServiceMethods {
 			manufacturer = Manufacturer.read(manuId)
 		}
 
-		def hql = new StringBuffer('SELECT m.id, m.assetType, m.modelName, man.id as manId, man.name as manName, m.modelStatus, m.usize as usize FROM Model m JOIN m.manufacturer as man')
+		def hql = new StringBuilder('SELECT m.id, m.assetType, m.modelName, man.id as manId, man.name as manName, m.modelStatus, m.usize as usize FROM Model m JOIN m.manufacturer as man')
 
 		def params = []
 
-		StringBuffer where = new StringBuffer()
+		StringBuilder where = new StringBuilder()
 
 		if (manufacturer) {
 			SqlUtil.appendToWhere(where, "m.manufacturer=?", 'AND')
@@ -3786,7 +3789,7 @@ class AssetEntityService implements ServiceMethods {
 		if (StringUtils.isNotBlank(term)) {
 			words = StringUtil.split(term)
 			List likeWords = SqlUtil.formatForLike(words)
-			StringBuffer search = new StringBuffer()
+			StringBuilder search = new StringBuilder()
 
 			if (!manufacturer) {
 				SqlUtil.appendToWhere(where, 'm.manufacturer.id = man.id', 'AND')
@@ -3809,7 +3812,7 @@ class AssetEntityService implements ServiceMethods {
 			hql.append(' WHERE ' + where)
 
 		// Construct to the orderby
-		StringBuffer orderBy = new StringBuffer()
+		StringBuilder orderBy = new StringBuilder()
 		if (!manufacturer)
 			orderBy.append('man.name')
 		orderBy.append((orderBy.size() ? ', ' : '') + 'm.modelName')
