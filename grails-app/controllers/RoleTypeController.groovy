@@ -67,7 +67,7 @@ class RoleTypeController implements ControllerMethods {
 			roleType.properties = params
 			if (!roleType.hasErrors() && roleType.save()) {
 				flash.message = "RoleType $params.description updated"
-				redirect(action: 'show', id: roleTypeInstance.id)
+				redirect(action: 'show', id: roleType.id)
 			}
 			else {
 				render(view: 'edit', model: [roleTypeInstance: roleType])
