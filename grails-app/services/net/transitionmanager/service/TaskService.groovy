@@ -4835,9 +4835,32 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		if (moveEvent) {
-			taskCountByEvent = AssetComment.countByMoveEventAndIsPublishedInList(moveEvent, publishedValues)
+			// taskCountByEvent = AssetComment.countByMoveEventAndIsPublishedInList(moveEvent, publishedValues)
+			def criteria = AssetComment.createCriteria()
+			taskCountByEvent = criteria.list {
+				projections {
+					count()
+				}
+				eq ('moveEvent', moveEvent)
+				if (! viewUnpublished) {
+					and {
+						eq ('isPublished', true)
+					}
+				}
+			}[0]
+
 			for (status in ACS.topStatusList) {
-				def tasks = AssetComment.findAllByMoveEventAndStatusAndIsPublishedInList(moveEvent, status, publishedValues)
+				// List tasks = AssetComment.findAllByMoveEventAndStatusAndIsPublishedInList(moveEvent, status, publishedValues)
+				List tasks = AssetComment.createCriteria().list {
+					eq 'moveEvent', moveEvent
+					and {
+						eq 'status', status
+						if (! viewUnpublished) {
+							eq ('isPublished', true)
+						}
+					}
+				}
+
 				def timeInMin = tasks?.sum { task ->
 					task.durationInMinutes()
 				}
@@ -4852,6 +4875,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		return [taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]
 	}
+
 	/**
 	 * This special method is used to find given event task summary (teamTaskCounts, teamTaskDoneCount)
 	 * @param MoveEvent moveEvent object
