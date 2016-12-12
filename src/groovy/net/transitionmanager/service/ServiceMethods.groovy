@@ -69,11 +69,12 @@ trait ServiceMethods {
 			instance.save(flush: flush)
 
 			if (instance.hasErrors()) {
-				log.error('Validation errors saving {} with id {} {}',
+				log.error('save() Validation errors saving {} with id {} {}',
 					instance.getClass().simpleName, instance.id, GormUtil.allErrorsString(instance))
 			}
 		}
 		catch (e) {
+			// TODO : JPM 12/2016 - the save() method buries exceptions which is WRONG
 			log.error(e.message, e)
 		}
 

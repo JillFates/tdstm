@@ -49,21 +49,6 @@ class PersonController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	UserService userService
 
-def test() {
-	Person currentPerson = securityService.userLoginPerson
-	Project project = Project.get(2445)
-	//List suitableTeams = getSuitableTeams(currentPerson)
-	//List assignedTeams = getAssignedTeams(project, currentPerson)
-	render "Person $currentPerson" +
-		"<br>Assigned Projects: $currentPerson.assignedProjects<br>" +
-		"<br>Assigned Teams:${currentPerson.getAssignedTeams(project)}" +
-//		"<br>Assigned Teams:$assignedTeams" +
-
-
-		"<br>Suitable Teams: $currentPerson.suitableTeams" +
-//		"<br>Suitable Teams: $suitableTeams" +
-		"<br>Company:$currentPerson.company"
-}
 	/**
 	 * Generates a list view of persons related to company
 	 * @param id - company id
@@ -344,6 +329,8 @@ def test() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
+		Person byWhom = securityService.getUserLoginPerson()
+
 		// When forWhom == 'person' we're working with the company submitted with the form otherwise we're
 		// going to use the company associated with the current project.
 		def isAjaxCall = params.forWhom != "person"
@@ -358,8 +345,9 @@ def test() {
 		def person
 
 		try {
-			person = personService.savePerson(params, companyId, project, true)
-		}catch (DomainUpdateException e) {
+			person = personService.savePerson(params, byWhom, companyId, project, true)
+		}
+		catch (DomainUpdateException e) {
 			def exceptionMsg = e.message
 			log.error(exceptionMsg, e)
 			// The line below is a hack to avoid querying the database.
@@ -367,14 +355,15 @@ def test() {
 			errMsg = "A person with the same name already exists. Click"
 			errMsg += "<a href=\"javascript:Person.showPersonDialog($personId,'generalInfoShow')\"> here </a>"//e.message
 			errMsg += "to view the person."
-		} catch (e) {
+		}
+		catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = e.message
 		}
 
 		if (isAjaxCall) {
 			def map = errMsg ? [errMsg : errMsg] :
-					             [id: person.id, name:person.lastNameFirst, isExistingPerson: false, fieldName:params.fieldName]
+				[id: person.id, name:person.lastNameFirst, isExistingPerson: false, fieldName:params.fieldName]
 			render map as JSON
 		} else {
 			if (errMsg) {

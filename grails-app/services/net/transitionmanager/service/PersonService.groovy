@@ -1770,55 +1770,58 @@ class PersonService implements ServiceMethods {
 			// Get list of all staff for the company and then try to find the individual so that we don't duplicate
 			// the creation
 			def personList = partyRelationshipService.getCompanyStaff(companyId)
+
 			// TODO : JPM 3/2016 : savePerson() Switch the person lookup to use the finder service
 			person = personList.find {
 				// Find person using case-insensitive search
 				StringUtils.equalsIgnoreCase(it.firstName, params.firstName) &&
-						((StringUtils.isEmpty(params.lastName) && StringUtils.isEmpty(it.lastName)) ||
-						  StringUtils.equalsIgnoreCase(it.lastName, params.lastName)) &&
-						((StringUtils.isEmpty(params.middleName) && StringUtils.isEmpty(it.middleName)) ||
-						  StringUtils.equalsIgnoreCase(it.middleName, params.middleName))
+					((StringUtils.isEmpty(params.lastName) && StringUtils.isEmpty(it.lastName)) ||
+					  StringUtils.equalsIgnoreCase(it.lastName, params.lastName)) &&
+					((StringUtils.isEmpty(params.middleName) && StringUtils.isEmpty(it.middleName)) ||
+					  StringUtils.equalsIgnoreCase(it.middleName, params.middleName))
 			}
 
 			if (person != null) {
 				throw new DomainUpdateException("A person with that name already exists. Person Id:$person.id")
 			}
-			else {
-				// Create the person and relationship appropriately
-				def reducedParams = [:] + params
-				reducedParams.remove('company')
-				reducedParams.remove('function')
 
-				person = new Person(reducedParams)
-				save person
-				if (!person.hasErrors()) {
-					// Assign the person to the company
-					partyRelationshipService.addCompanyStaff(companyParty, person)
+			// Create the person and relationship appropriately
+			def reducedParams = [:] + params
+			reducedParams.remove('company')
+			reducedParams.remove('function')
 
-					def teamCodes = CollectionUtils.asList(params.containsKey('function') ? params.function : [])
-					if (teamCodes) {
-						// Assign the person to the appropriate teams
-						partyRelationshipService.updateAssignedTeams(person, teamCodes)
-					}
+			// TODO : JPM 12/2016 : The save method should assign params to the person with command or list of properties
+			person = new Person(reducedParams)
+			save person
 
-					// If the byUser's current project.client is the same as the new person's company then we'll
-					// automatically assign the person to the project as well
-					if (defaultProject != null && defaultProject.client.id == companyId) {
-						if (teamCodes) {
-							teamCodes.each { tc ->
-								addToProjectTeamSecured(defaultProject, person, tc)
-							}
-						}
-						else {
-							// Add the person to the project which is done automatically when adding the team to the project
-							addToProjectSecured(defaultProject, person)
-						}
+			if (person.hasErrors()) {
+				throw new DomainUpdateException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
+			}
+
+			auditService.logMessage("$byWhom created person $person as staff of $companyParty")
+			// Assign the person to the company
+			partyRelationshipService.addCompanyStaff(companyParty, person)
+
+			def teamCodes = CollectionUtils.asList(params.containsKey('function') ? params.function : [])
+			if (teamCodes) {
+				// Assign the person to the appropriate teams
+				partyRelationshipService.updateAssignedTeams(person, teamCodes)
+			}
+
+			// If the byUser's current project.client is the same as the new person's company then we'll
+			// automatically assign the person to the project as well
+			if (defaultProject != null && defaultProject.client.id == companyId) {
+				if (teamCodes) {
+					teamCodes.each { tc ->
+						addToProjectTeamSecured(defaultProject, person, tc)
 					}
 				}
 				else {
-					throw new DomainUpdateException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
+					// Add the person to the project which is done automatically when adding the team to the project
+					addToProjectSecured(defaultProject, person)
 				}
 			}
+
 			break
 		}
 
