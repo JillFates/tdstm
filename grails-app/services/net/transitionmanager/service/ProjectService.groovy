@@ -1454,9 +1454,9 @@ class ProjectService implements ServiceMethods {
 		// Remove Team assignments for the individual against the project
 		PartyRelationship.executeUpdate('''
 			DELETE PartyRelationship
-			where partyRelationshipType='PROJ_STAFF'
-			  and roleTypeCodeFrom='PROJECT'
-			  and roleTypeCodeTo in (:teamCodes)
+			where partyRelationshipType.id='PROJ_STAFF'
+			  and roleTypeCodeFrom.id='PROJECT'
+			  and roleTypeCodeTo.id in (:teamCodes)
 			  and partyIdFrom=:project
 			  and partyIdTo=:person
 		''', [project: project, person: person, teamCodes: teamCodes])

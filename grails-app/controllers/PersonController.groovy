@@ -1191,20 +1191,20 @@ def test() {
 		String userMsg
 		try {
 			// Make the service call - note that the Permission is checked within the service
-			personService.addToProject(params.projectId, params.personId)
+			UserLogin byWhom = securityService.getUserLogin()
+			personService.addToProject(byWhom, params.projectId, params.personId)
 
 			renderSuccessJson()
+			return
 
 		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
 			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace("addProjectTeam()", e)
-			renderErrorJson(['An error occurred while trying to add the person to the project', e.message])
+			userMsg = 'An error occurred while trying to add the person to the project'
 		}
 
-		if (userMsg) {
-			renderErrorJson(userMsg)
-		}
+		renderErrorJson(userMsg)
 	}
 
 	/*
@@ -1217,19 +1217,19 @@ def test() {
 		String userMsg
 		try {
 			// Make the service call - note that the Permission is checked within the service
-			personService.removeFromProject(params.projectId, params.personId)
+			UserLogin byWhom = securityService.getUserLogin()
+			personService.removeFromProject(byWhom, params.projectId, params.personId)
 			renderSuccessJson()
+			return
 		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
 			userMsg = e.message
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace("removeProjectStaff()", e)
-			renderErrorJson(['An error occurred while trying to unassign the person from the project', e.message])
+			userMsg = 'An error occurred while trying to unassign the person from the project'
 		}
 
-		if (userMsg) {
-			log.debug "removeFromProject($securityService.currentUsername, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
-			renderErrorJson(userMsg)
-		}
+		log.debug "removeFromProject($securityService.currentUsername, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
+		renderErrorJson(userMsg)
 	}
 
 	/*
