@@ -25,10 +25,10 @@ class PermissionsController implements ControllerMethods {
 
 	@HasPermission('RolePermissionView')
 	def edit() {
-		def permissions = Permissions.withCriteria {
+		List permissions = Permissions.withCriteria {
 			and {
-			   order('permissionGroup','asc')
-		   order('permission    Item','asc')
+				order('permissionGroup','asc')
+				order('permissionItem','asc')
 			}
 		}
 		[permissions:permissions]
