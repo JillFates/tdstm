@@ -283,6 +283,7 @@ grails {
 				'/monitoring'		:'hasPermission(request, "ViewAdminTools")',
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
+				'/jasper/**'		:'permitAll',
 			]
 		}
 	}
