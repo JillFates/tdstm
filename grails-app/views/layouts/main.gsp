@@ -83,13 +83,13 @@ boolean isIE6 = tds.isIE6()
         </div>--%>
         <div class="menu2">
       	<ul>
-           <tds:hasPermission permission='AdminMenuViews '>
+           <tds:hasPermission permission='AdminMenuViews'>
 		<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
             </tds:hasPermission>
 		<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
       </ul>
     </div>
-      <!--
+<%--
 <div class="menu1">
 <ul>
     <li><g:link class="home" controller="projectUtil">Main</g:link></li>
@@ -102,7 +102,7 @@ boolean isIE6 = tds.isIE6()
     <li><a href="#">Import/Export</a></li>
 </ul>
 </div>
-      -->
+--%>
       <div class="main_bottom"><g:layoutBody /></div>
     </div>
     <div id="personDialog" title="Edit Person" style="display:none;">
