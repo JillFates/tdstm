@@ -369,7 +369,6 @@ tds.core.service.AlertsService = function(rootScope, timeout) {
 	};
 
 	var closeAlert = function(index) {
-		alert("Closing")
 		index = (index) ? index : rootScope.alerts.list.length - 1;
 		// After deleting the last one, the list is empty
 		if(rootScope.alerts.list[index]){
