@@ -1,18 +1,21 @@
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Party
-
+import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PartyController implements ControllerMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
+	@HasPermission('AdminMenuView')
 	def list() {
 		if (!params.max) params.max = 10
 		[partyInstanceList: Party.list(params)]
 	}
 
+	@HasPermission('AdminMenuView')
 	def show() {
 		Party party = fromParams()
 		if (!party) return
@@ -20,6 +23,7 @@ class PartyController implements ControllerMethods {
 		[partyInstance: party]
 	}
 
+	@HasPermission('AdminMenuView')
 	def delete() {
 		Party party = fromParams()
 		if (!party) return
@@ -29,6 +33,7 @@ class PartyController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
+	@HasPermission('AdminMenuView')
 	def edit() {
 		Party party = fromParams()
 		if (!party) return
@@ -36,6 +41,7 @@ class PartyController implements ControllerMethods {
 		[partyInstance: party]
 	}
 
+	@HasPermission('AdminMenuView')
 	def update() {
 		Party party = fromParams()
 		if (!party) return
@@ -51,10 +57,12 @@ class PartyController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('AdminMenuView')
 	def create() {
 		[partyInstance: new Party(params)]
 	}
 
+	@HasPermission('AdminMenuView')
 	def save() {
 		def party = new Party(params)
 		if (!partyww.hasErrors() && party.save()) {

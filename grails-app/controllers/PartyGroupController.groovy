@@ -31,12 +31,18 @@ class PartyGroupController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
-	// Will Return PartyGroup list where PartyType = COMPANY
-
+	/**
+	 * Used to render the Company List view which will call back to the listJson for the actual data
+	 */
+	@HasPermission('PartyEditView')
 	def list() {
 		[listJsonUrl: createLink(controller: 'person', action: 'listJson')]
 	}
 
+	/**
+	 * Used by the List view JQGrid
+	 */
+	@HasPermission('PartyEditView')
 	def listJson() {
 
     	Person whom = securityService.userLoginPerson
@@ -48,7 +54,7 @@ class PartyGroupController implements ControllerMethods {
 		int rowOffset = (currentPage - 1) * maxRows
 		def companies
 		def filterParams = [companyName: params.companyName, dateCreated: params.dateCreated,
-		                    lastUpdated: params.lastUpdated, partner: params.partner]
+		    lastUpdated: params.lastUpdated, partner: params.partner]
 
 		// Validate that the user is sorting by a valid column
 		if( ! sortIndex in filterParams)
@@ -102,6 +108,7 @@ class PartyGroupController implements ControllerMethods {
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
+	@HasPermission('PartyEditView')
 	def show() {
 		PartyGroup partyGroup = PartyGroup.get(params.id)
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
@@ -115,10 +122,8 @@ class PartyGroupController implements ControllerMethods {
 		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup)]
 	}
 
+	@HasPermission('CompanyDelete')
 	def delete() {
-		if (!controllerService.checkPermission(this, 'CompanyDelete')) {
-			return
-		}
 
 		PartyGroup partyGroupInstance = PartyGroup.get(params.id)
 		if (partyGroupInstance) {
@@ -178,6 +183,7 @@ class PartyGroupController implements ControllerMethods {
 
 	}
 
+	@HasPermission('PartyEditView')
 	def edit() {
 		PartyGroup partyGroup = PartyGroup.get( params.id )
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
@@ -190,6 +196,7 @@ class PartyGroupController implements ControllerMethods {
 		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup)]
 	}
 
+	@HasPermission('PartyEditView')
 	def update() {
 		PartyGroup partyGroup = PartyGroup.get( params.id )
 		//partyGroup.lastUpdated = new Date()
@@ -218,8 +225,8 @@ class PartyGroupController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('PartyCreateView')
     def create() {
-    	log.debug "**** Got to the create() method"
         [partyGroupInstance: new PartyGroup(params)]
     }
 
