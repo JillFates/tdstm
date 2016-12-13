@@ -6,7 +6,7 @@ class Person extends Party {
 
 	//COMPANION
 	// Data of Special Person Required by the System
-	private static final Map<String, String> SYSTEM_USER_AT = [lastName: 'Task', firstName: 'Automated']
+	static final Map<String, String> SYSTEM_USER_AT = [lastName: 'Task', firstName: 'Automated']
 
 	String firstName
 	String middleName = ''
@@ -197,14 +197,11 @@ class Person extends Party {
 	}
 
 	/**
-	 * The Person that completes automated tasks.
+	 * The Person that completes automated tasks
+	 * This method should not have been implemented here as it is in the TaskService
 	 */
 	Person getAutomaticPerson() {
-		def auto = findByLastNameAndFirstName(SYSTEM_USER_AT.lastName, SYSTEM_USER_AT.firstName)
-		if (!auto) {
-			log.error 'Unable to find Automated Task Person as expected'
-		}
-		return auto
+		throw new RuntimeException('Person.getAutomaticPerson() deprecated - use TaskService.getAutomaticPerson()')
 	}
 
 	/**

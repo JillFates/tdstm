@@ -28,6 +28,7 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
@@ -46,6 +47,7 @@ class PersonController implements ControllerMethods {
 	PersonService personService
 	ProjectService projectService
 	SecurityService securityService
+	TaskService taskService
 	UserPreferenceService userPreferenceService
 	UserService userService
 
@@ -704,6 +706,10 @@ class PersonController implements ControllerMethods {
 
 		Person loginPerson = securityService.userLoginPerson
 
+		// Get the ID of the Automated Task Person that shouldn't be in the list
+		Person autoTask = taskService.getAutomaticPerson()
+		Long autoTaskId = autoTask ? autoTask.id : 0
+
 		//
 		// Deal with filter parameters
 		//
@@ -888,6 +894,7 @@ class PersonController implements ControllerMethods {
 						AND pr.party_id_from_id IN ($companies)
 						AND p.active = 'Y'
 						AND pr.party_id_to_id IN ($staffIds)
+						AND pr.party_id_to_id != $autoTaskId
 					GROUP BY role, personId
 					ORDER BY fullName ASC
 				) AS companyStaff
