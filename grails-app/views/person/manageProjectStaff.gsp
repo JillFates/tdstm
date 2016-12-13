@@ -62,7 +62,7 @@
 							<br/>
 							<input type="checkbox" name="clientStaff" id="clientStaffId" 
 								onChange="this.value = this.checked ? 1 : 0; loadFilteredStaff('lastName','staff');"
-								${onlyClientStaff=='1'? 'checked="checked" value="1"'  : 'value="0"'}
+								${onlyClientStaff=='1'? 'checked="checked" value=1'  : 'value=0'}
 							/>
 						</td>
 						<td>
@@ -70,7 +70,7 @@
 							<br/>
 								<input type="checkbox" name="assigned" id="assignedId"  
 									onChange="this.value = this.checked ? 1 : 0; loadFilteredStaff('lastName','staff');"
-									${assigned=='1'? 'checked="checked" value="1"' : 'value="0"'}
+									${assigned=='1'? 'checked="checked" value=1' : 'value=0'}
 								/>
 						</td>
 						<td>
