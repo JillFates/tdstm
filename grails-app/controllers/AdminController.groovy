@@ -1478,11 +1478,13 @@ class AdminController implements ControllerMethods {
 			return
 		}
 
-		jdbcTemplate.queryForObject(''' -- Case sensitive - assets that assetType do not match
+		String query = """ -- Case sensitive - assets that assetType don't match
 			SELECT COUNT(*)
 			FROM asset_entity a
 			JOIN model m ON m.model_id = a.model_id
-			WHERE a.asset_class='DEVICE' AND BINARY a.asset_type <> BINARY m.asset_type; ''', Integer)
+			WHERE a.asset_class='DEVICE' AND BINARY a.asset_type <> BINARY m.asset_type """
+		Long assetCount = jdbcTemplate.queryForLong(query)
+		render assetCount.toString()
 	}
 
 	/**
