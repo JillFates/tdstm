@@ -122,11 +122,13 @@
 					</tr>
 					<%-- Dependencies section --%>
 					<tr class="prop">
-						<td valign="top" class="name">
+						<td valign="top" class="name" colspan="2" style="text-align: left;">
 							<label for="predecessorHeadTrId">Dependencies:</label>
 						</td>
-						<td>
-						    <table style="border: none;">
+					</tr>
+					<tr class="prop">
+						<td colspan="2">
+							<table style="border: none;">
 								<tr class="prop" id="predecessorHeadTrId">
 									<td valign="top" class="name" style="width: 50%">
 										<label>Predecessors</label>
@@ -145,7 +147,7 @@
 										<task-dependencies ng-model="dependencies.successors" deleted="dependencies.deletedSuccessors" comment-id='ac.commentId' event-name="successor" move-event='ac.moveEvent' prefix="succ"></task-dependencies>
 									</td>
 								</tr>
-						    </table>
+							</table>
 						</td>
 					</tr>
 					<tr id="processDiv" ng-show="havePredecessor">

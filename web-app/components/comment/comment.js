@@ -1654,6 +1654,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 						}
 					},
 					height: 220,
+					autoWidth: true,
 					dataSource: {
 						transport: {
 							read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
@@ -1690,6 +1691,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					filter: "contains",
 					autoBind: false,
 					height: 220,
+					autoWidth: true,
 					virtual: {
 						itemHeight: 20,
 						valueMapper: function(options) {
@@ -1758,8 +1760,6 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 				if(!onPreload) {					
 					createNewDataSource(dependency);
 				}
-
-				dependency.dropdown.list.width("230");
 				dependency.dropdown.list.css("white-space","nowrap");
 			};
 			scope.deleteRow = function(index) {
