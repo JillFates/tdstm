@@ -199,7 +199,7 @@ class MoveEventController implements ControllerMethods {
 			return
 		}
 
-		[moveEvent: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
+		[moveEventInstance: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
 	}
 
 	def update() {
