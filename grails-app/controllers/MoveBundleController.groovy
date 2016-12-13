@@ -226,7 +226,7 @@ class MoveBundleController implements ControllerMethods {
 		moveBundle.sourceRoom = Room.read(params.sourceRoom)
 		moveBundle.targetRoom = Room.read(params.targetRoom)
 
-		if (save(moveBundle)) {
+		if (moveBundle.save()) {
 			stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
 			stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
 				def checkbox = params["checkbox_" + it.id]

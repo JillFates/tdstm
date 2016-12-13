@@ -286,15 +286,13 @@ class PartyRelationshipService implements ServiceMethods {
 			}
 		}
 		else {
+			
 			//	if user select a blank then remove Partner
-			PartyRelationship.executeUpdate('''
-				delete from PartyRelationship
-				where partyRelationshipType = :relationshipType
-				  and partyIdFrom.id = :partyIdFromId
-				  and roleTypeCodeFrom = :roleTypeIdFrom
-				  and roleTypeCodeTo = :roleTypeIdTo
-			''', [relationshipType: relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom),
-			      roleTypeIdFrom: roleTypeIdFrom, roleTypeIdTo: roleTypeIdTo])
+			PartyRelationship.executeUpdate("delete from PartyRelationship where partyRelationshipType.id = :relationshipType"
+				  + " and partyIdFrom.id = :partyIdFromId and roleTypeCodeFrom = :roleTypeIdFrom"
+				  + " and roleTypeCodeTo = :roleTypeIdTo"
+				  , [relationshipType:relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom), 
+				    roleTypeIdFrom: RoleType.load(roleTypeIdFrom), roleTypeIdTo: RoleType.load(roleTypeIdTo)])
 		}
 	}
 
