@@ -1796,35 +1796,32 @@ class AssetEntityService {
 	 * @param updateOnPercent
 	 * @param session
 	 */
-	def cablingReportData( assetCablesList, cablingSheet, progressCount, progressTotal, updateOnPercent, key, session){
+	def cablingReportData( assetCablesList, cablingSheet){
 
 		assetCablesList.eachWithIndex{ cabling, idx ->
 			def rowNum = idx + 2 //Header Offset
-			def currentCabling = cabling.get(Criteria.ROOT_ALIAS)
-			progressCount++
-			updateProgress(key, progressCount, progressTotal, 'In progress', 0.01)
-			addCell(cablingSheet, rowNum, 0, String.valueOf(currentCabling.assetFromPort?.type ))
-			addCell(cablingSheet, rowNum, 1, currentCabling.assetFrom ? currentCabling.assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, rowNum, 2, String.valueOf(currentCabling.assetFrom ? currentCabling.assetFrom.assetName : "" ))
-			addCell(cablingSheet, rowNum, 3, String.valueOf(currentCabling.assetFromPort?.label ))
-			addCell(cablingSheet, rowNum, 4, currentCabling.assetTo ? currentCabling.assetTo?.id : "" , Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, rowNum, 5, String.valueOf(currentCabling.assetTo ? currentCabling.assetTo?.assetName :"" ))
-			if(currentCabling.assetFromPort && currentCabling.assetFromPort.type && currentCabling.assetFromPort.type !='Power'){
-				addCell(cablingSheet, rowNum, 6, String.valueOf(currentCabling.assetToPort ? currentCabling.assetToPort?.label :"" ))
+			addCell(cablingSheet, rowNum, 0, String.valueOf(cabling.assetFromPort?.type ))
+			addCell(cablingSheet, rowNum, 1, cabling.assetFrom ? cabling.assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
+			addCell(cablingSheet, rowNum, 2, String.valueOf(cabling.assetFrom ? cabling.assetFrom.assetName : "" ))
+			addCell(cablingSheet, rowNum, 3, String.valueOf(cabling.assetFromPort?.label ))
+			addCell(cablingSheet, rowNum, 4, cabling.assetTo ? cabling.assetTo?.id : "" , Cell.CELL_TYPE_NUMERIC)
+			addCell(cablingSheet, rowNum, 5, String.valueOf(cabling.assetTo ? cabling.assetTo?.assetName :"" ))
+			if(cabling.assetFromPort && cabling.assetFromPort.type && cabling.assetFromPort.type !='Power'){
+				addCell(cablingSheet, rowNum, 6, String.valueOf(cabling.assetToPort ? cabling.assetToPort?.label :"" ))
 			}else{
-				addCell(cablingSheet, rowNum, 6, String.valueOf(currentCabling.toPower?:"" ))
+				addCell(cablingSheet, rowNum, 6, String.valueOf(cabling.toPower?:"" ))
 			}
-			addCell(cablingSheet, rowNum, 7, String.valueOf(currentCabling.cableComment?:"" ))
-			addCell(cablingSheet, rowNum, 8, String.valueOf(currentCabling.cableColor?:"" ))
-			if(currentCabling.assetFrom?.sourceRoom){
-				addCell(cablingSheet, rowNum, 9, String.valueOf(currentCabling.assetFrom?.rackSource?.location+"/"+currentCabling.assetFrom?.sourceRoom+"/"+currentCabling.assetFrom?.sourceRack ))
-			}else if(currentCabling.assetFrom?.targetRoom){
-				addCell(cablingSheet, rowNum, 9, String.valueOf(currentCabling.assetFrom?.rackTarget?.location+"/"+currentCabling.assetFrom?.targetRoom+"/"+currentCabling.assetFrom?.targetRack ))
+			addCell(cablingSheet, rowNum, 7, String.valueOf(cabling.cableComment?:"" ))
+			addCell(cablingSheet, rowNum, 8, String.valueOf(cabling.cableColor?:"" ))
+			if(cabling.assetFrom?.sourceRoom){
+				addCell(cablingSheet, rowNum, 9, String.valueOf(cabling.assetFrom?.rackSource?.location+"/"+cabling.assetFrom?.sourceRoom+"/"+cabling.assetFrom?.sourceRack ))
+			}else if(cabling.assetFrom?.targetRoom){
+				addCell(cablingSheet, rowNum, 9, String.valueOf(cabling.assetFrom?.rackTarget?.location+"/"+cabling.assetFrom?.targetRoom+"/"+cabling.assetFrom?.targetRack ))
 			}else{
 				addCell(cablingSheet, rowNum, 9, '')
 			}
-			addCell(cablingSheet, rowNum, 10, String.valueOf(currentCabling.cableStatus?:"" ))
-			addCell(cablingSheet, rowNum, 11, String.valueOf(currentCabling.assetLoc?: "" ))
+			addCell(cablingSheet, rowNum, 10, String.valueOf(cabling.cableStatus?:"" ))
+			addCell(cablingSheet, rowNum, 11, String.valueOf(cabling.assetLoc?: "" ))
 			//GormUtil.flushAndClearSession(session, progressCount)
 		}
 
