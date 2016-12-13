@@ -52,6 +52,7 @@ class AdminController implements ControllerMethods {
 
 	private static final int thirtyDaysInMS = 60 * 24 * 30 * 1000
 
+	@HasPermission('AdminMenuView')
 	def index() {}
 
 	/**
@@ -1202,9 +1203,10 @@ class AdminController implements ControllerMethods {
 	}
 
 	/**
-	 * Downloads the spreadsheet import templat
+	 * Downloads the spreadsheet import template
 	 */
 	// /('P_PersonImport')
+	@HasPermission('PersonImport')
 	def importAccountsTemplate() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
