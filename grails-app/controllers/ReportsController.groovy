@@ -1104,7 +1104,7 @@ class ReportsController implements ControllerMethods {
 								'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId,
-			userDTFormat, 7, securityService.viewUnpublished())
+			userDTFormat, 3, securityService.viewUnpublished())
 
 
 	
