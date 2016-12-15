@@ -89,7 +89,7 @@ class CookbookService implements ServiceMethods {
 		RecipeVersion clonedReleasedVersion
 
 		if (cloneFrom != null) {
-			clonedVersion = get(Recipe, cloneFrom)
+			clonedVersion = Recipe.get(cloneFrom)
 		} else {
 			Recipe defaultRecipe = Recipe.findByNameAndProject('Default', Project.getDefaultProject())
 			if (defaultRecipe?.releasedVersion != null) {
@@ -135,7 +135,7 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
-		RecipeVersion recipeVersion = get(RecipeVersion, recipeVersionId)
+		RecipeVersion recipeVersion = RecipeVersion.get(recipeVersionId)
 
 		def recipe = recipeVersion.recipe
 		boolean valid = recipe.projectId == DEFAULT_PROJECT_ID ||
@@ -179,7 +179,7 @@ class CookbookService implements ServiceMethods {
 		securityService.requirePermission 'DeleteRecipe'
 
 		Project project = controllerService.requiredProject
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
 		// Update all TaskBatch to null the reference to the recipe
@@ -218,7 +218,7 @@ class CookbookService implements ServiceMethods {
 		}
 
 		Project project = controllerService.requiredProject
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
 		def rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
@@ -246,7 +246,7 @@ class CookbookService implements ServiceMethods {
 		//TODO check this checkAccess(project)
 		controllerService.getRequiredProject()
 
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		recipe.name = recipeName
 		recipe.description = description
 		save recipe
@@ -274,7 +274,7 @@ class CookbookService implements ServiceMethods {
 		}
 
 
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
 		// Validate that the syntax is correct before submitting
@@ -317,7 +317,7 @@ class CookbookService implements ServiceMethods {
 //		securityService.requirePermission 'ReleaseRecipe'
 
 		Project project = controllerService.requiredProject
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 
 		//TODO check this checkAccess(project)
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
@@ -347,7 +347,7 @@ class CookbookService implements ServiceMethods {
 //		securityService.requirePermission 'RevertRecipe'
 
 		Project project = controllerService.requiredProject
-		RecipeVersion recipeVersion = get(Recipe, recipeVersionId)
+		RecipeVersion recipeVersion = Recipe.get(recipeVersionId)
 		if (recipeVersion.versionNumber == 0) {
 			throw new IllegalArgumentException('Trying to revert a WIP')
 		}
@@ -586,7 +586,7 @@ class CookbookService implements ServiceMethods {
 	List<Map> findRecipeVersions(recipeId) {
 
 		Project project = controllerService.requiredProject
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
 		jdbcTemplate.query('''
@@ -639,7 +639,7 @@ class CookbookService implements ServiceMethods {
 		securityService.requirePermission 'EditRecipe'
 
 		Project project = controllerService.requiredProject
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
 		recipe.archived = archived
@@ -1343,7 +1343,7 @@ class CookbookService implements ServiceMethods {
 		securityService.requirePermission 'EditRecipe'
 
 		Project project = controllerService.requiredProject
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
 		if (contextId == null || !contextId.isNumber()) {
@@ -1364,7 +1364,7 @@ class CookbookService implements ServiceMethods {
 		securityService.requirePermission 'EditRecipe'
 
 		Project project = controllerService.requiredProject
-		Recipe recipe = get(Recipe, recipeId)
+		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
 		recipe.defaultAssetId = null
