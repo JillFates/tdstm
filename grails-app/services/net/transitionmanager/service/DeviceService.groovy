@@ -274,7 +274,7 @@ class DeviceService implements ServiceMethods {
 
 		if (params.modelId) {
 			// Check to see if the user gave us a valid model and then assign to the asset
-			def model = get(Model, params.modelId)
+			def model = Model.get(params.modelId)
 			device.model = model
 			device.manufacturer = model.manufacturer
 			device.assetType = model.assetType
@@ -298,7 +298,7 @@ class DeviceService implements ServiceMethods {
 
 		assetEntityService.assignDeviceToChassisOrRack(project, device, params)
 
-		if (!save(device)) {
+		if (!device.save()) {
 			throw new DomainUpdateException('Unable to update device ' + GormUtil.allErrorsString(device))
 		}
 	}
