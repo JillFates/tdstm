@@ -1,131 +1,131 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+<!DOCTYPE html>
 <html>
 <head>
-<title>Reset Password</title>
-<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
-<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-	<tds:favicon />
-<meta name="viewport" content="height=device-height,width=device-width" />
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-<g:javascript src="jquery-1.9.1.js"/>
-<g:javascript src="PasswordValidation.js" />
-<g:javascript src="tds-common.js" />
+	<title>Reset Password</title>
+	<!-- Tell the browser to be responsive to screen width -->
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<!-- Bootstrap 3.3.5 -->
+	<link rel="stylesheet" href="${resource(dir:'dist/js/vendors/bootstrap/dist/css',file:'bootstrap.min.css')}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css/fontawesome',file:'font-awesome.min.css')}">
+	<!-- Ionicons -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css/ionicons/2.0.1/css',file:'ionicons.min.css')}">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
+	<!-- General Template Style -->
+	<link rel="stylesheet" href="${resource(dir:'css',file:'style.css')}">
 
-<script type="text/javascript">
-	$( document ).ready(function() {
-		$("#forgotPasswordForm").on("submit", function(event) {
-			event.preventDefault();
-			var passwordField = $("#password");
-			var emailField = $("#email");
-			if (!PasswordValidation.checkPassword(passwordField[0])) {
-				alert("The password does not adhere to the specified requirements.");
-				passwordField.focus();
-				return false;
-			} else if (!tdsCommon.isValidEmail(emailField.val())) {
-				alert("Please enter a valid email address");
-				emailField.focus();
-				return false;
-			} else {
-				$(this).off("submit");
-				$("#resetPasswordSubmitButton").prop('disabled', true)
-				this.submit();
-			}
-		});
-	});
-</script>
-	
-</head>
-<body>
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 
-<div id="spinner" class="spinner" style="display: none;"><img
-	src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-</div>
+	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 
-<div class="logo">
-	<table style="border: 0; width: 292px;">
-		<tr>
-			<td style="text-align: center;">
-				<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" /></a>
-			</td>
-			
-		</tr>
-	</table>
-	<div class="mainbody" style="margin: .8em">
-		<table style="width:466px" width="100%" style="border: 0; vertical-align: top;" cellpadding="0" cellspacing="0">
-			<tr>
-				<td  valign="top" style="width:466px" >
-				<div class="">
-				<div class="left_cornerlog"></div>
-				<div class="border_toplog"></div>
-				<div class="right_cornerlog"></div>
-				<div class="">
-				<h1 style="padding: 8px 0px; margin: 0em !important;">Password Assistant - Enter New Password</h1>
-				<g:if test="${flash.message}">
-					<div class="message">${flash.message}</div>
-				</g:if>
-				<p>The final step is to enter your email address associated with your account and a new password 
-				that adheres to the password requirements listed below.
-				</p>
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="${resource(dir:'dist/js/vendors/html5shiv/dist',file:'html5shiv.min.js')}"></script>
+	<script src="${resource(dir:'dist/js/vendors/respond/dest',file:'respond.min.js')}"></script>
+	<![endif]-->
+
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+
+	<g:javascript src="PasswordValidation.js" />
+
+	</head>
+	<body class="hold-transition login-page">
+		<div class="login-box">
+
+			<div class="login-box-body">
+				<div class="login-logo">
+					<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
+						<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
+					</a>
+				</div>
+
+				<p class="login-box-msg">Password Assistant - Enter New Password</p>
+
+				<div id="spinner" class="spinner" style="display: none;"><img
+						src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+				</div>
 
 				<g:form action="applyNewPassword" id="forgotPasswordForm" name="forgotPasswordForm">
 					<input type="hidden" name="username" id="username" value="${username}" />
 					<input type="hidden" name="token" id="token" value="${token}" />
-					<table style="border: 0;">
-						<tbody>
-							<tr>
-								<td>Email&nbsp;Address:</td>
-								<td width="100%">
-									<input type="email" name="email" id="email" value="${email}" size="35"
-										required autofocus
-										placeholder="Enter your email address" 
-										autocorrect="email" autocapitalize="off" />
-								</td>
-							</tr>
-							<tr>
-								<td>Password:</td>
-								<td>
-									<input type="text" id="password" 
-										class="passwordField"
-										onkeyup="PasswordValidation.checkPassword(this)" 
-										name="password"  size="25" value="${password}" 
-										required autocapitalize='off' autocorrect='off'
-										placeholder="Enter a new password" />
-								</td>
-							</tr>
-							<tr class="passwordsEditFields">
-								<td>Requirements:</td>
-								<td>
-									<ul>
-									<li><em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
-									<li><em id="lengthRequirementId" size="${minPasswordLength}">Password must be at least ${minPasswordLength} characters long<b class="ok"></b></em><br/>
-									<li><em id="passwordRequirementsId">Password must contain at least 3 of these requirements:<b class="ok"></b></em><br/>
-									<ul>
-										<li><em id="uppercaseRequirementId">Uppercase characters<b class="ok"></b></em></li>
-										<li><em id="lowercaseRequirementId">Lowercase characters<b class="ok"></b></em></li>
-										<li><em id="numericRequirementId">Numeric characters<b class="ok"></b></em></li>
-										<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
-									</ul>
-									</ul>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align:center;" class="buttonR">
-									<g:if test="${validToken}">
-										<input type="submit" id="resetPasswordSubmitButton" value="Update Password" />
-									</g:if>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+					<p>The final step is to enter your email address associated with your account and a new password.
+					</p>
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="showPasswordEditId"/> Hide password
+						</label>
+					</div>
+
+					<div class="form-group has-feedback">
+						<input type="email" class="form-control" name="email" id="email" placeholder="Enter your email address" title="Enter your email address" value="${email}" autocorrect="off" autocapitalize="off" required autofocus>
+						<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+					</div>
+
+					<div class="form-group has-feedback">
+						<input type="text" id="passwordId" class="form-control passwordField" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)"/>
+					</div>
+
+					<em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
+					<em id="lengthRequirementId" size="${minPasswordLength}">Password must be at least ${minPasswordLength} characters long<b class="ok"></b></em><br/>
+					<em id="passwordRequirementsId">Password must contain at least 3 of these requirements:</em><br/>
+					<ul>
+						<li><em id="uppercaseRequirementId">Uppercase characters<b class="ok"></b></em></li>
+						<li><em id="lowercaseRequirementId">Lowercase characters<b class="ok"></b></em></li>
+						<li><em id="numericRequirementId">Numeric characters<b class="ok"></b></em></li>
+						<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
+					</ul>
+
+					<g:if test="${flash.message}">
+						<div class="message">${flash.message}</div>
+					</g:if>
+
+					<g:if test="${validToken}">
+						<div class="row change-password-submit">
+							<div class="col-xs-3">
+							</div>
+							<!-- /.col -->
+							<div class="col-xs-9">
+								<g:actionSubmit id="resetPasswordSubmitButton" class="btn btn-primary btn-block btn-flat" value="Update Password" action="applyNewPassword"/>
+							</div>
+							<!-- /.col -->
+						</div>
+					</g:if>
 				</g:form>
+				<a href="/tdstm/auth/login" class="light">Back to Login</a>
+
 				</div>
-				</td>
-			</tr>
-		</table>
-	</div>
-</div>
-<div class="logo"></div>
-</body>
+			</div>
+		</div>
+		<div id="overlay">
+			<div id="overlay-wrapper">
+				<div id="floatingBarsG">
+					<div class="blockG" id="rotateG_01"></div>
+					<div class="blockG" id="rotateG_02"></div>
+					<div class="blockG" id="rotateG_03"></div>
+					<div class="blockG" id="rotateG_04"></div>
+					<div class="blockG" id="rotateG_05"></div>
+					<div class="blockG" id="rotateG_06"></div>
+					<div class="blockG" id="rotateG_07"></div>
+					<div class="blockG" id="rotateG_08"></div>
+				</div>
+			</div>
+		</div>
+		<!-- /.spinenr-box -->
+
+		<script language="javascript" type="text/javascript">
+			// Let's keep this until migrate the login into angularjs.
+
+			$(document).ready(function() {
+				$("#submitButton").click(function(){
+					$("#overlay").css('display', 'inline');
+				});
+			});
+
+		</script>
+	</body>
 </html>
