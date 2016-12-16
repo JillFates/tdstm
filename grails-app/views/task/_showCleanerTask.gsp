@@ -375,7 +375,7 @@ function validateComment(objId){
 			} else {
 				$('#myTaskList').html(data)
 				$('#showStatusId_'+objId).show()
-				$('#issueTrId_'+id).each(function(){
+				$('#issueTrId_'+objId).each(function(){
 					$(this).removeAttr('onclick')
 					$(this).unbind("click").bind("click", function(){
 						hideStatus(objId,status)

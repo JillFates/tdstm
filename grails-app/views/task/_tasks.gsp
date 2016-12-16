@@ -78,12 +78,12 @@
 					</tr>
 					<tr id="showStatusId_${item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
 						<td nowrap="nowrap" colspan="6" class="statusButtonBar">
-							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
-							<tds:actionButton label="Start" icon="ui-icon-play" id="${item?.id}"  
+							<g:if test="${issue.item.status == AssetCommentStatus.READY}">
+							<tds:actionButton label="Start" icon="ui-icon-play" id="${item?.id}"
 								onclick="changeStatus('${item?.id}','${AssetCommentStatus.STARTED}', '${item?.status}', 'taskManager')"/>
 							</g:if>
-							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }"> 
-							<tds:actionButton label="Done" icon="ui-icon-check" id="${item?.id}"  
+							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }">
+							<tds:actionButton label="Done" icon="ui-icon-check" id="${item?.id}"
 								onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')"/>
 							</g:if>
 						

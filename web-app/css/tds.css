@@ -1462,7 +1462,14 @@ a.task_action{float: left; position: relative; margin: 0 0 0 17px;cursor: pointe
 a#viewtaskgraph_button_graph{ margin: 5px 0 0 30px;}
 a.task_action span.task_icon{position: absolute; top: 8px; left: 0;}
 a.task_action span.task_button { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:#2C61AA;}
-span.task_button_disabled { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:grey;}
+span.task_button_disabled { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:grey}
+
+span.task_icon_button_disabled {
+	background-image: url(../images/ui-icons_888888_256x240.png) !important;
+}
+a.button_task_disabled {
+	cursor: default;
+}
 
 .dialog select {
 	width: 150px;

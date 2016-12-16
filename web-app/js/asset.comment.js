@@ -10,18 +10,18 @@ function changeStatus(id, status, currentStatus, from){
 	
 	// Disable status change buttons to prevent double-clicking
 
-	var doneCss = $('#done_text_'+id).attr('class')
-	var doneOnClick = $('#done_button_'+id).attr('onclick')
+	var doneCss = $('#done_text_'+id).attr('class');
+	var doneOnClick = $('#done_button_'+id).attr('onclick');
 
-	$('#start_button_'+id).removeAttr('onclick')
-	$('#done_button_'+id).removeAttr('onclick')
-	$('#start_text_'+id).attr('class', 'task_button_disabled')
-	$('#done_text_'+id).attr('class', 'task_button_disabled')
+	$('#start_button_'+id).removeAttr('onclick');
+	$('#done_button_'+id).removeAttr('onclick');
+	$('#start_text_'+id).attr('class', 'task_button_disabled');
+	$('#done_text_'+id).attr('class', 'task_button_disabled');
 	
-	$('#showCommentDialog #start_button_'+id).removeAttr('onclick')
-	$('#showCommentDialog #done_button_'+id).removeAttr('onclick')
-	$('#showCommentDialog #start_text_'+id).attr('class', 'task_button_disabled')
-	$('#showCommentDialog #done_text_'+id).attr('class', 'task_button_disabled')
+	$('#showCommentDialog #start_button_'+id).removeAttr('onclick');
+	$('#showCommentDialog #done_button_'+id).removeAttr('onclick');
+	$('#showCommentDialog #start_text_'+id).attr('class', 'task_button_disabled');
+	$('#showCommentDialog #done_text_'+id).attr('class', 'task_button_disabled');
 
 	if (from == "myTask") {
 		params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }
@@ -44,12 +44,11 @@ function changeStatus(id, status, currentStatus, from){
 					$(cellId).parent().removeAttr('class').addClass(data.statusCss)
 					$(cellId).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
 					if (status=="Started") {
-					    // $('#startTdId_'+id).hide()
+						$('#start_button_'+id).remove();
 					    $('#done_button_'+id).attr('onclick', doneOnClick)
 					    $('#done_text_'+id).attr('class', doneCss)
 					} else if (status=="Completed") {
-						//$('#startTdId_'+id).hide()
-						//$('#doneTdId_'+id).hide()
+						$('#done_button_'+id).remove();
 					}
 				} else {
 					$('#myTaskList').html(data)
@@ -99,9 +98,10 @@ function assignTask(id, user, status, from) {
 					if (typeof timerBar !== 'undefined')
 						timerBar.resetTimer();
 				} else {
-					$('#assignedToNameSpan_'+id).html(data.assignedTo)
+					$('#assignedToNameSpan_'+id).html(data.assignedToName);
 					if (typeof timerBar !== 'undefined')
 						timerBar.resetTimer();
+					$('#assigntome_button_'+id).remove();
 				}
 				$("#showCommentDialog #assignedToTdId").html(data.assignedTo)
 			}

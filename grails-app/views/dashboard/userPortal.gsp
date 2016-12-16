@@ -111,8 +111,8 @@
         <script id="taskRowTemplate" type="text/x-kendo-tmpl">
 
             <tr id="issueTrId_#: taskId #" data-uid="#: uid #" class="#: css #">
-                <td class="custom-action">
-                    <a class="k-icon k-plus" href="\\#" tabindex="-1" action-bar-cell config-table="config.table" comment-id="#: taskId #" asset-id="#: assetId #" status="#: status #" id-prefix="issueTrId_" master="true" table-col-span="5" onclick="changeDropSummary(this)"></a>
+                <td class="custom-action" style="cursor: pointer; outline: none;" onclick="changeDropSummary(this)" href="\\#" tabindex="-1" action-bar-cell config-table="config.table" comment-id="#: taskId #" asset-id="#: assetId #" status="#: status #" id-prefix="issueTrId_" master="true" table-col-span="5">
+                    <a class="k-icon k-plus"></a>
                 </td>
                 <td #:isAllProjectMode() ? '' : 'style=display:none' # class="taskTd">
                     #: projectName #
@@ -120,7 +120,7 @@
                 <td class="taskTd">
                     #: task #
                 </td>
-                <td class="taskTd">
+                <td class="taskTd" style="cursor: pointer;">
                     <span onclick="EntityCrud.showAssetDetailView('#: assetClass #', '#: assetId #')"> #: related # </span>
                 </td class="taskTd">
                 <td class="#: overDue # taskTd">
@@ -177,10 +177,18 @@
         currentMenuId = "#teamMenuId";
 
         function changeDropSummary(e) {
-            if(e && $(e).hasClass('k-plus')) {
-                $(e).removeClass('k-plus').addClass('k-minus');
-            } else if(e && $(e).hasClass('k-minus')) {
-                $(e).removeClass('k-minus').addClass('k-plus');
+            var iconAnchor;
+            if(e) {
+                iconAnchor = ($(e).hasClass('k-plus') || $(e).hasClass('k-minus'))
+                if(iconAnchor) {
+                    if($(e).hasClass('k-plus')) {
+                        $(e).removeClass('k-plus').addClass('k-minus');
+                    } else if($(e).hasClass('k-minus')) {
+                        $(e).removeClass('k-minus').addClass('k-plus');
+                    }
+                } else if($(e).hasClass('custom-action')) {
+                    changeDropSummary($(e).find('a'));
+                }
             }
         }
 
@@ -502,7 +510,7 @@
                     detailRow.find('td').css('padding', 0);
                 },
                 dataBound: function(e) {
-                    recompileDOM("gridTaskSummary  .custom-action a");
+                    recompileDOM("gridTaskSummary  .custom-action");
                 },
                 height: 400
             });
