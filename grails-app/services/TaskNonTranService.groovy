@@ -70,6 +70,9 @@ class TaskNonTranService {
 				def successorDeps = TaskDependency.findAllByPredecessor(task)
 				log.info "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) found ${successorDeps ? successorDeps.size() : '0'} successors - $whom"
 				def i = 1
+
+				Person autoTaskPerson = taskService.getAutomaticPerson()
+
 				successorDeps?.each() { succDepend ->
 					def successorTask = succDepend.assetComment
 					log.info "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) Processing (#${i++}) successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom"
@@ -87,11 +90,13 @@ class TaskNonTranService {
 						} else {
 
 							def setStatusTo = AssetCommentStatus.READY
-							if (successorTask.role == AssetComment.AUTOMATIC_ROLE) {
+
+							if (successorTask.role == AssetComment.AUTOMATIC_ROLE || successorTask.assignedTo?.id == autoTaskPerson.id) {
 								// If this is an automated task, we'll mark it DONE instead of READY and indicate that it was completed by
 								// the Automated Task person.
 								setStatusTo = AssetCommentStatus.DONE
 								// whom = taskService.getAutomaticPerson()	// don't need this since it is duplicated
+								log.info "Task #${task.taskNumber} (id ${task.id}) was automatically completed"
 							}
 
 							log.info "updateTaskSuccessors: pred task(#:${task.taskNumber} Id:${task.id}) triggering successor task (#:${successorTask.taskNumber} Id:${successorTask.id}) to $setStatusTo by $whom"
