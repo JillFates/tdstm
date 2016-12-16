@@ -1263,26 +1263,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * Used to fetch the last task number for a project
-	 * @param Project
-	 * @return Integer
-	// TODO : SequenceService - Change to use new SequenceService - remove this function as it is unnecessary
-	def getLastTaskNumber(project) {
-		def lastTaskNum = AssetComment.executeQuery('select MAX(a.taskNumber) from AssetComment a where project=?', [project])[0]
-
-		if (! lastTaskNum) lastTaskNum = 0
-		// log.info "Last task number is $lastTaskNum"
-
-		return lastTaskNum
-	}
-	 */
-
-	/**
 	 * Used to retrieve the Person object that represent the person that completes automated tasks
 	 * @return Person
 	 */
 	Person getAutomaticPerson() {
-		return Person.getAutomaticPerson()
+		Person a = Person.findByLastNameAndFirstName(Person.SYSTEM_USER_AT.lastName, Person.SYSTEM_USER_AT.firstName)
+		if (! a) {
+			log.error 'Unable to find Automated Task Person as expected'
+		}
+		return a
 	}
 
 	/**
@@ -4496,7 +4485,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (taskSpec.containsKey('duration')) task.duration = taskSpec.duration
 				if (taskSpec.containsKey('team')) task.role = taskSpec.team
 				if (taskSpec.containsKey('category')) task.category = taskSpec.category
-				
+
 				if (taskSpec.containsKey('durationLocked')){
 					task.durationLocked = taskSpec.durationLocked.toBoolean()
 				}else{

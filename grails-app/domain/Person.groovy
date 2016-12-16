@@ -226,11 +226,7 @@ class Person extends Party {
 	 * @return
 	 */
 	Person getAutomaticPerson() {
-		def auto = Person.findByLastNameAndFirstName(SYSTEM_USER_AT.lastName, SYSTEM_USER_AT.firstName)
-		if (! auto) {
-			log.error 'Unable to find Automated Task Person as expected'
-		}
-		return auto
+		throw new RuntimeException('Person.getAutomaticPerson() deprecated - use TaskService.getAutomaticPerson()')
 	}
 
 	/**
