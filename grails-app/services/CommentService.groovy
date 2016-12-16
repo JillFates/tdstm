@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
@@ -281,19 +282,43 @@ class CommentService {
 					}
 				}
 
-				if (params.containsKey('assignedTo')) {
-					if (params.assignedTo && params.assignedTo.isNumber()){
-						if(params.assignedTo == '0'){ // if unassigned is selected .
+				if (params.assignedTo) {
+					if (params.assignedTo == '0') { // if unassigned is selected
+						if (assetComment.assignedTo) {
 							assetComment.assignedTo = null
+						}
+					} else {
+						if (params.assignedTo.equals('AUTO')) {
+							// Handle the assignment of the Automatic Task person
+							Person person = taskService.getAutomaticPerson()
+							if (! person) {
+								errorMsg = "Failed to find the Automatic person to update the Assigned To"
+								break
+							}
+
+							if (assetComment.assignedTo?.id != person.id) {
+								assetComment.assignedTo = person
+							}
 						} else {
-							def person = Person.read(params.assignedTo)
+							// Handle the assignment of typical staff assigned to the project
+							Long assignedToId = NumberUtil.toPositiveLong(params.assignedTo, -1)
+							if (assignedToId == -1) {
+								errorMsg = 'Assigned To id reference is invalid'
+								break
+							}
+							Person person = Person.read(assignedToId)
 							if (person) {
 								def projectStaff = partyRelationshipService.getProjectStaff( project.id )
-								if (projectStaff.find { "${it.staff.id}" == params.assignedTo }) {
+								if (projectStaff.find { it.staff.id == assignedToId }) {
 									assetComment.assignedTo = person
 								} else {
-									log.error "User (${userLogin}) attempted to assign unrelated person (${params.assignedTo}) to project (${project})"
+									errorMsg = 'The Assigned To person referenced was not found in project staff list'
+									securityService.reportViolation("attempted to assign unrelated person (${params.assignedTo}) to project (${project})")
+									break
 								}
+							} else {
+								errorMsg = 'The Assigned To person referenced was not found'
+								break
 							}
 						}
 					}
