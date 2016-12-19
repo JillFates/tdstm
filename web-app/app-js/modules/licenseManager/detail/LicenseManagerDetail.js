@@ -68,7 +68,7 @@ export default class LicenseManagerDetail extends FormValidator{
         this.initDate = {};
         this.initDateOptions = {
             format: 'yyyy/MM/dd',
-            max: (this.licenseModel.endDate !== null)? this.licenseModel.endDate : new Date(),
+            max: (this.licenseModel.endDate !== null && this.licenseModel.endDate !== '')? this.licenseModel.endDate : new Date(),
             change: ((e) => {
                 this.onChangeInitDate();
             })
@@ -77,14 +77,11 @@ export default class LicenseManagerDetail extends FormValidator{
         this.endDate = {};
         this.endDateOptions = {
             format: 'yyyy/MM/dd',
-            min: (this.licenseModel.initDate !== null)? this.licenseModel.initDate : new Date(),
+            min: (this.licenseModel.initDate !== null && this.licenseModel.initDate !== '')? this.licenseModel.initDate : new Date(),
             change: ((e) => {
                 this.onChangeEndDate();
             })
         };
-
-
-
 
 
         this.prepareMethodOptions();
@@ -254,6 +251,9 @@ export default class LicenseManagerDetail extends FormValidator{
                 this.saveForm(this.licenseModel);
                 this.log.info('License Saved');
             });
+        } else {
+            this.editMode = false;
+            this.prepareControlActionButtons()
         }
     }
 

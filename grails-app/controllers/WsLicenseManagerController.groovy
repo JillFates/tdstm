@@ -4,6 +4,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
+import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.LicenseService
 import org.apache.commons.codec.binary.Base64
 
@@ -144,8 +145,19 @@ class WsLicenseManagerController implements ControllerMethods {
 		if(json.environment?.id != null) {
 			lc.environment = License.Environment.forId(json.environment?.id)
 		}
-		if(json.project != null) {
-			lc.project = json.project?.toString()
+
+		if(json.project?.id != null) {
+			def dProject = [
+					id:"null",
+					name:"null",
+					client: [ id:'null', label:'null']
+			]
+			if(json.project?.id.toString() != "all"){
+				Project prj = Project.get(json.project?.id)
+				dProject.id = prj?.id
+				dProject.name = prj?.name
+			}
+			lc.project = dProject
 		}
 		if(json.client != null) {
 			lc.client = json.client?.toString()
