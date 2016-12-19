@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -523,7 +524,7 @@ class CookbookService implements ServiceMethods {
 							securityService.hasPermission('ShowAllProjects'), ProjectStatus.ANY)*.id
 
 					if (!Project.isDefaultProject(projectById) && !userProjectIds.contains(projectById.id)) {
-						throw new UnauthorizedException('''The current user doesn't have access to the project''')
+						throw new UnauthorizedException("The current user doesn't have access to the project")
 					}
 
 					projectIds.add(projectById.id)
@@ -612,21 +613,22 @@ class CookbookService implements ServiceMethods {
 	def findRecipeVersionsWithSourceCode(recipeId) {
 
 		Project project = controllerService.requiredProject
+		// arecordon: it seems that there are places where a string is passed, instead of a long.
+		recipeId = NumberUtil.toLong(recipeId)
 
-		if (recipeId == null || !recipeId.isNumber()) {
+		if (recipeId == null) {
 			throw new EmptyResultException()
 		}
 
-		jdbcTemplate.query('''
-			SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,
-			       recipe_version.source_code as sourceCode, recipe_version.changelog as changelog,
-			       recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
-			       if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
-	       FROM recipe
-			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id
-			WHERE recipe.recipe_id=?
-			ORDER BY version_number ASC
-			''', recipeId, new RecipeVersionCompleteMapper())
+		 
+		jdbcTemplate.query("SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,"
+			       + " recipe_version.source_code as sourceCode, recipe_version.changelog as changelog,"
+			       + " recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,"
+			       + " if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion"
+	       + " FROM recipe"
+			+ " INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id"
+			+ " WHERE recipe.recipe_id=?"
+			+ " ORDER BY version_number ASC", new RecipeVersionCompleteMapper(), [recipeId])
 	}
 
 	/**
