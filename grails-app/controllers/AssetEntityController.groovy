@@ -4256,10 +4256,10 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	/**
-	 * Used to retrieve the account information during the import process after it has been read in from the
+	 * Used to retrieve the task information during the import process after it has been read in from the
 	 * uploaded spreadsheet and reviewed for errors.
 	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
-	 * @return JSON { accounts: List of accounts }
+	 * @return JSON { tasks: List of tasks }
 	 */
 	@HasPermission('GenerateTasks')
 	def importTaskReviewData() {
@@ -4393,7 +4393,7 @@ class AssetEntityController implements ControllerMethods {
 					break
 				default:
 					log.error "Exception occurred while importing data (step $currentStep)", e
-					flash.message = "An error occurred while attempting to import accounts"
+					flash.message = "An error occurred while attempting to import tasks."
 			}
 			// Attempt to delete the temporary uploaded worksheet if an exception occurred
 			if (options.filename) {
