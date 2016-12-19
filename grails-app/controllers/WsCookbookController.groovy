@@ -18,8 +18,8 @@ class WsCookbookController implements ControllerMethods {
 
 	def createRecipe(String name, String description, String context, Long clonedFrom) {
 		try {
-			def recipe = cookbookService.createRecipe(name, description, context, clonedFrom)
-			renderSuccessJson(recipeId: recipe.id)
+			def recipeVersion = cookbookService.createRecipe(name, description, context, clonedFrom)
+			renderSuccessJson(recipeId: recipeVersion.recipe.id)
 		}
 		catch (e) {
 			handleException e, logger
