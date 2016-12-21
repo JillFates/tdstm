@@ -211,13 +211,11 @@ class DataTransferBatchController implements ControllerMethods {
 	def errorsListView() {
 		long dataTransferBatchId = params.long('id')
 
-		List<Map<String, Object>> dataTransferErrorList = jdbcTemplate.queryForList('''\
-			select d.asset_entity_id, d.import_value, d.row_id, a.attribute_code, d.error_text
-			FROM data_transfer_value d
-			     left join eav_attribute a on (d.eav_attribute_id = a.attribute_id)
-			where d.data_transfer_batch_id = :dtbId
-			  and has_error = 1
-			''', [dtbId: dataTransferBatchId])
+		List<Map<String, Object>> dataTransferErrorList = 
+			jdbcTemplate.queryForList("select d.asset_entity_id, d.import_value, d.row_id, a.attribute_code, d.error_text"
+				+ " FROM data_transfer_value d left join eav_attribute a"
+				+ " on (d.eav_attribute_id = a.attribute_id) where d.data_transfer_batch_id = ?"
+				+ " and has_error = 1" , [dataTransferBatchId])
 
 		def completeDataTransferErrorList = []
 		def currentValues
