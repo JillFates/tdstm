@@ -1725,10 +1725,14 @@ class AssetEntityService implements ServiceMethods {
 	/*
 	 * export cabling data.
 	 */
-	def cablingReportData(assetCablesList, cablingSheet) {
+	def cablingReportData(assetCablesList, cablingSheet, progressCount=0, progressTotal=0, updateOnPercent=0, key=null) {
 
 		assetCablesList.eachWithIndex { cabling, int idx ->
-			def currentCabling = cabling
+			def currentCabling = cabling.get(Criteria.ROOT_ALIAS)
+			if(key){
+				progressCount++
+				updateProgress(key, progressCount, progressTotal, 'In progress', 0.01)
+			}
 			addCell(cablingSheet, idx + 2, 0, String.valueOf(currentCabling.assetFromPort?.type ?: ''))
 			addCell(cablingSheet, idx + 2, 1, currentCabling.assetFrom?.id ?: '', Cell.CELL_TYPE_NUMERIC)
 			addCell(cablingSheet, idx + 2, 2, String.valueOf(currentCabling.assetFrom?.assetName ?: ''))

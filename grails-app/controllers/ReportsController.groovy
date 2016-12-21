@@ -46,6 +46,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
 
+import org.hibernate.Criteria
+import org.hibernate.transform.Transformers
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ReportsController implements ControllerMethods {
 
@@ -571,21 +574,34 @@ class ReportsController implements ControllerMethods {
 			def moveBundleInstance = MoveBundle.get(params.moveBundle)
 			def reportFields = []
 			def bundleName = "All Bundles"
-			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $project.id ")
-			//if moveBundleinstance is selected (single moveBundle)
-			if ( moveBundleInstance ) {
+
+
+
+
+			def assetCablesList = AssetCableMap.createCriteria().list{
+						createAlias("assetFrom", "af")
+						and{
+							eq("af.project", project)
+							
+							if(moveBundleInstance){
+								eq("moveBundle", moveBundleInstance)
+							}
+
+							if(cableType){
+								eq("af.type", cableType)
+							}
+						}
+
+						order("assetFrom")
+						
+						resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+						fetchSize 1000
+					}
+
+			if(moveBundleInstance){
 				bundleName = moveBundleInstance?.name
-				cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
 			}
-			//All Bundles Selected
-			else {
-				cablesQuery.append(" and acm.assetFrom.moveBundle != null ")
-			}
-			if (cableType) {
-				cablesQuery.append(" and acm.assetFromPort.type = '$cableType' ")
-			}
-			cablesQuery.append(" order By acm.assetFrom ")
-			def assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
+
 			try {
 				//set MIME TYPE as Excel
 				if (assetCablesList.size() == 0) {
