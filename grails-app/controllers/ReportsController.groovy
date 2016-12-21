@@ -130,6 +130,7 @@ class ReportsController implements ControllerMethods {
 		String tzId = userPreferenceService.timeZone
 		def sortOrder = params.sortType
 		def teamPartyGroup
+		def partyGroupInstance = PartyGroup.get(project.id)
 		// if no moveBundle was selected
 		if (params.moveBundle == "null") {
 			flash.message = " Please Select Bundles. "
@@ -182,13 +183,16 @@ class ReportsController implements ControllerMethods {
 					String roomTagSort = (asset.sourceRoom ?: "") + " " + (asset.sourceRack ?: "") + " " + (asset?.model?.usize ?: "")
 					String truckTagSort = (asset.truck ?: "") + " " + (asset.cart ?: "") + " " + (asset.shelf ?: "")
 
-					def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup)
+					def teamMembers = []
+					if(teamPartyGroup){
+						teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup)
+					}
 					reportFields << [assetName: asset.assetName , model: asset.model?.toString(),
 					                 sourceTargetPos: (teamPartyGroup?.currentLocation ?: "") + "(source/ unracking)",
 					                 cart: cartShelf, shelf: asset.shelf, source_team_id: teamPartyGroup?.id,
 					                 move_bundle_id: asset?.moveBundle?.id, dlocation: asset.rackSource?.location ?: '',
 					                 projectName: partyGroupInstance?.name, startAt: project.startDate,
-					                 completedAt: project.completionDate, bundleName: bundleInstance?.name,
+					                 completedAt: project.completionDate, bundleName: moveBundle?.name,
 					                 teamName: teamPartyGroup?.teamCode ? teamPartyGroup?.name + " - " + teamMembers : "",
 					                 location: "Source Team", truck: asset.truck,  room: asset.sourceRoom,
 					                 instructions: assetCommentString, roomTagSort: roomTagSort, truckTagSort: truckTagSort,
