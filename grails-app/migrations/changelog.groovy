@@ -145,4 +145,5 @@ databaseChangeLog = {
 	include file: "20161207-add-owner-to-license-table.groovy"
 	include file: "20161208-add-host-data-to-license-table.groovy"
 	include file: "20161208-add-host-data-to-licenseclient-table.groovy"
+	include file: "20161220-add-banner_message-to-licensedclient-table.groovy"
 }

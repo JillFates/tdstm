@@ -20,7 +20,7 @@ import net.nicholaswilliams.java.licensing.DeserializingLicenseProvider
  * | licenseHash
  */
 class MyLicenseProvider extends DeserializingLicenseProvider{
-	String license
+	String license //DB
 
 	@Override
 	protected byte[] getLicenseData(Object o) {

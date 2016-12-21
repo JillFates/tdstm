@@ -138,7 +138,7 @@ class WsLicenseController implements ControllerMethods {
 				lic.requestDate = new Date()
 				lic.status = License.Status.PENDING
 				lic.method = License.Method.MAX_SERVERS
-				lic.instalationNum = licenseService.getInstalationId()
+				lic.installationNum = licenseService.getInstalationId()
 				lic.hostName = licenseService.hostName
 				lic.websitename = licenseService.FQDN
 			}
@@ -153,7 +153,7 @@ class WsLicenseController implements ControllerMethods {
 				def project = Project.get(lic.project)
 				if(project !=  null) {
 					def client = project.client
-					lic.instalationNum = "${lic.instalationNum}|${project.name}|${client.name}"
+					lic.installationNum = "${lic.installationNum}|${project.name}|${client.name}"
 				}else{
 					lic.errors.rejectValue("project", "Project (id:${lic.project}) not found")
 				}

@@ -63,7 +63,7 @@ class LicenseController {
 		}else{
 			lic = new License()
 			lic.requestDate = new Date()
-			lic.instalationNum = licenseService.getInstalationId()
+			lic.installationNum = licenseService.getInstalationId()
 		}
 
 		lic.email = params.email
@@ -74,7 +74,7 @@ class LicenseController {
 		if(lic.project != "all"){
 			def project = Project.get(lic.project)
 			def client = project.client
-			lic.instalationNum = "${lic.instalationNum}|${project.name}|${client.name}"
+			lic.installationNum = "${lic.installationNum}|${project.name}|${client.name}"
 		}
 
 		if (lic.save()) {
@@ -95,7 +95,7 @@ class LicenseController {
 				id:lic.id,
 				email:lic.email,
 				environment:lic.environment,
-				instalationNum:lic.instalationNum,
+				installationNum:lic.installationNum,
 				project: lic.project,
 				requestDate: lic.requestDate,
 				requestNote: lic.requestNote

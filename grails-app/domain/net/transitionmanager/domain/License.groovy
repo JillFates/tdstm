@@ -8,8 +8,12 @@ import org.apache.commons.codec.binary.Base64
  * Created by octavio on 9/20/16.
  */
 class License {
+	/* TAG grapper for messaging */
+	static BEGIN_TAG = "-----BEGIN HASH-----"
+	static END_TAG = "-----END HASH-----"
+
 	String id = UUID.randomUUID().toString()
-	String instalationNum
+	String installationNum
 	String email
 	PartyGroup owner
 	Environment environment
@@ -34,6 +38,7 @@ class License {
 		tablePerHierarchy false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
+		installationNum column:'instalation_num'
 	}
 
 	static constraints = {
@@ -95,7 +100,7 @@ class License {
 				id: status?.id,
 				name: status?.name()
 			],
-			instalationNum	: instalationNum,
+			installationNum	: installationNum,
 			project			: dProject,
 			client			: [
 			        id: client?.id,

@@ -15,7 +15,7 @@ import net.transitionmanager.domain.License.Method
  */
 class LicensedClient {
 	String id
-	String instalationNum
+	String installationNum
 	String email
 	Environment environment
 	Status status
@@ -32,6 +32,7 @@ class LicensedClient {
 	String hostName
 	String websitename
 	String hash
+	String bannerMessage
 
 	static mapping = {
 		id 			generator: 'assigned'
@@ -41,6 +42,8 @@ class LicensedClient {
 		tablePerHierarchy false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
+		installationNum column:'instalation_num'
+		bannerMessage type:'text'
 	}
 
 	static constraints = {
@@ -49,6 +52,7 @@ class LicensedClient {
 		expirationDate 	nullable:true
 		requestNote 	nullable:true
 		hash 			nullable:true
+		bannerMessage	nullable:true
 	}
 
 	public toJsonMap() {
@@ -76,7 +80,7 @@ class LicensedClient {
 						id: status?.id,
 						name: status?.name()
 				],
-				instalationNum	: instalationNum,
+				installationNum	: installationNum,
 				project			: dProject,
 				client			: dClient,
 				owner			: dOwner,

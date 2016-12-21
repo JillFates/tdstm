@@ -16,7 +16,6 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.codecs.MD5Codec
 
 class LicenseService {
-
 	static transactional = false
 
 	GrailsApplication grailsApplication
@@ -27,20 +26,22 @@ class LicenseService {
 	 * Initialize the license service
 	 * @return
 	 */
-	private initialize() {
-		if(!tdsPasswordProvider) {
+	def initialize() {
+		if(isEnabled() && !tdsPasswordProvider) {
 			tdsPasswordProvider = new TDSPasswordProvider(grailsApplication.config.tdstm.license.password)
 			licenseProvider = new MyLicenseProvider()
 
 			File basePath = new File('.')  //grailsApplication.parentContext.getResource("/..").file
-			//LicenseCreatorProperties.setPrivateKeyDataProvider(new FilePrivateKeyDataProvider(basePath))
-			//LicenseCreatorProperties.setPrivateKeyPasswordProvider(tdsPasswordProvider)
+
+			//Manager License Generator
+			LicenseCreatorProperties.setPrivateKeyDataProvider(new FilePrivateKeyDataProvider(basePath))
+			LicenseCreatorProperties.setPrivateKeyPasswordProvider(tdsPasswordProvider)
 
 			LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(basePath))
 			LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
 			LicenseManagerProperties.setLicenseProvider(licenseProvider)
 
-			// Optional; set only if you are using a different password to encrypt licenses than your public key
+			// Optional; set only if you are using a different password to encrypt licenses than your key
 			// should we set a different password per client?
 			LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
 
@@ -57,16 +58,22 @@ class LicenseService {
 			//LicenseCreator.getInstance().signAndSerializeLicense(license)
 
 
-			LicenseManager manager = LicenseManager.getInstance()
+			//License Loader
+			//LicenseManager manager = LicenseManager.getInstance()
 			//log.info("OLB: Load License")
 			//licenseProvider.addLicense("rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L")
 			//log.info("OLB: Loaded")
 			//licenseProvider.getLicense("")
+			log.info("License Service Initialized")
 		}
 	}
 
+	def isEnabled(){
+		return grailsApplication.config.tdstm.license.enabled
+	}
+
 	//Installation  <--
-	public String getInstalationId(){
+	String getInstalationId(){
 		String hostname = getHostName()
 		String fqdn = getFQDN()
 
@@ -81,12 +88,12 @@ class LicenseService {
 		return md5key
 	}
 
-	public String getFQDN(){
+	String getFQDN(){
 		URL url = new URL(grailsApplication.config.grails.serverURL)
 		return url.getHost()
 	}
 
-	public String getHostName(){
+	String getHostName(){
 		InetAddress addr = InetAddress.getLocalHost()
 
 		//return addr.getCanonicalHostName() // this returns the IP in case that we cannot reverse check the IP-name
@@ -117,36 +124,7 @@ class LicenseService {
 		return macs.join(divider)
 	}
 
-
-	public String generateLicense(String productKey, String holder, String subject, int numberOfLicenses, Date goodAfter, Date goodBefore){
-		initialize()
-
-		License.Builder licenseBuilder = new License.Builder().
-				withProductKey(productKey). //TM-CORE-XXX
-				withIssuer("TDS").
-				withHolder(holder). //Partner - Client
-				withSubject(subject). //project:<guid> | global
-				withIssueDate(new Date().getTime()).
-				withGoodAfterDate(goodAfter.getTime()).
-				withGoodBeforeDate(goodBefore.getTime()).
-				withNumberOfLicenses(numberOfLicenses)
-
-		//Use the name of the license name "project:<guid>"
-		License license = licenseBuilder.
-				addFeature("environment:[engineering | training | demo | production]").
-				addFeature("module:dr").
-				addFeature("module:cookbook").
-				addFeature("module:core"). //All will have this so maybe is not required
-				build()
-
-		byte[] licenseData = LicenseCreator.getInstance().signAndSerializeLicense(license)
-
-		String trns = new String(Base64.encodeBase64(licenseData))
-
-		return trns
-	}
-
-	public boolean hasModule(projectGuid, moduleName){
+	boolean hasModule(projectGuid, moduleName){
 
 		LicenseManager manager = LicenseManager.getInstance()
 		License license = manager.getLicense("global")
@@ -155,8 +133,8 @@ class LicenseService {
 		license.hasLicenseForAllFeatures("module:$moduleName")
 	}
 
-	//public boolean isValid(projectGuid, featureName){
-	public boolean isValid(){
+	//boolean isValid(projectGuid, featureName){
+	boolean isValid(){
 		initialize()
 
 		//Is licence check disabled then is always valid
@@ -181,16 +159,16 @@ class LicenseService {
 		}
 	}
 
-	public void load(String license){
+	void load(String license){
 		initialize()
 		LicenseManager manager = LicenseManager.getInstance()
 		licenseProvider.addLicense(license)
 	}
 
-	public License useLicense() {
+	License useLicense() {
 		initialize()
 		LicenseManager manager = LicenseManager.getInstance()
-		License license = manager.getLicense("")
+		License license = manager.getLicense("") //All
 		try {
 			manager.validateLicense(license)
 		//} catch(ExpiredLicenseException | InvalidLicenseException e) {
@@ -200,8 +178,10 @@ class LicenseService {
 		}
 
 
-		int seats = license.getNumberOfLicenses()
-		log.info("SEATS: $seats")
+		//int seats = license.getNumberOfLicenses()
+		license.getNumberOfLicenses() //MaxServers
+
+		//log.info("SEATS: $seats")
 
 		return license
 

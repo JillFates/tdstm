@@ -1,22 +1,17 @@
 import com.github.icedrake.jsmaz.Smaz
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.LicenseManagerService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.license.LicenseService
-import groovy.json.JsonBuilder
 import org.apache.commons.codec.binary.Base64
-import org.apache.commons.lang3.math.NumberUtils
-import org.apache.commons.lang3.time.DateUtils
-import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 
 @Secured('isAuthenticated()')
 @Slf4j
 @Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class LicenseManagerController {
-
-	LicenseService  licenseService
+	LicenseManagerService licenseManagerService
 	SecurityService securityService
 	ProjectService projectService
 
@@ -33,7 +28,7 @@ class LicenseManagerController {
 	 * @return
 	 */
 	def manager(){
-		def licenses = LicensedClient.findAll()
+		def licenses = licenseManagerService.list()
 		[licenses:licenses]
 	}
 
@@ -86,7 +81,7 @@ class LicenseManagerController {
 	}
 
 	def clientRequest(){
-		String instalationNum = licenseService.getInstalationId()
+		String instalationNum = licenseService.getInstallationId()
 		[instalationNum:instalationNum]
 	}
 
