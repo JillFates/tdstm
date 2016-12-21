@@ -887,7 +887,7 @@
 	 will popup the dialog to create news
 	 */
 	function opencreateNews(){
-		progressTimer.resetTimer();
+		progressTimer.Pause();
 		$("#createNews").dialog('option', 'width', 'auto');
 		$("#createNews").dialog('option', 'position', ['center','top']);
 		$("#createNews").dialog('option', 'modal', 'auto');
@@ -953,6 +953,7 @@
 									onComplete:'getMoveEventNewsDetails(moveEvent)')}
 			 */
 		}
+		progressTimer.attemptResume();
 	}
 
 	/*
@@ -964,6 +965,7 @@
 		$('#resolutionNews').val("")
 		$('#isArchivedId').attr("checked",false)
 		$('#createNews').dialog('close');
+		progressTimer.attemptResume();
 	}
 
 	/* will popup the dialog to edit news */
