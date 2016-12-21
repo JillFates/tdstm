@@ -90,6 +90,7 @@ class LicensedClient {
 				requestNote		: requestNote,
 				hostName		: hostName,
 				websitename		: websitename,
+				bannerMessage	: bannerMessage,
 				activityList	: []
 		]
 	}
