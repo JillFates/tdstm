@@ -304,8 +304,10 @@ class ProjectService implements ServiceMethods {
 		EavEntityType eavEntityType = EavEntityType.findByDomainName(entityType)
 		List<EavAttribute> attributes = EavAttribute.findAllByEntityType(eavEntityType, [sort: 'frontendLabel'])
 
-		int firstCustom = attributes.indexOf { it.frontendLabel == "Custom1" }
-		int lastCustom = attributes.indexOf { it.frontendLabel == 'Custom' + Project.CUSTOM_FIELD_COUNT }
+
+
+		int firstCustom = attributes.findIndexOf { it.frontendLabel == "Custom1" }
+		int lastCustom = attributes.findIndexOf { it.frontendLabel == 'Custom' + Project.CUSTOM_FIELD_COUNT }
 		List<EavAttribute> firsts = attributes[0..firstCustom - 1]
 		List<EavAttribute> lasts = attributes[lastCustom + 1..attributes.size() - 1]
 		List<EavAttribute> nonCustoms = firsts + lasts
