@@ -621,12 +621,13 @@ class PartyRelationshipService implements ServiceMethods {
 	 * The List of ProjectTeam member names as a complete string to display in Reports.
 	 */
 	String getTeamMemberNames(ProjectTeam projectTeam) {
+
 		List<Person> teamMembers = Person.executeQuery('''
 			select pr.partyIdTo
 			from PartyRelationship pr
 			where pr.partyIdFrom = :projectTeam
 			  and pr.roleTypeCodeTo = 'TEAM_MEMBER'
-		''', [projectTeam: projectTeam])
+		''', ["projectTeam": projectTeam])
 
 		teamMembers.collect { Person p -> p.firstName << ' ' << p.lastName }.join('/')
 	}
