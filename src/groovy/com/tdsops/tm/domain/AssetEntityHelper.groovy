@@ -33,9 +33,14 @@ class AssetEntityHelper {
 		if (id) {
 			asset = domainClass.get(id)
 			if (asset) {
-				if (asset.projectId != project?.id) {
+				if (asset.project.id != project?.id) {
 					SecurityService securityService = ApplicationContextHolder.getBean('securityService', SecurityService)
-					securityService.reportViolation("Attempt to access ${AssetClass.domainNameFor(ac)} ($assetId) of unassociated project ($project.id)")
+					// ac is always null from some context
+					if(ac != null) {
+						securityService.reportViolation("Attempt to access ${AssetClass.domainNameFor(ac)} ($assetId) of unassociated project ($project.id)")
+					} else{
+						securityService.reportViolation("Attempt to access ($assetId) of unassociated project ($project.id)")
+					}
 				}
 			}
 		}
