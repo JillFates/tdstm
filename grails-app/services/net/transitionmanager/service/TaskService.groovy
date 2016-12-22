@@ -725,7 +725,7 @@ class TaskService implements ServiceMethods {
 	 * Used to clear all Task data that are associated to a task batch
 	 * @param moveEventId
 	 */
-	def resetTaskDataForTaskBatch(Map taskBatch) {
+	def resetTaskDataForTaskBatch(TaskBatch taskBatch) {
 		try {
 			def tasksMap = getTaskBatchTaskLists(taskBatch.id)
 			return resetTaskDataForTasks(tasksMap)
