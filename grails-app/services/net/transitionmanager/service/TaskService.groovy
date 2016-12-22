@@ -1346,7 +1346,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	Map initiateCreateTasksWithRecipe(String contextId, String recipeId, Boolean deletePrevious,
 	                                  Boolean useWIP, Boolean publishTasks) {
 
-		long currentProjectId = securityService.userCurrentProjectId
+		long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
 		securityService.requirePermission 'GenerateTasks'
@@ -1383,7 +1383,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		def contextType = recipeVersion.recipe.asContextType()
-		Long cid = contextId.toLong()
+		Integer cid = NumberUtil.toInteger(contextId)
 		def contextObj = getContextObject(contextType, cid)
 		if (! contextObj) {
 			throw new IllegalArgumentException('Referenced context was not found')
@@ -1413,7 +1413,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		progressService.create(key, 'Pending')
 
 		// Kickoff the background job to generate the tasks
-		def jobName = 'TM-GenerateTasks-' + project.id + '-' + contextType + '-' + cid
+		def jobName = 'TM-GenerateTasks-' + currentProjectId + '-' + contextType + '-' + cid
 		try {
 			log.info "initiateCreateTasksWithRecipe : Created taskBatch $tb and about to kickoff job to generate tasks $jobName"
 			// Delay 2 seconds to allow this current transaction to commit before firing off the job
@@ -1623,7 +1623,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		Person whom = taskBatch.createdBy
 
-		def contextObj = getContextObject(taskBatch.contextType, taskBatch.contextId)
+		def contextObj = getContextObject(taskBatch.contextType, (int)taskBatch.contextId)
 		def assets = getAssocAssets(contextObj)
 
 		List<Long> bundleIds = []
@@ -2740,7 +2740,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 										// Now Wire to the last tasks of the supporting assets
 
-										log.debug "Working on dependency asset ($ad.asset_ depends on ($ad.dependent) - matching on asset $predAsset"
+										log.debug "Working on dependency asset ($ad.asset depends on ($ad.dependent) - matching on asset $predAsset"
 
 										// Make sure that the other asset is in one of the bundles in the event
 										def predMoveBundle = predAsset.moveBundle
@@ -2949,6 +2949,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def currAssetPropName
 		def assocAssetPropName
 		String baseHql
+		String baseSql
 		def map
 
 		if (depMode == 's') {
@@ -2961,6 +2962,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			assocAssetPropName = 'asset'
 		}
 
+
 		if (depMode == 'b') {
 //			baseHql = '''
 //			from AssetDependency ad
@@ -2970,16 +2972,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 //			  and ad.status not in ('$AssetDependencyStatus.NA', '$AssetDependencyStatus.ARCHIVED') \
 //				and ad.type <> '$AssetDependencyType.BATCH'"
 			baseHql = '''
-				from AssetDependency
+				from AssetDependency ad
 				where (dependent.id=:assetId or asset.id=:assetId)
 				and dependent.moveBundle.id IN (:moveBundleIds)
 				and asset.moveBundle.id IN (:moveBundleIds)
-				and status not in ''' + "('$NA', '$ARCHIVED')" + ''' +
+				and status not in ''' + "('$NA', '$ARCHIVED')" + ''' 
 				and type <> '${AssetDependencyType.BATCH}'
 			'''
 		} else {
 			baseSql = """
-				from AssetDependency
+				from AssetDependency ad
 				where ${currAssetPropName}.id=:assetId
 				and ${assocAssetPropName}.moveBundle.id IN (:moveBundleIds)
 				and ad.status not in ('$NA', '$ARCHIVED')
