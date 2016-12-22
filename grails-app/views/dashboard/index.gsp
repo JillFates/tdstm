@@ -893,6 +893,7 @@
 		$("#createNews").dialog('option', 'modal', 'auto');
 		$("#showEditCommentDialog").dialog("close");
 		$('#createNews').dialog('open');
+		$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 	}
 	function updateHidden(checkBoxId,hiddenId){
 		var resolve = $("#"+checkBoxId).is(':checked');
