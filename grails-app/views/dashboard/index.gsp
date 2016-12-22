@@ -895,6 +895,11 @@
 		$('#createNews').dialog('open');
 		$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 	}
+
+	$('div#createNews').on('dialogclose', function() {
+		progressTimer.attemptResume();;
+	});
+
 	function updateHidden(checkBoxId,hiddenId){
 		var resolve = $("#"+checkBoxId).is(':checked');
 		if (resolve) {
