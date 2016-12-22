@@ -244,16 +244,6 @@
 				<tr>
 					<td colspan="2"><div class="required">Fields marked ( * ) are mandatory</div></td>
 				</tr>
-				<tr>
-					<td valign="top" class="name">
-						<label>Type:</label>
-					</td>
-					<td valign="top" class="value">
-						<select disabled="disabled">
-							<option>News</option>
-						</select>
-					</td>
-				</tr>
 				<tr class="prop">
 					<td valign="top" class="name">
 						<label for="messageNews">
