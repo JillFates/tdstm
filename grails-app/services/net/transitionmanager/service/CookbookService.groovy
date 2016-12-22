@@ -600,7 +600,7 @@ class CookbookService implements ServiceMethods {
 			INNER JOIN person ON person.person_id = recipe_version.created_by_id
 			WHERE recipe.recipe_id=?
 			ORDER BY version_number DESC
-			''', recipeId, new RecipeVersionMapper())
+			''', new RecipeVersionMapper(), [recipeId])
 	}
 
 	/**
