@@ -111,9 +111,13 @@ class UserPreferenceService implements ServiceMethods {
 
 		boolean isCurrent = userLogin.id == securityService.currentUserLoginId
 		if (isCurrent) {
-			Map holder = (Map) session.getAttribute(preferenceCode)
+			def holder = session.getAttribute(preferenceCode)
+			def userPrefValue = holder
 			if (holder != null) {
-				return holder[preferenceCode] ?: defaultIfNotSet
+				if(holder instanceof Map){
+					userPrefValue = holder[preferenceCode] ?: defaultIfNotSet
+				}
+				return userPrefValue
 			}
 		}
 
