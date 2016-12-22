@@ -271,6 +271,10 @@ class WsDashboardController implements ControllerMethods {
 			}
 		}
 
+		def days = dayTime?.days ? (dayTime?.days > 9 ? dayTime?.days : '0' + dayTime?.days) : '0'
+		def hours = dayTime?.hours  ? (dayTime?.hours > 9 ? dayTime?.hours : '0' + dayTime?.hours) : '00'
+		def minutes = dayTime?.minutes  ? (dayTime?.minutes > 9 ? dayTime?.minutes :'0' + dayTime?.minutes) : '00'
+
 		renderAsJson(snapshot: [
 			revisedComp: moveEvent?.revisedCompletionTime,
 			moveBundleId: moveBundleId,
@@ -280,11 +284,7 @@ class WsDashboardController implements ControllerMethods {
 			planSum: [
 				dialInd: moveEventPlannedSnapshot?.dialIndicator, 'confText' : 'High',
 				confColor: 'green', compTime: planSumCompTime,
-				dayTime: '<span><b>' +
-					dayTime?.days ? (dayTime?.days > 10 ? dayTime?.days : '0' + dayTime?.days) : '0' + ':' +
-					dayTime?.hours ? (dayTime?.hours > 10 ? dayTime?.hours : '0' + dayTime?.hours) : '00' + ':' +
-					dayTime?.minutes ? (dayTime?.minutes > 10 ? dayTime?.minutes :'0' + dayTime?.minutes) : '00' +
-				'</b></span>',
+				dayTime: '<span><b>' + days + ":" + hours + ":" + minutes + '</b></span>',
 				eventDescription: moveEvent?.description, eventString: eventString,
 				eventRunbook: moveEvent?.runbookStatus
 			],
