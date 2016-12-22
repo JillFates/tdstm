@@ -52,7 +52,8 @@ export default class LicenseManagerService {
             activationDate: license.initDate,
             expirationDate: license.endDate,
             status: { id: license.statusId },
-            project: { id: (license.projectId !== 'all')? parseInt(license.projectId) : license.projectId  } // We pass 'all' when is multiproject
+            project: { id: (license.projectId !== 'all')? parseInt(license.projectId) : license.projectId  }, // We pass 'all' when is multiproject
+            bannerMessage: license.bannerMessage
         };
 
         if(license.method !== 3) {

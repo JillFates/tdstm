@@ -325,7 +325,7 @@ export default class LicenseManagerDetail extends FormValidator{
             this.initDate.max(new Date(endDate));
         } else {
             endDate = new Date();
-            this.initDate.initDate.max(endDate);
+            this.initDate.max(endDate);
             this.endDate.min(endDate);
         }
     }
