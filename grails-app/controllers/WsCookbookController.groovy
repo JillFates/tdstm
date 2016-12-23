@@ -105,6 +105,7 @@ class WsCookbookController implements ControllerMethods {
 	 */
 	def recipe(Long id, Integer version) {
 		try {
+			def x = 5/0
 			Map result = cookbookService.getRecipe(id, version)
 			Recipe recipe = result.recipe
 			RecipeVersion rv = result.recipeVersion

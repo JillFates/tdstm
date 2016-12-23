@@ -1,6 +1,7 @@
 package net.transitionmanager.controller
 
 import com.tdsops.common.lang.CollectionUtils
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
@@ -146,7 +147,10 @@ trait ControllerMethods {
 			renderErrorJson('The request was invalid')
 		}
 		else {
-			sendInternalError(log, e)
+			if (log) {
+				log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 20)
+			}
+			renderErrorJson('An unresolved error has occurred')
 		}
 	}
 
