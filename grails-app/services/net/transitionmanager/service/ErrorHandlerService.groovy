@@ -68,10 +68,11 @@ class ErrorHandlerService {
 	 */
 	boolean isAjaxRequest(request) {
 		boolean isAjax = 'XMLHttpRequest'.equals( request.getHeader('X-Requested-With') )
-
+log.debug "isAjaxRequest() IN THE LOGIC"
 		if (! isAjax) {
 			// Angular in particular doesn't set the X-Requested-With header so we check for Accept allowing json
 			String accept = request.getHeader('Accept')
+			log.debug "isAjaxRequest() accept=$accept"
 			if (accept) {
 				List l = accept.split(',')
 				isAjax = l.contains('application/json')

@@ -21,7 +21,10 @@ import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 /**
- * @author Burt Beckwith
+ * This set of traits are intended to be used by the controller methods to respond to
+ * a variety of Ajax and API calls with a standardized set actions.
+ * TODO : JPM : 12/2016 - Burt copied all of the methods from the ServiceResults class
+ * 		but should have just called the methods on that object instead to elminate duplication.
  */
 trait ControllerMethods {
 
@@ -119,6 +122,13 @@ trait ControllerMethods {
 		response.status = status.value()
 	}
 
+	/**
+	 * Used to respond with a standard response appropriately for any sort of exception which
+	 * will return messages from certain exceptions that have consumer facing messages and
+	 * obscuring others that users should NOT see.
+	 * @param e - the exception that occurred
+	 * @param log - the logger object to log to
+	 */
 	void handleException(Exception e, log) {
 		if (e instanceof UnauthorizedException || e instanceof IllegalArgumentException) {
 			sendForbidden()
@@ -130,10 +140,10 @@ trait ControllerMethods {
 			renderAsJson errorsInValidation(e.errors)
 		}
 		else if (e instanceof InvalidParamException) {
-			renderErrorJson('Invalid preference value')
+			renderErrorJson('An invalid parameter was received')
 		}
 		else if (e instanceof InvalidRequestException) {
-			renderErrorJson('Invalid preference code')
+			renderErrorJson('The request was invalid')
 		}
 		else {
 			sendInternalError(log, e)
@@ -150,37 +160,6 @@ trait ControllerMethods {
 			redirect action: 'list'
 			null
 		}
-	}
-
-	Number convertPower(Number watts, String powerType) {
-		if (watts == null) watts = 0
-		powerType == 'Watts' ? Math.round(watts.floatValue()) : (watts / 120).toFloat().round(1)
-	}
-
-	/**
-	 * Join multiple parts with empty/null values replaced by the 'alt' attribute.
-	 * Shortens (x ?: '--') + '/' + (y ?: '--') + '/' + (z ?: '--') to safeJoinAlt('/', '--', x, y, z)
-	 *
-	 * @param separator  the string to use between parts
-	 * @param alt  the value to use if a part evaluates to Groovy-false
-	 * @param parts  the parts to join
-	 * @return  the concatenated string
-	 */
-	String safeJoinAlt(String separator, String alt, Object... parts) {
-		parts.collect { it ?: '--' }.join(separator)
-	}
-
-	/**
-	 * Join multiple parts with empty/null values ignored.
-	 * Shortens (x ?: '') + '/' + (y ?: '') + '/' + (z ?: '') to safeJoin('/', x, y, z)
-	 *
-	 * @param separator  the string to use between parts
-	 * @param alt  the value to use if a part evaluates to Groovy-false
-	 * @param parts  the parts to join
-	 * @return  the concatenated string
-	 */
-	String safeJoin(String separator, Object... parts) {
-		parts.findAll().join(separator)
 	}
 
 	/**
@@ -222,11 +201,47 @@ trait ControllerMethods {
 
 		if (instance.hasErrors()) {
 			LoggerFactory.getLogger('grails.app.controllers.' + getClass().name).error(
-					'Validation errors saving {} with id {} {}',
-					instance.getClass().simpleName, instance.id, GormUtil.allErrorsString(instance))
+				'Validation errors saving {} with id {} {}',
+				instance.getClass().simpleName, instance.id, GormUtil.allErrorsString(instance))
 		}
 
 		instance
+	}
+
+	// ----------------------
+	// TODO : JPM 12/2016 : Refactor the methods (convertPower, safeJoinAlt, safeJoin) appropriately
+	// I have NO clue why Burt put these here...
+	// ----------------------
+
+	Number convertPower(Number watts, String powerType) {
+		if (watts == null) watts = 0
+		powerType == 'Watts' ? Math.round(watts.floatValue()) : (watts / 120).toFloat().round(1)
+	}
+
+	/**
+	 * Join multiple parts with empty/null values replaced by the 'alt' attribute.
+	 * Shortens (x ?: '--') + '/' + (y ?: '--') + '/' + (z ?: '--') to safeJoinAlt('/', '--', x, y, z)
+	 *
+	 * @param separator  the string to use between parts
+	 * @param alt  the value to use if a part evaluates to Groovy-false
+	 * @param parts  the parts to join
+	 * @return  the concatenated string
+	 */
+	String safeJoinAlt(String separator, String alt, Object... parts) {
+		parts.collect { it ?: '--' }.join(separator)
+	}
+
+	/**
+	 * Join multiple parts with empty/null values ignored.
+	 * Shortens (x ?: '') + '/' + (y ?: '') + '/' + (z ?: '') to safeJoin('/', x, y, z)
+	 *
+	 * @param separator  the string to use between parts
+	 * @param alt  the value to use if a part evaluates to Groovy-false
+	 * @param parts  the parts to join
+	 * @return  the concatenated string
+	 */
+	String safeJoin(String separator, Object... parts) {
+		parts.findAll().join(separator)
 	}
 
 }

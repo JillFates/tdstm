@@ -1,3 +1,4 @@
+import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.ErrorHandlerService
 import net.transitionmanager.service.SecurityService
@@ -15,7 +16,7 @@ import java.lang.IllegalArgumentException
  * can read while the Ajax and API calls respond differently.
  */
 @Secured('permitAll')
-class ErrorHandlerController {
+class ErrorHandlerController implements ControllerMethods {
 
 	CoreService coreService
 	ErrorHandlerService errorHandlerService
@@ -46,6 +47,9 @@ class ErrorHandlerController {
 	 */
 	def unauthorized() {
 		log.debug "Hit unauthorized()"
+		if (errorHandlerService.isAjaxRequest(request)) {
+			// ...
+		}
 
 	}
 
@@ -102,6 +106,17 @@ class ErrorHandlerController {
 		}
 
 		Map model = errorHandlerService.model(request)
+
+		// Handle Ajax error messages
+		if (errorHandlerService.isAjaxRequest(request)) {
+			response.status = 200
+			if (model.exception) {
+				handleException(model.exception, log)
+			}
+			renderErrorJson('An unresolved error occurred')
+			return
+		}
+
 		if (model.exception) {
 			switch (model.exception) {
 				case UnauthorizedException:
@@ -125,6 +140,7 @@ class ErrorHandlerController {
 
 		// Set the status back to 200 so that it doesn't appear as a real error (TBD if this is the proper thing to do)
 		response.status = 200
+
 		model
 	}
 
