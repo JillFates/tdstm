@@ -1,4 +1,3 @@
-<%@page import="net.transitionmanager.service.ErrorHandler" %>
 <%@page defaultCodec="none" %>
 <g:set var="title" value="TransitionManager&trade; - Unauthorized" />
 
