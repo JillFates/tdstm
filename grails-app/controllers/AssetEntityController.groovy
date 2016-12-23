@@ -2702,25 +2702,28 @@ class AssetEntityController implements ControllerMethods {
 
 		def assetDependentlist
 		String selectionQuery = ''
-		String mapQuery
-		String nodesQuery
+		//String mapQuery
+		def nodesQuery = []
 		boolean multiple = false
 		if (params.dependencyBundle?.isNumber()) {
 			// Get just the assets for a particular dependency group id
-			mapQuery = " AND deps.bundle = $params.dependencyBundle"
+			//mapQuery = " AND deps.bundle = $params.dependencyBundle"
 			depGroups = [params.dependencyBundle]
-			nodesQuery = " AND dependency_bundle = $params.dependencyBundle "
+			//nodesQuery = " AND dependency_bundle = $params.dependencyBundle "
+			nodesQuery = NumberUtil.mapToPositiveInteger([params.dependencyBundle])
 		} else if (params.dependencyBundle == 'onePlus') {
 			// Get all the groups other than zero - these are the groups that have interdependencies
 			multiple = true
-			mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
+			//mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
 			depGroups = depGroups-[0]
-			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
+			//nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
+			nodesQuery = NumberUtil.mapToPositiveInteger(depGroups)
 		} else {
 			// Get 'all' assets that were bundled
 			multiple = true
-			mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
-			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
+			//mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
+			//nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
+			nodesQuery = NumberUtil.mapToPositiveInteger(depGroups)
 		}
 		def queryFordepsList = """
 			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, mb.move_bundle_id AS moveBundleId, mb.name AS moveBundleName,
@@ -2728,7 +2731,7 @@ class AssetEntityController implements ControllerMethods {
 			if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus
 			FROM (
 				SELECT * FROM tdstm.asset_dependency_bundle
-				WHERE project_id=$project.id $nodesQuery
+				WHERE project_id=? AND dependency_bundle in (?)
 				ORDER BY dependency_bundle
 			) AS deps
 			LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = deps.asset_id
@@ -2739,7 +2742,7 @@ class AssetEntityController implements ControllerMethods {
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			"""
 
-		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList)
+		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id, nodesQuery)
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
 
