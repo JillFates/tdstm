@@ -98,6 +98,14 @@ class CoreService implements ServiceMethods {
 		return tmpDir
 	}
 
+	/**
+	 * Returns the FQ URL to the application entry point
+	 */
+	String getApplicationUrl() {
+		grailsApplication.config.grails.serverURL
+	}
+
+
 	private ConfigObject getConfig() {
 		grailsApplication.config
 	}

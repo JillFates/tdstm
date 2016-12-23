@@ -1,3 +1,7 @@
+import org.springframework.security.access.AccessDeniedException
+//import org.springframework.security.acls.model.NotFoundException
+import org.springframework.security.acls.model.NotFoundException
+
 class UrlMappings {
 
 	static mappings = {
@@ -371,9 +375,15 @@ class UrlMappings {
 
 
 		//ROOT map to the auth/index action
-		"/"(controller: "auth")
+		"/" (controller: "auth")
 
-		"500"(view:'/error')
-		"401"(view:'/unauthorized')
+		// Various error pages
+		"401" ( controller: 'errorHandler', action: 'unauthorized' )
+		"403" ( controller: 'errorHandler', action: 'forbidden' )
+		"404" ( controller: 'errorHandler', action: 'notFound' )
+		"500" ( controller: 'errorHandler', action: 'notFound', exception: NotFoundException)
+		"500" ( controller: 'errorHandler', action: 'forbidden', exception: AccessDeniedException)
+		"500" ( controller: 'errorHandler', action: 'error' )
+
 	}
 }

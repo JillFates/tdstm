@@ -252,26 +252,46 @@ tdsops.buildFile = "/build.txt"
 grails {
 	plugin {
 		springsecurity {
+			// Refer to information on these settings please refer to:
+			//    https://grails-plugins.github.io/grails-spring-security-core/v2/guide/urlProperties.html
 			adh {
-				errorPage = '/auth/unauthorized'
+				// errorPage = '/errorHandler/error'
+				errorPage = null
 				useForward = false
 			}
 			apf {
 				filterProcessesUrl = '/auth/signIn'
 				usernameParameter = 'username'
 				passwordParameter = 'password'
+				postOnly = true
 			}
-			auth.loginFormUrl = '/auth/login'
-			dao.hideUserNotFoundExceptions = false
+			auth {
+				loginFormUrl = '/auth/login'
+				useForward = false
+			}
+			dao {
+				hideUserNotFoundExceptions = false
+			}
+
 			failureHandler.defaultFailureUrl = '/auth/login'
+
+			// See https://grails-plugins.github.io/grails-spring-security-core/v2/guide/requestMappings.html for details
+			// Note that when the two property values are reversed that Forbidden is thrown for unknown controllers while
+			// logged in and NotFound when unauthenticated however it also throws a stack trace for ever 404. Therefore it
+			// was choosen to have that inconsistence to avoid unnecessary noise in the application log files.
+			rejectIfNoRule = true
+			fii.rejectPublicInvocations = false
+			//rejectIfNoRule = false
+			//fii.rejectPublicInvocations = true
 
 			controllerAnnotations.staticRules = [
 				'/ws/**'			:'isAuthenticated()',
 				'/'					:'permitAll',
 				'/index'			:'permitAll',
 				'/index.gsp'		:'permitAll',
-				'/assets/**'		:'permitAll',
-				'/**/js/**'			:'permitAll',
+				'/assets/**'		:'permitAll',		// Don't believe it is used
+				'/auth/**'			:'permitAll',		// Authentication Controller
+				'/**/js/**'			:'permitAll',		// Javascript
 				'/**/css/**'		:'permitAll',
 				'/**/images/**'		:'permitAll',
 				'/i/**'				:'permitAll',

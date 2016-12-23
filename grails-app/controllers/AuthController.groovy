@@ -128,8 +128,10 @@ class AuthController implements ControllerMethods {
 	}
 
 	def unauthorized() {
-		flash.message = 'You do not have permission to access this page.'
-		redirectToPrefPage()
+
+		forward controller: 'errorHandler', action:'unauthorized'
+		// flash.message = 'You do not have permission to access this page.'
+		// redirectToPrefPage()
 	}
 
 	/*

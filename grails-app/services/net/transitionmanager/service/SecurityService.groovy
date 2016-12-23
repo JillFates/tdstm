@@ -333,7 +333,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			}
 		}
 		logger.warn 'SECURITY_VIOLATION : {} by user {}', message, username
-		auditService.logSecurityViolation(username, message)
+		// auditService.logSecurityViolation(username, message)
 	}
 
 	/**
@@ -1389,8 +1389,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			reportViolation violationMessage
 		}
 
-		throw new UnauthorizedException('User ' + currentUsername +
-				' does not have permission(s): ' + permissions.join(', '))
+		throw new UnauthorizedException('Missing required permission(s): ' + permissions.join(', '))
 	}
 
 	private static final List<String> PARTY_CRUD_CONTROLLERS = ['party', 'partyGroup']

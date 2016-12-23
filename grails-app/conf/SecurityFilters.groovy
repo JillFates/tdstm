@@ -18,7 +18,7 @@ class SecurityFilters {
 	UserService userService
 
 	def filters = {
-
+		/*
 		maintModeCheck(controller: '*', action: '*') {
 			before = {
 				if (controllerName == "wsSequence") return
@@ -42,6 +42,7 @@ class SecurityFilters {
 				}
 			}
 		}
+		*/
 
 		userActivityLog(controller: '*', action: '*') {
 			before = {
@@ -56,10 +57,13 @@ class SecurityFilters {
 //		}
 
 		// TODO BB revisit logic
-		newAuthFilter(controller: '*', action: '*') {
+		// newAuthFilter(controller: '*', action: '*') {
+		primaryFilter(controller: '*', action: '*') {
 			before = {
 				request.setAttribute 'tds_initialRequest', controllerName + '/' + actionName
 
+				// The logic below was for functionality originally dealing with loading moveEvent or MoveBundle
+				// TODO : JPM 12/2016 : Need to review security filter for 'moveEventNews' and 'wsDashboard' that doesn't make any sense
 				if (!webSvcCtrl.contains(controllerName)) {
 					return
 				}
@@ -90,10 +94,11 @@ class SecurityFilters {
 						return true
 					}
 
+					// TODO : JPM 12/2016 -- need to figure out the moveEventProjectClientStaff permission check here
 					def moveEventProjectClientStaff = PartyRelationship.find(
 							"from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
-									" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
-									" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = $securityService.currentPersonId")
+							"and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY' " +
+							"and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = $securityService.currentPersonId")
 					if (!moveEventProjectClientStaff) {
 						// if not ADMIN check whether user is associated to the Party that is associate to
 						// the Project.client of the moveEvent / MoveBundle
