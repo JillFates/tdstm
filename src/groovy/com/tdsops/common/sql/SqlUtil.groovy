@@ -28,6 +28,10 @@ class SqlUtil {
 		if (query) query << ' ' << andOr << ' '
 		query << criteria
 	}
+	static void appendToWhere(StringBuilder query, CharSequence criteria, String andOr = 'and') {
+		if (query) query << ' ' << andOr << ' '
+		query << criteria
+	}
 
 	/**
 	 * Used to do a multiple word match against a particular field
@@ -43,7 +47,7 @@ class SqlUtil {
 	 */
 	static String matchWords(String property, List words, boolean matchAll=false, boolean exact=false) {
 		String andOr = matchAll ? 'and' : 'or'
-		StringBuffer query = new StringBuffer()
+		StringBuilder query = new StringBuilder()
 		String criteria = exact ? property + '=?' : property + ' like ?'
 		int size = words.size()
 		if (size) {
