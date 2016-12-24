@@ -17,10 +17,7 @@ class ErrorHandlerService {
 	 */
 	String exceptionName(RuntimeException ex) {
 		List parts = ex.stackTraceLines[0].split(':')
-		String name = 'Unknown'
-		if (parts) {
-			name = parts[0]
-		}
+		String name = parts ? parts[0] : 'Unknown'
 		name
 	}
 
@@ -68,11 +65,9 @@ class ErrorHandlerService {
 	 */
 	boolean isAjaxRequest(request) {
 		boolean isAjax = 'XMLHttpRequest'.equals( request.getHeader('X-Requested-With') )
-log.debug "isAjaxRequest() IN THE LOGIC"
 		if (! isAjax) {
 			// Angular in particular doesn't set the X-Requested-With header so we check for Accept allowing json
 			String accept = request.getHeader('Accept')
-			log.debug "isAjaxRequest() accept=$accept"
 			if (accept) {
 				List l = accept.split(',')
 				isAjax = l.contains('application/json')
@@ -89,7 +84,6 @@ log.debug "isAjaxRequest() IN THE LOGIC"
 	String requestUri(request) {
 		UrlPathHelper helper = new UrlPathHelper()
 		String uri = helper.getOriginatingRequestUri(request)
-		// request.'javax.servlet.error.request_uri'
 		return uri
 	}
 
