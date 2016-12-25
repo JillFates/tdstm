@@ -1,11 +1,14 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.grails.ApplicationContextHolder
+
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.UserPreferenceService
+
 import org.springframework.util.Assert
+import org.springframework.util.StringUtils
 
 import java.sql.Timestamp
 import java.text.DateFormat
@@ -310,7 +313,7 @@ class TimeUtil {
 	 */
 	static String formatDateTime(Date date, String formatterType = FORMAT_DATE_TIME) {
 		if (!date) return ''
-		formatDateTime(userPreferenceService.timeZone, date, createFormatter(formatterType))
+		formatDateTime(StringUtil.defaultIfEmpty(userPreferenceService.timeZone, defaultTimeZone), date, createFormatter(formatterType))
 	}
 
 	/**
