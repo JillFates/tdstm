@@ -1,15 +1,17 @@
 import com.github.icedrake.jsmaz.Smaz
+import grails.plugin.springsecurity.annotation.Secured
 import groovy.json.JsonBuilder
 import net.transitionmanager.domain.License
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.license.LicenseService
+import net.transitionmanager.service.LicenseAdminService
 import org.apache.commons.codec.binary.Base64
 
 //Client Controller
+@Secured('isAuthenticated()')
 class LicenseController {
 
-	LicenseService licenseService
+	LicenseAdminService licenseAdminService
 	SecurityService securityService
 	ProjectService projectService
 
@@ -18,7 +20,7 @@ class LicenseController {
 	 * @return
 	 */
 	def index() {
-		redirect action:"manager"
+		[message:"Hola Mundo "]
 	}
 
 	/**
@@ -63,7 +65,7 @@ class LicenseController {
 		}else{
 			lic = new License()
 			lic.requestDate = new Date()
-			lic.installationNum = licenseService.getInstalationId()
+			lic.installationNum = licenseAdminService.getInstallationId()
 		}
 
 		lic.email = params.email
