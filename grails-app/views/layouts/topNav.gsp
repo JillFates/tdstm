@@ -71,7 +71,7 @@
 	String setImage = tds.setImage() ?: null
 	def userLogin = tds.userLogin() ?: null
 	int minPasswordLength = tds.minPasswordLength()
-    def isLicenseManagerEnabled = true
+    def isLicenseManagerEnabled = false
 %>
 
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
