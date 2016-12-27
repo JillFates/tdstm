@@ -412,10 +412,13 @@ class CookbookService implements ServiceMethods {
 
 		contextId = contextId.toInteger()
 
-		def context = checkAccess(contextId, contextTypeKey, project)
+		checkAccess(project)
+
+		// Commenting out the lines below because of unimplemented checkAccess(contextId, contextTypeKey, project)
+		/*def context = checkAccess(contextId, contextTypeKey, project)
 		if (context == null) {
 			throw new UnauthorizedException('The client does not own this context')
-		}
+		}*/
 		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder())
 		return fetchedGroups.collect({ k, v ->
 			def assets = v.collect { asset -> [id: asset.id, name: asset.assetName, assetType: asset.assetType] }
@@ -1354,9 +1357,13 @@ class CookbookService implements ServiceMethods {
 
 		contextId = contextId.toInteger()
 
-		if (!checkAccess(contextId, recipe.context, project)) {
+		checkAccess(project)
+
+		// Commenting out the lines below because of unimplemented checkAccess(contextId, contextTypeKey, project)
+
+		/*if (!checkAccess(contextId, recipe.context, project)) {
 			throw new UnauthorizedException('''The client doesn't own this context''')
-		}
+		}*/
 
 		recipe.defaultAssetId = contextId
 		recipe.save(flush:true, failOnError: true)
