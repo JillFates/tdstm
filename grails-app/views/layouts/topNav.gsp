@@ -87,19 +87,24 @@
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
                         <i class="fa fa-bars"></i>
                     </button>
-                    <g:if test="${setImage}">
-                        <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
+                    <g:if test="${isLicenseManagerEnabled}">
+                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogoManager.png')}" alt="Transition Manager project" border="0" />
                     </g:if>
                     <g:else>
-                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
+                        <g:if test="${setImage}">
+                            <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
+                        </g:if>
+                        <g:else>
+                            <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
+                        </g:else>
                     </g:else>
                 </div>
 
                 <g:if test="${isLicenseManagerEnabled}">
-                    <g:render template="../layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent]"  />
+                    <g:render template="../layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent]"  />
                 </g:if>
                 <g:else>
-                    <g:render template="../layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent]"  />
+                    <g:render template="../layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent]"  />
                 </g:else>
 
 
