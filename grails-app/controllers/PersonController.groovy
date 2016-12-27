@@ -671,7 +671,7 @@ class PersonController implements ControllerMethods {
 
 		def start = new Date()
 
-		List roleTypes = partyRelationshipService.getStaffingRoles()
+		List roleTypes = partyRelationshipService.getStaffingRoles(false)
 
 		// set the defaults for the checkboxes
 
