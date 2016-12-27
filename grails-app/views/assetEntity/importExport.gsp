@@ -241,7 +241,7 @@
                 $("#file").on('change', function() {
                     var fileName  = $(this).val().split(/(\\|\/)/g).pop();
                     var fileExt = fileName.split('.').pop()
-                    if(["xls", "xlsx"].indexOf(fileExt) > 0){
+                    if(["xls", "xlsx"].indexOf(fileExt) >= 0){
                         $("#uploadFile").val(fileName);
                     }else{
                         alert("Please, select a valid file.")
