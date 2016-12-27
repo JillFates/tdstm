@@ -26,6 +26,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.sql.ResultSet
 import java.sql.SQLException
 
+import com.tdsops.tm.enums.domain.ContextType
 import static com.tdsops.tm.enums.domain.ContextType.A
 import static com.tdsops.tm.enums.domain.ContextType.B
 import static com.tdsops.tm.enums.domain.ProjectStatus.ACTIVE
@@ -388,7 +389,7 @@ class CookbookService implements ServiceMethods {
 
 		RecipeVersion recipeVersion
 		def sourceCode
-		String contextTypeKey
+		String contextTypeValue
 
 		Project project = securityService.userCurrentProject
 		if (validRecipeId) {
@@ -400,10 +401,10 @@ class CookbookService implements ServiceMethods {
 			def recipe = recipeVersion.recipe
 			assertProject recipe, project
 
-			contextTypeKey = recipe.context
+			contextTypeValue = recipe.context
 			sourceCode = recipeVersion.sourceCode
 		} else {
-			contextTypeKey = predContextType
+			contextTypeValue = predContextType
 			sourceCode = predSourceCode ?: ''
 		}
 		if (contextId == null || !contextId.isNumber()) {
@@ -419,6 +420,9 @@ class CookbookService implements ServiceMethods {
 		if (context == null) {
 			throw new UnauthorizedException('The client does not own this context')
 		}*/
+		ContextType ct = ContextType.getByValue(contextTypeValue)
+		def context = ct.getObject(contextId)
+		
 		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder())
 		return fetchedGroups.collect({ k, v ->
 			def assets = v.collect { asset -> [id: asset.id, name: asset.assetName, assetType: asset.assetType] }

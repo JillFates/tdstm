@@ -43,4 +43,11 @@ enum ContextType {
 	static final List<String> labels = keys.collect { it.value }.asImmutable()
 
 	static List<String> getLabels(String locale = 'en') { labels }
+
+	/**
+	 * This method allows the lookup of a ContextType by value.
+	 */
+	static ContextType getByValue( String value ) {
+    	return values().find { it.value == value }
+	}
 }
