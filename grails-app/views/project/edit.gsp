@@ -1,3 +1,4 @@
+<%@page defaultCodec="none" %>
 <%@page import="net.transitionmanager.domain.Project" %>
 <html>
 <head>
