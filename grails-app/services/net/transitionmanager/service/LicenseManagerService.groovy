@@ -6,7 +6,6 @@ import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.license.LicenseService
 import org.apache.commons.codec.binary.Base64
 
 import java.text.ParseException
@@ -17,8 +16,8 @@ import java.text.ParseException
  */
 //@CompileStatic
 @Slf4j(value='log', category='net.transitionmanager.service.LicenseManagerService')
-class LicenseManagerService {
-	LicenseService licenseService
+class LicenseManagerService extends LicenseCommonService{
+	LicenseAdminService licenseAdminService
 
 	Collection<LicensedClient> list(){
 		LicensedClient.findAll()
@@ -99,7 +98,7 @@ class LicenseManagerService {
 	//// HELPER FUNCTIONS ///////////
 
 	private String generateLicense(String productKey, String holder, String subject, int numberOfLicenses, Date goodAfter, Date goodBefore){
-		licenseService.initialize()
+		licenseAdminService.initialize()
 
 		net.nicholaswilliams.java.licensing.License.Builder licenseBuilder = new net.nicholaswilliams.java.licensing.License.Builder().
 				withProductKey(productKey). //TM-CORE-XXX

@@ -4,13 +4,12 @@ import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
-import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
-import net.transitionmanager.service.license.LicenseService
+import net.transitionmanager.service.LicenseAdminService
 
 import net.transitionmanager.controller.ServiceResults
 
@@ -21,7 +20,7 @@ import net.transitionmanager.controller.ServiceResults
 @Slf4j
 @Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class WsLicenseController implements ControllerMethods {
-	LicenseService licenseService
+	LicenseAdminService licenseAdminService
 	ProjectService projectService
 	SecurityService securityService
 
@@ -138,9 +137,9 @@ class WsLicenseController implements ControllerMethods {
 				lic.requestDate = new Date()
 				lic.status = License.Status.PENDING
 				lic.method = License.Method.MAX_SERVERS
-				lic.installationNum = licenseService.getInstalationId()
-				lic.hostName = licenseService.hostName
-				lic.websitename = licenseService.FQDN
+				lic.installationNum = licenseAdminService.getInstallationId()
+				lic.hostName = licenseAdminService.hostName
+				lic.websitename = licenseAdminService.FQDN
 			}
 
 			lic.email = json.email
@@ -191,8 +190,8 @@ class WsLicenseController implements ControllerMethods {
 				}else {*/
 					lic.hash = json.hash
 
-					licenseService.load(lic.hash)
-					def lico = licenseService.useLicense()
+					licenseAdminService.load(lic.hash)
+					def lico = licenseAdminService.useLicense()
 
 					lic.status = License.Status.ACTIVE
 

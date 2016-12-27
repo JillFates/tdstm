@@ -29,7 +29,7 @@ import net.transitionmanager.service.AssetEntityAttributeLoaderService
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.license.LicenseService
+import net.transitionmanager.service.LicenseAdminService
 import org.grails.refcode.RefCode
 
 import java.lang.management.ManagementFactory
@@ -39,7 +39,7 @@ class BootStrap {
 	StateEngineService stateEngineService
 	TaskService taskService
 	QzSignService qzSignService
-	LicenseService licenseService
+	LicenseAdminService licenseAdminService
 
 	def init = { servletContext ->
 		checkForBlacklistedVMParameters()
@@ -48,7 +48,7 @@ class BootStrap {
 		checkConfigInfo()
 
 		//initialize License service to use
-		licenseService.initialize()
+		licenseAdminService.initialize()
 
 		CustomMethods.initialize()
 

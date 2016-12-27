@@ -1,8 +1,9 @@
-package net.transitionmanager.service.license
+package net.transitionmanager.service
 
 import net.transitionmanager.service.license.prefs.FilePrivateKeyDataProvider
 import net.transitionmanager.service.license.prefs.FilePublicKeyDataProvider
 import net.transitionmanager.service.license.prefs.MyLicenseProvider
+import net.transitionmanager.service.license.prefs.TDSLicenseValidator
 import net.transitionmanager.service.license.prefs.TDSPasswordProvider
 import net.nicholaswilliams.java.licensing.DefaultLicenseValidator
 import net.nicholaswilliams.java.licensing.License
@@ -15,10 +16,9 @@ import org.apache.commons.codec.binary.Base64
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.codecs.MD5Codec
 
-class LicenseService {
+class LicenseAdminService extends LicenseCommonService {
 	static transactional = false
 
-	GrailsApplication grailsApplication
 	private PasswordProvider tdsPasswordProvider
 	private MyLicenseProvider licenseProvider
 
@@ -27,6 +27,13 @@ class LicenseService {
 	 * @return
 	 */
 	def initialize() {
+		/* //Using the enviromnment variable
+		def tdslm = System.getenv("TDS_LM")
+		if(tdslm){
+			grailsApplication.config.tdstm.license.enabled = true
+		}
+		*/
+
 		if(isEnabled() && !tdsPasswordProvider) {
 			tdsPasswordProvider = new TDSPasswordProvider(grailsApplication.config.tdstm.license.password)
 			licenseProvider = new MyLicenseProvider()
@@ -47,7 +54,7 @@ class LicenseService {
 
 			// Optional; set only if you wish to validate licenses
 			//Global validation or per access?
-			LicenseManagerProperties.setLicenseValidator(new DefaultLicenseValidator())
+			LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
 
 			// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
 			LicenseManagerProperties.setCacheTimeInMinutes(24*60)
@@ -70,58 +77,6 @@ class LicenseService {
 
 	def isEnabled(){
 		return grailsApplication.config.tdstm.license.enabled
-	}
-
-	//Installation  <--
-	String getInstalationId(){
-		String hostname = getHostName()
-		String fqdn = getFQDN()
-
-		def hwkey = "${hostname}|${fqdn}"
-		def md5key = MD5Codec.encode(hwkey)
-
-		log.debug("***************************************************************************")
-		log.info("hwkey: $hwkey")
-		log.debug("md5key: $md5key")
-		log.debug("***************************************************************************")
-
-		return md5key
-	}
-
-	String getFQDN(){
-		URL url = new URL(grailsApplication.config.grails.serverURL)
-		return url.getHost()
-	}
-
-	String getHostName(){
-		InetAddress addr = InetAddress.getLocalHost()
-
-		//return addr.getCanonicalHostName() // this returns the IP in case that we cannot reverse check the IP-name
-		return addr.getHostName()  //always return the name, no check performed
-	}
-
-
-
-	/**
-	 * Not in current use
-	 * @return
-	 */
-	private String getApplicationPath(){
-		File layoutFolder = grailsApplication.parentContext.getResource("/").file
-		return layoutFolder.absolutePath
-	}
-
-	/**
-	 * Not in current use
-	 * @param divider
-	 * @return
-	 */
-	private String getMacAddresses(divider='|'){
-		def macs = NetworkInterface.networkInterfaces.collect { iface ->
-			iface.hardwareAddress?.encodeHex().toString()
-		}
-
-		return macs.join(divider)
 	}
 
 	boolean hasModule(projectGuid, moduleName){

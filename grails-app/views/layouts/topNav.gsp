@@ -1,4 +1,4 @@
-<%@ page import="net.transitionmanager.service.license.LicenseService" %>
+<g:set var="licenseCommonService" bean="licenseCommonService"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -71,7 +71,7 @@
 	String setImage = tds.setImage() ?: null
 	def userLogin = tds.userLogin() ?: null
 	int minPasswordLength = tds.minPasswordLength()
-    def isLicenseManagerEnabled = false
+    def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
 %>
 
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
