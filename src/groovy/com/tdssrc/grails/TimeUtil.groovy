@@ -662,4 +662,47 @@ class TimeUtil {
 	private static UserPreferenceService getUserPreferenceService() {
 		ApplicationContextHolder.getBean('userPreferenceService', UserPreferenceService)
 	}
+
+	/**
+	 * Formats a TimeDuration instance to a 2-digits colon-separated string 
+	 * with the corresponding values. The implementation will automatically 
+	 * include days, minutes and second. However, seconds and milliseconds can
+	 * also be included using the optional parameters.
+	 *
+	 * @param timeDuration: TimeDuration instance (passing null will return
+	 *					"00:00:00")
+	 * @param includeSeconds: boolean flag to indicate whether seconds should
+	 *					be included or not. Defaulted to false.
+	 * @param includeMillis: boolean flag to indicate whether millis should be
+	 *					included or not. Defaulted to false.
+	 * @return String of the form XX:XX:XX, XX:XX:XX:XX:XX
+	 */
+	static String formatTimeDuration(TimeDuration timeDuration, boolean includeSeconds=false, boolean includeMillis=false){
+
+		def fields = ["days", "hours", "minutes"]
+		
+		if(includeSeconds){
+			fields << "seconds"
+			// Millis will only be considered if seconds is also set to true.
+			if(includeMillis){
+				fields << "millis"
+			}
+		}
+		
+		def formatted = []
+		if(timeDuration){
+			fields.each{ field ->
+				int value = timeDuration."$field"
+				String valueStr = value > 9 ? value : "0" + value
+				formatted << valueStr
+			}	
+		}else{
+			fields.each{
+				formatted << "00"
+			}
+		}
+		
+		return formatted.join(":")
+
+	}
 }

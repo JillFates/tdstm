@@ -260,4 +260,43 @@ class TimeUtilTests extends AbstractUnitSpec {
 		expect:
 		TimeUtil.formatDateTimeWithTZ("GMT", null, formatter) == ''
 	}
+
+	void "Test formatTimeDuration(timeDuration, includeSeconds, includeMillis)"(){
+		given:
+			TimeDuration td1 = new TimeDuration(10, 10, 10, 10, 10)
+			TimeDuration td2 = new TimeDuration(100, 10, 10, 10, 10)
+			TimeDuration td3 = new TimeDuration(0, 0, 0, 0, 0)
+			TimeDuration td4 = new TimeDuration(1, 2, 3, 4, 5)
+
+		expect:
+			// Testing with regular values
+			TimeUtil.formatTimeDuration(td1) == "10:10:10"
+
+			// Testing with regular values (all accepted fields)
+			TimeUtil.formatTimeDuration(td1, true, true) == "10:10:10:10:10"
+
+			// Testing with a bigger than 99 value
+			TimeUtil.formatTimeDuration(td2) == "100:10:10"
+			
+			// Testing with all zeros
+			TimeUtil.formatTimeDuration(td3) == "00:00:00"
+			
+			//  Testing with regular values (1-digit values)
+			TimeUtil.formatTimeDuration(td4) == "01:02:03"
+			
+			// Testing with all the accepted fields (1-digit values).
+			TimeUtil.formatTimeDuration(td4, true, true) == "01:02:03:04:05"
+			
+			// Testing with seconds and without millis
+			TimeUtil.formatTimeDuration(td4, true) == "01:02:03:04"
+			
+			// Testing with conflicting params
+			TimeUtil.formatTimeDuration(td4, false, true) == "01:02:03"
+			
+			// Testing with a null TimeDuration
+			TimeUtil.formatTimeDuration(null) == "00:00:00"
+			
+			// Testing with a null TimeDuration, including secs and millis.
+			TimeUtil.formatTimeDuration(null, true, true) == "00:00:00:00:00"
+	}
 }
