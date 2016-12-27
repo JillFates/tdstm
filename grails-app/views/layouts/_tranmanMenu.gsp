@@ -1,5 +1,5 @@
 <!-- Collect the nav links, forms, and other content for toggling -->
-<div class="collapse navbar-collapse pull-left navbar-ul-container" id="navbar-collapse">
+<div class="collapse navbar-collapse pull-left navbar-ul-container navbar-ul-container-full-menu" id="navbar-collapse">
     <g:if test="${currProject}">
         <ul class="nav navbar-nav">
             <tds:hasPermission permission='AdminMenuView'>

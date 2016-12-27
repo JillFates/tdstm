@@ -82,7 +82,7 @@
         <input id="tzId" type="hidden" value="${tds.timeZone()}"/>
         <input id="userDTFormat" type="hidden" value="${tds.dateFormat()}"/>
         <nav class="navbar navbar-static-top">
-            <div class="container menu-top-container">
+            <div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
                         <i class="fa fa-bars"></i>
