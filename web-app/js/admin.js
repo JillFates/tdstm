@@ -58,7 +58,6 @@ function openShowTypeDiv() {
 		url: contextPath+'/admin/retrieveAssetTypes',
 		type: 'POST',
 		beforeSend: function(jqXHR) {
-			alert('beforeSend');
 			$("#showOrCleanTypeId").dialog('option', 'width', '550px');
 			$("#showOrCleanTypeId").dialog('option', 'position', ['center','top']);
 			$("#showOrCleanTypeId").dialog('option', 'modal', 'true');
