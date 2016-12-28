@@ -555,7 +555,7 @@ class MoveBundleService implements ServiceMethods {
 						 cellValue = formatDateForExport(currentTask.actFinish)
 						 break
 					*/
-					case ~/actStart|dateResolved|dateCreated|estStart/:
+					case ~/actStart|dateResolved|dateCreated|estStart|estFinish/:
 						cellValue = formatDateTimeForExport(currentTask[attribName])
 						 break
 
