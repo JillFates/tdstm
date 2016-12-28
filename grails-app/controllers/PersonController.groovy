@@ -624,7 +624,8 @@ class PersonController implements ControllerMethods {
 // TODO : JPM 8/31/2015 : Need to test
 	def resetPreferences() {
 		try {
-			Person person = personService.validatePersonAccess(params.user)
+			//Person person = personService.validatePersonAccess(params.user)
+			Person person = personService.validatePersonAccess(securityService.loadCurrentPerson())
 			UserLogin userLogin = securityService.getPersonUserLogin(person)
 			if (!userLogin) {
 				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
@@ -632,6 +633,8 @@ class PersonController implements ControllerMethods {
 				return
 			}
 
+			log.info ">>>>>>>>> params: ${params}"
+			
 			// if dateTimezoneOnly is specified, only reset the timezone and date format preferences if they exist
 			if (params.dateTimezoneOnly) {
 				userPreferenceService.removePreference(PREF.CURR_TZ)
@@ -649,7 +652,7 @@ class PersonController implements ControllerMethods {
 						}
 				}
 
-				userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard")
+				//userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard")
 			}
 
 			// Is there any reason to return an object? can't be just a POST/UPDATE -no return- operation?

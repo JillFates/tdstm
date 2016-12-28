@@ -467,7 +467,8 @@ var UserPreference = function() {
 		var prefDialog = $("#userPrefDivId")
 		prefDialog.html("")
 		prefDialog.dialog('close')
-		window.location.reload()
+		//window.location.reload()
+		window.location.href = tdsCommon.createAppURL('/project/list');
 	}
 	
 	// removes the specified preference for the current user
