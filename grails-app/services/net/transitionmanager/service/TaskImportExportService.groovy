@@ -72,7 +72,7 @@ class TaskImportExportService implements ServiceMethods {
 
 		log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
 		val?.toString()
-	}
+	}	
 
 	// ------------------------------------------------------------------------
 	// Kendo Template builder closures
@@ -111,10 +111,10 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Task #', template:changeTmpl('taskNumber')],
 
 		comment					: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:false,
-										label: 'Task Description', template:changeTmpl('taskDescription')],
+										label: 'Task Description', template:changeTmpl('comment')],
 
 		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:true,
-										label: 'Related Asset', template:changeTmpl('relatedAsset'), transform:xfrmString],
+										label: 'Related Asset', template:changeTmpl('assetEntity'), transform:xfrmString],
 
 		assetClass				: [type: 'string', ssPos:3, formPos:4, domain: 'A', width:120, locked:true,
 										label: 'Asset Class', template:changeTmpl('assetClass'), transform:xfrmString],
@@ -1012,7 +1012,7 @@ class TaskImportExportService implements ServiceMethods {
 	}
 
 
-	private void applyChangesToDomainObject(Object domainObject, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
+	private void applyChangesToDomainObject(AssetComment assetComment, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
 
 
 		boolean unplannedChange = false
@@ -1025,14 +1025,14 @@ class TaskImportExportService implements ServiceMethods {
 			if (propertyHasError(task, prop)) {
 				if (taskSpreadsheetColumnMap.containsKey('defaultOnError')) {
 					// Set a default value so that the domain validation will not fail
-					domainObject[prop] = taskSpreadsheetColumnMap.defaultOnError()
+					assetComment[prop] = taskSpreadsheetColumnMap.defaultOnError()
 				}
 				return
 			}
-			def bypassProps = ["assetClass", "assetId"]
+			def bypassProps = ["assetClass", "assetId", "assetEntity"]
 			if(!prop in bypassProps){
 
-				def origValue = domainObject[prop]
+				def origValue = assetComment[prop]
 				if (info.type == 'date' && origValue != null) {
 					origValue.clearTime()
 				}
@@ -1047,18 +1047,18 @@ class TaskImportExportService implements ServiceMethods {
 				if (chgValueIsBlank) {
 					if (! origValueIsBlank) {
 						if (! blockBlankOverwrites) {
-							setOriginalValue(task, prop, domainObject[prop])
+							setOriginalValue(task, prop, assetComment[prop])
 							if (identifyUnplannedChanges) {
 								unplannedChange = true
 								setErrorValue(task, prop, unChgdLabel)
 							}
 						} else {
-								setDefaultedValue(task, prop, domainObject[prop])
+								setDefaultedValue(task, prop, assetComment[prop])
 						}
 					}
 				} else {
 					if (! valuesEqual) {
-						setOriginalValue(task, prop, domainObject[prop])
+						setOriginalValue(task, prop, assetComment[prop])
 						if (identifyUnplannedChanges) {
 							unplannedChange = true
 							setErrorValue(task, prop, unChgdLabel)
@@ -1071,7 +1071,7 @@ class TaskImportExportService implements ServiceMethods {
 					chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
 					chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
 					if (! chgValueIsBlank && chgValueTransformed != origValueTransformed) {
-						domainObject[prop] = task[prop]
+						assetComments[prop] = task[prop]
 					}
 				}
 			}

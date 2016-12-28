@@ -251,7 +251,8 @@
 				filterable: true,
 				columnMenu: true,
 				pageable: false,
-				dataBound: onDataBound
+				dataBound: onDataBound,
+				scrollable:true,
 			});
 
 		});
