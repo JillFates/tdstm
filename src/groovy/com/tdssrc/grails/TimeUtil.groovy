@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils
 import java.sql.Timestamp
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import javax.servlet.http.HttpSession
 
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods
@@ -27,6 +28,9 @@ class TimeUtil {
 	static final List<String> dateTimeFormatTypes = [MIDDLE_ENDIAN, LITTLE_ENDIAN]
 
 	static final String defaultTimeZone = 'GMT'
+
+	def static final String TIMEZONE_ATTR = 'CURR_TZ'
+	def static final String DATE_TIME_FORMAT_ATTR = 'CURR_DT_FORMAT'
 
 	// Valid date time formats
 	static final String FORMAT_DATE         = "MM/dd/yyyy"
@@ -705,4 +709,32 @@ class TimeUtil {
 		return formatted.join(":")
 
 	}
+
+
+	private static String getFromHttpSession(HttpSession session, String key, String defaultValue = null) {
+		def value = null
+		if(session){
+			def map = session.getAttribute(key) ?: [:]
+			value = map[key]
+		}
+		return value ?: defaultValue
+	}
+
+	/**
+	 * Used to get the user perferred timezone
+	 * @param session - the HttpSession user session object
+	 * @return the timezone id string
+	 */
+	public static String getUserTimezone(HttpSession session) {
+		return TimeUtil.getFromHttpSession(session, TIMEZONE_ATTR, defaultTimeZone)
+	}	 
+
+	/**
+	 * Used to get the user perferred timezone
+	 * @param session - the HttpSession user session object
+	 * @return the timezone id string
+	 */
+	public static String getUserDateFormat(HttpSession session) {
+		return TimeUtil.getFromHttpSession(session, DATE_TIME_FORMAT_ATTR, getDefaultFormatType())
+	}	 
 }
