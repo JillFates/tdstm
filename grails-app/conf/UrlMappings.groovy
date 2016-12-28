@@ -335,6 +335,12 @@ class UrlMappings {
 		}
 
 		///// LICENSES Common API /////////
+		"/ws/manager/status" {
+			controller = "wsLicense"
+			action = [
+					GET: "managerActive"
+			]
+		}
 
 		"/ws/license/environment" {
 			controller = "wsLicense"

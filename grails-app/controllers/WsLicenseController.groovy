@@ -6,6 +6,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
@@ -20,9 +21,14 @@ import net.transitionmanager.controller.ServiceResults
 @Slf4j
 @Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class WsLicenseController implements ControllerMethods {
+	LicenseCommonService licenseCommonService
 	LicenseAdminService licenseAdminService
 	ProjectService projectService
 	SecurityService securityService
+
+	def managerActive(){
+		renderSuccessJson(licenseCommonService.isManagerEnabled())
+	}
 
 	/**
 	 * Get the List of projects attached with the clients, this is being used to select Client as well

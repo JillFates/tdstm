@@ -53,6 +53,7 @@ class LicenseCommonService {
 	}
 
 	/**
+	 * Get the application  installation Path (Even in Tomcat)
 	 * Not in current use
 	 * @return
 	 */
@@ -62,6 +63,7 @@ class LicenseCommonService {
 	}
 
 	/**
+	 * Get the MacAddresses (All interfaces) of the current installation
 	 * Not in current use
 	 * @param divider
 	 * @return
@@ -74,7 +76,11 @@ class LicenseCommonService {
 		return macs.join(divider)
 	}
 
-	def isManagerEnabled(){
-		return grailsApplication.config.tdstm.license.manager.enabled
+	/**
+	 * Is the License Manager enabled for this instance?
+	 * @return
+	 */
+	boolean isManagerEnabled(){
+		return (grailsApplication.config.tdstm?.license?.manager?.enabled)?true:false
 	}
 }
