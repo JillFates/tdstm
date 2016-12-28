@@ -2021,8 +2021,6 @@ class AccountImportExportService implements ServiceMethods {
 
 		// TODO : JPM 4/2016 : readAccountsFromSpreadsheet - need to check the person last modified against the spreadsheet time
 
-UserLogin currentUser = se
-
 		// def emailValidator = EmailValidator.getInstance()
 
 		List personIdList = accounts.findAll { it.personId }.collect {it.personId }
@@ -2257,13 +2255,15 @@ UserLogin currentUser = se
 			return true
 		}
 
+		def existingPersonUserLogin = account.person.userLogin
+
 		UserLogin.withNewSession { ses ->
 			boolean personExists = account.person.id
 			UserLogin userLogin
 
 			// Get or create a UserLogin
 			if (personExists) {
-				userLogin = account.person.userLogin
+				userLogin = existingPersonUserLogin
 			}
 			if (! userLogin) {
 				account.flags.isNewUserLogin = true
@@ -2324,7 +2324,6 @@ UserLogin currentUser = se
 			}
 			userLogin.discard()
 		}
-
 		// If we are not going to be updating the UserLogin then we should remove any of the defaulted values
 		// so that in the UI it doesn't look like anything occurred
 		if (! shouldUpdateUser || ! hasUserChanges) {
@@ -2592,8 +2591,10 @@ UserLogin currentUser = se
 		panicButton ''	// Initialize the map without an error message
 
 		List remainingCodes = []
+		
+		def person = securityService.userLogin.person
 
-		List authorizedRoleCodes = securityService.assignableRoleCodes
+		List authorizedRoleCodes = securityService.getAssignableRoleCodes(person)
 
 		log.debug "determineSecurityRoleChanges() \n   allRoles=$allRoles\n   currentRoles=$currentRoles\n   changes=$changes\n   authorizedRoleCodes=$authorizedRoleCodes"
 
@@ -3246,7 +3247,7 @@ UserLogin currentUser = se
 		// log.debug "\n\n*******\napplyChangesToDomainObject() called for ${domainObject.getClass().name} $domainObject ($domainObject.id)"
 
 		boolean isNew = ! domainObject.id
-		String className = domainObject.getClass().name
+		String className = domainObject.getClass().simpleName
 		String domainCode = className[0]
 		assert ['P','U'].contains(domainCode)
 		boolean identifyUnplannedChanges=shouldIdentifyUnplannedChanges(sheetInfoOpts, className)
