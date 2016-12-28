@@ -201,17 +201,17 @@ class ManufacturerController implements ControllerMethods {
 
 		def akaExist = Manufacturer.findByName(aka)
 		if (akaExist) {
-			return aka
+			render aka
 		}
 
 		def manuId = params.id
 		if (manuId) {
 			if (ManufacturerAlias.countByNameAndManufacturer(aka, Manufacturer.load(manuId))) {
-				return aka
+				render aka
 			}
 		}
 
-		return ''
+		render ''
 	}
 
 	/**
