@@ -10,10 +10,13 @@ export default class ManuallyRequest {
         this.log = $log;
         this.licenseAdminService = licenseAdminService;
         this.uibModalInstance = $uibModalInstance;
-        this.licenseModel = params.license;
-        this.licenseModel.encryptedDetail = '';
+        this.licenseModel = {
+            id:  params.license.id,
+            email: params.license.email,
+            encryptedDetail: ''
+        };
 
-        // Init
+        // Get the hash code using the id.
         this.getHashCode();
     }
 
@@ -21,15 +24,6 @@ export default class ManuallyRequest {
     getHashCode() {
         this.licenseAdminService.getHashCode(this.licenseModel.id, (data) => {
             this.licenseModel.encryptedDetail = '-----BEGIN HASH-----\n' + data + '\n-----END HASH-----';
-        });
-    }
-
-    /**
-     * Execute and validate the Key is correct
-     */
-    emailRequest() {
-        this.licenseAdminService.emailRequest(this.licenseModel, (data) => {
-            this.uibModalInstance.close(data);
         });
     }
 
