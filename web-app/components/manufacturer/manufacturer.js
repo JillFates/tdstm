@@ -152,7 +152,15 @@ tds.manufacturers.module.factory('manufacturerService', ['utils', '$http', '$q',
  ***************************/
 
 function showMergeDialog(manufacturerId, manufacturerName) {
-	var objDom = $('[ng-app]');
-	var s = angular.element(objDom).scope()
-	s.manufacturers.showMergeDialog(manufacturerId, manufacturerName)
+	try {
+		var objDom = $('[ng-app]');
+		var s = angular.element(objDom).scope()
+		s.manufacturers.showMergeDialog(manufacturerId, manufacturerName)
+	} catch(e) { // It's being used in a two apps page
+		if($('#manufacturersScopeId').length > 0) {
+			var objDom = $('#manufacturersScopeId');
+			var s = angular.element(objDom).scope()
+			s.manufacturers.showMergeDialog(manufacturerId, manufacturerName)
+		}
+	}
 }

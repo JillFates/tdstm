@@ -16,6 +16,7 @@
 		<g:javascript src="model.manufacturer.js"/>
 
 		<g:render template="../layouts/responsiveAngularResources" />
+		<script type="text/javascript" src="${resource(dir:'components/manufacturer',file:'manufacturer.js')}"></script>
 
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
@@ -192,10 +193,12 @@
 				</div>
 			</g:each>
 			<div id="commentScopeId" ng-controller="tds.comments.controller.MainController as comments">
-				<jqgrid:wrapper id="assetListId" /> 
+				<jqgrid:wrapper id="assetListId" />
 			</div>
 		</div> <%-- End of Body --%>
-		<g:render template="modelDialog"/>
+		<div id="manufacturersScopeId" ng-app="tdsManufacturers" ng-controller="tds.manufacturers.controller.MainController as manufacturers">
+			<g:render template="modelDialog"/>
+		</div>
 		<g:render template="../assetEntity/entityCrudDivs" />
 		<g:render template="../assetEntity/dependentAdd" />
 		<g:render template="../assetEntity/initAssetEntityData"/>
@@ -210,6 +213,11 @@
 				$(".menu-parent-assets-server-list").addClass('active');
 			}
 			$(".menu-parent-assets").addClass('active');
+
+			(function($) {
+				angular.bootstrap(document.getElementById("manufacturersScopeId"), ['tdsManufacturers']);
+			})(jQuery);
+
 		</script>
 	</body>
 </html>
