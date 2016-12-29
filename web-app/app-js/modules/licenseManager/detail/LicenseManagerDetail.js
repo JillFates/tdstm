@@ -32,8 +32,8 @@ export default class LicenseManagerDetail extends FormValidator{
             },
             environment: { id: params.license.environment.id },
             requestDate: params.license.requestDate,
-            initDate: (params.license.activationDate !== null)? params.license.activationDate : '',
-            endDate: (params.license.expirationDate !== null)? params.license.expirationDate : '',
+            initDate: (params.license.activationDate !== null)? angular.copy(params.license.activationDate) : '',
+            endDate: (params.license.expirationDate !== null)? angular.copy(params.license.expirationDate) : '',
             specialInstructions: params.license.requestNote,
             websiteName: params.license.websitename,
 
@@ -68,7 +68,9 @@ export default class LicenseManagerDetail extends FormValidator{
         this.initDate = {};
         this.initDateOptions = {
             format: 'yyyy/MM/dd',
-            max: (this.licenseModel.endDate !== null && this.licenseModel.endDate !== '')? this.licenseModel.endDate : new Date(),
+            open: ((e) => {
+                this.onChangeInitDate();
+            }),
             change: ((e) => {
                 this.onChangeInitDate();
             })
@@ -77,7 +79,9 @@ export default class LicenseManagerDetail extends FormValidator{
         this.endDate = {};
         this.endDateOptions = {
             format: 'yyyy/MM/dd',
-            min: (this.licenseModel.initDate !== null && this.licenseModel.initDate !== '')? this.licenseModel.initDate : new Date(),
+            open: ((e) => {
+                this.onChangeEndDate();
+            }),
             change: ((e) => {
                 this.onChangeEndDate();
             })
@@ -321,12 +325,14 @@ export default class LicenseManagerDetail extends FormValidator{
             startDate = new Date(startDate);
             startDate.setDate(startDate.getDate());
             this.endDate.min(startDate);
-        } else if (endDate) {
-            this.initDate.max(new Date(endDate));
-        } else {
-            endDate = new Date();
-            this.initDate.max(endDate);
-            this.endDate.min(endDate);
+
+            if(endDate) {
+                if(this.initDate.value() > this.endDate.value()) {
+                    endDate = new Date(endDate);
+                    endDate.setDate(startDate.getDate());
+                    this.licenseModel.endDate = endDate;
+                }
+            }
         }
     }
 
@@ -337,7 +343,6 @@ export default class LicenseManagerDetail extends FormValidator{
         if (endDate) {
             endDate = new Date(endDate);
             endDate.setDate(endDate.getDate());
-            this.initDate.max(endDate);
         } else if (startDate) {
             this.endDate.min(new Date(startDate));
         } else {
