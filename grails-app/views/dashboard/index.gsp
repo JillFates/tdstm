@@ -749,7 +749,10 @@
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
-			var sumDialInd = planSum.dialInd != null ? planSum.dialInd : 50
+			var sumDialInd =  -4//planSum.dialInd != null ? planSum.dialInd : 50
+			if(sumDialInd < 0){
+				sumDialInd = 0
+			}
 			if(AditionalFrames == 1 || defaultBundle != moveBundleId){
 				visibleSteps = modWidth;
 				AditionalFrames = ( totalSteps > visibleSteps ? ((totalSteps - visibleSteps) + 1) : 1 );
