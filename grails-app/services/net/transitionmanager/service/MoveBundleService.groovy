@@ -55,7 +55,7 @@ class MoveBundleService implements ServiceMethods {
 	private static final Map<String, Number> defaultsMedium = [force: -500, linkSize: 100, friction: 0.7, theta: 1, maxCutAttempts: 150]
 	private static final Map<String, Number> defaultsLarge =  [force: -500, linkSize: 120, friction: 0.7, theta: 1, maxCutAttempts: 100]
 
-	static final String dependecyBundlingAssetTypesJoined = '(' + MoveBundle .dependecyBundlingAssetTypes.join(',') + ')'
+	static final String dependecyBundlingAssetTypesJoined = '("' + MoveBundle .dependecyBundlingAssetTypes.join('","') + '")'
 
 	/**
 	 * @param  : moveBundleId
@@ -689,12 +689,12 @@ class MoveBundleService implements ServiceMethods {
 				       a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, a.asset_type as assetType
 				FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id
-				WHERE a.move_bundle_id in (${moveBundleText})
+				WHERE a.move_bundle_id in ( ? )
 		'''
 
 		logger.info 'SQL used to find assets: {}', queryForAssets
 
-		return jdbcTemplate.queryForList(queryForAssets)
+		return jdbcTemplate.queryForList(queryForAssets, [moveBundleText])
 	}
 
 	/**
