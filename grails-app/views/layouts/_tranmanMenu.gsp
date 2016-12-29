@@ -309,7 +309,6 @@
                         <tds:hasPermission permission='ShowPlanning'>
                             <li class="menu-child-item menu-reports-task-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
                         </tds:hasPermission>
-                        <li class="menu-child-item menu-reports-report-summary"><g:link controller="reports" params="[projectId:currProject?.id]">Report Summary</g:link></li>
                         <tds:hasPermission permission='ShowProjectDailyMetrics'>
                             <li class="menu-child-item menu-reports-activity-metrics"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
                         </tds:hasPermission>

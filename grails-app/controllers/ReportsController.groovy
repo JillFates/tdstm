@@ -63,8 +63,6 @@ class ReportsController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
-	def index() {
-	}
 
 	// Generate Report Dialog
 	def retrieveBundleListForReportDialog() {

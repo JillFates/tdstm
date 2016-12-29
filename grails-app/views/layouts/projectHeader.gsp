@@ -443,7 +443,6 @@ int minPasswordLength = tds.minPasswordLength()
 							<tds:hasPermission permission='ShowPlanning'>
 								<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report"  class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Task Report</a> </li>
 							</tds:hasPermission>
-							<li><g:link class="home mmlink" controller="reports" params="[projectId:currProject?.id]" onclick="hideMegaMenu('reportsMegaMenu')">Report Summary</g:link></li>
 							<tds:hasPermission permission='ShowProjectDailyMetrics'>
 								<li><a href="/tdstm/reports/projectActivityMetrics" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Activity Metrics</a> </li>
 							</tds:hasPermission>
