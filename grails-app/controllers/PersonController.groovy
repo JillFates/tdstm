@@ -592,7 +592,7 @@ class PersonController implements ControllerMethods {
 		String errMsg = ''
 		Map results = [:]
 		try {
-			params.id = securityService.currentUserLoginId
+			//params.id = securityService.currentUserLoginId
 			String tzId = userPreferenceService.timeZone
 			Person person = personService.updatePerson(params, tzId, false)
 

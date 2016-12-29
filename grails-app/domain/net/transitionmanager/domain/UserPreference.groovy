@@ -1,5 +1,7 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.TimeUtil
+
 import groovy.transform.EqualsAndHashCode
 
 @EqualsAndHashCode(includes = ['userLogin', 'preferenceCode'])
@@ -17,8 +19,11 @@ class UserPreference implements Serializable {
 
 	// TODO BB I think this isn't needed with the current logic in UserPreferenceService
 	String getValue() {
-		if ((!value || value == 'undefined') && UserPreferenceService.defaults[preferenceCode]) {
-			value = UserPreferenceService.defaults[preferenceCode]
+//		if ((!value || value == 'undefined') && UserPreferenceService.defaults[preferenceCode]) {
+//			value = UserPreferenceService.defaults[preferenceCode]
+//		}
+		if (!value || value == 'undefined') {
+			value = TimeUtil.defaultTimeZone
 		}
 
 		return value
