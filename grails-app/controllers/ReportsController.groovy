@@ -97,10 +97,6 @@ class ReportsController implements ControllerMethods {
 				view = 'assetTagLabel'
 				model.browserTest =  browserTest
 				break
-			case 'Login Badges':
-				view = 'loginBadgeLabelReport'
-				model.browserTest =  browserTest
-				break
 			case 'CablingQA':
 				view = 'cablingQAReport'
 				model.type = 'QA'
@@ -384,94 +380,6 @@ class ReportsController implements ControllerMethods {
 		}
 	}
 
-	/**
-	 * Team Login Badge labes Data
-	 */
-	def retrieveLabelBadges() {
-		Project project = securityService.getUserCurrentProject()
-		if (!project) {
-			flash.message = 'Please select project to view Reports'
-			redirect(action: 'list')
-			return
-		}
-
-		List<Map> reportFields = []
-
-		if (params.moveBundle == 'null') {
-			reportFields << [flashMessage: 'Please Select Bundles.']
-			render reportFields as JSON
-			return
-		}
-
-		ProjectTeam projectTeam
-		if (params.teamFilter != 'null') {
-			projectTeam = ProjectTeam.get(params.teamFilter)
-		}
-
-		List<PartyRelationship> teamMembers = []
-
-		//if moveBundle is selected (single moveBundle)
-		MoveBundle moveBundle = MoveBundle.get(params.moveBundle)
-		if (moveBundle) {
-			if (projectTeam) {
-				teamMembers.addAll partyRelationshipService.getTeamMembers(projectTeam)
-			}
-			else {
-				for (ProjectTeam team in ProjectTeam.findAllByMoveBundle(moveBundle)) {
-					teamMembers.addAll partyRelationshipService.getTeamMembers(team)
-				}
-			}
-		}
-		else {
-			if (projectTeam) {
-				teamMembers.addAll partyRelationshipService.getTeamMembers(projectTeam)
-			}
-			else {
-				List<ProjectTeam> teams = ProjectTeam.executeQuery(
-						'from ProjectTeam where moveBundle in (select id from MoveBundle where project = :project)',
-						[project: project])
-				for (ProjectTeam team in teams) {
-					teamMembers.addAll partyRelationshipService.getTeamMembers(team)
-				}
-			}
-		}
-
-		String location = params.location
-		def client = project.client.name
-
-		def addToReportFields = { PartyRelationship member, boolean source ->
-			ProjectTeam team = member.partyIdFrom
-			String teamCode = team.teamCode == 'Logistics' ? 'ct' : 'mt'
-			Person person = member.partyIdTo
-			MoveBundle bundle = team.moveBundle
-
-			reportFields << [
-					name: person.firstName + ' ' + person.lastName,
-					teamName: team.name + ' - ' + (source ? 'Source' : 'Target'),
-					sortField: bundle.name + person.firstName + person.lastName,
-					bundleName: client + ' - ' + bundle.name + ' ' + TimeUtil.formatDate(bundle.startTime),
-					barCode: teamCode + '-' + bundle.id + '-' + team.id + '-' + (source ? 's' : 't')]
-		}
-
-		for (PartyRelationship member in teamMembers) {
-			if (location == 'source' || location == 'both') {
-				addToReportFields member, true
-			}
-
-			if (member.partyIdFrom.teamCode != 'Logistics' && (location == 'target' || location == 'both')) {
-				addToReportFields member, false
-			}
-		}
-
-		if (reportFields) {
-			reportFields.sort { it.sortField }
-			render reportFields as JSON
-		}
-		else {
-			reportFields << [flashMessage: 'Team Members not Found for selected Teams']
-			render reportFields as JSON
-		}
-	}
 
 	/*
 	 *  Generate PDF Cabling QA / Conflict report

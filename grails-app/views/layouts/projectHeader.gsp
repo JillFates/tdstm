@@ -454,7 +454,6 @@ int minPasswordLength = tds.minPasswordLength()
 							<tds:hasPermission permission="ShowMovePrep">
 							<li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
 							</tds:hasPermission>
-							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Login Badges</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Transport Worksheets</a></li>
 							<tds:hasPermission permission='HelpMenuView'>
