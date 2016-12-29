@@ -282,7 +282,7 @@ class DeviceService implements ServiceMethods {
 			device.model = null
 			if (params.manufacturerId) {
 				// Attempt to assign just the manufacturer and asset type to the device
-				def manu = get(Manufacturer, params.manufacturerId)
+				def manu = Manufacturer.get(params.manufacturerId)
 				device.manufacturer = manu
 				// assetType was applied in the bind above
 			} else {
