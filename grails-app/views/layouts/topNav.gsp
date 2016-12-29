@@ -71,7 +71,8 @@
 	String setImage = tds.setImage() ?: null
 	def userLogin = tds.userLogin() ?: null
 	int minPasswordLength = tds.minPasswordLength()
-    def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
+    // Only for environments where the License Manager is true Enabled
+    def isLicenseManagerEnabled =  licenseCommonService.isManagerEnabled()
 %>
 
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
@@ -101,10 +102,10 @@
                 </div>
 
                 <g:if test="${isLicenseManagerEnabled}">
-                    <g:render template="../layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent]"  />
+                    <g:render template="../layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                 </g:if>
                 <g:else>
-                    <g:render template="../layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent]"  />
+                    <g:render template="../layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                 </g:else>
 
 
