@@ -3425,6 +3425,31 @@ class AssetEntityService implements ServiceMethods {
 		return model
 	}
 
+
+	long countServers(Project project){
+		if(!project) return 0L
+
+		def sql = """
+			SELECT 
+				count(distinct ae.asset_entity_id)
+			FROM asset_entity ae
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
+			LEFT OUTER JOIN model m ON m.model_id=ae.model_id
+			LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = 'issue'
+			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = 'comment'
+			LEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id 
+			LEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id 
+			LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id 
+			WHERE ae.project_id = :pid
+			AND ae.asset_class = 'DEVICE'
+			AND mb.use_for_planning=true
+			AND ae.asset_class='DEVICE'
+			AND ae.asset_type IN ('Server','Appliance','Blade','VM','Virtual') 
+		"""
+		/* id = 2445 */
+		namedParameterJdbcTemplate.queryForObject(sql, [pid: project.id], Long.class)
+	}
 	/**
 	 * Used to retrieve the data used by the AssetEntity List
 	 */
