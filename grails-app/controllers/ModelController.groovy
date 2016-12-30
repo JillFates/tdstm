@@ -261,10 +261,12 @@ class ModelController implements ControllerMethods {
 				for(int i = existingConnectors ; i<51; i++) {
 					otherConnectors << i
 				}
-				render(view: "create",
-					    model: [modelInstance: modelInstance, modelConnectors: modelConnectors,
-					            otherConnectors: otherConnectors, modelTemplate: modelTemplate])
-			}
+	            render(view: "list", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
+											   otherConnectors:otherConnectors, modelTemplate:modelTemplate ] )
+	        }
+		}catch(RuntimeException rte) {
+			flash.message = rte.getMessage()
+			redirect(controller:'model', action: 'list')
 		}
 		catch (RuntimeException rte) {
 			flash.message = rte.message
@@ -562,7 +564,7 @@ class ModelController implements ControllerMethods {
 			}
 		} catch(RuntimeException rte) {
 			flash.message = rte.message
-			redirect(controller:'project', action: 'list')
+			redirect(controller:'model', action: 'list')
 		}
 	}
 

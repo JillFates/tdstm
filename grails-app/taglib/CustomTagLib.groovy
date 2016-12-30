@@ -466,7 +466,8 @@ class CustomTagLib implements InitializingBean {
 		}
 
 		int converted = powerTypePref == 'Watts' ? Math.round(rackPower) : (rackPower / 120).toFloat().round(1)
-		out << (attrs.blankZero && converted == 0) ? '' : converted
+		def result = (attrs.blankZero && converted == 0) ? '' : converted
+		out << result
 	}
 
 	def currentProjectMoveEvents = { attrs ->
