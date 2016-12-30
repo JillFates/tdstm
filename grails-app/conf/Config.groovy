@@ -1,11 +1,11 @@
 import grails.util.Environment
 
-tdstm.license = [
+tdstm.license =[
 	password: 'sampleKey1984',
 	enabled : false,
-	manager :{
+	manager :[
 		enabled : false
-	}
+	]
 ]
 
 // This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
