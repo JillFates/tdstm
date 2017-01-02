@@ -16,6 +16,7 @@ import org.apache.commons.codec.net.URLCodec
 import org.apache.commons.validator.routines.UrlValidator
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
+import net.transitionmanager.service.LicenseCommonService
 
 import java.sql.Timestamp
 import java.text.DateFormat
@@ -37,6 +38,8 @@ class CustomTagLib implements InitializingBean {
 	LinkGenerator grailsLinkGenerator
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
+
+	LicenseCommonService licenseCommonService
 
 	/**
 	 * Adjusts a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified.
@@ -304,6 +307,38 @@ class CustomTagLib implements InitializingBean {
 		out << "viewBox='0 0 115 115' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'> "
 		out << "<image x='0' y='0' height='110px' width='110px' fill='#1f77b4'  xmlns:xlink='http://www.w3.org/1999/xlink' "
 		out << "xlink:href='" << resource(dir: 'icons/svg', file: name + '.svg') << "'></image></svg>"
+	}
+
+	/**
+	 * Helper Tag to render breadcrumbs to display
+	 * @param title - the display name of the Page/Module
+	 * @param crumbs - a map of elements what will be part of the crumbs
+	 */
+	def subHeader = { Map attrs ->
+		String title = attrs.title
+		def crumbs = attrs.crumbs
+
+		out << "<!-- Content Header (Page header) -->"
+		out << "<section class=\"content-header\">"
+			out << "<h1> " << title << licenseWarning() << " </h1>"
+
+			out << "<ol class=\"breadcrumb\">"
+				crumbs.each {
+					out << "<li><a href=\"#\">" << it << "</a></li>"
+				}
+			out << "</ol>"
+
+		out << "</section>"
+	}
+
+	/**
+	 * Inject a warning icon to show the status of the License Admin if is next to expires in a pop up
+	 */
+	def licenseWarning = {
+		// Only for environments where the License Manager is true Enabled
+		def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
+
+		out << "<a href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-content=\" OMG! your license is going to expire! <a href='/tdstm/app/#/license/admin/list'>Renew</a> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
 	}
 
 	/**

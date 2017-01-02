@@ -50,6 +50,8 @@
             $.datetimepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
 
             $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+
+            $('[data-toggle="popover"]').popover();
         });
 
         function updateEventHeader( e ){
@@ -72,7 +74,7 @@
 	def userLogin = tds.userLogin() ?: null
 	int minPasswordLength = tds.minPasswordLength()
     // Only for environments where the License Manager is true Enabled
-    def isLicenseManagerEnabled =  licenseCommonService.isManagerEnabled()
+    def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
 %>
 
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->

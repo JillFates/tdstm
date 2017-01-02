@@ -205,16 +205,8 @@
 	</script>
 </head>
 <body>
-<!-- Content Header (Page header) -->
-<section class="content-header">
-	<h1>
-		Task Manager
-	</h1>
-	<ol class="breadcrumb">
-		<li><a href="#">Task</a></li>
-		<li><a href="#">List</a></li>
-	</ol>
-</section><br />
+<tds:subHeader title="Task Manager" crumbs="['Task','List']"/>
+<br />
 	<input type="hidden" id="timeBarValueId" value="0"/>
 	<div id="outerBodyId" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<input type="hidden" id="timeBarValueId" value="0"/>
