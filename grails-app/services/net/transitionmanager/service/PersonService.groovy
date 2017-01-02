@@ -1153,7 +1153,7 @@ class PersonService implements ServiceMethods {
 		// Check that the individual that is attempting to assign someone has access to the project in the first place
 		Project project = Project.get(projectId)
 		if (! hasAccessToProject(byWhom.person, project)) {
-			auditService.logSecurityViolation(byWhom, "attempted to modify staffing on project $project with proper access")
+			auditService.logSecurityViolation(byWhom.username, "attempted to modify staffing on project $project with proper access")
 			throw new UnauthorizedException('You do not have access to the specified project')
 		}
 
