@@ -47,8 +47,18 @@ class ErrorHandlerController implements ControllerMethods {
 	 */
 	def unauthorized() {
 		log.debug "Hit unauthorized()"
-		if (errorHandlerService.isAjaxRequest(request)) {
-			// ...
+		// Retrieves the model for the response.
+		def model = errorHandlerService.model(request)
+		// Determines the Login URI.
+		def loginURI = coreService.getConfigSetting("grails.plugin.springsecurity.auth.loginFormUrl")
+		// Appends the Login URI to the continue URL.
+		model.continueUrl = model.continueUrl + loginURI
+		// Determines whether this is an AJAX request.
+		if (errorHandlerService.isAjaxRequest(request)){
+			response.setHeader('X-Login-URL', model.continueUrl)
+			render ""
+		}else{
+			return model	
 		}
 
 	}

@@ -271,6 +271,7 @@ grails {
 			auth {
 				loginFormUrl = '/auth/login'
 				useForward = false
+				ajaxLoginFormUrl = loginFormUrl // Overrides default redirect Login URL for AJAX requests.
 			}
 			dao {
 				hideUserNotFoundExceptions = false
