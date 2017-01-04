@@ -93,7 +93,7 @@
 						<tr>
 							<td>
 								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;
-								<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}"></g:select><br></br>
+								<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}" style="max-width: 144px;"></g:select><br></br>
 							</td>
 						</tr>
 						<tr>
