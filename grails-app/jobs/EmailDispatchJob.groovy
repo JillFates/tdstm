@@ -3,7 +3,7 @@ import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.EmailDispatchService
 import org.quartz.JobExecutionContext
 
-class EmailDispatchJob {
+class EmailDispatchJob extends SecureJob{
 
 	def group = 'tdstm-send-email'
 	static triggers = {}
@@ -15,7 +15,8 @@ class EmailDispatchJob {
 	 */
 	void execute(JobExecutionContext context) {
 		try {
-			emailDispatchService.sendEmail(context.mergedJobDataMap)
+			Map dataMap = initialize(context)
+			emailDispatchService.sendEmail(dataMap)
 		}
 		catch (e) {
 			log.error "execute() received exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
