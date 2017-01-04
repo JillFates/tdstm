@@ -17,6 +17,7 @@ import org.apache.commons.validator.routines.UrlValidator
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
 import net.transitionmanager.service.LicenseCommonService
+import net.transitionmanager.service.LicenseAdminService
 
 import java.sql.Timestamp
 import java.text.DateFormat
@@ -40,6 +41,7 @@ class CustomTagLib implements InitializingBean {
 	UserPreferenceService userPreferenceService
 
 	LicenseCommonService licenseCommonService
+	LicenseAdminService licenseAdminService
 
 	/**
 	 * Adjusts a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified.
@@ -336,9 +338,13 @@ class CustomTagLib implements InitializingBean {
 	 */
 	def licenseWarning = {
 		// Only for environments where the License Manager is true Enabled
-		def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
-
-		out << "<a href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-content=\" OMG! your license is going to expire! <a href='/tdstm/app/#/license/admin/list'>Renew</a> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
+		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
+		if(isLicenseAdminEnabled) {
+			String stateMessage = licenseAdminService.licenseStateMessage()
+			if(stateMessage) {
+				out << "<a href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-content=\" " << stateMessage << " <a href='/tdstm/app/#/license/admin/list'>Renew</a> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
+			}
+		}
 	}
 
 	/**
