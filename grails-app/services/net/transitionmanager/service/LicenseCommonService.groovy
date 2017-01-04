@@ -83,4 +83,8 @@ class LicenseCommonService {
 	boolean isManagerEnabled(){
 		return (grailsApplication.config.tdstm?.license?.manager?.enabled)?true:false
 	}
+
+	boolean isLicenseAdmin(){
+		return (grailsApplication.config.tdstm?.license?.enabled)?true:false
+	}
 }

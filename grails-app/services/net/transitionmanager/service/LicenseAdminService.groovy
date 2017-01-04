@@ -82,7 +82,7 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	def isEnabled(){
-		return grailsApplication.config.tdstm.license.enabled
+		return licenseCommonService.isLicenseAdmin()
 	}
 
 	boolean hasModule(projectGuid, moduleName){
