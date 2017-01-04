@@ -82,7 +82,15 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	def isEnabled(){
-		return licenseCommonService.isLicenseAdmin()
+		return licenseCommonService.isAdminEnabled()
+	}
+
+	/**
+	 * return the license Message for the required project or current if Null
+	 * @return the License Message
+	 */
+	String licenseStateMessage(Project project = null){
+		return "licenseStateMessage: [PLACEHOLDER Message]"
 	}
 
 	boolean hasModule(projectGuid, moduleName){
