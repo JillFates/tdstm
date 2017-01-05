@@ -25,6 +25,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import org.apache.commons.lang.StringUtils
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.FlushMode
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.interceptor.TransactionAspectSupport
@@ -34,6 +35,7 @@ import java.util.regex.Matcher
 @Slf4j
 class ImportService implements ServiceMethods {
 
+	GrailsApplication grailsApplication
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	AssetEntityService assetEntityService
 	DeviceService deviceService
