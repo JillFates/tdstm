@@ -1,5 +1,9 @@
+import com.tdsops.tm.domain.AssetEntityHelper
+import com.tds.asset.Database
+import com.tds.asset.Application
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.service.AssetEntityService
+
 
 class AssetEntityServiceTests extends IntegrationSpec {
 
@@ -45,6 +49,22 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 		and: "dependencyStatus contains 'Validated'"
 		findAssetOptionInList(data, 'Validated')
+	}
+
+
+	void "test AssetEntityHelper getPropertyNameByHashReference"(){
+		setup:
+			Application app = new Application()
+			Database db = new Database()
+		expect:
+			AssetEntityHelper.getPropertyNameByHashReference(app, "sme1") == "#SME1"
+			AssetEntityHelper.getPropertyNameByHashReference(app, "#sme1") == "#SME1"
+			AssetEntityHelper.getPropertyNameByHashReference(db, "#sme2") == null
+			AssetEntityHelper.getPropertyNameByHashReference(null, "#sme2") == null
+			AssetEntityHelper.getPropertyNameByHashReference(app, null) == null
+			AssetEntityHelper.getPropertyNameByHashReference(app, "") == null
+			AssetEntityHelper.getPropertyNameByHashReference(app, "#") == null
+			AssetEntityHelper.getPropertyNameByHashReference(app, "#license") == null
 	}
 
 

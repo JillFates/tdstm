@@ -12,6 +12,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdsops.tm.domain.AssetEntityHelper
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferValue
@@ -689,6 +690,9 @@ class ImportService implements ServiceMethods {
 
 		def eavAttributeSet = data.eavAttributeSet
 		def staffList = data.staffList
+
+		def teams = partyRelationshipService.getStaffingRoles()*.id
+		
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		assetCount = dataTransferValueRowList.size()
 
@@ -746,41 +750,51 @@ class ImportService implements ServiceMethods {
 				warnMsg = ''
 
 				switch (attribName) {
-					case ~/sme|sme2|appOwner/:
+					case ~/shutdownBy|startupBy|testingBy|sme|sme2|appOwner/:
 						if (it.importValue) {
 
 							// Substitute owner for appOwner
 							def propName = attribName
 
-							// First check to see if the app property (person) is already set to the name specified in the spreadsheet. If the names are
-							// the same we can skip a lot of expensive computations.
-							String existingName = application[propName] ? application[propName].toString() : ''
-							if (existingName && existingName == it.importValue) {
-								// The name hasn't changed so we can skip this task
-								log.debug "processApplicationImport() $attribName name was unchanged $it.importValue"
-								break
-							}
+							if (it.importValue[0] in ['@', '#']) {
+								assignWhomToAsset(application, attribName, it.importValue, staffList, teams, project)
+							}else{
 
-							def results
-							try {
-								results = personService.findOrCreatePerson(it.importValue, project, staffList)
-							} catch (e) {
-								warnMsg = "Failed to find or create $attribName ($it.importValue) on row $rowNum - $e.message"
-							}
+								// First check to see if the app property (person) is already set to the name specified in the spreadsheet. If the names are
+								// the same we can skip a lot of expensive computations.
+								String existingName = application[propName] ? application[propName].toString() : ''
+								if (existingName && existingName == it.importValue) {
+									// The name hasn't changed so we can skip this task
+									log.debug "processApplicationImport() $attribName name was unchanged $it.importValue"
+									break
+								}else{
+									Map assignMap = assignWhomToAsset(application, attribName, it.importValue, staffList, teams, project)
+									if(!assignMap.whom && !assignMap.isAmbiguous && assignMap.notExists){
+										def resultMap
+										try{
+											resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
+										} catch (e) {
+											warnMsg = "Failed to find or create $attribName (${it.importValue}) on row $rowNum - ${e.getMessage()}"
+										}
 
-							if (!warnMsg && results?.person) {
-								application[propName] = results.person
+										if ( ! warnMsg && resultMap?.person) {
+											application[attribName] = resultMap.person
 
-								// Now check for warnings
-								if (results.isAmbiguous) {
-									warnMsg = "Ambiguous name for $attribName ($it.importValue) in application $application.assetName on row $rowNum. Name set to $results.person"
+											// Now check for warnings
+											if (resultMap.isAmbiguous) {
+												warnMsg = "Ambiguous name for $attribName (${it.importValue}) in application ${application.assetName} on row $rowNum. Name set to ${resultMap.person}"
+											}
+
+											if (resultMap.isNew)
+												personsAdded++
+
+										} else if ( resultMap?.error ) {
+											warnMsg = "Person assignment to $attribName for App ${application.assetName} on row $rowNum failed. ${resultMap.error}"
+										}
+									}else{
+										warnMsg = assignMap.errMsg
+									}
 								}
-
-								if (results.isNew)
-									personsAdded++
-
-							} else if (results?.error) {
-								warnMsg = "Person assignment to $attribName for App $application.assetName on row $rowNum failed. $results.error"
 							}
 
 						}
@@ -1658,5 +1672,131 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 			project = GormUtil.mergeWithSession(project)
 		}
 		return project
+	}
+
+
+	/**
+	 * This method attempts to assign a person/team to an asset's property.
+	 *
+	 * It supports:
+	 *				Person's Id 		=> value = "123456"
+	 *				Person's Email 		=> value = "example@mail.com"
+	 *				Person's Name 		=> value = "John Doe"
+	 *				Team Code 			=> value = "@APP_COORD"
+	 *				Property Reference 	=> value = "#prop"
+	 *
+	 * @param asset 		- asset being updated.
+	 * @param property 		- which asset's property is to be given a value.
+	 * @param value 		- value to be assigned.
+	 * @param projectStaff 	- List of staff assigned to the project.
+	 * @param staffingRoles - List of team codes.
+	 * @param project
+	 *
+	 * @return Map => Keys: errMsg, isAmbiguous, notExists, whom.
+	 */
+	Map assignWhomToAsset(asset, String property, String value, List projectStaff, List staffingRoles, Project project){
+		def whom = null
+		String errMsg = null
+
+		boolean isAmbiguous = false
+		boolean notExists = false
+
+
+		def assignTeam = {
+			def team = value[1..-1]
+			if(staffingRoles.contains(team)){
+				whom = team
+			}else{
+				errMsg = "Unknown team ($team) indirectly referenced."
+				notExists = true
+			}
+
+		}
+
+
+		def assignByPersonId = { personId ->
+			def whomId = NumberUtil.toLong(personId)
+			whom = projectStaff.find { it.id == whomId }
+			if (!whom) {
+				// Look if the person exists
+				def person = Person.get(whomId)
+				if (person){
+					errMsg = "Person $person ($value) is not in project staff, asset name: ${asset?.assetName}."
+				} else {
+					errMsg = "Person id $person doesn't exist, asset name: ${asset?.assetName}."
+					notExists = true
+				}
+			}
+		}
+
+
+		def assignByPropertyName = {
+			def propReference = AssetEntityHelper.getPropertyNameByHashReference(asset, value)
+			if (propReference){
+				whom = propReference
+			}else{
+				errMsg = "Unable to resolve indirect whom reference (${value}), asset name: ${asset?.assetName}."
+			}
+		}
+
+
+		/*
+		 * This closure looks up a person by name.
+		 */
+		def assignByName = {
+			// <SL> Doing personService injection this way to prevent Spring bean initialization errors
+			def personService = grailsApplication.mainContext.personService
+
+			def map = personService.findPerson(value, project, projectStaff)
+			def personMap = personService.findPersonByFullName(value)
+
+			if (!map.person && personMap.person ) {
+				errMsg = "Person by name ($whom) found but it is NOT a staff"
+			} else if ( map.isAmbiguous ) {
+				errMsg = "Staff referenced by name ($value) was ambiguous"
+				isAmbiguous = true
+			} else if (personMap.person) {
+				whom = personMap.person
+			} else {
+				errMsg = "Person by name ($whom) NOT found"
+				notExists = true
+			}
+
+		}
+
+		switch(value){
+			// Team reference.
+		    case ~/@.*/:
+		        assignTeam()
+		        break
+		    // Property reference
+		    case ~/#.*/:
+				assignByPropertyName()
+		        break
+		    // Person's Id
+		    case ~/\d+/:
+		        assignByPersonId(value)
+		        break
+		    // Person's email address.
+		    case ~/.*@.*/:
+		    	whom = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
+		    	if(!whom){
+		    		errMsg = "Staff referenced by email ($value) not associated with project."
+		    	}
+		    	break
+		   	// Person's name
+		    default:
+		    	assignByName()
+
+		}
+
+		if(whom){
+			asset[property] = whom
+		}else{
+			errMsg = "Invalid value: $value for property: $property given for $asset."
+			log.error(errMsg)
+		}
+
+		return [whom: whom, notExists: notExists, isAmbiguous: isAmbiguous, errMsg: errMsg]
 	}
 }

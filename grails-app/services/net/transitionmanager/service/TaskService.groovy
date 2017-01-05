@@ -13,6 +13,7 @@ import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -4700,21 +4701,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.info "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
 
 		def value
-		def property = propertyRef	// Want to hold onto the original value for the exception message
-		if (property[0] == '#') {
-			// strip off the #
-			property = property[1..-1]
-		}
-
-		// Deal with propery name inconsistency
-		Map crossRef = [sme1:'sme', sme2:'sme2', owner:'appOwner']
-
-		if (crossRef.containsKey(property.toLowerCase())) {
-			property = crossRef[property.toLowerCase()]
-		}
+		ddef property = AssetEntityHelper.getPropertyNameByHashReference(asset, propertyRef)
 
 		// Check to make sure that the asset has the field referenced
-		if (! asset.metaClass.hasProperty(asset.getClass(), property)) {
+		if (property == null ) {
 			throw new RuntimeException("Invalid property name ($propertyRef) used in name lookup in asset $asset")
 		}
 

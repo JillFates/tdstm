@@ -12,6 +12,12 @@ import net.transitionmanager.service.SecurityService
  */
 class AssetEntityHelper {
 
+	// This map is used to match import values and object properties.
+	static Map CROSS_REFERENCES = [sme1:'sme', sme2:'sme2', owner:'appOwner']
+
+	// This maps and import value to the corresponding value to be assigned.
+	static Map CROSS_REFERENCE_VALUES = [sme1: "#SME1", sme2: "#SME2", owner: "#Owner"]
+
 	/**
 	 * Used to lookup an asset by it's ID number and will validate that it belongs to the user's current project
 	 * @param project - the project the user is assigned to
@@ -59,4 +65,43 @@ class AssetEntityHelper {
 		         assetClass: asset.assetClass,
 		         assetTag:   asset.assetTag]]
 	}
+
+
+	/**
+	 * This method determines if a given hash references a valid
+	 * asset property.
+	 *
+	 * @param asset: AssetEntity instance used for looking up the property.
+	 * @param propertyRef: the property to be looked up.
+	 *
+	 * @return the property name if it exists, null otherwise.
+	 * 
+	 */
+
+	 static String getPropertyNameByHashReference(AssetEntity asset, String propertyRef){
+
+	 	String propertyName = null
+
+	 	if(asset && propertyRef){
+
+	 		propertyRef = propertyRef.toLowerCase()
+
+	 		// checks if we need to strip off the #
+	 		if (propertyRef[0] == '#') {
+           	 	propertyRef = propertyRef.substring(1)
+        	}
+
+        	// Determines if the property is a valid cross reference and the asset has it.
+        	if (CROSS_REFERENCES.containsKey(propertyRef)){
+        		String cr = CROSS_REFERENCES[propertyRef]
+        		if(asset.metaClass.hasProperty(asset.getClass(), cr)){
+        			propertyName = CROSS_REFERENCE_VALUES[propertyRef]
+        		}
+        	}
+
+	 	}
+
+
+	 	return propertyName
+	 }
 }
