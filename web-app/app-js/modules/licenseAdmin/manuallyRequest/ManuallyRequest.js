@@ -23,7 +23,7 @@ export default class ManuallyRequest {
 
     getHashCode() {
         this.licenseAdminService.getHashCode(this.licenseModel.id, (data) => {
-            this.licenseModel.encryptedDetail = '-----BEGIN HASH-----\n' + data + '\n-----END HASH-----';
+            this.licenseModel.encryptedDetail = '-----BEGIN LICENSE REQUEST-----\n' + data + '\n-----END LICENSE REQUEST-----';
         });
     }
 

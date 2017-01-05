@@ -156,7 +156,7 @@ export default class LicenseManagerDetail extends FormValidator{
 
     prepareLicenseKey() {
         this.licenseManagerService.getKeyCode(this.licenseModel.id, (data) => {
-            this.licenseKey = '-----BEGIN HASH-----\n' + data + '\n-----END HASH-----';
+            this.licenseKey = '-----BEGIN LICENSE REQUEST-----\n' + data + '\n-----END LICENSE REQUEST-----';
         });
     }
 

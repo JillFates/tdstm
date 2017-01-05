@@ -9,8 +9,8 @@ import org.apache.commons.codec.binary.Base64
  */
 class License {
 	/* TAG grapper for messaging */
-	static BEGIN_TAG = "-----BEGIN HASH-----"
-	static END_TAG = "-----END HASH-----"
+	static BEGIN_TAG = "-----BEGIN LICENSE REQUEST-----"
+	static END_TAG = "-----END LICENSE REQUEST-----"
 
 	String id = UUID.randomUUID().toString()
 	String installationNum
