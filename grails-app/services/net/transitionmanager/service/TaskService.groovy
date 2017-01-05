@@ -4701,7 +4701,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.info "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
 
 		def value
-		ddef property = AssetEntityHelper.getPropertyNameByHashReference(asset, propertyRef)
+		def property = AssetEntityHelper.getPropertyNameByHashReference(asset, propertyRef)
 
 		// Check to make sure that the asset has the field referenced
 		if (property == null ) {
