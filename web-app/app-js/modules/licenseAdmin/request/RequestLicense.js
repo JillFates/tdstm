@@ -47,7 +47,14 @@ export default class RequestLicense extends FormValidator{
     getEnvironmentDataSource() {
         this.licenseAdminService.getEnvironmentDataSource((data)=>{
             this.environmentDataSource = data;
-            this.newLicenseModel.environmentId = data[0].id;
+            if(this.environmentDataSource) {
+                var index = this.environmentDataSource.findIndex(function(enviroment){
+                    return enviroment.name  === 'Production';
+                });
+                index = index || 0;
+                this.newLicenseModel.environmentId = data[index].id;
+            }
+
         });
     }
 

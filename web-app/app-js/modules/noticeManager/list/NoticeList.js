@@ -12,7 +12,7 @@ export default class NoticeList {
         this.actionType = {
             NEW: 'New',
             EDIT: 'Edit'
-        }
+        };
 
         this.noticeGrid = {};
         this.noticeGridOptions = {};
