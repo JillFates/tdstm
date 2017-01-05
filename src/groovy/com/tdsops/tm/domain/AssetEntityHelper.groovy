@@ -13,10 +13,10 @@ import net.transitionmanager.service.SecurityService
 class AssetEntityHelper {
 
 	// This map is used to match import values and object properties.
-	static Map CROSS_REFERENCES = [sme1:'sme', sme2:'sme2', owner:'appOwner']
-
-	// This maps and import value to the corresponding value to be assigned.
-	static Map CROSS_REFERENCE_VALUES = [sme1: "#SME1", sme2: "#SME2", owner: "#Owner"]
+	static Map CROSS_REFERENCES = [ sme1:[assetProperty: 'sme', label: "#SME1"],
+									sme2:[assetProperty: 'sme2', label: "#SME2"],
+									owner:[assetProperty: 'appOwner', label: "#Owner"]
+								]
 
 	/**
 	 * Used to lookup an asset by it's ID number and will validate that it belongs to the user's current project
@@ -78,30 +78,41 @@ class AssetEntityHelper {
 	 * 
 	 */
 
-	 static String getPropertyNameByHashReference(AssetEntity asset, String propertyRef){
-
-	 	String propertyName = null
+	 static getPropertyNameByHashReference(AssetEntity asset, String propertyRef){
+	 	// Stores original reference for later use.
+	 	String original = propertyRef
+	 	// String to be returned
+	 	String result = null
 
 	 	if(asset && propertyRef){
-
-	 		propertyRef = propertyRef.toLowerCase()
 
 	 		// checks if we need to strip off the #
 	 		if (propertyRef[0] == '#') {
            	 	propertyRef = propertyRef.substring(1)
         	}
 
-        	// Determines if the property is a valid cross reference and the asset has it.
-        	if (CROSS_REFERENCES.containsKey(propertyRef)){
-        		String cr = CROSS_REFERENCES[propertyRef]
-        		if(asset.metaClass.hasProperty(asset.getClass(), cr)){
-        			propertyName = CROSS_REFERENCE_VALUES[propertyRef]
+        	def crossReferenceInfo = null
+
+        	// Checks if it's a cross reference.
+        	if (CROSS_REFERENCES.containsKey(propertyRef.toLowerCase())){
+        		crossReferenceInfo = CROSS_REFERENCES[propertyRef.toLowerCase()]
+        		propertyRef = crossReferenceInfo.assetProperty
+        	}
+
+        	// Checks if the asset has the property
+        	if(asset.metaClass.hasProperty(asset.getClass(), propertyRef)){
+        		/* If it's a cross reference we need to use particular values
+        		for compatibility with the Asset Edit modal (otherwise it gets wiped).*/
+        		if(crossReferenceInfo){
+        			result = crossReferenceInfo.label
+        		}else{
+        			result = original
         		}
+        		
         	}
 
 	 	}
 
-
-	 	return propertyName
+	 	return result
 	 }
 }

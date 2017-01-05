@@ -64,7 +64,8 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			AssetEntityHelper.getPropertyNameByHashReference(app, null) == null
 			AssetEntityHelper.getPropertyNameByHashReference(app, "") == null
 			AssetEntityHelper.getPropertyNameByHashReference(app, "#") == null
-			AssetEntityHelper.getPropertyNameByHashReference(app, "#license") == null
+			AssetEntityHelper.getPropertyNameByHashReference(app, "#license") == "#license"
+			AssetEntityHelper.getPropertyNameByHashReference(app, "#custom1") == "#custom1"
 	}
 
 
