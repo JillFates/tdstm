@@ -274,6 +274,8 @@ var Person = function () {
 					$("#spinnerId").hide()
 					$("#messageId").html(data)
 					$(".ui-icon-refresh").click()
+					if(validateMergeCount)
+                    	validateMergeCount();
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$("#spinnerId").hide()
