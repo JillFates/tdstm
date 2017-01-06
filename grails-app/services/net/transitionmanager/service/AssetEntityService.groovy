@@ -3426,7 +3426,11 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 
-	long countServers(Project project){
+	long countServers(Project project = null){
+		if(project == null){
+			project = securityService.userCurrentProject
+		}
+
 		if(!project) return 0L
 
 		def sql = """

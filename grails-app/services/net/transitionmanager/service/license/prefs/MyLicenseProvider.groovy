@@ -1,5 +1,6 @@
 package net.transitionmanager.service.license.prefs
 
+import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.DeserializingLicenseProvider
 
 /**
@@ -19,11 +20,15 @@ import net.nicholaswilliams.java.licensing.DeserializingLicenseProvider
  * | expirationDate
  * | licenseHash
  */
+@Slf4j
 class MyLicenseProvider extends DeserializingLicenseProvider{
-	String license //DB
+	Map<Object,String>licenses = [:]
 
 	@Override
 	protected byte[] getLicenseData(Object o) {
+		log.info("License to retrieve: {}", o)
+
+		String license = licenses[o]
 		if(license) {
 			return license.decodeBase64()
 		}else{
@@ -31,8 +36,8 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 		}
 	}
 
-	public void addLicense(String license){
-		this.license = license
+	public void addLicense(String name, String license){
+		licenses[name] = license
 	}
 
 }

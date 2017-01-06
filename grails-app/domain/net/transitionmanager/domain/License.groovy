@@ -49,11 +49,11 @@ class License {
 		hash 			nullable:true
 	}
 
-	public boolean isActive(){
+	boolean isActive(){
 		return (hash)? true : false
 	}
 
-	public PartyGroup getClient(){
+	PartyGroup getClient(){
 		PartyGroup client
 		if(project != "all") {
 			def project = Project.get(project)
@@ -63,7 +63,7 @@ class License {
 		return client
 	}
 
-	public toJsonMap() {
+	def toJsonMap() {
 		PartyGroup client = getClient()
 		def dProject = [
 		        id:"",
@@ -115,14 +115,13 @@ class License {
 		]
 	}
 
-	public toJsonString(){
+	String toJsonString(){
 		new JsonBuilder( toJsonMap() ).toString()
 	}
 
-	public toEncodedMessage(){
+	String toEncodedMessage(){
 		new String(Base64.encodeBase64(Smaz.compress(toJsonString())))
 	}
-
 
 	/** Enumerator Helpers *******************************************/
 	enum Environment {

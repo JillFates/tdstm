@@ -53,6 +53,7 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
@@ -142,6 +143,7 @@ class AssetEntityController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	UserService userService
+	LicenseAdminService licenseAdminService
 
 	/**
 	 * To Filter the Data on AssetEntityList Page
@@ -2062,6 +2064,8 @@ class AssetEntityController implements ControllerMethods {
 
 		Project project = controllerService.getProjectForPage(this, 'to view Tasks')
 		if (!project) return
+
+		licenseAdminService.isLicenseComplient(project)
 
 		try {
 			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {

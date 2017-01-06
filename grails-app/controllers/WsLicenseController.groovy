@@ -189,24 +189,21 @@ class WsLicenseController implements ControllerMethods {
 			License lic = License.get(params.id)
 
 			if(lic){
+				/*
 				if(lic.hash){
 					response.status = 302 //Found
 					log.info("License Hash: {}", lic.hash)
 					render "${lic.id} already has a license"
 				}else {
+				*/
 					lic.hash = json.hash
 
-					licenseAdminService.load(lic.hash)
-					def lico = licenseAdminService.useLicense()
-
-					lic.status = License.Status.ACTIVE
-
-					if (lic.save()) {
+					if (licenseAdminService.load(lic)) {
 						renderSuccessJson("Ok")
 					} else {
 						throw new Exception("Error while creating License Request")
 					}
-				}
+				//}
 			}else{
 				response.status = 404 //Not Found
 				render "${params.id} not found."
