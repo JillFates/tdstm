@@ -458,7 +458,7 @@ class CookbookService implements ServiceMethods {
 		Long bundleId
 		Integer applicationId
 
-		if (recipe.defaultAssetId != null) {
+		if (recipe.defaultAssetId != null && recipe.defaultAssetId.isNumber()) {
 			switch (recipe.context) {
 				case 'Application':
 					Application app = A.getObject(recipe.defaultAssetId)
@@ -469,7 +469,7 @@ class CookbookService implements ServiceMethods {
 					}
 					break
 				case 'Bundle':
-					MoveBundle mb = 1B.getObject(recipe.defaultAssetId)
+					MoveBundle mb = B.getObject(recipe.defaultAssetId)
 					if (mb) {
 						eventId = mb.moveEventId
 						bundleId = recipe.defaultAssetId
