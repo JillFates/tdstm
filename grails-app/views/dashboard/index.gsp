@@ -1113,9 +1113,16 @@
 		var check = true
 		if ( !isNaN(value) ) {
 			if(value > 100){
-				alert("Summary status should not be greater than 100")
-				check = false
+				alert("Summary status should not be greater than 100");
+				check = false;
 			}
+
+            if(value < 0){
+                alert("Summary status should not be lesser than 0");
+                check = false
+            }
+
+
 		} else {
 			alert("Summary status should be Alpha Numeric ")
 			check = false
@@ -1124,7 +1131,7 @@
 	}
 	// send the request to update the manual summary value if it is valid
 	function changeEventSummary(){
-		var value = $("#manualSummaryStatusId").val()
+		var value = $("#manualSummaryStatusId").val();  alert(value);
 		if (validateManulaSummary( value )) {
 			//var checkbox = $('#checkBoxId').is(":checked");
 			var checkbox = true;
