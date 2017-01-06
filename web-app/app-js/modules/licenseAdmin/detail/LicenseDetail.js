@@ -59,7 +59,6 @@ export default class LicenseDetail {
             size: 'md',
             resolve: {
                 params: () => {
-                    console.log(this.licenseModel);
                     return { license: this.licenseModel };
                 }
             }
@@ -69,6 +68,7 @@ export default class LicenseDetail {
             this.licenseModel.applied = data.success;
             if(data.success) {
                 this.licenseModel.active = data.success;
+                this.uibModalInstance.close({ id: this.licenseModel.id, updated: true});
             }
         });
     }

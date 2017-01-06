@@ -12,6 +12,7 @@ export default class LicenseAdminList {
         this.licenseGridOptions = {};
         this.licenseAdminService = licenseAdminService;
         this.uibModal = $uibModal;
+        this.openLastLicenseId = 0;
 
         this.getDataSource();
         this.log.debug('LicenseAdminList Instanced');
@@ -52,9 +53,23 @@ export default class LicenseAdminList {
                 sort: {
                     field: 'project.name',
                     dir: 'asc'
+                },
+                change:  (e) => {
+                    // We are coming from a new imported request license
+                    if(this.openLastLicenseId !== 0 && this.licenseGrid.dataSource._data) {
+                        var lastLicense = this.licenseGrid.dataSource._data.find((license) => {
+                            return license.id === this.openLastLicenseId;
+                        });
+
+                        this.openLastLicenseId = 0;
+
+                        if(lastLicense) {
+                            this.onLicenseDetails(lastLicense);
+                        }
+                    }
                 }
             },
-            sortable: true
+            sortable: true,
         };
     }
 
@@ -91,13 +106,23 @@ export default class LicenseAdminList {
             size: 'lg',
             resolve: {
                 params: function () {
-                    var dataItem = license && license.dataItem;
+                    var dataItem = {};
+                    if(license && license.dataItem) {
+                        dataItem = license.dataItem;
+                    } else {
+                        dataItem = license;
+                    }
                     return { license: dataItem };
                 }
             }
         });
 
-        modalInstance.result.then(() => {
+        modalInstance.result.then((data) => {
+            this.openLastLicenseId = 0;
+            if(data.updated) {
+                this.openLastLicenseId = data.id; // take this param from the last imported license, of course
+            }
+
             this.reloadLicenseAdminList();
         }, () => {
             this.log.info('Request Canceled.');
