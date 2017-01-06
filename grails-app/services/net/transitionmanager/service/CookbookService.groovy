@@ -458,7 +458,7 @@ class CookbookService implements ServiceMethods {
 		Long bundleId
 		Integer applicationId
 
-		if (recipe.defaultAssetId != null && recipe.defaultAssetId.isNumber()) {
+		if (recipe.defaultAssetId != null) {
 			switch (recipe.context) {
 				case 'Application':
 					Application app = A.getObject(recipe.defaultAssetId)
