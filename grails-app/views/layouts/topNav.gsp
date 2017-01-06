@@ -141,9 +141,6 @@
                                             <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
                                             <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
                                         <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
-                                            <g:if test="${person?.modelScore}">
-                                                <li class="list-group-item"><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc"><span class="glyphicon glyphicon-info-sign user-menu-icon-badge"></span> Model Score <span class="badge">${person?.modelScore}</span></a></li>
-                                            </g:if>
                                         </ul>
                                     </li>
                                     <!-- Menu Footer-->

@@ -95,14 +95,6 @@
 					<g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" value="${tds.powerType()}"/>
 				</td>
 			</tr>
-			<tr class="prop">
-				<td valign="top" class="name">
-					<label for="modelScoreId">Model Score:</label>
-				</td>
-				<td valign="top" class="value">
-					<input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
-				</td>
-			</tr>
 
 			<g:render template="../userLogin/setPasswordFields" model="${[changingPassword:true, minPasswordLength:minPasswordLength, fromDialog:true]}" />
 		  </tbody>
