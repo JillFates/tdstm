@@ -180,11 +180,11 @@ boolean isIE6 = tds.isIE6()
                         </td>
                         <td valign="top" class="value">
 	                     <tds:hasPermission permission='AdminMenuView'>
-                            <g:select name="startPage" from="${['Project Settings','Current Dashboard','Admin Portal']}"
+                            <g:select name="startPage" from="${['Project Settings','Planning Dashboard','Admin Portal']}"
                             value="${tds.startPage()}"/>
                         </tds:hasPermission>
 	                     <tds:lacksPermission permission='AdminMenuView'>
-		                     <g:select name="startPage" from="${['Project Settings','Current Dashboard']}" value="${tds.startPage()}"/>
+		                     <g:select name="startPage" from="${['Project Settings','Planning Dashboard']}" value="${tds.startPage()}"/>
 	                     </tds:lacksPermission>
                         </td>
                     </tr>

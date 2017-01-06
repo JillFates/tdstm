@@ -78,11 +78,11 @@
 				<td valign="top" class="value">
 					<tds:hasPermission permission='AdminMenuView'>
 						<g:select name="startPage" value="${tds.startPage()}"
-						         from="${['Project Settings','Current Dashboard','Admin Portal', 'User Dashboard']}" />
+						         from="${['Project Settings','Planning Dashboard','Admin Portal', 'User Dashboard']}" />
 					</tds:hasPermission>
 					<tds:lacksPermission permission='AdminMenuView'>
 						<g:select name="startPage" value="${tds.startPage()}"
-						          from="${['Project Settings','Current Dashboard', 'User Dashboard']}" />
+						          from="${['Project Settings','Planning Dashboard', 'User Dashboard']}" />
 					</tds:lacksPermission>
 				</td>
 			</tr>
