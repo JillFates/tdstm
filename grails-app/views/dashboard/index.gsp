@@ -1131,7 +1131,7 @@
 	}
 	// send the request to update the manual summary value if it is valid
 	function changeEventSummary(){
-		var value = $("#manualSummaryStatusId").val();  alert(value);
+		var value = $("#manualSummaryStatusId").val();
 		if (validateManulaSummary( value )) {
 			//var checkbox = $('#checkBoxId').is(":checked");
 			var checkbox = true;
