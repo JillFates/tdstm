@@ -238,11 +238,10 @@
                     <th>Dashboard Label</th>
                     <th>Start</th>
                     <th>Completion</th>
-                    <th>Duration</th>
-                    <th>Type
+                    <th>Duration
                         <input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}"/>
                         <input type="hidden" name="projectId" value="${projectId}"/></th>
-                    <th>Be Green</th>
+                    </th>
                 </tr>
                 </thead>
                 <tbody id="commetAndNewsBodyId">
@@ -254,25 +253,6 @@
                         <td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planStartTime}"/></td>
                         <td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planCompletionTime}"/></td>
                         <td><tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/></td>
-                        <td>
-                            <g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">
-                                Manual
-                            </g:if>
-                            <g:else>Linear</g:else>
-                        </td>
-                        <td>
-                            <span id="beGreenDiv_${dashboardStep.moveBundleStep.id}" style="text-align: center;">
-                                <g:if test="${dashboardStep.moveBundleStep?.showInGreen}">
-                                    <input type="checkbox" name="beGreen_${dashboardStep.moveBundleStep.id}"
-                                           id="beGreen_${dashboardStep.moveBundleStep.id}" checked="checked"
-                                           disabled="disabled"/>
-                                </g:if>
-                                <g:else>
-                                    <input type="checkbox" name="beGreen_${dashboardStep.moveBundleStep.id}"
-                                           id="beGreen_${dashboardStep.moveBundleStep.id}" disabled="disabled"/>
-                                </g:else>
-                            </span>
-                        </td>
                     </tr>
                 </g:each>
                 </tbody>
