@@ -414,18 +414,39 @@
 		}
 	}
 	function showImage( value ){
+	    var imageTemp = $('#rearImageId').val() || image  ;
 		if($("#"+value).is(":checked")){
-			if(image ){
+			if(imageTemp){
+			    if(imageTemp != image)
+				{
+				    if(!$("#rearImage").prop('src'))
+                        $('#cablingPanelEdit').css('height','auto').prepend('<img id="rearImage" style="display:none;"/>')
+					readURL($('#rearImageId')[0],"#rearImage");
+				}
 				initializeConnectors( 2, 'auto' )
 				$("#rearImage").show()
 			} else {
 				alert("Rear image does not exist")
+                $("#"+value).prop("checked",false);
 			}
 		} else {
 			$("#rearImage").hide()
 			initializeConnectors( usize, null )
 		}
 	}
+
+    function readURL(input,target) {
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $(target).attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 	function validateForm(){
 		var isValid = true
 		if($(".field_error").length){
