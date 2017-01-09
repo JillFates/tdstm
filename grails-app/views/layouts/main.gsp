@@ -198,14 +198,6 @@ boolean isIE6 = tds.isIE6()
                 </tr>
                 <tr class="prop">
                     <td valign="top" class="name">
-                       <label for="modelScoreId">Model Score:</label>
-                    </td>
-                    <td valign="top" class="value">
-                       <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name">
                         <label for="oldPasswordId">Old Password:&nbsp;</label>
                     </td>
                     <td valign="top" class="value">

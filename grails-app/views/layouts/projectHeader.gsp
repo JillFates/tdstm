@@ -489,9 +489,6 @@ int minPasswordLength = tds.minPasswordLength()
 					<li><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()">Date and Timezone</a></li>
 					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference()">Edit preferences</a></li>
 					<li><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>
-					<g:if test="${person?.modelScore}">
-					<li><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc">Model Score: ${person?.modelScore}</a></li>
-					</g:if>
 				</ul>
 			</td>
 			<td style="vertical-align:top">
