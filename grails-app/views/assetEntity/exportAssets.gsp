@@ -160,11 +160,7 @@
 							</div>
 							<tds:hasPermission permission="Export">
 							<div class="form-group">
-								<label for="exportFormat">Export Format</label>
-								<select id="exportFormat" name="exportFormat" class="form-control selectpicker show-tick">
-									<option value="xlsx" selected="selected">Excel Workbook (.xlsx)</option>
-									<option value="xls">Excel 97-2004 (.xls)</option>
-								</select>
+								<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
 							</div>
 							<div class="box-footer">
 								<%--
@@ -172,7 +168,7 @@
 										<input class="button" type="button" value="Generate Special" onclick="window.location=this.parentNode.href;"/>
 									</g:link>
 								--%>
-								<button type="submit" class="btn btn-primary">Export&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
+								<button type="submit" class="btn btn-primary">Export Excel (.xlsx)&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
 							</div>
 							</tds:hasPermission>
 						</div><!-- /.box-body -->
