@@ -51,7 +51,7 @@
 
             $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 
-            $('[data-toggle="popover"]').popover();
+            $('[data-toggle="popover"]').popover({placement: 'bottom'});
         });
 
         function updateEventHeader( e ){
@@ -122,6 +122,9 @@
                                 <g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>
                                 <g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>
                             </a>
+                        </li>
+                        <li>
+                            <tds:licenseWarning />
                         </li>
                         <sec:ifLoggedIn>
                             <!-- User Account Menu -->

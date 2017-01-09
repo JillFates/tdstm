@@ -322,7 +322,7 @@ class CustomTagLib implements InitializingBean {
 
 		out << "<!-- Content Header (Page header) -->"
 		out << "<section class=\"content-header\">"
-			out << "<h1> " << title << licenseWarning() << " </h1>"
+			out << "<h1> " << title << " </h1>"
 
 			out << "<ol class=\"breadcrumb\">"
 				crumbs.each {
@@ -341,9 +341,9 @@ class CustomTagLib implements InitializingBean {
 		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
 		if(isLicenseAdminEnabled) {
 			String stateMessage = licenseAdminService.licenseStateMessage()
-			if(stateMessage) {
+			//if(stateMessage) {
 				out << "<a href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-content=\" " << stateMessage << " <a href='/tdstm/app/#/license/admin/list'>Renew</a> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
-			}
+			//}
 		}
 	}
 
