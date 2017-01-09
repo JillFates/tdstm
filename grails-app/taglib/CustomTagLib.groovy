@@ -341,9 +341,9 @@ class CustomTagLib implements InitializingBean {
 		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
 		if(isLicenseAdminEnabled) {
 			String stateMessage = licenseAdminService.licenseStateMessage()
-			//if(stateMessage) {
-				out << "<a href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-content=\" " << stateMessage << " <a href='/tdstm/app/#/license/admin/list'>Renew</a> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
-			//}
+			if(stateMessage) {
+				out << "<a class='licensing-error-warning' href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-content=\" " << stateMessage << " <br /><a href='/tdstm/app/#/license/admin/list'>Please click here to renew license.</a> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
+			}
 		}
 	}
 
