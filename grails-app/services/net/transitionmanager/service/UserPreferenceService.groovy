@@ -67,7 +67,8 @@ class UserPreferenceService implements ServiceMethods {
 			def prefs = JSON.parse(value)
 
 			for (label in archGraphCheckboxLabels) {
-				if (prefs[label] && prefs[label] != 'true') {
+				// transforming to String because sometimes it's a Boolean.
+				if (prefs[label] && prefs[label].toString() != 'true') {
 					return false
 				}
 			}
