@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>500 Error</title>
+	<title>TransitionManager&trade; - Error (500)</title>
 
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -46,9 +46,6 @@
 <div class="wrapper">
 
 	<header class="main-header">
-		<input id="contextPath" type="hidden" value="${request.contextPath}"/>
-		<input id="tzId" type="hidden" value="${tds.timeZone()}"/>
-		<input id="userDTFormat" type="hidden" value="${tds.dateFormat()}"/>
 		<nav class="navbar navbar-static-top">
 			<div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">
 				<div class="navbar-header">
