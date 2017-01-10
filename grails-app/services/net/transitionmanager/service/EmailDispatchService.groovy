@@ -66,6 +66,7 @@ class EmailDispatchService implements ServiceMethods {
 		
 		/*For later use when assuming the identity of this user during the
 		 execution of the Quartz Job.*/
+		trigger.jobDataMap.username = securityService.currentUsername
 		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
 		
 		trigger.setJobName("EmailDispatchJob")
