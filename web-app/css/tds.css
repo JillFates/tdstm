@@ -333,6 +333,23 @@
 	background-image: url(../images/news_bg.jpg);
 	background-size: contain;
 }
+.dashboardContainer > .dashboard_div{
+	height: auto;
+}
+@media(min-width: 1025px){
+	.dashboardContainer{
+		display: table;
+		border-spacing: 5px;
+		margin-top: 5px;
+		margin-right: -5px;
+	}
+	.dashboardContainer > .dashboard_div{
+		display: table-cell;
+		float: none;
+		margin-top: 0px;
+		margin-left: 0px;
+	}
+}
 .dashboard_div_subdiv{
 	margin-top: 10px;
 	margin-left: 0px;
