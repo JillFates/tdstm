@@ -126,7 +126,8 @@ class LicenseAdminService extends LicenseCommonService {
 
 		//log.info("OLB:WADA3 : (${!license || !license?.hash})")
 		if(!license || !license.hash){
-			licStateMessage = "UNLICENSED"
+			// UNLICENSED
+			licStateMessage = "Your TransitionManager project is not licensed."
 			return false
 		}
 
@@ -141,11 +142,12 @@ class LicenseAdminService extends LicenseCommonService {
 				licStateMessage = "" //"VALID"
 				return true
 			}else {
-				//If the gracePeriod is exceded
-				licStateMessage = "NONCOMPLIANT"
+				//If the gracePeriod is exceded NONCOMPLIANT
+				licStateMessage = "Your TransitionManager project is no longer compliant with license specifications."
 			}
 		}else{
-			licStateMessage = "EXPIRED"
+			// EXPIRED
+			licStateMessage = "The license for your TransitionManager project has expired."
 			return false
 		}
 	}
