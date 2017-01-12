@@ -8,8 +8,8 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
+<tds:subHeader title="Activity Metrics Report" crumbs="['Reports','Activity','Metrics']"/><br />
 <div class="body">
-<h1>Activity Metrics Report</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>

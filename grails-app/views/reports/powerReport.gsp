@@ -96,6 +96,7 @@
 </head>
 
 <body>
+<tds:subHeader title="Power Report" crumbs="['Reports', 'Power']"/>
 <div class="body" style="width:98%;">
         <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>

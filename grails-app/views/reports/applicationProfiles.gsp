@@ -8,8 +8,8 @@
 		<g:javascript src="report.js"/>
 	</head>
 	<body>
+		<tds:subHeader title="Application Profiles" crumbs="['Reports', 'Profiles']"/> <br />
 		<div class="body">
-			<h1>Application Profiles</h1>
 			
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>

@@ -23,9 +23,8 @@
 
 </head>
 <body>
-
+<tds:subHeader title="Structured Cabling Report" crumbs="['Reports', 'Cabling Data']"/><br />
 <div class="body">
-<h1>Structured Cabling Report </h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>

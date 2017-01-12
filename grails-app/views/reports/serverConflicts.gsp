@@ -8,8 +8,8 @@
 <g:javascript src="report.js"/>
 </head>
 <body>
+	<tds:subHeader title="Server Conflicts" crumbs="['Reports', 'Server']"/> <br />
 	<div class="body">
-		<h1>Server Conflicts</h1>
 		<div class="message" id="preMoveErrorId" style="display: none">Please select the bundle to start the report.</div>
 		
 		<g:if test="${flash.message}">

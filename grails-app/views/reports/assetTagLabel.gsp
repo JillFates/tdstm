@@ -144,8 +144,8 @@ function mySelect(x)
     </script>
 </head>
 <body >
+<tds:subHeader title="Generate Asset Tag" crumbs="['Reports','Generate', 'Asset']"/><br />
 <div class="body">
-<h1>Generate Asset Tag</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
