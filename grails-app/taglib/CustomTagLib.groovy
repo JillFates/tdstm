@@ -323,7 +323,9 @@ class CustomTagLib implements InitializingBean {
 		out << "<!-- Content Header (Page header) -->"
 		out << "<section class=\"content-header\">"
 			out << "<h1> " << title << " </h1>"
-
+			out << "<div class=\"breadcrumb licensing-banner-message\">"
+				out << "THE BANNER MESSAGE"
+			out << "</div>"
 			out << "<ol class=\"breadcrumb\">"
 				crumbs.each {
 					out << "<li><a href=\"#\">" << it << "</a></li>"

@@ -10,6 +10,8 @@ div.content-wrapper
         padding: 0px 5px
         a
           cursor: default
+      > .licensing-banner-message
+        right: 100px
     section
       div.box-body
         div.box
@@ -18,3 +20,8 @@ div.content-wrapper
             border: inherit
             margin-top: inherit
             padding: inherit
+
+@media (max-width: 991px)
+  section.content-header
+    > .licensing-banner-message
+      right: 0px !important
