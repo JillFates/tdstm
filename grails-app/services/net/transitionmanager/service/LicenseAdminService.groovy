@@ -16,6 +16,7 @@ class LicenseAdminService extends LicenseCommonService {
 	private PasswordProvider tdsPasswordProvider
 	private MyLicenseProvider licenseProvider
 	static String licStateMessage = ""
+	static String licBannerMessage = ""
 
 	AssetEntityService assetEntityService
 	LicenseCommonService  licenseCommonService
@@ -92,7 +93,15 @@ class LicenseAdminService extends LicenseCommonService {
 	 * @return the License Message
 	 */
 	String licenseStateMessage(Project project = null){
+		return getLicenseStateMessage(project)
+	}
+
+	String getLicenseStateMessage(Project project = null){
 		return licStateMessage
+	}
+
+	String getLicenseBannerMessage(Project project = null){
+		return licBannerMessage
 	}
 
 	boolean hasModule(projectGuid, moduleName){
@@ -130,6 +139,8 @@ class LicenseAdminService extends LicenseCommonService {
 			licStateMessage = "Your TransitionManager project is not licensed."
 			return false
 		}
+
+		licBannerMessage = license?.bannerMessage
 
 		Date now = new Date()
 
