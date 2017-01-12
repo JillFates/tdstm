@@ -19,17 +19,7 @@
 	</style>
 </head>
 <body>
-<!-- Content Header (Page header) -->
-<section class="content-header">
-	<h1>
-		Event Dashboard
-	</h1>
-	<ol class="breadcrumb">
-		<li><a href="#">Dashboards</a></li>
-		<li><a href="#">Live</a></li>
-		<li class="active">Event</li>
-	</ol>
-</section>
+<tds:subHeader title="Event Dashboard" crumbs="['Dashboard','Event']"/>
 <!-- Main content -->
 <section class="dashboard-event-wrapper">
 	<div>

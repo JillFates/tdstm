@@ -59,11 +59,8 @@ $(document).ready(function() {
 </style>
 </head>
 <body>
-
+<tds:subHeader title="Planning Dashboard" crumbs="['Dashboard','Planning']"/>
 		<div class="execution-phase-wrapper">
-				<!-- Full-width content -->
-
-			<h1>Planning Dashboard</h1>
 
 <%-- Analysis Phase --%>
 			<div class="dashboardContainer">
