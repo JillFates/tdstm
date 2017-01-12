@@ -104,6 +104,7 @@
 		</script>
 	</head>
 	<body>
+	<tds:subHeader title="Staff List" crumbs="['Admin','Client', 'Staff']"/>
 
 	<!-- BULK DELETE model -->
 	<div class="modal fade" id="bulkDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -133,7 +134,6 @@
 
 
 	<div class="body fluid">
-		<h1>Staff List</h1>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>

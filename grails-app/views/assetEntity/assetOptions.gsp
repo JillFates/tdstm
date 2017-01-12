@@ -6,8 +6,8 @@
 <title>Asset Options</title>
 </head>
 <body>
+    <tds:subHeader title="Administrative Setting" crumbs="['Admin','Settings']"/>
     <div align="left" style="margin-top: 30px;">
-       <h1>Administrative Setting</h1>
        <span>The following options are used for asset fields and are system-wide, not project specific.  Please take care when editing.</span>
 
         <div class="asset-options">

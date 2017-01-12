@@ -12,16 +12,7 @@
 </head>
 
 <body>
-<!-- Content Header (Page header) -->
-<section class="content-header">
-    <h1>
-        Workflows
-    </h1>
-    <ol class="breadcrumb">
-        <li><a href="#">Admin</a></li>
-        <li><a href="#">Workflow</a></li>
-    </ol>
-</section><br />
+<tds:subHeader title="Workflows" crumbs="['Admin','Workflow']"/><br />
 <div class="body">
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>

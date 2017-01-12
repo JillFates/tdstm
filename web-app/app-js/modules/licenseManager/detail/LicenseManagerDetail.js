@@ -43,7 +43,7 @@ export default class LicenseManagerDetail extends FormValidator{
             replacedId: params.license.replacedId,
             activityList: params.license.activityList,
             hostName: params.license.hostName,
-            hash: params.license.hash,
+            hash: params.license.id,
 
             applied: params.license.applied,
             keyId: params.license.keyId

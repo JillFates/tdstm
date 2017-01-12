@@ -81,16 +81,7 @@
 		</style>
 	</head>
 	<body>
-		<!-- Content Header (Page header) -->
-		<section class="content-header">
-			<h1>
-				Model List
-			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#">Admin</a></li>
-				<li><a href="#">Models</a></li>
-			</ol>
-		</section><br />
+		<tds:subHeader title="Model List" crumbs="['Admin','Models']"/><br />
 		<div class="body fluid">
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message" >${flash.message}</div>

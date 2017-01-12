@@ -558,7 +558,7 @@ function updateElementPositions () {
 
 // Toggles selection of a node
 function toggleNodeSelection (id) {
-	
+
 	if (nodeSelected == -1 && id == -1)
 		return // No node is selected, so there is nothing to deselect
 	

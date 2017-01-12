@@ -12,8 +12,9 @@
 		<div class="message">${flash.message}</div>
 	</g:if>
 	<tds:hasPermission permission='AdminMenuView'>
+		<tds:subHeader title="Role Permissions" crumbs="['Admin','Roles']"/>
 	<div class="body">
-		<h1>Role Permissions</h1>
+
 		<div id="buttonsDivId" class="buttons">
 			<g:form action="edit">
 				<span class="button">

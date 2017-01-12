@@ -100,6 +100,7 @@
 </head>
 
 <body>
+<tds:subHeader title="User Dashboard for ${loggedInPerson}" crumbs="['Dashboard','User']"/>
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
@@ -134,7 +135,6 @@
 
         <!-- Body Starts here-->
         <div id="bodycontent">
-            <h1>User Dashboard for ${loggedInPerson}</h1>
 
             <div class="panel panel-default">
                 <div class="panel-heading">

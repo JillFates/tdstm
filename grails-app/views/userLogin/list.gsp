@@ -94,13 +94,12 @@
 		</script>
 	</head>
 	<body>
+	<tds:subHeader title="UserLogin List - ${isActive == 'N' ? 'Inactive' : 'Active'} Users" crumbs="['Admin','Client', 'Users']"/>
 		<div id="unlockUserDialog" title="Unlock User Login">
 	
 		</div>
 
 		<div class="body fluid" ng-app="tdsAdmin" ng-controller="tds.admin.controller.MainController as admin">
-			<h1 ng-teast>UserLogin List - ${isActive == 'N' ? 'Inactive' : 'Active'} Users</h1>
-			<br/>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>

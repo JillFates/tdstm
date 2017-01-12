@@ -55,16 +55,7 @@
 		</style>
 	</head>
 	<body>
-	<!-- Content Header (Page header) -->
-	<section class="content-header">
-		<h1>
-			Manufacturer List
-		</h1>
-		<ol class="breadcrumb">
-			<li><a href="#">Admin</a></li>
-			<li><a href="#">Manufacturer</a></li>
-		</ol>
-	</section><br />
+	<tds:subHeader title="Manufacturer List" crumbs="['Admin','Manufacturer']"/><br />
 		<div class="body fluid" ng-app="tdsManufacturers" ng-controller="tds.manufacturers.controller.MainController as manufacturers">
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<div >
