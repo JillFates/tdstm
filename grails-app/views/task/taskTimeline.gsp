@@ -22,12 +22,12 @@
 		<g:javascript src="task-timeline.js" />
 	</head>
 	<body>
+		<tds:subHeader title="Task Timeline" crumbs="['Task','Timeline']"/><br />
 		<input type="hidden" id="timeBarValueId" value="0"/>
 		<div class="taskTimebar hide" id="issueTimebar">
 			<div id="issueTimebarId"></div>
 		</div>
 		<div class="body fluid task-timeline-container" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-			<h1>Task Timeline</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
