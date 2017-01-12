@@ -12,18 +12,7 @@
 		</style>
 	</head>
 	<body>
-		<!-- Content Header (Page header) -->
-		<section class="content-header">
-			<h1>
-				Bundle List
-			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#">Planning</a></li>
-				<li><a href="#">Bundles</a></li>
-				<li class="active">List</li>
-			</ol>
-		</section>
-		<!-- Main content -->
+		<tds:subHeader title="Bundle List" crumbs="['Planning','Bundles', 'List']"/>
 		<section>
 			<div>
 				<div class="box-body">

@@ -38,8 +38,8 @@
 		
 	</head>
 	<body>
+		<tds:subHeader title="Event List" crumbs="['Planning','Event', 'List']"/> <br />
 		<div class="body fluid">
-			<h1>Event List</h1>
 			<g:if test="${flash.message}">
 				<div class="message">
 					${flash.message}

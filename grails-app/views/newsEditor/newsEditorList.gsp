@@ -169,17 +169,7 @@ $('#reportsMenu').hide();
 </script>
 </head>
 <body>
-<!-- Content Header (Page header) -->
-<section class="content-header">
-	<h1>
-		Display News and Issues
-	</h1>
-	<ol class="breadcrumb">
-		<li><a href="#">Planning</a></li>
-		<li><a href="#">Events</a></li>
-		<li class="active">News and Issues</li>
-	</ol>
-</section>
+<tds:subHeader title="Display News and Issues" crumbs="['Planning','News and Issues']"/>
 <!-- Main content -->
 <section>
 	<div>
