@@ -29,6 +29,7 @@ class License {
 	String hash
 	String hostName
 	String websitename
+	String bannerMessage
 
 	static mapping = {
 		id 			generator: 'assigned'
@@ -111,7 +112,8 @@ class License {
 			requestDate		: requestDate,
 			requestNote		: requestNote,
 			hostName		: hostName,
-			websitename		: websitename
+			websitename		: websitename,
+			bannerMessage	: bannerMessage?:"[Place Holder]"
 		]
 	}
 
