@@ -30,7 +30,7 @@
 						<input id="uploadFile" placeholder="Choose File" disabled="disabled" />
 						<div class="fileUpload btn btn-default">
 							<span>Select</span>
-							<input id="uploadBtn" type="file" class="upload" name="${fileParamName}" />
+							<input id="file" type="file" class="upload" name="${fileParamName}" />
 						</div>
 
 						<input type="hidden" name="step" value="upload" />
@@ -51,6 +51,20 @@
 	<script>
 		$('.menu-parent-tasks').addClass('active');
 		$('.menu-parent-tasks-import-tasks').addClass('active');
+        $(document).ready(function() {
+                $("#file").on('change', function() {
+                    var fileName  = $(this).val().split(/(\\|\/)/g).pop();
+                    var fileExt = fileName.split('.').pop()
+                    if(["xls", "xlsx"].indexOf(fileExt) >= 0){
+                        $("#uploadFile").val(fileName);
+                    }else{
+                        alert("Please, select a valid file.")
+                        $(this).val(null)
+                    }
+                    
+                });
+        });
+
 	</script>
 </body>
 </html>
