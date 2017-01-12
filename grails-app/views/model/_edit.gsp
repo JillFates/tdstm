@@ -235,7 +235,7 @@
 	<div>
 		<div id="cablingPanelEdit" style="height: auto; " class="cablingPanel">
 			<g:if test="${modelInstance.rearImage}">
-				<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" style="display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>
+				<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" style="max-width:375px;display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>
 				<script type="text/javascript">
 					$("#cablingPanelEdit").css("background-color","#FFF")
 				</script>
@@ -420,7 +420,7 @@
 			    if(imageTemp != image)
 				{
 				    if(!$("#rearImage").prop('src'))
-                        $('#cablingPanelEdit').css('height','auto').prepend('<img id="rearImage" style="display:none;"/>')
+                        $('#cablingPanelEdit').css('height','auto').prepend('<img id="rearImage" style="display:none;max-width: 375px;"/>')
 					readURL($('#rearImageId')[0],"#rearImage");
 				}
 				initializeConnectors( 2, 'auto' )
