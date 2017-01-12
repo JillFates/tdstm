@@ -34,6 +34,12 @@
 
 	</head>
 	<body>
+	<g:if test="${roomId && viewType != 'list'}">
+		<!-- do nothing -->
+	</g:if>
+	<g:else>
+		<tds:subHeader title="Room List" crumbs="['Data', 'Room List']"/><br />
+	</g:else>
 		<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
 		<div class="body fluid" style="margin-top: 10px;width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 
@@ -51,7 +57,6 @@
 				<!-- do nothing -->
 				</g:if>
 				<g:else>
-					<fieldset><legend><b>Room List</b></legend>
 						<g:form action="create" >
 
 							<div style="float: left; width: auto;">

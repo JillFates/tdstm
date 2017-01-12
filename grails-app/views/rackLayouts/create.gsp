@@ -20,14 +20,13 @@
 </head>
 
 <body>
+<tds:subHeader title="Rack Elevations" crumbs="['Data', 'Rack List']"/><br />
 <div class="body" style="width:98%;" ng-app="tdsComments"
      ng-controller="tds.comments.controller.MainController as comments">
 
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
-
-    <h1 style="margin: 10px;">Rack Elevations</h1>
 
     <div class="dialog">
         <g:form action="generateElevations" name="rackLayoutCreate" method="post" target="_blank"
