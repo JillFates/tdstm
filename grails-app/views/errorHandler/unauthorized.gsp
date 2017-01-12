@@ -77,12 +77,11 @@
 		<section class="content">
 
 			<div class="error-page">
-				<h2 class="headline text-red">401</h2>
+				<h2 class="headline text-red"><span class="glyphicon glyphicon-ban-circle"></span></h2>
 				<div class="error-content">
 					<h3><i class="fa fa-warning text-red"></i> Unauthorized Access.</h3>
 					<p>
-						Yo do not have the permissions to access this page. If your permissions were changed please contact an Administrator to help you resolve this.
-						Meanwhile, <a href="${continueUrl}">you may return</a>.
+						Please contact an Administrator to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
 					</p>
 					<hr>
 				</div>

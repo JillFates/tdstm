@@ -77,12 +77,11 @@
 		<section class="content">
 
 			<div class="error-page">
-				<h2 class="headline text-red">404</h2>
+				<h2 class="headline text-red"><i class="fa fa-fw fa-chain-broken"></i></h2>
 				<div class="error-content">
 					<h3><i class="fa fa-warning text-red"></i> Oops! Nothing Found.</h3>
 					<p>
-						It seems we can't find what you're looking for. It may be broken, or the page has been removed.
-						Perhaps <a href="${continueUrl}">you may return</a>.
+						We can't find what you are looking for.  Perhaps the page is broken, or has been moved.  Please contact an Administrator to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
 					</p>
 					<hr>
 				</div>

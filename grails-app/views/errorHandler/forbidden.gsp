@@ -77,12 +77,11 @@
 		<section class="content">
 
 			<div class="error-page">
-				<h2 class="headline text-red">403</h2>
+				<h2 class="headline text-red"><span class="glyphicon glyphicon-ban-circle"></span></h2>
 				<div class="error-content">
-					<h3><i class="fa fa-warning text-red"></i> You don't have permission to access to this part of the system.</h3>
+					<h3><i class="fa fa-warning text-red"></i> You Don’t have permission to access this part of the system.</h3>
 					<p>
-						If your permissions were changed please contact an Administrator to help you resolve this.
-						Meanwhile, <a href="${continueUrl}">you may return</a>.
+						Please contact an Administrator to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
 					</p>
 					<hr>
 				</div>

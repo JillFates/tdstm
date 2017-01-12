@@ -77,12 +77,11 @@
 		<section class="content">
 
 			<div class="error-page">
-				<h2 class="headline text-red">500</h2>
+				<h2 class="headline text-red"><i class="fa fa-fw fa-frown-o"></i></h2>
 				<div class="error-content">
 					<h3><i class="fa fa-warning text-red"></i> Oops! Something went wrong.</h3>
 					<p>
-						We will work on fixing that right away.
-						Meanwhile, <a href="${continueUrl}">you may return</a>.
+						The TransitionManager team will fix this as soon as possible.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
 					</p>
 					<g:if test="${showStacktrace}">
 						<g:if test="${exception}">
