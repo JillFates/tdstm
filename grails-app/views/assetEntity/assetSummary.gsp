@@ -6,10 +6,8 @@
 <title>Asset Summary Table</title>
 </head>
 <body>
+<tds:subHeader title="Asset Summary Table" crumbs="['Assets', 'Summary']"/><br />
   <div class="body" style="width: 900px">
-  <div>
-  <h1>ASSET SUMMARY TABLE</h1>
-  </div>
   <table class="asset-summary-table" style="width:700px;">
      <thead>
       <tr>

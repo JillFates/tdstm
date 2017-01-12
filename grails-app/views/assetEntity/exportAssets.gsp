@@ -38,17 +38,7 @@
 	</style>
 	</head>
 	<body>
-	<!-- Content Header (Page header) -->
-	<section class="content-header">
-		<h1>
-			Asset Export
-		</h1>
-		<ol class="breadcrumb">
-			<li><a href="#">Assets</a></li>
-			<li><a href="#">Manage Data</a></li>
-			<li class="active">Asset Export</li>
-		</ol>
-	</section>
+	<tds:subHeader title="Asset Export" crumbs="['Assets','Asset Export']"/>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>

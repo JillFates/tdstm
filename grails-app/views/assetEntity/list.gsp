@@ -177,8 +177,8 @@
 		</script>
 	</head>
 	<body>
+		<tds:subHeader title="${title} ${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets', title]"/><br />
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<h1>${title} ${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">

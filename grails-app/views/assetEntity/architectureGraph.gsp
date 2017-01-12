@@ -22,8 +22,8 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 </head>
 <body>
+	<tds:subHeader title="Architecture Graph" crumbs="['Assets','Architecture']"/><br />
 <div id="body" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-	<h1 id="pageTitleId">Architecture Graph</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>

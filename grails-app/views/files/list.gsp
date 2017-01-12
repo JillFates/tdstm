@@ -119,8 +119,8 @@
 		
 	</head>
 	<body>
+		<tds:subHeader title="Logical Storage List${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets','Storage List']"/><br />
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<h1>Logical Storage List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
             <div ng-controller="tds.comments.controller.MainController as comments">
 			    <jqgrid:wrapper id="storageId" />

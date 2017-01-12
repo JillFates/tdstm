@@ -133,8 +133,8 @@
 		<title>DB list</title>
 	</head>
 	<body>
+		<tds:subHeader title="Database List${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets', 'Database List']"/><br />
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<h1>Database List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${dbPref[key]}" style="display:none;">

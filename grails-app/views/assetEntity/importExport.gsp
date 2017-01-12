@@ -89,17 +89,7 @@
 
 </head>
 <body>
-<!-- Content Header (Page header) -->
-<section class="content-header">
-    <h1>
-        Asset Import
-    </h1>
-    <ol class="breadcrumb">
-        <li><a href="#">Assets</a></li>
-        <li><a href="#">Manage Data</a></li>
-        <li class="active">Import Assets</li>
-    </ol>
-</section>
+<tds:subHeader title="Asset Import" crumbs="['Assets','Import Assets']"/>
 <g:if test="${flash.error}">
     <div class="errors">${flash.error}</div>
 </g:if>

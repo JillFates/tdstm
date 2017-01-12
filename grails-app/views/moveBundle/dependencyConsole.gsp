@@ -27,12 +27,10 @@
 		<g:javascript src="generator/generator.js" />
 	</head>
 	<body>
+		<tds:subHeader title="Dependency Analyzer" crumbs="['Assets','Dependency']"/><br />
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<div id="DependencyGroupsTableId" style="min-width: 1000px;">
-			<div id="dependencyTitle" style="float: left;">
-				<h1>Dependency Analyzer</h1>
-			</div>
 
 			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
 				<div id="checkBoxDivId">

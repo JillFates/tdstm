@@ -24,17 +24,7 @@
         </style>
     </head>
     <body>
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
-            <h1>
-                Manage Asset Import Batches
-            </h1>
-            <ol class="breadcrumb">
-                <li><a href="#">Assets</a></li>
-                <li><a href="#">Manage Data</a></li>
-                <li class="active">Manage Batches</li>
-            </ol>
-        </section>
+        <tds:subHeader title="Manage Asset Import Batches" crumbs="['Assets','Manage Batches']"/>
         <g:if test="${flash.message}">
             <div class="margin">
                 <div class="callout callout-info" style="margin-bottom: 0!important;">
