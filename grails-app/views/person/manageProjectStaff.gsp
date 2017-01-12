@@ -42,8 +42,8 @@
 		
 	</head>
 	<body>
+		<tds:subHeader title="Project Staff" crumbs="['Project', 'Staffing']"/><br />
 		<div class="body" ng-app="tdsProjectStaff" ng-controller="tds.staffing.controller.MainController as staffing" style="float:none;">
-			<h1>Project Staff</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<div id="staffSelectId" style=" overflow-x: auto; ">
 				<table id="staffFilterId" style="border: 0px;width: 100%;" >

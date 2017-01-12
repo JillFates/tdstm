@@ -13,13 +13,12 @@
 
 	</head>
 	<body>
-
+	<tds:subHeader title="Project Details" crumbs="['Project', 'Detail']"/><br />
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
 
 		<div class="body">
-			<h1>Project Details</h1>
 
 				<div class="nav" style="border: 1px solid #CCCCCC; height: 20px">
 					<tds:hasPermission permission='MoveBundleEditView'>

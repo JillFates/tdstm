@@ -54,16 +54,7 @@
 		</style>
 	</head>
 	<body>
-		<!-- Content Header (Page header) -->
-		<section class="content-header">
-			<h1>
-				Project List - ${active=='active' ? 'Active' : 'Completed'} Projects
-			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#">Project</a></li>
-				<li><a href="#">${active=='active' ? 'Active' : 'Completed'}</a></li>
-			</ol>
-		</section><br />
+	<tds:subHeader title="Project List - ${active=='active' ? 'Active' : 'Completed'} Projects" crumbs="['Project', active=='active' ? 'Active' : 'Completed' ]"/><br />
 		<div class="body fluid">
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">
