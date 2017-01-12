@@ -13,7 +13,7 @@
 					<g:renderErrors bean="${manufacturerInstance}" as="list" />
 				</div>
 			</g:hasErrors>
-			<g:form action="save" method="post" >
+			<g:form action="list" name="manufacturerDialogForm">
 				<div class="dialog">
 					<table>
 						<tbody>
@@ -85,7 +85,7 @@
 				</div>
 				
 				<div class="buttons">
-					<span class="button"><input class="save" type="submit" value="Save" /></span>
+					<span class="button"><g:actionSubmit class="save" action="save" value="Save"></g:actionSubmit></span>
 				</div>
 			</g:form>
 			<div id="akaDiv" style="display:none;"> 
