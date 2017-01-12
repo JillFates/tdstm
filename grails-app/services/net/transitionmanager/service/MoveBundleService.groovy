@@ -315,16 +315,18 @@ class MoveBundleService implements ServiceMethods {
 
 		if (dependencyBundle) {
 			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))
+			
+			if(dependencyBundle == 'onePlus'){
+				depGroups = depGroups-[0]
+			}
+			
 			if (depGroups.size() == 0) {
 				depGroups = [-1]
 			}
-			if (dependencyBundle.isNumber()) {
+			
+			if(dependencyBundle.isNumber()) {
 				depSql.append(" AND adb.dependency_bundle = $dependencyBundle")
-			}
-			else if (dependencyBundle == 'onePlus') {
-				depSql.append(" AND adb.dependency_bundle IN (${WebUtil.listAsMultiValueString(depGroups-[0])})")
-			}
-			else if (dependencyBundle == 'all') {
+			}else if (dependencyBundle in ['all' , 'onePlus'] ) {
 				depSql.append(" AND adb.dependency_bundle IN (${WebUtil.listAsMultiValueString(depGroups)})")
 			}
 		}
