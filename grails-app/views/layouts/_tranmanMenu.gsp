@@ -60,7 +60,7 @@
                         <li class="menu-parent-item">Manage Model Library</li>
                         <li class="menu-child-item menu-list-manufacturers"><g:link controller="manufacturer" id="${partyGroup}">List Manufacturers</g:link></li>
                         <li class="menu-child-item menu-list-models"><g:link controller="model" id="${partyGroup}">List Models</g:link></li>
-                        <li class="menu-child-item menu-sync-libraries"><g:link controller="model" action="importExport">Sync Libraries</g:link></li>
+                        <li class="menu-child-item menu-sync-libraries"><g:link controller="model" action="importExport">Export Mfg & Models</g:link></li>
                         <li class="menu-child-item">
                             <tds:hasPermission permission='HelpMenuView'>
                                 <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a>
