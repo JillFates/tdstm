@@ -81,7 +81,7 @@
 				<div class="error-content">
 					<h3><i class="fa fa-warning text-red"></i> Oops! Nothing Found.</h3>
 					<p>
-						We can't find what you are looking for.  Perhaps the page is broken, or has been moved.  Please contact an Administrator to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
+						We cannot find what you are looking for.  Perhaps the page is broken, or has been moved.  Please contact the Project Manager to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
 					</p>
 					<hr>
 				</div>

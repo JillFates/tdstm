@@ -81,7 +81,7 @@
 				<div class="error-content">
 					<h3><i class="fa fa-warning text-red"></i> Unauthorized Access.</h3>
 					<p>
-						Please contact an Administrator to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
+						Please contact the Project Manager to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
 					</p>
 					<hr>
 				</div>
