@@ -1143,9 +1143,11 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 				//scope.tasks.show.start=false;
 				scope.tasks.show.completed = false;
 
-				var jobId = data.data.jobId;
-
-				state.go("recipes.detail.gentasks.progress", {'jobId': jobId});
+				if(data.data){
+					var jobId = data.data.jobId;
+					state.go("recipes.detail.gentasks.progress", {'jobId': jobId});
+				}
+				
 				
 			}, function(data, status, headers, config){
 				alerts.addAlert({type: 'danger', msg: 'Unable to generate tasks. ' + data.headers().errormessage});
