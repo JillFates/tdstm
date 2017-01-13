@@ -83,7 +83,7 @@ class ManufacturerController implements ControllerMethods {
 			manuAlias*.delete()
 			ModelAlias.executeUpdate("delete from ModelAlias ma where ma.manufacturer.id = $manufacturer.id")
 			manufacturer.delete(flush:true)
-			flash.message = "Manufacturer $params.id deleted"
+			flash.message = "Manufacturer ${manufacturer.name} deleted"
 			redirect(action: 'list')
 		} else {
 			flash.message = "Manufacturer not found with id $params.id"
