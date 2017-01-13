@@ -325,9 +325,14 @@ class CustomTagLib implements InitializingBean {
 			out << "<h1> " << title << " </h1>"
 		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
 		if(isLicenseAdminEnabled) {
-			out << "<div class=\"breadcrumb licensing-banner-message breadcumb-" << crumbs.size << " \">"
-			out << "BANNER MESSAGE" //licenseAdminService.getLicenseBannerMessage()
-			out << "</div>"
+			def bannerMessage = licenseAdminService.getLicenseBannerMessage()
+			if(bannerMessage) {
+				out << "<div class=\"breadcrumb licensing-banner-message breadcumb-" << crumbs.size << " \">"
+				out << "<div class=\"callout callout-info\"> " +
+						"                    <p> " << bannerMessage << "</p> " +
+						"                  </div>"
+				out << "</div>"
+			}
 		}
 			out << "<ol class=\"breadcrumb\">"
 				crumbs.each {
