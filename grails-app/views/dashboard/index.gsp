@@ -639,12 +639,12 @@
 			data: $('#teamTaskPercentageFormId').serialize(),
 			url:"../dashboard/taskSummary/"+moveEvent,
 			success:function (data){
-				$("#taskSummary").html(data)
+				$("#taskSummary").html(data);
 			},
 			error:function (xhr, ajaxOptions, thrownError){
 				if (errorCode ==  xhr.status) {
 					clearInterval(handler);
-					$("#update").css("color","red")
+					$("#update").css("color","red");
 					if( xhr.status == "403"){
 						alert("403 Forbidden occurred, user don't have permission to load the current project data.");
 					}
@@ -735,11 +735,11 @@
 			var snapshot = bundleMap.snapshot;
 			var runbookOn = snapshot.runbookOn;
 			var moveBundleId = snapshot.moveBundleId;
-			var calcMethod = snapshot.calcMethod
+			var calcMethod = snapshot.calcMethod;
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
-			var planSum = snapshot.planSum
-			var sumDialInd =  -4//planSum.dialInd != null ? planSum.dialInd : 50
+			var planSum = snapshot.planSum;
+			var sumDialInd =  planSum.dialInd ? planSum.dialInd : 50;
 			if(sumDialInd < 0){
 				sumDialInd = 0
 			}
@@ -937,10 +937,8 @@
 				console.log('Error: Unable to locate createNewsForm in submitCreateNewsForm');
 			}
 			/*
-			${remoteFunction(controller:'newsEditor',action:'saveNews',
-									params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNews\').val()+\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()',
-									onComplete:'getMoveEventNewsDetails(moveEvent)')}
-			 */
+			${remoteFunction(controller:'newsEditor',action:'saveNews', params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNews\').val()+\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()', onComplete:'getMoveEventNewsDetails(moveEvent)')}
+			*/
 		}
 		progressTimer.attemptResume();
 	}
@@ -1100,8 +1098,8 @@
 
 	// validate the manual summary input value
 	function validateManulaSummary(value){
-		var check = true
-		if ( !isNaN(value) ) {
+		var check = true;
+		if ( !isNaN(parseFloat(value)) && isFinite(value) ) {
 			if(value > 100){
 				alert("Summary status should not be greater than 100");
 				check = false;
@@ -1109,15 +1107,14 @@
 
             if(value < 0){
                 alert("Summary status should not be lesser than 0");
-                check = false
+                check = false;
             }
 
-
 		} else {
-			alert("Summary status should be Alpha Numeric ")
-			check = false
+			alert("Summary status should be Alpha Numeric ");
+			check = false;
 		}
-		return check
+		return check;
 	}
 	// send the request to update the manual summary value if it is valid
 	function changeEventSummary(){
