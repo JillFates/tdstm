@@ -124,9 +124,9 @@
 		</tr>
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
-			<td><input size="20" type="file" name="frontImage" id="frontImageId" /></td>
+			<td><input size="20" type="file" name="frontImage" id="frontImageId" accept="image/*" /></td>
 			<td valign="top" class="name" nowrap="nowrap">Rear image:</td>
-			<td><input size="20" type="file" name="rearImage" id="rearImageId" /></td>
+			<td><input size="20" type="file" name="rearImage" id="rearImageId" accept="image/*" /></td>
 		</tr>
 		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>

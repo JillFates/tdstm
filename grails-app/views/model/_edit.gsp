@@ -137,9 +137,9 @@
 		</tr>
 		<tr>
 			<td>Front image:</td>
-			<td><input size="20" type="file" name="frontImage" id="frontImageId" /></td>
+			<td><input size="20" type="file" name="frontImage" id="frontImageId" accept="image/*" /></td>
 			<td>Rear image:</td>
-			<td><input size="20" type="file" name="rearImage" id="rearImageId" />
+			<td><input size="20" type="file" name="rearImage" id="rearImageId" accept="image/*" />
 			</td>
 		</tr>
         <tr>
