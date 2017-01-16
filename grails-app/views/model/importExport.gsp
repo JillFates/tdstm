@@ -10,7 +10,7 @@
 </head>
 
 <body>
-<tds:subHeader title="Export" crumbs="['Admin','Export']"/><br />
+<tds:subHeader title="Export Mfg & Models" crumbs="['Admin','Export']"/><br />
 <div class="body">
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
@@ -61,7 +61,7 @@ TODO: Import code removed until import feature be fixed
                 <tr>
                     <td>
                         <label>Only TDS Models :</label>
-                        <g:checkBox id="checkImport" name="exportCheckbox" value="1" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                        <g:checkBox id="checkImport" name="exportCheckbox" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
                     </td>
                     <td style="padding-right: auto;" class="buttonR">
                         <button type="submit" class="btn btn-default" name="_action_Export" value="Export" style="margin-left: 102px;">
