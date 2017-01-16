@@ -144,10 +144,11 @@ function updateModel (forWhom, formName) {
 	$("#"+formName).ajaxSubmit({
 		success: function(data) { 
 			$("#editModelView").dialog('close')
-			$("#showModelView").html(data) 
+			$("#showModelView").html(data)
 			$("#showModelView").dialog('option', 'width', 'auto')
-			$("#showModelView").dialog('option', 'position', ['center','top']);
-			$("#showModelView").dialog('open');
+				.dialog('option', 'position', ['center','top'])
+				.dialog('open');
+
 		},
 		error: function(request, errordata, errorObject) { alert(errorObject.toString()); }
 	});
