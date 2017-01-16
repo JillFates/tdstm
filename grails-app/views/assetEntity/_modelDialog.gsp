@@ -62,7 +62,7 @@
 			</td>
 		</tr>
 
-		<tr>
+		<!--<tr>
 			<td valign="top" class="name">Front image:</label></td>
 			<td valign="top" class="value" id="showModelFrontImage"></td>
 		</tr>
@@ -73,7 +73,7 @@
 		<tr>
 			<td valign="top" class="name">Use Image:</td>
 			<td valign="top" class="value" id="showModelUseImage"></td>
-	        </tr>
+	        </tr>-->
 		<tr id="showModelBladeRowsTr">
 			<td valign="top" class="name">Blade Rows:</td>
 			<td valign="top" class="value" id="showModelBladeRows"></td>

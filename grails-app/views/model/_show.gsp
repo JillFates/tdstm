@@ -74,7 +74,7 @@
         	<td>Notes:</td>
 			<td>${modelInstance?.description}</td>
         </tr>
-        <tr>
+        <!--<tr>
             <td>Front image:</label></td>
         	<td>
 	        	<g:if test="${modelInstance?.frontImage}">
@@ -87,7 +87,7 @@
         		<img src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
         		</g:if>
         	</td>
-        </tr>
+        </tr>-->
 		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td>Blade Rows:</td>
 			<td>${modelInstance?.bladeRows}</td>
@@ -111,10 +111,10 @@
             <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'roomObject','errors')}">
                 <input type="checkbox" id="roomObject" name="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''} disabled="disabled" />
             </td>
-	        <td>Use Image:</td>
+	       <!-- <td>Use Image:</td>
 	        <td>
 		        <input type="checkbox" name="useImage" id="useImageId" ${modelInstance.useImage ? 'checked="checked"' : ''} disabled="disabled"/>
-	        </td>
+	        </td>-->
         </tr>
 		<tr>
 		    <td>Created By :</td>
@@ -146,7 +146,7 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanel">
+		<div id="cablingPanel" style="min-height: 70px;">
 			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" />
 			<script type="text/javascript">

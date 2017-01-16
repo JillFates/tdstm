@@ -122,12 +122,12 @@
 		    	<input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
 			</td>
 		</tr>
-		<tr>
+		<!--<tr>
 			<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
 			<td><input size="20" type="file" name="frontImage" id="frontImageId" accept="image/*" /></td>
 			<td valign="top" class="name" nowrap="nowrap">Rear image:</td>
 			<td><input size="20" type="file" name="rearImage" id="rearImageId" accept="image/*" /></td>
-		</tr>
+		</tr>-->
 		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>
 			<td><input type="text" name="bladeRows" value="${modelInstance.bladeRows}" >
@@ -159,7 +159,7 @@
 			</td>
 		</tr>
 		<tr>
-		<td>Use Image:</td>
+		<!--<td>Use Image:</td>
 	        <td>
 	        	<g:if test="${modelTemplate?.useImage}">
 	       			<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
@@ -167,7 +167,7 @@
 		        <g:else>
 		        	<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
 		        </g:else>
-	        </td>
+	        </td>-->
 		 <td>Source TDS:</td>
 	        <td>
 	        	<g:if test="${modelTemplate?.sourceTDS}">
@@ -199,7 +199,7 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanel">
+		<div id="cablingPanel" style="min-height: 70px;">
 			<g:if test="${modelTemplate?.rearImage}">
 				<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelTemplate?.id)}" style="max-width:375px; display: ${modelTemplate?.useImage != 1 ? 'none':'block' }"/>
 			</g:if>

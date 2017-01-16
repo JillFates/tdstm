@@ -135,12 +135,13 @@
 				<input type="text" name="description" id="descriptionId" value="${modelInstance.description}">
 			</td>
 		</tr>
-		<tr>
+
+	<!--<tr>
 			<td>Front image:</td>
 			<td><input size="20" type="file" name="frontImage" id="frontImageId" accept="image/*" /></td>
 			<td>Rear image:</td>
 			<td><input size="20" type="file" name="rearImage" id="rearImageId" accept="image/*" />
-			</td>
+			</td>-->
 		</tr>
         <tr>
             <td valign="top" class="name">
@@ -149,7 +150,7 @@
             <td valign="top" class="value ${hasErrors(bean:modelInstance,field:'roomObject','errors')}">
                 <g:checkBox id="roomObject" name="roomObject" value='${modelInstance.roomObject}'/>
             </td>
-        	<td>Use Image:</td>
+        	<!--<td>Use Image:</td>
 	        <td>
 				<g:if test="${modelInstance.useImage}">
 					<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
@@ -157,7 +158,7 @@
 				<g:else>
 					<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
 				</g:else>
-	    	</td>
+	    	</td>-->
         </tr>
         <tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>
@@ -233,9 +234,9 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanelEdit" style="height: auto; " class="cablingPanel">
+		<div id="cablingPanelEdit" style="height: auto;min-height: 70px " class="cablingPanel">
 			<g:if test="${modelInstance.rearImage}">
-				<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" style="max-width:375px;display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>
+			<!--<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" style="max-width:375px;display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>-->
 				<script type="text/javascript">
 					$("#cablingPanelEdit").css("background-color","#FFF")
 				</script>
