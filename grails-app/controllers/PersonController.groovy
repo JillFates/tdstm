@@ -770,7 +770,7 @@ class PersonController implements ControllerMethods {
 		]
 
 		String sortString = "$paramsMap.sortOn $paramsMap.orderBy"
-		sortableProps.each {
+		sortableProps.findAll { it != paramsMap["startOn"] }.each {
 			sortString += ', ' + it + ' asc'
 		}
 
@@ -909,7 +909,8 @@ class PersonController implements ControllerMethods {
 				query.append("AND companyStaff.role = '$role' ")
 			}
 
-			query.append(" ORDER BY fullName ASC, team ASC ")
+			//query.append(" ORDER BY fullName ASC, team ASC ")
+			query.append(" ORDER BY ${sortString}")
 
 			// log.debug "loadFilteredStaff() query=$query"
 			staffList = jdbcTemplate.queryForList(query.toString())
@@ -924,7 +925,7 @@ class PersonController implements ControllerMethods {
 		render(template: "projectStaffTable",
 		       model: [staffList: staffList, moveEventList: retrieveBundleHeader(moveEvents), projectId: projectId,
 		               firstProp: params.firstProp, editPermission: securityService.hasPermission('EditProjectStaff'),
-		               project: project, sortOn: params.sortOn, orderBy: paramsMap.orderBy != 'asc' ? 'asc' : 'desc'])
+		               project: project, sortOn: params.sortOn, orderBy: paramsMap.orderBy])
 	}
 
 	/*

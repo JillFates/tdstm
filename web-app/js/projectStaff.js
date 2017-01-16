@@ -574,3 +574,11 @@ function openPersonDiv(value, fieldName){
 		$("#fieldName").val( fieldName );
 	}
 }
+
+function toggleSortOrder(sortOn , firstProp){
+    var newVal = "asc";
+    if($("#orderBy").val() == "asc"){
+        newVal = "desc";
+    }
+    loadFilteredStaff(sortOn , firstProp, newVal);
+}
