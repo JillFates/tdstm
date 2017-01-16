@@ -6,18 +6,22 @@
 
 import angular  from 'angular';
 import uiRouter from 'ui-router';
+
 import TaskManagerService from './service/TaskManagerService.js';
 import TaskManagerController from './list/TaskManagerController.js';
 import TaskManagerEdit from './edit/TaskManagerEdit.js';
 
-// Directives
-//import SVGLoaderController from '../../directives/svg/SVGLoaderController.js'
+var TaskManagerModule = angular.module('TDSTM.TaskManagerModule', [uiRouter]).config(['$stateProvider', 'formlyConfigProvider',
+    function ($stateProvider, formlyConfigProvider) {
 
-var TaskManagerModule = angular.module('TDSTM.TaskManagerModule', [uiRouter]).config(['$stateProvider', function ($stateProvider) {
+    formlyConfigProvider.setType({
+        name: 'custom',
+        templateUrl: 'custom.html'
+    });
 
     // Define a generic header for the entire module, or it can be changed for each instance.
     var header = {
-        templateUrl: 'app-js/modules/header/HeaderContainer.html',
+        templateUrl: '../app-js/modules/header/HeaderView.html',
         controller: 'HeaderController as header'
     };
 
@@ -28,7 +32,7 @@ var TaskManagerModule = angular.module('TDSTM.TaskManagerModule', [uiRouter]).co
             views: {
                 'headerView@': header,
                 'bodyView@': {
-                    templateUrl: 'app-js/modules/taskManager/list/TaskManagerContainer.html',
+                    templateUrl: '../app-js/modules/taskManager/list/TaskManagerContainer.html',
                     controller: 'TaskManagerController as taskManager'
                 }
             }
@@ -42,7 +46,5 @@ TaskManagerModule.service('taskManagerService', ['$log', 'RestServiceHandler', T
 TaskManagerModule.controller('TaskManagerController', ['$log', 'taskManagerService', '$uibModal', TaskManagerController]);
 TaskManagerModule.controller('TaskManagerEdit', ['$log', TaskManagerEdit]);
 
-// Directives
-//TaskManagerModule.directive('svgLoader', SVGLoaderController);
 
 export default TaskManagerModule;

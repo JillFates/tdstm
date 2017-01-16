@@ -1,3 +1,9 @@
+<style>
+    /*TODO: REMOVE ON COMPLETE MIGRATION */
+    div.content-wrapper {
+        background-color: #ecf0f5 !important;
+    }
+</style>
 <!-- Main content -->
 <section class="content">
     <div class="box box-default">
@@ -8,64 +14,21 @@
         </div>
         <div class="box-body">
 
-            <select kendo-combo-box
-                    k-placeholder="'Select Event'"
-                    k-filter="'contains'"
-                    k-data-text-field="'eventName'"
-                    k-data-value-field="'eventId'"
-                    k-data-source="taskManager.eventDataSource">
-            </select>
+            FORMLY
+            {{taskManager.userFields}}
+            <formly-form model="taskManager.user" fields="taskManager.userFields">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </formly-form>
 
-            <checkbox
-                    ng-model="checkboxModel"
-                    name="custom-name"
-                    ng-true-value="The Truth"
-                    ng-false-value="The Untruth"
-                    ng-change="onChange()"
-                    ></checkbox>
-            Just Remaining
-
-            <checkbox
-                    ng-model="checkboxModel"
-                    name="custom-name"
-                    ng-true-value="The Truth"
-                    ng-false-value="The Untruth"
-                    ng-change="onChange()"
-                    ></checkbox>
-            Just Mine
-
-            <checkbox
-                    ng-model="checkboxModel"
-                    name="custom-name"
-                    ng-true-value="The Truth"
-                    ng-false-value="The Untruth"
-                    ng-change="onChange()"
-                    ></checkbox>
-            View Unpublished
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.application.svg" name="application" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.database.svg" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.networkLogical.svg" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.networkPhysical.svg" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.other.svg" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.serverPhysical.svg" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.serverVirtual.svg" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.storageLogical.svg" > </svg-loader>
-            <svg-loader svg-data="taskManager.AppSVGShapes.shape.storagePhysical.svg" > </svg-loader>
-            <br/>
-            <br/>
-            <kendo-grid k-options="taskManager.taskGridOptions"> </kendo-grid>
-            <pageslide ps-open="checked">
-                <div>
-                    <p>some random content...</p>
-                </div>
-            </pageslide>
-            <br/>
-            <button class="btn btn-danger" ng-click="taskManager.onErrorHappens()">Error Prompt</button>
-
-            <button class="btn btn-primary" ng-click="taskManager.openModalDemo()">Open Dialog</button>
         </div>
         <!-- /.box-body -->
     </div>
 </section>
 
+<script type="text/ng-template" id="custom.html">
+    <div class="form-group">
+        <label for="{{::id}}">{{options.templateOptions.label}}</label>
+        <input id="{{::id}}" name="{{::id}}" class="form-control" ng-model="model[options.key]" />
+    </div>
+</script>
 

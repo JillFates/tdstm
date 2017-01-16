@@ -17,6 +17,7 @@ export default class TaskManagerController {
         this.getEventDataSource();
         this.getDataSource();
         this.log.debug('TaskManager Controller Instanced');
+        this.initForm();
 
     }
 
@@ -67,9 +68,9 @@ export default class TaskManagerController {
                 pageSize: 10,
                 transport: {
                     read: (e) => {
-                        this.taskManagerService.testService((data) => {
+                        /*this.taskManagerService.testService((data) => {
                             e.success(data);
-                        });
+                        });*/
                     }
                 }
             }
@@ -89,5 +90,44 @@ export default class TaskManagerController {
         this.taskManagerService.failCall(function () {
 
         });
+    }
+
+    initForm() {
+        this.userFields = [
+            {
+                key: 'email',
+                type: 'input',
+                templateOptions: {
+                    type: 'email',
+                    label: 'Email address',
+                    placeholder: 'Enter email'
+                }
+            },
+            {
+                key: 'password',
+                type: 'input',
+                templateOptions: {
+                    type: 'password',
+                    label: 'Password',
+                    placeholder: 'Password'
+                }
+            },
+            {
+                key: 'file',
+                type: 'file',
+                templateOptions: {
+                    label: 'File input',
+                    description: 'Example block-level help text here',
+                    url: 'https://example.com/upload'
+                }
+            },
+            {
+                key: 'checked',
+                type: 'checkbox',
+                templateOptions: {
+                    label: 'Check me out'
+                }
+            }
+        ];
     }
 }

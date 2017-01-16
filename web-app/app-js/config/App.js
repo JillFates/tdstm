@@ -15,6 +15,9 @@ require('angular-ui-bootstrap');
 require('ngClipboard');
 require('ui-router');
 require('rx-angular');
+require('api-check');
+require('angular-formly');
+require('angular-formly-templates-bootstrap');
 
 // Modules
 import HTTPModule from '../services/http/HTTPModule.js';
@@ -36,6 +39,8 @@ var TDSTM = angular.module('TDSTM', [
     'ngclipboard',
     'kendo.directives',
     'rx',
+    'formly',
+    'formlyBootstrap',
     'ui.bootstrap',
     HTTPModule.name,
     RestAPIModule.name,
