@@ -26,6 +26,7 @@
 						<th class="Arrowcursor ${sortBy == 'dbFormat' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','dbFormat')">DB Format</th>
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','moveBundle')">Bundle</th>
+						<th class="Arrowcursor ${sortBy == 'depGroup' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','depGroup')">Dep. Group</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','planStatus')">Plan Status</th>
 						<th class="Arrowcursor ${sortBy == 'depToResolve' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','depToResolve')">TBD</th>
 						<th class="Arrowcursor ${sortBy == 'depToConflict' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','depToConflict')">Conflict</th>
@@ -55,6 +56,9 @@
 							</td>
 							<td><span
 								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset.moveBundle}</span>
+							</td>
+							<td><span
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.depGroup}</span>
 							</td>
 							<td><span
 								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset.planStatus}</span>

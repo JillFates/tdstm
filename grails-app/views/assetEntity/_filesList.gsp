@@ -27,6 +27,7 @@
 						<th class="Arrowcursor ${sortBy == 'type' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','type')">Asset Type</th>
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','moveBundle')">Bundle</th>
+						<th class="Arrowcursor ${sortBy == 'depGroup' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','depGroup')">Dep Group</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','planStatus')">Plan Status</th>
 						<th class="Arrowcursor ${sortBy == 'depToResolve' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','depToResolve')">TBD</th>
 						<th class="Arrowcursor ${sortBy == 'depToConflict' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','depToConflict')">Conflict</th>
@@ -58,6 +59,9 @@
 							</td>
    							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.moveBundle}</span>
+							</td>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.depGroup}</span>
 							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.planStatus}</span>

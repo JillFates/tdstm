@@ -2785,12 +2785,11 @@ class AssetEntityController implements ControllerMethods {
 				assetDependentlist.each {
 					asset = AssetEntity.read(it.assetId)
 					String type = it.assetClass == AssetClass.STORAGE.toString() ? 'Logical Storage' : asset.assetType
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, type: type]
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, type: type, depGroup: it.bundle]
 				}
 				assetList = sortAssetByColumn(assetList, sortOn != "type" ? (sortOn) : "assetType", orderBy)
 				model.assetList = assetList
 				model.assetListSize = assetDependentlist.size()
-
 				render(template:"allList", model:model)
 				break
 
@@ -2801,7 +2800,7 @@ class AssetEntityController implements ControllerMethods {
 				applicationList.each {
 					asset = Application.read(it.assetId)
 
-					appList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
+					appList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle]
 				}
 				appList = sortAssetByColumn(appList,sortOn,orderBy)
 				model.appList = appList
@@ -2816,7 +2815,7 @@ class AssetEntityController implements ControllerMethods {
 
 				assetEntityList.each {
 					asset = AssetEntity.read(it.assetId)
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, locRoom:asset.roomSource]
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, locRoom:asset.roomSource, depGroup :it.bundle]
 				}
 				assetList = sortAssetByColumn(assetList,sortOn,orderBy)
 				model.assetList = assetList
@@ -2831,7 +2830,7 @@ class AssetEntityController implements ControllerMethods {
 				databaseList.each {
 					asset = Database.read(it.assetId)
 
-					dbList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
+					dbList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle]
 				}
 				dbList = sortAssetByColumn(dbList,sortOn,orderBy)
 				model.databaseList = dbList
@@ -2849,13 +2848,13 @@ class AssetEntityController implements ControllerMethods {
 				filesList.each {
 					asset = AssetEntity.read(it.assetId)
 
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup:it.bundle]
 				}
 
 				assetList.each {
 					def item = [id:it.asset.id, assetName:it.asset.assetName, assetType:it.asset.assetType,
 						validation:it.asset.validation, moveBundle:it.asset.moveBundle, planStatus:it.asset.planStatus,
-						depToResolve:it.asset.depToResolve, depToConflic:it.asset.depToConflict, assetClass:it.asset.assetClass]
+						depToResolve:it.asset.depToResolve, depToConflic:it.asset.depToConflict, assetClass:it.asset.assetClass, depGroup: it.depGroup]
 
 					// check if the object is a logical or physical strage
 					if (it.asset.assetClass.toString() == 'DEVICE') {

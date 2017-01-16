@@ -28,6 +28,7 @@
 						<th class="Arrowcursor ${sortBy == 'sme2' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','sme2')">SME2</th>
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','moveBundle')">Bundle</th>
+						<th class="Arrowcursor ${sortBy == 'depGroup' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','depGroup')">Dep Group</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','planStatus')">Plan Status</th>
 						<th class="Arrowcursor ${sortBy == 'depToResolve' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','depToResolve')">TBD</th>
 						<th class="Arrowcursor ${sortBy == 'depToConflict' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','depToConflict')">Conflict</th>
@@ -60,6 +61,9 @@
 							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${app.asset?.id});">${app.asset?.moveBundle}</span>
+							</td>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${app.asset?.id});">${app?.depGroup}</span>
 							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${app.asset?.id});">${app.asset?.planStatus}</span>
