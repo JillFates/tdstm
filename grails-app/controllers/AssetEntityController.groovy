@@ -2735,7 +2735,7 @@ class AssetEntityController implements ControllerMethods {
 			if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus
 			FROM (
 				SELECT * FROM tdstm.asset_dependency_bundle
-				WHERE project_id=? AND dependency_bundle in (?)
+				WHERE project_id=? AND dependency_bundle in (${nodesQuery.join(',')})
 				ORDER BY dependency_bundle
 			) AS deps
 			LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = deps.asset_id
@@ -2746,7 +2746,8 @@ class AssetEntityController implements ControllerMethods {
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			"""
 
-		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id, nodesQuery)
+		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id)
+		
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
 
@@ -2785,7 +2786,7 @@ class AssetEntityController implements ControllerMethods {
 				assetDependentlist.each {
 					asset = AssetEntity.read(it.assetId)
 					String type = it.assetClass == AssetClass.STORAGE.toString() ? 'Logical Storage' : asset.assetType
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, type: type, depGroup: it.bundle]
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, type: type, depGroup: it.bundle?.toInteger()]
 				}
 				assetList = sortAssetByColumn(assetList, sortOn != "type" ? (sortOn) : "assetType", orderBy)
 				model.assetList = assetList
@@ -2800,7 +2801,7 @@ class AssetEntityController implements ControllerMethods {
 				applicationList.each {
 					asset = Application.read(it.assetId)
 
-					appList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle]
+					appList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle?.toInteger()]
 				}
 				appList = sortAssetByColumn(appList,sortOn,orderBy)
 				model.appList = appList
@@ -2815,7 +2816,7 @@ class AssetEntityController implements ControllerMethods {
 
 				assetEntityList.each {
 					asset = AssetEntity.read(it.assetId)
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, locRoom:asset.roomSource, depGroup :it.bundle]
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, locRoom:asset.roomSource, depGroup: it.bundle?.toInteger()]
 				}
 				assetList = sortAssetByColumn(assetList,sortOn,orderBy)
 				model.assetList = assetList
@@ -2830,7 +2831,7 @@ class AssetEntityController implements ControllerMethods {
 				databaseList.each {
 					asset = Database.read(it.assetId)
 
-					dbList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle]
+					dbList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle?.toInteger()]
 				}
 				dbList = sortAssetByColumn(dbList,sortOn,orderBy)
 				model.databaseList = dbList
@@ -2848,13 +2849,13 @@ class AssetEntityController implements ControllerMethods {
 				filesList.each {
 					asset = AssetEntity.read(it.assetId)
 
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup:it.bundle]
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle?.toInteger()]
 				}
 
 				assetList.each {
 					def item = [id:it.asset.id, assetName:it.asset.assetName, assetType:it.asset.assetType,
 						validation:it.asset.validation, moveBundle:it.asset.moveBundle, planStatus:it.asset.planStatus,
-						depToResolve:it.asset.depToResolve, depToConflic:it.asset.depToConflict, assetClass:it.asset.assetClass, depGroup: it.depGroup]
+						depToResolve:it.asset.depToResolve, depToConflic:it.asset.depToConflict, assetClass:it.asset.assetClass, depGroup: it.depGroup?.toInteger()]
 
 					// check if the object is a logical or physical strage
 					if (it.asset.assetClass.toString() == 'DEVICE') {
@@ -3697,13 +3698,27 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	private List sortAssetByColumn(List assetlist, String sortOn, String orderBy) {
-		assetlist.sort { a, b ->
-			if (orderBy == 'asc') {
-				a.asset?.getAt(sortOn)?.toString() <=> b.asset?.getAt(sortOn)?.toString()
-			} else {
-				b.asset?.getAt(sortOn)?.toString() <=> a.asset?.getAt(sortOn)?.toString()
+		List result
+		if(sortOn == "depGroup"){
+			result = assetlist.sort { a, b ->
+				if (orderBy == 'asc') {
+					a.getAt(sortOn) <=> b.getAt(sortOn)
+				} else {
+					b.getAt(sortOn) <=> a.getAt(sortOn)
+				}
+			}
+		} else {
+
+			result = assetlist.sort { a, b ->
+					if (orderBy == 'asc') {
+						a.asset?.getAt(sortOn)?.toString() <=> b.asset?.getAt(sortOn)?.toString()
+					} else {
+						b.asset?.getAt(sortOn)?.toString() <=> a.asset?.getAt(sortOn)?.toString()
+					}
 			}
 		}
+		return result
+		
 	}
 
 	/**
