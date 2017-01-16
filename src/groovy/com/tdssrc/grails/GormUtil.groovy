@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
 import org.hibernate.FlushMode
 import org.hibernate.Session
+import org.hibernate.SessionFactory
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
 
@@ -141,6 +142,17 @@ class GormUtil {
 			return true
 		}
 		return false
+	}
+
+	/**
+	 * Used to clear out the hibernate session of objects no longer needed to help performance. It will also merge the existing
+	 * @param sessionFactory
+	 * @return
+	 */
+	static flushAndClearSession(SessionFactory sessionFactory) {
+		sessionFactory.currentSession.flush()
+		sessionFactory.currentSession.clear()
+		DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 	}
 
 	/**
