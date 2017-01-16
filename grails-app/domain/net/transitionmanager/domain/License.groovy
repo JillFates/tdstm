@@ -48,6 +48,7 @@ class License {
 		expirationDate 	nullable:true
 		requestNote 	nullable:true
 		hash 			nullable:true
+		bannerMessage	nullable:true
 	}
 
 	boolean isActive(){
@@ -113,7 +114,7 @@ class License {
 			requestNote		: requestNote,
 			hostName		: hostName,
 			websitename		: websitename,
-			bannerMessage	: bannerMessage?:"[Place Holder]"
+			bannerMessage	: bannerMessage
 		]
 	}
 

@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.github.icedrake.jsmaz.Smaz
+import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
@@ -74,13 +75,19 @@ class LicenseManagerService extends LicenseCommonService{
 		def lic = fetch(id)
 
 		if(lic) {
+			def dataJson = [
+					installationNum:lic.installationNum,
+					bannerMessage:	lic.bannerMessage,
+					hostName:		lic.hostName,
+					websitename:	lic.websitename
+			] as JSON
+
+
 			String productKey = lic.id
 			String holder = lic.email
-			String subject = lic.installationNum
-
+			String subject = dataJson.toString()
 			Date validAfter = lic.activationDate
 			Date validBefore = lic.expirationDate
-
 			int numberOfInstances = lic.max
 
 			String licString = generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
@@ -94,29 +101,41 @@ class LicenseManagerService extends LicenseCommonService{
 
 	//// HELPER FUNCTIONS ///////////
 
+	/**
+	 * @param productKey  defines the id
+	 * @param holder
+	 * @param subject	holds a JSON object to different extra properties
+	 * @param numberOfLicenses
+	 * @param goodAfter
+	 * @param goodBefore
+	 * @return
+	 */
 	private String generateLicense(String productKey, String holder, String subject, int numberOfLicenses, Date goodAfter, Date goodBefore){
 		licenseAdminService.initialize()
 
 		net.nicholaswilliams.java.licensing.License.Builder licenseBuilder = new net.nicholaswilliams.java.licensing.License.Builder().
-				withProductKey(productKey). //TM-CORE-XXX
+				withProductKey(productKey).
 				withIssuer("TDS").
-				withHolder(holder). //Partner - Client
-				withSubject(subject). //project:<guid> | global
+				withHolder(holder).
+				withSubject(subject).
 				withIssueDate(new Date().getTime()).
 				withGoodAfterDate(goodAfter.getTime()).
 				withGoodBeforeDate(goodBefore.getTime()).
 				withNumberOfLicenses(numberOfLicenses)
 
+		net.nicholaswilliams.java.licensing.License license = licenseBuilder.build()
+
 		//Use the name of the license name "project:<guid>"
+		/*
 		net.nicholaswilliams.java.licensing.License license = licenseBuilder.
 				addFeature("environment:[engineering | training | demo | production]").
 				addFeature("module:dr").
 				addFeature("module:cookbook").
 				addFeature("module:core"). //All will have this so maybe is not required
 				build()
+		*/
 
 		byte[] licenseData = LicenseCreator.getInstance().signAndSerializeLicense(license)
-
 		String trns = new String(Base64.encodeBase64(licenseData))
 
 		return trns

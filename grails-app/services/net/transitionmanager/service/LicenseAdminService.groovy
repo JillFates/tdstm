@@ -1,11 +1,14 @@
 package net.transitionmanager.service
 
+import grails.converters.JSON
 import net.nicholaswilliams.java.licensing.License
 import net.nicholaswilliams.java.licensing.LicenseManager
 import net.nicholaswilliams.java.licensing.LicenseManagerProperties
 import net.nicholaswilliams.java.licensing.encryption.PasswordProvider
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
+import net.sf.ehcache.Cache
+import net.sf.ehcache.CacheManager
 import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
@@ -17,6 +20,8 @@ class LicenseAdminService extends LicenseCommonService {
 	private MyLicenseProvider licenseProvider
 	static String licStateMessage = ""
 	static String licBannerMessage = ""
+
+	CacheManager licenseCache = CacheManager.getInstance()
 
 	AssetEntityService assetEntityService
 	LicenseCommonService  licenseCommonService
@@ -34,6 +39,14 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 		*/
 		if(isEnabled() && !tdsPasswordProvider) {
+			def cacheName = "lics"
+			if(!licenseCache.getCache(cacheName)) {
+				log.debug("configuring cache")
+				int ttl = 15 * 60
+				Cache memoryOnlyCache = new Cache(cacheName, 200, false, false, ttl, 0)
+				licenseCache.addCache(memoryOnlyCache)
+			}
+
 			log.debug("License Config Enabled")
 			/** BEGIN: License Common Configuration **/
 			File basePath = new File('.')  //grailsApplication.parentContext.getResource("/..").file
@@ -191,21 +204,41 @@ class LicenseAdminService extends LicenseCommonService {
 		log.info( "license.id: " + license.id)
 		log.info( "License ID: " + licObj.productKey)
 
-		if(license.id == licObj.productKey){
-			license.hash = hash
-			license.max = licObj.numberOfLicenses
-			license.activationDate = new Date(licObj.goodAfterDate)
-			license.expirationDate = new Date(licObj.goodBeforeDate)
+		def jsonData = JSON.parse(licObj.subject)
+		String installationNum= jsonData.installationNum
+		String bannerMessage  = jsonData.bannerMessage
+		String hostName 	  = jsonData.hostName
+		String websitename 	  = jsonData.websitename
 
-			def servers = assetEntityService.countServers()
-			log.info("TOTAL SERVERS: " + servers)
-
-
-			license.status = DomainLicense.Status.ACTIVE
-			return license.save()
-		}else{
-			throw new RuntimeException("Error loading licence data")
+		if(license.id != licObj.productKey){
+			throw new RuntimeException("Error loading licence data: Wrong product Key")
 		}
+		/*
+		if(getInstallationId() != installationNum){
+			log.debug("[${getInstallationId()}] == [$installationNum]")
+			throw new RuntimeException("Error loading licence data: Wrong Instalation Id")
+		}*/
+		if(getHostName() != hostName){
+			log.debug("[${getHostName()}] == [$hostName]")
+			throw new RuntimeException("Error loading licence data: Wrong Host Name")
+		}
+		if(getFQDN() != websitename){
+			log.debug("[${getFQDN()}] == [$websitename]")
+			throw new RuntimeException("Error loading licence data: Wrong Website Name")
+		}
+
+		license.hash = hash
+		license.max = licObj.numberOfLicenses
+		license.bannerMessage = bannerMessage
+		license.activationDate = new Date(licObj.goodAfterDate)
+		license.expirationDate = new Date(licObj.goodBeforeDate)
+
+		def servers = assetEntityService.countServers()
+		log.info("TOTAL SERVERS: " + servers)
+
+		license.status = DomainLicense.Status.ACTIVE
+		return license.save()
+
 	}
 
 }
