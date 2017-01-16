@@ -162,7 +162,7 @@ $(document).ready(function() {
 
 	<%-- Analysis Phase --%>
 
-				<div class="dashboard_div col-sm-12 col-lg-2" >
+				<div class="dashboard_div col-sm-12 col-lg-2" style="min-width: 200px" >
 					<span class="dashboard_head">Analysis Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 						<tr>
@@ -334,7 +334,7 @@ $(document).ready(function() {
 
 	<%-- Execution Phase Section --%>
 
-				<div class="dashboard_div col-sm-12  col-lg-8 execution-phase">
+				<div class="dashboard_div col-sm-12  col-lg-8">
 					<span class="dashboard_head">Execution Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 
