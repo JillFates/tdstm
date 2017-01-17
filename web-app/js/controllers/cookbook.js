@@ -1953,16 +1953,19 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 			contextType: scope.currentSelectedRecipe.context,
 			sourceCode: source
 		};
-		dataToSend = $.param(data)
+		dataToSend = $.param(data);
 		cookbookService.getGroups(dataToSend, function(data){
 			log.info('Success on getting Groups');
-			log.info(data.data.groups);
-			scope.groups.groupsArray = data.data.groups;
-			scope.groups.updateGrid();
-			loadAssets([]);
-			timeout(function(){
-				scope.enabledGridSelection = true;
-			}, 200)
+
+			if (data && data.data) {
+                scope.groups.groupsArray = data.data.groups;
+                scope.groups.updateGrid();
+                loadAssets([]);
+                timeout(function(){
+                    scope.enabledGridSelection = true;
+                }, 200)
+			}
+
 		}, function(){
 			log.warn('Error on getting Groups');
 			scope.groups.groupsArray = [{'message': 'Unexpected error', 'context': 'none'}];
