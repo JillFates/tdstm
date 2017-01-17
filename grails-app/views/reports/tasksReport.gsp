@@ -14,7 +14,7 @@
 </head>
 <body>
 <tds:subHeader title="Task Report" crumbs="['Report','Task']"/><br />
-	<div class="body">
+	<div class="body task-report-container">
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
