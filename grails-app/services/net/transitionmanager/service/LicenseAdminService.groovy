@@ -14,6 +14,7 @@ import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
+import org.apache.commons.lang.time.DateUtils
 
 class LicenseAdminService extends LicenseCommonService {
 	static transactional = false
@@ -186,18 +187,22 @@ class LicenseAdminService extends LicenseCommonService {
 						licState.message = "" //"VALID"
 						licState.valid = true
 					} else {
-						//If the gracePeriod is exceded NONCOMPLIANT
 						licState.message = "Your TransitionManager project is no longer compliant with license specifications."
 						licState.valid = false
 					}
 				} else {
-					// EXPIRED
-					licState.message = "The license for your TransitionManager project has expired."
-					licState.valid = false
+					//If the gracePeriod is exceded NONCOMPLIANT
+					if(gracePeriodDaysRemaining(license.expirationDate) > 0) {
+						licState.message = "Your TransitionManager project is in grace period."
+						licState.valid = true
+					}else{
+						// EXPIRED
+						licState.message = "The license for your TransitionManager project has expired."
+						licState.valid = false
+					}
 				}
 			}
 		}
-
 
 		licStateMessage = licState.message
 		licBannerMessage = licState.banner
@@ -206,6 +211,14 @@ class LicenseAdminService extends LicenseCommonService {
 
 	boolean isLicenseComplient(Project project){
 		return isValid(project)
+	}
+
+
+	int gracePeriodDaysRemaining(Date originalDate){
+		int maxDays = 5
+		Date graceDate = DateUtils.addDays(originalDate, maxDays)
+		Date now = new Date()
+		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
 	}
 
 	def load(DomainLicense license){
