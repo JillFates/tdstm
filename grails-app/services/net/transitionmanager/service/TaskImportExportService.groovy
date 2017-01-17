@@ -1170,4 +1170,31 @@ class TaskImportExportService implements ServiceMethods {
 			value == null ? '' : value
 		}
 	}
+
+
+	/**
+	 * Used to populate the model with the necessary properties for the Results form
+	 * @param formOptions
+	 * @return a Map of data used in the controller view including:
+	 *    filename - the local filename of the spreadsheet
+	 *    tasks - the tasks that were read from the spreadsheet
+	 *    labels - the list column header labels used in the tasks list
+	 *    properties - the list of the property names used in the tasks list
+	 *    gridMap - the meta data used by the data grid
+	 * @controllerMethod
+	 */
+	Map generateModelForPostResults(Map formOptions) {
+	
+		Map model = [:]
+
+		model.filename = formOptions.filename
+		model.labels = getLabelsInColumnOrder('formPos')
+		model.properties = getPropertiesInColumnOrder('formPos')
+		model.gridMap = taskSpreadsheetColumnMap
+		model.defaultSuffix = DEFAULTED_SUFFIX
+		model.originalSuffix = ORIGINAL_SUFFIX
+		model.errorSuffix = ERROR_SUFFIX
+
+		return model
+	}
 }

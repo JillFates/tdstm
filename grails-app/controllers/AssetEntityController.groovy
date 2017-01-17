@@ -2747,7 +2747,7 @@ class AssetEntityController implements ControllerMethods {
 			"""
 
 		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id)
-		
+
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
 
@@ -4387,7 +4387,7 @@ class AssetEntityController implements ControllerMethods {
 					log.debug "importTasks() post results = ${model.results}"
 
 					// TODO BB generateModelForPostResults() is in AccountImportExportService
-					model << taskImportExportService.generateModelForPostResults(project, options)
+					model << taskImportExportService.generateModelForPostResults(options)
 					if (!options.filename && model.filename) {
 						options.filename = model.filename
 					}
