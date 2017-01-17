@@ -1,3 +1,4 @@
+<%@page expressionCodec="none" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -368,7 +369,8 @@
 				</td>
 
 			</tr>
-			--%><tr>
+			--%>
+			<tr>
 				<td>&nbsp;</td>
 				<td>
 					${raw(userLogin)}<br />
@@ -420,7 +422,8 @@
 				<td>
 					<g:if test="${allErrors.contains('Tasks')}">
 						<span style="color: green;"><b><h2>Tasks</h2></b></span>
-					</g:if> <g:else>
+					</g:if>
+					<g:else>
 						<span style="color: red;"><b><h2>Tasks</h2></b></span>
 					</g:else>
 				</td>
@@ -461,12 +464,12 @@
 					${personAssignErr}
 					<g:if test="${personTasks && personTasks.size()>0}">
 						<table style="width: auto; margin-left: 100px;">
-						<tr>
-							<th>Task number</th>
-							<th>Title</th>
-							<th>TaskSpec</th>
-						</tr>
-						<tbody>
+							<tr>
+								<th>Task number</th>
+								<th>Title</th>
+								<th>TaskSpec</th>
+							</tr>
+							<tbody>
 								<g:each in="${personTasks}" var="task" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 										<td>
@@ -480,12 +483,11 @@
 										</td>
 									</tr>
 								</g:each>
-						</tbody>
-					</table>
+							</tbody>
+						</table>
 					</g:if>
 				</td>
 			</tr>
-
 		</table>
 
 	</div>
