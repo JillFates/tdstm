@@ -19,10 +19,12 @@ import org.apache.commons.lang.time.DateUtils
 class LicenseAdminService extends LicenseCommonService {
 	static transactional = false
 
+	static enum State {
+		UNLICENSED, TERMINATED, EXPIRED, INBREACH, NONCOMPLIANT, VALID
+	}
+
 	private PasswordProvider tdsPasswordProvider
 	private MyLicenseProvider licenseProvider
-	static String licStateMessage = ""
-	static String licBannerMessage = ""
 
 	static final String CACHE_NAME = "LIC_STATE"
 	CacheManager licenseCache = CacheManager.getInstance()
@@ -125,11 +127,15 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	String getLicenseStateMessage(Project project = null){
-		return licStateMessage
+		return getLicenseStateMap(project)?.message
 	}
 
 	String getLicenseBannerMessage(Project project = null){
-		return licBannerMessage
+		return getLicenseStateMap(project)?.banner
+	}
+
+	State getLicenseState(Project project = null){
+		return getLicenseStateMap(project)?.state
 	}
 
 	boolean hasModule(projectGuid, moduleName){
@@ -142,6 +148,14 @@ class LicenseAdminService extends LicenseCommonService {
 
 	//boolean isValid(projectGuid, featureName){
 	boolean isValid(Project project = null){
+		def licState = getLicenseStateMap(project)
+
+		licStateMessage = licState.message
+		licBannerMessage = licState.banner
+		return licState.valid
+	}
+
+	def getLicenseStateMap(Project project = null){
 		initialize()
 
 		//Is licence check disabled then is always valid
@@ -172,6 +186,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 			if (!license || !license.hash) {
 				// UNLICENSED
+				licState.state = State.UNLICENSED
 				licState.message = "Your TransitionManager project is not licensed."
 				licState.valid = false
 				licState.banner = ""
@@ -184,29 +199,32 @@ class LicenseAdminService extends LicenseCommonService {
 					long numServers = assetEntityService.countServers(project)
 					log.info("NumServers: ${numServers}")
 					if (numServers <= license.max) {
-						licState.message = "" //"VALID"
+						licState.state = State.VALID
+						licState.message = ""
 						licState.valid = true
 					} else {
+						/*
+						if(gracePeriodDaysRemaining(license.expirationDate) > 0) {
+							licState.state = State.NONCOMPLIANT
+							licState.message = "Your TransitionManager project is in grace period."
+							licState.valid = true
+						}
+						*/
+
+						licState.state = State.NONCOMPLIANT
 						licState.message = "Your TransitionManager project is no longer compliant with license specifications."
 						licState.valid = false
 					}
 				} else {
-					//If the gracePeriod is exceded NONCOMPLIANT
-					if(gracePeriodDaysRemaining(license.expirationDate) > 0) {
-						licState.message = "Your TransitionManager project is in grace period."
-						licState.valid = true
-					}else{
-						// EXPIRED
-						licState.message = "The license for your TransitionManager project has expired."
-						licState.valid = false
-					}
+					// EXPIRED
+					licState.state = State.EXPIRED
+					licState.message = "The license for your TransitionManager project has expired."
+					licState.valid = false
 				}
 			}
 		}
 
-		licStateMessage = licState.message
-		licBannerMessage = licState.banner
-		return licState.valid
+		return licState
 	}
 
 	boolean isLicenseComplient(Project project){
