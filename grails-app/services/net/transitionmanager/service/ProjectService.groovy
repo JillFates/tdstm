@@ -96,6 +96,8 @@ class ProjectService implements ServiceMethods {
 	 * @param searchParams - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
 	 * @param userLogin - the user to lookup projects for or null to use the authenticated user
 	 * @return list of projects
+	 *
+	 * TODO: <SL> This returns a PagedResultList not a List
 	 */
 	List<Project> getUserProjects(Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY,
 	                              Map searchParams=[:], UserLogin userLogin = null) {

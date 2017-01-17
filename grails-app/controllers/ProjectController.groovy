@@ -76,7 +76,7 @@ class ProjectController implements ControllerMethods {
 
 		def projectList = projectService.getUserProjects(securityService.hasPermission('ShowAllProjects'), projectStatus, searchParams)
 
-		int totalRows = projectList?.totalCount
+		int totalRows = projectList?.isEmpty() ? 0 : projectList?.getTotalCount()
 		int numberOfPages = totalRows ? Math.ceil(totalRows / maxRows) : 1
 
 		def results = projectList?.collect {
