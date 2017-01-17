@@ -9,6 +9,8 @@ import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
+import net.sf.ehcache.Element
+import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
@@ -21,6 +23,7 @@ class LicenseAdminService extends LicenseCommonService {
 	static String licStateMessage = ""
 	static String licBannerMessage = ""
 
+	static final String CACHE_NAME = "LIC_STATE"
 	CacheManager licenseCache = CacheManager.getInstance()
 
 	AssetEntityService assetEntityService
@@ -38,12 +41,16 @@ class LicenseAdminService extends LicenseCommonService {
 			grailsApplication.config.tdstm.license.enabled = true
 		}
 		*/
+
+		log.debug("computing Seals")
+		computeSeals()
+
 		if(isEnabled() && !tdsPasswordProvider) {
-			def cacheName = "lics"
-			if(!licenseCache.getCache(cacheName)) {
+
+			if(!licenseCache.getCache(CACHE_NAME)) {
 				log.debug("configuring cache")
 				int ttl = 15 * 60
-				Cache memoryOnlyCache = new Cache(cacheName, 200, false, false, ttl, 0)
+				Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, ttl, 0)
 				licenseCache.addCache(memoryOnlyCache)
 			}
 
@@ -97,6 +104,13 @@ class LicenseAdminService extends LicenseCommonService {
 
 	}
 
+	private computeSeals(){
+		ProjectDailyMetric.findAll().each {
+			it.seal = it.computeSeal()
+			it.save()
+		}
+	}
+
 	def isEnabled(){
 		return licenseCommonService.isAdminEnabled()
 	}
@@ -138,42 +152,56 @@ class LicenseAdminService extends LicenseCommonService {
 			project = securityService.userCurrentProject
 		}
 
-		def licenses = DomainLicense.findAllByProject(project.id)
+		//If the current project is null return true
+		if(project == null) return true
 
-		def license = licenses.find { it.hash }
+		Cache ch = licenseCache.getCache(CACHE_NAME)
+		def cacheEl = ch.get(project.id)
+		def licState = cacheEl?.getObjectValue()
 
-		//Validate that the license in the DB has not been compromised
-		//LicenseManager manager = LicenseManager.getInstance()
-		//License licObj = manager.getLicense(license.id)
+		if(!licState) {
+			licState = [:]
+			ch.put(new Element(project.id, licState))
+			def licenses = DomainLicense.findAllByProject(project.id)
+			def license = licenses.find { it.hash }
 
-		//log.info("OLB:WADA3 : (${!license || !license?.hash})")
-		if(!license || !license.hash){
-			// UNLICENSED
-			licStateMessage = "Your TransitionManager project is not licensed."
-			return false
-		}
+			//Validate that the license in the DB has not been compromised
+			//LicenseManager manager = LicenseManager.getInstance()
+			//License licObj = manager.getLicense(license.id)
 
-		licBannerMessage = license?.bannerMessage
-
-		Date now = new Date()
-
-		log.info("lincense: ${license.id}; [${license.activationDate} - ${license.expirationDate}]; Max: ${license.max}")
-
-		if(now.compareTo(license.activationDate) >= 0 &&  now.compareTo(license.expirationDate) <= 0){
-			long numServers = assetEntityService.countServers(project)
-			log.info("NumServers: ${numServers}")
-			if(numServers <= license.max){
-				licStateMessage = "" //"VALID"
-				return true
+			if (!license || !license.hash) {
+				// UNLICENSED
+				licState.message = "Your TransitionManager project is not licensed."
+				licState.valid = false
+				licState.banner = ""
 			}else {
-				//If the gracePeriod is exceded NONCOMPLIANT
-				licStateMessage = "Your TransitionManager project is no longer compliant with license specifications."
+				licState.banner = license.bannerMessage
+				Date now = new Date()
+				log.info("lincense: ${license.id}; [${license.activationDate} - ${license.expirationDate}]; Max: ${license.max}")
+
+				if (now.compareTo(license.activationDate) >= 0 && now.compareTo(license.expirationDate) <= 0) {
+					long numServers = assetEntityService.countServers(project)
+					log.info("NumServers: ${numServers}")
+					if (numServers <= license.max) {
+						licState.message = "" //"VALID"
+						licState.valid = true
+					} else {
+						//If the gracePeriod is exceded NONCOMPLIANT
+						licState.message = "Your TransitionManager project is no longer compliant with license specifications."
+						licState.valid = false
+					}
+				} else {
+					// EXPIRED
+					licState.message = "The license for your TransitionManager project has expired."
+					licState.valid = false
+				}
 			}
-		}else{
-			// EXPIRED
-			licStateMessage = "The license for your TransitionManager project has expired."
-			return false
 		}
+
+
+		licStateMessage = licState.message
+		licBannerMessage = licState.banner
+		return licState.valid
 	}
 
 	boolean isLicenseComplient(Project project){

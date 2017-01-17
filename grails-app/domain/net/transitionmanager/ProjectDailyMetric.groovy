@@ -1,8 +1,10 @@
 package net.transitionmanager
 
 import net.transitionmanager.domain.Project
+import org.apache.commons.codec.digest.DigestUtils
 
 class ProjectDailyMetric {
+	private static SEAL_SALT = "kx23lafKJqzfa123"
 
 	Project project
 	Date metricDate
@@ -27,8 +29,39 @@ class ProjectDailyMetric {
 	Long totalUserLogins = 0
 	Long activeUserLogins = 0
 	Date dateCreated
+	Boolean licenseCompliant = true
+	String  seal
 
 	static mapping = {
 		version false
+	}
+
+	String computeSeal(){
+		String cat = "" +
+				project?.id +
+				metricDate +
+				dateCreated +
+				planningServers +
+				planningApplications +
+				planningDatabases +
+				planningPhysicalStorages +
+				planningLogicalStorages +
+				planningNetworkDevices +
+				planningOtherDevices +
+				dependencyMappings +
+				tasksAll +
+				totalPersons +
+				activeUserLogins +
+				SEAL_SALT
+
+		return DigestUtils.md5Hex(cat)
+	}
+
+	boolean validSeal(){
+		return computeSeal() == seal
+	}
+
+	def beforeInsert(){
+		seal = computeSeal()
 	}
 }
