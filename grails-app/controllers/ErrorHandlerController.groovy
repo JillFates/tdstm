@@ -71,6 +71,8 @@ class ErrorHandlerController implements ControllerMethods {
 	def forbidden() {
 		log.debug "Hit forbidden()"
 		Map model = errorHandlerService.model(request)
+		// Add current user project
+		model["currProject"] = securityService.getUserCurrentProject()
 		String msg = model.exceptionMsg ?: 'URL not found'
 		securityService.reportViolation("${msg} while accessing ${model.requestUri}")
 		response.status = 200

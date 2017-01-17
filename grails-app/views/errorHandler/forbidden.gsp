@@ -57,7 +57,7 @@
 					</g:if>
 					<g:else>
 						<g:if test="${setImage}">
-							<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
+							<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject?.name} project" style="height: 30px;  margin-top: 8px;"/>
 						</g:if>
 						<g:else>
 							<img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
