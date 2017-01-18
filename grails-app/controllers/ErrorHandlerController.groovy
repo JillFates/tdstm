@@ -49,6 +49,7 @@ class ErrorHandlerController implements ControllerMethods {
 		log.debug "Hit unauthorized()"
 		// Retrieves the model for the response.
 		def model = errorHandlerService.model(request)
+
 		// Determines the Login URI.
 		def loginURI = coreService.getConfigSetting("grails.plugin.springsecurity.auth.loginFormUrl")
 		// Appends the Login URI to the continue URL.
@@ -95,7 +96,9 @@ class ErrorHandlerController implements ControllerMethods {
 			render ''
 		} else {
 			response.status = 200
-			errorHandlerService.model(request)
+			def model = errorHandlerService.model(request) 
+			model["currProject"] = securityService.getUserCurrentProject()
+			return model
 		}
 	}
 
