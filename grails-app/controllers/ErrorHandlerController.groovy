@@ -1,6 +1,7 @@
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.ErrorHandlerService
+import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import com.tdsops.common.lang.ExceptionUtil
@@ -21,6 +22,7 @@ class ErrorHandlerController implements ControllerMethods {
 	CoreService coreService
 	ErrorHandlerService errorHandlerService
 	SecurityService securityService
+	LicenseAdminService licenseAdminService
 
 	static final String SESSION_ATTR_ERROR = 'ErrorHandlerController.error'
 	//
@@ -40,6 +42,12 @@ class ErrorHandlerController implements ControllerMethods {
 
 	// ------------
 
+	private Map fetchModel(){
+		def model = errorHandlerService.model(request)
+		model.isLicenseManagerEnabled = licenseAdminService.isManagerEnabled()
+		return model
+	}
+
 	/**
 	 * unauthorized is triggered when resources are requested that require authentication but the security session
 	 * is un-authenticated.
@@ -48,7 +56,7 @@ class ErrorHandlerController implements ControllerMethods {
 	def unauthorized() {
 		log.debug "Hit unauthorized()"
 		// Retrieves the model for the response.
-		def model = errorHandlerService.model(request)
+		Map model = fetchModel()
 
 		// Determines the Login URI.
 		def loginURI = coreService.getConfigSetting("grails.plugin.springsecurity.auth.loginFormUrl")
@@ -71,9 +79,11 @@ class ErrorHandlerController implements ControllerMethods {
 	 */
 	def forbidden() {
 		log.debug "Hit forbidden()"
-		Map model = errorHandlerService.model(request)
+
+		Map model = fetchModel()
+
 		// Add current user project
-		model["currProject"] = securityService.getUserCurrentProject()
+		model.currProject = securityService.getUserCurrentProject()
 		String msg = model.exceptionMsg ?: 'URL not found'
 		securityService.reportViolation("${msg} while accessing ${model.requestUri}")
 		response.status = 200
@@ -96,8 +106,9 @@ class ErrorHandlerController implements ControllerMethods {
 			render ''
 		} else {
 			response.status = 200
-			def model = errorHandlerService.model(request) 
-			model["currProject"] = securityService.getUserCurrentProject()
+			Map model = fetchModel()
+			model.currProject = securityService.getUserCurrentProject()
+
 			return model
 		}
 	}
@@ -120,7 +131,7 @@ class ErrorHandlerController implements ControllerMethods {
 			request.setAttribute(SESSION_ATTR_ERROR, true)
 		}
 
-		Map model = errorHandlerService.model(request)
+		Map model = fetchModel()
 
 		// Handle Ajax error messages
 		if (errorHandlerService.isAjaxRequest(request)) {
@@ -156,7 +167,14 @@ class ErrorHandlerController implements ControllerMethods {
 		// Set the status back to 200 so that it doesn't appear as a real error (TBD if this is the proper thing to do)
 		response.status = 200
 
-		model
+		return model
+	}
+
+	def licensing(){
+		response.status = 200
+		Map model = fetchModel()
+		model.licenseStateMap = licenseAdminService.getLicenseStateMap()
+		return model
 	}
 
 

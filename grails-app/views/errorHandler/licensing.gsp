@@ -1,5 +1,3 @@
-<g:set var="licenseCommonService" bean="licenseCommonService"/>
-<g:set var="licenseAdminService" bean="licenseAdminService"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,15 +35,8 @@
     <script src="${resource(dir: 'dist/js/vendors/jquery/dist', file: 'jquery.min.js')}"></script>
 
 </head>
-<%
-    // Only for environments where the License Manager is true Enabled
-    def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
-    def licenseStateMap = licenseAdminService.getLicenseStateMap();
-%>
-
 <body class="hold-transition skin-blue layout-top-nav error-handling">
 <div class="wrapper">
-
     <header class="main-header">
         <nav class="navbar navbar-static-top">
             <div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">

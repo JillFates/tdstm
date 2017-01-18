@@ -1,4 +1,3 @@
-<g:set var="licenseCommonService" bean="licenseCommonService"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -36,11 +35,6 @@
 	<script src="${resource(dir: 'dist/js/vendors/jquery/dist', file: 'jquery.min.js')}"></script>
 
 </head>
-<%
-	// Only for environments where the License Manager is true Enabled
-	def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
-%>
-
 <body class="hold-transition skin-blue layout-top-nav error-handling">
 <div class="wrapper">
 
