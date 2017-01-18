@@ -51,7 +51,7 @@
 						<h3 class="box-title">Export</h3>
 					</div><!-- /.box-header -->
 
-					<g:form id="exportForm" action="export" method="post" name="exportForm" role="form" class="medium-size">
+					<g:form id="exportForm" action="export" method="post" name="exportForm" role="form" >
 
 						<input type="hidden" value="${projectId}" name="projectIdExport" />
 						<div class="box-body">
@@ -63,19 +63,19 @@
 									</g:each>
 								</select>
 							</div>
-							<div class="form-group">
+							<div class="form-group col-lg-3 col-md-4">
 								<label for="bundleId">Select one or more bundle(s):</label>
-								<select id="bundleId" name="bundle" multiple="multiple" class="form-control">
+								<select id="bundleId" name="bundle" multiple="multiple" class="form-control medium-height">
 									<option value="" selected="selected">All</option>
 									<g:each status="i" in="${moveBundleInstanceList}" var="moveBundle">
 										<option value="${moveBundle?.id}">${moveBundle?.name}</option>
 									</g:each>
 								</select>
 							</div>
-							<div class="form-group">
+							<div class="form-group col-lg-3 col-md-4">
 								<label for="checkboxGroup">Choose Items to Export:</label>
 								<div class="row checkboxGroup" id="checkboxGroup">
-									<div class="col-md-6">
+									<div class="col-sm-6">
 										<ul class="list-group sub-set">
 											<li class="list-group-item">
 												<span>
@@ -114,7 +114,7 @@
 											</li>
 										</ul>
 									</div>
-									<div class="col-md-6">
+									<div class="col-sm-6">
 										<ul class="list-group sub-set">
 											<li class="list-group-item">
 												<span>
@@ -152,7 +152,7 @@
 							<div class="form-group">
 								<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
 							</div>
-							<div class="box-footer">
+							<div class="">
 								<%--
 									<g:link controller="assetEntity" action="exportSpecialReport">
 										<input class="button" type="button" value="Generate Special" onclick="window.location=this.parentNode.href;"/>
