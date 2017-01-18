@@ -38,11 +38,8 @@
 
 </head>
 <%
-    String setImage = tds.setImage() ?: null
     // Only for environments where the License Manager is true Enabled
     def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
-    def licenseStateMessage = "Expired"//licenseAdminService.getLicenseStateMessage()
-    def licenseState = licenseAdminService.getLicenseState();
     def licenseStateMap = licenseAdminService.getLicenseStateMap();
 %>
 
@@ -60,12 +57,7 @@
                         <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogoManager.png')}" alt="Transition Manager project" border="0" />
                     </g:if>
                     <g:else>
-                        <g:if test="${setImage}">
-                            <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
-                        </g:if>
-                        <g:else>
-                            <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
-                        </g:else>
+                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
                     </g:else>
                 </div>
             </div><!-- /.container-fluid -->
