@@ -148,4 +148,5 @@ databaseChangeLog = {
 	include file: "20161220-add-banner_message-to-licensedclient-table.groovy"
 	include file: "20170110-add-banner_message-to-license-table.groovy"
 	include file: "20170110-add-license_compliant-and-seal-to-projectdailymetric-table.groovy"
+	include file: "20170118-add-grace_period_days-to-licensedclient-table.groovy"
 }

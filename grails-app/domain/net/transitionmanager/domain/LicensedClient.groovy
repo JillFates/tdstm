@@ -33,6 +33,7 @@ class LicensedClient {
 	String websitename
 	String hash
 	String bannerMessage
+	int	   gracePeriodDays = 5
 
 	static mapping = {
 		id 			generator: 'assigned'
@@ -60,7 +61,7 @@ class LicensedClient {
 		def dClient = client ? JSON.parse(client) : null
 		def dOwner = owner ? JSON.parse(owner) : null
 
-		[
+		return [
 				id				: id,
 				email			: email,
 				environment		: [
@@ -91,6 +92,7 @@ class LicensedClient {
 				hostName		: hostName,
 				websitename		: websitename,
 				bannerMessage	: bannerMessage,
+				gracePeriodDays : gracePeriodDays,
 				activityList	: []
 		]
 	}

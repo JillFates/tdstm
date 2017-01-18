@@ -238,6 +238,10 @@ class LicenseManagerService extends LicenseCommonService{
 			lc.bannerMessage = json.bannerMessage
 		}
 
+		if(json.gracePeriodDays != null){
+			lc.gracePeriodDays = json.gracePeriodDays
+		}
+
 		return lc
 	}
 }
