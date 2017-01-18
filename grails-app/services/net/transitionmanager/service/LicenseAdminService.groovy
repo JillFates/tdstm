@@ -193,6 +193,7 @@ class LicenseAdminService extends LicenseCommonService {
 		// If the license wasn't in the cache then one will be created and
 		// added to the cache
 		if(!licState) {
+			licState = [:]
 			ch.put(new Element(project.id, licState))
 			def licenses = DomainLicense.findAllByProject(project.id)
 			def license = licenses.find { it.hash }
