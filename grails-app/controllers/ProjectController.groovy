@@ -215,14 +215,30 @@ class ProjectController implements ControllerMethods {
 			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
 			if (logoFile instanceof String) {
 				flash.message = logoFile
-				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
-				render(view: 'edit',
-				       model: [company: company, projectInstance: project, projectPartner: projectDetails.projectPartner,
-				               projectManager: projectDetails.projectManager, moveManager: projectDetails.moveManager,
-				               companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff,
-				               partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners,
-				               workflowCodes: projectDetails.workflowCodes,
-				               projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params])
+				def projectDetails = projectService.getprojectEditDetails(project)
+				def projectPartners = partyRelationshipService.getProjectPartners(project)
+				def projectManagers = projectService.getProjectManagers(project)
+				def moveBundles = MoveBundle.findAllByProject(project)
+
+				def model = [
+						company: company,
+						projectInstance: project,
+						projectPartner: projectDetails.projectPartner,
+						projectManager: projectDetails.projectManager,
+						moveManager: projectDetails.moveManager,
+						companyStaff: projectDetails.companyStaff,
+						clientStaff: projectDetails.clientStaff,
+						partnerStaff: projectDetails.partnerStaff,
+						companyPartners: projectDetails.companyPartners,
+						workflowCodes: projectDetails.workflowCodes,
+						projectLogoForProject: projectDetails.projectLogoForProject,
+						prevParam:params,
+						projectPartners: projectPartners,
+						projectManagers: projectManagers,
+						moveBundles:moveBundles
+				]
+
+				render(view: 'edit', model: model)
 				return
 			}
 
@@ -243,6 +259,32 @@ class ProjectController implements ControllerMethods {
 				flash.message = "Project $project updated"
 				redirect(action:"show")
 
+			} else {
+				flash.message = 'Some properties were not properly defined'
+				def projectDetails = projectService.getprojectEditDetails(project)
+				def projectPartners = partyRelationshipService.getProjectPartners(project)
+				def projectManagers = projectService.getProjectManagers(project)
+				def moveBundles = MoveBundle.findAllByProject(project)
+
+				def model = [
+						company: company,
+						projectInstance: project,
+						projectPartner: projectDetails.projectPartner,
+						projectManager: projectDetails.projectManager,
+						moveManager: projectDetails.moveManager,
+						companyStaff: projectDetails.companyStaff,
+						clientStaff: projectDetails.clientStaff,
+						partnerStaff: projectDetails.partnerStaff,
+						companyPartners: projectDetails.companyPartners,
+						workflowCodes: projectDetails.workflowCodes,
+						projectLogoForProject: projectDetails.projectLogoForProject,
+						prevParam:params,
+						projectPartners: projectPartners,
+						projectManagers: projectManagers,
+						moveBundles:moveBundles
+				]
+
+				render(view: 'edit', model: model)
 			}
 		} // Project.withTransaction(t) {
 	}
