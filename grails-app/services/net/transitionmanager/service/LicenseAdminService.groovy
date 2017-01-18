@@ -146,21 +146,36 @@ class LicenseAdminService extends LicenseCommonService {
 		license.hasLicenseForAllFeatures("module:$moduleName")
 	}
 
-	//boolean isValid(projectGuid, featureName){
+	/**
+	 * Used to determine if there is a valid license for the project or a
+	 * valid global license
+	 * @param project
+	 * @return true if there is a valid license
+	 * 	 // alternative idea -- boolean isValid(projectGuid, featureName)
+	 */
 	boolean isValid(Project project = null){
-		def licState = getLicenseStateMap(project)
+		Map licState = getLicenseStateMap(project)
 
-		licStateMessage = licState.message
-		licBannerMessage = licState.banner
 		return licState.valid
 	}
 
-	def getLicenseStateMap(Project project = null){
+	/**
+	 * Used to retrieve the license state for the project
+	 * @param project
+	 * @return true if there is a valid license
+	 * 	 // alternative idea -- boolean isValid(projectGuid, featureName)
+	 */
+	Map getLicenseStateMap(Project project = null){
 		initialize()
+		Map licState = [:]
 
 		//Is licence check disabled then is always valid
 		if (!licenseCommonService.adminEnabled) {
-			return true
+			licState.state = State.VALID
+			licState.message = "License message"
+			licState.valid = true
+			licState.banner = "License banner"
+			return licState
 		}
 
 		if(project == null){
@@ -170,12 +185,14 @@ class LicenseAdminService extends LicenseCommonService {
 		//If the current project is null return true
 		if(project == null) return true
 
+		// Attempt to load the license from the EhCache
 		Cache ch = licenseCache.getCache(CACHE_NAME)
 		def cacheEl = ch.get(project.id)
-		def licState = cacheEl?.getObjectValue()
+		licState = cacheEl?.getObjectValue()
 
+		// If the license wasn't in the cache then one will be created and
+		// added to the cache
 		if(!licState) {
-			licState = [:]
 			ch.put(new Element(project.id, licState))
 			def licenses = DomainLicense.findAllByProject(project.id)
 			def license = licenses.find { it.hash }
