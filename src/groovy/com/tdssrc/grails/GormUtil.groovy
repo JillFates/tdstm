@@ -263,4 +263,28 @@ class GormUtil {
 	private static GrailsApplication getGrailsApplication() {
 		ApplicationContextHolder.grailsApplication
 	}
+
+	/**
+	 * Used to validate that a property exists on a Domain class
+	 * @param domainObject - the domain to inspect
+	 * @param propertyName - the name of the property to validate
+	 * @return true if the property exists otherwise false
+	 */
+	static boolean isDomainProperty(def domainObject, String propertyName) {
+		boolean valid=false
+		if (propertyName && domainObject) {
+			valid = domainObject.metaClass.hasProperty(domainObject.getClass(), propertyName)
+		}
+		return valid
+	}
+
+	/**
+	 * Returns the data type for a given property on a Domain class
+	 * @param domainObject - the domain to inspect
+	 * @param property - the name of the property
+	 * @return the class name of the property as a string
+	 */
+	static Class getDomainPropertyType(Object domainObject, String property) {
+		GrailsClassUtils.getPropertyType(domainObject.getClass(), property)
+	}
 }

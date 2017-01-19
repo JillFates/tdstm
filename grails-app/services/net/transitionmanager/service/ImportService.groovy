@@ -20,6 +20,7 @@ import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
@@ -143,6 +144,8 @@ class ImportService implements ServiceMethods {
 
 		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
 		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? group by rowId", [dtb])
+
+		// TODO : JPM 1/2017 : The staffList is getting ONLY the staff of the client but should be getting all staff on the project
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
 
 		def domainName = dtb.eavEntityType?.domainName
@@ -691,10 +694,10 @@ class ImportService implements ServiceMethods {
 		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
 
 		def eavAttributeSet = data.eavAttributeSet
-		def staffList = data.staffList
+		List staffList = data.staffList
 
-		def teams = partyRelationshipService.getStaffingRoles()*.id
-		
+		List teams = partyRelationshipService.getStaffingRoles()*.id
+
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		assetCount = dataTransferValueRowList.size()
 
@@ -749,57 +752,61 @@ class ImportService implements ServiceMethods {
 					return
 				}
 
+				// Skip over any blank values
+				if (it.importValue == '') {
+					return
+				}
+
 				warnMsg = ''
 
 				switch (attribName) {
+					// Deal with the properties that support #propertyName, @team, and person.id as values
 					case ~/shutdownBy|startupBy|testingBy|sme|sme2|appOwner/:
-						if (it.importValue) {
+						String existingValue = application[attribName] ? application[attribName].toString() : ''
+						if (existingValue && existingValue == it.importValue) {
+							// If the value hasn't changed then we don't need to do anything
+							// Note that names get converted from # to their names during export
+							log.debug "processApplicationImport() $attribName name was unchanged ${it.importValue}"
+							break
+						}
 
-							// Substitute owner for appOwner
-							def propName = attribName
+						Map assignMap = assignWhomToAsset(application, attribName, it.importValue, staffList, teams, project)
 
-							if (it.importValue[0] in ['@', '#']) {
-								assignWhomToAsset(application, attribName, it.importValue, staffList, teams, project)
-							}else{
-
-								// First check to see if the app property (person) is already set to the name specified in the spreadsheet. If the names are
-								// the same we can skip a lot of expensive computations.
-								String existingName = application[propName] ? application[propName].toString() : ''
-								if (existingName && existingName == it.importValue) {
-									// The name hasn't changed so we can skip this task
-									log.debug "processApplicationImport() $attribName name was unchanged $it.importValue"
-									break
-								}else{
-									Map assignMap = assignWhomToAsset(application, attribName, it.importValue, staffList, teams, project)
-									if(!assignMap.whom && !assignMap.isAmbiguous && assignMap.notExists){
-										def resultMap
-										try{
-											resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
-										} catch (e) {
-											warnMsg = "Failed to find or create $attribName (${it.importValue}) on row $rowNum - ${e.getMessage()}"
-										}
-
-										if ( ! warnMsg && resultMap?.person) {
-											application[attribName] = resultMap.person
-
-											// Now check for warnings
-											if (resultMap.isAmbiguous) {
-												warnMsg = "Ambiguous name for $attribName (${it.importValue}) in application ${application.assetName} on row $rowNum. Name set to ${resultMap.person}"
-											}
-
-											if (resultMap.isNew)
-												personsAdded++
-
-										} else if ( resultMap?.error ) {
-											warnMsg = "Person assignment to $attribName for App ${application.assetName} on row $rowNum failed. ${resultMap.error}"
-										}
-									}else{
-										warnMsg = assignMap.errMsg
-									}
-								}
+						if (assignMap.createByName) {
+							// assignWhomToAsset didn't find the person by name therefore a person should be created
+							Map resultMap
+							try {
+								// TODO : JPM 1/2017 : refactor to just create the person since we already tried to
+								// lookup the person in the assignWhomToAsset function.
+								resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
+							} catch (e) {
+								warnMsg = "Failed create $attribName (${it.importValue}) on row $rowNum - ${e.getMessage()}"
 							}
 
+							if ( ! warnMsg && resultMap?.person) {
+								application[attribName] = resultMap.person
+
+								// Now check for warnings
+								if (resultMap.isAmbiguous) {
+									warnMsg = "Ambiguous name for $attribName (${it.importValue}) in application ${application.assetName} on row $rowNum. Name set to ${resultMap.person}"
+								}
+
+								if (resultMap.isNew)
+									personsAdded++
+
+							} else if ( resultMap?.error ) {
+								warnMsg = "Person assignment to $attribName for App ${application.assetName} on row $rowNum failed. ${resultMap.error}"
+							}
+						} else if (assignMap.errMsg) {
+							warnMsg = "${assignMap.errMsg} for property $attribName of App ${application.assetName} on row $rowNum"
+						} else if (assignMap.whom) {
+							// This is a hack to address the hardcoding of the By fields in App CRUD
+							if (assignMap.whom instanceof String) {
+								// TODO : JPM 1/2017 : remove the fixupHashtag TM-5894
+								application[attribName] = AssetEntityHelper.fixupHashtag(assignMap.whom)
+							}
 						}
+
 						break
 
 					case ~/shutdownBy|startupBy|testingBy/:
@@ -1321,7 +1328,7 @@ class ImportService implements ServiceMethods {
 		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
 
 		def eavAttributeSet = data.eavAttributeSet
-		def staffList = data.staffList
+		List staffList = data.staffList
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
@@ -1465,7 +1472,7 @@ class ImportService implements ServiceMethods {
 		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
 
 		def eavAttributeSet = data.eavAttributeSet
-		def staffList = data.staffList
+		List staffList = data.staffList
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
@@ -1676,129 +1683,190 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		return project
 	}
 
-
 	/**
-	 * This method attempts to assign a person/team to an asset's property.
+	 * This method attempts to assign a person, team, or indirect person/team reference to a
+	 * an asset property. In this case the property is a String field and will be populated with
+	 * one of the three following values:
 	 *
-	 * It supports:
-	 *				Person's Id 		=> value = "123456"
-	 *				Person's Email 		=> value = "example@mail.com"
-	 *				Person's Name 		=> value = "John Doe"
-	 *				Team Code 			=> value = "@APP_COORD"
-	 *				Property Reference 	=> value = "#prop"
+	 *     12345         - reference to a person id
+	 *     @TEAM_CODE    - refers to a Team Code
+	 *     #propertyName - refers to another asset property that might contain a person or team
+	 *                     reference (e.g. sme, sme2)
 	 *
-	 * @param asset 		- asset being updated.
+	 * The input value can be on of the above as well person references can be done by email address
+	 * or their name. In those two cases, the person is looked up accordingly and their ID number is
+	 * assigned to the asset property.
+	 *
+	 * Input values support:
+	 *	  Person's Id 		  "123456"
+	 *	  Person's Email 	  "example@mail.com" -> replaced with Person.id
+	 *	  Person's Name 	  "John Doe" -> replaced with Person.id
+	 *	  Team Code 		  "@APP_COORD"
+	 *	  Property Reference  "#sme2"
+	 *
+	 * Note: when the value contains the person's name, there is a chance that when attempting to
+	 * lookup the person, that what is supplied matches more than one person. In that case, the
+	 * isAmbiguous property will be set to true to indicate that the name was ambiguous.
+	 *
+	 * @param asset 		- asset being updated
 	 * @param property 		- which asset's property is to be given a value.
 	 * @param value 		- value to be assigned.
 	 * @param projectStaff 	- List of staff assigned to the project.
 	 * @param staffingRoles - List of team codes.
 	 * @param project
 	 *
-	 * @return Map => Keys: errMsg, isAmbiguous, notExists, whom.
+	 * @return Map =>
+	 *		whom - the appropriate whom value that is assigned to the property if a valid match occurred
+	 *		errMsg - error message if a problem arrose while performing lookups
+	 *		createByName - a flag indicating that the person should be created by name
+	 *		isAmbiguous - a flag indicating if multiple people matched the lookup
 	 */
-	Map assignWhomToAsset(asset, String property, String value, List projectStaff, List staffingRoles, Project project){
-		def whom = null
-		String errMsg = null
+	Map assignWhomToAsset(AssetEntity asset, String property, String value, List projectStaff, List staffingRoles, Project project){
+		Map result =  [whom:null, isAmbiguous:false, createByName:false, errMsg:'']
 
-		boolean isAmbiguous = false
-		boolean notExists = false
+		if (value) {
+			switch(value){
+				// Team reference @TEAM_CODE
+				case ~/@.*/:
+					assignWhomHelperByTeamCode(value, staffingRoles, result)
+					break
 
+				// Indirect property reference using hashtag (#property)
+				case ~/#.*/:
+					assignWhomHelperByHashtag(value, asset, result)
+					break
 
-		def assignTeam = {
-			def team = value[1..-1]
-			if(staffingRoles.contains(team)){
-				whom = team
-			}else{
-				errMsg = "Unknown team ($team) indirectly referenced."
-				notExists = true
+				// By Person's Id
+				case ~/\d+/:
+					assignWhomHelperByPersonId(value, projectStaff, result)
+					break
+
+				// Person's email address.
+				case ~/.*@.*/:
+					assignWhomHelperByEmail(value, projectStaff, result)
+					break
+
+					// Person's name (2 or more chars)
+				case ~/^[a-zA-Z\s]{2,}.*/:
+					assignWhomHelperByName(value, project, projectStaff, result)
+					break
+
+				default:
+					result.errMsg = "Invalid Staff reference ($value)"
 			}
 
-		}
+			if (result.whom && ! result.errMsg) {
+				// Got a good match so we set the property value
+				boolean isPersonProperty = ['sme', 'sme2', 'appOwner'].contains(property)
+				if ( asset[property] != result.whom ) {
+					if (isPersonProperty) {
+						if (result.whom instanceof Person) {
+							asset[property] = result.whom
+						} else {
+							result.errMsg = "Property only supports person references"
+						}
+					} else {
+						if (result.whom instanceof Person) {
+							asset[property] = result.whom.id?.toString()
+						} else {
+							asset[property] = result.whom
+						}
 
-
-		def assignByPersonId = { personId ->
-			def whomId = NumberUtil.toLong(personId)
-			whom = projectStaff.find { it.id == whomId }
-			if (!whom) {
-				// Look if the person exists
-				def person = Person.get(whomId)
-				if (person){
-					errMsg = "Person $person ($value) is not in project staff, asset name: ${asset?.assetName}."
-				} else {
-					errMsg = "Person id $person doesn't exist, asset name: ${asset?.assetName}."
-					notExists = true
+					}
 				}
 			}
 		}
 
+		return result
+	}
 
-		def assignByPropertyName = {
-			def propReference = AssetEntityHelper.getPropertyNameByHashReference(asset, value)
-			if (propReference){
-				whom = propReference
-			}else{
-				errMsg = "Unable to resolve indirect whom reference (${value}), asset name: ${asset?.assetName}."
-			}
-		}
+	/**
+	 * Used by assignWhomToAsset to validate that the a person by name is valid
+	 * @param name - the person's name to find
+	 * @param project - the project to find the staff member of
+	 * @param projectStaff - the list of the staff assigned to the project
+	 * @param result - the Map that is returned by the method that is updated by this method
+	 */
+	private void assignWhomHelperByName(String name, Project project, List projectStaff, Map result) {
+		PersonService personService = grailsApplication.mainContext.personService
 
+		// Search across the project staff list for person by name
+		Map map = personService.findPerson(name, project, projectStaff)
 
-		/*
-		 * This closure looks up a person by name.
-		 */
-		def assignByName = {
-			// <SL> Doing personService injection this way to prevent Spring bean initialization errors
-			def personService = grailsApplication.mainContext.personService
-
-			def map = personService.findPerson(value, project, projectStaff)
-			def personMap = personService.findPersonByFullName(value)
-
-			if (!map.person && personMap.person ) {
-				errMsg = "Person by name ($whom) found but it is NOT a staff"
-			} else if ( map.isAmbiguous ) {
-				errMsg = "Staff referenced by name ($value) was ambiguous"
-				isAmbiguous = true
-			} else if (personMap.person) {
-				whom = personMap.person
+		if (map.person) {
+			if (map.isAmbiguous) {
+				result.isAmbiguous = true
+				result.errMsg = "Staff by name ($name) found multiple people"
 			} else {
-				errMsg = "Person by name ($whom) NOT found"
-				notExists = true
+				result.whom = map.person
 			}
-
+		} else {
+			result.createByName = true
+			result.errMsg = "Person name ($name) was not found"
 		}
+	}
 
-		switch(value){
-			// Team reference.
-		    case ~/@.*/:
-		        assignTeam()
-		        break
-		    // Property reference
-		    case ~/#.*/:
-				assignByPropertyName()
-		        break
-		    // Person's Id
-		    case ~/\d+/:
-		        assignByPersonId(value)
-		        break
-		    // Person's email address.
-		    case ~/.*@.*/:
-		    	whom = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
-		    	if(!whom){
-		    		errMsg = "Staff referenced by email ($value) not associated with project."
-		    	}
-		    	break
-		   	// Person's name
-		    default:
-		    	assignByName()
-
+	/**
+	 * Used by assignWhomToAsset to validate that a team code @TEAM is valid
+	 * @param name - the team code to find
+	 * @param projectStaff - the list of the staff assigned to the project
+	 * @param result - the Map that is returned by the method that is updated by this method
+	 */
+	private void assignWhomHelperByTeamCode(String name, List staffingRoles, Map result) {
+		String teamName = name[1..-1]
+		def team = staffingRoles.find { it.id == teamName || it.description == teamName }
+		if (team) {
+			log.debug "** found team $team"
+			result.whom = "@" + team.id
+		} else {
+			result.errMsg = "Unknown team ($teamName)"
 		}
+	}
 
-		if(whom){
-			asset[property] = whom
-		}else{
-			errMsg = "Invalid value: $value for property: $property given for $asset."
-			log.error(errMsg)
+	/**
+	 * Used by assignWhomToAsset to validate that a hashtag reference (#propertyName) exists
+	 * @param hashtag - the hashtag to validate
+	 * @param asset - the domain asset class to compare property name to
+	 * @param result - the Map that is returned by the method that is updated by this method
+	 */
+	private void assignWhomHelperByHashtag(String hashtag, AssetEntity asset, Map result) {
+		if (AssetEntityHelper.getPropertyNameByHashReference(asset, hashtag)) {
+			result.whom = hashtag
+		} else {
+			result.errMsg = "Invalid property reference (${hashtag})"
 		}
+	}
 
-		return [whom: whom, notExists: notExists, isAmbiguous: isAmbiguous, errMsg: errMsg]
+	/**
+	 * Used by assignWhomToAsset to validate a reference by person id is part of the project staffing
+	 * @param id - the persons' id
+	 * @param projectStaff - the list of the staff assigned to the project
+	 * @param result - the Map that is returned by the method that is updated by this method
+	 */
+	private void assignWhomHelperByPersonId(String id, List projectStaff, Map result) {
+		Long personId = NumberUtil.toPositiveLong(id, 0)
+		if ( personId ) {
+			result.whom = projectStaff.find { it.id == personId }
+			if (!result.whom) {
+				result.errMsg = "Staff by id ($id) not found"
+			}
+		} else {
+			result.errMsg = "Staff reference ($id) is invalid"
+		}
+	}
+
+	/**
+	 * Used by assignWhomToAsset to validate a reference by person email is part of the project staffing
+	 * @param personId - the persons' email address
+	 * @param projectStaff - the list of the staff assigned to the project
+	 * @param result - the Map that is returned by the method that is updated by this method
+	 */
+	private void assignWhomHelperByEmail(String email, List projectStaff, Map result) {
+		def person = projectStaff.find { it.email?.toLowerCase() == email.toLowerCase() }
+		if ( person ) {
+			result.whom = person
+		} else {
+			result.errMsg = "Staff referenced by email ($email) not found"
+		}
 	}
 }

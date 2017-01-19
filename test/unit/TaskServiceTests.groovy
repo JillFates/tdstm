@@ -15,7 +15,7 @@ import spock.lang.Specification
 
 @SuppressWarnings('unused')
 @TestFor(TaskService)
-@Mock([AssetComment, CommentNote, MoveEvent, TaskDependency, RoleType, PartyRelationshipService, Person])
+@Mock([AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, PartyRelationshipService, Person])
 class TaskServiceTests extends Specification {
 
 	void testCompareStatus() {

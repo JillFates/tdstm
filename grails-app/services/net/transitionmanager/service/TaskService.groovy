@@ -82,9 +82,10 @@ class TaskService implements ServiceMethods {
 	// The RoleTypes for Staff (populated in init())
 	private static List staffingRoles
 
-	private static final List<String> coreFilterProperties = ['assetName', 'assetTag', 'assetType', 'costCenter', 'department',
-	                                                          'description', 'environment', 'externalRefId', 'planStatus',
-	                                                          'priority', 'supportType', 'validation'].asImmutable()
+	private static final List<String> coreFilterProperties = [
+		'assetName', 'assetTag', 'assetType', 'costCenter', 'department',
+	    'description', 'environment', 'externalRefId', 'planStatus',
+	    'priority', 'supportType', 'validation'].asImmutable()
 
 	// The common asset properties that filtering can be applied to (populated in init())
 	private static List<String> commonFilterProperties
@@ -2977,7 +2978,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				where (dependent.id=:assetId or asset.id=:assetId)
 				and dependent.moveBundle.id IN (:moveBundleIds)
 				and asset.moveBundle.id IN (:moveBundleIds)
-				and status not in ''' + "('$NA', '$ARCHIVED')" + ''' 
+				and status not in ''' + "('$NA', '$ARCHIVED')" + '''
 				and type <> '${AssetDependencyType.BATCH}'
 			'''
 		} else {
@@ -3221,7 +3222,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// Try to lookup the indirect propert on the asset
 				log.debug "setTaskDuration: processing indirect refer to '$indirect' for '$duration'"
 				try {
-					def indDur = getIndirectPropertyRef(task.assetEntity, indirect)
+					def indDur = AssetEntityHelper.getIndirectPropertyRef(task.assetEntity, indirect)
 					log.debug "setTaskDuration: Indirect refer found '$indDur' in property '$indirect'"
 					if (indDur instanceof Integer) {
 						task.duration = indDur ?: defValue
@@ -4548,7 +4549,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 
 				try {
-					whom = getIndirectPropertyRef(task.assetEntity, whom)
+					whom = AssetEntityHelper.getIndirectPropertyRef(task.assetEntity, whom)
 					if (whom instanceof Person) {
 						// The indirect lookup returned a person so we don't need to go any further!
 						person = whom
@@ -4659,7 +4660,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					}
 					try {
 						def teamProp = team
-						team = getIndirectPropertyRef(task.assetEntity, team)
+						team = AssetEntityHelper.getIndirectPropertyRef(task.assetEntity, team)
 						if (! team) {
 							if (defTeam) {
 								team = defTeam
@@ -4685,49 +4686,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		return null
-	}
-
-	/**
-	 * Helper method lookup indirect property references that will recurse once if necessary
-	 * This supports two situations:
-	 *    1) taskSpec whom:'#prop' and asset.prop contains name/email
-	 *    2) taskSpec whom:'#prop' and asset.prop contains #prop2 reference (indirect reference)
-	 * @param AssetComment
-	 * @param String propName
-	 * @return String - the string (name or email) from the referenced or indirect referenced property
-	 * @throws RuntimeException if a reference is made to an invalid fieldname
-	 */
-	private Object getIndirectPropertyRef(asset, propertyRef, depth=0) {
-		log.info "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
-
-		def value
-		def property = AssetEntityHelper.getPropertyNameByHashReference(asset, propertyRef)
-
-		// Check to make sure that the asset has the field referenced
-		if (property == null ) {
-			throw new RuntimeException("Invalid property name ($propertyRef) used in name lookup in asset $asset")
-		}
-
-		// TODO : Need to see if we can eliminate the multiple if statements by determining the asset type upfront
-		def type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.name
-		if (type == 'java.lang.String') {
-			// Check to see if we're referencing a person object vs a string
-			log.debug "getIndirectPropertyRef() $property of type $type has value (${asset[property]})"
-			if (asset[property]?.size() && asset[property][0] == '#') {
-				if (++depth < 3)  {
-					value = getIndirectPropertyRef(asset, asset[property], depth)
-				} else {
-					throw new RuntimeException("Multiple nested indirection unsupported (${property}..${asset[property][0]}) of asset ($asset), depth=$depth")
-				}
-			} else {
-				value = asset[property]
-			}
-		} else {
-			log.debug "getIndirectPropertyRef() indirect references property $property of type $type"
-			value = asset[property]
-		}
-
-		return value
 	}
 
 	/**
@@ -4769,7 +4727,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (cdt[0] == '#') {
 					if (task.assetEntity) {
 						// Get indirect reference to where the DateTime value is stored in the asset
-						cdt = getIndirectPropertyRef(task.assetEntity, cdt)
+						cdt = AssetEntityHelper.getIndirectPropertyRef(task.assetEntity, cdt)
 					} else {
 						exceptions.append("TaskSpec $taskSpec.id can not use indirect reference ($cdt) for constraintTime of non-asset type task spec<br>")
 						return

@@ -1,9 +1,10 @@
 import com.tdsops.tm.domain.AssetEntityHelper
-import com.tds.asset.Database
+import grails.test.spock.IntegrationSpec
 import com.tds.asset.Application
+import com.tds.asset.Database
+import net.transitionmanager.domain.Project
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.service.AssetEntityService
-
 
 class AssetEntityServiceTests extends IntegrationSpec {
 
@@ -51,24 +52,6 @@ class AssetEntityServiceTests extends IntegrationSpec {
 		findAssetOptionInList(data, 'Validated')
 	}
 
-
-	void "test AssetEntityHelper getPropertyNameByHashReference"(){
-		setup:
-			Application app = new Application()
-			Database db = new Database()
-		expect:
-			AssetEntityHelper.getPropertyNameByHashReference(app, "sme1") == "#SME1"
-			AssetEntityHelper.getPropertyNameByHashReference(app, "#sme1") == "#SME1"
-			AssetEntityHelper.getPropertyNameByHashReference(db, "#sme2") == null
-			AssetEntityHelper.getPropertyNameByHashReference(null, "#sme2") == null
-			AssetEntityHelper.getPropertyNameByHashReference(app, null) == null
-			AssetEntityHelper.getPropertyNameByHashReference(app, "") == null
-			AssetEntityHelper.getPropertyNameByHashReference(app, "#") == null
-			AssetEntityHelper.getPropertyNameByHashReference(app, "#license") == "#license"
-			AssetEntityHelper.getPropertyNameByHashReference(app, "#custom1") == "#custom1"
-	}
-
-
 	void "test parse params for dependecy asset ids"() {
 		setup:
 		Map params = [
@@ -105,7 +88,6 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 		when:
 		(existingDep, newDep) = assetEntityService.parseParamsForDependencyAssetIds('dependent', params)
-
 		then: 'Dependent new'
 		2 == newDep.size()
 		and: 'Dependent existing'

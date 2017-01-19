@@ -273,10 +273,10 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 
 	//	get Cart - #Asset count corresponding to Bundle
-	def getCartAssetCounts (def bundleId) {
-		def cartAssetCounts = []
-		def bundleInstance = MoveBundle.get(bundleId)
-		def cartList = AssetEntity.executeQuery(" select ma.cart from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
+	List getCartAssetCounts (def bundleId) {
+		List cartAssetCounts = []
+		MoveBundle bundleInstance = MoveBundle.get(bundleId)
+		def cartList = AssetEntity.executeQuery("select ma.cart from AssetEntity ma where ma.moveBundle=$bundleInstance.id group by ma.cart")
 		cartList.each { assetCart ->
 			def cartAssetCount = AssetEntity.countByMoveBundleAndCart(bundleInstance, assetCart)
 			def AssetEntityList = AssetEntity.findAllByMoveBundleAndCart(bundleInstance, assetCart)
@@ -295,10 +295,10 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 	//get assetsList  corresponding to selected bundle to update assetsList dynamically
 
-	def getAssetList (def assetEntityList, rackPlan, bundleInstance, role) {
-		def assetEntity = []
-		def projectTeam =[]
-		def projectTeamInstanceList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '$role' ")
+	List getAssetList (def assetEntityList, rackPlan, bundleInstance, role) {
+		List assetEntity = []
+		List projectTeam =[]
+		List projectTeamInstanceList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '$role' ")
 		projectTeamInstanceList.each { teams ->
 			projectTeam << [teamCode: teams.teamCode]
 		}
@@ -336,6 +336,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		def errorConflictCount = 0
 
 		def modifiedSinceExport = (asset.lastUpdated && asset.lastUpdated >= dataTransferBatch.exportDatetime)
+		logger.info 'importValidation() asset lastUpdated={}, exportDatetime={}, modifiedSinceExport={}', asset.lastUpdated, dataTransferBatch.exportDatetime, modifiedSinceExport
 
 		if (modifiedSinceExport) {
 			logger.info 'importValidation() Asset $asset was modified at {}, after the export at {}', asset, asset.lastUpdated, dataTransferBatch.exportDatetime
