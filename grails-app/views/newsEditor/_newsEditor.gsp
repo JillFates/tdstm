@@ -59,6 +59,7 @@
 function openCreateNewsDialog(){
 	$("#createNewsDialog").dialog('option', 'width', 'auto');
 	$("#createNewsDialog").dialog('option', 'position', ['center','top']);
+	$("#createNewsDialog").dialog('option', 'modal', 'true');
 	$('#createNewsDialog').dialog('open');
 }
 function updateHidden(checkBoxId,hiddenId){

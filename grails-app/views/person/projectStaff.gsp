@@ -22,6 +22,7 @@
 	    		if('${submit}'){
 				    $("#addProjectStaff").dialog({ autoOpen: true });
 				    $("#addProjectStaff").dialog('option', 'width', 650)
+                    $("#addProjectStaff").dialog('option', 'modal', 'true');
 		        } else {
 		        	$("#addProjectStaff").dialog({ autoOpen: false });
 		        }
@@ -46,7 +47,8 @@
 		      	document.editForm.active.value = person.active
 		      	document.editForm.roleType.value = person.role
 		      
-		      	$("#editPerson").dialog('option', 'width', 350)
+		      	$("#editPerson").dialog('option', 'width', 350);
+                $("#editPerson").dialog('option', 'modal', 'true');
 				$("#editPerson").dialog( "open" );
 		
 		 	}
@@ -63,18 +65,21 @@
 				$("#showActive").html( person.active )
 				$("#showRole").html( person.role )
 				
-				$("#showPerson").dialog('option', 'width', 350)
+				$("#showPerson").dialog('option', 'width', 350);
+                $("#showPerson").dialog('option', 'modal', 'true');
 				$("#showPerson").dialog( "open" );
 		    }
 		 	
 		 	// function for add staff form dialog
 		 	function showAddProjectStaff(){
-		 		$("#addProjectStaff").dialog('option', 'width', 650)
+		 		$("#addProjectStaff").dialog('option', 'width', 650);
+                $("#addProjectStaff").dialog('option', 'modal', 'true');
 				$("#addProjectStaff").dialog( "open" );	
 		 	}
 		 	// function for create staff form dialog
 		 	function createProjectStaff(){
-		 		$("#createPerson").dialog('option', 'width', 350)
+		 		$("#createPerson").dialog('option', 'width', 350);
+                $("#createPerson").dialog('option', 'modal', 'true');
 				$("#createPerson").dialog( "open" );	
 		 	}
 		 	

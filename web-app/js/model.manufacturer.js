@@ -109,6 +109,7 @@ function createModelManuDetails (controllerName,forWhom) {
 			 $("#create"+forWhom+"View").dialog('option', 'position', ['center','top']);
 			 $("#show"+forWhom+"View").dialog('close');
 			 $("#edit"+forWhom+"View").dialog('close');
+			 $("#create"+forWhom+"View").dialog('option', 'modal', 'true');
 			 $("#create"+forWhom+"View").dialog('open');
 		}
 	});
@@ -129,7 +130,8 @@ function showOrEditModelManuDetails (controllerName,id,forWhom,view, name) {
 				 $("#show"+forWhom+"View").dialog('close');
 			 else if(view=='show')
 				 $("#edit"+forWhom+"View").dialog('close');
-			 
+
+			 $("#"+view+""+forWhom+"View").dialog('option', 'modal', 'true');
 			 $("#"+view+""+forWhom+"View").dialog('open');
 		}
 	});
@@ -145,6 +147,7 @@ function updateModel (forWhom, formName) {
 		success: function(data) { 
 			$("#editModelView").dialog('close')
 			$("#showModelView").html(data)
+			$("#showModelView").dialog('option', 'modal', 'true');
 			$("#showModelView").dialog('option', 'width', 'auto')
 				.dialog('option', 'position', ['center','top'])
 				.dialog('open');
@@ -165,8 +168,9 @@ function updateManufacturer(forWhom){
 			}else{
 				$("#edit"+forWhom+"View").html(data)
 				$("#edit"+forWhom+"View").dialog( "option", "title", "Show Manufacturer" );
-				$("#edit"+forWhom+"View").dialog('option', 'width', 'auto')
-				$("#edit"+forWhom+"View").dialog('option', 'height', 'auto')
+				$("#edit"+forWhom+"View").dialog('option', 'width', 'auto');
+				$("#edit"+forWhom+"View").dialog('option', 'height', 'auto');
+				$("#edit"+forWhom+"View").dialog('option', 'modal', 'true');
 				$("#edit"+forWhom+"View").dialog('option', 'position', ['center','top']);
 			}
 		}

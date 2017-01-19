@@ -189,8 +189,9 @@
 			onSuccess:function(e){
 				var timeZonePopup = $("#timeZoneSelectPopup")
 				timeZonePopup.html(e.responseText)
-				timeZonePopup.dialog('option', 'width', 'auto')
-				timeZonePopup.dialog("open")
+				timeZonePopup.dialog('option', 'width', 'auto');
+				timeZonePopup.dialog('option', 'modal', 'true');
+				timeZonePopup.dialog("open");
 			}
 		})
 	}

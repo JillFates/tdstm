@@ -32,6 +32,7 @@ $(document).ready(function() {
     $("#showEditCommentDialog").dialog({ autoOpen: false })
 	$("#showEditCommentDialog").dialog('option', 'width', 'auto');
 	$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
+	$("#showEditCommentDialog").dialog('option', 'modal', 'true');
 });
 
  function getCommentDetails(id,type){

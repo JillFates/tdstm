@@ -43,8 +43,9 @@ function listDialog(assign,sort,order,source,rack,roomName,location,position){
 				$("#listDialog").dialog('option', 'width', 600)
 				$("#listDialog").dialog('option', 'height', 600)
 				$("#listDialog").dialog('option', 'position', ['center','top']);
-				$("#createDialog").dialog("close")
-				$("#listDialog").dialog("open")
+				$("#createDialog").dialog("close");
+				$("#listDialog").dialog('option', 'modal', 'true');
+				$("#listDialog").dialog("open");
 			}
 		}
 	});
@@ -106,7 +107,8 @@ function listBladeDialog(source, blade, position, assign, roomName, location){
 				$("#listDialog").html(data)
 				$("#listDialog").dialog('option', 'width', 600)
 				$("#listDialog").dialog('option', 'position', ['center','top']);
-				$("#createDialog").dialog("close")
+				$("#createDialog").dialog("close");
+				$("#listDialog").dialog('option', 'modal', 'true');
 				$("#listDialog").dialog("open")
 			}
 		}

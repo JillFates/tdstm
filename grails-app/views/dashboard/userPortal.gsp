@@ -665,6 +665,7 @@
                     $("#personGeneralViewId").html(data)
                     $("#personGeneralViewId").dialog('option', 'width', '420px')
                     $("#personGeneralViewId").dialog('option', 'position', ['center', 'top']);
+                    $("#personGeneralViewId").dialog('option', 'modal', 'true');
                     $("#edtBId").parent().remove()
                     $("#personGeneralViewId").dialog('open');
 

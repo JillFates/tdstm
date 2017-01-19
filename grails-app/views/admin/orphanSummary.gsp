@@ -95,8 +95,9 @@ a:hover {
 		$("#queryText").html(records.query)
 	}
 	function showQuery(){
-		$("#queryTextDialog").dialog('option', 'width', 500)
-		$('#queryTextDialog').dialog('open')
+		$("#queryTextDialog").dialog('option', 'width', 500);
+		$('#queryTextDialog').dialog('option', 'modal', 'true');
+		$('#queryTextDialog').dialog('open');
 	}
 </script>
 <script>
