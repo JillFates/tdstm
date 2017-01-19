@@ -2705,7 +2705,7 @@ class AssetEntityController implements ControllerMethods {
 			depGroups = [-1]
 		}
 
-		def assetDependentlist
+		def assetDependentlist = []
 		String selectionQuery = ''
 		//String mapQuery
 		def nodesQuery = []
@@ -2730,7 +2730,9 @@ class AssetEntityController implements ControllerMethods {
 			//nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
 			nodesQuery = NumberUtil.mapToPositiveInteger(depGroups)
 		}
-		def queryFordepsList = """
+		// Query only if there're groups left.
+		if(depGroups){
+			def queryFordepsList = """
 			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, mb.move_bundle_id AS moveBundleId, mb.name AS moveBundleName,
 			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality,
 			if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus
@@ -2746,8 +2748,8 @@ class AssetEntityController implements ControllerMethods {
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			"""
-
-		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id)
+			assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id)
+		}
 
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
