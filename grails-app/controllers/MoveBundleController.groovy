@@ -32,6 +32,7 @@ import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
@@ -812,6 +813,7 @@ class MoveBundleController implements ControllerMethods {
 	 */
 	@HasPermission('DepAnalyzerView')
 	def dependencyConsole() {
+		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 

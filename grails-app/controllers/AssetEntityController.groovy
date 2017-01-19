@@ -2060,6 +2060,7 @@ class AssetEntityController implements ControllerMethods {
 	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
 	 */
 	def listTasks() {
+		licenseAdminService.checkValidForLicense()
 		securityService.requirePermission 'ViewTaskManager'
 
 		Project project = controllerService.getProjectForPage(this, 'to view Tasks')
@@ -4068,6 +4069,7 @@ class AssetEntityController implements ControllerMethods {
 
 	@Secured('isAuthenticated()')
 	def architectureViewer() {
+		licenseAdminService.checkValidForLicense()
 		Project project = securityService.userCurrentProject
 		def levelsUp = NumberUtils.toInt(params.levelsUp)
 		int levelsDown = NumberUtils.toInt(params.levelsDown) ?: 3

@@ -10,7 +10,6 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import net.transitionmanager.controller.ControllerMethods
@@ -45,6 +44,7 @@ import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
 
 import grails.plugin.springsecurity.annotation.Secured
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {
 
@@ -733,6 +733,7 @@ digraph runbook {
 	 */
 	@HasPermission('ViewTaskGraph')
 	def taskGraph() {
+		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
@@ -880,6 +881,7 @@ digraph runbook {
 	}
 
 	def taskTimeline() {
+		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this, 'to use the task timeline')
 		if (!project) return
 
@@ -1227,6 +1229,7 @@ digraph runbook {
 	 *		tab - all or todo
 	 */
 	def listUserTasks() {
+		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 

@@ -8,6 +8,7 @@ class CookbookController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 
 	def index() {
+		licenseAdminService.checkValidForLicense()
 		[userPreferenceService: userPreferenceService]
 	}
 }

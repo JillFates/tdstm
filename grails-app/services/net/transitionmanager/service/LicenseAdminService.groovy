@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.exceptions.InvalidLicenseException
 import grails.converters.JSON
 import net.nicholaswilliams.java.licensing.License
 import net.nicholaswilliams.java.licensing.LicenseManager
@@ -157,6 +158,12 @@ class LicenseAdminService extends LicenseCommonService {
 		Map licState = getLicenseStateMap(project)
 
 		return licState.valid
+	}
+
+	void checkValidForLicense(Project project = null) throws InvalidLicenseException{
+		if(!isValid(project)){
+			throw new InvalidLicenseException()
+		}
 	}
 
 	/**

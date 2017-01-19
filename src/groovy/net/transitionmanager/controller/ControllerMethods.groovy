@@ -8,6 +8,7 @@ import grails.validation.ValidationException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import org.slf4j.LoggerFactory
@@ -32,6 +33,7 @@ trait ControllerMethods {
 	// injected dependencies
 	MessageSource messageSource
 	SecurityService securityService
+	LicenseAdminService licenseAdminService
 
 	void renderAsJson(data) {
 		render(data as JSON)

@@ -1,3 +1,4 @@
+import com.tdsops.common.exceptions.InvalidLicenseException
 import org.springframework.security.access.AccessDeniedException
 //import org.springframework.security.acls.model.NotFoundException
 import org.springframework.security.acls.model.NotFoundException
@@ -389,6 +390,7 @@ class UrlMappings {
 		"404" ( controller: 'errorHandler', action: 'notFound' )
 		"500" ( controller: 'errorHandler', action: 'notFound', exception: NotFoundException)
 		"500" ( controller: 'errorHandler', action: 'forbidden', exception: AccessDeniedException)
+		"500" ( controller: 'errorHandler', action: 'licensing', exception: InvalidLicenseException)
 		"500" ( controller: 'errorHandler', action: 'error' )
 
 	}

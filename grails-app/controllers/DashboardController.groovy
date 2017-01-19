@@ -37,6 +37,7 @@ class DashboardController implements ControllerMethods {
 	UserService userService
 
 	def index() {
+		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this, 'to view User Dashboard')
 		if (!project) return
 
@@ -51,7 +52,6 @@ class DashboardController implements ControllerMethods {
 		}
 
 		if (! moveEvent) {
-			//TODO: OLB remove reloading of Map
 			def defaultEvent = userPreferenceService.moveEventId
 			if (defaultEvent) {
 				// Try finding the event in the user's preferences
