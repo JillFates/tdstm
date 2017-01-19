@@ -42,6 +42,10 @@ class ErrorHandlerController implements ControllerMethods {
 
 	// ------------
 
+	/**
+	 * Prebuilds a model with common data required in all actions
+	 * @return
+	 */
 	private Map fetchModel(){
 		def model = errorHandlerService.model(request)
 		model.isLicenseManagerEnabled = licenseAdminService.isManagerEnabled()
