@@ -42,7 +42,8 @@ export default class LicenseManagerList {
                 {field: 'method.max', title: 'Server/Tokens'},
                 {field: 'activationDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}' },
                 {field: 'expirationDate', title: 'Expiration', type: 'date', format : '{0:dd/MMM/yyyy}' },
-                {field: 'environment.name', title: 'Environment'}
+                {field: 'environment.name', title: 'Environment'},
+                {field:'gracePeriodDays',hidden: true}
             ],
             dataSource: {
                 pageSize: 10,

@@ -44,6 +44,7 @@ export default class LicenseManagerDetail extends FormValidator{
             activityList: params.license.activityList,
             hostName: params.license.hostName,
             hash: params.license.id,
+            gracePeriodDays: params.license.gracePeriodDays,
 
             applied: params.license.applied,
             keyId: params.license.keyId
@@ -226,20 +227,19 @@ export default class LicenseManagerDetail extends FormValidator{
      * This will be converted in a more complex directive later
      * TODO: Convert into a directive
      */
-    validateIntegerOnly(e){
+    validateIntegerOnly(e,model){
         try {
-            var newVal= parseInt(this.licenseModel.method.max);
+            var newVal= parseInt(model);
             if(!isNaN(newVal)) {
-                this.licenseModel.method.max = newVal;
+                model = newVal;
             } else {
-                this.licenseModel.method.max = 0;
+                model = 0;
             }
-
-            if(e && e.currentTarget && e.currentTarget.value) {
-                e.currentTarget.value = this.licenseModel.method.max;
+            if(e && e.currentTarget) {
+                e.currentTarget.value = model;
             }
         } catch(e) {
-            this.$log.warn('Invalid Number Expception', this.licenseModel.method.max);
+            this.$log.warn('Invalid Number Expception', model);
         }
     }
 
