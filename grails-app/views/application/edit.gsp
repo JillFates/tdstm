@@ -1,3 +1,4 @@
+<%@page defaultCodec="none" %>
 <%@page import="com.tds.asset.Application"%>
 <%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
 <g:set var="assetClass" value="Application" />
