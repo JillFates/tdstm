@@ -227,7 +227,7 @@
 				},
 				columns: [
 					{ template: '<img src="#= icon #" />', width:50, locked: true },
-		
+
 				<g:set var="isFirstElement" value="${true}"/>
 				<g:each var="propName" in="${properties}">
 					<g:set var="gridOpt" value="${gridMap[propName]}" />

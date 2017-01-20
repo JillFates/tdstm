@@ -110,87 +110,87 @@ class TaskImportExportService implements ServiceMethods {
 		taskNumber 				: [type:'number', ssPos:0, formPos:1, domain:'C', width:80, locked: true,
 										label: 'Task #', template:changeTmpl('taskNumber')],
 
-		comment					: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:false,
+		comment					: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:true,
 										label: 'Task Description', template:changeTmpl('comment')],
 
-		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:true,
+		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:false,
 										label: 'Related Asset', template:changeTmpl('assetEntity'), transform:xfrmString],
 
-		assetClass				: [type: 'string', ssPos:3, formPos:4, domain: 'A', width:120, locked:true,
+		assetClass				: [type: 'string', ssPos:3, formPos:4, domain: 'A', width:120, locked:false,
 										label: 'Asset Class', template:changeTmpl('assetClass'), transform:xfrmString],
 
-		assetId					: [type: 'number', ssPos:4, formPos:5, domain: 'A', width:80, locked:true,
+		assetId					: [type: 'number', ssPos:4, formPos:5, domain: 'A', width:80, locked:false,
 										label: 'Asset ID', template:changeTmpl('assetId'), transform:xfrmString],
 
 		predecessorTasks		: [type:'list',    ssPos:5,   formPos:7, domain:'T', width:190, locked:false, label:'Predecessor Task(s)',
 									template:changeTmpl('predecessorTasks'), transform: xfrmListToPipedString ],
 
 
-		responsibleResource		: [type: 'string', ssPos:6, formPos:7, domain: 'C', width:120, locked:true,
+		responsibleResource		: [type: 'string', ssPos:6, formPos:7, domain: 'C', width:120, locked:false,
 										label: 'Responsible Resource', template:changeTmpl('responsibleResource'), transform:xfrmString],
 
 
-		instructionsLink		: [type: 'string', ssPos:7, formPos:8, domain: 'C', width:120, locked:true,
+		instructionsLink		: [type: 'string', ssPos:7, formPos:8, domain: 'C', width:120, locked:false,
 										label: 'Instructions Link', template:changeTmpl('instructionsLink'), transform:xfrmString],
 
 		team					: [type: 'string', ssPos:8, formPos:9, domain: 'C', width:120, locked:false,
 										label: 'Team', template:changeTmpl('team'), transform:xfrmString],
 
-		status					: [type: 'string', ssPos:9, formPos:10, domain: 'C', width:120, locked:true,
+		status					: [type: 'string', ssPos:9, formPos:10, domain: 'C', width:120, locked:false,
 										label: 'Status', template:changeTmpl('status'), transform:xfrmString],
 
-		datePlanned				: [type: 'date', ssPos:10, formPos:11, domain: 'C', width:120, locked:true,
+		datePlanned				: [type: 'date', ssPos:10, formPos:11, domain: 'C', width:120, locked:false,
 										label: 'Date Planned', template:changeTmpl('datePlanned'), transform:xfrmDateTimeToString],
 
-		outstanding				: [type: 'string', ssPos:11, formPos:12, domain: 'C', width:120, locked:true,
+		outstanding				: [type: 'string', ssPos:11, formPos:12, domain: 'C', width:120, locked:false,
 										label: 'Oustanding', template:changeTmpl('outstanding'), transform:xfrmString],
 
-		dateRequired			: [type: 'date', ssPos:12, formPos:13, domain: 'C', width:120, locked:true,
+		dateRequired			: [type: 'date', ssPos:12, formPos:13, domain: 'C', width:120, locked:false,
 										label: 'Date Required', template:changeTmpl('dateRequired'), transform:xfrmDateToString],
 
-		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:true,
+		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:false,
 										label: 'Comments', template:changeTmpl('comments'), transform:xfrmString],
 
-		duration				: [type: 'string', ssPos:14, formPos:15, domain: 'C', width:120, locked:true,
+		duration				: [type: 'string', ssPos:14, formPos:15, domain: 'C', width:120, locked:false,
 										label: 'Duration', template:changeTmpl('duration'), transform:xfrmString],
 
-		durationLocked			: [type: 'string', ssPos:15, formPos:16, domain: 'C', width:120, locked:true,
+		durationLocked			: [type: 'string', ssPos:15, formPos:16, domain: 'C', width:120, locked:false,
 										label: 'Duration Locked', transform:xfrmString],
 
-		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:true,
+		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:false,
 										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmString],
 
-		estimatedStart			: [type: 'date', ssPos:17, formPos:18, domain: 'C', width:120, locked:true,
+		estimatedStart			: [type: 'date', ssPos:17, formPos:18, domain: 'C', width:120, locked:false,
 										label: 'Estimated Start', template:changeTmpl('estimatedStart'), transform:xfrmDateToString],
 
-		estimatedFinish			: [type: 'date', ssPos:18, formPos:19, domain: 'C', width:120, locked:true,
+		estimatedFinish			: [type: 'date', ssPos:18, formPos:19, domain: 'C', width:120, locked:false,
 										label: 'Estimated Finish', template:changeTmpl('estimatedFinish'), transform:xfrmDateToString],
 
-		actualStart				: [type: 'date', ssPos:19, formPos:20, domain: 'C', width:120, locked:true,
+		actualStart				: [type: 'date', ssPos:19, formPos:20, domain: 'C', width:120, locked:false,
 										label: 'Actual Start', template:changeTmpl('actualStart'), transform:xfrmDateToString],
 
-		actualFinish			: [type: 'date', ssPos:20, formPos:21, domain: 'C', width:120, locked:true,
+		actualFinish			: [type: 'date', ssPos:20, formPos:21, domain: 'C', width:120, locked:false,
 										label: 'Actual Finish', template:changeTmpl('actualFinish'), transform:xfrmDateToString],
 
-		workflowStep			: [type: 'string', ssPos:21, formPos:22, domain: 'C', width:120, locked:true,
+		workflowStep			: [type: 'string', ssPos:21, formPos:22, domain: 'C', width:120, locked:false,
 										label: 'WorkFlow Step', template:changeTmpl('workflowStep'), transform:xfrmString],
 
-		category				: [type: 'string', ssPos:22, formPos:23, domain: 'C', width:120, locked:true,
+		category				: [type: 'string', ssPos:22, formPos:23, domain: 'C', width:120, locked:false,
 										label: 'Category', template:changeTmpl('category'), transform:xfrmString],
 
-		dueDate					: [type: 'date', ssPos:23, formPos:24, domain: 'C', width:120, locked:true,
+		dueDate					: [type: 'date', ssPos:23, formPos:24, domain: 'C', width:120, locked:false,
 										label: 'Due Date', template:changeTmpl('dueDate'), transform:xfrmDateToString],
 
-		createdOn				: [type: 'date', ssPos:24, formPos:25, domain: 'C', width:120, locked:true,
+		createdOn				: [type: 'date', ssPos:24, formPos:25, domain: 'C', width:120, locked:false,
 										label: 'Created On', template:changeTmpl('createdOn'), transform:xfrmDateToString],
 
 		createdBy				: [type: 'string', ssPos:25, formPos:26, domain: 'C', width:120, locked:false,
 										label: 'Created By', template:changeTmpl('createdBy')],
 
-		moveEvent				: [type: 'string', ssPos:26, formPos:27, domain: 'A', width:120, locked:true,
+		moveEvent				: [type: 'string', ssPos:26, formPos:27, domain: 'A', width:120, locked:false,
 										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmString],
 
-		batchId 				: [type:'number', ssPos:27, formPos:28, domain:'C', width:80, locked: true,
+		batchId 				: [type:'number', ssPos:27, formPos:28, domain:'C', width:80, locked: false,
 										label: 'Batch Id', template:changeTmpl('batchId')],
 	]
 
