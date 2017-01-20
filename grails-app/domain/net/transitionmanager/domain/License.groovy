@@ -8,10 +8,6 @@ import org.apache.commons.codec.binary.Base64
  * Created by octavio on 9/20/16.
  */
 class License {
-	/* TAG grapper for messaging */
-	static BEGIN_TAG = "-----BEGIN LICENSE REQUEST-----"
-	static END_TAG = "-----END LICENSE REQUEST-----"
-
 	String id = UUID.randomUUID().toString()
 	String installationNum
 	String email

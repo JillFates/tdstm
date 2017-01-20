@@ -44,8 +44,8 @@ class LicenseManagerService extends LicenseCommonService{
 	}
 
 	def loadRequest(String body){
-		String beginTag = License.BEGIN_TAG
-		String endTag = License.END_TAG
+		String beginTag = LicenseCommonService.BEGIN_REQ_TAG
+		String endTag = LicenseCommonService.END_REQ_TAG
 
 		def idxB = body.indexOf(beginTag)
 		if(idxB >= 0){

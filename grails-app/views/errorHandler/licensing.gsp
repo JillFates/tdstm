@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="layout" content="topNav"/>
     <title>TransitionManager&trade; - Licensing Error (500)</title>
 
     <!-- Tell the browser to be responsive to screen width -->
@@ -37,23 +38,6 @@
 </head>
 <body class="hold-transition skin-blue layout-top-nav error-handling">
 <div class="wrapper">
-    <header class="main-header">
-        <nav class="navbar navbar-static-top">
-            <div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
-                        <i class="fa fa-bars"></i>
-                    </button>
-                    <g:if test="${isLicenseManagerEnabled}">
-                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogoManager.png')}" alt="Transition Manager project" border="0" />
-                    </g:if>
-                    <g:else>
-                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
-                    </g:else>
-                </div>
-            </div><!-- /.container-fluid -->
-        </nav>
-    </header>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->

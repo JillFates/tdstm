@@ -34,6 +34,8 @@ class LicenseAdminService extends LicenseCommonService {
 	LicenseCommonService  licenseCommonService
 	SecurityService	securityService
 
+	static Date lastCompliantDate = new Date()
+
 	/**
 	 * Initialize the license service
 	 * @return
@@ -195,7 +197,9 @@ class LicenseAdminService extends LicenseCommonService {
 		// Attempt to load the license from the EhCache
 		Cache ch = licenseCache.getCache(CACHE_NAME)
 		def cacheEl = ch.get(project.id)
-		licState = cacheEl?.getObjectValue()
+
+		//licState = cacheEl?.getObjectValue()
+		licState = null
 
 		// If the license wasn't in the cache then one will be created and
 		// added to the cache
@@ -212,13 +216,18 @@ class LicenseAdminService extends LicenseCommonService {
 			if (!license || !license.hash) {
 				// UNLICENSED
 				licState.state = State.UNLICENSED
-				licState.message = "Your TransitionManager project is not licensed."
+				licState.message = "A license is required in order to enable all features of the application"
 				licState.valid = false
 				licState.banner = ""
 			}else {
 				licState.banner = license.bannerMessage
 				Date now = new Date()
+
 				log.info("lincense: ${license.id}; [${license.activationDate} - ${license.expirationDate}]; Max: ${license.max}")
+
+				if(license.hash && !license.activationDate){
+					load(license)
+				}
 
 				if (now.compareTo(license.activationDate) >= 0 && now.compareTo(license.expirationDate) <= 0) {
 					long numServers = assetEntityService.countServers(project)
@@ -226,24 +235,24 @@ class LicenseAdminService extends LicenseCommonService {
 					if (numServers <= license.max) {
 						licState.state = State.VALID
 						licState.message = ""
+						//licState.lastCompliantDate = now
+						lastCompliantDate = now
 						licState.valid = true
 					} else {
-						/*
-						if(gracePeriodDaysRemaining(license.expirationDate) > 0) {
+						int gracePeriod = gracePeriodDaysRemaining(lastCompliantDate) //licState.lastCompliantDate)
+						if(gracePeriod > 0) {
 							licState.state = State.NONCOMPLIANT
-							licState.message = "Your TransitionManager project is in grace period."
+							licState.message = "The Server count has exceeded the license limit of ${license.max} by ${numServers - license.max} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
 							licState.valid = true
+						} else {
+							licState.state = State.INBREACH
+							licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${license.max} to re-enable all application features."
+							licState.valid = false
 						}
-						*/
-
-						licState.state = State.NONCOMPLIANT
-						licState.message = "Your TransitionManager project is no longer compliant with license specifications."
-						licState.valid = false
 					}
 				} else {
-					// EXPIRED
 					licState.state = State.EXPIRED
-					licState.message = "The license for your TransitionManager project has expired."
+					licState.message = "The license has expired. A new license is required in order to enable all features of the application."
 					licState.valid = false
 				}
 			}
@@ -257,9 +266,10 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 
-	int gracePeriodDaysRemaining(Date originalDate){
+	int gracePeriodDaysRemaining(Date lastCompliantDate){
+		lastCompliantDate = lastCompliantDate?:new Date()
 		int maxDays = 5
-		Date graceDate = DateUtils.addDays(originalDate, maxDays)
+		Date graceDate = DateUtils.addDays(lastCompliantDate, maxDays)
 		Date now = new Date()
 		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
 	}
@@ -269,8 +279,8 @@ class LicenseAdminService extends LicenseCommonService {
 		String id = license.id
 		String hash = license.hash
 
-		String beginTag = DomainLicense.BEGIN_TAG
-		String endTag = DomainLicense.END_TAG
+		String beginTag = LicenseCommonService.BEGIN_LIC_TAG
+		String endTag = LicenseCommonService.END_LIC_TAG
 		def idxB = hash.indexOf(beginTag)
 		if(idxB >= 0){
 			def idxE = hash.indexOf(endTag)
@@ -283,10 +293,15 @@ class LicenseAdminService extends LicenseCommonService {
 
 
 		LicenseManager manager = LicenseManager.getInstance()
+		manager.clearLicenseCache()
+
+		log.info("ID: " + id)
+		log.info("Hash: " + hash)
 		licenseProvider.addLicense(id, hash)
 		License licObj = manager.getLicense(id)
-		log.info( "license.id: " + license.id)
-		log.info( "License ID: " + licObj.productKey)
+		log.info("license.id: " + license.id)
+		log.info("License Obj: " + licObj)
+		log.info("License ID: " + licObj?.productKey)
 
 		def jsonData = JSON.parse(licObj.subject)
 		String installationNum= jsonData.installationNum

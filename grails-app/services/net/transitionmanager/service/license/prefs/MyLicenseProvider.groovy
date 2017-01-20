@@ -38,6 +38,7 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 
 	public void addLicense(String name, String license){
 		licenses[name] = license
+		log.info("licenses size: {}", licenses.size())
 	}
 
 }
