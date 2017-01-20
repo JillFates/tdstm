@@ -161,11 +161,9 @@
 				</script>
 			</g:else>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="sConnector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
+				<div id="sConnector${i}" style="position: relative; float: left; margin-right: 20px;">
+
 					<div>
-					<img src="${resource(dir:'i/cabling',file:modelConnector.status+'.png')}"/>
-					</div>
-					<div class="connector_${modelConnector.labelPosition}">
 					<span>${modelConnector.label}</span>
 					</div>
 				</div>

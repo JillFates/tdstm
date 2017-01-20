@@ -1371,9 +1371,6 @@ a.tab_deselect {
 	position: relative;
 }
 #cablingPanel div {
-	position: absolute; 
-	left: 0; 
-	top: 0;
 	color:black;
 }
 .connector_Bottom{

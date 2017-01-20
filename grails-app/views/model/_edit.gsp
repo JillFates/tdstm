@@ -250,13 +250,16 @@
 			</g:else>
 
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
-					<div>
-						<img src="${resource(dir:'i/cabling',file: '' + modelConnector.status + '.png')}"/>
+				<div id="connector${modelConnector.connector}" style="float: left; position: relative; margin-right: 20px;">
+					<%--
+					<div style="position: relative;">
+						<img src="${resource(dir:'i/cabling',file: '' + modelConnector.status + '.png')}" style="float: left;"/>
 					</div>
-					<div id="labelPositionDiv${modelConnector.connector}" class="connector_${modelConnector.labelPosition}">
+					--%>
+					<div id="labelPositionDiv${modelConnector.connector}" style="position: relative;">
 						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
 					</div>
+
 				</div>
 			</g:each>
 			<g:each in="${otherConnectors}" var="count">
@@ -359,8 +362,9 @@
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
 		if(count < 51 ){
-			var connector = "<div><img src=\"i/cabling/"+ type +".png\"/></div><div id='labelPositionDiv"+count+"' class='connector_Right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>"
+			var connector = "<div style='position: relative; float: left;'></div><div id='labelPositionDiv"+count+"' style='position: relative;'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>"
 			$("#connector"+count).html(connector)
+          	$("#connector"+count).css({"position": "relative", "float": "left", "margin-right": "20px"})
 			var modelConnector = $("#connectorTabe tbody").html()
 			$("#connectorModelBody").append(modelConnector)
 			// change attributes based on count
