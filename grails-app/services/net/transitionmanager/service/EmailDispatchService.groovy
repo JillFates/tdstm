@@ -63,12 +63,14 @@ class EmailDispatchService implements ServiceMethods {
 		dataMap.each { k, v -> trigger.jobDataMap[k] = v }
 
 		trigger.jobDataMap.edId = emailDispatch.id
-		
+
 		/*For later use when assuming the identity of this user during the
 		 execution of the Quartz Job.*/
-		trigger.jobDataMap.username = securityService.currentUsername
-		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
-		
+		if(!trigger.jobDataMap.username){
+				trigger.jobDataMap.username = securityService.currentUsername
+				trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
+		}
+
 		trigger.setJobName("EmailDispatchJob")
 		trigger.setJobGroup('tdstm-send-email')
 		quartzScheduler.scheduleJob(trigger)

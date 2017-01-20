@@ -247,7 +247,7 @@ class AuthController implements ControllerMethods {
 				pr.userLogin.person,
 				pr.userLogin.person
 			)
-			emailDispatchService.createEmailJob(ed, [:])
+			emailDispatchService.createEmailJob(ed, [username:pr.userLogin.username])
 
 			// Login and redirect to home page
 			params.username = pr.userLogin.username
