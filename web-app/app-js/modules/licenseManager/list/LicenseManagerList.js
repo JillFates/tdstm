@@ -26,11 +26,12 @@ export default class LicenseManagerList {
             pageable: {
                 refresh: true,
                 pageSizes: true,
-                buttonCount: 5
+                buttonCount: 5,
+                pageSize: 20
             },
             columns: [
                 {field: 'id', hidden: true },
-                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
+                {field: 'action', filterable: false, title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
                 {field: 'owner.name', title: 'Owner'},
                 {field: 'client.name', title: 'Client'},
                 {field: 'project.name', title: 'Project'},
@@ -72,6 +73,10 @@ export default class LicenseManagerList {
                         }
                     }
                 }
+            },
+            sortable: true,
+            filterable: {
+                extra: false
             }
         };
     }

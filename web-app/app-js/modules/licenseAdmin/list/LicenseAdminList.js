@@ -24,11 +24,12 @@ export default class LicenseAdminList {
             pageable: {
                 refresh: true,
                 pageSizes: true,
-                buttonCount: 5
+                buttonCount: 5,
+                pageSize: 20
             },
             columns: [
                 {field: 'licenseId', hidden: true },
-                {field: 'action', title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseAdminList.onLicenseDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
+                {field: 'action', filterable: false, title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseAdminList.onLicenseDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
                 {field: 'client.name', title: 'Client'},
                 {field: 'project.name', title: 'Project'},
                 {field: 'email', title: 'Contact Email'},
@@ -39,7 +40,7 @@ export default class LicenseAdminList {
                 {field: 'method.max', title: 'Server/Tokens'},
                 {field: 'requestDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}' },
                 {field: 'expirationDate', title: 'Expiration', type: 'date', format : '{0:dd/MMM/yyyy}' },
-                {field: 'environment.name', title: 'Env.'}
+                {field: 'environment.name', title: 'Environment'}
             ],
             dataSource: {
                 pageSize: 10,
@@ -70,6 +71,9 @@ export default class LicenseAdminList {
                 }
             },
             sortable: true,
+            filterable: {
+                extra: false
+            }
         };
     }
 

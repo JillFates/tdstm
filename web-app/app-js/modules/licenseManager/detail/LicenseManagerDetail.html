@@ -66,7 +66,7 @@
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#tab_1" data-toggle="tab">Details</a></li>
-                    <li><a href="#tab_2" data-toggle="tab">License Key</a></li>
+                    <li ng-if="licenseManagerDetail.licenseKey"><a href="#tab_2" data-toggle="tab">License Key</a></li>
                     <li><a href="#tab_3" data-toggle="tab">Activity</a></li>
                     <li><a href="#tab_4" data-toggle="tab">Thumbprint</a></li>
                 </ul>
@@ -175,7 +175,7 @@
                             </div>
                         </div>
                     </div><!-- /.tab-pane -->
-                    <div class="tab-pane" id="tab_2">
+                    <div class="tab-pane" id="tab_2" ng-if="licenseManagerDetail.licenseKey">
                         <div class="form-group">
                             <label class="col-md-12 control-label">The following text block contains the details of the license information in an encrypted format.</label>
                         </div>

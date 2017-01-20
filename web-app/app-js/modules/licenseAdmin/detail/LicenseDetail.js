@@ -20,7 +20,7 @@ export default class LicenseDetail {
             environmentName: params.license.environment.name,
             inception: params.license.requestDate,
             expiration: params.license.expirationDate,
-            specialInstructions: params.license.requestNote,
+            requestNote: params.license.requestNote,
             active: params.license.status.id === 1,
             id: params.license.id,
             replaced: params.license.replaced,

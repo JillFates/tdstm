@@ -157,7 +157,9 @@ export default class LicenseManagerDetail extends FormValidator{
 
     prepareLicenseKey() {
         this.licenseManagerService.getKeyCode(this.licenseModel.id, (data) => {
-            this.licenseKey = '-----BEGIN LICENSE REQUEST-----\n' + data + '\n-----END LICENSE REQUEST-----';
+            if(data) {
+                this.licenseKey = '-----BEGIN LICENSE REQUEST-----\n' + data + '\n-----END LICENSE REQUEST-----';
+            }
         });
     }
 
@@ -175,31 +177,12 @@ export default class LicenseManagerDetail extends FormValidator{
     }
 
     /**
-     * The user apply and server should validate the key is correct
-     */
-    applyLicenseKey() {
-        var modalInstance = this.uibModal.open({
-            animation: true,
-            templateUrl: '../app-js/modules/licenseManager/applyLicenseKey/ApplyLicenseKey.html',
-            controller: 'ApplyLicenseKey as applyLicenseKey',
-            size: 'md',
-            resolve: {
-                params: () => {
-                    return { license: this.licenseModel };
-                }
-            }
-        });
-
-        modalInstance.result.then(() => {
-            this.licenseModel.applied = true;
-        });
-    }
-
-    /**
      * If by some reason the License was not applied at first time, this will do a request for it
      */
     activateLicense() {
-        this.licenseManagerService.activateLicense(this.licenseModel, (data) => {});
+        this.licenseManagerService.activateLicense(this.licenseModel, (data) => {
+            //this.prepareLicenseKey();
+        });
     }
 
     revokeLicense() {
