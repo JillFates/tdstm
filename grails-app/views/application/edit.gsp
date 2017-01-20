@@ -1,10 +1,9 @@
-<%@page defaultCodec="none" %>
 <%@page import="com.tds.asset.Application"%>
 <%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
 <g:set var="assetClass" value="Application" />
 
 <style>
-	#select2-drop{ width: 200px !important; } 
+	#select2-drop{ width: 200px !important; }
 </style>
 
 <script type="text/javascript">
@@ -13,7 +12,7 @@
 	$("#appl_validation").val($('#gs_validation').val())
 	$("#appl_planStatus").val($('#gs_planStatus').val())
 	$("#appl_moveBundle").val($('#gs_moveBundle').val())
-	$(document).ready(function() { 
+	$(document).ready(function() {
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${applicationInstance.id}'
 		populateDependency(assetId, 'application','edit')
@@ -24,12 +23,12 @@
 			$("#sme2 option:first").after(myOption);
 			$("#appOwnerEdit option:first").after(myOption);
 		</tds:hasPermission>
-		$("#shutdownByEditId").val('${applicationInstance.shutdownBy}')
-		$("#startupByEditId").val('${applicationInstance.startupBy}')
-		$("#testingByEditId").val('${applicationInstance.testingBy}')
+		$("#shutdownByEditId").val('${raw(applicationInstance.shutdownBy)}')
+		$("#startupByEditId").val('${raw(applicationInstance.startupBy)}')
+		$("#testingByEditId").val('${raw(applicationInstance.testingBy)}')
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
-		changeDocTitle('${escapedName}');		
+		changeDocTitle('${escapedName}');
 	})
 </script>
 <g:form method="post" action="update" name="createEditAssetForm" onsubmit="return validateFields('Edit',this.name)">
@@ -63,11 +62,11 @@
 							<tr>
 								<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
 								<td colspan="3">
-									<input type="text" id="assetName" class="${config.assetName}" name="assetName" 
+									<input type="text" id="assetName" class="${config.assetName}" name="assetName"
 										value="${applicationInstance.assetName}" tabindex="9" /></td>
 								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap">Description</td>
 								<td colspan="3">
-									<input type="text" id="description" class="${config.description}" name="description" 
+									<input type="text" id="description" class="${config.description}" name="description"
 										value="${applicationInstance.description}" size="50" tabindex="10" />
 								</td>
 							</tr>
@@ -96,11 +95,11 @@
 								</td>
 								<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td>
-									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect" optionKey="personId" 
+									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
-										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}" 
-										tabindex="22" 
-										noSelection="${['null':' Please Select']}" 
+										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}"
+										tabindex="22"
+										noSelection="${['null':' Please Select']}"
 									/>
 								</td>
 								<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label>
@@ -123,19 +122,19 @@
 								<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td class="suffleTd">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="personId" 
-										optionValue="${{it.fullName}}" 
-										onchange="openPersonDiv(this.value, this.id)" 
-										value="${applicationInstance.sme2?.id}" 
-										tabindex="23" 
-										noSelection="${['null':' Please Select']}" 
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="personId"
+										optionValue="${{it.fullName}}"
+										onchange="openPersonDiv(this.value, this.id)"
+										value="${applicationInstance.sme2?.id}"
+										tabindex="23"
+										noSelection="${['null':' Please Select']}"
 									/>
 								</td>
 								<td class="label ${config.criticality} ${highlightMap.criticality?:''}" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
 								<td >
-									<g:select id="criticality" class="${config.criticality}" name="criticality" 
-										from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  
+									<g:select id="criticality" class="${config.criticality}" name="criticality"
+										from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"
 										noSelection="${['':'Please select']}"
 										tabindex="33">
 									</g:select>
@@ -152,12 +151,12 @@
 								<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
 								<td class="suffleTd">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="appOwnerEdit" class="${config.appOwner} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId" 
-										optionValue="${{it.fullName}}" 
-										onchange="openPersonDiv(this.value, this.id)" 
-										value="${applicationInstance.appOwner?.id}" 
-										tabindex="24" 
-										noSelection="${['null':' Please Select']}" 
+									<g:select from="${personList}" id="appOwnerEdit" class="${config.appOwner} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"
+										optionValue="${{it.fullName}}"
+										onchange="openPersonDiv(this.value, this.id)"
+										value="${applicationInstance.appOwner?.id}"
+										tabindex="24"
+										noSelection="${['null':' Please Select']}"
 									/>
 								</td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
@@ -194,7 +193,7 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="26"
-									value="<tds:convertDate date="${applicationInstance?.retireDate}"  />" > 
+									value="<tds:convertDate date="${applicationInstance?.retireDate}"  />" >
 								</td>
 								<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
@@ -214,7 +213,7 @@
 								    <script type="text/javascript" charset="utf-8">
 										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 									</script>
-									<input type="text" class="dateRange ${config.maintExpDate}" 
+									<input type="text" class="dateRange ${config.maintExpDate}"
 										size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" tabindex="27"
 										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">
 								</td>
@@ -228,7 +227,7 @@
 								<td ><g:select  id="startupProc" class="${config.startupProc} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.startupProc}" tabindex="47"/>
 								</td>
-								
+
 							</tr>
 							<tr>
 								<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="license">URL</label></td>
@@ -236,14 +235,14 @@
 								</td>
 								<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 								<td>
-									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" 
+									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId"
 									value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td >
 								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'${config.shutdownBy} assetSelect']"></g:render>
 									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
 										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
+										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
 										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed
 								</td>
 								<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
@@ -259,7 +258,7 @@
 								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'${config.startupBy} assetSelect']"></g:render>
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
+										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
 										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>
 								<td class="label ${config.startupDuration} ${highlightMap.startupDuration?:''}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
@@ -267,14 +266,14 @@
 								<td ><input type="text" id="startupDuration" class="${config.startupDuration}" name="startupDuration"
 											value="${applicationInstance.startupDuration}" tabindex="55" size="7" />m
 								</td>
-								
-								
+
+
 								<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'${config.testingBy} assetSelect']"></g:render>
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
 										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
+										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
 										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>
 								<td class="label ${config.testingDuration} ${highlightMap.testingDuration?:''}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>
@@ -293,7 +292,7 @@
 					</table>
 				</div></td>
 		</tr>
-		
+
 		<%-- Dependency Edit Block --%>
 		<tr id="applicationDependentId" class="assetDependent">
 			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/></span></td>
