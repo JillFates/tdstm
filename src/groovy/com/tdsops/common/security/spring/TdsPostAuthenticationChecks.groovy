@@ -33,17 +33,17 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 				userLogin.passwordExpirationDate.time <= System.currentTimeMillis()
 		if (passwordExpired) {
 			// no exception, just set the flag to force a password update
-			securityService.forcePasswordChange()
+			securityService.forcePasswordChange(userLogin)
 		}
 
 		// checkPasswordAge
 
 		int maxAgeDays = (int) securityService.userLocalConfig.maxPasswordAgeDays
-		if (maxAgeDays && userLogin.passwordChangedDate &&
+		if (!userLogin.passwordNeverExpires && maxAgeDays && userLogin.passwordChangedDate &&
 				userLogin.passwordChangedDate.time + maxAgeDays * MILLIS_IN_ONE_DAY < System.currentTimeMillis()) {
 
 			// no exception, just set the flag to force a password update
-			securityService.forcePasswordChange()
+			securityService.forcePasswordChange(userLogin)
 		}
 
 		// checkIfUserHasRoles

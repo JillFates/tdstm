@@ -1421,8 +1421,10 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	}
 
 	@Transactional
-	void forcePasswordChange() {
-		UserLogin user = getUserLogin()
+	void forcePasswordChange(UserLogin user = null) {
+		if(!user){
+			user = getUserLogin()
+		}
 		if (user.forcePasswordChange != 'Y') {
 			user.forcePasswordChange = 'Y'
 			user.save(failOnError: true)
