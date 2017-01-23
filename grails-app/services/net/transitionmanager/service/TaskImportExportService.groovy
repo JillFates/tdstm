@@ -70,7 +70,7 @@ class TaskImportExportService implements ServiceMethods {
 			return TimeUtil.formatDate(val, options.dateTimeFormatter)
 		}
 
-		log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
+		log.error "xfrmDateTimeToString                           () got unexpected data type ${val?.getClass()?.getName()}"
 		val?.toString()
 	}	
 
@@ -80,7 +80,7 @@ class TaskImportExportService implements ServiceMethods {
 
 	// Used in the map below to set the various template strings used by Kendo
 	static final changeTmpl = { prop ->
-		"\"#= showChanges(data, '$prop') #\""
+		"\"#=(!$prop || $prop == 'null' ||  $prop == 'undefined')? '' : showChanges(data, '$prop') #\""
 	}
 	static final errorListTmpl = { prop ->
 		"kendo.template(\$('#error-template').html())"

@@ -214,15 +214,6 @@
 						read: "${raw(createLink(action:'importTaskReviewData', params:paramsForReviewDataRequest))}"
 					},
 					error: processErrors,
-					schema: {
-						model: {
-							fields: {
-								<g:each var="propName" in="${properties}">${propName}: { type: "string" },</g:each>
-								errors: { type: "string" },
-								matches: { type: "string" }
-							}
-						}
-					},
 					pageSize: 0
 				},
 				columns: [
@@ -237,7 +228,7 @@
 						field: "${propName}",
 						title: "${gridOpt.label}",
 						locked: ${gridOpt.locked},
-						<g:if test="${gridOpt.template}">template: ${raw(gridOpt.template)},</g:if>
+                        <g:if test="${gridOpt.template}">template:${raw(gridOpt.template)},</g:if>
 						<g:if test="${gridOpt.templateClass}">attributes: { "class": "${gridOpt.templateClass}" },</g:if>
 						lockable: false,
 						width: ${gridOpt.width}
