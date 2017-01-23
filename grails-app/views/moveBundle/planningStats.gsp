@@ -64,7 +64,7 @@ $(document).ready(function() {
 
 <%-- Analysis Phase --%>
 			<div class="dashboardContainer">
-				<div class="dashboard_div col-sm-12 col-lg-2" >
+				<div class="dashboard_div col-sm-12 col-md-12 col-lg-3" style="min-width: 280px;" >
 					<span class="dashboard_head">Discovery Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 						<tr>
@@ -162,7 +162,7 @@ $(document).ready(function() {
 
 	<%-- Analysis Phase --%>
 
-				<div class="dashboard_div col-sm-12 col-lg-2" style="min-width: 200px" >
+				<div class="dashboard_div col-sm-12 col-md-12 col-lg-3" style="min-width: 200px" >
 					<span class="dashboard_head">Analysis Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 						<tr>
@@ -334,7 +334,7 @@ $(document).ready(function() {
 
 	<%-- Execution Phase Section --%>
 
-				<div class="dashboard_div col-sm-12  col-lg-8">
+				<div class="dashboard_div col-sm-12 col-md-12 col-lg-6">
 					<span class="dashboard_head">Execution Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 
@@ -417,7 +417,7 @@ $(document).ready(function() {
 
 					<div class="container-fluid">
 						<div class="row-fluid">
-							<div class="col-md-2 col-xs-2">
+							<div class="col-md-3 col-xs-3">
 								<div>
 									<table id="eventHeaderTableId" class="dashboard_right_table" style="border: none;">
 										<thead>
@@ -490,7 +490,7 @@ $(document).ready(function() {
 									</table>
 								</div>
 							</div>
-							<div class="col-md-10 col-xs-10" >
+							<div class="col-md-9 col-xs-9" >
 								<div id="eventDataTableId" style="overflow-y: hidden;">
 									<table class="dashboard_right_table dashboard_stat_table">
 										<thead>
