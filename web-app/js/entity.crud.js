@@ -42,7 +42,7 @@ var EntityCrud = ( function($) {
 		var fieldVal = $('#'+form+' #assetName').val();
 		if (fieldVal == '') {
 			if(alertErrors){
-				console.log('Please provide a name for the asset');
+				alert('Please provide a name for the asset');
 			}
 			
 		} else {
@@ -60,10 +60,10 @@ var EntityCrud = ( function($) {
 		if (ok) {
 			var size = $('#'+form+' #size').val();
 			if ( size=='' || isNaN(size)) {
-				console.log("Please enter numeric value for Storage Size");
+				alert("Please enter numeric value for Storage Size");
 				ok = false;
 			} else if ($('#'+form+' #fileFormat').val()=='') {
-				console.log("Please enter value for Storage Format");
+				alert("Please enter value for Storage Format");
 				ok = false;
 			}
 		}
@@ -81,13 +81,13 @@ var EntityCrud = ( function($) {
 		    var size = $('#'+form+' #size').val();
 		    if ( size=='' || isNaN(size)){
 		    	if(alertErrors){
-		    		console.log("Please enter numeric value for DB Size");
+		    		alert("Please enter numeric value for DB Size");
 		    	}
 		    	
 				ok = false;
 		    } else if($('#'+form+' #dbFormat').val()==''){
 		    	if(alertErrors){
-		    		console.log("Please enter value for DB Format");
+		    		alert("Please enter value for DB Format");
 		    	}
 				ok = false;
 		    }
@@ -117,7 +117,7 @@ var EntityCrud = ( function($) {
 			if (tds.utils.stringUtils.empty(location) ||
 				tds.utils.stringUtils.empty(room) ||
 				tds.utils.stringUtils.empty(rack) ) {
-				console.log("Location name, room name and rack name must be defined for 'Add Room'")
+				alert("Location name, room name and rack name must be defined for 'Add Room'")
 				ok = false;
 			}
 		} else {
@@ -126,7 +126,7 @@ var EntityCrud = ( function($) {
 				var type = ((sourceTarget == 'S')?'#source':'#target');
 				var rack = $(type + 'RackId').val();
 				if  (tds.utils.stringUtils.empty(rack)) {
-					console.log("Rack name must be defined for 'Add Rack'")
+					alert("Rack name must be defined for 'Add Rack'")
 					ok = false;
 				}
 			}
@@ -140,7 +140,7 @@ var EntityCrud = ( function($) {
 		if (ok) {
 			ok = false;
 			if($('#'+form+' #sme1').val()=='0' || $('#'+form+' #sme2').val()=='0' || $('#'+form+' #appOwner').val()=='0' ){
-				console.log("Please unselect the 'Add Person' option from SME, SME2 or Application Owner properties")
+				alert("Please unselect the 'Add Person' option from SME, SME2 or Application Owner properties")
 			} else {
 				var msg = '';
 				// Check to see if the durations have legit numbers
@@ -160,7 +160,7 @@ var EntityCrud = ( function($) {
 					}
 				});
 				if (msg != '') {
-					console.log("Please make sure that the " + msg + ' Duration field' + (c>1 ? 's have' : ' has a') + ' numeric value' + (c>1 ? 's' : ''));
+					alert("Please make sure that the " + msg + ' Duration field' + (c>1 ? 's have' : ' has a') + ' numeric value' + (c>1 ? 's' : ''));
 				} else {
 					ok = true;
 				}	
@@ -473,13 +473,13 @@ var EntityCrud = ( function($) {
 						selectCtrl.select2();
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
-					console.log(xhr.status + " " + thrownError);
+					alert(xhr.status + " " + thrownError);
 					selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>') ;
 					selectCtrl.val(0);
 				}
 			});
 		} else {
-			console.log('ERROR: fetchRackSelectForRoom() unable to locate select id '+ rsName);
+			alert('ERROR: fetchRackSelectForRoom() unable to locate select id '+ rsName);
 		}
 	};
 
@@ -500,7 +500,7 @@ var EntityCrud = ( function($) {
 					selectCtrl.select2();
 			}, 
 			error: function (xhr, ajaxOptions, thrownError) {
-				console.log(xhr.status + " " + thrownError);
+				alert(xhr.status + " " + thrownError);
 				selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>') ;
 				selectCtrl.val(0);
 			}
@@ -571,7 +571,7 @@ var EntityCrud = ( function($) {
 	 */
 	pub.saveToShow = function(button, assetClass) {
 		if (assetCreateInvoked) {
-			console.log("Please only click the save button once. Your save request is being processed.");
+			alert("Please only click the save button once. Your save request is being processed.");
 			return false;
 		} else {
 			assetCreateInvoked=true;
@@ -598,7 +598,7 @@ var EntityCrud = ( function($) {
 				type:'POST',
 				success: function(resp) {
 					if (resp.status == 'error') {
-						console.log(resp.errors);
+						alert(resp.errors);
 						assetCreateInvoked=false;
 						return false;
 					} else {
@@ -618,7 +618,7 @@ var EntityCrud = ( function($) {
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
 					console.log("error 2")
-					console.log("The following error occurred while attempting to create asset : "+ err);
+					alert("The following error occurred while attempting to create asset : "+ err);
 					assetCreateInvoked=false;
 					return false;
 				},
@@ -655,7 +655,7 @@ var EntityCrud = ( function($) {
 				break;
 
 			default:
-				console.log('ERROR: validateForm() - unsupported case for ' + assetClass);
+				alert('ERROR: validateForm() - unsupported case for ' + assetClass);
 		}
 		return validateOkay;
 
@@ -672,16 +672,16 @@ var EntityCrud = ( function($) {
 	 pub.performAssetUpdate = function(buttonClicked, assetClass) {
 
 		if (assetUpdateInvoked) {
-			console.log("Please only click the update button once. Your update request is being processed.");
+			alert("Please only click the update button once. Your update request is being processed.");
 			return false;
 		} else {
 			assetUpdateInvoked = true;
 			buttonClicked.disabled = true;
 		}
-		console.log("Button cicked = " + JSON.stringify(buttonClicked));
-		var act = buttonClicked.data('action');console.log(act);
+
+		var act = buttonClicked.data('action');
 		var type = 'Server';
-		var redirect = buttonClicked.data('redirect');console.log(redirect);
+		var redirect = buttonClicked.data('redirect');
 
 		$('#updateView').val('updateView');
 
@@ -708,7 +708,7 @@ var EntityCrud = ( function($) {
 				break;
 
 			default:
-				console.log("Unsupported case for assetClass '" + assetClass + "' in performAssetUpdate()");
+				alert("Unsupported case for assetClass '" + assetClass + "' in performAssetUpdate()");
 
 		}
 
@@ -718,7 +718,7 @@ var EntityCrud = ( function($) {
 		if (validateOkay) {
 			var formObj=$('#'+formName);
 			if (formObj.length==0) {
-				console.log("Unable to locate form "+formName);
+				alert("Unable to locate form "+formName);
 				return false;
 			}
 			var assetId=$("#"+formName+" :input[name='id']").val();
@@ -743,7 +743,7 @@ var EntityCrud = ( function($) {
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
-					console.log("An error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+					alert("An error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
 					buttonClicked.one(function() {
 						pub.EntityCrud.performAssetUpdate(buttonClicked, assetClass);
 					});
@@ -992,7 +992,7 @@ var EntityCrud = ( function($) {
 				valid = false;
 		});
 		if (! valid)
-			console.log("Please select a valid asset for all dependencies");
+			alert("Please select a valid asset for all dependencies");
 
 		return valid;
 	}
@@ -1062,7 +1062,7 @@ var EntityCrud = ( function($) {
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
-				console.log("An error occurred while loading the asset edit form."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				alert("An error occurred while loading the asset edit form."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
 				return false;
 			}
 		});
@@ -1085,7 +1085,7 @@ var EntityCrud = ( function($) {
 				return fetchAssetEditView('assetEntity', 'Device', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
 				 break;
 			default:
-				console.log("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");
+				alert("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");
 				return false;
 		}
 	};
@@ -1126,7 +1126,7 @@ var EntityCrud = ( function($) {
 			success: function(resp) {
 				if (typeof resp === 'object') {
 					if (resp.status=='error') {
-						console.log("An error occurred: " + resp.errors);
+						alert("An error occurred: " + resp.errors);
 						return false;
 					}
 					console.log("fetchAssetShowView() had unexpected response");
@@ -1137,7 +1137,7 @@ var EntityCrud = ( function($) {
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
-				console.log("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				alert("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
 				return false;
 			}
 		});
@@ -1173,7 +1173,7 @@ var EntityCrud = ( function($) {
 				return fetchAssetShowView('assetEntity', 'Device', assetId);
 				break;
 			default:
-				console.log("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
+				alert("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
 				return false;
 		}
 
@@ -1220,7 +1220,7 @@ var EntityCrud = ( function($) {
 			success: function(resp) {
 				if (typeof resp === 'object') {
 					if (resp.status=='error') {
-						console.log("The following error occurred: " + resp.errors);
+						alert("The following error occurred: " + resp.errors);
 						return false;
 					}
 					console.log("fetchAssetCreateView() had unexpected response");
@@ -1231,7 +1231,7 @@ var EntityCrud = ( function($) {
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
-				console.log("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				alert("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
 				return false;
 			}
 		});
@@ -1253,7 +1253,7 @@ var EntityCrud = ( function($) {
 				return fetchAssetCreateView('assetEntity', 'Device', source, rackOrChassisId, roomId, location, position, isBlade);
 				break;
 			default:
-				console.log("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
+				alert("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
 				return false;
 		}
 	};
@@ -1480,7 +1480,7 @@ function isValidDate ( date ) {
 	var returnVal = true;
 	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
 	if( date && !objRegExp.test(date) ){
-		console.log("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
+		alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
 		returnVal  =  false;
 	}
 	return returnVal;
@@ -1550,7 +1550,7 @@ function submitRemoteForm(){
 				EntityCrud.closeEditModal();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.log("An unexpected error occurred while updating asset.")
+				alert("An unexpected error occurred while updating asset.")
 			}
 		});
  		return false;
@@ -1618,7 +1618,7 @@ function reloadDependencyGroupsSection() {
 }
 function submitCheckBox(){
 	if($(".checkboxdiv_control input:checked").length == 0){
-		console.log("One or more status values must be selected.")
+		alert("One or more status values must be selected.")
 		return
 	}
 	var moveBundleId = $("#planningBundleSelectId").val();
@@ -1675,7 +1675,7 @@ function changeMoveBundle(assetType, totalAsset, assignBundle) {
 			}
 		}
 	}if(j == 0){
-		console.log('Please select the Asset');
+		alert('Please select the Asset');
 	}else{
 		$('#plannedMoveBundleList').val(assignBundle);
 		$('#bundleSession').val(assignBundle);
@@ -1738,7 +1738,7 @@ function deleteAssets(action){
 			assetArr.push(assetId)
   })
   	if(!assetArr) {
-		console.log('Please select the Asset');
+		alert('Please select the Asset');
 	} else {
 		if(confirm("You are about to delete all of the selected assets for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")){
 			jQuery.ajax({
@@ -1811,7 +1811,7 @@ function updateAudit(){
 		type:'POST',
 		success: function(data) {
 			if(data.errMsg){
-				console.log(data.errMsg)
+				alert(data.errMsg)
 			}else{
 				getRackLayout( $('#selectedRackId').val() )
 				$("#auditDetailViewId").html(data)
@@ -1976,7 +1976,7 @@ function populateDependency(assetId, whom, thisDialog){
 					$("select.assetSelect").select2();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.log("An unexpected error occurred while populating dependent asset.")
+				alert("An unexpected error occurred while populating dependent asset.")
 			}
 		});
 }
@@ -2021,7 +2021,7 @@ function assetFieldImportance(phase,type){
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			console.log("An unexpected error occurred while getting asset.")
+			alert("An unexpected error occurred while getting asset.")
 		}
 	});
 	
@@ -2040,7 +2040,7 @@ function assetFieldImportance(phase,type){
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			console.log("An unexpected error occurred while getting asset.")
+			alert("An unexpected error occurred while getting asset.")
 		}
 	});
 	 
@@ -2065,7 +2065,7 @@ function getHelpTextAsToolTip(type){
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			if(jqXHR.getAllResponseHeaders()){
-				console.log("An unexpected error occurred while getting asset.")
+				alert("An unexpected error occurred while getting asset.")
 			}
 			
 		}
