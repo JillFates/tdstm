@@ -38,7 +38,8 @@ function validateAKA(value,itemId,spanId,forWhom){
 		jQuery.ajax({
 			url : contextPath+'/'+forWhom+'/validateAKA',
 			data: params,
-			complete: function(e) { 
+			complete: function(e) {
+				debugger;
 				if(e.responseText){
 					$("#"+spanId).html("Duplicate AKA "+e.responseText+" already exist.")
 					$("#"+spanId).css('display','block')
@@ -98,12 +99,15 @@ function convertPowerType (value, whom) {
 	}
 }
 
+
+
 function createModelManuDetails (controllerName,forWhom) {
 	jQuery.ajax({
 		url : contextPath+'/'+controllerName+'/create',
 		data : {'forWhom':'modelDialog'},
 		type : 'POST',
 		success : function(data) {
+
 			 $("#create"+forWhom+"View").html(data);
 			 $("#create"+forWhom+"View").dialog('option', 'width', 'auto')
 			 $("#create"+forWhom+"View").dialog('option', 'position', ['center','top']);
@@ -111,10 +115,32 @@ function createModelManuDetails (controllerName,forWhom) {
 			 $("#edit"+forWhom+"View").dialog('close');
 			 $("#create"+forWhom+"View").dialog('option', 'modal', 'true');
 			 $("#create"+forWhom+"View").dialog('open');
+			 $("#create"+forWhom+"View")
+				.off('submit',"#manufacturerDialogForm")
+				.on('submit',"#manufacturerDialogForm",function (e) {
+				var obj = $("#create"+forWhom+"View #manufacturerDialogForm").serializeObject();
+                jQuery.ajax(
+                	{
+                		url : contextPath+'/'+controllerName+'/save',
+                    	data : obj,
+                		type : 'POST',
+                    	success : function(response) {
+                			if(response.indexOf('<div class="errors">')!==-1)
+                            	$("#create"+forWhom+"View").html(response);
+                			else{
+                                $("#create"+forWhom+"View").dialog('close');
+                                $('#messageId').html(response).show()
+							}
+						}
+                	});
+				return false;
+            });
 		}
 	});
 	updateTitle(forWhom,"create","Create")
 	}
+
+
 
 function showOrEditModelManuDetails (controllerName,id,forWhom,view, name) {
 	jQuery.ajax({

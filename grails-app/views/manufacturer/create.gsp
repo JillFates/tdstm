@@ -13,7 +13,7 @@
 					<g:renderErrors bean="${manufacturerInstance}" as="list" />
 				</div>
 			</g:hasErrors>
-			<g:form action="list" name="manufacturerDialogForm">
+			<g:form action="list" method="POST" name="manufacturerDialogForm">
 				<div class="dialog">
 					<table>
 						<tbody>
@@ -93,5 +93,8 @@
 			</div>
 			<input type="hidden" id="manageAkaId" value="-1" >
 		</div>
+		<script>
+
+		</script>
 	</body>
 </html>

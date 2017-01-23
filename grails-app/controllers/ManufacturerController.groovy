@@ -147,8 +147,8 @@ class ManufacturerController implements ControllerMethods {
 					manufacturer.findOrCreateAliasByName(aka, true)
 				}
 			}
-			flash.message = "Manufacturer $manufacturer.name created"
-			redirect(action: 'list',id:manufacturer.id)
+
+			 render "Manufacturer $manufacturer.name created"
 		} else {
 			render(view:'create',model:[manufacturerInstance:manufacturer])
 		}
