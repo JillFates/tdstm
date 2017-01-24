@@ -69,8 +69,7 @@ trait ServiceMethods {
 			instance.save(flush: flush)
 
 			if (instance.hasErrors()) {
-				log.error('save() Validation errors saving {} with id {} {}',
-					instance.getClass().simpleName, instance.id, GormUtil.allErrorsString(instance))
+				log.error("save() Validation errors saving ${instance.getClass().simpleName} with id ${instance.id} ${GormUtil.allErrorsString(instance)}")
 			}
 		}
 		catch (e) {
