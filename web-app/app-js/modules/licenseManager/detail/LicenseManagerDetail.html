@@ -42,13 +42,14 @@
                     <div class="form-group">
                         <label for="selectStatus" class="col-sm-4 control-label">Status: </label>
                         <div class="col-sm-8">
-                            <select kendo-drop-down-list="licenseManagerDetail.selectStatus"
+                            <label id="selectStatus" class="control-label ng-binding">{{licenseManagerDetail.statusText}}</label>
+                            <!-- <select kendo-drop-down-list="licenseManagerDetail.selectStatus"
                                     k-options="licenseManagerDetail.selectStatusListOptions"
                                     k-ng-model="licenseManagerDetail.licenseModel.statusId"
                                     id="selectStatus"
                                     class="form-control"
                                     ng-disabled="!licenseManagerDetail.editMode">
-                            </select>
+                            </select> -->
                         </div>
                     </div>
                 </div>
@@ -66,7 +67,7 @@
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#tab_1" data-toggle="tab">Details</a></li>
-                    <li ng-if="licenseManagerDetail.licenseKey"><a href="#tab_2" data-toggle="tab">License Key</a></li>
+                    <li><a href="#tab_2" data-toggle="tab">License Key</a></li>
                     <li><a href="#tab_3" data-toggle="tab">Activity</a></li>
                     <li><a href="#tab_4" data-toggle="tab">Thumbprint</a></li>
                 </ul>
@@ -97,21 +98,14 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">Id:</label>
-                                    <div class="col-sm-10">
-                                        <label class="control-label">{{licenseManagerDetail.licenseModel.id}}</label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
                                     <label for="gracePeriodDays" class="col-sm-4 control-label" style="padding-top: 3px;">Grace Period Days:</label>
                                     <div class="col-sm-2" >
                                         <input id="gracePeriodDays" type="number" ng-model="licenseManagerDetail.licenseModel.gracePeriodDays" min="0" max="14" step="1" class="element-width-80"  ng-blur="licenseManagerDetail.validateIntegerOnly($event,licenseManagerDetail.licenseModel.gracePeriodDays)"  required ng-disabled="!licenseManagerDetail.editMode" />
                                     </div>
                                 </div>
-
                             </div>
                         </div>
-                        <div class="form-group">
+                        <!--<div class="form-group">
                             <label for="selectReplaced" class="col-sm-2 control-label">Replaced: </label>
                             <div class="col-sm-5">
                                 <select kendo-drop-down-list
@@ -126,7 +120,7 @@
                                         ng-disabled="!licenseManagerDetail.editMode">
                                 </select>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label for="selectEnvironment" class="col-sm-2 control-label">Environment:</label>
                             <div class="col-sm-3">
@@ -175,7 +169,7 @@
                             </div>
                         </div>
                     </div><!-- /.tab-pane -->
-                    <div class="tab-pane" id="tab_2" ng-if="licenseManagerDetail.licenseKey">
+                    <div class="tab-pane" id="tab_2">
                         <div class="form-group">
                             <label class="col-md-12 control-label">The following text block contains the details of the license information in an encrypted format.</label>
                         </div>
@@ -186,7 +180,7 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-8">
-                                <button ngclipboard data-clipboard-text="{{licenseManagerDetail.licenseKey}}" type="submit" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
+                                <button ng-disabled="licenseManagerDetail.licenseModel.statusId === 4" ngclipboard data-clipboard-text="{{licenseManagerDetail.licenseKey}}" type="submit" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
                             </div>
                         </div>
                     </div>
@@ -204,21 +198,39 @@
                     </div>
                     <div class="tab-pane" id="tab_4">
                         <div class="form-group">
+                            <label class="col-sm-2 control-label text-right">License Id:</label>
+                            <div class="col-sm-10">
+                                <label class="control-label">{{licenseManagerDetail.licenseModel.hash}}</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label text-right">Project Name:</label>
+                            <div class="col-sm-10">
+                                <label class="control-label" ng-show="!licenseManagerDetail.editMode">{{licenseManagerDetail.licenseModel.clientName}}</label>
+                                <div class="btn-group btn-with-close-icon" ng-show="licenseManagerDetail.editMode">
+                                    <input type="text" ng-model="licenseManagerDetail.licenseModel.clientName" >
+                                    <i class="fa fa-fw fa-close"  ng-click="licenseManagerDetail.licenseModel.clientName = ''"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="col-sm-2 control-label text-right">Host Name:</label>
                             <div class="col-sm-10">
-                                <label class="control-label">{{licenseManagerDetail.licenseModel.hostName}}</label>
+                                <label class="control-label" ng-show="!licenseManagerDetail.editMode">{{licenseManagerDetail.licenseModel.hostName}}</label>
+                                <div class="btn-group btn-with-close-icon" ng-show="licenseManagerDetail.editMode">
+                                    <input  type="text" ng-model="licenseManagerDetail.licenseModel.hostName">
+                                    <i class="fa fa-fw fa-close" ng-click="licenseManagerDetail.licenseModel.hostName = ''"></i>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label text-right">Website Name:</label>
                             <div class="col-sm-10">
-                                <label class="control-label">{{licenseManagerDetail.licenseModel.websiteName}}</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label text-right">Hash:</label>
-                            <div class="col-sm-10">
-                                <label class="control-label">{{licenseManagerDetail.licenseModel.hash}}</label>
+                                <label class="control-label" ng-show="!licenseManagerDetail.editMode">{{licenseManagerDetail.licenseModel.websiteName}}</label>
+                                <div class="btn-group btn-with-close-icon" ng-show="licenseManagerDetail.editMode">
+                                    <input  type="text" ng-model="licenseManagerDetail.licenseModel.websiteName" >
+                                    <i class="fa fa-fw fa-close" ng-click="licenseManagerDetail.licenseModel.websiteName = ''"></i>
+                                </div>
                             </div>
                         </div>
                     </div><!-- /.tab-pane -->

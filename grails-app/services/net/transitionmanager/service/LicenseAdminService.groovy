@@ -216,7 +216,7 @@ class LicenseAdminService extends LicenseCommonService {
 			if (!license || !license.hash) {
 				// UNLICENSED
 				licState.state = State.UNLICENSED
-				licState.message = "A license is required in order to enable all features of the application"
+				licState.message = "A license is required in order to enable all features of the application."
 				licState.valid = false
 				licState.banner = ""
 			}else {

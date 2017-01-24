@@ -50,6 +50,8 @@ export default class LicenseManagerDetail extends FormValidator{
             keyId: params.license.keyId
         };
 
+        this.licenseKey = 'Licenses has not been issued';
+
         // Creates the Project Select List
         // Define the Project Select
         this.selectProject = {};
@@ -156,11 +158,13 @@ export default class LicenseManagerDetail extends FormValidator{
     }
 
     prepareLicenseKey() {
-        this.licenseManagerService.getKeyCode(this.licenseModel.id, (data) => {
-            if(data) {
-                this.licenseKey = data;
-            }
-        });
+        if(this.licenseModel.statusId === 1) {
+            this.licenseManagerService.getKeyCode(this.licenseModel.id, (data) => {
+                if(data) {
+                    this.licenseKey = data;
+                }
+            });
+        }
     }
 
     prepareActivityList() {
@@ -279,7 +283,13 @@ export default class LicenseManagerDetail extends FormValidator{
      * Populate values
      */
     getStatusDataSource() {
-        this.selectStatusListOptions = {
+        this.statusText =
+             (this.licenseModel.statusId === 1)? 'Active' :
+                 ((this.licenseModel.statusId === 2)? 'Expired':
+                     ((this.licenseModel.statusId === 3)? 'Terminated':
+                         ((this.licenseModel.statusId === 4)? 'Pending' : '')));
+
+        /*this.selectStatusListOptions = {
             dataSource: [
                 {id: 1, name: 'Active'},
                 {id: 2, name: 'Expired'},
@@ -289,7 +299,7 @@ export default class LicenseManagerDetail extends FormValidator{
             dataTextField: 'name',
             dataValueField: 'id',
             valuePrimitive: true
-        }
+        }*/
     }
 
     /**
@@ -356,7 +366,7 @@ export default class LicenseManagerDetail extends FormValidator{
     onResetForm() {
         // Reset Project Selector
         this.resetDropDown(this.selectProject, this.licenseModel.projectId);
-        this.resetDropDown(this.selectStatus, this.licenseModel.statusId);
+        //this.resetDropDown(this.selectStatus, this.licenseModel.statusId);
         this.resetDropDown(this.selectEnvironment, this.licenseModel.environment.id);
         this.onChangeInitDate();
         this.onChangeEndDate();

@@ -352,7 +352,9 @@ class CustomTagLib implements InitializingBean {
 		if(isLicenseAdminEnabled) {
 			String stateMessage = licenseAdminService.licenseStateMessage()
 			if(stateMessage) {
-				out << "<a class='licensing-error-warning' href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-content=\" " << stateMessage << " <br /><a href='/tdstm/app/#/license/admin/list'>Please click here to renew license.</a> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
+				// Bootstrap converts the html entities into real elements
+				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/app/#/license/admin/list&apos;&quot;"
+				out << "<a class='licensing-error-warning' href=\"#\" data-html=\"true\" data-toggle=\"popover\" data-trigger=\"focus\" data-content=\" <div class='license-warning-message'> <p>" << stateMessage << "</p> </div><div class='license-warning-message-button'><button type='button' class='btn btn-primary' " <<  administerLicenseButtonURL << "  >Administer License</button></div> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
 			}
 		}
 	}

@@ -37,7 +37,7 @@ export default class LicenseManagerList {
                 {field: 'project.name', title: 'Project'},
                 {field: 'email', title: 'Contact Email'},
                 {field: 'status.name', title: 'Status'},
-                {field: 'type.name', title: 'Type'},
+                {field: 'type.name', title: 'Type',  template: '#if(data.type && data.type.name === "MULTI_PROJECT"){# Global # } else {# Single #}#'},
                 {field: 'method.name', title: 'Method'},
                 {field: 'method.id', hidden: true},
                 {field: 'method.max', title: 'Server/Tokens'},
