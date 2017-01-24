@@ -1159,7 +1159,11 @@ class AssetExportService {
                     regularFields.each { col ->
                         def prop = room[col]
                         if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                            addCell(roomSheet, col, rowNum, String.valueOf(prop?:""))
+                            if (col == 0) {
+                                addCell(roomSheet, 0, rowNum, room[0], Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                            } else {
+                                addCell(roomSheet, col, rowNum, String.valueOf(prop ?: ""))
+                            }
                         }
 
                     }
@@ -1290,7 +1294,7 @@ class AssetExportService {
                         if (currentComment.dateCreated) {
                             dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
                         }
-                        addCell(commentSheet, 0, rowNum, String.valueOf(currentComment.id))
+                        addCell(commentSheet, 0, rowNum, currentComment.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         addCell(commentSheet, 1, rowNum, currentComment.assetEntity.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         addCell(commentSheet, 2, rowNum, String.valueOf(currentComment.category))
                         addCell(commentSheet, 3, rowNum, String.valueOf(dateCommentCreated))

@@ -99,7 +99,11 @@ class WorkbookUtil {
 	 * @param value
 	 */
 	static void setCellValue(Cell cell, Object value) {
-		cell.setCellValue(value.toString())
+		if (value instanceof Long || value instanceof Integer || value instanceof Double) {
+			cell.setCellValue((Double) value)
+		} else {
+			cell.setCellValue(value.toString())
+		}
 	}
 
 	static int getColumnsCount(Sheet sheet) {
