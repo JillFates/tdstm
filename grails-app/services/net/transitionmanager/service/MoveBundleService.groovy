@@ -107,7 +107,9 @@ class MoveBundleService implements ServiceMethods {
 
 		def beGreen = params["beGreen_"+transitionId]
 		MoveBundleStep moveBundleStep = MoveBundleStep.findOrCreateByMoveBundleAndTransitionId(moveBundle, transitionId)
-		moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
+		if(params["calcMethod_"+transitionId]){
+			moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
+		}
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
 		moveBundleStep.planStartTime = TimeUtil.parseDateTime((String) params['startTime_' + transitionId])
 		moveBundleStep.planCompletionTime = TimeUtil.parseDateTime((String) params['completionTime_' + transitionId])
@@ -115,7 +117,7 @@ class MoveBundleService implements ServiceMethods {
 		//show the step progress in green when user select the beGreen option
 		moveBundleStep.showInGreen = beGreen == 'on' ? 1 : 0
 
-		save moveBundleStep
+		save(moveBundleStep)
 	}
 
 	/**
@@ -315,15 +317,15 @@ class MoveBundleService implements ServiceMethods {
 
 		if (dependencyBundle) {
 			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))
-			
+
 			if(dependencyBundle == 'onePlus'){
 				depGroups = depGroups-[0]
 			}
-			
+
 			if (depGroups.size() == 0) {
 				depGroups = [-1]
 			}
-			
+
 			if(dependencyBundle.isNumber()) {
 				depSql.append(" AND adb.dependency_bundle = $dependencyBundle")
 			}else if (dependencyBundle in ['all' , 'onePlus'] ) {

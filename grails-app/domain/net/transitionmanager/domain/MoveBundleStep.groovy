@@ -17,7 +17,7 @@ class MoveBundleStep {
 	String label                    // Value to display in UI
 	Date planStartTime              // The date/time of when the step will start, entered by the project manager enters while planning to move
 	Date planCompletionTime         // The date/time of when the step will complete, entered by the project manager enters while planning to move
-	String calcMethod               // The method that will be used to calculate the projection of completion for the step
+	String calcMethod = MoveBundleStep.METHOD_LINEAR  // The method that will be used to calculate the projection of completion for the step
 	Integer showOnDashboard = 1     // Used to determine if the Step appears in the dashboard
 	Date dateCreated
 	Date lastUpdated
