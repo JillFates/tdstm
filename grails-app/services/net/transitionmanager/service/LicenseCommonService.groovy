@@ -10,10 +10,8 @@ import org.codehaus.groovy.grails.plugins.codecs.MD5Codec
 @Slf4j(value='log', category='net.transitionmanager.service.LicenseCommon')
 class LicenseCommonService {
 	/* TAG grapper for messaging */
-	static BEGIN_LIC_TAG = "-----BEGIN LICENSE-----"
-	static END_LIC_TAG = "-----END LICENSE-----"
-	static BEGIN_REQ_TAG = "-----BEGIN LICENSE REQUEST-----"
-	static END_REQ_TAG = "-----END LICENSE REQUEST-----"
+	public static BEGIN_LIC_TAG = "-----BEGIN LICENSE-----"
+	public static END_LIC_TAG = "-----END LICENSE-----"
 
 	GrailsApplication grailsApplication
 

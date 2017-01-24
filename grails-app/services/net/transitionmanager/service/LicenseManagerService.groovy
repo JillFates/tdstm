@@ -44,8 +44,8 @@ class LicenseManagerService extends LicenseCommonService{
 	}
 
 	def loadRequest(String body){
-		String beginTag = LicenseCommonService.BEGIN_REQ_TAG
-		String endTag = LicenseCommonService.END_REQ_TAG
+		String beginTag = License.BEGIN_REQ_TAG
+		String endTag = License.END_REQ_TAG
 
 		def idxB = body.indexOf(beginTag)
 		if(idxB >= 0){
@@ -59,12 +59,11 @@ class LicenseManagerService extends LicenseCommonService{
 			body = body.trim()
 		}
 
-		log.info("Body: {}", body)
+		log.debug("Body: {}", body)
 
 		String decodedString = Smaz.decompress(Base64.decodeBase64(body))
 
-		log.info("Decoded String:")
-		log.info(decodedString)
+		log.debug("Decoded String: {}", decodedString)
 
 		def json = grails.converters.JSON.parse(decodedString)
 
@@ -72,14 +71,16 @@ class LicenseManagerService extends LicenseCommonService{
 	}
 
 	def getLicenseKey(id){
-		def lic = fetch(id)
+		LicensedClient lic = fetch(id)
 
 		if(lic) {
 			def dataJson = [
-					installationNum:lic.installationNum,
-					bannerMessage:	lic.bannerMessage,
-					hostName:		lic.hostName,
-					websitename:	lic.websitename
+					installationNum: lic.installationNum,
+					project        : lic.project,
+					gracePeriodDays: lic.gracePeriodDays,
+					bannerMessage  : lic.bannerMessage,
+					hostName       : lic.hostName,
+					websitename    : lic.websitename
 			] as JSON
 
 
@@ -90,11 +91,16 @@ class LicenseManagerService extends LicenseCommonService{
 			Date validBefore = lic.expirationDate
 			int numberOfInstances = lic.max
 
-			String licString = generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
-			//String licString = "rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L"
+			String licString = ""
 
-			log.info("licString: {}", licString)
-			licString
+			if (productKey != null && validAfter != null && validBefore != null && numberOfInstances > 0){
+				licString = generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
+
+			}
+
+			licString = "${BEGIN_LIC_TAG}\n${licString}\n${END_LIC_TAG}"
+			log.debug("licString: {}", licString)
+			return licString
 		}
 
 	}
@@ -159,6 +165,7 @@ class LicenseManagerService extends LicenseCommonService{
 
 		LicensedClient lc = LicensedClient.get(json.id)
 
+		log.debug("Jsonene {}", json)
 		if(!lc && createIfNotFound) {
 			lc = new LicensedClient()
 		}
@@ -188,9 +195,9 @@ class LicenseManagerService extends LicenseCommonService{
 			lc.expirationDate = dateParser(json.expirationDate)
 		}
 		if(json.activationDate) {
-			log.info("set Activation DAte: {}", json.activationDate)
+			log.debug("set Activation DAte: {}", json.activationDate)
 			lc.activationDate = dateParser(json.activationDate)
-			log.info("set Activation DAte: {}", lc.activationDate)
+			log.debug("set Activation DAte: {}", lc.activationDate)
 		}
 		if(json.requestDate != null) {
 			lc.requestDate = dateParser(json.requestDate)
@@ -214,18 +221,15 @@ class LicenseManagerService extends LicenseCommonService{
 		if(json.environment?.id != null) {
 			lc.environment = License.Environment.forId(json.environment?.id)
 		}
-		if(json.project?.id != null) {
-			def dProject = [
-					id:"null",
-					name:"null",
-					client: [ id:'null', label:'null']
-			]
-			if(json.project?.id.toString() != "all"){
-				Project prj = Project.get(json.project?.id)
-				dProject.id = prj?.id
-				dProject.name = prj?.name
+		if(json.project != null) {
+			if(lc.project != null){
+				def jsonProj = JSON.parse(lc.project)
+				if(jsonP.id != json.project.id){
+					lc.project = json.project?.toString()
+				}
+			}else{
+				lc.project = json.project?.toString()
 			}
-			lc.project = dProject
 		}
 		if(json.client != null) {
 			lc.client = json.client?.toString()

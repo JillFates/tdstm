@@ -78,7 +78,7 @@ class LicenseAdminService extends LicenseCommonService {
 				// BEGIN: TEST MANAGER LICENSE //
 				// String id = "f5e087eb-0ff2-433b-aa4c-04fd3f8dcedb"
 				// String key = licenseManagerService.getLicenseKey(id)
-				// log.info("OLB ($id) License Key: $key")
+				// log.debug("OLB ($id) License Key: $key")
 				// END: TEST MANAGER LICENSE //
 			}
 
@@ -99,19 +99,22 @@ class LicenseAdminService extends LicenseCommonService {
 
 				// BEGIN: TEST CLIENT LICENSE //
 				// LicenseManager manager = LicenseManager.getInstance()
-				// log.info("OLB: Load License")
+				// log.debug("OLB: Load License")
 				// licenseProvider.addLicense("tst", "rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L")
-				// log.info("OLB: Loaded")
+				// log.debug("OLB: Loaded")
 				// License lic = manager.getLicense("tst") //set the license to test
-				// log.info "License loaded (${lic.productKey} ${lic.issuer})? ${lic.goodAfterDate} - ${lic.goodBeforeDate}"
+				// log.debug("License loaded (${lic.productKey} ${lic.issuer})? ${lic.goodAfterDate} - ${lic.goodBeforeDate}")
 				// END: TEST CLIENT LICENSE //
 			}
 		}
 
 	}
 
-	private computeSeals(){
-		ProjectDailyMetric.findAll().each {
+	/**
+	 * Compute seals for those values which seal is null or empty
+	 */
+	private void computeSeals(){
+		ProjectDailyMetric.findAll("from ProjectDailyMetric as p where p.seal is null or p.seal = ''").each {
 			it.seal = it.computeSeal()
 			it.save()
 		}
@@ -194,9 +197,11 @@ class LicenseAdminService extends LicenseCommonService {
 		//If the current project is null return true
 		if(project == null) return true
 
+		String projectId = project.id
+
 		// Attempt to load the license from the EhCache
 		Cache ch = licenseCache.getCache(CACHE_NAME)
-		def cacheEl = ch.get(project.id)
+		def cacheEl = ch.get(projectId)
 
 		//licState = cacheEl?.getObjectValue()
 		licState = null
@@ -205,8 +210,8 @@ class LicenseAdminService extends LicenseCommonService {
 		// added to the cache
 		if(!licState) {
 			licState = [:]
-			ch.put(new Element(project.id, licState))
-			def licenses = DomainLicense.findAllByProject(project.id)
+			ch.put(new Element(projectId, licState))
+			def licenses = DomainLicense.findAllByProject(projectId)
 			def license = licenses.find { it.hash }
 
 			//Validate that the license in the DB has not been compromised
@@ -220,26 +225,48 @@ class LicenseAdminService extends LicenseCommonService {
 				licState.valid = false
 				licState.banner = ""
 			}else {
+				License licObj = getLicenseObj(license)
+				def jsonData = JSON.parse(licObj.subject)
+				int gracePeriodDays = jsonData.gracePeriodDays
+				String projectName	   = JSON.parse(jsonData.project)?.name
+				log.debug("Lic: " + licObj.productKey)
+				log.debug("jsonData: " + jsonData)
+				log.debug("projectName : " + projectName)
+				log.debug("project.name : " + project.name)
+
 				licState.banner = license.bannerMessage
-				Date now = new Date()
 
-				log.info("lincense: ${license.id}; [${license.activationDate} - ${license.expirationDate}]; Max: ${license.max}")
-
-				if(license.hash && !license.activationDate){
-					load(license)
+				if(projectName != project.name){
+					licState.message = "A license is required in order to enable all features of the application, did the Project Name changed?"
+					licState.valid = false
+					licState.banner = ""
+					return licState
 				}
 
-				if (now.compareTo(license.activationDate) >= 0 && now.compareTo(license.expirationDate) <= 0) {
+
+				Date now = new Date()
+				long nowTime = now.getTime()
+
+				int max = licObj.numberOfLicenses;
+
+				//log.debug("lincense: ${license.id}; [${license.activationDate} - ${license.expirationDate}]; Max: ${license.max}")
+				/*
+				if(license.hash && !license.activationDate){
+					load(license)
+				}*/
+				//if (now.compareTo(license.activationDate) >= 0 && now.compareTo(license.expirationDate) <= 0) {
+
+				if (nowTime >= licObj.goodAfterDate && nowTime <= licObj.goodBeforeDate) {
 					long numServers = assetEntityService.countServers(project)
-					log.info("NumServers: ${numServers}")
-					if (numServers <= license.max) {
+					log.debug("NumServers: ${numServers}")
+					if (numServers <= max) {
 						licState.state = State.VALID
 						licState.message = ""
 						//licState.lastCompliantDate = now
 						lastCompliantDate = now
 						licState.valid = true
 					} else {
-						int gracePeriod = gracePeriodDaysRemaining(lastCompliantDate) //licState.lastCompliantDate)
+						int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, lastCompliantDate) //licState.lastCompliantDate)
 						if(gracePeriod > 0) {
 							licState.state = State.NONCOMPLIANT
 							licState.message = "The Server count has exceeded the license limit of ${license.max} by ${numServers - license.max} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
@@ -266,10 +293,9 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 
-	int gracePeriodDaysRemaining(Date lastCompliantDate){
+	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate){
 		lastCompliantDate = lastCompliantDate?:new Date()
-		int maxDays = 5
-		Date graceDate = DateUtils.addDays(lastCompliantDate, maxDays)
+		Date graceDate = DateUtils.addDays(lastCompliantDate, gracePeriodDays)
 		Date now = new Date()
 		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
 	}
@@ -295,33 +321,36 @@ class LicenseAdminService extends LicenseCommonService {
 		LicenseManager manager = LicenseManager.getInstance()
 		manager.clearLicenseCache()
 
-		log.info("ID: " + id)
-		log.info("Hash: " + hash)
+		log.debug("ID: " + id)
+		log.debug("Hash: " + hash)
 		licenseProvider.addLicense(id, hash)
 		License licObj = manager.getLicense(id)
-		log.info("license.id: " + license.id)
-		log.info("License Obj: " + licObj)
-		log.info("License ID: " + licObj?.productKey)
+		log.debug("license.id: " + license.id)
+		log.debug("License Obj: " + licObj)
+		log.debug("License ID: " + licObj?.productKey)
 
 		def jsonData = JSON.parse(licObj.subject)
-		String installationNum= jsonData.installationNum
-		String bannerMessage  = jsonData.bannerMessage
-		String hostName 	  = jsonData.hostName
-		String websitename 	  = jsonData.websitename
+		String installationNum = jsonData.installationNum
+		String project		   = jsonData.project
+		int gracePeriodDays	   = jsonData.gracePeriodDays
+		String bannerMessage   = jsonData.bannerMessage
+		String hostName 	   = jsonData.hostName
+		String websitename 	   = jsonData.websitename
+
+		log.debug("LicenseAdminService - Project: " + project)
 
 		if(license.id != licObj.productKey){
 			throw new RuntimeException("Error loading licence data: Wrong product Key")
 		}
-		/*
-		if(getInstallationId() != installationNum){
-			log.debug("[${getInstallationId()}] == [$installationNum]")
-			throw new RuntimeException("Error loading licence data: Wrong Instalation Id")
-		}*/
-		if(getHostName() != hostName){
+
+		//if is not wildcard and Sites don't match, FAIL
+		if(DomainLicense.WILDCARD != hostName && getHostName() != hostName){
 			log.debug("[${getHostName()}] == [$hostName]")
 			throw new RuntimeException("Error loading licence data: Wrong Host Name")
 		}
-		if(getFQDN() != websitename){
+
+		//if is not wildcard and sitename don't match, FAIL
+		if(DomainLicense.WILDCARD != websitename && getFQDN() != websitename){
 			log.debug("[${getFQDN()}] == [$websitename]")
 			throw new RuntimeException("Error loading licence data: Wrong Website Name")
 		}
@@ -333,11 +362,16 @@ class LicenseAdminService extends LicenseCommonService {
 		license.expirationDate = new Date(licObj.goodBeforeDate)
 
 		def servers = assetEntityService.countServers()
-		log.info("TOTAL SERVERS: " + servers)
+		log.debug("TOTAL SERVERS: " + servers)
 
 		license.status = DomainLicense.Status.ACTIVE
 		return license.save()
 
 	}
 
+	private License getLicenseObj(DomainLicense license){
+		load(license)
+		LicenseManager manager = LicenseManager.getInstance()
+		return manager.getLicense(license.id)
+	}
 }

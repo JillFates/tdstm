@@ -8,6 +8,11 @@ import org.apache.commons.codec.binary.Base64
  * Created by octavio on 9/20/16.
  */
 class License {
+	/* TAG grapper for messaging */
+	static BEGIN_REQ_TAG = "-----BEGIN LICENSE REQUEST-----"
+	static END_REQ_TAG = "-----END LICENSE REQUEST-----"
+	static WILDCARD = ""
+
 	String id = UUID.randomUUID().toString()
 	String installationNum
 	String email
@@ -119,7 +124,8 @@ class License {
 	}
 
 	String toEncodedMessage(){
-		new String(Base64.encodeBase64(Smaz.compress(toJsonString())))
+		String body = new String(Base64.encodeBase64(Smaz.compress(toJsonString())))
+		return "${BEGIN_REQ_TAG}\n${body}\n${END_REQ_TAG}"
 	}
 
 	/** Enumerator Helpers *******************************************/

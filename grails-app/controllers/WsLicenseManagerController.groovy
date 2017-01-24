@@ -2,6 +2,7 @@ import com.github.icedrake.jsmaz.Smaz
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.service.LicenseManagerService
 import org.apache.commons.codec.binary.Base64
@@ -50,7 +51,9 @@ class WsLicenseManagerController implements ControllerMethods {
 
 		renderIfNotNull(id, {
 			if(lic){
+				lic.status = License.Status.ACTIVE
 				//TODO: send the email
+
 				return "Email sent"
 			}
 		}())
@@ -69,17 +72,16 @@ class WsLicenseManagerController implements ControllerMethods {
 			lic.save()
 			if(lic.hasErrors()){
 				def errors = ""
-				log.info("da Error {}", lic.errors)
+				log.debug("da Error {}", lic.errors)
 				lic.errors.each {err->
 					errors << "${err}/n"
 				}
 				response.status = 400
-				log.info("Errors {}", errors)
+				log.debug("Errors {}", errors)
 				render errors
 			}else{
 				renderSuccessJson("saved")
 			}
-			log.info("aggghhh")
 		}else{
 			response.status = 404 //Not Found
 			render "${id} not found."
@@ -91,8 +93,6 @@ class WsLicenseManagerController implements ControllerMethods {
 		def rjson = request.JSON
 		def body = rjson?.data
 		if(body){
-
-			log.info("Body Before: {}", body)
 			LicensedClient lc = licenseManagerService.loadRequest(body)
 			lc.save()
 
