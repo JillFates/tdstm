@@ -577,12 +577,14 @@ class MoveBundleService implements ServiceMethods {
 						cellValue = String.valueOf(currentTask?."${columnList[c]}" ?:'')
 						break
 				}
-
-				if (isNumber) {
-					WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
-				} else {
-					WorkbookUtil.addCell(sheet, c, r, cellValue)
+				if(cellValue){
+					if (isNumber) {
+						WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
+					} else {
+						WorkbookUtil.addCell(sheet, c, r, cellValue)
+					}
 				}
+
 			}
 		}
 	}

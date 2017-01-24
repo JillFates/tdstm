@@ -72,7 +72,7 @@ class TaskImportExportService implements ServiceMethods {
 
 		log.error "xfrmDateTimeToString                           () got unexpected data type ${val?.getClass()?.getName()}"
 		val?.toString()
-	}	
+	}
 
 	// ------------------------------------------------------------------------
 	// Kendo Template builder closures
@@ -1092,32 +1092,36 @@ class TaskImportExportService implements ServiceMethods {
 	private List applyTaskChanges( Map task, Map sheetInfoOpts, Map formOptions) {
 		String error
 		boolean changed = false
-		AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
-		if (assetComment) {
+		// Ignore comments
+		if(NumberUtil.isPositiveLong(task.taskNumber)){
+			AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
+			if (assetComment) {
 
-			log.debug "applyTaskChanges() About to apply changes to $assetComment"
+				log.debug "applyTaskChanges() About to apply changes to $assetComment"
 
-			// Update the person with the values passed in
-			applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true)
+				// Update the person with the values passed in
+				applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true)
 
-			changed = assetComment.dirtyPropertyNames
+				changed = assetComment.dirtyPropertyNames
 
-			if (assetComment.id) {
-				log.debug "applyTaskChanges() is update person $assetComment (${assetComment.id}) properties: ${assetComment.dirtyPropertyNames}"
-			} else {
-				log.debug "applyTaskChanges() is creating task $assetComment"
-			}
+				if (assetComment.id) {
+					log.debug "applyTaskChanges() is update person $assetComment (${assetComment.id}) properties: ${assetComment.dirtyPropertyNames}"
+				} else {
+					log.debug "applyTaskChanges() is creating task $assetComment"
+				}
 
-			if (changed) {
-				recordChangeHistory(task.changeHistory, assetComment)
-				save assetComment
-				if (assetComment.hasErrors()) {
-					task.changeHistory = null
-					error = GormUtil.allErrorsString(assetComment)
-					assetComment.discard()
+				if (changed) {
+					recordChangeHistory(task.changeHistory, assetComment)
+					save assetComment
+					if (assetComment.hasErrors()) {
+						task.changeHistory = null
+						error = GormUtil.allErrorsString(assetComment)
+						assetComment.discard()
+					}
 				}
 			}
 		}
+
 		return [error, changed]
 	}
 
@@ -1184,7 +1188,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @controllerMethod
 	 */
 	Map generateModelForPostResults(Map formOptions) {
-	
+
 		Map model = [:]
 
 		model.filename = formOptions.filename
