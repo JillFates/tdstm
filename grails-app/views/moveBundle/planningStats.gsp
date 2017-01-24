@@ -64,7 +64,7 @@ $(document).ready(function() {
 
 <%-- Analysis Phase --%>
 			<div class="dashboardContainer">
-				<div class="dashboard_div col-sm-12 col-md-12 col-lg-3" style="min-width: 280px;" >
+				<div class="dashboard_div col-sm-12" style="min-width: 280px; width: 280px;" >
 					<span class="dashboard_head">Discovery Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 						<tr>
@@ -162,7 +162,7 @@ $(document).ready(function() {
 
 	<%-- Analysis Phase --%>
 
-				<div class="dashboard_div col-sm-12 col-md-12 col-lg-3" style="min-width: 200px" >
+				<div class="dashboard_div col-sm-12" style="min-width:280px; width: 280px;" >
 					<span class="dashboard_head">Analysis Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 						<tr>
