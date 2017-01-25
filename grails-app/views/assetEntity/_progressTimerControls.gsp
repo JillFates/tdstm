@@ -10,7 +10,7 @@
 			</g:each>
 		</select>
 	</div>
-	<div class="col-xs-4 item-wrapper progress-bar-wrapper">
+	<div class="col-xs-4 item-wrapper progress-bar-wrapper" style="display: none;">
 		<div class="progress-bar-svg"></div>
 	</div>
 </div>
