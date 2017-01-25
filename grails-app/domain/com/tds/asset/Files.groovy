@@ -10,7 +10,7 @@ class Files extends AssetEntity {
 	String LUN
 
 	static constraints = {
-		fileFormat blank: false
+		fileFormat nullable: true
 		LUN(nullable: true)
 	}
 

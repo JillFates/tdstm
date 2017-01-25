@@ -9,7 +9,7 @@ class Database extends AssetEntity {
 	String dbFormat
 
 	static constraints = {
-		dbFormat blank: false
+		dbFormat nullable: true
 	}
 
 	static mapping = {

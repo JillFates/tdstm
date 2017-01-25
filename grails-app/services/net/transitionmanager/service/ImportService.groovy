@@ -1502,7 +1502,7 @@ class ImportService implements ServiceMethods {
 
 			if (!asset.id) {
 				// Initialize extra properties for new asset
-				asset.scale = SizeScale.GB
+				// asset.scale = SizeScale.GB
 			}
 
 			dtvList.each {

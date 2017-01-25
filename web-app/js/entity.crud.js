@@ -56,7 +56,8 @@ var EntityCrud = ( function($) {
 	 * @return true if valid
 	 **/
 	var validateStorageForm = function(form) {
-		var ok = validateCommonFields(form);
+		return validateCommonFields(form);
+		/*var ok = validateCommonFields(form);
 		if (ok) {
 			var size = $('#'+form+' #size').val();
 			if ( size=='' || isNaN(size)) {
@@ -67,7 +68,7 @@ var EntityCrud = ( function($) {
 				ok = false;
 			}
 		}
-		return ok
+		return ok*/
 	};
 
 	/**
@@ -76,7 +77,8 @@ var EntityCrud = ( function($) {
 	 **/
 	var validateDBForm = function(form, alertErrors) {
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true;
-		var ok = validateCommonFields(form, alertErrors);
+		return validateCommonFields(form, alertErrors);
+		/*var ok = validateCommonFields(form, alertErrors);
 		if (ok) {
 		    var size = $('#'+form+' #size').val();
 		    if ( size=='' || isNaN(size)){
@@ -92,7 +94,7 @@ var EntityCrud = ( function($) {
 				ok = false;
 		    }
 		}
-		return ok
+		return ok*/
 	};
 
 	/**

@@ -56,7 +56,7 @@
 						</tr>
 
 						<tr>
-							<td class="label ${config.fileFormat} ${highlightMap.fileFormat?:''}" nowrap="nowrap"><label for="fileFormat">Format<span style="color: red;">*</span></label>
+							<td class="label ${config.fileFormat} ${highlightMap.fileFormat?:''}" nowrap="nowrap"><label for="fileFormat">Format</label>
 							</td>
 							<td><input type="text" id="fileFormat" class="${config.fileFormat}" name="fileFormat"
 									   value="${fileInstance.fileFormat}" />
@@ -76,7 +76,7 @@
 
 						</tr>
 						<tr>
-							<td class="label ${config.size} ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size<span style="color: red;">*</span></label></td>
+							<td class="label ${config.size} ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size</label></td>
 							<td nowrap="nowrap" class="sizeScale">
 								<input type="text" id="size" class="${config.size}" name="size" size="10"
 									   value="${fileInstance.size}" /> &nbsp;
