@@ -814,7 +814,7 @@ class AssetExportService {
 
                     // Add the appId column to column 0 if it exists
                     if (hasIdCol) {
-                        addCell(appSheet, appSheetColumnNames[idColName], applicationCount, (Double)(app.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                        addCell(appSheet, appSheetColumnNames[idColName], applicationCount, app.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                     }
 
                     for (int i=0; i < appColumnNameList.size(); i++) {
@@ -1211,7 +1211,7 @@ class AssetExportService {
 
                     rackSheetColumns.eachWithIndex{column, i->
                         if(column == 'rackId'){
-                            addCell(rackSheet, 0, rowNum, (racks[idx].id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                            addCell(rackSheet, 0, rowNum, currentRack.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else {
                             def prop = currentRack[rackMap[column]]
                             if(column =="Source")
