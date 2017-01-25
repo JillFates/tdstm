@@ -111,6 +111,7 @@
 						format: "{0:MM/dd/yyyy}"
 					}
 				],
+                height: 540,
 				sortable: true,
 				filterable: {
 					mode: "row"
