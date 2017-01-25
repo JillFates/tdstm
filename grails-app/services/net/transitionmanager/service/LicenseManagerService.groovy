@@ -223,7 +223,7 @@ class LicenseManagerService extends LicenseCommonService{
 		}
 		if(json.project != null) {
 			if(lc.project != null){
-				def jsonProj = JSON.parse(lc.project)
+				def jsonP = JSON.parse(lc.project)
 				if(jsonP.id != json.project.id){
 					lc.project = json.project?.toString()
 				}

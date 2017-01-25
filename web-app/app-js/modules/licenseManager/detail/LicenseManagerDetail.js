@@ -21,7 +21,10 @@ export default class LicenseManagerDetail extends FormValidator{
             id: params.license.id,
             ownerName: params.license.owner.name,
             email: params.license.email,
-            projectId: params.license.project.id,
+            project: {
+                id: params.license.project.id,
+                name: params.license.project.name,
+            },
             clientId: params.license.client.id,
             clientName: params.license.client.name,
             statusId: params.license.status.id,
@@ -51,12 +54,6 @@ export default class LicenseManagerDetail extends FormValidator{
         };
 
         this.licenseKey = 'Licenses has not been issued';
-
-        // Creates the Project Select List
-        // Define the Project Select
-        this.selectProject = {};
-        this.selectProjectListOptions = [];
-        this.getProjectDataSource();
 
         // Defined the Environment Select
         this.selectEnvironment = {};
@@ -97,36 +94,6 @@ export default class LicenseManagerDetail extends FormValidator{
 
         this.prepareControlActionButtons();
 
-    }
-
-    /**
-     * Populate the Project dropdown values
-     */
-    getProjectDataSource() {
-        this.selectProjectListOptions = {
-            dataSource: {
-                transport: {
-                    read: (e) => {
-                        this.licenseManagerService.getProjectDataSource((data) => {
-                            if(!this.licenseModel.projectId) {
-                                this.licenseModel.projectId = data[0].id;
-                            }
-
-                            this.saveForm(this.licenseModel);
-                            return e.success(data);
-                        })
-                    }
-                }
-            },
-            dataTextField: 'name',
-            dataValueField: 'id',
-            valuePrimitive: true,
-            select: ((e) => {
-                // On Project Change, select the Client Name
-                var item = this.selectProject.dataItem(e.item);
-                this.licenseModel.clientName = item.client.name;
-            })
-        };
     }
 
     /**
@@ -185,7 +152,10 @@ export default class LicenseManagerDetail extends FormValidator{
      */
     activateLicense() {
         this.licenseManagerService.activateLicense(this.licenseModel, (data) => {
-            //this.prepareLicenseKey();
+            this.licenseModel.statusId = 1;
+            this.saveForm(this.licenseModel);
+            this.prepareControlActionButtons();
+            this.prepareLicenseKey();
         });
     }
 
@@ -268,6 +238,8 @@ export default class LicenseManagerDetail extends FormValidator{
                             if(!this.licenseModel.environmentId) {
                                 this.licenseModel.environmentId = data[0].id;
                             }
+
+                            this.saveForm(this.licenseModel);
                             return e.success(data);
                         })
                     }
@@ -361,12 +333,9 @@ export default class LicenseManagerDetail extends FormValidator{
     }
 
     /**
-     * Depeding the number of fields and type of field, the reset can't be on the FormValidor, at least not now
+     * Depending the number of fields and type of field, the reset can't be on the FormValidor, at least not now
      */
     onResetForm() {
-        // Reset Project Selector
-        this.resetDropDown(this.selectProject, this.licenseModel.projectId);
-        //this.resetDropDown(this.selectStatus, this.licenseModel.statusId);
         this.resetDropDown(this.selectEnvironment, this.licenseModel.environment.id);
         this.onChangeInitDate();
         this.onChangeEndDate();

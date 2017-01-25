@@ -52,10 +52,15 @@ export default class LicenseManagerService {
             activationDate: license.initDate,
             expirationDate: license.endDate,
             status: { id: license.statusId },
-            project: { id: (license.projectId !== 'all')? parseInt(license.projectId) : license.projectId  }, // We pass 'all' when is multiproject
+            project: {
+                id: (license.project.id !== 'all')? parseInt(license.project.id) : license.project.id,  // We pass 'all' when is multiproject
+                name: license.project.name
+            },
             bannerMessage: license.bannerMessage,
-            gracePeriodDays: license.gracePeriodDays
-            };
+            gracePeriodDays: license.gracePeriodDays,
+            websitename: license.websiteName,
+            hostName: license.hostName
+        };
         if(license.method !== 3) {
             licenseModified.method.max = parseInt(license.method.max);
         }
@@ -70,7 +75,7 @@ export default class LicenseManagerService {
      * @param callback
      */
     activateLicense(license, callback) {
-        this.restService.licenseManagerServiceHandler().activateLicense(license, (data) => {
+        this.restService.licenseManagerServiceHandler().activateLicense(license.id, (data) => {
             this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'The license was activated and the license was emailed.'});
             return callback(data);
         });

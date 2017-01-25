@@ -114,9 +114,9 @@ export default class RestServiceHandler {
                 this.req.url =  '../ws/manager/license/' + licenseId + '/key';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            saveLicense: (licenseid, licenseModified, onSuccess, onError) => {
+            saveLicense: (licenseId, licenseModified, onSuccess, onError) => {
                 this.req.method = 'PUT';
-                this.req.url =  '../ws/manager/license/' + licenseid;
+                this.req.url =  '../ws/manager/license/' + licenseId;
                 this.req.data = licenseModified;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
@@ -125,11 +125,10 @@ export default class RestServiceHandler {
                 this.req.url =  '../ws/manager/license/'+data.id;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            activateLicense: (data, callback) => {
+            activateLicense: (licenseId, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/???';
-                this.req.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
+                this.req.url =  '../ws/manager/license/' + licenseId + '/activate';
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             }
         };
     }

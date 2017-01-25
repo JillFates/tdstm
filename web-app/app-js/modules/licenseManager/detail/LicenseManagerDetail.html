@@ -28,13 +28,7 @@
                     <div class="form-group">
                         <label for="selectProject" class="col-sm-3 control-label">Project: </label>
                         <div class="col-sm-9">
-                            <select kendo-drop-down-list="licenseManagerDetail.selectProject"
-                                    k-options="licenseManagerDetail.selectProjectListOptions"
-                                    k-ng-model="licenseManagerDetail.licenseModel.projectId"
-                                    id="selectProject"
-                                    class="form-control"
-                                    ng-disabled="!licenseManagerDetail.editMode">
-                            </select>
+                            <label id="selectProject" class="control-label ng-binding">{{licenseManagerDetail.licenseModel.project.name}}</label>
                         </div>
                     </div>
                 </div>
@@ -43,18 +37,11 @@
                         <label for="selectStatus" class="col-sm-4 control-label">Status: </label>
                         <div class="col-sm-8">
                             <label id="selectStatus" class="control-label ng-binding">{{licenseManagerDetail.statusText}}</label>
-                            <!-- <select kendo-drop-down-list="licenseManagerDetail.selectStatus"
-                                    k-options="licenseManagerDetail.selectStatusListOptions"
-                                    k-ng-model="licenseManagerDetail.licenseModel.statusId"
-                                    id="selectStatus"
-                                    class="form-control"
-                                    ng-disabled="!licenseManagerDetail.editMode">
-                            </select> -->
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <!--<div class="row">
                 <div class="col-sm-5">
                     <div class="form-group">
                         <label for="selectClient" class="col-sm-3 control-label">Client: </label>
@@ -63,7 +50,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#tab_1" data-toggle="tab">Details</a></li>
@@ -206,10 +193,10 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label text-right">Project Name:</label>
                             <div class="col-sm-10">
-                                <label class="control-label" ng-show="!licenseManagerDetail.editMode">{{licenseManagerDetail.licenseModel.clientName}}</label>
+                                <label class="control-label" ng-show="!licenseManagerDetail.editMode">{{licenseManagerDetail.licenseModel.project.name}}</label>
                                 <div class="btn-group btn-with-close-icon" ng-show="licenseManagerDetail.editMode">
-                                    <input type="text" ng-model="licenseManagerDetail.licenseModel.clientName" >
-                                    <i class="fa fa-fw fa-close"  ng-click="licenseManagerDetail.licenseModel.clientName = ''"></i>
+                                    <input type="text" ng-model="licenseManagerDetail.licenseModel.project.name" >
+                                    <i class="fa fa-fw fa-close"  ng-click="licenseManagerDetail.licenseModel.project.name = '';"></i>
                                 </div>
                             </div>
                         </div>
