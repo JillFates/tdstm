@@ -902,7 +902,7 @@ class ProjectService implements ServiceMethods {
 		log.info "Project Daily Metrics will run from $startDate to $endDate"
 
 		def metricsByProject
-		def metrics
+		List<ProjectDailyMetric> metrics
 		List<Project> projects
 		def sqlSearchDate
 
@@ -930,7 +930,7 @@ class ProjectService implements ServiceMethods {
 
 			// **************************************
 			// Retrieve person/user login information
-			fillUsersMetrics(metrics, metricsByProject, projects, sqlSearchDate)
+			fillUsersMetrics(metricsByProject, projects, sqlSearchDate)
 
 			// Deletes any existing record
 			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
@@ -1180,7 +1180,7 @@ class ProjectService implements ServiceMethods {
 	/**
 	 * Function used by activitySnapshot to retrieve persons and user login information
 	 */
-	private void fillUsersMetrics(metrics, metricsByProject, List<Project> projects, sqlSearchDate) {
+	private void fillUsersMetrics(metricsByProject, List<Project> projects, sqlSearchDate) {
 
 		def projectDailyMetric
 		def companyIds = [0]

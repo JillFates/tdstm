@@ -37,6 +37,10 @@ class ProjectDailyMetric {
 		version false
 	}
 
+	static constraints = {
+		seal nullable: false, blank:false
+	}
+
 	//Services
 	LicenseAdminService licenseAdminService
 	static transients=['licenseAdminService']
@@ -66,8 +70,21 @@ class ProjectDailyMetric {
 		return computeSeal() == seal
 	}
 
-	def beforeInsert(){
-		licenseCompliant = licenseAdminService.isLicenseCompliant(project)
-		seal = computeSeal()
+	/**
+	 * WARNING! READ this before changing it for something else.
+	 * For a STUPID reason grails don't want to call beforeInsert in the ProjectService:activitySnapshot
+	 * 	if (!metric.save(flush:true))
+	 *
+	 * it's calling beforeValidate and failing because the seal is null, so I'll add the seal computing logic here.
+	 * this is called before any insert and update, so I'll only compute the seal if the "id" is null
+	 *
+	 * If some future programmer get's to know why this happened I'll be glad to know @tavo_luna
+	 * @return
+	 */
+	def beforeValidate(){
+		if(!id && !seal){
+			seal = computeSeal()
+			licenseCompliant = licenseAdminService.isLicenseCompliant(project)
+		}
 	}
 }

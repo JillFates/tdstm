@@ -274,7 +274,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 	boolean isLicenseCompliant(Project project){
 		Map licState = getLicenseStateMap(project)
-		return licState..state != State.NONCOMPLIANT
+		return licState.state != State.NONCOMPLIANT
 	}
 
 
