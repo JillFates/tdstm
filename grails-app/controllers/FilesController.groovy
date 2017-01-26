@@ -234,7 +234,7 @@ class FilesController implements ControllerMethods {
 		 planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
 		 config: configMap.config, customs: configMap.customs,
 		 environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
-		 highlightMap: assetEntityService.getHighlightedInfo('Files', files, configMap)]
+		 highlightMap: assetEntityService.getHighlightedInfo('Files', files, configMap), project:project]
 	}
 
 	def show(String id) {
