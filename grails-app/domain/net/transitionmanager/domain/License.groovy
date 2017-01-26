@@ -9,9 +9,9 @@ import org.apache.commons.codec.binary.Base64
  */
 class License {
 	/* TAG grapper for messaging */
-	static BEGIN_REQ_TAG = "-----BEGIN LICENSE REQUEST-----"
-	static END_REQ_TAG = "-----END LICENSE REQUEST-----"
-	static WILDCARD = ""
+	static String BEGIN_REQ_TAG = "-----BEGIN LICENSE REQUEST-----"
+	static String END_REQ_TAG = "-----END LICENSE REQUEST-----"
+	static String WILDCARD = ""
 
 	String id = UUID.randomUUID().toString()
 	String installationNum
@@ -59,16 +59,20 @@ class License {
 	PartyGroup getClient(){
 		PartyGroup client
 		if(project != "all") {
-			def project = Project.get(project)
+			Project project = Project.get(project)
 			client = project?.client
 		}
 
 		return client
 	}
 
-	def toJsonMap() {
+	/*
+	 TODO: Add comments, change all calls to this to toMap()
+	Return a Map of the properties
+	*/
+	Map toJsonMap() {
 		PartyGroup client = getClient()
-		def dProject = [
+		Map dProject = [
 		        id:"",
 				name:"all"
 		]
@@ -79,7 +83,7 @@ class License {
 			dProject.name = prj?.name
 		}
 
-		[
+		Map data = [
 			id				: id,
 			email			: email,
 			environment		: [
@@ -117,6 +121,8 @@ class License {
 			websitename		: websitename,
 			bannerMessage	: bannerMessage
 		]
+
+		return data
 	}
 
 	String toJsonString(){
@@ -195,4 +201,5 @@ class License {
 			values().find { it.id == id }
 		}
 	}
+
 }

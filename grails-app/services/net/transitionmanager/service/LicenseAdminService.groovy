@@ -34,8 +34,6 @@ class LicenseAdminService extends LicenseCommonService {
 	LicenseCommonService  licenseCommonService
 	SecurityService	securityService
 
-	static Date lastCompliantDate = new Date()
-
 	/**
 	 * Initialize the license service
 	 * @return
@@ -48,14 +46,11 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 		*/
 
-		log.debug("computing Seals")
-		computeSeals()
-
 		if(isEnabled() && !tdsPasswordProvider) {
 
 			if(!licenseCache.getCache(CACHE_NAME)) {
 				log.debug("configuring cache")
-				int ttl = 15 * 60
+				int ttl = 15 * 60  //TODO: 20170124 Move to a config variable
 				Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, ttl, 0)
 				licenseCache.addCache(memoryOnlyCache)
 			}
@@ -110,21 +105,12 @@ class LicenseAdminService extends LicenseCommonService {
 
 	}
 
-	/**
-	 * Compute seals for those values which seal is null or empty
-	 */
-	private void computeSeals(){
-		ProjectDailyMetric.findAll("from ProjectDailyMetric as p where p.seal is null or p.seal = ''").each {
-			it.seal = it.computeSeal()
-			it.save()
-		}
-	}
-
-	def isEnabled(){
+	boolean isEnabled(){
 		return licenseCommonService.isAdminEnabled()
 	}
 
 	/**
+	 * @deprecated
 	 * return the license Message for the required project or current if Null
 	 * @return the License Message
 	 */
@@ -132,6 +118,10 @@ class LicenseAdminService extends LicenseCommonService {
 		return getLicenseStateMessage(project)
 	}
 
+	/**
+	 * return the license Message for the required project or current if Null
+	 * @return the License Message
+	 */
 	String getLicenseStateMessage(Project project = null){
 		return getLicenseStateMap(project)?.message
 	}
@@ -144,7 +134,7 @@ class LicenseAdminService extends LicenseCommonService {
 		return getLicenseStateMap(project)?.state
 	}
 
-	boolean hasModule(projectGuid, moduleName){
+	boolean hasModule(String projectGuid, String moduleName){
 		LicenseManager manager = LicenseManager.getInstance()
 		License license = manager.getLicense("global")
 		//License license = manager.getLicense("project:<Guid>")
@@ -200,19 +190,20 @@ class LicenseAdminService extends LicenseCommonService {
 		String projectId = project.id
 
 		// Attempt to load the license from the EhCache
-		Cache ch = licenseCache.getCache(CACHE_NAME)
-		def cacheEl = ch.get(projectId)
+		Cache cache = licenseCache.getCache(CACHE_NAME)
+		def cacheEl = cache.get(projectId)
 
-		//licState = cacheEl?.getObjectValue()
-		licState = null
+		licState = cacheEl?.getObjectValue()
+		//licState = null  //testing proposes
 
 		// If the license wasn't in the cache then one will be created and
 		// added to the cache
 		if(!licState) {
 			licState = [:]
-			ch.put(new Element(projectId, licState))
-			def licenses = DomainLicense.findAllByProject(projectId)
-			def license = licenses.find { it.hash }
+			cache.put(new Element(projectId, licState))
+			List<DomainLicense> licenses = DomainLicense.findAllByProject(projectId) //dateCreated?
+			//TODO: iterate over the licenses to find the one that fits
+			DomainLicense license = licenses.find { it.hash }
 
 			//Validate that the license in the DB has not been compromised
 			//LicenseManager manager = LicenseManager.getInstance()
@@ -228,6 +219,7 @@ class LicenseAdminService extends LicenseCommonService {
 				License licObj = getLicenseObj(license)
 				def jsonData = JSON.parse(licObj.subject)
 				int gracePeriodDays = jsonData.gracePeriodDays
+
 				String projectName	   = JSON.parse(jsonData.project)?.name
 				log.debug("Lic: " + licObj.productKey)
 				log.debug("jsonData: " + jsonData)
@@ -236,8 +228,9 @@ class LicenseAdminService extends LicenseCommonService {
 
 				licState.banner = license.bannerMessage
 
+				//The Name still the same?
 				if(projectName != project.name){
-					licState.message = "A license is required in order to enable all features of the application, did the Project Name changed?"
+					licState.message = "The name of the project was changed but must be '${projectName}' for license compliance"
 					licState.valid = false
 					licState.banner = ""
 					return licState
@@ -246,15 +239,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 				Date now = new Date()
 				long nowTime = now.getTime()
-
 				int max = licObj.numberOfLicenses;
-
-				//log.debug("lincense: ${license.id}; [${license.activationDate} - ${license.expirationDate}]; Max: ${license.max}")
-				/*
-				if(license.hash && !license.activationDate){
-					load(license)
-				}*/
-				//if (now.compareTo(license.activationDate) >= 0 && now.compareTo(license.expirationDate) <= 0) {
 
 				if (nowTime >= licObj.goodAfterDate && nowTime <= licObj.goodBeforeDate) {
 					long numServers = assetEntityService.countServers(project)
@@ -262,11 +247,10 @@ class LicenseAdminService extends LicenseCommonService {
 					if (numServers <= max) {
 						licState.state = State.VALID
 						licState.message = ""
-						//licState.lastCompliantDate = now
-						lastCompliantDate = now
+						licState.lastCompliantDate = now
 						licState.valid = true
 					} else {
-						int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, lastCompliantDate) //licState.lastCompliantDate)
+						int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
 						if(gracePeriod > 0) {
 							licState.state = State.NONCOMPLIANT
 							licState.message = "The Server count has exceeded the license limit of ${license.max} by ${numServers - license.max} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
@@ -288,23 +272,29 @@ class LicenseAdminService extends LicenseCommonService {
 		return licState
 	}
 
-	boolean isLicenseComplient(Project project){
-		return isValid(project)
+	boolean isLicenseCompliant(Project project){
+		Map licState = getLicenseStateMap(project)
+		return licState..state != State.NONCOMPLIANT
 	}
 
 
-	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate){
-		lastCompliantDate = lastCompliantDate?:new Date()
+	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate = new Date()){
 		Date graceDate = DateUtils.addDays(lastCompliantDate, gracePeriodDays)
 		Date now = new Date()
 		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
 	}
 
-	def load(DomainLicense license){
+	/**
+	 * Comments, comments, comments
+	 * @param license
+	 * @return
+	 */
+	boolean load(DomainLicense license){
 		initialize()
 		String id = license.id
 		String hash = license.hash
 
+		//strip the actual license from the envelope
 		String beginTag = LicenseCommonService.BEGIN_LIC_TAG
 		String endTag = LicenseCommonService.END_LIC_TAG
 		def idxB = hash.indexOf(beginTag)
@@ -330,10 +320,10 @@ class LicenseAdminService extends LicenseCommonService {
 		log.debug("License ID: " + licObj?.productKey)
 
 		def jsonData = JSON.parse(licObj.subject)
-		String installationNum = jsonData.installationNum
-		String project		   = jsonData.project
-		int gracePeriodDays	   = jsonData.gracePeriodDays
+		//String installationNum = jsonData.installationNum
+		//int gracePeriodDays	   = jsonData.gracePeriodDays
 		String bannerMessage   = jsonData.bannerMessage
+		String project		   = jsonData.project
 		String hostName 	   = jsonData.hostName
 		String websitename 	   = jsonData.websitename
 
@@ -355,14 +345,16 @@ class LicenseAdminService extends LicenseCommonService {
 			throw new RuntimeException("Error loading licence data: Wrong Website Name")
 		}
 
+		//Refreshing database license properties with the actual values from the Manager License, Keep client honest
+
 		license.hash = hash
 		license.max = licObj.numberOfLicenses
 		license.bannerMessage = bannerMessage
 		license.activationDate = new Date(licObj.goodAfterDate)
 		license.expirationDate = new Date(licObj.goodBeforeDate)
 
-		def servers = assetEntityService.countServers()
-		log.debug("TOTAL SERVERS: " + servers)
+		//def servers = assetEntityService.countServers()
+		//log.debug("TOTAL SERVERS: " + servers)
 
 		license.status = DomainLicense.Status.ACTIVE
 		return license.save()

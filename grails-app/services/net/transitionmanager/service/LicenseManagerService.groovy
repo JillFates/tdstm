@@ -75,12 +75,13 @@ class LicenseManagerService extends LicenseCommonService{
 
 		if(lic) {
 			def dataJson = [
-					installationNum: lic.installationNum,
-					project        : lic.project,
-					gracePeriodDays: lic.gracePeriodDays,
-					bannerMessage  : lic.bannerMessage,
-					hostName       : lic.hostName,
-					websitename    : lic.websitename
+					installationNum : lic.installationNum,
+					project         : lic.project,
+					gracePeriodDays : lic.gracePeriodDays,
+					bannerMessage   : lic.bannerMessage,
+					hostName        : lic.hostName,
+					websitename     : lic.websitename,
+					version			: 1
 			] as JSON
 
 

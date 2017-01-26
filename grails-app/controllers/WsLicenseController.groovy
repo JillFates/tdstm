@@ -4,6 +4,7 @@ import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.LicenseCommonService
@@ -32,32 +33,34 @@ class WsLicenseController implements ControllerMethods {
 
 	/**
 	 * Get the List of projects attached with the clients, this is being used to select Client as well
+	 * TODO: Do we need a list of projects in the Manager? What for? the Project is a String as far as I know
 	 * @return
      */
 	def fetchProjects(){
-		def projects = projectService.getUserProjects()
-		projects = projects.inject([[id:"all", name:"-- Multiple Projects --", client:[id:'', name:'']]]){ arr, p ->
-			def client = p.client
+		List<Project> projects = projectService.getUserProjects()
+
+		List<Map> initialData = [[id:"all", name:"-- Multiple Projects --", client:[id:'', name:'']]]
+
+		List<Map> projectsMap = projects.inject(initialData){ arr, p ->
+			PartyGroup client = p.client
 			arr << [id:p.id, name:p.projectCode, client:[id:client.id, name:client.name]]
 		}
 
-		//OL: Should we render using RESTFull ¬¬
-		//renderAsJson projMap
-		renderSuccessJson(projects)
+		renderSuccessJson(projectsMap)
 	}
 
+	//TODO: OLB Refactor into the ControllerMethods
 	private renderEnum(daEnum){
-		def list = daEnum.values().collect {
+		List list = daEnum.values().collect {
 			[
 					id:it.id,
 					name:it.name()
 			]
 		}
 
-		//OL: Should we render using RESTFull ¬¬
-		//renderAsJson map
 		renderSuccessJson(list)
 	}
+
 	def fetchEnvironments(){
 		renderEnum(License.Environment)
 	}
@@ -89,6 +92,7 @@ class WsLicenseController implements ControllerMethods {
 		if(lic) {
 			renderSuccessJson(lic.toJsonMap())
 		}else{
+			//TODO: OLB 20170124 Change this to the AJax Approach
 			response.status = 404 //Not Found
 			render "${id} not found."
 		}
@@ -105,6 +109,7 @@ class WsLicenseController implements ControllerMethods {
 		if(lic) {
 			renderSuccessJson(lic.toEncodedMessage())
 		}else{
+			//TODO: OLB 20170124 Change this to the AJax Approach
 			response.status = 404 //Not Found
 			render "${id} not found."
 		}
@@ -121,6 +126,7 @@ class WsLicenseController implements ControllerMethods {
 			lic.delete()
 			renderSuccessJson("Successful Deleted")
 		}else{
+			//TODO: OLB 20170124 Change this to the AJax Approach
 			response.status = 404 //Not Found
 			render "${id} not found."
 		}
@@ -167,7 +173,6 @@ class WsLicenseController implements ControllerMethods {
 			}
 
 			if (!lic.hasErrors() && lic.save(flush:true)) {
-				log.error("OLB: NDA: {}", lic.hasErrors())
 				renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
 			}else{
 				lic.errors.each {
@@ -205,6 +210,7 @@ class WsLicenseController implements ControllerMethods {
 					}
 				//}
 			}else{
+				//TODO: OLB 20170124 Change this to the AJax Approach
 				response.status = 404 //Not Found
 				render "${params.id} not found."
 			}

@@ -16,6 +16,8 @@ class LicenseCommonService {
 	GrailsApplication grailsApplication
 
 	/**
+	 * @deprecate
+	 * Is not in actual USE....
 	 * Get the Installation ID from the current Instance
 	 * Right now this is performed by concatenating the hostname + '|' + fqdn
 	 * as a hardware key, this algorithm can be changed later to something else
@@ -72,8 +74,8 @@ class LicenseCommonService {
 	 * @param divider
 	 * @return
 	 */
-	String getMacAddresses(divider='|'){
-		def macs = NetworkInterface.networkInterfaces.collect { iface ->
+	String getMacAddresses(String divider='|'){
+		List<String> macs = NetworkInterface.networkInterfaces.collect { iface ->
 			iface.hardwareAddress?.encodeHex().toString()
 		}
 
@@ -85,7 +87,7 @@ class LicenseCommonService {
 	 * @return
 	 */
 	boolean isManagerEnabled(){
-		return (grailsApplication.config.tdstm?.license?.manager?.enabled)?true:false
+		return grailsApplication.config.tdstm?.license?.manager?.enabled
 	}
 
 	/**
@@ -93,7 +95,7 @@ class LicenseCommonService {
 	 * @return
 	 */
 	boolean isAdminEnabled(){
-		return (grailsApplication.config.tdstm?.license?.enabled)?true:false
+		return grailsApplication.config.tdstm?.license?.enabled
 	}
 
 	/**

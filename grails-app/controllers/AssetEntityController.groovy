@@ -28,7 +28,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -2066,7 +2065,7 @@ class AssetEntityController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this, 'to view Tasks')
 		if (!project) return
 
-		licenseAdminService.isLicenseComplient(project)
+		licenseAdminService.isLicenseCompliant(project)
 
 		try {
 			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {

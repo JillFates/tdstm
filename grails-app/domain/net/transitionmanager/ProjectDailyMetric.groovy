@@ -1,6 +1,7 @@
 package net.transitionmanager
 
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.LicenseAdminService
 import org.apache.commons.codec.digest.DigestUtils
 
 class ProjectDailyMetric {
@@ -36,6 +37,10 @@ class ProjectDailyMetric {
 		version false
 	}
 
+	//Services
+	LicenseAdminService licenseAdminService
+	static transients=['licenseAdminService']
+
 	String computeSeal(){
 		String cat = "" +
 				project?.id +
@@ -62,6 +67,7 @@ class ProjectDailyMetric {
 	}
 
 	def beforeInsert(){
+		licenseCompliant = licenseAdminService.isLicenseCompliant(project)
 		seal = computeSeal()
 	}
 }
