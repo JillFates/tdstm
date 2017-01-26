@@ -257,7 +257,7 @@ class AuthController implements ControllerMethods {
 		catch (e) {
 			String exceptionMessage = controllerService.getExceptionMessage(this, e)
 			flash.message = exceptionMessage + '. Please contact support if you require assistance.'
-			log.error("Error applying new password: ", exceptionMessage)
+			log.error("Error applying new password: ${exceptionMessage}")
 			resetPassword()
 		}
 	}
