@@ -194,8 +194,9 @@ class LicenseAdminService extends LicenseCommonService {
 		def cacheEl = cache.get(projectId)
 
 		licState = cacheEl?.getObjectValue()
-		//licState = null  //testing proposes
+		licState = null  //testing proposes
 
+		log.debug("OLB: ${licState}")
 		// If the license wasn't in the cache then one will be created and
 		// added to the cache
 		if(!licState) {
@@ -278,7 +279,8 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 
-	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate = new Date()){
+	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate){
+		lastCompliantDate = lastCompliantDate ?: new Date()
 		Date graceDate = DateUtils.addDays(lastCompliantDate, gracePeriodDays)
 		Date now = new Date()
 		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)

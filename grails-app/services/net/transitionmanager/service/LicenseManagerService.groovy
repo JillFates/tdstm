@@ -223,14 +223,7 @@ class LicenseManagerService extends LicenseCommonService{
 			lc.environment = License.Environment.forId(json.environment?.id)
 		}
 		if(json.project != null) {
-			if(lc.project != null){
-				def jsonP = JSON.parse(lc.project)
-				if(jsonP.id != json.project.id){
-					lc.project = json.project?.toString()
-				}
-			}else{
-				lc.project = json.project?.toString()
-			}
+			lc.project = json.project?.toString()
 		}
 		if(json.client != null) {
 			lc.client = json.client?.toString()
