@@ -2731,7 +2731,8 @@ class AssetEntityController implements ControllerMethods {
 			nodesQuery = NumberUtil.mapToPositiveInteger(depGroups)
 		}
 		// Query only if there're groups left.
-		if(depGroups){
+		if(depGroups && nodesQuery){
+
 			def queryFordepsList = """
 			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, mb.move_bundle_id AS moveBundleId, mb.name AS moveBundleName,
 			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality,
@@ -3721,7 +3722,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 		return result
-		
+
 	}
 
 	/**
