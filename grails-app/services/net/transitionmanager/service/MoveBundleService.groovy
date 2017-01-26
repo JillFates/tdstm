@@ -516,7 +516,7 @@ class MoveBundleService implements ServiceMethods {
 						cellValue = StringUtil.ellipsis(cellValue, 32767)
 						break
 					case 'taskNumber':
-						cellValue = currentTask.taskNumber
+						cellValue = currentTask.taskNumber == null ? '':currentTask.taskNumber
 						isNumber = true
 						break
 					case "assetEntity":
