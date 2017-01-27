@@ -247,8 +247,11 @@ class WsDashboardController implements ControllerMethods {
 				""" )
 
 			planSumCompTime = resultMap?.compTime
-			if (resultMap?.startTime) {
-				def eventStartTime = new Date( resultMap.startTime.getTime() )
+			Date eventStartTime = moveEvent.estStartTime
+			if (eventStartTime || resultMap?.startTime) {
+				if(!eventStartTime){
+					eventStartTime = new Date(resultMap.startTime.getTime())
+				}
 				if (eventStartTime>sysTime) {
 					dayTime = TimeCategory.minus(eventStartTime, sysTime)
 					eventString = "<i>Event Countdown<i>"
@@ -271,7 +274,7 @@ class WsDashboardController implements ControllerMethods {
 			}
 		}
 
-		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime) 
+		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime)
 
 		renderAsJson(snapshot: [
 			revisedComp: moveEvent?.revisedCompletionTime,
