@@ -229,12 +229,13 @@ class MoveBundleController implements ControllerMethods {
 
 		if (moveBundle.save()) {
 			stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
+			boolean errorInSteps = false
 			stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
 				def checkbox = params["checkbox_" + it.id]
 				if (checkbox == 'on') {
 					MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, params)
-					if (step .hasErrors()) {
-						response.sendError(500, 'Validation Error')
+					if (step.hasErrors()) {
+						errorInSteps = true
 						return
 					}
 				} else {
@@ -243,6 +244,12 @@ class MoveBundleController implements ControllerMethods {
 						moveBundleService.deleteMoveBundleStep(moveBundleStep)
 					}
 				}
+			}
+
+			if(errorInSteps){
+				flash.message = "Validation error while adding steps."
+				redirect(action: "show", id: moveBundle.id)
+				return
 			}
 
 			//def projectManeger = Party.get(projectManagerId)
@@ -398,7 +405,10 @@ class MoveBundleController implements ControllerMethods {
 		List<MoveEvent> moveEventList = moveBundleList*.moveEvent.unique()
 		moveEventList.remove(null)
 		moveEventList = moveEventList.sort {
-			def start = it.getEventTimes().start
+			def start = it.estStartTime
+			if(!start){
+				it.getEventTimes().start
+			}
 			start ? "$start-$it.name" : it.name
 		}
 
@@ -444,8 +454,12 @@ class MoveBundleController implements ControllerMethods {
 			def moveBundles = moveEvent.moveBundles?.findAll {it.useForPlanning}
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 
-			def eventDates = moveEvent.getEventTimes()
-			eventStartDate[moveEvent.id] = TimeUtil.formatDateTime(eventDates.start, TimeUtil.FORMAT_DATE_TIME_7)
+			Date startDate = moveEvent.estStartTime
+			if(!startDate){
+				def eventDates = moveEvent.getEventTimes()
+				startDate = eventDates.start
+			}
+			eventStartDate[moveEvent.id] = TimeUtil.formatDateTime(startDate, TimeUtil.FORMAT_DATE_TIME_7)
 
 			// Fetching application count that are assigned to current move event
 			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs)[0] : 0
