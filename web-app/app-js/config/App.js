@@ -61,9 +61,11 @@ var TDSTM = angular.module('TDSTM', [
     '$urlRouterProvider',
     '$locationProvider',
     function ($logProvider, $rootScopeProvider, $compileProvider, $controllerProvider, $provide, $httpProvider,
-              $translateProvider, $translatePartialLoaderProvider, $urlRouterProvider) {
+              $translateProvider, $translatePartialLoaderProvider, $urlRouterProvider, $locationProvider) {
 
         $rootScopeProvider.digestTtl(30);
+        // Going back to you
+        $locationProvider.html5Mode(true);
 
         $logProvider.debugEnabled(true);
 
@@ -77,13 +79,13 @@ var TDSTM = angular.module('TDSTM', [
          * Translations
          */
 
-        $translateProvider.useSanitizeValueStrategy(null);
+        /*        $translateProvider.useSanitizeValueStrategy(null);
 
         $translatePartialLoaderProvider.addPart('tdstm');
 
         $translateProvider.useLoader('$translatePartialLoader', {
             urlTemplate: '../i18n/{part}/app.i18n-{lang}.json'
-        });
+        });*/
 
         $translateProvider.preferredLanguage('en_US');
         $translateProvider.fallbackLanguage('en_US');

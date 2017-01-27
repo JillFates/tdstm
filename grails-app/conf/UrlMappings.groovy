@@ -381,6 +381,8 @@ class UrlMappings {
 			]
 		}
 
+		"/app/**/*" ( controller: 'app', action: 'index' )
+
 		///// LICENSES Admin API (Client Side) /////////
 
 

@@ -16,8 +16,8 @@ import ManuallyRequest from './manuallyRequest/ManuallyRequest.js';
 import LicenseDetail from './detail/LicenseDetail.js';
 
 
-var LicenseAdminModule = angular.module('TDSTM.LicenseAdminModule', [uiRouter]).config(['$stateProvider',  '$translatePartialLoaderProvider',
-    function ($stateProvider, $translatePartialLoaderProvider) {
+var LicenseAdminModule = angular.module('TDSTM.LicenseAdminModule', [uiRouter]).config(['$stateProvider',  '$translatePartialLoaderProvider', '$locationProvider',
+    function ($stateProvider, $translatePartialLoaderProvider, $locationProvider) {
 
     $translatePartialLoaderProvider.addPart('licenseAdmin');
 
