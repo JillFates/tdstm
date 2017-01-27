@@ -209,7 +209,7 @@ class MoveBundleController implements ControllerMethods {
 		moveBundle.name = params.name
 		moveBundle.description = params.description
 		moveBundle.workflowCode = params.workflowCode
-		moveBundle.useForPlanning = params.useForPlanning as Boolean
+		moveBundle.useForPlanning = params.useForPlanning==null? false: params.useForPlanning as Boolean
 		if (params.moveEvent.id) {
 			moveBundle.moveEvent = MoveEvent.get(params.moveEvent.id)
 		} else {
