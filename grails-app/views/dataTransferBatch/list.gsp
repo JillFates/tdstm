@@ -232,7 +232,7 @@
                     schema: {
                         model: {
                             fields: {
-                                batchId: { type: "number" },
+                                batchId: { type: "string" },
                                 importedAt: { type: "date"},
                                 importedBy: { type: "string" },
                                 attributeSet: { type: "string" },
