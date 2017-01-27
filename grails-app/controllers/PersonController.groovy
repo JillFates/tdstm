@@ -624,8 +624,7 @@ class PersonController implements ControllerMethods {
 // TODO : JPM 8/31/2015 : Need to test
 	def resetPreferences() {
 		try {
-			//Person person = personService.validatePersonAccess(params.user)
-			Person person = personService.validatePersonAccess(securityService.loadCurrentPerson())
+			Person person = personService.validatePersonAccess(params.user)
 			UserLogin userLogin = securityService.getPersonUserLogin(person)
 			if (!userLogin) {
 				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
@@ -633,8 +632,6 @@ class PersonController implements ControllerMethods {
 				return
 			}
 
-			log.info ">>>>>>>>> params: ${params}"
-			
 			// if dateTimezoneOnly is specified, only reset the timezone and date format preferences if they exist
 			if (params.dateTimezoneOnly) {
 				userPreferenceService.removePreference(PREF.CURR_TZ)
@@ -1106,7 +1103,7 @@ class PersonController implements ControllerMethods {
 		render(template: "showPreference",
 		       model: [prefMap: prefMap.sort{it.value}, areas: userPreferenceService.timezonePickerAreas(),
 		               timezones: Timezone.findAll(), currTimeZone: currTimeZone,
-		               currDateTimeFormat: currDateTimeFormat])
+		               currDateTimeFormat: currDateTimeFormat, currentPersonId: securityService.currentPersonId])
 	}
 
 	/**
