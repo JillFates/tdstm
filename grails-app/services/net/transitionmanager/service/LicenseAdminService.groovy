@@ -11,7 +11,6 @@ import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
-import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*

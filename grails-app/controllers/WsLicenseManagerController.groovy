@@ -1,11 +1,9 @@
-import com.github.icedrake.jsmaz.Smaz
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.service.LicenseManagerService
-import org.apache.commons.codec.binary.Base64
 
 /**
  * Created by octavio on 11/30/16.
@@ -28,14 +26,14 @@ class WsLicenseManagerController implements ControllerMethods {
 
 	/* list the licenses */
 	def getLicenses(){
-		renderSuccessJson(licenseManagerService.list()*.toJsonMap())
+		renderSuccessJson(licenseManagerService.list()*.toMap())
 	}
 
 	def getLicense(){
 		def id = params.id
 		LicensedClient lic = licenseManagerService.fetch(id)
 
-		renderIfNotNull(id, lic?.toJsonMap())
+		renderIfNotNull(id, lic?.toMap())
 	}
 
 	def deleteLicense(){
@@ -65,7 +63,7 @@ class WsLicenseManagerController implements ControllerMethods {
 		def json = request.JSON
 		if(id) {
 			json.id = id
-			lic = licenseManagerService.fetchJsonToLicense(json)
+			lic = LicensedClient.fetch(json)
 		}
 
 		if(lic) {
@@ -104,7 +102,7 @@ class WsLicenseManagerController implements ControllerMethods {
 				response.status = 400
 				render errors
 			}else{
-				renderSuccessJson(lc.toJsonMap())
+				renderSuccessJson(lc.toMap())
 			}
 
 		}else{

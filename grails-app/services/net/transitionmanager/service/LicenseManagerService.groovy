@@ -8,6 +8,7 @@ import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.domain.Project
 import org.apache.commons.codec.binary.Base64
+import org.codehaus.groovy.grails.web.json.JSONElement
 
 import java.text.ParseException
 
@@ -65,9 +66,9 @@ class LicenseManagerService extends LicenseCommonService{
 
 		log.debug("Decoded String: {}", decodedString)
 
-		def json = grails.converters.JSON.parse(decodedString)
+		JSONElement json = grails.converters.JSON.parse(decodedString)
 
-		return fetchJsonToLicense(json, true)
+		return  LicensedClient.fetch(json, true)
 	}
 
 	def getLicenseKey(id){
@@ -148,98 +149,4 @@ class LicenseManagerService extends LicenseCommonService{
 		return trns
 	}
 
-	private fetchJsonToLicense(json, createIfNotFound = false){
-		def dateParser = {String strDate ->
-			if(strDate){
-				try {
-					return org.apache.tools.ant.util.DateUtils.parseIso8601DateTime(strDate)
-				}catch(ParseException pe){
-					log.error("Error Parsing Date", pe)
-				}
-			}
-			return null
-		}
-
-		if(!json.id){
-			return null
-		}
-
-		LicensedClient lc = LicensedClient.get(json.id)
-
-		log.debug("Jsonene {}", json)
-		if(!lc && createIfNotFound) {
-			lc = new LicensedClient()
-		}
-
-		if(!lc){
-			return null
-		}
-
-		lc.id = json.id
-
-		if(json.installationNum != null) {
-			lc.installationNum = json.installationNum
-		}
-		if(json.email != null) {
-			lc.email = json.email
-		}
-		if(json.requestNote != null) {
-			lc.requestNote = json.requestNote
-		}
-		if(json.hostName != null) {
-			lc.hostName = json.hostName
-		}
-		if(json.websitename != null) {
-			lc.websitename = json.websitename
-		}
-		if(json.expirationDate) {
-			lc.expirationDate = dateParser(json.expirationDate)
-		}
-		if(json.activationDate) {
-			log.debug("set Activation DAte: {}", json.activationDate)
-			lc.activationDate = dateParser(json.activationDate)
-			log.debug("set Activation DAte: {}", lc.activationDate)
-		}
-		if(json.requestDate != null) {
-			lc.requestDate = dateParser(json.requestDate)
-		}
-
-		if(json.requestDate != null) {
-			lc.environment = License.Environment.forId(json.environment?.id)
-		}
-		if(json.method?.id != null) {
-			lc.method = License.Method.forId(json.method?.id)
-		}
-		if(json.method?.max != null) {
-			lc.max = (json.method?.max) ?: 0
-		}
-		if(json.type?.id != null) {
-			lc.type = License.Type.forId(json.type?.id)
-		}
-		if(json.status?.id != null) {
-			lc.status = License.Status.forId(json.status?.id)
-		}
-		if(json.environment?.id != null) {
-			lc.environment = License.Environment.forId(json.environment?.id)
-		}
-		if(json.project != null) {
-			lc.project = json.project?.toString()
-		}
-		if(json.client != null) {
-			lc.client = json.client?.toString()
-		}
-		if(json.owner != null) {
-			lc.owner = json.owner?.toString()
-		}
-
-		if(json.bannerMessage != null) {
-			lc.bannerMessage = json.bannerMessage
-		}
-
-		if(json.gracePeriodDays != null){
-			lc.gracePeriodDays = json.gracePeriodDays
-		}
-
-		return lc
-	}
 }
