@@ -168,15 +168,17 @@ class LicenseAdminService extends LicenseCommonService {
 	 */
 	Map getLicenseStateMap(Project project = null){
 		initialize()
-		Map licState = [:]
+
+		Map defaultValidState = [
+			state	: State.VALID,
+			message : "",
+			valid 	: true,
+			banner 	: ""
+		]
 
 		//Is licence check disabled then is always valid
 		if (!licenseCommonService.adminEnabled) {
-			licState.state = State.VALID
-			licState.message = "License message"
-			licState.valid = true
-			licState.banner = "License banner"
-			return licState
+			return defaultValidState
 		}
 
 		if(project == null){
@@ -184,7 +186,9 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 
 		//If the current project is null return true
-		if(project == null) return true
+		if(project == null) {
+			return defaultValidState
+		}
 
 		String projectId = project.id
 
@@ -192,7 +196,7 @@ class LicenseAdminService extends LicenseCommonService {
 		Cache cache = licenseCache.getCache(CACHE_NAME)
 		def cacheEl = cache.get(projectId)
 
-		licState = cacheEl?.getObjectValue()
+		Map licState = (Map)cacheEl?.getObjectValue()
 		licState = null  //testing proposes
 
 		log.debug("OLB: ${licState}")
