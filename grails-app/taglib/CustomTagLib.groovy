@@ -327,9 +327,9 @@ class CustomTagLib implements InitializingBean {
 		if(isLicenseAdminEnabled) {
 			def bannerMessage = licenseAdminService.getLicenseBannerMessage()
 			if(bannerMessage) {
-				out << "<div class=\"breadcrumb licensing-banner-message breadcumb-" << crumbs.size << " \">"
-				out << "<div class=\"callout callout-info\"> " +
-						"                    <p> " << bannerMessage << "</p> " +
+				out << "<div class=\"breadcrumb licensing-banner-message breadcrumb-" << crumbs.size << " \">"
+				out << "<div class=\"callout\"> " +
+						"                    <p> <strong>" << bannerMessage << "</strong></p> " +
 						"                  </div>"
 				out << "</div>"
 			}

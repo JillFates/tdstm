@@ -7,18 +7,20 @@ div.license-warning-message-button
   margin-top: 10px
 
 .licensing-banner-message
+  text-align: center
   .callout
-    padding: 4px 12px 4px 12px
-    margin: 0px
-    position: relative
-    top: -4px
-    margin-right: 50px
-
-@media (max-width: 1150px)
-  .content-header>.breadcrumb.licensing-banner-message
+    color: #DB8700
     background: none
-    .callout
-      margin-right: 80px
+    padding: 4px 12px 4px 12px
+    font-size: 14px
+
+@media(min-width: 992px)
+  .licensing-banner-message
+    float: initial !important
+    max-width: 400px
+    margin: 0 auto
+    position: relative !important
+    top: -25px !important
 
 @media (max-width: 991px)
   .content-header>.breadcrumb.licensing-banner-message
