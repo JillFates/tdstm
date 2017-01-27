@@ -188,8 +188,8 @@ class AssetEntityController implements ControllerMethods {
 
 		def prefMap = userPreferenceService.getImportPreferences()
 
-		List assetsByProject	= AssetEntity.findAllByProject(project)
-		List moveBundleInstanceList = MoveBundle.findAllByProject(project)
+		//List assetsByProject	= AssetEntity.findAllByProject(project)
+		//List moveBundleInstanceList = MoveBundle.findAllByProject(project)
 
 		def dataTransferSetImport = DataTransferSet.executeQuery("from DataTransferSet where transferMode IN ('B','I') ")
 		def dataTransferSetExport = DataTransferSet.executeQuery("from DataTransferSet where transferMode IN ('B','E') ")
@@ -204,8 +204,8 @@ class AssetEntityController implements ControllerMethods {
 			isMSIE = true
 
 		render(view: "importExport",
-			    model: [assetsByProject: assetsByProject, projectId: project.id, error: params.error,
-			            moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport,
+			    model: [projectId: project.id, error: params.error,
+			            dataTransferSetImport: dataTransferSetImport,
 			            dataTransferSetExport: dataTransferSetExport, prefMap: prefMap, message: params.message,
 			            dataTransferBatchs: dataTransferBatchs, args: params.list("args"), isMSIE: isMSIE])
 	}

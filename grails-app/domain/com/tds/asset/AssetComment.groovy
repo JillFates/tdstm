@@ -76,7 +76,7 @@ class AssetComment {
 	Integer recipe                    // The recipe id # that caused this task to be created - TODO : this will be replaced by the taskBatch property with Catalog functionality
 	Integer taskSpec                  // The taskSpec id # within the recipe that caused this task to be created
 	String instructionsLink
-	Boolean durationLocked
+	Boolean durationLocked = false
 
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
