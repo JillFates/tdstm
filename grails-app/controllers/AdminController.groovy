@@ -194,7 +194,7 @@ class AdminController implements ControllerMethods {
 			WHERE mae.totalCount > 0
 			'''
 
-		summaryRecords << jdbcTemplate.queryForList( AssetsummaryQuery )
+		summaryRecords << jdbcTemplate.queryForList( assetSummaryQuery )
 
 		def dataTransferSummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR DATA_TRANSFER_ATTRIBUTE_MAP-------------------------------------------*/
@@ -347,7 +347,7 @@ class AdminController implements ControllerMethods {
 
 		summaryRecords << jdbcTemplate.queryForList(moveSummaryQuery)
 
-		def partySummaryQuery = '''
+		def partySummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PARTY-------------------------------------------*/
 			SELECT * FROM  ( SELECT 'party' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM party p
 							where p.party_id not in (select distinct pr.party_id from
@@ -446,7 +446,7 @@ class AdminController implements ControllerMethods {
 			SELECT * FROM  (  SELECT 'user_preference' as mainTable,'user_login_id' as refId,'Orphan' as type,count(*) as totalCount FROM user_preference up where up.user_login_id not in (select ul.user_login_id from user_login ul)
 				UNION
 				SELECT 'user_preference' as mainTable,'user_login_id' as refId,'Null' as type,count(*) as totalCount FROM user_preference up where up.user_login_id is null) up
-			WHERE up.totalCount > 0	'''
+			WHERE up.totalCount > 0	"""
 
 		summaryRecords << jdbcTemplate.queryForList(partySummaryQuery)
 
