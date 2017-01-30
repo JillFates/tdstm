@@ -220,17 +220,17 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
 	}); 
 
 </script>
-<div id="roomTypeDiv" style="position: relative;float:right;margin-top: 20px;">
-      	<label><input type="radio" class="cableRoomType" name="cableRoomType" id="cableRoomType_S" value="S" ${roomType=='S'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Current</label><br>
-		<label><input type="radio" class="cableRoomType" name="cableRoomType" id="cableRoomType_T" value="T" ${isTargetRoom? '' :'disabled="disabled"'} ${roomType=='T'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Target</label>
+<div id="roomTypeDiv" style="float:right;">
+      	<label><input type="radio" class="cableRoomType" name="cableRoomType" id="cableRoomType_S" value="S" ${roomType=='S'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Current</label>
+		<label><input type="radio" class="cableRoomType" name="cableRoomType" id="cableRoomType_T" value="T" ${isTargetRoom? '' :'disabled="disabled"'} ${roomType=='T'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)" style="margin-left:10px;"/>Target</label>
 		<input type="hidden" id="roomType" name="roomType"  value="${roomType}"/>
 </div>
-<div id="cablingPanel" style="height: auto; ">
+<div id="cablingPanel" style="min-width: 400px; font-size: 14px; clear: both;">
 	<g:if test="${assetCablingDetails}">
-		<g:each in="${assetCablingDetails}" var="assetCabling">
-			<div id='connector${assetCabling.id}' style='top: ${(assetCabling.connectorPosY / 2)}px; left: ${assetCabling.connectorPosX}px;'>
-				<a href='#'><div><img id='${assetCabling.status}' src="${resource(dir:'i/cabling',file:assetCabling.status.toLowerCase() + '.png')}"></div></a>
-				<div class='connector_${assetCabling.labelPosition}'><span>${assetCabling.label}</span></div>
+		<g:each in="${assetCablingDetails}" var="assetCabling" >
+			<div id='connector${assetCabling.id}' style='position:absolute;top: ${(assetCabling.connectorPosY / 2)}px; left: ${assetCabling.connectorPosX}px;'>
+				<a href='#' style="float: left"><div><img id='${assetCabling.status}' src="${resource(dir:'i/cabling',file:assetCabling.status.toLowerCase() + '.png')}"></div></a>
+				<div style="float: left; margin-left:5px"><span>${assetCabling.label}</span></div>
 			</div>
 		</g:each>
 	</g:if>
