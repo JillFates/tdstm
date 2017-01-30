@@ -404,12 +404,15 @@ class MoveBundleController implements ControllerMethods {
 		// Get the list of Move Events and sort on the start date
 		List<MoveEvent> moveEventList = moveBundleList*.moveEvent.unique()
 		moveEventList.remove(null)
-		moveEventList = moveEventList.sort {
-			def start = it.estStartTime
+		def getEventStartDate = {
+			Date start = it.estStartTime
 			if(!start){
-				it.getEventTimes().start
+				start = it.getEventTimes().start
 			}
-			start ? "$start-$it.name" : it.name
+			return start
+		}
+		moveEventList = moveEventList.sort {a,b ->
+			getEventStartDate(a) <=> getEventStartDate(b)
 		}
 
 		// Forming query for multi-uses
