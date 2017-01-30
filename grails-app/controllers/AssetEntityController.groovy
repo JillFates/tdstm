@@ -1110,10 +1110,16 @@ class AssetEntityController implements ControllerMethods {
 						}
 						assetDep.status = luv
 
-						assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "").replace("'","\\'") ?:
-							(isNew ? "Unknown" : assetDep.dataFlowFreq)
-						assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "").replace("'","\\'") ?:
-							(isNew ? "Unknown" : assetDep.dataFlowDirection)
+//						assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "").replace("'","\\'") ?:
+//							(isNew ? "Unknown" : assetDep.dataFlowFreq)
+						if (StringUtils.isNotEmpty(WorkbookUtil.getStringCellValue(dependencySheet, 8, r, ""))) {
+							assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "", true)
+						}
+//						assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "").replace("'","\\'") ?:
+//							(isNew ? "Unknown" : assetDep.dataFlowDirection)
+						if (StringUtils.isNotEmpty(WorkbookUtil.getStringCellValue(dependencySheet, 9, r, ""))) {
+							assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "", true)
+						}
 
 						def depComment = WorkbookUtil.getStringCellValue(dependencySheet, 11, r, "").replace("'","\\'")
 						def length = depComment.length()
@@ -1266,9 +1272,11 @@ class AssetEntityController implements ControllerMethods {
 						}
 
 						// Grab the category
-						def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r)?.replace("'","\\'")?.toLowerCase()?.trim()
+						//def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r)?.replace("'","\\'")?.toLowerCase()?.trim()
+						def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r, "", true)?.toLowerCase()?.trim()
 						if (AssetCommentCategory.list.contains(categoryInput)) {
-							assetComment.category = categoryInput ?: AssetCommentCategory.GENERAL
+							//assetComment.category = categoryInput ?: AssetCommentCategory.GENERAL
+							assetComment.category = categoryInput
 						} else {
 							//recordForAddition ? skippedAdded++ : skippedUpdated++
 							importResults.errors << "Invalid category '$categoryInput' specified (row $rowNum)"
