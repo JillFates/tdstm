@@ -1,6 +1,19 @@
 <g:set var="licenseCommonService" bean="licenseCommonService"/>
 <!DOCTYPE html>
 <html>
+<%
+    def moveBundle = tds.currentMoveBundle() ?: null
+    def moveEvent = tds.currentMoveEvent() ?: null
+    def currProject = tds.currentProject() ?: null
+    def room = tds.currentRoom() ?: null
+    def person = tds.currentPerson() ?: null
+    String partyGroup = tds.partyGroup() ?: null
+    String setImage = tds.setImage() ?: null
+    def userLogin = tds.userLogin() ?: null
+    int minPasswordLength = tds.minPasswordLength()
+    // Only for environments where the License Manager is true Enabled
+    def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
+%>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,10 +23,10 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
     <g:if test="${topNavClean}">
-        <g:render template="../layouts/responsiveResources" />
+        <g:render template="../layouts/responsiveResources" model="[isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
     </g:if>
     <g:if test="${!topNavClean}">
-        <g:render template="../layouts/responsiveStandardResources" />
+        <g:render template="../layouts/responsiveStandardResources" model="[isLicenseManagerEnabled:isLicenseManagerEnabled]" />
     </g:if>
 
     <g:layoutHead />
@@ -63,20 +76,6 @@
 
     </script>
 </head>
-<%
-	def moveBundle = tds.currentMoveBundle() ?: null
-	def moveEvent = tds.currentMoveEvent() ?: null
-	def currProject = tds.currentProject() ?: null
-	def room = tds.currentRoom() ?: null
-	def person = tds.currentPerson() ?: null
-	String partyGroup = tds.partyGroup() ?: null
-	String setImage = tds.setImage() ?: null
-	def userLogin = tds.userLogin() ?: null
-	int minPasswordLength = tds.minPasswordLength()
-    // Only for environments where the License Manager is true Enabled
-    def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
-%>
-
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
 <body class="hold-transition skin-blue layout-top-nav">
 <div class="wrapper">
