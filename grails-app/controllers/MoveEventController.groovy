@@ -122,7 +122,7 @@ class MoveEventController implements ControllerMethods {
 
 		def results = events.collect {
 			[cell: [it.name, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
-			        it.runbookStatus, it.moveBundlesString], id: it.id]
+			        it.runbookStatus, it.moveBundlesString, it.estStartTime], id: it.id]
 		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]

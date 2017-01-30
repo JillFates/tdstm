@@ -11,12 +11,13 @@
 				var listCaption ="Event List: <tds:hasPermission permission='MoveEventEditView'><span class='capBtn'>"+
 					"<input type='button' value='Create Event'  onClick=\"window.location.href=\'"+contextPath+"/moveEvent/create\'\"/></span></tds:hasPermission>"
 				<jqgrid:grid id="moveEventListId" url="'${createLink(action: 'listJson')}'"
-					colNames="'Name', 'Description','News Bar Mode', 'Runbook Status', 'Bundles'"
+					colNames="'Name', 'Description','News Bar Mode', 'Runbook Status', 'Bundles','Estimated Start'"
 					colModel="{name:'name',index: 'name', width:'300',formatter: linkFormatter},
 						{name:'description'},
 						{name:'newsBarMode'}, 
 						{name:'runbookStatus'},
-						{name:'moveBundlesString', search:false, sortable:false}"
+						{name:'moveBundlesString', search:false, sortable:false},
+						{name:'estStartTime', search:false, sortable:false, formatter: dateFormatter}"
 					sortname="'name'"
 					caption="listCaption"
 					width="'100%'"
@@ -32,7 +33,16 @@
 				var value = cellvalue ? cellvalue : ''
 				return "<a href="+contextPath+"/moveEvent/show/"+options.rowId+">"+value+"</a>"
 			}
-
+			
+			function dateFormatter(cellvalue, options, rowObjcet) {
+			    var value ='';
+                if(cellvalue)
+				{
+					var date =  new Date(cellvalue);
+					value = date.toLocaleDateString() +' '+ date.toLocaleTimeString();
+				}
+				return value;
+            }
 
 		</script>
 		
