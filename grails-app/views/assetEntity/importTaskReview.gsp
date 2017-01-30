@@ -235,6 +235,7 @@
 					}
 				</g:each>
 				],
+				height: 540,
 				sortable: true,
 				reorderable: false,
 				groupable: false,
