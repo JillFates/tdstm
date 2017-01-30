@@ -1286,13 +1286,13 @@ class PersonService implements ServiceMethods {
 
 		// Remove the Project Staff relationship for the project
 		List<RoleType> roles = partyRelationshipService.getProjectStaffFunctions(map.project.id, map.person.id)
-		for (RoleType roe in roles) {
+		for (RoleType role in roles) {
 			if (role.type == RoleType.TEAM) {
-				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, it.id)
+				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, role.type)
 				metrics.teamsUnassigned++
 			}
 		}
-		role
+
 		// Remove the person from the project
 		PartyRelationship prProjectStaff = getProjectReference(map.project, map.person)
 		if (prProjectStaff) {

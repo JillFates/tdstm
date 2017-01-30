@@ -1215,7 +1215,7 @@ class PersonController implements ControllerMethods {
 		try {
 			// Make the service call - note that the Permission is checked within the service
 			UserLogin byWhom = securityService.getUserLogin()
-			personService.removeFromProject(byWhom, params.projectId, params.personId)
+			personService.removeFromProject(params.projectId, params.personId)
 			renderSuccessJson()
 			return
 		} catch (DomainUpdateException | InvalidParamException | InvalidRequestException | UnauthorizedException e) {
