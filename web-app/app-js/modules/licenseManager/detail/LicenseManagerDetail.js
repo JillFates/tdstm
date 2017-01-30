@@ -157,6 +157,7 @@ export default class LicenseManagerDetail extends FormValidator{
             this.saveForm(this.licenseModel);
             this.prepareControlActionButtons();
             this.prepareLicenseKey();
+            this.reloadRequired = true;
         });
     }
 
