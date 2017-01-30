@@ -161,11 +161,20 @@ gulp.task('js-hint-tool', function (cb) {
 
 /**
  * What this task do is to compile the SASS file and generate a map that can be view from moder browser
- * style.css is being created, if prodEnv is true, then minified the css for use on prodEnv.
+ * style.css is being created, if prodEnv is true, then minify the css for use on prodEnv.
  * from command line: gulp sass-compiler --PROD
  */
 gulp.task('sass-compiler', function () {
     return gulp.src('web-app/css/style.sass')
+        .pipe(sourcemaps.init())
+        .pipe(sass({errLogToConsole: true}))
+        .pipe(autoprefixer({browsers: ['last 2 version'], cascade: false}))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest('web-app/css'));
+});
+
+gulp.task('sass-compiler-manager', function () {
+    return gulp.src('web-app/css/managerStyle.sass')
         .pipe(sourcemaps.init())
         .pipe(sass({errLogToConsole: true}))
         .pipe(autoprefixer({browsers: ['last 2 version'], cascade: false}))
@@ -179,7 +188,7 @@ gulp.task('sass-compiler', function () {
  * it will run until stop, searching for changes on any SASS file, compiles and ready to use
  */
 gulp.task('sass:watch', function () {
-    return gulp.watch('web-app/css/**/*.sass', ['sass-compiler']);
+    return gulp.watch('web-app/css/**/*.sass', ['sass-compiler', 'sass-compiler-manager']);
 });
 
 /**
