@@ -166,25 +166,37 @@ class ApplicationController implements ControllerMethods {
 
 		if (whereConditions) {
 			query.append(" WHERE apps.${whereConditions.join(" AND apps.")}")
+			firstWhere = false
 		}
 
 		if (params.latencys) {
+			if (firstWhere) {
+				query.append(' WHERE ')
+				firstWhere = false
+			} else {
+				query.append(' AND ')
+			}
 			if (params.latencys != 'unknown') {
-				query.append(" WHERE apps.latency = '${params.latencys.replaceAll("'", "")}' ")
+				query.append(" apps.latency = '${params.latencys.replaceAll("'", "")}' ")
+			} else {
+				query.append(" (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")
 			}
-			else {
-				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")
-			}
+
 		}
 
 		if (params.moveBundleId) {
+			if (firstWhere) {
+				query.append(' WHERE ')
+				firstWhere = false
+			} else {
+				query.append(' AND ')
+			}
 			if (params.moveBundleId != 'unAssigned') {
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
 				// @TODO : JPM 1/2016 : Fix for SQL injections @SECURITY
-				query.append(" WHERE apps.moveBundle  = '$bundleName' ")
-			}
-			else {
-				query.append(' WHERE apps.moveBundle IS NULL ')
+				query.append(" apps.moveBundle  = '$bundleName' ")
+			} else {
+				query.append(' apps.moveBundle IS NULL ')
 			}
 		}
 
