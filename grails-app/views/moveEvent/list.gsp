@@ -11,13 +11,13 @@
 				var listCaption ="Event List: <tds:hasPermission permission='MoveEventEditView'><span class='capBtn'>"+
 					"<input type='button' value='Create Event'  onClick=\"window.location.href=\'"+contextPath+"/moveEvent/create\'\"/></span></tds:hasPermission>"
 				<jqgrid:grid id="moveEventListId" url="'${createLink(action: 'listJson')}'"
-					colNames="'Name', 'Description','News Bar Mode', 'Runbook Status', 'Bundles','Estimated Start'"
+					colNames="'Name','Estimated Start', 'Description','News Bar Mode', 'Runbook Status', 'Bundles'"
 					colModel="{name:'name',index: 'name', width:'300',formatter: linkFormatter},
+						{name:'estStartTime', search:false, formatter: dateFormatter},
 						{name:'description'},
 						{name:'newsBarMode'}, 
 						{name:'runbookStatus'},
-						{name:'moveBundlesString', search:false, sortable:false},
-						{name:'estStartTime', search:false, sortable:false, formatter: dateFormatter}"
+						{name:'moveBundlesString', search:false, sortable:false}"
 					sortname="'name'"
 					caption="listCaption"
 					width="'100%'"

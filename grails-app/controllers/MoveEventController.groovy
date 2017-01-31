@@ -114,15 +114,15 @@ class MoveEventController implements ControllerMethods {
 			if (newsBM) {
 				'in'('newsBarMode', newsBM)
 			}
-			order(Order.asc(sortIndex).ignoreCase())
+			order(params.sord == "desc"? Order.desc(sortIndex).ignoreCase():Order.asc(sortIndex).ignoreCase())
 		}
 
 		int totalRows = events.totalCount
 		int numberOfPages = Math.ceil(totalRows / maxRows)
 
 		def results = events.collect {
-			[cell: [it.name, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
-			        it.runbookStatus, it.moveBundlesString, it.estStartTime], id: it.id]
+			[cell: [it.name, it.estStartTime, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
+			        it.runbookStatus, it.moveBundlesString], id: it.id]
 		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
