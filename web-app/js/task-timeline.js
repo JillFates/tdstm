@@ -2562,12 +2562,12 @@ function applyScaleDefinition(msConversion, scale, differScaleTime) {
 	if( msConversion === _MS_PER_MIN) {
 		scale.time = d3.time.minute;
 		scale.tick = 10;
-		scale.format = d3.time.format('%I:%M%PM');
+		scale.format = d3.time.format('%I:%M%p');
 	}
 	if( msConversion === _MS_PER_HOUR) {
 		scale.time = d3.time.hour;
 		scale.tick = 5;
-		scale.format = d3.time.format('%b %d, %I %PM');
+		scale.format = d3.time.format('%b %d, %I %p');
 	}
 	if( msConversion === _MS_PER_DAY) {
 		scale.time = d3.time.day;
@@ -2635,7 +2635,7 @@ function getTimeFormatToDraw(startDate, endDate, increasePer) {
 
 			if(increasePer && msConversion[i] === _MS_PER_HOUR) {
 				scale.tick = 1;
-				scale.format = d3.time.format('%I:%M%PM');
+				scale.format = d3.time.format('%I:%M%p');
 
 				var hours = specifTimeDiff(startDate, endDate, 'hours');
 				if(!isNaN(hours) && hours >=  10 ) {
@@ -2644,7 +2644,7 @@ function getTimeFormatToDraw(startDate, endDate, increasePer) {
 
 				if(!isNaN(hours) && hours >=  20 ) {
 					scale.tick = 5;
-					scale.format = d3.time.format('%b %d, %I %PM');
+					scale.format = d3.time.format('%b %d, %I %p');
 				}
 
 			}
