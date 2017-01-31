@@ -122,11 +122,14 @@ function buildGraph (response, status) {
 	});
 	
 	// set up the ranges for the mini and main graphs
+	var windowWidth = $(window).width(); // the width of the browser window
+	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
+	var graphExtraPadding = 10; // extra padding width for the graph on the page
 	var zoomScale = 2;
 	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length-1].end);
 	var x = d3.time.scale()
 		.domain([parseStartDate(data.startDate), items[items.length-1].end])
-		.range([0, $(window).width() - $('div.body h1').offset().left * 2 - 10]);
+		.range([0, windowWidth - graphPageOffset * 2 - graphExtraPadding]);
 	var x1 = d3.time.scale()
 		.domain(x.domain())
 		.range([0, x.range()[1] * zoomScale]);
