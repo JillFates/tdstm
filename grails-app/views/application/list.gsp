@@ -28,14 +28,14 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script type="text/javascript">
+
+            $(document).on('entityAssetUpdated',function () {
+                $('#applicationIdGrid').trigger("reloadGrid");
+            });
 			$(document).ready(function() {
 				$("#createEntityView").dialog({ autoOpen: false })
-				$("#showEntityView").dialog({ autoOpen: false, })
-				$("#editEntityView").dialog({ autoOpen: false ,
-                    close:function(event,ui){
-                        $('#applicationIdGrid').trigger("reloadGrid");
-                    }
-                });
+				$("#showEntityView").dialog({ autoOpen: false })
+				$("#editEntityView").dialog({ autoOpen: false});
 				$("#cablingDialogId").dialog({ autoOpen:false })
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })

@@ -740,7 +740,7 @@ var EntityCrud = ( function($) {
 				},
 				success: function(resp, dataType) {
 					pub.showAssetDetailView(assetClass, resp.data.asset.id);
-					$(document).trigger('entityAssetUpdated');
+						$(document).trigger('entityAssetUpdated');
 					//location.reload();  //to reload the whole List View
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
