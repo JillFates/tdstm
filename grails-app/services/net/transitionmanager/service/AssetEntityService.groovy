@@ -1733,13 +1733,19 @@ class AssetEntityService implements ServiceMethods {
 		String query = ''
 		String joinQuery = ''
 		for (String value in appPref.values()) {
+			/*
+			 TODO: the logic for sme, sme2 and 'by' fields needs to be changed.
+			 We'll probably address that with TM-5931. In the meantime I'm using
+			 CONCAT_WS for sme and sme2, to join first, middle and last name
+			 with a separator.
+			*/
 			switch (value) {
 				case 'sme':
-					query += "CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme,"
+					query += "CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS sme,"
 					joinQuery += "\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n"
 					break
 				case 'sme2':
-					query += "CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS sme2,"
+					query += "CONCAT_WS(' ', p1.first_name, p1.middle_name, p1.last_name) AS sme2,"
 					joinQuery += "\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n"
 					break
 				case 'modifiedBy':
@@ -2144,7 +2150,7 @@ class AssetEntityService implements ServiceMethods {
 		if(!project) return 0L
 
 		def sql = """
-			SELECT 
+			SELECT
 				count(distinct ae.asset_entity_id)
 			FROM asset_entity ae
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
@@ -2152,14 +2158,14 @@ class AssetEntityService implements ServiceMethods {
 			LEFT OUTER JOIN model m ON m.model_id=ae.model_id
 			LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = 'comment'
-			LEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id 
-			LEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id 
-			LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id 
+			LEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id
+			LEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id
+			LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id
 			WHERE ae.project_id = :pid
 			AND ae.asset_class = 'DEVICE'
 			AND mb.use_for_planning=true
 			AND ae.asset_class='DEVICE'
-			AND ae.asset_type IN ('Server','Appliance','Blade','VM','Virtual') 
+			AND ae.asset_type IN ('Server','Appliance','Blade','VM','Virtual')
 		"""
 		/* id = 2445 */
 		namedParameterJdbcTemplate.queryForObject(sql, [pid: project.id], Long.class)
