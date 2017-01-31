@@ -210,39 +210,23 @@ class DataTransferBatchController implements ControllerMethods {
 	 */
 	def errorsListView() {
 		long dataTransferBatchId = params.long('id')
-
+		
 		List<Map<String, Object>> dataTransferErrorList = 
 			jdbcTemplate.queryForList("select d.asset_entity_id, d.import_value, d.row_id, a.attribute_code, d.error_text"
 				+ " FROM data_transfer_value d left join eav_attribute a"
 				+ " on (d.eav_attribute_id = a.attribute_id) where d.data_transfer_batch_id = ?"
-				+ " and has_error = 1" , [dataTransferBatchId])
+				+ " and has_error = 1", dataTransferBatchId)
 
 		def completeDataTransferErrorList = []
 		def currentValues
 		dataTransferErrorList.each {
-			def assetNameId = EavAttribute.findByAttributeCode("assetName")?.id
-			def assetTagId = EavAttribute.findByAttributeCode("assetTag")?.id
-
-			def assetName = DataTransferValue.executeQuery('''
-				select importValue from DataTransferValue
-				where rowId=:rowId
-				and eavAttribute=:assetNameId
-				and dataTransferBatch=:dataTransferBatchId
-			''', [rowId: it.row_id, assetNameId: assetNameId, dataTransferBatchId: dataTransferBatchId], [max: 1])[0]
-
-			def assetTag = DataTransferValue.executeQuery('''
-				select importValue from DataTransferValue
-				where rowId=:rowId
-				and eavAttribute=:assetTagId
-				and dataTransferBatch=:dataTransferBatchId
-			''', [rowId: it.row_id, assetTagId: assetTagId, dataTransferBatchId: dataTransferBatchId], [max: 1])[0]
 			AssetEntity assetEntity = AssetEntity.get(it.asset_entity_id)
 			if (AssetEntityService.bundleMoveAndClientTeams.contains(it.attribute_code) ) {
 				currentValues = assetEntity?.(it.attribute_code).name
 			} else {
 				currentValues = assetEntity?.(it.attribute_code)
 			}
-			completeDataTransferErrorList << [assetName: assetName, assetTag: assetTag, attribute: it.attribute_code,
+			completeDataTransferErrorList << [assetName: assetEntity.assetName, assetTag: assetEntity.assetTag, attribute: it.attribute_code,
 			                                  error: it.error_text, currentValue: currentValues,
 			                                  importValue: it.import_value]
 		}
