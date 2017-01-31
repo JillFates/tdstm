@@ -54,6 +54,8 @@ grails.project.dependency.resolution = {
 		// Added the acl for some testing JPM 12/2016
 		compile ':spring-security-acl:2.0.0'
 
+		compile ':spring-security-rest:1.5.4'
+		compile ":rest-client-builder:2.1.0"
 
 		runtime ':database-migration:1.4.0'
 		runtime ':grails-melody:1.54.0'
