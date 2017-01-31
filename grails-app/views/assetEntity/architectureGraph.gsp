@@ -230,6 +230,9 @@
 			generateGraph();
 		});
 
+		// set the initial value of the asset classes dropdown based on user preference
+		$('#assetClassesId').val('${graphPrefs.assetClasses ?: ('')}').trigger("change");
+
 		// disable any plus/minus icons that should be initially disabled
 		GraphUtil.checkForDisabledButtons(parameterRanges);
 
