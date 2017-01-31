@@ -30,8 +30,12 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$("#createEntityView").dialog({ autoOpen: false })
-				$("#showEntityView").dialog({ autoOpen: false })
-				$("#editEntityView").dialog({ autoOpen: false })
+				$("#showEntityView").dialog({ autoOpen: false, })
+				$("#editEntityView").dialog({ autoOpen: false ,
+                    close:function(event,ui){
+                        $('#applicationIdGrid').trigger("reloadGrid");
+                    }
+                });
 				$("#cablingDialogId").dialog({ autoOpen:false })
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })

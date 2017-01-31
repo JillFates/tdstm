@@ -741,7 +741,7 @@ var EntityCrud = ( function($) {
 				success: function(resp, dataType) {
 					pub.showAssetDetailView(assetClass, resp.data.asset.id);
 					$(document).trigger('entityAssetUpdated');
-					location.reload();  //to reload the whole List View
+					//location.reload();  //to reload the whole List View
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
