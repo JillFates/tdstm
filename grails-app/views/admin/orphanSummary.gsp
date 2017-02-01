@@ -34,7 +34,7 @@ a:hover {
 			<tr class="${(counter % 2) == 0 ? 'even' : 'odd'}">
 				<td>${summary.mainTable}</td>
 				<td>${summary.refId}</td>
-				<td>${summary.type}</td>
+				<td><g:if test="${summary.type && summary.type != 'Null'}">${summary.type}</g:if></td>
 				<td style="text-align: center;"><a href='javascript:getOrphanDetails("${summary.mainTable}","${summary.refId}","${summary.type}")'>${summary.totalCount}</a></td>
 				<g:set var="counter" value="${counter + 1}" />
 			</tr>
@@ -89,8 +89,8 @@ a:hover {
 	}
 	function showOrphanDetails(e, table){
 		var records = eval('(' + e.responseText + ')');
-		var tableBody = getDeatiledReport( records.orphanDeatils, table )
-		$("#orphanDetailsTableId").html(tableBody)
+		var tableBody = getDeatiledReport( records.orphanDeatils, table );
+		$("#orphanDetailsTableId").html(replaceNullsAndUndefined(tableBody));
 		$("#orphanDetailed").show();
 		$("#queryText").html(records.query)
 	}
@@ -98,6 +98,9 @@ a:hover {
 		$("#queryTextDialog").dialog('option', 'width', 500);
 		$('#queryTextDialog').dialog('option', 'modal', 'true');
 		$('#queryTextDialog').dialog('open');
+	}
+	function replaceNullsAndUndefined(tableBody) {
+        return tableBody.replace(/(null|undefined)/mg, "");
 	}
 </script>
 <script>
