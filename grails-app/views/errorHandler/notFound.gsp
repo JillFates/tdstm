@@ -20,7 +20,12 @@
 	<!-- Theme style -->
 	<link rel="stylesheet" href="${resource(dir: 'dist/css', file: 'TDSTMLayout.min.css')}">
 	<!-- General Template Style -->
-	<link rel="stylesheet" href="${resource(dir: 'css', file: 'style.css')}">
+	<g:if test="${isLicenseManagerEnabled}">
+		<link rel="stylesheet" href="${resource(dir: 'css', file: 'managerStyle.css')}">
+	</g:if>
+	<g:else>
+		<link rel="stylesheet" href="${resource(dir: 'css', file: 'style.css')}">
+	</g:else>
 
 	<!-- Blue Skin -->
 	<link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
