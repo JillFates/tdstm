@@ -21,6 +21,6 @@ class AssetOptions {
 	}
 
 	static constraints = {
-		value blank: false
+		value blank: false, unique: 'type'
 	}
 }
