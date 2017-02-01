@@ -32,7 +32,9 @@
 		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
 		<script type="text/javascript">
 			// TODO : move this code to JS once verified in tmdev
-
+			$(document).on('entityAssetUpdated',function () {
+                $('#assetListIdGrid').trigger("reloadGrid");
+            });
 			$(document).ready(function() {
 				$("#createEntityView").dialog({ autoOpen: false });
 				$("#showEntityView").dialog({ autoOpen: false });

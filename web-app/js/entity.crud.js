@@ -847,6 +847,7 @@ var EntityCrud = ( function($) {
 			$('#assetTypeFilterUnSet').hide();
 			$('#currentAssetType').val(event.val);
 			modelFilteringData.assetType = event.val;
+            modelFilteringData.id = event.val;
 			if ((selectedModel != null && selectedModel.assetType != null && event.val != selectedModel.assetType.toString()) || (event.val == null)) {
 				if (selectedModel != null) {
 					clearSelectedModel(selectedModel.manufacturerId, selectedModel.manufacturerName, event.val);
@@ -910,6 +911,9 @@ var EntityCrud = ( function($) {
 				$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':modelText});
 				$("#manufacturerSelect").select2('data', {"id":manuId, "text":manuName});
 				$("#assetTypeSelect").select2('data', {"id":at, "text":at});
+                modelFilteringData.assetType = at;
+                modelFilteringData.id = at;
+                modelFilteringData.manufacturerId = manuId;
 				$(document).trigger('selectedAssetModelChanged', selectedModel);
 			} else {
 				clearSelectedModel(selectedModel.manufacturerId);
