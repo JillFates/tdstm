@@ -2403,10 +2403,13 @@ function buildMap (width, height) {
 	
 	// gets a list of all the nodes that can be reached by traversing down node's children
 	function getFullChildSet (node) {
+		if (node.fullChildSet)
+			return node.fullChildSet;
 		var set = [node];
 		$(getChildren(node)).each(function (i, o) {
 			set = set.concat(getFullChildSet(o));
 		});
+		node.fullChildSet = set;
 		return set;
 	}
 	
