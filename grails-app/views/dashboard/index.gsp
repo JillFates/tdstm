@@ -161,12 +161,12 @@
 						</ul>
 					</div>
 					<div id="leftarrow">
-						<a href="javascript:void(0);" id="move-left">
+						<a href="#" id="move-left">
 							<img src="${resource(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
 						</a>
 					</div>
-					<div class="mod">
-						<div id="themes">
+					<div class="mod" style="overflow: hidden;">
+						<div id="themes" style="position:relative;">
 							<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}" id="defaultBundleId">
 							<g:each in="${moveBundleList}" status="i" var="moveBundle">
 								<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
@@ -212,7 +212,7 @@
 						</div>
 					</div>
 					<div id="rightarrow">
-						<a href="javascript:void(0);" id="move-right">
+						<a href="#" id="move-right">
 							<img src="${resource(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
 						</a>
 					</div>
@@ -421,7 +421,72 @@
 		moveDataSteps();
 
 
-	})
+	});
+
+    var numCols = $('div.show_bundle_step').children().length;
+    var themes = $('#themes');
+    var left = $('#move-left').find('img');
+    var right = $('#move-right').find('img');
+
+    if (numCols <= 7) {
+    	$('#move-left').find('img').addClass('disabled');
+        $('#move-right').find('img').addClass('disabled');
+    } else {
+        $('#move-right').find('img').removeClass('disabled');
+	}
+
+
+    $("#move-left").click(function (event) {
+        event.preventDefault();
+
+        if (numCols <= 7) {
+            return;
+        } else {
+            //Maximum displacement multiple
+            var maxMultiple = numCols - 7;
+
+            //Read the offset of #themes
+            var offset = parseInt(themes.css('left'));
+
+            if (offset < 0) {
+                //Move #themes one more step to the right
+                offset = offset + 130;
+                if (offset >= 0) {
+                    left.addClass('disabled');
+                }
+                themes.css('left', offset + 'px');
+                right.removeClass('disabled'); //Enable right arrow
+            } else {
+                left.addClass('disabled');
+			}
+		}
+    });
+
+	$("#move-right").click(function (event) {
+	    event.preventDefault();
+
+	    if (numCols <= 7) {
+	        return;
+		} else {
+	        //Maximum displacement multiple
+			var maxMultiple = numCols - 7;
+
+	        //Read the offset of #themes
+			var offset = parseInt(themes.css('left'));
+
+			if (offset > -maxMultiple*130) {
+			    //Move #themes one more step to the left
+				offset = offset - 130;
+                if (offset <= -maxMultiple*130) {
+                    right.addClass('disabled');
+                }
+				themes.css('left', offset + 'px');
+                left.removeClass('disabled'); //Activate left arrow
+			} else {
+                right.addClass('disabled');  //Disable right arrow
+			}
+		}
+    });
 
 	function refreshDashboard () {
 		getMoveEventNewsDetails($('#moveEvent').val());
