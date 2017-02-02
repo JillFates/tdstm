@@ -10,9 +10,8 @@ import javax.servlet.http.HttpServletResponse
 
 class ProjectControllerFunctionalSpec extends IntegrationSpec implements LoginAs {
 
-    //TODO: Create and delete this user every time a tests starts
-    final String WATSON_USERNAME = 'watson'
-    final String WATSON_PASSWORD = 'Foobar123!'
+    final static String TEST_USERNAME = 'watson'
+    final static String TEST_PASSWORD = 'Foobar123!'
 
     //TODO: Grails 3 Migration
     // Remote this when migration to Grails 3
@@ -33,6 +32,19 @@ class ProjectControllerFunctionalSpec extends IntegrationSpec implements LoginAs
     @Override
     String grailServerUrl() {
         "http://localhost:${serverPort}${appName()}"
+    }
+
+    def setupSpec() {
+        def signupHelper = new SignupHelper()
+        signupHelper.savePersonWithRoles(TEST_USERNAME, TEST_PASSWORD, ['ADMIN'])
+        def username = TEST_USERNAME
+        signupHelper.disablePasswordExpirationByUsername(username)
+    }
+
+    def cleanupSpec() {
+        def signupHelper = new SignupHelper()
+        signupHelper.deleteUserLoginByUsername(TEST_USERNAME)
+
     }
 
     def "Validate unsucessful authentication"() {
@@ -78,7 +90,7 @@ class ProjectControllerFunctionalSpec extends IntegrationSpec implements LoginAs
         RestBuilder rest = new RestBuilder()
 
         when:
-        def accessToken = loginAs(WATSON_USERNAME, WATSON_PASSWORD).accessToken
+        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
 
         then:
         accessToken
@@ -107,7 +119,7 @@ class ProjectControllerFunctionalSpec extends IntegrationSpec implements LoginAs
         RestBuilder rest = new RestBuilder()
 
         when:
-        def accessToken = loginAs(WATSON_USERNAME, WATSON_PASSWORD).accessToken
+        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
 
         then:
         accessToken
@@ -136,7 +148,7 @@ class ProjectControllerFunctionalSpec extends IntegrationSpec implements LoginAs
         RestBuilder rest = new RestBuilder()
 
         when:
-        def accessToken = loginAs(WATSON_USERNAME, WATSON_PASSWORD).accessToken
+        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
 
         then:
         accessToken
@@ -169,7 +181,7 @@ class ProjectControllerFunctionalSpec extends IntegrationSpec implements LoginAs
         RestBuilder rest = new RestBuilder()
 
         when:
-        def accessToken = loginAs(WATSON_USERNAME, WATSON_PASSWORD).accessToken
+        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
 
         then:
         accessToken
