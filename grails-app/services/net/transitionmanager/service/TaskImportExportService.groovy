@@ -25,7 +25,7 @@ class TaskImportExportService implements ServiceMethods {
 
 	static final String TEMPLATE_TAB_NAME  = 'Tasks'
 	static final String TEMPLATE_TAB_TITLE = 'Title'
-	static final String IMPORT_OPTION_PARAM_NAME='importOption'
+	static final String IMPORT_OPTION_PARAM_NAME = 'importOption'
 	static final String IMPORT_FILENAME_PREFIX = 'TaskImport'
 
 	// Indicates the alternate property name with the original and defaulted values
@@ -111,7 +111,7 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Task #', template:changeTmpl('taskNumber')],
 
 		comment					: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:true,
-										label: 'Task Description', template:changeTmpl('comment')],
+										label: 'Task Description', template:changeTmpl('comment'), modifiable:true],
 
 		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:false,
 										label: 'Related Asset', template:changeTmpl('assetEntity'), transform:xfrmString],
@@ -126,15 +126,15 @@ class TaskImportExportService implements ServiceMethods {
 									template:changeTmpl('predecessorTasks'), transform: xfrmListToPipedString ],
 
 
-		responsibleResource		: [type: 'string', ssPos:6, formPos:7, domain: 'C', width:120, locked:false,
-										label: 'Responsible Resource', template:changeTmpl('responsibleResource'), transform:xfrmString],
+		assignedTo		: [type: 'string', ssPos:6, formPos:7, domain: 'C', width:120, locked:false, modifiable:true, foreignKey: true,
+										label: 'Responsible Resource', template:changeTmpl('assignedTo'), transform:xfrmString],
 
 
-		instructionsLink		: [type: 'string', ssPos:7, formPos:8, domain: 'C', width:120, locked:false,
+		instructionsLink		: [type: 'string', ssPos:7, formPos:8, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Instructions Link', template:changeTmpl('instructionsLink'), transform:xfrmString],
 
-		team					: [type: 'string', ssPos:8, formPos:9, domain: 'C', width:120, locked:false,
-										label: 'Team', template:changeTmpl('team'), transform:xfrmString],
+		role					: [type: 'string', ssPos:8, formPos:9, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Team', template:changeTmpl('role'), transform:xfrmString],
 
 		status					: [type: 'string', ssPos:9, formPos:10, domain: 'C', width:120, locked:false,
 										label: 'Status', template:changeTmpl('status'), transform:xfrmString],
@@ -151,20 +151,20 @@ class TaskImportExportService implements ServiceMethods {
 		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:false,
 										label: 'Comments', template:changeTmpl('comments'), transform:xfrmString],
 
-		duration				: [type: 'string', ssPos:14, formPos:15, domain: 'C', width:120, locked:false,
+		duration				: [type: 'string', ssPos:14, formPos:15, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Duration', template:changeTmpl('duration'), transform:xfrmString],
 
 		durationLocked			: [type: 'string', ssPos:15, formPos:16, domain: 'C', width:120, locked:false,
 										label: 'Duration Locked', transform:xfrmString],
 
-		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:false,
+		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmString],
 
-		estimatedStart			: [type: 'date', ssPos:17, formPos:18, domain: 'C', width:120, locked:false,
-										label: 'Estimated Start', template:changeTmpl('estimatedStart'), transform:xfrmDateToString],
+		estStart			: [type: 'date', ssPos:17, formPos:18, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Estimated Start', template:changeTmpl('estStart'), transform:xfrmDateToString],
 
-		estimatedFinish			: [type: 'date', ssPos:18, formPos:19, domain: 'C', width:120, locked:false,
-										label: 'Estimated Finish', template:changeTmpl('estimatedFinish'), transform:xfrmDateToString],
+		estFinish			: [type: 'date', ssPos:18, formPos:19, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Estimated Finish', template:changeTmpl('estFinish'), transform:xfrmDateToString],
 
 		actualStart				: [type: 'date', ssPos:19, formPos:20, domain: 'C', width:120, locked:false,
 										label: 'Actual Start', template:changeTmpl('actualStart'), transform:xfrmDateToString],
@@ -175,10 +175,10 @@ class TaskImportExportService implements ServiceMethods {
 		workflowStep			: [type: 'string', ssPos:21, formPos:22, domain: 'C', width:120, locked:false,
 										label: 'WorkFlow Step', template:changeTmpl('workflowStep'), transform:xfrmString],
 
-		category				: [type: 'string', ssPos:22, formPos:23, domain: 'C', width:120, locked:false,
+		category				: [type: 'string', ssPos:22, formPos:23, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Category', template:changeTmpl('category'), transform:xfrmString],
 
-		dueDate					: [type: 'date', ssPos:23, formPos:24, domain: 'C', width:120, locked:false,
+		dueDate					: [type: 'date', ssPos:23, formPos:24, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Due Date', template:changeTmpl('dueDate'), transform:xfrmDateToString],
 
 		createdOn				: [type: 'date', ssPos:24, formPos:25, domain: 'C', width:120, locked:false,
@@ -187,8 +187,8 @@ class TaskImportExportService implements ServiceMethods {
 		createdBy				: [type: 'string', ssPos:25, formPos:26, domain: 'C', width:120, locked:false,
 										label: 'Created By', template:changeTmpl('createdBy')],
 
-		moveEvent				: [type: 'string', ssPos:26, formPos:27, domain: 'A', width:120, locked:false,
-										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmString],
+		moveEvent				: [type: 'string', ssPos:26, formPos:27, domain: 'A', width:120, locked:false, modifiable:true,
+										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmString, foreignKey: true],
 
 		batchId 				: [type:'number', ssPos:27, formPos:28, domain:'C', width:80, locked: false,
 										label: 'Batch Id', template:changeTmpl('batchId')],
@@ -214,6 +214,7 @@ class TaskImportExportService implements ServiceMethods {
 	/**
 	 * Load the spreadsheet into memory and validate that it contains some information. If
 	 * successful, save the file with a random name and then return the model containing the filename.
+	 *
 	 * @param request - the servlet request object
 	 * @param project - the project that the import is being applied againstclearDefaultedValues
 	 * @param fileParamName - the servlet request params name of the var that references the upload spreadsheet file
@@ -266,11 +267,13 @@ class TaskImportExportService implements ServiceMethods {
 				' export a new template before attempt an import.')
 		}
 
+		/*
+		// The following code adds an unecessary overhead.
 		List tasks = readTasksFromSpreadsheet(workbook, sheetInfoOpts)
 		if (!tasks) {
 			throw new EmptyResultException('Unable to read the spreadsheet or the spreadsheet was empty')
 		}
-
+		*/
 		return model
 	}
 
@@ -639,10 +642,10 @@ class TaskImportExportService implements ServiceMethods {
 		model.originalSuffix = ORIGINAL_SUFFIX
 		model.errorSuffix = ERROR_SUFFIX
 		model.importOption = formOptions[IMPORT_OPTION_PARAM_NAME]
-
+		/*
 		Workbook workbook = readImportSpreadsheet(formOptions.filename)
 		Map sheetInfoOpts = getSheetInfoAndOptions(project, workbook)
-
+		*/
 		return model
 	}
 
@@ -763,14 +766,16 @@ class TaskImportExportService implements ServiceMethods {
 		List<MoveEvent> moveEvents = MoveEvent.findAllByProject(project)
 
 		for (Map task in tasks) {
-			if (!StringUtil.isBlank(task.responsibleResource)) {
-				Map personInfo = personService.findPersonByFullName(task.responsibleResource)
+			if (!StringUtil.isBlank(task.assignedTo)) {
+				Map personInfo = personService.findPersonByFullName(task.assignedTo)
 				if (personInfo.isAmbiguous) {
 					task.errors << 'Found multiple people by name'
+				}else{
+					task["_assignedTo"] = personInfo
 				}
 			}
-			if (!StringUtil.isBlank(task.team)){
-				String team = allTeamCodes.find { it == task.team }
+			if (!StringUtil.isBlank(task.role)){
+				String team = allTeamCodes.find { it == task.role }
 				if (!team) {
 					task.errors << "Team doesn't exist."
 				}
@@ -778,7 +783,9 @@ class TaskImportExportService implements ServiceMethods {
 
 			if (!StringUtil.isBlank(task.moveEvent)) {
 				MoveEvent event = moveEvents.find { it.name == task.moveEvent }
-				if (!event) {
+				if (event) {
+					task["_moveEvent"] = event
+				} else {
 					task.errors << "Move Event doesn't exist."
 				}
 			}
@@ -876,6 +883,7 @@ class TaskImportExportService implements ServiceMethods {
 	 */
 	@Transactional
 	Map postChangesToTasks(Project project, formOptions) {
+
 		if (!securityService.hasPermission('GenerateTasks', true)) {
 			throw new UnauthorizedException('Do not have the required permission to import task information')
 		}
@@ -943,7 +951,7 @@ class TaskImportExportService implements ServiceMethods {
 				// Copy all of the properties out of the Task Map and transform to the format that the
 				// data grid can use later
 				Map task = [:]
-				taskpreadsheetColumnMap.each { prop, info ->
+				taskSpreadsheetColumnMap.each { prop, info ->
 					String origKey = "$prop$ORIGINAL_SUFFIX".toString()
 					String defKey = "$prop$DEFAULTED_SUFFIX".toString()
 					String errKey = "$prop$ERROR_SUFFIX".toString()
@@ -964,15 +972,17 @@ class TaskImportExportService implements ServiceMethods {
 					}
 					task.flags = tasks[i].flags
 				}
-				updatedTasks<< tasks
+				updatedTasks << tasks[i]
 			}
+
+			results["taskUpdated"] = updatedTasks.size()
 
 			// Add something to the temporary results view
 			if (formOptions.testMode) {
 
 				if (taskChanged) {
-					chgSB.append("\r\n<br>Changes for ${task}}):<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
-					StringBuffer changeMsg = new StringBuffer("***** Change History for $task changed:")
+					chgSB.append("\r\n<br>Changes for ${tasks[i].taskNumber}}):<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
+					StringBuffer changeMsg = new StringBuffer("***** Change History for $tasks[i].taskNumber changed:")
 					tasks[i].changeHistory.each { prop, origVal ->
 						String p = prop.split(/\./)[1]
 						changeMsg.append("\n\t$prop was '$origVal' now is '${tasks[i][p]}'")
@@ -992,6 +1002,7 @@ class TaskImportExportService implements ServiceMethods {
 
 		}
 
+
 		// Add the appropriate icons to the new list
 		setIconsOnTasks(updatedTasks)
 
@@ -999,7 +1010,6 @@ class TaskImportExportService implements ServiceMethods {
 
 		// Delete the upload file
 		deleteUploadedSpreadsheet(formOptions.filename)
-
 		// Throw an exception so we don't commit the data while testing (to be removed)
 		if (formOptions.testMode) {
 			errorsSB.append('</table>')
@@ -1007,21 +1017,17 @@ class TaskImportExportService implements ServiceMethods {
 				(recordedErrors ? errorsSB.toString() : '')
 			throw new DomainUpdateException('<H2>Test Mode - Import Results</H2>' + resultData )
 		}
-
 		return results
 	}
 
 
-	private void applyChangesToDomainObject(AssetComment assetComment, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
-
+	private void applyChangesToDomainObject(AssetComment assetComment, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, Map modifiableProperties, boolean setDefaults=false) {
 
 		boolean unplannedChange = false
 		String unChgdLabel='Unplanned change'
 		boolean identifyUnplannedChanges = true
-		boolean blockBlankOverwrites = task.flags.blockBlankOverwrites
 
-		taskSpreadsheetColumnMap.each { prop, info ->
-
+		modifiableProperties.each { prop, info ->
 			if (propertyHasError(task, prop)) {
 				if (taskSpreadsheetColumnMap.containsKey('defaultOnError')) {
 					// Set a default value so that the domain validation will not fail
@@ -1029,56 +1035,55 @@ class TaskImportExportService implements ServiceMethods {
 				}
 				return
 			}
-			def bypassProps = ["assetClass", "assetId", "assetEntity"]
-			if(!prop in bypassProps){
 
-				def origValue = assetComment[prop]
-				if (info.type == 'date' && origValue != null) {
-					origValue.clearTime()
+
+			boolean blockBlankOverwrites = task.flags.blockBlankOverwrites
+
+			def origValue = assetComment[prop]
+			if (info.type == 'date' && origValue != null) {
+				origValue.clearTime()
+			}
+
+			// Check if it's a FK reference
+			if(info["foreignKey"]){
+				def reference = task["_${prop}"]
+				if(reference && reference.id != assetComment[prop].id){
+					assetComment[prop] = reference
 				}
+
+			} else {
 				String origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
 				String chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
 
 				boolean valuesEqual = origValueTransformed == chgValueTransformed
 				boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)
 				boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
-
-
-				if (chgValueIsBlank) {
-					if (! origValueIsBlank) {
+				// Checks if the incoming value is empty but the task has a value
+				if (chgValueIsBlank){
+					if ( !origValueIsBlank) {
+						// Checks if it should write a null value.
 						if (! blockBlankOverwrites) {
-							setOriginalValue(task, prop, assetComment[prop])
-							if (identifyUnplannedChanges) {
-								unplannedChange = true
-								setErrorValue(task, prop, unChgdLabel)
-							}
+							assetComment[prop] = task[prop]
+							setOriginalValue(task, prop, origValueTransformed)
 						} else {
-								setDefaultedValue(task, prop, assetComment[prop])
-						}
-					}
-				} else {
-					if (! valuesEqual) {
-						setOriginalValue(task, prop, assetComment[prop])
-						if (identifyUnplannedChanges) {
 							unplannedChange = true
 							setErrorValue(task, prop, unChgdLabel)
 						}
 					}
-				}
-
-
-				if (! propertyHasError(task, prop)) {
-					chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
-					chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
-					if (! chgValueIsBlank && chgValueTransformed != origValueTransformed) {
-						assetComments[prop] = task[prop]
+				} else {
+					if (! valuesEqual) {
+						assetComment[prop] = task[prop]
+						setOriginalValue(task, prop, origValueTransformed)
 					}
 				}
+
 			}
-			if (unplannedChange) {
+
+			if (propertyHasError(task, prop)) {
 				task.errors << "Unplanned change(s) for task."
 			}
 		}
+
 	}
 
 	/**
@@ -1092,27 +1097,23 @@ class TaskImportExportService implements ServiceMethods {
 	private List applyTaskChanges( Map task, Map sheetInfoOpts, Map formOptions) {
 		String error
 		boolean changed = false
+		Map modifiableProperties = taskSpreadsheetColumnMap.findAll{ p, k -> k.modifiable}
+
 		// Ignore comments
 		if(NumberUtil.isPositiveLong(task.taskNumber)){
+
 			AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
 			if (assetComment) {
-
 				log.debug "applyTaskChanges() About to apply changes to $assetComment"
 
 				// Update the person with the values passed in
-				applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true)
+				applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, modifiableProperties, true )
 
 				changed = assetComment.dirtyPropertyNames
 
-				if (assetComment.id) {
-					log.debug "applyTaskChanges() is update person $assetComment (${assetComment.id}) properties: ${assetComment.dirtyPropertyNames}"
-				} else {
-					log.debug "applyTaskChanges() is creating task $assetComment"
-				}
-
 				if (changed) {
-					recordChangeHistory(task.changeHistory, assetComment)
-					save assetComment
+					//recordChangeHistory(task.changeHistory, assetComment)
+					assetComment.save()
 					if (assetComment.hasErrors()) {
 						task.changeHistory = null
 						error = GormUtil.allErrorsString(assetComment)
@@ -1121,11 +1122,23 @@ class TaskImportExportService implements ServiceMethods {
 				}
 			}
 		}
-
 		return [error, changed]
 	}
 
+	/**
+	 * This method clears the references to MoveEvents and persons
+	 * used when updating tasks. This has to be done before saving
+	 * the result as JSON to avoid StackOverflow and redundant data.
+	 */
+	private void removeTmpReferences(List tasks){
+		tasks.each{
+			it.remove("_moveEvent")
+			it.remove("_assignedTo")
+		}
+	}
+
 	private String saveResultsAsJson(List tasks, String filename) {
+		removeTmpReferences(tasks)
 		String fqfn = getJsonFilename(filename)
 		log.debug "saveResultsAsJson() filename=$filename fqfn=$fqfn"
 		new File(fqfn).write(new JsonBuilder(tasks).toPrettyString())
