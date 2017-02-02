@@ -16,7 +16,7 @@
 	</script>
 	<div class="body body-disabled-float">
 		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
+			<div class="message">${raw(flash.message)}</div>
 		</g:if>
 
 		<div>
@@ -61,7 +61,7 @@
                         alert("Please, select a valid file.")
                         $(this).val(null)
                     }
-                    
+
                 });
         });
 

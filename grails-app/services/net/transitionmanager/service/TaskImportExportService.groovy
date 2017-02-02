@@ -70,7 +70,7 @@ class TaskImportExportService implements ServiceMethods {
 			return TimeUtil.formatDate(val, options.dateTimeFormatter)
 		}
 
-		log.error "xfrmDateTimeToString                           () got unexpected data type ${val?.getClass()?.getName()}"
+		log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
 		val?.toString()
 	}
 
@@ -79,12 +79,11 @@ class TaskImportExportService implements ServiceMethods {
 	// ------------------------------------------------------------------------
 
 	// Used in the map below to set the various template strings used by Kendo
-	static final changeTmpl = { prop ->
-		"\"#=(!$prop || $prop == 'null' ||  $prop == 'undefined')? '' : showChanges(data, '$prop') #\""
+	private static String changeTmpl(String prop) {
+		"\"#= showChanges(data, '$prop') #\""
 	}
-	static final errorListTmpl = { prop ->
-		"kendo.template(\$('#error-template').html())"
-	}
+
+	private static final String errorListTmpl = "kendo.template(\$('#error-template').html())"
 
 	// --------------------------------
 	// Meta Definition Maps
@@ -771,7 +770,7 @@ class TaskImportExportService implements ServiceMethods {
 				if (personInfo.isAmbiguous) {
 					task.errors << 'Found multiple people by name'
 				}else{
-					task["_assignedTo"] = personInfo
+					task["_assignedTo"] = personInfo.person
 				}
 			}
 			if (!StringUtil.isBlank(task.role)){
@@ -981,12 +980,11 @@ class TaskImportExportService implements ServiceMethods {
 			if (formOptions.testMode) {
 
 				if (taskChanged) {
-					chgSB.append("\r\n<br>Changes for ${tasks[i].taskNumber}}):<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
+					chgSB.append("\r\n<br>Changes for ${tasks[i].taskNumber}:<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
 					StringBuffer changeMsg = new StringBuffer("***** Change History for $tasks[i].taskNumber changed:")
 					tasks[i].changeHistory.each { prop, origVal ->
-						String p = prop.split(/\./)[1]
-						changeMsg.append("\n\t$prop was '$origVal' now is '${tasks[i][p]}'")
-						chgSB.append("<tr><td>$prop</td><td>$origVal</td><td>${tasks[i][p]}</td></tr>\r\n")
+						changeMsg.append("\n\t$prop was '$origVal' now is '${tasks[i][prop]}'")
+						chgSB.append("<tr><td>$prop</td><td>$origVal</td><td>${tasks[i][prop]}</td></tr>\r\n")
 					}
 					log.info changeMsg.toString()
 					chgSB.append("</table>\r\n")
@@ -1047,7 +1045,7 @@ class TaskImportExportService implements ServiceMethods {
 			// Check if it's a FK reference
 			if(info["foreignKey"]){
 				def reference = task["_${prop}"]
-				if(reference && reference.id != assetComment[prop].id){
+				if(reference && reference.id != assetComment[prop]?.id){
 					assetComment[prop] = reference
 				}
 
@@ -1087,6 +1085,17 @@ class TaskImportExportService implements ServiceMethods {
 	}
 
 	/**
+	 * Utility method to mapping the properties that were changed and the original values
+	 * @param account - the map to record the changes into which will be the propertyName:originalValue
+	 * @param domainObj - the object that the changes are read from
+	 */
+	private void recordChangeHistory(Map changeHistory, Object domainObj) {
+		for (prop in domainObj.dirtyPropertyNames) {
+			changeHistory[prop] = domainObj.getPersistentValue(prop)
+		}
+	}
+
+	/**
 	 * Used to update tasks
 	 * @param task - the task map
 	 * @param options - the map of the options
@@ -1112,7 +1121,7 @@ class TaskImportExportService implements ServiceMethods {
 				changed = assetComment.dirtyPropertyNames
 
 				if (changed) {
-					//recordChangeHistory(task.changeHistory, assetComment)
+					recordChangeHistory(task.changeHistory, assetComment)
 					assetComment.save()
 					if (assetComment.hasErrors()) {
 						task.changeHistory = null
@@ -1213,5 +1222,16 @@ class TaskImportExportService implements ServiceMethods {
 		model.errorSuffix = ERROR_SUFFIX
 
 		return model
+	}
+
+	File generatePostResultsData(String filename, Map formOptions) {
+		securityService.requirePermission('GenerateTasks', true)
+
+		File file = new File(getJsonFilename(filename))
+		if (!file.exists()) {
+			throw new EmptyResultException('Unable to load the Task Import Post Results data')
+		}
+
+		return file
 	}
 }

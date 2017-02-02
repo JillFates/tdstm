@@ -33,6 +33,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
@@ -4439,6 +4440,35 @@ class AssetEntityController implements ControllerMethods {
 		// log.debug "importAccounts() Finishing up controller step=$step, view=$view, model=$model"
 		render view:view, model:model
 	}
+
+
+	@HasPermission('GenerateTasks')
+	def importTaskPostResultsData() {
+		Project project = controllerService.getProjectForPage(this)
+		if (!project) {
+			renderErrorJson(flash.message)
+			flash.message = ''
+			return
+		}
+		if (!params.filename) {
+			renderErrorJson('Request was missing the required filename reference')
+			return
+		}
+
+		try {
+			Map formOptions = taskImportExportService.importParamsToOptionsMap(params)
+			File spreadsheetFile = taskImportExportService.generatePostResultsData(params.filename, formOptions)
+			ServiceResults.respondAsJson(response, spreadsheetFile)
+		}
+		catch (e) {
+			log.error 'importTaskPostResultsData() Exception occurred while retrieving import tasks post results: ', e
+
+			renderErrorJson(['An error occurred while attempting to retrieve import tasks post results', e.message])
+		}
+	}
+
+
+
 
 	/**
 	 * Check if a user have permissions to create/edit comments
