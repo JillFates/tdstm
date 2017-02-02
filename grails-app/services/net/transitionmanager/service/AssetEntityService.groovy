@@ -1761,7 +1761,7 @@ class AssetEntityService implements ServiceMethods {
 					joinQuery += "\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n"
 					break
 				case 'appOwner':
-					query += "CONCAT(CONCAT(p3.first_name, ' '), IFNULL(p3.last_name,'')) AS appOwner,"
+					query += "CONCAT_WS(' ', p3.first_name, p3.middle_name, p3.last_name) AS appOwner,"
 					joinQuery += "\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n"
 					break
 				case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownBy|shutdownDuration|startupBy|startupFixed|startupDuration|testingBy|testingFixed|testingDuration/:
