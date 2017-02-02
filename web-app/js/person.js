@@ -151,10 +151,15 @@ var Person = function () {
 				data: params,
 				type:'POST',
 				success: function(data) {
-					getPersonDiv().html(data)
-					var newCurrentTabShow = currentTabShow.replace('Edit','Show')
-					var newCurrentHeaderShow = currentHeaderShow.replace('Edit','Show')
-					switchTab(newCurrentTabShow, newCurrentHeaderShow)
+					if (data.status == 'error') {
+						for(var e = 0; e < data.errors.length; ++e)
+							alert(data.errors[e])
+					} else {					
+						getPersonDiv().html(data)
+						var newCurrentTabShow = currentTabShow.replace('Edit','Show')
+						var newCurrentHeaderShow = currentHeaderShow.replace('Edit','Show')
+						switchTab(newCurrentTabShow, newCurrentHeaderShow)
+					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					tdsCommon.displayWsError(jqXHR, "An unexpected error occurred while attempting to update Person.", false);
