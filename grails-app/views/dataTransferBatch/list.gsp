@@ -136,6 +136,7 @@
                     alert('An error occurred while invoking the posting process.');
                 }).always(function () {
                     postingFlag = false;
+
                 });
 
                 return false;
@@ -148,8 +149,10 @@
                 if (reviewOrProcess == 'r') {
                     // Flip the review button over to the Process
                     currentButton.html($(hiddenProcessButton).html());
+
                 } else {
                     currentButton.hide();
+                    loadManageAssetImportBatchesList();
                 }
 
                 console.log("showProcessResults() was called");
@@ -171,6 +174,7 @@
                 }).always(function () {
                     // allow another action to occur
                     postingFlag = false;
+
                 });
             }
 
