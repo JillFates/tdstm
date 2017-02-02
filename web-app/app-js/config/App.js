@@ -65,7 +65,7 @@ var TDSTM = angular.module('TDSTM', [
 
         $rootScopeProvider.digestTtl(30);
         // Going back to you
-        $locationProvider.html5Mode(true);
+        $locationProvider.html5Mode(true).hashPrefix('!');
 
         $logProvider.debugEnabled(true);
 
@@ -93,14 +93,11 @@ var TDSTM = angular.module('TDSTM', [
         //$urlRouterProvider.otherwise('dashboard');
 
     }]).
-    run(['$rootScope', '$http', '$log', '$location', function ($rootScope, $http, $log, $location, $state, $stateParams, $locale) {
+    run(['$transitions', '$http', '$log', '$location', function ($transitions, $http, $log, $location, $state, $stateParams, $locale) {
         $log.debug('Configuration deployed');
 
-        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-            $log.debug('State Change to ' + toState.name);
-            if (toState.data && toState.data.page) {
-                window.document.title = toState.data.page.title;
-            }
+        $transitions.onBefore( {}, function($state, $transition$) {
+            $log.log('In start ', $state);
         });
 
     }]);

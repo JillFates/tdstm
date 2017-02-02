@@ -65,6 +65,8 @@
             $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 
             $('.licensing-error-warning').popover({placement: 'bottom', container: 'body' });
+            $('.licensing-error-warning').click(function(event) { event.preventDefault(); });
+
         });
 
         function updateEventHeader( e ){
