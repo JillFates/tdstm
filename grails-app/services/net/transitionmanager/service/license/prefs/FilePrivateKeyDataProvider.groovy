@@ -16,8 +16,6 @@ class FilePrivateKeyDataProvider implements PrivateKeyDataProvider{
 
 	@Override
 	byte[] getEncryptedPrivateKeyData() throws KeyNotFoundException {
-		return IOUtils.toByteArray(
-				new FileInputStream(new File(path, "sample.private.key"))
-		);
+		return IOUtils.toByteArray(new FileInputStream(path))
 	}
 }

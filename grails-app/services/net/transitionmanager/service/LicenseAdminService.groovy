@@ -2,10 +2,10 @@ package net.transitionmanager.service
 
 import com.tdsops.common.exceptions.InvalidLicenseException
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.License
 import net.nicholaswilliams.java.licensing.LicenseManager
 import net.nicholaswilliams.java.licensing.LicenseManagerProperties
-import net.nicholaswilliams.java.licensing.encryption.PasswordProvider
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
 import net.sf.ehcache.Cache
@@ -16,6 +16,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
 import org.apache.commons.lang.time.DateUtils
 
+@Slf4j
 class LicenseAdminService extends LicenseCommonService {
 	static transactional = false
 
@@ -23,14 +24,12 @@ class LicenseAdminService extends LicenseCommonService {
 		UNLICENSED, TERMINATED, EXPIRED, INBREACH, NONCOMPLIANT, VALID
 	}
 
-	private PasswordProvider tdsPasswordProvider
 	private MyLicenseProvider licenseProvider
 
 	static final String CACHE_NAME = "LIC_STATE"
 	CacheManager licenseCache = CacheManager.getInstance()
 
 	AssetEntityService assetEntityService
-	LicenseCommonService  licenseCommonService
 	SecurityService	securityService
 
 	/**
@@ -45,7 +44,8 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 		*/
 
-		if(isEnabled() && !tdsPasswordProvider) {
+		if(isEnabled() && !licenseProvider) {
+			licenseProvider = MyLicenseProvider.getInstance()
 
 			if(!licenseCache.getCache(CACHE_NAME)) {
 				log.debug("configuring cache")
@@ -54,17 +54,17 @@ class LicenseAdminService extends LicenseCommonService {
 				licenseCache.addCache(memoryOnlyCache)
 			}
 
-			log.debug("License Config Enabled")
-			/** BEGIN: License Common Configuration **/
-			File basePath = new File('.')  //grailsApplication.parentContext.getResource("/..").file
-			tdsPasswordProvider = new TDSPasswordProvider(grailsApplication.config.tdstm.license.password)
-			/** END: License Common Configuration **/
-
-
-			if(licenseCommonService.isLGen()) {
+			if(isLGen()) {
 				log.debug("License Manager Enabled")
+				String keyFile = grailsApplication.config.tdstm.license.manager.key
+				String password = grailsApplication.config.tdstm.license.manager.password
+				log.debug("Manager Key: '{}', password: '{}'", keyFile, password)
+				File file = grailsApplication.parentContext.getResource(keyFile)?.file
+
+				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
+
 				// BEGIN: License Manager Configuration //
-				LicenseCreatorProperties.setPrivateKeyDataProvider(new FilePrivateKeyDataProvider(basePath))
+				LicenseCreatorProperties.setPrivateKeyDataProvider(new FilePrivateKeyDataProvider(file))
 				LicenseCreatorProperties.setPrivateKeyPasswordProvider(tdsPasswordProvider)
 				LicenseCreator.getInstance()
 				// END: License Manager Configuration //
@@ -76,11 +76,18 @@ class LicenseAdminService extends LicenseCommonService {
 				// END: TEST MANAGER LICENSE //
 			}
 
-			if(licenseCommonService.isAdminEnabled()) {
+			if(isAdminEnabled()) {
 				log.debug("License Admin Enabled")
+				String keyFile = grailsApplication.config.tdstm.license.key
+				String password = grailsApplication.config.tdstm.license.password
+				log.debug("Admin Key: '{}', password: '{}'", keyFile, password)
+				File file = grailsApplication.parentContext.getResource(keyFile)?.file
+
+				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
+
 				// BEGIN: License Admin Configuration //
-				licenseProvider = new MyLicenseProvider()
-				LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(basePath))
+				licenseProvider = MyLicenseProvider.getInstance()
+				LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
 				LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
 				LicenseManagerProperties.setLicenseProvider(licenseProvider)
 				LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
@@ -105,7 +112,7 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	boolean isEnabled(){
-		return licenseCommonService.isAdminEnabled()
+		return isAdminEnabled()
 	}
 
 	/**
@@ -177,7 +184,7 @@ class LicenseAdminService extends LicenseCommonService {
 		]
 
 		//Is licence check disabled then is always valid
-		if (!licenseCommonService.adminEnabled) {
+		if (!adminEnabled) {
 			return defaultValidState
 		}
 
@@ -199,13 +206,13 @@ class LicenseAdminService extends LicenseCommonService {
 		Map licState = (Map)cacheEl?.getObjectValue()
 		licState = null  //testing proposes
 
-		log.debug("OLB: ${licState}")
+		log.debug("OLB: {}",licState)
 		// If the license wasn't in the cache then one will be created and
 		// added to the cache
 		if(!licState) {
 			licState = [:]
 			cache.put(new Element(projectId, licState))
-			List<DomainLicense> licenses = DomainLicense.findAllByProject(projectId) //dateCreated?
+			List<DomainLicense> licenses = DomainLicense.findAllByProjectAndStatus(projectId, DomainLicense.Status.ACTIVE) //dateCreated?
 			//TODO: iterate over the licenses to find the one that fits
 			DomainLicense license = licenses.find { it.hash }
 
@@ -221,14 +228,23 @@ class LicenseAdminService extends LicenseCommonService {
 				licState.banner = ""
 			}else {
 				License licObj = getLicenseObj(license)
+				if(licObj == null){
+					licState.state = State.UNLICENSED
+					licState.message = "A license is required in order to enable all features of the application."
+					licState.valid = false
+					licState.banner = ""
+					return licState
+				}
+
+
 				def jsonData = JSON.parse(licObj.subject)
 				int gracePeriodDays = jsonData.gracePeriodDays
 
 				String projectName	   = JSON.parse(jsonData.project)?.name
-				log.debug("Lic: " + licObj.productKey)
-				log.debug("jsonData: " + jsonData)
-				log.debug("projectName : " + projectName)
-				log.debug("project.name : " + project.name)
+				log.debug("Lic: {}", licObj.productKey)
+				log.debug("jsonData: {}", jsonData)
+				log.debug("projectName : {}", projectName)
+				log.debug("project.name : {}", project.name)
 
 				licState.banner = license.bannerMessage
 
@@ -247,7 +263,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 				if (nowTime >= licObj.goodAfterDate && nowTime <= licObj.goodBeforeDate) {
 					long numServers = assetEntityService.countServers(project)
-					log.debug("NumServers: ${numServers}")
+					log.debug("NumServers: {}", numServers)
 					if (numServers <= max) {
 						licState.state = State.VALID
 						licState.message = ""
@@ -312,17 +328,34 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 		hash = hash.trim()
 
-
 		LicenseManager manager = LicenseManager.getInstance()
 		manager.clearLicenseCache()
 
-		log.debug("ID: " + id)
-		log.debug("Hash: " + hash)
+		log.debug("ID: {}", id)
+		log.debug("Hash: {}", hash)
 		licenseProvider.addLicense(id, hash)
-		License licObj = manager.getLicense(id)
-		log.debug("license.id: " + license.id)
-		log.debug("License Obj: " + licObj)
-		log.debug("License ID: " + licObj?.productKey)
+
+		License licObj
+		try {
+			licObj = manager.getLicense(id)
+		}catch(Exception ex){
+			log.error("Exception loading license: ", ex)
+			licenseProvider.remove(id)
+			license.status = DomainLicense.Status.CORRUPT
+			//return license.save()
+			return false
+		}
+		//Validate if is valid
+
+		log.debug("license.id: {}", license.id)
+		log.debug("License Obj: {}", licObj)
+		log.debug("License ID: {}", licObj?.productKey)
+
+		if(licObj == null) return false
+
+		if(license.id != licObj?.productKey){
+			throw new RuntimeException("Error loading licence data: Wrong product Key")
+		}
 
 		def jsonData = JSON.parse(licObj.subject)
 		//String installationNum = jsonData.installationNum
@@ -333,10 +366,6 @@ class LicenseAdminService extends LicenseCommonService {
 		String websitename 	   = jsonData.websitename
 
 		log.debug("LicenseAdminService - Project: " + project)
-
-		if(license.id != licObj.productKey){
-			throw new RuntimeException("Error loading licence data: Wrong product Key")
-		}
 
 		//if is not wildcard and Sites don't match, FAIL
 		if(DomainLicense.WILDCARD != hostName && getHostName() != hostName){

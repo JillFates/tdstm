@@ -22,7 +22,19 @@ import net.nicholaswilliams.java.licensing.DeserializingLicenseProvider
  */
 @Slf4j
 class MyLicenseProvider extends DeserializingLicenseProvider{
-	Map<Object,String>licenses = [:]
+	private static MyLicenseProvider INSTANCE
+
+	static MyLicenseProvider getInstance(){
+		if(INSTANCE==null){
+			synchronized (MyLicenseProvider.class){
+				if(INSTANCE==null) INSTANCE= new MyLicenseProvider()
+			}
+		}
+		return INSTANCE
+	}
+
+	private Map<Object,String>licenses = [:]
+	private MyLicenseProvider(){}
 
 	@Override
 	protected byte[] getLicenseData(Object o) {
@@ -36,9 +48,17 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 		}
 	}
 
-	public void addLicense(String name, String license){
-		licenses[name] = license
-		log.info("licenses size: {}", licenses.size())
+	void addLicense(String name, String license){
+		synchronized (licenses) {
+			licenses[name] = license
+			//log.info("licenses size: {}", licenses.size())
+		}
+	}
+
+	void remove(String name){
+		synchronized (licenses) {
+			licenses.remove(name)
+		}
 	}
 
 }

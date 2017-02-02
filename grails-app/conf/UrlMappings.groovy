@@ -251,14 +251,14 @@ class UrlMappings {
 
 		///// LICENSES Admin API (Client Side) /////////
 		"/ws/license" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "getLicenses"
 			]
 		}
 
 		"/ws/license/$id" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "getLicense",
 					DELETE: "deleteLicense"
@@ -267,7 +267,7 @@ class UrlMappings {
 
 		//Gets que request Hash  --- OLB 161207 Change Hash to request...
 		"/ws/license/$id/hash" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "getLicenseRequestHash"
 			]
@@ -276,7 +276,7 @@ class UrlMappings {
 
 		//Requests
 		"/ws/license/request" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 			        POST: "generateRequest"
 			]
@@ -284,7 +284,7 @@ class UrlMappings {
 
 		//Load License
 		"/ws/license/$id/load" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					POST: "loadLicense"
 			]
@@ -339,7 +339,7 @@ class UrlMappings {
 		}
 
 		"/ws/manager/status" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "managerActive"
 			]
@@ -347,35 +347,35 @@ class UrlMappings {
 
 		///// LICENSES Common API /////////
 		"/ws/license/environment" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchEnvironments"
 			]
 		}
 
 		"/ws/license/type" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchTypes"
 			]
 		}
 
 		"/ws/license/status" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchStatus"
 			]
 		}
 
 		"/ws/license/method" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchMethods"
 			]
 		}
 
 		"/ws/license/project" {
-			controller = "wsLicense"
+			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchProjects"
 			]

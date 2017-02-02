@@ -190,7 +190,8 @@ class License {
 		ACTIVE(1),
 		EXPIRED(2),
 		TERMINATED(3),
-		PENDING(4)
+		PENDING(4),
+		CORRUPT(5)
 
 		int id
 		Status(int id) {

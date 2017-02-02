@@ -16,8 +16,6 @@ class FilePublicKeyDataProvider implements PublicKeyDataProvider {
 
 	@Override
 	byte[] getEncryptedPublicKeyData() throws KeyNotFoundException {
-		return IOUtils.toByteArray(
-				new FileInputStream(new File(path, "sample.public.key"))
-		);
+		return IOUtils.toByteArray(new FileInputStream(path))
 	}
 }

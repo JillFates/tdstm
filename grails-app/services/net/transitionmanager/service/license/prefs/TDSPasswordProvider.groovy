@@ -3,16 +3,16 @@ package net.transitionmanager.service.license.prefs
 import net.nicholaswilliams.java.licensing.encryption.PasswordProvider
 
 
-public class TDSPasswordProvider implements PasswordProvider
+class TDSPasswordProvider implements PasswordProvider
 {
-	private String pass;
+	private String pass
 
-	public TDSPasswordProvider(String pass){
-		this.pass = new String(pass); //copy String
+	TDSPasswordProvider(String pass){
+		this.pass = new String(pass) //copy String
 	}
 
-	public char[] getPassword() {
+	char[] getPassword() {
 		println("pass : $pass")
-		return pass.toCharArray();
+		return pass.toCharArray()
 	}
 }

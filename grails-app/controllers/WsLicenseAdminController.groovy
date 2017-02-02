@@ -21,7 +21,7 @@ import net.transitionmanager.controller.ServiceResults
 @Secured('isAuthenticated()')
 @Slf4j
 @Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
-class WsLicenseController implements ControllerMethods {
+class WsLicenseAdminController implements ControllerMethods {
 	LicenseCommonService licenseCommonService
 	LicenseAdminService licenseAdminService
 	ProjectService projectService
@@ -206,7 +206,7 @@ class WsLicenseController implements ControllerMethods {
 					if (licenseAdminService.load(lic)) {
 						renderSuccessJson("Ok")
 					} else {
-						throw new Exception("Error while creating License Request")
+						throw new Exception("Error while loading the license")
 					}
 				//}
 			}else{
