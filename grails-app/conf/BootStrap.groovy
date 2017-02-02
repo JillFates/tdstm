@@ -31,6 +31,7 @@ import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.LicenseAdminService
 import org.grails.refcode.RefCode
+import org.apache.log4j.Logger
 
 import java.lang.management.ManagementFactory
 
@@ -49,6 +50,9 @@ class BootStrap {
 
 		//initialize License service to use
 		licenseAdminService.initialize()
+		
+		//initialize exception logger filter to mute GrailsExceptionResolver 
+		initializeExceptionLoggerFilter()
 
 		CustomMethods.initialize()
 
@@ -76,6 +80,20 @@ class BootStrap {
 		//Call some methods to show error messages (if any) from Boot time
 		qzSignService.getPassphrase()
 		qzSignService.findPrivateKeyFile()
+	}
+	
+	/**
+	 * Check Config flags or alert about required information
+	 */
+	private initializeExceptionLoggerFilter(){
+		
+		Logger.rootLogger.allAppenders.each { appender ->
+            ExceptionLoggerFilter filter = new ExceptionLoggerFilter()
+            filter.loggerClass = "org.codehaus.groovy.grails.web.errors.GrailsExceptionResolver"
+            filter.activateOptions()
+            appender.addFilter(filter)
+		}
+			
 	}
 
 	private void createInitialData() {
