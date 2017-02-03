@@ -1098,7 +1098,8 @@ digraph runbook {
 
 	// TODO: <SL> Need @HasPermission annotation
 	def actionLookUp() {
-
+		def taskNumber = params.taskNumber
+		// if taskNumber is not null then you can query the task and get the action and pass it to the model
 		render(view: "_actionLookUp", model: [])
 	}
 
