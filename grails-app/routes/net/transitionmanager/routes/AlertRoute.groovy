@@ -4,6 +4,7 @@ import org.apache.camel.builder.RouteBuilder
 
 class AlertRoute extends RouteBuilder {
 
+
 	@Override
 	void configure() {
 		from('seda:alert-queue')
