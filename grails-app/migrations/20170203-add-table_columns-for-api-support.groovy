@@ -7,6 +7,7 @@ databaseChangeLog = {
 				id bigint(20) NOT NULL AUTO_INCREMENT,
 				version bigint(20) NOT NULL DEFAULT 1,
 				name varchar(64) NOT NULL,
+				description varchar(255) NOT NULL DEFAULT '',
 				project_id bigint(20) NOT NULL,
 				agent_class int(3) NOT NULL,
 				agent_method varchar(64) NOT NULL COMMENT 'The name of the method on the agent class to invoke',
@@ -31,6 +32,7 @@ databaseChangeLog = {
 		sql("""
 			ALTER TABLE `asset_comment`
 			ADD COLUMN `api_action_id` bigint(20) NULL,
+			ADD COLUMN `agent_params` TEXT,
 			ADD INDEX `IDX_ASSET_COMMENT_API_ACTION` (`api_action_id`),
 			ADD CONSTRAINT `FK_ASSET_COMMENT_TO_API_ACTION`
 					FOREIGN KEY (`api_action_id`)

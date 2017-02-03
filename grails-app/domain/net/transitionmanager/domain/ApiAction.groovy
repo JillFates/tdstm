@@ -10,6 +10,8 @@ import net.transitionmanager.agent.CallbackMode
 class ApiAction {
 	String name
 
+	String description
+
 	// Indicates the class to use for invoking an action
 	AgentClass agentClass
 
@@ -23,7 +25,7 @@ class ApiAction {
 	//	groupId: [context:ParamContext.ASSET, property:'custom12']
 	//}
 
-	// Determines how async API calls notify the complition of an action invocation
+	// Determines how async API calls notify the completion of an action invocation
 	CallbackMode callbackMode = CallbackMode.NA
 
 	// The name of the queue that should be called back for CallbackMode.MESSAGE

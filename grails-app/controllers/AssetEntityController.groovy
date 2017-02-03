@@ -666,6 +666,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
 				canEdit: canEdit,
 				lastUpdated: lastUpdated,
+				apiAction: [id:1, name:'Option 1'],
+				actionMode: 'A'
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
