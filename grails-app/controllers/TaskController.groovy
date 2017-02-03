@@ -1096,6 +1096,12 @@ digraph runbook {
 		render(view: "_actionLookUp", model: [apiAction:apiActionPayload])
 	}
 
+	// TODO: <SL> Need @HasPermission annotation
+	def actionLookUp() {
+
+		render(view: "_actionLookUp", model: [])
+	}
+
 	@HasPermission(Permission.TaskView)
 	def showTask() {
 		//def instructionsLink = AssetComment.read(params.taskId)?.instructionsLink
