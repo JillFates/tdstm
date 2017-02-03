@@ -35,6 +35,14 @@
 						<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Event:</label></td>
 						<td valign="top" class="value" id="eventName" colspan="3">{{acData.eventName}}</td>
 					</tr>
+					<tr id="actionShowId">
+						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
+						<td valign="top" class="value" id="vmAction" colspan="2">{{acData.action}}</td>
+						<td valign="top" class="value" >
+							<button class="btn btn-default" role="button" ng-click="lookUpAction(acData);"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;
+							<button class="btn btn-default" role="button" ng-if="ac.status === 'Ready'" ng-click="invokeAction(acData.action);">Invoke</button>
+						</td>
+					</tr>
 					<tr id="categoryTrId">
 						<td valign="top" class="name"><label for="category">Category:</label></td>
 						<td valign="top" class="value" id="categoryTdId" style="width:15%">{{ac.category}}</td>
