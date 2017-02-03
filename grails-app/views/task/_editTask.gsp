@@ -42,6 +42,16 @@
 							optionKey='id' optionValue="name" noSelection="['':'please select']" />
 						</td>
 					</tr>
+					<tr id="actionShowId">
+						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
+						<td valign="top" class="value" id="vmAction" colspan="2">
+							<select>
+								<option>Option 1</option>
+								<option>Option 2</option>
+								<option>Option 3</option>
+							</select>
+						</td>
+					</tr>
 					<tr class="prop">
 						<td valign="top" class="name">
 							<label for="category">Category:</label>

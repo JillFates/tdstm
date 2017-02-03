@@ -229,7 +229,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 
 	this.lookUpAction = function(action) {
 
-		var view = '/task/actionLookUp';
+		var view = '/task/actionLookUp?taskNumber=' + action.assetComment.taskNumber;
 
 		var modalInstance = modal.open({
 			templateUrl: utils.url.applyRootPath(view),
