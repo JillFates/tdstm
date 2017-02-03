@@ -9,7 +9,7 @@ tdstm.license =[
 ]
 
 // This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
-println ""
+println()
 
 // copy binding variables into properties in the config for visibility in external scripts; as of 2.5.4 the
 // vars are: appName, appVersion, basedir, baseFile, baseName, grailsHome,
@@ -20,8 +20,25 @@ String appName = this.appName ?: null
 grails.config.locations = []
 
 List candidates = []
+String configManagerFile = null
 String configFileFromJavaOpts = System.getProperty("${appName}.config.location")
-if (configFileFromJavaOpts) candidates << configFileFromJavaOpts
+
+if (configFileFromJavaOpts){
+	candidates << configFileFromJavaOpts
+	try{ //get the possible Manager config File
+		File f = new File(configFileFromJavaOpts)
+		configManagerFile = "${f.getParent()}/licman-config.groovy"
+	}catch(e){
+		//configuration not found fails silently??
+	}
+}
+
+//check if the manager config file was injected on the JavaOPTS
+configManagerFile = System.getProperty("${appName}.manager.config.location") ?: configManagerFile
+if(configManagerFile){
+	candidates << configManagerFile
+}
+
 candidates << "$userHome/.grails/${appName}-config.groovy"
 
 boolean foundAppConfig=false

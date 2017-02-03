@@ -56,8 +56,8 @@ class LicenseAdminService extends LicenseCommonService {
 
 			if(isLGen()) {
 				log.debug("License Manager Enabled")
-				String keyFile = grailsApplication.config.tdstm.license.manager.key
-				String password = grailsApplication.config.tdstm.license.manager.password
+				String keyFile = grailsApplication.config.manager?.license?.key
+				String password = grailsApplication.config.manager?.license?.password
 				log.debug("Manager Key: '{}', password: '{}'", keyFile, password)
 				File file = grailsApplication.parentContext.getResource(keyFile)?.file
 

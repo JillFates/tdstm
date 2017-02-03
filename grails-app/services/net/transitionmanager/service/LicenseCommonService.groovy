@@ -87,7 +87,7 @@ class LicenseCommonService {
 	 * @return
 	 */
 	boolean isManagerEnabled(){
-		return grailsApplication.config.tdstm?.license?.manager?.enabled
+		return grailsApplication.config.manager?.license?.enabled
 	}
 
 	/**
@@ -103,6 +103,6 @@ class LicenseCommonService {
 	 * @return
 	 */
 	boolean isLGen(){
-		return isManagerEnabled() || (grailsApplication.config.tdstm?.license?.manager?.back)?true:false
+		return isManagerEnabled() || (grailsApplication.config.manager?.license?.back)
 	}
 }
