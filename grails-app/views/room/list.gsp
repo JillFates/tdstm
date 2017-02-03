@@ -132,14 +132,17 @@
 				<table>
 					<tbody>
 						<tr>
-							<td>Data Center<td/>
+							<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+						</tr>
+						<tr>
+							<td>Data Center<span style="color: red">*</span><td/>
 							<td>
 								<input type="hidden" name="project.id" id="projectId" value="${projectId}">
 								<input type="text" name="location" id="locationId" value="${roomInstance.location}">
 							</td>
 						</tr>
 						<tr>
-							<td>Room<td/>
+							<td>Room<span style="color: red">*</span><td/>
 							<td>
 								<input type="text" name="roomName" id="roomNameId" value="${roomInstance.roomName}">
 							</td>
