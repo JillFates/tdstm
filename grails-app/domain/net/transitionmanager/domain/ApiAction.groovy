@@ -16,6 +16,8 @@ class ApiAction {
 	String name
 	String description
 
+	String description
+
 	// Indicates the class to use when invoking the action
 	AgentClass agentClass
 
