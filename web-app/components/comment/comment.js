@@ -63,7 +63,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		scope.controller.lookUpAction(action);
 	});
 
-	scope.$on('showAssetDetails', function (evt, redirectTo, type, value) {
+	scope.$on('showAssetDetails', function(evt, redirectTo, type, value) {
 		scope.$broadcast('forceDialogClose', ['crud', 'list']);
 		EntityCrud.showAssetDetailView(type, value);
 	});
