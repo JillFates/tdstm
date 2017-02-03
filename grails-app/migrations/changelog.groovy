@@ -164,6 +164,7 @@ databaseChangeLog = {
 	include file: '20170118-add-grace_period_days-to-licensedclient-table.groovy'
 	include file: '20170125-drop_not_null_dbFormat_constraint_on_database_table.groovy'
 	include file: '20170125-drop_not_null_fileFormat_constraint_on_files_table.groovy'
+	include file: '20170203-add-table_columns-for-api-support.groovy'
 	include file: '20170209-delete-model-manufacturer-aliases-matching-their-parents-name.groovy'
 	include file: '20170224-add-autotimestamp-license-and-licensedclient.groovy'
 	include file: '20170224-change-license-enum-columns.groovy'
