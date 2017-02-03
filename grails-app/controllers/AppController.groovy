@@ -14,4 +14,6 @@ class AppController {
 	 */
 
 	def index() { }
+
+	def angular() { }
 }
