@@ -5,11 +5,20 @@ package net.transitionmanager.agent
  * help keep ApiCredential, ApiAction and Agent classes logically associated together.
  */
 enum AgentClass {
-	AWS,
-	RIVER_MEADOW,
-	RISK_NETWORKS,
-	RACIME,
-	CUSTOM,
-	TRANSITION_MANAGER,
-	LICENSE_MANAGER
+	AWS(1),
+	RIVERMEADOW(2),
+	RISKNETWORKS(3),
+	RACIME(4),
+	CUSTOM(5),
+    TRANSITION_MANAGER(6),
+    LICENSE_MANAGER(7)
+
+	int id
+	AgentClass(int id) {
+		this.id = id
+	}
+
+	static AgentClass forId(int id) {
+		values().find { it.id == id }
+	}
 }

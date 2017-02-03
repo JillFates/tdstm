@@ -7,7 +7,16 @@ package net.transitionmanager.agent
  *   Not Applicable
  */
 enum CallbackMode {
-	NA,
-	DIRECT,
-	MESSAGE
+	DIRECT(1),
+	MESSAGE(2),
+	NA(3)
+
+	int id
+	CallbackMode(int id) {
+		this.id = id
+	}
+
+	static CallbackMode forId(int id) {
+		values().find { it.id == id }
+	}
 }
