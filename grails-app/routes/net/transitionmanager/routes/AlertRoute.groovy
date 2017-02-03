@@ -4,11 +4,10 @@ import org.apache.camel.builder.RouteBuilder
 
 class AlertRoute extends RouteBuilder {
 
-
-	@Override
-	void configure() {
-		from('seda:alert-queue')
-			.log("Received an alert")
-			.to('bean:awsService?method=receiveAlert')
-	}
+    @Override
+    void configure() {
+        from('seda:alert-queue')
+        	.log("Received an alert")
+        	.to('bean:awsService?method=receiveAlert')
+    }
 }
