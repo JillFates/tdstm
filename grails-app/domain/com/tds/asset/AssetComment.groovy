@@ -78,6 +78,8 @@ class AssetComment {
 	String instructionsLink
 	Boolean durationLocked = false
 
+	String agentParams				//JSON object that holds the Agent Parameters
+
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
 	// The belongsTo would delete both Tasks and Comments when deleting Assets with the delete method. However
