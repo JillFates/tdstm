@@ -34,7 +34,7 @@ if (configFileFromJavaOpts){
 }
 
 //check if the manager config file was injected on the JavaOPTS
-configManagerFile = System.getProperty("${appName}.manager.config.location") ?: configManagerFile
+configManagerFile = System.getProperty("licManConf") ?: configManagerFile
 if(configManagerFile){
 	candidates << configManagerFile
 }
