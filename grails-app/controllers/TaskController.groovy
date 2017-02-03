@@ -1073,6 +1073,11 @@ digraph runbook {
 		render(view: "_editTask", model: [])
 	}
 
+	def actionLookUp() {
+
+		render(view: "_actionLookUp", model: [])
+	}
+
 	@HasPermission(Permission.TaskView)
 	def showTask() {
 		//def instructionsLink = AssetComment.read(params.taskId)?.instructionsLink

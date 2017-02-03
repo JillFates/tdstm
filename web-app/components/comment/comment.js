@@ -59,6 +59,10 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		scope.controller.editComment(commentTO);
 	});
 
+	scope.$on('lookUpAction', function(evt, action) {
+		scope.controller.lookUpAction(action);
+	});
+
 	scope.$on('showAssetDetails', function (evt, redirectTo, type, value) {
 		scope.$broadcast('forceDialogClose', ['crud', 'list']);
 		EntityCrud.showAssetDetailView(type, value);
@@ -220,6 +224,30 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			$('.daterangepicker').hide();
 		}, function (result) {
 			$('.daterangepicker').hide()
+		});
+	}
+
+	this.lookUpAction = function(action) {
+
+		var view = '/task/actionLookUp';
+
+		var modalInstance = modal.open({
+			templateUrl: utils.url.applyRootPath(view),
+			controller: tds.comments.controller.ActionLookUpDialogController,
+			scope: scope,
+			keyboard: false,
+			backdrop : 'static',
+			resolve: {
+				action: function() {
+					return action;
+				}
+			}
+		});
+
+		modalInstance.result.then(function() {
+
+		}, function (result) {
+
 		});
 	}
 
@@ -399,7 +427,11 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 	$scope.editComment = function () {
 		$scope.close();
 		$scope.$emit("editComment", commentTO);
-	}
+	};
+
+	$scope.lookUpAction = function(action) {
+		$scope.$emit("lookUpAction", action);
+	};
 
 	$scope.deleteComment = function () {
 		commentUtils.validateDelete($scope.ac.commentId, $scope.ac.assetEntity, commentService.deleteComment).then(
@@ -776,7 +808,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 		var startDate = utils.date.createDateTimeFromString($scope.ac.estStart);
 		var endDate = utils.date.createDateTimeFromString($scope.ac.estFinish);
 		if (startDate.isValid() && endDate.isValid()) {
-			// b - a > 0	
+			// b - a > 0
 			var diff = endDate.diff(startDate);
 			$scope.acData.durationTime = diff;
 		}
@@ -854,7 +886,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				// sometimes the duration property has and old value that does not
 				// represent the correct diff between estStart/estFinish causing
 				// an infinite loop of changes between the properties
-				// the following if statement will always consider the diff 
+				// the following if statement will always consider the diff
 				// between estStart/estFinish as the duration value
 				if (ac.estStart && ac.estFinish) {
 					var startDate = utils.date.createDateTimeFromString(ac.estStart);
@@ -970,6 +1002,22 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 		}
 	}
 };
+
+
+/**
+ * Controller use to show the action lookup information
+ */
+
+tds.comments.controller.ActionLookUpDialogController = function($scope, $modalInstance, $log, $timeout, commentService, alerts, action, appCommonData, utils, commentUtils) {
+
+
+	$scope.action = action;
+
+	$scope.close = function() {
+		commentUtils.closePopup($scope, 'actionLookUp');
+	};
+};
+
 
 /************************
  * SERVICES
