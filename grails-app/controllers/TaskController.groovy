@@ -1080,6 +1080,7 @@ digraph runbook {
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
+    // TODO: <SL> Need @HasPermission annotation
 	def actionLookUp() {
 		Long actionId = Long.parseLong(params.apiActionId)
 
@@ -1094,13 +1095,6 @@ digraph runbook {
 		// if taskNumber is not null then you can query the task and get the action and pass it to the model
 
 		render(view: "_actionLookUp", model: [apiAction:apiActionPayload])
-	}
-
-	// TODO: <SL> Need @HasPermission annotation
-	def actionLookUp() {
-		def taskNumber = params.taskNumber
-		// if taskNumber is not null then you can query the task and get the action and pass it to the model
-		render(view: "_actionLookUp", model: [])
 	}
 
 	@HasPermission(Permission.TaskView)
