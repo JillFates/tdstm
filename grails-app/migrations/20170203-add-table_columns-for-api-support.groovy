@@ -9,6 +9,9 @@ databaseChangeLog = {
 		sql("""
 			CREATE TABLE api_action (
 				id bigint(20) NOT NULL AUTO_INCREMENT,
+				version bigint(20) NOT NULL DEFAULT 1,
+				name varchar(64) NOT NULL,
+				description varchar(255) NOT NULL DEFAULT '',
 				project_id bigint(20) NOT NULL,
 				name varchar(64) NOT NULL,
 				version bigint(20) NOT NULL DEFAULT 0,
@@ -41,6 +44,7 @@ databaseChangeLog = {
 			ADD COLUMN `api_action_settings` JSON NULL COMMENT 'Settings for the API Action that override the default settings',
 			ADD COLUMN `api_action_invoked_at` DATE NULL COMMENT 'The datetime that the API Action was invoked',
 			ADD COLUMN `api_action_completed_at` DATE NULL COMMENT 'The datetime that the API Action invocation completed',
+			ADD COLUMN `agent_params` TEXT,
 			ADD INDEX `IDX_ASSET_COMMENT_API_ACTION` (`api_action_id`),
 			ADD CONSTRAINT `FK_ASSET_COMMENT_TO_API_ACTION`
 				FOREIGN KEY (`api_action_id`)
