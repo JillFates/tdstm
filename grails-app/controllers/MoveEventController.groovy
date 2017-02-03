@@ -233,10 +233,10 @@ class MoveEventController implements ControllerMethods {
 	}
 
 	def save() {
-		MoveEvent moveEvent = new MoveEvent(params)
 		if (params.estStartTime) {
-			moveEvent.estStartTime = TimeUtil.parseDateTime(params.estStartTime)
+			params.estStartTime = TimeUtil.parseDateTime(params.estStartTime) ?: params.estStartTime
 		}
+		MoveEvent moveEvent = new MoveEvent(params)
 
 		if (moveEvent.project.runbookOn == 1) {
 			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
