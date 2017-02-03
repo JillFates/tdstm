@@ -23,12 +23,10 @@ class LicenseAdminService extends LicenseCommonService {
 	static enum State {
 		UNLICENSED, TERMINATED, EXPIRED, INBREACH, NONCOMPLIANT, VALID
 	}
-
-	private MyLicenseProvider licenseProvider
-
 	static final String CACHE_NAME = "LIC_STATE"
 	CacheManager licenseCache = CacheManager.getInstance()
 
+	private boolean loaded = false
 	AssetEntityService assetEntityService
 	SecurityService	securityService
 
@@ -44,8 +42,9 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 		*/
 
-		if(isEnabled() && !licenseProvider) {
-			licenseProvider = MyLicenseProvider.getInstance()
+		if(isEnabled() && !loaded) {
+			loaded = true
+			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
 
 			if(!licenseCache.getCache(CACHE_NAME)) {
 				log.debug("configuring cache")
@@ -86,7 +85,6 @@ class LicenseAdminService extends LicenseCommonService {
 				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
 
 				// BEGIN: License Admin Configuration //
-				licenseProvider = MyLicenseProvider.getInstance()
 				LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
 				LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
 				LicenseManagerProperties.setLicenseProvider(licenseProvider)
@@ -333,6 +331,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 		log.debug("ID: {}", id)
 		log.debug("Hash: {}", hash)
+		MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
 		licenseProvider.addLicense(id, hash)
 
 		License licObj
