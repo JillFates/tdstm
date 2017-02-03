@@ -1063,7 +1063,8 @@ digraph runbook {
 
 	@HasPermission([Permission.TaskCreate, Permission.TaskEdit])
 	def editTask() {
-		render(view: "_editTask", model: [])
+		def apiActionList = [[id: 1, name: 'Action one'], [id: 2, name: 'Action two']]
+		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
 	def actionLookUp() {

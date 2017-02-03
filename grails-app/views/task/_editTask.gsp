@@ -45,10 +45,11 @@
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
 						<td valign="top" class="value" id="vmAction" colspan="2">
-							<select>
-								<option>Option 1</option>
-								<option>Option 2</option>
-								<option>Option 3</option>
+							<select ng-model="ac.apiActionId">
+								<option value="">please select</option>
+								<g:each var="apiAction" in="${apiActionList}">
+									<option value="${apiAction.id}">${apiAction.name}</option>
+								</g:each>
 							</select>
 						</td>
 					</tr>

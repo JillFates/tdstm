@@ -34,7 +34,7 @@
                                 <label><b>Description:</b></label>
                             </td>
                             <td valign="top" class="value">
-                                <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000">Used to get the status of the Transport of a VM by RiverMeadow and complete task appropriately.</textarea>
+                                <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000" readonly>Used to get the status of the Transport of a VM by RiverMeadow and complete task appropriately.</textarea>
                             </td>
                         </tr>
                         <tr class="prop">
