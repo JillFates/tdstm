@@ -50,6 +50,14 @@ tdstm {
 		}
 	}
 
+	credentials {
+		// Credentials to access the AWS service (temporary)
+		aws {
+			accessKey = ''
+			secretKey = ''
+		}
+	}
+
 	security {
 
 		// Audit configuration, valid options are: access and activity (default is access)
