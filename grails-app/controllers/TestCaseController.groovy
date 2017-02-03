@@ -7,6 +7,7 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
@@ -44,6 +45,12 @@ class TestCaseController implements ControllerMethods {
 	UserService userService
 
 	AwsService awsService
+
+	def api() {
+		def apis = ApiAction.findAll()[0]
+
+		render "${apis.name} agentClass=${apis.agentClass} callbackMode=${apis.callbackMode}"
+	}
 
 	@HasPermission('ViewAdminTools')
 	def sendSedaMessage() {
