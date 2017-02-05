@@ -8,7 +8,6 @@
 	</div>
 	<div id="actionLookUpDialog" class="comment-dialog-content">
 	<loading-indicator></loading-indicator>
-
 		<form name="actionLookUpForm" class="css-form">
             <div class="dialog" style="border: 1px solid #5F9FCF">
                 <div>
@@ -18,7 +17,7 @@
                                 <label><b>Agent:</b></label>
                             </td>
                             <td valign="top" class="value">
-                                <label>RIVERMEADOW</label>
+                                <label>${apiAction.agent}</label>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -26,7 +25,7 @@
                                 <label><b>Method:</b></label>
                             </td>
                             <td valign="top" class="value">
-                                <label>getTransportStatus</label>
+                                <label>${apiAction.method}</label>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -34,7 +33,7 @@
                                 <label><b>Description:</b></label>
                             </td>
                             <td valign="top" class="value">
-                                <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000" readonly>Used to get the status of the Transport of a VM by RiverMeadow and complete task appropriately.</textarea>
+                                <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000" readonly>${apiAction.description}</textarea>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -49,18 +48,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>taskId</td>
-                                            <td>TASK</td>
-                                            <td>id</td>
-                                            <td>12323</td>
-                                        </tr>
-                                        <tr>
-                                            <td>serverName</td>
-                                            <td>ASSET</td>
-                                            <td>assetName</td>
-                                            <td>server1</td>
-                                        </tr>
+                                        <g:each var="methodParam" in="${apiAction.methodParams}">
+                                            <tr>
+                                                <td>${methodParam.param}</td>
+                                                <td>${methodParam.context}</td>
+                                                <td>${methodParam.property}</td>
+                                                <td>${methodParam.value}</td>
+                                            </tr>
+                                        </g:each>
                                     </tbody>
                                 </table>
                             </td>

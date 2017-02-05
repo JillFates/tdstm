@@ -227,9 +227,9 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		});
 	}
 
-	this.lookUpAction = function(action) {
+	this.lookUpAction = function(apiAction) {
 
-		var view = '/task/actionLookUp?taskNumber=' + action.assetComment.taskNumber;
+		var view = '/task/actionLookUp?apiActionId=' + apiAction.id;
 
 		var modalInstance = modal.open({
 			templateUrl: utils.url.applyRootPath(view),
@@ -238,8 +238,8 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			keyboard: false,
 			backdrop : 'static',
 			resolve: {
-				action: function() {
-					return action;
+				apiAction: function() {
+					return apiAction;
 				}
 			}
 		});
@@ -955,6 +955,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				$scope.ac.dueDate = moment($scope.ac.dueDate).format(utils.date.defaultDateFormat());
 			}
 			$scope.ac.id = $scope.ac.commentId;
+			$scope.ac.apiActionId = (($scope.ac.apiAction && $scope.ac.apiAction.id)? parseInt($scope.ac.apiAction.id): 0);
 			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
 
 			if (commentService.validDependencies($scope.dependencies)) {
@@ -1008,10 +1009,10 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
  * Controller use to show the action lookup information
  */
 
-tds.comments.controller.ActionLookUpDialogController = function($scope, $modalInstance, $log, $timeout, commentService, alerts, action, appCommonData, utils, commentUtils) {
+tds.comments.controller.ActionLookUpDialogController = function($scope, $modalInstance, $log, $timeout, commentService, alerts, apiAction, appCommonData, utils, commentUtils) {
 
 
-	$scope.action = action;
+	$scope.apiAction = apiAction;
 
 	$scope.close = function() {
 		commentUtils.closePopup($scope, 'actionLookUp');
@@ -1580,6 +1581,8 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 			assetType: assetData.assetType,
 			assignedTo: appCommonData.getLoginPerson().id.toString(),
 			category: 'general',
+			apiAction: assetData.apiAction,
+			actionMode: assetData.actionMode,
 			comment: '',
 			commentFromId: '',
 			commentId: "",
