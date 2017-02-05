@@ -628,6 +628,8 @@ class AssetEntityController implements ControllerMethods {
 			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 			def canEdit = userCanEditComments(assetComment.commentType)
 
+			String actionMode =  'M' //(task?.role == AssetComment.AUTOMATIC_ROLE) ? 'A' : 'M'
+
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
 			commentList << [
@@ -662,6 +664,8 @@ class AssetEntityController implements ControllerMethods {
 				instructionsLinkURL: instructionsLinkURL ?: "",
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
 				canEdit: canEdit,
+				apiAction: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name],
+				actionMode: actionMode,
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,
 				action: assetComment.apiAction?.name
