@@ -108,7 +108,7 @@
 								<div class="buttons">
 									<span class="button">
 									 <tds:hasPermission permission='DeleteRoom'>
-										<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
+										<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close'); saveData();"/>
 									 </tds:hasPermission>
 										 <tds:hasPermission permission='MergeRoom'>
 											<span class="button"><input class="create disableButton" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" disabled="disabled" /></span>
@@ -306,7 +306,7 @@
 				url: contextPath+"/room/show",
 				data: {'id':roomId},
 				type:'POST',
-				success: function(data) {
+				success: function(data) {aler(JSON.stringify(data));
 					$("#roomListView").hide()
 					$("#roomShowView").html(data)
 					$("#roomShowView").show()
@@ -322,7 +322,19 @@
 			$("#editCommentDialog,#editManufacturerView").dialog({ autoOpen: false})
 			$(document).on('entityAssetCreated', function(e) { updateRackLayoutView(); });
 			$(document).on('entityAssetUpdated', function(e) { updateRackLayoutView(); });
-		})
+		});
+
+
+		var dataStore = {};
+		function saveData() {
+			var container = $('.ui-dialog .ui-dialog-titlebar');
+			var content = $('#createRoomDialog form');
+
+			if (content.length == 0) {
+                container.after(dataStore.content);
+			}
+            dataStore.content = content;
+		}
 
 		function updateRackLayoutView(){
 			var currentRackId = $('#selectedRackId').val()
@@ -331,7 +343,7 @@
 			}
 		}
 
-		function openRoomView(e,browser){
+		function openRoomView(e,browser){alert("A");
 
 			var resp = e.responseText
 			$("#roomListView").hide()
@@ -343,7 +355,7 @@
 			$("#room_layout").css("height","auto")
 		}
 
-		function enableActions(){
+		function enableActions(){alert("A");
 			var inputCheckBox = $("input:checkbox")
 			var enableButtons = 0
 			$('.listCheck:checked').each(function(index, val) {
@@ -412,7 +424,7 @@
 					getRackLayout( rackId )
 			},600);
 		}
-		function getRackLayout( rackId ){
+		function getRackLayout( rackId ){alert("A");
 			if (rackId) {
 				var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 				var moveBundleId = ''
