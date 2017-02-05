@@ -664,13 +664,12 @@ class AssetEntityController implements ControllerMethods {
 				instructionsLinkURL: instructionsLinkURL ?: "",
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
 				canEdit: canEdit,
-				apiAction: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name],
+				apiAction: [id: 1, name: 'Action one'], //[id: assetComment.apiAction?.id, name: assetComment.apiAction?.name],
 				actionMode: actionMode,
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,
 				action: assetComment.apiAction?.name
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
-
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "

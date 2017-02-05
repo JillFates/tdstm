@@ -17,6 +17,10 @@ class ApiActionService {
         return store.find{ it.id == id }
     }
 
+    ApiAction findApiAction(int id) {
+        return store.find{ it.id == id }
+    }
+
     List<Map> list(){
         store
     }
