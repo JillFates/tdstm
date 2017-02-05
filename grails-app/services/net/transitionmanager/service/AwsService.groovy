@@ -33,12 +33,9 @@ class AwsService implements InitializingBean {
 		// secretKey='B92lS3XWtf/jxpYxFRZZujAmgkLihYNaazh8GGPs'
 
 		// TODO : The credentials should be loaded based on the project
-		accessKey = config?.tdstm?.credentials?.aws?.accessKey
-		secretKey = config?.tdstm?.credentials?.aws?.secretKey
+		accessKey = config?.tdstm?.credentials?.aws?.accessKey ?: null
+		secretKey = config?.tdstm?.credentials?.aws?.secretKey ?: null
 
-		// If not defined the parameter appears as a map instead an empty String
-		if (accessKey.equals('[:]')) accessKey = null
-		if (secretKey.equals('[:]')) secretKey = null
 	}
 
 	/**
