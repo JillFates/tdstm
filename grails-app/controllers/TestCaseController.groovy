@@ -22,6 +22,8 @@ import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
 
+//import net.transitionmanager.agent.AgentClass
+
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
@@ -47,6 +49,14 @@ class TestCaseController implements ControllerMethods {
 	AwsService awsService
 
 	def api() {
+
+		log.debug "=====================\nAbout to save ApiAction\n====================="
+		ApiAction aa = new ApiAction(params)
+		if (! aa.save() ) {
+			render 'save failed:' + GormUtil.allErrorsString(aa)
+			return
+		}
+
 		def apis = ApiAction.findAll()[0]
 
 		render "${apis.name} agentClass=${apis.agentClass} callbackMode=${apis.callbackMode}"
