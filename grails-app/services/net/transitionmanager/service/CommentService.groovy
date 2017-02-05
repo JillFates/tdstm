@@ -48,6 +48,7 @@ class CommentService implements ServiceMethods {
 
 	def mailService					// SendMail MailService class
 	AssetEntityService assetEntityService
+	ApiActionService apiActionService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	Scheduler quartzScheduler
@@ -331,6 +332,11 @@ class CommentService implements ServiceMethods {
 					// log.info "saveUpdateCommentAndNotes: dueDate=[$params.dueDate]"
 					assetComment.dueDate = TimeUtil.parseDate(params.dueDate)
 				}
+			}
+
+			//Save ApiAction data
+			if(params.containsKey("apiActionId")){
+				assetComment.apiAction = apiActionService.findApiAction(params.apiActionId)
 			}
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This

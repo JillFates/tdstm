@@ -5,25 +5,15 @@ package net.transitionmanager.agent
  * help keep ApiCredential, ApiAction and Agent classes logically associated together.
  */
 enum ContextType {
-	APPLICATION ('APPLICATION'),
-	ASSET ('ASSET'),	// Any class of asset (App, DB, Server, Storage, etc)
-	BUNDLE ('BUNDLE'),
-	DATABASE ('DATABASE'),
-	DEVICE ('DEVICE'),
-	EVENT ('EVENT'),
-	PROJECT ('PROJECT'),
-	STORAGE ('STORAGE'),
-	SERVER ('SERVER'),
-	TASK ('TASK'),
-	USER_DEF ('USER_DEF')	// User defined
-
-	String id
-	ContextType (String id) {
-		this.id = id
-	}
-
-	static ContextType forId(String id) {
-		values().find { it.id == id }
-	}
-
+	APPLICATION,
+	ASSET,	// Any class of asset (App, DB, Server, Storage, etc)
+	BUNDLE,
+	DATABASE,
+	DEVICE,
+	EVENT,
+	PROJECT,
+	STORAGE,
+	SERVER,
+	TASK,
+	USER_DEF
 }
