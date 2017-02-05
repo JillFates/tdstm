@@ -9,8 +9,9 @@ databaseChangeLog = {
 		sql("""
 			CREATE TABLE api_action (
 				id bigint(20) NOT NULL AUTO_INCREMENT,
-				version bigint(20) NOT NULL DEFAULT 1,
+				project_id bigint(20) NOT NULL,
 				name varchar(64) NOT NULL,
+				version bigint(20) NOT NULL DEFAULT 0,
 				description varchar(255) NOT NULL DEFAULT '',
 				project_id bigint(20) NOT NULL,
 				name varchar(64) NOT NULL,

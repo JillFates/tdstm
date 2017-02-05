@@ -83,6 +83,22 @@ class ApiAction {
 		}
 	}
 
+	/*
+	 * Used to determine if the action is performed asyncronously
+	 * @return true if action is async otherwise false
+	 */
+	boolean isAsync() {
+		callbackMode != CallbackMode.NA
+	}
+
+	/*
+	 * Used to determine if the action is performed syncronously
+	 * @return true if action is syncronous otherwise false
+	 */
+	boolean isSync() {
+		callbackMode == CallbackMode.NA
+	}
+
 	static transients = ['methodParamsList']
 
 	/*

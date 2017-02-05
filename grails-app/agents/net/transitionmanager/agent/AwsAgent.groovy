@@ -16,6 +16,9 @@ import groovy.util.logging.Slf4j
 class AwsAgent extends AbstractAgent {
 
 	public AwsService awsService
+	private static Map topicParam() { [type:String, description: 'The name of the topic/queue to send message to'] }
+	private static Map messageParam() { [type:Object, description: 'The data to pass to the message'] }
+	private static Map queueParams() { [topicName: topicParam(), message: messageParam()] }
 
 	/*
 	 * Constructor
