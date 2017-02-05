@@ -19,6 +19,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.CommentService
@@ -67,6 +68,7 @@ class TaskController implements ControllerMethods {
 
 	AssetEntityService assetEntityService
 	AssetService assetService
+	ApiActionService apiActionService
 	CommentService commentService
 	ControllerService controllerService
 	CustomDomainService customDomainService
@@ -1070,13 +1072,14 @@ digraph runbook {
 
 	@HasPermission([Permission.TaskCreate, Permission.TaskEdit])
 	def editTask() {
-		def apiActionList = [[id: 1, name: 'Action one'], [id: 2, name: 'Action two']]
+		def apiActionList = apiActionService.list()
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
 	def actionLookUp() {
 		def taskNumber = params.taskNumber
 		// if taskNumber is not null then you can query the task and get the action and pass it to the model
+
 		render(view: "_actionLookUp", model: [])
 	}
 
