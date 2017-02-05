@@ -5,6 +5,7 @@ import net.transitionmanager.domain.ApiAction
 
 @Transactional
 class ApiActionService {
+
     private List<Map> store = [
             [id:1, name: 'Action one'],
             [id:2, name: 'Action two'],
