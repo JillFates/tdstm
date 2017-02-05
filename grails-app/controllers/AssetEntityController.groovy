@@ -687,7 +687,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,
 				action: assetComment.apiAction?.name
-				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
+				//action: [id: 1, name: 'Action one'], //[id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
