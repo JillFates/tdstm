@@ -9,11 +9,14 @@ import groovy.util.logging.Slf4j
 @Slf4j(value='logger')
 class AwsAgent implements AgentTrait {
 
-	private static Map topicParam() { [type:String, description: 'The name of the topic/queue to send message'] }
+	private static Map topicParam() { [type:String, description: 'The name of the topic/queue to send message to'] }
 	private static Map messageParam() { [type:Object, description: 'The data to pass to the message'] }
 	private static Map queueParams() { [topicName: topicParam(), message: messageParam()] }
 
 	private static final AgentClass agentClass = AgentClass.AWS
+
+	static final String name='Amazon AWS API'
+	static final String description='llll'
 
 	static List dict = [
 		new DictionaryItem([
@@ -24,7 +27,7 @@ class AwsAgent implements AgentTrait {
 			results: invokeResults()
 		]),
 		new DictionaryItem([
-			name: 'sendSQsMessage',
+			name: 'sendSqsMessage',
 			description: 'Used to generate Simple Queue Service (SQS) messages',
 			method: 'sendSqs',
 			params: queueParams(),

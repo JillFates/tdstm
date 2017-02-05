@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -78,7 +79,17 @@ class AssetComment {
 	String instructionsLink
 	Boolean durationLocked = false
 
-	String agentParams				//JSON object that holds the Agent Parameters
+	// If present is an API Action that will be invoked when a task goes to Started or Completed or user presses the Invoke
+	ApiAction apiAction
+
+	// The time that the API Action was invoked. Invocation can only occur if this property is null.
+	Date apiActionInvokedAt
+
+	// The time that the API Action invocation completed
+	Date apiActionCompletedAt
+
+	// Any settings for the API Action that will override the settings in the apiAction (stored as JSON)
+	String apiActionSettings
 
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
