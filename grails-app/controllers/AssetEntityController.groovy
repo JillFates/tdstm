@@ -48,6 +48,7 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
@@ -666,8 +667,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
 				canEdit: canEdit,
 				lastUpdated: lastUpdated,
-				apiAction: [id:1, name:'Option 1'],
-				actionMode: 'A'
+				apiActionId: assetComment.apiAction?.id,
+				action: assetComment.apiAction?.name
+				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
+
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "

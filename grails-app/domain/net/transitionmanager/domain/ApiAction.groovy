@@ -48,14 +48,14 @@ class ApiAction {
 
 	static belongsTo = [project: Project]
 
-	static constrants = {
-		agentClass  nullable: false, inList: AgentClass.values()*.id, enumType: 'string'
+	static constraints = {
+		agentClass  nullable: false
 		agentMethod nullable: false, size: 1..64
-		callbackMode nullable: false, inList: CallbackMode.values()*.id, enumType: 'string'
+		callbackMode nullable: false
 		asyncQueue nullable: false, size: 0..64
 		name nullable: false, size: 1..64
 		methodParams nullable: true
-		lastModifed nullable: true
+		lastModified nullable: true
 	}
 
 	static mapping = {
