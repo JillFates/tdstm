@@ -1077,10 +1077,34 @@ digraph runbook {
 	}
 
 	def actionLookUp() {
-		def taskNumber = params.taskNumber
+		def actionId = params.actionId
+
+		def apiAction = [
+		        agent: "RIVERMEADOW_DUMMY",
+				method: "getTransportStatus_DUMMY",
+				description: "Used to get the status of the Transport of a VM by RiverMeadow and complete task appropriately.",
+				methodParams: [
+					[
+						param:'assetId',
+						desc: 'The unique id to reference the asset',
+						type:'string',
+						context: "ContextType.ASSET.toString()",
+						property: 'id',
+						value: 'user def value'
+					],[
+						param: 'assetId 2',
+						desc: 'The unique id to reference the asset 2',
+						type:'string',
+						context: "ContextType.ASSET.toString() 2",
+						property: 'id 2',
+						value: 'user def value 2'
+					]
+				]
+
+		]
 		// if taskNumber is not null then you can query the task and get the action and pass it to the model
 
-		render(view: "_actionLookUp", model: [])
+		render(view: "_actionLookUp", model: [apiAction:apiAction])
 	}
 
 	@HasPermission(Permission.TaskView)

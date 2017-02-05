@@ -20,7 +20,7 @@ class ApiAction {
 	/*
 	 * A JSON object that contains the mapping of method parameters and where the values will be sourced from
 	 * [ {	'param':'assetId',
-	 *			'desc': 'The unique id to reference the asset' }
+	 *			'desc': 'The unique id to reference the asset',
 	 *			'type':'string',
 	 *			'context': ContextType.ASSET.toString(),	// The context that the param value will be pulled from
 	 * 			'property': 'id', 	// The property on the context that the value will be pulled from
