@@ -632,8 +632,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 			def canEdit = userCanEditComments(assetComment.commentType)
 
-			log.info "OLB: ${assetComment.role}"
-			String actionMode =  'M' //(assetComment.role == AssetComment.AUTOMATIC_ROLE) ? 'A' : 'M'
+			String actionMode = assetComment.isAutomatic() ? 'A' : 'M'
 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
@@ -670,6 +669,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
 				canEdit: canEdit,
 				apiAction: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name],
+				actionMode: actionMode,
+				actionInvocable: assetComment.actionInvocable(),
 				actionMode: actionMode,
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,
