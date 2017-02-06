@@ -709,11 +709,11 @@ class CookbookService implements ServiceMethods {
 		}
 	}
 
-	List<Map> validateSyntax(String sourceCode) {
+	List<Map> validateSyntax(String sourceCode, Project project = null) {
 		try {
-			basicValidateSyntax(sourceCode)
+			basicValidateSyntax(sourceCode, project)
 		} catch (e) {
-			[[error: 1, reason: 'Invalid syntax', detail: e.message.replaceAll(/[\r]/, '<br/>')]]
+			[[error: 1, reason: 'Invalid syntax', detail: e.message?.replaceAll(/[\r]/, '<br/>')]]
 		}
 	}
 
@@ -769,14 +769,16 @@ class CookbookService implements ServiceMethods {
 	* 4) Invalid reference
 	* 5) Duplicate reference
 	*/
-	List<Map> basicValidateSyntax(sourceCode) {
+	List<Map> basicValidateSyntax(sourceCode, Project currentProject = null) {
 
 		def errorList = [] as HashSet
 		def recipe
 		def msg
 
-		// Reference to current project
-		Project currentProject = controllerService.getRequiredProject()
+		if ( !currentProject ) {
+			// Reference to current project
+			currentProject = controllerService.getRequiredProject()
+		}
 		// Keeps an in-memory list of all the possible Api Actions to querying multiple times.
 		List apiActions = ApiAction.findAllByProject(currentProject)
 
