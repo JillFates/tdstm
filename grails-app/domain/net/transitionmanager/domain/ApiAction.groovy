@@ -1,7 +1,10 @@
 package net.transitionmanager.domain
 
+import grails.converters.JSON
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
+import org.codehaus.groovy.grails.web.json.JSONElement
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -69,6 +72,8 @@ class ApiAction {
 		}
 	}
 
+	static transients = ['methodParamsJson']
+
 	/*
 	 * Used to determine if the action is performed asyncronously
 	 * @return true if action is async otherwise false
@@ -87,5 +92,9 @@ class ApiAction {
 
 	String toString() {
 		name
+	}
+
+	JSONElement getMethodParamsJson(){
+		JSON.parse(methodParams)
 	}
 }
