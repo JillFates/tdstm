@@ -40,7 +40,7 @@
 						<td valign="top" class="value" id="vmAction" colspan="2">{{acData.apiAction.name}}</td>
 						<td valign="top" class="value" >
 							<button class="btn btn-default" role="button" ng-if="acData.apiAction.id" ng-click="lookUpAction(acData.apiAction);"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;
-							<button class="btn btn-default" role="button" ng-if="ac.status === 'Ready' && acData.actionMode === 'M'" ng-click="invokeAction(acData.action);">Invoke</button>
+							<button class="btn btn-default" role="button" ng-if="ac.status === 'Ready' && acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction(acData.action);">Invoke</button>
 						</td>
 					</tr>
 					<tr id="categoryTrId">
