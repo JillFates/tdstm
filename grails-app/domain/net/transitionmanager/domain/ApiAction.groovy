@@ -85,7 +85,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsJson', 'methodParamsMap']
+	static transients = ['methodParamsList']
 
 	/*
 	 * Used to determine if the action is performed asyncronously
@@ -139,16 +139,16 @@ class ApiAction {
 		return list
 	}
 
-	Map getMethodParamsMap(){
+	List<Map> getMethodParamsList(){
 		JsonSlurper slurper = new groovy.json.JsonSlurper()
-		Map map = [:]
+		List<Map> list = []
 		if(methodParams) {
 			try {
-				map = slurper.parseText(methodParams)
+				list = slurper.parseText(methodParams)
 			} catch (e) {
-				log.error "methodParams was not propertly formed JSON (value=$methodParams)"
+				log.error "methodParams was not propertly formed JSON (value=$methodParams)", e
 			}
 		}
-		return map
+		return list
 	}
 }
