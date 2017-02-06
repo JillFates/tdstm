@@ -1,11 +1,8 @@
 package net.transitionmanager.domain
 
-import grails.converters.JSON
 import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
-import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -73,7 +70,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsJson', 'methodParamsMap']
+	static transients = ['methodParamsList']
 
 	/*
 	 * Used to determine if the action is performed asyncronously
@@ -95,16 +92,16 @@ class ApiAction {
 		name
 	}
 
-	Map getMethodParamsMap(){
+	List<Map> getMethodParamsList(){
 		JsonSlurper slurper = new groovy.json.JsonSlurper()
-		Map map = [:]
+		List<Map> list = []
 		if(methodParams) {
 			try {
-				map = slurper.parseText(methodParams)
+				list = slurper.parseText(methodParams)
 			} catch (e) {
-				log.error "methodParams was not propertly formed JSON (value=$methodParams)"
+				log.error "methodParams was not propertly formed JSON (value=$methodParams)", e
 			}
 		}
-		return map
+		return list
 	}
 }
