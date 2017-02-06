@@ -1086,7 +1086,7 @@ digraph runbook {
 		        agent: "${apiAction.agentClass}",
 				method: apiAction.agentMethod,
 				description: apiAction.description,
-				methodParams: apiAction.methodParamsMap
+				methodParams: apiAction.methodParamsList
 		]
 		// if taskNumber is not null then you can query the task and get the action and pass it to the model
 
