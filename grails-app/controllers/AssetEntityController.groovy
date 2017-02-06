@@ -2698,7 +2698,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @return String HTML representing the page
 	 */
 	def retrieveLists() {
-
+		
 		def start = new Date()
 		session.removeAttribute('assetDependentlist')
 
@@ -3038,7 +3038,11 @@ class AssetEntityController implements ControllerMethods {
 
 				//map Groups array String values to Integer
 				depGroups = NumberUtil.mapToPositiveInteger(depGroups)
-
+				
+				// handle the case of empty dependency groups
+				if (depGroups == [])
+					depGroups = -1
+				
 				def assetDependencies = AssetDependency.executeQuery('''
 					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future,
 					                ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
