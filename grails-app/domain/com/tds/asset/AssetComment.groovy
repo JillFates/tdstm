@@ -260,6 +260,25 @@ class AssetComment {
 		isResolved = date ? 1 : 0
 	}
 
+	/**
+	 * Determines if the task is Automatic processed
+	 * @return
+	 */
+	boolean isAutomatic(){
+		AUTOMATIC_ROLE == role
+	}
+
+	/*
+	 * Determines if a task action can be invoked manually
+	 * @return true if action can be invoked
+	 */
+	boolean actionInvocable() {
+		apiAction &&
+		! apiActionInvokedAt &&
+		! apiActionCompletedAt &&
+		status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED]
+	}
+
 	/*
 	 * Returns the remaining duration until the tasks will be completed. This tasks into account the start time
 	 * if the task is in progress otherwise returns the total duration

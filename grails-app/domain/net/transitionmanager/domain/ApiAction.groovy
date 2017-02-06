@@ -1,6 +1,7 @@
 package net.transitionmanager.domain
 
 import grails.converters.JSON
+import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import org.codehaus.groovy.grails.web.json.JSONElement
@@ -72,7 +73,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsJson']
+	static transients = ['methodParamsJson', 'methodParamsMap']
 
 	/*
 	 * Used to determine if the action is performed asyncronously
@@ -94,7 +95,16 @@ class ApiAction {
 		name
 	}
 
-	JSONElement getMethodParamsJson(){
-		JSON.parse(methodParams)
+	Map getMethodParamsMap(){
+		JsonSlurper slurper = new groovy.json.JsonSlurper()
+		Map map = [:]
+		if(methodParams) {
+			try {
+				map = slurper.parseText(methodParams)
+			} catch (e) {
+				log.error "methodParams was not propertly formed JSON (value=$methodParams)"
+			}
+		}
+		return map
 	}
 }
