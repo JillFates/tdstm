@@ -159,6 +159,9 @@ class AssetComment {
 		taskSpec nullable: true
 		workflowOverride nullable: true            // TODO : add range to workflowOverride constraint
 		workflowTransition nullable: true
+		apiActionInvokedAt nullable: true
+		apiActionCompletedAt nullable: true
+		apiActionSettings nullable: true
 	}
 
 	static mapping = {

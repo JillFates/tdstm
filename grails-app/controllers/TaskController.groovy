@@ -14,6 +14,7 @@ import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -1077,34 +1078,19 @@ digraph runbook {
 	}
 
 	def actionLookUp() {
-		def actionId = params.actionId
+		Long actionId = Long.parseLong(params.apiActionId)
 
-		def apiAction = [
-		        agent: "RIVERMEADOW_DUMMY",
-				method: "getTransportStatus_DUMMY",
-				description: "Used to get the status of the Transport of a VM by RiverMeadow and complete task appropriately.",
-				methodParams: [
-					[
-						param:'assetId',
-						desc: 'The unique id to reference the asset',
-						type:'string',
-						context: "ContextType.ASSET.toString()",
-						property: 'id',
-						value: 'user def value'
-					],[
-						param: 'assetId 2',
-						desc: 'The unique id to reference the asset 2',
-						type:'string',
-						context: "ContextType.ASSET.toString() 2",
-						property: 'id 2',
-						value: 'user def value 2'
-					]
-				]
+		ApiAction apiAction = apiActionService.find(actionId)
 
+		Map apiActionPayload = [
+		        agent: "${apiAction.agentClass}",
+				method: apiAction.agentMethod,
+				description: apiAction.description,
+				methodParams: apiAction.methodParamsJson
 		]
 		// if taskNumber is not null then you can query the task and get the action and pass it to the model
 
-		render(view: "_actionLookUp", model: [apiAction:apiAction])
+		render(view: "_actionLookUp", model: [apiAction:apiActionPayload])
 	}
 
 	@HasPermission(Permission.TaskView)
