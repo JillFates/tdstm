@@ -243,10 +243,10 @@ class PersonService implements ServiceMethods {
 	 * @return Null if name unable to be parsed or a Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is
 	 * found. If more than one match is found then isAmbiguous will be set to true.
 	 */
-	Map findPerson(String name, Project project, def staffList = null, def clientStaffOnly = true) {
+	Map findPerson(String name, Project project, def staffList = null, def clientStaffOnly = true, boolean checkAmbiguity = false) {
 		Map map = parseName(name)
 		if (map) {
-			map = findPerson(map, project, staffList, clientStaffOnly)
+			map = findPerson(map, project, staffList, clientStaffOnly, checkAmbiguity)
 		}
 		logger.debug 'findPerson(String) results={}', map
 		return map
@@ -285,9 +285,9 @@ class PersonService implements ServiceMethods {
 	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is
 	 * found then isAmbiguous will be set to true and person will be null.
 	 */
-	Map findPerson(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true) {
+	Map findPerson(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true, boolean checkAmbiguity = false) {
 		String mn = 'findPerson()'
-		Map results = [person: null, isAmbiguous: false]
+		Map results = [person: null, isAmbiguous: false, partial: false]
 
 		logger.debug 'findPersion() attempting to find nameMap={} in project {}', nameMap, project
 
@@ -306,13 +306,13 @@ class PersonService implements ServiceMethods {
 		String lastName = lastNameWithSuffix(nameMap)
 		Map<String, Object> queryParams = [companies: companies, firstName: nameMap.first]
 
-		if (lastName) {
+		if (lastName || checkAmbiguity) {
 			where += " AND P.lastName=:lastName"
-			queryParams.lastName = lastName
+			queryParams.lastName = lastName ?: ''
 		}
-		if (nameMap.middle) {
+		if (nameMap.middle || checkAmbiguity) {
 			where += " AND P.middleName=:middleName"
-			queryParams.middleName = nameMap.middle
+			queryParams.middleName = nameMap.middle ?: ''
 		}
 
 		if (!clientStaffOnly) {
@@ -362,9 +362,11 @@ class PersonService implements ServiceMethods {
 			s = persons.size()
 			if (s > 1) {
 				results.isAmbiguous = true
+				results.partial = true
 			} else if (s == 1) {
 				results.person = persons[0]
 				results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
+				results.partial = true
 			}
 		}
 
@@ -1640,8 +1642,8 @@ class PersonService implements ServiceMethods {
 		Project project = securityService.userCurrentProject
 
 		Map nameMap = [first: person.firstName, middle: person.middleName, last: person.lastName]
-		Map findPersonInfo = findPerson(nameMap, project, null, false)
-		boolean isPersonAmbiguous = findPersonInfo.isAmbiguous && findPersonInfo.person?.id != person.id
+		Map findPersonInfo = findPerson(nameMap, project, null, false, true)
+		boolean isPersonAmbiguous = (findPersonInfo.isAmbiguous || (findPersonInfo.person && findPersonInfo.person?.id != person.id)) && !findPersonInfo.partial
 		if (isPersonAmbiguous) {
 			logger.error 'updatePerson() unable to save {} because of conflicting name.', person
 			throw new DomainUpdateException("The name of the person is ambiguous.")
