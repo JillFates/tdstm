@@ -83,6 +83,8 @@ class ApiAction {
 		}
 	}
 
+	static transients = ['methodParamsJson']
+
 	/*
 	 * Used to determine if the action is performed asyncronously
 	 * @return true if action is async otherwise false
@@ -133,5 +135,9 @@ class ApiAction {
 			}
 		}
 		return list
+	}
+
+	JSONElement getMethodParamsJson(){
+		JSON.parse(methodParams)
 	}
 }
