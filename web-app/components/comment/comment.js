@@ -955,7 +955,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				$scope.ac.dueDate = moment($scope.ac.dueDate).format(utils.date.defaultDateFormat());
 			}
 			$scope.ac.id = $scope.ac.commentId;
-			$scope.ac.apiActionId = (($scope.ac.apiAction && $scope.ac.apiAction.id)? parseInt($scope.ac.apiAction.id): 0);
+			$scope.ac.apiActionId = (($scope.acData.apiAction && $scope.acData.apiAction.id)? parseInt($scope.acData.apiAction.id): 0);
 			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
 
 			if (commentService.validDependencies($scope.dependencies)) {
@@ -1582,6 +1582,7 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 			assignedTo: appCommonData.getLoginPerson().id.toString(),
 			category: 'general',
 			apiAction: assetData.apiAction,
+			actionInvocable: assetData.actionInvocable,
 			actionMode: assetData.actionMode,
 			comment: '',
 			commentFromId: '',
