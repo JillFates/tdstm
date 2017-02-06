@@ -321,8 +321,11 @@ function findCyclicalDependencies (root) {
 			
 			var cycle = [];
 			for (var i = path.indexOf(node); i < tempPath.size() - 1; i++) {
-				//cycle.push(tempPath[i]);
-				var link = getLinkFromNodePair(tempPath[i], tempPath[i+1]);
+				var link;
+				if (direction == 'up')
+					link = getLinkFromNodePair(tempPath[i+1], tempPath[i]);
+				else
+					link = getLinkFromNodePair(tempPath[i], tempPath[i+1]);
 				link.partOfCycle = true;
 				cycle.push(link);
 			}
@@ -363,6 +366,14 @@ function findCyclicalDependencies (root) {
 		for (var i = 0; i < cyclicalLinks.length; ++i) {
 			links.push(cyclicalLinks[i]);
 		}
+	}
+	
+	// outputs the contents of a node path as a list
+	function printNodePath (path) {
+		var output = '';
+		for (var i in path)
+			output = output + ' --> ' + path[i].name
+		console.log(output)
 	}
 }
 
@@ -523,10 +534,9 @@ function rereferenceLink (link) {
 
 function getLinkFromNodePair (parent, child) {
 	var childList = parent.children;
-	for (var i = 0; i < childList.size(); i++) {
+	for (var i = 0; i < childList.size(); i++)
 		if (childList[i].child == child)
 			return childList[i];
-	}
 	return null;
 }
 
