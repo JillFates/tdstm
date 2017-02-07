@@ -50900,12 +50900,6 @@ exports.tryCatch = tryCatch;
 ;
 
 },{"./errorObject":16}],23:[function(require,module,exports){
-"use strict";
-var platform_browser_dynamic_1 = require('@angular/platform-browser-dynamic');
-var tds_app_module_1 = require('./tds/tds-app.module');
-platform_browser_dynamic_1.platformBrowserDynamic().bootstrapModule(tds_app_module_1.TDSAppModule);
-
-},{"./tds/tds-app.module":25,"@angular/platform-browser-dynamic":4}],24:[function(require,module,exports){
 /**
  * A Component is a Controller, that can permute into a directive or as a Service.
  */
@@ -50935,7 +50929,56 @@ var TDSAppComponent = (function () {
 }());
 exports.TDSAppComponent = TDSAppComponent;
 
-},{"@angular/core":3}],25:[function(require,module,exports){
+},{"@angular/core":3}],24:[function(require,module,exports){
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+/**
+ * App or Root Module
+ * it identify how the TDS App is being constructed
+ */
+var core_1 = require('@angular/core');
+var platform_browser_1 = require('@angular/platform-browser');
+var tds_app_component_1 = require('./tds-app.component');
+var shared_module_1 = require('../shared/shared.module');
+// Decorator that tells to Angular is a module.
+var TDSAppModule = (function () {
+    function TDSAppModule() {
+    }
+    TDSAppModule = __decorate([
+        core_1.NgModule({
+            imports: [platform_browser_1.BrowserModule],
+            declarations: [tds_app_component_1.TDSAppComponent, shared_module_1.SharedModule],
+            bootstrap: [tds_app_component_1.TDSAppComponent] // Contains the root component that is being injected on the index.html
+        }), 
+        __metadata('design:paramtypes', [])
+    ], TDSAppModule);
+    return TDSAppModule;
+}());
+exports.TDSAppModule = TDSAppModule;
+
+},{"../shared/shared.module":27,"./tds-app.component":23,"@angular/core":3,"@angular/platform-browser":5}],25:[function(require,module,exports){
+/**
+ * Compile the Application Dynamically Just-in-Time (JIT)
+ */
+"use strict";
+// The browser platform with a compiler
+var platform_browser_dynamic_1 = require('@angular/platform-browser-dynamic');
+var tds_app_module_1 = require('./config/tds-app.module');
+// Compile and launch the module
+platform_browser_dynamic_1.platformBrowserDynamic().bootstrapModule(tds_app_module_1.TDSAppModule);
+
+},{"./config/tds-app.module":24,"@angular/platform-browser-dynamic":4}],26:[function(require,module,exports){
+/**
+ * Created by Jorge Morayta on 2/5/2017.
+ */
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -50947,21 +50990,48 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var platform_browser_1 = require('@angular/platform-browser');
-var tds_app_component_1 = require('./tds-app.component');
-var TDSAppModule = (function () {
-    function TDSAppModule() {
+var HighlightDirective = (function () {
+    function HighlightDirective(el) {
+        el.nativeElement.style.backgroundColor = 'gold';
+        console.log('* AppRoot highlight called for ${el.nativeElement.tagName}');
     }
-    TDSAppModule = __decorate([
+    HighlightDirective = __decorate([
+        core_1.Directive({
+            selector: '[highlight]'
+        }), 
+        __metadata('design:paramtypes', [core_1.ElementRef])
+    ], HighlightDirective);
+    return HighlightDirective;
+}());
+exports.HighlightDirective = HighlightDirective;
+
+},{"@angular/core":3}],27:[function(require,module,exports){
+/**
+ * Created by Jorge Morayta on 2/5/2017.
+ */
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('@angular/core');
+var highlight_directive_1 = require('./highlight.directive');
+var SharedModule = (function () {
+    function SharedModule() {
+    }
+    SharedModule = __decorate([
         core_1.NgModule({
-            imports: [platform_browser_1.BrowserModule],
-            declarations: [tds_app_component_1.TDSAppComponent],
-            bootstrap: [tds_app_component_1.TDSAppComponent]
+            declarations: [highlight_directive_1.HighlightDirective]
         }), 
         __metadata('design:paramtypes', [])
-    ], TDSAppModule);
-    return TDSAppModule;
+    ], SharedModule);
+    return SharedModule;
 }());
-exports.TDSAppModule = TDSAppModule;
+exports.SharedModule = SharedModule;
 
-},{"./tds-app.component":24,"@angular/core":3,"@angular/platform-browser":5}]},{},[23]);
+},{"./highlight.directive":26,"@angular/core":3}]},{},[25]);
