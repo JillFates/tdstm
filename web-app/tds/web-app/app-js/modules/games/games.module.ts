@@ -1,11 +1,11 @@
 import { NgModule }      from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule }       from '@angular/common';
 
 import { GameListComponent }  from './games-list/games-list.component'
 
 @NgModule({
-  imports:      [ BrowserModule ],
+  imports:      [ CommonModule ],
   declarations: [ GameListComponent ],
-  bootstrap:    [ GameListComponent]
+  exports:    [ GameListComponent]
 })
 export class GamesModule { }

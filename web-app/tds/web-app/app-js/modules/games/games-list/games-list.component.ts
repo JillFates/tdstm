@@ -5,8 +5,14 @@ import { Game } from '../shared/game.model'
 @Component({
     moduleId: module.id,
     selector: 'games-list',
-    templateUrl: './games-list.component.html',
-    styleUrls: ['./games-list.component.css'],
+    template:`<h1>{{title}}</h1>
+            <table>
+                <tr *ngFor="let game of games">
+                    <td>{{game.Name}}</td>
+                </tr>
+            </table>`,
+   // templateUrl: 'games-list.component.html',
+   // styleUrls: ['games-list.component.css'],
     providers: [GameService, { provide: Game, useValue: {} }]
 })
 

@@ -9,6 +9,7 @@
         <tds-app>
                 Loading TDS App
         </tds-app>
+        <games-list></games-list>
     </body>
 
     <script src="${resource(dir: 'tds/web-app/dist', file: 'vendor.js')}"></script>
