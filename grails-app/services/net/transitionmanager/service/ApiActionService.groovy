@@ -19,22 +19,31 @@ class ApiActionService {
 		(AgentClass.AWS): AwsAgent,
 		(AgentClass.RIVER_MEADOW): RiverMeadowAgent ].asImmutable()
 
-	ApiAction find(Long id){
-		return ApiAction.get(id)
-	}
+    // This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
+	private static Map agentClassMap = [
+		(AgentClass.AWS): AwsAgent,
+		(AgentClass.RIVER_MEADOW): RiverMeadowAgent ].asImmutable()ApiAction find(Long id){
+        return ApiAction.get(id)
+    }
 
-	ApiAction findOrCreateApiAction(Long id, Project project) {
-		ApiAction apiAction = find(id)
+    ApiAction findOrCreateApiAction(Long id, Project project) {
+        ApiAction apiAction = find(id)
 
-		return apiAction
-	}
 
-	List<Map> list(Project project) {
-		List actions = ApiAction.createCriteria().list() {
-			eq('project', project)
+
+        return apiAction
+    }
+
+    List<Map> list(Project project){
+        Listactions = ApiAction.createCriteria().list(){
+            eq('project', project)
 			order('name', 'asc')
 		}
-		List<Map> list = actions.collect { [ id: it.id, name: it.name ] }
+		List<Map> list = actions.collect { [
+                    id:it.id,
+                    name: it.name
+            ]
+        }
 
 		return list
 	}

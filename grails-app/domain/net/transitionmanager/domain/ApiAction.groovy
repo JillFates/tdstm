@@ -139,14 +139,19 @@ class ApiAction {
 		return list
 	}
 
+	/*
+	 * Used to access the methodParams as a List of Map objects instead of JSON text
+	 * @return The methodParams JSON as Groovy List<Map>
+	 */
 	List<Map> getMethodParamsList(){
 		JsonSlurper slurper = new groovy.json.JsonSlurper()
 		List<Map> list = []
-		if(methodParams) {
+		if (methodParams) {
 			try {
 				list = slurper.parseText(methodParams)
 			} catch (e) {
-				log.error "methodParams was not propertly formed JSON (value=$methodParams)", e
+				// println "JsonSlurper failed : ${e.getMessage()}"
+				log.error "getMethodParamsList() methodParams was not propertly formed JSON (value=$methodParams) : ${e.getMessage()}"
 			}
 		}
 		return list
