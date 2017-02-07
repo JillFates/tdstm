@@ -12,7 +12,6 @@ import groovy.util.logging.Slf4j
 class AwsSqsRoute extends RouteBuilder {
 	RoutingService routingService
 	AwsService awsService
-	static final queueName = 'TransitionManager_Response_Queue'
 
 	@Override
 	void configure() {

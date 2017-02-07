@@ -1,67 +1,68 @@
 package net.transitionmanager.agent
 
+import net.transitionmanager.domain.ApiAction
+import com.tds.asset.AssetComment
+import net.transitionmanager.service.AwsService
+import net.transitionmanager.service.InvalidRequestException
+import com.tdsops.common.grails.ApplicationContextHolder
 
 import groovy.util.logging.Slf4j
 
 /**
- * Methods to interact with RiverMeadow 3rd Party Application API
+ * Methods to interact with the Amazon AWS services
  */
 @Slf4j(value='logger')
-class AwsAgent implements AgentTrait {
+@Singleton(strict=false)
+class AwsAgent extends AbstractAgent {
 
-	private static Map topicParam() { [type:String, description: 'The name of the topic/queue to send message to'] }
-	private static Map messageParam() { [type:Object, description: 'The data to pass to the message'] }
-	private static Map queueParams() { [topicName: topicParam(), message: messageParam()] }
+	public AwsService awsService
 
-	private static final AgentClass agentClass = AgentClass.AWS
+	/*
+	 * Constructor
+	 */
+	AwsAgent() {
 
-	static final String name='Amazon AWS API'
-	static final String description='llll'
+		setInfo(AgentClass.AWS, 'Amazon AWS API')
 
-	static List dict = [
-		new DictionaryItem([
-			name: 'sendSnsMessage',
-			description: 'Used to generate Simple Notification Service (SNS) messages',
-			method: 'sendSns',
-			params: queueParams(),
-			results: invokeResults()
-		]),
-		new DictionaryItem([
-			name: 'sendSqsMessage',
-			description: 'Used to generate Simple Queue Service (SQS) messages',
-			method: 'sendSqs',
-			params: queueParams(),
-			results: invokeResults()
-		])
-	]
+		setDictionary( [
+			sendSnsNotification: new DictionaryItem([
+				name: 'sendSnsNotification',
+				description: 'Used to generate Simple Notification Service (SNS) messages',
+				method: 'sendSns',
+				params: queueParams(),
+				results: invokeResults()
+			]),
+			sendSqsMessage: new DictionaryItem([
+				name: 'sendSqsMessage',
+				description: 'Used to generate Simple Queue Service (SQS) messages',
+				method: 'sendSqs',
+				params: queueParams(),
+				results: invokeResults()
+			])
+		].asImmutable() )
+
+		awsService = ApplicationContextHolder.getBean('awsService')
+	}
 
 	/**
 	 * Used to invoke the transport process on a groupd of servers
-	 * @param tokenName - the name of the token/queue to send the message to
+	 * @param topicName - the name of the token/queue to send the message to
 	 * @param message - the message object to send to the queue
 	 * @return a map with the invocation results
 	 */
-	static Map sendSqs(String tokenName, Object message) {
-		return notImplementedResults()
+	Map sendSnsNotification(String topicName, Object message) {
+		awsService.sendSnsMessage(topicName, message)
 	}
 
 	/**
-	 * Used to get the status of the an individual server that is being transported in a group
-	 * @param groupId - the group id reference
-	 * @param serverGuild - the unique id of the server being transported
-	 * @return a map containing the current status (status, progress and cause)
+	 * Used to invoke the transport process on a groupd of servers
+	 * @param topicName - the name of the token/queue to send the message to
+	 * @param message - the message object to send to the queue
+	 * @return a map with the invocation results
 	 */
-	static Map getTransportStatus(String groupId, String serverGuid) {
-		return notImplementedResults()
+	Map sendSqsMessage(String topicName, Object message) {
+		awsService.sendSqsMessage(topicName, message)
 	}
 
-	/**
-	 * Used to perform a Preflight Check on a group of servers that will be eventually transported
-	 * @param groupId - the id of the group to start transporting
-	 * @return A list of server issues or concerns to be addressed
-	 */
-	static Map executePreflightCheck(String groupdId) {
-		return notImplementedResults()
-	}
 
 }
