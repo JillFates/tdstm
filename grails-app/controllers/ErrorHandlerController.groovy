@@ -71,7 +71,7 @@ class ErrorHandlerController implements ControllerMethods {
 			response.setHeader('X-Login-URL', model.continueUrl)
 			render ""
 		}else{
-			return model	
+			return model
 		}
 
 	}
@@ -83,15 +83,20 @@ class ErrorHandlerController implements ControllerMethods {
 	 */
 	def forbidden() {
 		log.debug "Hit forbidden()"
-
-		Map model = fetchModel()
-
-		// Add current user project
-		model.currProject = securityService.getUserCurrentProject()
-		String msg = model.exceptionMsg ?: 'URL not found'
-		securityService.reportViolation("${msg} while accessing ${model.requestUri}")
 		response.status = 200
-		return model
+
+		// arecordon: adds validation for handling AJAX requests and display an error message back to the user.
+		if (errorHandlerService.isAjaxRequest(request)){
+			String message = response.getHeader("errorMessage")
+			ServiceResults.respondWithError(response,message)
+		}else{
+			Map model = fetchModel()
+			// Add current user project
+			model.currProject = securityService.getUserCurrentProject()
+			String msg = model.exceptionMsg ?: 'URL not found'
+			securityService.reportViolation("${msg} while accessing ${model.requestUri}")
+			return model
+		}
 	}
 
 	/**
