@@ -34,16 +34,12 @@ class ApiActionService {
         return apiAction
     }
 
-    List<Map> list(Project project){
-        Listactions = ApiAction.createCriteria().list(){
-            eq('project', project)
+	List<Map> list(Project project) {
+		List actions = ApiAction.createCriteria().list() {
+			eq('project', project)
 			order('name', 'asc')
 		}
-		List<Map> list = actions.collect { [
-                    id:it.id,
-                    name: it.name
-            ]
-        }
+		List<Map> list = actions.collect { [ id: it.id, name: it.name ] }
 
 		return list
 	}
