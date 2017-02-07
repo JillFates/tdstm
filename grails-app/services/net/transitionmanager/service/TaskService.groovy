@@ -481,7 +481,7 @@ class TaskService implements ServiceMethods {
 		task.statusUpdated = now
 
 		def previousStatus = task.getPersistentValue('status')
-		// Determine if the status is being reverted (e.g. going from COMPLETED to READY)
+		// Determine if the status is being reverted (e.g. going from DONE to READY)
 		boolean revertStatus = compareStatus(previousStatus, status) > 0
 
 		log.info "setTaskStatus() task(#:$task.taskNumber Id:$task.id) status=$status, previousStatus=$previousStatus, revertStatus=$revertStatus - $whom"
