@@ -1066,7 +1066,10 @@ digraph runbook {
 
 	@HasPermission([Permission.TaskCreate, Permission.TaskEdit])
 	def editTask() {
-		def apiActionList = apiActionService.list()
+		Project project = controllerService.getProjectForPage(this)
+		if (! project) return
+
+		def apiActionList = apiActionService.list(project)
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 

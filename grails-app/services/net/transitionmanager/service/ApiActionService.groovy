@@ -68,10 +68,13 @@ class ApiActionService {
 		return apiAction
 	}
 
-	List<Map> list(){
-		List<Map> list = ApiAction.findAll().collect { [ id: it.id, name: it.name ] }
+	List<Map> list(Project project) {
+		List actions = ApiAction.createCriteria().list() {
+			eq('project', project)
+			order('name', 'asc')
+		}
+		List<Map> list = actions.collect { [ id: it.id, name: it.name ] }
 
-		// list.addAll( store )
 		return list
 	}
 

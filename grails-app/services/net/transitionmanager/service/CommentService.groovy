@@ -278,7 +278,7 @@ class CommentService implements ServiceMethods {
 			if(params.durationLocked) assetComment.durationLocked = params.durationLocked.toBoolean()
 			if (params.durationScale) {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())
-				log.debug "saveUpdateCommentAndNotes - TimeScale=$assetComment.durationScale"
+				log.debug "saveUpdateCommentAndNotes - task(id:${assetComment.id}, num:${assetComment.taskNumber}) TimeScale=$assetComment.durationScale"
 			}
 
 			// Issues (aka tasks) have a number of additional properties to be managed
