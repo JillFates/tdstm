@@ -32,7 +32,7 @@ class RoutingService implements InitializingBean {
 		// Build up the routing table of method services
 		routeTable = [
 			addTaskComment: [service: taskService, method: 'addTaskCommentByMessage'],
-			updateTaskState: [service: taskService, method: 'updateTaskState']
+			updateTaskState: [service: taskService, method: 'updateTaskStateByMessage']
 		]
 	}
 

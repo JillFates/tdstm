@@ -509,9 +509,9 @@ class TaskService implements ServiceMethods {
 			}
 			// Clear the actual Start if we're moving back before STARTED
 			if (compareStatus(ACS.STARTED, status) > 0) {
-				if(previousStatus!= ACS.HOLD){
+				if (previousStatus!= ACS.HOLD) {
 					task.actStart = null
-				}else if(!task.actStart){
+				} else if (!task.actStart){
 					task.actStart = now
 				}
 			}
@@ -537,6 +537,12 @@ class TaskService implements ServiceMethods {
 		}
 
 		switch (status) {
+			case ACS.PENDING:
+				// Clear out the ApiAction tracking of invocations for testing
+				task.apiActionInvokedAt = null
+				task.apiActionCompletedAt = null
+				break
+
 			case ACS.HOLD:
 				addNote(task, whom, "Placed task on HOLD, previously was '$previousStatus'")
 				break
@@ -865,6 +871,61 @@ class TaskService implements ServiceMethods {
 			task.save()
 		}
 	}
+
+	/**
+	 * Used to add a note to a task by way of using queue / routes
+	 * @param message - a Map containing vital information to process the request
+	 */
+	void updateTaskStateByMessage(Map message) {
+		log.info "updateTaskStateByMessage() received message for task id ${message.taskId}"
+		AssetComment task = AssetComment.get(message.taskId)
+		String comment = message.comment
+		if (task) {
+			Person whom
+			if (message.byWhomId) {
+				whom = Person.get(message.byWhomId)
+				if (!whom) {
+					log.warn "updateTaskStateByMessage() request reference person (${message.byWhomId}) not found for task id ${message.taskId}"
+					comment += " : Unable to find specified user id"
+				}
+			}
+			if (!whom) {
+				whom = getAutomaticPerson()
+			}
+
+			String note
+			String newStatus = task.status
+			String status = message.status ?: 'invalid'
+
+			switch (status) {
+				case 'success':
+					boolean isCallback = message.containsKey('callbackMethod')
+					if (isCallback && task.isAutomatic()) {
+						task.apiActionCompletedAt = new Date()
+						newStatus = ACS.DONE
+					}
+					note = 'Task was completed by API notification'
+					break
+
+				case 'error':
+					newStatus = ACS.HOLD
+					note = 'Unable to validate task status due to error: ' + message.cause
+					break
+
+				default:
+					newStatus = ACS.HOLD
+					note = 'Invalid notification format : ' + message.toString()
+					break
+			}
+
+			addNote(task, whom, note, 0)
+			setTaskStatus(task, newStatus, whom)
+
+			log.debug "updateTaskStateByMessage() dirtyProps=${task.dirtyPropertyNames}, status=${task.status}, apiActionCompletedAt=${task.apiActionCompletedAt}"
+			task.save()
+		}
+	}
+
 
 	/**
 	 * Used to clear all Task data that are associated to a specified event
@@ -1928,7 +1989,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
 			// Validate the syntax of the recipe before going any further
-			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode, project)
+			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode)
 			if (recipeErrors) {
 				msg = 'There appears to be syntax error(s) in the recipe. Please run the Validate Syntax and resolve reported issue before continuing.'
 				log.debug 'Recipe had syntax errors'
@@ -1967,8 +2028,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			def percComplete = percIncrFull
 
 			log.debug "\n\n     ******* BEGIN TASK GENERATION *******\n\n"
-
-			List apiActions = ApiAction.findAllByProject(project)
 
 			// Now iterate over each of the task specs
 			recipeTasks.each { taskSpec ->
@@ -2105,24 +2164,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// Get the Workflow code if there is one specified in the task spec and then lookup the code for the workflow details
 				def taskWorkflowCode = taskSpec.containsKey('workflow') ? taskSpec.workflow : null
 				workflow = taskWorkflowCode ? getWorkflowStep(taskWorkflowCode) : null
-				ApiAction apiAction = null
-				// Validate invoke for ApiAction
-				if ( taskSpec.containsKey("invoke") ) {
-					Map invokeInfo = taskSpec.invoke
-					String method = invokeInfo["method"]
-					if ( method ) {
-						for (action in apiActions) {
-							if (action.name == method ) {
-								apiAction = action
-								break
-							}
-						}
-						if ( !apiAction ) {
-							bailOnTheGeneration("Task Spec (${taskSpec.id}) references an API action (${method}) that doesn't exist.")
-						}
-					}
-
-				}
 
 				// Validate that the taskSpec has the proper type
 				def stepType
