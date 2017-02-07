@@ -50917,11 +50917,12 @@ var core_1 = require('@angular/core');
 var TDSAppComponent = (function () {
     function TDSAppComponent() {
         this.name = 'Angular';
+        this.color = 'blue';
     }
     TDSAppComponent = __decorate([
         core_1.Component({
             selector: 'tds-app',
-            template: '<h1 tds-highlight>Compiled {{name}}</h1>',
+            template: '<h1>Compiled {{name}}</h1> <p tds-highlight [highlightColor]="color">Highlight me for a {{color}} color</p>',
         }), 
         __metadata('design:paramtypes', [])
     ], TDSAppComponent);
@@ -50948,13 +50949,14 @@ var core_1 = require('@angular/core');
 var platform_browser_1 = require('@angular/platform-browser');
 var tds_app_component_1 = require('./tds-app.component');
 var highlight_directive_1 = require('../shared/directives/highlight.directive');
+var games_module_1 = require('../modules/games/games.module');
 // Decorator that tells to Angular is a module.
 var TDSAppModule = (function () {
     function TDSAppModule() {
     }
     TDSAppModule = __decorate([
         core_1.NgModule({
-            imports: [platform_browser_1.BrowserModule],
+            imports: [platform_browser_1.BrowserModule, games_module_1.GamesModule],
             declarations: [tds_app_component_1.TDSAppComponent, highlight_directive_1.HighlightDirective],
             bootstrap: [tds_app_component_1.TDSAppComponent] // Contains the root component that is being injected on the index.html
         }), 
@@ -50964,7 +50966,7 @@ var TDSAppModule = (function () {
 }());
 exports.TDSAppModule = TDSAppModule;
 
-},{"../shared/directives/highlight.directive":26,"./tds-app.component":23,"@angular/core":3,"@angular/platform-browser":5}],25:[function(require,module,exports){
+},{"../modules/games/games.module":27,"../shared/directives/highlight.directive":30,"./tds-app.component":23,"@angular/core":3,"@angular/platform-browser":5}],25:[function(require,module,exports){
 /**
  * Compile the Application Dynamically Just-in-Time (JIT)
  */
@@ -50976,6 +50978,141 @@ var tds_app_module_1 = require('./config/tds-app.module');
 platform_browser_dynamic_1.platformBrowserDynamic().bootstrapModule(tds_app_module_1.TDSAppModule);
 
 },{"./config/tds-app.module":24,"@angular/platform-browser-dynamic":4}],26:[function(require,module,exports){
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('@angular/core');
+var game_service_1 = require('../shared/game.service');
+var game_model_1 = require('../shared/game.model');
+var GameListComponent = (function () {
+    function GameListComponent(gameService, game) {
+        this.gameService = gameService;
+        this.game = game;
+        this.title = "Games you should play";
+    }
+    GameListComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.gameService.query().then(function (result) {
+            _this.games = result;
+        });
+        this.newgame = this.game.Name == 'Default';
+    };
+    GameListComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            selector: 'games-list',
+            templateUrl: './games-list.component.html',
+            styleUrls: ['./games-list.component.css'],
+            providers: [game_service_1.GameService, { provide: game_model_1.Game, useValue: {} }]
+        }), 
+        __metadata('design:paramtypes', [game_service_1.GameService, game_model_1.Game])
+    ], GameListComponent);
+    return GameListComponent;
+}());
+exports.GameListComponent = GameListComponent;
+
+},{"../shared/game.model":28,"../shared/game.service":29,"@angular/core":3}],27:[function(require,module,exports){
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('@angular/core');
+var platform_browser_1 = require('@angular/platform-browser');
+var games_list_component_1 = require('./games-list/games-list.component');
+var GamesModule = (function () {
+    function GamesModule() {
+    }
+    GamesModule = __decorate([
+        core_1.NgModule({
+            imports: [platform_browser_1.BrowserModule],
+            declarations: [games_list_component_1.GameListComponent],
+            bootstrap: [games_list_component_1.GameListComponent]
+        }), 
+        __metadata('design:paramtypes', [])
+    ], GamesModule);
+    return GamesModule;
+}());
+exports.GamesModule = GamesModule;
+
+},{"./games-list/games-list.component":26,"@angular/core":3,"@angular/platform-browser":5}],28:[function(require,module,exports){
+"use strict";
+var Game = (function () {
+    function Game(name) {
+        this.Name = 'Default';
+        this.Name = name;
+    }
+    return Game;
+}());
+exports.Game = Game;
+
+},{}],29:[function(require,module,exports){
+"use strict";
+var game_model_1 = require('./game.model');
+var GameService = (function () {
+    function GameService() {
+        this.games = [];
+        this.games.push(new game_model_1.Game("Last of us"));
+        this.games.push(new game_model_1.Game("Uncharted"));
+        this.games.push(new game_model_1.Game("Dark Souls 3"));
+        this.games.push(new game_model_1.Game("Red dead redemption"));
+    }
+    ;
+    GameService.prototype.query = function () {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            setInterval(function () { resolve(_this.games); }, 2000);
+        });
+    };
+    ;
+    GameService.prototype.findById = function (id) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            setInterval(function () {
+                if (id < _this.games.length)
+                    resolve(_this.games[id]);
+                else
+                    reject("Game not found.");
+            }, 2000);
+        });
+    };
+    ;
+    GameService.prototype.save = function (game) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            setInterval(function () {
+                _this.games.push(game);
+                resolve(_this.games.length);
+            }, 2000);
+        });
+    };
+    ;
+    GameService.prototype.delete = function (id) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            setInterval(function () {
+                _this.games.splice(id, 1);
+                resolve("Ok");
+            }, 2000);
+        });
+    };
+    return GameService;
+}());
+exports.GameService = GameService;
+
+},{"./game.model":28}],30:[function(require,module,exports){
 /**
  * Created by Jorge Morayta on 2/7/2017.
  */
@@ -50992,8 +51129,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var HighlightDirective = (function () {
     function HighlightDirective(el) {
-        el.nativeElement.style.backgroundColor = 'yellow';
+        this.el = el;
+        el.nativeElement.style.backgroundColor = this.highlightColor;
     }
+    HighlightDirective.prototype.onMouseEnter = function () {
+        this.highlight(this.highlightColor);
+    };
+    HighlightDirective.prototype.onMouseLeave = function () {
+        this.highlight(null);
+    };
+    HighlightDirective.prototype.highlight = function (color) {
+        this.el.nativeElement.style.backgroundColor = color;
+    };
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', String)
+    ], HighlightDirective.prototype, "highlightColor", void 0);
+    __decorate([
+        core_1.HostListener('mouseenter'), 
+        __metadata('design:type', Function), 
+        __metadata('design:paramtypes', []), 
+        __metadata('design:returntype', void 0)
+    ], HighlightDirective.prototype, "onMouseEnter", null);
+    __decorate([
+        core_1.HostListener('mouseleave'), 
+        __metadata('design:type', Function), 
+        __metadata('design:paramtypes', []), 
+        __metadata('design:returntype', void 0)
+    ], HighlightDirective.prototype, "onMouseLeave", null);
     HighlightDirective = __decorate([
         core_1.Directive({ selector: '[tds-highlight]' }), 
         __metadata('design:paramtypes', [core_1.ElementRef])
