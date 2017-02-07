@@ -2000,7 +2000,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
 			// Validate the syntax of the recipe before going any further
-			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode, project)
+			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode)
 			if (recipeErrors) {
 				msg = 'There appears to be syntax error(s) in the recipe. Please run the Validate Syntax and resolve reported issue before continuing.'
 				log.debug 'Recipe had syntax errors'
@@ -2039,8 +2039,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			def percComplete = percIncrFull
 
 			log.debug "\n\n     ******* BEGIN TASK GENERATION *******\n\n"
-
-			List apiActions = ApiAction.findAllByProject(project)
 
 			// Now iterate over each of the task specs
 			recipeTasks.each { taskSpec ->
@@ -2177,24 +2175,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// Get the Workflow code if there is one specified in the task spec and then lookup the code for the workflow details
 				def taskWorkflowCode = taskSpec.containsKey('workflow') ? taskSpec.workflow : null
 				workflow = taskWorkflowCode ? getWorkflowStep(taskWorkflowCode) : null
-				ApiAction apiAction = null
-				// Validate invoke for ApiAction
-				if ( taskSpec.containsKey("invoke") ) {
-					Map invokeInfo = taskSpec.invoke
-					String method = invokeInfo["method"]
-					if ( method ) {
-						for (action in apiActions) {
-							if (action.name == method ) {
-								apiAction = action
-								break
-							}
-						}
-						if ( !apiAction ) {
-							bailOnTheGeneration("Task Spec (${taskSpec.id}) references an API action (${method}) that doesn't exist.")
-						}
-					}
-
-				}
 
 				// Validate that the taskSpec has the proper type
 				def stepType
