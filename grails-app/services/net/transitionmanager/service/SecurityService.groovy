@@ -42,6 +42,7 @@ import org.springframework.security.core.userdetails.UserCache
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.util.Assert
+import org.springframework.web.context.request.RequestContextHolder
 
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.USER
@@ -1513,16 +1514,21 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	void assumeUserIdentity(final String username) {
 		log.info "SECURITY: assumeUserIdentity called for user $username"
 
-		UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
-		UserCache userCache = ApplicationContextHolder.getBean("userCache")
-		UserDetails userDetails = userDetailsService.loadUserByUsername(username)
+		if /*(!WebUtils.retrieveGrailsWebRequest())*/ (!RequestContextHolder.getRequestAttributes()) {
 
-		UsernamePasswordAuthenticationToken upwt = new UsernamePasswordAuthenticationToken(
-			userDetails, userDetails.getPassword(), userDetails.getAuthorities() )
+			UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
+			UserCache userCache = ApplicationContextHolder.getBean("userCache")
+			UserDetails userDetails = userDetailsService.loadUserByUsername(username)
 
-		SecurityContextHolder.getContext().setAuthentication(upwt)
+			UsernamePasswordAuthenticationToken upwt = new UsernamePasswordAuthenticationToken(
+					userDetails, userDetails.getPassword(), userDetails.getAuthorities())
 
-		userCache.removeUserFromCache(username)
+			SecurityContextHolder.getContext().setAuthentication(upwt)
+
+			userCache.removeUserFromCache(username)
+		} else {
+			log.warn("SECURITY: ${getCurrentUsername()} is trying to assumeUserIdentity for user $username ")
+		}
 	}
 
 	private Person resolve(Person person) {
