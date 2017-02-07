@@ -2416,7 +2416,7 @@ tds.cookbook.controller.RecipeVersionsDiffController.$inject = ['$scope', '$stat
 tds.cookbook.controller.RecipeCodeEditController = function($scope, $state, $stateParams, $log, $modalInstance, $timeout, utils, cookbookService, sourceCode) {
 
 	$scope.modal = {};
-	$scope.modal.sourceCode = (!sourceCode || sourceCode.length == 0) ? ' ' : sourceCode;
+	$scope.modal.sourceCode = (sourceCode.length == 0)?' ':sourceCode;
 
 	$scope.codeEditorOptions = {
 		lineNumbers: true,
