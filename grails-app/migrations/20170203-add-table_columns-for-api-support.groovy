@@ -1,3 +1,6 @@
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.PartyType
+
 databaseChangeLog = {
 
 	changeSet(author: 'jmartin', id: '20170203 TM-5958-01') {
@@ -47,4 +50,47 @@ databaseChangeLog = {
 		""")
 	}
 
+	changeSet(author: "jmartin", id: "20170203 TM-5958-03") {
+		comment('Recreate the Automated Task Person people keep deleting')
+		String last='Task'
+		String first='Automated'
+		preConditions(onFail:'MARK_RAN') {
+			sqlCheck(expectedResult:'0',
+				"select count(*) from person where last_name='$last' and first_name='$first'"
+			)
+		}
+		grailsChange {
+			change {
+				def personType = PartyType.read("PERSON")
+				def person =  new Person (
+					firstName:first,
+					lastName:last,
+					title:'Account for task completions',
+					active: 'Y',
+					staffType: 'Salary',
+					partyType:personType)
+				if ( ! person.save(flush:true) ) {
+					throw new RuntimeException('Creating person failed')
+				}
+			}
+		}
+	}
+
+	changeSet(author: "jmartin", id: "20170203 TM-5958-04") {
+		comment('Add additional columns to the ApiAction table')
+		sql("""
+			ALTER TABLE api_action
+			ADD COLUMN `callback_method` varchar(64) NOT NULL DEFAULT '' COMMENT 'The method to invoke to return results of async function call' AFTER `callback_mode` ,
+			ADD COLUMN `polling_interval` INT(10) NOT NULL DEFAULT 0 COMMENT 'The frequence that async responses are checked' AFTER `timeout`;
+		""")
+	}
+
+	changeSet(author: 'jmartin', id: '20170203 TM-5958-05') {
+		comment('Corrected date to datetime for a few colums in AssetComment table')
+		sql("""
+			ALTER TABLE asset_comment
+			MODIFY COLUMN `api_action_invoked_at` DATETIME NULL COMMENT 'The datetime that the API Action was invoked',
+			MODIFY COLUMN `api_action_completed_at` DATETIME NULL COMMENT 'The datetime that the API Action invocation completed';
+		""")
+	}
 }

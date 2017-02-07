@@ -20,6 +20,13 @@ import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.*
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.ContextType
+import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdsops.tm.enums.domain.TimeConstraintType
+import com.tdsops.tm.enums.domain.TimeScale
+import net.transitionmanager.service.InvalidConfigurationException
+import net.transitionmanager.service.InvalidRequestException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
@@ -58,8 +65,9 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
 @Slf4j
 class TaskService implements ServiceMethods {
 
-	def controllerService
-	def cookbookService
+	ApiActionService apiActionService
+	ControllerService controllerService
+	CookbookService cookbookService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	def partyRelationshipService
@@ -73,6 +81,11 @@ class TaskService implements ServiceMethods {
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
 	private static final List<String> statusList = ACS.list
+
+	private static final List<String> ACTIONABLE_STATUSES = [ACS.READY, ACS.STARTED, ACS.DONE]
+
+	// The RoleTypes for Staff (populated in init())
+	private static List staffingRoles
 
 	private static final List<String> coreFilterProperties = [
 		'assetName', 'assetTag', 'assetType', 'costCenter', 'department',
@@ -338,16 +351,102 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
+	 * Used by routes to update task status/state
+	 * @param whom - the Person that is performing the update (e.g. Automatic Task)
+	 * @param params - a map containing the values that come from the JSON
+	 * @return AssetComement	task that was updated by method
+	 */
+	/*
+	void updateTaskState(Person whom, Map params) {
+		Map statusMap = ['running': ACS.STARTED, 'success': ACS.DONE, 'error': ACS.HOLD]
+		String status = statusMap[params.status]
+		if (!status) {
+			throw new InvalidRequestException("Invalid status ${params.status}, valid values are ${statusMap.keySet()}")
+		}
+
+		boolean isPM = false
+		AssetComment task = AssetComment.get(params.taskId)
+
+		if (!task) {
+			throw new InvalidRequestException("Task id ${params.taskId} not found")
+		}
+
+		if (status == ACS.STARTED && task.)
+		return setTaskStatus(task, status, whom, isPM)
+	}
+	*/
+
+	/**
 	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
 	 * @param task
 	 * @param status
 	 * @return AssetComement	task that was updated by method
 	 */
-	// Refactor to accept the Person
-	def setTaskStatus(AssetComment task, String status) {
+	AssetComment setTaskStatus(AssetComment task, String status) {
 		def currentPerson = securityService.getUserLoginPerson()
 		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'PROJ_MGR')
 		return setTaskStatus(task, status, currentPerson, isPM)
+	}
+
+	/**
+	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
+	 * plan to set the status to HOLD and add a note to the task.
+	 * @param task - the Task to invoke the method on
+	 * @return The status that the task should be set to
+	 */
+	String invokeAction(AssetComment task, Person whom) {
+		def status = task.status
+		//return status
+		// For tasks that are actionable and has an assigned action, this logic will attempt to invoke and
+		// update the task accordingly.
+		// Actions that are synchronous (future) will fire the action immediately and the task is marked DONE
+		// if successful, otherwise for asynchronous actions the status will be marked STARTED.
+		if (ACTIONABLE_STATUSES.contains(status) && task.hasAction() ) {
+			if (task.isActionInvocable()) {
+				String errMsg
+
+				if (task.apiAction.isSync()) {
+					log.error "invokeAction() task has synchronous action that is not supported (taskId=${task.id})"
+					errMsg = 'Task has an synchronous action which are not supported'
+				} else {
+					try {
+						log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+						// Kick of the async method and mark the task STARTED
+						apiActionService.invoke(task.apiAction, task)
+
+						// Update the task so that the we track that the action was invoked
+						task.apiActionInvokedAt = new Date()
+
+						// Log a note that the API Action was called
+						// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
+						addNote(task, whom, "Invoked action ${task.apiAction.name}")
+
+						// Make sure that the status is STARTED instead
+						status = AssetCommentStatus.STARTED
+						task.status = status
+
+
+					} catch (InvalidRequestException e) {
+						errMsg = e.getMessage()
+					} catch (InvalidConfigurationException e) {
+						errMsg = e.getMessage()
+					} catch (e) {
+						errMsg = 'A runtime error occurred while attempting to process the update'
+						log.error ExceptionUtil.stackTraceToString('invokeAction() failed ', e)
+					}
+				}
+
+				if (errMsg) {
+					log.info "invokeAction() error $errMsg"
+					addNote(task, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
+					status = ACS.HOLD
+					task.status = status
+				}
+
+			}
+		}
+
+		return status
 	}
 
 	/**
@@ -375,13 +474,20 @@ class TaskService implements ServiceMethods {
 
 		def previousStatus = task.getPersistentValue('status')
 		// Determine if the status is being reverted (e.g. going from COMPLETED to READY)
-		def revertStatus = compareStatus(previousStatus, status) > 0
+		boolean revertStatus = compareStatus(previousStatus, status) > 0
 
-		log.info "setTaskStatus - task(#:$task.taskNumber Id:$task.id) status=$status, previousStatus=$previousStatus, revertStatus=$revertStatus - $whom"
+		log.info "setTaskStatus() task(#:$task.taskNumber Id:$task.id) status=$status, previousStatus=$previousStatus, revertStatus=$revertStatus - $whom"
 
 		// Override the whom if this is an automated task being completed
-		if (task.role == AssetComment.AUTOMATIC_ROLE && status == ACS.COMPLETED) {
+		if (task.isAutomatic() && status == ACS.COMPLETED) {
 			whom = getAutomaticPerson()
+
+			if (ACTIONABLE_STATUSES.contains(status) ) {
+				// Attempt to invoke the task action if an ApiAction is set. Depending on the
+				// Action excution method (sync vs async), if async the status will be changed to
+				// STARTED instead of the default to DONE.
+				status = invokeAction(task, whom)
+			}
 		}
 
 		// Setting of AssignedTO:
@@ -440,7 +546,7 @@ class TaskService implements ServiceMethods {
 				// We don't want to loose the original started time if we are reverting from COMPLETED to STARTED
 				if (! revertStatus) {
 					task.actStart = now
-					if (task.isRunbookTask()) addNote(task, whom, "Task Started")
+					addNote(task, whom, "Task Started")
 				}
 				break
 
@@ -451,7 +557,7 @@ class TaskService implements ServiceMethods {
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
-				if (task.isRunbookTask()) addNote(task, whom, "Task Completed")
+				addNote(task, whom, "Task Completed")
 				break
 
 			case ACS.TERMINATED:
@@ -722,6 +828,56 @@ class TaskService implements ServiceMethods {
 
 		task.addToNotes(taskNote)
 		true
+	}
+
+	/**
+	 * Used to add a note to a task by way of using queue / routes
+	 * @param message - a Map containing vital information to process the request
+	 */
+	void addTaskCommentByMessage(Map message) {
+		log.info "addTaskCommentByMessage() received message for task id ${message.taskId}"
+		AssetComment task = AssetComment.get(message.taskId)
+		String comment = message.comment
+		if (task) {
+			Person whom
+			if (message.byWhomId) {
+				whom = Person.get(message.byWhomId)
+				if (!whom) {
+					log.warn "addTaskCommentByMessage() request reference person (${message.byWhomId}) not found for task id ${message.taskId}"
+					comment += " : Unable to find specified user id"
+				}
+			}
+			if (!whom) {
+				whom = getAutomaticPerson()
+			}
+
+			addNote(task, whom, comment, 0)
+
+			boolean isCallback = message.containsKey('callbackMethod')
+			if (isCallback && task.isAutomatic()) {
+				log.debug "addTaskCommentByMessage() called as callback so going to close out the task"
+				// Close out the task
+				task.apiActionCompletedAt = new Date()
+				setTaskStatus(task, ACS.DONE, whom)
+			}
+
+			log.debug "addTaskCommentByMessage() dirtyProps=${task.dirtyPropertyNames}, status=${task.status}, apiActionCompletedAt=${task.apiActionCompletedAt}"
+			task.save()
+		}
+	}
+
+	/**
+	 * Used to clear all Task data that are associated to a specified event
+	 * @param moveEventId
+	 */
+	def resetTaskData(MoveEvent moveEvent) {
+		try {
+			def tasksMap = getMoveEventTaskLists(moveEvent.id)
+			return resetTaskDataForTasks(tasksMap)
+		} catch(e) {
+			log.error "An error occurred while trying to Reset tasks for moveEvent $moveEvent on project $moveEvent.project\n$e"
+			throw new RuntimeException("An unexpected error occured")
+		}
 	}
 
 	/**
@@ -4446,7 +4602,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param category
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	private def createRollcallTasks(moveEvent, whom, recipeId, taskSpec, settings) {
+	private List createRollcallTasks(moveEvent, whom, recipeId, taskSpec, settings) {
 
 		def taskList = []
 		def staffList = MoveEventStaff.findAllByMoveEvent(moveEvent, [sort:'person'])

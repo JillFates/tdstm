@@ -1,72 +1,190 @@
 package net.transitionmanager.service
 
+import groovy.util.logging.Slf4j
 import grails.converters.JSON
 import grails.transaction.Transactional
-import net.transitionmanager.agent.AgentClass
+
+import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
+import com.tds.asset.AssetComment
+import net.transitionmanager.service.InvalidRequestException
 
+@Slf4j(value='logger')
 @Transactional
 class ApiActionService {
 
-    private List<Map> store = [
-            [id:-1, name: 'Action one'],
-            [id:-2, name: 'Action two'],
-            [id:-3, name: 'Action three'],
-            [id:-4, name: 'Action four']
-    ]
+	private static final List<Map> store = [
+			[id:-1, name: 'Action one'],
+			[id:-2, name: 'Action two'],
+			[id:-3, name: 'Action three'],
+			[id:-4, name: 'Action four']
+		]
 
-    ApiAction find(Long id){
-        return ApiAction.get(id)
-    }
+	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
+	private static Map agentClassMap = [
+		(AgentClass.AWS): AwsAgent,
+		(AgentClass.RIVER_MEADOW): RiverMeadowAgent ].asImmutable()
 
-    ApiAction findOrCreateApiAction(Long id, Project project) {
-        ApiAction apiAction = find(id)
-        if(!apiAction){
-            Map apiStored = store.find{ it.id == id }
+	ApiAction find(Long id){
+		return ApiAction.get(id)
+	}
 
-            if(apiStored) {
-                //Creating and Filling Demo data
-                apiAction = new ApiAction()
-                apiAction.name = apiStored.name
-                apiAction.project = project
-                apiAction.agentClass = AgentClass.AWS
-                apiAction.description = "the description"
-                apiAction.agentMethod = "daMethod"
-                apiAction.methodParams = (([
-                        [
-                                param:'assetId',
-                                desc: 'The unique id to reference the asset',
-                                type:'string',
-                                context: "ASSET",
-                                property: 'id',
-                                value: 'user def value'
-                        ],[
-                                param: 'assetId 2',
-                                desc: 'The unique id to reference the asset 2',
-                                type:'string',
-                                context: "ASSET",
-                                property: 'id 2',
-                                value: 'user def value 2'
-                        ]
-                ]) as JSON).toString()
-                if(!apiAction.save()){
-                    log.error(apiAction.errors)
-                }
-            }
-        }
-        return apiAction
-    }
+	ApiAction findOrCreateApiAction(Long id, Project project) {
+		ApiAction apiAction = find(id)
+		if(!apiAction){
+			Map apiStored = store.find{ it.id == id }
 
-    List<Map> list(){
-        List<Map> list = ApiAction.findAll().collect{
-            [
-                    id:it.id,
-                    name: it.name
-            ]
-        }
+			if(apiStored) {
+				//Creating and Filling Demo data
+				apiAction = new ApiAction()
+				apiAction.name = apiStored.name
+				apiAction.project = project
+				apiAction.agentClass = AgentClass.AWS
+				apiAction.description = "the description"
+				apiAction.agentMethod = "daMethod"
+				apiAction.methodParams = (([
+					[
+						param:'assetId',
+						desc: 'The unique id to reference the asset',
+						type:'string',
+						context: "ASSET",
+						property: 'id',
+						value: 'user def value'
+					],[
+						param: 'assetId 2',
+						desc: 'The unique id to reference the asset 2',
+						type:'string',
+						context: "ASSET",
+						property: 'id 2',
+						value: 'user def value 2'
+					]
+				]) as JSON).toString()
+				if(!apiAction.save()){
+					log.error(apiAction.errors)
+				}
+			}
+		}
+		return apiAction
+	}
 
-        list.addAll(store)
-        return list
-    }
+	List<Map> list(){
+		List<Map> list = ApiAction.findAll().collect { [ id: it.id, name: it.name ] }
+
+		// list.addAll( store )
+		return list
+	}
+
+	/**
+	 * Used to invoke an agent method with a given context
+	 * @param action - the ApiAction to be invoked
+	 * @param context - the context from which the method parameter values will be derivied
+	 */
+	void invoke(ApiAction action, Object context) {
+		// methodParams will hold the parameters to pass to the remote method
+		Map remoteMethodParams = [:]
+		if (context.hasErrors()) {
+			println "TASK ERRORS: ${com.tdssrc.grails.GormUtil.allErrorsString(context)}"
+		}
+		if (! context) {
+			throw new InvalidRequestException('invoke() required context was null')
+		}
+
+		if (context instanceof AssetComment) {
+			// Validate that the method is still invocable
+			if (! context.isActionInvocable() ) {
+				throw new InvalidRequestException('Task state does not permit action to be invoked')
+			}
+
+			// Get the method definition of the Agent method
+			DictionaryItem methodDef = methodDefinition(action)
+
+			// We only need to implement Task for the moment
+			remoteMethodParams = buildMethodParamsForContext(action, context)
+
+			boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
+
+			if (methodRequiresCallbackMethod) {
+				if (! action.callbackMethod) {
+					println action.toString()
+					throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
+				}
+				remoteMethodParams << [callbackMethod: action.callbackMethod]
+			}
+
+			if (CallbackMode.NA != action.callbackMode) {
+				// We're going to perform an Async Message Invocation
+				if (! action.asyncQueue) {
+					throw new InvalidConfigurationException("Action $action missing required message queue name")
+				}
+				def agent = agentInstanceForAction(action)
+
+				// Lets try to invoke the method
+				println "About to invoke the following command: ${agent.name}.${action.agentMethod}('${action.asyncQueue}', ($remoteMethodParams))"
+				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
+
+			} else {
+				throw new InvalidRequestException('Synchronous invocation not supported')
+			}
+		} else {
+			throw new InvalidRequestException(
+				'invoke() not implemented for class ' + context.getClass().getName() )
+		}
+	}
+
+	/**
+	 * Used to construct the method paramater values Map needed to invoke the function
+	 * @param action - the ApiAction to generate the method params for
+	 * @param context - the context to get the property values from
+	 * @return A map with the defined ApiAction property names and values from the context
+	 */
+	private Map buildMethodParamsForContext(ApiAction action, Object context) {
+		AbstractAgent agent = agentInstanceForAction(action)
+
+		// This just does a call back on the Agent class to get the built up parameters
+		agent.buildMethodParamsForContext(action, context)
+	}
+
+	/**
+	 * Used to retrieve the method definition (aka Dictionary Item) for a give ApiAction
+	 * @param action - the ApiAction object to lookup the method definition
+	 * @return the method definition
+	 * @throws InvalidRequestException if the method name is invalid or the agent is not implemented
+	 */
+	private DictionaryItem methodDefinition(ApiAction action) {
+		Object agent = agentInstanceForAction(action)
+		Map dict = agent.dictionary()
+		DictionaryItem methodDef = dict[action.agentMethod]
+		if (! methodDef) {
+			throw new InvalidRequestException(
+				"Action class ${action.agentClass} method ${action.agentMethod} not implemented" )
+		}
+		methodDef
+	}
+
+	/**
+	 * Used to retrieve the Agent class that will handle the method
+	 * @param action - the ApiAction to be used to invoke the method
+	 * @return the Agent class to invoke the method on
+	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
+	 */
+	private Class agentClassForAction(ApiAction action) {
+		Class clazz = agentClassMap[action.agentClass]
+		if (! clazz) {
+			throw new InvalidRequestException("Action class ${action.agentClass} not implemented")
+		}
+		clazz
+	}
+
+	/**
+	 * Used to retrieve an instance of Agent class that will handle the method
+	 * @param action - the ApiAction to be used to invoke the method
+	 * @return the Agent class instance to invoke the method on
+	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
+	 */
+	private AbstractAgent agentInstanceForAction(ApiAction action) {
+		Class clazz = agentClassForAction(action)
+		clazz.instance
+	}
+
 }

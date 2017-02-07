@@ -1083,7 +1083,7 @@ digraph runbook {
 		ApiAction apiAction = apiActionService.find(actionId)
 
 		Map apiActionPayload = [
-		        agent: "${apiAction.agentClass}",
+		        agent: apiAction.agentClass.toString(),
 				method: apiAction.agentMethod,
 				description: apiAction.description,
 				methodParams: apiAction.methodParamsList

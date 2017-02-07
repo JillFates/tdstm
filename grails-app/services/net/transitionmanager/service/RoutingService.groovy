@@ -1,20 +1,25 @@
 package net.transitionmanager.service
 
+import net.transitionmanager.domain.Person
+import net.transitionmanager.service.InvalidRequestException
+import com.tdsops.common.lang.ExceptionUtil
+
 import org.springframework.beans.factory.InitializingBean
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 
 /**
- * Methods to interact with Camel components
+ * The purpose of the RoutingService is to handle inbound route requests with a JSON message
+ * and determine the target method. If defined then it will route the message to the appropriate
+ * service.
  */
 @Slf4j(value='logger')
-// class CamelService implements ServiceMethods, InitializingBean {
 class RoutingService implements InitializingBean {
 
 	AuditService auditService
 	AwsService awsService
-	// TaskService taskService
+	TaskService taskService
 
 	GrailsApplication grailsApplication
 
@@ -25,7 +30,10 @@ class RoutingService implements InitializingBean {
 		def config = grailsApplication.config
 
 		// Build up the routing table of method services
-		routeTable << [ updateTransportStatus: [service: awsService, method: 'updateTransportStatus']]
+		routeTable = [
+			addTaskComment: [service: taskService, method: 'addTaskCommentByMessage'],
+			updateTaskState: [service: taskService, method: 'updateTaskState']
+		]
 	}
 
 	/**
@@ -36,30 +44,45 @@ class RoutingService implements InitializingBean {
 	void processMessage(Object message) {
 		String method
 		if (! (message instanceof String) ) {
-			log.error "processMessage() called with invalid message (type=${message?.getClass().getName()}, value=$message)"
+			log.warn "processMessage() called with invalid message (type=${message?.getClass().getName()}, value=$message)"
 		} else {
 			if (! message ) {
-				log.error "processMessage() called with empty message"
+				log.warn "processMessage() called with empty message"
 			} else {
 				JsonSlurper slurper = new groovy.json.JsonSlurper()
 				Map map
 				try {
 	 				map = slurper.parseText(message)
 	 			} catch(e) {
-	 				log.error "processMessage() message was not propertly formed JSON (value=$message)"
+	 				log.warn "processMessage() message was not propertly formed JSON (value=$message)"
 	 			}
 
 	 			if (map) {
-					if (! map.containsKey('method')) {
-						log.error "processMessage() called with missing method (value=$message)"
+	 				boolean isCallback = map.containsKey('callbackMethod')
+	 				method = map.method ?: map.callbackMethod
+					if (! method) {
+						log.warn "processMessage() called with missing method (value=$message)"
 					} else {
-						method = map.method
+						// method = map.method
 						if (! routeTable.containsKey(method)) {
-							log.error "processMessage() called with invalid method (value=$message)"
+							log.warn "processMessage() called with invalid method (value=$message)"
 						} else {
-							// Invoke the method through some groovy awesomeness...
-							log.debug "processMessage() attempting to invoke $message"
-							routeTable[method].service."${routeTable[method]['method']}"(map)
+							try {
+								if (isCallback) {
+									// Needed to put in a sleep for 4 sec for callbacks so that the
+									// original thread finishes and commits the status change.
+									sleep(4000)
+								}
+
+								// Invoke the method through some groovy awesomeness...
+								log.debug "processMessage() attempting to invoke $message"
+								routeTable[method].service."${routeTable[method]['method']}"(map)
+
+							} catch (InvalidRequestException e) {
+								log.warn "processMessage() called with invalid request (${e.getMessage()}) : $map"
+							} catch (e) {
+								log.error ExceptionUtil.stackTraceToString('processMessage() encounted runtime error :', e)
+							}
 						}
 					}
 				}

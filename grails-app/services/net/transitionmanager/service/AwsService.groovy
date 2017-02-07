@@ -55,8 +55,8 @@ class AwsService implements InitializingBean {
 	 */
 	void sendSqsMessage(String topicName, Object message) {
 		String jsonMessage = JsonOutput.toJson(message)
-		//sendMessage(sqsUrl(topicName), jsonMessage)
-		sendMessage(sqsUrl(topicName), message)
+		sendMessage(sqsUrl(topicName), jsonMessage)
+		//sendMessage(sqsUrl(topicName), message)
 		log.debug "sendSqsMessage() sent message to the $topicName queue"
 	}
 
