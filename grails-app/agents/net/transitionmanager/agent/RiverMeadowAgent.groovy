@@ -6,49 +6,54 @@ import groovy.util.logging.Slf4j
  * Methods to interact with RiverMeadow 3rd Party Application API
  */
 @Slf4j(value='logger')
-class RiverMeadowAgent implements AgentTrait {
+@Singleton(strict=false)
+class RiverMeadowAgent extends AbstractAgent {
 
 	private static Map groupIdParam() { [type:String, description: 'The id of the group to transport'] }
 
-	static final AgentClass agentClass = AgentClass.RiverMeadow
+	/*
+	 * Constructor
+	 */
+	RiverMeadowAgent() {
+		setInfo(AgentClass.RiverMeadow, 'River Meadow APIs')
 
-	static List dict = [
-		new DictionaryItem([
-			name: 'initiateTransport',
-			description: 'Initiates the transport process for a group of servers',
-			params: [
-				groupId: groupIdParam()
-			],
-			results: invokeResults()
-		]),
-		new DictionaryItem([
-			name: 'getTransportStatus',
-			description: 'Used to retrieve the status of the transport of a particular server',
-			params: [
-				groupId: groupIdParam(),
-				serverGuid: [type:String, description: 'The unique server reference']
-			],
-			results: invokeResults() + [progress:progressResult()]
-		]),
-		new DictionaryItem([
-			name: 'preflightCheck',
-			description: 'Performs a series of checks on a group of servers prior to a transport',
-			method: 'executePreflightCheck',
-			params: [
-				groupId: groupIdParam(),
-				serverGuid: [type:String, description: 'The unique server reference']
-			],
-			results: invokeResults() + [type:List, description: 'A list of Map objects describing issues for servers in the group']
-		])
-
-	]
+		setDictionary( [
+			initiateTransport: new DictionaryItem([
+				name: 'initiateTransport',
+				description: 'Initiates the transport process for a group of servers',
+				params: [
+					groupId: groupIdParam()
+				],
+				results: invokeResults()
+			]),
+			getTransportStatus: new DictionaryItem([
+				name: 'getTransportStatus',
+				description: 'Used to retrieve the status of the transport of a particular server',
+				params: [
+					groupId: groupIdParam(),
+					serverGuid: [type:String, description: 'The unique server reference']
+				],
+				results: invokeResults() + [progress:progressResult()]
+			]),
+			preflightCheck: new DictionaryItem([
+				name: 'preflightCheck',
+				description: 'Performs a series of checks on a group of servers prior to a transport',
+				method: 'executePreflightCheck',
+				params: [
+					groupId: groupIdParam(),
+					serverGuid: [type:String, description: 'The unique server reference']
+				],
+				results: invokeResults() + [type:List, description: 'A list of Map objects describing issues for servers in the group']
+			])
+		] )
+	}
 
 	/**
 	 * Used to invoke the transport process on a groupd of servers
 	 * @param groupId - the id of the group to start transporting
 	 * @return a map with the invocation results
 	 */
-	static Map initiateTransport(String groupId) {
+	Map initiateTransport(String groupId) {
 		return notImplementedResults()
 	}
 
@@ -58,7 +63,7 @@ class RiverMeadowAgent implements AgentTrait {
 	 * @param serverGuild - the unique id of the server being transported
 	 * @return a map containing the current status (status, progress and cause)
 	 */
-	static Map getTransportStatus(String groupId, String serverGuid) {
+	Map getTransportStatus(String groupId, String serverGuid) {
 		return notImplementedResults()
 	}
 
@@ -67,7 +72,7 @@ class RiverMeadowAgent implements AgentTrait {
 	 * @param groupId - the id of the group to start transporting
 	 * @return A list of server issues or concerns to be addressed
 	 */
-	static Map executePreflightCheck(String groupdId) {
+	Map executePreflightCheck(String groupdId) {
 		return notImplementedResults()
 	}
 

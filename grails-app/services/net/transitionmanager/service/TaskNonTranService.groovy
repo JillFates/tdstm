@@ -23,7 +23,7 @@ class TaskNonTranService implements ServiceMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
-	
+
 
 	/**
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
@@ -72,8 +72,8 @@ class TaskNonTranService implements ServiceMethods {
 				def successorDeps = TaskDependency.findAllByPredecessor(task)
 				log.info "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) found ${successorDeps ? successorDeps.size() : '0'} successors - $whom"
 				def i = 1
-				successorDeps?.each { succDepend ->
-					def successorTask = succDepend.assetComment
+				for (succDepend in successorDeps) {
+					AssetComment successorTask = succDepend.assetComment
 					log.info "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) Processing (#${i++}) successorTask(#:$successorTask.taskNumber Id:$successorTask.id) - $whom"
 
 					// If the Successor Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
@@ -89,7 +89,7 @@ class TaskNonTranService implements ServiceMethods {
 						} else {
 
 							def setStatusTo = AssetCommentStatus.READY
-							if (successorTask.role == AssetComment.AUTOMATIC_ROLE) {
+                            if (successorTask.isAutomatic()) {
 								// If this is an automated task, we'll mark it COMPLETED instead of READY and indicate that it was completed by
 								// the Automated Task person.
 								setStatusTo = AssetCommentStatus.COMPLETED

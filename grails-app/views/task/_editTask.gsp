@@ -47,7 +47,6 @@
 						<td valign="top" class="value" id="vmAction" colspan="2">
 							<!-- default to NONE -->
 							<select ng-model="acData.apiAction.id">
-								<option value="">please select</option>
 								<g:each var="apiAction" in="${apiActionList}">
 									<option value="${apiAction.id}">${apiAction.name}</option>
 								</g:each>

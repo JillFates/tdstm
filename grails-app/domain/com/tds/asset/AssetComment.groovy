@@ -159,6 +159,7 @@ class AssetComment {
 		taskSpec nullable: true
 		workflowOverride nullable: true            // TODO : add range to workflowOverride constraint
 		workflowTransition nullable: true
+		apiAction nullable: true
 		apiActionInvokedAt nullable: true
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
@@ -169,6 +170,7 @@ class AssetComment {
 		createdBy column: 'created_by'
 		id column: 'asset_comment_id'
 		resolvedBy column: 'resolved_by'
+		// child lazy: false
 		columns {
 			comment sqltype: 'text'
 			displayOption sqltype: 'char', length: 1
@@ -268,11 +270,19 @@ class AssetComment {
 		AUTOMATIC_ROLE == role
 	}
 
+	/**
+	 * Used to determine if the task has an action associated with it
+	 * @return true if the task has an associated action
+	 */
+	boolean hasAction() {
+		apiAction != null
+	}
+
 	/*
 	 * Determines if a task action can be invoked manually
 	 * @return true if action can be invoked
 	 */
-	boolean actionInvocable() {
+	boolean isActionInvocable() {
 		apiAction &&
 		! apiActionInvokedAt &&
 		! apiActionCompletedAt &&
