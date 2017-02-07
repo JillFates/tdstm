@@ -50921,7 +50921,7 @@ var TDSAppComponent = (function () {
     TDSAppComponent = __decorate([
         core_1.Component({
             selector: 'tds-app',
-            template: "<h1>Compiled {{name}}</h1>",
+            template: '<h1 tds-highlight>Compiled {{name}}</h1>',
         }), 
         __metadata('design:paramtypes', [])
     ], TDSAppComponent);
@@ -50947,6 +50947,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var platform_browser_1 = require('@angular/platform-browser');
 var tds_app_component_1 = require('./tds-app.component');
+var highlight_directive_1 = require('../shared/directives/highlight.directive');
 // Decorator that tells to Angular is a module.
 var TDSAppModule = (function () {
     function TDSAppModule() {
@@ -50954,7 +50955,7 @@ var TDSAppModule = (function () {
     TDSAppModule = __decorate([
         core_1.NgModule({
             imports: [platform_browser_1.BrowserModule],
-            declarations: [tds_app_component_1.TDSAppComponent],
+            declarations: [tds_app_component_1.TDSAppComponent, highlight_directive_1.HighlightDirective],
             bootstrap: [tds_app_component_1.TDSAppComponent] // Contains the root component that is being injected on the index.html
         }), 
         __metadata('design:paramtypes', [])
@@ -50963,7 +50964,7 @@ var TDSAppModule = (function () {
 }());
 exports.TDSAppModule = TDSAppModule;
 
-},{"./tds-app.component":23,"@angular/core":3,"@angular/platform-browser":5}],25:[function(require,module,exports){
+},{"../shared/directives/highlight.directive":26,"./tds-app.component":23,"@angular/core":3,"@angular/platform-browser":5}],25:[function(require,module,exports){
 /**
  * Compile the Application Dynamically Just-in-Time (JIT)
  */
@@ -50974,4 +50975,31 @@ var tds_app_module_1 = require('./config/tds-app.module');
 // Compile and launch the module
 platform_browser_dynamic_1.platformBrowserDynamic().bootstrapModule(tds_app_module_1.TDSAppModule);
 
-},{"./config/tds-app.module":24,"@angular/platform-browser-dynamic":4}]},{},[25]);
+},{"./config/tds-app.module":24,"@angular/platform-browser-dynamic":4}],26:[function(require,module,exports){
+/**
+ * Created by Jorge Morayta on 2/7/2017.
+ */
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('@angular/core');
+var HighlightDirective = (function () {
+    function HighlightDirective(el) {
+        el.nativeElement.style.backgroundColor = 'yellow';
+    }
+    HighlightDirective = __decorate([
+        core_1.Directive({ selector: '[tds-highlight]' }), 
+        __metadata('design:paramtypes', [core_1.ElementRef])
+    ], HighlightDirective);
+    return HighlightDirective;
+}());
+exports.HighlightDirective = HighlightDirective;
+
+},{"@angular/core":3}]},{},[25]);

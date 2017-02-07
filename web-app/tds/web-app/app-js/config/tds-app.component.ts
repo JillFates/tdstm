@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'tds-app',
-  template: `<h1>Compiled {{name}}</h1>`,
+  template: '<h1 tds-highlight>Compiled {{name}}</h1>',
 })
 
 export class TDSAppComponent  {
