@@ -12,5 +12,10 @@
 </g:if>
 <g:render template="../model/show" />
 </div>
+  <script>
+    $(document).ready(function(){
+        localStorage.setItem('editAsset',Date.now());
+    });
+  </script>
 </body>
 </html>

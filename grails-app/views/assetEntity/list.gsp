@@ -41,12 +41,20 @@
                 $('#assetListIdGrid').trigger("reloadGrid");
             });
 			$(document).ready(function() {
+                $(window).unbind('storage').bind('storage', function (e) {
+                    var id = $('#showEntityView .assetEntity').data('id');
+                    if(id && localStorage.getItem('editAsset')) {
+                        localStorage.removeItem('editAsset');
+                        EntityCrud.showAssetDetailView('DEVICE', id);
+                    }
+                });
+
 				$("#createEntityView").dialog({ autoOpen: false });
 				$("#showEntityView").dialog({ autoOpen: false });
 				$("#editEntityView").dialog({ autoOpen: false });
 				$("#manufacturerShowDialog").dialog({ autoOpen: false });
 				$("#modelShowDialog").dialog({ autoOpen: false });
-				$("#editManufacturerView").dialog({ autoOpen: false});
+				$("#editManufacturerView").dialog({ autoOpen: false, });
 				$("#cablingDialogId").dialog({ autoOpen:false });
 				$("#filterPane").draggable();
 				var filter = '${filter}';

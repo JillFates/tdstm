@@ -2,7 +2,7 @@
 <%@page defaultCodec="html" %> 
 
 <g:form method="post">
-	<table style="border:0;width:1000px;">
+	<table style="border:0;width:1000px;" class="assetEntity" data-id="${assetEntity?.id}">
 		<tr>
 			<td colspan="2">
 				<div class="dialog"
