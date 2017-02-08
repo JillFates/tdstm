@@ -50,7 +50,7 @@ class AbstractAgent {
 	 * @param context - the domain context that the data for the parameters will come from
 	 * @return the map of the parameters with the appropriate values
 	 */
-	protected Map buildMethodParamsForContext(ApiAction action, AssetComment task) {
+	protected Map buildMethodParamsWithContext(ApiAction action, AssetComment task) {
 		Map methodParams = [:]
 		for(param in action.methodParamsList) {
 			switch (ContextType[param.context]) {
