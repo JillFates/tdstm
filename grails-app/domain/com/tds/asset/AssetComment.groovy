@@ -279,14 +279,20 @@ class AssetComment {
 	}
 
 	/*
-	 * Determines if a task action can be invoked manually
+	 * Used to determine if the task action can be invoked either manually or by the automatic mechanism
+	 *
+	 * Note that a user can Mark a task STARTED OR DONE an the action should be run.
+	 * Automated tasks that turn to READY should invoke the action. If the Action is Async then the status
+	 * will turn to STARTED otherwise marked DONE if successful.
+	 * With both manual/user or automatic tasks, if the invocation fails the status should change to HOLD
+	 *
 	 * @return true if action can be invoked
 	 */
 	boolean isActionInvocable() {
 		apiAction &&
 		! apiActionInvokedAt &&
 		! apiActionCompletedAt &&
-		status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED]
+		status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.DONE]
 	}
 
 	/*

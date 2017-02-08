@@ -46,6 +46,7 @@ class AwsService implements InitializingBean {
 	void sendSnsMessage(String topicName, Object message) {
 		String jsonMessage = JsonOutput.toJson(message)
 		sendMessage(snsUrl(topicName), jsonMessage)
+		log.debug "sendSnsMessage() sent message to the $topicName queue"
 	}
 
 	/**
@@ -56,7 +57,6 @@ class AwsService implements InitializingBean {
 	void sendSqsMessage(String topicName, Object message) {
 		String jsonMessage = JsonOutput.toJson(message)
 		sendMessage(sqsUrl(topicName), jsonMessage)
-		//sendMessage(sqsUrl(topicName), message)
 		log.debug "sendSqsMessage() sent message to the $topicName queue"
 	}
 
@@ -67,7 +67,6 @@ class AwsService implements InitializingBean {
 	 */
 	String snsUrl(String topicName) {
 		StringBuilder url = serviceUrl('sns', topicName)
-		// log.debug "URL = $url"
 		url ? url.toString() : null
 	}
 
@@ -78,7 +77,6 @@ class AwsService implements InitializingBean {
 	 */
 	String sqsUrl(String topicName) {
 		StringBuilder url = serviceUrl('sqs', topicName)
-		// log.debug "URL = $url"
 		url ? url.toString() : null
 	}
 
@@ -99,16 +97,6 @@ class AwsService implements InitializingBean {
 			url.append(URLEncoder.encode(secretKey, 'UTF-8'))
 		}
 		return url
-	}
-
-
-	/**
-	 * Temporary function to demostrate the method routing
-	 * This will update the task specified in the message
-	 * @param message - the Map that came from the message
-	 */
-	void updateTransportStatus(Map message) {
-		log.debug "updateTransportStatus() called with message=$message"
 	}
 
 	// Test methods to play with
