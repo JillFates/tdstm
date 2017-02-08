@@ -22,16 +22,21 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script type="text/javascript">
 
+            $(document).on('entityAssetUpdated',function (e,obj) {
+                $("#messageId").html(obj.asset.assetName + ' Updated').show();
+                $('#databaseIdGrid').trigger("reloadGrid");
+            });
+            $(document).on('entityAssetCreated',function (e,obj) {
+                $("#messageId").html(obj.asset.assetName + ' Created').show();
+                $('#databaseIdGrid').trigger("reloadGrid");
+            });
+
 			$(document).ready(function() {
 
 				//$('#assetMenu').show();
-				$("#createEntityView").dialog({ autoOpen: false, close:function () {
-                    $('#databaseIdGrid').trigger("reloadGrid");
-                } });
+				$("#createEntityView").dialog({ autoOpen: false });
 				$("#showEntityView").dialog({ autoOpen: false })
-				$("#editEntityView").dialog({ autoOpen: false , close:function () {
-                    $('#databaseIdGrid').trigger("reloadGrid");
-                }})
+				$("#editEntityView").dialog({ autoOpen: false })
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })
