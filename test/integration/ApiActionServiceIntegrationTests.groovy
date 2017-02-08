@@ -14,13 +14,12 @@ import net.transitionmanager.service.AwsService
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 
-import spock.lang.Specification
-//import spock.lang.Stepwise
-//import spock.util.mop.ConfineMetaClassChanges
+//import spock.lang.Specification
+import spock.lang.*
 
+@Title('Tests for the ApiActionService class')
 class ApiActionServiceIntegrationTests extends Specification {
 
-	// IOC
 	ApiActionService apiActionService
 
 	private ApiAction action
@@ -67,8 +66,9 @@ class ApiActionServiceIntegrationTests extends Specification {
 		action.save(flush:true)
 
 		asset = new AssetEntity(
-			assetName:'foo',
-			custom1: 'abc'
+			assetName:'fubarsvr01',
+			custom1: 'abc',
+			project: project
 		)
 
 		task = new AssetComment(
@@ -82,45 +82,34 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	}
 
-	def '1. Tests for agentClassForAction'() {
-		if (project.hasErrors()) {
-			println 'Project errors: ' + GormUtil.allErrorsString(project)
-		}
-		if (action.hasErrors()) {
-			println 'action errors: ' + GormUtil.allErrorsString(action)
-		}
-		if (asset.hasErrors()) {
-			println 'asset errors: ' + GormUtil.allErrorsString(asset)
-		}
-		if (task.hasErrors()) {
-			println 'task errors: ' + GormUtil.allErrorsString(task)
-		}
-
-		setup:
+	def '1. Tests for the agentClassForAction method'() {
+		setup: 'requires a Class variable so that'
 			Class clazz
-		when: 'calling agentClassForAction for a good ApiAction'
+
+		when: 'calling agentClassForAction to get an implemented ApiAction'
 			clazz = apiActionService.agentClassForAction(action)
-		then:
+		then: 'the specified class should be returned'
 			clazz == net.transitionmanager.agent.AwsAgent
 
-		when: 'the ApiAction has an unimplemented Agent'
+		when: 'the method is called referencing an unimplemented Agent'
 			action.agentClass = AgentClass.RACIME
 			clazz = apiActionService.agentClassForAction(action)
 		then: 'an exception should be thrown'
 			thrown InvalidRequestException
 	}
 
-	def '2. Tests for agentInstanceForAction'() {
-		setup:
+	def '2. Tests for the agentInstanceForAction method'() {
+		setup: 'requires an Object to hold the Agent instance so that'
 			Object aws
-		when: 'calling agentInstanceForAction for a good ApiAction'
+
+		when: 'calling the method to get an implemented Agent'
 			aws = apiActionService.agentInstanceForAction(action)
-		then:
+		then: 'the requested Agent class instance should be returned'
 			(aws instanceof AwsAgent)
 		and: 'the AwsService was propery injected into the instance'
 			aws.awsService != null
 
-		when: 'the ApiAction has an unimplemented Agent'
+		when: 'the method is called requesting an unimplemented Agent'
 			action.agentClass = AgentClass.RACIME
 			clazz = apiActionService.agentInstanceForAction(action)
 		then: 'an exception should be thrown'
@@ -135,9 +124,8 @@ class ApiActionServiceIntegrationTests extends Specification {
 		then: 'a valid DictionaryItem should be returned'
 			methodDef
 			(methodDef instanceof DictionaryItem)
+		and: 'the method name is the one expected'
 			methodDef.name == action.agentMethod
-			// methodDef.keySet().size() > 0
-			// methodDef.containsKey('sendSnsMessage')
 
 		when: 'the ApiAction has an unimplemented Agent'
 			action.agentClass = AgentClass.RACIME
@@ -146,16 +134,17 @@ class ApiActionServiceIntegrationTests extends Specification {
 			thrown InvalidRequestException
 	}
 
-	def '4. Tests for ApiAction.getMethodParamsMap'() {
+	def '4. Tests for ApiAction.methodParamsList'() {
 		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
 		setup:
 			List paramsList
-		when: 'accessing the methodParamsMap property a.k.a. getMethodParamsMap()'
+
+		when: 'accessing the methodParamsList property a.k.a. methodParamsList()'
 			paramsList = action.methodParamsList
-		then: 'a map of method params should be returned'
+		then: 'a list containing a map representing each of the method params should be returned'
 			paramsList
 			paramsList.size() == 3
-		and: 'the first parameter should be the taskId'
+		and: 'the first map in the list should be the taskId as defined paramsJson above'
 			paramsList[0].param == 'taskId'
 			paramsList[0].context == 'TASK'
 			paramsList[0].property == 'id'
@@ -165,56 +154,65 @@ class ApiActionServiceIntegrationTests extends Specification {
 	def '5. Test for AssetComment.actionInvocable'() {
 		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
 
-		when: 'apiActionInvokedAt is set'
+		when: 'the apiActionInvokedAt property is set'
 			task.status = AssetCommentStatus.READY
 			task.apiActionInvokedAt = new Date()
-		then: 'the task should not be invocable'
+		then: 'the task action should not be invocable because it was already invoked'
 			! task.isActionInvocable()
 
-		when: 'apiActionCompletedAt is set'
+		when: 'the apiActionCompletedAt property is set'
 			task.apiActionInvokedAt = null
 			task.apiActionCompletedAt = new Date()
-		then: 'the task should not be invocable'
+		then: 'the task action should not be invocable because it was already invoked and completed'
 			! task.isActionInvocable()
 
-		when: 'status is not Ready or Started'
+		when: 'the task status is not Ready or Started'
 			task.status = AssetCommentStatus.PENDING
 			task.apiActionInvokedAt = null
 			task.apiActionCompletedAt = null
-		then: 'the task should not be invocable'
+		then: 'the task action should not be invocable'
 			! task.isActionInvocable()
 
-		when: 'the task is READY and has not been previously invoked'
+		when: 'the task status is READY and has not been previously invoked'
 			task.status = AssetCommentStatus.READY
 			task.apiActionInvokedAt = null
 			task.apiActionCompletedAt = null
-		then: 'the task should be invocable'
+		then: 'the task action should be invocable'
 			task.isActionInvocable()
 
-		when: 'status is set to STARTED'
+		when: 'the task status is set to STARTED'
 			task.status = AssetCommentStatus.STARTED
-		then: 'the task should be invocable'
+		then: 'the task action should still be invocable'
 			task.isActionInvocable()
 
-		when: 'apiAction is not set'
-			task.apiAction = null
-		then: 'the task should not be invocable'
-			! task.isActionInvocable()
+		when: 'the task status is set to DONE'
+			task.status = AssetCommentStatus.DONE
+		then: 'the task action should still be invocable since people may jump directly to DONE'
+			task.isActionInvocable()
 
+		when: 'the task apiAction property is not set'
+			task.apiAction = null
+		then: 'the task action should not be invocable'
+			! task.isActionInvocable()
 	}
 
-	def '6. Tests for buildMethodParamsForTask'() {
+	def '6. Tests for buildMethodParamsWithContext'() {
 		setup:
-			Map methodArgsMap
-		when: 'calling the buildMethodParamsForTask'
-			methodArgsMap = apiActionService.buildMethodParamsForContext(action, task)
-		then:
-			methodArgsMap
-			methodArgsMap.keySet().sort() == ['groupRefCode', 'serverRefId', 'taskId']
+			Map methodParamsMap
+		when: 'calling the method with the AwsAgent and the above mocked task'
+			methodParamsMap = apiActionService.buildMethodParamsWithContext(action, task)
+		then: 'a map with the method arguments should be returned'
+			methodParamsMap
+		and: 'the map should contain each of the parameter names as specified in paramsJson above'
+			methodParamsMap.keySet().sort() == ['groupRefCode', 'serverRefId', 'taskId']
+		and: 'the parameters should have the values based on the context and definition for USER_DEF params'
+			methodParamsMap.taskId == null
+			'xk324-kj1i2-23ks-9sdl' == methodParamsMap.groupRefCode
+			asset.assetName == methodParamsMap.serverRefId
 	}
 
 	def '7. Test the invoke method'() {
-		setup: 'inject a mock awsService into the AweAgent class'
+		setup: 'will inject a mock awsService into the AwsAgent class to stub out calls to AWS so that'
 			AwsService awsService = Mock()
 			AwsAgent awsAgent = AwsAgent.instance
 			awsAgent.awsService = awsService
@@ -223,11 +221,20 @@ class ApiActionServiceIntegrationTests extends Specification {
 			apiActionService.invoke(action, task)
 		then: 'the awsService.sendSnsNotification should be called with proper params'
 			1 * awsService.sendSnsMessage(action.asyncQueue, { validateSendSnsMessageMap(it) } )
-
 	}
 
-	// A closure that is used to validate that the argument sent to the method
-	// is correct.
+	@Ignore
+	def '8. tests not yet implemented'() {
+		expect: 'when calling invoke without a valid context that an exception occurs'
+			false
+		expect: 'when calling invoke with a defined parameter that references an undefined property that an an exception occurs'
+			false
+	}
+
+	/*
+	 * This closure is used to validate the 'invoke' test case such that it validates that the argument
+	 * sent to the awsService.sendSnsNotification method are properly formed
+	 */
 	private boolean validateSendSnsMessageMap(param) {
 		// (param instancesof Map) &&
 		param.serverRefId == asset.assetName &&
