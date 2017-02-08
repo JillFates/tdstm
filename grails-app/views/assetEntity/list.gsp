@@ -54,7 +54,10 @@
 				$("#editEntityView").dialog({ autoOpen: false });
 				$("#manufacturerShowDialog").dialog({ autoOpen: false });
 				$("#modelShowDialog").dialog({ autoOpen: false });
-				$("#editManufacturerView").dialog({ autoOpen: false, });
+				$("#editManufacturerView").dialog({ autoOpen: false, close:function(){
+                    var id = $('#showEntityView .assetEntity').data('id');
+                    EntityCrud.showAssetDetailView('DEVICE', id);
+				}});
 				$("#cablingDialogId").dialog({ autoOpen:false });
 				$("#filterPane").draggable();
 				var filter = '${filter}';
