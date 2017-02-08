@@ -385,7 +385,10 @@ class TimeUtil {
 	static String formatDateTimeWithTZ(String tzId, Date date, DateFormat formatter) {
 		if (!date) return ''
 		Assert.notNull formatter, 'formatDateTimeWithTZ called with missing DateFormat formatter parameter'
-		Assert.notNull tzId, 'formatDateTimeWithTZ called with null timezone'
+
+		if(!tzId){
+			tzId = TimeUtil.getDefaultTimeZoneId()
+		}
 
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		formatter.format(date)
@@ -466,7 +469,6 @@ class TimeUtil {
 	 */
 	static Date parseDateTimeWithFormatter(String tzId, String dateString, DateFormat formatter) {
 		if (StringUtil.isBlank(dateString)) return null
-
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		try {
 			return formatter.parse(dateString)
@@ -668,8 +670,8 @@ class TimeUtil {
 	}
 
 	/**
-	 * Formats a TimeDuration instance to a 2-digits colon-separated string 
-	 * with the corresponding values. The implementation will automatically 
+	 * Formats a TimeDuration instance to a 2-digits colon-separated string
+	 * with the corresponding values. The implementation will automatically
 	 * include days, minutes and second. However, seconds and milliseconds can
 	 * also be included using the optional parameters.
 	 *
@@ -684,7 +686,7 @@ class TimeUtil {
 	static String formatTimeDuration(TimeDuration timeDuration, boolean includeSeconds=false, boolean includeMillis=false){
 
 		def fields = ["days", "hours", "minutes"]
-		
+
 		if(includeSeconds){
 			fields << "seconds"
 			// Millis will only be considered if seconds is also set to true.
@@ -692,20 +694,20 @@ class TimeUtil {
 				fields << "millis"
 			}
 		}
-		
+
 		def formatted = []
 		if(timeDuration){
 			fields.each{ field ->
 				int value = timeDuration."$field"
 				String valueStr = value > 9 ? value : "0" + value
 				formatted << valueStr
-			}	
+			}
 		}else{
 			fields.each{
 				formatted << "00"
 			}
 		}
-		
+
 		return formatted.join(":")
 
 	}
@@ -727,7 +729,7 @@ class TimeUtil {
 	 */
 	public static String getUserTimezone(HttpSession session) {
 		return TimeUtil.getFromHttpSession(session, TIMEZONE_ATTR, defaultTimeZone)
-	}	 
+	}
 
 	/**
 	 * Used to get the user perferred timezone
@@ -736,5 +738,14 @@ class TimeUtil {
 	 */
 	public static String getUserDateFormat(HttpSession session) {
 		return TimeUtil.getFromHttpSession(session, DATE_TIME_FORMAT_ATTR, getDefaultFormatType())
-	}	 
+	}
+
+
+	/**
+	 * This method should be called when the user has no Time Zone Id
+	 * it his preferences.
+	 */
+	public static String getDefaultTimeZoneId(){
+		return "GMT"
+	}
 }
