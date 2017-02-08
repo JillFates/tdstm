@@ -17,9 +17,9 @@
         <r:layoutResources />
     </head>
     <body>
-
-        <div class="body">
-            <h1>Edit Company</h1>
+    <tds:subHeader title="Project Edit" crumbs="['Project','Edit']"/>
+    <div class="body">
+            <!-- <h1>Edit Company</h1> -->
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>

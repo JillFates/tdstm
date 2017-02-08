@@ -10,10 +10,11 @@
 	<script src="${resource(dir:'js',file:'project.js')}"></script>
 </head>
 <body>
-	<div class="body">
-		<h1>Edit Project</h1>
+<tds:subHeader title="Project Edit" crumbs="['Project','Edit']"/>
+<div class="body">
+		<!-- <h1>Edit Project</h1> -->
 		<br/>
-			<g:if test="${flash.message}">
+	<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
 			<g:form action="update" method="post" name="editProjectForm" enctype="multipart/form-data">

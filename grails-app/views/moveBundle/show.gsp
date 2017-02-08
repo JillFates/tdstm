@@ -79,6 +79,7 @@
 </head>
 
 <body>
+<tds:subHeader title="Bundle List" crumbs="['Planning','Bundles', 'Show']"/>
 <div class="body">
     <div class="nav" style="border: 1px solid #CCCCCC; width: 300px; margin:9px 14px 0px">
         <span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>

@@ -5,10 +5,11 @@
         <title>Company</title>
     </head>
     <body>
-       
-        <div class="body">
+        <tds:subHeader title="Company List" crumbs="['Admin','Edit']"/>
 
-			<h1>Company</h1>
+    <div class="body">
+
+			<!-- <h1>Company</h1>  -->
 
         	<br/>
             <g:if test="${flash.message}">

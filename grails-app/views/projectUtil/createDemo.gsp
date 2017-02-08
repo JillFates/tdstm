@@ -7,9 +7,12 @@
 
 </head>
 <body>
+	<tds:subHeader title="Project List" crumbs="['Project','Demo']"/>
+
 
 <div class="body">
-<h1>Create Demo Project</h1>
+
+	<!-- <h1>Create Demo Project</h1> -->
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><g:link controller="project" class="list" action="list">Project List</g:link></span>
 </div>
