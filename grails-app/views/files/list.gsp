@@ -24,6 +24,14 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script type="text/javascript">
 			$(document).ready(function() {
+                $(document).on('entityAssetUpdated',function (e,obj) {
+                    $("#messageId").html(obj.asset.assetName + ' Updated').show();
+                    $('#storageIdGrid').trigger("reloadGrid")
+                });
+                $(document).on('entityAssetCreated',function (e,obj) {
+                    $("#messageId").html(obj.asset.assetName + ' Created').show();
+                    $('#storageIdGrid').trigger("reloadGrid")
+                });
 				//$('#assetMenu').show();
 				$("#createEntityView").dialog({ autoOpen: false })
 				$("#showEntityView").dialog({ autoOpen: false })

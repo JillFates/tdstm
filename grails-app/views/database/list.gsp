@@ -25,9 +25,13 @@
 			$(document).ready(function() {
 
 				//$('#assetMenu').show();
-				$("#createEntityView").dialog({ autoOpen: false })
+				$("#createEntityView").dialog({ autoOpen: false, close:function () {
+                    $('#databaseIdGrid').trigger("reloadGrid");
+                } });
 				$("#showEntityView").dialog({ autoOpen: false })
-				$("#editEntityView").dialog({ autoOpen: false })
+				$("#editEntityView").dialog({ autoOpen: false , close:function () {
+                    $('#databaseIdGrid').trigger("reloadGrid");
+                }})
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })

@@ -32,7 +32,12 @@
 		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
 		<script type="text/javascript">
 			// TODO : move this code to JS once verified in tmdev
-			$(document).on('entityAssetUpdated',function () {
+			$(document).on('entityAssetUpdated',function (e,obj) {
+                $("#messageId").html(obj.asset.assetName + ' Updated').show();
+                $('#assetListIdGrid').trigger("reloadGrid");
+            });
+            $(document).on('entityAssetCreated',function (e,obj) {
+                $("#messageId").html(obj.asset.assetName + ' Created').show();
                 $('#assetListIdGrid').trigger("reloadGrid");
             });
 			$(document).ready(function() {

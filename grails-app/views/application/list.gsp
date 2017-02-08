@@ -29,7 +29,12 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script type="text/javascript">
 
-            $(document).on('entityAssetUpdated',function () {
+            $(document).on('entityAssetUpdated',function (e,obj) {
+                $("#messageId").html(obj.asset.assetName + ' Updated').show();
+                $('#applicationIdGrid').trigger("reloadGrid");
+            });
+            $(document).on('entityAssetCreated',function (e,obj) {
+                $("#messageId").html(obj.asset.assetName + ' Created').show();
                 $('#applicationIdGrid').trigger("reloadGrid");
             });
 			$(document).ready(function() {

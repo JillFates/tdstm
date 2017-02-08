@@ -615,7 +615,7 @@ var EntityCrud = ( function($) {
 						*/
 					}
 					assetCreateInvoked=false
-					$(document).trigger('entityAssetCreated');
+					$(document).trigger('entityAssetCreated',resp.data);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
@@ -740,7 +740,7 @@ var EntityCrud = ( function($) {
 				},
 				success: function(resp, dataType) {
 					pub.showAssetDetailView(assetClass, resp.data.asset.id);
-						$(document).trigger('entityAssetUpdated');
+					$(document).trigger('entityAssetUpdated',resp.data);
 					//location.reload();  //to reload the whole List View
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
