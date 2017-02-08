@@ -30,9 +30,8 @@ class ApiActionService {
         ApiAction apiAction = find(id)
 
 
-
-        return apiAction
-    }
+		return apiAction
+	}
 
 	List<Map> list(Project project) {
 		List actions = ApiAction.createCriteria().list() {
