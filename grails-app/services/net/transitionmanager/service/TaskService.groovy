@@ -425,13 +425,12 @@ class TaskService implements ServiceMethods {
 						status = AssetCommentStatus.STARTED
 						task.status = status
 
-
 					} catch (InvalidRequestException e) {
 						errMsg = e.getMessage()
 					} catch (InvalidConfigurationException e) {
 						errMsg = e.getMessage()
 					} catch (e) {
-						errMsg = 'A runtime error occurred while attempting to process the update'
+						errMsg = 'A runtime error occurred while attempting to process the action'
 						log.error ExceptionUtil.stackTraceToString('invokeAction() failed ', e)
 					}
 				}
@@ -442,10 +441,8 @@ class TaskService implements ServiceMethods {
 					status = ACS.HOLD
 					task.status = status
 				}
-
 			}
 		}
-
 		return status
 	}
 
