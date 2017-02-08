@@ -401,7 +401,7 @@ class TaskService implements ServiceMethods {
 		// update the task accordingly.
 		// Actions that are synchronous (future) will fire the action immediately and the task is marked DONE
 		// if successful, otherwise for asynchronous actions the status will be marked STARTED.
-		if (ACTIONABLE_STATUSES.contains(status) && task.hasAction() ) {
+		if (task.hasAction() && ACTIONABLE_STATUSES.contains(status)) {
 			if (task.isActionInvocable()) {
 				String errMsg
 
@@ -464,7 +464,7 @@ class TaskService implements ServiceMethods {
 			return task
 		}
 
-		def now = TimeUtil.nowGMT()
+		Date now = new Date()
 
 		// First thing to do, set the status
 		task.status = status
@@ -544,7 +544,7 @@ class TaskService implements ServiceMethods {
 				break
 
 			case ACS.HOLD:
-				addNote(task, whom, "Placed task on HOLD, previously was '$previousStatus'")
+				addNote(task, whom, "Placed task on HOLD, previous state was '$previousStatus'")
 				break
 
 			case ACS.STARTED:
@@ -552,23 +552,26 @@ class TaskService implements ServiceMethods {
 				// We don't want to loose the original started time if we are reverting from COMPLETED to STARTED
 				if (! revertStatus) {
 					task.actStart = now
-					addNote(task, whom, "Task Started")
+					addNote(task, whom, "Task was Started")
 				}
 				break
 
 			case ACS.COMPLETED:
+				// If the task being changed to the DONE state then the system should check all successors
+				// to make them ready appropriately.
 				if (task.isDirty('status') && task.getPersistentValue('status') != status) {
 					triggerUpdateTaskSuccessors(task.id, status, whom, isPM)
 				}
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
-				addNote(task, whom, "Task Completed")
+				addNote(task, whom, "Task was Completed")
 				break
 
 			case ACS.TERMINATED:
 				task.resolvedBy = assignee
 				task.actFinish = now
+				addNote(task, whom, "Task was Terminated")
 				break
 		}
 
