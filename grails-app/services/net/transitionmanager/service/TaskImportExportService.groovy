@@ -670,6 +670,19 @@ class TaskImportExportService implements ServiceMethods {
 		list.collect { it[1] }
 	}
 
+
+
+	/**
+	 * Used to cancel a previously started import process
+	 * @param params - the parameters from the HttpRequest
+	 */
+	void cancelPreviousUpload(Project project, Map formOptions) {
+		securityService.requirePermission(['GenerateTasks'], false,
+			"attempted to cancel an task import for project $project")
+
+		deleteUploadedSpreadsheet(formOptions.filename)
+	}
+
 	/**
 	 * Used by the controller in the event that an exception was thrown and there's the potential that a file
 	 * exists.

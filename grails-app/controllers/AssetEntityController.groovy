@@ -2698,7 +2698,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @return String HTML representing the page
 	 */
 	def retrieveLists() {
-		
+
 		def start = new Date()
 		session.removeAttribute('assetDependentlist')
 
@@ -3038,11 +3038,11 @@ class AssetEntityController implements ControllerMethods {
 
 				//map Groups array String values to Integer
 				depGroups = NumberUtil.mapToPositiveInteger(depGroups)
-				
+
 				// handle the case of empty dependency groups
 				if (depGroups == [])
 					depGroups = -1
-				
+
 				def assetDependencies = AssetDependency.executeQuery('''
 					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future,
 					                ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
@@ -4325,6 +4325,35 @@ class AssetEntityController implements ControllerMethods {
 
 			renderErrorJson(['An error occurred while attempting to import tasks', e.message])
 		}
+	}
+
+
+	/**
+	 * Cancels the import process that is in flight; deletes the uploaded spreadsheet
+	 * and then redirects the user back to the Import Task view.
+	 * @param params.filename - the filename that the temporary uploaded spreadsheet was saved as
+	 * @return JSON{ accounts: List of accounts }
+	 */
+	@HasPermission('GenerateTasks')
+	def cancelImport() {
+		try {
+			Project project = controllerService.getProjectForPage(this)
+			if (!project) {
+				return
+			}
+
+			taskImportExportService.cancelPreviousUpload(project, [filename: params.id])
+			flash.message = 'The previous import was cancelled'
+		}
+		catch (InvalidRequestException | DomainUpdateException | InvalidParamException | EmptyResultException e) {
+			flash.message = e.message
+		}
+		catch (e) {
+			log.error 'cancelImport() Unexpected exception occurred while cancelling Task Import', e
+			flash.message = 'An error occurred while attempting to cancel Task Import'
+		}
+
+		redirect(action: 'importTask')
 	}
 
 	/**
