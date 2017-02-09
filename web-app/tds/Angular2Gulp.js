@@ -5,7 +5,8 @@
 var gulp = require('gulp'),
     browserify = require("browserify"),
     tsify = require("tsify"),
-    source = require('vinyl-source-stream');
+    source = require('vinyl-source-stream'),
+    shell = require('gulp-shell');
 
 
 gulp.task('build', ['build-app', 'build-vendor']);
@@ -31,3 +32,7 @@ gulp.task('build-vendor', function () {
         .pipe(gulp.dest('./web-app/dist/'));
 
 });
+
+gulp.task('typescript-compile', shell.task(['tsc -p web-app']));
+
+gulp.task('build-test',['typescript-compile'], shell.task(['karma start karma.conf.js']));
