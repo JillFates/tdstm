@@ -50914,23 +50914,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var user_service_1 = require('../shared/services/user.service');
 var TDSAppComponent = (function () {
-    function TDSAppComponent() {
+    function TDSAppComponent(userService) {
         this.name = 'Angular';
         this.color = 'blue';
+        this.userName = '';
+        this.userName = userService.userName;
     }
     TDSAppComponent = __decorate([
         core_1.Component({
             selector: 'tds-app',
-            template: '<h1>Compiled {{name}}</h1> <p tds-highlight [highlightColor]="color">Highlight me for a {{color}} color</p>',
+            template: '<h1>Compiled {{name}} for {{userName}}</h1> <p tds-highlight [elementHighlight]="color">Highlight me for a {{color}} color</p><br><games-list></games-list>',
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [user_service_1.UserService])
     ], TDSAppComponent);
     return TDSAppComponent;
 }());
 exports.TDSAppComponent = TDSAppComponent;
 
-},{"@angular/core":3}],24:[function(require,module,exports){
+},{"../shared/services/user.service":31,"@angular/core":3}],24:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -50950,6 +50953,7 @@ var platform_browser_1 = require('@angular/platform-browser');
 var tds_app_component_1 = require('./tds-app.component');
 var highlight_directive_1 = require('../shared/directives/highlight.directive');
 var games_module_1 = require('../modules/games/games.module');
+var user_service_1 = require('../shared/services/user.service');
 // Decorator that tells to Angular is a module.
 var TDSAppModule = (function () {
     function TDSAppModule() {
@@ -50958,7 +50962,8 @@ var TDSAppModule = (function () {
         core_1.NgModule({
             imports: [platform_browser_1.BrowserModule, games_module_1.GamesModule],
             declarations: [tds_app_component_1.TDSAppComponent, highlight_directive_1.HighlightDirective],
-            bootstrap: [tds_app_component_1.TDSAppComponent] // Contains the root component that is being injected on the index.html
+            bootstrap: [tds_app_component_1.TDSAppComponent],
+            providers: [user_service_1.UserService]
         }), 
         __metadata('design:paramtypes', [])
     ], TDSAppModule);
@@ -50966,7 +50971,7 @@ var TDSAppModule = (function () {
 }());
 exports.TDSAppModule = TDSAppModule;
 
-},{"../modules/games/games.module":27,"../shared/directives/highlight.directive":30,"./tds-app.component":23,"@angular/core":3,"@angular/platform-browser":5}],25:[function(require,module,exports){
+},{"../modules/games/games.module":27,"../shared/directives/highlight.directive":30,"../shared/services/user.service":31,"./tds-app.component":23,"@angular/core":3,"@angular/platform-browser":5}],25:[function(require,module,exports){
 /**
  * Compile the Application Dynamically Just-in-Time (JIT)
  */
@@ -51008,8 +51013,9 @@ var GameListComponent = (function () {
         core_1.Component({
             moduleId: module.id,
             selector: 'games-list',
-            templateUrl: './games-list.component.html',
-            styleUrls: ['./games-list.component.css'],
+            template: "<h1>{{title}}</h1>\n            <table>\n                <tr *ngFor=\"let game of games\">\n                    <td>{{game.Name}}</td>\n                </tr>\n            </table>",
+            // templateUrl: 'games-list.component.html',
+            // styleUrls: ['games-list.component.css'],
             providers: [game_service_1.GameService, { provide: game_model_1.Game, useValue: {} }]
         }), 
         __metadata('design:paramtypes', [game_service_1.GameService, game_model_1.Game])
@@ -51030,16 +51036,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var platform_browser_1 = require('@angular/platform-browser');
+var common_1 = require('@angular/common');
 var games_list_component_1 = require('./games-list/games-list.component');
 var GamesModule = (function () {
     function GamesModule() {
     }
     GamesModule = __decorate([
         core_1.NgModule({
-            imports: [platform_browser_1.BrowserModule],
+            imports: [common_1.CommonModule],
             declarations: [games_list_component_1.GameListComponent],
-            bootstrap: [games_list_component_1.GameListComponent]
+            exports: [games_list_component_1.GameListComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], GamesModule);
@@ -51047,7 +51053,7 @@ var GamesModule = (function () {
 }());
 exports.GamesModule = GamesModule;
 
-},{"./games-list/games-list.component":26,"@angular/core":3,"@angular/platform-browser":5}],28:[function(require,module,exports){
+},{"./games-list/games-list.component":26,"@angular/common":1,"@angular/core":3}],28:[function(require,module,exports){
 "use strict";
 var Game = (function () {
     function Game(name) {
@@ -51060,6 +51066,16 @@ exports.Game = Game;
 
 },{}],29:[function(require,module,exports){
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('@angular/core');
 var game_model_1 = require('./game.model');
 var GameService = (function () {
     function GameService() {
@@ -51108,11 +51124,15 @@ var GameService = (function () {
             }, 2000);
         });
     };
+    GameService = __decorate([
+        core_1.Injectable(), 
+        __metadata('design:paramtypes', [])
+    ], GameService);
     return GameService;
 }());
 exports.GameService = GameService;
 
-},{"./game.model":28}],30:[function(require,module,exports){
+},{"./game.model":28,"@angular/core":3}],30:[function(require,module,exports){
 /**
  * Created by Jorge Morayta on 2/7/2017.
  */
@@ -51130,7 +51150,6 @@ var core_1 = require('@angular/core');
 var HighlightDirective = (function () {
     function HighlightDirective(el) {
         this.el = el;
-        el.nativeElement.style.backgroundColor = this.highlightColor;
     }
     HighlightDirective.prototype.onMouseEnter = function () {
         this.highlight(this.highlightColor);
@@ -51142,7 +51161,7 @@ var HighlightDirective = (function () {
         this.el.nativeElement.style.backgroundColor = color;
     };
     __decorate([
-        core_1.Input(), 
+        core_1.Input('elementHighlight'), 
         __metadata('design:type', String)
     ], HighlightDirective.prototype, "highlightColor", void 0);
     __decorate([
@@ -51164,5 +51183,29 @@ var HighlightDirective = (function () {
     return HighlightDirective;
 }());
 exports.HighlightDirective = HighlightDirective;
+
+},{"@angular/core":3}],31:[function(require,module,exports){
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('@angular/core');
+var UserService = (function () {
+    function UserService() {
+        this.userName = 'Jorge Morayta';
+    }
+    UserService = __decorate([
+        core_1.Injectable(), 
+        __metadata('design:paramtypes', [])
+    ], UserService);
+    return UserService;
+}());
+exports.UserService = UserService;
 
 },{"@angular/core":3}]},{},[25]);

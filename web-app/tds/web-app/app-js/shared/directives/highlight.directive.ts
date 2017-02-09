@@ -10,11 +10,10 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 
 export class HighlightDirective {
 
-    @Input() highlightColor: string;
+    // Using an Input allow you to change the name of the binding externally, so, it becomes public to the 'scope'
+    @Input('elementHighlight') highlightColor: string;
 
-    constructor(private el: ElementRef) {
-        el.nativeElement.style.backgroundColor = this.highlightColor;
-    }
+    constructor(private el: ElementRef) {}
 
     @HostListener('mouseenter') onMouseEnter() {
         this.highlight(this.highlightColor);

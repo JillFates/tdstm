@@ -1,5 +1,7 @@
+import { Injectable } from '@angular/core';
 import { Game } from './game.model'
 
+@Injectable()
 export class GameService {
     private games: Array<Game> = [];
 

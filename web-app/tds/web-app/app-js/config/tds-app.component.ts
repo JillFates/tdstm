@@ -3,15 +3,21 @@
  */
 
 import { Component } from '@angular/core';
+import { UserService } from '../shared/services/user.service'
 
 @Component({
   selector: 'tds-app',
-  template: '<h1>Compiled {{name}}</h1> <p tds-highlight [highlightColor]="color">Highlight me for a {{color}} color</p><br><games-list></games-list>',
+  template: '<h1>Compiled {{name}} for {{userName}}</h1> <p tds-highlight [elementHighlight]="color">Highlight me for a {{color}} color</p><br><games-list></games-list>',
 })
 
 export class TDSAppComponent  {
 
   name = 'Angular';
   color = 'blue';
+  userName = '';
+
+  constructor(userService: UserService){
+    this.userName = userService.userName;
+  }
 
 }
