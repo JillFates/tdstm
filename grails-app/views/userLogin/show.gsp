@@ -22,7 +22,7 @@
 		<g:javascript src="asset.comment.js" />
 	</head>
 	<body>
-		<tds:subHeader title="UserLogin List" crumbs="['Admin','Client', 'Show']"/>
+		<tds:subHeader title="UserLogin" crumbs="['Admin','Client', 'Detail']"/>
 	<!-- BEGIN Modal Dialogs -->
 		<div id="personGeneralViewId"></div>
 		<!-- END Modal Dialogs -->

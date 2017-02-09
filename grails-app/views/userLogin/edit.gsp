@@ -48,7 +48,7 @@
 		</script>
 	</head>
 	<body>
-	<tds:subHeader title="UserLogin List" crumbs="['Admin','Client', 'Edit']"/>
+	<tds:subHeader title="Edit UserLogin" crumbs="['Admin','Client', 'Edit']"/>
 	<div class="body">
 			<!-- <h1>Edit UserLogin</h1> -->
 

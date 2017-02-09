@@ -12,7 +12,7 @@
 		</style>
 	</head>
 	<body>
-		<tds:subHeader title="Bundle List" crumbs="['Planning','Bundles', 'List']"/>
+		<tds:subHeader title="Bundle Edit" crumbs="['Planning','Bundles', 'List']"/>
 		<section>
 			<div>
 				<div class="box-body">

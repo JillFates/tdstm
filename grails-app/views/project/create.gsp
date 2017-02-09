@@ -113,7 +113,7 @@
 	<r:layoutResources/>
 </head>
 <body>
-	<tds:subHeader title="Project List" crumbs="['Project','Create']"/>
+	<tds:subHeader title="Create Project" crumbs="['Project','Create']"/>
 	<div class="body">
 		<!-- <h1>Create Project</h1> -->
 		<br/>

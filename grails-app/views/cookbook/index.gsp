@@ -56,7 +56,7 @@
 	</script>
 </head>
 <body>
-<tds:subHeader title="Task Cookbook" crumbs="['Tasks','Cookbook']"/>
+<tds:subHeader title="Cookbook" crumbs="['Tasks','Cookbook']"/>
 <g:include view="/layouts/_error.gsp" />
 
 	<div class="body cookbook_recipes_editor" style="position: relative" id="cookbookRecipesEditor" ng-app="tdsCookbook" ng-controller="tds.cookbook.controller.MainController">

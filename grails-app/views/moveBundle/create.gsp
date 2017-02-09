@@ -39,8 +39,7 @@
     </script>
   </head>
   <body>
-  <tds:subHeader title="Bundle List" crumbs="['Planning','Bundles', 'Create']"/>
-
+  <tds:subHeader title="Create Bundle" crumbs="['Planning','Bundles', 'List']"/>
   <div class="body">
       <!-- <h1>Create Bundle</h1> -->
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px;">

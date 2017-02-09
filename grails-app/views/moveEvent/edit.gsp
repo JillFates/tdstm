@@ -36,7 +36,7 @@
 
     <div class="body move-event-edit">
             <!-- <h1>Edit Event</h1> -->
-            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+            <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
 		    </div>
 		    <br/>

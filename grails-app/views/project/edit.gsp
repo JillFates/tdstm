@@ -10,7 +10,7 @@
 	<script src="${resource(dir:'js',file:'project.js')}"></script>
 </head>
 <body>
-<tds:subHeader title="Project Edit" crumbs="['Project','Edit']"/>
+<tds:subHeader title="Edit Project" crumbs="['Project','Edit']"/>
 <div class="body">
 		<!-- <h1>Edit Project</h1> -->
 		<br/>

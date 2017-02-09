@@ -15,7 +15,7 @@
 </head>
 <body>
 	<tds:subHeader title="My Task" crumbs="['Tasks','My Task']"/>
-
+	<br>
 	<script type="text/javascript">
 		//Some Preferences
 		window.PREFS = {
@@ -23,7 +23,7 @@
 			PRINTER_COPIES : "${prefPrinterCopies}"
 		}
 	</script>
-<%-- BEGIN: NOTIFICATIONS SCRIPT --%>
+	<%-- BEGIN: NOTIFICATIONS SCRIPT --%>
 	<span id="notification" style="display:none;"></span>
 	<script id="successTemplate" type="text/x-kendo-template">
 		<div class="alert alert-success alert-dismissable fadeIn" ng-show="alert.success.show">

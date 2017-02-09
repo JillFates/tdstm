@@ -36,7 +36,7 @@
     </script>
     </head>
     <body>
-    <tds:subHeader title="Event List" crumbs="['Planning', 'Event', 'Create']"/>
+    <tds:subHeader title="Create Event" crumbs="['Create', 'Event']"/>
         <div class="body">
             <!-- <h1>Create Event</h1> -->
             <div class="nav" style="border: 1px solid #CCCCCC; height: 25px">
