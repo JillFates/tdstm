@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Removing License Manager dependencies (before compilation)
+# author: oluna
+
+#remove license lib and cert
+rm -f ../lib/licensing-licensor-base-1.1.0.jar
+rm -f ../web-app/WEB-INF/tdstm/licenseManager.key
+
+# remove frontend views
+rm -fr ../web-app/app-js/modules/licenseManager
+
+# remove backend code
+rm -f ../grails-app/domain/net/transitionmanager/domain/LicensedClient.groovy
+rm -f ../grails-app/controllers/WsLicenseManagerController.groovy
+rm -f ../grails-app/services/net/transitionmanager/service/LicenseManagerService.groovy
+rm -f ../grails-app/services/net/transitionmanager/service/license/prefs/FilePrivateKeyDataProvider.groovy
