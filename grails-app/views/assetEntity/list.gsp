@@ -45,6 +45,7 @@
                     var id = $('#showEntityView .assetEntity').data('id');
                     if(id && localStorage.getItem('editAsset')) {
                         $('#assetListIdGrid').trigger("reloadGrid");
+                        $('#modelShowDialog').dialog("close")
                         localStorage.removeItem('editAsset');
                         EntityCrud.showAssetDetailView('DEVICE', id);
                     }
@@ -58,6 +59,7 @@
 				$("#editManufacturerView").dialog({ autoOpen: false, close:function(){
                     var id = $('#showEntityView .assetEntity').data('id');
                     EntityCrud.showAssetDetailView('DEVICE', id);
+                    $('#assetListIdGrid').trigger("reloadGrid");
 				}});
 				$("#cablingDialogId").dialog({ autoOpen:false });
 				$("#filterPane").draggable();
