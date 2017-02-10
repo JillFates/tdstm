@@ -64865,7 +64865,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 exports.routes = [
-    { path: '', redirectTo: 'games', pathMatch: 'full' }
+    { path: '', redirectTo: '', pathMatch: 'full' }
 ];
 var TDSRoutingModule = (function () {
     function TDSRoutingModule() {
