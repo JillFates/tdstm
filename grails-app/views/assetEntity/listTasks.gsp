@@ -32,7 +32,12 @@
 
 	<script type="text/javascript">
 		var progressTimer;
-		
+        $(document).on('entityAssetUpdated',function (e,obj) {
+            $('#taskListIdGrid').trigger("reloadGrid")
+        });
+        $(document).on('entityAssetCreated',function (e,obj) {
+            $('#taskListIdGrid').trigger("reloadGrid")
+        });
 		$(document).ready(function() {
 
 			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
