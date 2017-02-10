@@ -7,7 +7,7 @@ import { UserService } from '../shared/services/user.service'
 
 @Component({
   selector: 'tds-app',
-  template: '<h1>Compiled {{name}} for {{userName}}</h1> <p tds-highlight [elementHighlight]="color">Highlight me for a {{color}} color</p><br><router-outlet></router-outlet>',
+  templateUrl: '../../tds/web-app/app-js/config/tds-app.component.html',
 })
 
 export class TDSAppComponent  {
