@@ -44,6 +44,7 @@
                 $(window).unbind('storage').bind('storage', function (e) {
                     var id = $('#showEntityView .assetEntity').data('id');
                     if(id && localStorage.getItem('editAsset')) {
+                        $('#assetListIdGrid').trigger("reloadGrid");
                         localStorage.removeItem('editAsset');
                         EntityCrud.showAssetDetailView('DEVICE', id);
                     }
