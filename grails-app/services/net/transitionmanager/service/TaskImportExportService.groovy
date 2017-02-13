@@ -40,6 +40,8 @@ class TaskImportExportService implements ServiceMethods {
 
 	static final List<String> DELIM_OPTIONS = [';',':','|']
 
+
+	static final xfrmInteger = {val, options -> return NumberUtil.toInteger(val)}
 	// Transform a string, changing null to blank
 	static final xfrmString = { val, options -> val ?: '' }
 
@@ -150,8 +152,8 @@ class TaskImportExportService implements ServiceMethods {
 		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:false,
 										label: 'Comments', template:changeTmpl('comments'), transform:xfrmString],
 
-		duration				: [type: 'string', ssPos:14, formPos:15, domain: 'C', width:120, locked:false, modifiable:true,
-										label: 'Duration', template:changeTmpl('duration'), transform:xfrmString],
+		duration				: [type: 'number', ssPos:14, formPos:15, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Duration', template:changeTmpl('duration'), transform:xfrmInteger],
 
 		durationLocked			: [type: 'string', ssPos:15, formPos:16, domain: 'C', width:120, locked:false,
 										label: 'Duration Locked', transform:xfrmString],
@@ -953,7 +955,6 @@ class TaskImportExportService implements ServiceMethods {
 			(error, taskChanged) = applyTaskChanges(tasks[i], sheetInfoOpts, formOptions)
 			if(error){
 				tasks[i].errors << ["Row ${i+2} $error"]
-				updatedTasks << tasks[i]
 				results.taskError++
 			}
 
@@ -1063,12 +1064,12 @@ class TaskImportExportService implements ServiceMethods {
 				}
 
 			} else {
-				String origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
-				String chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
+				def origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
+				def chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
 
 				boolean valuesEqual = origValueTransformed == chgValueTransformed
-				boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)
-				boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
+				boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed.toString())
+				boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed.toString())
 				// Checks if the incoming value is empty but the task has a value
 				if (chgValueIsBlank){
 					if ( !origValueIsBlank) {
@@ -1083,7 +1084,7 @@ class TaskImportExportService implements ServiceMethods {
 					}
 				} else {
 					if (! valuesEqual) {
-						assetComment[prop] = task[prop]
+						assetComment[prop] = chgValueTransformed //task[prop]
 						setOriginalValue(task, prop, origValueTransformed)
 					}
 				}
@@ -1198,16 +1199,18 @@ class TaskImportExportService implements ServiceMethods {
 	 * @return the transformed or original value appropriately
 	 */
 	private transformProperty(String propName, value, Map sheetInfoOpts) {
+		def transformedValue = null
 		if (!taskSpreadsheetColumnMap.containsKey(propName)) {
 			throw new RuntimeException("transformProperty called with invalid property name $propName")
 		}
 
 		if (taskSpreadsheetColumnMap[propName].containsKey('transform')) {
-			taskSpreadsheetColumnMap[propName].transform(value, sheetInfoOpts)
+			transformedValue = taskSpreadsheetColumnMap[propName].transform(value, sheetInfoOpts)
 		}
 		else {
-			value == null ? '' : value
+			transformedValue = (value == null) ? '' : value
 		}
+		return transformedValue
 	}
 
 
