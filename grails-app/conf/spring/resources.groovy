@@ -1,5 +1,6 @@
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.SecurityBeanFactoryPostProcessor
+import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
 import com.tdsops.common.security.spring.TdsPasswordEncoder
 import com.tdsops.common.security.spring.TdsPermissionEvaluator
 import com.tdsops.common.security.spring.TdsPostAuthenticationChecks
@@ -8,6 +9,7 @@ import com.tdsops.common.security.spring.TdsSaltSource
 import com.tdsops.common.security.spring.TdsUserDetailsService
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.security.web.access.ExceptionTranslationFilter
 
 beans = {
 	// uses the grails dataSource from DataSource.groovy
@@ -41,6 +43,20 @@ beans = {
 	saltSource(TdsSaltSource)
 
 	userDetailsService(TdsUserDetailsService)
+
+	// See: SpringSecurityCoreGrailsPlugin for referece
+	requestCache(TdsHttpSessionRequestCache) {
+		portResolver = ref('portResolver')
+		createSessionAllowed = true
+		requestMatcher = ref('requestMatcher')
+		coreService = ref('coreService')
+	}
+
+	exceptionTranslationFilter(ExceptionTranslationFilter, ref('authenticationEntryPoint'), ref('requestCache')) {
+		accessDeniedHandler = ref('accessDeniedHandler')
+		authenticationTrustResolver = ref('authenticationTrustResolver')
+		throwableAnalyzer = ref('throwableAnalyzer')
+	}
 
 	securityBeanFactoryPostProcessor(SecurityBeanFactoryPostProcessor)
 }
