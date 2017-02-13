@@ -36,7 +36,8 @@ class NewsEditorController implements ControllerMethods {
 		def moveEventId = params.moveEvent
 		def moveEvent
 		if (moveEventId) {
-			userPreferenceService.setUserCurrentMoveEventId(moveEventId.toString())
+			//userPreferenceService.setUserCurrentMoveEventId(moveEventId.toString())
+			userPreferenceService.setPreference(securityService.loadCurrentUserLogin(), PREF.MOVE_EVENT, moveEventId.toString())
 			moveEvent = MoveEvent.get(moveEventId)
 		}
 		else {
