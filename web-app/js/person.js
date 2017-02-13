@@ -112,6 +112,8 @@ var Person = function () {
 					personDiv.dialog('option', 'modal', 'true')
 					if (currentTabShow == "generalInfoShowId")
 						personDiv.dialog('option', 'title', 'Manage Staff - ' + $('span[id="firstNameId"]').text() + ' ' + $('span[id="middleNameId"]').text() + ' ' + $('span[id="lastNameId"]').text())
+
+					$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 					
 					$("#"+currentTabShow).show()
 					
