@@ -59,9 +59,8 @@ class TdsPreAuthenticationChecks implements UserDetailsChecker, InitializingBean
 
 				String tzId = userPreferenceService.getTimeZone()
 
-				String lockoutUntil = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME).format(
-						TimeUtil.formatDateTimeWithTZ(tzId, TimeUtil.defaultFormatType,
-						userLogin.lockedOutUntil, TimeUtil.FORMAT_DATE_TIME_2))
+				String lockoutUntil = TimeUtil.formatDateTimeWithTZ(tzId, TimeUtil.defaultFormatType, userLogin.lockedOutUntil, TimeUtil.FORMAT_DATE_TIME)
+
 				throw new LockedException('Your account is presently locked until ' + lockoutUntil +
 						'. You may wait or contact support to have your account unlocked.')
 			}
