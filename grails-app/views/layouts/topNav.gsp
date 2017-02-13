@@ -197,7 +197,7 @@
             <div class="pull-right hidden-xs">
                 <b></b>
             </div>
-            <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2015-2017 .</strong> All
+            <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2010-${Calendar.getInstance().get(Calendar.YEAR)} .</strong> All
         rights reserved.
         </div>
         <!-- /.container -->
