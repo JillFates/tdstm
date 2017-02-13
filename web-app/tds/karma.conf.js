@@ -1,8 +1,8 @@
 module.exports = function(config) {
 
     var appBase    = 'web-app/specs-dist/';       // transpiled app JS and map files
-    var appSrcBase = 'web-app/app-js';       // app source TS files
-    var appAssets  = '/web-app/'; // component assets fetched by Angular's compiler
+    var appSrcBase = 'web-app/app-js/';       // app source TS files
+    var appAssets  = 'web-app/app-js/'; // component assets fetched by Angular's compiler
 
     // Testing helpers (optional) are conventionally in a folder called `testing`
     var testingBase    = 'testing/'; // transpiled test JS and map files
@@ -68,8 +68,8 @@ module.exports = function(config) {
 
             // Asset (HTML & CSS) paths loaded via Angular's component compiler
             // (these paths need to be rewritten, see proxies section)
-            { pattern: appBase + '**/*.html', included: false, watched: true },
-            { pattern: appBase + '**/*.css', included: false, watched: true },
+            { pattern: appSrcBase + '**/*.html', included: false, watched: true },
+            { pattern: appSrcBase + '**/*.css', included: false, watched: true },
 
             // Paths for debugging with source maps in dev tools
             { pattern: appSrcBase + '**/*.ts', included: false, watched: false },
@@ -81,7 +81,10 @@ module.exports = function(config) {
         // Proxied base paths for loading assets
         proxies: {
             // required for component assets fetched by Angular's compiler
-            "/web-app/": appAssets
+            //"/web-app/": appAssets,
+           // '/base/web-app/app-js/modules/games/games-list/games-list.component.html':"/base/web-app/specs-dist/modules/games/games-list/games-list.component.html",
+            //'/base/web-app/specs-dist/':"/base/web-app/app-js/",//root development
+            '/base/web-app/specs-dist/modules/tds/web-app/app-js/':"/base/web-app/app-js/"//sweet!!
         },
 
         exclude: [],

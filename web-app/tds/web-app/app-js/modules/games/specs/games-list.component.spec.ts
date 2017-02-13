@@ -20,7 +20,7 @@ import { GameListComponent } from '../games-list/games-list.component'
 import { GameService } from '../shared/game.service'
 import { Game } from '../shared/game.model'
 
-describe('Warming up: Instance of the component', () => {
+describe('GameListComponent - Learning: Instance of the component', () => {
     let fixture: ComponentFixture<GameListComponent>;
     let comp: GameListComponent;
 
@@ -54,16 +54,18 @@ describe('Warming up: Instance of the component', () => {
 
 });
 
-describe("Getting Hot: DOM Access", () => {
+describe("GameListComponent - Learning: DOM Access", () => {
     let fixture: ComponentFixture<GameListComponent>;
     let comp: GameListComponent;
     let de: DebugElement; // this will hold our html element
 
 
     beforeEach(async(() => {
+        debugger;
         TestBed.configureTestingModule({
             declarations: [GameListComponent],
-            providers: [{ provide: Game, useValue: {} }]//ignore this for now
+            providers: [{ provide: Game, useValue: {} }],//ignore this for now
+
         }).compileComponents();
     }));
 
@@ -91,7 +93,7 @@ describe("Getting Hot: DOM Access", () => {
     });
 });
 
-describe('Litte detour: Fixture.detectChanges', () => {
+describe('GameListComponent - Learning: Fixture.detectChanges', () => {
     let fixture: ComponentFixture<GameListComponent>;
     let comp: GameListComponent;
     let de: DebugElement; // this will hold our html element
@@ -118,7 +120,7 @@ describe('Litte detour: Fixture.detectChanges', () => {
 });
 
 //if your component is receiving some object at its contructor you can use your own objects to test
-describe('Hotter: Stub values', () => {
+describe('GameListComponent - Learning: Stub values', () => {
     let fixture: ComponentFixture<GameListComponent>;
     let comp: GameListComponent;
     let gameStub: Game = {
@@ -144,7 +146,7 @@ describe('Hotter: Stub values', () => {
 });
 
 //you should not use/manipulate real data in your test, right?
-describe('Welcome to hell: async and spy', () => {
+describe('GameListComponent - Learning: async and spy', () => {
 
     let mockData: Array<Game> = [
         new Game('Super Mario'),
