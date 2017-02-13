@@ -264,6 +264,7 @@ class UserPreferenceService implements ServiceMethods {
 		if ( !tzId ) {
 			tzId = TimeUtil.getDefaultTimeZoneId()
 		}
+		return tzId
 	}
 	void setTimeZone(UserLogin userLogin = null, String timeZoneId) {
 		setPreference userLogin, CURR_TZ, timeZoneId
