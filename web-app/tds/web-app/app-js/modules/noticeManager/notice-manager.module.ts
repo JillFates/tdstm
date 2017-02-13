@@ -1,0 +1,20 @@
+// Angular
+import { NgModule }      from '@angular/core';
+import { CommonModule }       from '@angular/common';
+// Routing Logic
+import { UIRouterModule } from 'ui-router-ng2';
+import { NOTICE_STATES } from './notice-routing.states';
+// Components
+import { NoticeListComponent } from './list/notice-list.component';
+
+@NgModule({
+    imports: [
+        CommonModule,
+        UIRouterModule.forChild({ states: NOTICE_STATES }), // Same as { states: [state1, state2 ] }
+    ],
+    declarations: [ NoticeListComponent ],
+    exports:    [ NoticeListComponent]
+})
+
+export class NoticesManagerModule {
+}

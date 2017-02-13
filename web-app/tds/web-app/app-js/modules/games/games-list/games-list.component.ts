@@ -5,24 +5,20 @@ import { Game } from '../shared/game.model'
 @Component({
     moduleId: module.id,
     selector: 'games-list',
-    template:`<h1>{{title}}</h1>
-            <table>
-                <tr *ngFor="let game of games">
-                    <td>{{game.Name}}</td>
-                </tr>
-            </table>`,
-   // templateUrl: 'games-list.component.html',
-   // styleUrls: ['games-list.component.css'],
-    providers: [GameService, { provide: Game, useValue: {} }]
+    templateUrl: '../../tds/web-app/app-js/modules/games/games-list/games-list.component.html',
+    styleUrls: ['../../tds/web-app/app-js/modules/games/games-list/games-list.component.css'],
+    providers: [GameService, {provide: Game, useValue: {}}]
 })
 
 export class GameListComponent implements OnInit {
-    games: Array<Game>;
-    newgame: boolean;
+    games:Array<Game>;
+    newgame:boolean;
     title = "Games you should play";
-    constructor(private gameService: GameService, private game: Game) { }
 
-    ngOnInit(): void {
+    constructor(private gameService:GameService, private game:Game) {
+    }
+
+    ngOnInit():void {
         this.gameService.query().then(result => {
             this.games = result;
         });

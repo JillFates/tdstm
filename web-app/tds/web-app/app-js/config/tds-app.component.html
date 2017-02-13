@@ -1,10 +1,8 @@
-<h1>Compiled {{name}} for {{userName}}</h1>
+<h1>Compiled Angular 2 -> Logged as {{userName}}</h1>
+<br/>
+<ol>
+    <li><a uiSref="games" uiSrefActive="active">Go to Games</a></li>
+    <li><a uiSref="noticeList" uiSrefActive="active">Go to NoticeList</a></li>
+</ol>
 
-<p tds-highlight [elementHighlight]="color">Highlight me for a {{color}} color</p><br>
-
-<a routerLink=""  routerLinkActive="active">Go to Root</a>
-<br />
-<br />
-<a routerLink="games"  routerLinkActive="active">Go to Games</a>
-
-<router-outlet></router-outlet>
+<ui-view></ui-view>

@@ -7589,10 +7589,10 @@ if (_global['navigator'] && _global['navigator'].geolocation) {
 },{"_process":258}],261:[function(require,module,exports){
 "use strict";
 // Polyfills
-require('core-js/es6');
-require('core-js/es7/reflect');
-require('zone.js/dist/zone');
+require("core-js/es6");
+require("core-js/es7/reflect");
+require("zone.js/dist/zone");
 // TODO: disable for production
-require('zone.js/dist/long-stack-trace-zone');
+require("zone.js/dist/long-stack-trace-zone");
 
 },{"core-js/es6":1,"core-js/es7/reflect":2,"zone.js/dist/long-stack-trace-zone":259,"zone.js/dist/zone":260}]},{},[261]);

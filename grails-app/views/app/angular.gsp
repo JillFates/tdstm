@@ -8,8 +8,7 @@
     </head>
 
     <body>
-        <tds-app> Loading TDS App</tds-app>
-
+        <ui-view>Loading...</ui-view>
 
         <script src="${resource(dir: 'tds/web-app/dist', file: 'vendor.js')}"></script>
         <script src="${resource(dir: 'tds/web-app/dist', file: 'app.js')}"></script>
