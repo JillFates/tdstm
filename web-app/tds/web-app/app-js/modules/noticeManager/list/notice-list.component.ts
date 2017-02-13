@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 @Component({
     moduleId: module.id,
     selector: 'notice-list',
-    template: '<a uiSref="tds" uiSrefActive="active">Return</a> <br /><h1>{{moduleName}}</h1>'
+    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/list/notice-list.component.html',
 })
 
 export class NoticeListComponent implements OnInit {

@@ -6,13 +6,14 @@ import { UIRouterModule } from 'ui-router-ng2';
 import { NOTICE_STATES } from './notice-routing.states';
 // Components
 import { NoticeListComponent } from './list/notice-list.component';
+import { HeaderComponent } from '../header/header.component';
 
 @NgModule({
     imports: [
         CommonModule,
         UIRouterModule.forChild({ states: NOTICE_STATES }), // Same as { states: [state1, state2 ] }
     ],
-    declarations: [ NoticeListComponent ],
+    declarations: [ NoticeListComponent, HeaderComponent ],
     exports:    [ NoticeListComponent]
 })
 

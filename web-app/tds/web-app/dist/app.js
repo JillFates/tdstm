@@ -69931,7 +69931,7 @@ TDSAppComponent = __decorate([
 ], TDSAppComponent);
 exports.TDSAppComponent = TDSAppComponent;
 
-},{"../shared/services/user.service":81,"@angular/core":3}],69:[function(require,module,exports){
+},{"../shared/services/user.service":82,"@angular/core":3}],69:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -69985,7 +69985,7 @@ TDSAppModule = __decorate([
 ], TDSAppModule);
 exports.TDSAppModule = TDSAppModule;
 
-},{"../modules/games/games.module":75,"../modules/noticeManager/notice-manager.module":79,"../shared/services/user.service":81,"./tds-app.component":68,"./tds-routing.states":70,"@angular/core":3,"@angular/forms":4,"@angular/http":5,"@angular/platform-browser":7,"ui-router-ng2":67}],70:[function(require,module,exports){
+},{"../modules/games/games.module":75,"../modules/noticeManager/notice-manager.module":80,"../shared/services/user.service":82,"./tds-app.component":68,"./tds-routing.states":70,"@angular/core":3,"@angular/forms":4,"@angular/http":5,"@angular/platform-browser":7,"ui-router-ng2":67}],70:[function(require,module,exports){
 "use strict";
 var tds_app_component_1 = require("./tds-app.component");
 exports.tdsRoot = {
@@ -70198,6 +70198,39 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
+var ui_router_ng2_1 = require("ui-router-ng2");
+var HeaderComponent = (function () {
+    function HeaderComponent(state) {
+        this.state = state;
+        if (this.state && this.state.$current && this.state.$current.data) {
+            this.pageMetaData = this.state.$current.data.page;
+            document.title = this.pageMetaData.title;
+        }
+    }
+    return HeaderComponent;
+}());
+HeaderComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'header',
+        templateUrl: '../../tds/web-app/app-js/modules/header/header.component.html',
+    }),
+    __metadata("design:paramtypes", [ui_router_ng2_1.StateService])
+], HeaderComponent);
+exports.HeaderComponent = HeaderComponent;
+
+},{"@angular/core":3,"ui-router-ng2":67}],79:[function(require,module,exports){
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require("@angular/core");
 var NoticeListComponent = (function () {
     function NoticeListComponent(moduleName) {
         this.moduleName = '';
@@ -70212,13 +70245,13 @@ NoticeListComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'notice-list',
-        template: '<a uiSref="tds" uiSrefActive="active">Return</a> <br /><h1>{{moduleName}}</h1>'
+        templateUrl: '../../tds/web-app/app-js/modules/noticeManager/list/notice-list.component.html',
     }),
     __metadata("design:paramtypes", [String])
 ], NoticeListComponent);
 exports.NoticeListComponent = NoticeListComponent;
 
-},{"@angular/core":3}],79:[function(require,module,exports){
+},{"@angular/core":3}],80:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -70234,6 +70267,7 @@ var ui_router_ng2_1 = require("ui-router-ng2");
 var notice_routing_states_1 = require("./notice-routing.states");
 // Components
 var notice_list_component_1 = require("./list/notice-list.component");
+var header_component_1 = require("../header/header.component");
 var NoticesManagerModule = (function () {
     function NoticesManagerModule() {
     }
@@ -70245,15 +70279,16 @@ NoticesManagerModule = __decorate([
             common_1.CommonModule,
             ui_router_ng2_1.UIRouterModule.forChild({ states: notice_routing_states_1.NOTICE_STATES }),
         ],
-        declarations: [notice_list_component_1.NoticeListComponent],
+        declarations: [notice_list_component_1.NoticeListComponent, header_component_1.HeaderComponent],
         exports: [notice_list_component_1.NoticeListComponent]
     })
 ], NoticesManagerModule);
 exports.NoticesManagerModule = NoticesManagerModule;
 
-},{"./list/notice-list.component":78,"./notice-routing.states":80,"@angular/common":1,"@angular/core":3,"ui-router-ng2":67}],80:[function(require,module,exports){
+},{"../header/header.component":78,"./list/notice-list.component":79,"./notice-routing.states":81,"@angular/common":1,"@angular/core":3,"ui-router-ng2":67}],81:[function(require,module,exports){
 "use strict";
 var notice_list_component_1 = require("./list/notice-list.component");
+var header_component_1 = require("../header/header.component");
 /**
  * This state displays the notice list.
  * It also provides a nested ui-view (viewport) for child states to fill in.
@@ -70262,13 +70297,17 @@ var notice_list_component_1 = require("./list/notice-list.component");
 exports.noticeListState = {
     name: 'noticeList',
     url: '/notice/list',
-    component: notice_list_component_1.NoticeListComponent
+    data: { page: { title: 'Notice Administration', instruction: '', menu: ['Admin', 'Notice', 'List'] } },
+    views: {
+        'headerView@noticeList': { component: header_component_1.HeaderComponent },
+        $default: { component: notice_list_component_1.NoticeListComponent }
+    },
 };
 exports.NOTICE_STATES = [
     exports.noticeListState
 ];
 
-},{"./list/notice-list.component":78}],81:[function(require,module,exports){
+},{"../header/header.component":78,"./list/notice-list.component":79}],82:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
