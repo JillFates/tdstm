@@ -8,11 +8,14 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.ModelConnector
 import net.transitionmanager.domain.UserLogin
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.Order
 
 class ModelService implements ServiceMethods {
 
@@ -25,7 +28,7 @@ class ModelService implements ServiceMethods {
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	SecurityService securityService
 
-   /**
+	/**
 	 * @param fromModel : instance of the model that is being merged
 	 * @param toModel : instance of toModel
 	 * @return : updated assetCount
@@ -214,5 +217,54 @@ class ModelService implements ServiceMethods {
 		else {
 			jdbcTemplate.queryForList(query.toString())
 		}
+	}
+	
+	/**
+	 * Validates whether the given alias is valid for the given model
+	 * @param newAlias, the alias to be added
+	 * @param model, the model this alias is being applied to
+	 * @param allowLocalDuplicates, if true, the alias will not be checked against this model's current aliases
+	 * @param manufacturer, if given, the alias will validated using this manufacturer instead of the given model's current manufacturer
+	 * @param modelName, if given, the alias will validated using this name instead of the given model's current name
+	 * @return true if the alias is valid for the given parameters
+	 */
+	boolean isValidAlias (String newAlias, Model model, boolean allowLocalDuplicates = false, Manufacturer manufacturer = null, String modelName = null) {
+		
+		// if there wasn't enough information supplied 
+		if (!model && (!modelName || !manufacturer))
+			return false
+		
+		modelName = (modelName == null) ? (model.modelName) : (modelName)
+		manufacturer = manufacturer ?: model.manufacturer
+			
+		// check if the alias matches the model name
+		if (newAlias == modelName)
+			return false
+		
+		// check if there is another model from the same manufacturer with this alias as their name 
+		def modelsWithName = Model.createCriteria().list {
+			eq('modelName', newAlias)
+			eq('manufacturer', manufacturer)
+			if (model)
+				ne('modelName', model.modelName)
+		}
+		
+		if (modelsWithName.size() > 0)
+			return false
+			
+		// check if there is a model from this manufacturer already using this alias
+		def modelsWithAlias = ModelAlias.createCriteria().list {
+			eq('name', newAlias)
+			eq('manufacturer', manufacturer)
+			if (allowLocalDuplicates && model)
+				ne('model', model)
+		}
+		
+		if (modelsWithAlias)
+			return false
+		
+		
+		// if all the tests were passes, this is a valid alias
+		return true
 	}
 }

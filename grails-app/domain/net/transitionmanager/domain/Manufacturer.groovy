@@ -2,9 +2,12 @@ package net.transitionmanager.domain
 
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.service.ManufacturerService
 
 class Manufacturer {
-
+	
+	def manufacturerService
+	
 	String name
 	String description
 	String corporateName
@@ -75,8 +78,9 @@ class Manufacturer {
 	ManufacturerAlias findOrCreateAliasByName(String name, boolean createIfNotFound = false) {
 		ManufacturerAlias alias = ManufacturerAlias.findByNameAndManufacturer(name, this)
 		if (!alias && createIfNotFound) {
+			def isValid = manufacturerService.isValidAlias(name, this, false)
 			alias = new ManufacturerAlias(name: name.trim(), manufacturer: this)
-			if (!alias.save(flush: true)) {
+			if (!isValid || !alias.save(flush: true)) {
 				log.error GormUtil.allErrorsString(alias)
 				return null
 			}

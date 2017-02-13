@@ -1,4 +1,5 @@
 import com.tds.asset.AssetEntity
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
@@ -7,6 +8,7 @@ import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.ManufacturerService
 import org.hibernate.criterion.Order
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -19,6 +21,7 @@ class ManufacturerController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate
 	SecurityService securityService
+	ManufacturerService manufacturerService
 
 	def list() {}
 
@@ -191,27 +194,26 @@ class ManufacturerController implements ControllerMethods {
 	}
 
 	/**
-	 *  Validate whether requested AKA already exist in DB or not
-	 *  @param: aka, name of aka
-	 *  @param: id, id of model
-	 *  @return : return aka if exists
-	 */
-	def validateAKA() {
-		def aka = params.name
-
-		def akaExist = Manufacturer.findByName(aka)
-		if (akaExist) {
-			render aka
-		}
-
-		def manuId = params.id
-		if (manuId) {
-			if (ManufacturerAlias.countByNameAndManufacturer(aka, Manufacturer.load(manuId))) {
-				render aka
-			}
-		}
-
-		render ''
+	* Validate whether requested manufactuer alias already exists in the database or not
+	* @param: alias, the new alias to be validated
+	* @param: id, id of manufacturer
+	* @param: parentName, name of the manufacturer to validate the alias with (not needed if the manufacturer's name hasn't changed)
+	* @return: "valid" if the alias is valid, "invalid" otherwise
+	*/
+	@HasPermission('EditModel')
+	def validateAliasForForm() {
+		def alias = params.alias
+		def manufacturerId = params.id
+		def newManufacturerName = params.parentName
+		
+		// get the manufacturer if specified and call the service method for alias validation
+		def manufacturer = manufacturerId ? Manufacturer.read(manufacturerId) : null
+		def isValid = manufacturerService.isValidAlias(alias, manufacturer, true, newManufacturerName)
+		if (isValid)
+			render 'valid'
+		else
+			render 'invalid'
+		
 	}
 
 	/**

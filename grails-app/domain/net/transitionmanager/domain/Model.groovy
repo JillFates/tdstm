@@ -8,11 +8,13 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.ModelService
 
 @Slf4j(value='logger')
 class Model {
 
 	transient SecurityService securityService
+	def modelService
 
 	// TODO - modelName should be renamed to name (as it is in the db - confusing)
 	String modelName
@@ -219,8 +221,9 @@ class Model {
 		name = name.trim()
 		ModelAlias alias = ModelAlias.findByNameAndModel(name, this)
 		if (!alias && createIfNotFound) {
+			def isValid = modelService.isValidAlias(name, this)
 			alias = new ModelAlias(name: name, model: this, manufacturer: manufacturer)
-			if (!alias.save()) {
+			if (!isValid || !alias.save()) {
 				logger.error '{}', GormUtil.allErrorsString(alias)
 				return null
 			}

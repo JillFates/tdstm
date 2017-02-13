@@ -11,7 +11,7 @@
 				</div>
 			</g:hasErrors>
 			<g:form method="post" action="update" name="editManufacturerFormId">
-				<input type="hidden" name="id" value="${manufacturerInstance?.id}" />
+				<input type="hidden" id="manufacturerId" name="id" value="${manufacturerInstance?.id}" />
 				<div class="dialog">
 					<table>
 						<tbody>
@@ -32,19 +32,18 @@
 									<label for="aka">AKA:</label>
 								</td>
 								<td valign="top">
-									
 									<table style="border: 0px;margin-left: -8px;">
 										<tbody id="addAkaTableId">
 										<g:each in="${manuAlias}" var="alias">
-											<tr id="aka_${alias.id}"><td nowrap="nowrap">
-												<input type="text" class="akaValidate" id="aka" name="aka_${alias.id}" value="${alias.name}" onchange="validateAKA(this.value,${alias.id},'errSpan_${alias.id}', 'manufacturer')"/>
-												<a href="javascript:deleteAkaRow('aka_${alias.id}',true)"><span class='clear_filter'><u>X</u></span></a>
+											<tr id="aka_${alias.id}" js-is-unique="true"><td nowrap="nowrap">
+												<input type="text" class="akaValidate" id="aka_${alias.id}" name="aka_${alias.id}" value="${alias.name}" onchange="akaUtil.handleAkaChange(this, 'manufacturer', '${manufacturerInstance?.id}')"/>
+												<a href="javascript:akaUtil.deleteAkaRow('aka_${alias.id}', true, 'manufacturer')"><span class='clear_filter'><u>X</u></span></a>
 												<br><div class="errors" style="display: none" id="errSpan_${alias.id}"></div>
 											</td></tr>
 										</g:each>
 										</tbody>
 									</table>
-									<span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
+									<span style="cursor: pointer;" onclick="akaUtil.addAka('manufacturer')"><b>Add AKA</b></span>
 								</td>
 							</tr>
 							
@@ -90,7 +89,7 @@
 				<input type="hidden" name="deletedAka" id="deletedAka" />
 				<div class="buttons" >
 					<span class="button">
-						<input type="button" class="save" value="Update" onclick="updateManufacturer('Manufacturer')"/>
+						<input type="button" class="save" value="Update" id="saveManufacturerId" onclick="updateManufacturer('Manufacturer')"/>
 					</span>
 					<span class="button">
 						<g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" />
@@ -100,10 +99,9 @@
 					</span>
 				</div>
 			</g:form>
-			<div id="akaDiv" style="display:none;"> 
-				<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'${manufacturerInstance.id}', 'errSpan', 'manufacturer' )"/>
+			<div id="akaTemplateDiv" style="display:none;"> 
+				<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="akaUtil.handleAkaChange(this, 'manufacturer', '${manufacturerInstance?.id}')"/>
 			</div>
-			<input type="hidden" id="manageAkaId" value="-1" >
 		</div>
 		<script>
 			currentMenuId = "#adminMenu";

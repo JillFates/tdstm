@@ -2,31 +2,31 @@
 <%@page import="net.transitionmanager.domain.Manufacturer" %>
 <%@page import="net.transitionmanager.domain.ModelConnector" %>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Model - Edit</title>
-    <g:javascript src="model.manufacturer.js" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-<g:javascript src="drag_drop.js" />
-<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
-  </head>
-  <body>
-<div class="body">
-<g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
-<div style="border: 0px;margin-top: 5px;" >
-<fieldset>
-<legend><b>Edit Model</b></legend>
-<g:form action="update"  enctype="multipart/form-data" name="modelForm">
-<div style="margin-left: 10px;margin-right: 10px; width: auto;">
-<table style="border: 0px;">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Model - Edit</title>
+	<g:javascript src="model.manufacturer.js" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+	<g:javascript src="drag_drop.js" />
+	<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
+</head>
+<body>
+	<div class="body">
+	<g:if test="${flash.message}">
+		<div class="message">${flash.message}</div>
+	</g:if>
+	<div style="border: 0px;margin-top: 5px;" >
+	<fieldset>
+	<legend><b>Edit Model</b></legend>
+	<g:form action="update"  enctype="multipart/form-data" name="modelForm">
+	<div style="margin-left: 10px;margin-right: 10px; width: auto;">
+	<table style="border: 0px;">
 	<tbody>
 		<tr>
 			<td>Manufacturer:</td>
-			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer.id}"/></td>
-		    <td>Model Name:</td>
-			<td><input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}">
+			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer.id}" onchange="akaUtil.handleParentPropChange('model')"/></td>
+			<td>Model Name:</td>
+			<td><input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}" onchange="akaUtil.handleParentPropChange('model')">
 				<g:hasErrors bean="${modelInstance}" field="modelName">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelName" /></div>
 				</g:hasErrors>
@@ -34,18 +34,19 @@
 		</tr>
 		<tr>
 			<td>AKA:</td>
-			<td><table style="border: 0px;margin-left: -8px;">
-                 <tbody id="addAkaTableId">
-                 <g:each in="${modelAliases}" var="alias">
-                  <tr id="aka_${alias.id}"><td nowrap="nowrap">
-                 	 <input type="text" class="akaValidate" id="aka" name="aka_${alias.id}" value="${alias.name}" onchange="validateAKA(this.value,${modelInstance.id},'errSpan_${alias.id}', 'model')"/>
-                 	 <a href="javascript:deleteAkaRow('aka_${alias.id}',true)"><span class='clear_filter'><u>X</u></span></a>
-                 	 <br><div class="errors" style="display: none" id="errSpan_${alias.id}"></div>
-                  </td></tr>
-                 </g:each>
-                 </tbody>
-                </table>
-                <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
+			<td>
+				<table style="border: 0px;margin-left: -8px;">
+					<tbody id="addAkaTableId">
+						<g:each in="${modelAliases}" var="alias">
+							<tr id="aka_${alias.id}" js-is-unique="true"><td nowrap="nowrap">
+								<input type="text" class="akaValidate" id="aka_${alias.id}" name="aka_${alias.id}" value="${alias.name}" onchange="akaUtil.handleAkaChange(this, 'model', '${modelInstance?.id}')"/>
+								<a href="javascript:akaUtil.deleteAkaRow('aka_${alias.id}', true, 'model')"><span class='clear_filter'><u>X</u></span></a>
+								<br><div class="errors" style="display: none" id="errSpan_${alias.id}"></div>
+							</td></tr>
+						</g:each>
+					</tbody>
+				</table>
+				<span style="cursor: pointer;" onclick="akaUtil.addAka('model')"><b>Add AKA</b></span>
 			</td>
 			<td>Asset Type:</td>
 			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
@@ -92,7 +93,7 @@
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="productLine" /></div>
 				</g:hasErrors>
 			</td>
-		    <td>Model Family:</td>
+			<td>Model Family:</td>
 			<td><input type="text" name="modelFamily" id="modelFamilyId" value="${modelInstance?.modelFamily}">
 				<g:hasErrors bean="${modelInstance}" field="layoutStyle">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelFamily" /></div>
@@ -106,12 +107,12 @@
 					jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
 				</script>
 				<input type="text" class="dateRange" size="15" style="width:138px;" name="endOfLifeDate" id="endOfLifeDateId"
-                   value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" />" />
+				   value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" />" />
 				<g:hasErrors bean="${projectInstance}" field="startDate">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeDate" /></div>
 				</g:hasErrors>
 			</td>
-            <td>End of Life Status:</td>
+			<td>End of Life Status:</td>
 			<td><input type="text" name="endOfLifeStatus" id="endOfLifeStatusId" value="${modelInstance?.endOfLifeStatus}">
 				<g:hasErrors bean="${modelInstance}" field="endOfLifeStatus">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeStatus" /></div>
@@ -143,24 +144,24 @@
 			<td><input size="20" type="file" name="rearImage" id="rearImageId" accept="image/*" />
 			</td>-->
 		</tr>
-        <tr>
-            <td valign="top" class="name">
-                <label for="description">Room Object:</label>
-            </td>
-            <td valign="top" class="value ${hasErrors(bean:modelInstance,field:'roomObject','errors')}">
-                <g:checkBox id="roomObject" name="roomObject" value='${modelInstance.roomObject}'/>
-            </td>
-        	<!--<td>Use Image:</td>
-	        <td>
+		<tr>
+			<td valign="top" class="name">
+				<label for="description">Room Object:</label>
+			</td>
+			<td valign="top" class="value ${hasErrors(bean:modelInstance,field:'roomObject','errors')}">
+				<g:checkBox id="roomObject" name="roomObject" value='${modelInstance.roomObject}'/>
+			</td>
+			<!--<td>Use Image:</td>
+			<td>
 				<g:if test="${modelInstance.useImage}">
 					<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
 				</g:if>
 				<g:else>
 					<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
 				</g:else>
-	    	</td>-->
-        </tr>
-        <tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
+			</td>-->
+		</tr>
+		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>
 			<td><input type="text" name="bladeRows" value="${modelInstance.bladeRows}" >
 				<g:hasErrors bean="${modelInstance}" field="bladeRows">
@@ -190,11 +191,11 @@
 				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constraints.bladeHeight.inList}" value="${modelInstance.bladeHeight}"></g:select>
 			</td>
 		</tr>
-        <tr>
+		<tr>
 			<td>Created By :</td>
 			<td>${modelInstance?.createdBy}</td>
-	        <td>Source TDS:</td>
-	        <td>
+			<td>Source TDS:</td>
+			<td>
 				<g:if test="${modelInstance.sourceTDS}">
 					<input type="checkbox" name="sourceTDS" id="sourceTDSId"  checked="checked" />
 				</g:if>
@@ -313,35 +314,34 @@
 		</table>
 	</div>
 	<tr>
-			<td colspan="2">
-				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
-					<tds:hasPermission permission="EditModel">
-						<input name="id" value="${modelInstance.id}" type="hidden"/>
-						<input type="hidden" name="redirectTo" value="${redirectTo }" />
-						<span class="button">
-						 <g:if test="${redirectTo=='modelDialog'}">
-							<input type="button" class="save"  value="Update" onclick="updateModel('Model', 'modelForm')"/>
-						</g:if>
-						<g:else>
-							<input type="submit" class="save"  value="Update" />
-						</g:else>
-						</span>
-					</tds:hasPermission>
+		<td colspan="2">
+			<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
+				<tds:hasPermission permission="EditModel">
+					<input id="modelId" name="id" value="${modelInstance.id}" type="hidden"/>
+					<input type="hidden" name="redirectTo" value="${redirectTo }" />
 					<span class="button">
-						<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','show','Show')" />
+					 <g:if test="${redirectTo=='modelDialog'}">
+						<input type="button" class="save" id="saveModelId" value="Update" onclick="updateModel('Model', 'modelForm')"/>
+					</g:if>
+					<g:else>
+						<input type="submit" class="save" id="saveModelId" value="Update" />
+					</g:else>
 					</span>
-				</div>
-			</td>
-		</tr>
+				</tds:hasPermission>
+				<span class="button">
+					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','show','Show')" />
+				</span>
+			</div>
+		</td>
+	</tr>
 </div>
 <input type="hidden" name="deletedAka" id="deletedAka" />
 </g:form>
 </fieldset>
-<div id="akaDiv" style="display:none;">
-	<input type="text" name="aka" id="akaId" value=""
-	onchange="validateAKA(this.value,'${modelInstance.id}', 'errSpan', 'model' )"/>
+<div id="akaTemplateDiv" style="display:none;">
+	<input type="text" name="aka" id="akaId" class="akaValidate" value=""
+		onchange="akaUtil.handleAkaChange(this, 'model', '${modelInstance?.id}')"/>
 </div>
-<input type="hidden" id="manageAkaId" value="-1" >
 </div>
 
 <script type="text/javascript">
@@ -364,7 +364,7 @@
 		if(count < 51 ){
 			var connector = "<div style='position: relative; float: left;'></div><div id='labelPositionDiv"+count+"' style='position: relative;'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>"
 			$("#connector"+count).html(connector)
-          	$("#connector"+count).css({"position": "relative", "float": "left", "margin-right": "20px"})
+		  	$("#connector"+count).css({"position": "relative", "float": "left", "margin-right": "20px"})
 			var modelConnector = $("#connectorTabe tbody").html()
 			$("#connectorModelBody").append(modelConnector)
 			// change attributes based on count
@@ -419,20 +419,20 @@
 		}
 	}
 	function showImage( value ){
-	    var imageTemp = $('#rearImageId').val() || image  ;
+		var imageTemp = $('#rearImageId').val() || image  ;
 		if($("#"+value).is(":checked")){
 			if(imageTemp){
-			    if(imageTemp != image)
+				if(imageTemp != image)
 				{
-				    if(!$("#rearImage").prop('src'))
-                        $('#cablingPanelEdit').css('height','auto').prepend('<img id="rearImage" style="display:none;max-width: 375px;"/>')
+					if(!$("#rearImage").prop('src'))
+						$('#cablingPanelEdit').css('height','auto').prepend('<img id="rearImage" style="display:none;max-width: 375px;"/>')
 					readURL($('#rearImageId')[0],"#rearImage");
 				}
 				initializeConnectors( 2, 'auto' )
 				$("#rearImage").show()
 			} else {
 				alert("Rear image does not exist")
-                $("#"+value).prop("checked",false);
+				$("#"+value).prop("checked",false);
 			}
 		} else {
 			$("#rearImage").hide()
@@ -440,20 +440,20 @@
 		}
 	}
 
-    function readURL(input,target) {
+	function readURL(input,target) {
 
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
 
-            reader.onload = function (e) {
-                $(target).attr('src', e.target.result);
-            }
+			reader.onload = function (e) {
+				$(target).attr('src', e.target.result);
+			}
 
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
 	function validateForm(){
-	    debugger;
+		debugger;
 		var isValid = true
 		if($(".field_error").length){
 			isValid = false

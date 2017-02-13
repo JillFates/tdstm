@@ -34,13 +34,9 @@
 								<td>
 									<table style="border:0px ;margin-left:-8px">
 										<tbody id="addAkaTableId">
-											<tr><td nowrap="nowrap">
-											<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'','errSpan', 'manufacturer')"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
-											<br><div class="errors" style="display: none" id="errSpan"></div>
-											
-											</td></tr>
 										</tbody>
 									</table>
+									<span style="cursor: pointer;" onclick="akaUtil.addAka('manufacturer')"><b>Add AKA</b></span>
 								</td>
 							</tr>
 							
@@ -85,13 +81,12 @@
 				</div>
 				
 				<div class="buttons">
-					<span class="button"><g:actionSubmit class="save" action="save" value="Save"></g:actionSubmit></span>
+					<span class="button"><g:actionSubmit class="save" id="saveManufacturerId" action="save" value="Save"></g:actionSubmit></span>
 				</div>
 			</g:form>
-			<div id="akaDiv" style="display:none;"> 
-				<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'', 'errSpan', 'manufacturer' )">
+			<div id="akaTemplateDiv" style="display:none;"> 
+				<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="akaUtil.handleAkaChange(this, 'manufacturer', '')">
 			</div>
-			<input type="hidden" id="manageAkaId" value="-1" >
 		</div>
 		<script>
 

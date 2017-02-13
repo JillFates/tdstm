@@ -2,16 +2,16 @@
 <%@page import="net.transitionmanager.domain.Manufacturer" %>
 <%@page import="net.transitionmanager.domain.ModelConnector" %>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Model - New</title>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>Model - New</title>
 
-  </head>
-  <body>
+</head>
+<body>
 <div class="body">
 <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
+	<div class="message">${flash.message}</div>
+</g:if>
 <div class="steps_table" style="border: 0px;">
 <fieldset>
 <legend><b>Create Model</b></legend>
@@ -27,14 +27,14 @@
 		<tr>
 			<td valign="top" class="name"><b>Manufacturer:<span style="color: red">*</span></b></td>
 			<td valign="top" class="name">
-				<g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer?.id}"></g:select>
+				<g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer?.id}" onchange="akaUtil.handleParentPropChange('model')"></g:select>
 				<g:hasErrors bean="${modelInstance}" field="manufacturer">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="manufacturer" /></div>
 				</g:hasErrors>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap"><b>Model Name:<span style="color: red">*</span></b></td>
 			<td>
-				<input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}">
+				<input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}" onchange="akaUtil.handleParentPropChange('model')">
 				<g:hasErrors bean="${modelInstance}" field="modelName">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelName" /></div>
 				</g:hasErrors>
@@ -44,16 +44,13 @@
 			<td valign="top" class="name">AKA:</td>
 			<td>
 				<table style="border:0px ;margin-left:-8px">
-				    <tbody id="addAkaTableId">
-				      <tr><td nowrap="nowrap">
-					  	<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'','errSpan','model')"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
-					  	<br><div class="errors" style="display: none" id="errSpan"></div>
-					  </td></tr>
+					<tbody id="addAkaTableId">
 					</tbody>
 				</table>
-			 </td>
-			 <td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
-			 <td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
+				<span style="cursor: pointer;" onclick="akaUtil.addAka('model')"><b>Add AKA</b></span>
+			</td>
+			<td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
+			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
 		<tr>
 			<td valign="top" class="name">Usize:</td>
 			<td>
@@ -89,15 +86,15 @@
 		<tr>
 			<td><label for="endOfLifeDate"> End of Life Date:</label></td>
 			<td class="value ${hasErrors(bean:modelInstance ,field:'endOfLifeDate','errors')}">
-				    <script type="text/javascript" charset="utf-8">
-						jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
-                    </script> <input type="text" class="dateRange" size="15" style="width: 138px;" name="endOfLifeDate" id="endOfLifeDateId"
+				<script type="text/javascript" charset="utf-8">
+					jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
+				</script> <input type="text" class="dateRange" size="15" style="width: 138px;" name="endOfLifeDate" id="endOfLifeDateId"
 					value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" />" />
-       			 <g:hasErrors bean="${modelInstance}" field="endOfLifeDate">
+				<g:hasErrors bean="${modelInstance}" field="endOfLifeDate">
 					<div class="errors">
 						<g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeDate" />
 					</div>
-				 </g:hasErrors>
+				</g:hasErrors>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">End of Life Status:</td>
 			<td>
@@ -117,9 +114,9 @@
 				<input type="text" size="4" name="powerUse" id="powerUseCreateId" value="${modelInstance.powerUse}" >&nbsp;
 				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${tds.powerType()}" /></td>
 			</td>
-		    <td valign="top" class="name">Notes:</td>
-		    <td>
-		    	<input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
+			<td valign="top" class="name">Notes:</td>
+			<td>
+				<input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
 			</td>
 		</tr>
 		<!--<tr>
@@ -147,7 +144,7 @@
 		<tr id="bladeLabelCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Label Count:</td>
 			<td><input type="text" name="bladeLabelCount" value="${modelInstance.bladeLabelCount}" >
-			<g:hasErrors bean="${modelInstance}" field="bladeLabelCount">
+				<g:hasErrors bean="${modelInstance}" field="bladeLabelCount">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeLabelCount" /></div>
 				</g:hasErrors>
 			</td>
@@ -159,32 +156,32 @@
 			</td>
 		</tr>
 		<tr>
-		<!--<td>Use Image:</td>
-	        <td>
-	        	<g:if test="${modelTemplate?.useImage}">
-	       			<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
-		        </g:if>
-		        <g:else>
-		        	<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
-		        </g:else>
-	        </td>-->
-		 <td>Source TDS:</td>
-	        <td>
-	        	<g:if test="${modelTemplate?.sourceTDS}">
-	       			<input type="checkbox" name="sourceTDS" id="sourceTDSId"  checked="checked" />
-		        </g:if>
-		        <g:else>
-		        	<input type="checkbox" name="sourceTDS" id="sourceTDSId"/>
-		        </g:else>
-	        </td>
-        </tr>
+			<!--<td>Use Image:</td>
+			<td>
+				<g:if test="${modelTemplate?.useImage}">
+					<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
+				</g:if>
+				<g:else>
+					<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
+				</g:else>
+			</td>-->
+			<td>Source TDS:</td>
+			<td>
+				<g:if test="${modelTemplate?.sourceTDS}">
+					<input type="checkbox" name="sourceTDS" id="sourceTDSId"  checked="checked" />
+				</g:if>
+				<g:else>
+					<input type="checkbox" name="sourceTDS" id="sourceTDSId"/>
+				</g:else>
+			</td>
+		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="useForPlanning">Room Object:</label></td>
-            <td><input type="checkbox" name="roomObject" id="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''}/></td>
+			<td><input type="checkbox" name="roomObject" id="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''}/></td>
 			<td valign="top" class="name" nowrap="nowrap">Source URL :</td>
 			<td><input type="text" name="sourceURL " id="sourceURL " value=""/></td>
 		</tr>
-        <tr>
+		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Validated By:</td>
 			<td>
 				<input type="text" name="validatedBy" id="validatedBy" value="" readonly="readonly"/>
@@ -193,7 +190,7 @@
 			<td>
 				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" ></g:select>
 			</td>
-       </tr>
+		</tr>
 	</tbody>
 </table>
 </div>
@@ -263,12 +260,12 @@
 			</tbody>
 		</table>
 	</div>
-	    <tr>
+		<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
 					<tds:hasPermission permission="EditModel">
 					<span class="button">
-						<g:actionSubmit class="save" action="save" value="Save"></g:actionSubmit>
+						<g:actionSubmit class="save" id="saveModelId" action="save" value="Save"></g:actionSubmit>
 					</span>
 					</tds:hasPermission>
 				</div>
@@ -278,10 +275,9 @@
 
 </g:form>
 </fieldset>
-			<div id="akaDiv" style="display:none;">
-             	<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'', 'errSpan', 'model' )">
-             </div>
-             <input type="hidden" id="manageAkaId" value="-1" >
+	<div id="akaTemplateDiv" style="display:none;">
+		<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="akaUtil.handleAkaChange(this, 'model', '')">
+	</div>
 </div>
 
 <script type="text/javascript">

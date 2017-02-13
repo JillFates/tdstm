@@ -52,4 +52,49 @@ class ManufacturerService implements ServiceMethods {
 			fromManufacturer.delete()
 		}
 	}
+	
+	/**
+	 * Validates whether the given alias is valid for the given manufacturer
+	 * @param newAlias, the alias to be added
+	 * @param manufacturer, the manufacturer this alias is being applied to
+	 * @param allowLocalDuplicates, if true, the alias will not be checked against this manufacturer's current aliases
+	 * @param manufacturerName, if given, the alias will validated using this name instead of the given manufacturer's current name
+	 * @return true if the alias is valid for the given parameters
+	 */
+	boolean isValidAlias (String newAlias, Manufacturer manufacturer, boolean allowLocalDuplicates = false, String manufacturerName = null) {
+		// if there wasn't enough information supplied 
+		if (!manufacturer && !manufacturerName)
+			return false
+		
+		// get the manufacturer's name if an alternative wasn't given
+		manufacturerName = (manufacturerName == null) ? (manufacturer.name) : (manufacturerName)
+		
+		// check if the alias matches the manufacturer name
+		if (newAlias == manufacturerName)
+			return false
+		
+		// check if there is another manufacturer with this alias as their name 
+		def manufacturersWithName = Manufacturer.createCriteria().list {
+			eq('name', newAlias)
+			if (manufacturer)
+				ne('name', manufacturer.name)
+		}
+		
+		if (manufacturersWithName)
+			return false
+		
+		// check if there is a manufacturer already using this alias
+		def manufacturersWithAlias = ManufacturerAlias.createCriteria().list {
+			eq('name', newAlias)
+			if (allowLocalDuplicates && manufacturer)
+				ne('manufacturer', manufacturer)
+		}
+		
+		if (manufacturersWithAlias)
+			return false
+		
+		
+		// if all the tests were passes, this is a valid alias
+		return true
+	}
 }

@@ -155,23 +155,23 @@ class ModelController implements ControllerMethods {
 					}
 				}
 			}
-
+			
 			if (endOfLifeDate) {
 				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
 			}
-
+			
 			if (powerType == "Amps") {
 				powerNameplate *= 120
 				powerDesign *= 120
 				powerUsed *= 120
 			}
-
+			
 			Model modelTemplate = modelId ? Model.get(modelId) : null
 			params.useImage = params.useImage == 'on' ? 1 : 0
 			params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
 			params.roomObject = params.roomObject == 'on'
 			params.powerUse = powerUsed
-
+			
 			def modelInstance = new Model(params)
 			modelInstance.powerUse = powerUsed
 			modelInstance.powerDesign = powerDesign
@@ -220,7 +220,7 @@ class ModelController implements ControllerMethods {
 							connectorPosX : Integer.parseInt(params['connectorPosX' + i]),
 							connectorPosY : Integer.parseInt(params['connectorPosY' + i]),
 							status:params['status' + i])
-
+						
 						if (!modelConnector.hasErrors())
 							modelConnector.save(flush: true)
 					}
@@ -234,20 +234,21 @@ class ModelController implements ControllerMethods {
 						connectorPosY : 0,
 						status: "missing"
 						)
-
+					
 					if (!powerConnector.save(flush: true)) {
 						def etext = "Unable to create Power Connectors for $modelInstance" +
 						GormUtil.allErrorsString(powerConnector)
 						println etext
 					}
 				}
-
+				
 				modelInstance.sourceTDSVersion = 1
 				modelInstance.save(flush: true)
 				def akaNames = params.list('aka')
 				akaNames.each { aka ->
 					aka = aka.trim()
 					if (aka) {
+						def isValid = modelService.isValidAlias(aka, modelInstance, false)
 						modelInstance.findOrCreateAliasByName(aka, true)
 					}
 				}
@@ -261,9 +262,9 @@ class ModelController implements ControllerMethods {
 				for(int i = existingConnectors ; i<51; i++) {
 					otherConnectors << i
 				}
-	            render(view: "list", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
+				render(view: "list", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
 											   otherConnectors:otherConnectors, modelTemplate:modelTemplate ] )
-	        }
+			}
 		}catch(RuntimeException rte) {
 			flash.message = rte.getMessage()
 			redirect(controller:'model', action: 'list')
@@ -273,7 +274,7 @@ class ModelController implements ControllerMethods {
 			redirect(controller: 'project', action: 'list')
 		}
 	}
-
+	
 	def show() {
 		def modelId = params.id
 		if (modelId && modelId.isNumber()) {
@@ -437,13 +438,17 @@ class ModelController implements ControllerMethods {
 						ModelAlias.executeUpdate("delete ModelAlias where id in (:ids)", [ids:deletedAka.split(",").collect{NumberUtils.toDouble(it,0).round()}])
 					}
 					def modelAliasList = ModelAlias.findAllByModel(modelInstance)
+					log.info "akaToSave = ${akaToSave}"
+					log.info "modelAliasList = ${modelAliasList}"
 					modelAliasList.each { modelAlias ->
+						log.info "old alias: ${modelAlias.name}"
 						modelAlias.name = params["aka_"+modelAlias.id]
 						if (!modelAlias.save()) {
 							modelAlias.errors.allErrors.each {println it}
 						}
 					}
 					akaToSave.each { aka ->
+						log.info "new alias: ${aka}"
 						modelInstance.findOrCreateAliasByName(aka, true)
 					}
 
@@ -1215,7 +1220,7 @@ class ModelController implements ControllerMethods {
 						powerDesign : powerDesign]
 		render modelMap as JSON
 	}
-
+	
 	def validateModel() {
 		def modelInstance = Model.get(params.id)
 		if (securityService.loggedIn) {
@@ -1228,32 +1233,32 @@ class ModelController implements ControllerMethods {
 		flash.message = "$modelInstance.modelName Validated"
 		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
 	}
-
+	
 	/**
-	* Validate whether requested AKA already exist in DB or not
-	* @param: aka, name of aka
+	* Validate whether requested alias already exist in DB or not
+	* @param: alias, the new alias to be validated
 	* @param: id, id of model
-	* @return : return aka if exists
+	* @param: manufacturerId, id of the manufacturer to validate the alias using (not needed if the model's manufacturer hasn't changed)
+	* @param: parentName, name of the model to validate the alias with (not needed if the model's name hasn't changed)
+	* @return: "valid" if the alias is valid, "invalid" otherwise
 	*/
-	def validateAKA() {
-		def duplicateAka = ""
-		def aka = params.name
+	@HasPermission('EditModel')
+	def validateAliasForForm() {
+		def alias = params.alias
 		def modelId = params.id
-		def akaExist = Model.findByModelName(aka)
-
-		if (akaExist) {
-			duplicateAka = aka
-		} else if (modelId) {
-			def model = Model.read(modelId)
-			def akaInAlias = ModelAlias.findByNameAndManufacturer(aka, model.manufacturer)
-			if (akaInAlias) {
-				duplicateAka = aka
-			}
-		}
-
-		render duplicateAka
+		def manufacturerId = params.manufacturerId
+		def newModelName = params.parentName
+		
+		// get the model and manufacturer if specified and call the service method for alias validation
+		def model = modelId ? Model.read(modelId) : null
+		def manufacturer = manufacturerId ? Manufacturer.read(manufacturerId) : null
+		def isValid = modelService.isValidAlias(alias, model, true, manufacturer, newModelName)
+		if (isValid)
+			render 'valid'
+		else
+			render 'invalid'
 	}
-
+	
 	/**
 	 * Updates a model for audit view , not using update method as there have a lot of code in update action might degrade performance.
 	 * @param id : id of model for update

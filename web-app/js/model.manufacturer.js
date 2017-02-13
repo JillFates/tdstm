@@ -1,80 +1,195 @@
-/**
- * To add AKA text field to add AKA for model and manufacturer (common method for both)
- */
-
-function addAka(){
-	var trId = $("#manageAkaId").val() 
-	var spanId = "errSpan_"+trId
-	var textHtml = $("#akaDiv").html().replace(/errSpan/g,"errSpan_"+trId)
-	$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td nowrap='nowrap'>"+textHtml+
-		"<a href=\"javascript:deleteAkaRow(\'akaId_"+trId+"')\"><span class='clear_filter'><u>X</u></span></a>"+
-		"<br><div style='display:none' class='errors' id='errSpan_"+trId+"'></div>"+
-		"</td></tr>")
-	$("#manageAkaId").val(parseInt(trId)-1)
-}
-/**
- * Used to delete text field from DOM and if it was persistent the maintain id to send at controller
- * @param id : id of tr to remove .
- * @param save : a flag to make sure whether to maintain deleted id .
- */
-function deleteAkaRow(id, save){
-	$("#"+id).remove()
-	if(save){
-		var deletedId = id.split("_")[1]
-		$("#deletedAka").val() ? $("#deletedAka").val($("#deletedAka").val()+","+deletedId) : $("#deletedAka").val(deletedId)
+// this object contains the functions and variables used for managing model/manufacturer aliases (AKAs)
+var akaUtil = (function ($) {
+	
+	var public = {}
+	var private = {}
+	
+	private.lastAkaId = -1
+	
+	/**
+	 * To add AKA text field to add AKA for model and manufacturer (common method for both)
+	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKA this is
+	 */
+	public.addAka = function (forWhom) {
+		// TODO : rmacfarlane 2/9/2017 : this is pretty messy and should probable be done in a more elegant way
+		var akaId = private.lastAkaId--
+		var spanId = "errSpan_" + akaId
+		var textHtml = $("#akaTemplateDiv").html().replace(/errSpan/g,"errSpan_"+akaId).replace(/akaId/g,"akaId_"+akaId)
+		$("#addAkaTableId").append("<tr id='akaRowId_"+akaId+"' js-is-unique='unknown'><td nowrap='nowrap'>"+textHtml+
+			"<a href=\"javascript:akaUtil.deleteAkaRow('akaRowId_"+akaId+"',false,'"+forWhom+"')\"><span class='clear_filter'><u>X</u></span></a>"+
+			"<br><div style='display:none' class='errors' id='errSpan_"+akaId+"'></div>"+
+			"</td></tr>")
 	}
-}
-/**
- * Method to use validate AKA field whether it already exist in DB or not .
- * @param value: aka value
- * @param itemId : model or manufaturerId 
- * @param spanId : span id where to display error message if AKA exist.
- * @param forWhom : to determine which controller we need to send the requst.
- */
-function validateAKA(value,itemId,spanId,forWhom){
-	var makeAjaxCall = avoidDuplicate(spanId)
-	if(makeAjaxCall){
-		var params = {'name':value,'id':itemId}
-		jQuery.ajax({
-			url : contextPath+'/'+forWhom+'/validateAKA',
+	
+	/**
+	 * Used to delete text field from DOM and if it was persistent the maintain id to send at controller
+	 * @param id : id of tr to remove .
+	 * @param save : a flag to make sure whether to maintain deleted id .
+	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKA this is
+	 */
+	public.deleteAkaRow = function (id, save, forWhom) {
+		// remove this AKA row from the DOM
+		$("#"+id).remove()
+		if (save) {
+			var deletedId = id.split("_")[1]
+			$("#deletedAka").val() ? $("#deletedAka").val($("#deletedAka").val()+","+deletedId) : $("#deletedAka").val(deletedId)
+		}
+		
+		// revalidate all the AKAs as some may have only had errors due to being a duplicate of the now deleted AKA
+		public.validateAllAka(forWhom)
+	}
+	
+	/**
+	 * Called when an aka field was changed in order to mark it for revalidation
+	 * @param akaInput, the input element for the AKA that was changed
+	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKA this is
+	 */
+	public.handleAkaChange = function (akaInput, forWhom) {
+		// mark this AKA for server-side validation
+		var akaId = $(akaInput).attr('id').replace('aka', 'akaRow')
+		$('tr#' + akaId).attr('js-is-unique', 'unknown')
+		
+		// revalidate all the AKAs
+		public.validateAllAka(forWhom)
+	}
+	
+	/**
+	 * Called when a property of the parent object changes that will affect validation (either name or manufacturer for models)
+	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKAs will need to be checked
+	 */
+	public.handleParentPropChange = function (forWhom) {
+		// mark all AKAs for server-side validation (the result may be different with the new parent properties)
+		$('#addAkaTableId > tr').attr('js-is-unique', 'unknown')
+		
+		// revalidate all the AKAs
+		public.validateAllAka(forWhom)
+	}
+	
+	/**
+	 * Validates all the AKAs for a model
+	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKA this is
+	 */
+	public.validateAllAka = function (forWhom) {
+		// get the parent's name and id, along with the manufacturer's id if this is a model AKA
+		var parentName, parentId, manufacturerId
+		if (forWhom == 'model') {
+			parentName = $('#modelNameId').val()
+			parentId = $('input#modelId').val()
+			manufacturerId = $('#manufacturerId').val()
+		} else {
+			parentName = $('#name').val()
+			parentId = $('input#manufacturerId').val()
+		}
+		
+		// iterate through all the AKAs, performing the necessary validation on each one
+		var akaList = []
+		$("#addAkaTableId > tr").each(function (i, row) {
+			var akaRow = $(row)
+			var akaName = akaRow.find('.akaValidate').val()
+			var akaErrorDivId = akaRow.find('.errors').attr('id')
+			var duplicateOf = 'none'
+			
+			// check if the AKA matches the parent's name
+			if (akaName == parentName)
+				duplicateOf = 'parent'
+			// check if the AKA matches another AKA on the list
+			else if (akaList.indexOf(akaName) != -1)
+				duplicateOf = 'local'
+			// if this AKA is new, check it's validity against other models on the server
+			else if (akaRow.attr('js-is-unique') == 'unknown')
+				duplicateOf = private.validateAkaOnServer(forWhom, akaRow, {'alias':akaName, 'id':parentId, 'manufacturerId':manufacturerId, 'parentName':parentName})
+			// check if this AKA has previously been marked as invalid
+			else if (akaRow.attr('js-is-unique') == 'false')
+				duplicateOf = 'other'
+			// otherwise this AKA is not a duplicate
+			else
+				duplicateOf = 'none'
+			
+			akaList.push(akaName)
+			public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom)
+		})
+		
+		// if there are no AKAs left, enable the save button
+		if (akaList.size() == 0)
+			 public.handleAkaForSaveButton(forWhom)
+	}
+	
+	/**
+	 * Checks to see if an AKA exists on the server
+	 * @param forWhom, to determine which controller we need to send the requst.
+	 * @param akaRow, the row element of the AKA being checked
+	 * @param params, the params to use for the AJAX call
+	 * @return 'none' if the AKA is valid, 'other' otherwise
+	 */
+	private.validateAkaOnServer = function (forWhom, akaRow, params) {
+		var duplicateOf
+		$.ajax({
+			url : contextPath+'/'+forWhom+'/validateAliasForForm',
 			data: params,
+			async: false,
 			complete: function(e) {
-				debugger;
-				if(e.responseText){
-					$("#"+spanId).html("Duplicate AKA "+e.responseText+" already exist.")
-					$("#"+spanId).css('display','block')
-				}else{
-					$("#"+spanId).html("")
-					$("#"+spanId).css('display','none')
+				if (e.responseText == 'valid') {
+					duplicateOf = 'none'
+					akaRow.attr('js-is-unique', 'true')
+				} else if (e.responseText == 'invalid') {
+					duplicateOf = 'other'
+					akaRow.attr('js-is-unique', 'false')
+				} else if (status == 'error') {
+					alert('An unexpected error occurred while validating AKA')
 				}
-				
 			}
-		});
+		})
+		return duplicateOf
 	}
-}
-/**
- * 
- * @param spanId : where to show error message
- * @returns {Boolean} 
- */
-function avoidDuplicate(spanId){
-	var textValues = new Array();
-	var flag = true
-    $("input.akaValidate").each(function() {
-        doesExisit = ($.inArray($(this).val(), textValues) == -1) ? false : true;
-        if (!doesExisit) {
-            textValues.push($(this).val())
-            $("#"+spanId).html("")
-			$("#"+spanId).css('display','none')
-        } else {
-        	$("#"+spanId).html("Duplicate AKA "+$(this).val()+" already Entered.")
-			$("#"+spanId).css('display','block')
-			flag = false
-            return false;
-        }
-    });
-	return flag
-}
+	
+	/**
+	 * handles showing/hiding the error text for when an AKA is invalid
+	 * @param spanId the ID of the error span
+	 * @param akaMessage if present, the error will be displayed with this message, if null, there will be no error
+	 */
+	public.setAkaErrorStatus = function (errorId, akaName, duplicateOf, forWhom) {
+		var akaMessage = ''
+		if (duplicateOf == 'parent')
+			akaMessage = 'AKA should be different from the ' + forWhom + ' name'
+		else if (duplicateOf == 'local')
+			akaMessage = 'AKA ' + akaName + ' already entered'
+		else if (duplicateOf == 'other')
+			akaMessage = 'AKA ' + akaName + ' already exists'
+		
+		var errorDiv = $('#' + errorId)
+		if (akaMessage) {
+			errorDiv.html(akaMessage)
+			errorDiv.css('display','block')
+			errorDiv.addClass('hasErrors')
+		} else {
+			errorDiv.html("")
+			errorDiv.css('display','none')
+			errorDiv.removeClass('hasErrors')
+		}
+		
+		// now that we know if this AKA has an error check if the save button should be disabled
+		public.handleAkaForSaveButton(forWhom)
+	}
+	
+	/**
+	 * handle disabling/enabling the save button based on the presence of errors
+	 */
+	public.handleAkaForSaveButton = function (forWhom) {
+		var hasErrors = $('#addAkaTableId div.hasErrors')
+		var saveButton = $('#saveModelId')
+		if (forWhom == 'manufacturer')
+			saveButton = $('#saveManufacturerId')
+		if (hasErrors.size() > 0)
+			// disable the button
+			saveButton.attr('disabled', 'disabled').addClass('disableButton')
+		else
+			// enable the button
+			saveButton.attr('disabled', null).removeClass('disableButton')
+	}
+	
+	// return the public functions and variables to make them accessible
+	return public
+})(jQuery);
 
 /**
  * convert values from Amps to Watts OR Watts to Amps
@@ -210,14 +325,14 @@ function changePowerValue(whom){
 	var powerDesign = $("#powerDesign"+whom+"Id").val()	
 	var powerUse= $("#powerUse"+whom+"Id").val()
 	if(powerDesign == "" || powerDesign == 0 || powerDesign == 0.0 ){
-	  $("#powerDesign"+whom+"Id").val(parseInt(namePlatePower)*0.5)
-	  if(whom=='Edit')
-		  $("#powerDesignIdH").val(parseInt(namePlatePower)*0.5)
+		$("#powerDesign"+whom+"Id").val(parseInt(namePlatePower)*0.5)
+		if(whom=='Edit')
+			$("#powerDesignIdH").val(parseInt(namePlatePower)*0.5)
 	}
-    if(powerUse == "" || powerUse == 0 || powerUse == 0.0 ){
-      $("#powerUse"+whom+"Id").val(parseInt(namePlatePower)*0.33)
-      if(whom=='Edit')
-    	   $("#powerUseIdH").val(parseInt(namePlatePower)*0.33)
+	if(powerUse == "" || powerUse == 0 || powerUse == 0.0 ){
+		$("#powerUse"+whom+"Id").val(parseInt(namePlatePower)*0.33)
+		if(whom=='Edit')
+			$("#powerUseIdH").val(parseInt(namePlatePower)*0.33)
 	}
 }
 
@@ -226,7 +341,7 @@ function setStanderdPower(whom){
 	var powerDesign = $("#powerDesign"+whom+"Id").val()	
 	var powerUse= $("#powerUse"+whom+"Id").val()
 	$("#powerDesign"+whom+"Id").val((parseInt(namePlatePower)*0.5).toFixed(0))  
-    $("#powerUse"+whom+"Id").val((parseInt(namePlatePower)*0.33).toFixed(0))
+	$("#powerUse"+whom+"Id").val((parseInt(namePlatePower)*0.33).toFixed(0))
 }
 
 function compareOrMerge(){
@@ -382,12 +497,12 @@ function removeCol(id){
 
 function deleteModels(){
 		var modelArr = new Array();
-	    $(".cbox:checkbox:checked").each(function(){
-	        var modelId = $(this).attr('id').split("_")[2]
+		$(".cbox:checkbox:checked").each(function(){
+			var modelId = $(this).attr('id').split("_")[2]
 			if(modelId)  
 				modelArr.push(modelId)
-	  })
-	  	if(!modelArr){
+		})
+		if(!modelArr){
 			alert('Please select the Model');
 		}else{
 			if(confirm("You are about to delete all of the selected models for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")){
