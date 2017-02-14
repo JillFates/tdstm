@@ -26,7 +26,7 @@ var LicenseManagerModule = angular.module('TDSTM.LicenseManagerModule', [uiRoute
 
     $stateProvider
         .state('licenseManagerList', {
-            data: {page: {title: 'Licensing Manager', instruction: '', menu: ['MANAGER', 'LICENSE', 'LIST']}},
+            data: {page: {title: 'Licensing Manager', instruction: '', menu: ['Manager', 'License', 'List']}},
             url: '/license/manager/list',
             views: {
                 'headerView@': header,

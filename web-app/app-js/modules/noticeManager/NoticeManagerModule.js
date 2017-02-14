@@ -24,7 +24,7 @@ var NoticeManagerModule = angular.module('TDSTM.NoticeManagerModule', [uiRouter]
 
     $stateProvider
         .state('noticeList', {
-            data: {page: {title: 'Notice Administration', instruction: '', menu: ['ADMIN', 'NOTICE', 'LIST']}},
+            data: {page: {title: 'Notice Administration', instruction: '', menu: ['Admin', 'Notice', 'List']}},
             url: '/notice/list',
             views: {
                 'headerView@': header,

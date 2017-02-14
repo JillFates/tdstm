@@ -29,7 +29,7 @@ var LicenseAdminModule = angular.module('TDSTM.LicenseAdminModule', [uiRouter]).
 
     $stateProvider
         .state('licenseAdminList', {
-            data: {page: {title: 'Administer Licenses', instruction: '', menu: ['ADMIN', 'LICENSE', 'LIST']}},
+            data: {page: {title: 'Administer Licenses', instruction: '', menu: ['Admin', 'License', 'List']}},
             url: '/license/admin/list',
             views: {
                 'headerView@': header,
