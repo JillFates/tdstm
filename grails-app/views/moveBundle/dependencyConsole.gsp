@@ -118,14 +118,14 @@
 				<div id="statusColorsId">
 					<div class="row">
 						<div class="col-sm-12" style="padding-top: 6px;">
-							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
 								<div class="box-header with-border" style="background-color: yellow;">
 									<h3 class="box-title">Conflicts</h3>
 									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
-								<div class="box-body" style="display: none;">
+								<div class="box-body">
 									Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or more assets are assigned to different bundles/events or one or more assets' dependency status is set to Questioned or Unknown.
 								</div><!-- /.box-body -->
 							</div>
@@ -133,29 +133,29 @@
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
 								<div class="box-header with-border" style="background-color: #e0e0e0;">
 									<h3 class="box-title">Pending</h3>
 									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
-								<div class="box-body" style="display: none;">
-									Grey indicates that there are no outstanding conflicts but the dependency Validation needs to be set to Bundle Ready in order to become Ready to Bundle.
+								<div class="box-body">
+									Grey indicates that there are no outstanding conflicts but the dependency Validation needs to be set to Bundle Ready indicating the group is ready to Bundle.
 								</div><!-- /.box-body -->
 							</div>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
 								<div class="box-header with-border" style="background-color: lightgreen;">
 									<h3 class="box-title">Ready to Bundle</h3>
 									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
-								<div class="box-body" style="display: none;">
+								<div class="box-body">
 									Green indicates that the assets in the group are Ready to be assigned to bundles.
 								</div><!-- /.box-body -->
 							</div>
@@ -163,15 +163,15 @@
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-							<div class="box box-default collapsed-box" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
+							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
 								<div class="box-header with-border" style="background-color: #5f9fcf;">
-									<h3 class="box-title">Completed</h3>
+									<h3 class="box-title">Assigned</h3>
 									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus" style="color: black;"></i></button>
+										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
-								<div class="box-body" style="display: none;">
-									Blue indicates that the work flow process of bundling assets has been completed for the group of assets. There are no conflicts and all of the assets in the group have been assigned to common bundles (in same event).
+								<div class="box-body">
+									Blue indicates that there are no conflicts and all of the assets in the group have been assigned to common bundles (in same event).
 								</div><!-- /.box-body -->
 							</div>
 						</div>
