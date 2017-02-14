@@ -70,17 +70,6 @@
 
         </section><!-- /.content -->
     </div><!-- /.content-wrapper -->
-    <footer class="main-footer">
-        <div class="container">
-            <div class="pull-right hidden-xs">
-                <b></b>
-            </div>
-            <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2015-2016 .</strong> All
-        rights reserved.
-        </div>
-        <!-- /.container -->
-    </footer>
-
 </div><!-- ./wrapper -->
 
 
