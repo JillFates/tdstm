@@ -125,12 +125,14 @@
 				str = '<span class="unchanged">' + model[propertyName] + '</span>';
 			}
 
-			return str;
-
-
+            return replaceNullsAndUndefined(str);
 		}
 
-		// Used by the cancel button to call the cancel action
+        function replaceNullsAndUndefined(str) {
+            return str.replace(/(null|undefined)/mig, "");
+        }
+
+        // Used by the cancel button to call the cancel action
 		function callCancelImport(fn) {
 			var url = '${createLink(action: 'cancelImport')}'
 			window.location = url + '/' + fn;
