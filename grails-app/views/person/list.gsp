@@ -78,15 +78,14 @@
 					$("#formId").submit();
 				});
 				<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
-					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'User Company', 'Date Created', 'Last Updated', 'Model Score'"
+					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'User Company', 'Date Created', 'Last Updated'"
 					colModel="{name:'firstname', width:'80'},
 						{name:'middlename', width:'80'},
 						{name:'lastname', index: 'lastname', width:'80'},
 						{name:'userLogin', width:'80'},
 						{name:'company',width:'100'},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
-						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
-						{name:'modelScore',width:'50'}"
+						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'lastname'"
 					caption="listCaption"
 					multiselect="true"
