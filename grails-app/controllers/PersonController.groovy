@@ -938,7 +938,7 @@ class PersonController implements ControllerMethods {
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
 		def company = person.company
 		def personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
-		def availabaleFunctions = partyRelationshipService.getStaffingRoles()
+		def availabaleFunctions = partyRelationshipService.getStaffingRoles(false)
 		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.userLoginPerson)
 
 		render(template: params.tab ?: 'generalInfoShow',
