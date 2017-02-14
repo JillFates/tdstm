@@ -539,7 +539,7 @@ class ProjectController implements ControllerMethods {
 		} else {
 			flash.message = "Project logo was not found"
 		}
-		redirect(action: 'show', id: project.id)
+		redirect(action: 'edit', id: project.id)
 	}
 
 	/*
