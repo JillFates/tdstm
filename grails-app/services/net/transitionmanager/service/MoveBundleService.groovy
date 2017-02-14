@@ -255,8 +255,8 @@ class MoveBundleService implements ServiceMethods {
 	 *  Delete MoveBundle associated records
 	 */
 	void deleteMoveBundleAssociates(MoveBundle moveBundle) {
-		jdbcTemplate.update('DELETE user_preference WHERE value=?', moveBundle.id)
-		jdbcTemplate.update('DELETE party_relationship where party_id_from_id=? or party_id_to_id=?', moveBundle.id, moveBundle.id)
+		jdbcTemplate.update('DELETE FROM user_preference WHERE value=?', moveBundle.id.toString())
+		jdbcTemplate.update('DELETE FROM party_relationship where party_id_from_id=? or party_id_to_id=?', moveBundle.id, moveBundle.id)
 		MoveBundleStep.executeUpdate('DELETE MoveBundleStep where moveBundle=?', [moveBundle])
 	}
 
