@@ -469,7 +469,7 @@
 	        return;
 		} else {
 	        //Maximum displacement multiple
-			var maxMultiple = numCols - 7;
+			var maxMultiple = numCols - modWidth;
 
 	        //Read the offset of #themes
 			var offset = parseInt(themes.css('left'));
@@ -524,6 +524,7 @@
 		var baseWidth = maxWidth - labelsWidth - arrowWidth * 2;
 		modWidth = Math.min(parseInt(baseWidth / stepWidth), totalSteps);
 		$(".mod").css("width", modWidth * 130 + "px");
+        themes.css("width",totalSteps * 130 + "px");
 		checkArrowStatus();
 	}
 
