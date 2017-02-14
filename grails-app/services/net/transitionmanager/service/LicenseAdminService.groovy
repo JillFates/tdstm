@@ -15,6 +15,7 @@ import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
 import org.apache.commons.lang.time.DateUtils
+import org.springframework.core.io.Resource
 
 @Slf4j
 class LicenseAdminService extends LicenseCommonService {
@@ -58,7 +59,16 @@ class LicenseAdminService extends LicenseCommonService {
 				String keyFile = grailsApplication.config.manager?.license?.key
 				String password = grailsApplication.config.manager?.license?.password
 				log.debug("Manager Key: '{}', password: '{}'", keyFile, password)
-				File file = grailsApplication.parentContext.getResource(keyFile)?.file
+
+				File file = new File(keyFile)
+
+				//if the file doesn't exists load from the web-app resources
+				if(!file.exists()){
+					Resource resource = grailsApplication.parentContext.getResource(keyFile)
+					if(resource.exists()) {
+						file = resource.file
+					}
+				}
 
 				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
 
@@ -80,7 +90,16 @@ class LicenseAdminService extends LicenseCommonService {
 				String keyFile = grailsApplication.config.tdstm.license.key
 				String password = grailsApplication.config.tdstm.license.password
 				log.debug("Admin Key: '{}', password: '{}'", keyFile, password)
-				File file = grailsApplication.parentContext.getResource(keyFile)?.file
+
+				File file = new File(keyFile)
+
+				//if the file doesn't exists load from the web-app resources
+				if(!file.exists()){
+					Resource resource = grailsApplication.parentContext.getResource(keyFile)
+					if(resource.exists()) {
+						file = resource.file
+					}
+				}
 
 				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
 
