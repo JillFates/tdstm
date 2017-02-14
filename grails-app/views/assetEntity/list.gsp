@@ -33,33 +33,33 @@
 		<script type="text/javascript">
 			// TODO : move this code to JS once verified in tmdev
 			$(document).on('entityAssetUpdated',function (e,obj) {
-                $("#messageId").html(obj.asset.assetName + ' Updated').show();
-                $('#assetListIdGrid').trigger("reloadGrid");
-            });
-            $(document).on('entityAssetCreated',function (e,obj) {
-                $("#messageId").html(obj.asset.assetName + ' Created').show();
-                $('#assetListIdGrid').trigger("reloadGrid");
-            });
+				$("#messageId").html(obj.asset.assetName + ' Updated').show();
+				$('#assetListIdGrid').trigger("reloadGrid");
+			});
+			$(document).on('entityAssetCreated',function (e,obj) {
+				$("#messageId").html(obj.asset.assetName + ' Created').show();
+				$('#assetListIdGrid').trigger("reloadGrid");
+			});
 			$(document).ready(function() {
-                $(window).unbind('storage').bind('storage', function (e) {
-                    var id = $('#showEntityView .assetEntity').data('id');
-                    if(id && localStorage.getItem('editAsset')) {
-                        $('#assetListIdGrid').trigger("reloadGrid");
-                        $('#modelShowDialog').dialog("close")
-                        localStorage.removeItem('editAsset');
-                        EntityCrud.showAssetDetailView('DEVICE', id);
-                    }
-                });
-
+				$(window).unbind('storage').bind('storage', function (e) {
+					var id = $('#showEntityView .assetEntity').data('id');
+					if(id && localStorage.getItem('editAsset')) {
+						$('#assetListIdGrid').trigger("reloadGrid");
+						$('#modelShowDialog').dialog("close")
+						localStorage.removeItem('editAsset');
+						EntityCrud.showAssetDetailView('DEVICE', id);
+					}
+				});
+				
 				$("#createEntityView").dialog({ autoOpen: false });
 				$("#showEntityView").dialog({ autoOpen: false });
 				$("#editEntityView").dialog({ autoOpen: false });
 				$("#manufacturerShowDialog").dialog({ autoOpen: false });
 				$("#modelShowDialog").dialog({ autoOpen: false });
 				$("#editManufacturerView").dialog({ autoOpen: false, close:function(){
-                    var id = $('#showEntityView .assetEntity').data('id');
-                    EntityCrud.showAssetDetailView('DEVICE', id);
-                    $('#assetListIdGrid').trigger("reloadGrid");
+					var id = $('#showEntityView .assetEntity').data('id');
+					EntityCrud.showAssetDetailView('DEVICE', id);
+					$('#assetListIdGrid').trigger("reloadGrid");
 				}});
 				$("#cablingDialogId").dialog({ autoOpen:false });
 				$("#filterPane").draggable();

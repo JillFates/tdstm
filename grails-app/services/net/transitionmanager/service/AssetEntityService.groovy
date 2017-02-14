@@ -2236,8 +2236,11 @@ class AssetEntityService implements ServiceMethods {
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
-		altColumns.append(", manu.name AS manufacturer")
+		// join the manufacturer name from the model if it exists, otherwise from the asset's manufacturer property
+		altColumns.append(", IFNULL(manu.name, manu2.name) AS manufacturer")
 		joinQuery.append("\nLEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id ")
+		joinQuery.append("\nLEFT OUTER JOIN manufacturer manu2 ON manu2.manufacturer_id=ae.manufacturer_id ")
+
 
 		boolean srcRoomAdded = true 	// Can set to false if the above lines are removed
 		boolean tgtRoomAdded = false
@@ -2494,7 +2497,7 @@ class AssetEntityService implements ServiceMethods {
 			        it.commentsStatus]
 			]
 		}
-
+		
 		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 	}
 
