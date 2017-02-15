@@ -595,6 +595,8 @@ class AssetExportService {
 
                 profiler.lap('Devices', 'Entering while loop')
 
+                int depGroupColNum = serverMap['DepGroup']
+
                 while (scrollableResults.next()) {
                     AssetEntity currentAsset = (AssetEntity)scrollableResults.get()[0]
                     profiler.beginSilent(silentTag)
@@ -705,6 +707,7 @@ class AssetExportService {
                         }
 
                     }
+                    addCell(serverSheet, depGroupColNum, deviceCount, assetDepBundleMap[currentAsset.id.toString()])
 
                     if (profilingRow) {
                         profiler.end('Device Fields')
