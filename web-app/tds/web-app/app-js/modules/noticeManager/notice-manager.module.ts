@@ -5,7 +5,7 @@ import { CommonModule }       from '@angular/common';
 import { UIRouterModule } from 'ui-router-ng2';
 import { NOTICE_STATES } from './notice-routing.states';
 // Components
-import { NoticeListComponent } from './list/notice-list.component';
+import { NoticeListComponent } from './components/list/notice-list.component';
 import { HeaderComponent } from '../header/header.component';
 
 @NgModule({

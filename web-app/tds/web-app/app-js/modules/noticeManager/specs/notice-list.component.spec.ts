@@ -5,7 +5,7 @@ import { ComponentFixture, TestBed, async } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { DebugElement } from '@angular/core'
 
-import { NoticeListComponent } from '../list/notice-list.component'
+import { NoticeListComponent } from '../components/list/notice-list.component'
 
 describe('NoticeListComponent:', () => {
     let fixture: ComponentFixture<NoticeListComponent>;

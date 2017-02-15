@@ -1,5 +1,5 @@
 import {Ng2StateDeclaration} from 'ui-router-ng2';
-import { NoticeListComponent } from './list/notice-list.component'
+import { NoticeListComponent } from './components/list/notice-list.component'
 import { HeaderComponent } from '../header/header.component';
 /**
  * This state displays the notice list.
