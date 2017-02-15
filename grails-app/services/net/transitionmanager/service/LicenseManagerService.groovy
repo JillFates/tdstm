@@ -95,13 +95,14 @@ class LicenseManagerService extends LicenseCommonService{
 
 			String licString = ""
 
+			log.info("OLB: Lets Generate a License!!")
 			if (productKey != null && validAfter != null && validBefore != null && numberOfInstances > 0){
+				log.info("OLB: Generating the License!!")
 				licString = generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
-
 			}
 
 			licString = "${BEGIN_LIC_TAG}\n${licString}\n${END_LIC_TAG}"
-			log.debug("licString: {}", licString)
+			log.info("OLB: licString: {}", licString)
 			return licString
 		}
 
