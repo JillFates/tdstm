@@ -1,4 +1,5 @@
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.ErrorHandlerService
 import net.transitionmanager.service.LicenseAdminService
