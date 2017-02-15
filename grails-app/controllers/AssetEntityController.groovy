@@ -2557,7 +2557,6 @@ class AssetEntityController implements ControllerMethods {
 			  id:it.id
 			]
 		}
-
 		// If sessions variables exists, set them with params and sort
 		session.TASK?.JQ_FILTERS = params
 		session.TASK?.JQ_FILTERS?.sidx = sortIndex
@@ -4468,6 +4467,7 @@ class AssetEntityController implements ControllerMethods {
 				log.error e.message, e
 				taskImportExportService.deletePreviousUpload(options)
 			}
+			redirect (action: 'importTask')
 		}
 
 		// log.debug "importAccounts() Finishing up controller step=$step, view=$view, model=$model"
