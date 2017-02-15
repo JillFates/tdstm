@@ -400,35 +400,41 @@ var UserPreference = function() {
 	
 	// opens the edit user date and timezone dialog
 	var editDateAndTimezone = function () {
-		new Ajax.Request('/tdstm/person/editTimezone',{
-			asynchronous:true,
-			evalScripts:true,
-			onSuccess:function(e){
+        jQuery.ajax({
+        	url:'/tdstm/person/editTimezone',
+            success:function(e){
 				var prefDialog = $("#userTimezoneDivId")
-				prefDialog.html(e.responseText)
+				prefDialog.html(e);
 				prefDialog.dialog('option', 'width', 'auto')
 				prefDialog.dialog('option', 'modal', true)
 				prefDialog.dialog("open")
-			}
-		})	
+			},
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert("An unexpected error occurred while attempting to update task/comment")
+            }
+		})
+		return false;
 	}
 	
 	// opens the edit user preferences dialog
 	var editPreference = function () {
-		new Ajax.Request('/tdstm/person/editPreference',{
-			asynchronous:true,
-			evalScripts:true,
-			onSuccess:function(e){
+        jQuery.ajax({
+            url:'/tdstm/person/editPreference',
+			success:function(e){
 				var prefDialog = $("#userPrefDivId")
 				var pageHeight = Math.max($(window).outerHeight(), 200)
-				prefDialog.html(e.responseText)
+				prefDialog.html(e)
 				prefDialog.dialog('option', 'width', 'auto')
 				prefDialog.dialog('option', 'maxHeight', pageHeight)
 				prefDialog.dialog('option', 'containment', 'body')
 				prefDialog.dialog('option', 'modal', true)
 				prefDialog.dialog("open")
-			}
+			},
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert("An unexpected error occurred while attempting to update task/comment")
+            }
 		})
+		return false;
 	}
 	
 	// saves the new preference values
