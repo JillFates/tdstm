@@ -309,6 +309,8 @@ grails {
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',
 			]
+
+			ldap.active = false
 		}
 	}
 }

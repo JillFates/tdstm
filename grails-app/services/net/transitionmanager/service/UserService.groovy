@@ -61,7 +61,7 @@ class UserService implements ServiceMethods {
 		String mn = 'findOrProvisionUser:'
 		String em
 
-		Map domain = config.domains[authority.toLowerCase()]
+		Map domain = config.domains[authority]
 
 		boolean debug = log.debugEnabled || config.debug
 

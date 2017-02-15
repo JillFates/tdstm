@@ -49,6 +49,7 @@ grails.project.dependency.resolution = {
 		compile ':ref-code:0.3.0'
 		compile ':scaffolding:2.1.2'
 		compile ':spring-security-core:2.0.0'
+		compile ':spring-security-ldap:2.0.1'
 		// Added the acl for some testing JPM 12/2016
 		compile ':spring-security-acl:2.0.0'
 
