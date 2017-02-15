@@ -85,7 +85,8 @@ module.exports = function(config) {
            // '/base/web-app/app-js/modules/games/games-list/games-list.component.html':"/base/web-app/specs-dist/modules/games/games-list/games-list.component.html",
             //'/base/web-app/specs-dist/':"/base/web-app/app-js/",//root development
             '/base/web-app/specs-dist/modules/tds/web-app/app-js/':"/base/web-app/app-js/",//sweet!!
-            '/tds/web-app/app-js/':"/base/web-app/app-js/"
+            '/tds/web-app/app-js/':"/base/web-app/app-js/",
+            '/base/web-app/specs-dist/modules/noticeManager/tds/web-app/app-js/':"/base/web-app/app-js/"
         },
 
         exclude: [],

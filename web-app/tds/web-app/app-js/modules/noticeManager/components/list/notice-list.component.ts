@@ -5,7 +5,7 @@ import { NoticeModel } from '../../model/notice.model';
 @Component({
     moduleId: module.id,
     selector: 'notice-list',
-    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/list/notice-list.component.html',
+    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
     providers: [NoticeService, {provide: NoticeModel, useValue: {}}]
 })
 

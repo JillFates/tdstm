@@ -17,8 +17,8 @@ import {
 
 //after all these imports you should import what actually is gonna be tested
 import { GameListComponent } from '../games-list/games-list.component'
-import { GameService } from '../shared/game.service'
-import { Game } from '../shared/game.model'
+import { GameService } from '../service/game.service'
+import { Game } from '../model/game.model'
 
 describe('GameListComponent - Learning: Instance of the component', () => {
     let fixture: ComponentFixture<GameListComponent>;

@@ -6,6 +6,8 @@ import { By } from '@angular/platform-browser'
 import { DebugElement } from '@angular/core'
 
 import { NoticeListComponent } from '../components/list/notice-list.component'
+import { NoticeService } from '../service/notice.service';
+import { NoticeModel } from '../model/notice.model';
 
 describe('NoticeListComponent:', () => {
     let fixture: ComponentFixture<NoticeListComponent>;
@@ -14,7 +16,7 @@ describe('NoticeListComponent:', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [NoticeListComponent],
-            providers: [{ provide: String,multi:false, useValue: '' }]
+            providers: [NoticeService,{ provide: String,multi:false, useValue: '' },{ provide: NoticeModel, useValue: {} }]
         }).compileComponents();
     }));
 
