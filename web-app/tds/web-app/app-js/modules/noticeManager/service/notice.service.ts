@@ -9,9 +9,22 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class NoticeService {
+
+    // private instance variable to hold base url
+    private noticeListUrl = '../../ws/notices';
+
     // Resolve HTTP using the constructor
     constructor (private http: Http) {}
-    // private instance variable to hold base url
-    private commentsUrl = 'http://localhost:3000/api/comments';
+
+    getNoticesList() : Observable<NoticeModel[]> {
+
+        // ...using get request
+        return this.http.get(this.noticeListUrl)
+            // ...and calling .json() on the response to return data
+            .map((res:Response) => res.json())
+            //...errors if any
+            .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+
+    }
 
 }

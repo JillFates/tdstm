@@ -12,12 +12,24 @@ import { NoticeModel } from '../../model/notice.model';
 export class NoticeListComponent implements OnInit {
 
     private moduleName:string = '';
+    private noticeList:NoticeModel[];
 
-    constructor(moduleName:string, private noticeService:NoticeService, private noticeModel:NoticeModel) {
+    constructor(moduleName:string, private noticeService:NoticeService) {
         this.moduleName = 'Notice List';
     }
 
+    private onLoadNoticeList(noticeList) {
+        this.noticeList = noticeList;
+        console.log(this.noticeList);
+    }
+
     ngOnInit():void {
+        this.noticeService.getNoticesList().subscribe(
+            (noticeList) => this.onLoadNoticeList(noticeList),
+            (err) => {
+                console.log(err);
+            });
+
         console.log('Notice List Loaded');
     }
 }
