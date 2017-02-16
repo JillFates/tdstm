@@ -6,8 +6,9 @@
 
 export default class ManuallyRequest {
 
-    constructor($log, licenseAdminService, $uibModalInstance, params) {
+    constructor($log, $scope, licenseAdminService, $uibModalInstance, params) {
         this.log = $log;
+        this.scope = $scope;
         this.licenseAdminService = licenseAdminService;
         this.uibModalInstance = $uibModalInstance;
         this.licenseModel = {
@@ -24,6 +25,7 @@ export default class ManuallyRequest {
     getHashCode() {
         this.licenseAdminService.getHashCode(this.licenseModel.id, (data) => {
             this.licenseModel.encryptedDetail = data;
+            window.TDSTM.safeApply(this.scope);
         });
     }
 

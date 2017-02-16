@@ -107,6 +107,4 @@ TDSTM.iframeLoader = function () {
     );
 };
 
-
-// It will be removed after we rip off all iframes
 window.TDSTM = TDSTM;

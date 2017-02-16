@@ -10,6 +10,7 @@ export default class LicenseManagerDetail extends FormValidator{
 
     constructor($log, $scope, licenseManagerService, $uibModal, $uibModalInstance, params) {
         super($log, $scope, $uibModal, $uibModalInstance);
+        this.scope = $scope;
         this.licenseManagerService = licenseManagerService;
         this.uibModalInstance = $uibModalInstance;
         this.uibModal =$uibModal;
@@ -129,6 +130,7 @@ export default class LicenseManagerDetail extends FormValidator{
             this.licenseManagerService.getKeyCode(this.licenseModel.id, (data) => {
                 if(data) {
                     this.licenseKey = data;
+                    window.TDSTM.safeApply(this.scope);
                 }
             });
         }
