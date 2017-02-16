@@ -261,7 +261,8 @@ export default class LicenseManagerDetail extends FormValidator{
              (this.licenseModel.statusId === 1)? 'Active' :
                  ((this.licenseModel.statusId === 2)? 'Expired':
                      ((this.licenseModel.statusId === 3)? 'Terminated':
-                         ((this.licenseModel.statusId === 4)? 'Pending' : '')));
+                         ((this.licenseModel.statusId === 4)? 'Pending':
+                            ((this.licenseModel.statusId === 5)? 'Corrupt' : ''))));
 
         /*this.selectStatusListOptions = {
             dataSource: [
