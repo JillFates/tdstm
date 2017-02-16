@@ -43,6 +43,7 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 		*/
 
+		log.info("LM is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
 		if(isEnabled() && !loaded) {
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
