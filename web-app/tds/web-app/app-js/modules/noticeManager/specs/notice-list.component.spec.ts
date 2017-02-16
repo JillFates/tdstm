@@ -4,6 +4,7 @@
 import { ComponentFixture, TestBed, async } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { DebugElement } from '@angular/core'
+import { HttpModule } from '@angular/http';
 
 import { NoticeListComponent } from '../components/list/notice-list.component'
 import { NoticeService } from '../service/notice.service';
@@ -15,8 +16,9 @@ describe('NoticeListComponent:', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
+            imports:[HttpModule],
             declarations: [NoticeListComponent],
-            providers: [NoticeService,{ provide: String,multi:false, useValue: '' },{ provide: NoticeModel, useValue: {} }]
+            providers: [{ provide: String,multi:false, useValue: '' },{ provide: NoticeModel, useValue: {} }]
         }).compileComponents();
     }));
 

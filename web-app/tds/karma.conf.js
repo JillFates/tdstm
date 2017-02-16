@@ -15,7 +15,8 @@ module.exports = function(config) {
         plugins: [
             require('karma-jasmine'),
             require('karma-chrome-launcher'),
-            require('karma-jasmine-html-reporter')
+            require('karma-jasmine-html-reporter'),
+            require('karma-junit-reporter')
         ],
 
         client: {
@@ -91,13 +92,23 @@ module.exports = function(config) {
 
         exclude: [],
         preprocessors: {},
+
+
         reporters: ['progress', 'kjhtml'],
+        singleRun: false,
+
+        //singleRun: true,
+        //reporters: ['dots', 'junit'],
+        //junitReporter: {
+        //    outputDir: 'web-app/test/',
+        //    outputFile: 'test-results.xml'
+        //},
 
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
         browsers: ['Chrome'],
-        singleRun: false
+
     })
 }
