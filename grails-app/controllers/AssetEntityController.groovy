@@ -2576,7 +2576,7 @@ class AssetEntityController implements ControllerMethods {
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:
-				result = TimeUtil.formatDate(task[value])
+				result = TimeUtil.formatDateTime(task[value])
 			break
 			case "event": result = task.moveEvent?.name; break
 			case "bundle": result = task.assetEntity?.moveBundle?.name; break
