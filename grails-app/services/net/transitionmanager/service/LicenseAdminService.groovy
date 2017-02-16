@@ -54,11 +54,12 @@ class LicenseAdminService extends LicenseCommonService {
 				licenseCache.addCache(memoryOnlyCache)
 			}
 
+			log.info("load LM?: ${isLGen()}")
 			if(isLGen()) {
-				log.debug("License Manager Enabled")
+				log.info("License Manager Enabled")
 				String keyFile = grailsApplication.config.manager?.license?.key
 				String password = grailsApplication.config.manager?.license?.password
-				log.debug("Manager Key: '{}', password: '{}'", keyFile, password)
+				log.info("Manager Key: '{}', password: '{}'", keyFile, password)
 
 				File file = new File(keyFile)
 
@@ -79,9 +80,9 @@ class LicenseAdminService extends LicenseCommonService {
 				// END: License Manager Configuration //
 
 				// BEGIN: TEST MANAGER LICENSE //
-				// String id = "f5e087eb-0ff2-433b-aa4c-04fd3f8dcedb"
-				// String key = licenseManagerService.getLicenseKey(id)
-				// log.debug("OLB ($id) License Key: $key")
+				String id = "84612874-7d78-4a69-906c-2e02c27ab54d"
+				String key = licenseManagerService.getLicenseKey(id)
+				log.info("OLB ($id) License Key: $key")
 				// END: TEST MANAGER LICENSE //
 			}
 
