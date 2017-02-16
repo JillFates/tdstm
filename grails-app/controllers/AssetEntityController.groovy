@@ -1150,6 +1150,7 @@ class AssetEntityController implements ControllerMethods {
 
 						if (!isNew && assetDep.dirtyPropertyNames) {
 							log.info "upload() Changed fields $assetDep.dirtyPropertyNames of Dependency $assetDep.id"
+							dependencyUpdated++
 						}
 
 						// Attempt to save the record
@@ -1160,8 +1161,6 @@ class AssetEntityController implements ControllerMethods {
 
 						if (isNew) {
 							dependencyAdded++
-						} else {
-							dependencyUpdated++
 						}
 						dependencySkipped--
 					}
