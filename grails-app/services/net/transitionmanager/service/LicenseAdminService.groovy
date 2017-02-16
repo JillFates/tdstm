@@ -81,9 +81,9 @@ class LicenseAdminService extends LicenseCommonService {
 				// END: License Manager Configuration //
 
 				// BEGIN: TEST MANAGER LICENSE //
-				String id = "84612874-7d78-4a69-906c-2e02c27ab54d"
-				String key = licenseManagerService.getLicenseKey(id)
-				log.info("OLB ($id) License Key: $key")
+				//String id = "84612874-7d78-4a69-906c-2e02c27ab54d"
+				//String key = licenseManagerService.getLicenseKey(id)
+				//log.info("OLB ($id) License Key: $key")
 				// END: TEST MANAGER LICENSE //
 			}
 
