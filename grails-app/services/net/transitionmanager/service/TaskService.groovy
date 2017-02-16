@@ -1396,7 +1396,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		def assets = getAssocAssets(contextObj)
 		if (!assets) {
-			throw new RuntimeException("The selected event doesn't have associated bundles")
+			throw new EmptyResultException("The selected event doesn't have associated bundles")
 		}
 
 		// Delete previous task batches now if the user specified to delete them

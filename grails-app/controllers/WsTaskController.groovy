@@ -167,7 +167,7 @@ class WsTaskController implements ControllerMethods {
 		}
 		else if (e instanceof EmptyResultException) {
 			if (includeException) {
-				ServiceResults.internalError(response, logger, e)
+				ServiceResults.respondWithError(response, e.message)
 			}
 			else {
 				ServiceResults.methodFailure(response)
