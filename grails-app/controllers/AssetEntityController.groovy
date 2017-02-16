@@ -996,7 +996,7 @@ class AssetEntityController implements ControllerMethods {
 								dependencyError "AssetDependencyId '$depId' not found (in A$rowNum)"
 								continue
 							}
-							if (assetDep.asset.projectId != project.id) {
+							if (assetDep.asset.project.id != project.id) {
 								securityService.reportViolation("attempted to access assetDependency ($depId) not assigned to project ($project.id)")
 								dependencyError " invalid AssetDependencyId reference '$depId' (in A$rowNum)"
 								continue
@@ -1049,7 +1049,7 @@ class AssetEntityController implements ControllerMethods {
 							dependencyError "Asset by DependentId ($dependencyId) not found (row $rowNum)"
 							continue
 						}
-						if (dependent.projectId != project.id) {
+						if (dependent.project.id != project.id) {
 							securityService.reportViolation("attempted to access dependent ($dependencyId) not assigned to project ($project.id)")
 							dependencyError "Invalid reference of DependentId ($dependencyId) (row $rowNum)"
 							continue
