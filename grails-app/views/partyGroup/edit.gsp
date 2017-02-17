@@ -65,12 +65,7 @@
                                     <label for="comment">Partner:</label>
                                 </td>
                                 <td valign="top">
-                                    <g:if test="${partner}">
-                                        <input type="checkbox" name="partner" value="" checked="true" disabled="true"> 
-                                    </g:if>
-                                    <g:else>
-                                        <input type="checkbox" name="partner" value="Y"> 
-                                    </g:else>
+                                    <input type="checkbox" name="partner" value="Y" <g:if test="${partner}">checked="true"</g:if> <g:if test="${projectPartner}">disabled="true"</g:if> />
                                     <span style="padding-left: 5px"><b>Note:</b><i>Partners can participate on projects of other companies</i></span>
                                 </td>
                             </tr> 

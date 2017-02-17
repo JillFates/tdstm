@@ -119,7 +119,7 @@ class PartyGroupController implements ControllerMethods {
 			return
 		}
 
-		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup)]
+		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup), projectPartner: isAProjectPartner(partyGroup)]
 	}
 
 	@HasPermission('CompanyDelete')
@@ -193,7 +193,7 @@ class PartyGroupController implements ControllerMethods {
 			return
 		}
 
-		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup)]
+		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup), projectPartner: isAProjectPartner(partyGroup)]
 	}
 
 	@HasPermission('PartyEditView')
@@ -205,10 +205,12 @@ class PartyGroupController implements ControllerMethods {
 
 			if( !partyGroup.hasErrors() && partyGroup.save()) {
 
-				if (params.partner && params.partner == "Y" && !isAPartner(partyGroup)) {
-					def company = partyRelationshipService.getCompanyOfStaff(securityService.loadCurrentPerson())
-					if (company) {
-						partyRelationshipService.savePartyRelationship( "PARTNERS", company, "COMPANY", partyGroup, "PARTNER" )
+				def company = partyRelationshipService.getCompanyOfStaff(securityService.loadCurrentPerson())
+				if (company) {
+					if (params.partner && params.partner == "Y" && !isAPartner(partyGroup)) {
+						partyRelationshipService.savePartyRelationship("PARTNERS", company, "COMPANY", partyGroup, "PARTNER")
+					} else if (!params.partner && !isAProjectPartner(partyGroup)) {
+						partyRelationshipService.deletePartyRelationship("PARTNERS", company, "COMPANY", partyGroup, "PARTNER")
 					}
 				}
 
@@ -270,7 +272,7 @@ class PartyGroupController implements ControllerMethods {
         }
     }
 
-// TODO : JPM 3/2016 : isAPartner method should be in a service AND shoud take the company as a company instead of looking it up based on the user
+	// TODO : JPM 3/2016 : isAPartner method should be in a service AND shoud take the company as a company instead of looking it up based on the user
 	private boolean isAPartner(PartyGroup partyGroup) {
 		Party personCompany = securityService.userLoginPerson.company
 		if (personCompany) {
@@ -282,6 +284,22 @@ class PartyGroupController implements ControllerMethods {
 				  and p.roleTypeCodeTo.id = 'PARTNER'
 				  and	p.partyIdTo = :partyGroup
 			''', [partyGroup: partyGroup, companyId: personCompany.id])[0] > 0
+		}
+		else {
+			false
+		}
+	}
+
+	private boolean isAProjectPartner(PartyGroup partyGroup) {
+		Party personCompany = securityService.userLoginPerson.company
+		if (personCompany) {
+			PartyRelationship.executeQuery('''
+				select count(1) from PartyRelationship p
+				where p.partyRelationshipType = 'PROJ_PARTNER'
+				  and p.roleTypeCodeFrom.id = 'PROJECT'
+				  and p.roleTypeCodeTo.id = 'PARTNER'
+				  and p.partyIdTo = :partyGroup
+			''', [partyGroup: partyGroup])[0] > 0
 		}
 		else {
 			false
