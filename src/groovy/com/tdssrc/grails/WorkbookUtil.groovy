@@ -155,6 +155,8 @@ class WorkbookUtil {
 
 		if (cell) {
 			switch (cell.getCellType()) {
+				case Cell.CELL_TYPE_BLANK:
+					break
 				case Cell.CELL_TYPE_NUMERIC:
 					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
 					result = cell.getDateCellValue()
@@ -176,12 +178,14 @@ class WorkbookUtil {
 						}
 					}
 
-					if(!result){
-						log.warn("Can't Parse '$cellVal' using any of the formatters declared in $formatterTypes")
+					if (!result) {
+						log.warn("Unable to parse date in cell ${columnCode(columnIdx+1)}${rowIdx+1} with value '$cellVal'")
 					}
 					break
+				case Cell.CELL_TYPE_FORMULA:
+					throw new IllegalArgumentException("Cell ${columnCode(columnIdx+1)}${rowIdx+1} contains a formula")
 				default:
-					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
+					throw new IllegalArgumentException("Cell ${columnCode(columnIdx+1)}${rowIdx+1} contains an invalid date value")
 			}
 		}
 		return result
