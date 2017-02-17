@@ -58,10 +58,6 @@ module.exports = function(config) {
             { pattern: 'node_modules/@angular/**/*.js', included: false, watched: false },
             { pattern: 'node_modules/@angular/**/*.js.map', included: false, watched: false },
 
-
-            'node_modules/ui-router-ng2/_bundles/ui-router-ng2.js',
-
-
             { pattern: 'systemjs.config.js', included: false, watched: false },
             { pattern: 'systemjs.config.extras.js', included: false, watched: false },
             'karma-test-shim.js', // optionally extend SystemJS mapping e.g., with barrels
@@ -101,13 +97,6 @@ module.exports = function(config) {
 
         reporters: ['progress', 'kjhtml'],
         singleRun: false,
-
-        //singleRun: true,
-        //reporters: ['dots', 'junit'],
-        //junitReporter: {
-        //    outputDir: 'web-app/test/',
-        //    outputFile: 'test-results.xml'
-        //},
 
         port: 9876,
         colors: true,

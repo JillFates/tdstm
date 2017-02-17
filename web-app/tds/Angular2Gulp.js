@@ -36,3 +36,5 @@ gulp.task('build-vendor', function () {
 gulp.task('typescript-compile', shell.task(['tsc -p web-app']));
 
 gulp.task('build-test',['typescript-compile'], shell.task(['karma start karma.conf.js']));
+
+gulp.task('build-test-report',['typescript-compile'], shell.task(['karma start karma.production.conf.js']));

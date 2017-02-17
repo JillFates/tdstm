@@ -14,13 +14,13 @@ export class GameService {
 
     query(): Promise<Array<Game>> {
         return new Promise((resolve, reject) => {
-            setInterval(() => { resolve(this.games) }, 2000);
+            setTimeout(() => { resolve(this.games) }, 2000);
         });
     };
 
     findById(id: number):Promise<Game> {
         return new Promise((resolve, reject) => {
-            setInterval(() => {
+            setTimeout(() => {
                 if (id < this.games.length)
                     resolve(this.games[id]);
                 else
@@ -31,7 +31,7 @@ export class GameService {
 
     save(game: Game):Promise<number> {
         return new Promise((resolve, reject) => {
-            setInterval(() => {
+            setTimeout(() => {
                 this.games.push(game);
                 resolve(this.games.length);
             }, 2000);
@@ -40,7 +40,7 @@ export class GameService {
 
     delete(id: number):Promise<string> {
         return new Promise((resolve, reject) => {
-            setInterval(() => {
+            setTimeout(() => {
                 this.games.splice(id, 1);
                 resolve("Ok");
             }, 2000);

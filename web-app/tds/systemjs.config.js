@@ -25,7 +25,6 @@
             '@angular/http': 'npm:@angular/http/bundles/http.umd.js',
             '@angular/router': 'npm:@angular/router/bundles/router.umd.js',
             '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
-            'ui-router-ng2':'npm:ui-router-ng2/_bundles/ui-router-ng2.js',
 
             // other libraries
             'rxjs':                      'npm:rxjs',
