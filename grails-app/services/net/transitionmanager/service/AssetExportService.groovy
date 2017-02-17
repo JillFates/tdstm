@@ -707,7 +707,10 @@ class AssetExportService {
                         }
 
                     }
-                    addCell(serverSheet, depGroupColNum, deviceCount, assetDepBundleMap[currentAsset.id.toString()])
+                    def depGroupId = assetDepBundleMap[currentAsset.id.toString()]
+                    if (depGroupId != null) {
+                        addCell(serverSheet, depGroupColNum, deviceCount, depGroupId)
+                    }
 
                     if (profilingRow) {
                         profiler.end('Device Fields')
