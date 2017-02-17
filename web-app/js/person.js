@@ -32,7 +32,6 @@ var Person = function () {
 			success: function(data, stat, xhr) {
 				var url = xhr.getResponseHeader('X-Login-URL');
 				if (url) {
-					alert("Your session has expired and need to login again.");
 					window.location.href = url;
 				} else {
 					if (data.status == 'success') {

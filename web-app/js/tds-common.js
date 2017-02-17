@@ -82,12 +82,13 @@ var tdsCommon = {
 	 * A common error response handler for the Select2 controller when using Ajax and an error occurs
 	 */
 	select2AjaxErrorHandler: function(jqXHR, textStatus, errorThrown) {
-		console.log('select2 ajax error : status=' + jqXHR.status + ' error='+errorThrown);
-		if (textStatus == 'parsererror' && jqXHR.responseText.indexOf('Your login session has expired.')>0) {
-			alert('Your session has expired and need to login again');
-			window.location.href = tdsCommon.createAppURL('/auth/login');
+		var url = jqXHR.getResponseHeader('X-Login-URL');
+		if (url) {
+			window.location.href = url;
+		} else {
+			console.log('select2 ajax error : status=' + jqXHR.status + ' error=' + errorThrown);
+			return 'An error occurred during search';
 		}
-		return 'An error occurred during search';
 	},
 
 	/**

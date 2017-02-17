@@ -211,7 +211,6 @@ tds.core.interceptor.LoggedCheckerInterceptor = function($log) {
 				}
 				return jsonResponse
 			} else {
-				alert("Your session has expired and need to login again.");
 				//location.reload();
 				window.location.href = loginRedirect;
 			}
@@ -256,7 +255,6 @@ function handleRequestResponse (jsonResponse, loginRedirect) {
 			return jsonResponse;
 		}
 	} else {
-		alert("Your session has expired and need to login again.");
 		window.location.href = loginRedirect;
 	}
 }
@@ -293,7 +291,6 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 			}
 		} else {
 			// The session must of expired if the X-Login-URL header was received
-			alert("Your session has expired and need to login again.");
 			_goToLogin(url);
 			return;
 		}

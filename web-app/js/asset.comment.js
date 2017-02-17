@@ -136,7 +136,6 @@ function getActionBarGrid (spanId) {
 			$('#load_d_'+id).remove()
 			var url = xhr.getResponseHeader('X-Login-URL');
 			if (url) {
-				alert("Your session has expired and need to login again.");
 				window.location.href = url;
 			} else {
 				if (!$("#row_d_"+id).html() && data)

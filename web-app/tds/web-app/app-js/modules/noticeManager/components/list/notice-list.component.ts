@@ -18,6 +18,10 @@ export class NoticeListComponent implements OnInit {
         this.moduleName = 'Notice List';
     }
 
+    /**
+     * Get the Initial Notice List
+     * @param noticeList
+     */
     private onLoadNoticeList(noticeList) {
         this.noticeList = noticeList;
         console.log(this.noticeList);

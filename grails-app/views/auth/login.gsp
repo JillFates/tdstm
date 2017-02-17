@@ -170,7 +170,12 @@
 				</div>
 			</g:each>
 		</g:if>
-		<h1 class="login-box-msg">Sign in to start your session</h1>
+		<g:if test="${params.expired}">
+			<h1 class="login-box-msg message">Your session has expired. Please log in.</h1>
+		</g:if>
+		<g:else>
+			<h1 class="login-box-msg">Sign in to start your session</h1>
+		</g:else>
 		<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 		</div>
 		<g:form action="signIn" name="loginForm" class="loginPageFormWrapper">
