@@ -16,7 +16,7 @@ import {
 } from '@angular/core'
 
 //after all these imports you should import what actually is gonna be tested
-import { GameListComponent } from '../games-list/games-list.component'
+import { GameListComponent } from '../components/games-list/games-list.component'
 import { GameService } from '../service/game.service'
 import { Game } from '../model/game.model'
 

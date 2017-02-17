@@ -58,6 +58,10 @@ module.exports = function(config) {
             { pattern: 'node_modules/@angular/**/*.js', included: false, watched: false },
             { pattern: 'node_modules/@angular/**/*.js.map', included: false, watched: false },
 
+
+            'node_modules/ui-router-ng2/_bundles/ui-router-ng2.js',
+
+
             { pattern: 'systemjs.config.js', included: false, watched: false },
             { pattern: 'systemjs.config.extras.js', included: false, watched: false },
             'karma-test-shim.js', // optionally extend SystemJS mapping e.g., with barrels
@@ -87,7 +91,8 @@ module.exports = function(config) {
             //'/base/web-app/specs-dist/':"/base/web-app/app-js/",//root development
             '/base/web-app/specs-dist/modules/tds/web-app/app-js/':"/base/web-app/app-js/",//sweet!!
             '/tds/web-app/app-js/':"/base/web-app/app-js/",
-            '/base/web-app/specs-dist/modules/noticeManager/tds/web-app/app-js/':"/base/web-app/app-js/"
+            '/base/web-app/specs-dist/modules/noticeManager/tds/web-app/app-js/':"/base/web-app/app-js/",
+            '/base/web-app/specs-dist/modules/games/tds/web-app/app-js/':"/base/web-app/app-js/"
         },
 
         exclude: [],

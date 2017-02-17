@@ -1,5 +1,5 @@
 import {Ng2StateDeclaration} from 'ui-router-ng2';
-import { GameListComponent }  from './games-list/games-list.component'
+import { GameComponent }  from './components/games/games.component'
 
 /**
  * This state displays the game module.
@@ -9,7 +9,7 @@ import { GameListComponent }  from './games-list/games-list.component'
 export const gamesState: Ng2StateDeclaration = <Ng2StateDeclaration>{
     name: 'games',
     url: '/games',
-    component: GameListComponent
+    component: GameComponent
 };
 
 export const GAMES_STATES = [
