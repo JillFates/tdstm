@@ -1312,12 +1312,12 @@ class AssetEntityController implements ControllerMethods {
 						if (person) {
 							assetComment.createdBy = person
 						} else {
-							importResults.errors <<  "Created by person '$createdByImported' not found (row $rowNum)"
+							importResults.errors <<  "Created by person '$createdByImported' was not found (row $rowNum)"
 							continue
 						}
 
 						if (!personService.hasAccessToProject(person, project)) {
-							importResults.errors << "Created by person '$person' does not have access to project (row $rowNum)"
+							importResults.errors << "Created by '$person' whom does not have access to project or a login (row ${rowNum})"
 							continue
 						}
 
