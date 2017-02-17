@@ -349,8 +349,9 @@ class CustomTagLib implements InitializingBean {
 	def licenseWarning = {
 		// Only for environments where the License Manager is true Enabled
 		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
-		if(isLicenseAdminEnabled) {
-			String stateMessage = licenseAdminService.licenseStateMessage()
+		def isLicenseMananagerEnabled = licenseCommonService.isManagerEnabled()
+		if(isLicenseAdminEnabled && !isLicenseMananagerEnabled) {
+			String stateMessage = licenseAdminService.getLicenseStateMessage()
 			if(stateMessage) {
 				// Bootstrap converts the html entities into real elements
 				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/app/license/admin/list&apos;&quot;"
