@@ -160,7 +160,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index + 
 		'" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" />';
 	scope.colDef = [
-	{field:'name', displayName:'RecipeM', enableCellEdit: true, enableCellEditOnFocus: false, width: '***',
+	{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***',
 		editableCellTemplate: scope.edittableField},
 	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, 
 		width: '******', editableCellTemplate: scope.edittableField},
