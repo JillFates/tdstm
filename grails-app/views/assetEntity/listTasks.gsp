@@ -32,12 +32,7 @@
 
 	<script type="text/javascript">
 		var progressTimer;
-        $(document).on('entityAssetUpdated',function (e,obj) {
-            $('#taskListIdGrid').trigger("reloadGrid")
-        });
-        $(document).on('entityAssetCreated',function (e,obj) {
-            $('#taskListIdGrid').trigger("reloadGrid")
-        });
+       
 		$(document).ready(function() {
 
 			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
@@ -47,8 +42,7 @@
 			
 			$('#assetMenu').show();
 			$("#showEntityView").dialog({ autoOpen: false })
-			$("#editEntityView").dialog({ autoOpen: false })
-			$("#createEntityView").dialog({ autoOpen: false })
+			
 			$("#editManufacturerView").dialog({ autoOpen: false})
 			$("#manufacturerShowDialog").dialog({ autoOpen: false })
 			$("#modelShowDialog").dialog({ autoOpen: false })

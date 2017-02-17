@@ -639,6 +639,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 				if ($scope.isEdit) {
 					commentService.updateComment($scope.ac, $scope.dependencies).then(
 						function(data) {
+							$('#taskListIdGrid').trigger("reloadGrid");
 							if (data.error) {
 								alerts.addAlertMsg(data.error);
 							} else {
