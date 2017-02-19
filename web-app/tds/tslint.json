@@ -90,7 +90,6 @@
       "check-type"
     ],
     "align": [true, "parameters"],
-    "no-consecutive-blank-lines": true,
-
+    "no-consecutive-blank-lines": true
   }
 }

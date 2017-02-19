@@ -6,7 +6,6 @@ export const tdsRoot = {
     component: TDSAppComponent
 };
 
-
 export const TDSRoutingStates = [
     tdsRoot
 ];
