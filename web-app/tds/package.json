@@ -29,6 +29,7 @@
     "canonical-path": "0.0.2",
     "concurrently": "^3.1.0",
     "gulp-shell": "^0.5.2",
+    "gulp-tslint": "^7.1.0",
     "jasmine-core": "^2.5.2",
     "karma": "^1.4.1",
     "karma-chrome-launcher": "^2.0.0",
@@ -41,8 +42,10 @@
     "protractor": "~4.0.14",
     "rimraf": "^2.5.4",
     "tsify": "^3.0.1",
-    "tslint": "^3.15.1",
-    "typescript": "~2.2.0"
+    "tslint": "^4.0.0",
+    "typescript": "~2.2.0",
+    "vinyl-source-stream": "1.1.0",
+    "watchify": "3.7.0"
   },
   "repository": {}
 }
