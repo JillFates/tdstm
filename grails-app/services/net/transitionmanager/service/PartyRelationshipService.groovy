@@ -286,12 +286,12 @@ class PartyRelationshipService implements ServiceMethods {
 			}
 		}
 		else {
-			
+
 			//	if user select a blank then remove Partner
 			PartyRelationship.executeUpdate("delete from PartyRelationship where partyRelationshipType.id = :relationshipType"
 				  + " and partyIdFrom.id = :partyIdFromId and roleTypeCodeFrom = :roleTypeIdFrom"
 				  + " and roleTypeCodeTo = :roleTypeIdTo"
-				  , [relationshipType:relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom), 
+				  , [relationshipType:relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom),
 				    roleTypeIdFrom: RoleType.load(roleTypeIdFrom), roleTypeIdTo: RoleType.load(roleTypeIdTo)])
 		}
 	}
@@ -316,7 +316,7 @@ class PartyRelationshipService implements ServiceMethods {
 		if (!partyRelationship) {
 			partyRelationship = new PartyRelationship(args)
 			partyRelationship.statusCode = 'ENABLED'
-			save partyRelationship, true
+			save(partyRelationship, true)
 			if (partyRelationship.hasErrors()) {
 				throw new DomainUpdateException('Unable to update party relationship')
 			}

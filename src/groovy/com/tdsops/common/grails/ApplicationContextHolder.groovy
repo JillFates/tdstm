@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationContextAware
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsClass
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -42,7 +43,39 @@ class ApplicationContextHolder implements ApplicationContextAware {
 		getGrailsApplication().config
 	}
 
+	/**
+	 * Used to retrieve Grails Application artefacts (e.g. Grails domain object)
+	 * @param type - the type of artefact (e.g. 'Domain')
+	 * @param className - the name of the class
+	 * @return a GrailsClass for the specified artefact
+	 * @usage ApplicationContextHolder.getArtefact('Domain', domainClassName)
+	 */
+	static GrailsClass getArtefact(String type, String className) {
+		getGrailsApplication().getArtefact(type, className)
+	}
+
+	/**
+	 * used to access classes by name
+	 * @param name - the name of the class to lookup
+	 * @example getClassForName("library.Book"); to lookup a domain class
+	 */
+	static getClassForName(String name) {
+		getGrailsApplication().getClassForName(name)
+  	}
+
 	static GrailsPluginManager getPluginManager() {
 		getBean('pluginManager', GrailsPluginManager)
 	}
+
+ /*
+	// For testing
+	static void registerTestBean(String name, bean) {
+		TEST_BEANS[name] = bean
+	}
+
+	// For testing
+	static void unregisterTestBeans() {
+		TEST_BEANS.clear()
+	}
+*/
 }

@@ -3,6 +3,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Timezone
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang.RandomStringUtils as RSU

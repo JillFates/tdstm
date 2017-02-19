@@ -79,9 +79,12 @@ class ProjectService implements ServiceMethods {
 	 * @param userLogin - the user to lookup projects for
 	 * @return list of projects
 	 */
-	List<Project> getUserProjectsOrderBy(Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY,
-		                                  ProjectSortProperty sortOn = ProjectSortProperty.NAME,
-		                                  SortOrder sortOrder = SortOrder.ASC, UserLogin userLogin = null) {
+	List<Project> getUserProjectsOrderBy(
+		Boolean showAllProjPerm=false,
+		ProjectStatus projectStatus=ProjectStatus.ANY,
+		ProjectSortProperty sortOn = ProjectSortProperty.NAME,
+		SortOrder sortOrder = SortOrder.ASC, UserLogin userLogin = null) {
+
 		return getUserProjects(showAllProjPerm, projectStatus, [sortOn: sortOn, sortOrder: sortOrder], userLogin)
 	}
 
@@ -100,7 +103,8 @@ class ProjectService implements ServiceMethods {
 	 * TODO: <SL> This returns a PagedResultList not a List
 	 */
 	List<Project> getUserProjects(Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY,
-	                              Map searchParams=[:], UserLogin userLogin = null) {
+		Map searchParams=[:], UserLogin userLogin = null) {
+
 		def projectIds = []
 		def timeNow = new Date()
 
@@ -117,8 +121,8 @@ class ProjectService implements ServiceMethods {
 		String sortOn = searchParams.sortOn ?: ProjectSortProperty.PROJECT_CODE
 		String sortOrder = searchParams.sortOrder ?: SortOrder.ASC
 		Map projParams = searchParams.params ?: [:]
-		def personId = searchParams.personId ?: userLogin.personId
-		def person = Person.get(personId)
+		def personId = searchParams.personId ?: userLogin.person.id
+		Person person = Person.get(personId)
 		def companyParty = person.company
 
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
@@ -134,11 +138,11 @@ class ProjectService implements ServiceMethods {
 		}
 
 		List<Date> startDates = projParams.startDate ? Project.executeQuery(
-				'select startDate from Project where str(startDate) like :sd',
-				[sd: '%' + projParams.startDate + '%']) : []
+			'select startDate from Project where str(startDate) like :sd',
+			[sd: '%' + projParams.startDate + '%']) : []
 		List<Date> completionDates = projParams.completionDate ? Project.executeQuery(
-				'select completionDate from Project where str(completionDate) like :cd',
-				[cd: '%' + projParams.completionDate + '%']) : []
+			'select completionDate from Project where str(completionDate) like :cd',
+			[cd: '%' + projParams.completionDate + '%']) : []
 		// if !showAllProjPerm then filter in('id', userProjectIds)
 		// If projectState = active, filter ge("completionDate", timeNow)
 		// If projectState = completed then filter lt('completionDate', timeNow)
@@ -885,7 +889,6 @@ class ProjectService implements ServiceMethods {
 			params.completionDate = new Date()
 		}
 		query.append(" order by p.name")
-		//println "getProjectsWhereClient() query=$query, params=$params"
 		Project.executeQuery(query.toString(), params)
 	}
 
@@ -1430,12 +1433,16 @@ class ProjectService implements ServiceMethods {
 	 */
 	@Transactional
 	void addTeamMember(Project project, Person person, teamCodes) {
+		log.debug "addTeamMember() project=${project.id}, person=${person.id}, teams=$teamCodes"
 		partyRelationshipService.addProjectStaff(project, person)
 
 		List currentTeams = person.getTeamsAssignedTo(project).id
-		CollectionUtils.asList(teamCodes).each {tc ->
-			if (!currentTeams.contains(tc)) {
-				partyRelationshipService.addStaffFunction(person, tc, person.company, project)
+		log.debug "addTeamMember() currentTeams=$currentTeams"
+		CollectionUtils.asList(teamCodes).each { teamcode ->
+			log.debug "addTeamMember() checking for teamcode=$teamcode"
+			if (!currentTeams.contains(teamcode)) {
+				log.debug "addTeamMember() going to add teamcode=$teamcode"
+				partyRelationshipService.addStaffFunction(person, teamcode, person.company, project)
 			}
 		}
 	}

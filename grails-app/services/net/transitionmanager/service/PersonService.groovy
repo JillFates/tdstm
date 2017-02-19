@@ -7,7 +7,7 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+// import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -28,6 +28,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -64,29 +65,26 @@ class PersonService implements ServiceMethods {
 			"le", "mac", "di", "del", "vel", "van", "von", "e'", "san", "af", "el", "o'"
 	]
 
-	private static final Map<String, List<String>> PERSON_DOMAIN_RELATIONSHIP_MAP = [
-			application     : ['sme_id', 'sme2_id', 'shutdown_by', 'startup_by', 'testing_by'],
-			asset_comment   : ['resolved_by', 'created_by', 'assigned_to_id'],
-			comment_note    : ['created_by_id'],
-			asset_dependency: ['created_by', 'updated_by'],
-			asset_entity    : ['app_owner_id'],
-			exception_dates : ['person_id'],
-			model           : ['created_by', 'updated_by', 'validated_by'],
-			model_sync      : ['created_by_id', 'updated_by_id', 'validated_by_id'],
-			model_sync_batch: ['created_by_id'],
-			move_event_news : ['archived_by', 'created_by'],
-			move_event_staff: ['person_id'],
-			workflow        : ['updated_by'],
-			recipe_version  : ['created_by_id'],
-			task_batch      : ['created_by_id']
-	]
-
+	// A list of the Domain class properties that perform cross references to prevent deletions
 	private static final Map<String, Map<String, Boolean>> PERSON_DELETE_EXCEPTIONS_MAP = [
-		application: [sme_id: true, sme2_id: true], asset_entity: [app_owner_id: true]
+		application: [sme_id: true, sme2_id: true],
+		asset_entity: [app_owner_id: true]
 	]
 
-	private static final List<String> notToUpdate = ['beforeDelete', 'beforeInsert', 'beforeUpdate',
-	                                                       'blackOutDates', 'firstName', 'id']
+	// The Person properties that are updated by the Person Merge functionality
+	private static final List<String> MERGE_PERSON_DOMAIN_PROPERTIES = [
+		'firstName', 'middleName', 'lastName', 'nickName', 'title', 'email',
+		'department', 'location', 'stateProv', 'country',
+		'workPhone', 'mobilePhone',
+		'personImageURL',
+		'tdsNote', 'tdsLink', 'keyWords', 'travelOK'
+	]
+
+/* ***************************
+	private static final List<String> notToUpdate = [
+		'beforeDelete', 'beforeInsert', 'beforeUpdate',
+		'blackOutDates', 'firstName', 'id']
+*/
 
 	/**
 	 * Returns a properly format person's last name with its suffix
@@ -383,6 +381,7 @@ class PersonService implements ServiceMethods {
 	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is
 	 * found then isAmbiguous will be set to true.
 	 */
+	@Transactional
 	Map findOrCreatePerson(String name, Project project, List<Person> staffList = null, boolean clientStaffOnly = true) {
 		def nameMap = parseName(name)
 		if (nameMap == null) {
@@ -401,6 +400,7 @@ class PersonService implements ServiceMethods {
 	 * @param clientStaffOnly - a flag to indicate if it should only look for person that is staff of the company or allow anyone assigned to a project (default true)
 	 * @return Map containing person, status or null if unable to parse the name
 	 */
+	@Transactional
 	Map findOrCreatePerson(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true) {
 		Person person
 		boolean staffListSupplied = (staffList != null)
@@ -412,7 +412,7 @@ class PersonService implements ServiceMethods {
 			if (!results.person && nameMap.first) {
 				logger.info 'findOrCreatePerson() Creating new person ({}) as Staff for {}', nameMap, project.client
 				person = new Person('firstName': nameMap.first, 'lastName': nameMap.last, 'middleName': nameMap.middle, staffType: 'Salary')
-				save person, true
+				save(person, true)
 				if (person.hasErrors()) {
 					results.error = "Unable to create person $nameMap${GormUtil.allErrorsString(person)}"
 				}
@@ -554,257 +554,132 @@ class PersonService implements ServiceMethods {
 		return map
 	}
 
+	/**
+	 * Used to merge one person into another account which will move all of the teams, security roles, user account, and references
+	 * of the fromPerson and assign to the toPerson. This will be responsible for deleting any duplicate references as well.
+	 * @param fromPerson
+	 * @param toPerson
+	 */
 	@Transactional
-	Person mergePerson(Person fromPerson, Person toPerson) {
-		UserLogin toUserLogin = toPerson.userLogin
-		UserLogin fromUserLogin = fromPerson.userLogin
+	void mergePerson(UserLogin byWhom, Person fromPerson, Person toPerson) {
+		//
+		// Perform some validation before performing the merge
+		//
+		if (fromPerson.isSystemUser() || toPerson.isSystemUser()) {
+			throw new InvalidParamException('Merging with system accounts is prohibited')
+		}
 
-		GormUtil.copyUnsetValues(toPerson, fromPerson, notToUpdate)
-		save toPerson
+		if (fromPerson.id == toPerson.id) {
+			throw new InvalidParamException('The To and From persons must be different')
+		}
 
-		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
-		updatePersonReference(fromPerson, toPerson)
-		updateProjectRelationship(fromPerson, toPerson)
+		def toCompany = toPerson.getCompany()
+		def fromCompany = fromPerson.getCompany()
+		if (toCompany.id != fromCompany.id) {
+			throw new InvalidParamException('Merging people is only allowed within the same company')
+		}
+
+		// TODO : JPM 8/2016 : Change mergePerson to validate if the user has access to the persons being merged
+
+		auditService.logMessage("$byWhom is merging $fromPerson (${fromPerson.id}) to $toPerson (${toPerson.id})")
+
+		// Merge the UserLogin accounts and security rolls associated with them
+		securityService.mergePersonsUserLogin(byWhom, fromPerson, toPerson)
+		// Merge the references and delete the fromPerson when finished
+		GormUtil.mergeDomainReferences(fromPerson, toPerson, true)
 
 		GormUtil.flushAndClearSession()
-
-		fromPerson.delete()
-
-		return fromPerson
 	}
 
 	/**
-	 * Deletes a person and other entities related to the instance, such as party and party role.
-	 *
+	 * This method deletes a person and other entities
+	 * related to the instance, such as party and party role.
+	 * @param byWhom - the User that invoked the deleting of the person
 	 * @param person - Person Instance to be deleted
 	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.
 	 * @param deleteIfAssocWithAssets - boolean that indicates if a person with relationships with assets must
-	 * 									 be deleted (see PERSON_DELETE_EXCEPTIONS_MAP)
-	 * @return Map[
-	 * 				String[]	-> messages: errors and other messages.
-	 * 				int 		-> cleared: assets cleared
-	 * 				Boolean 	-> deleted: the person was deleted.
-	 * 			]
+	 * 		be deleted (see PERSON_DELETE_EXCEPTIONS_MAP)
+	 * @return A map containing the following:
+	 *		messages: String[] containing errors and other messages
+	 *		cleared: the number of assets cleared
+	 *		deleted: a boolean indicating if the person was deleted
 	 */
 	@Transactional
-	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets) {
+	Map deletePerson(Person byWhom, Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets){
+
 		int cleared = 0
 		boolean deleted = false
-		List<String> messages = []
+		String messages = []
+
+		validatePersonAccess(person.id, byWhom)
+
 		UserLogin userLogin = person.userLogin
 
-		boolean isDeletable = !haveRelationship(person) && !(!deleteIfUserLogin && userLogin)
+		// Determine if person can be deleted based on if there are key referenced or if there is a user account for the person
+		boolean isDeletable = true
+		if (! deleteIfAssocWithAssets && hasKeyReferences(person)) {
+			messages << "$person was unable to be delete due to being associated with assets"
+			isDeletable = false
+		}
+		if (userLogin && !deleteIfUserLogin) {
+			messages << "$person was unable to be delete due to having user login account"
+			isDeletable = false
+		}
+		if (person.isSystemUser()) {
+			messages << "$person is a system account and can not be deleted"
+			isDeletable = false
+		}
 		if (isDeletable) {
-
 			Person.withTransaction { trxStatus ->
 
 				try {
-
-					// Sets additional person references to NULL
-					PERSON_DELETE_EXCEPTIONS_MAP.each { table, fields ->
-						fields.each { column, status ->
-							if (isDeletable) {
-								if (jdbcTemplate.queryForObject('SELECT count(*) FROM ' + table + ' WHERE ' + column + '=?', Integer, person.id)) {
-									if (deleteIfAssocWithAssets) {
-										// Clear out the person's associate with all assets for the given column
-										logger.debug 'Disassociated person as {}', column
-										cleared += jdbcTemplate.update('UPDATE ' + table +
-											' SET ' + column + '=NULL WHERE ' + column + '=?', person.id)
-									}
-									else {
-										logger.debug('Ignoring delete of person {} as it contains {} association with asset(s)', person.id, column)
-										messages << "Staff '$person.firstName, $person.lastName' unable to be deleted due it contains $column association with asset(s)."
-										isDeletable = false
-									}
-								}
-							}
-						}
+					// Delete the UserLogin
+					if (userLogin) {
+						securityService.deleteUserLogin(userLogin)
 					}
 
-					if (isDeletable) {
-						Map personMap = [person: person]
-						Person.executeUpdate('DELETE PartyRole         WHERE party=:person', personMap)
-						Person.executeUpdate("DELETE PartyRelationship WHERE partyIdFrom=:person or partyIdTo=:person", personMap)
+					def (deletedCount, nulledCount) = GormUtil.deleteOrNullDomainReferences(person, true)
 
-						Party.load(person.id).delete()
-
-						if (deleteIfUserLogin) {
-							if (userLogin) {
-								UserPreference.executeUpdate('DELETE UserPreference up WHERE up.userLogin = :user', [user: userLogin])
-								userLogin.delete()
-							}
-						}
-						person.delete()
-						deleted = true
-					}
-				}
-				catch (Exception e) {
-					status.setRollbackOnly()
-					messages << "There was an error trying to delete staff '$person.firstName, $person.lastName'"
-					logger.debug('An error occurred while trying to delete {}: {}', person.id, e.message)
+				} catch(Exception e) {
+					messages << "An error occurred while attempting to delete $person"
+					log.error ExceptionUtil.stackTraceToString("Attempted to delete person $person (${person.id}", e)
+					trxStatus.setRollbackOnly()
 				}
 			}
 		}
-		else {
-			messages << "Staff '$person.firstName, $person.lastName' unable to be deleted due to associations with existing elements in one or more Projects. Please use Person Merge functionality if applicable."
-		}
-
 		return [messages: messages, cleared: cleared, deleted: deleted]
 	}
 
 	/**
-	 * Merges Person's UserLogin according to criteria
-	 * 1. If neither account has a UserLogin - nothing to do
-	 * 2. If Person being merged into the master has a UserLogin but master doesn't, assign the UserLogin to the master Person record.
-	 * 3. If both Persons have a UserLogin,select the UserLogin that has the most recent login activity. If neither have login activity,
-	 * 	  choose the oldest login account.
-	 * @param fromUserLogin : instance of fromUserLogin
-	 * @param toUserLogin : instance of toUserLogin
-	 * @param toPerson : instance of toPerson
-	 * @return
-	 */
-	@Transactional
-	def mergeUserLogin(toUserLogin, fromUserLogin, toPerson) {
-		if (fromUserLogin && !toUserLogin) {
-			fromUserLogin.person = toPerson
-			fromUserLogin.save(flush: true)
-		}
-		else if (fromUserLogin && toUserLogin) {
-			if (fromUserLogin.lastLogin && toUserLogin.lastLogin) {
-				if ((fromUserLogin.active == "Y" && toUserLogin.active == "N") || (toUserLogin.active == fromUserLogin.active && fromUserLogin.lastLogin > toUserLogin.lastLogin)) {
-					fromUserLogin.person = toPerson
-					toUserLogin.delete()
-				}
-				else {
-					fromUserLogin.delete()
-				}
-			}
-			else {
-				if (fromUserLogin.createdDate > toUserLogin.createdDate) {
-					fromUserLogin.person = toPerson
-					toUserLogin.delete()
-				}
-				else {
-					fromUserLogin.delete()
-				}
-			}
-		}
-		if (fromUserLogin && toUserLogin) {
-			updateUserLoginRefrence(fromUserLogin, toUserLogin)
-		}
-	}
-
-	/**
-	 * Updates Person reference from 'fromPerson' to  'toPerson'
-	 * @param fromPerson : instance of fromPerson
-	 * @param toPerson : instance of toPerson
-	 * @return
-	 */
-	def updatePersonReference(fromPerson, toPerson) {
-		PERSON_DOMAIN_RELATIONSHIP_MAP.each { key, value ->
-			value.each { prop ->
-				jdbcTemplate.update("UPDATE $key SET $prop = '$toPerson.id' where $prop= '$fromPerson.id'")
-			}
-		}
-
-		PERSON_DELETE_EXCEPTIONS_MAP.each { table, fields ->
-			fields.each { column, status ->
-				jdbcTemplate.update("UPDATE $table SET $column = '$toPerson.id' WHERE $column = '$fromPerson.id'")
-			}
-		}
-	}
-
-	/**
-	 * Update all UserLogin reference in all domains from on account to another
-	 * @param fromUserLogin : instance of fromUserLogin
-	 * @param toUserLogin : instance of toUserLogin
-	 */
-	@Transactional
-	void updateUserLoginRefrence(fromUserLogin, toUserLogin) {
-		def map = ['data_transfer_batch': ['user_login_id'], 'model_sync': ['created_by_id']]
-		map.each { table, columns ->
-			columns.each { column ->
-				jdbcTemplate.update("UPDATE $table SET $column = $toUserLogin.id where $column=$fromUserLogin.id")
-			}
-		}
-	}
-
-	/**
-	 * Update person reference in PartyRelationship table.
-	 * @param toPerson : instance of Person
-	 * @param fromPerson : instance of Person
-	 */
-	@Transactional
-	void updateProjectRelationship(Party fromPerson, Party toPerson) {
-		try {
-			// Find all of the relationships that the FROM person has
-			def allRelations = jdbcTemplate.queryForList("SELECT p.party_relationship_type_id AS prType, p.party_id_from_id AS pIdFrom, \
-				p.party_id_to_id AS pIdTo, p.role_type_code_from_id AS rTypeCodeFrom, p.role_type_code_to_id AS rTypeCodeTo \
-				FROM party_relationship p WHERE p.party_id_to_id = $fromPerson.id")
-
-			allRelations.each { relation ->
-				// Check to see if the TO person has the particular relationship already. If so we delete the FROM person relationship otherwise
-				def toAlreadyHasRelationship = jdbcTemplate.queryForList("SELECT 1 FROM party_relationship p WHERE \
-					p.party_relationship_type_id='$relation.prType' AND p.party_id_from_id =$relation.pIdFrom \
-					AND p.party_id_to_id =$toPerson.id AND p.role_type_code_from_id='$relation.rTypeCodeFrom'\
-					AND p.role_type_code_to_id ='$relation.rTypeCodeTo'")
-
-				def where = " WHERE party_relationship_type_id = '$relation.prType' \
-					   AND role_type_code_from_id = '$relation.rTypeCodeFrom' AND role_type_code_to_id='$relation.rTypeCodeTo' \
-					   AND party_id_to_id = $fromPerson.id AND party_id_from_id = $relation.pIdFrom"
-
-				if (toAlreadyHasRelationship) {
-					jdbcTemplate.update("DELETE FROM party_relationship $where")
-				}
-				else {
-					jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = $toPerson.id $where")
-				}
-			}
-		}
-		catch (Exception ex) {
-			logger.error('Cannot update person project relationship: {}', ex.message, ex)
-		}
-	}
-
-	/**
-	 * Check if the user have a relationship with some entity, for example, Recipes
+	 * Check if the Person has any key relationships (e.g. Application owner or SME) that could prevent it from being deleted
 	 * @param person - Person to check
-	 * @return boolean value that indicates if a relationship exist
+	 * @return true if a relationship exist otherwise false
 	 */
-	boolean haveRelationship(Person person) {
-		for (entry in PERSON_DOMAIN_RELATIONSHIP_MAP.entrySet()) {
-			String key = entry.key
-			List<String> value = entry.value
-			for (prop in value) {
-				if (!checkRelationshipException(key, prop)) {
-					int count = jdbcTemplate.queryForObject('SELECT count(*) FROM ' + key + ' WHERE ' + prop + '=?', Integer, person.id)
-					if (count) {
-						logger.info 'Found relationship for "{}, {}" on table: "{}" over field: "{}"',
-								person.firstName, person.lastName, key, prop
-						return true
+	boolean hasKeyReferences(Person person) {
+		boolean hasRef = false
+		PERSON_DELETE_EXCEPTIONS_MAP.each { table, colums ->
+			if (!hasRef) {
+				StringBuffer sb = "SELECT count(*) AS count FROM ${table} WHERE "
+				boolean first=true
+				columns.each { col ->
+					if (first) {
+						first=false
+					} else {
+						sb.append(' OR ')
 					}
+					sb.append("$col = ${person.id}")
+					String sql = sb.toString()
+					int count = jdbcTemplate.queryForObject(sql, Integer.class)
+					hasRef = (count > 0)
 				}
 			}
 		}
+
+		return hasRef
 	}
 
 	/**
-	 * Check if the table and field should be checked in the haveRelationship funcion
-	 * @param table to check
-	 * @param field to check
-	 * @return boolean tru
-	 */
-	boolean checkRelationshipException(table, field) {
-		def result = false
-		def fields = PERSON_DELETE_EXCEPTIONS_MAP[table]
-		if (fields != null) {
-			result = (fields[field] != null)
-		}
-		return result
-	}
-
-	/**
-	 * Bulk deletes Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
+	 * Used to bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
 	 * @param user - The user attempting to do the bulk delete
 	 * @param ids - the list of person ids to delete
 	 * @param deleteIfAssocWithAssets - a flag to indicate that it is okay to delete the person if they're associated to assets
@@ -814,104 +689,51 @@ class PersonService implements ServiceMethods {
 	 *   cleared: number of assets references that were cleared/unassigned
 	 */
 	@Transactional
-	Map bulkDelete(ids, Boolean deleteIfAssocWithAssets) {
-		if (!ids) {
+	Map bulkDelete(Person byWhom, List ids, Boolean deleteIfAssocWithAssets) {
+		if (! ids || ids.size()==0) {
 			throw new InvalidParamException('Must select at least one person to delete')
 		}
 
-		logger.info 'Attempted to bulk delete {} persons ({}), deleteIfAssocWithAssets={}', ids?.size(), ids, deleteIfAssocWithAssets
+		log.info "Attempted to bulk delete ${ids?.size()} persons ($ids), deleteIfAssocWithAssets=$deleteIfAssocWithAssets"
 
-		int deleted = 0
-		int skipped = 0
-		int cleared = 0
-		List<String> messages = []
+		def deleted = 0
+		def skipped = 0
+		def cleared = 0
+		def messages = []
 
-		for (id in ids) {
-			if (!id.isLong()) {
-				continue
-			}
+		if (ids) {
+			try {
+				for (id in ids) {
+					Person person = validatePersonAccess(byWhom, id)
+					if (person) {
+						// Deletes the person and other related entities.
+						Map deleteResultMap = deletePerson(person, true, deleteIfAssocWithAssets)
 
-			Person person = Person.get(id)
-			if (!person) {
-				continue
-			}
-
-			// Deletes the person and other related entities.
-			Map deleteResultMap = deletePerson(person, true, deleteIfAssocWithAssets)
-
-			// Updates variables that comput different results.
-			cleared += deleteResultMap.cleared
-			if (deleteResultMap.deleted) {
-				deleted++
-			}
-			else {
-				skipped++
-			}
-			messages.addAll deleteResultMap.messages
-
-			/*
-			// Don't delete if they have a UserLogin
-			UserLogin userLogin = person.userLogin
-			if (userLogin) {
-				messages << "Staff '$person.firstName, $person.lastName', ignoring bulk delete because it is associated to a user login."
-				logger.debug('Ignoring bulk delete of {} as it contains userLogin', id)
-				skipped++
-				continue
-			}
-
-			// Don't delete if they have assigned tasks
-			def tasks = AssetComment.findAllByAssignedTo(person)
-			if (tasks) {
-				messages << "Staff '$person.firstName, $person.lastName', ignoring bulk delete because it contains tasks assigned."
-				logger.debug('Ignoring bulk delete of {} as it contains tasks assigned', id)
-				skipped++
-				continue
-			}
-
-			Map map = [person:person]
-
-			if (haveRelationship(person)) {
-				messages << "Staff '$person.firstName, $person.lastName' unable to be deleted due to associations with existing elements in one or more Projects. Please use Person Merge functionality if applicable."
-				skipped++
-				continue
-			}
-			// Optionally don't delete if they are associated with Assets by AppOwner, SME or SME2
-			def foundAssoc = false
-			PERSON_DELETE_EXCEPTIONS_MAP.each { table, fields ->
-				fields.each { column, status ->
-					if (foundAssoc) {
-						return
-					}
-					int count = jdbcTemplate.queryForObject('SELECT count(*) FROM ' + table + ' WHERE ' + column ")
-					if (count) {
-						if (deleteIfAssocWithAssets) {
-							// Clear out the person's associate with all assets for the given column
-							logger.debug 'Disassociated person as {}', column
-							cleared += jdbcTemplate.update("UPDATE $table SET $column = NULL WHERE $column = '$person.id'")
+						// Updates variables that comput different results.
+						cleared += deleteResultMap.cleared
+						if (deleteResultMap.deleted) {
+							deleted++
 						} else {
-							logger.debug('Ignoring bulk delete of person {} {} as it contains {} association with asset(s)', id, person, column)
-							messages << "Staff '$person.firstName, $person.lastName' unable to be deleted due it contains $column association with asset(s)."
-							foundAssoc=true
-							return
+							skipped++
 						}
+						log.info("bulkDelete() ${deleteResultMap["messages"]}")
+						messages << deleteResultMap["messages"]
+
+					} else {
+						messages << 'Invalid ID(s) were submitted in the request'
 					}
 				}
-				if (foundAssoc)
-					return
+			} catch (UnauthorizedException ue) {
+				securityService.reportViolation("attempted to delete person ($id) without neccessary access", byWhom)
+				messages << "You do not have the required access to delete the specified person"
+			} catch (InvalidParamException ipe) {
+				log.error "bulkDelete() was invoked with invalid id ($id) value by $byWhom"
+				messages << "One of the parameters specified was invalid and an error was logged."
+			} catch (EmptyResultException ere) {
+				securityService.reportViolation("attempted to delete a non-existent person ($id)", byWhom)
+				messages << "Specified person was not found"
 			}
 
-			if (foundAssoc) {
-				skipped++
-				continue
-			}
-
-			//delete references
-			logger.info 'Bulk deleting person {} {}', id, person
-			Person.executeUpdate("DELETE PartyRole p where p.party=:person", map)
-			Person.executeUpdate("DELETE PartyRelationship p where p.partyIdFrom=:person or p.partyIdTo=:person", map)
-			person.delete(flush:true)
-			deleted++
-			*/
 		}
 
 		return [deleted: deleted, skipped: skipped, cleared: cleared, messages: messages]
@@ -942,16 +764,20 @@ class PersonService implements ServiceMethods {
 		}
 
 		MoveEvent moveEvent = MoveEvent.get(eventId)
+		if (! moveEvent) {
+			return 'The specified event was not found'
+		}
+
 		Person person = Person.get(personId)
-		if (!person || !moveEvent) {
-			return "The selected person and/or move event were not found"
+		if (!person) {
+			return "The specified person was not found"
 		}
 
 		// Check that the individual that is attempting to assign someone has access to the project in the first place
 		Project project = moveEvent.project
-		if (!hasAccessToProject(project)) {
+		if (!hasAccessToProject(person, project)) {
 			securityService.reportViolation("attempted to modify staffing on project $project with proper access")
-			return "You do not have access to the project specified"
+			return "$person does not have access to the project specified"
 		}
 
 		// Now make sure that the person being assigned is affiliated with the project in some manor
@@ -991,7 +817,24 @@ class PersonService implements ServiceMethods {
 	 * @return A map containing the looked up project, person, teamRoleType
 	 */
 	private Map validateUserCanEditStaffing(projectId, personId, String teamCode) {
-		securityService.requirePermission 'EditProjectStaff', false, "attempted to alter staffing for person $personId on project $projectId without permission"
+		UserLogin user = securityService.userLogin
+		return validateUserCanEditStaffing(user, projectId, personId, teamCode)
+	}
+
+	/**
+	 * Validates that a user has the permissions to edit Staffing that the person/project are accessible as well. This will
+	 * validate and lookup values for project:project, person:person, teamRoleType:teamRoleType. If there are any problems it will
+	 * throw the appropriate Exception.
+	 * @param user - the user whom is trying to edit the staff
+	 * @param projectId - the id of the project to assign/remove a person from
+	 * @param personId - the id of the person being editted
+	 * @param teamCode - the code of the team the person to be assigned/removed
+	 * @return A map containing the looked up project, person, teamRoleType
+	 */
+	private Map validateUserCanEditStaffing(UserLogin user, projectId, personId, String teamCode) {
+		if (!securityService.hasPermission(user, 'EditProjectStaff')) {
+			throw new UnauthorizedException("Do not have permission to edit staff")
+		}
 
 		if (projectId && !NumberUtil.isPositiveLong(projectId)) {
 			throw new InvalidParamException("Invalid Project Id was specified")
@@ -1048,12 +891,23 @@ class PersonService implements ServiceMethods {
 	 */
 	boolean hasAccessToPerson(Person personToAccess, boolean forEdit = false, boolean reportViolation = true)
 			throws UnauthorizedException {
+		hasAccessToProject(securityService.userLoginPerson, personToAccess, forEdit, reportViolation)
+	}
+
+	/**
+	 * Determine if the current user has the permission to access another person
+	 * @param personToAccess - the Person to be accessed
+	 * @param forEdit - flag that when set to true will validate the accessor has permission to edit
+	 * @return true if the current user has access to the person otherwise false
+	 */
+	boolean hasAccessToPerson(Person byWhom, Person personToAccess, boolean forEdit = false, boolean reportViolation = true)
+			throws UnauthorizedException {
 
 		//
 		// TODO : JPM 3/2016 : hasAccessToPerson() presently does NOT work
 		//
 		boolean hasAccess = false
-		List currentUserProjects = getAvailableProjects(securityService.userLoginPerson)*.id
+		List currentUserProjects = getAvailableProjects(byWhom)*.id
 		List personProjects = getAvailableProjects(personToAccess)*.id
 
 		if (forEdit && !securityService.hasPermission('EditUserLogin')) {
@@ -1571,45 +1425,94 @@ class PersonService implements ServiceMethods {
 	}
 
 	/**
-	 * Determine if the person is associated with the project
+	 * Used to determine if the person is associated with the project and therefore has access. Access is allowed
+	 * for the following scenarios:
+	 *    a) System User account(s) (e.g. Automatic User)
+	 *    b) Staff of the project owner with the 'ShowAllProjects' permission
+	 *    c) Anybody assigned to the project regardless as to if the person is staff of the owner, client or partner of the project
 	 * @param person - the person to check
 	 * @param project - the project to see if person has access to
 	 * @return true if person is associated otherwise false
 	 */
-	boolean hasAccessToProject(Person person = null, Project project) {
-		long personId = person ? person.id : securityService.currentPersonId
-		List projects = projectService.getUserProjects(false, ProjectStatus.ANY, [personId: personId])
-		if (projects) {
-			return projects.any { it.id == project.id }
+	boolean hasAccessToProject(Person person, Project project) {
+		boolean hasAccess = false
+		if (person.isSystemUser()) {
+			hasAccess = true
+		} else {
+			UserLogin user = person.userLogin
+			if (user) {
+				boolean hasShowAllProj = securityService.hasPermission(user, 'ShowAllProjects')
+				if (person.company.id == project.owner.id && hasShowAllProj) {
+					hasAccess = true
+				} else {
+					List projects = projectService.getUserProjects(false, ProjectStatus.ANY, [:], user)
+					log.debug "hasAccessToProject() user has these projects $projects"
+					if (projects) {
+						hasAccess = projects.any { it.id == project.id }
+					}
+				}
+			} else {
+				log.warn "hasAccessToProject() called for person with no UserLogin (${person.id}:$person"
+				//throw new InvalidParamException('Person specified has no UserLogin')
+			}
 		}
+		hasAccess
 	}
 
+
 	/**
-	 * Validate that the user can access a person and will respond with appropriate
+	 * Used to validate that a personId specified is valid, that the person exists and that the
+	 * person attempting to access the individual has rights to access the person. It will throw
+	 * applicable exceptions accordingly.
 	 * HTTP responses based on access constraints (e.g. Unauthorized or Not Found)
 	 * @param personId - the id of the person to access
+	 * @param byWhom - the Person that is attempting to access the Person
 	 * @return Person - the person if can access or null
+	 * @throws UnauthorizedException - byWhom doesn't have access to the person
+	 * @throws InvalidParamException - the specified personId is not valid
+	 * @throws EmptyResultException - the specified personId does not exist
 	 */
 	Person validatePersonAccess(personId) throws UnauthorizedException, InvalidParamException, EmptyResultException {
+		Person byWhom = securityService.getUserLoginPerson()
+		validatePersonAccess(personId, byWhom)
+	}
+
+
+	/**
+	 * Used to validate that a personId specified is valid, that the person exists and that the
+	 * person attempting to access the individual has rights to access the person. It will throw
+	 * applicable exceptions accordingly.
+	 * HTTP responses based on access constraints (e.g. Unauthorized or Not Found)
+	 * @param personId - the id of the person to access
+	 * @param byWhom - the Person that is attempting to access the Person
+	 * @return Person - the person if can access or null
+	 * @throws UnauthorizedException - byWhom doesn't have access to the person
+	 * @throws InvalidParamException - the specified personId is not valid
+	 * @throws EmptyResultException - the specified personId does not exist
+	 */
+	Person validatePersonAccess(personId, Person byWhom) throws UnauthorizedException, InvalidParamException, EmptyResultException {
 
 		if (!NumberUtil.isPositiveLong(personId)) {
 			throw new InvalidParamException('Invalid person id requested')
 		}
 
 		// If not edit own account, the user must have privilege to edit the account
-		boolean editSelf = NumberUtil.toLong(personId) == securityService.currentPersonId
+		boolean editSelf = NumberUtil.toLong(personId) == byWhom.id
 		if (!editSelf) {
-			securityService.requirePermission('PersonEditView', false,
-				"$securityService.currentUsername attempted to edit Person($personId) without necessary permission")
-		}
-
-		if (!editSelf) {
-			// TODO : JPM 5/2015 : Need to make sure showing/editing someone that the user has access to
+			if (! securityService.hasPermission(byWhom.userLogin, 'PersonEditView', true)) {
+				throw new EmptyResultException('You do not have access to referenced person')
+			}
+			//securityService.requirePermission('PersonEditView', false,
+			//	"$securityService.currentUsername attempted to edit Person($personId) without necessary permission")
 		}
 
 		Person person = Person.get(personId)
 		if (!person) {
-			throw new EmptyResultException()
+			throw new EmptyResultException('Unable to find referenced person')
+		}
+
+		if (!editSelf) {
+			hasAccessToPerson(byWhom, person, true, true)
 		}
 
 		return person
@@ -1746,18 +1649,18 @@ class PersonService implements ServiceMethods {
 	/**
 	 * Used by controller to create a Person.
 	 * @param params - request params
-	 * @param byWhom - The person that is performing the update
 	 * @param companyId - The person company
 	 * @param defaultProject - this is the current user's currentProject that the person will be assigned to if the company is the project.client
 	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
 	 * @return The Person record being created or throws an exception for various issues
 	 */
 	@Transactional
-	Person savePerson(Map params, Person byWhom, Long companyId, Project defaultProject, boolean byAdmin = false)
+	Person savePerson(Map params, Long companyId, Project defaultProject, boolean byAdmin = false)
 			throws DomainUpdateException, InvalidParamException {
 
 		def companyParty
-		def person
+		Person person
+		Person byWhom = securityService.loadCurrentPerson()
 
 		// Look to allow easy breakout for exceptions
 		while (true) {
@@ -1794,7 +1697,7 @@ class PersonService implements ServiceMethods {
 
 			// TODO : JPM 12/2016 : The save method should assign params to the person with command or list of properties
 			person = new Person(reducedParams)
-			save person
+			save person, true
 
 			if (person.hasErrors()) {
 				throw new DomainUpdateException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
@@ -1817,8 +1720,7 @@ class PersonService implements ServiceMethods {
 					teamCodes.each { tc ->
 						addToProjectTeamSecured(defaultProject, person, tc)
 					}
-				}
-				else {
+				} else {
 					// Add the person to the project which is done automatically when adding the team to the project
 					addToProjectSecured(defaultProject, person)
 				}

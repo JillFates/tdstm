@@ -34,6 +34,35 @@ class PartyRelationship implements Serializable {
 		}
 	}
 
+	/**
+	 * Used to get retrieve a single PartyRelationship object
+	 * @param partyIdTo : instance of person for which need to get instance
+	 * @param partyIdFrom : instance of  Project for which need to get instance
+	 * @param roleTypeCodeTo : instance of Role for which need to get instance
+	 * @param roleTypeCodeFrom : instance of Role for which need to get instance
+	 * @param partyRelationshipType : instance of partyRelationshipType for which need to get instance
+	 * @return the PartyRelationship object if found otherwise null
+	 */
+
+	static PartyRelationship getRelationshipInstance(
+		Party partyIdTo,
+		Party partyIdFrom,
+		RoleType roleTypeCodeTo,
+		RoleType roleTypeCodeFrom,
+		PartyRelationshipType partyRelationshipType
+	) {
+		PartyRelationship result = PartyRelationship.createCriteria().get {
+			and {
+				eq('partyIdTo', partyIdTo )
+				eq('partyIdFrom', partyIdFrom )
+				eq('roleTypeCodeTo', roleTypeCodeTo )
+				eq('roleTypeCodeFrom', roleTypeCodeFrom )
+				eq('partyRelationshipType', partyRelationshipType )
+			}
+		}
+		return result
+	}
+
 	String toString() {
 		"$partyRelationshipType : ${roleTypeCodeFrom.id}/${partyIdFrom.id} : ${roleTypeCodeTo.id}/${partyIdTo.id}"
 	}

@@ -15,6 +15,7 @@ class MoveEventStaff {
 
 	static mapping = {
 		autoTimestamp false
+		person unique:['moveEvent', 'role']
 	}
 
 	def beforeInsert = {

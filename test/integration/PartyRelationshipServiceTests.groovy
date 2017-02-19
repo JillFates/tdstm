@@ -29,7 +29,7 @@ class PartyRelationshipServiceTests extends Specification {
 
 		def personHelper = new PersonTestHelper()
 		byWhom = personHelper.getAdminPerson()
-		securityService.assumeUserIdentity(byWhom.userLogin.username)
+		securityService.assumeUserIdentity(byWhom.userLogin.username, false)
 
 		userLogin = byWhom.userLogin
 		assert userLogin
