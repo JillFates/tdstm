@@ -108,6 +108,29 @@ class LicensedClient {
 		new JsonBuilder( toMap() ).toString()
 	}
 
+	String missingPropertyErrors(){
+		Collection<Map<String, String>> requiredProps = [
+				[prop:"max",			error:"Max Servers"],
+				[prop:"activationDate", error:"Begin Valid Date"],
+				[prop:"expirationDate", error:"End Valid Date"]
+		]
+
+		String errors = ""
+		requiredProps.each {
+			if(!owner[it.prop]){
+				errors += "|\t* ${it.error}\n"
+			}
+		}
+
+		if(errors){
+			errors = """\
+					|Missing required Parameters to generate License check any of:
+					${errors}
+				""".stripMargin()
+		}
+		errors
+	}
+
 	static LicensedClient fetch(JSONElement json, createIfNotFound = false){
 		Closure dateParser = {String strDate ->
 			if(strDate){

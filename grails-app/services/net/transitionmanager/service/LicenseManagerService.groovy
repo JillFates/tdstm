@@ -1,16 +1,14 @@
 package net.transitionmanager.service
 
 import com.github.icedrake.jsmaz.Smaz
+import com.tdsops.common.exceptions.InvalidLicenseException
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
-import net.transitionmanager.domain.Project
 import org.apache.commons.codec.binary.Base64
 import org.codehaus.groovy.grails.web.json.JSONElement
-
-import java.text.ParseException
 
 /**
  * Created by octavio on 12/9/16.
@@ -71,10 +69,15 @@ class LicenseManagerService extends LicenseCommonService{
 		return  LicensedClient.fetch(json, true)
 	}
 
-	def getLicenseKey(id){
+	def getLicenseKey(id) throws InvalidLicenseException{
 		LicensedClient lic = fetch(id)
 
 		if(lic) {
+			String errors = lic.missingPropertyErrors()
+			if(errors){
+				throw new InvalidLicenseException(errors)
+			}
+
 			def dataJson = [
 					installationNum : lic.installationNum,
 					project         : lic.project,
@@ -84,7 +87,6 @@ class LicenseManagerService extends LicenseCommonService{
 					websitename     : lic.websitename,
 					version			: 1
 			] as JSON
-
 
 			String productKey = lic.id
 			String holder = lic.email
@@ -148,6 +150,20 @@ class LicenseManagerService extends LicenseCommonService{
 		String trns = new String(Base64.encodeBase64(licenseData))
 
 		return trns
+	}
+
+	String activate(String id) throws InvalidLicenseException{
+		LicensedClient lic = fetch(id)
+		if(lic) {
+			String errors = lic.missingPropertyErrors()
+			if(errors){
+				throw new InvalidLicenseException(errors)
+			}
+
+			lic.status = License.Status.ACTIVE
+			lic.save()
+			"Ok"
+		}
 	}
 
 }

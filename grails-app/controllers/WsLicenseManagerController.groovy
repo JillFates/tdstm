@@ -1,3 +1,4 @@
+import com.tdsops.common.exceptions.InvalidLicenseException
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -15,12 +16,18 @@ import net.transitionmanager.service.LicenseManagerService
 class WsLicenseManagerController implements ControllerMethods {
 	LicenseManagerService licenseManagerService
 
-	private renderIfNotNull(id, obj){
-		if(obj) {
-			renderSuccessJson(obj)
-		}else{
-			response.status = 404 //Not Found
-			render "${id} not found."
+	private renderIfNotNull(id, Closure closure){
+		def obj
+		try{
+			obj = closure()
+			if(obj) {
+				renderSuccessJson(obj)
+			}else{
+				response.status = 404 //Not Found
+				render "${id} not found."
+			}
+		}catch(InvalidLicenseException ex){
+			renderAsJson([status:"error", "data":ex.message])
 		}
 	}
 
@@ -29,32 +36,24 @@ class WsLicenseManagerController implements ControllerMethods {
 		renderSuccessJson(licenseManagerService.list()*.toMap())
 	}
 
-	def getLicense(){
-		def id = params.id
-		LicensedClient lic = licenseManagerService.fetch(id)
-
-		renderIfNotNull(id, lic?.toMap())
+	def getLicense(String id){
+		renderIfNotNull(id){
+			LicensedClient lic = licenseManagerService.fetch(id)
+			lic?.toMap()
+		}
 	}
 
-	def deleteLicense(){
-		def id = params.id
-		LicensedClient lic = licenseManagerService.delete(id)
-
-		renderIfNotNull(id, lic ? "successful deleted" : null)
+	def deleteLicense(String id){
+		renderIfNotNull(id){
+			LicensedClient lic = licenseManagerService.delete(id)
+			lic ? "successful deleted" : null
+		}
 	}
 
-	def activateLicense(){
-		def id = params.id
-		LicensedClient lic = licenseManagerService.fetch(id)
-
-		renderIfNotNull(id, {
-			if(lic){
-				lic.status = License.Status.ACTIVE
-				//TODO: send the email
-
-				return "Email sent"
-			}
-		}())
+	def activateLicense(String id){
+		renderIfNotNull(id){
+			licenseManagerService.activate(id)
+		}
 	}
 
 	def updateLicense(){
@@ -87,7 +86,6 @@ class WsLicenseManagerController implements ControllerMethods {
 	}
 
 	def loadRequest(){
-		//def body = request.reader.text
 		def rjson = request.JSON
 		def body = rjson?.data
 		if(body){
@@ -111,12 +109,9 @@ class WsLicenseManagerController implements ControllerMethods {
 		}
 	}
 
-	def getLicenseKey(){
-		def id = params.id
-
-		renderIfNotNull(
-			id,
+	def getLicenseKey(String id){
+		renderIfNotNull(id) {
 			licenseManagerService.getLicenseKey(id)
-		)
+		}
 	}
 }
