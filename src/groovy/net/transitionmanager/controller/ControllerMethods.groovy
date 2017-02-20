@@ -5,6 +5,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
+import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
@@ -142,8 +143,8 @@ trait ControllerMethods {
 		else if (e instanceof ValidationException) {
 			renderAsJson errorsInValidation(e.errors)
 		}
-		else if (e instanceof InvalidParamException) {
-			renderErrorJson('An invalid parameter was received')
+		else if (e instanceof InvalidParamException || e instanceof DomainUpdateException) {
+			renderErrorJson(e.message)
 		}
 		else if (e instanceof InvalidRequestException) {
 			renderErrorJson('The request was invalid')

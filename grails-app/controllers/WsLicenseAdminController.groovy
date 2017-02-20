@@ -83,7 +83,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	}
 
 	def getLicense(){
-		def id = params.id
+		Long id = params.id
 		License lic
 		if(id) {
 			lic = License.get(id)
@@ -115,79 +115,49 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 	}
 
-	def deleteLicense(){
-		def id = params.id
-		def lic
-		if(id) {
-			lic = License.get(id)
-		}
 
-		if(lic) {
-			lic.delete()
-			renderSuccessJson("Successful Deleted")
-		}else{
-			//TODO: OLB 20170124 Change this to the AJax Approach
-			response.status = 404 //Not Found
-			render "${id} not found."
-		}
 
-	}
+    def deleteLicense(){
 
-	/**
-	 * Where should I check for the valid parameters?
-	 * @return
-	 */
-	def generateRequest(){
-		try {
-			def json = request.JSON
-			License lic
-			if(params.id){
-				lic = License.get(json.id)
-			}else{
-				lic = new License()
-				lic.owner = securityService.loadCurrentPerson().company
-				lic.requestDate = new Date()
-				lic.status = License.Status.PENDING
-				lic.method = License.Method.MAX_SERVERS
-				lic.installationNum = licenseAdminService.getInstallationId()
-				lic.hostName = licenseAdminService.hostName
-				lic.websitename = licenseAdminService.FQDN
-			}
+        def id = params.id
+        if(licenseAdminService.deleteLicense(id)) {
+            renderSuccessJson("Successful Deleted")
+        }else{
+            sendNotFound()
+        }
+    }
 
-			lic.email = json.email
-			lic.environment = License.Environment.forId(json.environmentId)
-			lic.project = json.projectId
-			lic.requestNote = json.requestNote
 
-			if(lic.project != "all"){
-				lic.type = License.Type.SINGLE_PROJECT
-				def project = Project.get(lic.project)
-				if(project !=  null) {
-					def client = project.client
-					lic.installationNum = "${lic.installationNum}|${project.name}|${client.name}"
-				}else{
-					lic.errors.rejectValue("project", "Project (id:${lic.project}) not found")
-				}
-			}else{
-				lic.type = License.Type.MULTI_PROJECT
-			}
 
-			if (!lic.hasErrors() && lic.save(flush:true)) {
-				renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
-			}else{
-				lic.errors.each {
-					log.error("lic error: {}", it)
-				}
-				throw new Exception("Error while creating License Request")
-			}
-		} catch (e) {
-			log.error("Da error", e)
-			preHandleException e
-		}
+    def generateRequest() {
 
-	}
+        try {
 
-	def loadLicense(){
+            def json = request.JSON
+
+            Long licId = json.id
+            def owner = securityService.loadCurrentPerson().company
+            def email = json.email
+            Long environmentId = json.environmentId
+            def projectId = json.projectId  // Can be a numeric id or "all", for all projects
+            String requestNote = json.requestNote
+
+            License lic = licenseAdminService.generateRequest(licId, owner, email, environmentId, projectId, requestNote)
+
+            if (lic) {
+                renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
+            }
+
+        } catch (e) {
+            log.error("Error", e)
+            handleException e, log
+        }
+
+    }
+
+
+
+	def loadLicense(){ // Apply license
 		try{
 			def json = request.JSON
 			log.info("license ID: {}", params.id)
@@ -216,13 +186,14 @@ class WsLicenseAdminController implements ControllerMethods {
 			}
 		} catch (e) {
 			log.error("Da error", e)
-			preHandleException e
+			handleException e, log
 		}
 	}
 
+
 	/*** HELPER *************************/
 	/* I believe that this should be on the trait  ¬¬ */
-	private void preHandleException(Exception e, boolean includeException = false) {
+	private void preHandleException(Exception e, boolean includeException = false) { // TODO move to super class
 		if (e instanceof UnauthorizedException) {
 			if (includeException) {
 				ServiceResults.forbidden(response, e)

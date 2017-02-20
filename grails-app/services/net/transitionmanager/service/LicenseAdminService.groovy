@@ -12,10 +12,13 @@ import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
 import net.transitionmanager.domain.License as DomainLicense
+import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
 import org.apache.commons.lang.time.DateUtils
+import net.transitionmanager.domain.PartyGroup
 import org.springframework.core.io.Resource
+
 
 @Slf4j
 class LicenseAdminService extends LicenseCommonService {
@@ -420,4 +423,107 @@ class LicenseAdminService extends LicenseCommonService {
 		LicenseManager manager = LicenseManager.getInstance()
 		return manager.getLicense(license.id)
 	}
+
+
+
+//
+    /**
+     * Creates a new License Request. If the licenseUid parameter is null or there is no license with that uid,
+     * a new License will be created.
+     *
+     *
+     * @param licenseUid - the uid of the License
+     * @param owner - The owner
+     * @param email - The email address to be assigned to the license request.
+     * @param environmentId - The environment id.
+     * @param projectId - The id of the Project.
+     * @param requestNote - The note attached to the License Request
+     *
+     */
+    def License generateRequest( Long licenseUid, PartyGroup owner, String email, Long environmentId, def projectId, String requestNote ){
+
+
+
+            License lic
+
+            if (licenseUid != null && !licenseUid.isNumber()) {
+                throw new IllegalArgumentException('Not a licence Id number')
+            }
+
+            if(licenseUid){
+                lic = License.get(licenseUid)
+
+            }else{
+
+                lic = new License()
+                lic.owner = owner
+                lic.requestDate = new Date()
+                lic.status = License.Status.PENDING
+                lic.method = License.Method.MAX_SERVERS
+                lic.installationNum = getInstallationId()
+                lic.hostName = hostName
+                lic.websitename = FQDN
+            }
+
+            lic.email = email
+            lic.environment = License.Environment.forId(environmentId.intValue())
+            lic.project = projectId
+            lic.requestNote = requestNote
+
+            if(lic.project != "all"){
+                lic.type = License.Type.SINGLE_PROJECT
+                def project = Project.get(lic.project)
+                if(project !=  null) {
+                    def client = project.client
+                    lic.installationNum = "${lic.installationNum}|${project.name}|${client.name}"
+                }else{
+                    lic.errors.rejectValue("project", "Project (id:${lic.project}) not found")
+                }
+            }else{
+                lic.type = License.Type.MULTI_PROJECT
+            }
+
+            if (lic.save(flush:true)) {
+                return lic
+            }else{
+                lic.errors.each {    // TODO GormUtil.allErrorsString
+                    log.error("lic error: {}",  it)
+                }
+                throw new DomainUpdateException("Error while creating License Request")
+            }
+
+    }
+
+
+
+    // TODO validate that the user has access to the license - check with Octavio
+    /**
+     * Deletes a License Request.
+     *
+     *
+     * @param licId - the id of the License.
+     * @return true if the license was successfully deleted. false if the license does not exist.
+     *
+     */
+    boolean deleteLicense(def licId){
+
+        def lic
+
+        if(licId) {
+            lic = License.get(licId)
+        }
+        else {
+            return false;
+        }
+
+        if(lic) {
+            lic.delete()
+            return true
+        }else{
+            return false
+        }
+    }
+
+
+
 }
