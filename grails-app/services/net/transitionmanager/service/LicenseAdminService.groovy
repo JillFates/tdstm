@@ -87,7 +87,7 @@ class LicenseAdminService extends LicenseCommonService {
 				// END: TEST MANAGER LICENSE //
 			}
 
-			if(isAdminEnabled()) {
+			if(isAdminEnabled() && !isManagerEnabled()) {
 				log.debug("License Admin Enabled")
 				String keyFile = grailsApplication.config.tdstm.license.key
 				String password = grailsApplication.config.tdstm.license.password
