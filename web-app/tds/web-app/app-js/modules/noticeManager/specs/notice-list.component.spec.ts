@@ -9,6 +9,8 @@ import { HttpModule } from '@angular/http';
 import { NoticeListComponent } from '../components/list/notice-list.component'
 import { NoticeService } from '../service/notice.service';
 import { NoticeModel } from '../model/notice.model';
+import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
+import { NotifierService } from '../../../shared/services/notifier.service';
 
 describe('NoticeListComponent:', () => {
     let fixture: ComponentFixture<NoticeListComponent>;
@@ -16,9 +18,10 @@ describe('NoticeListComponent:', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports:[HttpModule],
+            imports: [HttpModule],
             declarations: [NoticeListComponent],
-            providers: [{ provide: String,multi:false, useValue: '' },{ provide: NoticeModel, useValue: {} }]
+            providers: [{ provide: String, multi: false, useValue: '' }, { provide: NoticeModel, useValue: {} },
+                HttpServiceProvider, NotifierService]
         }).compileComponents();
     }));
 

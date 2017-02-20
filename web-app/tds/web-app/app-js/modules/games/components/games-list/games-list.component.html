@@ -12,7 +12,7 @@
     <button type="button" class="btn btn-default" (click)="newGame(); gameForm.reset()">Cancel</button>
 </form>
 <br>
-<button (click)="onRefresh()" type="button">Refresh</button>
+<button id="refresh" (click)="onRefresh()" type="button">Refresh</button>
 <table>
     <tr *ngFor="let game of games">
         <td>{{game.Name}}</td>

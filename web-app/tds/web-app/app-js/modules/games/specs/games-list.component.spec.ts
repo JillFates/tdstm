@@ -10,6 +10,7 @@ import {
 import {
     By // Used to query html elements
 } from '@angular/platform-browser'
+import { FormsModule } from '@angular/forms';
 
 import {
     DebugElement // Hold the instance to an HTML element you want to test
@@ -28,6 +29,7 @@ describe('GameListComponent - Learning: Instance of the component', () => {
     beforeEach(async(() => {
         //similar to what you do when creating a NgModule
         TestBed.configureTestingModule({
+            imports: [FormsModule],
             declarations: [GameListComponent],
             providers: [{ provide: Game, useValue: {} }]//ignore this for now
         }).compileComponents();//this methods returns a promise
@@ -63,6 +65,7 @@ describe("GameListComponent - Learning: DOM Access", () => {
     beforeEach(async(() => {
         debugger;
         TestBed.configureTestingModule({
+            imports: [FormsModule],
             declarations: [GameListComponent],
             providers: [{ provide: Game, useValue: {} }],//ignore this for now
 
@@ -100,9 +103,10 @@ describe('GameListComponent - Learning: Fixture.detectChanges', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
+            imports: [FormsModule],
             declarations: [GameListComponent],
             providers: [{ provide: Game, useValue: {} },//ignore this for now
-                { provide: ComponentFixtureAutoDetect, useValue: true }]//this enable automatic detectChanges at test startup
+            { provide: ComponentFixtureAutoDetect, useValue: true }]//this enable automatic detectChanges at test startup
         }).compileComponents();
     }));
 
@@ -129,6 +133,7 @@ describe('GameListComponent - Learning: Stub values', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
+            imports: [FormsModule],
             declarations: [GameListComponent],
             providers: [{ provide: Game, useValue: gameStub }]//passing your value
         }).compileComponents();
@@ -162,6 +167,7 @@ describe('GameListComponent - Learning: async and spy', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
+            imports: [FormsModule],
             declarations: [GameListComponent],
             providers: [{ provide: Game, useValue: {} }]
         }).compileComponents();
@@ -207,4 +213,16 @@ describe('GameListComponent - Learning: async and spy', () => {
         de = fixture.debugElement.query(By.css('tr'));
         expect(de.childNodes.length).toBe(3);
     }));
+
+    it('should call query when refresh is clicked', async(()=>{
+        fixture.detectChanges();
+        expect(spy.calls.count()).toBe(1);
+        fixture.whenStable().then(() => {
+            fixture.detectChanges();
+            de = fixture.debugElement.query(By.css('#refresh'));
+            de.triggerEventHandler("click",null);
+            fixture.detectChanges();
+            expect(spy.calls.count()).toBe(2);
+        });
+    }))
 });
