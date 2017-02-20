@@ -154,12 +154,14 @@ export default class LicenseManagerDetail extends FormValidator{
      */
     activateLicense() {
         this.licenseManagerService.activateLicense(this.licenseModel, (data) => {
-            this.licenseModel.statusId = 1;
-            this.getStatusDataSource();
-            this.saveForm(this.licenseModel);
-            this.prepareControlActionButtons();
-            this.prepareLicenseKey();
-            this.reloadRequired = true;
+            if (data) {
+                this.licenseModel.statusId = 1;
+                this.getStatusDataSource();
+                this.saveForm(this.licenseModel);
+                this.prepareControlActionButtons();
+                this.prepareLicenseKey();
+                this.reloadRequired = true;
+            }
         });
     }
 

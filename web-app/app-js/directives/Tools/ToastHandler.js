@@ -31,22 +31,26 @@ TDSTM.createDirective('toastHandler', ['$log', '$timeout', 'HTTPRequestHandlerIn
                 success: {
                     show: false,
                     status: '',
-                    statusText: ''
+                    statusText: '',
+                    time: 2000
                 },
                 danger: {
                     show: false,
                     status: '',
-                    statusText: ''
+                    statusText: '',
+                    time: 4000
                 },
                 info: {
                     show: false,
                     status: '',
-                    statusText: ''
+                    statusText: '',
+                    time: 2000
                 },
                 warning: {
                     show: false,
                     status: '',
-                    statusText: ''
+                    statusText: '',
+                    time: 4000
                 },
             };
 
@@ -109,7 +113,7 @@ TDSTM.createDirective('toastHandler', ['$log', '$timeout', 'HTTPRequestHandlerIn
                 $scope.alert[args.type].show = true;
                 $scope.alert[args.type].statusText = args.text;
                 $scope.alert[args.type].status = null;
-                $timeout(turnOffNotifications, 2000);
+                $timeout(turnOffNotifications,  $scope.alert[args.type].time);
                 $scope.$apply(); // rootScope and watch exclude the apply and needs the next cycle to run
             });
 
