@@ -23,18 +23,22 @@ export class NoticeListComponent implements OnInit {
      * Get the Initial Notice List
      * @param noticeList
      */
-    private onLoadNoticeList(noticeList) {
+    private onLoadNoticeList(noticeList): void {
         this.noticeList = noticeList;
-        console.log(this.noticeList);
     }
 
-    ngOnInit(): void {
+    public getNoticeList() : void {
         this.noticeService.getNoticesList().subscribe(
             (noticeList) => this.onLoadNoticeList(noticeList),
             (err) => {
-                console.log(err);
+                //
             });
+    }
 
-        console.log('Notice List Loaded');
+    /**
+     * Initiates the Notice Module
+     */
+    ngOnInit(): void {
+        this.getNoticeList();
     }
 }

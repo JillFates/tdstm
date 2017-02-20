@@ -62,10 +62,11 @@ export class HttpInterceptor extends Http {
      * Intercept the observable to track errors
      */
     intercept(observable: Observable<Response>, requestInfo): Observable<Response> {
-        this.notifierService.broadcast({
-            name: 'httpRequestInitial'
-        });
-        console.debug('Request to: ', requestInfo.url);
+        if(requestInfo) {
+            this.notifierService.broadcast({
+                name: 'httpRequestInitial'
+            });
+        }
         return observable.catch((err, source) => {
             if (err.status == 401 /*&& !_.endsWith(err.url, 'api/auth/login')*/) {
                 //this._router.navigate(['/login']);
@@ -74,10 +75,12 @@ export class HttpInterceptor extends Http {
                 return Observable.throw(err);
             }
         }).finally(() => {
-            this.notifierService.broadcast({
-                name: 'httpRequestCompleted',
-            });
-            console.log('Request Completed ', requestInfo.url);
+            //Invokes after the source observable sequence terminates gracefully or exceptionally.
+            if(requestInfo) {
+                this.notifierService.broadcast({
+                    name: 'httpRequestCompleted',
+                });
+            }
         });
     }
 }
