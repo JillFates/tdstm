@@ -1,4 +1,3 @@
-
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
@@ -6,6 +5,6 @@
         <small>{{pageMetaData.instruction}}</small>
     </h1>
     <ol class="breadcrumb">
-        <li *ngFor="let menu of pageMetaData.menu">{{menu}}</li>
+        <li *ngFor="let menu of pageMetaData.menu"><a href="#">{{menu}}</a></li>
     </ol>
 </section>

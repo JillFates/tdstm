@@ -1,6 +1,7 @@
-import { Injectable }     from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import { NoticeModel }           from '../model/notice.model';
+import {Injectable}     from '@angular/core';
+import {Response, Headers, RequestOptions} from '@angular/http';
+import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider'
+import {NoticeModel}           from '../model/notice.model';
 import {Observable} from 'rxjs/Rx';
 
 // Import RxJs required methods
@@ -14,16 +15,13 @@ export class NoticeService {
     private noticeListUrl = '../../ws/notices';
 
     // Resolve HTTP using the constructor
-    constructor (private http: Http) {}
+    constructor(private http: HttpInterceptor) {
+    }
 
-    getNoticesList() : Observable<NoticeModel[]> {
-
-        // ...using get request
+    getNoticesList(): Observable<NoticeModel[]> {
         return this.http.get(this.noticeListUrl)
-            // ...and calling .json() on the response to return data
-            .map((res:Response) => res.json())
-            //...errors if any
-            .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+            .map((res: Response) => res.json())
+            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
 
     }
 

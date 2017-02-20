@@ -1,20 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { NoticeService } from '../../service/notice.service';
-import { NoticeModel } from '../../model/notice.model';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {NoticeService} from '../../service/notice.service';
+import {NoticeModel} from '../../model/notice.model';
 
 @Component({
     moduleId: module.id,
     selector: 'notice-list',
+    encapsulation: ViewEncapsulation.None,
     templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
     providers: [NoticeService, {provide: NoticeModel, useValue: {}}]
 })
 
 export class NoticeListComponent implements OnInit {
 
-    private moduleName:string = '';
-    private noticeList:NoticeModel[];
+    private moduleName: string = '';
+    private noticeList: NoticeModel[];
 
-    constructor(moduleName:string, private noticeService:NoticeService) {
+    constructor(moduleName: string, private noticeService: NoticeService) {
         this.moduleName = 'Notice List';
     }
 
@@ -27,7 +28,7 @@ export class NoticeListComponent implements OnInit {
         console.log(this.noticeList);
     }
 
-    ngOnInit():void {
+    ngOnInit(): void {
         this.noticeService.getNoticesList().subscribe(
             (noticeList) => this.onLoadNoticeList(noticeList),
             (err) => {
