@@ -170,7 +170,7 @@
 				</div>
 			</g:each>
 		</g:if>
-		<g:if test="${params.expired}">
+		<g:if test="${params.expired /*|| session['sessionExpired'] == true*/}">
 			<h1 class="login-box-msg message">Your session has expired. Please log in.</h1>
 		</g:if>
 		<g:else>

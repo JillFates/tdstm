@@ -44,7 +44,7 @@ beans = {
 
 	userDetailsService(TdsUserDetailsService)
 
-	// See: SpringSecurityCoreGrailsPlugin for referece
+	// See: SpringSecurityCoreGrailsPlugin for reference
 	requestCache(TdsHttpSessionRequestCache) {
 		portResolver = ref('portResolver')
 		createSessionAllowed = true

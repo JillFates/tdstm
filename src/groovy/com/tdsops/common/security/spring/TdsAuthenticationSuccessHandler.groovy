@@ -17,6 +17,7 @@ import org.springframework.util.Assert
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import javax.servlet.http.HttpSession
 
 /**
  * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
@@ -80,6 +81,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				              redirectToPrefPage()
 			}
 
+			removeSessionExpiredAttribute(request)
 			redirectStrategy.sendRedirect request, response, redirectUri
 		}
 		finally {
@@ -115,5 +117,17 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 		Assert.notNull securityService, 'securityService is required'
 		Assert.notNull userPreferenceService, 'userPreferenceService is required'
 		Assert.notNull userService, 'userService is required'
+	}
+
+	/**
+	 * Removes TdsHttpSessionRequestCache.SESSION_EXPIRED attribute from session after a successful login.
+	 * TM-6060
+	 * @param request
+	 */
+	private void removeSessionExpiredAttribute(HttpServletRequest request) {
+		HttpSession session = request.getSession()
+		if (session && session[TdsHttpSessionRequestCache.SESSION_EXPIRED]) {
+			session.removeAttribute(TdsHttpSessionRequestCache.SESSION_EXPIRED)
+		}
 	}
 }

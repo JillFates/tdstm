@@ -16,6 +16,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import javax.servlet.http.HttpSession
 
 /**
  * A enhanced version of the Spring Security HttpSessionRequestCache
@@ -26,7 +27,8 @@ import javax.servlet.http.HttpServletResponse
  * to the last visited page after a successful login.
  */
 class TdsHttpSessionRequestCache extends HttpSessionRequestCache {
-    static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST"
+    public static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST"
+    public static final String SESSION_EXPIRED = "sessionExpired"
     protected final Log logger = LogFactory.getLog(this.getClass())
 
     private PortResolver portResolver = new PortResolverImpl()
@@ -41,32 +43,33 @@ class TdsHttpSessionRequestCache extends HttpSessionRequestCache {
     @Override
     void saveRequest(HttpServletRequest request, HttpServletResponse response) {
         if (requestMatcher.matches(request)) {
-            SavedRequest savedRequest = null;
+            SavedRequest savedRequest = null
 
             if (createSessionAllowed || request.getSession(false) != null) {
                 // Store the HTTP request itself. Used by AbstractAuthenticationProcessingFilter
                 // for redirection after successful authentication (SEC-29)
 
+                HttpSession session = request.getSession()
                 if (SpringSecurityUtils.isAjax(request)) {
                     // Ajax, saves referer header value
                     String referer = request.getHeader(HttpHeaders.REFERER)
                     if (referer && referer.toLowerCase().startsWith(getServerBaseURL())) {
                         savedRequest = new TdsSavedRequest(request, portResolver, referer)
-                        request.getSession().setAttribute(SAVED_REQUEST, savedRequest);
                     }
                 } else {
                     if (HttpMethod.GET.toString() == request.getMethod()) {
-                        savedRequest = new DefaultSavedRequest(request, portResolver);
-                        request.getSession().setAttribute(SAVED_REQUEST, savedRequest);
+                        savedRequest = new DefaultSavedRequest(request, portResolver)
                     }
                 }
 
                 if (savedRequest) {
-                    logger.debug("SavedRequest added to Session: " + savedRequest);
+                    logger.debug("SavedRequest added to Session: " + savedRequest)
+                    session.setAttribute(SAVED_REQUEST, savedRequest)
+                    session.setAttribute(SESSION_EXPIRED, true)
                 }
             }
         } else {
-            logger.debug("Request not saved as configured RequestMatcher did not match");
+            logger.debug("Request not saved as configured RequestMatcher did not match")
         }
     }
 
