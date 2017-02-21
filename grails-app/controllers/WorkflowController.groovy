@@ -315,7 +315,7 @@ class WorkflowController implements ControllerMethods {
 					where moveBundleStep in (select id from MoveBundleStep
 					                         where moveBundle.project.workflowCode=:workflowCode
 					                           and transitionId=:transitionId)
-				''', [workflowCode: workflowTransition.workflow.process])
+				''', [workflowCode: workflowTransition.workflow.process, transitionId: transitionId])
 				MoveBundleStep.executeUpdate('''
 					delete MoveBundleStep
 					where moveBundle in (select id from MoveBundle where workflowCode=:workflowCode)
