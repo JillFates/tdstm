@@ -12,7 +12,6 @@ import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
 import net.transitionmanager.domain.License as DomainLicense
-import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
 import org.apache.commons.lang.time.DateUtils
@@ -428,11 +427,11 @@ class LicenseAdminService extends LicenseCommonService {
 
 //
     /**
-     * Creates a new License Request. If the licenseUid parameter is null or there is no license with that uid,
+     * Creates a new License Request. If the uuid parameter is null or there is no license with that uid,
      * a new License will be created.
      *
      *
-     * @param licenseUid - the uid of the License
+     * @param uuid - the uid of the License
      * @param owner - The owner
      * @param email - The email address to be assigned to the license request.
      * @param environmentId - The environment id.
@@ -440,57 +439,49 @@ class LicenseAdminService extends LicenseCommonService {
      * @param requestNote - The note attached to the License Request
      *
      */
-    def License generateRequest( Long licenseUid, PartyGroup owner, String email, Long environmentId, def projectId, String requestNote ){
+    def License generateRequest(String uuid, PartyGroup owner, String email, Long environmentId, def projectId, String requestNote ){
+		DomainLicense lic
 
+		if(uuid){
+			lic = DomainLicense.get(uuid)
+		}else{
 
+			lic = new DomainLicense()
+			lic.owner = owner
+			lic.requestDate = new Date()
+			lic.status = DomainLicense.Status.PENDING
+			lic.method = DomainLicense.Method.MAX_SERVERS
+			lic.installationNum = getInstallationId()
+			lic.hostName = hostName
+			lic.websitename = FQDN
+		}
 
-            License lic
+		lic.email = email
+		lic.environment = DomainLicense.Environment.forId(environmentId.intValue())
+		lic.project = projectId
+		lic.requestNote = requestNote
 
-            if (licenseUid != null && !licenseUid.isNumber()) {
-                throw new IllegalArgumentException('Not a licence Id number')
-            }
+		if(lic.project != "all"){
+			lic.type = DomainLicense.Type.SINGLE_PROJECT
+			def project = Project.get(lic.project)
+			if(project !=  null) {
+				def client = project.client
+				lic.installationNum = "${lic.installationNum}|${project.name}|${client.name}"
+			}else{
+				lic.errors.rejectValue("project", "Project (id:${lic.project}) not found")
+			}
+		}else{
+			lic.type = DomainLicense.Type.MULTI_PROJECT
+		}
 
-            if(licenseUid){
-                lic = License.get(licenseUid)
-
-            }else{
-
-                lic = new License()
-                lic.owner = owner
-                lic.requestDate = new Date()
-                lic.status = License.Status.PENDING
-                lic.method = License.Method.MAX_SERVERS
-                lic.installationNum = getInstallationId()
-                lic.hostName = hostName
-                lic.websitename = FQDN
-            }
-
-            lic.email = email
-            lic.environment = License.Environment.forId(environmentId.intValue())
-            lic.project = projectId
-            lic.requestNote = requestNote
-
-            if(lic.project != "all"){
-                lic.type = License.Type.SINGLE_PROJECT
-                def project = Project.get(lic.project)
-                if(project !=  null) {
-                    def client = project.client
-                    lic.installationNum = "${lic.installationNum}|${project.name}|${client.name}"
-                }else{
-                    lic.errors.rejectValue("project", "Project (id:${lic.project}) not found")
-                }
-            }else{
-                lic.type = License.Type.MULTI_PROJECT
-            }
-
-            if (lic.save(flush:true)) {
-                return lic
-            }else{
-                lic.errors.each {    // TODO GormUtil.allErrorsString
-                    log.error("lic error: {}",  it)
-                }
-                throw new DomainUpdateException("Error while creating License Request")
-            }
+		if (lic.save(flush:true)) {
+			return lic
+		}else{
+			lic.errors.each {    // TODO GormUtil.allErrorsString
+				log.error("lic error: {}",  it)
+			}
+			throw new DomainUpdateException("Error while creating License Request")
+		}
 
     }
 
@@ -501,16 +492,16 @@ class LicenseAdminService extends LicenseCommonService {
      * Deletes a License Request.
      *
      *
-     * @param licId - the id of the License.
+     * @param uuid - the id of the License.
      * @return true if the license was successfully deleted. false if the license does not exist.
      *
      */
-    boolean deleteLicense(def licId){
+    boolean deleteLicense(String uuid){
 
-        def lic
+		DomainLicense lic
 
-        if(licId) {
-            lic = License.get(licId)
+        if(uuid) {
+            lic = DomainLicense.get(uuid)
         }
         else {
             return false;
