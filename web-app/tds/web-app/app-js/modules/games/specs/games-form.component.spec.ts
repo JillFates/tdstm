@@ -45,7 +45,7 @@ describe('GameFormComponent - Learning: Stub values', () => {
         fixture.whenStable().then(() => {
             de = fixture.debugElement.query(By.css('input#Name'));
             expect(de.nativeElement.value).toBe('Zelda');
-        });
+        }, () => { });
     });
 
 });
@@ -55,5 +55,97 @@ describe('GameFormComponent - Learning: Form Validation', () => {
     let comp: GameFormComponent;
     let de: DebugElement;
 
+    let gameService: GameService;
+    let spySave: jasmine.Spy;
+
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            imports: [FormsModule],
+            declarations: [GameFormComponent],
+            providers: [{ provide: Game, useValue: new Game("") }, GameService]//passing your value
+        }).compileComponents();
+    }));
+
+    beforeEach(() => {
+        fixture = TestBed.createComponent(GameFormComponent);
+        comp = fixture.componentInstance;
+        gameService = fixture.debugElement.injector.get(GameService);
+
+        //save on the mockdata 
+        spySave = spyOn(gameService, 'save').and.callFake((game: Game) => {
+            return new Promise((resolve, reject) => {
+                resolve(1);
+            });
+        });
+    });
+
+    it('should already have empty input at start', () => {
+        fixture.detectChanges();
+        de = fixture.debugElement.query(By.css('input#Name'));
+        expect(de.nativeElement.value).toBe('');
+    });
+
+    it('should clear input when cancel is clicked', () => {
+        fixture.detectChanges();
+
+        comp.model.Name = "Zelda"
+        fixture.detectChanges();
+
+        fixture.whenStable().then(() => {
+
+            fixture.detectChanges();
+            de = fixture.debugElement.query(By.css('input#Name'));
+            expect(de.nativeElement.value).toBe('Zelda');
+
+            de = fixture.debugElement.query(By.css('#cancel'));
+            de.triggerEventHandler('click', null);
+
+            fixture.detectChanges();
+
+            fixture.whenStable().then(() => {
+                fixture.detectChanges();
+
+                de = fixture.debugElement.query(By.css('input#Name'));
+                expect(de.nativeElement.value).toBe('');
+                expect(comp.model.Name).toBe('');
+            }, () => { });
+
+        }, () => { });
+
+    });
+
+    it('should not call save if have an empty input', () => {
+        fixture.detectChanges();
+        de = fixture.debugElement.query(By.css('input#Name'));
+        expect(de.nativeElement.value).toBe('');
+
+        de = fixture.debugElement.query(By.css('#submit'));
+        de.triggerEventHandler('click', null);
+        fixture.detectChanges();
+
+        expect(spySave.calls.any()).toBe(false);
+    });
+
+    it('should call save if form is valid and reset afterwards', () => {
+        fixture.detectChanges();
+
+        comp.model.Name = "Zelda"
+        fixture.detectChanges();
+
+        fixture.whenStable().then(() => {
+
+            fixture.detectChanges();
+            de = fixture.debugElement.query(By.css('#submit'));
+            de.triggerEventHandler('click', null);
+            fixture.detectChanges();
+
+            expect(spySave.calls.any()).toBe(true);
+            fixture.whenStable().then(() => {
+                 fixture.detectChanges();
+                expect(comp.model.Name).toBe('');
+            })
+        }, () => { });
+
+    });
 
 });
