@@ -95,7 +95,7 @@ class WorkflowController implements ControllerMethods {
 			message = 'Workflow "' + workflow + '" must be unique'
 		}
 		else {
-			Workflow stdWorkflow = Workflow.get(workflow)
+			Workflow stdWorkflow = Workflow.get(params.workflow)
 			if (stdWorkflow) {
 				/* create Standard swimlanes to the workflow */
 				Swimlane.findAllByWorkflow(stdWorkflow).each { stdSwimlane ->
