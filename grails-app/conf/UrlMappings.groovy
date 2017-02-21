@@ -432,6 +432,8 @@ class UrlMappings {
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")
 
+		"/api/projects/heartbeat"(controller: 'project', action: 'heartbeat', namespace:"v1", method: "GET")
+
 		"/api/${controller}s"(version: "1.0", namespace: "v1", method: "GET")
 		"/api/${controller}s/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
 		"/api/${controller}s/$id(.$format)?"(action: "delete", version: "1.0", namespace:"v1", method: "DELETE")

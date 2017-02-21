@@ -1,11 +1,13 @@
 package net.transitionmanager.controller.api.v1
 
 import com.tdsops.common.security.spring.HasPermission
+import grails.plugin.springsecurity.annotation.Secured
 import grails.rest.RestfulController
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.api.ProjectGormService
 
+@Secured('isAuthenticated()')
 class ProjectController extends RestfulController {
     static namespace = 'v1'
     static responseFormats = ['json']
@@ -17,6 +19,13 @@ class ProjectController extends RestfulController {
     ProjectGormService projectGormService
 
     SecurityService securityService
+
+    @Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
+    def heartbeat() {
+        render(contentType: 'text/json') {[
+                'status': 'OK'
+        ]}
+    }
 
     @Override
     def index(Integer max) {
