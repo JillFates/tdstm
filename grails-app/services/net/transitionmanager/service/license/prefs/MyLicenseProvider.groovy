@@ -42,10 +42,13 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 
 		String license = licenses[o]
 		if(license) {
-			return license.decodeBase64()
-		}else{
-			return null
+			try {
+				return license.decodeBase64()
+			}catch(e){
+				log.error(e.message)
+			}
 		}
+		return null
 	}
 
 	void addLicense(String name, String license){

@@ -362,7 +362,7 @@ class LicenseAdminService extends LicenseCommonService {
 		try {
 			licObj = manager.getLicense(id)
 		}catch(Exception ex){
-			log.error("Exception loading license: ", ex)
+			log.error(ex.message)
 			licenseProvider.remove(id)
 			license.status = DomainLicense.Status.CORRUPT
 			//return license.save()

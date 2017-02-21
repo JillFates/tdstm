@@ -180,13 +180,12 @@ class WsLicenseAdminController implements ControllerMethods {
 					}
 				//}
 			}else{
-				//TODO: OLB 20170124 Change this to the AJax Approach
 				response.status = 404 //Not Found
 				render "${params.id} not found."
 			}
 		} catch (e) {
-			log.error("Da error", e)
-			handleException e, log
+			log.error(e.message)
+			renderErrorJson(e.message)
 		}
 	}
 

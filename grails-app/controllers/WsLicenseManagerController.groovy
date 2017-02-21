@@ -2,7 +2,6 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.service.LicenseManagerService
 
