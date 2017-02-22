@@ -48,13 +48,12 @@ class ProjectService implements ServiceMethods {
 	 */
 	List<Project> getProjectsWherePersonIsStaff(Person person, ProjectStatus projectStatus=ProjectStatus.ACTIVE) {
 		String query = '''
-			from Project p
-			where p.id in (
-				select partyIdFrom.id from PartyRelationship pr
+			from Project p where p.id in (
+				select pr.partyIdFrom.id from PartyRelationship pr
 				where pr.partyRelationshipType.id = 'PROJ_STAFF'
-				  and pr.roleTypeCodeFrom.id = 'PROJECT'
-				  and pr.roleTypeCodeTo.id = 'STAFF'
-				  and pr.partyIdTo = :person)
+					and pr.roleTypeCodeFrom.id = 'PROJECT'
+					and pr.roleTypeCodeTo.id = 'STAFF'
+					and pr.partyIdTo = :person)
 		'''
 		Map<String, Object> args = [person: person]
 

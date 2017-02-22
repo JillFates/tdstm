@@ -1,5 +1,6 @@
 import com.tdsops.tm.enums.domain.ProjectStatus
 import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
@@ -30,13 +31,17 @@ class ProjectServiceTests extends Specification {
 		project = projectHelper.createProject()
 		adminPerson = personHelper.createStaff(project.owner)
 		assert adminPerson
+
+		// Assign the admin to the project
 		projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
 
 		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
 		assert adminUser
 		assert adminUser.username
+
 		// setup the Admin User as though they're logged in
 		securityService.assumeUserIdentity(adminUser.username, false)
+
 	}
 
 	void "1. Test the getStaff "() {
@@ -135,20 +140,73 @@ class ProjectServiceTests extends Specification {
 			allProjects == (activeProjects + completedProjects)
 	}
 
-	void "5. Test access by users to projects "() {
-		when:
-		Person adminPerson = personHelper.getAdminPerson()
-		Person person = personHelper.createPerson(adminPerson, project.client, project)
+	void '5. Testing the getUserProjects for project owner staff to determine user access to projects'() {
+		when: 'creating a new person'
+			Person person = personHelper.createPerson(adminPerson, project.owner, project)
 
-		then:
-		person
-		personService.hasAccessToProject(person, project)
-		projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size() == 1
-		projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size() == 1
-		projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size() == 0
+		then: 'a person should be created'
+			person
+		and: 'the person does not have access to the project because the person has no login'
+			! personService.hasAccessToProject(person, project)
+
+		when: 'creating a user login for the person'
+			personHelper.createUserLogin(person)
+		then: 'the person should have access to the project'
+			personService.hasAccessToProject(person, project)
+		and: 'filting for ANY status should return one project'
+			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
+		and: 'filting for ACTIVE status should return one project'
+			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
+		and: 'filting for COMPLETED status should return zero projects'
+			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
 	}
 
-	void "6. Test defaultAccountExpirationDate"() {
+	void '6. Testing the getUserProjects for project partner staff to determine user access to projects'() {
+		when: 'creating a partner company and staff for the partner'
+			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+			Person person = personHelper.createPerson(adminPerson, partner, project)
+		then: 'a partner company and  person should be created'
+			partner
+			person
+		and: 'the partner should be associated to the project'
+			partner.id == partyRelationshipService.getProjectPartners(project)[0].id
+		and: 'the person does not have access to the project because the person has no login'
+			! personService.hasAccessToProject(person, project)
+
+		when: 'creating a user login for the person'
+			personHelper.createUserLogin(person)
+		then: 'the person should have access to the project'
+			personService.hasAccessToProject(person, project)
+		and: 'filting for ANY status should return one project'
+			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
+		and: 'filting for ACTIVE status should return one project'
+			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
+		and: 'filting for COMPLETED status should return zero projects'
+			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
+	}
+
+	void '7. Testing the getUserProjects for client staff to determine user access to projects'() {
+		when: 'creating a new person'
+			Person person = personHelper.createPerson(adminPerson, project.client, project)
+
+		then: 'a person should be created'
+			person
+		and: 'the person does not have access to the project because the person has no login'
+			! personService.hasAccessToProject(person, project)
+
+		when: 'creating a user login for the person'
+			personHelper.createUserLogin(person)
+		then: 'the person should have access to the project'
+			personService.hasAccessToProject(person, project)
+		and: 'filting for ANY status should return one project'
+			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
+		and: 'filting for ACTIVE status should return one project'
+			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
+		and: 'filting for COMPLETED status should return zero projects'
+			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
+	}
+
+	void '8. Test defaultAccountExpirationDate'() {
 		when:
 		Date compDate = new Date() + 45
 		Project project = new Project()
@@ -163,7 +221,7 @@ class ProjectServiceTests extends Specification {
 		projectService.defaultAccountExpirationDate(project) == compDate
 	}
 
-	def "7. Test companyIsAssociated"() {
+	def "9. Test companyIsAssociated"() {
 		when:
 			Project p = projectHelper.createProject()
 			PartyGroup partner = projectHelper.createCompany()
@@ -175,5 +233,22 @@ class ProjectServiceTests extends Specification {
 			projectService.companyIsAssociated(p, p.client)
 			projectService.companyIsAssociated(p, partner)
 			! projectService.companyIsAssociated(p, unrelatedCompany)
+	}
+
+	void '10. Test the getStaff method'() {
+		when: 'calling getStaff for the project'
+			List staff = projectService.getStaff(project)
+		then: 'by default the admin person should be a member'
+			1 == staff?.size()
+			adminPerson.id == staff[0].id
+
+		when: 'adding a new person to the project'
+			Person person = personHelper.createPerson(adminPerson, project.client, project)
+			staff = projectService.getStaff(project)
+		then: 'the getStaff count should jump to two'
+			2 == staff?.size()
+		and: 'the new person should be in the list'
+			staff.find { person.id == it.id }
+
 	}
 }

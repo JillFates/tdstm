@@ -1034,7 +1034,7 @@ class PersonService implements ServiceMethods {
 			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, 'STAFF')) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project $project.name as STAFF")
 			} else {
-				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
+				throw new DomainUpdateException("An error occurred while attempting to assign the person to the project")
 			}
 		}
 	}
@@ -1452,7 +1452,7 @@ class PersonService implements ServiceMethods {
 					}
 				}
 			} else {
-				log.warn "hasAccessToProject() called for person with no UserLogin (${person.id}:$person"
+				log.warn "hasAccessToProject() called for a person that has no UserLogin (${person.id}:$person"
 				//throw new InvalidParamException('Person specified has no UserLogin')
 			}
 		}
@@ -1658,7 +1658,7 @@ class PersonService implements ServiceMethods {
 	Person savePerson(Map params, Long companyId, Project defaultProject, boolean byAdmin = false)
 			throws DomainUpdateException, InvalidParamException {
 
-		def companyParty
+		PartyGroup companyParty
 		Person person
 		Person byWhom = securityService.loadCurrentPerson()
 
@@ -1674,7 +1674,7 @@ class PersonService implements ServiceMethods {
 
 			// Get list of all staff for the company and then try to find the individual so that we don't duplicate
 			// the creation
-			def personList = partyRelationshipService.getCompanyStaff(companyId)
+			List personList = partyRelationshipService.getCompanyStaff(companyId)
 
 			// TODO : JPM 3/2016 : savePerson() Switch the person lookup to use the finder service
 			person = personList.find {
@@ -1691,7 +1691,7 @@ class PersonService implements ServiceMethods {
 			}
 
 			// Create the person and relationship appropriately
-			def reducedParams = [:] + params
+			Map reducedParams = [:] + params
 			reducedParams.remove('company')
 			reducedParams.remove('function')
 
@@ -1715,7 +1715,8 @@ class PersonService implements ServiceMethods {
 
 			// If the byUser's current project.client is the same as the new person's company then we'll
 			// automatically assign the person to the project as well
-			if (defaultProject != null && defaultProject.client.id == companyId) {
+//			if (defaultProject && defaultProject.client.id == companyId) {
+			if (defaultProject) {
 				if (teamCodes) {
 					teamCodes.each { tc ->
 						addToProjectTeamSecured(defaultProject, person, tc)

@@ -105,4 +105,23 @@ class ProjectTestHelper {
 		partyRelationshipService.assignClientToCompany(client, company)
 		return client
 	}
+
+	/**
+	 * Create a company as a client and assign them as a client of the specified company.
+	 * @param company  the client's owning company
+	 * @return the client
+	 */
+	PartyGroup createPartner(PartyGroup company, Project project=null) {
+		PartyType pt = PartyType.get('COMPANY')
+
+		PartyGroup partner = createCompany('Partner')
+		partyRelationshipService.assignPartnerToCompany(partner, company)
+
+		if (project) {
+			partyRelationshipService.assignPartnerToProject(partner, project)
+		}
+
+		return partner
+	}
+
 }

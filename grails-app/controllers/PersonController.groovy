@@ -348,8 +348,7 @@ class PersonController implements ControllerMethods {
 
 		try {
 			person = personService.savePerson(params, companyId, project, true)
-		}
-		catch (DomainUpdateException e) {
+		} catch (DomainUpdateException e) {
 			def exceptionMsg = e.message
 			log.error(exceptionMsg, e)
 			// The line below is a hack to avoid querying the database.
@@ -357,8 +356,7 @@ class PersonController implements ControllerMethods {
 			errMsg = "A person with the same name already exists. Click"
 			errMsg += "<a href=\"javascript:Person.showPersonDialog($personId,'generalInfoShow')\"> here </a>"//e.message
 			errMsg += "to view the person."
-		}
-		catch (e) {
+		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = e.message
 		}
