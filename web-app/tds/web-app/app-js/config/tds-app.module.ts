@@ -15,6 +15,7 @@ import {UserService} from '../shared/services/user.service';
 import {NotifierService} from '../shared/services/notifier.service';
 // Shared Directives
 import {UILoaderDirective} from '../shared/directives/ui-loader.directive';
+import {UIToastDirective} from '../shared/directives/ui-toast.directive';
 // Feature modules
 import {GamesModule} from '../modules/games/games.module';
 import {NoticesManagerModule} from '../modules/noticeManager/notice-manager.module';
@@ -41,7 +42,8 @@ import {TDSRoutingStates} from './tds-routing.states';
     ],
     declarations: [
         TDSAppComponent,
-        UILoaderDirective
+        UILoaderDirective,
+        UIToastDirective,
     ], // components, directives and pipes ONLY and only ONCE\
     providers: [
         UserService,

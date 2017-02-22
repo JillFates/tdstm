@@ -30,9 +30,7 @@ export class NoticeListComponent implements OnInit {
     public getNoticeList() : void {
         this.noticeService.getNoticesList().subscribe(
             (noticeList) => this.onLoadNoticeList(noticeList),
-            (err) => {
-                //
-            });
+            (err) => this.onLoadNoticeList([]));
     }
 
     /**
