@@ -219,4 +219,14 @@ class LicensedClient {
 		return lc
 	}
 
+	/**
+	 * Retrieve all changes on the Entity and if any build a Json that will be stored
+	 * @return
+	 */
+	def beforeUpdate(){
+		//register the changes in the class
+		LicenseActivityTrack.trackChanges(this)
+		return true
+	}
+
 }
