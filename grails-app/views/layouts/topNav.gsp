@@ -125,7 +125,9 @@
                             </a>
                         </li>
                         <li>
-                            <tds:licenseWarning />
+                            <g:if test="${!isLicenseManagerEnabled}">
+                                <tds:licenseWarning />
+                            </g:if>
                         </li>
                         <sec:ifLoggedIn>
                             <!-- User Account Menu -->
