@@ -161,17 +161,17 @@ class TaskImportExportService implements ServiceMethods {
 		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmString],
 
-		estStart			: [type: 'date', ssPos:17, formPos:18, domain: 'C', width:120, locked:false, modifiable:true,
-										label: 'Estimated Start', template:changeTmpl('estStart'), transform:xfrmDateToString],
+		estStart			: [type: 'datetime', ssPos:17, formPos:18, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Estimated Start', template:changeTmpl('estStart'), transform:xfrmDateTimeToString],
 
-		estFinish			: [type: 'date', ssPos:18, formPos:19, domain: 'C', width:120, locked:false, modifiable:true,
-										label: 'Estimated Finish', template:changeTmpl('estFinish'), transform:xfrmDateToString],
+		estFinish			: [type: 'datetime', ssPos:18, formPos:19, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Estimated Finish', template:changeTmpl('estFinish'), transform:xfrmDateTimeToString],
 
-		actualStart				: [type: 'date', ssPos:19, formPos:20, domain: 'C', width:120, locked:false,
-										label: 'Actual Start', template:changeTmpl('actualStart'), transform:xfrmDateToString],
+		actualStart				: [type: 'datetime', ssPos:19, formPos:20, domain: 'C', width:120, locked:false,
+										label: 'Actual Start', template:changeTmpl('actualStart'), transform:xfrmDateTimeToString],
 
-		actualFinish			: [type: 'date', ssPos:20, formPos:21, domain: 'C', width:120, locked:false,
-										label: 'Actual Finish', template:changeTmpl('actualFinish'), transform:xfrmDateToString],
+		actualFinish			: [type: 'datetime', ssPos:20, formPos:21, domain: 'C', width:120, locked:false,
+										label: 'Actual Finish', template:changeTmpl('actualFinish'), transform:xfrmDateTimeToString],
 
 		workflowStep			: [type: 'string', ssPos:21, formPos:22, domain: 'C', width:120, locked:false,
 										label: 'WorkFlow Step', template:changeTmpl('workflowStep'), transform:xfrmString],
@@ -383,7 +383,7 @@ class TaskImportExportService implements ServiceMethods {
 		// Date Formatter is forced to be UTC/GMT, and the Date time is based on the sheet creation Timezone
 		sheetOpts.sheetDateFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE)
 		assert sheetOpts.sheetDateFormatter
-		sheetOpts.sheetDateTimeFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE_TIME_22, sheetOpts.sheetTzId)
+		sheetOpts.sheetDateTimeFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE_TIME, sheetOpts.sheetTzId)
 		assert sheetOpts.sheetDateTimeFormatter
 
 		// Note that the exportedOn property is dependent on timezone being previously loaded
@@ -492,6 +492,7 @@ class TaskImportExportService implements ServiceMethods {
 								task.errors << "Invalid date value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"
 								setErrorValue(task, prop, 'Invalid datetime')
 								value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
+
 							}
 							break
 						case 'date':
@@ -514,6 +515,10 @@ class TaskImportExportService implements ServiceMethods {
 									value = bv
 								}
 							}
+							break
+
+						case 'number':
+							value = WorkbookUtil.getIntegerCellValue(sheet, colPos, row)
 							break
 
 						default:
@@ -979,7 +984,6 @@ class TaskImportExportService implements ServiceMethods {
 							}
 						}
 					}
-
 					if (tasks[i].changeHistory) {
 						task.changeHistory = tasks[i].changeHistory
 					}
@@ -1018,7 +1022,7 @@ class TaskImportExportService implements ServiceMethods {
 		// Add the appropriate icons to the new list
 		setIconsOnTasks(updatedTasks)
 
-		saveResultsAsJson(updatedTasks, formOptions.filename)
+		saveResultsAsJson(updatedTasks, formOptions.filename, sheetInfoOpts)
 
 		// Delete the upload file
 		deleteUploadedSpreadsheet(formOptions.filename)
@@ -1084,7 +1088,7 @@ class TaskImportExportService implements ServiceMethods {
 					}
 				} else {
 					if (! valuesEqual) {
-						assetComment[prop] = chgValueTransformed //task[prop]
+						assetComment[prop] = task[prop]
 						setOriginalValue(task, prop, origValueTransformed)
 					}
 				}
@@ -1103,9 +1107,9 @@ class TaskImportExportService implements ServiceMethods {
 	 * @param account - the map to record the changes into which will be the propertyName:originalValue
 	 * @param domainObj - the object that the changes are read from
 	 */
-	private void recordChangeHistory(Map changeHistory, Object domainObj) {
+	private void recordChangeHistory(Map changeHistory, Object domainObj, Map options) {
 		for (prop in domainObj.dirtyPropertyNames) {
-			changeHistory[prop] = domainObj.getPersistentValue(prop)
+			changeHistory[prop] = transformProperty(prop, domainObj.getPersistentValue(prop), options)
 		}
 	}
 
@@ -1135,7 +1139,7 @@ class TaskImportExportService implements ServiceMethods {
 				changed = assetComment.dirtyPropertyNames
 
 				if (changed) {
-					recordChangeHistory(task.changeHistory, assetComment)
+					recordChangeHistory(task.changeHistory, assetComment, sheetInfoOpts)
 					assetComment.save()
 					if (assetComment.hasErrors()) {
 						task.changeHistory = null
@@ -1160,8 +1164,13 @@ class TaskImportExportService implements ServiceMethods {
 		}
 	}
 
-	private String saveResultsAsJson(List tasks, String filename) {
+	private String saveResultsAsJson(List tasks, String filename, Map sheetInfoOpts) {
 		removeTmpReferences(tasks)
+		tasks.each{ task ->
+			taskSpreadsheetColumnMap.each{key, value ->
+				task[key] = transformProperty(key, task[key], sheetInfoOpts)
+			}
+		}
 		String fqfn = getJsonFilename(filename)
 		log.debug "saveResultsAsJson() filename=$filename fqfn=$fqfn"
 		new File(fqfn).write(new JsonBuilder(tasks).toPrettyString())
