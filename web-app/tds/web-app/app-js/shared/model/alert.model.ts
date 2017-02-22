@@ -4,6 +4,7 @@
  */
 
 export enum AlertType {
+    EMPTY,
     SUCCESS,
     DANGER,
     INFO,
@@ -11,8 +12,7 @@ export enum AlertType {
 };
 
 export class AlertModel {
-    static shows: boolean;
-    static status: string;
+    static alertType: AlertType;
     static message: string;
     static time: 2000;
 }

@@ -16,6 +16,7 @@ import {
 
 import {Observable} from 'rxjs/Observable';
 import {NotifierService} from "../services/notifier.service";
+import {AlertType} from '../model/alert.model';
 
 export class HttpInterceptor extends Http {
 
@@ -62,7 +63,7 @@ export class HttpInterceptor extends Http {
      * Intercept the observable to track errors
      */
     intercept(observable: Observable<Response>, requestInfo): Observable<Response> {
-        if(requestInfo) {
+        if (requestInfo) {
             this.notifierService.broadcast({
                 name: 'httpRequestInitial'
             });
@@ -76,12 +77,28 @@ export class HttpInterceptor extends Http {
             }
         }).finally(() => {
             //Invokes after the source observable sequence terminates gracefully or exceptionally.
-            if(requestInfo) {
+            if (requestInfo) {
                 this.notifierService.broadcast({
                     name: 'httpRequestCompleted',
                 });
             }
         });
+    }
+
+    onError(error: any): Observable<any> {
+        this.notifierService.broadcast({
+            name: AlertType.DANGER,
+            message: error.message
+        });
+
+        return Observable.throw(error.json().error || 'Server error');
+    }
+
+    onSuccess(res: any): Observable<any> {
+        if (res.headers.get("x-login-url")) {
+            window.location.href = res.headers.get("x-login-url");
+        }
+        return res.json();
     }
 }
 

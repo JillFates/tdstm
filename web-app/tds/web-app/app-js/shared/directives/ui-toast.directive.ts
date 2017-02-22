@@ -6,25 +6,35 @@
  */
 
 import { Component} from '@angular/core';
-import {NotifierService} from "../services/notifier.service";
+import {NotifierService} from '../services/notifier.service';
+import {AlertType, AlertModel} from '../model/alert.model';
 
 @Component({
     selector: 'tds-ui-toast',
-    template: ''
+    templateUrl: '../../tds/web-app/app-js/shared/directives/ui-toast.directive.html'
 })
 
 export class UIToastDirective {
 
-    private showsLoader: boolean = false;
+    private showsPopUp: boolean = false;
+    private alertModel = AlertModel;
+    private alertType = AlertType;
 
     constructor(private notifierService: NotifierService) {
-        this.errorFailure();
+        this.eventListeners();
     }
 
-    errorFailure() {
-        this.notifierService.on('errorFailure', (event) => {
-            this.showsLoader = true;
+    eventListeners() {
+        this.notifierService.on(AlertType.DANGER, (event) => {
+            this.showsPopUp = true;
+            this.alertModel.alertType = this.alertType.DANGER;
+            this.alertModel.message = event.message;
         });
+    }
+
+    onCloseDialog() {
+        this.alertModel.alertType = this.alertType.EMPTY;
+        this.alertModel.message = '';
     }
 
 }
