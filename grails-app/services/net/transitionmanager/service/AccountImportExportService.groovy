@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.StringUtils
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -675,7 +676,7 @@ class AccountImportExportService implements ServiceMethods {
 					accounts[i].errors << error
 				} else if (userChanged) {
 					if (isNewUser) {
-						personService.addToProject(project.id.toString(), person.id.toString())
+						personService.addToProject(securityService.getUserLogin(), project.id.toString(), person.id.toString())
 						results.userLoginCreated++
 					} else {
 						updateUserAndOrSecurity = true
@@ -1993,9 +1994,31 @@ class AccountImportExportService implements ServiceMethods {
 					account[prop] = value
 				}
 			}
-			accounts.add(account)
+			//accounts.add(account)
+			addToAccounts(accounts, account)
 		}
 		return accounts
+	}
+
+	private void addToAccounts(List accounts, Map account) {
+		if (isValidAccount(account)) {
+			accounts.add(account)
+		}
+	}
+
+	/**
+	 * Validate if required account fields are not empty.
+	 * Fields to be validated from <code>accountSpreadsheetColumnMap [firstName, middleName, lastName, company]</code>
+	 * @param account
+	 * @return
+	 */
+	private boolean isValidAccount(Map account) {
+		return (
+				StringUtils.isNotEmpty(account['fistName'] as String)
+						|| StringUtils.isNotEmpty(account['middleName'] as String)
+						|| StringUtils.isNotEmpty(account['lastName'] as String)
+						|| StringUtils.isNotEmpty(account['company'] as String)
+		)
 	}
 
 	/**
@@ -2255,7 +2278,7 @@ class AccountImportExportService implements ServiceMethods {
 			return true
 		}
 
-		def existingPersonUserLogin = account.person.userLogin
+//		def existingPersonUserLogin = account.person.userLogin
 
 		UserLogin.withNewSession { ses ->
 			boolean personExists = account.person.id
@@ -2263,7 +2286,8 @@ class AccountImportExportService implements ServiceMethods {
 
 			// Get or create a UserLogin
 			if (personExists) {
-				userLogin = existingPersonUserLogin
+//				userLogin = existingPersonUserLogin
+				userLogin = account.person.userLogin
 			}
 			if (! userLogin) {
 				account.flags.isNewUserLogin = true
