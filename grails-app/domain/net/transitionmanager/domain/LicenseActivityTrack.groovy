@@ -62,11 +62,11 @@ class LicenseActivityTrack {
 		 */
 		def dirtyProperties = licensedClient.dirtyPropertyNames
 		List<Map> changes = []
-		dirtyProperties.each { prop ->
-			def currentValue = licensedClient[prop]
-			def originalValue = licensedClient.getPersistentValue(prop)
+		dirtyProperties.each { field ->
+			def currentValue = licensedClient[field]
+			def originalValue = licensedClient.getPersistentValue(field)
 			if (currentValue != originalValue) {
-				changes << ["$prop":[oldValue:originalValue, newValue:currentValue]]
+				changes << [field:field, oldValue:originalValue, newValue:currentValue]
 			}
 		}
 
