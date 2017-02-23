@@ -14,6 +14,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.PersonCO
 import net.transitionmanager.domain.ExceptionDates
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
@@ -555,6 +556,42 @@ class PersonService implements ServiceMethods {
 	}
 
 	/**
+	 * Called from the Person Merge form which will update all of the properties for the person referenced by
+	 * the toId parameter and then will merge each of the persons referenced in the fromId List parameter.
+	 */
+	String processMergePersonRequest(UserLogin byWhom, PersonCO cmdObj, params) {
+		Person toPerson = Person.get(params.long('toId'))
+
+		hasAccessToPerson(byWhom.person, toPerson, true, true)
+
+		List fromPersons = params.list("fromId[]")
+		List personMerged = []
+
+		// toPerson.properties = cmdObj
+		cmdObj.populateDomain(toPerson, true)
+		if (!toPerson.save(flush:true)) {
+			throw new DomainUpdateException('Unable to update person ' + GormUtil.allErrorsString(toPerson))
+			toPerson.errors.allErrors.each{ println it }
+		}
+
+		for (personId in fromPersons) {
+			Person fromPerson = Person.get(personId)
+			hasAccessToPerson(byWhom.person, fromPerson, true, true)
+			personMerged << fromPerson
+			mergePerson(byWhom, fromPerson, toPerson)
+		}
+
+		String results
+		int size = personMerged.size()
+		if (size) {
+			results = "${personMerged.join(', ')} ${size==1 ? 'was' : 'where'} merged to ${toPerson}"
+		} else {
+			results = 'No merges were performed'
+		}
+		results
+	}
+
+	/**
 	 * Used to merge one person into another account which will move all of the teams, security roles, user account, and references
 	 * of the fromPerson and assign to the toPerson. This will be responsible for deleting any duplicate references as well.
 	 * @param fromPerson
@@ -891,7 +928,7 @@ class PersonService implements ServiceMethods {
 	 */
 	boolean hasAccessToPerson(Person personToAccess, boolean forEdit = false, boolean reportViolation = true)
 			throws UnauthorizedException {
-		hasAccessToProject(securityService.userLoginPerson, personToAccess, forEdit, reportViolation)
+		hasAccessToPerson(securityService.userLoginPerson, personToAccess, forEdit, reportViolation)
 	}
 
 	/**

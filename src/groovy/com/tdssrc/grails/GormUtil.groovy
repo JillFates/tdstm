@@ -387,7 +387,7 @@ public class GormUtil {
 	 * @param propertyName - the name of the property to validate
 	 * @return true if the property exists otherwise false
 	 */
-	static boolean isDomainProperty(def domainObject, String propertyName) {
+	static boolean isDomainProperty(Object domainObject, String propertyName) {
 		boolean valid=false
 		if (propertyName && domainObject) {
 			valid = domainObject.metaClass.hasProperty(domainObject.getClass(), propertyName)
@@ -665,8 +665,8 @@ public class GormUtil {
 	}
 
 	/**
-	 * Used to clone a domain object matching one to be cloned where certain key(s) properties are overridden but only if it does not
-	 * already exist. Optionally it will delete the original record.
+	 * Used to clone a domain object matching one to be cloned where certain key(s) properties are overridden but
+	 * only if it does not already exist. Optionally it will delete the original record.
 	 * @param domainObj - the object to clone
 	 * @param replaceKeys - a map of keys and the values to override in the lookup
 	 * @return the object if it was cloned otherwise null

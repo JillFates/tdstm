@@ -65,7 +65,7 @@ class Person extends Party {
 		tdsLink nullable: true
 		tdsNote nullable: true
 		title nullable: true, size: 0..34
-		travelOK nullable: true
+		travelOK range: 0..1
 		workPhone nullable: true, phoneNumber: true
 		userLogin nullable: true
 	}

@@ -6,6 +6,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import net.transitionmanager.command.PersonCO
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -1174,14 +1175,16 @@ class PersonController implements ControllerMethods {
 	 * @return The appropriate message after merging completed or error message
 	 */
 	@HasPermission('PersonEditView')
-	def mergePerson() {
+	def mergePerson(PersonCO cmdObj) {
 		String msg
 		UserLogin byWhom = securityService.getUserLogin()
 
 		try {
-			personService.processPersonMerge(byWhom, params)
-			msg = 'The merge was successful'
+			msg = personService.processMergePersonRequest(byWhom, cmdObj, params)
+			//msg = 'The merge was successful'
 		} catch (InvalidParamException e) {
+			msg = e.getMessage()
+		} catch (DomainUpdateException e) {
 			msg = e.getMessage()
 		} catch (e) {
 			log.error ExceptionUtil.messageWithStacktrace('mergePerson failed', e, 80)

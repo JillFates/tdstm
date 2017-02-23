@@ -1077,16 +1077,16 @@ class PartyRelationshipService implements ServiceMethods {
 			)"""
 
 		List projects = PartyRelationship.executeQuery(query, args)
-		// logger.debug 'companyProjects() for company {} : list 1 : projects {}', company, projects*.id
+		logger.debug 'companyProjects() for company {} : list 1 : projects {}', company, projects*.id
 		// Add to the list those that for clients
 		if (project && ! projects.contains(project) && project.client == company) {
 			projects = [project]
-			// logger.debug 'companyProjects() for company {} : list 2 : projects {}', company, projects*.id
+			logger.debug 'companyProjects() for company {} : list 2 : projects {}', company, projects*.id
 		} else {
 			List clientProjects = Project.findAllByClient(company)
 			if (clientProjects) {
 				projects += clientProjects
-				//logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
+				logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
 			}
 		}
 

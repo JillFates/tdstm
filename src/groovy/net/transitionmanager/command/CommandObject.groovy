@@ -1,0 +1,53 @@
+package net.transitionmanager.command
+
+import grails.converters.JSON
+//import org.codehaus.groovy.grails.commons.GrailsDomainClass
+
+trait CommandObject {
+
+	/**
+	 * Used to populate the Command Object with the properties from the domain
+	 * @param domain - the domain object that the proporty values will be retrieved from
+	 */
+	void populateFromDomain(Object domain) {
+		for (prop in commandProperties()) {
+			// TODO check that the domain has the property
+			this[prop.key] = domain[prop.key]
+		}
+	}
+`
+	/**
+	 * Used to populate the domain object from the command object with the option to skip properties that are empty/null
+	 * @param domain - the domain object to set the properties on
+	 * @param skipEmptyProperties - flag (true|false) to indicate if empty properties of the command object should be skipped over (default false)
+	 */
+	void populateDomain(Object domain, boolean skipEmptyProperties=false) {
+		for (prop in commandProperties()) {
+			// If skip empty and the Command Object doesn't have a value for the property we will skip over the it
+			if (skipEmptyProperties && (prop.value == null || ((prop.value instanceof String) && prop.value == '' ))) {
+				continue
+			}
+			if (prop.value != domain[prop.key]) {
+				// println "populateDomain() changing ${prop.key} to ${prop.value}"
+				domain[prop.key] = prop.value
+			}
+		}
+		// println "populateDomain() $domain dirty: ${domain.dirtyPropertyNames}"
+	}
+
+	/**
+	 * Used to exact the properties of the command object as a Map
+	 * @return a map of all of the properties that make up the Command Object
+	 */
+	Map toMap() {
+		commandProperties()
+	}
+
+	/**
+	 * Used to return the property/values of the domain object excluding those that are injected by the @Validateable
+	 * @return a map of all of the property/values
+	 */
+	private Map commandProperties() {
+		this.properties.findAll{ !['metaClass','class', 'constraints', 'errors'].contains(it.key)}
+	}
+}
