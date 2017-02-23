@@ -119,6 +119,12 @@ export default class LicenseManagerService {
         });
     }
 
+    getActivityLog(license, onSuccess) {
+        this.restService.licenseManagerServiceHandler().getActivityLog(license.id, (data) => {
+            return onSuccess(data);
+        });
+    }
+
     /**
      * Create a New License passing params
      * @param newLicense

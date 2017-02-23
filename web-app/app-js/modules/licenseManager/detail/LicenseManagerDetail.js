@@ -45,7 +45,6 @@ export default class LicenseManagerDetail extends FormValidator{
             requestedId: params.license.requestedId,
             replaced: params.license.replaced,
             replacedId: params.license.replacedId,
-            activityList: params.license.activityList,
             hostName: params.license.hostName,
             hash: params.license.id,
             gracePeriodDays: params.license.gracePeriodDays,
@@ -137,14 +136,34 @@ export default class LicenseManagerDetail extends FormValidator{
     }
 
     prepareActivityList() {
+
         this.activityGrid = {};
         this.activityGridOptions = {
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5,
+                pageSize: 20
+            },
             columns: [
-                {field: 'date', title: 'Date'},
-                {field: 'whom', title: 'Whom'},
-                {field: 'action', title: 'Action'}
+                {field: 'dateCreated', title: 'Date', type: 'date', format : '{0:dd/MMM/yyyy h:mm:ss tt}'},
+                {field: 'author.personName', title: 'Whom'},
+                {field: 'changes', title: 'Action', template: '<ul>#for(var i = 0; i < data.changes.length; i++){#<li>#=data.changes[i].field# <br /> #=data.changes[i].oldValue# | #=data.changes[i].newValue# </li>#}#</ul> '},
             ],
-            dataSource: this.licenseModel.activityList,
+            dataSource: {
+                pageSize: 10,
+                transport: {
+                    read: (e) => {
+                        this.licenseManagerService.getActivityLog(this.licenseModel, (data) => {
+                            e.success(data.data);
+                        });
+                    }
+                },
+                sort: {
+                    field: 'dateCreated',
+                    dir: 'asc'
+                }
+            },
             scrollable: true
         };
     }

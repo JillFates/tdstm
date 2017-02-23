@@ -69,8 +69,7 @@ export class HttpInterceptor extends Http {
             });
         }
         return observable.catch((err, source) => {
-            if (err.status == 401 /*&& !_.endsWith(err.url, 'api/auth/login')*/) {
-                //this._router.navigate(['/login']);
+            if (err.status == 401) {
                 return Observable.empty();
             } else {
                 return Observable.throw(err);
