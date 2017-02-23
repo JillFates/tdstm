@@ -1,3 +1,4 @@
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -315,7 +316,7 @@ class WorkflowController implements ControllerMethods {
 					where moveBundleStep in (select id from MoveBundleStep
 					                         where moveBundle.project.workflowCode=:workflowCode
 					                           and transitionId=:transitionId)
-				''', [workflowCode: workflowTransition.workflow.process, transitionId: workflowTransition.id])
+				''', [workflowCode: workflowTransition.workflow.process, transitionId: NumberUtil.toInteger(transitionId)])
 				MoveBundleStep.executeUpdate('''
 					delete MoveBundleStep
 					where moveBundle in (select id from MoveBundle where workflowCode=:workflowCode)
