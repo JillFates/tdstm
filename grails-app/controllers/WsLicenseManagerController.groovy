@@ -19,7 +19,7 @@ class WsLicenseManagerController implements ControllerMethods {
 		def obj
 		try{
 			obj = closure()
-			if(obj) {
+			if(obj != null) {
 				renderSuccessJson(obj)
 			}else{
 				response.status = 404 //Not Found
