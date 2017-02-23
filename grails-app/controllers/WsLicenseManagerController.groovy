@@ -55,6 +55,21 @@ class WsLicenseManagerController implements ControllerMethods {
 		}
 	}
 
+	def activityLog(String id){
+		renderIfNotNull(id) {
+			licenseManagerService.activityLog(id).collect{
+				[
+						author: [
+								username: it.userLogin.username,
+								personName: it.userLogin?.person.toString()
+						],
+						dateCreated: it.dateCreated,
+						changes: it.changesJSON
+				]
+			}
+		}
+	}
+
 	def updateLicense(){
 		def id = params.id
 		LicensedClient lic

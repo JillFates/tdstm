@@ -3,7 +3,7 @@ package net.transitionmanager.domain
 import com.tdsops.common.grails.ApplicationContextHolder
 import grails.converters.JSON
 import net.transitionmanager.service.SecurityService
-import org.slf4j.LoggerFactory
+import org.codehaus.groovy.grails.web.json.JSONElement
 
 /**
  * Created by octavio on 2/20/17.
@@ -28,9 +28,13 @@ class LicenseActivityTrack {
  	*/
 	String changes
 
-	static transients=['securityService']
+	static transients=['securityService', 'changesJSON']
 	static mapping = {
 		version false
+	}
+
+	JSONElement getChangesJSON(){
+		JSON.parse(changes)
 	}
 
 	/**
@@ -62,7 +66,7 @@ class LicenseActivityTrack {
 			def currentValue = licensedClient[prop]
 			def originalValue = licensedClient.getPersistentValue(prop)
 			if (currentValue != originalValue) {
-				changes << [prop:[oldValue:originalValue, newValue:currentValue]]
+				changes << ["$prop":[oldValue:originalValue, newValue:currentValue]]
 			}
 		}
 

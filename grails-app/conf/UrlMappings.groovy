@@ -338,6 +338,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/manager/license/${id}/activitylog" {
+			controller = "wsLicenseManager"
+			action = [
+					GET: "activityLog"
+			]
+		}
+
 		"/ws/manager/status" {
 			controller = "wsLicenseAdmin"
 			action = [

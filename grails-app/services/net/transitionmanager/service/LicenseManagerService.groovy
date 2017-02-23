@@ -6,6 +6,7 @@ import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
+import net.transitionmanager.domain.LicenseActivityTrack
 import net.transitionmanager.domain.LicensedClient
 import org.apache.commons.codec.binary.Base64
 import org.codehaus.groovy.grails.web.json.JSONElement
@@ -166,4 +167,12 @@ class LicenseManagerService extends LicenseCommonService{
 		}
 	}
 
+	List<LicenseActivityTrack> activityLog(String id){
+		LicensedClient licensedClient = fetch(id)
+		List<LicenseActivityTrack> log = []
+		if(licensedClient){
+			log = LicenseActivityTrack.findAllByLicensedClient(licensedClient, [sort: "dateCreated", order:"desc"])
+		}
+		log
+	}
 }
