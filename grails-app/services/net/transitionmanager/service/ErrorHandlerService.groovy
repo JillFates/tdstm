@@ -59,24 +59,6 @@ class ErrorHandlerService {
 	}
 
 	/**
-	 * Used to determine if a request was issued by a Javascript AJAX call
-	 * @param request - the HttpRequest object
-	 * @return true if the request is from an Ajax client
-	 */
-	boolean isAjaxRequest(request) {
-		boolean isAjax = 'XMLHttpRequest'.equals( request.getHeader('X-Requested-With') )
-		if (! isAjax) {
-			// Angular in particular doesn't set the X-Requested-With header so we check for Accept allowing json
-			String accept = request.getHeader('Accept')
-			if (accept) {
-				List l = accept.split(',')
-				isAjax = l.contains('application/json')
-			}
-		}
-		return isAjax
-	}
-
-	/**
 	 * Used to extract the URI of the request
 	 * @param request - the HttpRequest to get the URI from
 	 * @return the URI of the request

@@ -1,6 +1,12 @@
 package com.tdssrc.grails
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.transform.CompileStatic
+import org.apache.commons.lang.StringUtils
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+
+import javax.servlet.http.HttpServletRequest
 
 @CompileStatic
 class WebUtil {
@@ -40,4 +46,21 @@ class WebUtil {
 		   '_'
 		).toLowerCase()
 	 }
+
+	/**
+	 * Used to determine if a request was issued by a Javascript AJAX call
+	 * @param request - the HttpRequest object
+	 * @return true if the request is from an Ajax client
+	 */
+	static boolean isAjax(final HttpServletRequest request) {
+		boolean isAjax = SpringSecurityUtils.isAjax(request)
+		if (!isAjax) {
+			// Angular in particular doesn't set the X-Requested-With header so we check for Accept allowing json
+			String accept = request.getHeader(HttpHeaders.ACCEPT)
+			if (accept) {
+				isAjax = StringUtils.containsIgnoreCase(accept, MediaType.APPLICATION_JSON_VALUE)
+			}
+		}
+		return isAjax
+	}
 }

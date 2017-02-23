@@ -1,15 +1,9 @@
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.WebUtil
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.ErrorHandlerService
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UnauthorizedException
-import com.tdsops.common.lang.ExceptionUtil
-
-import grails.plugin.springsecurity.annotation.Secured
-import java.lang.IllegalArgumentException
-
+import net.transitionmanager.service.*
 
 /**
  * The ErrorHandlerController controller is used by the system to handle response to various non-success responses such
@@ -68,7 +62,7 @@ class ErrorHandlerController implements ControllerMethods {
 		// Appends the Login URI to the continue URL.
 		model.continueUrl = model.continueUrl + loginURI
 		// Determines whether this is an AJAX request.
-		if (errorHandlerService.isAjaxRequest(request)){
+		if (WebUtil.isAjax(request)){
 			response.setHeader('X-Login-URL', model.continueUrl)
 			render ""
 		}else{
@@ -87,7 +81,7 @@ class ErrorHandlerController implements ControllerMethods {
 		response.status = 200
 
 		// arecordon: adds validation for handling AJAX requests and display an error message back to the user.
-		if (errorHandlerService.isAjaxRequest(request)){
+		if (WebUtil.isAjax(request)){
 			String message = response.getHeader("errorMessage")
 			ServiceResults.respondWithError(response,message)
 		}else{
@@ -144,7 +138,7 @@ class ErrorHandlerController implements ControllerMethods {
 		Map model = fetchModel()
 
 		// Handle Ajax error messages
-		if (errorHandlerService.isAjaxRequest(request)) {
+		if (WebUtil.isAjax(request)) {
 			response.status = 200
 			if (model.exception) {
 				handleException(model.exception, log)

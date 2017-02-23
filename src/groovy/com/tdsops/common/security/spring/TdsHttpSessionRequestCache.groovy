@@ -1,6 +1,6 @@
 package com.tdsops.common.security.spring
 
-import grails.plugin.springsecurity.SpringSecurityUtils
+import com.tdssrc.grails.WebUtil
 import net.transitionmanager.service.CoreService
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -50,7 +50,7 @@ class TdsHttpSessionRequestCache extends HttpSessionRequestCache {
                 // for redirection after successful authentication (SEC-29)
 
                 HttpSession session = request.getSession()
-                if (SpringSecurityUtils.isAjax(request)) {
+                if (WebUtil.isAjax(request)) {
                     // Ajax, saves referer header value
                     String referer = request.getHeader(HttpHeaders.REFERER)
                     if (referer && referer.toLowerCase().startsWith(getServerBaseURL())) {
