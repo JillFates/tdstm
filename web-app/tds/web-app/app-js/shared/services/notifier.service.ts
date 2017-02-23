@@ -2,10 +2,10 @@
  * Notifier is special class that allow us to bind the events calls across the TDS App
  */
 
-import {Injectable} from '@angular/core';
-import {Observable,Observer} from 'rxjs/Rx';
+import { Injectable } from '@angular/core';
+import { Observable, Observer } from 'rxjs/Rx';
 
-import {AlertModel} from '../model/alert.model';
+import { AlertModel } from '../model/alert.model';
 
 
 @Injectable()
@@ -27,8 +27,12 @@ export class NotifierService {
     }
 
     on(eventName, callback) {
-        this.observable.filter((event) => {
+        let subscription = this.observable.filter((event) => {
             return event.name === eventName;
-        }).subscribe(callback);
+        }).subscribe(callback)
+        return () => {
+            subscription.remove(subscription);
+            subscription.unsubscribe();
+        };
     }
 }
