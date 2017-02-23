@@ -293,4 +293,23 @@ class StringUtil {
  			}
  		}
 	}
+
+	/**
+	 * Strip a message enclosed by two tags
+	 * ex.
+	 * -- OPEN --
+	 * da Message
+	 * -- CLOSE --
+	 */
+	static openEnvelop(String openTag, String closeTag, String message){
+		def idxB = message.indexOf(openTag)
+		if(idxB >= 0){
+			def idxE = message.indexOf(closeTag)
+			if(idxE < 0){
+				throw new RuntimeException("Malformed Message", "Missing ${closeTag} tag for request")
+			}
+			message = message.substring(idxB + openTag.length(), idxE)
+		}
+		message.trim()
+	}
 }

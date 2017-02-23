@@ -113,8 +113,8 @@ class License {
 			        id: client?.id,
 					name: client?.name
 			],
-			activationDate	: activationDate,
-			expirationDate 	: expirationDate,
+			activationDate	: activationDate?.format("yyyy-MM-dd"),
+			expirationDate 	: expirationDate?.format("yyyy-MM-dd"),
 			requestDate		: requestDate,
 			requestNote		: requestNote,
 			hostName		: hostName,

@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.github.icedrake.jsmaz.Smaz
 import com.tdsops.common.exceptions.InvalidLicenseException
+import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
@@ -44,20 +45,7 @@ class LicenseManagerService extends LicenseCommonService{
 	}
 
 	def loadRequest(String body){
-		String beginTag = License.BEGIN_REQ_TAG
-		String endTag = License.END_REQ_TAG
-
-		def idxB = body.indexOf(beginTag)
-		if(idxB >= 0){
-			def idxE = body.indexOf(endTag)
-			if(idxE < 0){
-				LicensedClient lc = new LicensedClient()
-				lc.errors.rejectValue("Malformed Message", "Missing ${endTag} tag for request")
-				return lc
-			}
-			body = body.substring(idxB + beginTag.length(), idxE)
-			body = body.trim()
-		}
+		body = StringUtil.openEnvelop(License.BEGIN_REQ_TAG, License.END_REQ_TAG, body)
 
 		log.debug("Body: {}", body)
 

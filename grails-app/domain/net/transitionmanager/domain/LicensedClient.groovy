@@ -1,6 +1,5 @@
 package net.transitionmanager.domain
 
-import com.google.gson.JsonElement
 import grails.converters.JSON
 import groovy.json.JsonBuilder
 import net.transitionmanager.domain.License.Environment
@@ -90,8 +89,8 @@ class LicensedClient {
 				project			: dProject,
 				client			: dClient,
 				owner			: dOwner,
-				activationDate	: activationDate,
-				expirationDate 	: expirationDate,
+				activationDate	: activationDate?.format("yyyy-MM-dd"),
+				expirationDate 	: expirationDate?.format("yyyy-MM-dd"),
 				requestDate		: requestDate,
 				requestNote		: requestNote,
 				hostName		: hostName,
@@ -135,7 +134,17 @@ class LicensedClient {
 		Closure dateParser = {String strDate ->
 			if(strDate){
 				try {
-					return org.apache.tools.ant.util.DateUtils.parseIso8601DateTime(strDate)
+					return Date.parse("yyyy-MM-dd", strDate)
+				}catch(ParseException pe){
+					log.error("Error Parsing Date", pe)
+				}
+			}
+			return null
+		}
+		Closure dateTimeParser = {String strDate ->
+			if(strDate){
+				try {
+					return  org.apache.tools.ant.util.DateUtils.parseIso8601DateTime(strDate)
 				}catch(ParseException pe){
 					log.error("Error Parsing Date", pe)
 				}
@@ -177,7 +186,7 @@ class LicensedClient {
 			lc.activationDate = dateParser(json.activationDate)
 		}
 		if(json.requestDate != null) {
-			lc.requestDate = dateParser(json.requestDate)
+			lc.requestDate = dateTimeParser(json.requestDate)
 		}
 
 		if(json.requestDate != null) {

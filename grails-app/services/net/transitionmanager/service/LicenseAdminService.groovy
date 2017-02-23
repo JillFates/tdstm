@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.exceptions.InvalidLicenseException
+import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.License
@@ -337,17 +338,7 @@ class LicenseAdminService extends LicenseCommonService {
 		String hash = license.hash
 
 		//strip the actual license from the envelope
-		String beginTag = LicenseCommonService.BEGIN_LIC_TAG
-		String endTag = LicenseCommonService.END_LIC_TAG
-		def idxB = hash.indexOf(beginTag)
-		if(idxB >= 0){
-			def idxE = hash.indexOf(endTag)
-			if(idxE < 0){
-				throw new RuntimeException("Malformed Message", "Missing ${endTag} tag for request")
-			}
-			hash = hash.substring(idxB + beginTag.length(), idxE)
-		}
-		hash = hash.trim()
+		hash = StringUtil.openEnvelop(LicenseCommonService.BEGIN_LIC_TAG, LicenseCommonService.END_LIC_TAG, hash)
 
 		LicenseManager manager = LicenseManager.getInstance()
 		manager.clearLicenseCache()
@@ -406,11 +397,12 @@ class LicenseAdminService extends LicenseCommonService {
 		license.hash = hash
 		license.max = licObj.numberOfLicenses
 		license.bannerMessage = bannerMessage
+
 		license.activationDate = new Date(licObj.goodAfterDate)
 		license.expirationDate = new Date(licObj.goodBeforeDate)
 
-		//def servers = assetEntityService.countServers()
-		//log.debug("TOTAL SERVERS: " + servers)
+		log.debug("license.activationDate: {}", license.activationDate)
+		log.debug("license.expirationDate: {}", license.expirationDate)
 
 		license.status = DomainLicense.Status.ACTIVE
 		return license.save()
