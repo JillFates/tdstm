@@ -146,9 +146,9 @@ export default class LicenseManagerDetail extends FormValidator{
                 pageSize: 20
             },
             columns: [
-                {field: 'dateCreated', title: 'Date', type: 'date', format : '{0:dd/MMM/yyyy h:mm:ss tt}'},
-                {field: 'author.personName', title: 'Whom'},
-                {field: 'changes', title: 'Action', template: '<ul>#for(var i = 0; i < data.changes.length; i++){#<li>#=data.changes[i].field# <br /> #=data.changes[i].oldValue# | #=data.changes[i].newValue# </li>#}#</ul> '},
+                {field: 'dateCreated', title: 'Date', width:180, type: 'date', format : '{0:dd/MMM/yyyy h:mm:ss tt}'},
+                {field: 'author.personName', title: 'Whom',  width:180},
+                {field: 'changes', title: 'Action', template: '<ul>#for(var i = 0; i < data.changes.length; i++){#<li>#=data.changes[i].field# <br /> <span class="activity-list-old-val" style="color:darkred; font-weight: bold;">#=data.changes[i].oldValue#</span> | <span class="activity-list-new-val" style="color: green; font-weight: bold;">#=data.changes[i].newValue#</span></li>#}#</ul> '},
             ],
             dataSource: {
                 pageSize: 10,
