@@ -64,7 +64,7 @@ class NewsEditorController implements ControllerMethods {
 			)
 		}
 
-		[moveEventId: moveEvent.id, viewFilter: params.viewFilter, bundleId: params.moveBundle,
+		[moveEventId: moveEvent == null ? null : moveEvent.id, viewFilter: params.viewFilter, bundleId: params.moveBundle,
 		 moveBundlesList: moveBundles, moveEventsList: MoveEvent.findAllByProject(project)]
     }
 
