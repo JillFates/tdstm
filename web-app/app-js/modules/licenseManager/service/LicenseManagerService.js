@@ -49,8 +49,8 @@ export default class LicenseManagerService {
             method: {
                 id: parseInt(license.method.id)
             },
-            activationDate: license.initDate,
-            expirationDate: license.endDate,
+            activationDate: moment(license.initDate).format('YYYY-MM-DD'),
+            expirationDate: moment(license.endDate).format('YYYY-MM-DD'),
             status: { id: license.statusId },
             project: {
                 id: (license.project.id !== 'all')? parseInt(license.project.id) : license.project.id,  // We pass 'all' when is multiproject

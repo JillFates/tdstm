@@ -78,6 +78,7 @@
     "it": false,
     "inject": false,
     "expect": false,
-    "spyOn": false
+    "spyOn": false,
+    "moment": false
   }
 }
