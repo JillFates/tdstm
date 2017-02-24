@@ -242,13 +242,20 @@ class ProjectController implements ControllerMethods {
 				return
 			}
 
-			// Logic to delete the projectLogo
+
+
 
 			if (!project.hasErrors() && project.save() ) {
 
 				projectService.updateProjectPartners(project, params.projectPartners)
 
 				// Deal with the image
+
+                // if the logo was deleted and no new logo was uploaded, delete the previous logo
+                if (params.isLogoDeleted.toBoolean() && !logoFile) {
+                    deleteImage()
+                }
+
 				if (logoFile) {
 					ProjectLogo.createOrUpdate(project, logoFile)
 				}
@@ -528,7 +535,7 @@ class ProjectController implements ControllerMethods {
 	 * Used to delete the project logo for the project in the users context
 	 */
 	@HasPermission('ProjectEditView')
-	def deleteImage() {
+	private def deleteImage() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
@@ -539,7 +546,7 @@ class ProjectController implements ControllerMethods {
 		} else {
 			flash.message = "Project logo was not found"
 		}
-		redirect(action: 'edit', id: project.id)
+
 	}
 
 	/*

@@ -137,18 +137,17 @@
 							<td class="name">
 								<label for="client">Project Logo:</label>
 							</td>
-							<g:if test="${projectLogoForProject}">
-								<td class="valueNW">
-									<g:link action="deleteImage" indextab="200" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'icons',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link>
-								</td>
-							</g:if>
-							<g:else>
-								<td class="valueNW">
-									<input type="file" name="projectLogo" indextab="200" id="projectLogo" />
-									<br>
-									<span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span>
-								</td>
-							</g:else>
+                            <g:if test="${projectLogoForProject}">
+                                <td class="valueNW" id="imageLogo">
+                                    <a onClick="deleteImage()"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'icons',file:'delete.png' )}" style="border:0px;padding:6px;"/></a>
+                                </td>
+                            </g:if>
+                            <g:hiddenField name="isLogoDeleted" value="false"/>
+                            <td class="valueNW" id="imageInput"  style="${projectLogoForProject ? 'display:none;' : 'display:block;'}">
+                                <input type="file" name="projectLogo" indextab="200" id="projectLogo" />
+                                <br>
+                                <span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span>
+                            </td>
 						</tr>
 						<tr class="prop">
 							<td class="name">
@@ -313,6 +312,15 @@
 		function validateForm() {
 			return validateDates() && Project.validSelectedPartners();
 		}
+
+        function deleteImage() {
+            var logo = document.getElementById("imageLogo");
+            var input = document.getElementById("imageInput");
+            var isLogoDeleted = document.getElementById("isLogoDeleted");
+            logo.style.display =  "none";
+            input.style.display =  "block";
+            isLogoDeleted.value = "true";
+        }
 	   </script>
 <script>
 	currentMenuId = "#projectMenu";
