@@ -19,13 +19,15 @@ describe('NoticeListComponent:', () => {
     let comp: NoticeListComponent;
 
     let noticeService: NoticeService;
+    let notifierService: NotifierService;
     let spyGet: jasmine.Spy;
 
     let mockData: Array<NoticeModel> = [
         new NoticeModel(new Date(Date.now()), "Mario", "Description", 1),
         new NoticeModel(new Date(Date.now()), "Peach", "Description", 2),
         new NoticeModel(new Date(Date.now()), "Luigi", "Description", 3),
-        new NoticeModel(new Date(Date.now()), "Kappa", "Description", 4)];
+        new NoticeModel(new Date(Date.now()), "Kappa", "Description", 4)
+    ];
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
@@ -40,6 +42,7 @@ describe('NoticeListComponent:', () => {
         fixture = TestBed.createComponent(NoticeListComponent);
         comp = fixture.componentInstance;
         noticeService = fixture.debugElement.injector.get(NoticeService);
+        notifierService = fixture.debugElement.injector.get(NotifierService);
         spyGet = spyOn(noticeService, 'getNoticesList')
             .and.returnValue(Observable.from(mockData).bufferCount(mockData.length));
     });
@@ -56,7 +59,7 @@ describe('NoticeListComponent:', () => {
                 expect(noticeList.length).toBe(4)
             },
             (err) => {
-                    console.log('error')
+                console.log('error')
             },
             () => {//completed callback
                 expect(comp.noticeList.length).toBe(4);
@@ -64,5 +67,4 @@ describe('NoticeListComponent:', () => {
             }
         )
     });
-
 });
