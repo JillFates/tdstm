@@ -2,8 +2,8 @@ package net.transitionmanager.domain
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import grails.converters.JSON
+import groovy.json.JsonSlurper
 import net.transitionmanager.service.SecurityService
-import org.codehaus.groovy.grails.web.json.JSONElement
 
 /**
  * Created by octavio on 2/20/17.
@@ -33,8 +33,21 @@ class LicenseActivityTrack {
 		version false
 	}
 
-	JSONElement getChangesJSON(){
-		JSON.parse(changes)
+	/*
+	 * Used to access the changes as a List of Map objects instead of JSON text
+	 * @return The changes JSON String as Groovy List<Map>
+	 */
+	List<Map> getChangesList(){
+		JsonSlurper slurper = new JsonSlurper()
+		List<Map> list = []
+		if (changes) {
+			try {
+				list = slurper.parseText(changes)
+			} catch (e) {
+				log.error "'changes' was not propertly formed JSON (value=$changes) : ${e.getMessage()}"
+			}
+		}
+		list
 	}
 
 	/**
@@ -56,15 +69,28 @@ class LicenseActivityTrack {
 	 * @return
 	 */
 	static LicenseActivityTrack trackChanges(LicensedClient licensedClient){
+		//Convert non standar Json Values (String, Number, Boolean) to the toString representation
+		Closure toBasicType = { input ->
+			switch(input){
+				case String:
+				case Number:
+				case Boolean: break
+				default:
+					input = String.valueOf(input)
+			}
+			input
+		}
+
 		/*
-		  WARNING: Beware of the IDEs!! somehow IntelliJ doesnt get the 'dirtyPropertyNames'
-		  but this is the correct way of doing it
+		  WARNING: Beware of the IDEs!! somehow IntelliJ doesn't get the 'dirtyPropertyNames'
+		  but this is the correct way of doing it!!
 		 */
-		def dirtyProperties = licensedClient.dirtyPropertyNames
+		Collection<String> dirtyProperties = licensedClient.dirtyPropertyNames
 		List<Map> changes = []
 		dirtyProperties.each { field ->
-			def currentValue = licensedClient[field]
-			def originalValue = licensedClient.getPersistentValue(field)
+			Object currentValue = toBasicType(licensedClient[field])
+			Object originalValue = toBasicType(licensedClient.getPersistentValue(field))
+
 			if (currentValue != originalValue) {
 				changes << [field:field, oldValue:originalValue, newValue:currentValue]
 			}

@@ -64,7 +64,7 @@ class WsLicenseManagerController implements ControllerMethods {
 								personName: it.userLogin?.person.toString()
 						],
 						dateCreated: it.dateCreated,
-						changes: it.changesJSON
+						changes: it.changesList
 				]
 			}
 		}
