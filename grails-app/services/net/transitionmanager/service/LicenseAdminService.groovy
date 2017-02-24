@@ -1,9 +1,11 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.exceptions.InvalidLicenseException
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
+
 import net.nicholaswilliams.java.licensing.License
 import net.nicholaswilliams.java.licensing.LicenseManager
 import net.nicholaswilliams.java.licensing.LicenseManagerProperties
@@ -315,7 +317,7 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	boolean isLicenseCompliant(Project project){
-		Map licState = getLicenseStateMap(project)
+ 		Map licState = getLicenseStateMap(project)
 		return licState.state != State.NONCOMPLIANT
 	}
 
@@ -416,8 +418,6 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 
-
-//
     /**
      * Creates a new License Request. If the uuid parameter is null or there is no license with that uid,
      * a new License will be created.
@@ -431,12 +431,16 @@ class LicenseAdminService extends LicenseCommonService {
      * @param requestNote - The note attached to the License Request
      *
      */
-    def License generateRequest(String uuid, PartyGroup owner, String email, Long environmentId, def projectId, String requestNote ){
+    def DomainLicense generateRequest(String uuid, PartyGroup owner, String email, Long environmentId, def projectId, String requestNote ){
 		DomainLicense lic
+
+		if (uuid != null && !uuid.isNumber()) {
+        	throw new IllegalArgumentException('Not a licence Id number')
+        }
 
 		if(uuid){
 			lic = DomainLicense.get(uuid)
-		}else{
+		} else {
 
 			lic = new DomainLicense()
 			lic.owner = owner
@@ -459,27 +463,26 @@ class LicenseAdminService extends LicenseCommonService {
 			if(project !=  null) {
 				def client = project.client
 				lic.installationNum = "${lic.installationNum}|${project.name}|${client.name}"
-			}else{
+			} else {
 				lic.errors.rejectValue("project", "Project (id:${lic.project}) not found")
 			}
-		}else{
+		} else {
 			lic.type = DomainLicense.Type.MULTI_PROJECT
 		}
 
-		if (lic.save(flush:true)) {
-			return lic
-		}else{
-			lic.errors.each {    // TODO GormUtil.allErrorsString
-				log.error("lic error: {}",  it)
-			}
-			throw new DomainUpdateException("Error while creating License Request")
-		}
-
+        if (lic.save(flush:true)) {
+        	return lic
+        } else {
+        	if (lic.hasErrors()) {
+            	String errors = GormUtil.allErrorsString(lic)
+                log.error("lic error: {}",  errors)
+            }
+            throw new DomainUpdateException("Error while creating License Request")
+        }
     }
 
 
 
-    // TODO validate that the user has access to the license - check with Octavio
     /**
      * Deletes a License Request.
      *
@@ -502,11 +505,10 @@ class LicenseAdminService extends LicenseCommonService {
         if(lic) {
             lic.delete()
             return true
-        }else{
+        } else {
             return false
         }
     }
-
 
 
 }
