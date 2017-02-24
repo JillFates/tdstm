@@ -1,12 +1,12 @@
 /*
  * TDS Common Javascript Library
  */
- 
+
 var tdsCommon = {
-	
+
 	config: {
 		// The base path of the application URI
-		appBaseUri:  '/tdstm',
+		appBaseUri: '/tdstm',
 		dateFormatNoYear: null,
 		dateFormat: null,
 		dateTimeFormat: null,
@@ -18,7 +18,7 @@ var tdsCommon = {
 	// creates relative or fully qualified url to for the application
 	// @param uri - the URI to append to the application base URI or FQU
 	// @param fqu - optional flag if true will create fully qualified URL or default to the relative 
-	createAppURL: function(uri, fqu) {
+	createAppURL: function (uri, fqu) {
 		fqu = fqu || false;
 		var url = '';
 		if (fqu) {
@@ -32,7 +32,7 @@ var tdsCommon = {
 	// @param Integer the length of string to generate (default 5)
 	// @param String the characterset to build the random string from (default A-Za-z0-9)
 	// @return String the random string
-	randomString: function(strLength, charSet) {
+	randomString: function (strLength, charSet) {
 		var result = [];
 
 		strLength = strLength || 5;
@@ -46,7 +46,7 @@ var tdsCommon = {
 	},
 
 	// Common method to capitalize the first letter of a string
-	capitalize: function(str) {
+	capitalize: function (str) {
 		return str.charAt(0).toUpperCase() + str.substring(1);
 	},
 
@@ -58,17 +58,17 @@ var tdsCommon = {
 	 *
 	 * To disable this behavior add the class 'static-dialog' to the DIV (class="static-dialog" or modal.addClass('static-dialog'))
 	 */
-	autoClearDialogOnClose: function() {
-		$.widget( "ui.dialog", $.ui.dialog, {
-			close: function(event) {
+	autoClearDialogOnClose: function () {
+		$.widget("ui.dialog", $.ui.dialog, {
+			close: function (event) {
 				var result = this._super();
 				if (this.element.length > 0) {
 					var dialog = $("#" + this.element[0].id)
 					if (dialog.length > 0) {
 						// Need to close any Select2 controls that might still be open
-						dialog.find('.select2-container').select2('close'); 
+						dialog.find('.select2-container').select2('close');
 
-						if (! dialog.hasClass('static-dialog')) {
+						if (!dialog.hasClass('static-dialog')) {
 							dialog.html('');
 						}
 					}
@@ -81,7 +81,7 @@ var tdsCommon = {
 	/**
 	 * A common error response handler for the Select2 controller when using Ajax and an error occurs
 	 */
-	select2AjaxErrorHandler: function(jqXHR, textStatus, errorThrown) {
+	select2AjaxErrorHandler: function (jqXHR, textStatus, errorThrown) {
 		var url = jqXHR.getResponseHeader('X-Login-URL');
 		if (url) {
 			window.location.href = url;
@@ -94,7 +94,7 @@ var tdsCommon = {
 	/**
 	 * Check if the response is valid and return the response otherwise show the error appropriately
 	 */
-	isValidWsResponse: function(response, errorMsg, alerts) {
+	isValidWsResponse: function (response, errorMsg, alerts) {
 		var isValid = false;
 		var data = false;
 
@@ -123,13 +123,13 @@ var tdsCommon = {
 			}
 		}
 
-		return ( isValid ? data : false );
+		return (isValid ? data : false);
 	},
 
 	/**
 	 * A common error response handler that display different errors base on http status
 	 */
-	displayWsError: function(response, errorMsg, alerts) {
+	displayWsError: function (response, errorMsg, alerts) {
 		switch (response.status) {
 			case 401:
 			case 403:
@@ -147,9 +147,9 @@ var tdsCommon = {
 	/**
 	 * Display a message error using the alerts server or the defauls javascript alert
 	 */
-	displayError: function(msg, alerts) {
+	displayError: function (msg, alerts) {
 		if (alerts) {
-			alerts.addAlert({type: 'danger', msg: msg});
+			alerts.addAlert({ type: 'danger', msg: msg });
 		} else {
 			alert(msg);
 		}
@@ -161,7 +161,7 @@ var tdsCommon = {
 	 * @param scale (char val)
 	 * return string representation of the duration in terms of days, hours, minutes
 	 */
-	formatDuration: function(duration, scale) {
+	formatDuration: function (duration, scale) {
 		var startDate = moment().startOf('day');
 		var endDate = moment().startOf('day');
 		endDate.add(duration, scale);
@@ -170,18 +170,18 @@ var tdsCommon = {
 			durationResult = "";
 
 		var days = parseInt(durationDate.asDays());
-		if(days > 0) {
-			durationResult += days + " day"+((days > 1)? "s ":" ");
+		if (days > 0) {
+			durationResult += days + " day" + ((days > 1) ? "s " : " ");
 		}
 
 		var hours = parseInt(durationDate.hours());
-		if(hours > 0) {
-			durationResult += hours + " hr"+((hours > 1)? "s ":" ");
+		if (hours > 0) {
+			durationResult += hours + " hr" + ((hours > 1) ? "s " : " ");
 		}
 
 		var minutes = parseInt(durationDate.minutes());
-		if(minutes > 0) {
-			durationResult += minutes + " min"+((minutes > 1)? "s ":" ");
+		if (minutes > 0) {
+			durationResult += minutes + " min" + ((minutes > 1) ? "s " : " ");
 		}
 
 
@@ -193,15 +193,15 @@ var tdsCommon = {
 	 * @param email
 	 * @return boolean true if valid else false
 	 */
-	isValidEmail: function(email) {
-		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/ ;
+	isValidEmail: function (email) {
+		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/;
 		return emailExp.test(email);
 	},
 
 	/**
 	 * Check if user date format type is MM/DD/YY
 	 */
-	isFormatMMDDYYYY: function() {
+	isFormatMMDDYYYY: function () {
 		var df = $("#userDTFormat").val();
 		return ((df != null) && (df == "MM/DD/YYYY"))
 	},
@@ -209,7 +209,7 @@ var tdsCommon = {
 	/**
 	 * Returns a date format that don't have a year
 	 */
-	noYearDateFormat: function() {
+	noYearDateFormat: function () {
 		if (this.config.dateFormatNoYear == null) {
 			this.config.dateFormatNoYear = "MM/DD h:mm A";
 			if (!this.isFormatMMDDYYYY()) {
@@ -222,7 +222,7 @@ var tdsCommon = {
 	/**
 	 * Returns default date short format
 	 */
-	defaultShortDateFormat: function() {
+	defaultShortDateFormat: function () {
 		if (this.config.dateShortFormat == null) {
 			this.config.dateShortFormat = "MM/DD/YY";
 			if (!this.isFormatMMDDYYYY()) {
@@ -235,7 +235,7 @@ var tdsCommon = {
 	/**
 	 * Returns default date format
 	 */
-	defaultDateFormat: function() {
+	defaultDateFormat: function () {
 		if (this.config.dateFormat == null) {
 			this.config.dateFormat = "MM/DD/YYYY";
 			if (!this.isFormatMMDDYYYY()) {
@@ -248,7 +248,7 @@ var tdsCommon = {
 	/**
 	 * Returns default date time format
 	 */
-	defaultDateTimeFormat: function() {
+	defaultDateTimeFormat: function () {
 		if (this.config.dateTimeFormat == null) {
 			this.config.dateTimeFormat = "MM/DD/YYYY h:mm A";
 			if (!this.isFormatMMDDYYYY()) {
@@ -261,7 +261,7 @@ var tdsCommon = {
 	/**
 	 * Returns jQuery date format
 	 */
-	jQueryDateFormat: function() {
+	jQueryDateFormat: function () {
 		if (this.config.jQueryDateFormat == null) {
 			this.config.jQueryDateFormat = "mm/dd/yy";
 			if (!this.isFormatMMDDYYYY()) {
@@ -274,7 +274,7 @@ var tdsCommon = {
 	/**
 	 * Returns jQuery date time format
 	 */
-	jQueryDateTimeFormat: function() {
+	jQueryDateTimeFormat: function () {
 		if (this.config.jQueryDateTimeFormat == null) {
 			this.config.jQueryDateTimeFormat = "mm/dd/yy h:i";
 			if (!this.isFormatMMDDYYYY()) {
@@ -284,30 +284,30 @@ var tdsCommon = {
 		return this.config.jQueryDateTimeFormat;
 	},
 
-	parseDateTimeFromZulu: function(stringValue, format) {
+	parseDateTimeFromZulu: function (stringValue, format) {
 		return moment(stringValue);
 	},
-	
-	parseDateTimeString: function(stringValue, format) {
-		if (typeof(format)==='undefined') {
+
+	parseDateTimeString: function (stringValue, format) {
+		if (typeof (format) === 'undefined') {
 			format = this.defaultDateTimeFormat();
 		}
 		return moment(stringValue, format);
 	},
 
-	isValidDate: function(stringValue) {
+	isValidDate: function (stringValue) {
 		var d = moment(stringValue, this.defaultDateFormat());
 		return d.isValid()
 	},
 
-	isValidDateTime: function(stringValue) {
+	isValidDateTime: function (stringValue) {
 		var d = moment(stringValue, this.defaultDateTimeFormat());
 		return d.isValid()
 	},
 
-	formatDateTime: function(momentObj, format) {
+	formatDateTime: function (momentObj, format) {
 		var result = "";
-		if (typeof(format)==='undefined') {
+		if (typeof (format) === 'undefined') {
 			format = this.defaultDateTimeFormat();
 		}
 		if (momentObj) {
@@ -316,7 +316,7 @@ var tdsCommon = {
 		return result;
 	},
 
-	jqgridDateCellFormatter: function(cellvalue, options, rowObject) {
+	jqgridDateCellFormatter: function (cellvalue, options, rowObject) {
 		if (cellvalue) {
 			var result = "";
 			var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
@@ -330,7 +330,7 @@ var tdsCommon = {
 		}
 	},
 
-	jqgridPrefCellFormatter: function(cellvalue, options, rowObject) {
+	jqgridPrefCellFormatter: function (cellvalue, options, rowObject) {
 		var result = cellvalue;
 		switch (options.colModel.name) {
 			case "lastUpdated":
@@ -364,15 +364,15 @@ var tdsCommon = {
 	},
 
 	// Used to escape the text cells to prevent XSS 
-	jqgridTextCellFormatter: function(cellvalue, options, rowObject) {
+	jqgridTextCellFormatter: function (cellvalue, options, rowObject) {
 		return _.escape(cellvalue);
 	},
 
-	parseAndFormatDateTimeFromZulu: function(stringValue, format) {
+	parseAndFormatDateTimeFromZulu: function (stringValue, format) {
 		var result;
 		var momentObj = tdsCommon.parseDateTimeFromZulu(stringValue);
 		if (momentObj.isValid()) {
-			if (typeof(format)==='undefined') {
+			if (typeof (format) === 'undefined') {
 				format = this.defaultDateTimeFormat();
 			}
 			momentObj.tz(tdsCommon.timeZone());
@@ -383,7 +383,7 @@ var tdsCommon = {
 		return result;
 	},
 
-	timeZone: function() {
+	timeZone: function () {
 		var tz = $("#tzId").val();
 		return tz;
 	}
@@ -397,31 +397,31 @@ tdsCommon.autoClearDialogOnClose();
  * TDS User Preference utils
  */
 
-var UserPreference = function() {
-	
+var UserPreference = function () {
+
 	// opens the edit user date and timezone dialog
 	var editDateAndTimezone = function () {
-        jQuery.ajax({
-        	url:'/tdstm/person/editTimezone',
-            success:function(e){
+		jQuery.ajax({
+			url: '/tdstm/person/editTimezone',
+			success: function (e) {
 				var prefDialog = $("#userTimezoneDivId")
 				prefDialog.html(e);
 				prefDialog.dialog('option', 'width', 'auto')
 				prefDialog.dialog('option', 'modal', true)
 				prefDialog.dialog("open")
 			},
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert("An unexpected error occurred while attempting to update task/comment")
-            }
+			error: function (jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while attempting to update task/comment")
+			}
 		})
 		return false;
 	}
-	
+
 	// opens the edit user preferences dialog
 	var editPreference = function () {
-        jQuery.ajax({
-            url:'/tdstm/person/editPreference',
-			success:function(e){
+		jQuery.ajax({
+			url: '/tdstm/person/editPreference',
+			success: function (e) {
 				var prefDialog = $("#userPrefDivId")
 				var pageHeight = Math.max($(window).outerHeight(), 200)
 				prefDialog.html(e)
@@ -431,44 +431,43 @@ var UserPreference = function() {
 				prefDialog.dialog('option', 'modal', true)
 				prefDialog.dialog("open")
 			},
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert("An unexpected error occurred while attempting to update task/comment")
-            }
+			error: function (jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while attempting to update task/comment")
+			}
 		})
 		return false;
 	}
-	
+
 	// saves the new preference values
- 	var savePreferences = function(formId) {
+	var savePreferences = function (formId) {
 		var data = $('#' + formId).serialize();
-		$.post(tdsCommon.createAppURL('/person/savePreferences'), data, function() {
+		$.post(tdsCommon.createAppURL('/person/savePreferences'), data, function () {
 			window.location.reload();
 		})
-		.fail(function() {
-			alert("Can't update user's preferences");
-		});
- 	}
+			.fail(function () {
+				alert("Can't update user's preferences");
+			});
+	}
 
 	// resets the user's preferences to their default values
 	var resetPreference = function (user, dateTimezoneOnly) {
-		var params = {'user':user}
+		var params = { 'user': user }
 		if (dateTimezoneOnly)
 			params.dateTimezoneOnly = true
-		new Ajax.Request('/tdstm/person/resetPreferences',{
-			asynchronous:true,
-			evalScripts:true,
-			onSuccess:function(e){
+		jQuery.ajax({
+			url: '/tdstm/person/resetPreferences',
+			data:params,
+			success: function (e) {
 				changeResetMessage(e)
-			},
-			parameters:params
-		})
+			}
+		});
 	}
 
 	// resets the user's preferences to their default values
 	var resetTimezonePrefs = function (user) {
 		resetPreference(user, true)
 	}
-	
+
 	// closes the preference dialog then refreshes the page
 	var changeResetMessage = function (e) {
 		var prefDialog = $("#userPrefDivId")
@@ -477,18 +476,18 @@ var UserPreference = function() {
 		//window.location.reload()
 		window.location.href = tdsCommon.createAppURL('/project/list');
 	}
-	
+
 	// removes the specified preference for the current user
 	var removeUserPrefs = function (prefCode) {
-		new Ajax.Request('/tdstm/person/removeUserPreference?prefCode='+prefCode,{
-			asynchronous:true,
-			evalScripts:true,
-			onSuccess:function(e){
-				$("#pref_"+prefCode).remove()
+		new Ajax.Request('/tdstm/person/removeUserPreference?prefCode=' + prefCode, {
+			asynchronous: true,
+			evalScripts: true,
+			onSuccess: function (e) {
+				$("#pref_" + prefCode).remove()
 			}
 		})
 	}
-	
+
 	return {
 		editDateAndTimezone: editDateAndTimezone,
 		editPreference: editPreference,
@@ -500,19 +499,18 @@ var UserPreference = function() {
 	}
 }();
 
-$.fn.serializeObject = function()
-{
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function() {
-        if (o[this.name] !== undefined) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
-            }
-            o[this.name].push(this.value || '');
-        } else {
-            o[this.name] = this.value || '';
-        }
-    });
-    return o;
+$.fn.serializeObject = function () {
+	var o = {};
+	var a = this.serializeArray();
+	$.each(a, function () {
+		if (o[this.name] !== undefined) {
+			if (!o[this.name].push) {
+				o[this.name] = [o[this.name]];
+			}
+			o[this.name].push(this.value || '');
+		} else {
+			o[this.name] = this.value || '';
+		}
+	});
+	return o;
 };
