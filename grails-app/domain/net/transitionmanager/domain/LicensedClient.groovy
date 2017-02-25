@@ -39,11 +39,14 @@ class LicensedClient {
 	String bannerMessage
 	int	   gracePeriodDays = 5
 
+	/** Date when the change was performed */
+	Date dateCreated
+	Date lastUpdated
+
 	static mapping = {
 		id 			generator: 'assigned'
 		requestNote type:'text'
 		hash 		type:'text'
-		version 	false
 		tablePerHierarchy false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
@@ -192,20 +195,20 @@ class LicensedClient {
 		if(json.requestDate != null) {
 			lc.environment = License.Environment.forId(json.environment?.id)
 		}
-		if(json.method?.id != null) {
-			lc.method = License.Method.forId(json.method?.id)
+		if(json.method?.name != null) {
+			lc.method = json.method?.name as License.Method
 		}
 		if(json.method?.max != null) {
 			lc.max = (json.method?.max) ?: 0
 		}
-		if(json.type?.id != null) {
-			lc.type = License.Type.forId(json.type?.id)
+		if(json.type != null) {
+			lc.type = json.type as License.Type
 		}
-		if(json.status?.id != null) {
-			lc.status = License.Status.forId(json.status?.id)
+		if(json.status != null) {
+			lc.status = json.status as License.Status
 		}
-		if(json.environment?.id != null) {
-			lc.environment = License.Environment.forId(json.environment?.id)
+		if(json.environment != null) {
+			lc.environment = json.environment as License.Environment
 		}
 		if(json.project != null) {
 			lc.project = json.project?.toString()

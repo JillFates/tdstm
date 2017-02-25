@@ -32,11 +32,14 @@ class License {
 	String websitename
 	String bannerMessage
 
+	/** Date when the change was performed */
+	Date dateCreated
+	Date lastUpdated
+
 	static mapping = {
 		id 			generator: 'assigned'
 		requestNote type:'text'
 		hash 		type:'text'
-		version 	false
 		tablePerHierarchy false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
@@ -86,27 +89,17 @@ class License {
 		Map data = [
 			id				: id,
 			email			: email,
-			environment		: [
-				id: environment?.id,
-				name: environment?.name()
-			],
+			environment		: environment?.name(),
 			owner: [
 				id: owner?.id,
 				name: owner?.name
 			],
-			type			: [
-				id: type?.id,
-				name: type?.name()
-				],
+			type			: type?.name(),
 			method			: [
-				id: method?.id,
 				name: method?.name(),
 				max : max
 			],
-			status			: [
-				id: status?.id,
-				name: status?.name()
-			],
+			status			: status?.name(),
 			installationNum	: installationNum,
 			project			: dProject,
 			client			: [
@@ -136,71 +129,35 @@ class License {
 
 	/** Enumerator Helpers *******************************************/
 	enum Environment {
-		Engineering(1),
-		Training(2),
-		Demo(3),
-		Production(4)
-
-		int id
-		Environment(int id) {
-			this.id = id
-		}
-
-		static Environment forId(int id) {
-			values().find { it.id == id }
-		}
+		ENGINEERING,
+		TRAINING,
+		DEMO,
+		PRODUCTION
 	}
 
 	enum Type {
-		SINGLE_PROJECT (1),
-		MULTI_PROJECT (2)
-
-		int id
-		Type(int id) {
-			this.id = id
-		}
-
-		static Type forId(int id) {
-			values().find { it.id == id }
-		}
+		SINGLE_PROJECT,
+		MULTI_PROJECT
 	}
 
 	enum Method {
 		// Accounting based on highwater limit of the number of servers
-		MAX_SERVERS (1),
+		MAX_SERVERS,
 
 		// Accounting based on average number of servers under management during the month where tokens
 				// are deducted until the tokensUsed >= tokensAllocated
-		TOKEN (2),
+		TOKEN,
 
 		// Used for custom licenses where there is no limits of usage
-		CUSTOM (3)
-
-		int id
-		Method(int id) {
-			this.id = id
-		}
-
-		static Method forId(int id) {
-			values().find { it.id == id }
-		}
+		CUSTOM
 	}
 
 	enum Status {
-		ACTIVE(1),
-		EXPIRED(2),
-		TERMINATED(3),
-		PENDING(4),
-		CORRUPT(5)
-
-		int id
-		Status(int id) {
-			this.id = id
-		}
-
-		static Status forId(int id) {
-			values().find { it.id == id }
-		}
+		ACTIVE,
+		EXPIRED,
+		TERMINATED,
+		PENDING,
+		CORRUPT
 	}
 
 }

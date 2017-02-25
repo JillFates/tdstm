@@ -5,28 +5,31 @@ import net.transitionmanager.domain.License
  * TM-3776
  */
 databaseChangeLog = {
-	changeSet(author: "oluna", id: "20161129 TM-3776A") {
+	changeSet(author: "oluna", id: "20161129 TM-3776A.v2") {
 		comment('Fix "license" columns for client')
 
 		preConditions(onFail:'MARK_RAN') {
 			not {
-				columnExists(schemaName: 'tdstm', tableName: 'license', columnName: 'status')
+				columnExists(tableName: 'license', columnName: 'status')
 			}
 		}
 
+		def pendingStatus = License.Status.PENDING
+		def PENDING_ID = pendingStatus.hasProperty("id")? pendingStatus["id"] : 4
+
 		sql("""
 			ALTER TABLE `license`
-			ADD COLUMN `status` INT NOT NULL DEFAULT ${License.Status.PENDING.id};
+			ADD COLUMN `status` INT NOT NULL DEFAULT ${PENDING_ID}
 		""")
 
 	}
 
-	changeSet(author: "oluna", id: "20161129 TM-3776B") {
+	changeSet(author: "oluna", id: "20161129 TM-3776B.v2") {
 		comment('Fix "license" columns for client')
 
 		preConditions(onFail:'MARK_RAN') {
 			not {
-				columnExists(schemaName: 'tdstm', tableName: 'license', columnName: 'type')
+				columnExists(tableName: 'license', columnName: 'type')
 			}
 		}
 

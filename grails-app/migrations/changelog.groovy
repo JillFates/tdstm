@@ -154,4 +154,8 @@ databaseChangeLog = {
 	include file: "20170125-drop_not_null_fileFormat_constraint_on_files_table.groovy"
 	include file: "20170209-delete-model-manufacturer-aliases-matching-their-parents-name.groovy"
 	include file: "20170220-create-license-activity-track-table.groovy"
+	include file: "20170224-add-autotimestamp-license-and-licensedclient.groovy"
+	include file: "20170224-change-license-enum-columns.groovy"
+	include file: "20170224-change-licensedclient-enum-columns.groovy"
+	include file: "20170224-delete-current-license-activities.groovy"
 }

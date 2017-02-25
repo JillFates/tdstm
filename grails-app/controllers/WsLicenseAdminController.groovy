@@ -52,10 +52,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	//TODO: OLB Refactor into the ControllerMethods
 	private renderEnum(daEnum){
 		List list = daEnum.values().collect {
-			[
-					id:it.id,
-					name:it.name()
-			]
+			it.name()
 		}
 
 		renderSuccessJson(list)
