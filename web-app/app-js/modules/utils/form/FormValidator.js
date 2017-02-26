@@ -140,7 +140,7 @@ export default class FormValidator {
     resetDropDown(selectorInstance, selectedId, force) {
         if(selectorInstance && selectorInstance.dataItems) {
             selectorInstance.dataItems().forEach((value, index) => {
-                if(selectedId === value.id) {
+                if(selectedId === value.id || selectedId === value) {
                     selectorInstance.select(index);
                 }
             });

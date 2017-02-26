@@ -34,17 +34,16 @@ export default class LicenseManagerList {
                 {field: 'action', filterable: false, title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
                 {field: 'owner.name', title: 'Owner'},
                 {field: 'client.name', title: 'Client'},
-                {field: 'project.name', title: 'Project'},
+                {field: 'project.name', title: 'Project', template: '<span style="text-transform: capitalize;">#=((data.project && data.project.name)? data.project.name.toLowerCase(): "" )#</span>'},
                 {field: 'email', title: 'Contact Email'},
-                {field: 'status.name', title: 'Status'},
+                {field: 'status', title: 'Status', template: '<span style="text-transform: capitalize;">#=((data.status)? data.status.toLowerCase(): "" )#</span>'},
                 {field: 'type.name', title: 'Type',  template: '#if(data.type && data.type.name === "MULTI_PROJECT"){# Global # } else {# Single #}#'},
-                {field: 'method.name', title: 'Method'},
-                {field: 'method.id', hidden: true},
+                {field: 'method.name', title: 'Method', template: '<span style="text-transform: capitalize;">#=((data.method && data.method.name)? data.method.name.toLowerCase(): "" )#</span>'},
                 {field: 'method.max', title: 'Server/Tokens'},
                 {field: 'activationDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}' },
                 {field: 'expirationDate', title: 'Expiration', type: 'date', format : '{0:dd/MMM/yyyy}' },
-                {field: 'environment.name', title: 'Environment'},
-                {field:'gracePeriodDays',hidden: true}
+                {field: 'environment', title: 'Environment', template: '<span style="text-transform: capitalize;">#=((data.environment)? data.environment.toLowerCase(): "" )#</span>'},
+                {field:'gracePeriodDays', hidden: true}
             ],
             dataSource: {
                 pageSize: 10,

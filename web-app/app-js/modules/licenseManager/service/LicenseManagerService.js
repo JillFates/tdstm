@@ -45,13 +45,13 @@ export default class LicenseManagerService {
     saveLicense(license, onSuccess) {
 
         var licenseModified = {
-            environment: { id: parseInt(license.environment.id) },
+            environment: license.environment,
             method: {
-                id: parseInt(license.method.id)
+                name: license.method.name
             },
             activationDate: moment(license.initDate).format('YYYY-MM-DD'),
             expirationDate: moment(license.endDate).format('YYYY-MM-DD'),
-            status: { id: license.statusId },
+            status: license.status,
             project: {
                 id: (license.project.id !== 'all')? parseInt(license.project.id) : license.project.id,  // We pass 'all' when is multiproject
                 name: license.project.name
@@ -61,7 +61,7 @@ export default class LicenseManagerService {
             websitename: license.websiteName,
             hostName: license.hostName
         };
-        if(license.method !== 3) {
+        if(license.method.name !== 'CUSTOM') {
             licenseModified.method.max = parseInt(license.method.max);
         }
 

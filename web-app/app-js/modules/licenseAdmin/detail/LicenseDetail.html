@@ -44,14 +44,14 @@
                             <label for="radioGroupMethod" class="col-sm-1 control-label">Method:</label>
                             <div class="col-sm-11" id="radioGroupMethod">
                                 <label class="radio-inline" ng-repeat="methodOption in licenseDetail.methodOptions">
-                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="servers" ng-model="licenseDetail.licenseModel.methodId" ng-value="methodOption.id" disabled> {{methodOption.name}}
+                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="servers" ng-model="licenseDetail.licenseModel.method.name" ng-value="methodOption.name" disabled> {{methodOption.text}}
                                 </label>
                             </div>
                         </div>
-                        <div class="form-group sub-option-50" ng-if="licenseDetail.licenseModel.methodId === 1">
+                        <div class="form-group sub-option-50" ng-if="licenseDetail.licenseModel.method.name === 'MAX_SERVERS'">
                             <label class="col-sm-2 control-label">Max Server:</label>
                             <div class="col-sm-10" >
-                                <label class="control-label ">{{licenseDetail.licenseModel.serversTokens}}</label>
+                                <label class="control-label ">{{licenseDetail.licenseModel.method.max}}</label>
                             </div>
                         </div>
                         <div class="form-group">

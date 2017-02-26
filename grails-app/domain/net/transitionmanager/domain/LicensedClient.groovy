@@ -71,23 +71,13 @@ class LicensedClient {
 		Map data = [
 				id				: id,
 				email			: email,
-				environment		: [
-						id: environment?.id,
-						name: environment?.name()
-				],
-				type			: [
-						id: type?.id,
-						name: type?.name()
-				],
+				environment		: environment?.name(),
+				type			: type?.name(),
 				method			: [
-						id: method?.id,
 						name: method?.name(),
 						max: max
 				],
-				status			: [
-						id: status?.id,
-						name: status?.name()
-				],
+				status			: status?.name(),
 				installationNum	: installationNum,
 				project			: dProject,
 				client			: dClient,
@@ -192,8 +182,8 @@ class LicensedClient {
 			lc.requestDate = dateTimeParser(json.requestDate)
 		}
 
-		if(json.requestDate != null) {
-			lc.environment = License.Environment.forId(json.environment?.id)
+		if(json.environment != null) {
+			lc.environment = json.environment as License.Environment
 		}
 		if(json.method?.name != null) {
 			lc.method = json.method?.name as License.Method

@@ -28,13 +28,12 @@ export default class LicenseManagerDetail extends FormValidator{
             },
             clientId: params.license.client.id,
             clientName: params.license.client.name,
-            statusId: params.license.status.id,
+            status: params.license.status,
             method: {
-                id: params.license.method.id,
                 name: params.license.method.name,
                 max: params.license.method.max,
             },
-            environment: { id: params.license.environment.id },
+            environment: params.license.environment,
             requestDate: params.license.requestDate,
             initDate: (params.license.activationDate !== null)? angular.copy(params.license.activationDate) : '',
             endDate: (params.license.expirationDate !== null)? angular.copy(params.license.expirationDate) : '',
@@ -62,7 +61,6 @@ export default class LicenseManagerDetail extends FormValidator{
 
         // Defined the Status Select List
         this.selectStatus = [];
-        this.getStatusDataSource();
 
         // Init the two Kendo Dates for Init and EndDate
         this.initDate = {};
@@ -100,32 +98,32 @@ export default class LicenseManagerDetail extends FormValidator{
      * Controls what buttons to show
      */
     prepareControlActionButtons() {
-        this.pendingLicense = this.licenseModel.statusId === 4 && !this.editMode;
-        this.expiredOrTerminated = (this.licenseModel.statusId === 2 || this.licenseModel.statusId === 3);
-        this.activeShowMode = this.licenseModel.statusId === 1 && !this.expiredOrTerminated && !this.editMode;
+        this.pendingLicense = this.licenseModel.status === 'PENDING' && !this.editMode;
+        this.expiredOrTerminated = (this.licenseModel.status === 'EXPIRED' || this.licenseModel.status === 'TERMINATED');
+        this.activeShowMode = this.licenseModel.status === 'ACTIVE' && !this.expiredOrTerminated && !this.editMode;
     }
 
     prepareMethodOptions() {
         this.methodOptions = [
             {
-                id: 1,
-                name: 'Servers',
+                name: 'MAX_SERVERS',
+                text: 'Servers',
                 max: 0
             },
             {
-                id: 2,
-                name: 'Tokens',
+                name: 'TOKEN',
+                text: 'Tokens',
                 max: 0
             },
             {
-                id: 3,
-                name: 'Custom'
+                name: 'CUSTOM',
+                text: 'Custom'
             }
         ]
     }
 
     prepareLicenseKey() {
-        if(this.licenseModel.statusId === 1) {
+        if(this.licenseModel.status === 'ACTIVE') {
             this.licenseManagerService.getKeyCode(this.licenseModel.id, (data) => {
                 if(data) {
                     this.licenseKey = data;
@@ -174,12 +172,12 @@ export default class LicenseManagerDetail extends FormValidator{
     activateLicense() {
         this.licenseManagerService.activateLicense(this.licenseModel, (data) => {
             if (data) {
-                this.licenseModel.statusId = 1;
-                this.getStatusDataSource();
+                this.licenseModel.status = 'ACTIVE';
                 this.saveForm(this.licenseModel);
                 this.prepareControlActionButtons();
                 this.prepareLicenseKey();
                 this.reloadRequired = true;
+                this.reloadLicenseManagerList();
             }
         });
     }
@@ -221,7 +219,7 @@ export default class LicenseManagerDetail extends FormValidator{
                 e.currentTarget.value = model;
             }
         } catch(e) {
-            this.$log.warn('Invalid Number Expception', model);
+            this.$log.warn('Invalid Number Exception', model);
         }
     }
 
@@ -235,6 +233,7 @@ export default class LicenseManagerDetail extends FormValidator{
             this.licenseManagerService.saveLicense(this.licenseModel, (data) => {
                 this.reloadRequired = true;
                 this.saveForm(this.licenseModel);
+                this.reloadLicenseManagerList();
                 this.log.info('License Saved');
             });
         } else {
@@ -260,8 +259,8 @@ export default class LicenseManagerDetail extends FormValidator{
                 transport: {
                     read: (e) => {
                         this.licenseManagerService.getEnvironmentDataSource((data) => {
-                            if(!this.licenseModel.environmentId) {
-                                this.licenseModel.environmentId = data[0].id;
+                            if(!this.licenseModel.environment) {
+                                this.licenseModel.environment = data[0];
                             }
 
                             this.saveForm(this.licenseModel);
@@ -270,42 +269,10 @@ export default class LicenseManagerDetail extends FormValidator{
                     }
                 }
             },
-            dataTextField: 'name',
-            dataValueField: 'id',
+            valueTemplate: '<span style="text-transform: capitalize;">#=((data)? data.toLowerCase(): "" )#</span>',
+            template: '<span style="text-transform: capitalize;">#=((data)? data.toLowerCase(): "" )#</span>',
             valuePrimitive: true
         };
-    }
-
-    /**
-     * Populate values
-     */
-    getStatusDataSource() {
-        this.statusText =
-             (this.licenseModel.statusId === 1)? 'Active' :
-                 ((this.licenseModel.statusId === 2)? 'Expired':
-                     ((this.licenseModel.statusId === 3)? 'Terminated':
-                         ((this.licenseModel.statusId === 4)? 'Pending':
-                            ((this.licenseModel.statusId === 5)? 'Corrupt' : ''))));
-
-        /*this.selectStatusListOptions = {
-            dataSource: [
-                {id: 1, name: 'Active'},
-                {id: 2, name: 'Expired'},
-                {id: 3, name: 'Terminated'},
-                {id: 4, name: 'Pending'}
-            ],
-            dataTextField: 'name',
-            dataValueField: 'id',
-            valuePrimitive: true
-        }*/
-    }
-
-    /**
-     * A new Project has been selected, that means we need to reload the next project section
-     * @param item
-     */
-    onChangeProject(item) {
-        this.log.info('On change Project', item);
     }
 
     onChangeInitDate() {
@@ -362,12 +329,21 @@ export default class LicenseManagerDetail extends FormValidator{
      * Depending the number of fields and type of field, the reset can't be on the FormValidor, at least not now
      */
     onResetForm() {
-        this.resetDropDown(this.selectEnvironment, this.licenseModel.environment.id);
+        this.resetDropDown(this.selectEnvironment, this.licenseModel.environment);
         this.onChangeInitDate();
         this.onChangeEndDate();
 
         this.editMode = false;
         this.prepareControlActionButtons();
+    }
+
+    /**
+     * Manual reload after a change has been performed to the License
+     */
+    reloadLicenseManagerList() {
+        if(this.activityGrid.dataSource) {
+            this.activityGrid.dataSource.read();
+        }
     }
 
 }

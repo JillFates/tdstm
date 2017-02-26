@@ -12,16 +12,18 @@ export default class LicenseDetail {
         this.uibModal =$uibModal;
         this.log = $log;
         this.licenseModel = {
-            methodId: params.license.method.id,
+            method: {
+                name: params.license.method.name,
+                max: params.license.method.max
+            },
             projectName: params.license.project.name,
             clientName: params.license.client.name,
             email: params.license.email,
-            serversTokens: params.license.method.max,
             environment: params.license.environment,
             inception: params.license.requestDate,
             expiration: params.license.expirationDate,
             requestNote: params.license.requestNote,
-            active: params.license.status.id === 1,
+            active: params.license.status === 'ACTIVE',
             id: params.license.id,
             replaced: params.license.replaced,
             encryptedDetail: params.license.encryptedDetail,
@@ -34,16 +36,16 @@ export default class LicenseDetail {
     prepareMethodOptions() {
         this.methodOptions = [
             {
-                id: 1,
-                name: 'Servers'
+                name: 'MAX_SERVERS',
+                text: 'Servers'
             },
             {
-                id: 2,
-                name: 'Tokens'
+                name: 'TOKEN',
+                text: 'Tokens'
             },
             {
-                id: 3,
-                name: 'Custom'
+                name: 'CUSTOM',
+                text: 'Custom'
             }
         ]
     }
