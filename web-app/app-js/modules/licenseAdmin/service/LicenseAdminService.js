@@ -44,7 +44,6 @@ export default class LicenseAdminService {
      * @param callback
      */
     createNewLicenseRequest(newLicense, onSuccess){
-        newLicense.environmentId = parseInt(newLicense.environmentId);
         this.restService.licenseAdminServiceHandler().createNewLicenseRequest(newLicense, (data) => {
             return onSuccess(data);
         });

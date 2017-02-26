@@ -17,7 +17,7 @@ export default class LicenseDetail {
             clientName: params.license.client.name,
             email: params.license.email,
             serversTokens: params.license.method.max,
-            environmentName: params.license.environment.name,
+            environment: params.license.environment,
             inception: params.license.requestDate,
             expiration: params.license.expirationDate,
             requestNote: params.license.requestNote,

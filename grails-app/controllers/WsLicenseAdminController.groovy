@@ -135,11 +135,11 @@ class WsLicenseAdminController implements ControllerMethods {
             String licenseUid = json.id
             def owner = securityService.loadCurrentPerson().company
             def email = json.email
-            Long environmentId = json.environmentId
+            String environment = json.environment
             def projectId = json.projectId  // Can be a numeric id or "all", for all projects
             String requestNote = json.requestNote
 
-            License lic = licenseAdminService.generateRequest(licenseUid, owner, email, environmentId, projectId, requestNote)
+            License lic = licenseAdminService.generateRequest(licenseUid, owner, email, environment, projectId, requestNote)
 
             if (lic) {
                 renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())

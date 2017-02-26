@@ -431,7 +431,7 @@ class LicenseAdminService extends LicenseCommonService {
      * @param requestNote - The note attached to the License Request
      *
      */
-    def DomainLicense generateRequest(String uuid, PartyGroup owner, String email, Long environmentId, def projectId, String requestNote ){
+    def DomainLicense generateRequest(String uuid, PartyGroup owner, String email, String environment, def projectId, String requestNote ){
 		DomainLicense lic
 
 		if (uuid != null && !uuid.isNumber()) {
@@ -453,7 +453,7 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 
 		lic.email = email
-		lic.environment = DomainLicense.Environment.forId(environmentId.intValue())
+		lic.environment = environment as DomainLicense.Environment
 		lic.project = projectId
 		lic.requestNote = requestNote
 

@@ -33,7 +33,7 @@ export default class RequestLicense extends FormValidator{
         // Create the Model for the New License
         this.newLicenseModel = {
             email: '',
-            environmentId: 0,
+            environment: '',
             projectId: 0,
             clientName: '',
             requestNote: ''
@@ -49,12 +49,11 @@ export default class RequestLicense extends FormValidator{
             this.environmentDataSource = data;
             if(this.environmentDataSource) {
                 var index = this.environmentDataSource.findIndex(function(enviroment){
-                    return enviroment.name  === 'Production';
+                    return enviroment  === 'PRODUCTION';
                 });
                 index = index || 0;
-                this.newLicenseModel.environmentId = data[index].id;
+                this.newLicenseModel.environment = data[index];
             }
-
         });
     }
 

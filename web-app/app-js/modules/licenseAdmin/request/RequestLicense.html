@@ -17,11 +17,11 @@
                     <div class="col-sm-9">
                         <select kendo-drop-down-list
                                 k-placeholder="'Select an Environment'"
-                                k-data-text-field="'name'"
-                                k-data-value-field="'id'"
                                 k-value-primitive="true"
+                                k-value-template="'<span style=\'text-transform: capitalize;\'>#:((data)? data.toLowerCase(): \'\' )#</span>'"
+                                k-template="'<span style=\'text-transform: capitalize;\'>#:((data)? data.toLowerCase(): \'\' )#</span>'"
                                 k-data-source="requestLicense.environmentDataSource"
-                                k-ng-model="requestLicense.newLicenseModel.environmentId"
+                                k-ng-model="requestLicense.newLicenseModel.environment"
                                 id="selectEnvironment"
                                 class="form-control"
                                 required >
