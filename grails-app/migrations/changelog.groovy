@@ -158,4 +158,5 @@ databaseChangeLog = {
 	include file: "20170224-change-license-enum-columns.groovy"
 	include file: "20170224-change-licensedclient-enum-columns.groovy"
 	include file: "20170224-delete-current-license-activities.groovy"
+	include file: "20170227-update-autotimestamps-license-licensed-client.groovy"
 }
