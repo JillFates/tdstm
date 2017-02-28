@@ -104,7 +104,6 @@ class WsLicenseManagerController implements ControllerMethods {
 		def body = rjson?.data
 		if(body){
 			LicensedClient lc = licenseManagerService.loadRequest(body)
-			lc.save()
 
 			if(lc.hasErrors()){
 				def errors = ""
@@ -116,7 +115,6 @@ class WsLicenseManagerController implements ControllerMethods {
 			}else{
 				renderSuccessJson(lc.toMap())
 			}
-
 		}else{
 			response.status = 400 //bad Request
 			render "Wrong format on License Request"

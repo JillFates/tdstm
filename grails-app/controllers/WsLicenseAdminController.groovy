@@ -114,9 +114,7 @@ class WsLicenseAdminController implements ControllerMethods {
 
 
 
-    def deleteLicense(){
-
-        def id = params.id
+    def deleteLicense(String id){
         if(licenseAdminService.deleteLicense(id)) {
             renderSuccessJson("Successful Deleted")
         }else{

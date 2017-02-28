@@ -92,45 +92,46 @@ class LicenseAdminService extends LicenseCommonService {
 				// END: TEST MANAGER LICENSE //
 			}
 
-			if(isAdminEnabled() && !isManagerEnabled()) {
-				log.debug("License Admin Enabled")
-				String keyFile = grailsApplication.config.tdstm.license.key
-				String password = grailsApplication.config.tdstm.license.password
-				log.debug("Admin Key: '{}', password: '{}'", keyFile, password)
+			log.debug("License Admin Enabled")
+			String keyFile = grailsApplication.config.tdstm.license.key
+			String password = grailsApplication.config.tdstm.license.password
+			log.debug("Admin Key: '{}', password: '{}'", keyFile, password)
 
-				File file = new File(keyFile)
+			File file = new File(keyFile)
 
-				//if the file doesn't exists load from the web-app resources
-				if(!file.exists()){
-					Resource resource = grailsApplication.parentContext.getResource(keyFile)
-					if(resource.exists()) {
-						file = resource.file
-					}
+			//if the file doesn't exists load from the web-app resources
+			if(!file.exists()){
+				Resource resource = grailsApplication.parentContext.getResource(keyFile)
+				if(resource.exists()) {
+					file = resource.file
 				}
-
-				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
-
-				// BEGIN: License Admin Configuration //
-				LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
-				LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
-				LicenseManagerProperties.setLicenseProvider(licenseProvider)
-				LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
-				// should we set a different password per client?
-				LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
-				// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
-				LicenseManagerProperties.setCacheTimeInMinutes(24 * 60)
-				LicenseManager.getInstance()
-				// END: License Admin Configuration //
-
-				// BEGIN: TEST CLIENT LICENSE //
-				// LicenseManager manager = LicenseManager.getInstance()
-				// log.debug("OLB: Load License")
-				// licenseProvider.addLicense("tst", "rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L")
-				// log.debug("OLB: Loaded")
-				// License lic = manager.getLicense("tst") //set the license to test
-				// log.debug("License loaded (${lic.productKey} ${lic.issuer})? ${lic.goodAfterDate} - ${lic.goodBeforeDate}")
-				// END: TEST CLIENT LICENSE //
 			}
+
+			TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
+
+			// BEGIN: License Admin Configuration //
+
+			LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
+			LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
+			LicenseManagerProperties.setLicenseProvider(licenseProvider)
+			LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
+			// should we set a different password per client?
+			LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
+			// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
+			LicenseManagerProperties.setCacheTimeInMinutes(24 * 60)
+
+			LicenseManager.getInstance()
+
+			// END: License Admin Configuration //
+
+			// BEGIN: TEST CLIENT LICENSE //
+			// LicenseManager manager = LicenseManager.getInstance()
+			// log.debug("OLB: Load License")
+			// licenseProvider.addLicense("tst", "rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L")
+			// log.debug("OLB: Loaded")
+			// License lic = manager.getLicense("tst") //set the license to test
+			// log.debug("License loaded (${lic.productKey} ${lic.issuer})? ${lic.goodAfterDate} - ${lic.goodBeforeDate}")
+			// END: TEST CLIENT LICENSE //
 		}
 
 	}
@@ -492,19 +493,14 @@ class LicenseAdminService extends LicenseCommonService {
      *
      */
     boolean deleteLicense(String uuid){
-
-		DomainLicense lic
-
-        if(uuid) {
-            lic = DomainLicense.get(uuid)
-        }
-        else {
-            return false;
-        }
-
-        if(lic) {
-            lic.delete()
-            return true
+		if(uuid) {
+			DomainLicense lic = DomainLicense.get(uuid)
+			if(lic) {
+				lic.delete()
+				return true
+			} else {
+				return false
+			}
         } else {
             return false
         }

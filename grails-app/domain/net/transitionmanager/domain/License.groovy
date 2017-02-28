@@ -41,6 +41,7 @@ class License {
 		requestNote type:'text'
 		hash 		type:'text'
 		tablePerHierarchy false
+		version		false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
 		installationNum column:'instalation_num'

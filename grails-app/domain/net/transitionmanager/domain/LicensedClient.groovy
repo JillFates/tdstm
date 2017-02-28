@@ -47,6 +47,7 @@ class LicensedClient {
 		id 			generator: 'assigned'
 		requestNote type:'text'
 		hash 		type:'text'
+		version		false
 		tablePerHierarchy false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
@@ -196,9 +197,6 @@ class LicensedClient {
 		}
 		if(json.status != null) {
 			lc.status = json.status as License.Status
-		}
-		if(json.environment != null) {
-			lc.environment = json.environment as License.Environment
 		}
 		if(json.project != null) {
 			lc.project = json.project?.toString()

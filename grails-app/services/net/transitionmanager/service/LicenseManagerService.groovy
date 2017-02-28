@@ -46,16 +46,10 @@ class LicenseManagerService extends LicenseCommonService{
 
 	def loadRequest(String body){
 		body = StringUtil.openEnvelop(License.BEGIN_REQ_TAG, License.END_REQ_TAG, body)
-
-		log.debug("Body: {}", body)
-
 		String decodedString = Smaz.decompress(Base64.decodeBase64(body))
-
-		log.debug("Decoded String: {}", decodedString)
-
 		JSONElement json = grails.converters.JSON.parse(decodedString)
-
-		return  LicensedClient.fetch(json, true)
+		LicensedClient lc = LicensedClient.fetch(json, true)
+		return lc.save()
 	}
 
 	def getLicenseKey(id) throws InvalidLicenseException{
