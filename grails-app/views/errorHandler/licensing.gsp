@@ -28,9 +28,7 @@
                     </p>
                     <div class="callout callout-danger">
                         <h4>Why am I seeing this?</h4>
-                        <p>There is a problem with your TransitionManager license that we need to fix.  Perhaps the current license has expired.  Or perhaps the number of projects or number of devices has been exceeded.
-
-                        Your Project Manager can help you identify the issue and get the license fixed.</p>
+                        <p>Your TransitionManager license is missing, expired or is otherwise no longer valid for this project. Your Administrator can manage the license from the Admin Menu, or if you are the Administrator and need assistance, please open a ticket at: <a href="https://support.transitionmanager.com" style="color: white; font-weight: bold;">https://support.transitionmanager.com</a></p>
                     </div>
                 </div>
             </div><!-- /.error-page -->
