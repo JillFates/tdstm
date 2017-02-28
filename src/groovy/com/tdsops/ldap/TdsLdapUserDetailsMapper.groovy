@@ -1,6 +1,7 @@
 package com.tdsops.ldap
 
 import com.tdsops.common.security.SecurityUtil
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.UserService
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware
@@ -12,9 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper
 
-/**
- * Created by jameskleeh on 2/1/17.
- */
+
 class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplicationAware {
 
     @Autowired
@@ -57,11 +56,26 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
             }
         }
 
+        if (roles.empty) {
+            String msg = "User ${username} has no roles defined in the roleMap. LDAP roles returned: ${ldapRoles}"
+            if (ldap.debug == true) {
+                println(msg)
+            }
+            throw new NoRolesException(msg)
+        }
+
         userInfo.roles = roles
 
-        userService.findOrProvisionUser(userInfo, ldap, authority)
+        UserLogin userLogin = userService.findOrProvisionUser(userInfo, ldap, authority)
 
-        userDetailsService.loadUserByUsername(username)
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username)
+
+        if (ldap.debug) {
+            println("Successfully mapped ldap context to user for username: ${username} and LDAP roles: ${ldapRoles}")
+            println("UserLogin: ${userLogin.toString()}")
+            println("UserDetails: ${userDetails.toString()}")
+        }
+        userDetails
     }
 
     @Override

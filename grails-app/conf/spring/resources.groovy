@@ -72,6 +72,12 @@ beans = {
 
 				println "\nConfiguring Spring Security LDAP for ${ldapDomain} ..."
 
+				if (application.config.tdstm.security.ldap.debug == true) {
+					def debugConfig = new ConfigObject(conf)
+					debugConfig.servicePassword = "REDACTED"
+					println "\nConfiguration for LDAP domain ${ldapDomain}:"
+					println debugConfig.toString()
+				}
 
 				SpringSecurityUtils.registerProvider "ldapAuthProvider${ldapDomain}"
 
@@ -142,9 +148,12 @@ beans = {
 
 				println "... finished configuring Spring Security LDAP for ${ldapDomain}\n"
 
-
-
 			}
 		}
+	} else {
+		if (log.isDebugEnabled()) {
+			log.debug("TDSTM LDAP configuration skipped due to either no domains configured or ldap is disabled")
+		}
 	}
+
 }
