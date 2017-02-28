@@ -111,9 +111,16 @@ databaseChangeLog = {
 
 	}
 
-	changeSet(author: "oluna", id: "20170224 TM-6063.2.lc.d") {
+	changeSet(author: "oluna", id: "20170224 TM-6063.2.lc.d.v2") {
 		comment('Fix "licensed_client.method" columns enumerations for client')
-		//This column was already a Varchar
+
+		preConditions(onFail:'MARK_RAN') {
+			sqlCheck(expectedResult:'int(11)', """
+				SELECT COLUMN_TYPE 
+				FROM information_schema.COLUMNS 
+				WHERE TABLE_NAME = 'licensed_client' and COLUMN_NAME = 'method'
+			""")
+		}
 
 		grailsChange {
 			change {
@@ -122,7 +129,7 @@ databaseChangeLog = {
 					ADD COLUMN `t_method` VARCHAR(255) NOT NULL AFTER `method`;
 				""")
 
-				def enumList = License.Type.values()
+				def enumList = License.Method.values()
 
 				enumList.eachWithIndex{ enu, i ->
 					def id = i+1 //the old id is offset+1
