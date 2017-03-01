@@ -2,26 +2,21 @@
  * App or Root Module
  * it identify how the TDS App is being constructed
  */
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {HttpModule, Http} from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule, Http } from '@angular/http';
 
-import {TDSAppComponent}  from './tds-app.component';
+import { TDSAppComponent } from './tds-app.component';
 // Providers
-import {HttpServiceProvider} from '../shared/providers/http-interceptor.provider';
-// Shared Services
-import {UserService} from '../shared/services/user.service';
-import {NotifierService} from '../shared/services/notifier.service';
-// Shared Directives
-import {UILoaderDirective} from '../shared/directives/ui-loader.directive';
-import {UIToastDirective} from '../shared/directives/ui-toast.directive';
+
 // Feature modules
-import {GamesModule} from '../modules/games/games.module';
-import {NoticesManagerModule} from '../modules/noticeManager/notice-manager.module';
+import {SharedModule} from'../shared/shared.module'
+import { GamesModule } from '../modules/games/games.module';
+import { NoticesManagerModule } from '../modules/noticeManager/notice-manager.module';
 // Router Logic
-import {UIRouterModule, UIView} from 'ui-router-ng2';
-import {TDSRoutingStates} from './tds-routing.states';
+import { UIRouterModule, UIView } from 'ui-router-ng2';
+import { TDSRoutingStates } from './tds-routing.states';
 
 
 // Decorator that tells to Angular is a module.
@@ -32,6 +27,7 @@ import {TDSRoutingStates} from './tds-routing.states';
         FormsModule,
         HttpModule,
         //Feature Modules
+        SharedModule,
         NoticesManagerModule,
         GamesModule,
         // Routing Modules using UI Router
@@ -42,15 +38,11 @@ import {TDSRoutingStates} from './tds-routing.states';
     ],
     declarations: [
         TDSAppComponent,
-        UILoaderDirective,
-        UIToastDirective,
+        
     ], // components, directives and pipes ONLY and only ONCE\
     providers: [
-        UserService,
-        NotifierService,
-        {provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader},
-        HttpServiceProvider
-        ],
+        { provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
+    ],
     bootstrap: [UIView]
 })
 
