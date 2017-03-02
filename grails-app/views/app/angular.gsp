@@ -1,4 +1,3 @@
-<g:set var="TDSResources" value="true" scope="request"/>
 <html>
     <head>
         <base href="${createLink( uri: '/app/angular/' )}">

@@ -23,8 +23,7 @@
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
 <!-- Kendo UI Material Theme -->
-<link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.common-material.min.css')}">
-<link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.material.min.css')}">
+<link rel="stylesheet" href="${resource(dir: 'tds/web-app/dist/css/kendo', file: 'kendo.material.min.css')}">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -101,8 +100,6 @@ def moveEvent = tds.currentMoveEvent() ?: null
 
 <!-- LEGACY CODE END -->
 
-<!-- Kendo Directives -->
-<script src="${resource(dir: 'dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
 <!-- Boosttrap -->
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>
 <!-- SlimScroll -->

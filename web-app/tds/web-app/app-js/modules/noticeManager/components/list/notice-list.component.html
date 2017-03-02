@@ -1,3 +1,18 @@
 <a uiSref="tds" uiSrefActive="active">Return</a>
 <br />
 <button type="button" class="btn btn-default" (click)="getNoticeList();">Get Notice List</button>
+<br />
+<button kendoButton (click)="onButtonClick()" [primary]="true">My Kendo UI Button</button>
+
+
+<kendo-grid
+        [data]="view | async"
+        [pageSize]="pageSize"
+        [skip]="skip"
+        [pageable]="true"
+>
+    <kendo-grid-column field="CategoryID" width="100"></kendo-grid-column>
+    <kendo-grid-column field="CategoryName" width="200"></kendo-grid-column>
+    <kendo-grid-column field="Description" [sortable]="false">
+    </kendo-grid-column>
+</kendo-grid>

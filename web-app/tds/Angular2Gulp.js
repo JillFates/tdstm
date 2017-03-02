@@ -4,11 +4,14 @@
 
 var argv = require('yargs').argv,            // Arguments from command prompt
     browserify = require("browserify"),
+    buffer = require('vinyl-buffer'),
     gulp = require('gulp'),
+    gulpif = require('gulp-if'),
     source = require('vinyl-source-stream'),
     shell = require('gulp-shell'),
     tsify = require("tsify"),
     tslint = require("gulp-tslint"),
+    uglify = require('gulp-uglify'),
     watchify = require('watchify');
 
 /* Command line arg, e.g.: gulp --PROD */
@@ -29,6 +32,8 @@ gulp.task('build-app', function () {
         .plugin("tsify")
         .bundle()
         .pipe(source('app.js'))
+        .pipe(gulpif(prodEnv, buffer()))
+        .pipe(gulpif(prodEnv, uglify()))
         .pipe(gulp.dest('./web-app/dist/'));
 
 });
@@ -41,7 +46,7 @@ gulp.task('watch-build-app', function () {
 
     var b = browserify({
         entries: ['./web-app/app-js/main.ts'],
-        debug: true // SourceMapping
+        debug: !prodEnv // SourceMapping
     });
 
     var watcher = watchify(b, {
@@ -61,6 +66,8 @@ gulp.task('watch-build-app', function () {
                     this.emit("end");
                 })
                 .pipe(source('app.js'))
+                .pipe(gulpif(prodEnv, buffer()))
+                .pipe(gulpif(prodEnv, uglify()))
                 .pipe(gulp.dest('./web-app/dist/'));
             console.log('Build success! in ', (Date.now() - updateStart) + 'ms');
         })
@@ -79,11 +86,13 @@ gulp.task('build-vendor', function () {
 
     return browserify({
         entries: ['./web-app/app-js/vendor.ts'],
-        debug: prodEnv // SourceMapping
+        debug: false // SourceMapping
     })
         .plugin("tsify")
         .bundle()
         .pipe(source('vendor.js'))
+        .pipe(gulpif(prodEnv, buffer()))
+        .pipe(gulpif(prodEnv, uglify()))
         .pipe(gulp.dest('./web-app/dist/'));
 });
 

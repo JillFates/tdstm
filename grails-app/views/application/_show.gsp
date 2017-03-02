@@ -1,4 +1,4 @@
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 
 <table class="planning-application-table">
 	<tbody>
