@@ -117,7 +117,6 @@ databaseChangeLog = {
 	include file: '20151230-remove-from-role-user-dep-analyzer-view.groovy'
 	include file: '20160210-new-security-permission-for-critical-path.groovy'
 	include file: '20160310-add-permission-monitoring-permission.groovy'
-	// TM-4697 Deleting Task Batches leaves orphaned TaskDependency and CommentNote records behind
 	include file: '20160315-fix-orphan-records-asset_comment.groovy'
 	include file: '20160321-add-permission-restartapplication-admin.groovy'
 	include file: '20160325-recreate-orphaned-staff-team-references.groovy'
@@ -131,6 +130,7 @@ databaseChangeLog = {
 	include file: '20160721-delete-PRINTER_NAME-preference.groovy'
 	include file: "20160725-change-engine-to-InnoDB-for-MyISAM-tables.groovy"
  	include file: "20160727-delete-orphaned-persons.groovy"
+	include file: '20160727-drop-notnull-for-created-by.groovy'
  	include file: "20160805-update-person-middle-and-last-name-default-value.groovy"
 	include file: "20160815-add-permission-company-crud-admin.groovy"
 	include file: "20160817-delete-source-target-team-eav-attributes.groovy"

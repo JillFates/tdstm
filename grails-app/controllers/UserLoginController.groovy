@@ -22,8 +22,8 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
-
 import grails.plugin.springsecurity.annotation.Secured
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class UserLoginController implements ControllerMethods {
 
@@ -173,27 +173,40 @@ class UserLoginController implements ControllerMethods {
 			return
 		}
 
-		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-		def cellValue = [id: showUser.id, username: showUser.username,
-		                 lockedOutUntil: showUser.lockedOutUntil,
-		                 lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), showUser.lockedOutUntil),
-		                 failedLoginAttempts: showUser.failedLoginAttempts] as JSON
+		// TODO : JPM 10/2016 : Fix team list to drop the description parsing - can where on the type now
+		List roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+		String cellValue = [
+			id: showUser.id,
+			username: showUser.username,
+			lockedOutUntil: showUser.lockedOutUntil,
+			lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), showUser.lockedOutUntil),
+			failedLoginAttempts: showUser.failedLoginAttempts
+		] as JSON
+
 		[userLoginInstance: showUser, companyId: companyId, roleList: roleList,
 		 assignedRoles: securityService.getAssignedRoles(showUser.person),
 		 cellValue: cellValue, canResetPasswordByAdmin: showUser.canResetPasswordByAdmin()]
 	}
 
+	/**
+	 * Used to delete a UserLogin and remove and references to the User
+	 * @param id - the ID of the user login to be removed
+	 * @param companyId - the ID of the company that is selected for filtering the User List
+	 */
 	@HasPermission('UserLoginDelete')
 	def delete() {
-		def deleteUser = UserLogin.get(params.id)
 		def companyId = params.companyId
-		if (deleteUser) {
-			securityService.deleteSecurityRoles(deleteUser.person)
-			deleteUser.delete(flush: true)
-			flash.message = "UserLogin $deleteUser deleted"
-		}
-		else {
-			flash.message = "UserLogin not found with id $params.id"
+		UserLogin userToDelete = UserLogin.get(params.id)
+		if (!userToDelete) {
+			flash.message = 'UserLogin was not found'
+		} else {
+
+			try {
+				securityService.deleteUserLogin(userToDelete)
+				flash.message = "UserLogin ${userLoginInstance} deleted"
+			} catch (e) {
+				flash.message = "An error occurred while attempting to delete the user"
+			}
 		}
 		redirect(action: "list", params: [id: companyId])
 	}

@@ -2,9 +2,19 @@ package net.transitionmanager.domain
 
 import net.transitionmanager.service.PartyRelationshipService
 
+// Domain classes that Person is associated with that are impacted by merging which are not in
+// this package.
+import com.tds.asset.Application
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
+import com.tds.asset.CommentNote
+import net.transitionmanager.EmailDispatch
+import net.transitionmanager.PasswordReset
+import net.transitionmanager.UserAudit
+
 class Person extends Party {
 
-	//COMPANION
 	// Data of Special Person Required by the System
 	static final Map<String, String> SYSTEM_USER_AT = [lastName: 'Task', firstName: 'Automated']
 
@@ -31,9 +41,9 @@ class Person extends Party {
 	Integer travelOK = 1
 
 	transient PartyRelationshipService partyRelationshipService
-	transient UserLogin userLogin
 
 	static hasMany = [blackOutDates: ExceptionDates]
+	static hasOne = [userLogin: UserLogin]
 
 	static constraints = {
 		active blank: false, inList: ['Y', 'N']
@@ -55,8 +65,9 @@ class Person extends Party {
 		tdsLink nullable: true
 		tdsNote nullable: true
 		title nullable: true, size: 0..34
-		travelOK nullable: true
+		travelOK range: 0..1
 		workPhone nullable: true, phoneNumber: true
+		userLogin nullable: true
 	}
 
 	static mapping = {
@@ -77,18 +88,45 @@ class Person extends Party {
 
 	static transients = [
 		'assignedProjects',
+		'assignedTeams',
 		'automaticPerson',
 		'company',
+		'domainReferences',
 		'enabled',
 		'lastNameFirst',
 		'lastNameFirstAndTitle',
+		'name',
 		'partyRelationshipService',
 		'suitableTeams',
-		'systemUser',
-		'teamsCanParticipateIn',
-		'userLogin'
+		'systemUser'
+		//'userLogin'
 	]
 
+	// The list of domains and the propert(y/ies) that have a reference the Person domain
+	static final List<Map> domainReferences = [
+		[domain: Application, 		onDelete: 'null',   properties: ['sme', 'sme2'] ],
+		[domain: Application, 		onDelete: 'null',   properties: ['shutdownBy', 'startupBy', 'testingBy'], transform:{ it.id.toString() } ],
+		[domain: AssetComment, 		onDelete: 'null',   properties: ['resolvedBy', 'createdBy', 'assignedTo'] ],
+		[domain: AssetDependency, 	onDelete: 'null',   properties: ['createdBy','updatedBy'] ],
+		[domain: AssetEntity, 		onDelete: 'null',   properties: ['appOwner', 'modifiedBy'] ],
+		[domain: CommentNote, 		onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: EmailDispatch, 	onDelete: 'delete', properties: ['toPerson'] ],
+		[domain: EmailDispatch, 	onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: ExceptionDates, 	onDelete: 'delete', properties: ['person'] ],
+		[domain: Model, 			onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
+		[domain: ModelSync, 		onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
+		[domain: ModelSyncBatch, 	onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: MoveEventNews, 	onDelete: 'null',   properties: ['archivedBy', 'createdBy'] ],
+		[domain: MoveEventStaff, 	onDelete: 'delete', properties: ['person'] ],
+		[domain: PartyRole, 		onDelete: 'delete', properties: ['party'] ],
+		[domain: PartyRelationship, onDelete: 'delete', properties: ['partyIdFrom'] ],
+		[domain: PartyRelationship, onDelete: 'delete', properties: ['partyIdTo'] ],
+		[domain: PasswordReset, 	onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: RecipeVersion, 	onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: TaskBatch, 		onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: UserLogin, 		onDelete: 'delete', properties: ['person'] ],
+		[domain: Workflow, 			onDelete: 'null',   properties: ['updatedBy'] ]
+	]
 	/**
 	 * This method was incorrectly implemented but not sure where it may be used so an exception has been
 	 * added so that we may catch any possible location in testing. At some point we can blow away this method.
@@ -175,13 +213,14 @@ class Person extends Party {
 		active = 'N'
 	}
 
+/*
 	UserLogin getUserLogin() {
 		if (!userLogin) {
 			userLogin = UserLogin.findByPerson(this)
 		}
 		userLogin
 	}
-
+*/
 	/**
 	 * The person's name in 'LastName, FirstName MiddleName' format
 	 */
@@ -226,7 +265,7 @@ class Person extends Party {
 
 	def beforeDelete = {
 		if (isSystemUser()) {
-			def msg = "${this}: is a System User and can't be Deleted"
+			def msg = "${this} is a System User Account and can not be deleted"
 			log.warn(msg)
 			throw new UnsupportedOperationException(msg)
 		}

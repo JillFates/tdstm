@@ -5,9 +5,16 @@ import grails.transaction.Transactional
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 
 class MoveEventService implements ServiceMethods {
+
+	MoveEvent create(Project project, String name) {
+		MoveEvent me = new MoveEvent([project:project, name:name])
+		save me, true
+		me
+	}
 
 	/**
 	 * This function using to verify events for requested project

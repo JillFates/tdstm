@@ -6,6 +6,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.PasswordReset
+import net.transitionmanager.UserAudit
 
 class UserLogin {
 
@@ -66,11 +68,37 @@ class UserLogin {
 		username sqlType: 'varchar(50)'
 	}
 
+	// The list of domains and the properties that have a reference the UserLogin domain
+	static final List<Map> domainReferences = [
+		[domain: DataTransferBatch, onDelete:'null',   properties: ['userLogin'] ],
+		[domain: ModelSync, 		onDelete:'null',   properties: ['createdBy'] ],
+		[domain: PartyRole,			onDelete:'delete', properties: ['party'] ],
+		[domain: PasswordHistory,	onDelete:'delete', properties: ['userLogin'] ],
+		[domain: PasswordReset,		onDelete:'delete', properties: ['userLogin'] ],
+		[domain: Person,			onDelete:'null',   properties: ['userLogin'] ],
+		[domain: UserPreference,	onDelete:'delete', properties: ['userLogin'] ],
+		[domain: UserAudit, 		onDelete:'delete', properties: ['userLogin'] ]
+	]
+
 	// Transient flag set whenever the password is changed
 	boolean passwordWasChanged = false
 
-	static transients = ['currentProject', 'disabled', 'lockedOut', 'passwordWasChanged',
-	                     'personDetails', 'securityRoleCodes']
+// TODO : JPM 1/2017 : The bulk of transients were commented out. Lets see if they can be deleted
+	static transients = [
+		'lockedOut',
+		'passwordWasChanged'
+		// 'currentProject',
+		// 'domainReferences',
+		// 'disabled',
+		// 'personDetails',
+		//'securityRoleCodes'
+	]
+		//'applyPassword',
+		//'canResetPasswordByAdmin',
+		//'canResetPasswordByUser',
+		//'comparePassword',
+		//'hasEmail',
+		//'userActive'
 
 	String toString() {
 		username ?: 'Undefined User'
@@ -196,6 +224,10 @@ class UserLogin {
 			return Project.get(projectId)
 		}
 	}
+
+	// ----------------
+	// Events
+	// ----------------
 
 	def beforeUpdate = {
 		checkForPasswordChange()

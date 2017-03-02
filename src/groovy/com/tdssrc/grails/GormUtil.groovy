@@ -18,8 +18,19 @@ import org.hibernate.SessionFactory
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
 
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.orm.hibernate.cfg.CompositeIdentity
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
+import org.codehaus.groovy.grails.orm.hibernate.cfg.Mapping
+import org.codehaus.groovy.grails.validation.ConstrainedProperty
+import org.codehaus.groovy.grails.validation.Constraint
+
 @Slf4j(value='logger')
-class GormUtil {
+public class GormUtil {
+
+// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
+    // Used to control how some functions will perform comparisons with multiple where criteria
+	enum Operator { AND, OR }
 
 	/**
 	 * Output GORM Domain constraints and update errors in human readable format
@@ -74,7 +85,6 @@ class GormUtil {
 	 * @usage getDomainPropertiesWithConstraint(Model, 'nullable', true) - returns all properties that are nullable
 	 */
 	static List<String> getDomainPropertiesWithConstraint(Class clazz, String constraintName, value = null) {
-
 		List<String> propertyNames = []
 		Map<String, ConstrainedProperty> constraints = clazz.constraints
 		for (propertyName in constraints.keySet()) {
@@ -85,27 +95,106 @@ class GormUtil {
 				}
 			}
 		}
-
 		return propertyNames
 	}
 
+	/*
+// TODO : JPM 1/2017 : Validate getDomainPropertiesWithConstraint method that Burt replaced
+	public static List<String> getDomainPropertiesWithConstraint(def domain, def constraintName, def value=null ) {
+		def fields = []
+		domain.constraints.each() { propName, props ->
+			def constraint = props.getAppliedConstraint( constraintName )?.getAt(constraintName)
+			switch (constraintName) {
+				case 'blank':
+					// By default property blank is false except String prop so if false is requested as value
+					// and property is not string so considering as 'blank : false'
+					def type = GrailsClassUtils.getPropertyType(domain, propName)?.getName()
+					if (type == 'java.lang.String' && constraint in [null , true])
+						constraint = true
+					else
+						constraint = false
+					break
+
+				case ['nullable', 'range']:
+					// println "propName=$propName, constraintName=$constraintName, constraint=$constraint, value=$value"
+					break
+
+				default:
+					log.error "Called getDomainPropertiesWithConstraint() with unsupported constraint $constraintName"
+			}
+
+			if ( (value == null && constraint != null) || (value != null && constraint == value) )
+				fields <<  propName
+		}
+		return fields
+	}
+	*/
+
 	/**
-	 * Validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
+	 * Used to access all constraints for a single property of a domain object
+	 * @param domainClass - the domain class to get the constraint from
+	 * @param property - the name of the property to be accessed
+	 * @return the map of constraints
+	 */
+	public static Map getConstrainedProperties(Class domainClass) {
+		if (! isDomainClass(domainClass)) {
+			throw new RuntimeException("A non-domain class parameter was provided")
+		}
+
+		String domainName = domainClass.getName()
+		def domainObj = ApplicationContextHolder.getArtefact('Domain', domainName)
+		if (! domainObj) {
+			throw RuntimeException('Unable to find artefact for domain ' + domainName)
+		}
+
+		return domainObj.getConstrainedProperties()
+	}
+
+	/**
+	 * Used to access all constraints for a single property of a domain object
+	 * @param domainClass - the domain class to get the constraint from
+	 * @param propertyName - the name of the property to be accessed
+	 * @return the map of constraints
+	 */
+	public static ConstrainedProperty getConstrainedProperty(Class domainClass, String propertyName) {
+		Map props = getConstrainedProperties(domainClass)
+
+		if (! props[propertyName]) {
+			throw new RuntimeException("An invalid property name ($propertyName) was specified")
+		}
+
+		return props[propertyName]
+	}
+
+	/**
+	 * Used to access individual constraints from a domain object
+	 * @param domainClass - the domain class to get the constraint from
+	 * @param property - the name of the property to be accessed
+	 * @param constraintName - the individual constraint to access
+	 * @return the constraint value
+	 */
+	public static getConstraint(Class domainClass, String property, String constraintName) {
+		ConstrainedProperty constraint =  getConstrainedProperty(domainClass, property)
+		return constraint.getAppliedConstraint(constraintName)
+	}
+
+
+	/**
+	 * Used to validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
 	 * @param domainObj - the domain object to check the version on
 	 * @param versionFromForm - the original value of the domain version when it was originally read
 	 * @param label - the text to indicate the domain object in error message
 	 * @throws RuntimeException if there no initialVersion value
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
-	static void optimisticLockCheck(domainObj, Map params, String label) {
-		Long version = NumberUtil.toLong(params.version)
+	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
+		def version = NumberUtil.toLong(params.version)
 		if (version == null) {
-			println "domainVersionCheck failed on domain $domainObj for no version id parameter"
 			throw new DomainUpdateException("The $label version was missing from request")
-		}
-
-		if (domainObj.version > version) {
-			throw new DomainUpdateException("The $label was updated by someone while you were editing therefore your changes were not saved.")
+		} else {
+			if (domainObj.version > version) {
+				throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
+			}
 		}
 	}
 
@@ -122,7 +211,7 @@ class GormUtil {
 	}
 
 	/**
-	 * Merge/reattach domain object with the current Hibernate session.
+	 * Merge/reattach domain object with the current Hibernate session
 	 *
 	 * @param domainObject  the instance to be merged back into the session after detaching from the session
 	 */
@@ -197,27 +286,33 @@ class GormUtil {
 	 * Access the maxSize constraint value on a property of a Domain class
 	 * @param clazz  the Domain class to access the property on
 	 * @param propertyName - the name of the property to get the maxSize constraint of
-	 * @return The value set in the maxSize constraint
+	 * @return The value set in the maxSize constraint or null of the property does not have the constraint
 	 */
-	static Integer getConstraintMaxSize(Class clazz, String propertyName) {
-		if (!grailsApplication.isDomainClass(clazz)) {
-			throw new IllegalArgumentException("An non-domain class was provided for getMaxSize constraint")
-		}
-
-		Map<String, ConstrainedProperty> constraints = clazz.constraints
-		ConstrainedProperty constrainedProperty = constraints[propertyName]
-		if (!constrainedProperty) {
-			throw new IllegalArgumentException("An invalid property name ($propertyName) was specified")
-		}
-
-		if (!constrainedProperty.getAppliedConstraint('maxSize')) {
-			throw new IllegalArgumentException("Property $propertyName does not have the maxSize constraint")
-		}
-
-		return constrainedProperty.getMaxSize()
+	static Long getConstraintMaxSize(Class domainClass, String propertyName) {
+		Constraint constraint = GormUtil.getConstraint(domainClass, propertyName, 'maxSize')
+		return constraint?.getMaxSize()
 	}
 
-	static getConstraintValue(Class clazz, String propertyName, String constraintName) {
+	/**
+	 * Used to get the Uniqueness Group or list of properties that combined make up the uniques of
+	 * a domain class for the given propertyName.
+	 * @param domainClass - the Domain class to access the property on
+	 * @param propertyName - the name of the property to get the maxSize constraint of
+	 * @return a list of the property names
+	 */
+	static List getConstraintUniqueProperties(Class domainClass, String propertyName) {
+		Constraint cp = GormUtil.getConstraint(domainClass, propertyName, 'unique')
+		return cp.getUniquenessGroup()
+	}
+
+	/**
+	 * Used to retrieve the value specified for a particular property constraint
+	 * @param clazz - the Class object of the domain being inspected
+	 * @param propertyName - the property name to inspect
+	 * @param constraintName - the name of the constraint being inspected
+	 * @return the value be it an Integer, Closure, Range, etc base on the constraint type
+	 */
+	static Object getConstraintValue(Class clazz, String propertyName, String constraintName) {
 		Map<String, ConstrainedProperty> constraints = getDomainClass(clazz).constrainedProperties
 		Constraint constraint = constraints[propertyName].getAppliedConstraint(constraintName)
 
@@ -232,14 +327,36 @@ class GormUtil {
 		constraint?.parameter
 	}
 
+	/**
+	 * Used to determine if a particular domain property is a String
+	 * @param clazz - the Class object of the domain being inspected
+	 * @param propertyName - the property name to inspect
+	 * @return true if the property is a String otherwise false
+	 */
 	static boolean isStringType(Class clazz, String propertyName) {
 		String == GrailsClassUtils.getPropertyType(clazz, propertyName)
 	}
 
+	/**
+	 * Returns a Collection of GrailsDomainClassProperty properties for a domain class that are
+	 * persistable and updatable.
+	 * @param clazz - the Class object of the domain being inspected
+	 * @param notToUpdateNames - a list of property names that should be excluded from the result
+	 * @return a list of GrailsDomainClassProperty that are updatable
+	 */
 	static Collection<GrailsDomainClassProperty> updatablePersistentProperties(Class clazz, Collection<String> notToUpdateNames) {
 		getDomainClass(clazz).persistentProperties.findAll { it.isPersistent() && !notToUpdateNames.contains(it.name) }
 	}
 
+// TODO : JPM copyUnsetValues - reverse the from/to parameters
+
+	/**
+	 * Used to clone persistent properties from one domain object to another with ability to
+	 * exclude a list of properties that should be ignored.
+	 * @param from - domain object to copy property values from
+	 * @param to - the domain object to copy the properties to
+	 * @param notToUpdateNames - an optional list of property names that should not be copied
+	 */
 	static void copyUnsetValues(to, from, Collection<String> notToUpdateNames = []) {
 		Assert.isTrue(from.getClass() == to.getClass() || (from instanceof Map),
 				'Can only copy between instances of the same type unless from is a Map')
@@ -270,12 +387,488 @@ class GormUtil {
 	 * @param propertyName - the name of the property to validate
 	 * @return true if the property exists otherwise false
 	 */
-	static boolean isDomainProperty(def domainObject, String propertyName) {
+	static boolean isDomainProperty(Object domainObject, String propertyName) {
 		boolean valid=false
 		if (propertyName && domainObject) {
 			valid = domainObject.metaClass.hasProperty(domainObject.getClass(), propertyName)
 		}
 		return valid
+	}
+
+	/**
+	 * Used to determine if an object is a Domain class
+	 * @param clazz - the class to evaluate to determine if it is a Domain class
+	 * @return true if the object is a Domain class otherwise false
+	 */
+	static boolean isDomainClass(Class domainClass) {
+		def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
+		return grailsApp.isDomainClass( domainClass )
+//		return grailsApp.isDomainClass( domainObj.getClass() )
+		//org.codehaus.groovy.grails.commons.isDomainClass(domainClass)
+	}
+
+	/**
+	 * Used to determine if an object is a Domain class
+	 * @param domainInstance - the object to evaluate to determine if it is a Domain class
+	 * @return true if the object is a Domain class otherwise false
+	 */
+	static boolean isDomainClass(Object domainInstance) {
+		return isDomainClass(domainInstance.getClass())
+	}
+
+	/**
+	 * Used to get the list of persistent properties for a given domain class
+	 * @param domain - the Domain class to get the properties for
+	 * @return A list of the properties
+	 */
+	static List<String> persistentProperties(Object domain) {
+		if (!isDomainClass(domain)) {
+			throw new RuntimeException('persistentProperties called with non-domain object')
+		}
+
+		def d = new DefaultGrailsDomainClass(domain.class)
+
+		return d.persistentProperties.name
+	}
+
+	/**
+	 * Used to get the list of persistent properties for a given domain class
+	 * @param domainClass - the Domain class to get the properties for
+	 * @param propertyName - the name of a property to retrieve
+	 * @return The GrailsDomainClassProperty object
+	 */
+	static GrailsDomainClassProperty getDomainProperty(Class domainClass, String propertyName) {
+		if (!isDomainClass(domainClass)) {
+			println "getDomainProperty() domainClass=${domainClass.getName()}"
+			throw new RuntimeException('Called with non-domain class parameter')
+		}
+
+		def d = new DefaultGrailsDomainClass(domainClass)
+		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
+
+		return cp
+	}
+
+	/**
+	 * Used to get the list of persistent properties for a given domain class
+	 * @param domainInst - the Domain instance to get the properties for
+	 * @param propertyName - the name of a property to retrieve
+	 * @return The GrailsDomainClassProperty object
+	 */
+	static GrailsDomainClassProperty getDomainProperty(Object domainInst, String propertyName) {
+		return getDomainProperty(domainInst.getClass(), propertyName)
+	}
+
+	/**
+	 * Used to retrieve the Domain Binder Mapping of a domain which can then be interrogated
+	 * @param domainClass - the domain to integrate
+	 * @return true if it has a composite primary key
+	 */
+	static Mapping getDomainBinderMapping(Class domainClass) {
+		if (!isDomainClass(domainClass)) {
+			throw new RuntimeException('a Grails domain class parameter is required')
+		}
+		Mapping binderMapping = new GrailsDomainBinder().getMapping(domainClass)
+		//if (!binderMapping) {
+		//	throw new RuntimeException('Failed to load Grails domain mapping for ' + getDomainNameForClass(domainClass))
+		//}
+		return binderMapping
+	}
+
+	/**
+	 * Used to determine if a Domain class has a Composite Key
+	 * @param domainClass - the domain to integrate
+	 * @return true if it has a composite primary key
+	 */
+	static boolean hasCompositeKey(Class domainClass) {
+		Mapping mapping = getDomainBinderMapping(domainClass)
+		boolean hasCK = (mapping && (mapping.identity instanceof CompositeIdentity))
+		return hasCK
+	}
+
+	/**
+	 * Used to get the list of properties that make up a composite key on a domain class
+	 * @param domainClass - the domain to integrate
+	 * @return a list of the property names
+	 */
+	static List<String> getCompositeKeyProperties(Class domainClass) {
+		List props = []
+		if (hasCompositeKey(domainClass)) {
+			def binder = new GrailsDomainBinder().getMapping(domainClass)
+			props = binder.identity.propertyNames as List
+		}
+		return props
+	}
+
+	/**
+	 * Used to determine if a property for a given domain class is part of a composite key
+	 * @param domainClass - the Domain class to iterrogate
+	 * @param propertyName - the name of a property to check as being a composite key element
+	 * @return true if property is part of a composite key otherwise false
+	 */
+	static boolean isCompositeProperty(Class domainClass, String propertyName) {
+		GrailsDomainClassProperty property = getDomainProperty(domainClass, propertyName)
+		return isCompositeProperty(domainClass, property)
+	}
+
+	/**
+	 * Used to determine if a property for a given domain class is part of a composite key
+	 * @param domainClass - the Domain class to iterrogate
+	 * @param property - the domain property to check as being a composite key element
+	 * @return true if property is part of a composite key otherwise false
+	 */
+	static boolean isCompositeProperty(Class domainClass, GrailsDomainClassProperty property) {
+		Mapping mapping = getDomainBinderMapping(domainClass)
+		return new GrailsDomainBinder().isCompositeIdProperty(mapping, property)
+	}
+
+	/**
+	 * Used to determine if a single key property can be replace or if the domain object would need to be cloned. This is helpful when merging people
+	 * or users for instance. It will verify if the propert(y|ies) is part of the composite key.
+	 * @param domainClass - the class to check
+	 * @param propertyName - the name of a property to examine
+	 */
+	static boolean canDomainPropertyBeReplaced(Class domainClass, String propertyName) {
+		return canDomainPropertiesBeReplaced(domainClass, [propertyName])
+	}
+
+	/**
+	 * Used to determine if a list of key property can be replace or if the domain object would need to be cloned. This is helpful when merging people
+	 * or users for instance. It will verify if the propert(y|ies) is part of the composite key.
+	 * @param domainClass - the class to check
+	 * @param propertyNames - a list of the
+	 */
+	static boolean canDomainPropertiesBeReplaced(Class domainClass, List propertyNames) {
+		boolean replaceable=true
+		for (propName in propertyNames) {
+			if (replaceable) {
+				GrailsDomainClassProperty dp = getDomainProperty(domainClass, propName)
+				if (dp.isIdentity()) {
+					replaceable=false
+				} else {
+					if (isCompositeProperty(domainClass, dp)) {
+						replaceable=false
+					}
+					if (replaceable) {
+						// See it the property has a unique constraint on it that will require merging vs replacement
+						Constraint cp = getConstraint(domainClass, propName, 'unique')
+						if (cp) {
+							replaceable = false
+						} else {
+							// Try looking at the mapping
+							def mapping = getDomainBinderMapping(domainClass)
+							if (mapping) {
+								//println "** property $propName"
+								// println "*** Mapping columns ${mapping.columns}"
+								def propConfig = mapping.getPropertyConfig(propName)
+								if (propConfig && propConfig.isUnique()) {
+									replaceable = false
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return replaceable
+	}
+
+	/**
+	 * Used to clone a domain object to a new object subsituting key properties and optionally deleting the original
+	 * @param originalDomain - the domain to clone properties from
+	 * @param replaceKeys - a Map of property name(s) and the associated values to set, if value is null then it is not set
+	 * @param deleteOriginal - a flag if the original domain should be deleted (default:false)
+	 * @return the cloned object
+	 */
+	static Object cloneDomain(Object originalDomain, Map replaceKeys, boolean deleteOriginal=false) {
+		if (!isDomainClass(originalDomain.getClass())) {
+			throw new RuntimeException('a Grails domain object parameter is required')
+		}
+
+		Object newDomain = originalDomain.getClass().getConstructor().newInstance()
+
+		// Assign the key values to the domain
+		replaceKeys.each { key, value ->
+			if (value != null) {
+				newDomain[key] = value
+			}
+		}
+
+		// Get the list of persistent properties from the domain that are not the keys being overridden
+		List keys = replaceKeys.keySet() as List
+		List props = persistentProperties(originalDomain)
+
+		// Strip off the replacement keys from the list and then copy over the values to the new domain
+		props = props - keys
+		props.each { p ->
+			newDomain[p] = originalDomain[p]
+		}
+
+		newDomain.save(flush:true)
+
+		if (deleteOriginal) {
+			originalDomain.delete(flush:true)
+		}
+
+		return newDomain
+	}
+
+	/**
+	 * Used to find a domain object matching one to be cloned where certain key(s) properties are overridden
+	 * @param domainObj - the object to clone
+	 * @param replaceKeys - a map of keys and the values to override in the lookup
+	 * @return the object if found otherwise null
+	 */
+	static Object findCloneDomainTarget(Object domainObj, Map replaceKeys) {
+		if (!isDomainClass(domainObj.getClass())) {
+			throw new RuntimeException('a Grails domain object parameter is required')
+		}
+
+		List props = GormUtil.getCompositeKeyProperties(domainObj.getClass())
+		List keys = replaceKeys.keySet() as List
+
+		// Remove the override keys from the property list
+		props = props - keys
+
+		String tableName = domainObj.getClass().getName()
+
+		List params = []
+		StringBuilder hql = new StringBuilder("from $tableName x where ")
+		boolean first=true
+		int paramIndex=0
+		props.each { propName ->
+			params << domainObj[propName]
+			if (first) {
+				first=false
+			} else {
+				hql.append(' AND ')
+			}
+			hql.append("x.$propName=?")
+		}
+
+		keys.each { keyName ->
+			params << replaceKeys[keyName]
+			if (first) {
+				first = false
+			} else {
+				hql.append(' AND ')
+			}
+			hql.append("x.$keyName=?")
+		}
+
+		String hqlStr = hql.toString()
+		logger.debug "findCloneDomainTarget() query=$hql, params=$params"
+		Object record = domainObj.getClass().find(hqlStr, params)
+
+		return record
+
+	}
+
+	/**
+	 * Used to clone a domain object matching one to be cloned where certain key(s) properties are overridden but
+	 * only if it does not already exist. Optionally it will delete the original record.
+	 * @param domainObj - the object to clone
+	 * @param replaceKeys - a map of keys and the values to override in the lookup
+	 * @return the object if it was cloned otherwise null
+	 */
+	static Object cloneDomainIfNotExist(Object domain, Map keyValues, boolean deleteOriginal=false) {
+		Object clone
+		if (! findCloneDomainTarget(domain, keyValues)) {
+			// println "cloneDomainIfNotExist() cloning domain ($domain) and replacing ($keyValues)"
+			clone = cloneDomain(domain, keyValues, deleteOriginal)
+			// println "cloneDomainIfNotExist() resulted in $clone"
+		} else {
+			if (deleteOriginal) {
+				// println "cloneDomainIfNotExist() deleting duplicate domain $domain"
+				domain.delete()
+			}
+		}
+		return clone
+	}
+
+	/**
+	 * Used to retrieve a list of records from a domain by one or more key values
+	 * @param domainClass - the class of the domain to search
+	 * @param propertiesMap - a map of the property names and the associated value/objects
+	 * @return list of the domain objects found
+	 */
+	static List<Object> findAllByProperties(Class domainClass, Map propertiesMap, Operator operator = Operator.AND) {
+		String domainName = domainClass.getName()
+		boolean first=true
+		StringBuilder hql = new StringBuilder('From ' + domainName + ' x Where ')
+		List params = []
+		int paramIndex=0
+		propertiesMap.each { propName, value ->
+			if (first) {
+				first=false
+			} else {
+				hql.append(" ${operator.toString()} ")
+			}
+			hql.append("x.$propName=?")
+			params << value
+		}
+		String hqlStr = hql.toString()
+		//logger.debug "findAllByProperties() query=$hql, params=$params"
+
+		List rows = domainClass.findAll(hqlStr, params)
+		return rows
+	}
+
+	/**
+	 * Used to get just the Name of the domain stripping off the package name if it exists
+	 * @param domainClass - the class of the domain interested in
+	 * @return a String representing the name of the Domain
+	 */
+	static String getDomainNameForClass(Class domain) {
+		String name = domain.getName()
+		name = name.tokenize('.').last()
+		return name
+	}
+
+	/**
+	 * Used to delete or null out references of an object that is going to be deleted. This relies on the Domain having the
+	 * domainReferences being properly defined in the domain class.
+	 * @param domainObject - the object to deference
+	 * @param deleteObject - a flag to indicate if the object should be deleted when finished dereferencing (default: false)
+	 * @return A list consisting of reference deletedCount and nulledCount
+	 */
+	static List deleteOrNullDomainReferences(Object domainObject, boolean deleteObject=false) {
+		int deletedCount=0
+		int nulledCount=0
+
+		domainObject.domainReferences.each { attribs ->
+
+			Class domainClass = attribs.domain
+			String domainName = getDomainNameForClass(attribs.domain)
+
+			// Build & execute HQL statement(s) to delete or null out references for each Domain
+			if (attribs.onDelete == 'delete') {
+				// Delete the reference
+				StringBuilder hql = new StringBuilder("DELETE FROM $domainName x WHERE ")
+				boolean first=true
+				List params=[]
+				int paramIndex=0
+				attribs.properties.each { propName ->
+					if (first) {
+						first=false
+					} else {
+						hql.append(' OR ')
+					}
+					hql.append("x.$propName=?")
+					params << (attribs.transform ? attribs.transform.call(domainObject) : domainObject)
+				}
+				String hqlStr = hql.toString()
+				log.debug "deleteOrNullUserLoginReferences() Delete statement: $hqlStr, params: $params"
+				deletedCount += attribs.domain.executeUpdate(hqlStr, params)
+			} else {
+				// Null out the reference(s)
+				int paramIndex=0
+				attribs.properties.each { propName ->
+					String hql = "UPDATE $domainName SET $propName=NULL WHERE $propName=?"
+					List params = [(attribs.transform ? attribs.transform.call(domainObject) : domainObject)]
+					log.debug "deleteOrNullUserLoginReferences() Delete statement: $hql, params: $params"
+					nulledCount += attribs.domain.executeUpdate(hql, params)
+				}
+			}
+		}
+
+		if (deleteObject) {
+			domainObject.delete(flush:true)
+		}
+
+		return [deletedCount, nulledCount]
+	}
+
+	/**
+	 * Used to determine if a particular Domain property can be merged. Domain properties that are
+	 * associated and is the Owning Side require merging in a different manor.
+	 * @param domain the class of the domain to check
+	 * @param propName the name of the property to check
+	 * @return true if the property can be merged
+	 */
+	static boolean canMergeDomainProperty(Class domainClass, String propName) {
+		GrailsDomainClassProperty domainProp =  getDomainProperty(domainClass, propName)
+		boolean isAssoc = domainProp.isAssociation()
+		boolean isOwning = domainProp.isOwningSide()
+		boolean isOne = domainProp.isOneToOne()
+		return ! (isAssoc && isOwning && isOne)
+	}
+
+	/**
+	 * Used to merge all references from one domain object over to another. This relies on the Domain having the domainReferences variable
+	 * properly defined in the domain class.
+	 * @param fromDomain - the domain that will be replaced
+	 * @param toDomain - the domain that will remain and have all outstanding references
+	 * @param deleteFrom - flag that if true will delete the fromDomain when finished (default: false)
+	 */
+	static void mergeDomainReferences(Object fromDomain, Object toDomain, boolean deleteFrom=false) {
+
+		Class domainClass = fromDomain.getClass()
+		String domainName = domainClass.getName()
+
+		if (! domainClass.domainReferences) {
+			throw new RuntimeException("Domain $domainName is missing required static Map domainReferences")
+		}
+
+		domainClass.domainReferences.each { attribs ->
+			// See if there is a transformation that needs to be performed on the key (e.g. convert to String)
+			def toRef, fromRef
+			if (attribs.transform) {
+				fromRef = attribs.transform.call(fromDomain)
+				toRef = attribs.transform.call(toDomain)
+			} else {
+				fromRef = fromDomain
+				toRef = toDomain
+			}
+
+			// logger.debug "mergeDomainReferences() fromRef=${fromRef.getClass().getName()} $fromRef ::: ${toRef.getClass().getName()} $toRef"
+
+			// Determine if we can replace or need to clone the domain object by seeing if the object can be replaced
+			if (GormUtil.canDomainPropertiesBeReplaced(attribs.domain, attribs.properties)) {
+				String updateTableName = getDomainNameForClass(attribs.domain)
+				// Map params = [to: toRef.id, from: fromRef.id]
+				Map params = [to: toRef, from: fromRef]
+				attribs.domain.withSession { session ->
+					attribs.properties.each { propName ->
+						boolean canMerge = canMergeDomainProperty(attribs.domain, propName)
+						if (!canMerge) {
+							log.debug "***** mergeDomainReferences() skipping the merge for $domainName reference ${attribs.domain}.$propName"
+						} else {
+							// String hql = "update $updateTableName x set x.${propName}.id=:to WHERE x.${propName}.id=:from"
+							String hql = "update $updateTableName x set x.${propName}=:to WHERE x.${propName}=:from"
+							// log.debug "mergeDomainReferences() hql=$hql, params=$params"
+							int changes = attribs.domain.executeUpdate(hql, params)
+							//log.debug "mergeDomainReferences() reassigned $changes $updateTableName references"
+						}
+					}
+					session.flush()
+				}
+			} else {
+				// Clone to domain with the new reference properties and delete the from domain when finished
+				Map findMap = [:]
+				Map refValuesToReplace = [:]
+				attribs.properties.each { propertyName ->
+					findMap.put(propertyName, fromRef)
+					refValuesToReplace.put(propertyName, toRef)
+				}
+				List rows = GormUtil.findAllByProperties(attribs.domain, findMap, GormUtil.Operator.OR)
+				int rowCount = rows.size()
+				if (rowCount) {
+					log.info "mergeDomainReferences() merging ${rowCount} $domainName row(s)"
+					rows.each { row ->
+						// println "mergeDomainReferences() calling cloneDomainIfNotExist for $row"
+						GormUtil.cloneDomainIfNotExist(row, refValuesToReplace, true)
+					}
+				}
+			}
+		}
+
+		// After replacing references we can look to delete the original domain
+		if (deleteFrom) {
+			logger.debug "Deleting ${fromDomain.getClass().getName()} $fromDomain"
+			domainClass.executeUpdate("delete $domainName x where x.id=:id", [id:fromDomain.id])
+			//fromDomain.delete(flush:true)
+		}
 	}
 
 	/**

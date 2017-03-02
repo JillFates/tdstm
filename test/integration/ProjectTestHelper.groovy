@@ -3,6 +3,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Timezone
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang.RandomStringUtils as RSU
@@ -104,4 +105,23 @@ class ProjectTestHelper {
 		partyRelationshipService.assignClientToCompany(client, company)
 		return client
 	}
+
+	/**
+	 * Create a company as a client and assign them as a client of the specified company.
+	 * @param company  the client's owning company
+	 * @return the client
+	 */
+	PartyGroup createPartner(PartyGroup company, Project project=null) {
+		PartyType pt = PartyType.get('COMPANY')
+
+		PartyGroup partner = createCompany('Partner')
+		partyRelationshipService.assignPartnerToCompany(partner, company)
+
+		if (project) {
+			partyRelationshipService.assignPartnerToProject(partner, project)
+		}
+
+		return partner
+	}
+
 }

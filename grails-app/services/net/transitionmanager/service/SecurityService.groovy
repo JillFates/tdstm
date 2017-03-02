@@ -32,6 +32,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RolePermissions
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserPreference
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
@@ -47,8 +48,13 @@ import org.springframework.web.context.request.RequestContextHolder
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.USER
 
+// import javax.servlet.http.HttpSession
+// import org.apache.shiro.SecurityUtils
+// import org.springframework.web.context.request.RequestContextHolder
+// import groovy.time.TimeCategory
+
 /**
- * Methods to manage User Roles and Permissions, etc.
+ * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
 @Slf4j(value='logger')
 class SecurityService implements ServiceMethods, InitializingBean {
@@ -726,6 +732,167 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	}
 
 	/**
+	 * Used to delete a UserLogin and clear out any references in other tables
+	 * @param userLogin - the UserLogin to be deleted
+	 */
+	void deleteUserLogin(UserLogin userLogin) {
+		auditService.logMessage("deleting user account $userLogin")
+		GormUtil.deleteOrNullDomainReferences(userLogin, true)
+	}
+
+	/**
+	 * This action is used to merge two UserLogin according to the following criteria:
+	 * 1. If neither account has a UserLogin - nothing to do
+	 * 2. If Person being replaced into the master has a UserLogin but master doesn't, assign the UserLogin to the master Person record.
+	 * 3. If both Persons have a UserLogin,select the UserLogin that has the most recent login activity. If neither have login activity,
+	 *	  choose the oldest login account.
+	 * @param fromUserLogin : instance of fromUserLogin
+	 * @param toUserLogin : instance of toUserLogin
+	 * @param toPerson: instance of toPerson
+	 * @return
+	 */
+	void mergePersonsUserLogin(UserLogin byWhom, Person fromPerson, Person toPerson) {
+logger.debug "mergePersonsUserLogin() entered"
+		UserLogin toUserLogin = toPerson.userLogin
+		UserLogin fromUserLogin = fromPerson.userLogin
+
+		// Check to see if there is nothing to do be done
+		if (! fromUserLogin) {
+			return
+		}
+
+		// From account exists but To doesn't then just assign the From UserLogin to the To Person
+		if (fromUserLogin && ! toUserLogin) {
+			auditService.logMessage "$byWhom reassigned user $fromUserLogin to person $toPerson (${toPerson.id})"
+			fromUserLogin.person = toPerson
+			fromUserLogin.save(flush:true)
+			toPerson.userLogin = fromUserLogin
+			toPerson.save()
+		} else {
+
+			// We must have both a To and From UserLogin so we need to decide which is going to remain
+			// and which will be deleted.
+			String whichToKeep = keepWhichOnMerge(fromUserLogin, toUserLogin)
+
+			// Helper closure used to replace certain properties from one userLogin to the other
+			def replaceUserFieldValues = { from, to ->
+				if (from.createdDate < to.createdDate) {
+					to.createdDate = from.createdDate
+				}
+				if (from.expiryDate && (! to.expiryDate || from.expiryDate > to.expiryDate)) {
+					to.expiryDate = from.expiryDate
+				}
+			}
+
+			if (whichToKeep == 'to') {
+				GormUtil.mergeDomainReferences(fromUserLogin, toUserLogin, true)
+				replaceUserFieldValues(fromUserLogin, toUserLogin)
+				auditService.logMessage "$byWhom merged user $fromUserLogin into $toUserLogin"
+			} else {
+				GormUtil.mergeDomainReferences(toUserLogin, fromUserLogin, true)
+				fromUserLogin.person = toPerson
+				save fromUserLogin, true
+				toPerson.userLogin = fromUserLogin
+				save toPerson, true
+				replaceUserFieldValues(toUserLogin, fromUserLogin)
+				auditService.logMessage "$byWhom merged user $toUserLogin into $fromUserLogin"
+			}
+		}
+	}
+
+	/**
+	 * Logic used to determine which UserLogin to keep when merging two persons' UserLogin accounts
+	 * @param fromUserLogin - the UserLogin of the From Person
+	 * @param toUserLogin - the UserLogin of the To Person in the merge
+	 * @return An indicator as to which UserLogin to use [to|from]
+	 */
+	private String keepWhichOnMerge(UserLogin fromUserLogin, UserLogin toUserLogin) {
+		String whichToKeep = ''
+		while (true) {
+			// Check for the one with the most recent login
+			if (fromUserLogin.lastLogin || toUserLogin.lastLogin) {
+				if (fromUserLogin.lastLogin && toUserLogin.lastLogin) {
+					whichToKeep = (toUserLogin.lastLogin >  fromUserLogin.lastLogin ? 'to' : 'from')
+				} else {
+					whichToKeep = (fromUserLogin.lastLogin ? 'from' : 'to')
+				}
+				// println "keepWhichOnMerge() lastLogin check"
+				break
+			}
+
+			// If one account is active and the other isn't then use the active one
+			boolean fromActive = fromUserLogin.userActive()
+			boolean toActive = toUserLogin.userActive()
+			if ( (fromActive || toActive) && !(fromActive && toActive) ) {
+				whichToKeep = (toActive ? 'to' : 'from')
+				// println "keepWhichOnMerge() active check"
+				break
+			}
+
+			// Use the most recently created one
+			whichToKeep = (toUserLogin.createdDate >= fromUserLogin.createdDate ? 'to' : 'from')
+			// println "keepWhichOnMerge() createdDate check"
+			break
+		}
+		return whichToKeep
+	}
+
+	/**
+	 * This method is used to update Person reference from 'fromUser' to  the 'toUser'
+	 * @param byWhom - the user that is performing the merge
+	 * @param fromUser - the user whom references will be overwritten
+	 * @param toUser - the user that will assume any person assigned references
+	 */
+	private void mergeUserLoginDomainReferences(UserLogin byWhom, UserLogin fromUser, UserLogin toUser) {
+		GormUtil.mergeDomainReferences(fromUser, toUser, true)
+	}
+
+	/**
+	 * Used to replace any user security roles from one user to another or deleting if preference already existed
+	 * @param byWhom - the user that is performing the replace
+	 * @param fromUser - the UserLogin that preferences are being replaced from
+	 * @param toUser - the UserLogin that any new preferences will be replaced into
+	 */
+	private void replaceUserSecurityRoles(UserLogin byWhom, UserLogin fromUser, UserLogin toUser) {
+
+		Person fromPerson = fromUser.person
+		Person toPerson = toUser.person
+
+		List roles = PartyRole.findAllByParty(fromPerson)
+		roles.each { fromRole ->
+			PartyRole toRole = PartyRole.findByPartyAndRoleType(toPerson, fromRole.roleType)
+			if (! toRole) {
+				PartyRole newPR = new PartyRole(party: toPerson, roleType: fromRole.roleType)
+				newPR.save()
+				log.debug "$byWhom replaced $fromUser role ${fromRole.roleType} to $toUser"
+			} else {
+				log.debug "$byWhom replaced $fromUser role ${fromRole.roleType} pre-existed for $toUser"
+			}
+			fromRole.delete(flush:true)
+		}
+	}
+
+	/**
+	 * Used to replace any user preferences from one user to another or deleting if preference already existed
+	 * @param byWhom - the user that is performing the replace
+	 * @param fromUser - the UserLogin that preferences are being replaced from
+	 * @param toUser - the UserLogin that any new preferences will be replaced into
+	 */
+	private void replaceUserPreferences(UserLogin byWhom, UserLogin fromUser, UserLogin toUser) {
+		List prefs = UserPreference.findAllByUserLogin(fromUser)
+		prefs.each { fromUserPref ->
+			UserPreference toUserPref = UserPreference.findByUserLoginAndPreferenceCode(toUser, fromUserPref.preferenceCode)
+			if (! toUserPref) {
+				UserPreference newUP = new UserPreference(userLogin: toUser, preferenceCode:fromUserPref.preferenceCode, value: fromUserPref.value)
+				newUP.save()
+				log.debug "$byWhom replaced ${fromUser} preference ${fromUserPref.preferenceCode} to ${toUser}"
+			} else {
+				log.debug "$byWhom merging ${fromUser} preference ${fromUserPref.preferenceCode} pre-existed"
+			}
+			fromUserPref.delete(flush:true)
+		}
+	}
+	/**
 	 * Update the UserLogin and the associated permissions for the account.
 	 * @param params - request params
 	 * @param isNewUser - flag true indicating to create otherwise update an existing user
@@ -1379,7 +1546,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	}
 
 	void requirePermission(String username /* TODO BB */, List<String> permissions,
-	                       boolean report = false, String violationMessage = null) {
+	    boolean report = false, String violationMessage = null) {
+
 		for (permission in permissions) {
 			if (hasPermission(permission, report)) {
 				return
@@ -1510,25 +1678,30 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 *    1. Integration tests that do not have a user session
 	 *    2. Quartz Jobs that do not have a user session
 	 * @param username - the username of the UserLogin to be loaded into the Spring Security context
+	 * @param preventWebInvocation - flag to control if the method can be used from web requests (default false)
+	 * @throws UnauthorizedException if invocation is prevented
 	 */
-	void assumeUserIdentity(final String username) {
+	void assumeUserIdentity(final String username, boolean preventWebInvocation=true) {
+
+		if (preventWebInvocation && RequestContextHolder.getRequestAttributes()) {
+			reportViolation 'attempted to invoke assumeUserIdentity with ' + username
+			throw new UnauthorizedException('Assuming User Identity is not allowed')
+		}
+
 		log.info "SECURITY: assumeUserIdentity called for user $username"
 
-		if /*(!WebUtils.retrieveGrailsWebRequest())*/ (!RequestContextHolder.getRequestAttributes()) {
+		UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
+		UserCache userCache = ApplicationContextHolder.getBean("userCache")
+		UserDetails userDetails = userDetailsService.loadUserByUsername(username)
 
-			UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
-			UserCache userCache = ApplicationContextHolder.getBean("userCache")
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username)
+		UsernamePasswordAuthenticationToken token =
+			new UsernamePasswordAuthenticationToken(
+				userDetails, userDetails.getPassword(), userDetails.getAuthorities() )
 
-			UsernamePasswordAuthenticationToken upwt = new UsernamePasswordAuthenticationToken(
-					userDetails, userDetails.getPassword(), userDetails.getAuthorities())
+		SecurityContextHolder.getContext().setAuthentication(token)
 
-			SecurityContextHolder.getContext().setAuthentication(upwt)
-
-			userCache.removeUserFromCache(username)
-		} else {
-			log.warn("SECURITY: ${getCurrentUsername()} is trying to assumeUserIdentity for user $username ")
-		}
+		// removes previous user permission? if loaded
+		userCache.removeUserFromCache(username)
 	}
 
 	private Person resolve(Person person) {

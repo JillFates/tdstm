@@ -30,6 +30,9 @@ class PartyRelationshipService implements ServiceMethods {
 	ProjectService projectService
 	SecurityService securityService
 
+	/**
+	 * Used to create a party relationship
+	 */
 	PartyRelationship savePartyRelationship(
 		String relationshipTypeId,
 		Party from, String fromRoleTypeId,
@@ -45,15 +48,17 @@ class PartyRelationshipService implements ServiceMethods {
 				statusCode: 'ENABLED')
 			save(partyRelationship, true)
 			if (partyRelationship.hasErrors()) {
+				// TODO : JPM 2/2017 : we should not return null here because we don't know why it failed
 				return null
 			}
-
 			return partyRelationship
 		} catch (e) {
 			logger.error 'savePartyRelationship() had exception {}: {}',
 				e.message, ExceptionUtil.stackTraceToString(e)
 		}
 	}
+
+
 
 	void deletePartyRelationship(String relationshipTypeId, Party partyFrom, String fromRoleTypeId, Party partyTo, String toRoleTypeId) {
 
@@ -69,12 +74,33 @@ class PartyRelationshipService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to assign a company as a client of another
+	 * Used to assign a company as a client of a company
 	 * @param client - the company to be the client in the relationship
 	 * @param company - the company that will have the other as a client
+	 * @return the PartyRelationship that was created or null if the creation failed
 	 */
-	void assignClientToCompany(PartyGroup client, PartyGroup company) {
+	PartyRelationship assignClientToCompany(PartyGroup client, PartyGroup company) {
 		savePartyRelationship("CLIENTS", company, "COMPANY", client, "CLIENT")
+	}
+
+	/**
+	 * Used to assign a company as a Partner to a company
+	 * @param partner - the company to be the client in the relationship
+	 * @param company - the company that will have the other as a client
+	 * @return the PartyRelationship that was created or null if the creation failed
+	 */
+	PartyRelationship assignPartnerToCompany(PartyGroup partner, PartyGroup company) {
+		savePartyRelationship("PARTNERS", company, "COMPANY", partner, "PARTNER")
+	}
+
+	/**
+	 * Used to assign a company as a client of another
+	 * @param partner - the company to be the client in the relationship
+	 * @param company - the company that will have the other as a client
+	 * @return the PartyRelationship that was created or null if the creation failed
+	 */
+	PartyRelationship assignPartnerToProject(PartyGroup partner, Project project) {
+		savePartyRelationship("PROJ_PARTNER", project, "PROJECT", partner, "PARTNER")
 	}
 
 	/**
@@ -205,11 +231,18 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return The PartyRelationship record or null if it failed
 	 */
 	PartyRelationship addProjectStaff(Project project, Person person) {
-		updatePartyRelationshipPartyIdFrom('STAFF', project, 'PROJECT', person, 'STAFF')
+		updatePartyRelationshipPartyIdFrom('PROJ_STAFF', project, 'PROJECT', person, 'STAFF')
 	}
 
-	def updatePartyRelationshipRoleTypeTo(String relationshipType, Party partyFrom, String roleTypeIdFrom,
-	                                      Party partyTo, String roleTypeIdTo) {
+	/**
+	 * Used to update or create a party
+	 */
+	def updatePartyRelationshipRoleTypeTo(
+		String relationshipType,
+		Party partyFrom, String roleTypeIdFrom,
+		Party partyTo, String roleTypeIdTo
+	) {
+
 		if (!roleTypeIdTo) return
 
 		PartyRelationship partyRelationship = PartyRelationship.executeQuery('''
@@ -261,7 +294,7 @@ class PartyRelationshipService implements ServiceMethods {
 			''', [relationshipType: relationshipType, roleTypeIdFrom: roleTypeIdFrom, roleTypeIdTo: roleTypeIdTo,
 			      partyIdFromId: NumberUtil.toLong(partyIdFrom), partyIdToId: NumberUtil.toLong(partyIdTo)], [max: 1])[0]
 
-			// condition to check whether partner has changed or not
+			// condition to check whether relationship has changed or not
 			if (!partyRelationship) {
 				PartyRelationship otherRelationship = PartyRelationship.executeQuery('''
 					from PartyRelationship
@@ -284,14 +317,13 @@ class PartyRelationshipService implements ServiceMethods {
 						roleTypeCodeTo: RoleType.load(roleTypeIdTo),
 						statusCode: 'ENABLED').save()
 			}
-		}
-		else {
-			
-			//	if user select a blank then remove Partner
+		} else {
+
+			//	if user select a blank then remove relationship
 			PartyRelationship.executeUpdate("delete from PartyRelationship where partyRelationshipType.id = :relationshipType"
 				  + " and partyIdFrom.id = :partyIdFromId and roleTypeCodeFrom = :roleTypeIdFrom"
 				  + " and roleTypeCodeTo = :roleTypeIdTo"
-				  , [relationshipType:relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom), 
+				  , [relationshipType:relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom),
 				    roleTypeIdFrom: RoleType.load(roleTypeIdFrom), roleTypeIdTo: RoleType.load(roleTypeIdTo)])
 		}
 	}
@@ -305,19 +337,22 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @param String - the to party type in the relationship
 	 * @return PartyRelationship
 	 */
-	PartyRelationship updatePartyRelationshipPartyIdFrom(String relationshipTypeCode, Party partyIdFrom,
-	                                                     String roleTypeIdFrom, Party partyIdTo, String roleTypeIdTo) {
+	PartyRelationship updatePartyRelationshipPartyIdFrom(
+			String relationshipTypeCode,
+			Party partyIdFrom, String roleTypeIdFrom,
+			Party partyIdTo, String roleTypeIdTo) {
 
-		Map args = [partyRelationshipType: PartyRelationshipType.load(relationshipTypeCode),
-		            partyIdFrom: partyIdFrom, roleTypeCodeFrom: RoleType.load(roleTypeIdFrom),
-		            partyIdTo: partyIdTo, roleTypeCodeTo: RoleType.load(roleTypeIdTo)]
+		Map args = [
+			partyRelationshipType: PartyRelationshipType.load(relationshipTypeCode),
+			partyIdFrom: partyIdFrom, roleTypeCodeFrom: RoleType.load(roleTypeIdFrom),
+			partyIdTo: partyIdTo, roleTypeCodeTo: RoleType.load(roleTypeIdTo)]
+
 		PartyRelationship partyRelationship = PartyRelationship.findWhere(args)
 
 		if (!partyRelationship) {
 			partyRelationship = new PartyRelationship(args)
 			partyRelationship.statusCode = 'ENABLED'
-			save partyRelationship, true
-			if (partyRelationship.hasErrors()) {
+			if (! save(partyRelationship, true)) {
 				throw new DomainUpdateException('Unable to update party relationship')
 			}
 		}
@@ -523,13 +558,18 @@ class PartyRelationshipService implements ServiceMethods {
 		return list
 	}
 
+	/**
+	 * Used to retrieve the list of commpanies associated to a project which include the owner, client and partners
+	 * @param projectId - the id of the project to lookup
+	 * @return a list the PartyRelationship records where the partyIdTo and the roleTypeCodeTo indicate the company and relationship
+	 */
 	List<PartyRelationship> getProjectCompanies(long projectId) {
 		PartyRelationship.executeQuery('''
 			from PartyRelationship
 			where partyRelationshipType in (:types)
 			  and partyIdFrom = :projectId
 			  and roleTypeCodeFrom = 'PROJECT'
-			''', [projectId: projectId, types: ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR', 'PROJ_VENDOR']])
+			''', [projectId: projectId, types: ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR']])
 	}
 
 	void createBundleTeamMembers(ProjectTeam projectTeam, teamMemberIds) {
@@ -605,8 +645,13 @@ class PartyRelationshipService implements ServiceMethods {
 		}
 	}
 
-	PartyRelationship getPartyToRelationship(String partyRelationshipType, Party partyIdFrom,
-	                                         String roleTypeFrom, String roleTypeTo) {
+	/**
+	 * Used to retrieve a single PartyRelationship based on all of the primary keys
+	 */
+	PartyRelationship getPartyToRelationship(
+		String partyRelationshipType, Party partyIdFrom,
+		String roleTypeFrom, String roleTypeTo) {
+
 		PartyRelationship.executeQuery('''
 			from PartyRelationship
 			where partyRelationshipType.id = :partyRelationshipTypeId
@@ -924,6 +969,12 @@ class PartyRelationshipService implements ServiceMethods {
 		}
 	}
 
+	/**
+	 * Used to get a list of staff for a project for a give function or team code
+	 * @param function - the function/team code to look for
+	 * @param project - the project to look of staff for
+	 * @return a list of the persons associate to the specified team code for the project
+	 */
 	List<Person> getProjectStaffByFunction(RoleType function, Project project) {
 		Person.executeQuery('''
 			select pr.partyIdTo
@@ -1026,16 +1077,16 @@ class PartyRelationshipService implements ServiceMethods {
 			)"""
 
 		List projects = PartyRelationship.executeQuery(query, args)
-		// logger.debug 'companyProjects() for company {} : list 1 : projects {}', company, projects*.id
+		logger.debug 'companyProjects() for company {} : list 1 : projects {}', company, projects*.id
 		// Add to the list those that for clients
 		if (project && ! projects.contains(project) && project.client == company) {
 			projects = [project]
-			// logger.debug 'companyProjects() for company {} : list 2 : projects {}', company, projects*.id
+			logger.debug 'companyProjects() for company {} : list 2 : projects {}', company, projects*.id
 		} else {
 			List clientProjects = Project.findAllByClient(company)
 			if (clientProjects) {
 				projects += clientProjects
-				//logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
+				logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
 			}
 		}
 

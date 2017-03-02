@@ -6,6 +6,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import net.transitionmanager.command.PersonCO
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -219,9 +220,11 @@ class PersonController implements ControllerMethods {
 		}
 
 		try {
+			Person byWhom = securityService.getUserLoginPerson()
 			controllerService.checkPermissionForWS('BulkDeletePerson')
+
 			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'true'
-			def data = personService.bulkDelete(ids, deleteIfAssocWithAssets)
+			def data = personService.bulkDelete(byWhom, ids, deleteIfAssocWithAssets)
 			renderSuccessJson(data)
 		}
 		catch (e) {
@@ -250,6 +253,7 @@ class PersonController implements ControllerMethods {
 	@HasPermission('PersonDeleteView')
 	def delete() {
 		Person person = Person.get(params.id)
+
 		def companyId = params.companyId
 		if (person) {
 			Map deleteResultMap = personService.deletePerson(person, true, true)
@@ -281,8 +285,7 @@ class PersonController implements ControllerMethods {
 		if (!person) {
 			flash.message = "Person not found with id $params.id"
 			redirect(action:"list", params:[ id:companyId ])
-		}
-		else {
+		} else {
 			[personInstance: person, companyId: companyId]
 		}
 	}
@@ -331,8 +334,6 @@ class PersonController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		Person byWhom = securityService.getUserLoginPerson()
-
 		// When forWhom == 'person' we're working with the company submitted with the form otherwise we're
 		// going to use the company associated with the current project.
 		def isAjaxCall = params.forWhom != "person"
@@ -347,9 +348,8 @@ class PersonController implements ControllerMethods {
 		def person
 
 		try {
-			person = personService.savePerson(params, byWhom, companyId, project, true)
-		}
-		catch (DomainUpdateException e) {
+			person = personService.savePerson(params, companyId, project, true)
+		} catch (DomainUpdateException e) {
 			def exceptionMsg = e.message
 			log.error(exceptionMsg, e)
 			// The line below is a hack to avoid querying the database.
@@ -357,8 +357,7 @@ class PersonController implements ControllerMethods {
 			errMsg = "A person with the same name already exists. Click"
 			errMsg += "<a href=\"javascript:Person.showPersonDialog($personId,'generalInfoShow')\"> here </a>"//e.message
 			errMsg += "to view the person."
-		}
-		catch (e) {
+		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = e.message
 		}
@@ -1120,62 +1119,79 @@ class PersonController implements ControllerMethods {
 	}
 
 	/**
-	 * Populate CompareOrMergePerson dialog.
+	 * This action is Used to populate the CompareOrMergePerson dialog with the information regarding the persons selected
 	 * @param : ids[] is array of 2 id which user want to compare or merge
 	 * @return : all column list , person list and userlogin list which we are display at client side
 	 */
 	@HasPermission('PersonEditView')
 	def compareOrMerge() {
+
 		Map<Person, Long> personsMap = [:]
 		List<UserLogin> userLogins = []
 		params.list("ids[]").each {
 			Person person = Person.get(it.isLong() ? Long.parseLong(it) : null)
+
 			if (person) {
-				personsMap[person] = person.company.id
-				userLogins << person.userLogin
+				if (person.isSystemUser()) {
+					flash.message = "$person is a system account that can not be modified"
+				} else {
+					personsMap << [(person): person.company.id]
+					UserLogin userLogin = person.getUserLogin()
+					userLogins << userLogin
+				}
 			}
 		}
 
-		// Defined a Map as 'columnList' where key is displaying label and value is property of label for Person .
-		def columnList =  ['Merge To': '', 'First Name': 'firstName', 'Last Name': 'lastName',
-		                   'Nick Name': 'nickName', 'Active': 'active', 'Title': 'title', 'Email': 'email',
-		                   'Department': 'department', 'Location': 'location', 'State Prov': 'stateProv',
-		                   'Country': 'country', 'Work Phone': 'workPhone', 'Mobile Phone': 'mobilePhone',
-		                   'Model Score': 'modelScore', 'Model Score Bonus': 'modelScoreBonus',
-		                   'Person Image URL': 'personImageURL', 'KeyWords': 'keyWords', 'Tds Note': 'tdsNote',
-		                   'Tds Link': 'tdsLink', 'Staff Type': 'staffType', 'TravelOK': 'travelOK',
-		                   'Black Out Dates': 'blackOutDates', 'Roles': '']
+		// a HashMap as 'columnList' where key is displaying label and value is property of label for Person
+		def columnList =  [ 'Merge To':'',
+			'First Name': 'firstName', 'Middle Name': 'middleName', 'Last Name': 'lastName',
+			'Nick Name': 'nickName' , 'Active':'active','Title':'title',
+			'Email':'email', 'Department':'department', 'Location':'location', 'State Prov':'stateProv',
+			'Country':'country', 'Work Phone':'workPhone','Mobile Phone':'mobilePhone',
+			'Model Score':'modelScore',
+			'Model Score Bonus':'modelScoreBonus',
+			'Person Image URL':'personImageURL',
+			'KeyWords':'keyWords',
+			'Tds Note':'tdsNote', 'Tds Link':'tdsLink', 'Staff Type':'staffType',
+			'TravelOK':'travelOK', 'Black Out Dates':'blackOutDates', 'Roles':''
+		]
 
-		// Defined a Map as 'columnList' where key is displaying label and value is property of label for UserLogin .
-		def loginInfoColumns = ['Username': 'username', 'Active': 'active', 'Created Date': 'createdDate',
-		                        'Last Login': 'lastLogin', 'Last Page': 'lastPage', 'Expiry Date': 'expiryDate']
+		// a HashMap as 'columnList' where key is displaying label and value is property of label for UserLogin
+		def loginInfoColumns = ['Username':'username', 'Active':'active', 'Created Date':'createdDate', 'Last Login':'lastLogin',
+			'Last Page':'lastPage', 'Expiry Date':'expiryDate'
+		]
 
-		render(template: "compareOrMerge",
-		       model: [personsMap: personsMap, columnList: columnList, loginInfoColumns: loginInfoColumns,
-		               userLogins: userLogins])
+		Map model = [personsMap:personsMap, columnList:columnList, loginInfoColumns:loginInfoColumns, userLogins:userLogins]
+
+		render( template:"compareOrMerge", model:model)
 	}
 
 	/**
-	 * Merge two persons
-	 * @param : toId is requested id of person into which second person will get merge
-	 * @param : fromId is requested id of person which will be merged
-	 * @return : Appropriate message after merging
+	 * This action is used to merge one or more Person accounts into another Person account which is used to eliminate duplicate
+	 * person accounts. The accounts must be different and part of the same company. Merging can not be peformed on accounts that are
+	 * system (e.g. Automatic Tasks).
+	 * @param toId is requested id of person into which second person will get merge
+	 * @param fromId is requested id of person which will be merged
+	 * @return The appropriate message after merging completed or error message
 	 */
 	@HasPermission('PersonEditView')
-	def mergePerson() {
+	def mergePerson(PersonCO cmdObj) {
+		String msg
+		UserLogin byWhom = securityService.getUserLogin()
 
-		def toPerson = Person.get(params.toId)
-		toPerson.properties = params
-		if (!toPerson.save(flush:true)) {
-			toPerson.errors.allErrors.each { println it }
+		try {
+			msg = personService.processMergePersonRequest(byWhom, cmdObj, params)
+			//msg = 'The merge was successful'
+		} catch (InvalidParamException e) {
+			msg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			msg = e.getMessage()
+		} catch (e) {
+			log.error ExceptionUtil.messageWithStacktrace('mergePerson failed', e, 80)
+			msg = 'An error occurred and the merge was not performed'
 		}
 
-		List<Person> personMerged = []
-		params.list("fromId[]").each {
-			personMerged << personService.mergePerson(Person.get(it), toPerson)
-		}
-
-		render "${personMerged.size() ? WebUtil.listAsMultiValueString(personMerged) : 'None of Person '} Merged to $toPerson"
+		render msg
 	}
 
 	/*

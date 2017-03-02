@@ -7,7 +7,6 @@
  * that's the idea...
  */
 
-import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -15,7 +14,13 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
+
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdssrc.grails.GormUtil
+
+import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang.RandomStringUtils as RSU
+import groovy.time.TimeCategory
 
 class PersonTestHelper {
 	PersonService personService
@@ -43,14 +48,28 @@ class PersonTestHelper {
 	 * @return the newly created person
 	 */
 	Person createPerson(Person currentPerson, PartyGroup company, Project project=null, Map personProps=null, List teams=['PROJ_MGR'], roles=null) {
-		Map personMap = [firstName:"Test ${new Date()}", lastName: 'User', active:'Y', function: teams ]
+		Map personMap = [active:'Y', function: teams ]
 
 		// Apply any changes passed into the method
 		if (personProps) {
 			personMap << personProps
 		}
 
-		Person person = personService.savePerson(personMap, currentPerson, company.id, project, true)
+		// Make sure that all of the properties are set to something
+		['firstName', 'middleName', 'lastName'].each {prop ->
+			if (! personMap?.containsKey(prop)) {
+				personMap[prop] = RandomStringUtils.randomAlphabetic(12)
+			}
+		}
+
+		if (! personProps?.containsKey('email')) {
+			personMap.email = personMap.firstName +
+				(personMap.middleName ? ".${personMap.middleName}" : '') +
+				(personMap.lastName ? ".${personMap.lastName}" : '') +
+				'@example.com'
+		}
+
+		Person person = personService.savePerson(personMap, company.id, project, true)
 		assert person
 
 		if (roles) {
@@ -103,20 +122,42 @@ class PersonTestHelper {
 	 * @param roles - a list of role codes to create (optionally)
 	 * @return the newly created UserLogin
 	 */
-	UserLogin createUserLogin(Person person, List roles=[]) {
-		Map map = [
-			username: RSU.randomAlphabetic(10),
-			active: 'Y',
-			expiryDate: (new Date() + 365),
-			person: person
-		]
-		UserLogin u = new UserLogin(map)
-		u.save(failOnError:true)
+	UserLogin createUserLoginWithRoles(Person person, List roles=[]) {
+		UserLogin u = createUserLogin(person)
 		if (roles.size()) {
 			securityService.assignRoleCodes(person, roles)
 		}
 
 		return u
+	}
+
+	/**
+	 * Used to create a UserLogin for a person with optional properties
+	 * @param person - the person for whom to create the UserLogin
+	 * @param props - a map containing the various UserLogin properties to be set
+	 * @return a newly minted UserLogin object
+	 */
+	UserLogin createUserLogin(Person person, Map props=null) {
+		UserLogin user = new UserLogin(person:person)
+		user.username = RandomStringUtils.randomAlphabetic(12)
+		if (props) {
+			props.each { prop, value -> user[prop]=value}
+		}
+		if (!user.username) {
+			user.username = RandomStringUtils.randomAlphabetic(12)
+		}
+		if (! user.active) {
+			user.active = 'Y'
+		}
+		if (! user.expiryDate) {
+			user.expiryDate = new Date()
+		}
+
+		if (! user.save(flush:true)) {
+			throw new RuntimeException("Unable to save new UserLogin due to " + GormUtil.allErrorsString(user))
+		}
+
+		return user
 	}
 
 	/**
@@ -132,7 +173,7 @@ class PersonTestHelper {
 
 		assert admin
 
-		this.createUserLogin(admin, ['ADMIN'])
+		this.createUserLoginWithRoles(admin, ['ADMIN'])
 
 		return admin
 	}
