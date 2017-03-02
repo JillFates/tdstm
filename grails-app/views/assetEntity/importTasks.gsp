@@ -37,7 +37,7 @@
 
 						<br />
 						<br>
-						<button type="submit" class="btn btn-default">
+						<button type="submit" class="btn btn-default" id="importTaskSubmitButton" disabled>
 							Upload Spreadsheet
 							<span class="uploadIcon glyphicon glyphicon-upload" aria-hidden="true"></span>
 						</button>
@@ -57,9 +57,11 @@
                     var fileExt = fileName.split('.').pop()
                     if(["xls", "xlsx"].indexOf(fileExt) >= 0){
                         $("#uploadFile").val(fileName);
+						$("#importTaskSubmitButton").attr('disabled', false)
                     }else{
+						$("#importTaskSubmitButton").attr('disabled', true)
+						$("#uploadFile").val(null);
                         alert("Please, select a valid file.")
-                        $(this).val(null)
                     }
 
                 });
