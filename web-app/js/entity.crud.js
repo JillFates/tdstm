@@ -2,11 +2,11 @@
  * Javascript functions used by the Entity CRUD forms and Lists
  */
 
-var EntityCrud = ( function($) {
+var EntityCrud = (function ($) {
 
 	var pub = {};	// public methods
 
-	var stArray = ['source','target'];
+	var stArray = ['source', 'target'];
 
 	// The default quiet period for Select2 before issuing searches
 	var quietMillis = 600;
@@ -16,14 +16,14 @@ var EntityCrud = ( function($) {
 	// ---
 
 	var modelFilteringData = {
-	    'id'             : null,
-	    'manufacturerId' : null,
-	    'assetType'      : null,
-	    'term'           : null
+		'id': null,
+		'manufacturerId': null,
+		'assetType': null,
+		'term': null
 	};
-	
+
 	var selectedModel = null;
-	
+
 	var assetFormName = "createEditAssetForm";
 
 
@@ -35,16 +35,16 @@ var EntityCrud = ( function($) {
 	 * Private method used to validate common fields on any of the asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateCommonFields = function(form, alertErrors) {
+	var validateCommonFields = function (form, alertErrors) {
 		var ok = false;
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true
 		// Validate that asset name is not blank
-		var fieldVal = $('#'+form+' #assetName').val();
+		var fieldVal = $('#' + form + ' #assetName').val();
 		if (fieldVal == '') {
-			if(alertErrors){
+			if (alertErrors) {
 				alert('Please provide a name for the asset');
 			}
-			
+
 		} else {
 			ok = true
 		}
@@ -55,7 +55,7 @@ var EntityCrud = ( function($) {
 	 * Private method used to validate the Storage asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateStorageForm = function(form) {
+	var validateStorageForm = function (form) {
 		return validateCommonFields(form);
 		/*var ok = validateCommonFields(form);
 		if (ok) {
@@ -75,7 +75,7 @@ var EntityCrud = ( function($) {
 	 * Private method used to validate the Database asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateDBForm = function(form, alertErrors) {
+	var validateDBForm = function (form, alertErrors) {
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true;
 		return validateCommonFields(form, alertErrors);
 		/*var ok = validateCommonFields(form, alertErrors);
@@ -101,7 +101,7 @@ var EntityCrud = ( function($) {
 	 * Used to validate the Server/Device asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateDeviceForm = function(form) {
+	var validateDeviceForm = function (form) {
 		var ok = validateCommonFields(form);
 		ok = ok && validateNewRoom(form, 'S') && validateNewRoom(form, 'T');
 		return ok
@@ -109,25 +109,25 @@ var EntityCrud = ( function($) {
 
 	var validateNewRoom = function (form, sourceTarget) {
 		var ok = true;
-		var rmCtrl = $('#roomSelect'+sourceTarget);
+		var rmCtrl = $('#roomSelect' + sourceTarget);
 		var roomId = pub.selectOptionSelected(rmCtrl);
 		if (roomId == -1) {
-			var type = ((sourceTarget == 'S')?'#source':'#target');
+			var type = ((sourceTarget == 'S') ? '#source' : '#target');
 			var location = $(type + 'LocationId').val();
 			var room = $(type + 'RoomId').val();
 			var rack = $(type + 'RackId').val();
 			if (tds.utils.stringUtils.empty(location) ||
 				tds.utils.stringUtils.empty(room) ||
-				tds.utils.stringUtils.empty(rack) ) {
+				tds.utils.stringUtils.empty(rack)) {
 				alert("Location name, room name and rack name must be defined for 'Add Room'")
 				ok = false;
 			}
 		} else {
-			var rackId = $('#' + ((sourceTarget == 'S')?'rackSourceId':'rackTargetId')).val();
+			var rackId = $('#' + ((sourceTarget == 'S') ? 'rackSourceId' : 'rackTargetId')).val();
 			if (rackId == -1) {
-				var type = ((sourceTarget == 'S')?'#source':'#target');
+				var type = ((sourceTarget == 'S') ? '#source' : '#target');
 				var rack = $(type + 'RackId').val();
-				if  (tds.utils.stringUtils.empty(rack)) {
+				if (tds.utils.stringUtils.empty(rack)) {
 					alert("Rack name must be defined for 'Add Rack'")
 					ok = false;
 				}
@@ -136,25 +136,25 @@ var EntityCrud = ( function($) {
 		return ok;
 	}
 
-	var validateAppForm = function(form){
+	var validateAppForm = function (form) {
 
 		var ok = validateCommonFields(form);
 		if (ok) {
 			ok = false;
-			if($('#'+form+' #sme1').val()=='0' || $('#'+form+' #sme2').val()=='0' || $('#'+form+' #appOwner').val()=='0' ){
+			if ($('#' + form + ' #sme1').val() == '0' || $('#' + form + ' #sme2').val() == '0' || $('#' + form + ' #appOwner').val() == '0') {
 				alert("Please unselect the 'Add Person' option from SME, SME2 or Application Owner properties")
 			} else {
 				var msg = '';
 				// Check to see if the durations have legit numbers
 				var fname = ['Shutdown', 'Startup', 'Testing'];
 				// Hack because of inconsistency in the field ids
-				var c=0;
-				_(fname).forEach( function(name) {
-					var fs = '#'+form+' input[name='+ name.toLowerCase() + 'Duration]';
+				var c = 0;
+				_(fname).forEach(function (name) {
+					var fs = '#' + form + ' input[name=' + name.toLowerCase() + 'Duration]';
 					var field = $(fs);
-					if (field.length>0) {
-						if ( field.val() != '' && isNaN(field.val()) ) {
-							msg = ( msg!='' ? msg + ', ' : '' ) + name;
+					if (field.length > 0) {
+						if (field.val() != '' && isNaN(field.val())) {
+							msg = (msg != '' ? msg + ', ' : '') + name;
 							c++;
 						}
 					} else {
@@ -162,10 +162,10 @@ var EntityCrud = ( function($) {
 					}
 				});
 				if (msg != '') {
-					alert("Please make sure that the " + msg + ' Duration field' + (c>1 ? 's have' : ' has a') + ' numeric value' + (c>1 ? 's' : ''));
+					alert("Please make sure that the " + msg + ' Duration field' + (c > 1 ? 's have' : ' has a') + ' numeric value' + (c > 1 ? 's' : ''));
 				} else {
 					ok = true;
-				}	
+				}
 			}
 		}
 		return ok;
@@ -175,47 +175,47 @@ var EntityCrud = ( function($) {
 	// Public Methods
 	// ------------------
 
-	pub.getCreateModal = function() { return $('#createEntityView'); };
-	pub.getEditModal = function() { return $('#editEntityView'); };
-	pub.getShowModal = function() { return $('#showEntityView'); };
+	pub.getCreateModal = function () { return $('#createEntityView'); };
+	pub.getEditModal = function () { return $('#editEntityView'); };
+	pub.getShowModal = function () { return $('#showEntityView'); };
 
-	pub.closeCreateModal = function() {
-		pub.getCreateModal().dialog('close'); 
+	pub.closeCreateModal = function () {
+		pub.getCreateModal().dialog('close');
 	};
-	pub.closeEditModal = function() {
+	pub.closeEditModal = function () {
 		pub.getEditModal().dialog('close');
 	};
-	pub.closeShowModal = function() {
-		pub.getShowModal().dialog('close'); 
+	pub.closeShowModal = function () {
+		pub.getShowModal().dialog('close');
 	};
 
 	// Used to access the assetType within the CRUD pages
-	pub.getAssetType = function() {
+	pub.getAssetType = function () {
 		return $('#currentAssetType').val();
 	};
 
 	// Get the initial rack id for S)ource or T)arget 
-	pub.getRackId = function(sourceTarget) {
-		var id = $('#deviceRackId'+sourceTarget).val();
+	pub.getRackId = function (sourceTarget) {
+		var id = $('#deviceRackId' + sourceTarget).val();
 		return id;
 	}
 
 	// Get the initial chassis id for S)ource or T)arget 
-	pub.getChassisId = function(sourceTarget) {
-		var id = $('#deviceChassisId'+sourceTarget).val();
+	pub.getChassisId = function (sourceTarget) {
+		var id = $('#deviceChassisId' + sourceTarget).val();
 		return id;
 	}
 
 	// Common method used to return the selected option in a select control
 	// TODO : refactor this to shared lib
-	pub.selectOptionSelected = function(selectCtrl) {
-		var val='';
+	pub.selectOptionSelected = function (selectCtrl) {
+		var val = '';
 		if (selectCtrl.jquery) {
 			// JQuery found object
 			val = selectCtrl.val();
 		} else {
 			// Select found by other means
-			var si=selectCtrl.selectedIndex;
+			var si = selectCtrl.selectedIndex;
 			if (si > -1)
 				val = selectCtrl.options[si].value;
 		}
@@ -223,12 +223,12 @@ var EntityCrud = ( function($) {
 	};
 
 	// Creates a Select2 control for an Asset Name selector used in Depenedencies
-	pub.assetNameSelect2 = function(element) {
-		element.select2( {
+	pub.assetNameSelect2 = function (element) {
+		element.select2({
 			minimumInputLength: 0,
 			width: '100%',
 			initSelection: function (element, callback) {
-				var data = { id: element.val(), text: element.data("asset-name")};
+				var data = { id: element.val(), text: element.data("asset-name") };
 				callback(data);
 			},
 			placeholder: "Please select",
@@ -238,98 +238,100 @@ var EntityCrud = ( function($) {
 				quietMillis: quietMillis,
 				data: function (term, page) {
 					return {
-						q: term, 
-						max: 25, 
+						q: term,
+						max: 25,
 						page: page,
-						assetClassOption:$(this).data("asset-type"),
+						assetClassOption: $(this).data("asset-type"),
 					};
 				},
 				results: function (data, page) {
 					var more = (page * 25) < data.total;
-					return { results: data.results , more: more};
+					return { results: data.results, more: more };
 				}
 			}
-		} );
+		});
 	};
 
 	// Used on populate the Manufacturer SELECT to toggle various form fields
 	// TODO : JPM 9/2014 : This is subject to change with the change in behavior with AssetType selector
-	pub.selectManufacturer = function(assetType, forWhom) {
+	pub.selectManufacturer = function (assetType, forWhom) {
 		EntityCrud.toggleAssetTypeFields(assetType);
 
 		new Ajax.Request(
-			tdsCommon.createAppURL('/assetEntity/retrieveManufacturersList?assetType='+assetType+'&forWhom='+forWhom),
-			{ 	asynchronous:true,
-				evalScripts:true,
-				onComplete:function(e) { showManufacView(e, forWhom); }
+			tdsCommon.createAppURL('/assetEntity/retrieveManufacturersList?assetType=' + assetType + '&forWhom=' + forWhom),
+			{
+				asynchronous: true,
+				evalScripts: true,
+				onComplete: function (e) { showManufacView(e, forWhom); }
 			}
 		);
 	};
 
 	// Update Model Selector based on manufacturer
-	pub.updateModelSelect = function(manuId, forWhom) {
-		var assetType = $("#assetType"+forWhom+"Id").val() ;
+	pub.updateModelSelect = function (manuId, forWhom) {
+		var assetType = $("#assetType" + forWhom + "Id").val();
 		new Ajax.Request(
-			tdsCommon.createAppURL('/assetEntity/retrieveModelsList?assetType='+assetType+'&manufacturer='+manuId+'&forWhom='+forWhom),
-			{	asynchronous:true,
-				evalScripts:true,
-				onComplete:function(e) { showModelView(e, forWhom); }
+			tdsCommon.createAppURL('/assetEntity/retrieveModelsList?assetType=' + assetType + '&manufacturer=' + manuId + '&forWhom=' + forWhom),
+			{
+				asynchronous: true,
+				evalScripts: true,
+				onComplete: function (e) { showModelView(e, forWhom); }
 			}
 		);
 	};
 
-	pub.showRackOrBladeFields = function(rackBlade) {
-		_(stArray).forEach( function(stValue) {
+	pub.showRackOrBladeFields = function (rackBlade) {
+		_(stArray).forEach(function (stValue) {
 			// Show Rack select if room is selected; Rack name if New Room or New Rack; or nothing if Room or Rack are not selected
-			_(['S','T']).forEach( function(stValue) {
-				var rmCtrl = $('#roomSelect'+stValue);
+			_(['S', 'T']).forEach(function (stValue) {
+				var rmCtrl = $('#roomSelect' + stValue);
 				var roomId = pub.selectOptionSelected(rmCtrl);
-				var sOrT = (stValue=='S' ? 'source' : 'target');
-				var elPrefix = '#'+sOrT;
-				var rbcName = rackBlade.toLowerCase()+tdsCommon.capitalize(sOrT)+'Id';
+				var sOrT = (stValue == 'S' ? 'source' : 'target');
+				var elPrefix = '#' + sOrT;
+				var rbcName = rackBlade.toLowerCase() + tdsCommon.capitalize(sOrT) + 'Id';
 				var newrbcName = "new" + tdsCommon.capitalize(rbcName);
 				var oldrbcName = "old" + tdsCommon.capitalize(rbcName);
-				var rackBladeCtrl = $('#'+rbcName);
-				var rackBladePosCtrl = $(elPrefix+rackBlade+'PositionId');
-				switch(roomId) {
+				var rackBladeCtrl = $('#' + rbcName);
+				var rackBladePosCtrl = $(elPrefix + rackBlade + 'PositionId');
+				switch (roomId) {
 					case '0':
 						// Unselected
-						$('.use'+rackBlade+stValue).hide();
-						$(".newRoom"+stValue).hide();
-						$(".newRack"+stValue).hide();
+						$('.use' + rackBlade + stValue).hide();
+						$(".newRoom" + stValue).hide();
+						$(".newRack" + stValue).hide();
 						rackBladePosCtrl.hide();
 
-						if (rackBlade=='Rack') {
+						if (rackBlade == 'Rack') {
 							$('#' + rbcName).attr('name', rbcName);
 							$('#' + newrbcName).attr('name', newrbcName);
 						}
 						break;
 					case '-1':
 						// Create room - room  and input fields
-						$(".newRoom"+stValue).show();
-						if (rackBlade=='Rack') {
-							$(".newRack"+stValue).show();
-							$('.use'+rackBlade+stValue).hide();
+						$(".newRoom" + stValue).show();
+						if (rackBlade == 'Rack') {
+							$(".newRack" + stValue).show();
+							$('.use' + rackBlade + stValue).hide();
 							rackBladePosCtrl.hide();
 							rackBladePosCtrl.show();
-							
+
 							$('#' + rbcName).attr('name', oldrbcName);
 							$('#' + newrbcName).attr('name', rbcName);
 						}
 						break;
 					default:
-						$(".newRoom"+stValue).hide();
-						$(".newRack"+stValue).hide();
-						$('.use'+rackBlade+stValue).show();
+						$(".newRoom" + stValue).hide();
+						$(".newRack" + stValue).hide();
+						$('.use' + rackBlade + stValue).show();
 						// Now show the chassis position based on if a chassis is selected
 						var rbVal = pub.selectOptionSelected(rackBladeCtrl);
-						var optionId = parseInt( rbVal );
+						var optionId = parseInt(rbVal);
 						if (optionId > 0) {
 							rackBladePosCtrl.show();
 						} else {
 							rackBladePosCtrl.hide();
 						}
-						if (rackBlade=='Rack') {
+						if (rackBlade == 'Rack') {
 							$('#' + rbcName).attr('name', rbcName);
 							$('#' + newrbcName).attr('name', newrbcName);
 						}
@@ -339,35 +341,35 @@ var EntityCrud = ( function($) {
 
 	}
 	// Used to display Chassis fields appropriately
-	pub.showChassisFields = function() {
+	pub.showChassisFields = function () {
 		$(".positionLabel").show();
 		$(".bladeLabel").show();
-		_(stArray).forEach( function(stValue) {
+		_(stArray).forEach(function (stValue) {
 			// Only show Chassis select if room is selected
-			_(['S','T']).forEach( function(stValue) {
-				var rmCtrl = $('#roomSelect'+stValue);
+			_(['S', 'T']).forEach(function (stValue) {
+				var rmCtrl = $('#roomSelect' + stValue);
 				var roomId = pub.selectOptionSelected(rmCtrl);
-				var sOrT = (stValue=='S' ? 'source' : 'target');
-				var elPrefix = '#'+sOrT;
-				var chassisCtrl = $(elPrefix+'ChassisSelectId');
-				var bladePosCtrl = $(elPrefix+'BladePositionId');
-				switch(roomId) {
+				var sOrT = (stValue == 'S' ? 'source' : 'target');
+				var elPrefix = '#' + sOrT;
+				var chassisCtrl = $(elPrefix + 'ChassisSelectId');
+				var bladePosCtrl = $(elPrefix + 'BladePositionId');
+				switch (roomId) {
 					case '-1':
 						// Show room input fields
-						$(".newRoom"+stValue).show();
-						$(".useBlade"+stValue).hide();
+						$(".newRoom" + stValue).show();
+						$(".useBlade" + stValue).hide();
 						bladePosCtrl.hide();
 						break;
 					case '0':
-						$(".useBlade"+stValue).hide();
-						$(".newRoom"+stValue).hide();
+						$(".useBlade" + stValue).hide();
+						$(".newRoom" + stValue).hide();
 						bladePosCtrl.hide();
 						break;
 					default:
-						$(".useBlade"+stValue).show();
-						$(".newRoom"+stValue).hide();
+						$(".useBlade" + stValue).show();
+						$(".newRoom" + stValue).hide();
 						// Now show the chassis position based on if a chassis is selected
-						var optionId = parseInt( chassisCtrl.val() );
+						var optionId = parseInt(chassisCtrl.val());
 						if (optionId > 0) {
 							bladePosCtrl.show();
 						} else {
@@ -379,42 +381,42 @@ var EntityCrud = ( function($) {
 	};
 
 	// Used to hide Chassis fields
-	pub.hideChassisFields = function() {
+	pub.hideChassisFields = function () {
 		$(".bladeLabel").hide();
 		$(".useBladeS").hide();
 		$(".useBladeT").hide();
 	};
 
 	// Used to display the Rack fields
-	pub.showRackFields = function() {
+	pub.showRackFields = function () {
 		$(".positionLabel").show();
 		$(".rackLabel").show();
 		pub.showRackOrBladeFields('Rack');
 	}
 
 	// Used to hide Rack fields
-	pub.hideRackFields = function() {
+	pub.hideRackFields = function () {
 		$(".newRackS").hide();
-		$(".newRackT").hide();		
+		$(".newRackT").hide();
 		$(".useRackS").hide();
 		$(".useRackT").hide();
-		$(".rackLabel").hide();	
+		$(".rackLabel").hide();
 	};
 
 	// Used to display VM fields
-	pub.showVMFields = function() {
+	pub.showVMFields = function () {
 		$(".vmLabel").show();
 		$(".positionLabel").hide();
 	};
 
 	// Used to hide VM fields
-	pub.hideVMFields = function() {
+	pub.hideVMFields = function () {
 		$(".vmLabel").hide();
 	};
 
 	// Used to hide and show the appropriate fields based on the asset type (Blade, VM or other types)
-	pub.toggleAssetTypeFields = function( assetType ) {
-		switch(assetType) {
+	pub.toggleAssetTypeFields = function (assetType) {
+		switch (assetType) {
 			case 'Blade':
 				pub.hideRackFields();
 				pub.hideVMFields();
@@ -435,39 +437,39 @@ var EntityCrud = ( function($) {
 		}
 	};
 
-	var populateRackOrChassisSelect = function(checkRask) {
-		_(['S','T']).forEach( function(stValue) {
-			var rmCtrl = $('#roomSelect'+stValue);
+	var populateRackOrChassisSelect = function (checkRask) {
+		_(['S', 'T']).forEach(function (stValue) {
+			var rmCtrl = $('#roomSelect' + stValue);
 			var roomId = pub.selectOptionSelected(rmCtrl);
 
 			if ((roomId != null) && (roomId != "") && (roomId != "0") && (roomId != "-1")) {
 				if (checkRask) {
-					var rackSelect = $(stValue=='S' ? '#rackSourceId' : '#rackTargetId');
+					var rackSelect = $(stValue == 'S' ? '#rackSourceId' : '#rackTargetId');
 					if (rackSelect.children('option').length <= 2) {
 						pub.fetchRackSelectForRoom(roomId, stValue, 'Edit');
 					}
 				} else {
-					var chassisSelect = $(stValue=='S' ? '#sourceChassisSelectId' : '#targetChassisSelectId');
+					var chassisSelect = $(stValue == 'S' ? '#sourceChassisSelectId' : '#targetChassisSelectId');
 					if (chassisSelect.children('option').length <= 1) {
 						pub.fetchChassisSelectForRoom(roomId, stValue, 'Edit');
 					}
 				}
 			}
 
-		} );
+		});
 	}
 
 	// Used to retrieve a SELECT control populated with the appropriate Rack for the specified room and source/target and assign to the appropriate form control
-	pub.fetchRackSelectForRoom = function(roomId, sourceTarget, forWhom) {
+	pub.fetchRackSelectForRoom = function (roomId, sourceTarget, forWhom) {
 		var rackId = pub.getRackId(sourceTarget);
-		var rsName='#rack'+(sourceTarget=='S' ? 'Source' : 'Target') + 'Id';
+		var rsName = '#rack' + (sourceTarget == 'S' ? 'Source' : 'Target') + 'Id';
 		var selectCtrl = $(rsName);
 		if (selectCtrl.length) {
 			jQuery.ajax({
 				url: tdsCommon.createAppURL('/assetEntity/retrieveRackSelectForRoom'),
-				data: {'roomId':roomId, 'rackId':rackId, 'sourceTarget':sourceTarget, 'forWhom':forWhom},
-				type:'POST',
-				success: function(resp) {
+				data: { 'roomId': roomId, 'rackId': rackId, 'sourceTarget': sourceTarget, 'forWhom': forWhom },
+				type: 'POST',
+				success: function (resp) {
 					selectCtrl.html(resp);
 					EntityCrud.showRackFields();
 
@@ -476,44 +478,44 @@ var EntityCrud = ( function($) {
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 					alert(xhr.status + " " + thrownError);
-					selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>') ;
+					selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>');
 					selectCtrl.val(0);
 				}
 			});
 		} else {
-			alert('ERROR: fetchRackSelectForRoom() unable to locate select id '+ rsName);
+			alert('ERROR: fetchRackSelectForRoom() unable to locate select id ' + rsName);
 		}
 	};
 
 	// Used to retrieve a SELECT control populated with the appropriate Blade Chassis for the specified room and source/target and assign to the appropriate form control
-	pub.fetchChassisSelectForRoom = function(roomId, sourceTarget, forWhom) {
+	pub.fetchChassisSelectForRoom = function (roomId, sourceTarget, forWhom) {
 		var id = pub.getChassisId(sourceTarget);
-		var selectCtrl = $( '#' + (sourceTarget=='S' ? 'source' : 'target') + 'ChassisSelectId');
+		var selectCtrl = $('#' + (sourceTarget == 'S' ? 'source' : 'target') + 'ChassisSelectId');
 
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/assetEntity/retrieveChassisSelectForRoom'),
-			data: {'roomId':roomId, 'id':id, 'sourceTarget':sourceTarget, 'forWhom':forWhom},
-			type:'POST',
-			success: function(resp) {
+			data: { 'roomId': roomId, 'id': id, 'sourceTarget': sourceTarget, 'forWhom': forWhom },
+			type: 'POST',
+			success: function (resp) {
 				selectCtrl.html(resp);
 				pub.showChassisFields();
 
 				if (!isIE7OrLesser)
 					selectCtrl.select2();
-			}, 
+			},
 			error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status + " " + thrownError);
-				selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>') ;
+				selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>');
 				selectCtrl.val(0);
 			}
 		});
 	};
 
 	// Handle form changes when the user selects a room
-	pub.updateOnRoomSelection = function(selectCtrl, sourceTarget, forWhom) {
+	pub.updateOnRoomSelection = function (selectCtrl, sourceTarget, forWhom) {
 		var selectId = pub.selectOptionSelected(selectCtrl);
 		var assetType = pub.getAssetType();
-		switch(assetType) {
+		switch (assetType) {
 			case 'Blade':
 				if (parseInt(selectId) > 0)
 					pub.fetchChassisSelectForRoom(selectId, sourceTarget, forWhom);
@@ -526,7 +528,7 @@ var EntityCrud = ( function($) {
 		}
 		pub.toggleAssetTypeFields(assetType);
 		if (selectId == -1) {
-			var elPrefix = "#" + (sourceTarget=='S' ? 'source' : 'target');
+			var elPrefix = "#" + (sourceTarget == 'S' ? 'source' : 'target');
 			$(elPrefix + 'LocationId').focus();
 		}
 	};
@@ -537,20 +539,20 @@ var EntityCrud = ( function($) {
 	};
 
 	// Updates the form after the user chooses a rack
-	pub.updateOnRackSelection = function(selectCtrl, sourceTarget, forWhom) {
+	pub.updateOnRackSelection = function (selectCtrl, sourceTarget, forWhom) {
 		var selectId = pub.selectOptionSelected(selectCtrl);
-		var elPrefix = "#" + (sourceTarget=='S' ? 'source' : 'target');
-		var rackName=$(elPrefix + 'RackId');
-		var newRack=$(".newRack"+sourceTarget);
-		var rackPosition=$(elPrefix + 'RackPositionId');
+		var elPrefix = "#" + (sourceTarget == 'S' ? 'source' : 'target');
+		var rackName = $(elPrefix + 'RackId');
+		var newRack = $(".newRack" + sourceTarget);
+		var rackPosition = $(elPrefix + 'RackPositionId');
 
-		switch(selectId) {
+		switch (selectId) {
 			case '0':
 				newRack.hide();
 				rackPosition.hide();
 				rackPosition.val('');	// clear out current position
 				break;
-			case '-1': 
+			case '-1':
 				newRack.show();
 				rackPosition.show();
 				rackName.focus();
@@ -562,7 +564,7 @@ var EntityCrud = ( function($) {
 	};
 
 	// private singleton variable to control the saveToShow function from being called repeatedly
-	var assetCreateInvoked=false;
+	var assetCreateInvoked = false;
 
 	/**
 	 * Used to save newly created assets from the Create forms. After validating that the fields are 
@@ -571,12 +573,12 @@ var EntityCrud = ( function($) {
 	 * @param me - the form that is being processed
 	 * @param forWhom - string indicating which form is being processed (note that this is inconsistent with the update metho)
 	 */
-	pub.saveToShow = function(button, assetClass) {
+	pub.saveToShow = function (button, assetClass) {
 		if (assetCreateInvoked) {
 			alert("Please only click the save button once. Your save request is being processed.");
 			return false;
 		} else {
-			assetCreateInvoked=true;
+			assetCreateInvoked = true;
 		}
 
 		// var action = button.data('action');
@@ -593,15 +595,15 @@ var EntityCrud = ( function($) {
 		if (validateOkay)
 			validateOkay = pub.validateDependencies(formName)
 		if (validateOkay) {
-			var url=$('#createEditAssetForm').attr('action');
+			var url = $('#createEditAssetForm').attr('action');
 			jQuery.ajax({
 				url: url,
 				data: $('#createEditAssetForm').serialize(),
-				type:'POST',
-				success: function(resp) {
+				type: 'POST',
+				success: function (resp) {
 					if (resp.status == 'error') {
 						alert(resp.errors);
-						assetCreateInvoked=false;
+						assetCreateInvoked = false;
 						return false;
 					} else {
 						pub.showAssetDetailView(assetClass, resp.data.asset.id);
@@ -614,19 +616,19 @@ var EntityCrud = ( function($) {
 							getRackLayout( $('#selectedRackId').val() );
 						*/
 					}
-					assetCreateInvoked=false
-					$(document).trigger('entityAssetCreated',resp.data);
+					assetCreateInvoked = false
+					$(document).trigger('entityAssetCreated', resp.data);
 				},
-				error: function(jqXHR, textStatus, errorThrown) {
+				error: function (jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
 					console.log("error 2")
-					alert("The following error occurred while attempting to create asset : "+ err);
-					assetCreateInvoked=false;
+					alert("The following error occurred while attempting to create asset : " + err);
+					assetCreateInvoked = false;
 					return false;
 				},
 				// This function is executed after the interceptor displays the error message, to perform additional actions.
-				successWithErrors: function(resp){
-					assetCreateInvoked=false;
+				successWithErrors: function (resp) {
+					assetCreateInvoked = false;
 				},
 			});
 		} else {
@@ -636,7 +638,7 @@ var EntityCrud = ( function($) {
 	};
 
 
-	pub.validateForm = function(assetClass, formName, alertErrors){
+	pub.validateForm = function (assetClass, formName, alertErrors) {
 		var validateOkay = true;
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true
 		switch (assetClass) {
@@ -664,14 +666,14 @@ var EntityCrud = ( function($) {
 	}
 
 	// Private variable used to prevent multiple clicks from invoking multiple updates
-	var assetUpdateInvoked=false;
+	var assetUpdateInvoked = false;
 
 	/**
 	 * Used to call Ajax Update for given asset form and then load the show view of the asset
 	 * @param me - the button that the user clicked to get here
 	 * @param forWhom - the asset class of the form (app, files, database)
 	 **/
-	 pub.performAssetUpdate = function(buttonClicked, assetClass) {
+	pub.performAssetUpdate = function (buttonClicked, assetClass) {
 
 		if (assetUpdateInvoked) {
 			alert("Please only click the update button once. Your update request is being processed.");
@@ -687,8 +689,8 @@ var EntityCrud = ( function($) {
 
 		$('#updateView').val('updateView');
 
-		var validateOkay=false;
-		var formName=assetFormName;
+		var validateOkay = false;
+		var formName = assetFormName;
 		switch (assetClass) {
 			case 'APPLICATION':
 				type = 'Application';
@@ -718,35 +720,35 @@ var EntityCrud = ( function($) {
 			validateOkay = pub.validateDependencies(formName);
 
 		if (validateOkay) {
-			var formObj=$('#'+formName);
-			if (formObj.length==0) {
-				alert("Unable to locate form "+formName);
+			var formObj = $('#' + formName);
+			if (formObj.length == 0) {
+				alert("Unable to locate form " + formName);
 				return false;
 			}
-			var assetId=$("#"+formName+" :input[name='id']").val();
-			var url=formObj.attr('action')+'/'+assetId;
-			var data=formObj.serialize();
+			var assetId = $("#" + formName + " :input[name='id']").val();
+			var url = formObj.attr('action') + '/' + assetId;
+			var data = formObj.serialize();
 			jQuery.ajax({
 				url: url,
 				data: data,
-				type:'POST',
+				type: 'POST',
 				//async: false,
-				complete: function(resp, status) {
-					buttonClicked.one(function() {
+				complete: function (resp, status) {
+					buttonClicked.one(function () {
 						pub.EntityCrud.performAssetUpdate(buttonClicked, assetClass);
 					});
 					assetUpdateInvoked = false;
 					buttonClicked.disabled = false;
 				},
-				success: function(resp, dataType) {
+				success: function (resp, dataType) {
 					pub.showAssetDetailView(assetClass, resp.data.asset.id);
-					$(document).trigger('entityAssetUpdated',resp.data);
+					$(document).trigger('entityAssetUpdated', resp.data);
 					//location.reload();  //to reload the whole List View
 				},
-				error: function(jqXHR, textStatus, errorThrown) {
+				error: function (jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
-					alert("An error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
-					buttonClicked.one(function() {
+					alert("An error occurred while updating Asset." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
+					buttonClicked.one(function () {
 						pub.EntityCrud.performAssetUpdate(buttonClicked, assetClass);
 					});
 					assetUpdateInvoked = false;
@@ -757,36 +759,36 @@ var EntityCrud = ( function($) {
 		} else {
 			assetUpdateInvoked = false;
 		}
-		return true;	
-	};	
+		return true;
+	};
 
 	// Used to format the results of the model shown in the Model select (below) so that validated models are emphasized with BOLD and the other italics
-	var modelSelectFormatResult = function(item) {
+	var modelSelectFormatResult = function (item) {
 		if (item.text) {
 			if (item.isValid) {
-				return '<b>'+item.text+'</b>';
+				return '<b>' + item.text + '</b>';
 			} else {
-				return '<i>'+item.text+'</i>';
+				return '<i>' + item.text + '</i>';
 			}
 		} else {
 			return '';
 		}
 	};
 	// Used to format the item selected of the model in the Model select (below) so that validated models are emphasized with BOLD and the other italics
-	var modelSelectFormatSelection = function(item) {
+	var modelSelectFormatSelection = function (item) {
 		if (item.text) {
-			if ( (('isValid' in item) && item.isValid) || item.text.indexOf('?') == -1 ) {
-				return '<b>'+item.text+'</b>';
+			if ((('isValid' in item) && item.isValid) || item.text.indexOf('?') == -1) {
+				return '<b>' + item.text + '</b>';
 			} else {
-				return '<i>'+item.text+'</i>';
+				return '<i>' + item.text + '</i>';
 			}
 		} else {
 			return '';
 		}
-	}; 
+	};
 
 	// Initializes the various controls for the selection of manufacturer and model with the assetType filter
-	pub.initializeUI = function(modelId, modelName, manufacturerId, manufacturerName) {
+	pub.initializeUI = function (modelId, modelName, manufacturerId, manufacturerName) {
 
 		// Initialize the model filtering parameters
 		modelFilteringData.id = $('#hiddenModel').val();
@@ -794,19 +796,19 @@ var EntityCrud = ( function($) {
 		modelFilteringData.assetType = $('#currentAssetType').val();
 		modelFilteringData.id = $('#currentAssetType').val();
 
-		$('#assetTypeFilterUnSet').click(function() {
+		$('#assetTypeFilterUnSet').click(function () {
 			$('#assetTypeLabel').toggle();
 			$('#assetTypeSelectContainer').toggle();
 		});
 
-		$('#assetTypeFilterSet').click(function() {
+		$('#assetTypeFilterSet').click(function () {
 			$('#assetTypeLabel').toggle();
 			$('#assetTypeSelectContainer').toggle();
 			$('#assetTypeFilterSet').toggle();
 			$('#assetTypeFilterSet2').toggle();
 		});
 
-		$('#assetTypeFilterSet2').click(function() {
+		$('#assetTypeFilterSet2').click(function () {
 			$('#assetTypeLabel').toggle();
 			$('#assetTypeSelectContainer').toggle();
 			$('#assetTypeFilterSet').toggle();
@@ -826,28 +828,28 @@ var EntityCrud = ( function($) {
 				dataType: 'json',
 				data: function (term, page) {
 					return {
-						"term" : term,
-						"manufacturerId" : modelFilteringData.manufacturerId
+						"term": term,
+						"manufacturerId": modelFilteringData.manufacturerId
 					};
 				},
 				results: function (data, page) {
-					return {results: data.data.assetTypes};
+					return { results: data.data.assetTypes };
 				}
 			},
-			initSelection: function(element, callback) {
+			initSelection: function (element, callback) {
 				var at = EntityCrud.getAssetType();
 				if (at != "") {
-					callback({id: at, text: at});
+					callback({ id: at, text: at });
 				}
 			}
 		}).select2('val', []);
-		
-		$("#assetTypeSelect").on("change", function(event) {
+
+		$("#assetTypeSelect").on("change", function (event) {
 			$('#assetTypeFilterSet').show();
 			$('#assetTypeFilterUnSet').hide();
 			$('#currentAssetType').val(event.val);
 			modelFilteringData.assetType = event.val;
-            modelFilteringData.id = event.val;
+			modelFilteringData.id = event.val;
 			if ((selectedModel != null && selectedModel.assetType != null && event.val != selectedModel.assetType.toString()) || (event.val == null)) {
 				if (selectedModel != null) {
 					clearSelectedModel(selectedModel.manufacturerId, selectedModel.manufacturerName, event.val);
@@ -858,38 +860,38 @@ var EntityCrud = ( function($) {
 				pub.toggleAssetTypeFields(event.val);
 			}
 		});
-		
+
 		$("#modelSelect").select2({
-		    placeholder: "Model",
-		    minimumInputLength: 0,
-   			dropdownAutoWidth: true,
-		    width: "100%",
-		    allowClear: true,
+			placeholder: "Model",
+			minimumInputLength: 0,
+			dropdownAutoWidth: true,
+			width: "100%",
+			allowClear: true,
 			// Specify format function for dropdown item
 			formatResult: modelSelectFormatResult,
 			// Specify format function for selected item
 			formatSelection: modelSelectFormatSelection,
 			formatAjaxError: tdsCommon.select2AjaxErrorHandler,
-		    ajax: {
-		        url: tdsCommon.createAppURL('/assetEntity/modelsOf'),
+			ajax: {
+				url: tdsCommon.createAppURL('/assetEntity/modelsOf'),
 				quietMillis: quietMillis,
-		        dataType: 'json',
-		        data: function (term, page) {
-		        	modelFilteringData.term = term;
-		            return modelFilteringData;
-		        },
-		        results: function (data, page) {
-		            return {results: data.data.models};
-		        },
-		    },
-		    initSelection: function(element, callback) {
-		    	if (modelId != "") {
-		    		callback({id: modelId, text : modelName});
-		    	}
-		    },
+				dataType: 'json',
+				data: function (term, page) {
+					modelFilteringData.term = term;
+					return modelFilteringData;
+				},
+				results: function (data, page) {
+					return { results: data.data.models };
+				},
+			},
+			initSelection: function (element, callback) {
+				if (modelId != "") {
+					callback({ id: modelId, text: modelName });
+				}
+			},
 		}).select2('val', []);
-		
-		$('#modelSelect').on("change", function(event) {
+
+		$('#modelSelect').on("change", function (event) {
 			//console.log("in the #modelSelect on change event");
 			if (event.added) {
 				var at = event.added.assetType;
@@ -905,21 +907,21 @@ var EntityCrud = ( function($) {
 				$('#hiddenManufacturer').val();
 
 				pub.toggleAssetTypeFields(at);
-				
+
 				// Put trailing questionmark for non-validated models
 				var modelText = selectedModel.name + (selectedModel.isValid ? '' : ' ?');
-				$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':modelText});
-				$("#manufacturerSelect").select2('data', {"id":manuId, "text":manuName});
-				$("#assetTypeSelect").select2('data', {"id":at, "text":at});
-                modelFilteringData.assetType = at;
-                modelFilteringData.id = at;
-                modelFilteringData.manufacturerId = manuId;
+				$('#modelSelect').select2('data', { 'id': selectedModel.id, 'text': modelText });
+				$("#manufacturerSelect").select2('data', { "id": manuId, "text": manuName });
+				$("#assetTypeSelect").select2('data', { "id": at, "text": at });
+				modelFilteringData.assetType = at;
+				modelFilteringData.id = at;
+				modelFilteringData.manufacturerId = manuId;
 				$(document).trigger('selectedAssetModelChanged', selectedModel);
 			} else {
 				clearSelectedModel(selectedModel.manufacturerId);
 			}
 		});
-		
+
 		$("#manufacturerSelect").select2({
 			placeholder: "Manufacturer filter",
 			minimumInputLength: 0,
@@ -933,41 +935,41 @@ var EntityCrud = ( function($) {
 				dataType: 'json',
 				data: function (term, page) {
 					return {
-						"term" : term,
-						"assetType" : modelFilteringData.assetType
+						"term": term,
+						"assetType": modelFilteringData.assetType
 					};
 				},
 				results: function (data, page) {
-					return {results: data.data.manufacturers};
+					return { results: data.data.manufacturers };
 				}
 			},
-			initSelection: function(element, callback) {
+			initSelection: function (element, callback) {
 				if (manufacturerId != "") {
-					callback({id: manufacturerId, text : manufacturerName});
+					callback({ id: manufacturerId, text: manufacturerName });
 				}
 			}
 		}).select2('val', []);
 
-		$('#manufacturerSelect').on("change", function(event) {
+		$('#manufacturerSelect').on("change", function (event) {
 			modelFilteringData.manufacturerId = event.val;
 			$('#hiddenManufacturer').val(event.val);
-			
+
 			if ((selectedModel != null && selectedModel.manufacturerId != null && event.val != selectedModel.manufacturerId.toString()) || (event.val == null)) {
 				clearSelectedModel(event.val, '', null);
 			}
 		});
 	};
 
-	var clearSelectedModel = function(manufacturerId, manufacturerName, assetType) {
+	var clearSelectedModel = function (manufacturerId, manufacturerName, assetType) {
 		selectedModel = {
-			"id" : null,
-			"text" : null,
-			"assetType" : assetType,
-			"manufacturerId" : manufacturerId,
-			"manufacturerName" : manufacturerName,
-			"usize" : null
+			"id": null,
+			"text": null,
+			"assetType": assetType,
+			"manufacturerId": manufacturerId,
+			"manufacturerName": manufacturerName,
+			"usize": null
 		}
-		
+
 		$("#modelSelect").select2('val', '');
 		$('#hiddenModel').val('');
 		if (assetType) {
@@ -975,15 +977,15 @@ var EntityCrud = ( function($) {
 		}
 		$(document).trigger('selectedAssetModelChanged', selectedModel);
 	}
-	
-	pub.setManufacturerValues = function(modelId, modelName, assetType, manufacturerId, manufacturerName) {
+
+	pub.setManufacturerValues = function (modelId, modelName, assetType, manufacturerId, manufacturerName) {
 		selectedModel = {
-			"id" : modelId,
-			"text" : modelName,
-			"assetType" : assetType,
-			"manufacturerId" : manufacturerId,
+			"id": modelId,
+			"text": modelName,
+			"assetType": assetType,
+			"manufacturerId": manufacturerId,
 			"manufacturerName": manufacturerName,
-			"usize" : null
+			"usize": null
 		}
 		$("#assetTypeSelect").val('');
 		$(document).trigger('selectedAssetModelChanged', selectedModel);
@@ -991,13 +993,13 @@ var EntityCrud = ( function($) {
 
 	// Validates the user input for the dependency section of the form
 	// TODO : JPM 10/2014 - It would be nice to include which asset dependency is in error for validateDependencies
-	pub.validateDependencies = function(formName) {
+	pub.validateDependencies = function (formName) {
 		var valid = true;
-		$('#'+formName+' input[name^="asset_"]').each( function() {
-			if ($(this).val() == 'null' ||  $(this).val() == '')
+		$('#' + formName + ' input[name^="asset_"]').each(function () {
+			if ($(this).val() == 'null' || $(this).val() == '')
 				valid = false;
 		});
-		if (! valid)
+		if (!valid)
 			alert("Please select a valid asset for all dependencies");
 
 		return valid;
@@ -1006,7 +1008,7 @@ var EntityCrud = ( function($) {
 
 	// Used to populate the hidden form fields with the values from the JQGrid form fields
 	// TODO : JPM 10/2014 - See if we can eliminate loadFormFromJQGridFilters
-	pub.loadFormFromJQGridFilters = function() {
+	pub.loadFormFromJQGridFilters = function () {
 		$("#asset_assetName").val($('#gs_assetName').val())
 		$("#asset_assetType").val($('#gs_assetType').val())
 		$("#asset_model").val($('#gs_model').val())
@@ -1020,16 +1022,16 @@ var EntityCrud = ( function($) {
 
 	// Used to change the Select2 Asset Name SELECT when the Class SELECT is changed
 	// TODO : JPM 9/2014 : Is this still being used?
-	pub.updateDependentAssetNameSelect = function(name) {
+	pub.updateDependentAssetNameSelect = function (name) {
 		var split = name.split("_");
-		var classSelect = $("select[name='entity_"+split[1]+"_"+split[2]+"']");
-		var nameSelect = $("input[name='asset_"+split[1]+"_"+split[2]+"']");
+		var classSelect = $("select[name='entity_" + split[1] + "_" + split[2] + "']");
+		var nameSelect = $("input[name='asset_" + split[1] + "_" + split[2] + "']");
 		nameSelect.data("asset-type", classSelect.val());
 		nameSelect.select2("val", "");
 	};
 
 	// Private method called by fetchAssetEditView to actually display the form once it is retrieved
-	var presentAssetEditView = function(html, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
+	var presentAssetEditView = function (html, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
 		var editModal = pub.getEditModal();
 
 		if (editModal.length) {
@@ -1038,17 +1040,17 @@ var EntityCrud = ( function($) {
 			editModal.html(html);
 			editModal.dialog('option', 'width', 'auto');
 			editModal.dialog('option', 'modal', 'true');
-			editModal.dialog('option', 'position', ['center','top']);
+			editModal.dialog('option', 'position', ['center', 'top']);
 			editModal.dialog('open');
-			
+
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 
-			if(!isIE7OrLesser)
+			if (!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
 			updateAssetTitle(fieldHelpType);
 			if (rackOrChassisId)
-				updateAssetInfo(source,rackOrChassisId,roomId,location,position,'edit',isBlade);
+				updateAssetInfo(source, rackOrChassisId, roomId, location, position, 'edit', isBlade);
 			return true;
 		} else {
 			console.log("EntityCrud.presentAssetEditView() Error: Unable to access editEntityView DIV");
@@ -1057,26 +1059,26 @@ var EntityCrud = ( function($) {
 	}
 	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
-	var fetchAssetEditView = function(controller, fieldType, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
-		var url = tdsCommon.createAppURL('/'+controller+'/edit/' + assetId);
+	var fetchAssetEditView = function (controller, fieldType, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
+		var url = tdsCommon.createAppURL('/' + controller + '/edit/' + assetId);
 		jQuery.ajax({
 			url: url,
-			type:'POST',
-			success: function(resp) {
+			type: 'POST',
+			success: function (resp) {
 				// Load the edit entity view
 				return presentAssetEditView(resp, fieldType, source, rackOrBladeId, roomId, location, position, isBlade);
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
+			error: function (jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
-				alert("An error occurred while loading the asset edit form."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				alert("An error occurred while loading the asset edit form." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
 				return false;
 			}
 		});
 	};
 	// Used to display the various asset class edit modal views
 	// This replaces editEntity()
-	pub.showAssetEditView = function(assetClass, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
-		assetUpdateInvoked=false;	// Reset the update invoked flag
+	pub.showAssetEditView = function (assetClass, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
+		assetUpdateInvoked = false;	// Reset the update invoked flag
 		switch (assetClass) {
 			case "APPLICATION":
 				return fetchAssetEditView('application', 'Application', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
@@ -1089,7 +1091,7 @@ var EntityCrud = ( function($) {
 				break;
 			case "DEVICE":
 				return fetchAssetEditView('assetEntity', 'Device', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
-				 break;
+				break;
 			default:
 				alert("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");
 				return false;
@@ -1097,7 +1099,7 @@ var EntityCrud = ( function($) {
 	};
 
 	// Displays the detail view of the asset from ajax call in model popup
-	var presentAssetShowView = function(html, fieldHelpType) {
+	var presentAssetShowView = function (html, fieldHelpType) {
 		var showModal = pub.getShowModal();
 
 		if (showModal.length) {
@@ -1106,7 +1108,7 @@ var EntityCrud = ( function($) {
 			showModal.html(html);
 			showModal.dialog('option', 'width', 'auto');
 			showModal.dialog('option', 'modal', 'true');
-			showModal.dialog('option', 'position', ['center','top']);
+			showModal.dialog('option', 'position', ['center', 'top']);
 			showModal.dialog('open');
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
@@ -1124,14 +1126,14 @@ var EntityCrud = ( function($) {
 
 	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
-	var fetchAssetShowView = function(controller, fieldHelpType, assetId) {
-		var url = tdsCommon.createAppURL('/'+controller+'/show/' + assetId);
+	var fetchAssetShowView = function (controller, fieldHelpType, assetId) {
+		var url = tdsCommon.createAppURL('/' + controller + '/show/' + assetId);
 		jQuery.ajax({
 			url: url,
-			type:'POST',
-			success: function(resp) {
+			type: 'POST',
+			success: function (resp) {
 				if (typeof resp === 'object') {
-					if (resp.status=='error') {
+					if (resp.status == 'error') {
 						alert("An error occurred: " + resp.errors);
 						return false;
 					}
@@ -1141,9 +1143,9 @@ var EntityCrud = ( function($) {
 				// Load the edit entity view
 				return presentAssetShowView(resp, fieldHelpType);
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
+			error: function (jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
-				alert("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				alert("An error occurred while loading the asset show view." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
 				return false;
 			}
 		});
@@ -1151,20 +1153,20 @@ var EntityCrud = ( function($) {
 
 	// Called from the page to popup the Asset Entity details dialog
 	// getEntityDetails
-	pub.showAssetDetailView = function(assetClass, assetId) {
+	pub.showAssetDetailView = function (assetClass, assetId) {
 		/*
 			Handling Angular Scope (root scope) outside Angular. This is
 			far from ideal, but it's required for keeping track of the current
 			asset when the user edits a comment from the asset modal.
 		*/
-		var $asset = angular.element("#"+assetId)
-  		if($asset.scope()){
-  			var $rootScope = $asset.scope().$root
-  			$rootScope.$apply(function () {
-    			$rootScope.selectedAsset = assetId
-  			})	
+		var $asset = angular.element("#" + assetId)
+		if ($asset.scope()) {
+			var $rootScope = $asset.scope().$root
+			$rootScope.$apply(function () {
+				$rootScope.selectedAsset = assetId
+			})
 		}
-		
+
 		switch (assetClass) {
 			case "APPLICATION":
 				return fetchAssetShowView('application', 'Application', assetId);
@@ -1186,17 +1188,17 @@ var EntityCrud = ( function($) {
 	};
 
 	// Private method called by fetchAssetCreateView to present the various asset create modal window
-	var presentAssetCreateView = function(html, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
+	var presentAssetCreateView = function (html, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
 		var createModal = pub.getCreateModal();
 		if (createModal.length) {
 			createModal.html(html);
 			createModal.dialog('option', 'width', 'auto');
 			createModal.dialog('option', 'modal', 'true');
-			createModal.dialog('option', 'position', ['center','top']);
+			createModal.dialog('option', 'position', ['center', 'top']);
 			createModal.dialog('open');
 			pub.closeEditModal();
 			pub.closeShowModal();
-			
+
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 			pub.populateAssetEditView(fieldHelpType, source, rackOrChassisId, roomId, location, position, 'create', isBlade);
@@ -1206,26 +1208,26 @@ var EntityCrud = ( function($) {
 			return false;
 		}
 	};
-	pub.populateAssetEditView = function(fieldHelpType, source, rackOrChassisId, roomId, location, position, forWhom, isBlade) {
+	pub.populateAssetEditView = function (fieldHelpType, source, rackOrChassisId, roomId, location, position, forWhom, isBlade) {
 		updateAssetTitle(fieldHelpType);
-		if (fieldHelpType=='Device')
+		if (fieldHelpType == 'Device')
 			updateAssetInfo(source, rackOrChassisId, roomId, location, position, forWhom, isBlade);
 
-		if(!isIE7OrLesser)
+		if (!isIE7OrLesser)
 			getHelpTextAsToolTip(fieldHelpType);
 	}
 	// Private method used by showAssetCreateView
 	function fetchAssetCreateView(controller, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
-		var url = tdsCommon.createAppURL('/'+controller+'/create');
+		var url = tdsCommon.createAppURL('/' + controller + '/create');
 		jQuery.ajax({
 			url: url,
-			type:'POST',
+			type: 'POST',
 			data: {
-				initialAssetType: (isBlade?'Blade':'')
+				initialAssetType: (isBlade ? 'Blade' : '')
 			},
-			success: function(resp) {
+			success: function (resp) {
 				if (typeof resp === 'object') {
-					if (resp.status=='error') {
+					if (resp.status == 'error') {
 						alert("The following error occurred: " + resp.errors);
 						return false;
 					}
@@ -1235,16 +1237,16 @@ var EntityCrud = ( function($) {
 				// Load the edit entity view
 				return presentAssetCreateView(resp, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade);
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
+			error: function (jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
-				alert("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				alert("An error occurred while loading the asset show view." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
 				return false;
 			}
 		});
 	};
 	// Called from the page to popup the Asset Entity Create dialog
-	pub.showAssetCreateView = function(assetClass, source, rackOrChassisId, roomId, location, position, isBlade) {
-		assetCreateInvoked=false;
+	pub.showAssetCreateView = function (assetClass, source, rackOrChassisId, roomId, location, position, isBlade) {
+		assetCreateInvoked = false;
 		switch (assetClass) {
 			case "APPLICATION":
 				return fetchAssetCreateView('application', 'Application', source, rackOrChassisId, roomId, location, position, isBlade);
@@ -1267,18 +1269,18 @@ var EntityCrud = ( function($) {
 	// Used to dynamically add a new dependency row to the dependency formin either support or dependent tables (see _dependent.gsp)
 	// @param supportDepend - the dependency type [support|dependent]
 	// @param forWhom - used to indicate edit or create? views
-	pub.addAssetDependencyRow = function(supportDepend) {
-		var addedCounter = $("#"+supportDepend+"Added");
-		if (addedCounter.length==0)
-			console.log('EntityCrud.addAssetDependencyRow() unable to locate #'+supportDepend+'Added');
+	pub.addAssetDependencyRow = function (supportDepend) {
+		var addedCounter = $("#" + supportDepend + "Added");
+		if (addedCounter.length == 0)
+			console.log('EntityCrud.addAssetDependencyRow() unable to locate #' + supportDepend + 'Added');
 
 		var rowNum = addedCounter.val();
 
 		// We tick negatively so that new dependencies have negative id suffix vs actual (positive) ids for existing dependencies
-		addedCounter.val(parseInt(rowNum)-1);	
+		addedCounter.val(parseInt(rowNum) - 1);
 
-		var fieldSuffix = supportDepend+"_"+rowNum;
-		var rowId='row_'+supportDepend.substring(0,1)+'_'+rowNum;
+		var fieldSuffix = supportDepend + "_" + rowNum;
+		var rowId = 'row_' + supportDepend.substring(0, 1) + '_' + rowNum;
 
 		// Update all of the properties names that are from _dependentAdd.gsp to include the new row information
 		var rowData = $("#assetDependencyRow tr").html()
@@ -1286,28 +1288,28 @@ var EntityCrud = ( function($) {
 			.replace(/ROW_ID/g, rowId);
 
 		// Stuff the new row html into the table
-		var dependencyList = $('#'+supportDepend+'List');
+		var dependencyList = $('#' + supportDepend + 'List');
 		if (dependencyList.length)
-			dependencyList.prepend("<tr id='"+rowId+"'>"+rowData+'</tr>');
+			dependencyList.prepend("<tr id='" + rowId + "'>" + rowData + '</tr>');
 		else
-			console.log('EntityCrud.addAssetDependencyRow() unable to locate #'+supportDepend+'List');
+			console.log('EntityCrud.addAssetDependencyRow() unable to locate #' + supportDepend + 'List');
 
 		// Initialize some of the newly created form fields
-		$("#comment_"+fieldSuffix).val('');
-		$("#dep_comment_"+fieldSuffix).val('');
-		$("#depComment_"+fieldSuffix).dialog({ autoOpen: false});
-		
+		$("#comment_" + fieldSuffix).val('');
+		$("#dep_comment_" + fieldSuffix).val('');
+		$("#depComment_" + fieldSuffix).dialog({ autoOpen: false });
+
 		// Update the asset select control
-		var assetSelect = $("#asset_"+fieldSuffix);
+		var assetSelect = $("#asset_" + fieldSuffix);
 		if (assetSelect.length) {
 			assetSelect.addClass("scrollSelect");
-			assetSelect.attr("data-asset-type", $("#entity_"+fieldSuffix).val());
+			assetSelect.attr("data-asset-type", $("#entity_" + fieldSuffix).val());
 			if (!isIE7OrLesser) {
-				pub.assetNameSelect2( assetSelect );
+				pub.assetNameSelect2(assetSelect);
 			}
 		} else {
-			console.log('EntityCrud.addAssetDependencyRow() unable to locate #dep_'+fieldSuffix);
-		}		
+			console.log('EntityCrud.addAssetDependencyRow() unable to locate #dep_' + fieldSuffix);
+		}
 
 	};
 
@@ -1315,15 +1317,15 @@ var EntityCrud = ( function($) {
 	// @param rowDomId - the DOM id for the row in the table
 	// @param forWhomId - the supportAdded|dependAdded form variable that contains the counter?
 	//pub.deleteAssetDependencyRow = function( rowDomId, forWhomId ) {
-	pub.deleteAssetDependencyRow = function( rowDomId ) {
-		$("#"+rowDomId).remove();
+	pub.deleteAssetDependencyRow = function (rowDomId) {
+		$("#" + rowDomId).remove();
 
 		// If row being deleted is a previousl persisted dependency (suffix > 0) then need to add the id to the delete list
 		var id = rowDomId.split('_')[3];
-		if (id && parseInt(id)>0) {
+		if (id && parseInt(id) > 0) {
 			var deletedDepList = $("#deletedDep");
 			var ddVal = deletedDepList.val();
-			deletedDepList.val(( ddVal ? ddVal+',' : '') + id);
+			deletedDepList.val((ddVal ? ddVal + ',' : '') + id);
 		}
 		// Note that we never tick the addedCounter because if there were a combination of rows added, deleted, added we don't want to duplicate any
 	};
@@ -1333,33 +1335,33 @@ var EntityCrud = ( function($) {
 	 * @param assetId - the id of the asset the user selected 
 	 * @param depId
 	 */
-	pub.updateDependentBundle = function(assetId, assetDomId, assetBundleId){
+	pub.updateDependentBundle = function (assetId, assetDomId, assetBundleId) {
 		var splittedDep = assetDomId.split("_");
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/assetEntity/retrieveChangedBundle'),
-			data: {'assetId':assetId, 'dependentId':splittedDep[2], 'type':splittedDep[1]},
-			type:'POST',
-			success: function(resp) {
-				$("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2]).val(resp.id);
+			data: { 'assetId': assetId, 'dependentId': splittedDep[2], 'type': splittedDep[1] },
+			type: 'POST',
+			success: function (resp) {
+				$("#moveBundle_" + splittedDep[1] + "_" + splittedDep[2]).val(resp.id);
 				pub.changeDependentBundleColor(assetDomId, assetBundleId, resp.id, '');
 			}
 		});
 	};
 
-	pub.changeDependentBundleColor = function(depId, assetId, assetBundleId, status) {
+	pub.changeDependentBundleColor = function (depId, assetId, assetBundleId, status) {
 		var splittedDep = depId.split("_");
-		var bundleObj = $("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2]);
-		var status = status != '' ? status : $("#status_"+splittedDep[1]+"_"+splittedDep[2]).val();
+		var bundleObj = $("#moveBundle_" + splittedDep[1] + "_" + splittedDep[2]);
+		var status = status != '' ? status : $("#status_" + splittedDep[1] + "_" + splittedDep[2]).val();
 		var assetId = assetId != '' ? assetId : bundleObj.val();
 		bundleObj.removeAttr("class").removeAttr("style");
-		
+
 		if (assetId != assetBundleId && status == 'Validated') {
-			bundleObj.css('background-color','red');
+			bundleObj.css('background-color', 'red');
 		} else {
-			if(status != 'Questioned' && status != 'Validated')
+			if (status != 'Questioned' && status != 'Validated')
 				bundleObj.addClass('dep-Unknown');
 			else
-				bundleObj.addClass('dep-'+status);
+				bundleObj.addClass('dep-' + status);
 		}
 	};
 
@@ -1367,26 +1369,26 @@ var EntityCrud = ( function($) {
 	 * Used to open the Comment dialog for a specific Asset Dependency
 	 * @param dialogId
 	 */
-	pub.openDepCommentDialog = function(typeAndId) {
+	pub.openDepCommentDialog = function (typeAndId) {
 		// The typeAndId id is formatted as Type_DependencyID
 		var type = typeAndId.split('_')[0];
 		var rowNo = typeAndId.split('_')[1];
 		var modal = $('#depCommentDialog');
 
-		var suffix = type+'_'+rowNo;
-		var hiddenInput = $('input:hidden[name=comment_'+suffix+']');
+		var suffix = type + '_' + rowNo;
+		var hiddenInput = $('input:hidden[name=comment_' + suffix + ']');
 		var textarea = $('#depCommentTextarea');
 		// Populate the textarea from the hidden field
-		if (! hiddenInput.val())
+		if (!hiddenInput.val())
 			hiddenInput.val('');
 		textarea.val(hiddenInput.val());
 
 		// Save the type/id back so the window know which dependency to update on close
 		$('#depCommentType').val(type);
 		$('#depCommentRowNo').val(rowNo);
-		
-		var depAssetText='Unselected';
-		var depAssetSelect = $('#asset_'+suffix);
+
+		var depAssetText = 'Unselected';
+		var depAssetSelect = $('#asset_' + suffix);
 		if (depAssetSelect.length && depAssetSelect.select2('data') != null) {
 			if (!isIE7OrLesser) {
 				depAssetText = depAssetSelect.select2('data').text;
@@ -1400,7 +1402,7 @@ var EntityCrud = ( function($) {
 		modal.dialog('option', 'modal', 'true');
 		modal.dialog('option', 'position', 'absolute');
 		modal.dialog('option', 'title', title);
-		modal.dialog('open'); 
+		modal.dialog('open');
 		textarea.focus();
 	};
 
@@ -1411,20 +1413,20 @@ var EntityCrud = ( function($) {
 	 * @param hiddenInputId - the DOM id of the hidden input that is used to pass the comment value as part of the post
 	 * @param iconLinkId - the DOM id of the A tag that contains the icon that is changed accordingly
 	 */
-	pub.onDepCommentDialogClose = function() {
+	pub.onDepCommentDialogClose = function () {
 		var modal = $('#depCommentDialog');
 		var type = $('#depCommentType').val();
 		var rowNo = $('#depCommentRowNo').val();
 		var textarea = $('#depCommentTextarea');
 
-		var hiddenInput = $('input:hidden[name=comment_'+type+'_'+rowNo+']')
+		var hiddenInput = $('input:hidden[name=comment_' + type + '_' + rowNo + ']')
 
 		hiddenInput.val(textarea.val());
 		modal.dialog('close');
 
 		// Update the icon based on if there is content
 		var iconMode = hiddenInput.val() ? 'edit' : 'add';
-		$('#commLink_'+type+'_'+rowNo).html('<img border="0px" src="'+tdsCommon.createAppURL('/icons/comment_' + iconMode + '.png">') );
+		$('#commLink_' + type + '_' + rowNo).html('<img border="0px" src="' + tdsCommon.createAppURL('/icons/comment_' + iconMode + '.png">'));
 	};
 
 	/**
@@ -1432,7 +1434,7 @@ var EntityCrud = ( function($) {
 	 * @param dialogId - the DOM id of the modal dialog
 	 * @param textareaId - the DOM id of the textarea
 	 */
-	pub.onDepCommentDialogCancel = function() {
+	pub.onDepCommentDialogCancel = function () {
 		var modal = $('#depCommentDialog');
 		var textarea = $('#depCommentTextarea');
 		modal.dialog('close');
@@ -1445,7 +1447,7 @@ var EntityCrud = ( function($) {
 	//
 	return pub;
 
-} )(jQuery); //passed 'jQuery' global variable into local parameter '$'
+})(jQuery); //passed 'jQuery' global variable into local parameter '$'
 
 
 //
@@ -1454,69 +1456,69 @@ var EntityCrud = ( function($) {
 
 var title = document.title;
 
-function changeDocTitle ( newTitle ) {
+function changeDocTitle(newTitle) {
 	$(document).attr('title', newTitle);
-	$(document).keyup(function(e) {
-		if(e.keyCode== 27) {
+	$(document).keyup(function (e) {
+		if (e.keyCode == 27) {
 			$(document).attr('title', title);
 		}
 	});
-	$(".ui-dialog .ui-dialog-titlebar-close").click(function(){
+	$(".ui-dialog .ui-dialog-titlebar-close").click(function () {
 		$(document).attr('title', title);
 		if (typeof timerBar !== 'undefined')
 			timerBar.attemptResume();
 	});
-	$( "#deps" ).tooltip({
-		 position: {
+	$("#deps").tooltip({
+		position: {
 			my: "center bottom-20",
 			at: "center top",
-			using: function( position, feedback ) {
-				$( this ).css( position );
-				$( "<div>" )
-				.addClass( "arrow" )
-				.addClass( feedback.vertical )
-				.addClass( feedback.horizontal )
-				.appendTo( this );
+			using: function (position, feedback) {
+				$(this).css(position);
+				$("<div>")
+					.addClass("arrow")
+					.addClass(feedback.vertical)
+					.addClass(feedback.horizontal)
+					.appendTo(this);
 			}
-		 }
+		}
 	});
 }
 
-function isValidDate ( date ) {
+function isValidDate(date) {
 	var returnVal = true;
-	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
-	if( date && !objRegExp.test(date) ){
+	var objRegExp = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
+	if (date && !objRegExp.test(date)) {
 		alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
-		returnVal  =  false;
+		returnVal = false;
 	}
 	return returnVal;
 }
 
-function updateAssetTitle ( type ) {
-	EntityCrud.getCreateModal().dialog( "option", "title", type+ ' Create' );
-	EntityCrud.getShowModal().dialog( "option", "title", type+' Detail' );
-	EntityCrud.getEditModal().dialog( "option", "title", type+' Edit' );
+function updateAssetTitle(type) {
+	EntityCrud.getCreateModal().dialog("option", "title", type + ' Create');
+	EntityCrud.getShowModal().dialog("option", "title", type + ' Detail');
+	EntityCrud.getEditModal().dialog("option", "title", type + ' Edit');
 }
 
-function showManufacView (e, forWhom) {
+function showManufacView(e, forWhom) {
 	var resp = e.responseText;
-	if(forWhom == 'Edit')
+	if (forWhom == 'Edit')
 		$("#manufacturerEditId").html(resp);
 	else
 		$("#manufacturerCreateId").html(resp);
-	
+
 	$("#manufacturers").removeAttr("multiple")
-	if(!isIE7OrLesser)
+	if (!isIE7OrLesser)
 		$("select.assetSelect").select2()
 }
 
 
-function showModelView (e, forWhom) {
+function showModelView(e, forWhom) {
 	var resp = e.responseText;
-	$("#model"+forWhom+"Id").html(resp);
+	$("#model" + forWhom + "Id").html(resp);
 	$("#models").removeAttr("multiple")
 	if (forWhom == "assetAudit") {
-		$("#models").attr("onChange","editModelAudit(this.value)")
+		$("#models").attr("onChange", "editModelAudit(this.value)")
 	}
 	if (!isIE7OrLesser) {
 		$("select.assetSelect").select2()
@@ -1529,74 +1531,78 @@ function showEditDeviceViewFromAudit(assetClass, entityId) {
 }
 
 //DEPRECATED
-function showComment (commentId , action, commentType) {
+function showComment(commentId, action, commentType) {
 	console.log('DEPRECATED: showComment');
 	var id = id
 	var objDom = $('[ng-app]');
 	var injector = angular.element(objDom).injector();
-		injector.invoke(function($rootScope, commentUtils){
-			if(action =='edit'){
-				$rootScope.$broadcast('editComment', commentUtils.commentTO(commentId, commentType));
-			} else {
-				$rootScope.$broadcast('viewComment', commentUtils.commentTO(commentId, commentType), 'show');
-			}
-		});
+	injector.invoke(function ($rootScope, commentUtils) {
+		if (action == 'edit') {
+			$rootScope.$broadcast('editComment', commentUtils.commentTO(commentId, commentType));
+		} else {
+			$rootScope.$broadcast('viewComment', commentUtils.commentTO(commentId, commentType), 'show');
+		}
+	});
 }
 
-function submitRemoteForm(){
-		jQuery.ajax({
-			url: $('#editAssetsFormId').attr('action'),
-			data: $('#editAssetsFormId').serialize(),
-			type:'POST',
-			success: function(data) {
-				var assetName = $("#assetName").val();
-				$('#items1').html(data);
-				$("#messageId").html( "Entity "+assetName+" Updated." );
-				$("#messageId").show();
-				EntityCrud.closeEditModal();
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while updating asset.")
-			}
-		});
- 		return false;
+function submitRemoteForm() {
+	jQuery.ajax({
+		url: $('#editAssetsFormId').attr('action'),
+		data: $('#editAssetsFormId').serialize(),
+		type: 'POST',
+		success: function (data) {
+			var assetName = $("#assetName").val();
+			$('#items1').html(data);
+			$("#messageId").html("Entity " + assetName + " Updated.");
+			$("#messageId").show();
+			EntityCrud.closeEditModal();
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while updating asset.")
+		}
+	});
+	return false;
 }
-function deleteAsset(id,value){
+function deleteAsset(id, value) {
 	var redirectTo = 'dependencyConsole'
-	if(value=='server'){
-		new Ajax.Request(contextPath+'/assetEntity/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
-			onComplete:function(data){
+	if (value == 'server') {
+		new Ajax.Request(contextPath + '/assetEntity/delete?id=' + id + '&dstPath=' + redirectTo, {
+			asynchronous: true, evalScripts: true,
+			onComplete: function (data) {
 				EntityCrud.closeEditModal();
 				EntityCrud.closeShowModal();
 				$('#items1').html(data.responseText);
 			}
 		})
-	}else if(value=='app'){
-		new Ajax.Request(contextPath+'/application/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
-			onComplete:function(data) {
+	} else if (value == 'app') {
+		new Ajax.Request(contextPath + '/application/delete?id=' + id + '&dstPath=' + redirectTo, {
+			asynchronous: true, evalScripts: true,
+			onComplete: function (data) {
 				EntityCrud.closeEditModal();
 				EntityCrud.closeShowModal();
 				$('#items1').html(data.responseText);
 			}
 		})
-	}else if(value=='database'){
-		new Ajax.Request(contextPath+'/database/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
-			onComplete:function(data){
+	} else if (value == 'database') {
+		new Ajax.Request(contextPath + '/database/delete?id=' + id + '&dstPath=' + redirectTo, {
+			asynchronous: true, evalScripts: true,
+			onComplete: function (data) {
 				EntityCrud.closeEditModal();
 				EntityCrud.closeShowModal();
 				$('#items1').html(data.responseText);
 			}
 		})
-	}else {
-		new Ajax.Request(contextPath+'/files/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
-			onComplete:function(data){
+	} else {
+		new Ajax.Request(contextPath + '/files/delete?id=' + id + '&dstPath=' + redirectTo, {
+			asynchronous: true, evalScripts: true,
+			onComplete: function (data) {
 				EntityCrud.closeEditModal();
 				EntityCrud.closeShowModal();
 				$('#items1').html(data.responseText);
 			}
 		})
 	}
-	
+
 }
 function reloadDependencyGroupsSection() {
 	var moveBundleId = $("#planningBundleSelectId").val();
@@ -1606,111 +1612,111 @@ function reloadDependencyGroupsSection() {
 	var assetTab = jQuery('#dependencyTableId');
 	assetTab.attr("style", "display:none");
 	assetTab.attr("style", "display:none");
-	jQuery('#items1').css("display","none");
-	$('#upArrow').css('display','none')
+	jQuery('#items1').css("display", "none");
+	$('#upArrow').css('display', 'none')
 	$.ajax({
 		type: "GET",
-		url: contextPath+'/moveBundle/dependencyBundleDetails?bundle='+moveBundleId,
-		success: function(data){
+		url: contextPath + '/moveBundle/dependencyBundleDetails?bundle=' + moveBundleId,
+		success: function (data) {
 			$('#dependencyBundleDetailsId').html(data)
 			var processTab = jQuery('#processDiv');
 			processTab.attr("style", "display:none");
 			var assetTab = jQuery('#dependencyBundleDetailsId');
 			assetTab.attr("style", "display:block");
-			$('#upArrow').css('display','inline');
-			$('#downArrow').css('display','none');
+			$('#upArrow').css('display', 'inline');
+			$('#downArrow').css('display', 'none');
 		}
 	});
 }
-function submitCheckBox(){
-	if($(".checkboxdiv_control input:checked").length == 0){
+function submitCheckBox() {
+	if ($(".checkboxdiv_control input:checked").length == 0) {
 		alert("One or more status values must be selected.")
 		return
 	}
 	var moveBundleId = $("#planningBundleSelectId").val();
-	var items = $('#checkBoxForm').serialize() + "&bundle="+moveBundleId;
+	var items = $('#checkBoxForm').serialize() + "&bundle=" + moveBundleId;
 
 	var assetTab = jQuery('#dependencyTableId');
 	assetTab.attr("style", "display:none");
-	jQuery('#items1').css("display","none");
-	$('#upArrow').css('display','none')
+	jQuery('#items1').css("display", "none");
+	$('#upArrow').css('display', 'none')
 	hideDependencyControlDiv();
 
-	$.post(contextPath+'/moveBundle/generateDependency', items, function(data) {
-		var progressBar = tds.ui.progressBar(data.data.key, 5000, 
-		function() {
-			var assetTab = jQuery('#dependencyBundleDetailsId');
-			assetTab.attr("style", "display:block");
-			$('#upArrow').css('display','inline');
-			$('#downArrow').css('display','none');
-			reloadDependencyGroupsSection()
-		}, function() {
-			location.reload();
-		},
-		"Generating Dependency Groups");
+	$.post(contextPath + '/moveBundle/generateDependency', items, function (data) {
+		var progressBar = tds.ui.progressBar(data.data.key, 5000,
+			function () {
+				var assetTab = jQuery('#dependencyBundleDetailsId');
+				assetTab.attr("style", "display:block");
+				$('#upArrow').css('display', 'inline');
+				$('#downArrow').css('display', 'none');
+				reloadDependencyGroupsSection()
+			}, function () {
+				location.reload();
+			},
+			"Generating Dependency Groups");
 	});
 
 }
 var isFirst = true;
-function selectAll(){
+function selectAll() {
 	var totalCheck = $("input[name=checkBox]");
-	if($('#selectId').is(":checked")){
-		for(i=0;i<totalCheck.size();i++){
+	if ($('#selectId').is(":checked")) {
+		for (i = 0; i < totalCheck.size(); i++) {
 			totalCheck[i].checked = true;
 		}
 		isFirst = false;
 	} else {
-		for(i=0;i<totalCheck.size();i++){
+		for (i = 0; i < totalCheck.size(); i++) {
 			totalCheck[i].checked = false;
 		}
 		isFirst = true;
 	}
 }
 function changeMoveBundle(assetType, totalAsset, assignBundle) {
-	if(!assignBundle){
+	if (!assignBundle) {
 		$("#saveBundleId").attr("disabled", "disabled");
 	}
 	var assetArr = new Array();
-	var j=0;
-	for(i=0; i< totalAsset.size() ; i++){
-		if($('#checkId_'+totalAsset[i]) != null){
-			var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
-			if(booCheck){
+	var j = 0;
+	for (i = 0; i < totalAsset.size(); i++) {
+		if ($('#checkId_' + totalAsset[i]) != null) {
+			var booCheck = $('#checkId_' + totalAsset[i]).is(':checked');
+			if (booCheck) {
 				assetArr[j] = totalAsset[i];
 				j++;
 			}
 		}
-	}if(j == 0){
+	} if (j == 0) {
 		alert('Please select the Asset');
-	}else{
+	} else {
 		$('#plannedMoveBundleList').val(assignBundle);
 		$('#bundleSession').val(assignBundle);
 		$('#assetsTypeId').val(assetType)
 		$('#assetVal').val(assetArr);
 		$('#moveBundleSelectId').dialog('open')
 	}
-}	
-function submitMoveForm(){
+}
+function submitMoveForm() {
 	jQuery.ajax({
 		url: $('#changeBundle').attr('action'),
 		data: $('#changeBundle').serialize(),
-		type:'POST',
-		success: function(data) {
+		type: 'POST',
+		success: function (data) {
 			$('#moveBundleSelectId').dialog("close")
 			$('#items1').html(data);
-			$('#allBundles').attr('checked','false')
-			$('#planningBundle').attr('checked','true')
+			$('#allBundles').attr('checked', 'false')
+			$('#planningBundle').attr('checked', 'true')
 			$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
 		}
 	});
 }
 
-function updateToRefresh(){
+function updateToRefresh() {
 	jQuery.ajax({
 		url: $('#editAssetsFormId').attr('action'),
 		data: $('#editAssetsFormId').serialize(),
-		type:'POST',
-		success: function(data) {
+		type: 'POST',
+		success: function (data) {
 			EntityCrud.closeEditModal();
 			$("#taskMessageDiv").html(data)
 			$("#taskMessageDiv").show()
@@ -1719,73 +1725,75 @@ function updateToRefresh(){
 	});
 }
 
-function selectAllAssets(){
-	$('#deleteAsset').attr('disabled',false)
+function selectAllAssets() {
+	$('#deleteAsset').attr('disabled', false)
 	var totalCheck = document.getElementsByName('assetCheckBox');
-	if($('#selectAssetId').is(":checked")){
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = true;
-	}
-	isFirst = false;
-	}else{
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = false;
-	$('#deleteAsset').attr('disabled',true)
-	}
-	isFirst = true;
+	if ($('#selectAssetId').is(":checked")) {
+		for (i = 0; i < totalCheck.length; i++) {
+			totalCheck[i].checked = true;
+		}
+		isFirst = false;
+	} else {
+		for (i = 0; i < totalCheck.length; i++) {
+			totalCheck[i].checked = false;
+			$('#deleteAsset').attr('disabled', true)
+		}
+		isFirst = true;
 	}
 }
 
-function deleteAssets(action){
+function deleteAssets(action) {
 	var assetArr = new Array();
-    $(".cbox:checkbox:checked").each(function(){
-        var assetId = $(this).attr('id').split("_")[2]
-		if(assetId)  
+	$(".cbox:checkbox:checked").each(function () {
+		var assetId = $(this).attr('id').split("_")[2]
+		if (assetId)
 			assetArr.push(assetId)
-  })
-  	if(!assetArr) {
+	})
+	if (!assetArr) {
 		alert('Please select the Asset');
 	} else {
-		if(confirm("You are about to delete all of the selected assets for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")){
+		if (confirm("You are about to delete all of the selected assets for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")) {
 			jQuery.ajax({
-			url: tdsCommon.createAppURL('/assetEntity/deleteBulkAsset'),
-			data: {'assetLists':assetArr,'type':action},
-			type:'POST',
-			success: function(data) {
+				url: tdsCommon.createAppURL('/assetEntity/deleteBulkAsset'),
+				data: { 'assetLists': assetArr, 'type': action },
+				type: 'POST',
+				success: function (data) {
 					$(".ui-icon-refresh").click();
 					$("#messageId").show();
 					$("#messageId").html(data.resp);
-					$('#deleteAssetId').attr('disabled',true)
+					$('#deleteAssetId').attr('disabled', true)
 				}
 			});
 		}
 	}
 }
 
-function enableButton(list){
+function enableButton(list) {
 	var assetArr = new Array();
-	var j=0;
-	for(i=0; i< list.size() ; i++){
-		if($('#checkId_'+list[i]) != null){
-			var booCheck = $('#checkId_'+list[i]).is(':checked');
-			if(booCheck){
+	var j = 0;
+	for (i = 0; i < list.size(); i++) {
+		if ($('#checkId_' + list[i]) != null) {
+			var booCheck = $('#checkId_' + list[i]).is(':checked');
+			if (booCheck) {
 				assetArr[j] = list[i];
 				j++;
 			}
 		}
-	}if(j == 0){
-		$('#deleteAsset').attr('disabled',true)
-	}else{
-		$('#deleteAsset').attr('disabled',false)
+	} if (j == 0) {
+		$('#deleteAsset').attr('disabled', true)
+	} else {
+		$('#deleteAsset').attr('disabled', false)
 	}
 }
 
-function getAuditDetails(redirectTo, assetType, value){
-	new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,
-		onComplete:function(e){
+function getAuditDetails(redirectTo, assetType, value) {
+	new Ajax.Request(contextPath + '/assetEntity/show?id=' + value + '&redirectTo=' + redirectTo, {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (e) {
 			$("#auditDetailViewId").html(e.responseText)
 			$("#auditDetailViewId").show()
-		}}
+		}
+	}
 	)
 }
 
@@ -1794,115 +1802,128 @@ function closeEditAuditView() {
 	$("#auditDetailViewId").hide()
 }
 
-function editAudit(redirectTo, source, assetType, value){
-	new Ajax.Request(contextPath+'/assetEntity/edit?id='+value+'&redirectTo='+redirectTo+'&source='+source+'&assetType='+assetType,
-	{asynchronous:true,evalScripts:true,
-		onComplete:function(e){
-			$("#auditDetailViewId").html(e.responseText)
-			if(source==0){
-				$("#auditLocationId").attr("name","targetLocation")
-				$("#auditRoomId").attr("name","targetRoom")
-				$("#auditRackId").attr("name","targetRack")
-				$("#auditPosId").attr("name","targetRackPosition")
+function editAudit(redirectTo, source, assetType, value) {
+	new Ajax.Request(contextPath + '/assetEntity/edit?id=' + value + '&redirectTo=' + redirectTo + '&source=' + source + '&assetType=' + assetType,
+		{
+			asynchronous: true, evalScripts: true,
+			onComplete: function (e) {
+				$("#auditDetailViewId").html(e.responseText)
+				if (source == 0) {
+					$("#auditLocationId").attr("name", "targetLocation")
+					$("#auditRoomId").attr("name", "targetRoom")
+					$("#auditRackId").attr("name", "targetRack")
+					$("#auditPosId").attr("name", "targetRackPosition")
+				}
+				$("#auditDetailViewId").show()
 			}
-			$("#auditDetailViewId").show()
-		}}
+		}
 	)
 }
 
-function updateAudit(){
+function updateAudit() {
 	jQuery.ajax({
 		url: $('#editAssetsAuditFormId').attr('action'),
 		data: $('#editAssetsAuditFormId').serialize(),
-		type:'POST',
-		success: function(data) {
-			if(data.errMsg){
+		type: 'POST',
+		success: function (data) {
+			if (data.errMsg) {
 				alert(data.errMsg)
-			}else{
-				getRackLayout( $('#selectedRackId').val() )
+			} else {
+				getRackLayout($('#selectedRackId').val())
 				$("#auditDetailViewId").html(data)
 			}
 		}
 	});
 }
 
-function deleteAudit(id,value){
-	new Ajax.Request(contextPath+'/assetEntity/delete?id='+id+'&dstPath=assetAudit',{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
-				$("#auditDetailViewId").hide()
-				window.location.reload()
-		}}
+function deleteAudit(id, value) {
+	new Ajax.Request(contextPath + '/assetEntity/delete?id=' + id + '&dstPath=assetAudit', {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (data) {
+			$("#auditDetailViewId").hide()
+			window.location.reload()
+		}
+	}
 	)
 }
 
-function showModelAudit(id){
-	new Ajax.Request(contextPath+'/model/show?id='+id+'&redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
+function showModelAudit(id) {
+	new Ajax.Request(contextPath + '/model/show?id=' + id + '&redirectTo=assetAudit', {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (data) {
+			$("#modelAuditId").html(data.responseText)
+			$("#modelAuditId").show()
+		}
+	}
+	)
+
+}
+
+function editModelAudit(val) {
+	if (val) {
+		var manufacturer = $("#manufacturersAuditId").val()
+		new Ajax.Request(contextPath + '/model/retrieveModelDetailsByName?modelName=' + val + '&manufacturerName=' + manufacturer, {
+			asynchronous: true, evalScripts: true,
+			onComplete: function (data) {
 				$("#modelAuditId").html(data.responseText)
 				$("#modelAuditId").show()
-		}}
-	)
-	
-}
+				$("#autofillIdModel").hide()
 
-function editModelAudit(val){
-	if(val){
-		var manufacturer = $("#manufacturersAuditId").val()
-		new Ajax.Request(contextPath+'/model/retrieveModelDetailsByName?modelName='+val+'&manufacturerName='+manufacturer,{asynchronous:true,evalScripts:true,
-			onComplete:function(data){
-					$("#modelAuditId").html(data.responseText)
-					$("#modelAuditId").show()
-					$("#autofillIdModel").hide()
-					
 			}
 		})
 	}
 }
 
-function updateModelAudit(){
+function updateModelAudit() {
 	jQuery.ajax({
 		url: $('#modelAuditEdit').attr('action'),
 		data: $('#modelAuditEdit').serialize(),
-		type:'POST',
-		success: function(data) {
-			tds.Alerts.addAlert({type: 'success', msg: 'Model Updated', closeIn: 1500});
+		type: 'POST',
+		success: function (data) {
+			tds.Alerts.addAlert({ type: 'success', msg: 'Model Updated', closeIn: 1500 });
 		}
 	});
 }
 
-function createAuditPage(type, source, rack, roomId, location, position, locationName, roomName){
-	new Ajax.Request(contextPath+'/assetEntity/create?redirectTo=assetAudit'+'&assetType='+type+'&source='+source,{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
+function createAuditPage(type, source, rack, roomId, location, position, locationName, roomName) {
+	new Ajax.Request(contextPath + '/assetEntity/create?redirectTo=assetAudit' + '&assetType=' + type + '&source=' + source, {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (data) {
 			$("#auditDetailViewId").html(data.responseText)
 			$("#auditDetailViewId").show()
 			$("#auditLocationName").val(locationName)
 			$("#auditRoomName").val(roomName)
 			EntityCrud.populateAssetEditView('Device', source, rack, roomId, location, position, 'create');
-		}}
+		}
+	}
 	)
 }
 
-function createBladeAuditPage(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){
-	new Ajax.Request(contextPath+'/assetEntity/create?redirectTo=assetAudit'+'&assetType='+assetType+'&source='+source,{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
-				$("#auditDetailViewId").html(data.responseText)
-				$("#BladeChassisId").val(blade)
-				$("#bladePositionId").val(position)
-				$("#assetTypeCreateId").val(assetType)
-				$("#moveBundleId").val(moveBundleId)
-				$("#sourceId").val(source)
-				$(".bladeLabel").show()
-				$(".rackLabel").hide()
-				$("#auditDetailViewId").show()
-		}}
+function createBladeAuditPage(source, blade, position, manufacturer, assetType, assetEntityId, moveBundleId) {
+	new Ajax.Request(contextPath + '/assetEntity/create?redirectTo=assetAudit' + '&assetType=' + assetType + '&source=' + source, {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (data) {
+			$("#auditDetailViewId").html(data.responseText)
+			$("#BladeChassisId").val(blade)
+			$("#bladePositionId").val(position)
+			$("#assetTypeCreateId").val(assetType)
+			$("#moveBundleId").val(moveBundleId)
+			$("#sourceId").val(source)
+			$(".bladeLabel").show()
+			$(".rackLabel").hide()
+			$("#auditDetailViewId").show()
+		}
+	}
 	)
 }
 
-function saveAuditPref(val, id){
-	new Ajax.Request(contextPath+'/room/show?id='+id+'&auditView='+val,{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
+function saveAuditPref(val, id) {
+	new Ajax.Request(contextPath + '/room/show?id=' + id + '&auditView=' + val, {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (data) {
 			openRoomView(data)
-		}}
+		}
+	}
 	)
 }
 
@@ -1910,81 +1931,85 @@ var manuLoadRequest
 var modelLoadRequest
 
 function getAlikeManu(val) {
-	if(manuLoadRequest)manuLoadRequest.abort();
+	if (manuLoadRequest) manuLoadRequest.abort();
 	manuLoadRequest = jQuery.ajax({
 		url: tdsCommon.createAppURL('/manufacturer/autoCompleteManufacturer'),
-		data: {'value':val},
-		type:'POST',
-		success: function(data) {
+		data: { 'value': val },
+		type: 'POST',
+		success: function (data) {
 			$("#autofillId").html(data)
 			$("#autofillId").show()
 		}
 	});
- 
+
 }
 
-function getAlikeModel(val){
-	if(modelLoadRequest)modelLoadRequest.abort()
-	var manufacturer= $("#manufacturersAuditId").val()
+function getAlikeModel(val) {
+	if (modelLoadRequest) modelLoadRequest.abort()
+	var manufacturer = $("#manufacturersAuditId").val()
 	modelLoadRequest = jQuery.ajax({
 		url: tdsCommon.createAppURL('/model/autoCompleteModel'),
-		data: {'value':val,'manufacturer':manufacturer},
-		type:'POST',
-		success: function(data) {
+		data: { 'value': val, 'manufacturer': manufacturer },
+		type: 'POST',
+		success: function (data) {
 			$("#autofillIdModel").html(data)
 			$("#autofillIdModel").show()
 		}
 	});
 }
-function updateManu(name){
+function updateManu(name) {
 	$("#manufacturersAuditId").val(name)
 	$("#autofillId").hide()
 	$("#modelsAuditId").val("")
 }
 
-function updateModelForAudit(name){
+function updateModelForAudit(name) {
 	$("#modelsAuditId").val(name)
 	$("#modelsAuditId").focus()
 	$("#autofillIdModel").hide()
-	$("#modelsAuditId").attr('onBlur','getAssetType("'+name+'")')
+	$("#modelsAuditId").attr('onBlur', 'getAssetType("' + name + '")')
 }
 
-function getAssetType(val){
-	new Ajax.Request(contextPath+'/model/retrieveModelType?value='+val,{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
+function getAssetType(val) {
+	new Ajax.Request(contextPath + '/model/retrieveModelType?value=' + val, {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (data) {
 			$("#assetTypeEditId").val(data.responseText)
-			editModelAudit(""+val+"")
-		}}
+			editModelAudit("" + val + "")
+		}
+	}
 	)
 }
 
-function setType(id, forWhom){
-	new Ajax.Request(contextPath+'/assetEntity/retrieveAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
-			$("#assetType"+forWhom+"Id").val(data.responseText)
-			if(!isIE7OrLesser)
+function setType(id, forWhom) {
+	new Ajax.Request(contextPath + '/assetEntity/retrieveAssetModelType?id=' + id, {
+		asynchronous: true, evalScripts: true,
+		onComplete: function (data) {
+			$("#assetType" + forWhom + "Id").val(data.responseText)
+			if (!isIE7OrLesser)
 				$("select.assetSelect").select2()
 			EntityCrud.toggleAssetTypeFields(data.responseText)
-		}}
-	)	
+		}
+	}
+	)
 }
 
-function populateDependency(assetId, whom, thisDialog){
-	$(".updateDep").attr('disabled','disabled')
-		jQuery.ajax({
-			url: tdsCommon.createAppURL('/assetEntity/populateDependency'),
-			data: {'id':assetId,'whom':thisDialog},
-			type:'POST',
-			success: function(data) { 
-				$("#"+whom+"DependentId").html(data)
-				$(".updateDep").removeAttr('disabled')
-				if(!isIE7OrLesser)
-					$("select.assetSelect").select2();
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while populating dependent asset.")
-			}
-		});
+function populateDependency(assetId, whom, thisDialog) {
+	$(".updateDep").attr('disabled', 'disabled')
+	jQuery.ajax({
+		url: tdsCommon.createAppURL('/assetEntity/populateDependency'),
+		data: { 'id': assetId, 'whom': thisDialog },
+		type: 'POST',
+		success: function (data) {
+			$("#" + whom + "DependentId").html(data)
+			$(".updateDep").removeAttr('disabled')
+			if (!isIE7OrLesser)
+				$("select.assetSelect").select2();
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while populating dependent asset.")
+		}
+	});
 }
 
 /*function updateModel(rackId,value){
@@ -1997,83 +2022,86 @@ function populateModelSelect(e,rackId){
     $("#modelSpan_"+rackId).html(resp);
 }*/
 
-function showDependencyControlDiv(){
+function showDependencyControlDiv() {
 	$("#checkBoxDiv").dialog('option', 'width', '480px')
 	$("#checkBoxDiv").dialog('option', 'modal', 'true');
-	$("#checkBoxDiv").dialog('option', 'position', ['center','top']);
+	$("#checkBoxDiv").dialog('option', 'position', ['center', 'top']);
 	$("#checkBoxDiv").dialog('open')
 	$("#checkBoxDivId").show();
 }
 
-function hideDependencyControlDiv(){
-	$("#checkBoxDiv").dialog('close'); 
+function hideDependencyControlDiv() {
+	$("#checkBoxDiv").dialog('close');
 }
 
 // Sets the field importance style classes in the edit and create views for all asset classes
-function assetFieldImportance(phase,type){
+function assetFieldImportance(phase, type) {
 	jQuery.ajax({
 		url: tdsCommon.createAppURL('/assetEntity/retrieveAssetImportance'),
-		data: {'validation':phase, 'type':type},
-		type:'POST',
-		success: function(resp) {
-			$("td,input,select").removeClass("C")
-			$("td,input,select").removeClass("H")
-			$("td,input,select").removeClass("I")
-			$("td,input,select").removeClass("N")
+		data: { 'validation': phase, 'type': type },
+		type: 'POST',
+		success: function (resp) {
+			$("td,input,select,.select2-choice")
+				.removeClass("C")
+				.removeClass("H")
+				.removeClass("I")
+				.removeClass("N")
+				.removeClass("U")
+
 			for (var key in resp) {
 				var value = resp[key]
-				$(".dialog input[name="+key+"],select[name="+key+"],input[name='"+key+".id'],select[name='"+key+".id']").addClass(value);
-				$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
+				$(".dialog input[name=" + key + "],select[name=" + key + "],input[name='" + key + ".id'],select[name='" + key + ".id'],div[id*='" + key + "'] .select2-choice").addClass(value);
+				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").parent().addClass(value);
 			}
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while getting asset.")
 		}
 	});
-	
+
 }
- function highlightCssByValidation(phase,forWhom, id){
+function highlightCssByValidation(phase, forWhom, id) {
 	jQuery.ajax({
 		url: tdsCommon.createAppURL('/assetEntity/retrieveHighlightCssMap'),
-		data: {'validation':phase, 'type':forWhom,'id':id},
-		type:'POST',
-		success: function(resp) {
+		data: { 'validation': phase, 'type': forWhom, 'id': id },
+		type: 'POST',
+		success: function (resp) {
 			//console.log(resp)
 			$("td,input,select").removeClass("highField")
 			for (var key in resp) {
 				var value = resp[key]
-				$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
+				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").parent().addClass(value);
 			}
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while getting asset.")
 		}
 	});
-	 
- }
- 
-function getHelpTextAsToolTip(type){
+
+}
+
+function getHelpTextAsToolTip(type) {
 	jQuery.ajax({
 		url: tdsCommon.createAppURL('/common/retrieveTooltips'),
-		data: {'type':type},
-		type:'POST',
-		success: function(resp) {
+		data: { 'type': type },
+		type: 'POST',
+		success: function (resp) {
 			for (var key in resp) {
 				var value = resp[key]
-				$(".dialog input[name="+key+"],input[name='"+key+".id']" ).tooltip({ position: {my: "left top"} });
-				$(".dialog label[for="+key+"],label[for="+key+"Id]").tooltip({ position: {my: "left top"} });
-				$(".dialog input[name="+key+"],input[name='"+key+".id']").attr("title",value);
-				$(".dialog label[for="+key+"],label[for="+key+"Id]").attr("title",value);
-				
-				$(".dialog label[for="+key+"]").closest('td').next('td').tooltip({ position: {my: "left top"} });
-				$(".dialog label[for="+key+"]").closest('td').next('td').attr("title",value);
+				$(".dialog input[name=" + key + "],input[name='" + key + ".id']").tooltip({ position: { my: "left top" } });
+				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").tooltip({ position: { my: "left top" } });
+				$(".dialog input[name=" + key + "],input[name='" + key + ".id']").attr("title", value);
+				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").attr("title", value);
+
+				$(".dialog label[for=" + key + "]").closest('td').next('td').tooltip({ position: { my: "left top" } });
+				$(".dialog label[for=" + key + "]").closest('td').next('td').attr("title", value);
 			}
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			if(jqXHR.getAllResponseHeaders()){
+		error: function (jqXHR, textStatus, errorThrown) {
+			if (jqXHR.getAllResponseHeaders()) {
 				alert("An unexpected error occurred while getting asset.")
 			}
-			
+
 		}
 	});
 }
@@ -2083,30 +2111,30 @@ function getHelpTextAsToolTip(type){
  * @param value : value of select
  * @param gid : id of select
  */
-function changeHard(value, gid){
-	if(value.indexOf('@')==0){
-		$("#"+gid+"Fixed").removeAttr("checked").attr("disabled", "disabled").val(0);
-	}else {
-		$("#"+gid+"Fixed").removeAttr("disabled");
+function changeHard(value, gid) {
+	if (value.indexOf('@') == 0) {
+		$("#" + gid + "Fixed").removeAttr("checked").attr("disabled", "disabled").val(0);
+	} else {
+		$("#" + gid + "Fixed").removeAttr("disabled");
 	}
 }
 
-function shufflePerson(sFrom,sTo){
-	var sFromVal=$("#"+sFrom).val()
-	var sToVal=$("#"+sTo).val()
-	if(sFromVal!='0' && sToVal!='0'){
-		$("#"+sFrom).val(sToVal)
-		$("#"+sTo).val(sFromVal)
-		if(!isIE7OrLesser)
+function shufflePerson(sFrom, sTo) {
+	var sFromVal = $("#" + sFrom).val()
+	var sToVal = $("#" + sTo).val()
+	if (sFromVal != '0' && sToVal != '0') {
+		$("#" + sFrom).val(sToVal)
+		$("#" + sTo).val(sFromVal)
+		if (!isIE7OrLesser)
 			$("select.assetSelect").select2();
 	}
 }
 
-$(document).ready(function() {
-	$(window).keydown(function(event){
-		if(event.keyCode == 13) {
+$(document).ready(function () {
+	$(window).keydown(function (event) {
+		if (event.keyCode == 13) {
 			if (event.srcElement && event.srcElement.type == "textarea") {
-			    return;
+				return;
 			}
 			event.preventDefault();
 			var activeSup = $('[id^=depComment_support_]:visible')
@@ -2123,38 +2151,38 @@ $(document).ready(function() {
 			} else if ($("#updatedId").length > 0) {
 				$("#updatedId").click();
 			}
-		
+
 		}
-		$("[id^=gs_]").keydown(function(event){
+		$("[id^=gs_]").keydown(function (event) {
 			$(".clearFilterId").removeAttr("disabled");
 		});
-		
+
 	});
 });
 
-function toogleRack(value, source){
-	if( value == '-1' )
-		$(".newRack"+source).show()
+function toogleRack(value, source) {
+	if (value == '-1')
+		$(".newRack" + source).show()
 	else
-		$(".newRack"+source).hide()
+		$(".newRack" + source).hide()
 }
 
-function changeBundleSelect(){
-	if($("#plannedMoveBundleList").val()){
+function changeBundleSelect() {
+	if ($("#plannedMoveBundleList").val()) {
 		$("#saveBundleId").removeAttr("disabled");
-	}else {
+	} else {
 		$("#saveBundleId").attr("disabled", "disabled");
 	}
 }
-function setColumnAssetPref(value,key, type){
+function setColumnAssetPref(value, key, type) {
 	jQuery.ajax({
 		url: tdsCommon.createAppURL('/application/columnAssetPref'),
-		data: {'columnValue':value,'from':key,'previousValue':$("#previousValue_"+key).val(),'type':type},
-		type:'POST',
-		success: function(resp) {
+		data: { 'columnValue': value, 'from': key, 'previousValue': $("#previousValue_" + key).val(), 'type': type },
+		type: 'POST',
+		success: function (resp) {
 			// console.log('success');
-			if(resp){
-				if( type!='Task_Columns')
+			if (resp) {
+				if (type != 'Task_Columns')
 					window.location.reload()
 				else
 					submitForm()
@@ -2162,87 +2190,87 @@ function setColumnAssetPref(value,key, type){
 		}
 	});
 }
-var columnPref=''
-function showSelect(column, type, key){
-	if(column!=columnPref){
-		$("#"+type+"IdGrid_"+column).append($("#columnCustomDiv_"+column).html());
+var columnPref = ''
+function showSelect(column, type, key) {
+	if (column != columnPref) {
+		$("#" + type + "IdGrid_" + column).append($("#columnCustomDiv_" + column).html());
 	}
-	$(".columnDiv_"+key).show();
-	columnPref=column
+	$(".columnDiv_" + key).show();
+	columnPref = column
 }
 
 // TODO : JPM 10/2014 : This click function should ONLY be applied to certain pages. What is it for?
-$(document).click(function(e){
+$(document).click(function (e) {
 	var customizeCount = $("#customizeFieldCount").val()
-	if(!customizeCount)
+	if (!customizeCount)
 		customizeCount = 5;
-	
-	for(var i=1;i<=customizeCount;i++){
-		if($(".columnDiv_"+i+":visible").length){
-		    if (!$(e.target).is(".editSelectimage_"+i)) {
-		    	$(".columnDiv_"+i).hide();
-		    }
+
+	for (var i = 1; i <= customizeCount; i++) {
+		if ($(".columnDiv_" + i + ":visible").length) {
+			if (!$(e.target).is(".editSelectimage_" + i)) {
+				$(".columnDiv_" + i).hide();
+			}
 		}
 	}
 });
 
 var lastScroll = 0;
-$(window).scroll(function(event){
-    //Sets the current scroll position
-    var st = $(this).scrollTop();
-    //Determines up-or-down scrolling
-    if (st > lastScroll){
-       //Replace this with your function call for downward-scrolling
-    	$(".customScroll").hide();
-    }
-    else {
-       //Replace this with your function call for upward-scrolling
-    	$(".customScroll").hide();
-    }
-    //Updates scroll position
-    lastScroll = st;
+$(window).scroll(function (event) {
+	//Sets the current scroll position
+	var st = $(this).scrollTop();
+	//Determines up-or-down scrolling
+	if (st > lastScroll) {
+		//Replace this with your function call for downward-scrolling
+		$(".customScroll").hide();
+	}
+	else {
+		//Replace this with your function call for upward-scrolling
+		$(".customScroll").hide();
+	}
+	//Updates scroll position
+	lastScroll = st;
 });
 
-function toggleJustPlanning($me){
-	var isChecked= $me.is(":checked")
+function toggleJustPlanning($me) {
+	var isChecked = $me.is(":checked")
 	jQuery.ajax({
-        url: tdsCommon.createAppURL('/assetEntity/setImportPerferences'),
-        data:{'value':isChecked, 'preference':'assetJustPlanning'},
-        type:'POST',
-		success: function(data) {
+		url: tdsCommon.createAppURL('/assetEntity/setImportPerferences'),
+		data: { 'value': isChecked, 'preference': 'assetJustPlanning' },
+		type: 'POST',
+		success: function (data) {
 			window.location.reload()
 		}
-    });
+	});
 }
-function clearFilter(gridId){
+function clearFilter(gridId) {
 	$("[id^=gs_]").val('');
 	var data = new Object();
-	$("[id^=gs_]").each(function(){
-		 data[$(this).attr("name")] = '';//{assetName='',appOwner:'',environment:'',....}
+	$("[id^=gs_]").each(function () {
+		data[$(this).attr("name")] = '';//{assetName='',appOwner:'',environment:'',....}
 	});
-	$("#"+gridId+"Grid").setGridParam({postData: data});
+	$("#" + gridId + "Grid").setGridParam({ postData: data });
 	$('.ui-icon-refresh').click();
-	$(".clearFilterId").attr("disabled","disabled");
+	$(".clearFilterId").attr("disabled", "disabled");
 }
-function updateAssetInfo(source,rackOrBladeId,roomId,location,position,forWhom,isBlade){
+function updateAssetInfo(source, rackOrBladeId, roomId, location, position, forWhom, isBlade) {
 	var target = source != '1' ? 'target' : 'source'
 	var type = source != '1' ? 'T' : 'S'
 	var roomType = source != '1' ? 'Target' : 'Source'
-		
-	$("#"+target+"LocationId").val(location)
-	$("#roomSelect"+type).val(roomId)
+
+	$("#" + target + "LocationId").val(location)
+	$("#roomSelect" + type).val(roomId)
 	if (isBlade) {
-		$('#deviceChassisId'+type).val(rackOrBladeId);
+		$('#deviceChassisId' + type).val(rackOrBladeId);
 		$('#' + target + 'BladePositionId').val(position);
 		EntityCrud.fetchChassisSelectForRoom(roomId, type, forWhom);
 		EntityCrud.toggleAssetTypeFields('Blade');
 	} else {
-		$("#"+target+"RackPositionId").val(position)
-		$('#deviceRackId'+type).val(rackOrBladeId);
+		$("#" + target + "RackPositionId").val(position)
+		$('#deviceRackId' + type).val(rackOrBladeId);
 		EntityCrud.fetchRackSelectForRoom(roomId, type, forWhom);
 	}
 
-	if(!isIE7OrLesser)
+	if (!isIE7OrLesser)
 		$("select.assetSelect").select2();
 }
 

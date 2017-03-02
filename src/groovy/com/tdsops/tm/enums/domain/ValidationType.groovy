@@ -14,5 +14,5 @@ class ValidationType {
 
 	static final Map<String, String> listAsMap = [D: DIS, V: VL, R: DR, S: DS, B: BR].asImmutable()
 
-	static final Map<String, String> valuesAsMap = [(DIS): 'D', (VL): 'V', (DS): 'S', (BR): 'B'].asImmutable()
+	static final Map<String, String> valuesAsMap = [(DIS): 'D', (VL): 'V', (DR):'R', (DS): 'S', (BR): 'B'].asImmutable()
 }

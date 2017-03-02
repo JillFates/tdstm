@@ -571,15 +571,19 @@ span.cellWithoutBackground
 
 .C{
 	background-color:#F9FF90 !important;
+	background-image: none !important;
 }
 .I{
-	background-color:#D4F8D4 !important
+	background-color:#D4F8D4 !important;
+	background-image: none !important;
 }
 .H{
 	background-color:#CCCCCC !important;
+	background-image: none !important;
 }
 .U{
 	color:darkgray !important;
+	background-image: none !important;
 }
 
 .legend{
