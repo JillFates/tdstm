@@ -99,6 +99,11 @@ class UrlMappings {
 			action = [POST:"groups"]
 		}
 
+		name wsDepAnalyzer:
+		"/ws/depAnalyzer/$action?/$id?" {
+			controller = 'wsDepAnalyzer'
+		}
+
 		"/ws/event/listBundles/$id" {
 			controller = "wsEvent"
 			action = [GET:"listBundles"]
@@ -289,12 +294,9 @@ class UrlMappings {
 			]
 		}
 
-
-
 		///// LICENSES Manager API (BackOffice) /////////
-		/**
-		 * TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???
-		 */
+
+		// TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???
 
 		//load a request HASH from a client, returns JSON object
 		"/ws/manager/license/request" {

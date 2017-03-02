@@ -3,12 +3,12 @@ var parameterPrecision = {'force':${multiple?10:100}, 'linkSize':10, 'friction':
 var parameterRanges = {'force':[${multiple?-500:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1]};
 
 $(document).ready(function() {
-	
+
 	// handle detecting whether this graph is being opened in the fullscreen state
 	var fullscreen = ${fullscreen};
 	if (fullscreen)
 		GraphUtil.enableFullscreen();
-	
+
 	// figure out which panel should be opened initially
 	var showControls = '${showControls ?: ''}';
 	GraphUtil.togglePanel('hide');
@@ -16,19 +16,19 @@ $(document).ready(function() {
 		GraphUtil.togglePanel('control');
 	else if (showControls == 'legend')
 		GraphUtil.togglePanel('legend');
-	
+
 	// if the browser doesn't support svg display a message instead of the graph
 	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
 		$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.');
-	
+
 	// initially close the control panel twisties
 	$('#layoutControlContainerId').slideUp(0);
 	$('#labelControlContainerId').slideUp(0);
 	GraphUtil.checkForDisabledButtons(parameterRanges);
-	
+
 	// enable the bootstrap popover tooltips in the legend
 	$('.toolTipButton').popover()
-	
+
 	// handle applying the legend twistie preferences
 	var legendTwistiePref = '${legendTwistiePref}'
 	var twistieDivs = $('#legendDivId .twistieControlledDiv')
@@ -45,12 +45,12 @@ $(document).ready(function() {
 		}
 	}
 
-	
+
 	// add bindings to the filtering selects to set their corresponding radio buttons when clicked on
 	$('#filterOptionsMenuId .optionRow select').click(function () {
 		$(this).parent().parent().children('input').attr('checked', true)
 	})
-	
+
 	// define the parameters for the kendo combobox
 	var comboBoxParams = {
 		animation: {
@@ -62,7 +62,7 @@ $(document).ready(function() {
 		dataSource: {
 			transport: {
 				read: {
-					url: "/tdstm/assetEntity/getDepGraphFilterPeople",
+					url: "${createLink(mapping: 'wsDepAnalyzer', action: 'peopleAssociatedToDepGroup')}",
 					dataType: "json",
 					data: {
 						depGroup: '${depGroup}'
@@ -78,10 +78,10 @@ $(document).ready(function() {
 			GraphUtil.performSearch()
 		}
 	};
-	
+
 	// create the combobox
 	var comboBox = $('#personHighlightSelectId').kendoComboBox(comboBoxParams).data("kendoComboBox");
-	
+
 	// bind focussing on the combobox to openning the dropdown
 	$('#highlightPersonId input.k-input').focus(function () {
 		comboBox.open();
@@ -95,19 +95,19 @@ function modifyParameter (action, id) {
 	var type = input.attr('name');
 	var plusButton = input.parent().children('.plus');
 	var minusButton = input.parent().children('.minus');
-	
+
 	if (action == 'add')
 		value += parameterPrecision[type];
 	else if (action == 'sub')
 		value -= parameterPrecision[type];
-	
+
 	if (parameterPrecision[type] == 0.1)
 		value = value.toPrecision(1);
-	
+
 	var minValue = parameterRanges[type][0];
 	var maxValue = parameterRanges[type][1];
 	value = Math.min(Math.max(value, minValue), maxValue);
-	
+
 	if (value == minValue)
 		minusButton.addClass('disabled');
 	else
@@ -116,7 +116,7 @@ function modifyParameter (action, id) {
 		plusButton.addClass('disabled');
 	else
 		plusButton.removeClass('disabled');
-	
+
 	if (action != 'none') {
 		input.val(value);
 		rebuildMap(true, $("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $("#widthId").val(), $("#heightId").val());
@@ -132,7 +132,7 @@ function listCheck () {
 }
 
 $('#tabTypeId').val('graph')
-  
+
 </script>
 <div class="tabs">
 	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
