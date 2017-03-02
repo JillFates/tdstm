@@ -1,4 +1,4 @@
-import grails.compiler.GrailsCompileStatic
+// import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import com.tdsops.common.security.spring.HasPermission
 import groovy.util.logging.Slf4j
@@ -26,7 +26,6 @@ class WsDepAnalyzerController implements ControllerMethods {
 	 * @return List of persons as JSON
 	 */
 	@HasPermission('DepAnalyzerView')
-//	def getDepGraphFilterPeople () {
 	def peopleAssociatedToDepGroup () {
 		// validate the parameters
 		def depGroup = NumberUtil.isLong(params.depGroup) ? NumberUtil.toInteger(params.depGroup) : (params.depGroup == 'onePlus' ? 'onePlus' : null)
@@ -61,7 +60,6 @@ class WsDepAnalyzerController implements ControllerMethods {
 	 * @return A list of assets found by filter as JSON
 	 */
 	@HasPermission('DepAnalyzerView')
-//	def getFilteredDepGraph () {
 	def filteredAssetList () {
 		// validate the parameters
 		String nameFilter = params.nameFilter ? params.nameFilter.toUpperCase() : ''
@@ -114,5 +112,4 @@ class WsDepAnalyzerController implements ControllerMethods {
 		// send the results back to the client as JSON
 		render assetList as JSON
 	}
-
 }
