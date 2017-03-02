@@ -764,8 +764,8 @@ public class GormUtil {
 				// Null out the reference(s)
 				int paramIndex=0
 				attribs.properties.each { propName ->
-					String hql = "UPDATE $domainName SET $propName=NULL WHERE $propName=?"
-					List params = [(attribs.transform ? attribs.transform.call(domainObject) : domainObject)]
+					String hql = "UPDATE $domainName SET $propName=NULL WHERE $propName=:ref"
+					Map params = [ref:(attribs.transform ? attribs.transform.call(domainObject) : domainObject)]
 					log.debug "deleteOrNullUserLoginReferences() Delete statement: $hql, params: $params"
 					nulledCount += attribs.domain.executeUpdate(hql, params)
 				}

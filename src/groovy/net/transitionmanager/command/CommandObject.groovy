@@ -15,7 +15,7 @@ trait CommandObject {
 			this[prop.key] = domain[prop.key]
 		}
 	}
-`
+
 	/**
 	 * Used to populate the domain object from the command object with the option to skip properties that are empty/null
 	 * @param domain - the domain object to set the properties on

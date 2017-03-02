@@ -737,7 +737,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	void deleteUserLogin(UserLogin userLogin) {
 		auditService.logMessage("deleting user account $userLogin")
-		GormUtil.deleteOrNullDomainReferences(userLogin, true)
+		try {
+			GormUtil.deleteOrNullDomainReferences(userLogin, true)
+		} catch(e) {
+			log.error ExceptionUtil.stackTraceToString('deleteUserLogin()',e)
+		}
 	}
 
 	/**
