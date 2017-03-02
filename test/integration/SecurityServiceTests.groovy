@@ -334,8 +334,6 @@ class SecurityServiceTests extends Specification {
 			securityService.assumeUserIdentity(username, true)
 		then: 'an exception should be thrown'
 			thrown UnauthorizedException
-		and: 'the session should NOT be logged in'
-			! securityService.isLoggedIn()
 
 		when: 'calling assumeUserIdentity with an INVALID username'
 			username = 'someBogusUsernameThatCanNotPossiblyExist'
@@ -343,5 +341,6 @@ class SecurityServiceTests extends Specification {
 		then: 'an exception should be thrown'
 			thrown RuntimeException
 	}
+
 
 }
