@@ -610,7 +610,7 @@ class RackLayoutsController implements ControllerMethods {
 				if (!printView) {
 					def roomParameter = it.rackDetails.room?.id
 					def rackParameter = it.rackDetails.id
-					def rackAdd2ImgUrl = HtmlUtil.createLinkToResource([dir: "i", file: "rack_add2.png", absolute: true])
+					def rackAdd2ImgUrl = HtmlUtil.resource([dir: "i", file: "rack_add2.png"])
 					row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${
 						rackId
 					}"><img src="${rackAdd2ImgUrl}">
