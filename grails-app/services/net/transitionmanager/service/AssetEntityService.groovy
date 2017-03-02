@@ -1201,26 +1201,26 @@ class AssetEntityService implements ServiceMethods {
 		//assert ['Database'].contains(type)
 		def configMap = getConfig(type, asset?.validation ?: 'Discovery')
 
-		def assetTypeAttribute = getPropertyAttribute('assetType')
+		//def assetTypeAttribute = getPropertyAttribute('assetType') // TM-6096
 		//def validationType = asset.validation
 		def highlightMap = getHighlightedInfo(type, asset, configMap)
-		def dependentAssets = getDependentAssets(asset)
-		def supportAssets = getSupportingAssets(asset)
+		//def dependentAssets = getDependentAssets(asset) // TM-6096
+		//def supportAssets = getSupportingAssets(asset) // TM-6096
 
 		// TODO - JPM 8/2014 - Need to see if Edit even uses the servers list at all. If so, this needs to join the model to filter on assetType
-		def servers = AssetEntity.executeQuery('''
+		/*def servers = AssetEntity.executeQuery('''
 			FROM AssetEntity
 			WHERE project=:project AND assetClass=:ac AND assetType IN (:types)
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
-
+			*/ // TM-6096
 		[assetId: asset.id,
-		 assetTypeAttribute: assetTypeAttribute,
-		 assetTypeOptions: getDeviceAssetTypeOptions(),
+		 //assetTypeAttribute: assetTypeAttribute,
+		 //assetTypeOptions: getDeviceAssetTypeOptions(),
 		 config: configMap.config,
 		 customs: configMap.customs,
-		 dependencyStatus: getDependencyStatuses(),
-		 dependencyType: getDependencyTypes(),
-		 dependentAssets: dependentAssets,
+		 // dependencyStatus: getDependencyStatuses(), // TM-6096
+		 // dependencyType: getDependencyTypes(), // TM-6096
+		 // dependentAssets: dependentAssets, // TM-6096
 		 environmentOptions: getAssetEnvironmentOptions(),
 		 // The name of the asset that is quote escaped to prevent lists from erroring with links
 		 // TODO - this function should be replace with a generic HtmlUtil method - this function is to single purposed...
@@ -1229,12 +1229,12 @@ class AssetEntityService implements ServiceMethods {
 		 moveBundleList: getMoveBundles(project),
 		 planStatusOptions: getAssetPlanStatusOptions(),
 		 project: project,
-		 projectId: project.id,
-		 priorityOption: getAssetPriorityOptions(),
+		 //projectId: project.id, // TM-6096
+		 //priorityOption: getAssetPriorityOptions(), // TM-6096
 		 // The page to return to after submitting changes
 		 redirectTo: params.redirectTo,
-		 servers: servers,
-		 supportAssets: supportAssets,
+		 //servers: servers, // TM-6096
+		 //supportAssets: supportAssets, // TM-6096
 		 version: asset.version]
 	}
 
@@ -2497,7 +2497,7 @@ class AssetEntityService implements ServiceMethods {
 			        it.commentsStatus]
 			]
 		}
-		
+
 		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 	}
 
