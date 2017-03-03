@@ -28,14 +28,14 @@ tds.cookbook.controller.MainController = function(scope, rootScope, log, recipeM
 
 	rootScope.previousState = '';
 	rootScope.currentState = '';
-	
-	rootScope.$on('$stateChangeSuccess', function(ev, to, toParams, from, fromParams) { 
-		rootScope.previousState = from.name; 
-		rootScope.currentState = to.name; 
+
+	rootScope.$on('$stateChangeSuccess', function(ev, to, toParams, from, fromParams) {
+		rootScope.previousState = from.name;
+		rootScope.currentState = to.name;
 		log.log('Previous state:' + rootScope.previousState);
 		log.log('Current state:' + rootScope.currentState);
 
-		//Disable loading indicator when cookbook is in the state 
+		//Disable loading indicator when cookbook is in the state
 		scope.cookbook.loadingIndicatorEnabled = (rootScope.currentState != "recipes.detail.gentasks.progress");
 
 		//Clear timer if the state is not recipes.detail.gentasks.progress
@@ -82,17 +82,17 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	// Method to Get the list of Recipes.
 	listRecipes = function(){
-		scope.recipes = cookbookService.getListOfRecipes({archived: scope.archived, context: scope.context, rand: tdsCommon.randomString(16) }, 
+		scope.recipes = cookbookService.getListOfRecipes({archived: scope.archived, context: scope.context, rand: tdsCommon.randomString(16) },
 			function(data){
 			log.info('Success on getting Recipes');
 			if(data.data){
 				scope.totalItems = data.data.list.length;
-				scope.gridData = (scope.totalItems) ? data.data.list : 
-					[{'message': 'No results found', 'context': 'none'}]; 
+				scope.gridData = (scope.totalItems) ? data.data.list :
+					[{'message': 'No results found', 'context': 'none'}];
 				scope.colDefinition = (scope.totalItems) ? scope.colDef : scope.colDefNoData;
 				timeout(function(){
 					checkForSelectedRow();
-				}, 100);				
+				}, 100);
 			}else{
 				log.warn('Moved Temporarily');
 				location.reload();
@@ -157,20 +157,20 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 			'<img src="'+ utils.url.applyRootPath('/icons/delete.png') + '" alt="Delete">' +
 			'</a>'+
 		'</div>';
-	scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index + 
+	scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index +
 		'" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" />';
 	scope.colDef = [
 	{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***',
 		editableCellTemplate: scope.edittableField},
-	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, 
+	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false,
 		width: '******', editableCellTemplate: scope.edittableField},
 	{field:'context', displayName:'Context', enableCellEdit: false, width: '**'},
 	{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '***'},
 	{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '****', cellTemplate : scope.dateCellTemplate},
-	{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, 
+	{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false,
 		width: '**'},
 	{field:'hasWIP', displayName:'WIP', cellClass: 'text-center', enableCellEdit: false, width: '*'},
-	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**', 
+	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**',
 		sortable: false, cellTemplate: actionsTemplate}
 	];
 
@@ -178,7 +178,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	scope.colDefinition = scope.colDef;
 
 	scope.currentSelectedRow = {};
-	
+
 	scope.enabledGridSelection = true;
 
 	scope.recipesGridOptions = {
@@ -207,7 +207,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 			if(rowItem.rowIndex != scope.currentSelectedRow.rowIndex && scope.enabledGridSelection){
 
 				scope.currentSelectedRow = rowItem;
-				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This hack is to avoid changeRecipe() to be executed many times.
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
 				timeout.cancel(lastLoop);
 				lastLoop = timeout(function(){
@@ -222,7 +222,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 						scope.currentSelectedRecipe = null;
 					}
 				}, 50)
-				
+
 			}
 		}
 	};
@@ -285,7 +285,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 		scope.updateRecipeData(row);
 	});
 
-	// Update recipe. After editing. 
+	// Update recipe. After editing.
 	scope.updateRecipeData = function(row) {
 		var recipeToUpdate = {
 			name : scope.gridData[row.rowIndex].name,
@@ -302,7 +302,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 		if(!scope.executeUpdate){
 			return false;
 		};
-		
+
 		scope.save.row = row.rowIndex;
 		if(!scope.save.pending && (recipeToUpdate.name != scope.currentSelectedRecipe.name ||
 			recipeToUpdate.description != scope.currentSelectedRecipe.description)) {
@@ -326,7 +326,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 					alerts.addAlert({type: 'danger', msg: 'Could not save the recipe'});
 				});
 			}, 500);
-		}  
+		}
 	};
 
 	scope.keyPressed = function(ev, row, col) {
@@ -423,7 +423,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 		if (ind != 0) {
 			scope.preventSelection = true;
 		}
-		
+
 		if (ind == 1 && scope.gridData[row.rowIndex].versionNumber < 1) {
 			return false;
 		}
@@ -434,7 +434,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	scope.createRecipe = function() {
 		var showDialog = true;
 		if(recipeManager.isEditingRecipe()){
-			var confirmation=confirm("You have unsaved changes in recipe '" + scope.currentSelectedRow.entity.name + "'.\n\n" + 
+			var confirmation=confirm("You have unsaved changes in recipe '" + scope.currentSelectedRow.entity.name + "'.\n\n" +
 				"Press OK to continue and loose those changes otherwise press Cancel.");
 			showDialog = confirmation;
 		}
@@ -442,7 +442,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 			recipeManager.setEditingRecipe(false);
 			timeout(function() {
 				state.go("recipes.create");
-			}, 
+			},
 			100);
 		}
 	}
@@ -476,7 +476,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		}
 
 		return el;
-	}	
+	}
 
 	scope.recipeTabs = [
 		{ heading: "Task Generation", route:"recipes.detail.gentasks", active:false },
@@ -527,8 +527,8 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		var recipe = scope.editor.selectedRVersion;
 		if (recipe && recipe.context) {
 			var context = recipe.context;
-			if((context == 'Event' && scope.contexts.selectedEvent) || (context == 'Bundle' && 
-					scope.contexts.selectedBundle) ||	(context == 'Application' && 
+			if((context == 'Event' && scope.contexts.selectedEvent) || (context == 'Bundle' &&
+					scope.contexts.selectedBundle) ||	(context == 'Application' &&
 					scope.contexts.selectedApplication)){
 				log.log('matches event, or bundle, or application');
 				return true;
@@ -573,7 +573,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		}
 	}
 
-	// Put select elements in blank. 
+	// Put select elements in blank.
 	scope.contexts.blankBundles = function(){
 		scope.contexts.selectedBundle = '';
 		scope.contexts.selectedApplication = '';
@@ -626,7 +626,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	var checkActiveTabs = function() {
 		scope.recipeTabs.forEach(function(tab) {
 			tab.active = scope.active(tab.route);
-		});	
+		});
 	};
 
 	scope.contexts.setRecipeDefaultContext = function() {
@@ -693,7 +693,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 	scope.go = function(route){
 		if (!scope.active(route)) {
-			state.go(route);	
+			state.go(route);
 		}
 	};
 
@@ -758,9 +758,9 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	}
 
 	// generate an array to show the select element correctly
-	// Expect opts with the following data: isUnassigned (boolean), unassignedArray 
+	// Expect opts with the following data: isUnassigned (boolean), unassignedArray
 	// (array with unassigned info)
-	// assignedArray (array with assigned info), and groupName which would be the group name if 
+	// assignedArray (array with assigned info), and groupName which would be the group name if
 	// isUnassigned is false.
 	scope.generateOptions = function(opts, scopeContext){
 		var newArray = (opts.isUnassigned) ? opts.unassignedArray : opts.assignedArray;
@@ -775,7 +775,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			})
 		}
 		return newArray
-	}	
+	}
 
 	// Get List of Bundles for a given Event
 	scope.getListBundles = function(event, scopeContext){
@@ -786,16 +786,16 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			if(event.id == 0){
 				//generate an array to show the select element correctly
 				scopeContext.bundlesArrayUnassigned = scope.generateOptions({
-					isUnassigned: true, 
-					unassignedArray: data.data.list, 
+					isUnassigned: true,
+					unassignedArray: data.data.list,
 					assignedArray: []
 				}, scopeContext);
 			}else{
 				//generate an array to show the select element correctly
 				scopeContext.bundlesArrayAssigned = scope.generateOptions({
-					isUnassigned: false, 
-					unassignedArray: angular.copy(scopeContext.bundlesArrayUnassigned), 
-					assignedArray: data.data.list, 
+					isUnassigned: false,
+					unassignedArray: angular.copy(scopeContext.bundlesArrayUnassigned),
+					assignedArray: data.data.list,
 					groupName: event.name
 				}, scopeContext);
 			}
@@ -820,16 +820,16 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 				if(bundle.id == 0){
 					//generate an array to show the select element correctly
 					scopeContext.applicationsArrayUnassigned = scope.generateOptions({
-						isUnassigned: true, 
-						unassignedArray: data.data.list, 
+						isUnassigned: true,
+						unassignedArray: data.data.list,
 						assignedArray: []
 					}, scopeContext);
 				}else{
 					//generate an array to show the select element correctly
 					scopeContext.applicationsArrayAssigned = scope.generateOptions({
-						isUnassigned: false, 
-						unassignedArray: angular.copy(scopeContext.applicationsArrayUnassigned), 
-						assignedArray: data.data.list, 
+						isUnassigned: false,
+						unassignedArray: angular.copy(scopeContext.applicationsArrayUnassigned),
+						assignedArray: data.data.list,
 						groupName: bundle.name,
 						isGroup: isGroup
 					}, scopeContext);
@@ -894,14 +894,14 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 		},
 		currentSelectedRecipeRow : '',
 		selectedRecipe : '',
-		givenProjects : { 
+		givenProjects : {
 			"status": "success",
 			"data": {
 				"projects": []
 			}
 		}
 	}
-	
+
 	scope.clone.selectedContext = scope.clone.contextArray[0];
 
 	// Grid stuff
@@ -912,8 +912,8 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 		{field:'last', displayName:'Last', enableCellEdit: false, width: '**', cellTemplate : scope.dateCellTemplate},
 		{field:'version', displayName:'Version', enableCellEdit: false, width: '**'},
 	];
-	
-	// grid 
+
+	// grid
 	scope.clone.projectsGrid = {
 		data: 'clone.gridData',
 		multiSelect: false,
@@ -924,7 +924,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.clone.currentSelectedRecipeRow){
 				scope.clone.currentSelectedRecipeRow = rowItem;
-				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This hack is to avoid changeRecipe() to be executed many times.
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
 				timeout.cancel(lastLoop);
 				lastLoop = timeout(function(){
@@ -934,7 +934,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 						scope.clone.newRecipe.context = scope.clone.selectedRecipe.context;
 						scope.clone.newRecipe.clonedFrom = scope.clone.selectedRecipe.recipeId;
 					}
-				}, 50)		
+				}, 50)
 			}
 		}
 	};
@@ -942,7 +942,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 	var getProjectsAndStatuses = function(){
 		log.log('getProjectsAndStatuses');
 		cookbookService.getUserProjects(
-			{currentPage: 0, maxRows: 1000, rand: tdsCommon.randomString(16)}, 
+			{currentPage: 0, maxRows: 1000, rand: tdsCommon.randomString(16)},
 			function(data){
 				log.info('Success on getting Project list');
 				scope.clone.projectsArray = data.data.projects;
@@ -1012,7 +1012,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 
 	scope.save = function () {
 		var recipeToSave = (scope.clone.activeTabs.newRecipe) ? scope.newRecipe : scope.clone.newRecipe;
-		saveRecipe(recipeToSave); 
+		saveRecipe(recipeToSave);
 	};
 
 	scope.cancel = function () {
@@ -1080,7 +1080,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 
 	/**
 	 * e: event passed from the caller
-	 * conf: configuration object passed 
+	 * conf: configuration object passed
 	 */
 	scope.tasks.viewTaskGraph = function(e, conf){
 		conf = conf || {}
@@ -1148,19 +1148,19 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 					var jobId = data.data.jobId;
 					state.go("recipes.detail.gentasks.progress", {'jobId': jobId});
 				}
-				
-				
+
+
 			}, function(data, status, headers, config){
 				alerts.addAlert({type: 'danger', msg: 'Unable to generate tasks. ' + data.headers().errormessage});
 				log.info('Error on generating task');
 			});
 		}
 	}
-	
+
 	scope.getTaskGenerationProgress = function() {
 		return scope.tasks.progressPercent;
 	}
-	
+
 	scope.getTaskGenerationStatus = function() {
 		return scope.tasks.generation.status;
 	}
@@ -1179,8 +1179,8 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 
 	if (state.is("recipes.detail.gentasks")) {
 		timeout(function() {
-			state.go("recipes.detail.gentasks.start");	
-		}, 
+			state.go("recipes.detail.gentasks.start");
+		},
 		100);
 	}
 
@@ -1221,9 +1221,9 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 	scope.cookbook.progressPromise = setInterval(function() {
 		cookbookService.getProgress({section: jobId, rand: tdsCommon.randomString(16)}, {"id" : jobId}, function(data) {
 			scope.tasks.progressPercent = data.data.percentComp;
-			scope.tasks.show.progress = ((data.data.percentComp < 100) && 
+			scope.tasks.show.progress = ((data.data.percentComp < 100) &&
 				((data.data.status == "Pending") || (data.data.status == "Processing")));
-			
+
 			if (!scope.tasks.show.progress) {
 				clearInterval(scope.cookbook.progressPromise);
 				scope.cookbook.progressPromise = null;
@@ -1290,7 +1290,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	if (!scope.tasks.singleRecipe) {
 		scope.tasks.statePrefix = "generationHistory";
 	}
-	
+
 	var	tasksActionsTemplate = '<div class="gridIcon">'+
 		'<a href="" class="actions edit" title="Reset Tasks"'+
 			'ng-click="tasks.tasksGridActions(row, \'reset\')">'+
@@ -1324,7 +1324,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.tasks.currentSelectedTaskRow){
 				scope.tasks.currentSelectedTaskRow = rowItem;
-				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This hack is to avoid changeRecipe() to be executed many times.
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
 				timeout.cancel(lastLoop);
 				lastLoop = timeout(function(){
@@ -1335,11 +1335,11 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 				}, 50)
 				var nextState = getNextState();
 				if (nextState != null) {
-					state.go(getNextState(), { 'taskBatchId' : rowItem.entity.id});	
+					state.go(getNextState(), { 'taskBatchId' : rowItem.entity.id});
 				}
 			}
 		}
-	}; 
+	};
 
 	var validNextStates = [
 		"**." + scope.tasks.statePrefix + ".detail.logs.**",
@@ -1402,8 +1402,8 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 		} else {
 			taskBatchStatus = "publish";
 		}
-		
-		var confirmation = confirm("You are about to " + taskBatchStatus + " the generated tasks.\n\n"+ 
+
+		var confirmation = confirm("You are about to " + taskBatchStatus + " the generated tasks.\n\n"+
 		"Press OK to " + taskBatchStatus + " the tasks otherwise press Cancel.");
 
 		if (confirmation) {
@@ -1435,7 +1435,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 
 	// Reset tasks batch function
 	scope.tasks.resetTaskBatch = function(taskBatchId){
-		var confirmation = confirm("You are about to reset the generated tasks that clears out the comments and resets the task statuses.\n\n"+ 
+		var confirmation = confirm("You are about to reset the generated tasks that clears out the comments and resets the task statuses.\n\n"+
 				"Press OK to continue otherwise press Cancel.");
 
 		if (confirmation) {
@@ -1451,7 +1451,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 		}
 	}
 
-	// This should to be fired whenever the usr click on "Task Generation" tab. 
+	// This should to be fired whenever the usr click on "Task Generation" tab.
 	// It selects the first row if there isn't any selected
 	scope.tasks.updateGrid = function(){
 		log.log(scope.tasks.tasksGrid);
@@ -1468,26 +1468,26 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 		cookbookService.getListTaskBatches(params, function(data){
 			log.info('Success on getting Task Batches');
 			log.info(data);
-		
-			scope.tasks.gridData = (data.data.list.length > 0) ? 
+
+			scope.tasks.gridData = (data.data.list.length > 0) ?
 				data.data.list : [{'message': 'No results found', 'context': 'none'}];
-			
+
 			scope.tasks.colDef = (data.data.list.length > 0) ? [
 				// {field:'id', displayName:'Target', enableCellEdit: false, width: '**'},
 				{field:'contextName', displayName:'Context Target', enableCellEdit: false, width: '***'},
-				{field:'taskCount', displayName:'Tasks', cellClass: 'text-center', 
+				{field:'taskCount', displayName:'Tasks', cellClass: 'text-center',
 					enableCellEdit: false, width: '**'},
-				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center', 
+				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center',
 					enableCellEdit: false, width: '**'},
 				{field:'createdBy', displayName:'Generated By', enableCellEdit: false, width: '****'},
 				{field:'dateCreated', displayName:'Generated At', enableCellEdit: false, width: '****', cellTemplate : scope.dateCellTemplate},
 				{field:'status', displayName:'Status', enableCellEdit: false, width: '**'},
-				{field:'versionNumber', displayName:'Version', cellClass: 'text-center', 
+				{field:'versionNumber', displayName:'Version', cellClass: 'text-center',
 					enableCellEdit: false, width: '**'},
-				{field:'isPublished', displayName:'Published', cellClass: 'text-center', 
+				{field:'isPublished', displayName:'Published', cellClass: 'text-center',
 					enableCellEdit: false, width: '**',
 					cellTemplate: checkboxTemplate},
-				{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, 
+				{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false,
 					width: '**', sortable: false, cellTemplate: tasksActionsTemplate}
 			] : [
 				{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}
@@ -1561,7 +1561,7 @@ tds.cookbook.controller.TaskBatchHistoryDetailController = function(scope, state
 	var checkActiveTabs = function() {
 		scope.taskBatchTabs.forEach(function(tab) {
 			tab.active = scope.active(tab.route);
-		});	
+		});
 	};
 
 	scope.$on("$stateChangeSuccess", function() {
@@ -1570,7 +1570,7 @@ tds.cookbook.controller.TaskBatchHistoryDetailController = function(scope, state
 
 	scope.go = function(route){
 		if (!scope.active(route)) {
-			state.go(route);	
+			state.go(route);
 		}
 	};
 
@@ -1667,7 +1667,7 @@ tds.cookbook.controller.TaskBatchHistoryLogsController = function(scope, state, 
 
 	scope.showLog = function(type) {
 		if (scope.tasks.currentSelectedTaskRow) {
-			scope.taskBatchLogs = scope.secureHTML(scope.tasks.currentSelectedTaskRow.entity[type]);		
+			scope.taskBatchLogs = scope.secureHTML(scope.tasks.currentSelectedTaskRow.entity[type]);
 		}
 	}
 
@@ -1697,7 +1697,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	var checkActiveTabs = function() {
 		scope.editorTabs.forEach(function(tab) {
 			tab.active = scope.active(tab.route);
-		});	
+		});
 	};
 
 	scope.$on("$stateChangeSuccess", function() {
@@ -1706,7 +1706,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 
 	scope.go = function(route){
 		if (!scope.active(route)) {
-			state.go(route);	
+			state.go(route);
 		}
 	};
 
@@ -1755,11 +1755,11 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			}, function(){
 				log.warn('Error on Saving WIP');
 				alerts.addAlert({type: 'danger', msg: 'Error: Unable to save WIP'});
-			});	
+			});
 		}
-		
+
 	};
-	
+
 	// Release
 	scope.releaseVersion = function() {
 		var dataToSend = $.param(scope.editor.selectedRecipe);
@@ -1787,7 +1787,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			}
 		}
 	};
-	
+
 	// Cancel
 	scope.cancelChanges = function() {
 		var confirmation = confirm("You are about to undo local changes of the recipe.\n\nPress OK to undo changes otherwise press Cancel.");
@@ -1806,7 +1806,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			var dataToSend = $.param(scope.editor.selectedRecipe),
 			selectedId = stateParams.recipeId,
 			selectedVersion = scope.editor.selectedRecipe.versionNumber;
-			cookbookService.discardWIP({details:selectedId, moreDetails:selectedVersion}, 
+			cookbookService.discardWIP({details:selectedId, moreDetails:selectedVersion},
 				dataToSend, function(){
 				log.info('Success on Discarding WIP');
 				alerts.addAlert({type: 'success', msg: 'WIP Discarded', closeIn: 1500});
@@ -1815,7 +1815,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			}, function(){
 				log.warn('Error on Discarding WIP');
 				alerts.addAlert({type: 'danger', msg: 'Error: Unable to discard WIP'});
-			});	
+			});
 		}
 	};
 
@@ -1830,7 +1830,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			alerts.addAlert({type: 'danger', msg: 'Unable to validate Syntax'});
 		});
 	};
-	
+
 	scope.diff = function() {
 		scope.showCompareCodeDialog(
 			(scope.editor.selectedRVersion.hasWIP?recipeManager.wipBackup().sourceCode:recipeManager.versionBackup().sourceCode),
@@ -1842,7 +1842,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 
 	scope.showCompareCodeDialog = function(leftSourceCode, rightSourceCode, leftLabel, rightLabel) {
 		scope.toCompare = {
-			"leftSourceCode":leftSourceCode, 	
+			"leftSourceCode":leftSourceCode,
 			"rightSourceCode":rightSourceCode,
 			"leftLabel":leftLabel,
 			"rightLabel":rightLabel
@@ -1987,7 +1987,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 		plugins: [layoutPluginGroups],
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.groups.selectedGroup){
-				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This hack is to avoid changeRecipe() to be executed many times.
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
 				timeout.cancel(lastLoop);
 				lastLoop = timeout(function(){
@@ -1999,12 +1999,12 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 						loadAssets(rowItem.entity.assets);
 					}
 				}, 50)
-				
+
 			}
 		}
 	};
 
-	// This should to be fired whenever the usr click on "Groups" tab. 
+	// This should to be fired whenever the usr click on "Groups" tab.
 	// It selects the first row if there isn't any selected
 	scope.groups.updateGrid = function(){
 		log.log(scope.groups.groupsGrid);
@@ -2031,7 +2031,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 		selectedItems: [],
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.assets.selectedAsset){
-				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This hack is to avoid changeRecipe() to be executed many times.
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
 				timeout.cancel(lastLoop);
 				lastLoop = timeout(function(){
@@ -2097,7 +2097,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 
 	var	versionsActionsTemplate = '<div class="gridIcon">'+
 		'<a href="" ng-hide="row.entity.isCurrentVersion || !row.entity.versionNumber"'+
-			'class="actions edit" title="Revert Recipe Version"'+ 
+			'class="actions edit" title="Revert Recipe Version"'+
 			'ng-click="versions.versionsGridActions(row, \'revert\')">'+
 			'<img src="'+ utils.url.applyRootPath('/icons/arrow_undo.png') + '" alt="Revert">' +
 		'</a>'+
@@ -2114,16 +2114,16 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 		versionNumberTemplate = '<div class="ngCellText" ng-class="col.colIndex()">'+
 			'<span ng-cell-text ng-bind="row.entity.versionNumber && row.entity.versionNumber || \'WIP\'"></span>'+
 		'</div>';
-		
+
 
 	scope.versions.colDef = [
-		{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, 
+		{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false,
 			cellTemplate: versionNumberTemplate, width: '**'},
-		{field:'', displayName:'Current', enableCellEdit: false, sortable: false, 
+		{field:'', displayName:'Current', enableCellEdit: false, sortable: false,
 			cellTemplate: currentVersionTemplate, width: '**'},
 		{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '***', cellTemplate : scope.dateCellTemplate},
 		{field:'createdBy', displayName:'Created By', enableCellEdit: false, width: '***'},
-		{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, 
+		{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false,
 			sortable: false, cellTemplate: versionsActionsTemplate, width: '**'}
 	];
 
@@ -2150,12 +2150,12 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 			}
 		}else if(action == 'remove'){
 			console.log(scope.editor.selectedRecipe);
-			var confirmation = confirm("You are about to delete version " + version + " of recipe '" + 
+			var confirmation = confirm("You are about to delete version " + version + " of recipe '" +
 				scope.currentSelectedRecipe.name + "'.\n\nPress OK to continue otherwise press Cancel.");
 			if (confirmation == true){
 				log.info(item.entity);
 				var versionToDelete = item.entity.versionNumber?item.entity.versionNumber:0;
-				cookbookService.discardWIP({details:scope.editor.selectedRecipe.recipeId, 
+				cookbookService.discardWIP({details:scope.editor.selectedRecipe.recipeId,
 					moreDetails: versionToDelete}, function(data){
 					if (data.status == 'fail') {
 						alerts.addAlert({type: 'danger', msg: data.data});
@@ -2200,7 +2200,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 
 	scope.showCompareCodeDialog = function(leftSourceCode, rightSourceCode, leftLabel, rightLabel) {
 		scope.toCompare = {
-			"leftSourceCode":leftSourceCode, 	
+			"leftSourceCode":leftSourceCode,
 			"rightSourceCode":rightSourceCode,
 			"leftLabel":leftLabel,
 			"rightLabel":rightLabel
@@ -2233,7 +2233,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 	};
 
 	scope.versions.onCompareVersions = function() {
-		scope.versions.getRecipeVersionDataAndCompare(scope.versions.toCompareVersion);	
+		scope.versions.getRecipeVersionDataAndCompare(scope.versions.toCompareVersion);
 	};
 
 	var lastLoop;
@@ -2248,7 +2248,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.versions.selectedVersionRow){
 				scope.versions.selectedVersionRow = rowItem;
-				// This hack is to avoid the code to be executed many times. 
+				// This hack is to avoid the code to be executed many times.
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
 				timeout.cancel(lastLoop);
 				lastLoop = timeout(function(){
@@ -2259,7 +2259,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 						state.go(getNextState(), {'recipeVersion': versionNumber.toString()});
 					}
 				}, 50)
-				
+
 			}
 		}
 	};
@@ -2297,8 +2297,8 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 		});
 	}
 
-	// This should to be fired whenever the usr click on "Versions" tab. 
-	// It selects the first row if there isn't any selected  
+	// This should to be fired whenever the usr click on "Versions" tab.
+	// It selects the first row if there isn't any selected
 	scope.versions.updateGrid = function() {
 		log.info('versions grid select, recipeId: ' + stateParams.recipeId);
 		scope.versions.getVersions({recipeId: stateParams.recipeId});
@@ -2308,7 +2308,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 		timeout(function() {
 			if (scope.versions.versionsArray.length > 0) {
 				scope.versions.versionsGrid.selectRow(0, true);
-			}				
+			}
 		}, 100)
 	}
 
@@ -2319,7 +2319,7 @@ tds.cookbook.controller.RecipeVersionsController.$inject = ['$scope', '$rootScop
 
 
 /********************************************************************************
- * Recipe Versions Detail controller 
+ * Recipe Versions Detail controller
  */
 tds.cookbook.controller.RecipeVersionsDetailController = function(scope, state, stateParams, log, utils, cookbookService, recipeVersionData) {
 
@@ -2338,7 +2338,7 @@ tds.cookbook.controller.RecipeVersionsDetailController = function(scope, state, 
 	var checkActiveTabs = function() {
 		scope.versionsInnerTabs.forEach(function(tab) {
 			tab.active = scope.active(tab.route);
-		});	
+		});
 	};
 
 	scope.$on("$stateChangeSuccess", function() {
@@ -2347,7 +2347,7 @@ tds.cookbook.controller.RecipeVersionsDetailController = function(scope, state, 
 
 	scope.go = function(route){
 		if (!scope.active(route)) {
-			state.go(route);	
+			state.go(route);
 		}
 	};
 
@@ -2357,7 +2357,7 @@ tds.cookbook.controller.RecipeVersionsDetailController.$inject = ['$scope', '$st
 
 
 /********************************************************************************
- * Recipe Versions Code controller 
+ * Recipe Versions Code controller
  */
 tds.cookbook.controller.RecipeVersionsCodeController = function(scope, state, stateParams, utils, cookbookService) {
 
@@ -2396,7 +2396,7 @@ tds.cookbook.controller.RecipeVersionsDiffController = function(scope, state, st
 				}
 			);
 			if (recipeManager.isEditingRecipe() || scope.editor.selectedRecipe.hasWIP) {
-				toCompareVersions.splice(0, 0, "WIP");				
+				toCompareVersions.splice(0, 0, "WIP");
 			}
 		}
 		scope.versions.toCompareVersions = toCompareVersions;
@@ -2415,7 +2415,7 @@ tds.cookbook.controller.RecipeVersionsDiffController.$inject = ['$scope', '$stat
 tds.cookbook.controller.RecipeCodeEditController = function($scope, $state, $stateParams, $log, $modalInstance, $timeout, utils, cookbookService, sourceCode) {
 
 	$scope.modal = {};
-	$scope.modal.sourceCode = (sourceCode.length == 0)?' ':sourceCode;
+	$scope.modal.sourceCode = (sourceCode?.length == 0)?' ':sourceCode;
 
 	$scope.codeEditorOptions = {
 		lineNumbers: true,
@@ -2725,7 +2725,7 @@ tds.cookbook.service.CookbookService = function(utils, http, resource) {
 				}
 			}
 	};
-	
+
 	restCalls = resource(
 		utils.url.applyRootPath('/ws/:domain/:section/:details/:moreDetails'),
 		{
@@ -2803,15 +2803,15 @@ tds.cookbook.service.RecipeManager = function(utils) {
 /********************************************************************************
  * Cookbook module configuration
  ********************************************************************************/
-tds.cookbook.module = angular.module('tdsCookbook', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur', 
+tds.cookbook.module = angular.module('tdsCookbook', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur',
 	 'ui.codemirror', 'ui.router', 'tdsComments']);
 
 tds.cookbook.module.config(['$httpProvider', function($httpProvider) {
 	$httpProvider.interceptors.push('servicesInterceptor');
 }]);
 
-tds.cookbook.module.config(['$logProvider', function($logProvider) {  
-   //$logProvider.debugEnabled(false);  
+tds.cookbook.module.config(['$logProvider', function($logProvider) {
+   //$logProvider.debugEnabled(false);
 }]);
 
 tds.cookbook.module.factory('servicesInterceptor', [tds.core.interceptor.LoggedCheckerInterceptor]);
@@ -2914,7 +2914,7 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 				},
 				"taskBatchProgress": {
 					template: ''
-				},				
+				},
 				"taskBatchCompleted": {
 					templateUrl: servRootPathProvider.$get() + '/components/cookbook/generation/task-generation-completed-template.html',
 					controller: tds.cookbook.controller.TaskGenerationCompletedController
@@ -3155,5 +3155,5 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 			}
 		})
 		;
-		
+
 });
