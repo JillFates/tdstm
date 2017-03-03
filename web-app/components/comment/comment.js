@@ -62,7 +62,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 	});
 
 	scope.$on('commentDeleted', function(evt, commentId, assetId) {
-		dispathCommentChangedEvent(commentId, assetId, 'deleted');
+		dispathCommentChangedEvent(commentId, assetId, 'deleted'); $('#taskListIdGrid').trigger("reloadGrid");
 	});
 
 	scope.$on('commentUpdated', function(evt, commentId, assetId) {
