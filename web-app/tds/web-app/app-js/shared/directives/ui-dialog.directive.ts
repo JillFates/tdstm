@@ -26,7 +26,7 @@ import { DialogModel } from '../model/dialog.model'
                     <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div><!-- /.modal-content -->
-        /div><!-- /.modal-dialog -->
+        </div><!-- /.modal-dialog -->
     </div>`
 })
 export class UIDialogDirective implements OnInit, OnChanges, OnDestroy {

@@ -1,22 +1,24 @@
-function processBatch () {
+var purgeDialog, flushDialog;
+
+function processBatch() {
 	var value = $('input:radio[name=deleteHistory]:checked').val()
 	if (value == "doNothing") {
-		 $("#flushOldBatchId").dialog('close');
+		flushDialog.dialog('close');
 	} else {
 		jQuery.ajax({
-			url: contextPath+'/admin/processOldData',
-			data: {'deleteHistory':value},
+			url: contextPath + '/admin/processOldData',
+			data: { 'deleteHistory': value },
 			type: 'POST',
-			beforeSend: function(jqXHR) {
+			beforeSend: function (jqXHR) {
 				$('#processDivId').show();
 				$("#respMsgId").hide();
 				$("#processDivId").show()
 			},
-			success: function(data) {
+			success: function (data) {
 				$("#processDivId").hide()
 				$("#respMsgId").show().html(data)
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
+			error: function (jqXHR, textStatus, errorThrown) {
 				$("#processDivId").hide()
 				$("#respMsgId").show().html("An unexpected error occurred. Please close and reload form to see if the problem persists")
 			}
@@ -24,25 +26,22 @@ function processBatch () {
 	}
 }
 
-function openFlushDiv () {
+function openFlushDiv() {
 	jQuery.ajax({
-		url: contextPath+'/admin/retrieveBatchRecords',
+		url: contextPath + '/admin/retrieveBatchRecords',
 		type: 'POST',
-		beforeSend: function(jqXHR) {
-			$("#flushOldBatchId").dialog('option', 'width', '500px')
-			$("#flushOldBatchId").dialog('option', 'position', ['center','top']);
-			$("#flushOldBatchId").dialog('option', 'modal', 'true');
-			$("#flushOldBatchId").dialog('open');
+		beforeSend: function (jqXHR) {
+			flushDialog.dialog('open');
 			$("#getRecordsInfoId").show()
 			$("#respMsgId").hide()
 			$("#processDivId").show()
 		},
-		success: function(data) {
+		success: function (data) {
 			$("#respMsgId").html(data)
 			$("#processDivId").hide()
 			$("#respMsgId").show()
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while opening Flush import div. Please reload form to see if the problem persists")
 		}
 	})
@@ -55,20 +54,20 @@ function openShowTypeDiv() {
 	$("#cleanProcessId").hide();
 	$("#cleanProcessDivId").hide();
 	jQuery.ajax({
-		url: contextPath+'/admin/retrieveAssetTypes',
+		url: contextPath + '/admin/retrieveAssetTypes',
 		type: 'POST',
-		beforeSend: function(jqXHR) {
-			$("#showOrCleanTypeId").dialog('option', 'width', '550px');
-			$("#showOrCleanTypeId").dialog('option', 'position', ['center','top']);
-			$("#showOrCleanTypeId").dialog('option', 'modal', 'true');
-			$("#showOrCleanTypeId").dialog('open');
+		beforeSend: function (jqXHR) {
+			// $("#showOrCleanTypeId").dialog('option', 'width', '550px');
+			// $("#showOrCleanTypeId").dialog('option', 'position', ['center','top']);
+			// $("#showOrCleanTypeId").dialog('option', 'modal', 'true');
+			purgeDialog.dialog('open');
 			$("#showCleanTypeMsgId").hide();
 			$("#cleanProcessDivId").show();
 		},
-		success: function(data) {
+		success: function (data) {
 			$("#cleanProcessDivId").html(data);
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while opening Show/Clean type div. Please reload form to see if the problem persists.");
 		}
 	});
@@ -80,9 +79,9 @@ function openShowTypeDiv() {
 function cleanTypes() {
 	$("#cleanProcessId").show()
 	jQuery.ajax({
-		url: contextPath+'/admin/cleanAssetTypes',
-		type:'POST',
-		success: function(data) {
+		url: contextPath + '/admin/cleanAssetTypes',
+		type: 'POST',
+		success: function (data) {
 			if (data) {
 				$("#showCleanTypeMsgId").html(data)
 				$("#showCleanTypeMsgId").show();
@@ -92,7 +91,7 @@ function cleanTypes() {
 			}
 			jQuery('#showOrCleanTypeId').dialog('close');
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while opening Show/Clean type div. Please reload form to see if the problem persists")
 		}
 	})
@@ -101,15 +100,16 @@ function cleanTypes() {
 /*
  * This function opens the form for the reconcile assets function
  */
-function openReconcileAssetsForm () {
+function openReconcileAssetsForm() {
 	jQuery.ajax({
 		url: contextPath + '/admin/countAssetsOutOfSync',
-		type:'GET',
-		success: function(text, b, data) {;
+		type: 'GET',
+		success: function (text, b, data) {
+			;
 			$("#outOfSyncAssetCountId").html('Assets out of sync: ' + text);
 			$("#reconcileAssetsFormId").css('display', 'block');
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while opening Show/Clean type div. Please reload form to see if the problem persists")
 		}
 	})
@@ -118,16 +118,16 @@ function openReconcileAssetsForm () {
 /*
  * This function opens the form for the reconcile assets function
  */
-function reconcileAssetTypes () {
+function reconcileAssetTypes() {
 	jQuery.ajax({
 		url: contextPath + '/admin/reconcileAssetTypes',
-		type:'POST',
-		success: function(text, b, data) {
+		type: 'POST',
+		success: function (text, b, data) {
 			$("#outOfSyncAssetCountId").html('Assets out of sync: ' + text);
 			$("#reconcileAssetsFormId").css('display', 'none');
 			alert("Device assetTypes reconciled");
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("You do not have permissions to use this function");
 		}
 	})
@@ -152,18 +152,37 @@ function closeEncryptStringForm() {
 /*
  * This function send the value to encrypt
  */
-function sendValueToEncrypt () {
+function sendValueToEncrypt() {
 	jQuery.ajax({
 		url: contextPath + '/admin/encryptValue?toEncryptString=' + $("#toEncryptString").val() + '&encryptSalt=' + $("#encryptSalt").val() + '&encryptAlghoritm=' + $("#encryptAlghoritm").val(),
-		type:'POST',
-		success: function(text, b, data) {
+		type: 'POST',
+		success: function (text, b, data) {
 			$("#encryptedString").val(text);
 		},
-		error: function(jqXHR, textStatus, errorThrown) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			alert("Can't encrypt value");
 		}
 	})
 }
 
-
+$(function () {
+	purgeDialog = $("#showOrCleanTypeId").dialog({
+		autoOpen: false,
+		width: '550px',
+		position: { at: 'center top' },
+		modal: true,
+		close: function () {
+			location.reload();
+		}
+	});
+	flushDialog = $("#flushOldBatchId").dialog({
+		autoOpen: false,
+		width: '550px',
+		position: { at: 'center top' },
+		modal: true,
+		close: function () {
+			location.reload();
+		}
+	});
+});
 

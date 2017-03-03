@@ -38,7 +38,6 @@ describe('NotifierService:', () => {
     });
 
     it('should no call listener if it already has been unsuscribed', done => {
-        debugger;
         let listerner = notifier.on('NotifierTestEvent', event => {
             expect(false).toBe(true)//should not go here
             done();

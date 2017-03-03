@@ -54,7 +54,7 @@
 
 
 <g:javascript src="jquery-1.9.1.js"/>
-<g:javascript src="jquery-1.9.1-ui.js"/>
+
 <g:javascript src="datetimepicker.js"/>
 <g:javascript src="jquery-migrate-1.0.0.js"/>
 
@@ -108,6 +108,7 @@ def moveEvent = tds.currentMoveEvent() ?: null
 <script src="${resource(dir: 'dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
 <!-- Boosttrap -->
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>
+<g:javascript src="jquery-1.9.1-ui.js"/>
 <!-- SlimScroll -->
 <script src="${resource(dir: 'dist/js/vendors/jquery-slimscroll', file: 'jquery.slimscroll.min.js')}"></script>
 <!-- FastClick -->

@@ -453,7 +453,6 @@
 		}
 	}
 	function validateForm(){
-		debugger;
 		var isValid = true
 		if($(".field_error").length){
 			isValid = false

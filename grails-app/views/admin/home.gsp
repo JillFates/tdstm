@@ -218,7 +218,7 @@ a:hover {
 	<input type="radio" name="deleteHistory" id="all" value="all" > <label for="all">All processed AND pending data</label> <br>
 	<div class="buttons">
 		<input type="button" id="processData" class="save" value="Submit" onclick="processBatch()"/>
-		<input type="button"  class="delete" value="Cancel" id="processData" onclick="jQuery('#flushOldBatchId').dialog('close')"/>
+		<input type="button"  class="delete" value="Cancel" id="processData" onclick="flushDialog.dialog('close')"/>
 	</div>
 	</div>
 </div>
@@ -235,7 +235,7 @@ a:hover {
 	</div>
 	<div class="buttons">
 		<input type="button" id="cleanTypes" class="save" value="Purge" onclick="cleanTypes()"/>
-		<input type="button"  class="delete" value="Cancel" onclick="jQuery('#showOrCleanTypeId').dialog('close')"/>
+		<input type="button"  class="delete" value="Cancel" onclick="purgeDialog.dialog('close')"/>
 	</div>
 </div>
 
@@ -243,11 +243,6 @@ a:hover {
 	currentMenuId = '#adminMenu';
 	$('.menu-admin-portal').addClass('active');
 	$('.menu-parent-admin').addClass('active');
-
-	$(document).ready(function() {
-		$("#flushOldBatchId").dialog({ autoOpen: false })
-		$("#showOrCleanTypeId").dialog({ autoOpen: false })
-	})
 
 </script>
 </body>
