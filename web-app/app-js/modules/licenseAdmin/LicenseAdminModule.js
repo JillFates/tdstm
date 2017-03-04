@@ -17,28 +17,28 @@ import LicenseDetail from './detail/LicenseDetail.js';
 
 
 var LicenseAdminModule = angular.module('TDSTM.LicenseAdminModule', [uiRouter]).config(['$stateProvider',  '$translatePartialLoaderProvider', '$locationProvider',
-    function ($stateProvider, $translatePartialLoaderProvider, $locationProvider) {
+		function ($stateProvider, $translatePartialLoaderProvider, $locationProvider) {
 
-    $translatePartialLoaderProvider.addPart('licenseAdmin');
+		$translatePartialLoaderProvider.addPart('licenseAdmin');
 
-    // Define a generic header for the entire module, or it can be changed for each instance.
-    var header = {
-        templateUrl: '../app-js/modules/header/HeaderView.html',
-        controller: 'HeaderController as header'
-    };
+		// Define a generic header for the entire module, or it can be changed for each instance.
+		var header = {
+				templateUrl: '../app-js/modules/header/HeaderView.html',
+				controller: 'HeaderController as header'
+		};
 
-    $stateProvider
-        .state('licenseAdminList', {
-            data: {page: {title: 'Administer Licenses', instruction: '', menu: ['Admin', 'License', 'List']}},
-            url: '/license/admin/list',
-            views: {
-                'headerView@': header,
-                'bodyView@': {
-                    templateUrl: '../app-js/modules/licenseAdmin/list/LicenseAdminList.html',
-                    controller: 'LicenseAdminList as licenseAdminList'
-                }
-            }
-        });
+		$stateProvider
+				.state('licenseAdminList', {
+						data: {page: {title: 'Administer Licenses', instruction: '', menu: ['Admin', 'License', 'List']}},
+						url: '/license/admin/list',
+						views: {
+								'headerView@': header,
+								'bodyView@': {
+										templateUrl: '../app-js/modules/licenseAdmin/list/LicenseAdminList.html',
+										controller: 'LicenseAdminList as licenseAdminList'
+								}
+						}
+				});
 }]);
 
 // Services
@@ -54,5 +54,16 @@ LicenseAdminModule.controller('ApplyLicenseKey', ['$log', '$scope', 'LicenseAdmi
 LicenseAdminModule.controller('ManuallyRequest', ['$log', '$scope', 'LicenseAdminService', '$uibModalInstance', 'params', ManuallyRequest]);
 LicenseAdminModule.controller('LicenseDetail', ['$log', 'LicenseAdminService', '$uibModal', '$uibModalInstance', 'params', LicenseDetail]);
 
+/*
+ * Filter to URL Encode text for the 'mailto'
+ */
+LicenseAdminModule.filter('escapeURLEncoding', function () {
+	return function (text) {
+		if(text){
+			text = encodeURI(text);
+		}
+		return text;
+	}
+});
 
 export default LicenseAdminModule;
