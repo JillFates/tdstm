@@ -1,6 +1,8 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { NoticeService } from '../../service/notice.service';
 import { NoticeModel } from '../../model/notice.model';
+
+import { ActionType } from '../../../../shared/model/action-type.enum';
 
 import { Observable } from 'rxjs/Rx';
 
@@ -21,11 +23,12 @@ export class NoticeListComponent implements OnInit {
     private title: string = '';
     noticeList: NoticeModel[] = [];
 
-    private view: Observable<GridDataResult>;
-    private pageSize: number = 5;
-    private skip: number  = 0;
+    ActionType: typeof ActionType = ActionType;
 
-    constructor(moduleName: string, private noticeService: NoticeService) {
+    private view: Observable<GridDataResult>;
+    @ViewChild(GridComponent) private grid: GridComponent;
+
+    constructor(private noticeService: NoticeService) {
         this.moduleName = 'Notice List';
     }
 
@@ -34,17 +37,22 @@ export class NoticeListComponent implements OnInit {
      * @param noticeList
      */
     private onLoadNoticeList(noticeList): void {
-        this.noticeList = noticeList;
+        this.noticeList = noticeList.notices;
     }
 
-    public getNoticeList(): void {
+    private getNoticeList(): void {
         this.noticeService.getNoticesList().subscribe(
             (noticeList) => this.onLoadNoticeList(noticeList),
             (err) => this.onLoadNoticeList([]));
     }
 
-    public onButtonClick(): void {
-        this.title = 'Hello from Kendo UI!';
+    public reloadNoticeList(): void {
+        console.log(this.grid);
+        this.getNoticeList();
+    }
+
+    public onEditCreateNotice(actionType: ActionType, dataItem: NoticeModel): void {
+        console.log('Clicked on ', dataItem);
     }
 
     /**
@@ -53,4 +61,5 @@ export class NoticeListComponent implements OnInit {
     ngOnInit(): void {
         this.getNoticeList();
     }
+
 }

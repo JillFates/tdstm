@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
 <!-- Kendo UI Material Theme -->
-<link rel="stylesheet" href="${resource(dir: 'tds/web-app/dist/css/kendo', file: 'kendo.material.min.css')}">
+<link rel="stylesheet" href="${resource(dir: 'tds/node_modules/@progress/kendo-theme-default/dist', file: 'all.css')}">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -43,9 +43,6 @@
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.theme.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.datetimepicker.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'jquery-ui-smoothness.css')}"/>
-<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'combox.css')}"/>
-<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'select2.css')}"/>
-<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'combox.css')}"/>
 
 <%-- TODO : JPM 10/2014 : Determine why we have jquery ui 1.8.15 css while using 1.9.1-ui --%>
 <link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css"
@@ -70,12 +67,10 @@ def moveEvent = tds.currentMoveEvent() ?: null
     <g:javascript src="crawler.js" />
 </g:if>
 <g:javascript src="select2.js"/>
-<g:javascript src="jquery.combox.js"/>
 <g:javascript src="moment.min.js" />
 <g:javascript src="moment-timezone-with-data.min.js" />
 <g:javascript src="daterangepicker.js" />
 <g:javascript src="lodash/lodash.min.js" />
-<g:javascript src="tds-common.js" />
 <g:javascript src="timezone/jquery.maphilight.min.js" />
 <g:javascript src="timezone/jquery.timezone-picker.min.js" />
 <g:javascript src="person.js"/>

@@ -1,3 +1,9 @@
+
+export enum NoticeType {
+    PreLogin,
+    PostLogin
+};
+
 export class NoticeModel {
     constructor(
         public id: Date,
