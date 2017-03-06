@@ -456,8 +456,8 @@ class ReportsController implements ControllerMethods {
 			}
 			//No Assets were found for selected moveBundle,team and Location
 			if(reportFields.size() <= 0) {
-				flash.message = " No Cables were found for  selected values  "
-				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingQA'] )
+				flash.message = " No Cables were found for  selected values"
+				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingConflict'] )
 			}else {
 				def name = reportName == 'cablingQA' ? "CablingQA" : "CablingConflict"
 				String filename = (name + '-' + project.name + '-' + bundleName).replace(" ", "_")
