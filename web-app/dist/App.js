@@ -1,54 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/*! ngclipboard - v1.1.1 - 2016-02-26
-* https://github.com/sachinchoolur/ngclipboard
-* Copyright (c) 2016 Sachin; Licensed MIT */
-(function() {
-    'use strict';
-    var MODULE_NAME = 'ngclipboard';
-    var angular, Clipboard;
-    
-    // Check for CommonJS support
-    if (typeof module === 'object' && module.exports) {
-      angular = require('angular');
-      Clipboard = require('clipboard');
-      module.exports = MODULE_NAME;
-    } else {
-      angular = window.angular;
-      Clipboard = window.Clipboard;
-    }
-
-    angular.module(MODULE_NAME, []).directive('ngclipboard', function() {
-        return {
-            restrict: 'A',
-            scope: {
-                ngclipboardSuccess: '&',
-                ngclipboardError: '&'
-            },
-            link: function(scope, element) {
-                var clipboard = new Clipboard(element[0]);
-
-                clipboard.on('success', function(e) {
-                  scope.$apply(function () {
-                    scope.ngclipboardSuccess({
-                      e: e
-                    });
-                  });
-                });
-
-                clipboard.on('error', function(e) {
-                  scope.$apply(function () {
-                    scope.ngclipboardError({
-                      e: e
-                    });
-                  });
-                });
-
-            }
-        };
-    });
-}());
-
-},{"angular":"angular","clipboard":3}],2:[function(require,module,exports){
 (function (global, factory) {
     if (typeof define === "function" && define.amd) {
         define(['module', 'select'], factory);
@@ -278,7 +228,7 @@
 
     module.exports = ClipboardAction;
 });
-},{"select":8}],3:[function(require,module,exports){
+},{"select":8}],2:[function(require,module,exports){
 (function (global, factory) {
     if (typeof define === "function" && define.amd) {
         define(['module', './clipboard-action', 'tiny-emitter', 'good-listener'], factory);
@@ -464,13 +414,11 @@
 
     module.exports = Clipboard;
 });
-},{"./clipboard-action":2,"good-listener":7,"tiny-emitter":9}],4:[function(require,module,exports){
-var DOCUMENT_NODE_TYPE = 9;
-
+},{"./clipboard-action":1,"good-listener":6,"tiny-emitter":9}],3:[function(require,module,exports){
 /**
  * A polyfill for Element.matches()
  */
-if (typeof Element !== 'undefined' && !Element.prototype.matches) {
+if (Element && !Element.prototype.matches) {
     var proto = Element.prototype;
 
     proto.matches = proto.matchesSelector ||
@@ -488,7 +436,7 @@ if (typeof Element !== 'undefined' && !Element.prototype.matches) {
  * @return {Function}
  */
 function closest (element, selector) {
-    while (element && element.nodeType !== DOCUMENT_NODE_TYPE) {
+    while (element && element !== document) {
         if (element.matches(selector)) return element;
         element = element.parentNode;
     }
@@ -496,7 +444,7 @@ function closest (element, selector) {
 
 module.exports = closest;
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var closest = require('./closest');
 
 /**
@@ -542,7 +490,7 @@ function listener(element, selector, type, callback) {
 
 module.exports = delegate;
 
-},{"./closest":4}],6:[function(require,module,exports){
+},{"./closest":3}],5:[function(require,module,exports){
 /**
  * Check if argument is a HTML element.
  *
@@ -593,7 +541,7 @@ exports.fn = function(value) {
     return type === '[object Function]';
 };
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var is = require('./is');
 var delegate = require('delegate');
 
@@ -690,7 +638,57 @@ function listenSelector(selector, type, callback) {
 
 module.exports = listen;
 
-},{"./is":6,"delegate":5}],8:[function(require,module,exports){
+},{"./is":5,"delegate":4}],7:[function(require,module,exports){
+/*! ngclipboard - v1.1.1 - 2016-02-26
+* https://github.com/sachinchoolur/ngclipboard
+* Copyright (c) 2016 Sachin; Licensed MIT */
+(function() {
+    'use strict';
+    var MODULE_NAME = 'ngclipboard';
+    var angular, Clipboard;
+    
+    // Check for CommonJS support
+    if (typeof module === 'object' && module.exports) {
+      angular = require('angular');
+      Clipboard = require('clipboard');
+      module.exports = MODULE_NAME;
+    } else {
+      angular = window.angular;
+      Clipboard = window.Clipboard;
+    }
+
+    angular.module(MODULE_NAME, []).directive('ngclipboard', function() {
+        return {
+            restrict: 'A',
+            scope: {
+                ngclipboardSuccess: '&',
+                ngclipboardError: '&'
+            },
+            link: function(scope, element) {
+                var clipboard = new Clipboard(element[0]);
+
+                clipboard.on('success', function(e) {
+                  scope.$apply(function () {
+                    scope.ngclipboardSuccess({
+                      e: e
+                    });
+                  });
+                });
+
+                clipboard.on('error', function(e) {
+                  scope.$apply(function () {
+                    scope.ngclipboardError({
+                      e: e
+                    });
+                  });
+                });
+
+            }
+        };
+    });
+}());
+
+},{"angular":"angular","clipboard":2}],8:[function(require,module,exports){
 function select(element) {
     var selectedText;
 
@@ -700,18 +698,8 @@ function select(element) {
         selectedText = element.value;
     }
     else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
-        var isReadOnly = element.hasAttribute('readonly');
-
-        if (!isReadOnly) {
-            element.setAttribute('readonly', '');
-        }
-
-        element.select();
+        element.focus();
         element.setSelectionRange(0, element.value.length);
-
-        if (!isReadOnly) {
-            element.removeAttribute('readonly');
-        }
 
         selectedText = element.value;
     }
@@ -1020,7 +1008,7 @@ TDSTM.ProviderCore = ProviderCore;
 
 module.exports = TDSTM;
 
-},{"../modules/header/HeaderModule.js":18,"../modules/licenseAdmin/LicenseAdminModule.js":19,"../modules/licenseManager/LicenseManagerModule.js":27,"../modules/noticeManager/NoticeManagerModule.js":32,"../modules/taskManager/TaskManagerModule.js":36,"../services/RestAPI/RestAPIModule.js":42,"../services/http/HTTPModule.js":45,"angular":"angular","angular-animate":"angular-animate","angular-formly":"angular-formly","angular-formly-templates-bootstrap":"angular-formly-templates-bootstrap","angular-mocks":"angular-mocks","angular-resource":"angular-resource","angular-sanitize":"angular-sanitize","angular-translate":"angular-translate","angular-translate-loader-partial":"angular-translate-loader-partial","angular-ui-bootstrap":"angular-ui-bootstrap","api-check":"api-check","ngClipboard":1,"rx-angular":"rx-angular","ui-router":"ui-router"}],12:[function(require,module,exports){
+},{"../modules/header/HeaderModule.js":18,"../modules/licenseAdmin/LicenseAdminModule.js":19,"../modules/licenseManager/LicenseManagerModule.js":27,"../modules/noticeManager/NoticeManagerModule.js":32,"../modules/taskManager/TaskManagerModule.js":36,"../services/RestAPI/RestAPIModule.js":42,"../services/http/HTTPModule.js":45,"angular":"angular","angular-animate":"angular-animate","angular-formly":"angular-formly","angular-formly-templates-bootstrap":"angular-formly-templates-bootstrap","angular-mocks":"angular-mocks","angular-resource":"angular-resource","angular-sanitize":"angular-sanitize","angular-translate":"angular-translate","angular-translate-loader-partial":"angular-translate-loader-partial","angular-ui-bootstrap":"angular-ui-bootstrap","api-check":"api-check","ngClipboard":7,"rx-angular":"rx-angular","ui-router":"ui-router"}],12:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1381,7 +1369,7 @@ exports.default = HeaderModule;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+		value: true
 });
 
 var _angular = require('angular');
@@ -1421,30 +1409,30 @@ var _LicenseDetail = require('./detail/LicenseDetail.js');
 var _LicenseDetail2 = _interopRequireDefault(_LicenseDetail);
 
 function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
+		return obj && obj.__esModule ? obj : { default: obj };
 }
 
 var LicenseAdminModule = _angular2.default.module('TDSTM.LicenseAdminModule', [_uiRouter2.default]).config(['$stateProvider', '$translatePartialLoaderProvider', '$locationProvider', function ($stateProvider, $translatePartialLoaderProvider, $locationProvider) {
 
-    $translatePartialLoaderProvider.addPart('licenseAdmin');
+		$translatePartialLoaderProvider.addPart('licenseAdmin');
 
-    // Define a generic header for the entire module, or it can be changed for each instance.
-    var header = {
-        templateUrl: '../app-js/modules/header/HeaderView.html',
-        controller: 'HeaderController as header'
-    };
+		// Define a generic header for the entire module, or it can be changed for each instance.
+		var header = {
+				templateUrl: '../app-js/modules/header/HeaderView.html',
+				controller: 'HeaderController as header'
+		};
 
-    $stateProvider.state('licenseAdminList', {
-        data: { page: { title: 'Administer Licenses', instruction: '', menu: ['Admin', 'License', 'List'] } },
-        url: '/license/admin/list',
-        views: {
-            'headerView@': header,
-            'bodyView@': {
-                templateUrl: '../app-js/modules/licenseAdmin/list/LicenseAdminList.html',
-                controller: 'LicenseAdminList as licenseAdminList'
-            }
-        }
-    });
+		$stateProvider.state('licenseAdminList', {
+				data: { page: { title: 'Administer Licenses', instruction: '', menu: ['Admin', 'License', 'List'] } },
+				url: '/license/admin/list',
+				views: {
+						'headerView@': header,
+						'bodyView@': {
+								templateUrl: '../app-js/modules/licenseAdmin/list/LicenseAdminList.html',
+								controller: 'LicenseAdminList as licenseAdminList'
+						}
+				}
+		});
 }]);
 
 // Services
@@ -1464,12 +1452,12 @@ LicenseAdminModule.controller('LicenseDetail', ['$log', 'LicenseAdminService', '
  * Filter to URL Encode text for the 'mailto'
  */
 LicenseAdminModule.filter('escapeURLEncoding', function () {
-    return function (text) {
-        if (text) {
-            text = encodeURI(text);
-        }
-        return text;
-    };
+		return function (text) {
+				if (text) {
+						text = encodeURI(text);
+				}
+				return text;
+		};
 });
 
 exports.default = LicenseAdminModule;
