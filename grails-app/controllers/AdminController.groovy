@@ -1576,7 +1576,6 @@ class AdminController implements ControllerMethods {
 
 		Map sysProps = rtMXBean.getSystemProperties()
 
-		render(template: 'systemInfo', model:
 			[freeMemory      : freeMemory,
 			 totalMemory     : totalMemory,
 			 maxMemory       : maxMemory,
@@ -1601,7 +1600,6 @@ class AdminController implements ControllerMethods {
 			 osMxBean        : osMxBean,
 			 rt              : rt,
 			 groovyVersion   : GroovySystem.getVersion()]
-		)
 	}
 
 	/**

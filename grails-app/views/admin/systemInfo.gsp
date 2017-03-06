@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>System Info</title>
 	<style type="text/css">
 		th {
@@ -10,17 +10,17 @@
 	</style>
 </head>
 <body style="font-family:'helvetica','arial';">
+<tds:subHeader title="System Info" crumbs="['Admin','System Info']"/>
 <div class="body">
 <div>
-	<h1>System Info</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
 
 	<h3>Memory Usage (Kb):</h3>
 	<br>
-	<pre>
-       ---- System ----	
+	<pre style="width: 280px;">
+       ---- System ----
  Physical Memory: ${String.format("%,10d", sysMemSize)}
      Used Memory: ${String.format("%,10d", sysMemSize - sysMemFree)}
      Free Memory: ${String.format("%,10d", sysMemFree)}
@@ -41,7 +41,7 @@
             Used: ${String.format("%,10d", nonHeapUsed)}
             Free: ${String.format("%,10d", nonHeapMax - nonHeapUsed)}
 	</pre>
-	
+
 	<h3>Memory Pools:</h3>
 	<table style="border-spacing: 5px; border-collapse: separate; border: 1px solid black;">
 		<tr>
