@@ -231,7 +231,6 @@ class LicenseAdminService extends LicenseCommonService {
 		Map licState = (Map)cacheEl?.getObjectValue()
 		licState = null  //testing proposes
 
-		log.debug("OLB: {}",licState)
 		// If the license wasn't in the cache then one will be created and
 		// added to the cache
 		if(!licState) {
@@ -308,8 +307,14 @@ class LicenseAdminService extends LicenseCommonService {
 					}
 				} else {
 					licState.state = State.EXPIRED
+					license.status = DomainLicense.Status.EXPIRED
+
 					licState.message = "The license has expired. A new license is required in order to enable all features of the application."
 					licState.valid = false
+				}
+
+				if(license.isDirty()){
+					license.save()
 				}
 			}
 		}
