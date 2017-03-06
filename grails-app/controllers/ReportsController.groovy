@@ -491,7 +491,9 @@ class ReportsController implements ControllerMethods {
 							eq("af.project", project)
 
 							if(moveBundleInstance){
-								eq("moveBundle", moveBundleInstance)
+								eq("af.moveBundle", moveBundleInstance)
+							} else {
+								isNotNull("af.moveBundle")
 							}
 
 							if(cableType){
