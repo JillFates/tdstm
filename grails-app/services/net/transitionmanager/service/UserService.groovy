@@ -436,6 +436,12 @@ class UserService implements ServiceMethods {
 		}
 	}
 
+	/**
+	 * Gets a list of events for one or more projects
+	 * @param projects - a list of one or more projects
+	 * @param dateNow - the date to base active events (guessing here because it isn't making a lot of sense)
+	 * @return
+	 */
 	def getEvents(projects, dateNow){
 		def moveEventList = MoveEvent.findAllByProjectInList(projects).sort{it.eventTimes.start}
 		def thirtyDaysInMS = 2592000000
