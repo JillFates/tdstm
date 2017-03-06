@@ -344,13 +344,11 @@ class ReportsController implements ControllerMethods {
 		// Generate XLS report
 		try {
 			File file = grailsApplication.parentContext.getResource( "/templates/IssueReport.xls" ).getFile()
-
 			//set MIME TYPE as Excel
 			response.setContentType( "application/vnd.ms-excel" )
 			response.setHeader( "Content-Disposition", 'attachment; filename="' + filename + '.xls"' )
 
 			def book = new HSSFWorkbook(new FileInputStream( file ))
-
 			def sheet = book.getSheet("issues")
 			WorkbookUtil.addCell(sheet, 1, 1, String.valueOf( project?.client?.name ))
 			WorkbookUtil.addCell(sheet, 1, 2, String.valueOf( partyGroupInstance?.name ))
@@ -366,11 +364,10 @@ class ReportsController implements ControllerMethods {
 				WorkbookUtil.addCell(sheet, 7, r+6, TimeUtil.formatDateTime(reportFields[r].occuredAt))
 				WorkbookUtil.addCell(sheet, 8, r+6, String.valueOf(reportFields[r].createdBy ?:''))
 				WorkbookUtil.addCell(sheet, 9, r+6, String.valueOf(reportFields[r].owner ?:''))
-				WorkbookUtil.addCell(sheet, 10, r+6, String.valueOf(WebUtil.listAsMultiValueString(reportFields[r].previousNote)?:''))
+				WorkbookUtil.addCell(sheet, 10, r+6, String.valueOf(reportFields[r].previousNote?:''))
 				WorkbookUtil.addCell(sheet, 11, r+6, String.valueOf(reportFields[r].issue ?:''))
 			}
 			WorkbookUtil.addCell(sheet, 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") )
-
 			book.write(response.getOutputStream())
 		}
 		catch (e) {
@@ -492,7 +489,7 @@ class ReportsController implements ControllerMethods {
 						createAlias("assetFrom", "af")
 						and{
 							eq("af.project", project)
-							
+
 							if(moveBundleInstance){
 								eq("moveBundle", moveBundleInstance)
 							}
@@ -503,7 +500,7 @@ class ReportsController implements ControllerMethods {
 						}
 
 						order("assetFrom")
-						
+
 						resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
 						fetchSize 1000
 					}
@@ -1033,7 +1030,7 @@ class ReportsController implements ControllerMethods {
 			userDTFormat, 3, securityService.viewUnpublished())
 
 
-	
+
 		def exportTitleSheet = {
 			def userLogin = securityService.getUserLogin()
 			def titleSheet = book.getSheet("Title")
@@ -1043,18 +1040,18 @@ class ReportsController implements ControllerMethods {
 			WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project).toString())
 			WorkbookUtil.addCell(titleSheet, 1, 5, eventsTitleSheet)
 			WorkbookUtil.addCell(titleSheet, 1, 6, userLogin.person.toString())
-	
+
 			def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
 			WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
 			WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
 			WorkbookUtil.addCell(titleSheet, 1, 9, userDTFormat)
-	
+
 			WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
 		}
-	
+
 		exportTitleSheet()
-	
-	
+
+
 
 
 		book.write(response.getOutputStream())
