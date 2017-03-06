@@ -27,7 +27,7 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 		// checkUserLoginExist
 
 		UserLogin userLogin = UserLogin.findWhere(username: username)
-		if (!userLogin || !userLogin.isLocal) {
+		if (!userLogin) {
 			logger.warn 'loadUserByUsername() User not found: {}', username
 			throw new NoStackUsernameNotFoundException()
 		}

@@ -748,7 +748,7 @@ class ProjectService implements ServiceMethods {
 			// Make sure that the partner Id is a valid partner assoicated with the company
 			if (!ownerPartnerIds.contains(pid)) {
 				log.debug "Project $projectInstance owner $projectOwner partner ids are $ownerPartnerIds"
-				throw new InvalidParamException("Partner id specified is not associated with project ($pid)")
+				throw new InvalidParamException("Partner ID ($pid) specified is not associated with Project.Owner ($projectOwner.id)")
 			}
 			newPartnersIds << pid
 		}

@@ -762,13 +762,13 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 					}
 				}
 			} catch (UnauthorizedException ue) {
-				securityService.reportViolation("attempted to delete person ($id) without neccessary access", byWhom)
+				securityService.reportViolation("attempted to delete person ($id) without neccessary access", byWhom.userLogin.username)
 				messages << "You do not have the required access to delete the specified person"
 			} catch (InvalidParamException ipe) {
 				log.error "bulkDelete() was invoked with invalid id ($id) value by $byWhom"
 				messages << "One of the parameters specified was invalid and an error was logged."
 			} catch (EmptyResultException ere) {
-				securityService.reportViolation("attempted to delete a non-existent person ($id)", byWhom)
+				securityService.reportViolation("attempted to delete a non-existent person ($id)", byWhom.userLogin.username)
 				messages << "Specified person was not found"
 			}
 

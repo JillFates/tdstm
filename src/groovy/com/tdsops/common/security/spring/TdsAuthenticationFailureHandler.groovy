@@ -48,7 +48,7 @@ class TdsAuthenticationFailureHandler extends AjaxAwareAuthenticationFailureHand
 			throws IOException, ServletException {
 
 		Assert.isInstanceOf WrappedAuthenticationException, e, ''
-				'This workflow expects an WrappedAuthenticationException instance here'
+			'This workflow expects an WrappedAuthenticationException instance here'
 
 		WrappedAuthenticationException wrapped = (WrappedAuthenticationException) e
 		e = (AuthenticationException) wrapped.cause
@@ -88,6 +88,11 @@ class TdsAuthenticationFailureHandler extends AjaxAwareAuthenticationFailureHand
 				grailsLinkGenerator.link(controller: 'auth', action: 'login', params: params, base: ' ').substring(1))
 	}
 
+	/**
+	 * checkFailsCount will keep track of login failure attempts and set a lock out after a configurable
+	 * quantity of failures.
+	 * @param username - the username that failed to authenticate
+	 */
 	@Transactional
 	private void checkFailsCount(String username) {
 
@@ -95,26 +100,28 @@ class TdsAuthenticationFailureHandler extends AjaxAwareAuthenticationFailureHand
 
 		UserLogin userLogin = UserLogin.findWhere(username: username)
 
-		userLogin.failedLoginAttempts++
-		int maxLoginFailureAttempts = (int) securityService.userLocalConfig.maxLoginFailureAttempts
+		// Users that haven't been provisioned yet (LDAP) won't exist until they successfully authenticate
+		if (userLogin) {
+			userLogin.failedLoginAttempts++
+			int maxLoginFailureAttempts = (int) securityService.userLocalConfig.maxLoginFailureAttempts
 
-		// Lock out the account if they exceeded the max tries and the account isn't already locked
-		if (maxLoginFailureAttempts && userLogin.failedLoginAttempts >= maxLoginFailureAttempts &&
-				(!userLogin.lockedOutUntil || userLogin.lockedOutUntil.time < now.time)) {
-			String lockoutTime = 'indefintely'
-			int failedLoginLockoutPeriodMinutes = (int) securityService.userLocalConfig.failedLoginLockoutPeriodMinutes
-			Date lockedOutUntil
-			if (failedLoginLockoutPeriodMinutes) {
-				lockedOutUntil = futureDate(failedLoginLockoutPeriodMinutes, MINUTE)
-				lockoutTime = "for ${failedLoginLockoutPeriodMinutes} minutes"
+			// Lock out the account if they exceeded the max tries and the account isn't already locked
+			if (maxLoginFailureAttempts && userLogin.failedLoginAttempts >= maxLoginFailureAttempts &&
+					(!userLogin.lockedOutUntil || userLogin.lockedOutUntil.time < now.time)) {
+				String lockoutTime = 'indefintely'
+				int failedLoginLockoutPeriodMinutes = (int) securityService.userLocalConfig.failedLoginLockoutPeriodMinutes
+				Date lockedOutUntil
+				if (failedLoginLockoutPeriodMinutes) {
+					lockedOutUntil = futureDate(failedLoginLockoutPeriodMinutes, MINUTE)
+					lockoutTime = "for ${failedLoginLockoutPeriodMinutes} minutes"
+				} else {
+					lockedOutUntil = IN_ONE_HUNDRED_YEARS
+				}
+				userLogin.lockedOutUntil = lockedOutUntil
+				auditService.logMessage("User $userLogin.username, account locked out $lockoutTime")
 			}
-			else {
-				lockedOutUntil = IN_ONE_HUNDRED_YEARS
-			}
-			userLogin.lockedOutUntil = lockedOutUntil
-			auditService.logMessage("User $userLogin.username, account locked out $lockoutTime")
+			userLogin.save()
 		}
-		userLogin.save()
 	}
 
 	void afterPropertiesSet() {
