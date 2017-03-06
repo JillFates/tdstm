@@ -200,11 +200,11 @@ class UserLoginController implements ControllerMethods {
 		if (!userToDelete) {
 			flash.message = 'UserLogin was not found'
 		} else {
-
 			try {
 				securityService.deleteUserLogin(userToDelete)
-				flash.message = "UserLogin ${userLoginInstance} deleted"
+				flash.message = "UserLogin ${userToDelete} deleted"
 			} catch (e) {
+				log.error ExceptionUtil.stackTraceToString('delete() failed ', e)
 				flash.message = "An error occurred while attempting to delete the user"
 			}
 		}

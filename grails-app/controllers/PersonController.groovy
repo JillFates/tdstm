@@ -205,6 +205,7 @@ class PersonController implements ControllerMethods {
 
 	/**
 	 * Bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
+	 * @param ids[] - a list of person ids to be deleted
 	 */
 	def bulkDelete() {
 		def ids = params.get("ids[]")
@@ -212,20 +213,16 @@ class PersonController implements ControllerMethods {
 			renderErrorJson('Please select at least one person to be be bulk deleted.')
 			return
 		}
-
-		if (ids instanceof String) {
-			def arr = new String[1]
-			arr[0] = ids
-			ids = arr
-		}
+		// Convert from Ljava.lang.String or String to a list
+		List idsToDelete = (ids instanceof String) ? [ids] : ids
 
 		try {
 			Person byWhom = securityService.getUserLoginPerson()
 			controllerService.checkPermissionForWS('BulkDeletePerson')
 
-			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'true'
-			def data = personService.bulkDelete(byWhom, ids, deleteIfAssocWithAssets)
-			renderSuccessJson(data)
+			boolean deleteIfAssocWithAssets = (params.deleteIfAssocWithAssets == 'true')
+			Map results = personService.bulkDelete(byWhom, idsToDelete, deleteIfAssocWithAssets)
+			renderSuccessJson(results)
 		}
 		catch (e) {
 			handleException e, log

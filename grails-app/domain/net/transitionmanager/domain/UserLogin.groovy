@@ -75,7 +75,6 @@ class UserLogin {
 		[domain: PartyRole,			onDelete:'delete', properties: ['party'] ],
 		[domain: PasswordHistory,	onDelete:'delete', properties: ['userLogin'] ],
 		[domain: PasswordReset,		onDelete:'delete', properties: ['userLogin'] ],
-		[domain: Person,			onDelete:'null',   properties: ['userLogin'] ],
 		[domain: UserPreference,	onDelete:'delete', properties: ['userLogin'] ],
 		[domain: UserAudit, 		onDelete:'delete', properties: ['userLogin'] ]
 	]

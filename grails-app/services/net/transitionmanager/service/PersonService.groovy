@@ -7,7 +7,6 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
-// import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -39,15 +38,15 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 @Slf4j(value='logger')
 class PersonService implements ServiceMethods {
 
-	AuditService auditService
-	GrailsApplication grailsApplication
-	JdbcTemplate jdbcTemplate
-	MoveEventService moveEventService
-	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	ProjectService projectService
-	SecurityService securityService
-	UserPreferenceService userPreferenceService
+	def auditService
+	def grailsApplication
+	def jdbcTemplate
+	def moveEventService
+	def namedParameterJdbcTemplate
+	def partyRelationshipService
+	def projectService
+	def securityService
+	def userPreferenceService
 
 	private static final List<String> SUFFIXES = [
 			"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -675,7 +674,9 @@ class PersonService implements ServiceMethods {
 						securityService.deleteUserLogin(userLogin)
 					}
 
-					def (deletedCount, nulledCount) = GormUtil.deleteOrNullDomainReferences(person, true)
+					def (deletedCount, clearedCount) = GormUtil.deleteOrNullDomainReferences(person, true)
+					deleted = deletedCount
+					cleared = clearedCount
 
 				} catch(Exception e) {
 					messages << "An error occurred while attempting to delete $person"
@@ -694,9 +695,9 @@ class PersonService implements ServiceMethods {
 	 */
 	boolean hasKeyReferences(Person person) {
 		boolean hasRef = false
-		PERSON_DELETE_EXCEPTIONS_MAP.each { table, colums ->
+		PERSON_DELETE_EXCEPTIONS_MAP.each { table, columns ->
 			if (!hasRef) {
-				StringBuffer sb = "SELECT count(*) AS count FROM ${table} WHERE "
+				StringBuilder sb = new StringBuilder("SELECT count(*) AS count FROM ${table} WHERE ")
 				boolean first=true
 				columns.each { col ->
 					if (first) {
@@ -741,11 +742,11 @@ class PersonService implements ServiceMethods {
 		if (ids) {
 			try {
 				for (id in ids) {
-					Person person = validatePersonAccess(byWhom, id)
+					Person person = validatePersonAccess(id, byWhom)
 					if (person) {
 						// Deletes the person and other related entities.
-						Map deleteResultMap = deletePerson(person, true, deleteIfAssocWithAssets)
-
+						Map deleteResultMap = deletePerson(byWhom, person, true, deleteIfAssocWithAssets)
+log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 						// Updates variables that comput different results.
 						cleared += deleteResultMap.cleared
 						if (deleteResultMap.deleted) {
