@@ -8,12 +8,13 @@
 	<g:javascript src="jqgrid-support.js" />
 </head>
 <body>
+	
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
 	<tds:hasPermission permission='AdminMenuView'>
+		<tds:subHeader title="Role Permissions" crumbs="['Admin','Roles','Edit']"/><br/>
 		<div class="body">
-			<h1>Role Permissions</h1>
 			<g:form action="update">
 				<div class="list" id="updateShow">
 					<table id="editPermissionsTableId">

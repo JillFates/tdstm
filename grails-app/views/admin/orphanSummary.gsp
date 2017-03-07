@@ -11,10 +11,10 @@ a:hover {
 </style>
 </head>
 <body>
+	<tds:subHeader title="Summary Report" crumbs="['Admin','Portal','Summary Report']"/> <br/>
 <div class="body">
 <div>&nbsp;</div>
 	<div>
-	<h1 style="margin: 0px;"><b>Summary Report</b></h1>
  	<g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
  	</g:if>

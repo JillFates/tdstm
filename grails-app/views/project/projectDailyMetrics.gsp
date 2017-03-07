@@ -10,9 +10,9 @@
 	</style>
 </head>
 <body style="font-family:'helvetica','arial';">
+<tds:subHeader title="Project Daily Metrics Job" crumbs="['Admin','Portal','Project Daily Metrics Job']"/><br/>
 <div class="body">
 <div>
-	<h1>Project Daily Metrics Job</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>

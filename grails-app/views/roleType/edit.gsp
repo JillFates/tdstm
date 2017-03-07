@@ -5,8 +5,8 @@
 <title>Edit RoleType</title>
 </head>
 <body>
+	<tds:subHeader title="Edit RoleType" crumbs="['Admin','Portal','Role Type','Edit']"/> <br/>
 <div class="body">
-<h1>Edit RoleType</h1>
  <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
 	             <tds:hasPermission permission='CreateRoleType'>

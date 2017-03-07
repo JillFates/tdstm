@@ -5,8 +5,8 @@
     <title>Show RoleType</title>
   </head>
   <body>
+    <tds:subHeader title="Show RoleType" crumbs="['Admin','Portal','Role Type','Show']"/><br/>
     <div class="body">
-      <h1>Show RoleType</h1>
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
 	          <tds:hasPermission permission='CreateRoleType'>

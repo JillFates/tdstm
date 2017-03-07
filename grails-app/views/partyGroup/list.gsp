@@ -35,7 +35,7 @@
 		</script>
 	</head>
 	<body>
-		<tds:subHeader title="Company List" crumbs="['Admin','Client', 'List']"/> <br />
+		<tds:subHeader title="Company List" crumbs="['Admin','Company', 'List']"/> <br />
 		<div class="body fluid" style="width:50% !important;">
 			<g:if test="${flash.message}">
 				<div class="message">${raw(flash.message)}</div>
