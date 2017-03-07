@@ -31,6 +31,7 @@ class PersonServiceIntegrationTests extends Specification {
 	private Person adminPerson
 	private PersonTestHelper personHelper = new PersonTestHelper()
 	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+	private AssetTestHelper assetHelper = new AssetTestHelper()
 
 	final Map personMap = [lastName:'Bullafarht']
 
@@ -56,7 +57,7 @@ class PersonServiceIntegrationTests extends Specification {
 		personService.addToProjectSecured(project, adminPerson)
 	}
 
-	def '0. Test the AdminPerson and AdminUser are setup correctly'() {
+	def '01. Test the AdminPerson and AdminUser are setup correctly'() {
 		expect: 'admin person is setup correctly'
 			adminPerson
 			adminPerson.userLogin
@@ -64,7 +65,7 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.hasAccessToProject(adminPerson, project)
 	}
 
-	def '1. Test owner staff access to a project'() {
+	def '02. Test owner staff access to a project'() {
 		setup: 'add the adminPerson to the project so that'
 			personService.addToProjectSecured(project, adminPerson)
 
@@ -92,7 +93,7 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.isAssignedToProject(project, newPerson)
 	}
 
-	def '2. Test client staff access to a project'() {
+	def '03. Test client staff access to a project'() {
 		setup: 'add the adminPerson to the project so that'
 			personService.addToProjectSecured(project, adminPerson)
 
@@ -117,7 +118,7 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.isAssignedToProject(project, newPerson)
 	}
 
-	def '3. Test finding persons by their name using a string that must be parsed'() {
+	def '04. Test finding persons by their name using a string that must be parsed'() {
 		// Know person for the project
 		when:
 			personHelper.createPerson(adminPerson, project.client, null, [lastName: 'Banks', firstName: 'Robin'])
@@ -149,7 +150,7 @@ class PersonServiceIntegrationTests extends Specification {
 			results.person == null
 	}
 
-	def '4. Test finding persons by their name using a mapped name'() {
+	def '05. Test finding persons by their name using a mapped name'() {
 		// Know person for the project
 		when:
 			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin', middleName: ''])
@@ -189,7 +190,7 @@ class PersonServiceIntegrationTests extends Specification {
 		//	results.person == null
 	}
 
-	def '5. Test project team assignment when creating person'() {
+	def '06. Test project team assignment when creating person'() {
 		when:
 			Person person = personHelper.createPerson(adminPerson, project.client, null,
 				[lastName:'Buster', firstName:'Brock'],
@@ -219,7 +220,7 @@ class PersonServiceIntegrationTests extends Specification {
 			!personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
 	}
 
-	def '6. Test assigning a person to a move event team directly by an admin user'() {
+	def '07. Test assigning a person to a move event team directly by an admin user'() {
 		setup: 'create an event for the project'
 			String errMsg
 			// personService.addToProjectSecured(project, adminPerson)
@@ -254,7 +255,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 	/*
 		TODO : JPM 3/2016 : personService.hasAccessToPerson() does not work correctly
-	def '7. Test if a person has access to another person based on who they are'() {
+	def '08. Test if a person has access to another person based on who they are'() {
 		when:
 			// Make sure that the adminPerson is assigned to the project
 			Map results = [:]
@@ -273,7 +274,7 @@ class PersonServiceIntegrationTests extends Specification {
 	}
 	*/
 
-	def '8. Test findByCompanyAndEmail method'() {
+	def '09. Test findByCompanyAndEmail method'() {
 		when:
 			def company = projectHelper.createCompany()
 			Person p1 = personHelper.createStaff(company, null, null, null, null)
@@ -302,7 +303,7 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.findByCompanyAndEmail(company, null) == []
 	}
 
-	def '9. Test findByCompanyAndName method'() {
+	def '10. Test findByCompanyAndName method'() {
 		when: 'Try finding a single exact match on full name'
 			def company = projectHelper.createCompany()
 			Person p1 = personHelper.createStaff(company)
@@ -349,24 +350,41 @@ class PersonServiceIntegrationTests extends Specification {
 
 	}
 
-	def "10. Delete Person Tests"() {
-		when: 'creating a new person'
+	def "11. Delete Person Tests"() {
+		when: 'creating a new person with a user account'
 			Person newPerson = personHelper.createPerson(adminPerson, project.client)
 			Long newPID = newPerson.id
+			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+			Long userId = user.id
+			Application app = assetHelper.createApplication(newPerson, project)
+			app.sme = newPerson
+			app.save(flush:true)
+
 		then: 'make sure they are associated with the client company'
 			personService.isAssociatedTo(newPerson, project.client)
+		and: 'have valid ids'
+			userId
+			newPID
+		and: 'there should be PartyRelationship references'
+			PartyRelationship.findAllWhere(partyIdTo: newPerson)
+		and: 'is associated as a SME on an application'
+			app.sme.id == newPID
 
 		when: 'the person is deleted and all associations with the individual are removed'
 			personService.deletePerson(adminPerson, newPerson, true, true)
-		then: 'the person references should be deleted'
+			app.refresh()
+		then: 'the person and user references should be deleted'
 			// Shouldn't be able to lookup the person
-			Person.get(newPID) == null
+			! Person.get(newPID)
+			! UserLogin.get(userId)
+		and: 'there should be no PartyRelationship references'
+			! PartyRelationship.findAllWhere(partyIdTo: newPerson)
+		and: 'is associated as a SME on an application has been cleared'
+			! app.sme
 
-			// The from person should have a number of PartyRelationships
-			GormUtil.findAllByProperties(PartyRelationship, [partyIdFrom:newPerson, partyIdTo:newPerson], GormUtil.Operator.OR).size() == 0
 	}
 
-	def "11. Merge Person with no user login accounts"() {
+	def "12. Merge Person with no user login accounts"() {
 		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
@@ -376,7 +394,6 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.addToProjectTeam(project.id.toString(), fromPerson.id.toString(), extraTeam, results)
 
 			Person toPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
-			def assetHelper = new AssetTestHelper()
 			Application app = assetHelper.createApplication(fromPerson, project)
 
 			// Closure used a few times for testing
@@ -426,7 +443,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 	}
 
-	def "12. Merge Person with login account only associated with From person"() {
+	def "13. Merge Person with login account only associated with From person"() {
 		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
@@ -469,7 +486,7 @@ class PersonServiceIntegrationTests extends Specification {
 */
 	}
 
-	def "13. Merge Person with login accounts associated with both persons"() {
+	def "14. Merge Person with login accounts associated with both persons"() {
 		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
 
 		when: 'getting the Person userLogin property'
