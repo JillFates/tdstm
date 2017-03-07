@@ -16,6 +16,7 @@ export default class LicenseManagerService {
 
     getLicenseList(onSuccess) {
         this.restService.licenseManagerServiceHandler().getLicenseList((data) => {
+
             return onSuccess(data.data);
         });
     }
@@ -35,6 +36,12 @@ export default class LicenseManagerService {
 
     getKeyCode(licenseId, onSuccess) {
         this.restService.licenseManagerServiceHandler().getKeyCode(licenseId, (data) => {
+            return onSuccess(data.data);
+        });
+    }
+
+    getTimeZoneConfiguration(onSuccess) {
+        this.restService.commonServiceHandler().getTimeZoneConfiguration((data) => {
             return onSuccess(data.data);
         });
     }

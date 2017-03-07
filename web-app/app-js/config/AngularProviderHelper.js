@@ -107,4 +107,21 @@ TDSTM.iframeLoader = function () {
     );
 };
 
+TDSTM.getConvertedDateFormat = function( dateString, userDTFormat, timeZone ) {
+    'use strict';
+    var timeString = '';
+    if(dateString){
+        if (timeZone === null) {
+            timeZone = 'GMT';
+        }
+        var format = 'MM/DD/YYYY';
+        if (userDTFormat === 'DD/MM/YYYY') {
+            format = 'DD/MM/YYYY';
+        }
+        // Convert zulu datetime to a specific timezone/format
+        timeString = moment(dateString).tz(timeZone).format(format)
+    }
+    return timeString;
+};
+
 window.TDSTM = TDSTM;

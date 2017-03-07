@@ -8,15 +8,18 @@ import FormValidator from '../../utils/form/FormValidator.js';
 
 export default class LicenseManagerDetail extends FormValidator{
 
-    constructor($log, $scope, licenseManagerService, $uibModal, $uibModalInstance, params) {
+    constructor($log, $scope, licenseManagerService, userPreferencesService, $uibModal, $uibModalInstance, params, timeZoneConfiguration) {
         super($log, $scope, $uibModal, $uibModalInstance);
         this.scope = $scope;
         this.licenseManagerService = licenseManagerService;
+        this.userPreferencesService = userPreferencesService;
         this.uibModalInstance = $uibModalInstance;
         this.uibModal =$uibModal;
         this.log = $log;
 
         this.editMode = false;
+
+        this.timeZoneConfiguration = timeZoneConfiguration;
 
         this.licenseModel = {
             id: params.license.id,

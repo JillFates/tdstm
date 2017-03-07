@@ -15,4 +15,11 @@ HeaderModule.controller('HeaderController', ['$log', '$state', HeaderController]
 // Modal - Controllers
 HeaderModule.controller('DialogAction', ['$log','$uibModal', '$uibModalInstance', 'params', DialogAction]);
 
+/*
+ * Filter change the date into a proper format timezone date
+ */
+HeaderModule.filter('convertDateIntoTimeZone', ['UserPreferencesService', function (userPreferencesService) {
+    return (dateString) => userPreferencesService.getConvertedDateIntoTimeZone(dateString);
+}]);
+
 export default HeaderModule;

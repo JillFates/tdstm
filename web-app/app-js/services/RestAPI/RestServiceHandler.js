@@ -40,6 +40,14 @@ export default class RestServiceHandler {
         };
     }
 
+    commonServiceHandler() {
+        return {
+            getTimeZoneConfiguration: (onSuccess) => {
+                return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/user/preferences/CURR_DT_FORMAT,CURR_TZ'), onSuccess);
+            }
+        }
+    }
+
     licenseAdminServiceHandler() {
         return {
             getLicense: (onSuccess) => {

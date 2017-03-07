@@ -93,11 +93,17 @@ var TDSTM = angular.module('TDSTM', [
         //$urlRouterProvider.otherwise('dashboard');
 
     }]).
-    run(['$transitions', '$http', '$log', '$location', function ($transitions, $http, $log, $location, $state, $stateParams, $locale) {
+    run(['$transitions', '$http', '$log', '$location', '$q','UserPreferencesService', function ($transitions, $http, $log, $location, $q, userPreferencesService) {
         $log.debug('Configuration deployed');
 
-        $transitions.onBefore( {}, function($state, $transition$) {
-            $log.log('In start ', $state);
+        $transitions.onBefore( {}, ($state, $transition$) => {
+            var defer = $q.defer();
+
+            userPreferencesService.getTimeZoneConfiguration(() => {
+                defer.resolve();
+            });
+
+            return defer.promise;
         });
 
     }]);
