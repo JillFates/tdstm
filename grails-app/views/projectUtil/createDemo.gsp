@@ -7,7 +7,7 @@
 
 </head>
 <body>
-	<tds:subHeader title="Create Demo Project" crumbs="['Project','Demo', 'Create']"/>
+	<tds:subHeader title="Create Demo Project" crumbs="['Project', 'Create Demo']"/><br/>
 
 
 <div class="body">

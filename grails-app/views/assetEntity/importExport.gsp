@@ -89,7 +89,7 @@
 
 </head>
 <body>
-<tds:subHeader title="Asset Import" crumbs="['Assets','Import Assets']"/>
+<tds:subHeader title="Import Assets" crumbs="['Assets','Import Assets']"/>
 <g:if test="${flash.error}">
     <div class="errors">${flash.error}</div>
 </g:if>

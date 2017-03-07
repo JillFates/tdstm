@@ -13,7 +13,7 @@
 	<g:javascript src="jqgrid-support.js" />
 </head>
 <body>
-	<tds:subHeader title="Project Field Settings" crumbs="['Project', 'Fields']"/><br />
+	<tds:subHeader title="Project Field Settings" crumbs="['Project', 'Field Settings']"/><br />
 	<div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
 		<div style="margin-left:20px;">
 			<h2>Custom Fields Shown in Selectors:
