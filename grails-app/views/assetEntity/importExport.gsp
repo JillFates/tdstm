@@ -233,11 +233,14 @@
                     var fileExt = fileName.split('.').pop()
                     if(["xls", "xlsx"].indexOf(fileExt) >= 0){
                         $("#uploadFile").val(fileName);
+                        $("#importTaskSubmitButton").attr('disabled', false)
                     }else{
-                        alert("Please, select a valid file.")
                         $(this).val(null)
+                        $("#uploadFile").val(fileName);
+                        $("#importTaskSubmitButton").attr('disabled', true)
+                        alert("Please, select a valid file.")
                     }
-                    
+
                 });
             });
         </script>
