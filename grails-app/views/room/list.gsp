@@ -346,7 +346,7 @@
 			}
 		}
 
-		function openRoomView(e,browser){alert("A");
+		function openRoomView(e,browser){
 
 			var resp = e.responseText
 			$("#roomListView").hide()
@@ -358,7 +358,7 @@
 			$("#room_layout").css("height","auto")
 		}
 
-		function enableActions(){alert("A");
+		function enableActions(){
 			var inputCheckBox = $("input:checkbox")
 			var enableButtons = 0
 			$('.listCheck:checked').each(function(index, val) {
@@ -427,7 +427,7 @@
 					getRackLayout( rackId )
 			},600);
 		}
-		function getRackLayout( rackId ){alert("A");
+		function getRackLayout( rackId ){
 			if (rackId) {
 				var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 				var moveBundleId = ''
