@@ -192,7 +192,7 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmString, foreignKey: true],
 
 		batchId 				: [type:'number', ssPos:27, formPos:28, domain:'C', width:80, locked: false,
-										label: 'Batch Id', template:changeTmpl('batchId')],
+										label: 'Batch Id', transform:xfrmString, template:changeTmpl('batchId')],
 	]
 
 	// The map of the location for the properties on the Title sheet.
