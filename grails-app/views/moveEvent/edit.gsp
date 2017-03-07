@@ -32,7 +32,7 @@
     </script>
         </head>
     <body>
-    <tds:subHeader title="Event Details" crumbs="['Planning','Event', 'Edit']"/> <br />
+    <tds:subHeader title="Edit Event" crumbs="['Planning','Event', 'Edit']"/> <br />
 
     <div class="body move-event-edit">
             <!-- <h1>Edit Event</h1> -->

@@ -14,9 +14,10 @@
 </script>
 </head>
 <body>
+	<tds:subHeader title="Pre-Event Checklist" crumbs="['Reports','Pre-Event Checklist']"/> <br />
 	<div class="generated-check-list">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>Pre-Event Checklist - ${project.name} : ${moveEvent.name }</b>
+			<b>${project.name} : ${moveEvent.name }</b>
 		</div>
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
