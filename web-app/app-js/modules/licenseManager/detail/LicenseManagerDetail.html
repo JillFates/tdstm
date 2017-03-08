@@ -152,6 +152,18 @@
                                     #activityLog .k-grid-content {
                                         height: 300px; /*When is initialized on a none displayed content, it does not update correctly the height*/
                                     }
+                                    #activityLog .inner-activity_table td {
+                                        padding: 0px;
+                                    }
+
+                                    #activityLog .inner-activity_table .col-action_td, #activityLog .inner-activity_table .col-value_td {
+                                        text-align: center;
+                                    }
+
+                                    #activityLog .inner-activity_table .glyphicon {
+                                        font-size: 10px;
+                                    }
+
                                 </style>
                                 <div id="activityLog" kendo-grid="licenseManagerDetail.activityGrid" k-options="licenseManagerDetail.activityGridOptions"> </div>
                             </div>

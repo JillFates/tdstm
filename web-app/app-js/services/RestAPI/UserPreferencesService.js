@@ -24,11 +24,11 @@ export default class UserPreferencesService {
     }
 
     getConvertedDateIntoTimeZone(dateString) {
-        var timeString = '';
+        var timeString = dateString;
         var userDTFormat = this.timeZoneConfiguration.preferences.CURR_DT_FORMAT;
         var timeZone = this.timeZoneConfiguration.preferences.CURR_TZ;
 
-        if(dateString){
+        if(dateString && moment(dateString).isValid()){
             if (timeZone === null) {
                 timeZone = 'GMT';
             }
@@ -36,10 +36,29 @@ export default class UserPreferencesService {
             if (userDTFormat === 'DD/MM/YYYY') {
                 format = 'DD/MM/YYYY';
             }
-            // Convert zulu datetime to a specific timezone/format
             timeString = moment(dateString).tz(timeZone).format(format)
         }
-        return timeString;
+
+        return timeString !== 'null'? timeString: '';
+    }
+
+    getConvertedDateTimeIntoTimeZone(dateString) {
+        var timeString = dateString;
+        var userDTFormat = this.timeZoneConfiguration.preferences.CURR_DT_FORMAT;
+        var timeZone = this.timeZoneConfiguration.preferences.CURR_TZ;
+
+        if(dateString && moment(dateString).isValid()){
+            if (timeZone === null) {
+                timeZone = 'GMT';
+            }
+            var format = 'MM/DD/YYYY hh:mm a'
+            if (userDTFormat === 'DD/MM/YYYY') {
+                format = 'DD/MM/YYYY hh:mm a'
+            }
+            timeString = moment(dateString).tz(timeZone).format(format)
+        }
+
+        return timeString !== 'null'? timeString: '';
     }
 
 }

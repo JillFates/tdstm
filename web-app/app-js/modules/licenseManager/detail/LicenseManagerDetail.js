@@ -147,9 +147,9 @@ export default class LicenseManagerDetail extends FormValidator{
                 pageSize: 20
             },
             columns: [
-                {field: 'dateCreated', title: 'Date', width:180, type: 'date', format : '{0:dd/MMM/yyyy h:mm:ss tt}'},
-                {field: 'author.personName', title: 'Whom',  width:180},
-                {field: 'changes', title: 'Action', template: '<ul>#for(var i = 0; i < data.changes.length; i++){#<li>#=data.changes[i].field# <br /> <span class="activity-list-old-val" style="color:darkred; font-weight: bold;">#=data.changes[i].oldValue#</span> | <span class="activity-list-new-val" style="color: green; font-weight: bold;">#=data.changes[i].newValue#</span></li>#}#</ul> '},
+                {field: 'dateCreated', title: 'Date', width:160, type: 'date', format : '{0:dd/MMM/yyyy h:mm:ss tt}', template: '{{ dataItem.dateCreated | convertDateTimeIntoTimeZone }}' },
+                {field: 'author.personName', title: 'Whom',  width:160},
+                {field: 'changes', title: 'Action', template: '<table class="inner-activity_table"><tbody><tr><td></td><td class="col-action_td"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></td><td class="col-action_td"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></td></tr>#for(var i = 0; i < data.changes.length; i++){#<tr><td style="font-weight: bold;">#=data.changes[i].field# </td><td class="col-value_td"><span class="activity-list-old-val" style="color:darkred; font-weight: bold;">{{ \'#=data.changes[i].oldValue#\' | convertDateIntoTimeZone }}</span></td><td class="col-value_td"><span class="activity-list-new-val" style="color: green; font-weight: bold;">{{ \'#=data.changes[i].newValue#\' | convertDateIntoTimeZone }}</td></tr>#}#</tbody></table>'},
             ],
             dataSource: {
                 pageSize: 10,

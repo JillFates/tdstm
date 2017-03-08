@@ -22,4 +22,8 @@ HeaderModule.filter('convertDateIntoTimeZone', ['UserPreferencesService', functi
     return (dateString) => userPreferencesService.getConvertedDateIntoTimeZone(dateString);
 }]);
 
+HeaderModule.filter('convertDateTimeIntoTimeZone', ['UserPreferencesService', function (userPreferencesService) {
+    return (dateString) => userPreferencesService.getConvertedDateTimeIntoTimeZone(dateString);
+}]);
+
 export default HeaderModule;
