@@ -3,17 +3,17 @@
  * TM-3776
  */
 databaseChangeLog = {
-	changeSet(author: "oluna", id: "20160920 TM-3776-A") {
+	changeSet(author: "oluna", id: "20160920 TM-3776-A.v2") {
 		comment('Create "license" table in "tdstm" schema')
 
 		preConditions(onFail:'MARK_RAN') {
 			not {
-				tableExists(schemaName:'tdstm', tableName:'license')
+				tableExists(tableName:'license')
 			}
 		}
 		//Changing  'key' column name as 'fi_key' cause 'key' is a reserved keyword in MYSQL
 		sql("""
-			CREATE TABLE tdstm.license(
+			CREATE TABLE license(
 				id 	   			varchar(255) NOT NULL,
 				instalation_num varchar(255) NOT NULL,
 				email		   	varchar(255) NOT NULL,
@@ -28,13 +28,6 @@ databaseChangeLog = {
 				hash		   	TEXT,
 				PRIMARY KEY (id)
 			)
-		""")
-	}
-
-	changeSet(author: "oluna", id: "20160920 TM-3776-A2") {
-		sql("""
-			ALTER TABLE `tdstm`.`license`
-			CHANGE COLUMN `environment` `environment` INT NOT NULL COMMENT '' ;
 		""")
 	}
 }
