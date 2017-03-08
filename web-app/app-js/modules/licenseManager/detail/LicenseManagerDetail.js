@@ -68,7 +68,7 @@ export default class LicenseManagerDetail extends FormValidator{
         // Init the two Kendo Dates for Init and EndDate
         this.initDate = {};
         this.initDateOptions = {
-            format: 'yyyy/MM/dd',
+            format: this.userPreferencesService.getConvertedDateFormatToKendoDate(),
             open: ((e) => {
                 this.onChangeInitDate();
             }),
@@ -79,7 +79,7 @@ export default class LicenseManagerDetail extends FormValidator{
 
         this.endDate = {};
         this.endDateOptions = {
-            format: 'yyyy/MM/dd',
+            format: this.userPreferencesService.getConvertedDateFormatToKendoDate(),
             open: ((e) => {
                 this.onChangeEndDate();
             }),

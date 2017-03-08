@@ -61,4 +61,18 @@ export default class UserPreferencesService {
         return timeString !== 'null'? timeString: '';
     }
 
+    /**
+     * Kendo Date Format is quite different and threats the chars with a different meaning
+     * this Functions return the one in the standar format.
+     * Consider this is only from our Current Format
+     */
+    getConvertedDateFormatToKendoDate() {
+        var format = this.timeZoneConfiguration.preferences.CURR_DT_FORMAT;
+
+        format = format.replace('DD', 'dd');
+        format = format.replace('YYYY', 'yyyy');
+
+        return format;
+    }
+
 }
