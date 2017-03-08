@@ -1,3 +1,4 @@
+import com.tds.asset.AssetComment
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
@@ -202,7 +203,7 @@ class WorkflowController implements ControllerMethods {
 					duration : params.int('duration_' + i))
 
 				if (! workflowTransition.validate() || ! workflowTransition.save(flush:true)) {
-					flash.message += '[' + workflowTransition.code + ']'
+					flash.message += 'Workflow step with code [' + workflowTransition.code + '] must be unique.'
 				} else {
 					logger.debug('Workflow step "{}" updated', workflowTransition)
 				}
@@ -310,24 +311,31 @@ class WorkflowController implements ControllerMethods {
 		if (transitionId) {
 			WorkflowTransition workflowTransition = WorkflowTransition.get(transitionId)
 			if (workflowTransition) {
-				def process = workflowTransition.workflow.process
-				StepSnapshot.executeUpdate('''
+				// verify if workflow transition has comments related to it
+				def assetsComments = AssetComment.executeQuery(
+						"select count(*) from AssetComment where workflowTransition >= :workflowTransition", [workflowTransition: workflowTransition])
+				if (assetsComments[0] > 0) {
+					flash.message = "Workflow step [${workflowTransition.code}] cannot be deleted because it has linked Asset Comments."
+				} else {
+					def process = workflowTransition.workflow.process
+					StepSnapshot.executeUpdate('''
 					delete StepSnapshot
 					where moveBundleStep in (select id from MoveBundleStep
 					                         where moveBundle.project.workflowCode=:workflowCode
 					                           and transitionId=:transitionId)
 				''', [workflowCode: workflowTransition.workflow.process, transitionId: NumberUtil.toInteger(transitionId)])
-				MoveBundleStep.executeUpdate('''
+					MoveBundleStep.executeUpdate('''
 					delete MoveBundleStep
 					where moveBundle in (select id from MoveBundle where workflowCode=:workflowCode)
 					  and transitionId=:transitionId
 				''', [workflowCode: workflowTransition.workflow.process, transitionId: workflowTransition.transId])
-				WorkflowTransitionMap.executeUpdate('delete WorkflowTransitionMap where workflowTransition=?',
-						[workflowTransition])
-				workflowTransition.delete(flush:true)
+					WorkflowTransitionMap.executeUpdate('delete WorkflowTransitionMap where workflowTransition=?',
+							[workflowTransition])
+					workflowTransition.delete(flush: true)
 
-				//	load transitions details into application memory.
-				stateEngineService.loadWorkflowTransitionsIntoMap(process, 'workflow')
+					//	load transitions details into application memory.
+					stateEngineService.loadWorkflowTransitionsIntoMap(process, 'workflow')
+				}
 			}
 		}
 		redirect(action: "workflowList", params: [workflow: workflow.id])
