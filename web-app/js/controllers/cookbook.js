@@ -1278,7 +1278,8 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 
 	$(".menu-parent-tasks-cookbook").removeClass('active');
 	$(".menu-parent-tasks-generation-history").addClass('active');
-
+	$(".content-header h1").html("Generation History");
+	$(".content-header ol.breadcrumb li:last-child").html("Generation History")
 	scope.tasks = {};
 
 	scope.tasks.gridData = [{'message': 'No results found', 'context': 'none'}];
