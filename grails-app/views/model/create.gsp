@@ -66,7 +66,7 @@
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Model Weight:</td>
 			<td>
-				<input type="text" name="weight" id="weightId" value=""/>
+				<input type="number" max="10000" name="weight" id="weightId" value=""/>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Layout Style:</td>
 			<td>
@@ -107,8 +107,8 @@
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Power (Max/Design/Avg):</td>
 			<td>
-				<input type="text" size="4" name="powerNameplate" id="powerNameplateCreateId" value="${modelInstance.powerNameplate}"
-					onblur="changePowerValue('Create')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;vertical-align: top"
+				<input type="number" size="4" name="powerNameplate" id="powerNameplateCreateId" value="${modelInstance.powerNameplate}"
+					onblur="changePowerValue('Create')" style="width: 50px;"><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;vertical-align: top"
 					onclick="setStanderdPower('Create')"> >> </a>
 				<input type="text" size="4" name="powerDesign" id="powerDesignCreateId" value="${modelInstance.powerDesign}" >&nbsp;
 				<input type="text" size="4" name="powerUse" id="powerUseCreateId" value="${modelInstance.powerUse}" >&nbsp;
@@ -392,6 +392,8 @@
 			alert("The model name cannot be null.")
 			isValid = false
 		}
+
+		$("#modelNameId").val($("#modelNameId").val().trim())
 
 		if($(".field_error").length){
 			isValid = false
