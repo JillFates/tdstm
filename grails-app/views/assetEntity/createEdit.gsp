@@ -129,9 +129,9 @@
 							<td class="label ${config.sourceLocation} ${highlightMap.sourceLocation?:''}" nowrap="nowrap">
 								<label for="sourceLocationId">Location/Room</label>
 							</td>
-							<td style="vertical-align: text-top;" >
+							<td style="vertical-align: text-top;" data-for="sourceLocationId">
 									<span class="useRoomS">
-										<g:select id="roomSelectS" name="roomSourceId"
+										<g:select id="roomSelectS"  name="roomSourceId"
 												  from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
 												  optionKey="id" optionValue="${{it.value}}"
 												  noSelection="${[0:'Please select...']}"
@@ -156,7 +156,7 @@
 												/>
 									</span>
 							</td>
-							<td nowrap style="vertical-align: text-top;">
+							<td nowrap style="vertical-align: text-top;" data-for="sourceLocationId">
 									<span class="useRoomT">
 										<g:select id="roomSelectT" name="roomTargetId"
 												  from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
@@ -208,7 +208,7 @@
 								<label for="sourceChassisId">Blade Chassis</label>
 							</td>
 
-							<td class="label rackLabel">
+							<td class="label rackLabel" data-for="sourceRackId">
 									<span class="useRackS">
 										<g:render template="deviceRackSelect" model="[clazz:config.sourceRack, options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id,
 											rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
@@ -223,7 +223,7 @@
 										<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
 									</span>
 							</td>
-							<td class="label rackLabel">
+							<td class="label rackLabel" data-for="sourceRackId">
 									<span class="useRackT">
 										<g:render template="deviceRackSelect"  model="[clazz:config.targetRack, options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 											rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />

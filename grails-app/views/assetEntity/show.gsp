@@ -25,7 +25,7 @@
 						<td class="label ${config.environment}  ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 						<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
 						<td></td>
-						<td class="label_sm">Current</td>
+						<td class="label_sm">Source</td>
 						<td class="label_sm">Target</td>
 					</tr>
 					<tr class="prop">

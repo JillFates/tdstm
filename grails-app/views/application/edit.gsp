@@ -64,7 +64,7 @@
 								<td colspan="3">
 									<input type="text" id="assetName" class="${config.assetName}" name="assetName"
 										value="${applicationInstance.assetName}" tabindex="9" /></td>
-								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap">Description</td>
+								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
 								<td colspan="3">
 									<input type="text" id="description" class="${config.description}" name="description"
 										value="${applicationInstance.description}" size="50" tabindex="10" />

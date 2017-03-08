@@ -44,7 +44,7 @@
 							<td><input type="text" id="assetType" name="assetType"
 									   value="Logical Storage" readonly="readonly" />
 							</td>
-							<td class="label" nowrap="nowrap"><label for="lun">LUN</label>
+							<td class="label" nowrap="nowrap"><label for="LUN">LUN</label>
 							</td>
 							<td><input type="text" id="lun" name="LUN"
 									   value="${fileInstance.LUN}"/>
