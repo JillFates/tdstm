@@ -19,8 +19,8 @@ import { toODataString } from '@progress/kendo-data-query';
 
 export class NoticeListComponent implements OnInit {
 
-    private moduleName: string = '';
-    private title: string = '';
+    private moduleName = '';
+    private title = '';
     noticeList: NoticeModel[] = [];
 
     ActionType: typeof ActionType = ActionType;

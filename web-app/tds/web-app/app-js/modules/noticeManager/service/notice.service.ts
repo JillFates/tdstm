@@ -1,7 +1,7 @@
 import {Injectable}     from '@angular/core';
 import {Response, Headers, RequestOptions} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider'
-import {NotifierService} from '../../../shared/services/notifier.service'
+import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {NotifierService} from '../../../shared/services/notifier.service';
 import {NoticeModel}           from '../model/notice.model';
 import {Observable} from 'rxjs/Rx';
 
@@ -15,7 +15,8 @@ export class NoticeService {
     private noticeListUrl = '../../ws/notices';
 
     // Resolve HTTP using the constructor
-    constructor(private http: HttpInterceptor, private notifierService: NotifierService) {}
+    constructor(private http: HttpInterceptor, private notifierService: NotifierService) {
+    }
 
     /**
      * Get the Notice List

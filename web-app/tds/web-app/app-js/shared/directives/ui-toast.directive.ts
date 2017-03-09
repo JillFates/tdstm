@@ -16,7 +16,7 @@ import {AlertType, AlertModel} from '../model/alert.model';
 
 export class UIToastDirective {
 
-    private showsPopUp: boolean = false;
+    private showsPopUp = false;
     private alertModel = AlertModel;
     private alertType = AlertType;
 

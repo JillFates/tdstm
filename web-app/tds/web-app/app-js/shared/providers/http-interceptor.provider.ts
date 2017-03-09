@@ -15,7 +15,7 @@ import {
 } from '@angular/http';
 
 import {Observable} from 'rxjs/Observable';
-import {NotifierService} from "../services/notifier.service";
+import {NotifierService} from '../services/notifier.service';
 import {AlertType} from '../model/alert.model';
 
 export class HttpInterceptor extends Http {
@@ -36,7 +36,6 @@ export class HttpInterceptor extends Http {
     }
 
     post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-        console.debug('Post Request to: ', url);
         return this.intercept(super.post(url, body, this.getRequestOptionArgs(options)), url);
     }
 
@@ -49,10 +48,10 @@ export class HttpInterceptor extends Http {
     }
 
     getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {
-        if (options == null) {
+        if (options === null) {
             options = new RequestOptions();
         }
-        if (options.headers == null) {
+        if (options.headers === null) {
             options.headers = new Headers();
         }
         options.headers.append('Content-Type', 'application/json');
@@ -69,13 +68,13 @@ export class HttpInterceptor extends Http {
             });
         }
         return observable.catch((err, source) => {
-            if (err.status == 401) {
+            if (err.status === 401) {
                 return Observable.empty();
             } else {
                 return Observable.throw(err);
             }
         }).finally(() => {
-            //Invokes after the source observable sequence terminates gracefully or exceptionally.
+            // Invokes after the source observable sequence terminates gracefully or exceptionally.
             if (requestInfo) {
                 this.notifierService.broadcast({
                     name: 'httpRequestCompleted',
@@ -94,16 +93,16 @@ export class HttpInterceptor extends Http {
     }
 
     onSuccess(res: any): Observable<any> {
-        if (res.headers.get("x-login-url")) {
-            window.location.href = res.headers.get("x-login-url");
+        if (res.headers.get('x-login-url')) {
+            window.location.href = res.headers.get('x-login-url');
         }
         return res.json();
     }
 }
 
-export let HttpServiceProvider =
-    {
+export let HttpServiceProvider = {
         provide: HttpInterceptor,
-        useFactory: (xhrBackend: XHRBackend, requestOptions: RequestOptions, notifierService: NotifierService) => new HttpInterceptor(xhrBackend, requestOptions, notifierService),
+        useFactory: ( xhrBackend: XHRBackend, requestOptions: RequestOptions, notifierService: NotifierService) =>
+            new HttpInterceptor(xhrBackend, requestOptions, notifierService),
         deps: [XHRBackend, RequestOptions, NotifierService]
     };

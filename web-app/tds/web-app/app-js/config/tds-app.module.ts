@@ -2,22 +2,21 @@
  * App or Root Module
  * it identify how the TDS App is being constructed
  */
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule, Http } from '@angular/http';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {HttpModule, Http} from '@angular/http';
 
-import { TDSAppComponent } from './tds-app.component';
+import {TDSAppComponent} from './tds-app.component';
 // Providers
 
 // Feature modules
-import {SharedModule} from'../shared/shared.module'
-import { GamesModule } from '../modules/games/games.module';
-import { NoticesManagerModule } from '../modules/noticeManager/notice-manager.module';
+import {SharedModule} from'../shared/shared.module';
+import {GamesModule} from '../modules/games/games.module';
+import {NoticesManagerModule} from '../modules/noticeManager/notice-manager.module';
 // Router Logic
-import { UIRouterModule, UIView } from 'ui-router-ng2';
-import { TDSRoutingStates } from './tds-routing.states';
-
+import {UIRouterModule, UIView} from 'ui-router-ng2';
+import {TDSRoutingStates} from './tds-routing.states';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -26,7 +25,7 @@ import { TDSRoutingStates } from './tds-routing.states';
         BrowserModule,
         FormsModule,
         HttpModule,
-        //Feature Modules
+        // Feature Modules
         SharedModule,
         NoticesManagerModule,
         GamesModule,
@@ -38,10 +37,10 @@ import { TDSRoutingStates } from './tds-routing.states';
     ],
     declarations: [
         TDSAppComponent,
-        
+
     ], // components, directives and pipes ONLY and only ONCE\
     providers: [
-        { provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
+        {provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader}
     ],
     bootstrap: [UIView]
 })

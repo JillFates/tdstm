@@ -1,5 +1,5 @@
 import {Ng2StateDeclaration} from 'ui-router-ng2';
-import {NoticeListComponent} from './components/list/notice-list.component'
+import {NoticeListComponent} from './components/list/notice-list.component';
 import {HeaderComponent} from '../header/header.component';
 
 /**
@@ -16,7 +16,6 @@ export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
         'containerView@tds': {component: NoticeListComponent}
     },
 };
-
 
 export const NOTICE_STATES = [
     noticeListState

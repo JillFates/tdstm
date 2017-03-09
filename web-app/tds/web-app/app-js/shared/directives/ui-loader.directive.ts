@@ -6,7 +6,7 @@
  */
 
 import { Component } from '@angular/core';
-import { NotifierService } from "../services/notifier.service";
+import { NotifierService } from '../services/notifier.service';
 
 @Component({
     selector: 'tds-ui-loader',
@@ -15,7 +15,7 @@ import { NotifierService } from "../services/notifier.service";
 
 export class UILoaderDirective {
 
-    private showsLoader: boolean = false;
+    private showsLoader = false;
 
     constructor(private notifierService: NotifierService) {
         this.httpRequestHandlerInitial();
