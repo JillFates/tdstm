@@ -161,5 +161,6 @@ databaseChangeLog = {
 	include file: "20170227-update-autotimestamps-license-licensed-client.groovy"
 	include file: "20170228-remove-version-in-license-licensed-client.groovy"
 	include file: "20170228-fix-type-method-enum-licensed-client.groovy"
+	include file: "20170307-change-license-installation-column-spelling.groovy"
 	include file: "20170308-nullout-orphaned-asset-comments-by-workflow-transition.groovy"
 }

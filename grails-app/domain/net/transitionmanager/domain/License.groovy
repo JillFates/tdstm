@@ -44,7 +44,6 @@ class License {
 		version		false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
-		installationNum column:'instalation_num'
 	}
 
 	static constraints = {

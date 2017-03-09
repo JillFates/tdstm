@@ -3,7 +3,7 @@
  * TM-3776
  */
 databaseChangeLog = {
-	changeSet(author: "oluna", id: "20160920 TM-3776-Manager.v2") {
+	changeSet(author: "oluna", id: "20160920 TM-3776-Manager.v3") {
 		comment('Create "licensed_client" table in "tdstm" schema')
 
 		preConditions(onFail:'MARK_RAN') {
@@ -15,7 +15,7 @@ databaseChangeLog = {
 		sql("""
 			CREATE TABLE licensed_client(
 				id 	   			varchar(255) NOT NULL,
-				instalation_num varchar(255) NOT NULL,
+				installation_num varchar(255) NOT NULL,
 				email		   	varchar(255) NOT NULL,
                 project        	varchar(255) NOT NULL,
                 client        	varchar(255) NOT NULL,
