@@ -672,6 +672,7 @@ class PersonService implements ServiceMethods {
 				try {
 					// Delete the UserLogin
 					if (userLogin) {
+						person.userLogin = null
 						securityService.deleteUserLogin(userLogin)
 					}
 

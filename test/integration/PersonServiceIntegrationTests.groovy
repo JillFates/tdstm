@@ -371,9 +371,11 @@ class PersonServiceIntegrationTests extends Specification {
 			app.sme.id == newPID
 
 		when: 'the person is deleted and all associations with the individual are removed'
-			personService.deletePerson(adminPerson, newPerson, true, true)
+			Map result = personService.deletePerson(adminPerson, newPerson, true, true)
 			app.refresh()
-		then: 'the person and user references should be deleted'
+		then: 'deleted flag should be true'
+			result['deleted'] == true
+		and: 'the person and user references should be deleted'
 			// Shouldn't be able to lookup the person
 			! Person.get(newPID)
 			! UserLogin.get(userId)
@@ -548,6 +550,26 @@ class PersonServiceIntegrationTests extends Specification {
 		then: 'it should no longer exist'
 			fromUsers.size() == 0
 
+	}
+
+	def "15. Bulk Delete Persons Test"() {
+		when: 'creating a new person with a user account'
+		Person newPerson = personHelper.createPerson(adminPerson, project.client)
+		Long newPID = newPerson.id
+		UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+		Long userId = user.id
+		Application app = assetHelper.createApplication(newPerson, project)
+		app.save(flush:true)
+
+		then: 'have valid ids'
+		userId != null
+		newPID != null
+
+		when: 'the person is deleted and all associations with the individual are removed'
+		Map result = personService.bulkDelete(adminPerson, [newPID], true)
+		app.refresh()
+		then: 'deleted count should greater than zero'
+		result['deleted'] == 1
 	}
 
 	// Used to convert a person object into a map used by the PersonService
