@@ -43,7 +43,7 @@
 	</pre>
 
 	<h3>Memory Pools:</h3>
-	<table style="border-spacing: 5px; border-collapse: separate; border: 1px solid black;">
+	<table style="border-spacing: 5px; border-collapse: separate; border: 1px solid black;table-layout:fixed;">
 		<tr>
 			<th>Name</th>
 			<th>Type</th>
