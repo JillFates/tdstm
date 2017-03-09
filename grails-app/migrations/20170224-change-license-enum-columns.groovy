@@ -1,3 +1,4 @@
+import groovy.sql.Sql
 import net.transitionmanager.domain.License
 
 /**
@@ -9,11 +10,23 @@ databaseChangeLog = {
 		comment('Fix "license.environment" column enumerations for client')
 
 		preConditions(onFail:'MARK_RAN') {
-			sqlCheck(expectedResult:'int(11)', """
-				SELECT COLUMN_TYPE 
-				FROM information_schema.COLUMNS 
-				WHERE TABLE_NAME = 'license' and COLUMN_NAME = 'environment'
-			""")
+			grailsPrecondition {
+				check {
+					def schemaName = databaseConnection.catalog
+
+					def sql = new Sql(connection) //this is fixed in 1.4.1
+					def row = sql.firstRow("""
+						SELECT COLUMN_TYPE
+						FROM information_schema.COLUMNS
+						WHERE 
+							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_NAME = 'license' and 
+							COLUMN_NAME = 'environment'
+					""")
+
+					assert row['COLUMN_TYPE'] == 'int(11)'
+				}
+			}
 		}
 
 		grailsChange {
@@ -44,11 +57,23 @@ databaseChangeLog = {
 		comment('Fix "license.status" columns enumerations for client')
 
 		preConditions(onFail:'MARK_RAN') {
-			sqlCheck(expectedResult:'int(11)', """
-				SELECT COLUMN_TYPE 
-				FROM information_schema.COLUMNS 
-				WHERE TABLE_NAME = 'license' and COLUMN_NAME = 'status'
-			""")
+			grailsPrecondition {
+				check {
+					def schemaName = databaseConnection.catalog
+
+					def sql = new Sql(connection) //this is fixed in 1.4.1
+					def row = sql.firstRow("""
+						SELECT COLUMN_TYPE
+						FROM information_schema.COLUMNS
+						WHERE 
+							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_NAME = 'license' and 
+							COLUMN_NAME = 'status'
+					""")
+
+					assert row['COLUMN_TYPE'] == 'int(11)'
+				}
+			}
 		}
 
 		grailsChange {
@@ -80,11 +105,23 @@ databaseChangeLog = {
 		comment('Fix "license.type" columns enumerations for client')
 
 		preConditions(onFail:'MARK_RAN') {
-			sqlCheck(expectedResult:'int(11)', """
-				SELECT COLUMN_TYPE 
-				FROM information_schema.COLUMNS 
-				WHERE TABLE_NAME = 'license' and COLUMN_NAME = 'type'
-			""")
+			grailsPrecondition {
+				check {
+					def schemaName = databaseConnection.catalog
+
+					def sql = new Sql(connection) //this is fixed in 1.4.1
+					def row = sql.firstRow("""
+						SELECT COLUMN_TYPE
+						FROM information_schema.COLUMNS
+						WHERE 
+							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_NAME = 'license' and 
+							COLUMN_NAME = 'type'
+					""")
+
+					assert row['COLUMN_TYPE'] == 'int(11)'
+				}
+			}
 		}
 
 		grailsChange {

@@ -30,4 +30,42 @@ databaseChangeLog = {
 				CHANGE COLUMN `instalation_num` `installation_num` VARCHAR(255) NOT NULL default '';
 		""")
 	}
+
+	changeSet(author: "oluna", id: "20170309 TM-6151.a") {
+		comment('Fix dumb environment erase in license')
+
+		preConditions(onFail:'MARK_RAN') {
+			not{
+				columnExists(tableName:"license", columnName:"environment")
+			}
+		}
+
+		sql("""
+			ALTER TABLE `license`
+				ADD COLUMN `environment` VARCHAR(255) NOT NULL AFTER `email`;
+		""")
+
+		sql("""
+			update `license` set `environment`='${License.Environment.DEMO.name()}' where `environment`='';
+		""")
+	}
+
+	changeSet(author: "oluna", id: "20170309 TM-6151.b") {
+		comment('Fix dumb environment erase in licensed_client')
+
+		preConditions(onFail:'MARK_RAN') {
+			not{
+				columnExists(tableName:"licensed_client", columnName:"environment")
+			}
+		}
+
+		sql("""
+			ALTER TABLE `licensed_client`
+				ADD COLUMN `environment` VARCHAR(255) NOT NULL AFTER `email`;
+		""")
+
+		sql("""
+			update `licensed_client` set `environment`='${License.Environment.DEMO.name()}' where `environment`='';
+		""")
+	}
 }
