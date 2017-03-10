@@ -4,10 +4,7 @@ import { NoticeModel } from '../../model/notice.model';
 
 import { ActionType } from '../../../../shared/model/action-type.enum';
 
-import { Observable } from 'rxjs/Rx';
-
-import { GridComponent, GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
-import { toODataString } from '@progress/kendo-data-query';
+import { GridComponent } from '@progress/kendo-angular-grid';
 
 @Component({
     moduleId: module.id,
@@ -25,7 +22,6 @@ export class NoticeListComponent implements OnInit {
 
     ActionType: typeof ActionType = ActionType;
 
-    private view: Observable<GridDataResult>;
     @ViewChild(GridComponent) private grid: GridComponent;
 
     constructor(private noticeService: NoticeService) {
