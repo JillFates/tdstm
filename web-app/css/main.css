@@ -568,19 +568,26 @@ span.cellWithoutBackground
 .assetFieldHeader1 {
 	margin-left: 10px;
 }
-
+td[data-for].C,td[data-for].I,td[data-for].H,td[data-for].U{background-color:#FFF !important;}
+td[data-for].C .select2-choice,
 .C{
 	background-color:#F9FF90 !important;
 	background-image: none !important;
 }
+
+td[data-for].I .select2-choice,
 .I{
 	background-color:#D4F8D4 !important;
 	background-image: none !important;
 }
+
+td[data-for].H .select2-choice,
 .H{
 	background-color:#CCCCCC !important;
 	background-image: none !important;
 }
+
+td[data-for].U .select2-choice,
 .U{
 	color:darkgray !important;
 	background-image: none !important;
