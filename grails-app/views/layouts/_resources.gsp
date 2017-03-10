@@ -18,9 +18,6 @@
 <!-- Blue Skin -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
-<!-- Kendo UI Material Theme -->
-<link rel="stylesheet" href="${resource(dir: 'tds/node_modules/@progress/kendo-theme-default/dist', file: 'all.css')}">
-
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
 <script src="${resource(dir: 'dist/js/vendors/html5shiv/dist', file: 'html5shiv.min.js')}"></script>
