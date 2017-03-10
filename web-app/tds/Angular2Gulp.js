@@ -3,7 +3,7 @@
  */
 
 var _ = require('lodash'),
-    argv = require('yargs').argv,            // Arguments from command prompt
+    autoprefixer = require('gulp-autoprefixer'),
     browserify = require("browserify"),
     buffer = require('vinyl-buffer'),
     del = require('del'),
@@ -12,7 +12,9 @@ var _ = require('lodash'),
     gulpif = require('gulp-if'),
     gulpFilter = require('gulp-filter'),
     nodeResolve = require('resolve'),
+    sass = require('gulp-sass'),
     source = require('vinyl-source-stream'),
+    sourcemaps = require('gulp-sourcemaps'),
     shell = require('gulp-shell'),
     tsify = require("tsify"),
     tslint = require("gulp-tslint"),
@@ -110,6 +112,29 @@ gulp.task('watch-build-app', function () {
             this.emit("end")
         });
 
+});
+
+/**
+ * What this task do is to compile the SASS file and generate a map that can be view from moder browser
+ * style.css is being created, if prodEnv is true, then minify the css for use on prodEnv.
+ * from command line: gulp sass-compiler --PROD
+ */
+gulp.task('sass-compiler', function () {
+    return gulp.src('./web-app/css/style.sass')
+        .pipe(sourcemaps.init())
+        .pipe(sass({errLogToConsole: true}))
+        .pipe(autoprefixer({browsers: ['last 2 version'], cascade: false}))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest('./web-app/css'));
+});
+
+/**
+ * Execute watch task to compile css automatically on Development mode
+ * from command line: gulp sass:watch
+ * it will run until stop, searching for changes on any SASS file, compiles and ready to use
+ */
+gulp.task('sass:watch', function () {
+    return gulp.watch('./web-app/css/**/*.sass', ['sass-compiler']);
 });
 
 /**

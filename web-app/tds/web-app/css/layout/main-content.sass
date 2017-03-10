@@ -1,0 +1,34 @@
+div.content-wrapper
+  background: $white
+  .container
+    margin-right: 0
+    margin-left: 0
+    width: 100% !important
+    section.content-header
+      padding: 8px 15px 0px 15px
+      > .breadcrumb
+        padding: 0px 5px
+        a
+          cursor: default
+      > .licensing-banner-message
+        &.breadcumb-1
+          right: 7%
+        &.breadcumb-2
+          right: 9%
+        &.breadcumb-3
+          right: 10%
+        &.breadcumb-4
+          right: 12%
+    section
+      div.box-body
+        div.box
+          ul.nav
+            background: inherit
+            border: inherit
+            margin-top: inherit
+            padding: inherit
+
+@media (max-width: 991px)
+  section.content-header
+    > .licensing-banner-message
+      right: 0px !important
