@@ -12,7 +12,16 @@
                     </template>
                 </kendo-grid-column>
                 <kendo-grid-column field="title" title="Title"></kendo-grid-column>
-                <kendo-grid-column field="type" title="Type"></kendo-grid-column>
+                <kendo-grid-column field="type" title="Type">
+                    <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        {{((dataItem.typeId === 1 )? 'Prelogin' : 'Postlogin')}}
+                    </template>
+                </kendo-grid-column>
+                <kendo-grid-column field="active" title="Active">
+                    <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        {{dataItem.active | tdsUIBoolean}}
+                    </template>
+                </kendo-grid-column>
             </kendo-grid>
         </div>
         <!-- /.box-body -->
