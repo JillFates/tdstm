@@ -26,49 +26,6 @@
 
     <g:layoutHead />
 
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs3.css')}" />
-
-    <g:javascript src="tdsmenu.js" />
-    <g:javascript src="PasswordValidation.js" />
-
-    <script type="text/javascript">
-	$(document).ready(function() {
-            $("#personDialog").dialog({ autoOpen: false });
-            $("#userPrefDivId").dialog({ autoOpen: false });
-            $("#userTimezoneDivId").dialog({ autoOpen: false });
-
-            // Due to some issue with textarea overriding the value at intial load
-            $('textarea').each(function(){
-                $(this).val($(this).text());
-            });
-            $(".headerClass").mouseover(function(){
-                $(this).parent().find('a').addClass('mouseover');
-                $(this).parent().find('a').removeClass('mouseout');
-            });
-            $(".headerClass").mouseout(function(){
-                if (!$(this).parent().find(".megamenu").is(":visible")) {
-                    $(this).parent().find('a').removeClass('mouseover');
-                } else {
-                    $('.headerClass').removeClass('mouseover');
-                }
-            });
-
-            $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
-
-            $('.licensing-error-warning').popover({placement: 'bottom', container: 'body' });
-            $('.licensing-error-warning').click(function(event) { event.preventDefault(); });
-
-        });
-
-        function updateEventHeader( e ){
-            var newsAndStatus = eval("(" + e.responseText + ")")
-            $("#head_mycrawlerId").html(newsAndStatus[0].news);
-            $("#head_crawler").addClass(newsAndStatus[0].cssClass)
-            $("#moveEventStatus").html(newsAndStatus[0].status)
-        }
-
-    </script>
 </head>
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
 <body class="hold-transition skin-blue layout-top-nav">
@@ -195,15 +152,6 @@
         <!-- /.container -->
     </footer>
 </div>
-
-    <%-- DIV for editing User Profile --%>
-    <g:render template="../person/personEdit" model="[user:userLogin, minPasswordLength:minPasswordLength]" />
-
-    <%-- DIV for editing User Preferences --%>
-    <div id="userPrefDivId" style="display: none;" title="${tds.currentPersonName()} Preferences"></div>
-
-	<%-- DIV for editing User date and timezone --%>
-	<div id="userTimezoneDivId" style="display: none;" title="${tds.currentPersonName()} Date and Timezone"></div>
 
 </body>
 </html>
