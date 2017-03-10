@@ -28,7 +28,9 @@ export default class UserPreferencesService {
         var userDTFormat = this.timeZoneConfiguration.preferences.CURR_DT_FORMAT;
         var timeZone = this.timeZoneConfiguration.preferences.CURR_TZ;
 
-        if(dateString && moment(dateString).isValid()){
+        if(dateString !== 'null' &&
+            dateString && moment(dateString).isValid() &&
+            !(typeof Number(dateString.toString()) === 'number' && !isNaN(dateString.toString()))){
             if (timeZone === null) {
                 timeZone = 'GMT';
             }
@@ -47,7 +49,9 @@ export default class UserPreferencesService {
         var userDTFormat = this.timeZoneConfiguration.preferences.CURR_DT_FORMAT;
         var timeZone = this.timeZoneConfiguration.preferences.CURR_TZ;
 
-        if(dateString && moment(dateString).isValid()){
+        if(dateString !== 'null' &&
+            dateString && moment(dateString).isValid() &&
+            !(typeof Number(dateString.toString()) === 'number' && !isNaN(dateString.toString()))){
             if (timeZone === null) {
                 timeZone = 'GMT';
             }
