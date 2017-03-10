@@ -652,6 +652,7 @@ class MoveBundleService implements ServiceMethods {
 			def groups = graph.groupByDependencies(statusList, connectionList, moveBundleIdStrings)
 			groups.sort { a, b -> b.size() <=> a.size() }
 
+
 			logger.info 'Dependency groups generation - Group dependencies time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 70I, ProgressService.STARTED, "Save dependencies")
@@ -670,7 +671,7 @@ class MoveBundleService implements ServiceMethods {
 			progressService.update(progressKey, 90I, ProgressService.STARTED, "Finishing")
 
 			graph.destroy()
-
+			
 			logger.info 'Dependency groups generation - Destroy graph time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 100I, ProgressService.COMPLETED, "Finished")
@@ -688,19 +689,14 @@ class MoveBundleService implements ServiceMethods {
 	 * @return List of records
 	 */
 	private def searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes) {
-
 		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
-		String  queryForAssets = '''
-				SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId,
-				       a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, a.asset_type as assetType
-				FROM asset_entity a
-			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id
-				WHERE a.move_bundle_id in ( ? )
-		'''
+		String  queryForAssets = "SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId," +
+				" a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, a.asset_type as assetType FROM asset_entity a" +
+				" LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id" +
+				" WHERE a.move_bundle_id in ( ${moveBundleText} )"
 
 		logger.info 'SQL used to find assets: {}', queryForAssets
-
-		return jdbcTemplate.queryForList(queryForAssets, [moveBundleText])
+		return jdbcTemplate.queryForList(queryForAssets)
 	}
 
 	/**
