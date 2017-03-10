@@ -200,12 +200,18 @@
 			var ajaxRequest;
 			// Used to keep track of Color By on the dependency map
 			var currentColorBy;
+			var currentValue,currentdependencyBundle;
+
+			$(document).on('entityAssetUpdated',function (e,obj) {
+				getList(currentValue,currentdependencyBundle);
+			});
 
 			function getList(value,dependencyBundle, force, distance, labels) {
 				$('#moveBundleSelectId').dialog("close")
 				var id = 'all'
 				if(dependencyBundle != null) id = dependencyBundle
-
+				currentValue=value;
+				currentdependencyBundle = dependencyBundle;
 				$('.depGroupSelected').removeClass('depGroupSelected').removeClass('selectedGroup')
 				$('.app_count').removeClass('app_count').removeClass('selectedGroup')
 				$('.server_count').removeClass('server_count').removeClass('selectedGroup')
