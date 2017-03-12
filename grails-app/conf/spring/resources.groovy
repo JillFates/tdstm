@@ -8,6 +8,7 @@ import com.tdsops.common.security.spring.TdsSaltSource
 import com.tdsops.common.security.spring.TdsUserDetailsService
 import com.tdsops.ldap.TdsLdapUserDetailsMapper
 import com.tdsops.ldap.TdsBindAuthenticator
+import com.tdsops.ldap.TdsLdapAuthenticationProvider
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ldap.core.GrailsSimpleDirContextAuthenticationStrategy
 import grails.plugin.springsecurity.ldap.core.SimpleAuthenticationSource
@@ -15,7 +16,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch
 import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator
 
@@ -139,11 +139,12 @@ beans = {
 					ignorePartialResultException = true
 				}
 
-				"ldapAuthProvider$ldapDomain"(LdapAuthenticationProvider, ref("ldapAuthenticator$ldapDomain"), ref("ldapAuthoritiesPopulator$ldapDomain")) {
+				"ldapAuthProvider$ldapDomain"(TdsLdapAuthenticationProvider, ref("ldapAuthenticator$ldapDomain"), ref("ldapAuthoritiesPopulator$ldapDomain")) {
 					userDetailsContextMapper = ref('ldapUserDetailsMapper')
 					hideUserNotFoundExceptions = globalConfig.ldap.auth.hideUserNotFoundExceptions // true
 					useAuthenticationRequestCredentials = globalConfig.ldap.auth.useAuthPassword // true
 					authoritiesMapper = ref('ldapAuthoritiesMapper')
+					ldapDebug = application.config.tdstm.security.ldap.debug
 				}
 
 				println "... finished configuring Spring Security LDAP for ${ldapDomain}\n"
