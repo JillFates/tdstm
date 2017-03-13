@@ -18,8 +18,7 @@ export class NoticeService {
     private noticeListUrl = '../../ws/notices';
 
     // Resolve HTTP using the constructor
-    constructor(private http: HttpInterceptor, private notifierService: NotifierService) {
-    }
+    constructor(private http: HttpInterceptor, private notifierService: NotifierService) { }
 
     /**
      * Get the Notice List
@@ -27,9 +26,8 @@ export class NoticeService {
      */
     getNoticesList(): Observable<NoticeModel[]> {
         return this.http.get(this.noticeListUrl)
-            .map((res: Response) => this.http.onSuccess(res))
-            .catch((error: any) => this.http.onError(error));
-
+            .map((res: Response) => res.json())
+            .catch((error: any) => error.json());
     }
 
 }

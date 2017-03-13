@@ -28,23 +28,33 @@ export class HttpInterceptor extends Http {
     }
 
     request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.request(url, options), url);
+        return this.intercept(super.request(url, options).map(res => {
+            return this.onSuccessHandler(res);
+        }), url);
     }
 
     get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.get(url, options), url);
+        return this.intercept(super.request(url, options).map(res => {
+            return this.onSuccessHandler(res);
+        }), url);
     }
 
     post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.post(url, body, this.getRequestOptionArgs(options)), url);
+        return this.intercept(super.post(url, body, this.getRequestOptionArgs(options)).map(res => {
+            return this.onSuccessHandler(res);
+        }), url);
     }
 
     put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.put(url, body, this.getRequestOptionArgs(options)), url);
+        return this.intercept(super.put(url, body, this.getRequestOptionArgs(options)).map(res => {
+            return this.onSuccessHandler(res);
+        }), url);
     }
 
     delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.delete(url, options), url);
+        return this.intercept(super.delete(url, options).map(res => {
+            return this.onSuccessHandler(res);
+        }), url);
     }
 
     getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {
@@ -59,6 +69,19 @@ export class HttpInterceptor extends Http {
     }
 
     /**
+     * Handle the on Success, currently server always returns 200, but the x-login-url can be catch
+     * when the session has already expired
+     * @param response
+     * @returns {any}
+     */
+    onSuccessHandler(response: any): any {
+        if (response.headers.get('x-login-url')) {
+            window.location.href = response.headers.get('x-login-url');
+        }
+        return response;
+    }
+
+    /**
      * Intercept the observable to track errors
      */
     intercept(observable: Observable<Response>, requestInfo): Observable<Response> {
@@ -67,11 +90,17 @@ export class HttpInterceptor extends Http {
                 name: 'httpRequestInitial'
             });
         }
-        return observable.catch((err, source) => {
-            if (err.status === 401) {
+        return observable.catch((error, source) => {
+
+            this.notifierService.broadcast({
+                name: AlertType.DANGER,
+                message: error.message
+            });
+
+            if (error.status === 401) {
                 return Observable.empty();
             } else {
-                return Observable.throw(err);
+                return Observable.throw(error);
             }
         }).finally(() => {
             // Invokes after the source observable sequence terminates gracefully or exceptionally.
@@ -83,26 +112,11 @@ export class HttpInterceptor extends Http {
         });
     }
 
-    onError(error: any): Observable<any> {
-        this.notifierService.broadcast({
-            name: AlertType.DANGER,
-            message: error.message
-        });
-
-        return Observable.throw(error.json().error || 'Server error');
-    }
-
-    onSuccess(res: any): Observable<any> {
-        if (res.headers.get('x-login-url')) {
-            window.location.href = res.headers.get('x-login-url');
-        }
-        return res.json();
-    }
 }
 
 export let HttpServiceProvider = {
-        provide: HttpInterceptor,
-        useFactory: ( xhrBackend: XHRBackend, requestOptions: RequestOptions, notifierService: NotifierService) =>
-            new HttpInterceptor(xhrBackend, requestOptions, notifierService),
-        deps: [XHRBackend, RequestOptions, NotifierService]
-    };
+    provide: HttpInterceptor,
+    useFactory: (xhrBackend: XHRBackend, requestOptions: RequestOptions, notifierService: NotifierService) =>
+        new HttpInterceptor(xhrBackend, requestOptions, notifierService),
+    deps: [XHRBackend, RequestOptions, NotifierService]
+};
