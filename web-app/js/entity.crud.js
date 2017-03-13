@@ -2041,7 +2041,7 @@ function assetFieldImportance(phase, type) {
 		data: { 'validation': phase, 'type': type },
 		type: 'POST',
 		success: function (resp) {
-			$("td,input,select,.select2-choice")
+			$("td,input,select,.select2-choice,td[data-for]")
 				.removeClass("C")
 				.removeClass("H")
 				.removeClass("I")
@@ -2050,7 +2050,7 @@ function assetFieldImportance(phase, type) {
 
 			for (var key in resp) {
 				var value = resp[key]
-				$(".dialog input[name=" + key + "],select[name=" + key + "],input[name='" + key + ".id'],select[name='" + key + ".id'],div[id*='" + key + "'] .select2-choice,td[data-for*='" + key + "'] .select2-choice").addClass(value);
+				$(".dialog input[name=" + key + "],select[name=" + key + "],input[name='" + key + ".id'],select[name='" + key + ".id'],div[id*='" + key + "'] .select2-choice,td[data-for*='" + key + "']").addClass(value);
 				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").parent().addClass(value);
 			}
 		},
