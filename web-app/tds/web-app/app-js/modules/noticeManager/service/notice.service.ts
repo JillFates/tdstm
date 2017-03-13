@@ -8,6 +8,9 @@ import {Observable} from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
+/**
+ * @name NoticeService
+ */
 @Injectable()
 export class NoticeService {
 

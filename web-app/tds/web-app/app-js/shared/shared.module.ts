@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 
 import {HttpServiceProvider} from '../shared/providers/http-interceptor.provider';
 // Shared Services
+import {AuthService} from '../shared/services/auth.service';
 import {UserService} from '../shared/services/user.service';
 import {NotifierService} from '../shared/services/notifier.service';
 // Shared Directives
@@ -21,6 +22,7 @@ import {UIBooleanPipe} from './pipes/types/ui-boolean.pipe';
         UIBooleanPipe
     ],
     providers: [
+        AuthService,
         UserService,
         NotifierService,
         HttpServiceProvider

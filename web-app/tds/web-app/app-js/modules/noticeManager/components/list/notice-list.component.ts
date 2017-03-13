@@ -24,6 +24,10 @@ export class NoticeListComponent implements OnInit {
 
     @ViewChild(GridComponent) private grid: GridComponent;
 
+    /**
+     * @constructor
+     * @param {NoticeService} noticeService
+     */
     constructor(private noticeService: NoticeService) {
         this.moduleName = 'Notice List';
     }

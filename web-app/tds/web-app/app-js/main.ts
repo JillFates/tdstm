@@ -1,5 +1,6 @@
 /**
  * Compile the Application Dynamically Just-in-Time (JIT)
+ * Application is using the JSDoc 3
  */
 
 // Polyfills
