@@ -71,10 +71,13 @@ export default class UserPreferencesService {
      * Consider this is only from our Current Format
      */
     getConvertedDateFormatToKendoDate() {
-        var format = this.timeZoneConfiguration.preferences.CURR_DT_FORMAT;
+        var userDTFormat = this.timeZoneConfiguration.preferences.CURR_DT_FORMAT;
 
-        format = format.replace('DD', 'dd');
-        format = format.replace('YYYY', 'yyyy');
+        var format = 'MM/dd/yyyy';
+        if (userDTFormat !== null) {
+            format = format.replace('DD', 'dd');
+            format = format.replace('YYYY', 'yyyy');
+        }
 
         return format;
     }
