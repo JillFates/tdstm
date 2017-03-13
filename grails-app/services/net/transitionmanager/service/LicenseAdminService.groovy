@@ -260,9 +260,10 @@ class LicenseAdminService extends LicenseCommonService {
 					return licState
 				}
 
-
 				def jsonData = JSON.parse(licObj.subject)
 				int gracePeriodDays = jsonData.gracePeriodDays
+				String hostName 	= jsonData.hostName
+				String websitename 	= jsonData.websitename
 
 				String projectName	   = JSON.parse(jsonData.project)?.name
 				log.debug("Lic: {}", licObj.productKey)
@@ -272,11 +273,32 @@ class LicenseAdminService extends LicenseCommonService {
 
 				licState.banner = license.bannerMessage
 
+				String currentHost = getHostName()
+				if(DomainLicense.WILDCARD != hostName && currentHost != hostName){
+					licState.message = """
+						|Error loading license:<br/> 
+						|current host:<br/><strong>${currentHost}</strong><br/>
+						|licensed host:<br/><strong>${hostName}</strong>
+					""".stripMargin()
+					licState.valid = false
+					return licState
+				}
+
+				String fqdn = getFQDN()
+				if(DomainLicense.WILDCARD != websitename && fqdn != websitename){
+					licState.message = """
+						|Error loading license:<br/> 
+						|current website:<br/><strong>${fqdn}</strong><br/>
+						|licensed website:<br/><strong>${websitename}</strong>
+					""".stripMargin()
+					licState.valid = false
+					return licState
+				}
+
 				//The Name still the same?
 				if(projectName != project.name){
-					licState.message = "The name of the project was changed but must be '${projectName}' for license compliance"
+					licState.message = "The name of the project was changed but must be <strong>'${projectName}'</strong> for license compliance"
 					licState.valid = false
-					licState.banner = ""
 					return licState
 				}
 
@@ -391,13 +413,13 @@ class LicenseAdminService extends LicenseCommonService {
 		//if is not wildcard and Sites don't match, FAIL
 		if(DomainLicense.WILDCARD != hostName && getHostName() != hostName){
 			log.debug("[${getHostName()}] == [$hostName]")
-			throw new RuntimeException("Error loading licence data: Wrong Host Name")
+			log.error("Error loading licence data: Wrong Host Name")
 		}
 
 		//if is not wildcard and sitename don't match, FAIL
 		if(DomainLicense.WILDCARD != websitename && getFQDN() != websitename){
 			log.debug("[${getFQDN()}] == [$websitename]")
-			throw new RuntimeException("Error loading licence data: Wrong Website Name")
+			log.error("Error loading licence data: Wrong Website Name")
 		}
 
 		//Refreshing database license properties with the actual values from the Manager License, Keep client honest
