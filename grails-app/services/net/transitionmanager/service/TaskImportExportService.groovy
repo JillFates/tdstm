@@ -82,7 +82,7 @@ class TaskImportExportService implements ServiceMethods {
 
 	// Used in the map below to set the various template strings used by Kendo
 	private static String changeTmpl(String prop) {
-		"\"#= showChanges(data, '$prop') #\""
+		"\"#= !$prop ?'':showChanges(data, '$prop') #\""
 	}
 
 	private static final String errorListTmpl = "kendo.template(\$('#error-template').html())"
