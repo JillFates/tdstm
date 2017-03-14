@@ -48,6 +48,8 @@ module.exports = function(config) {
             'node_modules/zone.js/dist/jasmine-patch.js',
             'node_modules/zone.js/dist/async-test.js',
             'node_modules/zone.js/dist/fake-async-test.js',
+            
+            // { pattern: 'node_modules/@progress/kendo-angular-grid/dist/npm/**/*.js', included: false, watched: false },
 
             // RxJs
             { pattern: 'node_modules/rxjs/**/*.js', included: false, watched: false },
@@ -76,7 +78,12 @@ module.exports = function(config) {
             { pattern: appSrcBase + '**/*.ts', included: false, watched: false },
             { pattern: appBase + '**/*.js.map', included: false, watched: false },
             { pattern: testingSrcBase + '**/*.ts', included: false, watched: false },
-            { pattern: testingBase + '**/*.js.map', included: false, watched: false}
+            { pattern: testingBase + '**/*.js.map', included: false, watched: false},
+
+            'node_modules/@progress/kendo-angular-grid/dist/cdn/js/kendo-angular-grid.js',
+            'node_modules/@progress/kendo-angular-intl/dist/cdn/js/kendo-angular-intl.js',
+            'node_modules/@progress/kendo-angular-l10n/dist/cdn/js/kendo-angular-l10n.js',
+            'node_modules/@ng-bootstrap/ng-bootstrap/bundles/ng-bootstrap.js'
         ],
 
         // Proxied base paths for loading assets

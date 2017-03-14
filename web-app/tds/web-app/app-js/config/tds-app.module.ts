@@ -7,6 +7,8 @@ import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/
 import {FormsModule} from '@angular/forms';
 import {HttpModule, Http} from '@angular/http';
 
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
 import {TDSAppComponent} from './tds-app.component';
 // Providers
 
@@ -25,6 +27,8 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         BrowserModule,
         FormsModule,
         HttpModule,
+        //Bootstrap Module
+        NgbModule.forRoot(),
         // Feature Modules
         SharedModule,
         NoticesManagerModule,

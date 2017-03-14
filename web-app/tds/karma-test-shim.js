@@ -12,7 +12,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
 // builtPaths: root paths for output ("built") files
 // get from karma.config.js, then prefix with '/base/' (default is 'app/')
 var builtPaths = (__karma__.config.builtPaths || ['app/'])
-    .map(function(p) { return '/base/'+p;});
+    .map(function (p) { return '/base/' + p; });
 
 __karma__.loaded = function () { };
 
@@ -27,7 +27,7 @@ function isSpecFile(path) {
 // Is a "built" file if is JavaScript file in one of the "built" folders
 function isBuiltFile(path) {
     return isJsFile(path) &&
-        builtPaths.reduce(function(keep, bp) {
+        builtPaths.reduce(function (keep, bp) {
             return keep || (path.substr(0, bp.length) === bp);
         }, false);
 }
@@ -54,7 +54,7 @@ function createPathRecords(pathsMapping, appPath) {
 System.config({
     baseURL: 'base',
     // Extend usual application package list with test folder
-    packages: { 'testing': { main: 'index.js', defaultExtension: 'js' }},
+    packages: { 'testing': { main: 'index.js', defaultExtension: 'js' } },
 
     // Assume npm: is set in `paths` in systemjs.config
     // Map the angular testing umd bundles
@@ -66,7 +66,12 @@ System.config({
         '@angular/platform-browser-dynamic/testing': 'npm:@angular/platform-browser-dynamic/bundles/platform-browser-dynamic-testing.umd.js',
         '@angular/http/testing': 'npm:@angular/http/bundles/http-testing.umd.js',
         '@angular/router/testing': 'npm:@angular/router/bundles/router-testing.umd.js',
-        '@angular/forms/testing': 'npm:@angular/forms/bundles/forms-testing.umd.js'
+        '@angular/forms/testing': 'npm:@angular/forms/bundles/forms-testing.umd.js',
+        '@progress/kendo-angular-grid': 'npm:@progress/kendo-angular-grid/dist/cdn/js/kendo-angular-grid.js',
+        '@progress/kendo-angular-intl':'npm:@progress/kendo-angular-intl/dist/cdn/js/kendo-angular-intl.js',
+        '@progress/kendo-angular-l10n':'npm:@progress/kendo-angular-l10n/dist/cdn/js/kendo-angular-l10n.js',
+        '@ng-bootstrap/ng-bootstrap': 'npm:@ng-bootstrap/ng-bootstrap/bundles/ng-bootstrap.js'
+
     },
 });
 
@@ -76,9 +81,9 @@ System.import('systemjs.config.js')
     .then(initTesting);
 
 /** Optional SystemJS configuration extras. Keep going w/o it */
-function importSystemJsExtras(){
+function importSystemJsExtras() {
     return System.import('systemjs.config.extras.js')
-        .catch(function(reason) {
+        .catch(function (reason) {
             console.log(
                 'Warning: System.import could not load the optional "systemjs.config.extras.js". Did you omit it by accident? Continuing without it.'
             );
@@ -86,14 +91,14 @@ function importSystemJsExtras(){
         });
 }
 
-function initTestBed(){
+function initTestBed() {
     return Promise.all([
         System.import('@angular/core/testing'),
         System.import('@angular/platform-browser-dynamic/testing')
     ])
 
         .then(function (providers) {
-            var coreTesting    = providers[0];
+            var coreTesting = providers[0];
             var browserTesting = providers[1];
 
             coreTesting.TestBed.initTestEnvironment(
@@ -103,7 +108,7 @@ function initTestBed(){
 }
 
 // Import all spec files and start karma
-function initTesting () {
+function initTesting() {
     return Promise.all(
         allSpecFiles.map(function (moduleName) {
             return System.import(moduleName);
