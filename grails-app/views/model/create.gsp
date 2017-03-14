@@ -58,9 +58,9 @@
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Dimensions(inches):</td>
 			<td>
-			H:<input type="text" size="3" name="height" id="heightId" value=""/>
-			W:<input type="text" size="3" name="width" id="widthId" value=""/>
-			D:<input type="text" size="3" name="depth" id="depthId" value=""/>
+			H:<input type="number" min="0" size="3" name="height" id="heightId" value="" style="width: 44px;"/>
+			W:<input type="number" min="0" size="3" name="width" id="widthId" value="" style="width: 44px;"/>
+			D:<input type="number" min="0" size="3" name="depth" id="depthId" value="" style="width: 44px;"/>
 			</td>
 		</tr>
 		<tr>
@@ -110,8 +110,8 @@
 				<input type="number" size="4" name="powerNameplate" id="powerNameplateCreateId" value="${modelInstance.powerNameplate}"
 					onblur="changePowerValue('Create')" style="width: 50px;"><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;vertical-align: top"
 					onclick="setStanderdPower('Create')"> >> </a>
-				<input type="text" size="4" name="powerDesign" id="powerDesignCreateId" value="${modelInstance.powerDesign}" >&nbsp;
-				<input type="text" size="4" name="powerUse" id="powerUseCreateId" value="${modelInstance.powerUse}" >&nbsp;
+				<input type="number" size="4" name="powerDesign" id="powerDesignCreateId" value="${modelInstance.powerDesign}" style="width: 50px;" >&nbsp;
+				<input type="number" size="4" name="powerUse" id="powerUseCreateId" value="${modelInstance.powerUse}" style="width: 50px;">&nbsp;
 				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${tds.powerType()}" /></td>
 			</td>
 			<td valign="top" class="name">Notes:</td>
@@ -236,10 +236,10 @@
 					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
 					<td><input title="Label" id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
 					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Left','Top','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
-					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosX}"></td>
+					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width: 25px;" type="number" min="0" value="${modelConnector.connectorPosX}"></td>
 					<td>
 						<input id="connectorId${modelConnector.connector}" name="connector${modelConnector.connector}" maxlength="5" style="width: 35px;" type="hidden" value="${modelConnector.connector}">
-						<input id="connectorPosYId${modelConnector.connector}" name="connectorPosY${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosY}">
+						<input id="connectorPosYId${modelConnector.connector}" name="connectorPosY${modelConnector.connector}" maxlength="3" style="width: 25px;" type="number" min="0" value="${modelConnector.connectorPosY}">
 						<input id="statusId${modelConnector.connector}" name="status${modelConnector.connector}" type="hidden" value="${modelConnector.status}">
 					</td>
 				</tr>
@@ -249,10 +249,10 @@
 					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
 					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
-					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 25px;" type="text" value="0"></td>
+					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 35px;" type="number" min="0" value="0"></td>
 					<td>
 						<input id="connectorId${count}" maxlength="5" style="width: 35px;" type="hidden" value="${count}">
-						<input id="connectorPosYId${count}" maxlength="3" style="width: 25px;" type="text" value="360">
+						<input id="connectorPosYId${count}" maxlength="3" style="width: 35px;" type="number" min="0" value="360">
 						<input id="statusId${count}" type="hidden">
 					</td>
 				</tr>
