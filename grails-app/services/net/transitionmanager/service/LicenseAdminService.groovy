@@ -4,6 +4,7 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
+import grails.plugin.mail.MailService
 import groovy.util.logging.Slf4j
 
 import net.nicholaswilliams.java.licensing.License
@@ -34,6 +35,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 	private boolean loaded = false
 	AssetEntityService assetEntityService
+	MailService mailService
 	SecurityService	securityService
 
 	/**
@@ -208,7 +210,7 @@ class LicenseAdminService extends LicenseCommonService {
 			banner 	: ""
 		]
 
-		//Is licence check disabled then is always valid
+		//Is license check disabled then is always valid
 		if (!adminEnabled) {
 			return defaultValidState
 		}
@@ -397,7 +399,8 @@ class LicenseAdminService extends LicenseCommonService {
 		if(licObj == null) return false
 
 		if(license.id != licObj?.productKey){
-			throw new RuntimeException("Error loading licence data: Wrong product Key")
+			log.debug("[${license.id}] == [${licObj?.productKey}]")
+			log.error("Error loading license data: Wrong product Key")
 		}
 
 		def jsonData = JSON.parse(licObj.subject)
@@ -413,13 +416,13 @@ class LicenseAdminService extends LicenseCommonService {
 		//if is not wildcard and Sites don't match, FAIL
 		if(DomainLicense.WILDCARD != hostName && getHostName() != hostName){
 			log.debug("[${getHostName()}] == [$hostName]")
-			log.error("Error loading licence data: Wrong Host Name")
+			log.error("Error loading license data: Wrong Host Name")
 		}
 
 		//if is not wildcard and sitename don't match, FAIL
 		if(DomainLicense.WILDCARD != websitename && getFQDN() != websitename){
 			log.debug("[${getFQDN()}] == [$websitename]")
-			log.error("Error loading licence data: Wrong Website Name")
+			log.error("Error loading license data: Wrong Website Name")
 		}
 
 		//Refreshing database license properties with the actual values from the Manager License, Keep client honest
@@ -463,7 +466,7 @@ class LicenseAdminService extends LicenseCommonService {
 		DomainLicense lic
 
 		if (uuid != null && !uuid.isNumber()) {
-        	throw new IllegalArgumentException('Not a licence Id number')
+        	throw new IllegalArgumentException('Not a license Id number')
         }
 
 		if(uuid){
@@ -499,6 +502,7 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 
         if (lic.save(flush:true)) {
+			sendMailRequest(lic)
         	return lic
         } else {
         	if (lic.hasErrors()) {
@@ -509,6 +513,39 @@ class LicenseAdminService extends LicenseCommonService {
         }
     }
 
+	boolean resubmitRequest(String uuid){
+		DomainLicense license = DomainLicense.get(uuid)
+		if(license){
+			sendMailRequest(license)
+		}else{
+			log.error("License Request identified by '${uuid}' not found")
+			false
+		}
+	}
+
+	private sendMailRequest(DomainLicense license){
+		log.info("SEND License Request")
+		String toEmail = grailsApplication.config.tdstm?.license?.request_email
+
+		if(toEmail) {
+			String message = license.toEncodedMessage()
+			String buff = ""
+			message.eachLine{ line ->
+				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'
+			}
+
+			mailService.sendMail {
+				to toEmail
+				subject "License Request"
+				body buff
+			}
+			true
+
+		}else{
+			log.error("tdstm.license.request_email not found in the configuration")
+			false
+		}
+	}
 
 
     /**

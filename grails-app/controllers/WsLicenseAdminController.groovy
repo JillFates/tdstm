@@ -184,6 +184,14 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 	}
 
+	def emailRequest(String id){
+		if(licenseAdminService.resubmitRequest(id)){
+			renderSuccessJson("Ok")
+		}else{
+			renderFailureJson("Email could not be sent")
+		}
+	}
+
 
 	/*** HELPER *************************/
 	/* I believe that this should be on the trait  ¬¬ */

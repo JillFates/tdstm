@@ -277,12 +277,19 @@ class UrlMappings {
 			]
 		}
 
-
 		//Requests
 		"/ws/license/request" {
 			controller = "wsLicenseAdmin"
 			action = [
 			        POST: "generateRequest"
+			]
+		}
+
+		//Resubmit License Request
+		"/ws/license/$id/email/request" {
+			controller = "wsLicenseAdmin"
+			action = [
+					POST: "emailRequest"
 			]
 		}
 

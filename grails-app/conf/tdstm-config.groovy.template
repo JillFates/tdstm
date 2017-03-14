@@ -29,6 +29,7 @@ grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 tdstm.admin.serviceRestartCommand = "service tomcat_tranman01 restart"
 
 tdstm {
+  license.request_email = "*** EMAIL ADDRESS ***"
 
 	admin {
 		// The command to be executed to restart the application
