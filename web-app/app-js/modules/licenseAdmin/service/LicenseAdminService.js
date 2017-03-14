@@ -49,10 +49,17 @@ export default class LicenseAdminService {
         });
     }
 
-    resubmitLicenseRequest(license, callback) {
-        this.restService.licenseAdminServiceHandler().resubmitLicenseRequest(license, (data) => {
-            this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'Request License was successfully.'});
-            return callback(data);
+    resubmitLicenseRequest(license, onSuccess) {
+        this.restService.licenseAdminServiceHandler().resubmitLicenseRequest(license.id, (data) => {
+
+            if(data.status === this.statusSuccess) {
+                this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'Request License was successfully'});
+            } else {
+                this.rootScope.$emit('broadcast-msg', { type: 'warning', text: data.data});
+                return onSuccess({ success: false});
+            }
+
+            return onSuccess(data);
         });
     }
 

@@ -80,11 +80,10 @@ export default class RestServiceHandler {
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             //--------------------------------------------
-            resubmitLicenseRequest: (data, callback) => {
+            resubmitLicenseRequest: (licenseId, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/???';
-                this.req.data = data;
-                return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
+                this.req.url =  '../ws/license/' + licenseId + '/email/request';
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             emailRequest: (data, callback) => {
                 this.req.method = 'POST';
