@@ -13,7 +13,7 @@
 
 	</head>
 	<body>
-	<tds:subHeader title="Project Details" crumbs="['Project', 'Detail']"/><br />
+	<tds:subHeader title="Project Details" crumbs="['Project', 'Detail']"/>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>

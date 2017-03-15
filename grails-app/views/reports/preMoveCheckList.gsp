@@ -6,7 +6,7 @@
 <title>Pre-Event Checklist</title>
 </head>
 <body>
-<tds:subHeader title="Pre-Event Checklist" crumbs="['Reports','Pre-Event Checklist']"/> <br />
+<tds:subHeader title="Pre-Event Checklist" crumbs="['Reports','Pre-Event Checklist']"/>
 <div class="body">
 		<div class="message" id="preMoveErrorId" style="display: none">Please select the event to start the report.</div>
 		<g:if test="${flash.message}">

@@ -11,7 +11,7 @@ a:hover {
 </style>
 </head>
 <body>
-	<tds:subHeader title="Summary Report" crumbs="['Admin','Portal','Summary Report']"/> <br/>
+	<tds:subHeader title="Summary Report" crumbs="['Admin','Portal','Summary Report']"/>
 <div class="body">
 <div>&nbsp;</div>
 	<div>

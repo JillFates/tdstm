@@ -332,7 +332,7 @@
 		</script>
 	</head>
 	<body>
-		<tds:subHeader title="Task Graph" crumbs="['Task','Graph']"/><br />
+		<tds:subHeader title="Task Graph" crumbs="['Task','Graph']"/>
 		<input type="hidden" id="timeBarValueId" value="0"/>
 		<div class="taskTimebar hide" id="issueTimebar" >
 			<div id="issueTimebarId"></div>

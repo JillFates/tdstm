@@ -82,7 +82,7 @@
 		</script>
 	</head>
 	<body>
-		<tds:subHeader title="Asset Comment" crumbs="['Assets','Comments']"/><br />
+		<tds:subHeader title="Asset Comment" crumbs="['Assets','Comments']"/>
 		<div id="commentScopeId" class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 
 			<g:if test="${flash.message}">

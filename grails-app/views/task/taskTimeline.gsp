@@ -22,7 +22,7 @@
 		<g:javascript src="task-timeline.js" />
 	</head>
 	<body>
-		<tds:subHeader title="Task Timeline" crumbs="['Task','Timeline']"/><br />
+		<tds:subHeader title="Task Timeline" crumbs="['Task','Timeline']"/>
 		<input type="hidden" id="timeBarValueId" value="0"/>
 		<div class="taskTimebar hide" id="issueTimebar">
 			<div id="issueTimebarId"></div>

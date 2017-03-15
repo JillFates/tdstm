@@ -27,7 +27,7 @@
 		<g:javascript src="generator/generator.js" />
 	</head>
 	<body>
-		<tds:subHeader title="Dependency Analyzer" crumbs="['Assets','Dependency Analyzer']"/><br />
+		<tds:subHeader title="Dependency Analyzer" crumbs="['Assets','Dependency Analyzer']"/>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<div id="DependencyGroupsTableId" style="min-width: 1000px;">

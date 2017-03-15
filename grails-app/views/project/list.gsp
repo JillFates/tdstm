@@ -54,7 +54,7 @@
 		</style>
 	</head>
 	<body>
-	<tds:subHeader title="Project List - ${active=='active' ? 'Active' : 'Completed'} Projects" crumbs="['Project', active=='active' ? 'Active' : 'Completed' ]"/><br />
+	<tds:subHeader title="Project List - ${active=='active' ? 'Active' : 'Completed'} Projects" crumbs="['Project', active=='active' ? 'Active' : 'Completed' ]"/>
 		<div class="body fluid">
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">

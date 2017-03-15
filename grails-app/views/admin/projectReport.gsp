@@ -6,7 +6,7 @@
 <title>Projects Summary Report</title>
 </head>
 <body>
-<tds:subHeader title="Projects Summary Report" crumbs="['Admin','Portal','Projects Summary Report']"/><br/>
+<tds:subHeader title="Projects Summary Report" crumbs="['Admin','Portal','Projects Summary Report']"/>
 <div class="body">
 <div class="dialog">
 <g:form method="post" name="reportSummaryFormId"  action="projectSummaryReport">

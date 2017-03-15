@@ -6,7 +6,7 @@
 	</head>
 	<script type="text/javascript"></script>
 	<body>
-		<tds:subHeader title="Export Runbook" crumbs="['Planning','Export Runbook']"/> <br />
+		<tds:subHeader title="Export Runbook" crumbs="['Planning','Export Runbook']"/>
 		<g:form name="moveEventForm" action="exportRunbookToExcel">
 			<div class="body">
 

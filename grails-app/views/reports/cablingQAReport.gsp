@@ -25,7 +25,7 @@
 
 </head>
 <body>
-<tds:subHeader title="Cabling ${ type == 'QA' ? 'QA' : 'Conflict' } Report " crumbs="['Reports', 'Cabling ' +( type == 'QA' ? 'QA' : 'Conflict')]"/> <br />
+<tds:subHeader title="Cabling ${ type == 'QA' ? 'QA' : 'Conflict' } Report " crumbs="['Reports', 'Cabling ' +( type == 'QA' ? 'QA' : 'Conflict')]"/>
 <div class="body">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>

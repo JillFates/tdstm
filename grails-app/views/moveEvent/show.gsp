@@ -5,7 +5,7 @@
         <title>Show Event</title>
     </head>
     <body>
-		<tds:subHeader title="Event Details" crumbs="['Planning','Event', 'Details']"/> <br />
+		<tds:subHeader title="Event Details" crumbs="['Planning','Event', 'Details']"/>
         <div class="body">
             <div class="nav" style="border: 1px solid #CCCCCC; height: 25px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>

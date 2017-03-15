@@ -10,7 +10,7 @@
 	</style>
 </head>
 <body style="font-family:'helvetica','arial';">
-<tds:subHeader title="Project Daily Metrics Job" crumbs="['Admin','Portal','Project Daily Metrics Job']"/><br/>
+<tds:subHeader title="Project Daily Metrics Job" crumbs="['Admin','Portal','Project Daily Metrics Job']"/>
 <div class="body">
 <div>
 	<g:if test="${flash.message}">

@@ -15,7 +15,6 @@
 </head>
 <body>
 	<tds:subHeader title="My Task" crumbs="['Tasks','My Task']"/>
-	<br>
 	<script type="text/javascript">
 		//Some Preferences
 		window.PREFS = {

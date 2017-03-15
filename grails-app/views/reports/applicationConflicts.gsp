@@ -8,7 +8,7 @@
 <g:javascript src="report.js"/>
 </head>
 <body>
-	<tds:subHeader title="Application Conflicts" crumbs="['Reports', 'Application']"/> <br />
+	<tds:subHeader title="Application Conflicts" crumbs="['Reports', 'Application']"/>
 	<div class="body">
 		<div class="message" id="preMoveErrorId" style="display: none">Please select the bundle to start the report.</div>
 		

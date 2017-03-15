@@ -141,7 +141,7 @@
                     Project:&nbsp;<g:select id="userProjectId" name="projectId" from="${projects}" optionKey="id" optionValue="name" value="${projectInstance.id}" style="width: 250px;"/>
                 </div>
 
-                <div class="panel-body">
+                <div class="panel-body" style="margin-top: -20px;">
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-md-6 cell-container">

@@ -71,7 +71,7 @@
 		</script>
 	</head>
 	<body>
-		<tds:subHeader title="Dependencies List" crumbs="['Assets','Dependencies']"/><br />
+		<tds:subHeader title="Dependencies List" crumbs="['Assets','Dependencies']"/>
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>

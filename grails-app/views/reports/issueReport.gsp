@@ -38,7 +38,7 @@
     </script>
 </head>
 <body>
-<tds:subHeader title="Issue Report" crumbs="['Reports','Issue']"/><br />
+<tds:subHeader title="Issue Report" crumbs="['Reports','Issue']"/>
 <div class="body">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>

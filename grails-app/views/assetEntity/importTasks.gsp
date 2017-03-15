@@ -14,7 +14,7 @@
 			});
 		});
 	</script>
-	<div class="body body-disabled-float">
+	<div class="body body-disabled-float" style=" margin-top: -15px;">
 		<g:if test="${flash.message}">
 			<div class="message">${raw(flash.message)}</div>
 		</g:if>

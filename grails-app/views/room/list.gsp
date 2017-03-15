@@ -38,7 +38,7 @@
 		<!-- do nothing -->
 	</g:if>
 	<g:else>
-		<tds:subHeader title="Room List" crumbs="['Data Center', 'Room List']"/><br />
+		<tds:subHeader title="Room List" crumbs="['Data Center', 'Room List']"/>
 	</g:else>
 		<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
 		<div class="body fluid" style="margin-top: 10px;width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">

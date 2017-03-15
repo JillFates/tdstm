@@ -20,7 +20,7 @@
 </head>
 
 <body>
-<tds:subHeader title="Rack Elevations" crumbs="['Data Center', 'Rack Elevations']"/><br />
+<tds:subHeader title="Rack Elevations" crumbs="['Data Center', 'Rack Elevations']"/>
 <div class="body" style="width:98%;" ng-app="tdsComments"
      ng-controller="tds.comments.controller.MainController as comments">
 

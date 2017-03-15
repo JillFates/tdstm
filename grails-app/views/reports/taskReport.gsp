@@ -6,7 +6,7 @@
 <title>Task Report</title>
 </head>
 <body>
-<tds:subHeader title="Task Report" crumbs="['Report','Task Report']"/><br />
+<tds:subHeader title="Task Report" crumbs="['Report','Task Report']"/>
 <div class="body">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>

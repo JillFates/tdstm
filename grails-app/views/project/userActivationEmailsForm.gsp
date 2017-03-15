@@ -7,7 +7,7 @@
 	<title>User Activation Emails</title>
 </head>
 <body>
-<tds:subHeader title="User Activation Emails" crumbs="['Project', 'Emails']"/><br />
+<tds:subHeader title="User Activation Emails" crumbs="['Project', 'Emails']"/>
 <div class="body">
 	<p>This form is used to initiate the user account activation process for staff of the project whom have new account properly configured in TransitionManager. By selecting the users and submitting the form, an activation email notification will be sent to each individual so that they can login and set their own passwords.</p><br/>
 	<g:if test="${flash.message}">
