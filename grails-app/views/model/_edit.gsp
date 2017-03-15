@@ -316,7 +316,7 @@
 	<tr>
 		<td colspan="2">
 			<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
-				<tds:hasPermission permission="EditModel">
+				<tds:hasPermission permission="ModelEdit">
 					<input id="modelId" name="id" value="${modelInstance.id}" type="hidden"/>
 					<input type="hidden" name="redirectTo" value="${redirectTo }" />
 					<span class="button">

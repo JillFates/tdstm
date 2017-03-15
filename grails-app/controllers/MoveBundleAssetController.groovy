@@ -1,5 +1,6 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.common.security.spring.HasPermission
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -24,11 +25,13 @@ class MoveBundleAssetController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
+	@HasPermission('AssetView')
 	def list() {
 		if (!params.max) params.max = 10
 		[moveBundleAssetInstanceList: AssetEntity.list(params)]
 	}
 
+	@HasPermission('AssetView')
 	def show() {
 		AssetEntity moveBundleAsset = AssetEntity.get(params.id)
 		if (!moveBundleAsset) {
@@ -40,6 +43,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		[moveBundleAssetInstance: moveBundleAsset]
 	}
 
+	@HasPermission('AssetDelete')
 	def delete() {
 		AssetEntity moveBundleAsset = AssetEntity.get(params.id)
 		if (moveBundleAsset) {
@@ -52,6 +56,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		redirect(action: "list")
 	}
 
+	@HasPermission('AssetEdit')
 	def edit() {
 		def moveBundleAsset = AssetEntity.get(params.id)
 		if (!moveBundleAsset) {
@@ -63,6 +68,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		[moveBundleAssetInstance: moveBundleAsset]
 	}
 
+	@HasPermission('AssetEdit')
 	def update() {
 		def moveBundleAsset = AssetEntity.get(params.id)
 		if (moveBundleAsset) {
@@ -81,10 +87,12 @@ class MoveBundleAssetController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('AssetCreate')
 	def create() {
 		[moveBundleAssetInstance: new AssetEntity(params)]
 	}
 
+	@HasPermission('AssetCreate')
 	def save() {
 		def moveBundleAsset = new AssetEntity(params)
 		if (!moveBundleAsset.hasErrors() && moveBundleAsset.save()) {
@@ -96,6 +104,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('AssetEdit')
 	def assignAssetsToBundle() {
 		Project project = securityService.userCurrentProject
 		def moveBundle
@@ -117,6 +126,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		         params: [bundleLeft: moveBundleLeft.id, bundleRight: moveBundle.id])
 	}
 
+	@HasPermission('AssetEdit')
 	def assignAssetsToBundleChange() {
 		def bundleRight = params.bundleRight
 		def bundleLeft = params.bundleLeft
@@ -179,6 +189,7 @@ class MoveBundleAssetController implements ControllerMethods {
 	/*
 	 *  Sort Assets By Selected Row Column
 	 */
+	@HasPermission('AssetView')
 	def sortAssetList() {
 		def rightBundleId = params.rightBundle
 		def leftBundleId = params.leftBundle
@@ -278,6 +289,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		               moveBundleAssets: moveBundleAssets, sideField: params.side])
 	}
 
+	@HasPermission('AssetEdit')
 	def saveAssetsToBundle() {
 		def bundleFrom = params.bundleFrom
 		def bundleTo = params.bundleTo
@@ -296,6 +308,7 @@ class MoveBundleAssetController implements ControllerMethods {
 	}
 
 	//get teams for selected bundles.
+	@HasPermission('MoveBundleView')
 	def retrieveTeamsForBundles() {
 		def bundleId = params.bundleId
 		List<ProjectTeam> teams
@@ -311,11 +324,13 @@ class MoveBundleAssetController implements ControllerMethods {
 	}
 
 	//Get the List of Racks corresponding to Selected Bundle
+	@HasPermission('MoveBundleView')
 	def retrieveRacksForBundles() {
 		def assetEntityList = AssetEntity.findAllByMoveBundle(MoveBundle.load(params.bundleId))
 		renderAsJson(assetEntityList.collect { [id: it.sourceRack, name: it.sourceRack] })
 	}
 
+	@HasPermission('RackView')
 	def retrieveRackDetails() {
 		Long bundleId = params.long('bundleId')
 		def sourceRackList
@@ -352,6 +367,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		renderAsJson([[sourceRackList: sourceRackList, targetRackList: targetRackList]])
 	}
 
+	@HasPermission('AssetView')
 	def retrieveAssetTagLabelData() {
 		def moveBundleId = params.moveBundle
 		def projectId = params.project

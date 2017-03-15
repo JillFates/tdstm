@@ -321,7 +321,7 @@ grails {
 				'/app-js/**'		:'permitAll', // Angular - resources
 				'/i18n/**'			:'permitAll', // Angular - Translate
 				'/test/**'			:'permitAll', // Angular - Test
-				'/monitoring'		:'hasPermission(request, "ViewAdminTools")',
+				'/monitoring'		:'hasPermission(request, "AdminUtilitiesAccess")',
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',

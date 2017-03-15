@@ -1351,9 +1351,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
-		securityService.requirePermission 'GenerateTasks'
+		securityService.requirePermission 'RecipeGenerateTasks'
 		if (publishTasks) {
-			securityService.requirePermission 'PublishTasks'
+			securityService.requirePermission 'TaskPublish'
 		}
 
 		// Validate that we have a valid recipeVersionId and is associated with the user's project
@@ -4828,7 +4828,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param taskBatchId - the id of the TaskBatch to be reset
 	 */
 	def resetTasksOfTaskBatch(taskBatchId) {
-		securityService.requirePermission 'PublishTasks'
+		securityService.requirePermission 'TaskPublish'
 		controllerService.getRequiredProject()
 
 		resetTaskDataForTaskBatch(getRequired(TaskBatch, taskBatchId))
@@ -4841,7 +4841,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return the number of affected tasks
 	 */
 	def publish(taskId) {
-		return basicPublish(taskId, true, "PublishTasks")
+		return basicPublish(taskId, true, "TaskPublish")
 	}
 
 	/**
@@ -4851,7 +4851,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return the number of affected tasks
 	 */
 	def unpublish(taskId) {
-		return basicPublish(taskId, false, "PublishTasks")
+		return basicPublish(taskId, false, "TaskPublish")
 	}
 
 	/**
@@ -4890,7 +4890,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		String currentUsername = securityService.currentUsername
 		log.debug "User $currentUsername is attempting to delete TaskBatch $taskBatchId"
 
-		securityService.requirePermission 'DeleteTaskBatch'
+		securityService.requirePermission 'TaskBatchDelete'
 		controllerService.getRequiredProject()
 
 		TaskBatch taskBatch = getRequired(TaskBatch, taskBatchId)

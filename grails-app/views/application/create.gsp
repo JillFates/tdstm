@@ -7,7 +7,7 @@
 	$("#createStaffDialog").dialog({ autoOpen: false })
 	
 	var myOption = "<option value='0'>Add Person...</option>"
-	<tds:hasPermission permission='PersonCreateView'>
+	<tds:hasPermission permission='PersonCreate'>
 		$("#sme1 option:first").after(myOption);
 		$("#sme2 option:first").after(myOption);
 		$("#appOwner option:first").after(myOption);

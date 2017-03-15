@@ -789,7 +789,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 	 */
 	@Transactional
 	String assignToProjectEvent(personId, eventId, teamCode, toAssign) {
-		securityService.requirePermission 'EditProjectStaff'
+		securityService.requirePermission 'ProjectStaffEdit'
 
 		String message = ""
 
@@ -950,7 +950,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		List currentUserProjects = getAvailableProjects(byWhom)*.id
 		List personProjects = getAvailableProjects(personToAccess)*.id
 
-		if (forEdit && !securityService.hasPermission('EditUserLogin')) {
+		if (forEdit && !securityService.hasPermission('UserEdit')) {
 			if (reportViolation) {
 				reportViolation("attempted to edit person $personToAccess ($personToAccess.id) without permission")
 			}
@@ -1539,7 +1539,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		// If not edit own account, the user must have privilege to edit the account
 		boolean editSelf = NumberUtil.toLong(personId) == byWhom.id
 		if (!editSelf) {
-			if (! securityService.hasPermission(byWhom.userLogin, 'PersonEditView', true)) {
+			if (! securityService.hasPermission(byWhom.userLogin, 'PersonEdit', true)) {
 				throw new EmptyResultException('You do not have access to referenced person')
 			}
 			//securityService.requirePermission('PersonEditView', false,

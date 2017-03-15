@@ -22,6 +22,7 @@ class CommonController implements ControllerMethods {
 	ProjectService projectService
 	SecurityService securityService
 
+	// TODO: This should be deleted
 	def index() { }
 
 	/**
@@ -29,6 +30,7 @@ class CommonController implements ControllerMethods {
 	 * @param : entityType type of entity.
 	 * @return : Json data.
 	 */
+	@HasPermission('ProjectFieldSettingsView')
 	def tooltips() {
 		def entityType = request.JSON.entityType
 		def keyValueMap = [:]
@@ -56,7 +58,7 @@ class CommonController implements ControllerMethods {
 	 * @param : entityType type of entity.
 	 * @return success string.
 	 */
-	@HasPermission('EditProjectFieldSettings')
+	@HasPermission('ProjectFieldSettingsEdit')
 	def tooltipsUpdate() {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
@@ -105,11 +107,13 @@ class CommonController implements ControllerMethods {
 	 * @param : entityType type of entity.
 	 * @return : json data.
 	 */
+	@HasPermission('UserGeneralAccess')
 	def retrieveTooltips() {
 		renderAsJson assetEntityService.retrieveTooltips(EntityType.getKeyByText(params.type),
 				securityService.userCurrentProject)
 	}
 
+	@HasPermission('UserGeneralAccess')
 	def tmLinkableUrl() {
 		String errMsg
 		try {

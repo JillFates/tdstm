@@ -11,7 +11,7 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var listCaption ="Projects: \
-				<tds:hasPermission permission='CreateProject'>\
+				<tds:hasPermission permission='ProjectCreate'>\
 					<span class='capBtn'><input type='button' class='create' value='Create Project' onClick=\"window.location.href=\'"+contextPath+"/project/create\'\"/></span> \
 					<span class='capBtn'><input type='button' class='create' value='Create Demo Project' onClick=\"window.location.href=\'"+contextPath+"/projectUtil/createDemo\'\" /></span>\
 				</tds:hasPermission>\

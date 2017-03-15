@@ -29,7 +29,7 @@
 							<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a><br />
 							<input type="hidden" name="viewType" value="list" />
 							<button type="submit" class="btn btn-default" ><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> List</button>
-							<tds:hasPermission permission='RoomEditView'>
+							<tds:hasPermission permission='RoomEdit'>
 								<button type="button" value="Edit" class="btn btn-default" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Edit</button>
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetEdit'>

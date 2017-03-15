@@ -212,7 +212,7 @@
                         </div>
                     </div><!-- /.box-body -->
 
-                    <tds:hasPermission permission="Import">
+                    <tds:hasPermission permission="AssetImport">
                         <div class="box-footer">
                             <button type="submit" id="run"  class="btn btn-primary">Import Spreadsheet&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
                             <div class="box-footer-url-right"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></div>

@@ -554,7 +554,7 @@ class ProjectService implements ServiceMethods {
 	@Transactional
 	def deleteProject(prokectId, includeProject=false) throws UnauthorizedException {
 		def message
-		def projects = getUserProjects(securityService.hasPermission("ShowAllProjects"))
+		def projects = getUserProjects(securityService.hasPermission("ProjectShowAll"))
 		def projectInstance = Project.get(prokectId)
 
 		if(!(projectInstance in projects)){
@@ -1532,7 +1532,7 @@ class ProjectService implements ServiceMethods {
 	}
 
 	boolean hasAccessToProject(UserLogin userLogin = null, long projectId) {
-		return projectId in (getUserProjects(securityService.hasPermission("ShowAllProjects"), null, null, userLogin)*.id)
+		return projectId in (getUserProjects(securityService.hasPermission("ProjectShowAll"), null, null, userLogin)*.id)
 	}
 
 	        /**

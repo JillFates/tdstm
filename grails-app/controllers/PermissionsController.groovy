@@ -16,24 +16,23 @@ class PermissionsController implements ControllerMethods {
 	def show() {
 		def permissions = Permissions.withCriteria {
 			and {
-			   order('permissionGroup','asc')
 			   order('permissionItem','asc')
 			}
 		}
 		[permissions:permissions]
 	}
 
-	@HasPermission('RolePermissionView')
+	@HasPermission('RolePermissionEdit')
 	def edit() {
 		List permissions = Permissions.withCriteria {
 			and {
-				order('permissionGroup','asc')
 				order('permissionItem','asc')
 			}
 		}
 		[permissions:permissions]
 	}
 
+	@HasPermission('RolePermissionEdit')
 	def update() {
 		def paramList = params.column
 		jdbcTemplate.update("delete from role_permissions")

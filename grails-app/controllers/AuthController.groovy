@@ -1,5 +1,6 @@
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
@@ -85,7 +86,7 @@ class AuthController implements ControllerMethods {
 				uri = '/projectUtil'
 			}
 			else if (startPage == 'Current Dashboard') {
-				if (securityService.hasPermission('MoveBundleShowView')) {
+				if (securityService.hasPermission('BundleView')) {
 					uri = '/moveBundle/planningStats'
 				}
 				else {
@@ -137,6 +138,7 @@ class AuthController implements ControllerMethods {
 	/*
 	 *  Action to navigate the admin control home page
 	 */
+	// TODO: This should be deleted
 	def home() {
 		Date dateNow = TimeUtil.nowGMT()
 		long timeNow = dateNow.time
@@ -175,6 +177,7 @@ class AuthController implements ControllerMethods {
 		[recentUsers: recentUsers, moveEventsList: moveEventsData, upcomingBundles: upcomingBundles]
 	}
 
+	// TODO: This should be deleted
 	def maintMode() {
 		//Do nothing
 	}
@@ -208,6 +211,7 @@ class AuthController implements ControllerMethods {
 	/**
 	 * The 3rd step in the password reset process where the user is prompted for their email address and their new password.
 	 */
+	@HasPermission('UserResetOwnPassword')
 	def resetPassword() {
 		String token = params.token
 		PasswordReset pr
@@ -233,6 +237,7 @@ class AuthController implements ControllerMethods {
 	 * to their landing page along with a message that their password was changed. If it fails it will return to the
 	 * reset password form.
 	 */
+	@HasPermission('UserResetOwnPassword')
 	def applyNewPassword() {
 		try {
 			PasswordReset pr = securityService.applyPasswordFromPasswordReset(params.token, params.password, params.email)

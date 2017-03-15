@@ -321,12 +321,12 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param response - the HttpResponse object to write the spreadsheet to
 	 * @param project - the user's current project
 	 * @param formOptions - the params values used by the request
-	 * @permission PersonExport, EditUserLogin
+	 * @permission PersonExport, UserEdit
 	 */
 	void generateAccountsExportToBrowser(response, Project project, Map formOptions) {
 		securityService.requirePermission('PersonExport', true)
 		if (shouldUpdateUserLogin(formOptions)) {
-			securityService.requirePermission('ExportUserLogin', true)
+			securityService.requirePermission('UserExport', true)
 		}
 
 		int loginChoice = NumberUtil.toPositiveLong(formOptions.loginChoice, -1)
@@ -365,7 +365,7 @@ class AccountImportExportService implements ServiceMethods {
 			securityService.requirePermission('PersonImport', true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission('UserImport', true)
 		}
 
 		Map model = [:]
@@ -423,7 +423,7 @@ class AccountImportExportService implements ServiceMethods {
 	List generateReviewData(Project project, String filename, Map formOptions) {
 		securityService.requirePermission('PersonImport', true)
 		if (shouldUpdateUserLogin(formOptions)) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission('UserImport', true)
 		}
 
 		// Load the spreadsheet
@@ -447,7 +447,7 @@ class AccountImportExportService implements ServiceMethods {
 	File generatePostResultsData(String filename, Map formOptions) {
 		securityService.requirePermission('PersonImport', true)
 		if (shouldUpdateUserLogin(formOptions)) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission('UserImport', true)
 		}
 
 		File file = new File(getJsonFilename(filename))
@@ -476,7 +476,7 @@ class AccountImportExportService implements ServiceMethods {
 			securityService.requirePermission('PersonImport', true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission('UserImport', true)
 		}
 
 		Map model = [:]
@@ -529,7 +529,7 @@ class AccountImportExportService implements ServiceMethods {
 			securityService.requirePermission('PersonImport', true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission('UserImport', true)
 		}
 
 		Map model = [:]
@@ -564,7 +564,7 @@ class AccountImportExportService implements ServiceMethods {
 			securityService.requirePermission('PersonImport', true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission('UserImport', true)
 		}
 
 		Workbook workbook = readImportSpreadsheet(formOptions.filename)
@@ -774,7 +774,7 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param params - the parameters from the HttpRequest
 	 */
 	void cancelPreviousUpload(Project project, Map formOptions) {
-		securityService.requirePermission(['PersonImport', 'ImportUserLogin'], false,
+		securityService.requirePermission(['PersonImport', 'UserImport'], false,
 			"attempted to cancel an account import for project $project")
 
 		deleteUploadedSpreadsheet(formOptions.filename)
@@ -785,7 +785,7 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param formOptions - the params which will include the filename
 	 */
 	void deletePreviousUpload(Map formOptions) {
-		securityService.requirePermission(['PersonImport', 'ImportUserLogin'], false,
+		securityService.requirePermission(['PersonImport', 'UserImport'], false,
 			"attempted to delete an uploaded account import spreadsheet($formOptions.filename)")
 
 		deleteUploadedSpreadsheet(formOptions.filename)

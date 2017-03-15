@@ -241,7 +241,7 @@
 					<label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>
 				</span>
 				&nbsp;&nbsp;
-				<tds:hasPermission permission="PublishTasks">
+				<tds:hasPermission permission="TaskPublish">
 					<span class="checkboxContainer">
 						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/>
 						<label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>

@@ -1,4 +1,5 @@
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.common.security.spring.HasPermission
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveEvent
@@ -8,14 +9,15 @@ import org.springframework.jdbc.core.JdbcTemplate
 import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class MoveEventNewsController implements ControllerMethods {
-
+	
 	JdbcTemplate jdbcTemplate
 	StateEngineService stateEngineService
-
+	
 	/* will return the list of AssetComments and MoveEventNews
 	 * @param : moveEventId?type=[N|I}&state=[L|A]&maxLen= n &sort=[A|D]
 	 * @return : union (AssetComments , MoveEventNews)
 	 */
+	@HasPermission('NewsView')
 	def list() {
 		def projectId = securityService.userCurrentProjectId
 		def moveEventId = params.id
@@ -85,11 +87,11 @@ class MoveEventNewsController implements ControllerMethods {
 
 		render totalComments as JSON
 	}
+	
 	/* will truncate the test to specified length
 	 * @param : text as value
 	 * @param : length to truncate
 	 */
-
 	def truncate(def value, def length) {
 		if (value) {
 			def size = value.size()

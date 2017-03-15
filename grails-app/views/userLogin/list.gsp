@@ -41,7 +41,7 @@
 
 
 				var listCaption = "Users: \
-				<tds:hasPermission permission='CreateUserLogin'>\
+				<tds:hasPermission permission='UserCreate'>\
 					<span class='capBtn'><input type='button' value='Create User Login' onClick=\"redirectToListStaff()\"/></span> \
 				</tds:hasPermission>\
 				<span class='capBtn'><input type='button' value=' Show ${isActive == 'N' ? 'Active' : 'Inactive'} Users' onClick=\"$(\'#showActiveId\').val(${(session.getAttribute('InActive') == 'N')?"\'Y\'":"\'N\'"});submitForm();\"/></span>"
@@ -77,7 +77,7 @@
 				function actionFormatter (cellVal, options, rowObject) {
 					var unlockButton = '';
 					<g:if test="${isActive != 'N'}">
-						<tds:hasPermission permission="UnlockUserLogin">
+						<tds:hasPermission permission="UserUnlock">
 							if (cellVal.lockedOutUntil && cellVal.lockedOutTime.charAt(0) != '-')
 								unlockButton += "<img tm-unlock-account src='${resource(dir:'icons',file:'lock_delete.png')}' border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
 						</tds:hasPermission>

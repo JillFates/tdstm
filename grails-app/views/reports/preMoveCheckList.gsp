@@ -30,7 +30,7 @@
 						</td>
 					</tr>
 					<tr class="buttonR">
-					<tds:hasPermission permission="ShowMovePrep">
+					<tds:hasPermission permission="ReportViewEventPrep">
 						<td>
 							<button type="submit" class="btn btn-default" onclick="return verifyEvent();">
 								Generate

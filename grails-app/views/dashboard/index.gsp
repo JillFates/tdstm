@@ -37,7 +37,7 @@
 										</option>
 									</g:each>
 								</select>
-								<tds:hasPermission permission="PublishTasks">
+								<tds:hasPermission permission="TaskPublish">
 									<span class="checkboxContainer">
 										&nbsp;&nbsp;
 										<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="toggleUnpublished(event)"/><!--

@@ -94,7 +94,7 @@ class ImportService implements ServiceMethods {
 				project.id, userLogin, assetClass, batchId, new Date()
 
 		// TODO BB
-		securityService.requirePermission userLogin.toString(), 'Import', false,
+		securityService.requirePermission userLogin.toString(), 'AssetImport', false,
 				"Attempted to process asset imports without permission, project:$project, batchId:$batchId"
 
 		Long id = NumberUtil.toLong(batchId)
@@ -370,7 +370,7 @@ class ImportService implements ServiceMethods {
 				sb.append("<li>Mfg: $d.mfg | Model: $d.model | $d.count reference${d.count > 1 ? '(s)' : ''}</li>")
 			}
 			sb.append('</ul>')
-			if (!securityService.hasPermission(userLogin, 'NewModelsFromImport')) {
+			if (!securityService.hasPermission(userLogin, 'ModelCreateFromImport')) {
 				sb.append("$indent <b>Note: You do not have the permission necessary to create models during import</b><br>")
 			}
 		}
@@ -1115,7 +1115,7 @@ class ImportService implements ServiceMethods {
 					log.debug "$methodName Did not find asset in cache so calling assetEntityAttributeLoaderService.assignMfgAndModelToDevice()"
 					// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
 					Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, asset, mfgName,
-						modelName, deviceType, deviceTypeMap, usize, securityService.hasPermission(userLogin, 'NewModelsFromImport'))
+						modelName, deviceType, deviceTypeMap, usize, securityService.hasPermission(userLogin, 'ModelCreateFromImport'))
 					log.debug "$methodName call to assetEntityAttributeLoaderService.assignMfgAndModelToDevice() resulted in: $results"
 					mmm = [
 						errorMsg: results.errorMsg,

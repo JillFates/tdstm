@@ -27,7 +27,7 @@
                         <li class="menu-child-item menu-list-companies"><g:link controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}">List Companies</g:link></li>
                         <li class="menu-child-item menu-list-staff"><g:link controller="person" id="${partyGroup}">List Staff</g:link></li>
                         <li class="menu-child-item menu-list-users">
-                            <tds:hasPermission permission='UserLoginView'>
+                            <tds:hasPermission permission='UserView'>
                                 <g:link controller="userLogin" id="${partyGroup}">List Users</g:link>
                             </tds:hasPermission>
                         </li>

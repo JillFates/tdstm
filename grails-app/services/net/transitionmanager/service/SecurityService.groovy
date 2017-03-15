@@ -189,7 +189,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * TODO : JPM 4/2016 : isChangePendingStatusAllowed method here is OBSCURED and should be removed but used in tasks
 	 */
 	boolean isChangePendingStatusAllowed() {
-		hasPermission('ChangePendingStatus')
+		hasPermission('TaskChangeStatus')
 	}
 
 	/**
@@ -374,7 +374,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	@Transactional
 	void unlockAccount(UserLogin account) {
-		requirePermission 'UnlockUserLogin'
+		requirePermission 'UserUnlock'
 
 		account.lockedOutUntil = null
 		save account
@@ -1360,7 +1360,7 @@ logger.debug "mergePersonsUserLogin() entered"
 	/**
 	 * The list of security roles that a person can assign base on the individual's highest priviledged
 	 * role. The list should include that role plus all lessor roles. If the person doesn't have
-	 * the EditUserLogin permission then no roles are assignable hence an empty list.
+	 * the UserEdit permission then no roles are assignable hence an empty list.
 	 * @param person - the person for whom we are determining can assign some roles
 	 * @return The list of security role that the individual can assign
 	 */
@@ -1369,7 +1369,7 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		List assignableRoles = []
 
-		if (hasPermission(person, 'EditUserLogin')) {
+		if (hasPermission(person, 'UserEdit')) {
 			RoleType maxRoleOfPerson = getMaxAssignedRole(person)
 			if (maxRoleOfPerson) {
 				assignableRoles = getAllRoles(maxRoleOfPerson.level)
@@ -1380,7 +1380,7 @@ logger.debug "mergePersonsUserLogin() entered"
 		/*
 			// JPM 4/2016 : this was some of the logic for filter but wasn't used so stripped out
 			def assignableRoles = []
-			if (person && hasPermission(person, "EditUserLogin")) {
+			if (person && hasPermission(person, "UserEdit")) {
 				// All roles
 				def roles = getAllRoles()
 				// Assumes getAssignedRoles sorts by level desc.
@@ -1398,7 +1398,7 @@ logger.debug "mergePersonsUserLogin() entered"
 
 	/**
 	 * The list of security role codes that a person can assign. If the person
-	 * doesn't have _EditUserLogin_ then no roles are returned.
+	 * doesn't have _UserEdit_ then no roles are returned.
 	 */
 	List<String> getAssignableRoleCodes(Person person = null) {
 		getAssignableRoles(resolve(person))*.id
@@ -1590,7 +1590,7 @@ logger.debug "mergePersonsUserLogin() entered"
 	}
 
 	boolean viewUnpublished() {
-		hasPermission('PublishTasks') && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true'
+		hasPermission('TaskPublish') && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true'
 	}
 
 	@Transactional

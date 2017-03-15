@@ -17,7 +17,7 @@
 	<div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
 		<div style="margin-left:20px;">
 			<h2>Custom Fields Shown in Selectors:
-				<g:if test="${hasEditProjectFieldSettingsPermission}">
+				<g:if test="${hasProjectFieldSettingsEditPermission}">
 					<g:select ng-model="customShown" name="customFieldSelect" from="${Project.constraints.customFieldsShown.inList}"
 							 value="customShown" ng-change="updateCustomFieldsShown();" />
 				</g:if>

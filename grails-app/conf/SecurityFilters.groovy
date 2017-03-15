@@ -90,7 +90,7 @@ class SecurityFilters {
 						return false
 					}
 
-					if (securityService.hasPermission('MoveEventStatus')) { // verify the user role as ADMIN
+					if (securityService.hasPermission('EventChangeStatus')) { // verify the user role as ADMIN
 						return true
 					}
 

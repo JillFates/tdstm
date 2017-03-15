@@ -159,16 +159,16 @@
 					</tbody>
 				</table>
 			</div>
-			<tds:hasPermission permission='EditUserLogin'>
+			<tds:hasPermission permission='UserEdit'>
 				<div class="buttons">
 					<g:form>
 						<input type="hidden" name="id" value="${userLoginInstance?.id}" />
 						<input type="hidden" name="companyId" value="${companyId}" />
 						<span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
-						<tds:hasPermission permission='UserLoginDelete'>
+						<tds:hasPermission permission='UserDelete'>
 							<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
 						</tds:hasPermission>
-						<tds:hasPermission permission='EditUserLogin'>
+						<tds:hasPermission permission='UserEdit'>
 							<span class="button"><input type="button" value="Send Password Reset" id="resetPassword"  <g:if test="${!canResetPasswordByAdmin}"> class="save disableButton" disabled</g:if> <g:else>class="save"</g:else> /></span>
 						</tds:hasPermission>
 					</g:form>

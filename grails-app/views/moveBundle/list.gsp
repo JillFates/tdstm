@@ -41,7 +41,7 @@
 		 */
 		function loadGridBundleList() {
 			$("#gridBundleList").kendoGrid({
-				toolbar: kendo.template('<tds:hasPermission permission='MoveBundleEditView'><button type="button" class="btn btn-default action-toolbar-btn" onClick=\"window.location.href=\'#=contextPath#/moveBundle/create\'\"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</button></tds:hasPermission> <div onclick="loadGridBundleList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+				toolbar: kendo.template('<tds:hasPermission permission='BundleEdit'><button type="button" class="btn btn-default action-toolbar-btn" onClick=\"window.location.href=\'#=contextPath#/moveBundle/create\'\"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</button></tds:hasPermission> <div onclick="loadGridBundleList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
 				dataSource: {
 					type: "json",
 					transport: {

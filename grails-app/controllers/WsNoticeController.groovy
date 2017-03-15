@@ -1,4 +1,5 @@
 import grails.plugin.springsecurity.annotation.Secured
+import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.service.NoticeService
@@ -15,6 +16,7 @@ class WsNoticeController implements ControllerMethods {
 	 * Fetch using pType
 	 * We might expand this to add different type of filters
 	 */
+	@HasPermission('NoticeView')
 	def fetch(Integer typeId) {
 		try {
 			Notice.NoticeType type
@@ -32,6 +34,7 @@ class WsNoticeController implements ControllerMethods {
 	/**
 	 * Get Notice By ID
 	 */
+	@HasPermission('NoticeView')
 	def fetchById(Long id) {
 		try {
 			Notice notice = noticeService.get(id)
@@ -54,6 +57,7 @@ class WsNoticeController implements ControllerMethods {
 	 * 		"htmlText":"<strong>este es el Mensaje</strong>",
 	 * 		"type":"Prelogin"
 	 */
+	@HasPermission('NoticeCreate')
 	def create() {
 		try {
 			Map<String, ?> result = noticeService.create(request.JSON)
@@ -67,6 +71,7 @@ class WsNoticeController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('NoticeEdit')
 	def update() {
 		try {
 			Map<String, ?> result = noticeService.update(params.long('id'), request.JSON)
@@ -84,6 +89,7 @@ class WsNoticeController implements ControllerMethods {
 	/**
 	 * Deletes an existing Notice
 	 */
+	@HasPermission('NoticeDelete')
 	def delete(Long id) {
 		try {
 			boolean result = noticeService.delete(id)
@@ -101,6 +107,7 @@ class WsNoticeController implements ControllerMethods {
 	 * Mark a Note Acknowledge by a User
 	 * TODO: (oluna)Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
 	 */
+	@HasPermission('UserGeneralAccess')
 	def ack(Long id, String username) {
 		try {
 			boolean result = noticeService.ack(id, username)

@@ -45,7 +45,7 @@
 					Include only remaining tasks in report
 				</td>
 			</tr>
-			<tds:hasPermission permission="PublishTasks">
+			<tds:hasPermission permission="TaskPublish">
 			<tr>
 				<td></td>
 				<td style="width:auto;">

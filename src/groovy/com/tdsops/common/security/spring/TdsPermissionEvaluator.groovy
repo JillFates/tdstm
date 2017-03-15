@@ -16,9 +16,9 @@ import javax.servlet.http.HttpServletRequest
  * for static resources or other urls that can't or shouldn't be annotated it's possible to use SpEL
  * for those url patterns in controllerAnnotations.staticRules, e.g.
  *
- *    '/monitoring':     'hasPermission(request, "ViewAdminTools")'
+ *    '/monitoring':     'hasPermission(request, "AdminUtilitiesAccess")'
  *
- * This will result in a call here with the current request as the 'target' and 'ViewAdminTools' as
+ * This will result in a call here with the current request as the 'target' and 'AdminUtilitiesAccess' as
  * the permission. The  url isn't passed to the hasPermission() method but it isn't needed; the
  * ConfigAttribute instances derived from the annotations and the static rules are stored with the
  * url pattern as the key, and a match between one of them and the current request url result in a

@@ -1289,7 +1289,7 @@ class AssetEntityService implements ServiceMethods {
 		 redirectTo: params.redirectTo,
 		 supportAssets: supportAssets,
 		 viewUnpublishedValue: viewUnpublishedValue,
-		 hasPublishPermission: securityService.hasPermission("PublishTasks")]
+		 hasPublishPermission: securityService.hasPermission("TaskPublish")]
 	}
 
 	/**

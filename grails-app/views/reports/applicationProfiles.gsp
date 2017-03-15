@@ -38,7 +38,7 @@
 							</td>
 						</tr>
 						<tr class="buttonR">
-							<tds:hasPermission permission="ShowMovePrep">
+							<tds:hasPermission permission="ReportViewEventPrep">
 								<td colspan="2">
 									<button type="button" class="btn btn-default" id="applicationProfilesButton"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Generate</button>
 								</td>

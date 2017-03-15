@@ -76,7 +76,7 @@
             </div>
             <div class="buttons">
                 <g:form>
-                <tds:hasPermission permission='MoveEventEditView'>
+                <tds:hasPermission permission='EventEdit'>
                     <input type="hidden" name="id" id="moveEventId"  value="${moveEventInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any news and any related step data?');" value="Delete" /></span>

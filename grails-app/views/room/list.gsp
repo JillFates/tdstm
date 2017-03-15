@@ -107,13 +107,13 @@
 								</table>
 								<div class="buttons">
 									<span class="button">
-									 <tds:hasPermission permission='DeleteRoom'>
+									 <tds:hasPermission permission='RoomDelete'>
 										<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close'); saveData();"/>
 									 </tds:hasPermission>
-										 <tds:hasPermission permission='MergeRoom'>
+										 <tds:hasPermission permission='RoomMerge'>
 											<span class="button"><input class="create disableButton" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" disabled="disabled" /></span>
 										 </tds:hasPermission>
-										 <tds:hasPermission permission='DeleteRoom'>
+										 <tds:hasPermission permission='RoomDelete'>
 											<g:actionSubmit class="delete disableButton" action="delete" id="deleteId" value="Delete" disabled="disabled"/>
 										</tds:hasPermission>
 									</span>

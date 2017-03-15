@@ -263,7 +263,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
-					<tds:hasPermission permission="EditModel">
+					<tds:hasPermission permission="ModelEdit">
 					<span class="button">
 						<g:actionSubmit class="save" id="saveModelId" action="save" value="Save"></g:actionSubmit>
 					</span>

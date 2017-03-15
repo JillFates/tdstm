@@ -9,13 +9,13 @@ class PartyController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
-	@HasPermission('AdminMenuView')
+	@HasPermission('PartyView')
 	def list() {
 		if (!params.max) params.max = 10
 		[partyInstanceList: Party.list(params)]
 	}
 
-	@HasPermission('AdminMenuView')
+	@HasPermission('PartyView')
 	def show() {
 		Party party = fromParams()
 		if (!party) return
@@ -23,7 +23,7 @@ class PartyController implements ControllerMethods {
 		[partyInstance: party]
 	}
 
-	@HasPermission('AdminMenuView')
+	@HasPermission('PartyDelete')
 	def delete() {
 		Party party = fromParams()
 		if (!party) return
@@ -33,7 +33,7 @@ class PartyController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
-	@HasPermission('AdminMenuView')
+	@HasPermission('PartyEdit')
 	def edit() {
 		Party party = fromParams()
 		if (!party) return
@@ -41,7 +41,7 @@ class PartyController implements ControllerMethods {
 		[partyInstance: party]
 	}
 
-	@HasPermission('AdminMenuView')
+	@HasPermission('PartyEdit')
 	def update() {
 		Party party = fromParams()
 		if (!party) return
@@ -57,12 +57,12 @@ class PartyController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('AdminMenuView')
+	@HasPermission('PartyCreate')
 	def create() {
 		[partyInstance: new Party(params)]
 	}
 
-	@HasPermission('AdminMenuView')
+	@HasPermission('PartyCreate')
 	def save() {
 		def party = new Party(params)
 		if (!partyww.hasErrors() && party.save()) {

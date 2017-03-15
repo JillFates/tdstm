@@ -129,7 +129,7 @@ a:hover {
 						</tr>
 						<tr class="odd">
 							<td>
-								<tds:hasPermission permission='ShowProjectDailyMetrics'>
+								<tds:hasPermission permission='ReportViewProjectDailyMetrics'>
 									<g:link controller="project" action="launchProjectDailyMetricsJob" style="color:black">Launch Project Daily Metrics Job</g:link>
 								</tds:hasPermission>
 							</td>

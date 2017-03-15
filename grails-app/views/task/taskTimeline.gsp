@@ -66,7 +66,7 @@
 						<form id="preferencesformId">
 							<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
 								
-								<tds:hasPermission permission="PublishTasks">
+								<tds:hasPermission permission="TaskPublish">
 									<tr title="Shows tasks that are not published">
 										<td colspan="3" style="padding-left :0px">
 											<span class="checkboxContainer">
@@ -104,7 +104,7 @@
 									</td>
 								</tr>
 								
-								<tds:hasPermission permission='CriticalPathExport'>
+								<tds:hasPermission permission='TaskViewCriticalPath'>
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
 										<span>

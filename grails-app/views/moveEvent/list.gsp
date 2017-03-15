@@ -8,7 +8,7 @@
 		<g:javascript src="jqgrid-support.js" />
 		<script type="text/javascript">
 			$(document).ready(function() {
-				var listCaption ="Event List: <tds:hasPermission permission='MoveEventEditView'><span class='capBtn'>"+
+				var listCaption ="Event List: <tds:hasPermission permission='EventEdit'><span class='capBtn'>"+
 					"<input type='button' value='Create Event'  onClick=\"window.location.href=\'"+contextPath+"/moveEvent/create\'\"/></span></tds:hasPermission>"
 				<jqgrid:grid id="moveEventListId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Name','Estimated Start', 'Description','News Bar Mode', 'Runbook Status', 'Bundles'"

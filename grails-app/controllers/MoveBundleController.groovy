@@ -65,12 +65,14 @@ class MoveBundleController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
+	@HasPermission('MoveBundleView')
 	def list() {}
 
 	/**
 	 * Used to generate the List for Bundles using jqgrid.
 	 * @return : list of bundles as JSON
 	 */
+	@HasPermission('MoveBundleView')
 	def listJson() {
 		String sortOrder  = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
@@ -94,6 +96,7 @@ class MoveBundleController implements ControllerMethods {
 	 * Generates the List for Bundles using Kendo Grid.
 	 * @return : list of bundles as JSON
 	 */
+	@HasPermission('MoveBundleView')
 	def retrieveBundleList() {
 		List<MoveBundle> bundleList = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
 		renderAsJson bundleList.collect { MoveBundle entry -> [
@@ -107,6 +110,7 @@ class MoveBundleController implements ControllerMethods {
 		]}
 	}
 
+	@HasPermission('MoveBundleShow')
 	def show() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -138,6 +142,7 @@ class MoveBundleController implements ControllerMethods {
 		 dashboardSteps: dashboardSteps, isDefaultBundle: moveBundle.id == project.defaultBundle.id]
 	}
 
+	@HasPermission('MoveBundleDelete')
 	def delete() {
 		String message = moveBundleService.deleteBundle(MoveBundle.get(params.id),
 			securityService.loadUserCurrentProject())
@@ -145,6 +150,7 @@ class MoveBundleController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
+	@HasPermission('MoveBundleDelete')
 	def deleteBundleAndAssets() {
 		MoveBundle moveBundle = MoveBundle.get(params.id)
 		if (moveBundle) {
@@ -168,6 +174,7 @@ class MoveBundleController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
+	@HasPermission('MoveBundleEdit')
 	def edit() {
 		MoveBundle moveBundle = MoveBundle.get(params.id)
 		if (!moveBundle) {
@@ -192,6 +199,7 @@ class MoveBundleController implements ControllerMethods {
 		 rooms: Room.findAllByProject(project)]
 	}
 
+	@HasPermission('MoveBundleEdit')
 	def update() {
 
 		// TODO : Security : Get User's project and attempt to find the project before blindly updating it
@@ -277,12 +285,14 @@ class MoveBundleController implements ControllerMethods {
 		               workflowCodes: stateEngineService.getWorkflowCode()])
 	}
 
+	@HasPermission('MoveBundleCreate')
 	def create() {
 		Project project = securityService.userCurrentProject
 		[moveBundleInstance: new MoveBundle(params), managers: partyRelationshipService.getProjectStaff(project.id),
 		 projectInstance: project, workflowCodes: stateEngineService.getWorkflowCode(), rooms: Room.findAllByProject(project)]
 	}
 
+	@HasPermission('MoveBundleCreate')
 	def save() {
 
 		def startTime = params.startTime
@@ -329,6 +339,7 @@ class MoveBundleController implements ControllerMethods {
 	 * If the checkbox is subsequently checked and the form submitted, a new MoveBundleStep shall be created for that transition.
 	 * @return  new moveBundleStep
 	 */
+	@HasPermission('MoveBundleEdit')
 	MoveBundleStep createMoveBundleStep() {
 		def moveBundle = MoveBundle.get(params.moveBundleId)
 		int transitionId = params.int('transitionId')
@@ -351,6 +362,7 @@ class MoveBundleController implements ControllerMethods {
 	 * @param  : moveBundleId, list of unchecked steps
 	 * @return : success / failure
 	 *---------------------------------------------------*/
+	@HasPermission('MoveBundleView')
 	def checkStepSnapshotRecord() {
 		def steps = params.steps
 		MoveBundle moveBundle = MoveBundle.get(params.moveBundleId)
@@ -372,6 +384,7 @@ class MoveBundleController implements ControllerMethods {
 		render message
 	}
 
+	@HasPermission('MoveBundleView')
 	def projectMoveBundles() {
 		Project project = securityService.loadUserCurrentProject()
 		def moveBundlesList
@@ -381,6 +394,7 @@ class MoveBundleController implements ControllerMethods {
 		render moveBundlesList as JSON
 	}
 
+	@HasPermission('MenuDashboardView')
 	def planningStats() {
 		Project project = securityService.userCurrentProject
 
@@ -920,7 +934,7 @@ class MoveBundleController implements ControllerMethods {
 
 		forward(controller: "assetEntity", action: "retrieveLists",
 			     params: [entity: params.assetType, dependencyBundle: session.getAttribute('dependencyBundle')])
-   }
+	}
 
 	/**
 	 * To generate Moveday Tasks for a specified Bundle
@@ -928,6 +942,7 @@ class MoveBundleController implements ControllerMethods {
 	 * @return - error Message - if any else success Message
 	 * TODO -- THIS METHOD CAN BE REMOVED AS IT IS NOT USED ANY MORE
 	 */
+	@HasPermission('TaskCreate')
 	def createTask() {
 
 		def bundleId = params.bundleId
@@ -1050,6 +1065,7 @@ class MoveBundleController implements ControllerMethods {
 	 * @param filteredAppCount : This is filtered app based on PlanStatus
 	 * @return : Percentage of Calculated app
 	 */
+	@HasPermission('AssetView')
 	def countAppPercentage(int totalAppCount, int filteredAppCount) {
 		return totalAppCount ? Math.round((filteredAppCount /  totalAppCount) * 100) : 0
 	}
@@ -1057,6 +1073,7 @@ class MoveBundleController implements ControllerMethods {
 	/**
 	 * Sets compactControl preference
 	 */
+	@HasPermission('UserGeneralAccess')
 	def setCompactControlPref() {
 		String key = params.prefFor
 		String selected = params.selected

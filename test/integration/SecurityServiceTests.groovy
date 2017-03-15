@@ -176,7 +176,7 @@ class SecurityServiceTests extends Specification {
 			createPrivAccount()
 			createUnPrivAccount()
 			assert securityService.assignRoleCode(unPrivPerson, 'USER')
-			String privPerm = 'RestartApplication'
+			String privPerm = 'ApplicationRestart'
 
 		expect: 'that calling hasPermission for privileged user with the ADMIN role returns true'
 			securityService.hasPermission(privUser, privPerm)
@@ -205,7 +205,7 @@ class SecurityServiceTests extends Specification {
 	void '7 - Test the hasPermission calls reportViolation if user does not have permission'() {
 		setup:
 			createUnPrivAccount()
-			String privPerm = 'RestartApplication'
+			String privPerm = 'ApplicationRestart'
 
 			// Use this command to figure out the method signature we want to override
 			println "net.transitionmanager.service.SecurityService.reportViolation method signatures:\n" +

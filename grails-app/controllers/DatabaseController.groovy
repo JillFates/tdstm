@@ -1,6 +1,7 @@
 import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tdsops.common.sql.SqlUtil
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
@@ -38,6 +39,7 @@ class DatabaseController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
+	@HasPermission('AssetView')
 	def list() {
 		def filters = session.DB?.JQ_FILTERS
 		session.DB?.JQ_FILTERS = []
@@ -54,6 +56,7 @@ class DatabaseController implements ControllerMethods {
 	/**
 	 * Used by JQgrid to load assetList
 	 */
+	@HasPermission('AssetView')
 	def listJson() {
 		String sortIndex = params.sidx ?: 'assetName'
 		String sortOrder  = params.sord ?: 'asc'
@@ -226,6 +229,7 @@ class DatabaseController implements ControllerMethods {
 		render jsonData as JSON
 	}
 
+	@HasPermission('AssetView')
 	def show(String id) {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -238,6 +242,7 @@ class DatabaseController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('AssetCreate')
 	def create() {
 		def databaseInstance = new Database(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -255,6 +260,7 @@ class DatabaseController implements ControllerMethods {
 		 config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 
+	@HasPermission('AssetEdit')
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -272,6 +278,7 @@ class DatabaseController implements ControllerMethods {
 		return model
 	}
 
+	@HasPermission('AssetCreate')
 	def save() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, databaseService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -279,6 +286,7 @@ class DatabaseController implements ControllerMethods {
 		session.DB?.JQ_FILTERS = params
 	}
 
+	@HasPermission('AssetEdit')
 	def update() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, databaseService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -286,6 +294,7 @@ class DatabaseController implements ControllerMethods {
 		session.DB?.JQ_FILTERS = params
 	}
 
+	@HasPermission('AssetDelete')
 	def delete() {
 		def database = Database.get(params.id)
 		if (database) {
@@ -310,6 +319,7 @@ class DatabaseController implements ControllerMethods {
 	/**
 	 * Delete multiple database.
 	 */
+	@HasPermission('AssetDelete')
 	def deleteBulkAsset() {
 		def assetNames = []
 		for (assetId in  params.id.split(',')) {

@@ -60,7 +60,7 @@ describe('Role Permissions page', function(){
                       
           });
           
-          xit('should have "CreateUserLogin" as Permission item', function() {
+          xit('should have "UserCreate" as Permission item', function() {
             
           });
 
@@ -76,12 +76,12 @@ describe('Role Permissions page', function(){
 
         /*
         "group": "User",
-        "permission Item" : "UserLoginDelete",
+        "permission Item" : "UserDelete",
         "roles": ["Admin"],
         "description": "Ability to delete User accounts"}
 
         "group": "User",
-        "permission Item" : "UserLoginView",
+        "permission Item" : "UserView",
         "roles": ["Admin"],
         "description": "Ability to view User accounts list and details"}
         

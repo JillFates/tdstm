@@ -20,7 +20,7 @@
 		</tbody>
 		</table>
 	</div>
-	<tds:hasPermission permission='ModelDialogView'>
+	<tds:hasPermission permission='ModelView'>
 	<div class="buttons">
 		<input type="hidden" name="id" id="show_manufacturerId" />
 		<span class="button"><input type="button" class="edit" value="Edit" onclick="showOrEditModelManuDetails('manufacturer',$('#show_manufacturerId').val(),'Manufacturer','edit','Edit');$('#manufacturerShowDialog').dialog('close');"/></span>
@@ -101,7 +101,7 @@
 		</tbody>
 	</table>
 </div>
-<tds:hasPermission permission='ModelDialogView'>
+<tds:hasPermission permission='ModelView'>
 <div class="buttons"> 
 	<g:form action="edit" controller="model" target="new">
 		<input name="id" type="hidden" id="show_modelId"/>

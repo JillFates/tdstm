@@ -150,6 +150,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param  Selected Filter Values
 	 * @return Will return filters data to AssetEntity
 	 */
+	@HasPermission('AssetView')
 	def filter() {
 		if (params.rowVal) {
 			if (!params.max) params.max = params.rowVal
@@ -182,7 +183,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * The initial Asset Import form
 	 */
-	@HasPermission('Import')
+	@HasPermission('AssetImport')
 	def assetImport() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -214,12 +215,13 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Render the Export form
 	 */
+	@HasPermission('AssetExport')
 	def assetExport() {}
 
 	/**
 	 * Renders the export form.
 	 */
-	@HasPermission('Export')
+	@HasPermission('AssetExport')
 	def exportAssets() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -647,7 +649,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param DataTransferSet,Project,Excel Sheet
 	 * @return currentPage(assetImport Page)
 	 */
-	@HasPermission('Import')
+	@HasPermission('AssetImport')
 	def upload() {
 		// URL action to forward to if there is an error
 		String forwardAction = 'assetImport'
@@ -1416,7 +1418,7 @@ class AssetEntityController implements ControllerMethods {
 	 * Used to kick off the export process that will schedule a Quartz job to run in background so that the user will get
 	 * an immediate response and can poll for the status of the job.
 	 */
-	@HasPermission('Export')
+	@HasPermission('AssetExport')
 	def export() {
 		def key = "AssetExport-" + UUID.randomUUID()
 		progressService.create(key)
@@ -1444,7 +1446,7 @@ class AssetEntityController implements ControllerMethods {
 		renderSuccessJson(key: key)
 	}
 
-//	@HasPermission('Export')
+	@HasPermission('AssetExport')
 	def downloadExport() {
 		String key = params.key
 		InputStream io = new FileInputStream(new File(progressService.getData(key, 'filename')))
@@ -1465,6 +1467,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param project, filter, number of properties
 	 * @return model data to initate the asset list
 	 **/
+	@HasPermission('AssetView')
 	def list() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1475,6 +1478,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Used by JQgrid to load assetList
 	 */
+	@HasPermission('AssetView')
 	def listJson() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1482,6 +1486,7 @@ class AssetEntityController implements ControllerMethods {
 		renderAsJson assetEntityService.getDeviceDataForList(project, session, params)
 	}
 
+	@HasPermission('AssetDelete')
 	def delete() {
 		AssetEntity assetEntityInstance = AssetEntity.get(params.id)
 		if (!assetEntityInstance) {
@@ -1519,6 +1524,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Remove the asset from project
 	 */
+	@HasPermission('AssetDelete')
 	def remove() {
 		AssetEntity assetEntity = AssetEntity.get(params.id)
 		if (assetEntity) {
@@ -1540,6 +1546,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * remote link for asset entity dialog.
 	 */
+	@HasPermission('AssetEdit')
 	def editShow() {
 		Project project = securityService.userCurrentProject
 		AssetEntity assetEntity = AssetEntity.get(params.id)
@@ -1563,10 +1570,11 @@ class AssetEntityController implements ControllerMethods {
 		}
 		renderAsJson items
 	}
-
+	
+	@HasPermission('AssetView')
 	def retrieveAttributes() {
 		def items = []
-
+		
 		if (params.attribSet) {
 			Project project = securityService.userCurrentProject
 			List<EavEntityAttribute> entityAttributes = EavEntityAttribute.executeQuery('''
@@ -1590,10 +1598,11 @@ class AssetEntityController implements ControllerMethods {
 				}
 			}
 		}
-
+		
 		renderAsJson items
 	}
-
+	
+	@HasPermission('AssetView')
 	def retrieveAssetAttributes() {
 		def items = []
 		if (params.assetId) {
@@ -1611,6 +1620,7 @@ class AssetEntityController implements ControllerMethods {
 		renderAsJson items
 	}
 
+	@HasPermission('AssetEdit')
 	def retrieveAutoCompleteDate(String autoCompAttribs) {
 		def data = []
 		if (autoCompAttribs) {
@@ -1627,6 +1637,7 @@ class AssetEntityController implements ControllerMethods {
 		renderAsJson data
 	}
 
+	@HasPermission('CommentView')
 	def listComments() {
 		def assetEntityInstance = AssetEntity.get(params.id)
 		def commentType = params.commentType
@@ -1658,6 +1669,7 @@ class AssetEntityController implements ControllerMethods {
 		renderAsJson assetCommentsList
 	}
 
+	@HasPermission('CommentView')
 	def showComment() {
 		def commentList = []
 		def personResolvedObj
@@ -1792,6 +1804,7 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	// def saveComment() { com.tdsops.tm.command.AssetCommentCommand cmd ->
+	@HasPermission('CommentCreate')
 	def saveComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
@@ -1805,6 +1818,7 @@ class AssetEntityController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('CommentEdit')
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
@@ -1829,6 +1843,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @author Lokanath
 	 * @return assetCommentList
 	 */
+	@HasPermission('CommentDelete')
 	def deleteComment() {
 		// TODO - SECURITY - deleteComment - verify that the asset is part of a project that the user has the rights to delete the note
 		AssetComment assetComment = AssetComment.get(params.id)
@@ -1853,6 +1868,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param : fromState and toState
 	 * @return: boolean value to validate comment field
 	 *---------------------------------*/
+	@HasPermission('WorkflowView')
 	def retrieveFlag() {
 		def moveBundleInstance = MoveBundle.get(params.moveBundle)
 		def toState = params.toState
@@ -1869,6 +1885,7 @@ class AssetEntityController implements ControllerMethods {
 	 *@param : state value
 	 *@return: List of valid stated for param state
 	 *----------------------------------------*/
+	@HasPermission('WorkflowView')
 	def retrieveStates(def state,def assetEntity) {
 		def stateIdList = []
 		def validStates
@@ -1884,6 +1901,7 @@ class AssetEntityController implements ControllerMethods {
 		return stateIdList
 	}
 
+	@HasPermission('AssetImport')
 	def retrieveProgress() {
 		def importedData
 		def progressData = []
@@ -1905,6 +1923,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @return : render to create page based on condition as if redirectTo is assetAudit then redirecting
 	 * to auditCreate view
 	 */
+	@HasPermission('AssetCreate')
 	def create() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1933,6 +1952,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
 	 * to auditEdit view
 	 */
+	@HasPermission('AssetEdit')
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1964,6 +1984,7 @@ class AssetEntityController implements ControllerMethods {
 	 * user to the place that they came from based on the params.redirectTo param. The return content varies based on that
 	 * param as well.
 	 */
+	@HasPermission('AssetCreate')
 	def save() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, deviceService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -1977,6 +1998,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param id : id of assetEntity
 	 * @return : render to appropriate view
 	 */
+	@HasPermission('AssetEdit')
 	def update() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, deviceService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -1987,6 +2009,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	* Renders the detail of an AssetEntity
 	*/
+	@HasPermission('AssetView')
 	def show() {
 
 		Project project = controllerService.getProjectForPage(this)
@@ -2023,6 +2046,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param assetType : requested assetType for which we need to get manufacturer list
 	 * @return : render to manufacturerView
 	 */
+	@HasPermission('ManufacturerView')
 	def retrieveManufacturersList() {
 		def assetType = params.assetType
 		def manufacturers = Model.executeQuery("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
@@ -2034,6 +2058,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Used to set showAllAssetTasks preference, which is used to show all or hide the inactive tasks
 	 */
+	@HasPermission('UserGeneralAccess')
 	def setShowAllPreference() {
 		userPreferenceService.setPreference(PREF.SHOW_ALL_ASSET_TASKS, params.selected == '1')
 		render true
@@ -2042,6 +2067,8 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Used to set showAllAssetTasks preference, which is used to show all or hide the inactive tasks
 	 */
+	@HasPermission('UserGeneralAccess')
+	@HasPermission('TaskPublish')
 	def setViewUnpublishedPreference () {
 		userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED,
 			params.viewUnpublished == '1' || params.viewUnpublished == 'true')
@@ -2053,6 +2080,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param assetType : requested assetType for which we need to get manufacturer list
 	 * @return : render to manufacturerView
 	 */
+	@HasPermission('ModelView')
 	def retrieveModelsList() {
 		def manufacturer = params.manufacturer
 		def models=[]
@@ -2066,9 +2094,10 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
 	 */
+	@HasPermission('TaskManagerView')
 	def listTasks() {
 		licenseAdminService.checkValidForLicense()
-		securityService.requirePermission 'ViewTaskManager'
+		securityService.requirePermission 'TaskManagerView'
 
 		Project project = controllerService.getProjectForPage(this, 'to view Tasks')
 		if (!project) return
@@ -2155,6 +2184,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Generates the List of Comments, which leverages a shared closeure with the above listTasks controller.
 	 */
+	@HasPermission('CommentView')
 	def listComment() {
 		Project project = controllerService.getProjectForPage(this, 'to view Comments')
 		if (!project) return
@@ -2172,6 +2202,7 @@ class AssetEntityController implements ControllerMethods {
 	 * Used to generate list of comments using jqgrid
 	 * @return : list of tasks as JSON
 	 */
+	@HasPermission('CommentView')
 	def listCommentJson() {
 		String sortIndex = params.sidx ?: 'lastUpdated'
 		String sortOrder = params.sord ?: 'asc'
@@ -2185,8 +2216,8 @@ class AssetEntityController implements ControllerMethods {
 			where project=:project
 			  and commentType=:comment
 			  and str(lastUpdated) like :lastUpdated
-	  ''', [project: project, comment: AssetCommentType.COMMENT, lastUpdated: '%' + params.lastUpdated + '%']) : []
-
+		''', [project: project, comment: AssetCommentType.COMMENT, lastUpdated: '%' + params.lastUpdated + '%']) : []
+		
 		def assetCommentList = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.COMMENT)
@@ -2238,6 +2269,7 @@ class AssetEntityController implements ControllerMethods {
 	 * This will be called from TaskManager screen to load jqgrid
 	 * @return : list of tasks as JSON
 	 */
+	@HasPermission('TaskManagerView')
 	def listTaskJSON() {
 		String sortIndex =  params.sidx ?: session.TASK?.JQ_FILTERS?.sidx
 		String sortOrder =  params.sord ?: session.TASK?.JQ_FILTERS?.sord
@@ -2588,6 +2620,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Get AssetOptions by type to display at admin's AssetOption page .
 	 */
+	@HasPermission('AdminUtilitiesAccess')
 	def assetOptions() {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
@@ -2601,6 +2634,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Save AssetOptions by type to display at admin's AssetOption page .
 	 */
+	@HasPermission('AdminUtilitiesAccess')
 	def saveAssetoptions() {
 		AssetOptions assetOption = new AssetOptions()
 		switch(params.assetOptionType) {
@@ -2635,6 +2669,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Deletes AssetOptions by type from admin's AssetOption page .
 	 */
+	@HasPermission('AdminUtilitiesAccess')
 	def deleteAssetOptions() {
 		String idParamName
 		switch(params.assetOptionType) {
@@ -2653,6 +2688,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Render Summary of assigned and unassgined assets.
 	 */
+	@HasPermission('AssetView')
 	def assetSummary() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -2695,6 +2731,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param Integer dependencyBundle - the dependency bundle ID
 	 * @return String HTML representing the page
 	 */
+	@HasPermission('DepAnalyzerView')
 	def retrieveLists() {
 
 		def start = new Date()
@@ -3136,6 +3173,7 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	// removes the user's dependency analyzer map related preferences
+	@HasPermission('UserGeneralAccess')
 	def removeUserGraphPrefs () {
 		userPreferenceService.removePreference(params.preferenceName ?: 'depGraph')
 		render true
@@ -3145,6 +3183,7 @@ class AssetEntityController implements ControllerMethods {
 	* Delete multiple  Assets, Apps, Databases and files .
 	* @param : assetLists[]  : list of ids for which assets are requested to deleted
 	*/
+	@HasPermission('AssetDelete')
 	def deleteBulkAsset() {
 		renderAsJson(resp: assetEntityService.deleteBulkAssets(params.type, params.list("assetLists[]")))
 	}
@@ -3155,6 +3194,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return select or a JSON array
 	 */
+	@HasPermission('WorkflowView')
 	def retrieveWorkflowTransition() {
 		Project project = securityService.userCurrentProject
 		def format = params.format
@@ -3191,6 +3231,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return HTML select of staff belongs to company and TDS or a JSON array
 	 */
+	@HasPermission('ProjectStaffShow')
 	def updateAssignedToSelect() {
 
 		// TODO : Need to refactor this function to use the new TaskService.assignToSelectHtml method
@@ -3233,6 +3274,7 @@ class AssetEntityController implements ControllerMethods {
 		                               firstOption: [value: '0', display: 'Unassigned'])
 	}
 
+	@HasPermission('UserGeneralAccess')
 	def isAllowToChangeStatus() {
 		def taskId = params.id
 		boolean allowed = true
@@ -3252,6 +3294,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param   format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return render HTML or a JSON array
 	 */
+	@HasPermission('CommentView')
 	def updateStatusSelect() {
 		//Changing code to populate all select options without checking security roles.
 		def mapKey = 'ALL'//securityService.hasRole([ADMIN.name(),SUPERVISOR.name(),CLIENT_ADMIN.name(),CLIENT_MGR.name()]) ? 'ALL' : 'LIMITED'
@@ -3280,6 +3323,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param	params.id	The ID of the AssetComment to load  predecessor SELECT for
 	 * @return render HTML
 	 */
+	@HasPermission('TaskView')
 	def predecessorTableHtml() {
 		//def sw = new org.springframework.util.StopWatch("predecessorTableHtml Stopwatch")
 		//sw.start("Get current project")
@@ -3293,11 +3337,12 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	/**
-	 * Generats options for task dependency select
+	 * Generates options for task dependency select
 	 * @param : taskId  : id of task for which select options are generating .
 	 * @param : category : category for options .
 	 * @return : options
 	 */
+	@HasPermission('TaskEdit')
 	def generateDepSelect() {
 		def task = AssetComment.read(params.taskId)
 		def category = params.category
@@ -3331,6 +3376,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param   params.id   The ID of the AssetComment to load  successor SELECT for
 	 * @return render HTML
 	 */
+	@HasPermission('TaskView')
 	def successorTableHtml() {
 		def task = AssetComment.findByIdAndProject(params.commentId, securityService.loadUserCurrentProject())
 		if (! task) {
@@ -3353,6 +3399,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return String - HTML Select of prdecessor list or a JSON
 	 */
+	@HasPermission('TaskView')
 	def predecessorSelectHtml() {
 		Project project = securityService.userCurrentProject
 		def task
@@ -3387,6 +3434,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * returns a list of tasks paginated and filtered
 	 */
+	@HasPermission('TaskView')
 	def tasksSearch() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -3423,6 +3471,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Return the task index in the search
 	 */
+	@HasPermission('TaskView')
 	def taskSearchMap() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -3448,6 +3497,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param NA
 	 * @return : Export data in WH project format
 	 */
+	@HasPermission('AssetExport')
 	def exportSpecialReport() {
 		Project project = securityService.userCurrentProject
 		def today = TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_5)
@@ -3483,6 +3533,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param : id - Requested model's id
 	 * @return : assetType if exist for requested model else 0
 	 */
+	@HasPermission('ModelView')
 	def retrieveAssetModelType() {
 		def assetType = 0
 		if (params.id?.isNumber()) {
@@ -3496,6 +3547,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param id : asset id
 	 * @return : HTML code containing support and dependent edit form
 	 */
+	@HasPermission('AssetEdit')
 	def populateDependency() {
 		try {
 			Map model = assetEntityService.dependencyEditMap(params)
@@ -3515,6 +3567,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param id - class of asset to filter on (e.g. Application, Database, Server)
 	 * @return JSON array of asset id, assetName
 	 */
+	@HasPermission('AssetView')
 	def assetSelectDataByClass() {
 		renderAsJson(assets: assetEntityService.getAssetsByType(params.id).collect { [value: it.id, caption: it.assetName] })
 	}
@@ -3523,6 +3576,7 @@ class AssetEntityController implements ControllerMethods {
 	 * Gets validation for particular fields
 	 * @param type,validation
 	 */
+	@HasPermission('AssetView')
 	def retrieveAssetImportance() {
 		renderAsJson assetEntityService.getConfig(params.type, params.validation).config
 	}
@@ -3530,6 +3584,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Gets highlighting css for particular fields
 	 */
+	@HasPermission('AssetView')
 	def retrieveHighlightCssMap() {
 		def assetType = params.type
 		Class clazz
@@ -3567,6 +3622,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param preference
 	 * @param value
 	 */
+	@HasPermission('AssetImport')
 	def setImportPerferences() {
 		def key = params.preference
 		def value = params.value
@@ -3580,6 +3636,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Action to return on list Dependency
 	 */
+	@HasPermission('AssetView')
 	def listDependencies() {
 		Project project = controllerService.getProjectForPage(this, 'to view Dependencies')
 		if (!project) return
@@ -3613,6 +3670,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Show list of dependencies using jqgrid.
 	 */
+	@HasPermission('AssetView')
 	def listDepJson() {
 		String sortIndex = params.sidx ?: 'asset'
 		String sortOrder = params.sord ?: 'asc'
@@ -3704,6 +3762,7 @@ class AssetEntityController implements ControllerMethods {
 	* @param assetId
 	* @render resultMap
 	*/
+	@HasPermission('BundleView')
 	def retrieveChangedBundle() {
 		def dependentId = params.dependentId
 		def dependent = AssetDependency.read(dependentId.isInteger() ? dependentId.toInteger() : -1)
@@ -3742,6 +3801,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param params.sourceTarget - S)ource or T)arget
 	 * @param params.forWhom - indicates if it is Create or Edit
 	 */
+	@HasPermission('RackLayoutModify')
 	def retrieveRackSelectForRoom() {
 		Project project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
@@ -3778,6 +3838,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param params.sourceTarget - S)ource or T)arget
 	 * @param params.forWhom - indicates if it is Create or Edit
 	 */
+	@HasPermission('RackLayoutModify')
 	def retrieveChassisSelectForRoom() {
 		Project project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
@@ -3808,6 +3869,7 @@ class AssetEntityController implements ControllerMethods {
 				         value: id, forWhom: forWhom, sourceTarget: sourceTarget, tabindex: tabindex])
 	}
 
+	@HasPermission('AssetView')
 	def retrieveAssetsByType() {
 		Project project = controllerService.getProjectForPage(this, 'to view assets')
 		if (!project) return
@@ -3852,23 +3914,28 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * This service retrieves all the assets for a given asset class.
 	 */
+	@HasPermission('AssetView')
 	def assetsByClass() {
 		renderSuccessJson(assetEntityService.getAssetsByClass(params))
 	}
 
+	@HasPermission('AssetView')
 	def assetClasses() {
 		def results = []
 		assetEntityService.getAssetClasses().each { k,v -> results << [key:k, label:v]}
 		renderSuccessJson(results)
 	}
 
+	@HasPermission('AssetView')
 	def classForAsset() {
 		renderSuccessJson(assetClass: AssetClass.getClassOptionForAsset(AssetEntity.load(params.id)))
 	}
 
+	@HasPermission('AssetExport')
 	def poiDemo() {
 	}
 
+	@HasPermission('AssetExport')
 	def exportPoiDemo() {
 		String filePath = "/templates/TDSMaster_Poi_template.xls" // Template file Path
 		String today = TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_5)
@@ -3939,6 +4006,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param page
 	 * @param q
 	 */
+	@HasPermission('AssetView')
 	def assetListForSelect2() {
 		def results = []
 		long total = 0
@@ -4043,7 +4111,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Returns the list of models for a specific manufacturer and asset type
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission('ModelView')
 	def modelsOf() {
 		try {
 			def models = assetEntityService.modelsOf(params.manufacturerId, params.assetType, params.term)
@@ -4055,9 +4123,9 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	/**
-	 * Returns the list of models for a specific asset type
+	 * Returns the list of manufacturers for a specific asset type
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission('ManufacturerView')
 	def manufacturer() {
 		try {
 			renderSuccessJson(manufacturers: assetEntityService.manufacturersOf(params.assetType, params.term))
@@ -4070,7 +4138,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Returns the list of asset types for a specific manufactures
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission('AssetView')
 	def assetTypesOf() {
 		try {
 			renderSuccessJson(assetTypes: assetEntityService.assetTypesOf(params.manufacturerId, params.term))
@@ -4080,7 +4148,7 @@ class AssetEntityController implements ControllerMethods {
 		}
 	}
 
-	@Secured('isAuthenticated()')
+	@HasPermission('ArchitectureView')
 	def architectureViewer() {
 		licenseAdminService.checkValidForLicense()
 		Project project = securityService.userCurrentProject
@@ -4117,7 +4185,7 @@ class AssetEntityController implements ControllerMethods {
 	/**
 	 * Returns the data needed to generate the application architecture graph
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission('ArchitectureView')
 	def applicationArchitectureGraph() {
 		try {
 			Project project = securityService.userCurrentProject
@@ -4288,6 +4356,7 @@ class AssetEntityController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('UserGeneralAccess')
 	def graphLegend() {
 		render(view: '_graphLegend', model: [assetTypes: assetEntityService.ASSET_TYPE_NAME_MAP])
 	}
@@ -4298,7 +4367,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
 	 * @return JSON { tasks: List of tasks }
 	 */
-	@HasPermission('GenerateTasks')
+	@HasPermission('RecipeGenerateTasks')
 	def importTaskReviewData() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -4332,7 +4401,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param params.filename - the filename that the temporary uploaded spreadsheet was saved as
 	 * @return JSON{ accounts: List of accounts }
 	 */
-	@HasPermission('GenerateTasks')
+	@HasPermission('RecipeGenerateTasks')
 	def cancelImport() {
 		try {
 			Project project = controllerService.getProjectForPage(this)
@@ -4363,7 +4432,7 @@ class AssetEntityController implements ControllerMethods {
 	 *     post   - The previously confirmed and this submission will reload the saved spreadsheet and post the
 	 *              changes to the database and delete the spreadsheet.
 	 */
-	@HasPermission('GenerateTasks')
+	@HasPermission('RecipeGenerateTasks')
 	def importTask() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -4474,7 +4543,7 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 
-	@HasPermission('GenerateTasks')
+	@HasPermission('RecipeGenerateTasks')
 	def importTaskPostResultsData() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {

@@ -1,5 +1,6 @@
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.PartyType
+import com.tdsops.common.security.spring.HasPermission
 
 import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -8,6 +9,7 @@ class PartyTypeController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
+	@HasPermission('PartyTypeView')
 	def list() {
 		if (!params.max) {
 			params.max = 10
@@ -15,6 +17,7 @@ class PartyTypeController implements ControllerMethods {
 		[partyTypeInstanceList: PartyType.list(params)]
 	}
 
+	@HasPermission('PartyTypeView')
 	def show() {
 		PartyType partyType = fromParams()
 		if (!partyType) return
@@ -22,6 +25,7 @@ class PartyTypeController implements ControllerMethods {
 		[partyType: partyType]
 	}
 
+	@HasPermission('PartyTypeDelete')
 	def delete() {
 		PartyType partyType = fromParams()
 		if (!partyType) return
@@ -31,6 +35,7 @@ class PartyTypeController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
+	@HasPermission('PartyTypeEdit')
 	def edit() {
 		PartyType partyType = fromParams()
 		if (!partyType) return
@@ -38,6 +43,7 @@ class PartyTypeController implements ControllerMethods {
 		[partyTypeInstance: partyType]
 	}
 
+	@HasPermission('PartyTypeEdit')
 	def update() {
 		PartyType partyType = fromParams()
 		if (!partyType) return
@@ -52,10 +58,12 @@ class PartyTypeController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission('PartyTypeCreate')
 	def create() {
 		[partyTypeInstance: new PartyType(params)]
 	}
 
+	@HasPermission('PartyTypeCreate')
 	def save() {
 		def partyType = new PartyType(params)
 		partyType.id = params.id

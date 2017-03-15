@@ -21,7 +21,7 @@
 		<div class="body">
 
 				<div class="nav" style="border: 1px solid #CCCCCC; height: 20px">
-					<tds:hasPermission permission='MoveBundleEditView'>
+					<tds:hasPermission permission='BundleEdit'>
 						<span class="menuButton"><g:link class="create" controller="moveBundle" action="planningStats">Planning Dashboard</g:link></span>
 					</tds:hasPermission>
 				</div>
@@ -77,7 +77,7 @@
 									</g:each>
 								</ul>
 								<br>
-								<tds:hasPermission permission='EditProjectStaff'>
+								<tds:hasPermission permission='ProjectStaffEdit'>
 								<g:link class="mmlink" controller="person" action="manageProjectStaff" params="[role: 'PROJ_MGR', clientStaff: '1']">Manage</g:link>
 								</tds:hasPermission>
 							</td>
@@ -107,7 +107,7 @@
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" value="${projectInstance?.id}" />
-					<tds:hasPermission permission='ProjectEditView'>
+					<tds:hasPermission permission='ProjectEdit'>
 						<span class="button">
 							<g:actionSubmit type="button" class="edit" value="Edit"/>
 						</span>

@@ -7,7 +7,7 @@
 		<li>
 			<a href="#" id="availEditHeadId" class="mobmenu" onclick="Person.switchTab('availabilityEditId','availEditHeadId')">Availability</a>
 		</li>
-		<tds:hasPermission permission='EditTDSPerson'>
+		<tds:hasPermission permission='PersonEditTDS'>
 			<li>
 				<a href="#" id="tdsEditHeadId" class="mobmenu" onclick="Person.switchTab('tdsUtilityEditId','tdsEditHeadId')">Misc</a>
 			</li>
@@ -272,7 +272,7 @@
 		</div>
 	</div>
 </g:form>
-<tds:hasPermission permission='PersonEditView'>
+<tds:hasPermission permission='PersonEdit'>
 	<div class="footer_buttons">
 		<button class="btn btn-default" role="button" onClick="Person.updatePerson('generalInfoShow','personDialogForm')"><span class="glyphicon  glyphicon-ok"></span> Update</button>
 		<button class="btn btn-default" role="button" onClick="Person.closePersonDiv('personGeneralViewId');Person.showPersonDialog(${person.id}, 'generalInfoShow')"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>

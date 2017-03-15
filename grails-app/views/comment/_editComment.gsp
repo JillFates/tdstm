@@ -49,7 +49,7 @@
 				</table>
 			</div>
 		</form>
-		<tds:hasPermission permission='CommentCrudView'>
+		<tds:hasPermission permission='CommentView'>
 			<div class="buttons">
 				<span class="button">
 					<input class="save" type="button" id="saveAndViewBId" value="Save" ng-click="saveComment(true)" ng-disabled="form.$invalid" ng-show="ac.canEdit" />

@@ -81,7 +81,7 @@
 	</tbody>
 </table>
 </div>
-<tds:hasPermission permission='PersonEditView'>
+<tds:hasPermission permission='PersonEdit'>
 <div class="buttons"><g:form>
 	<input type="hidden" name="id" value="${personInstance?.id}" />
 	<input type="hidden" name="companyId" value="${companyId}" />

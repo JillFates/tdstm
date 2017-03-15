@@ -39,7 +39,7 @@
 					</tr>
 				</table>
 			</div>
-			<tds:hasPermission permission='CommentCrudView'>
+			<tds:hasPermission permission='CommentView'>
 				<div class="buttons" style="white-space: nowrap;">
 					<span class="button" class="slide">
 					<span class="slide">

@@ -20,7 +20,6 @@
 					<table id="editPermissionsTableId">
 						<thead class="needHeaderBorder">
 							<tr id="headerRowId" style="border: ; text-align: left">
-								<th>Group</th>
 								<th>Permission Item</th>
 								<g:each in="${Permissions.Roles.values()}">
 									<th>
@@ -34,9 +33,6 @@
 							<g:each var="permissionGroup" in="${permissions}" var="permission" status="i">
 							<input type="hidden" name="column" value="${permission.id}"/>
 								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
-									<td style="text-align: left;">
-										${permission.permissionGroup.key}
-									</td>
 									<td style="text-align: left;">
 										${permission.permissionItem}
 									</td>

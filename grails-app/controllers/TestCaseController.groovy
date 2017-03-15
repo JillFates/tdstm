@@ -1,6 +1,7 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.ConnectorActiveDirectory
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
@@ -40,21 +41,25 @@ class TestCaseController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	UserService userService
 
+	@HasPermission('TestCaseMethodCall')
 	def remoteAddr() {
 		render "Your address is ${HtmlUtil.getRemoteIp()}"
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def shouldUpdatePerson() {
 		Map opt = [(accountImportExportService.IMPORT_OPTION_PARAM_NAME): accountImportExportService.IMPORT_OPTION_PERSON ]
 		render (accountImportExportService.shouldUpdatePerson(opt) ? 'shouldUpdatePerson=TRUE' : 'shouldUpdatePerson=FALSE FAILED!!!!')
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def cleanString() {
 		def a = " a\tstring\nwith\rcharacters \u000bA\u007cB\u008fC that\r\ncan\fhave funcky\'character\"in it"
 		def b = StringUtil.clean(a)
 		render '[' + b + ']'
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def elapsed() {
 		StringBuffer sb = new StringBuffer("<h1>Testing the Elapsed Method</h1>")
 		List now = [new Date()]
@@ -69,6 +74,7 @@ class TestCaseController implements ControllerMethods {
 		render sb.toString()
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def tz() {
 		String tz = userPreferenceService.timeZone
 		String dateFormat = userPreferenceService.dateFormat
@@ -76,6 +82,7 @@ class TestCaseController implements ControllerMethods {
 		render "session isa ${session.getClass().name}, TZ=$tz<br>dateFormat=$dateFormat<br>now=$now".toString()
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def securityRoleChanges() {
 		List<String> allRoles = securityService.getAllRoleCodes()
 		// List currentRoles = [ADMIN.name(), SUPERVISOR.name(), USER.name()]
@@ -88,6 +95,7 @@ class TestCaseController implements ControllerMethods {
 		render out
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def teamCodeChanges() {
 		List allTeams = ['A','B','C','D','E']
 		List currPersonTeams = ['A','E']
@@ -123,6 +131,7 @@ class TestCaseController implements ControllerMethods {
 
 	//determineTeamChanges(List allTeams, List currPersonTeams, List chgPersonTeams, List currProjectTeams, List chgProjectTeams)
 
+	@HasPermission('TestCaseMethodCall')
 	def checkMinusList() {
 		List valid   = ['A','B','C','D','E']
 		List toCheck = ['A','-B','Q','-Z']
@@ -131,11 +140,13 @@ class TestCaseController implements ControllerMethods {
 		render out
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def testPersonGetAssignedProjects() {
 		List projects = personService.getAssignedProjects(securityService.userLoginPerson)
 		render 'Assigned to projects ' + projects*.id
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def testPerms() {
 		boolean hasPermGood = securityService.hasPermission('ShowCartTracker')
 		boolean hasPermBad = securityService.hasPermission('xyzzy')
@@ -143,11 +154,13 @@ class TestCaseController implements ControllerMethods {
 		render "hasPermGood=$hasPermGood, hasPermBad=$hasPermBad"
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def checkADConfig() {
 		String out = "<h1>Testing AD Configuration</h1><pre>" + securityService.getActiveDirectorySettings() + "</pre>"
 		render out
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def findPerson() {
 		def nameMap = [first:'John', last:'Martin']
 
@@ -161,15 +174,18 @@ class TestCaseController implements ControllerMethods {
 	}
 
 	// Used to test the JQuery one method
+	@HasPermission('TestCaseMethodCall')
 	def testOne() {
 		render(view: '../dashboard/testOne', model:[a:1])
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def finduser() {
 		def userLogin = UserLogin.findByUsername( 'jmtest@transitionaldata.com' )
 		render (userLogin ? userLogin.toString() : 'Not found')
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def provisioning() {
 		def conf = securityService.getActiveDirectoryConfig()
 		conf.defaultProject = 2468
@@ -190,6 +206,7 @@ class TestCaseController implements ControllerMethods {
 		render (user ? user.toString() : 'Nothing')
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def adIntegration() {
 		def adConf = grailsApplication.config.tdstm?.security?.ad
 
@@ -202,6 +219,7 @@ class TestCaseController implements ControllerMethods {
 	}
 
 
+	@HasPermission('TestCaseMethodCall')
 	def testGormUtilGetDPWC() {
 		def sb = new StringBuilder()
 
@@ -240,6 +258,7 @@ class TestCaseController implements ControllerMethods {
 		render sb.toString()
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def testStaffingRoles() {
 		def list = partyRelationshipService.getStaffingRoles(false)
 		def s = '<table>'
@@ -250,6 +269,7 @@ class TestCaseController implements ControllerMethods {
 		render s
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def testPersonServiceFindPerson() {
 		def person
 		def isa
@@ -290,6 +310,7 @@ class TestCaseController implements ControllerMethods {
 
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def testFindPerson() {
 
 		// The dataset consists of [searchString, clientStaffOnly, shouldFind, ambiguous]
@@ -326,6 +347,7 @@ class TestCaseController implements ControllerMethods {
 		render s
 	}
 
+	@HasPermission('TestCaseMethodCall')
 	def indirectTest() {
 
 		def p = new Person(firstName:'Robin', lastName:'Banks', id:123)
@@ -349,6 +371,7 @@ class TestCaseController implements ControllerMethods {
 	/**
 	 * Testing the GORM error handler to see if we can get human readable messages
 	 */
+	@HasPermission('TestCaseMethodCall')
 	def gormErrorsTest() {
 
 		def app = new AssetEntity(assetName:'Test app', validation:'Foo', )

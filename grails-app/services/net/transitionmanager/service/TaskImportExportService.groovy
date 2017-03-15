@@ -228,7 +228,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @controllerMethod
 	 */
 	Map processFileUpload(HttpServletRequest request, Project project, Map formOptions) {
-		if (! securityService.hasPermission('GenerateTasks', true)) {
+		if (! securityService.hasPermission('RecipeGenerateTasks', true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import task information')
 		}
 
@@ -684,7 +684,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @param params - the parameters from the HttpRequest
 	 */
 	void cancelPreviousUpload(Project project, Map formOptions) {
-		securityService.requirePermission(['GenerateTasks'], false,
+		securityService.requirePermission(['RecipeGenerateTasks'], false,
 			"attempted to cancel an task import for project $project")
 
 		deleteUploadedSpreadsheet(formOptions.filename)
@@ -696,7 +696,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @param formOptions - the params which will include the filename
 	 */
 	void deletePreviousUpload(Map formOptions) {
-		if (!securityService.hasPermission('GenerateTasks', false)) {
+		if (!securityService.hasPermission('RecipeGenerateTasks', false)) {
 			securityService.reportViolation("attempted to delete an uploaded task import spreadsheet(${formOptions.filename})")
 			throw new UnauthorizedException('Do not have the required permission perform this action')
 		}
@@ -732,7 +732,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @controllerMethod
 	 */
 	List generateReviewData(Project project, String filename, Map formOptions) {
-		if (!securityService.hasPermission('GenerateTasks', true)) {
+		if (!securityService.hasPermission('RecipeGenerateTasks', true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import task information')
 		}
 
@@ -903,7 +903,7 @@ class TaskImportExportService implements ServiceMethods {
 	@Transactional
 	Map postChangesToTasks(Project project, formOptions) {
 
-		if (!securityService.hasPermission('GenerateTasks', true)) {
+		if (!securityService.hasPermission('RecipeGenerateTasks', true)) {
 			throw new UnauthorizedException('Do not have the required permission to import task information')
 		}
 
@@ -1250,7 +1250,7 @@ class TaskImportExportService implements ServiceMethods {
 	}
 
 	File generatePostResultsData(String filename, Map formOptions) {
-		securityService.requirePermission('GenerateTasks', true)
+		securityService.requirePermission('RecipeGenerateTasks', true)
 
 		File file = new File(getJsonFilename(filename))
 		if (!file.exists()) {

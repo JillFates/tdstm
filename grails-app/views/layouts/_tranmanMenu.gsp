@@ -29,7 +29,7 @@
                         <li class="menu-child-item menu-list-companies"><g:link controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}">List Companies</g:link></li>
                         <li class="menu-child-item menu-list-staff"><g:link controller="person" id="${partyGroup}">List Staff</g:link></li>
                         <li class="menu-child-item menu-list-users">
-                            <tds:hasPermission permission='UserLoginView'>
+                            <tds:hasPermission permission='UserView'>
                                 <g:link controller="userLogin" id="${partyGroup}">List Users</g:link>
                             </tds:hasPermission>
                         </li>
@@ -76,7 +76,7 @@
                     <g:if test="${currProject}">
                         <li class="menu-child-item menu-projects-current-project"><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProject.name.size()>20}">${currProject.name.substring(0,20)+'...'}</g:if><g:else>${currProject.name}</g:else> Details</g:link></li>
                         <li class="menu-child-item menu-projects-project-staff"><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
-                        <tds:hasPermission permission='SendUserActivations'>
+                        <tds:hasPermission permission='UserSendActivations'>
                             <li class="menu-child-item menu-projects-user-activation"><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link></li>
                         </tds:hasPermission>
                         <li class="menu-child-item menu-projects-field-settings"><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('projectMegaMenu')">Field Settings</g:link></li>
@@ -185,13 +185,13 @@
                         </tds:hasPermission>
                         <li class="divider"></li>
                         <li class="menu-parent-item">Manage Data</li>
-                        <tds:hasPermission permission='Import'>
+                        <tds:hasPermission permission='AssetImport'>
                             <li class="menu-child-item menu-parent-assets-import-assets"><g:link controller="assetEntity" action="assetImport" >Import Assets</g:link></li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission='Import'>
+                        <tds:hasPermission permission='AssetImport'>
                             <li class="menu-child-item menu-parent-assets-manage-batches"><g:link controller="dataTransferBatch" action="list" >Manage Batches</g:link></li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission='Export'>
+                        <tds:hasPermission permission='AssetExport'>
                             <li class="menu-child-item menu-parent-assets-export-assets"><g:link controller="assetEntity" action="exportAssets" >Export Assets</g:link></li>
                         </tds:hasPermission>
                         <tds:hasPermission permission='HelpMenuView'>
@@ -212,7 +212,7 @@
                         <tds:hasPermission permission='ShowListNews'>
                             <li class="menu-child-item menu-parent-planning-event-news"><g:link controller="newsEditor" >List Event News</g:link></li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission="ShowMovePrep">
+                        <tds:hasPermission permission="ReportViewEventPrep">
                             <li class="menu-child-item"><g:link controller="reports" action="preMoveCheckList" >Pre-event Checklist</g:link></li>
                         </tds:hasPermission>
                         <li class="menu-child-item menu-parent-planning-export-runbook"><g:link controller="moveEvent" action="exportRunbook">Export Runbook</g:link></li>
@@ -238,23 +238,23 @@
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-parent-item">Tasks</li>
                         <li class="menu-child-item menu-parent-tasks-my-tasks"><a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a></li>
-                        <tds:hasPermission permission='ViewTaskManager'>
+                        <tds:hasPermission permission='TaskManagerView'>
                             <li class="menu-child-item menu-parent-tasks-task-manager"><g:link controller="assetEntity" action="listTasks"  params="[initSession:true]">Task Manager</g:link></li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission='ViewTaskGraph'>
+                        <tds:hasPermission permission='TaskGraphView'>
                             <li class="menu-child-item menu-parent-tasks-task-graph"><g:link controller="task" action="taskGraph"  params="[initSession:true]" >Task Graph</g:link></li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission='ViewTaskTimeline'>
+                        <tds:hasPermission permission='TaskTimelineView'>
                             <li class="menu-child-item menu-parent-tasks-task-timeline"><g:link controller="task" action="taskTimeline">Task Timeline</g:link></li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission="ViewRecipe">
+                        <tds:hasPermission permission="RecipeView">
                             <li class="menu-child-item menu-parent-tasks-cookbook"><g:link controller="cookbook" action="index">Cookbook</g:link></li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission="GenerateTasks">
+                        <tds:hasPermission permission="RecipeGenerateTasks">
                             <li class="menu-child-item menu-parent-tasks-generation-history"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
                         </tds:hasPermission>
 
-                        <tds:hasPermission permission='GenerateTasks'>
+                        <tds:hasPermission permission='RecipeGenerateTasks'>
                             <li class="menu-child-item menu-parent-tasks-import-tasks">
                                 <g:link class="mmlink" controller="assetEntity" action="importTask" >Import Tasks</g:link>
                             </li>
@@ -274,7 +274,7 @@
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-parent-item">Live Dashboards</li>
                         <li class="menu-child-item menu-parent-dashboard-user-dashboard"><g:link controller="dashboard" action="userPortal" >User Dashboard</g:link></li>
-                        <tds:hasPermission permission='ShowPlanning'>
+                        <tds:hasPermission permission='ReportViewPlanning'>
                             <li class="menu-child-item menu-parent-dashboard-planning-dashboard"><g:link controller="moveBundle" action="planningStats" >Planning Dashboard</g:link></li>
                         </tds:hasPermission>
                         <li class="menu-child-item menu-parent-dashboard-event-dashboard"><g:link controller="dashboard">Event Dashboard</g:link></li>
@@ -293,7 +293,7 @@
                 <li class="dropdown menu-parent-reports">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports<span class="caret"></span></a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
-                        <tds:hasPermission permission='ShowDiscovery'>
+                        <tds:hasPermission permission='ReportViewDiscovery'>
                             <li class="menu-parent-item">Discovery</li>
                             <li class="menu-child-item menu-reports-cabling-conflict"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" >Cabling Conflict</a> </li>
                             <li class="menu-child-item menu-reports-cabling-data"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a> </li>
@@ -308,16 +308,16 @@
                         <li class="menu-child-item menu-reports-application-conflicts"><a href="/tdstm/reports/applicationConflicts">Application Conflicts</a> </li>
                         <li class="menu-child-item menu-reports-server-conflicts"><a href="/tdstm/reports/serverConflicts">Server Conflicts</a> </li>
                         <li class="menu-child-item menu-reports-database-conflicts"><a href="/tdstm/reports/databaseConflicts" >Database Conflicts</a> </li>
-                        <tds:hasPermission permission='ShowPlanning'>
+                        <tds:hasPermission permission='ReportViewPlanning'>
                             <li class="menu-child-item menu-reports-task-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission='ShowProjectDailyMetrics'>
+                        <tds:hasPermission permission='ReportViewProjectDailyMetrics'>
                             <li class="menu-child-item menu-reports-activity-metrics"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
                         </tds:hasPermission>
-                        <tds:hasPermission permission='ShowMovePrep'>
+                        <tds:hasPermission permission='ReportViewEventPrep'>
                             <li class="divider"></li>
                             <li class="menu-parent-item">Event Prep</li>
-                            <tds:hasPermission permission="ShowMovePrep">
+                            <tds:hasPermission permission="ReportViewEventPrep">
                                 <li class="menu-child-item menu-reports-pre-checklist"><a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a> </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-reports-asset-tags"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a> </li>
@@ -326,7 +326,7 @@
                                 <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
                             </tds:hasPermission>
                         </tds:hasPermission>
-                        <tds:hasPermission permission='ShowMoveDay'>
+                        <tds:hasPermission permission='ReportViewEventDay'>
                             <li class="divider"></li>
                             <li class="menu-parent-item">Event Day</li>
                             <li class="menu-child-item menu-reports-application-migration"><a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>

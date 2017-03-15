@@ -53,7 +53,7 @@
 							</td>
 					</tr>
 					<tr class="buttonR">
-					<tds:hasPermission permission="ShowMovePrep">
+					<tds:hasPermission permission="ReportViewEventPrep">
 						<td>
 							<button type="button" class="btn btn-default" id="databaseConflictsButton"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Generate</button>
 						</td>

@@ -13,7 +13,7 @@
 	<div class="dialog">
 		<div class="nav" style="border: 1px solid #CCCCCC; height: 11px"><span
 			class="menuButton"><g:link class="list" action="list">Party List</g:link></span>
-		<tds:hasPermission permission='PartyCreateView'>
+		<tds:hasPermission permission='PartyCreate'>
 			<span class="menuButton"><g:link class="create" action="create">Create Party</g:link></span>
 		</tds:hasPermission></div>
 		<br>

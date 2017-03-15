@@ -1,4 +1,5 @@
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
 import groovy.util.logging.Slf4j
@@ -27,6 +28,7 @@ class WsDashboardController implements ControllerMethods {
 	 * @param moveEventId
 	 * @return JSON map
 	 */
+	@HasPermission('DashboardMenuView')
 	def bundleData() {
 		String error = ""
 		Project project = securityService.userCurrentProject

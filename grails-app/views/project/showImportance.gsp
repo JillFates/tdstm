@@ -6,7 +6,7 @@
 		<tr id="buttonRowId">
 			<td colspan="10" class="buttons">
 				<div>
-					<tds:hasPermission permission='EditProjectFieldSettings'>
+					<tds:hasPermission permission='ProjectFieldSettingsEdit'>
 						<span class="button">
 							<input type="button" value="Edit" class="edit" ng-click="toggleEditMode(type.name)" />
 						</span>

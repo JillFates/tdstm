@@ -112,7 +112,7 @@
 							</g:if>
 
 
-							<tds:hasPermission permission='CommentCrudView'>
+							<tds:hasPermission permission='CommentView'>
 								<g:if test="${issue.item.status == AssetCommentStatus.READY && !(item.category in AssetComment.moveDayCategories)}">
 									<span class="delay_myTasks">Delay for:</span>
 									<tds:actionButton label="1 day" icon="ui-icon-seek-next" id="${item?.id}"  

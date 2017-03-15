@@ -37,7 +37,7 @@ class RoomService implements ServiceMethods {
 		try {
 			while (true) {
 
-				if (!securityService.hasPermission('RoomEditView')) {
+				if (!securityService.hasPermission('RoomEdit')) {
 					log.warn "SECURITY : User $username attempted to edit a room without permission for project $project"
 					msg = 'Sorry but you do not appear to have the security rights to modify Room and Rack information'
 					break
@@ -211,7 +211,7 @@ class RoomService implements ServiceMethods {
 	 * @param roomIds - an id or a list of ids of the room to be deleted
 	 */
 	List deleteRoom(Project project, roomIds) {
-		securityService.requirePermission 'DeleteRoom'
+		securityService.requirePermission 'RoomDelete'
 
 		def skippedRooms = []
 		def userPrefRoom = userPreferenceService.getPreference(PREF.CURR_ROOM)

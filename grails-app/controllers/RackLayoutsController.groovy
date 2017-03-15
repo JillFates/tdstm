@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
@@ -42,6 +43,7 @@ class RackLayoutsController implements ControllerMethods {
 	/**
 	 * Used to generate the Rack Elevation criteria form that users access to generation elevations
 	 */
+	@HasPermission('RackCreate')
 	def create() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -93,6 +95,7 @@ class RackLayoutsController implements ControllerMethods {
 	/**
 	 * Used to generate multiple rack elevation diagrams
 	 */
+	@HasPermission('RackEdit')
 	def generateElevations() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -126,7 +129,7 @@ class RackLayoutsController implements ControllerMethods {
 			def bundlesString = bundleIds.toString().replace("[", "(").replace("]", ")")
 			moveBundles = MoveBundle.findAll("from MoveBundle where id in ${bundlesString} ")
 		}
-		def rackLayoutsHasPermission = securityService.hasPermission('EditAssetInRackLayout')
+		def rackLayoutsHasPermission = securityService.hasPermission('RackLayoutModify')
 
 		List<Rack> sourceRacks = findRacks('sourcerack', moveBundles, true)
 		List<Rack> targetRacks = findRacks('targetrack', moveBundles, false)
@@ -344,6 +347,7 @@ class RackLayoutsController implements ControllerMethods {
 		return model
 	}
 
+	@HasPermission('RackView')
 	def retrieveRackDetails() {
 		def bundleIds = params.bundles
 		def moveBundles = []
@@ -823,6 +827,7 @@ class RackLayoutsController implements ControllerMethods {
 		return bladeTable.toString()
 	}
 
+	@HasPermission('RackView')
 	def modelTemplate() {
 		return [params: params]
 	}
@@ -830,6 +835,7 @@ class RackLayoutsController implements ControllerMethods {
 	/*
 	 * Return AssetCableMap record details to display at RackLayout cabling screen
 	 */
+	@HasPermission('RackView')
 	def retrieveCablingDetails() {
 
 		Project project = securityService.userCurrentProject
@@ -931,6 +937,7 @@ class RackLayoutsController implements ControllerMethods {
 	/*
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen
 	 */
+	@HasPermission('RackView')
 	def retrieveAssetModelConnectors() {
 		def jsonInput = request.JSON
 		def roomType = jsonInput.roomType
@@ -973,6 +980,7 @@ class RackLayoutsController implements ControllerMethods {
 	/*
 	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
 	 */
+	@HasPermission('RackEdit')
 	def updateCablingDetails() {
 		def jsonInput = request.JSON
 		def assetCableId = jsonInput.assetCable
@@ -1076,6 +1084,7 @@ class RackLayoutsController implements ControllerMethods {
 	/*
 	 *  Provide the Rack auto complete details and connector, uposition validation
 	 */
+	@HasPermission('RackView')
 	def retrieveAutoCompleteDetails() {
 		Project project = securityService.userCurrentProject
 		def data
@@ -1124,6 +1133,7 @@ class RackLayoutsController implements ControllerMethods {
 	/*
 	 *  Generate Cabling diagram for given asset
 	 */
+	@HasPermission('RackView')
 	def generateCablingLayout(assetEntity, backView) {
 
 		def cableDiagram = ""
@@ -1162,6 +1172,7 @@ class RackLayoutsController implements ControllerMethods {
 	/**
 	 * Saves 'ShowAddIcons' Preference
 	 */
+	@HasPermission('UserGeneralAccess')
 	def savePreference() {
 		def preference = params.preference
 		if (params.add == "true") {
@@ -1185,6 +1196,7 @@ class RackLayoutsController implements ControllerMethods {
 	 * @param rackId - id of requested rack.
 	 * @return -  flash message
 	 */
+	@HasPermission('RackEdit')
 	def assignPowers() {
 		def rack
 		if (params.roomId) {
@@ -1203,6 +1215,7 @@ class RackLayoutsController implements ControllerMethods {
 	 * @param rackId - id of requested rack.
 	 * @return -  rack
 	 */
+	@HasPermission('RackEdit')
 	def assignPowerForRack(rackId) {
 		def rack = Rack.read(rackId)
 		def toPowers = ["A", "B", "C"]
@@ -1233,6 +1246,7 @@ class RackLayoutsController implements ControllerMethods {
 	 * @param : targetrack[] : list of target racks
 	 * @return : json list
 	 */
+	@HasPermission('RackEdit')
 	def retrieveAssignedCables() {
 		List<String> bundleIds = request.getParameterValues("moveBundle[]")
 		Project project = securityService.userCurrentProject

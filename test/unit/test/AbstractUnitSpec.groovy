@@ -28,7 +28,7 @@ abstract class AbstractUnitSpec extends Specification {
 	// TODO populate the test db with real data
 	protected static final List<String> ROLE_USER_PERMISSIONS = [
 			'ArchitectureView', 'AssetMenuView', 'AssetTrackerMenuView', 'DashBoardMenuView',
-			'ProjectStaffList', 'ProjectStaffShow', 'RackMenuView', 'ViewTaskGraph']
+			'ProjectStaffList', 'ProjectStaffShow', 'RackMenuView', 'TaskGraphView']
 
 	void setup() {
 		// it's assumed here that the test class is annotated with @TestFor or mixes in

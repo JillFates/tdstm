@@ -1,4 +1,5 @@
 import com.tdssrc.grails.GormUtil
+import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerSync
@@ -18,14 +19,16 @@ class ModelSyncBatchController implements ControllerMethods {
 
 	SecurityService securityService
 
-    def list() {
-        //params.max = Math.min(params.max ? params.int('max') : 20, 100)
-        [modelSyncBatchInstanceList: ModelSyncBatch.list(sort: 'id', order: 'desc'),
-         modelSyncBatchInstanceTotal: ModelSyncBatch.count()]
-    }
+	@HasPermission('ModelImport')
+	def list() {
+      	//params.max = Math.min(params.max ? params.int('max') : 20, 100)
+		[modelSyncBatchInstanceList: ModelSyncBatch.list(sort: 'id', order: 'desc'),
+		modelSyncBatchInstanceTotal: ModelSyncBatch.count()]
+	}
 
-    def process() {
-    	def modelBatch = params.batchId
+	@HasPermission('ModelImport')
+	def process() {
+		def modelBatch = params.batchId
 		def modelSyncBatch = ModelSyncBatch.get(modelBatch)
 		try{
 			if (modelSyncBatch) {
@@ -320,6 +323,6 @@ class ModelSyncBatchController implements ControllerMethods {
 			log.error "Can't import: " + e.message
 			e.printStackTrace()
 		}
-    	redirect(action: "list", params: params)
-    }
+		redirect(action: "list", params: params)
+	}
 }

@@ -34,7 +34,7 @@ class PartyGroupController implements ControllerMethods {
 	/**
 	 * Used to render the Company List view which will call back to the listJson for the actual data
 	 */
-	@HasPermission('PartyEditView')
+	@HasPermission('CompanyView')
 	def list() {
 		[listJsonUrl: createLink(controller: 'person', action: 'listJson')]
 	}
@@ -42,7 +42,7 @@ class PartyGroupController implements ControllerMethods {
 	/**
 	 * Used by the List view JQGrid
 	 */
-	@HasPermission('PartyEditView')
+	@HasPermission('CompanyView')
 	def listJson() {
 
     	Person whom = securityService.userLoginPerson
@@ -108,7 +108,7 @@ class PartyGroupController implements ControllerMethods {
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
-	@HasPermission('PartyEditView')
+	@HasPermission('CompanyView')
 	def show() {
 		PartyGroup partyGroup = PartyGroup.get(params.id)
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
@@ -183,7 +183,7 @@ class PartyGroupController implements ControllerMethods {
 
 	}
 
-	@HasPermission('PartyEditView')
+	@HasPermission('CompanyEdit')
 	def edit() {
 		PartyGroup partyGroup = PartyGroup.get( params.id )
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
@@ -196,7 +196,7 @@ class PartyGroupController implements ControllerMethods {
 		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup), projectPartner: isAProjectPartner(partyGroup)]
 	}
 
-	@HasPermission('PartyEditView')
+	@HasPermission('CompanyEdit')
 	def update() {
 		PartyGroup partyGroup = PartyGroup.get( params.id )
 		//partyGroup.lastUpdated = new Date()
@@ -227,12 +227,12 @@ class PartyGroupController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('PartyCreateView')
+	@HasPermission('CompanyCreate')
     def create() {
         [partyGroupInstance: new PartyGroup(params)]
     }
 
-	@HasPermission('PartyCreateView')
+	@HasPermission('CompanyCreate')
     def save() {
 
     	Person whom = securityService.userLoginPerson

@@ -429,7 +429,7 @@ class UserService implements ServiceMethods {
 
 	private List<Project> getSelectedProject(Project project) {
 		if (project == Project.ALL) {
-			projectService.getUserProjects(securityService.hasPermission("ShowAllProjects"), ProjectStatus.ACTIVE)
+			projectService.getUserProjects(securityService.hasPermission("ProjectShowAll"), ProjectStatus.ACTIVE)
 		}
 		else {
 			[project]
@@ -617,7 +617,7 @@ class UserService implements ServiceMethods {
 	 * Used to retrieve a list of users with recent activity
 	 * @param inPastMinutes - the number of minutes since latest activity (default 5)
 	 * @return A list of the username
-	 * @Permission RestartApplication
+	 * @Permission ApplicationRestart
 	 * TODO : JPM 3/2016 : Change to use new permission that is more applicable
 	 */
 	List usernamesWithRecentActivity(int inPastMinutes=5) {

@@ -33,7 +33,7 @@ class WsProjectController implements ControllerMethods {
 		searchParams.sortOrder = SortOrder.valueOfParam(params.sortOrder)
 
 		try {
-			def projects = projectService.getUserProjects(securityService.hasPermission("ShowAllProjects"), projectStatus, searchParams)
+			def projects = projectService.getUserProjects(securityService.hasPermission("ProjectShowAll"), projectStatus, searchParams)
 			def dataMap = [:]
 			def results = []
 			projects.each { project ->

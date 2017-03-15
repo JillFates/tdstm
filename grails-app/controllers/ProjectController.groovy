@@ -54,6 +54,7 @@ class ProjectController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	UserService userService
 
+	@HasPermission('ProjectView')
 	def list() {
 		[active: params.active ?: 'active']
 	}
@@ -62,6 +63,7 @@ class ProjectController implements ControllerMethods {
 	 * Generate the List for projects using jqgrid.
 	 * @return : list of projects as JSON
 	 */
+	@HasPermission('ProjectView')
 	def listJson() {
 		String sortIndex = params.sidx ?: 'projectCode'
 		String sortOrder  = params.sord ?: 'asc'
@@ -74,7 +76,7 @@ class ProjectController implements ControllerMethods {
 
 		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive) ?: ProjectStatus.COMPLETED
 
-		def projectList = projectService.getUserProjects(securityService.hasPermission('ShowAllProjects'), projectStatus, searchParams)
+		def projectList = projectService.getUserProjects(securityService.hasPermission('ProjectShowAll'), projectStatus, searchParams)
 
 		int totalRows = projectList?.isEmpty() ? 0 : projectList?.getTotalCount()
 		int numberOfPages = totalRows ? Math.ceil(totalRows / maxRows) : 1
@@ -88,6 +90,7 @@ class ProjectController implements ControllerMethods {
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
+	@HasPermission('ProjectView')
 	def show() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -133,7 +136,7 @@ class ProjectController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ProjectEditView')
+	@HasPermission('ProjectEdit')
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -189,7 +192,7 @@ class ProjectController implements ControllerMethods {
 	/*
 	 * Update the Project details
 	 */
-	@HasPermission('ProjectEditView')
+	@HasPermission('ProjectEdit')
 	def update() {
 		Project.withTransaction { status ->
 
@@ -299,7 +302,7 @@ class ProjectController implements ControllerMethods {
 	/*
 	 * Populate and present the create view for a new project
 	 */
-	@HasPermission('CreateProject')
+	@HasPermission('ProjectCreate')
 	def create() {
 		PartyGroup company = securityService.userLoginPerson.company
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
@@ -316,7 +319,7 @@ class ProjectController implements ControllerMethods {
 	 *    - save a partner logo
 	 *    - create the default 'TBD' bundle
 	 */
-	@HasPermission('CreateProject')
+	@HasPermission('ProjectCreate')
 	def save() {
 
 		Project.withTransaction { status ->
@@ -401,6 +404,7 @@ class ProjectController implements ControllerMethods {
 	 * @return JSON array:
  	 * 		staffList: List<Map> of staff [id:person.id, text: "firstName lastName, Company"]
 	 */
+	@HasPermission('ProjectStaffList')
 	def fetchStaffList() {
 
 		Person whom = securityService.userLoginPerson
@@ -484,6 +488,7 @@ class ProjectController implements ControllerMethods {
 		render json as JSON
 	}
 
+	@HasPermission('ProjectEdit')
 	def cancel() {
 		redirect(controller:'projectUtil')
 	}
@@ -491,6 +496,7 @@ class ProjectController implements ControllerMethods {
 	/*
 	 * Updates the user's project. It also resets the preferences for:
 	 */
+	@HasPermission('UserGeneralAccess')
 	def addUserPreference() {
 		Long selectProject = params.long('id')
 		String errMsg
@@ -519,11 +525,12 @@ class ProjectController implements ControllerMethods {
 	/**
 	 * Used to render a project logo if it exists
 	 */
+	@HasPermission('ProjectView')
 	def showImage() {
 		if( params.id ) {
-	 		ProjectLogo logo = ProjectLogo.get( params.id )
-	 		response.contentType = 'image/jpg'
-	 		if (logo) {
+			ProjectLogo logo = ProjectLogo.get( params.id )
+			response.contentType = 'image/jpg'
+			if (logo) {
 				response.outputStream << logo.partnerImage
 			}
 			// TODO : JPM 12/2016 : showImage() should have solution for missing logos
@@ -534,7 +541,7 @@ class ProjectController implements ControllerMethods {
 	/**
 	 * Used to delete the project logo for the project in the users context
 	 */
-	@HasPermission('ProjectEditView')
+	@HasPermission('ProjectEdit')
 	private def deleteImage() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -552,6 +559,7 @@ class ProjectController implements ControllerMethods {
 	/*
 	* function to set the user preference powerType
 	*/
+	@HasPermission('UserUpdateOwnAccount')
 	def setPower() {
 		userPreferenceService.setPreference(PREF.CURR_POWER_TYPE, params.p)
 		render params.p
@@ -560,9 +568,10 @@ class ProjectController implements ControllerMethods {
 	/**
 	 * Action to render the Field Settings (aka Importance) Show/Edit maintenance form for field importance and field tooltips
 	 */
+	@HasPermission('ProjectFieldSettingsView')
 	def fieldImportance() {
 		[project: securityService.userCurrentProject,
-		 hasEditProjectFieldSettingsPermission: securityService.hasPermission("EditProjectFieldSettings")]
+		 hasProjectFieldSettingsEditPermission: securityService.hasPermission("ProjectFieldSettingsEdit")]
 	}
 
 	/**
@@ -570,6 +579,7 @@ class ProjectController implements ControllerMethods {
 	 *@param : entityType type of entity.
 	 *@return : json data
 	 */
+	@HasPermission('AssetView')
 	def retrieveAssetFields() {
 
 		def assetTypes=EntityType.list
@@ -580,6 +590,7 @@ class ProjectController implements ControllerMethods {
 		fieldMap.customs = projectService.getCustoms()
 		render fieldMap as JSON
 	}
+	
 	/**
 	 * Initialising importance for a given entity type.
 	 *@param : entityType type of entity.
@@ -603,6 +614,7 @@ class ProjectController implements ControllerMethods {
 			custom8:{phase:{D:N,V:N,R:N,S:N,B:N}}}
 		}
 	 */
+	@HasPermission('AssetView')
 	def retrieveImportance() {
 		def assetTypes=EntityType.list
 		def impMap =[:]
@@ -617,6 +629,7 @@ class ProjectController implements ControllerMethods {
 	 * @param entity type
 	 * @return json data
 	 */
+	@HasPermission('AssetView')
 	def cancelImportance() {
 		render projectService.getConfigByEntity(request.JSON.entityType) as JSON
 	}
@@ -626,7 +639,7 @@ class ProjectController implements ControllerMethods {
 	 * @param : entityType type of entity for which user is requested for importance .
 	 * @return success string
 	 */
-	@HasPermission('EditProjectFieldSettings')
+	@HasPermission('ProjectFieldSettingsEdit')
 	def updateFieldImportance() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -655,6 +668,7 @@ class ProjectController implements ControllerMethods {
 	 * @param : entityType type of entity for which user is requested for importance .
 	 * @return
 	 */
+	@HasPermission('ProjectFieldSettingsEdit')
 	def retriveDefaultImportance() {
 		def entityType = request.JSON.entityType
 		renderSuccessJson(
@@ -667,7 +681,7 @@ class ProjectController implements ControllerMethods {
 	 * @param : custom count.
 	 * @render string 'success'.
 	 */
-	@HasPermission('EditProjectFieldSettings')
+	@HasPermission('ProjectFieldSettingsEdit')
 	def updateProjectCustomShown() {
 		Project project = securityService.userCurrentProject
 		project.customFieldsShown = NumberUtils.toInt(request.JSON.customCount,Project.CUSTOM_FIELD_COUNT)
@@ -683,6 +697,7 @@ class ProjectController implements ControllerMethods {
 	 * @param timezone default timezone selected
 	 * @render time zone view
 	 */
+	@HasPermission('ProjectEdit')
 	def showTimeZoneSelect() {
 		def timezone = params.timezone ?: TimeUtil.defaultTimeZone
 		def timezones = Timezone.findAll()
@@ -691,10 +706,12 @@ class ProjectController implements ControllerMethods {
 		render(template:"showTimeZoneSelect",model:[areas: areas, timezones: timezones, currTimeZone: timezone, userPref:false])
 	}
 
+	@HasPermission('ProjectFieldSettingsView')
 	def showImportanceFields() {
 		render( view: "showImportance", model: [])
 	}
-
+	
+	@HasPermission('ProjectFieldSettingsEdit')
 	def editImportanceFields() {
 		render( view: "editImportance", model: [])
 	}
@@ -702,7 +719,7 @@ class ProjectController implements ControllerMethods {
 	/**
 	 * Used to launch the project metrics daily job for testing purposes.
 	 */
-	@HasPermission('ShowProjectDailyMetrics')
+	@HasPermission('ReportViewProjectDailyMetrics')
 	def launchProjectDailyMetricsJob() {
 		def params = [:]
 		String key = "ProjectDailyMetrics-" + UUID.randomUUID()
@@ -719,10 +736,10 @@ class ProjectController implements ControllerMethods {
 	}
 
 	/**
- 	 * Renders the form so Admin's can initiate the bulk Account Activation
- 	 * Notification process.
+	 * Renders the form so Admin's can initiate the bulk Account Activation
+	 * Notification process.
 	 */
-	@HasPermission('SendUserActivations')
+	@HasPermission('UserSendActivations')
 	def userActivationEmailsForm() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -735,7 +752,7 @@ class ProjectController implements ControllerMethods {
 	/**
 	 * Sends out an Activation Email to those accounts selected by the admin.
 	 */
-	@HasPermission('SendUserActivations')
+	@HasPermission('UserSendActivations')
 	def sendAccountActivationEmails() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return

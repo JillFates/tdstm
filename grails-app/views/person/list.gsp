@@ -63,11 +63,11 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var listCaption ="Staff: \
-				<tds:hasPermission permission='PersonCreateView'>\
+				<tds:hasPermission permission='PersonCreate'>\
 					<span class=\"button\"><input type=\"button\" value=\"Create Staff\" class=\"create\" onClick=\"createDialog()\"/></span> \
 				</tds:hasPermission>\
 				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='Person.compareOrMerge()' disabled='disabled'/></span>\
-				<tds:hasPermission permission='BulkDeletePerson'>\
+				<tds:hasPermission permission='PersonBulkDelete'>\
 					<span class='capBtn'><input type='button' id='bulkDelete' value='Bulk Delete' onclick='Person.showBulkDeleteModal()' /></span>\
 				</tds:hasPermission>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })

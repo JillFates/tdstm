@@ -9,7 +9,7 @@
     <div class="body">
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
-	          <tds:hasPermission permission='CreateRoleType'>
+	          <tds:hasPermission permission='RoleTypeCreate'>
 	            <span class="menuButton"><g:link class="create" action="create">Create RoleType</g:link></span>
 	          </tds:hasPermission>
         	</div>
@@ -60,7 +60,7 @@
           </tbody>
         </table>
       </div>
-      <tds:hasPermission permission='RoleTypeEditView'>
+      <tds:hasPermission permission='RoleTypeView'>
       <div class="buttons">
         <g:form>
           <input type="hidden" name="id" value="${roleTypeInstance?.id}" />

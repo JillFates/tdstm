@@ -148,7 +148,7 @@
 									</div>
 								</div>
 							</div>
-							<tds:hasPermission permission="Export">
+							<tds:hasPermission permission="AssetExport">
 							<div class="form-group">
 								<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
 							</div>
