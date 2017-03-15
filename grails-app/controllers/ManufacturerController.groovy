@@ -32,7 +32,7 @@ class ManufacturerController implements ControllerMethods {
 		String sortIndex = params.sidx ?: 'modelName'
 		String sortOrder  = params.sord ?: 'asc'
 		int maxRows = params.int('rows')
-		int currentPage = params.int('page') ?: 1
+ 		int currentPage = params.int('page') ?: 1
 		int rowOffset = (currentPage - 1) * maxRows
 
 		session.MAN = [:]
@@ -182,6 +182,38 @@ class ManufacturerController implements ControllerMethods {
 		}
 		render manufacturersList as JSON
 	}
+
+
+
+	/*
+ 	 *  Send List of Manufacturer to be able to select one to merge with the current manufacturer, as JSON object
+ 	 *  @param fromId:Current manufacturer id
+	 *  @return : List of Manufacturers to merge as JSON
+ 	 */
+	def retrieveManufacturersListToMergeAsJSON() {
+
+		// Gets current manufacturer
+		def manufacturer = Manufacturer.get(params.fromId)
+
+		List<Manufacturer> manufacturers
+		manufacturers = Manufacturer.list()
+
+		// Remove current manufacturer from the list
+		manufacturers.removeElement(manufacturer)
+
+		manufacturers = manufacturers.sort { it.name }
+
+		def manufacturersList = manufacturers.collect {
+			Map<String, Object> data = [id: it.id, name: it.name]
+
+			data.alias = WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer(it).name)
+
+			data
+		}
+		render manufacturersList as JSON
+	}
+
+
 
 	/**
 	 *  Send Manufacturer details as JSON object

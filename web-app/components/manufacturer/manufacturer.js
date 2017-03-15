@@ -53,7 +53,7 @@ tds.manufacturers.controller.SelectManufacturerToMergeDialogController = functio
 	$scope.removePopupOpenedListener = $scope.$on('popupOpened', function(evt) {
 		$timeout(function() {
 			$scope.removePopupOpenedListener();
-			manufacturerService.getManufacturers().then(
+			manufacturerService.getManufacturersToMerge(currentManufacturerId).then(
 				function(data) {
 					$scope.manufacturers = data
 				},
@@ -131,9 +131,22 @@ tds.manufacturers.service.ManufacturerService = function(utils, http, q) {
 		return deferred.promise;
 	};
 
+    var getManufacturersToMerge = function(mFromId) {
+        var deferred = q.defer();
+        http.post(utils.url.applyRootPath('/manufacturer/retrieveManufacturersListToMergeAsJSON?fromId=' + mFromId)).
+        success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).
+        error(function(data, status, headers, config) {
+            deferred.reject(data);
+        });
+        return deferred.promise;
+    };
+
 	return {
 		getManufacturers: getManufacturers,
-		mergeManufacturers: mergeManufacturers
+		mergeManufacturers: mergeManufacturers,
+        getManufacturersToMerge: getManufacturersToMerge
 	};
 
 };
