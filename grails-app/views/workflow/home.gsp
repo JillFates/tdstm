@@ -12,7 +12,7 @@
 </head>
 
 <body>
-<tds:subHeader title="Workflows" crumbs="['Admin','Workflows','List']"/><br />
+<tds:subHeader title="Workflows" crumbs="['Admin','Workflows','List']"/>
 <div class="body">
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>

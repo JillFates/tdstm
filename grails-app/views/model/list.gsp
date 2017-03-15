@@ -81,7 +81,7 @@
 		</style>
 	</head>
 	<body>
-		<tds:subHeader title="Model List" crumbs="['Admin','Models']"/><br />
+		<tds:subHeader title="Model List" crumbs="['Admin','Models']"/>
 		<div class="body fluid">
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message" >${flash.message}</div>

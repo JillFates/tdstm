@@ -55,7 +55,7 @@
 		</style>
 	</head>
 	<body>
-	<tds:subHeader title="Manufacturer List" crumbs="['Admin','Manufacturer']"/><br />
+	<tds:subHeader title="Manufacturer List" crumbs="['Admin','Manufacturer']"/>
 		<div class="body fluid" ng-app="tdsManufacturers" ng-controller="tds.manufacturers.controller.MainController as manufacturers">
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<div >

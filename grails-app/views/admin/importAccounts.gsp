@@ -19,8 +19,7 @@
 			<div class="message">${raw(flash.message)}</div>
 		</g:if>
 
-		<div>
-			<br />
+		<div style="margin-top: 7px;">
 			<div class="panel panel-default account-import-step1">
 				<div class="panel-heading">This form is used to import and manage staff and user login accounts for the current project.</div>
 				<div class="panel-body">

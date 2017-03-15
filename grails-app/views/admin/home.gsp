@@ -14,12 +14,11 @@ a:hover {
 <body>
 <tds:subHeader title="Admin Portal" crumbs="['Admin','Portal']"/>
 <div class="body">
-<div>&nbsp;</div>
 <div><g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
 <div id="showCleanTypeMsgId" style="display: none" class="message"></div>
-<table style="border: 0" class="admin-home">
+<table style="border: 0; margin-top: -15px;" class="admin-home">
 	<tr>
 		<td style="vertical-align:top">
 			<div>
