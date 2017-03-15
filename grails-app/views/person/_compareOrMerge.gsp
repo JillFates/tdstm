@@ -51,7 +51,7 @@
 						</g:elseif>
 						<g:else>
 							<td id="${columnList.get(column)+'_td_'+person.id}">
-								<g:if test="${!['Active', 'Model Score', 'Model Score Bonus', 'Staff Type'].contains(column)}">
+								<g:if test="${!['Active', 'Staff Type'].contains(column)}">
 									<span class="showAll showFrom_${person.id}">
 										${columnList.get(column) ? person.(columnList.get(column)) : ''}
 									</span>
