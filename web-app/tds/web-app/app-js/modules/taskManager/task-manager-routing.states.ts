@@ -1,5 +1,9 @@
+/**
+ * Created by Jorge Morayta on 3/15/2017.
+ */
+
 import {Ng2StateDeclaration} from 'ui-router-ng2';
-import {NoticeListComponent} from './components/list/notice-list.component';
+import {TaskListComponent} from './components/list/task-list.component';
 import {HeaderComponent} from '../../shared/modules/header/header.component';
 
 /**
@@ -8,18 +12,18 @@ import {HeaderComponent} from '../../shared/modules/header/header.component';
  * The notice are fetched using a resolve.
  */
 export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-    name: 'tds.noticelist',
-    url: '/notice/list',
+    name: 'tds.tasklist',
+    url: '/task/list',
     data: {
-        page: {title: 'Notice Administration', instruction: '', menu: ['Admin', 'Notice', 'List']},
+        page: {title: 'Task Manager', instruction: '', menu: ['Task', 'List']},
         requiresAuth: true
     },
     views: {
         'headerView@tds': {component: HeaderComponent},
-        'containerView@tds': {component: NoticeListComponent}
+        'containerView@tds': {component: TaskListComponent}
     }
 };
 
-export const NOTICE_STATES = [
+export const TASK_MANAGER_STATES = [
     noticeListState
 ];

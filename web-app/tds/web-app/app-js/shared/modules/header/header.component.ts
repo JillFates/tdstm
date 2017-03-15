@@ -4,7 +4,7 @@ import {StateService} from 'ui-router-ng2';
 @Component({
     moduleId: module.id,
     selector: 'header',
-    templateUrl: '../../tds/web-app/app-js/modules/header/header.component.html',
+    templateUrl: '../../tds/web-app/app-js/shared/modules/header/header.component.html',
 })
 
 export class HeaderComponent {

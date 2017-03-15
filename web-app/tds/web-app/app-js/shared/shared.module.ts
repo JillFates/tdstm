@@ -15,6 +15,8 @@ import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
+// Shared Components
+import { HeaderComponent } from './modules/header/header.component';
 
 @NgModule({
     imports: [CommonModule],
@@ -22,7 +24,8 @@ import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
         UILoaderDirective,
         UIToastDirective,
         UIBooleanPipe,
-        UIDialogDirective
+        UIDialogDirective,
+        HeaderComponent
     ],
     providers: [
         AuthService,
@@ -36,7 +39,8 @@ import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
     exports: [UILoaderDirective,
         UIToastDirective,
         UIDialogDirective,
-        UIBooleanPipe]
+        UIBooleanPipe,
+        HeaderComponent]
 })
 export class SharedModule {
 }

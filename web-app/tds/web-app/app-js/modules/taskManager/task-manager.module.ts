@@ -1,11 +1,15 @@
+/**
+ * Created by Jorge Morayta on 3/15/2017.
+ */
+
 // Angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // Routing Logic
 import { UIRouterModule } from 'ui-router-ng2';
-import { NOTICE_STATES } from './notice-routing.states';
+import { TASK_MANAGER_STATES } from './task-manager-routing.states';
 // Components
-import { NoticeListComponent } from './components/list/notice-list.component';
+import { TaskListComponent } from './components/list/task-list.component';
 import { SharedModule } from '../../shared/shared.module';
 // Import Kendo Modules
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -15,11 +19,11 @@ import { GridModule } from '@progress/kendo-angular-grid';
         CommonModule,
         SharedModule,
         GridModule,
-        UIRouterModule.forChild({ states: NOTICE_STATES }), // Same as { states: [state1, state2 ] }
+        UIRouterModule.forChild({ states: TASK_MANAGER_STATES }), // Same as { states: [state1, state2 ] }
     ],
-    declarations: [NoticeListComponent],
-    exports: [NoticeListComponent]
+    declarations: [TaskListComponent],
+    exports: [TaskListComponent]
 })
 
-export class NoticesManagerModule {
+export class TaskManagerModule {
 }

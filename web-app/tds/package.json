@@ -22,6 +22,7 @@
     "@progress/kendo-data-query": "^0.3.6",
     "angular-in-memory-web-api": "~0.2.4",
     "core-js": "^2.4.1",
+    "ng-formly": "^1.0.0-rc.0",
     "rxjs": "5.0.3",
     "ui-router-core": "^4.0.0",
     "ui-router-ng2": "^1.0.0-beta.4",
