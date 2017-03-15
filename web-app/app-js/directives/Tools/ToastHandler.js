@@ -86,6 +86,10 @@ TDSTM.createDirective('toastHandler', ['$log', '$timeout', 'HTTPRequestHandlerIn
                 $log.debug('The request took ' + (time / 1000) + ' seconds');
                 $log.debug('Response result: ', response);
                 $scope.progress.show = false;
+
+                if(response && response.headers && response.headers('x-login-url')) {
+                    window.location.href = response.headers('x-login-url');
+                }
             });
 
             HTTPResponseErrorHandlerInterceptor.listenError().then(null, null, function(rejection){
