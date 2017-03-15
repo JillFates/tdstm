@@ -262,7 +262,11 @@
 					<!--<th>Start</th>
 					<th>Completion</th>
 					<th>Duration</th> -->
-					<th>Start - Completion<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" /></th>
+					<th>Start - Completion</th>
+					<th>Type
+					<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
+					</th>
+					<th>Be Green</th>
 				</tr>
 			</thead>
 			<tbody id="commetAndNewsBodyId">
@@ -329,6 +333,27 @@
 									</table>
 								</div>
 								</td>
+								<td>
+									<div id="calcMethodText_${dashboardStep.step.id }" title="text" style="display: none;" >
+									<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
+									<g:else>Linear</g:else></g:if>
+									</div>
+									<div id="calcMethodInput_${dashboardStep.step.id }" title="input">
+										<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
+										value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
+									</div>
+								</td>
+								<td>
+									<div id="beGreenDiv_${dashboardStep.step.id }" style="text-align: center;" >
+										<g:if test="${dashboardStep.moveBundleStep?.showInGreen}">
+											<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }" checked="checked"/>
+										</g:if>
+										<g:else>
+											<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }"/>
+										</g:else>
+
+									</div>
+								</td>
 							</g:if>
 							<g:else>
 								<td>
@@ -384,6 +409,21 @@
 											</td>
 										</tr>
 									</table>
+									</div>
+								</td>
+								<td>
+								<div id="calcMethodText_${dashboardStep.step.id }" title="text">
+								<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
+								<g:else>Linear</g:else></g:if>
+								</div>
+								<div id="calcMethodInput_${dashboardStep.step.id }" style="display: none;" title="input">
+									<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
+									value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
+								</div>
+								</td>
+								<td>
+									<div id="beGreenDiv_${dashboardStep.step.id }" style="display: none;text-align: center;">
+										<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }" />
 									</div>
 								</td>
 							</g:else>
