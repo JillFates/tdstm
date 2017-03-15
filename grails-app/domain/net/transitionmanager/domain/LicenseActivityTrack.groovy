@@ -33,6 +33,10 @@ class LicenseActivityTrack {
 		version false
 	}
 
+	static constraints = {
+		userLogin	nullable:true
+	}
+
 	/*
 	 * Used to access the changes as a List of Map objects instead of JSON text
 	 * @return The changes JSON String as Groovy List<Map>
