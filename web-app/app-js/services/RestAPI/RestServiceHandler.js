@@ -142,6 +142,11 @@ export default class RestServiceHandler {
                 this.req.url =  '../ws/manager/license/' + licenseId + '/activitylog';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
+            manuallyRequest: (licenseId, onSuccess, onError) => {
+                this.req.method = 'POST';
+                this.req.url =  '../ws/manager/license/' + licenseId + '/email/send';
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
+            }
         };
     }
 

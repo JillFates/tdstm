@@ -46,6 +46,20 @@ export default class LicenseManagerService {
         });
     }
 
+    manuallyRequest(license, onSuccess) {
+        this.restService.licenseManagerServiceHandler().manuallyRequest(license.id, (data) => {
+
+            if(data.status === this.statusSuccess) {
+                this.rootScope.$emit('broadcast-msg', { type: 'info', text: 'Email License was successfully'});
+            } else {
+                this.rootScope.$emit('broadcast-msg', { type: 'warning', text: data.data});
+                return onSuccess({ success: false});
+            }
+
+            return onSuccess(data);
+        });
+    }
+
     /**
      * Save the License
      */

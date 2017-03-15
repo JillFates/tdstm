@@ -206,6 +206,13 @@ export default class LicenseManagerDetail extends FormValidator{
     }
 
     /**
+     * If by some reason the License was not applied at first time, this will do a request for it
+     */
+    manuallyRequest() {
+        this.licenseManagerService.manuallyRequest(this.licenseModel, (data) => {});
+    }
+
+    /**
      * Validate the input on Server or Tokens is only integer only
      * This will be converted in a more complex directive later
      * TODO: Convert into a directive
