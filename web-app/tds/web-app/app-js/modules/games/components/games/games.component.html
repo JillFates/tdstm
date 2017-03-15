@@ -1,6 +1,12 @@
 <a uiSref="tds" uiSrefActive="active">Return</a> <br />
 <h1>{{title}}</h1>
-<tds-ui-dialog [config]="config"></tds-ui-dialog>
+<button (click)="open()">Open</button>
+<br>
+<p>
+    {{message}}
+</p>
+<br>
 <games-form></games-form>
 <br>
 <games-list></games-list>
+<tds-ui-dialog></tds-ui-dialog>

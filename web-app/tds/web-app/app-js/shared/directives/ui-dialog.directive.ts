@@ -1,79 +1,88 @@
+/**
+ * UI Dialog Directive works as a placeholder for any dialog being initiaded
+ * 
+ */
+
 import {
-    Component, ComponentRef, ComponentFactoryResolver,
-    OnInit, OnChanges, OnDestroy, SimpleChange, Input,
-    ViewChild, ViewContainerRef, ReflectiveInjector
+    Component, ComponentRef,
+    Input, ViewChild, ViewContainerRef,
+    OnDestroy
 } from '@angular/core';
 
 import { NotifierService } from "../services/notifier.service";
-
-import { DialogModel } from '../model/dialog.model'
+import { UIActiveDialogService } from "../services/ui-dialog.service";
+import { ComponentCreatorService } from "../services/component-creator.service";
+declare var jQuery: any;
 
 @Component({
     selector: 'tds-ui-dialog',
     template: `
-    <div class="modal fade" id="{{config.name}}" tabindex="-1" role="dialog">
+    <div class="modal fade" id="tdsUiDialog" data-backdrop="static" tabindex="-1" role="dialog" >
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Modal title</h4>
-                </div>
-                <div class="modal-body" #view>
-                    
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
+                <div #view></div>
+            </div>
+        </div>
     </div>`
 })
-export class UIDialogDirective implements OnInit, OnChanges, OnDestroy {
-    @Input('config') config: DialogModel;
+export class UIDialogDirective implements OnDestroy {
+    @Input('name') name: string;
     @ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
     cmpRef: ComponentRef<{}>;
 
+    resolve: any;
+    reject: any;
+
+    openNotifier: any;
+    closeNotifier: any;
+    dismissNotifier: any;
+
     constructor(private notifierService: NotifierService,
-        private resolver: ComponentFactoryResolver) {
+        private activeDialog: UIActiveDialogService,
+        private compCreator: ComponentCreatorService) {
         this.registerListeners();
     }
 
-    ngOnInit(): void {
-        if (!this.config.lazyLoad)
-            this.createExistingComponent();
-    };
+    private registerListeners(): void {
+        this.openNotifier = this.notifierService.on('dialog.open', event => {
+            if (this.cmpRef) {
+                this.cmpRef.destroy();
+                jQuery("#tdsUiDialog").modal('hide');
+                this.reject("OTHER_DIALOG_OPENED");
+            }
 
-    ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
-        if (changes['config'].previousValue.params)
-            this.createExistingComponent();
+            this.reject = event.reject;
+            this.resolve = event.resolve;
+            this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
+
+            this.activeDialog.componentInstance = this.cmpRef;
+            
+            jQuery("#tdsUiDialog").modal('show');
+        });
+
+        this.closeNotifier = this.notifierService.on('dialog.close', event => {
+            if (this.cmpRef) {
+                jQuery("#tdsUiDialog").modal('hide');
+                this.resolve(event.result);
+                this.cmpRef.destroy();
+            }
+        });
+
+        this.dismissNotifier = this.notifierService.on('dialog.dismiss', event => {
+            if (this.cmpRef) {
+                jQuery("#tdsUiDialog").modal('hide');
+                this.reject(event.result);
+                this.cmpRef.destroy();
+            }
+        });
+
     };
 
     ngOnDestroy(): void {
-        this.cmpRef.destroy();
-    }
-
-    private createExistingComponent(): void {
         if (this.cmpRef)
             this.cmpRef.destroy();
-
-        let resolvedInputs = ReflectiveInjector.resolve(this.config.params);
-        let injector = ReflectiveInjector.fromResolvedProviders(resolvedInputs, this.view.parentInjector);
-        let factory = this.resolver.resolveComponentFactory(this.config.component);
-
-        this.cmpRef = this.view.createComponent(factory, null, injector);
-    };
-
-    private registerListeners(): void {
-        this.notifierService.on(this.config.name + '.open', event => {
-            if (!this.cmpRef)
-                this.createExistingComponent();
-        });
-
-        this.notifierService.on(this.config.name + '.close', event => {
-            if (this.cmpRef)
-                this.cmpRef.destroy();
-        });
+        this.openNotifier();
+        this.closeNotifier();
+        this.dismissNotifier();
     }
-
 }
