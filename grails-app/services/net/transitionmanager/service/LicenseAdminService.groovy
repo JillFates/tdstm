@@ -523,7 +523,7 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 	}
 
-	private sendMailRequest(DomainLicense license){
+	private boolean sendMailRequest(DomainLicense license){
 		log.info("SEND License Request")
 		String toEmail = grailsApplication.config.tdstm?.license?.request_email
 

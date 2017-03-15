@@ -313,8 +313,6 @@ class UrlMappings {
 			]
 		}
 
-
-
 		//load a request HASH from a client, returns JSON object
 		"/ws/manager/license" {
 			controller = "wsLicenseManager"
@@ -328,7 +326,7 @@ class UrlMappings {
 			action = [
 					GET: "getLicense",
 					PUT: "updateLicense",
-					DELETE: "deleteLicense"
+					DELETE: "revokeLicense"
 			]
 		}
 
@@ -350,6 +348,14 @@ class UrlMappings {
 			controller = "wsLicenseManager"
 			action = [
 					GET: "activityLog"
+			]
+		}
+
+		//Email License
+		"/ws/manager/license/$id/email/send" {
+			controller = "wsLicenseManager"
+			action = [
+					POST: "emailLicense"
 			]
 		}
 

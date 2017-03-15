@@ -49,6 +49,13 @@ class WsLicenseManagerController implements ControllerMethods {
 		}
 	}
 
+	def revokeLicense(String id){
+		renderIfNotNull(id){
+			LicensedClient lic = licenseManagerService.revoke(id)
+			lic ? "successful deleted" : null
+		}
+	}
+
 	def activateLicense(String id){
 		renderIfNotNull(id){
 			licenseManagerService.activate(id)
@@ -124,6 +131,14 @@ class WsLicenseManagerController implements ControllerMethods {
 	def getLicenseKey(String id){
 		renderIfNotNull(id) {
 			licenseManagerService.getLicenseKey(id)
+		}
+	}
+
+	def emailLicense(String id){
+		if(licenseManagerService.emailLicense(id)){
+			renderSuccessJson("Ok")
+		}else{
+			renderFailureJson("Email could not be sent")
 		}
 	}
 }

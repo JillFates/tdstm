@@ -4,6 +4,7 @@ import com.github.icedrake.jsmaz.Smaz
 import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
+import grails.plugin.mail.MailService
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
@@ -20,12 +21,13 @@ import org.codehaus.groovy.grails.web.json.JSONElement
 @Slf4j
 class LicenseManagerService extends LicenseCommonService{
 	LicenseAdminService licenseAdminService
+	MailService mailService
 
 	Collection<LicensedClient> list(){
 		LicensedClient.findAll()
 	}
 
-	LicensedClient fetch(id){
+	LicensedClient fetch(String id){
 		LicensedClient lic
 		if(id) {
 			lic = LicensedClient.get(id)
@@ -34,11 +36,22 @@ class LicenseManagerService extends LicenseCommonService{
 		return lic
 	}
 
-	LicensedClient delete(id){
+	LicensedClient delete(String id){
 		LicensedClient lic = fetch(id)
 
 		if(lic) {
 			lic.delete()
+		}
+
+		return lic
+	}
+
+	LicensedClient revoke(String id){
+		LicensedClient lic = fetch(id)
+
+		if(lic) {
+			lic.status = License.Status.TERMINATED
+			lic.save()
 		}
 
 		return lic
@@ -52,9 +65,12 @@ class LicenseManagerService extends LicenseCommonService{
 		return lc.save()
 	}
 
-	def getLicenseKey(id) throws InvalidLicenseException{
+	String getLicenseKey(String id) throws InvalidLicenseException {
 		LicensedClient lic = fetch(id)
+		getLicenseKey(lic)
+	}
 
+	String getLicenseKey(LicensedClient lic) throws InvalidLicenseException{
 		if(lic) {
 			String errors = lic.missingPropertyErrors()
 			if(errors){
@@ -88,9 +104,10 @@ class LicenseManagerService extends LicenseCommonService{
 
 			licString = "${BEGIN_LIC_TAG}\n${licString}\n${END_LIC_TAG}"
 			log.info("OLB: licString: {}", licString)
-			return licString
+			licString
+		}else{
+			""
 		}
-
 	}
 
 	//// HELPER FUNCTIONS ///////////
@@ -156,5 +173,34 @@ class LicenseManagerService extends LicenseCommonService{
 			log = LicenseActivityTrack.findAllByLicensedClient(licensedClient, [sort: "dateCreated", order:"desc"])
 		}
 		log
+	}
+
+	boolean emailLicense(String id){
+		LicensedClient licensedClient = fetch(id)
+		emailLicense(licensedClient)
+	}
+
+	boolean emailLicense(LicensedClient licensedClient){
+		log.info("SEND License Request")
+		String toEmail = licensedClient.email
+
+		if(toEmail) {
+			String message = getLicenseKey(licensedClient)
+			String buff = ""
+			message.eachLine{ line ->
+				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'
+			}
+
+			mailService.sendMail {
+				to toEmail
+				subject "TM License"
+				body buff
+			}
+			true
+
+		}else{
+			log.error("no email found for the client")
+			false
+		}
 	}
 }
