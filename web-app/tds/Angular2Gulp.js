@@ -37,7 +37,7 @@ gulp.task('build-app', function () {
         fs.unlink(generatedFile);
     }
 
-    //validateJS('web-app/app-js/**/*.ts');
+    validateJS('web-app/app-js/**/*.ts');
 
     console.log('Compiling app.js file.');
 
@@ -75,7 +75,7 @@ gulp.task('watch-build-app', function () {
         debug: true // SourceMapping
     });
 
-    //validateJS('web-app/app-js/**/*.ts');
+    validateJS('web-app/app-js/**/*.ts');
 
     // Exclude all NPM Package from the build
     getNPMPackageIds().forEach(function (id) {

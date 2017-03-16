@@ -3,6 +3,8 @@
  */
 
 import {Component, OnInit} from '@angular/core';
+import { StateService } from 'ui-router-ng2';
+import { TaskStates } from '../../task-manager-routing.states';
 
 @Component({
     moduleId: module.id,
@@ -13,13 +15,21 @@ import {Component, OnInit} from '@angular/core';
 export class TaskListComponent implements OnInit {
 
     private moduleName = '';
-    private title = '';
 
     /**
      * @constructor
+     * @param {StateService} stateService
      */
-    constructor() {
+    constructor(private stateService: StateService) {
         this.moduleName = 'Task Manager List';
+    }
+
+    /**
+     * Create a new Task
+     * @listens onEditCreateNotice
+     */
+    onCreateTask(): void {
+        this.stateService.go(TaskStates.CREATE);
     }
 
     /**

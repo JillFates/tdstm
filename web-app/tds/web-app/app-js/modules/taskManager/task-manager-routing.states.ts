@@ -4,15 +4,19 @@
 
 import {Ng2StateDeclaration} from 'ui-router-ng2';
 import {TaskListComponent} from './components/list/task-list.component';
+import {TaskCreateComponent} from './components/create/task-create.component';
 import {HeaderComponent} from '../../shared/modules/header/header.component';
 
+export class TaskStates {
+    public static readonly LIST = 'tds.tasklist';
+    public static readonly CREATE = 'tds.taskcreate';
+}
+
 /**
- * This state displays the notice list.
- * It also provides a nested ui-view (viewport) for child states to fill in.
- * The notice are fetched using a resolve.
+ * This state displays the Task List.
  */
-export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-    name: 'tds.tasklist',
+export const taskListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
+    name: TaskStates.LIST,
     url: '/task/list',
     data: {
         page: {title: 'Task Manager', instruction: '', menu: ['Task', 'List']},
@@ -24,6 +28,23 @@ export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
     }
 };
 
+/**
+ * This state displays the Task Creation View
+ */
+export const taskViewState: Ng2StateDeclaration = <Ng2StateDeclaration>{
+    name: TaskStates.CREATE,
+    url: '/task/create',
+    data: {
+        page: {title: 'Create Task', instruction: '', menu: ['Task', 'List', 'Create']},
+        requiresAuth: true
+    },
+    views: {
+        'headerView@tds': {component: HeaderComponent},
+        'containerView@tds': {component: TaskCreateComponent}
+    }
+};
+
 export const TASK_MANAGER_STATES = [
-    noticeListState
+    taskListState,
+    taskViewState
 ];
