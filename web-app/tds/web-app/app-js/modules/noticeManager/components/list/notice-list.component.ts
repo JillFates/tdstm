@@ -51,7 +51,20 @@ export class NoticeListComponent implements OnInit {
         this.getNoticeList();
     }
 
-    public onEditCreateNotice(actionType: ActionType, dataItem: NoticeModel): void {
+    /**
+     * Create a new Notice
+     * @listens onCreateNotice
+     */
+    public onCreateNotice() {
+
+    }
+
+    /**
+     * Edit a Task
+     * @listens onEditCreateNotice
+     * @param {NoticeModel} dataItem
+     */
+    public onEditCreateNotice(dataItem: NoticeModel): void {
         console.log('Clicked on ', dataItem);
     }
 
