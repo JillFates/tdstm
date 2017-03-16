@@ -5,8 +5,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
 import {HttpModule} from '@angular/http';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {FormlyModule, FormlyBootstrapModule} from 'ng-formly';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
@@ -27,12 +25,7 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
     imports: [
         // Angular Modules
         BrowserModule,
-        FormsModule,
         HttpModule,
-        FormsModule,
-        ReactiveFormsModule,
-        FormlyModule.forRoot(),
-        FormlyBootstrapModule,
         // Bootstrap Module
         NgbModule.forRoot(),
         // Feature Modules

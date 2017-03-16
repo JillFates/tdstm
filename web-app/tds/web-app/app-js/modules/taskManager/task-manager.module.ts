@@ -14,16 +14,26 @@ import {TaskCreateComponent} from './components/create/task-create.component';
 import { SharedModule } from '../../shared/shared.module';
 // Import Kendo Modules
 import { GridModule } from '@progress/kendo-angular-grid';
+// Formly
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
     imports: [
         CommonModule,
         SharedModule,
         GridModule,
+        FormsModule,
+        ReactiveFormsModule,
         UIRouterModule.forChild({ states: TASK_MANAGER_STATES }), // Same as { states: [state1, state2 ] }
     ],
-    declarations: [TaskListComponent, TaskCreateComponent],
-    exports: [TaskListComponent, TaskCreateComponent]
+    declarations: [
+        TaskListComponent,
+        TaskCreateComponent
+    ],
+    exports: [
+        TaskListComponent,
+        TaskCreateComponent
+    ]
 })
 
 export class TaskManagerModule {

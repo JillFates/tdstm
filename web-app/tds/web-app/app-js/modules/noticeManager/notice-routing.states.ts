@@ -3,7 +3,10 @@ import {NoticeListComponent} from './components/list/notice-list.component';
 import {HeaderComponent} from '../../shared/modules/header/header.component';
 
 export class NoticeStates {
-    public static readonly LIST = 'tds.noticelist';
+    public static readonly LIST = {
+        name: 'tds.noticelist',
+        url: '/notice/list'
+    };
 }
 
 /**
@@ -12,8 +15,8 @@ export class NoticeStates {
  * The notice are fetched using a resolve.
  */
 export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-    name: NoticeStates.LIST,
-    url: '/notice/list',
+    name: NoticeStates.LIST.name,
+    url:  NoticeStates.LIST.url,
     data: {
         page: {title: 'Notice Administration', instruction: '', menu: ['Admin', 'Notice', 'List']},
         requiresAuth: true

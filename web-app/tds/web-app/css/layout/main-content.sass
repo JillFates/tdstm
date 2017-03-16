@@ -1,6 +1,6 @@
 div.content-wrapper
   background: $white
-  .container
+  div.container
     margin-right: 0
     margin-left: 0
     width: 100% !important
@@ -8,8 +8,6 @@ div.content-wrapper
       padding: 8px 15px 0px 15px
       > .breadcrumb
         padding: 0px 5px
-        a
-          cursor: default
       > .licensing-banner-message
         &.breadcumb-1
           right: 7%
@@ -27,6 +25,8 @@ div.content-wrapper
             border: inherit
             margin-top: inherit
             padding: inherit
+      div.box-with-empty-header
+        padding: 0px
 
 @media (max-width: 991px)
   section.content-header

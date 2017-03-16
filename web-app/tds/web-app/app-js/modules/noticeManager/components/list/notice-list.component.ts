@@ -55,8 +55,8 @@ export class NoticeListComponent implements OnInit {
      * Create a new Notice
      * @listens onCreateNotice
      */
-    public onCreateNotice() {
-
+    public onCreateNotice(): void {
+        console.log('Clicked on create notice');
     }
 
     /**

@@ -3,17 +3,20 @@
  */
 
 import {Component, OnInit} from '@angular/core';
+import {Validators, FormGroup} from '@angular/forms';
+import {FormlyFieldConfig} from 'ng-formly';
 
 @Component({
     moduleId: module.id,
-    selector: 'task-list',
+    selector: 'task-create',
     templateUrl: '../../tds/web-app/app-js/modules/taskManager/components/create/task-create.component.html'
 })
 
 export class TaskCreateComponent implements OnInit {
 
     private moduleName = '';
-    private title = '';
+
+    public form: FormGroup = new FormGroup({});
 
     /**
      * @constructor

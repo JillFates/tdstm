@@ -29,7 +29,7 @@ export class TaskListComponent implements OnInit {
      * @listens onEditCreateNotice
      */
     onCreateTask(): void {
-        this.stateService.go(TaskStates.CREATE);
+        this.stateService.go(TaskStates.CREATE.name);
     }
 
     /**

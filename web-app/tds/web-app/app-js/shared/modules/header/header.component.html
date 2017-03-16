@@ -5,7 +5,12 @@
         <small>{{pageMetaData.instruction}}</small>
     </h1>
     <ol class="breadcrumb">
-        <li *ngFor="let menu of pageMetaData.menu"><a href="#">{{menu}}</a></li>
+        <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}">
+            <a *ngIf="!last" href="#">{{menu}}</a>
+            <ng-container *ngIf="last">
+                {{menu}}
+            </ng-container>
+        </li>
     </ol>
 </section>
 <tds-ui-dialog></tds-ui-dialog>
