@@ -239,8 +239,14 @@ class LicenseAdminService extends LicenseCommonService {
 			licState = [:]
 			cache.put(new Element(projectId, licState))
 			List<DomainLicense> licenses = DomainLicense.findAllByProjectAndStatus(projectId, DomainLicense.Status.ACTIVE) //dateCreated?
+
 			//TODO: iterate over the licenses to find the one that fits
 			DomainLicense license = licenses.find { it.hash }
+
+			//If no active license for this project, check ALL for a multi-project one
+			if(!license) {
+				license = DomainLicense.findByProjectAndStatus("all", DomainLicense.Status.ACTIVE)
+			}
 
 			//Validate that the license in the DB has not been compromised
 			//LicenseManager manager = LicenseManager.getInstance()
@@ -297,8 +303,8 @@ class LicenseAdminService extends LicenseCommonService {
 					return licState
 				}
 
-				//The Name still the same?
-				if(projectName != project.name){
+				//The Name still the same? and is not a Multiproject one
+				if(projectName != project.name && projectName != "all"){
 					licState.message = "The name of the project was changed but must be <strong>'${projectName}'</strong> for license compliance"
 					licState.valid = false
 					return licState
