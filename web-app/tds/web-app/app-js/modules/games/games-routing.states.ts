@@ -1,5 +1,5 @@
 import {Ng2StateDeclaration} from 'ui-router-ng2';
-import { GameComponent }  from './components/games/games.component'
+import { GameComponent }  from './components/games/games.component';
 
 /**
  * This state displays the game module.

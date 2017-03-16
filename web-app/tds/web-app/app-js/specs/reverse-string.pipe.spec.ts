@@ -1,10 +1,10 @@
 /**
  * Created by aaferreira on 15/02/2017.
  */
-import {ReverseStringPipe} from '../shared/pipes/reverse-string.pipe'
+import { ReverseStringPipe } from '../shared/pipes/reverse-string.pipe';
 
-describe('ReverseStringPipe:',()=>{
-   let pipe: ReverseStringPipe
+describe('ReverseStringPipe:', () => {
+    let pipe: ReverseStringPipe;
 
     beforeEach(() => {
         pipe = new ReverseStringPipe();
@@ -17,6 +17,5 @@ describe('ReverseStringPipe:',()=>{
     it('should return a reverted string', () => {
         expect(pipe.transform('potato')).toBe('otatop');
     });
-
 
 });

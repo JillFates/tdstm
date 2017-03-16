@@ -3,10 +3,10 @@
  */
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({name: 'addEmotion'})
+@Pipe({ name: 'addEmotion' })
 export class AddEmotionPipe implements PipeTransform {
-    transform(value: string,emphasis:boolean = false): string{
-        value += emphasis?'!!!!':'';
+    transform(value: string, emphasis = false): string {
+        value += emphasis ? '!!!!' : '';
         return value.toUpperCase();
     }
 }

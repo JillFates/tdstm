@@ -9,16 +9,10 @@ import { Injectable } from '@angular/core';
 export class AuthService {
 
     /**
-     * @constructor
-     */
-    constructor() {}
-
-    /**
      * Returns true if the user is currently authenticated, else false
      */
     isAuthenticated() {
         return true;
     }
-
 
 }

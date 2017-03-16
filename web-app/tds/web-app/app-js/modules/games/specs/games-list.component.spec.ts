@@ -1,29 +1,29 @@
 import {
-    ComponentFixture,// Core class of a component: has control over methods, digest cycle, elements, injection and so on
-    TestBed, //Acts like a NgModule to wrap the component as an application
-    async, //Any component who has external resources(eg. html,css) or any asynchronous call should import this module
-    fakeAsync, //Not needed, another way to handle async, but in the same thread
-    tick //Not needed, waits to all async call get resolved or simullates passage of time
-} from '@angular/core/testing'
+    ComponentFixture, // Core class of a component: has control over methods, digest cycle, elements, injection and so on
+    TestBed, // Acts like a NgModule to wrap the component as an application
+    async, // Any component who has external resources(eg. html,css) or any asynchronous call should import this module
+    fakeAsync, // Not needed, another way to handle async, but in the same thread
+    tick // Not needed, waits to all async call get resolved or simullates passage of time
+} from '@angular/core/testing';
 
 import {
     By // Used to query html elements
-} from '@angular/platform-browser'
+} from '@angular/platform-browser';
 
 import {
     DebugElement // Hold the instance to an HTML element you want to test
-} from '@angular/core'
+} from '@angular/core';
 
-//after all these imports you should import what actually is gonna be tested
-import { GameListComponent } from '../components/games-list/games-list.component'
+// after all these imports you should import what actually is gonna be tested
+import { GameListComponent } from '../components/games-list/games-list.component';
 
-import { GameService } from '../service/game.service'
-import { Game } from '../model/game.model'
+import { GameService } from '../service/game.service';
+import { Game } from '../model/game.model';
 
-//you should not use/manipulate real data in your test, right?
+// you should not use/manipulate real data in your test, right?
 describe('GameListComponent - Learning: async and spy', () => {
 
-    let mockData: Array<Game>
+    let mockData: Array<Game>;
 
     let fixture: ComponentFixture<GameListComponent>;
     let comp: GameListComponent;
@@ -50,11 +50,11 @@ describe('GameListComponent - Learning: async and spy', () => {
         // GameService actually injected into the component
         gameService = fixture.debugElement.injector.get(GameService);
 
-        //return mockData when query get called
+        // return mockData when query get called
         spyQuery = spyOn(gameService, 'query')
             .and.returnValue(Promise.resolve(mockData));
 
-        //save on the mockdata 
+        // save on the mockdata
         spySave = spyOn(gameService, 'save').and.callFake((game: Game) => {
             return new Promise((resolve, reject) => {
                 mockData.push(game);
@@ -72,7 +72,7 @@ describe('GameListComponent - Learning: async and spy', () => {
         expect(spyQuery.calls.any()).toBe(true, 'query() called');
     });
 
-    //first way on how handle async calls, seems better to me
+    // first way on how handle async calls, seems better to me
     it('should have 3 games listed (async)', async(() => {
         fixture.detectChanges();
         fixture.whenStable().then(() => {
@@ -88,7 +88,7 @@ describe('GameListComponent - Learning: async and spy', () => {
         fixture.whenStable().then(() => {
             fixture.detectChanges();
             de = fixture.debugElement.query(By.css('#refresh'));
-            de.triggerEventHandler("click", null);
+            de.triggerEventHandler('click', null);
             fixture.detectChanges();
             expect(spyQuery.calls.count()).toBe(2);
         });
@@ -99,11 +99,10 @@ describe('GameListComponent - Learning: async and spy', () => {
         fixture.whenStable().then(() => {
             fixture.detectChanges();
             expect(comp.games.length).toBe(3);
-            
-            gameService.save(new Game("Donkey Kong"));
+            gameService.save(new Game('Donkey Kong'));
 
             de = fixture.debugElement.query(By.css('#refresh'));
-            de.triggerEventHandler("click", null);
+            de.triggerEventHandler('click', null);
 
             fixture.detectChanges();
 
@@ -140,19 +139,18 @@ describe('GameListComponent - Learning: fakeAsync and tick', () => {
         fixture = TestBed.createComponent(GameListComponent);
         comp = fixture.componentInstance;
 
-
         // GameService actually injected into the component
         gameService = fixture.debugElement.injector.get(GameService);
 
-        //return mockData when query get called
+        // return mockData when query get called
         spy = spyOn(gameService, 'query')
             .and.returnValue(Promise.resolve(mockData));
     });
 
-    //another way on how handle async calls
+    // another way on how handle async calls
     it('should have 3 games listed (fakeAsync)', fakeAsync(() => {
         fixture.detectChanges();
-        tick();//simulates passage of time or in this case wait until all async calls get resolved
+        tick(); // simulates passage of time or in this case wait until all async calls get resolved
         fixture.detectChanges();
         de = fixture.debugElement.query(By.css('tr'));
         expect(de.childNodes.length).toBe(3);

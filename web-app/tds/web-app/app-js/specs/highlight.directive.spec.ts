@@ -1,13 +1,12 @@
 /**
  * Created by aaferreira on 13/02/2017.
  */
-import { ComponentFixture, TestBed, async } from '@angular/core/testing'
-import { By } from '@angular/platform-browser'
-import { DebugElement } from '@angular/core'
-import { EmptyComponent } from '../testing/empty.component'
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
+import { EmptyComponent } from '../testing/empty.component';
 
-import { HighlightDirective } from '../shared/directives/highlight.directive'
-
+import { HighlightDirective } from '../shared/directives/highlight.directive';
 
 describe('HighlightDirective:', () => {
     let fixture: ComponentFixture<EmptyComponent>;

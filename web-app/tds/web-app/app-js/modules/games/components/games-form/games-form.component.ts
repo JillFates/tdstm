@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { GameService } from '../../service/game.service'
-import { Game } from '../../model/game.model'
+import { GameService } from '../../service/game.service';
+import { Game } from '../../model/game.model';
 
 @Component({
     moduleId: module.id,
@@ -11,23 +11,23 @@ import { Game } from '../../model/game.model'
 })
 
 export class GameFormComponent {
-    model: Game
+    model: Game;
     submitted = false;
 
     constructor(private gameService: GameService, private game: Game) {
-        this.model = game || new Game("");
+        this.model = game || new Game('');
     }
 
     onSubmit(form): void {
-        var ctrl = this;
+        let ctrl = this;
         this.submitted = true;
         this.gameService.save(this.model).then(function (r) {
-            ctrl.model = new Game("");
+            ctrl.model = new Game('');
             form.reset();
             ctrl.submitted = false;
         });
     };
 
-    newGame() { this.model = new Game(""); };
+    newGame() { this.model = new Game(''); };
 
 }

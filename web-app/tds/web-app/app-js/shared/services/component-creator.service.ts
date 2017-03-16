@@ -6,8 +6,7 @@ import { Injectable, Injector, ComponentRef, ComponentFactoryResolver, Reflectiv
 @Injectable()
 export class ComponentCreatorService {
 
-    constructor(private resolver: ComponentFactoryResolver,
-        private parentInjector: Injector) {
+    constructor(private resolver: ComponentFactoryResolver, private parentInjector: Injector) {
 
     }
 

@@ -1,6 +1,6 @@
 export class Game {
-    Name: string = 'Default';
-    
+    Name = 'Default';
+
     constructor(name: string) {
         this.Name = name;
     }

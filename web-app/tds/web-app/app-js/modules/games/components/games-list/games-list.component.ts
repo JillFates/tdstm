@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { GameService } from '../../service/game.service'
-import { Game } from '../../model/game.model'
+import { GameService } from '../../service/game.service';
+import { Game } from '../../model/game.model';
 
 @Component({
     moduleId: module.id,
@@ -9,7 +9,6 @@ import { Game } from '../../model/game.model'
     styleUrls: ['../../tds/web-app/app-js/modules/games/components/games-list/games-list.component.css'],
     providers: []
 })
-
 export class GameListComponent implements OnInit {
     games: Array<Game>;
 

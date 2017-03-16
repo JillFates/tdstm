@@ -1,35 +1,36 @@
 import { Injectable } from '@angular/core';
-import { Game } from '../model/game.model'
+import { Game } from '../model/game.model';
 
 @Injectable()
 export class GameService {
     private games: Array<Game> = [];
 
     constructor() {
-        this.games.push(new Game("Last of us"));
-        this.games.push(new Game("Uncharted"));
-        this.games.push(new Game("Dark Souls 3"));
-        this.games.push(new Game("Red dead redemption"));
+        this.games.push(new Game('Last of us'));
+        this.games.push(new Game('Uncharted'));
+        this.games.push(new Game('Dark Souls 3'));
+        this.games.push(new Game('Red dead redemption'));
     };
 
     query(): Promise<Array<Game>> {
         return new Promise((resolve, reject) => {
-            setTimeout(() => { resolve(this.games) }, 2000);
+            setTimeout(() => { resolve(this.games); }, 2000);
         });
     };
 
-    findById(id: number):Promise<Game> {
+    findById(id: number): Promise<Game> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                if (id < this.games.length)
+                if (id < this.games.length) {
                     resolve(this.games[id]);
-                else
-                    reject("Game not found.");
-            }, 2000)
+                } else {
+                    reject('Game not found.');
+                }
+            }, 2000);
         });
     };
 
-    save(game: Game):Promise<number> {
+    save(game: Game): Promise<number> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 this.games.push(game);
@@ -38,11 +39,11 @@ export class GameService {
         });
     };
 
-    delete(id: number):Promise<string> {
+    delete(id: number): Promise<string> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 this.games.splice(id, 1);
-                resolve("Ok");
+                resolve('Ok');
             }, 2000);
         });
     }

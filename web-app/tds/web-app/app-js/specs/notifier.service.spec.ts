@@ -1,10 +1,10 @@
 /**
  * Created by aaferreira on 15/02/2017.
  */
-import { NotifierService } from '../shared/services/notifier.service'
+import { NotifierService } from '../shared/services/notifier.service';
 
 describe('NotifierService:', () => {
-    let notifier: NotifierService
+    let notifier: NotifierService;
 
     beforeEach(() => {
         notifier = new NotifierService();
@@ -14,10 +14,9 @@ describe('NotifierService:', () => {
         expect(notifier).toBeDefined();
     });
 
-
     it('should be able to listen for events', done => {
         notifier.on('NotifierTestEvent', event => {
-            expect(event.name).toBe("NotifierTestEvent")
+            expect(event.name).toBe('NotifierTestEvent');
             done();
         });
         notifier.broadcast({
@@ -27,8 +26,8 @@ describe('NotifierService:', () => {
 
     it('should be able to pass data to listener', done => {
         notifier.on('NotifierTestEvent', event => {
-            expect(event.name).toBe('NotifierTestEvent')
-            expect(event.data).toBe('NotifierTestData')
+            expect(event.name).toBe('NotifierTestEvent');
+            expect(event.data).toBe('NotifierTestData');
             done();
         });
         notifier.broadcast({
@@ -39,16 +38,16 @@ describe('NotifierService:', () => {
 
     it('should no call listener if it already has been unsuscribed', done => {
         let listerner = notifier.on('NotifierTestEvent', event => {
-            expect(false).toBe(true)//should not go here
+            expect(false).toBe(true); // should not go here
             done();
         });
-        listerner(); //remove the listener;
+        listerner(); // remove the listener;
         notifier.broadcast({
             name: 'NotifierTestEvent'
         });
-        //setup listerner again to resolve test
+        // setup listerner again to resolve test
         listerner = notifier.on('NotifierTestEvent', event => {
-            expect(event.name).toBe('NotifierTestEvent')
+            expect(event.name).toBe('NotifierTestEvent');
             done();
         });
         notifier.broadcast({
@@ -61,15 +60,19 @@ describe('NotifierService:', () => {
             callbacksCalled: 0
         };
         notifier.on('NotifierTestEvent', event => {
-            expect(event.name).toBe('NotifierTestEvent')
+            expect(event.name).toBe('NotifierTestEvent');
             control.callbacksCalled++;
-            if (control.callbacksCalled == 4) done();
+            if (control.callbacksCalled === 4) {
+                done();
+            }
         });
 
         notifier.on('NotifierTestEvent', event => {
-            expect(event.name).toBe('NotifierTestEvent')
+            expect(event.name).toBe('NotifierTestEvent');
             control.callbacksCalled++;
-            if (control.callbacksCalled == 4) done();
+            if (control.callbacksCalled === 4) {
+                done();
+            }
         });
 
         notifier.broadcast({
@@ -85,16 +88,18 @@ describe('NotifierService:', () => {
             callbacksCalled: 0
         };
         let listener1 = notifier.on('NotifierTestEvent', event => {
-            expect(event.name).toBe('NotifierTestEvent')
+            expect(event.name).toBe('NotifierTestEvent');
             control.callbacksCalled++;
-            if (control.callbacksCalled == 2) done();
+            if (control.callbacksCalled === 2) {
+                done();
+            }
         });
 
         let listener2 = notifier.on('NotifierTestEvent', event => {
-            expect(false).toBe(true)//should not go here
+            expect(false).toBe(true); // should not go here
             done();
         });
-        listener2();//kill second listener;
+        listener2(); // kill second listener;
 
         notifier.broadcast({
             name: 'NotifierTestEvent'
@@ -103,6 +108,5 @@ describe('NotifierService:', () => {
             name: 'NotifierTestEvent'
         });
     });
-
 
 });

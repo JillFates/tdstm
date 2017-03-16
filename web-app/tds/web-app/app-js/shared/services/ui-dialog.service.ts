@@ -1,8 +1,5 @@
-/**
- * 
- */
 import { Injectable, ComponentRef } from '@angular/core';
-import { NotifierService } from './notifier.service'
+import { NotifierService } from './notifier.service';
 
 @Injectable()
 export class UIDialogService {

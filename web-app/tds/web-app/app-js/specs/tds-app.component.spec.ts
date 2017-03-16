@@ -1,9 +1,9 @@
-import { ComponentFixture, TestBed, async } from '@angular/core/testing'
-import { By } from '@angular/platform-browser'
-import { DebugElement } from '@angular/core'
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 
-import { TDSAppComponent } from '../config/tds-app.component'
-import { UserService } from '../shared/services/user.service'
+import { TDSAppComponent } from '../config/tds-app.component';
+import { UserService } from '../shared/services/user.service';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 import { NotifierService } from '../shared/services/notifier.service';
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
