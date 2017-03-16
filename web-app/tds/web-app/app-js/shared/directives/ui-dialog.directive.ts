@@ -27,7 +27,7 @@ declare var jQuery: any;
 export class UIDialogDirective implements OnDestroy {
     @Input('name') name: string;
     @ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
-    cmpRef: ComponentRef<{}>;
+    cmpRef: ComponentRef<{}>; // Instace of the component
 
     resolve: any;
     reject: any;
@@ -43,8 +43,12 @@ export class UIDialogDirective implements OnDestroy {
         this.registerListeners();
     }
 
+    /**
+     * Register the listener to handle dialog events
+     */
     private registerListeners(): void {
         this.openNotifier = this.notifierService.on('dialog.open', event => {
+            // make sure UI has no other open dialog
             if (this.cmpRef) {
                 this.cmpRef.destroy();
                 jQuery('#tdsUiDialog').modal('hide');
@@ -78,6 +82,9 @@ export class UIDialogDirective implements OnDestroy {
 
     };
 
+    /**
+     * Clear resources on destroy
+     */
     ngOnDestroy(): void {
         if (this.cmpRef) {
             this.cmpRef.destroy();
