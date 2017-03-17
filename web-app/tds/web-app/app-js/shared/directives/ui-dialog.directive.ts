@@ -3,9 +3,9 @@
  */
 
 import {
-    Component, ComponentRef,
+    Component, ComponentRef, ElementRef,
     Input, ViewChild, ViewContainerRef,
-    OnDestroy
+    OnDestroy, AfterViewInit
 } from '@angular/core';
 
 import { NotifierService } from '../services/notifier.service';
@@ -16,17 +16,21 @@ declare var jQuery: any;
 @Component({
     selector: 'tds-ui-dialog',
     template: `
-    <div class="modal fade" id="tdsUiDialog" data-backdrop="static" tabindex="-1" role="dialog" >
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="tdsUiDialog" data-backdrop="static" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" #modalDialog>
             <div class="modal-content">
                 <div #view></div>
             </div>
         </div>
     </div>`
 })
-export class UIDialogDirective implements OnDestroy {
+export class UIDialogDirective implements OnDestroy, AfterViewInit {
     @Input('name') name: string;
     @ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
+    @ViewChild('modalDialog') el: ElementRef;
+
+    tdsUiDialog: any;
+
     cmpRef: ComponentRef<{}>; // Instace of the component
 
     resolve: any;
@@ -51,7 +55,7 @@ export class UIDialogDirective implements OnDestroy {
             // make sure UI has no other open dialog
             if (this.cmpRef) {
                 this.cmpRef.destroy();
-                jQuery('#tdsUiDialog').modal('hide');
+                this.tdsUiDialog.modal('hide');
                 this.reject('OTHER_DIALOG_OPENED');
             }
 
@@ -61,11 +65,13 @@ export class UIDialogDirective implements OnDestroy {
 
             this.activeDialog.componentInstance = this.cmpRef;
 
-            jQuery('#tdsUiDialog').modal('show');
+            this.tdsUiDialog.modal('show');
         });
 
         this.closeNotifier = this.notifierService.on('dialog.close', event => {
             if (this.cmpRef) {
+                this.el.nativeElement.style.top = 'initial';
+                this.el.nativeElement.style.left = 'initial';
                 jQuery('#tdsUiDialog').modal('hide');
                 this.resolve(event.result);
                 this.cmpRef.destroy();
@@ -74,7 +80,9 @@ export class UIDialogDirective implements OnDestroy {
 
         this.dismissNotifier = this.notifierService.on('dialog.dismiss', event => {
             if (this.cmpRef) {
-                jQuery('#tdsUiDialog').modal('hide');
+                this.el.nativeElement.style.top = 'initial';
+                this.el.nativeElement.style.left = 'initial';
+                this.tdsUiDialog.modal('hide');
                 this.reject(event.result);
                 this.cmpRef.destroy();
             }
@@ -92,5 +100,12 @@ export class UIDialogDirective implements OnDestroy {
         this.openNotifier();
         this.closeNotifier();
         this.dismissNotifier();
+    }
+
+    ngAfterViewInit(): void {
+        this.tdsUiDialog = jQuery('#tdsUiDialog');
+        jQuery(this.el.nativeElement).draggable({
+            handle: '.modal-header'
+        });
     }
 }
