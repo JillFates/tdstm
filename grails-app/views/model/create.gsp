@@ -1,6 +1,7 @@
 <%@page expressionCodec="none" %>
 <%@page import="net.transitionmanager.domain.Manufacturer" %>
 <%@page import="net.transitionmanager.domain.ModelConnector" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -263,7 +264,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
-					<tds:hasPermission permission="ModelEdit">
+					<tds:hasPermission permission="${Permission.ModelEdit}">
 					<span class="button">
 						<g:actionSubmit class="save" id="saveModelId" action="save" value="Save"></g:actionSubmit>
 					</span>

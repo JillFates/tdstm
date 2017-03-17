@@ -1,5 +1,6 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="com.tds.asset.AssetType"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 
 <%-- Set some vars based on the action being save or update --%>
 <g:set var="actionLabel" value="${action == 'save' ? 'Save' : 'Update'}" />
@@ -466,7 +467,7 @@
 					 	<input type="button" class="save updateDep" data-redirect='${redirectTo}' data-action='show'
 							   value="${actionLabel}" onclick="EntityCrud.${jsAction}($(this), '${assetEntityInstance.assetClass}'); " />
 					 </span>
-					<tds:hasPermission permission='AssetDelete'>
+					<tds:hasPermission permission="${Permission.AssetDelete}">
 						 <span class="button"><g:actionSubmit class="delete"
 															  onclick=" return confirm('You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel');" value="Delete" /> </span>
 					</tds:hasPermission>

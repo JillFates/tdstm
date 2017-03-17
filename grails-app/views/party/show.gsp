@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -13,7 +14,7 @@
 	<div class="dialog">
 		<div class="nav" style="border: 1px solid #CCCCCC; height: 11px"><span
 			class="menuButton"><g:link class="list" action="list">Party List</g:link></span>
-		<tds:hasPermission permission='PartyCreate'>
+		<tds:hasPermission permission="${Permission.PartyCreate}">
 			<span class="menuButton"><g:link class="create" action="create">Create Party</g:link></span>
 		</tds:hasPermission></div>
 		<br>
@@ -48,9 +49,9 @@
 				<tr class="prop">
 					<td valign="top" class="name">Party Type:</td>
 
-					<td valign="top" class="value"><tds:hasPermission permission='PartyTypeShowView'><g:link controller="partyType"
+					<td valign="top" class="value"><tds:hasPermission permission="${Permission.PartyTypeShowView}"><g:link controller="partyType"
 						action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType?.encodeAsHTML()}</g:link></tds:hasPermission>
-					<tds:hasPermission permission='PartyShowView'>${partyInstance?.partyType?.encodeAsHTML()}</tds:hasPermission>
+					<tds:hasPermission permission="${Permission.PartyShowView}">${partyInstance?.partyType?.encodeAsHTML()}</tds:hasPermission>
 					</td>
 
 				</tr>
@@ -58,7 +59,7 @@
 			</tbody>
 		</table>
 	</div>
-	<tds:hasPermission permission='PartyEditView'>
+	<tds:hasPermission permission="${Permission.PartyEditView}">
 		<div class="buttons">
 			<g:form>
 				<input type="hidden" name="id" value="${partyInstance?.id}" />

@@ -4,6 +4,7 @@
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentType"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -241,7 +242,7 @@
 					<label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>
 				</span>
 				&nbsp;&nbsp;
-				<tds:hasPermission permission="TaskPublish">
+				<tds:hasPermission permission="${Permission.TaskPublish}">
 					<span class="checkboxContainer">
 						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/>
 						<label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>

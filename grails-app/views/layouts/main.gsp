@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -83,7 +84,7 @@ boolean isIE6 = tds.isIE6()
         </div>--%>
         <div class="menu2">
       	<ul>
-           <tds:hasPermission permission='AdminMenuViews'>
+           <tds:hasPermission permission="${Permission.AdminMenuViews}">
 		<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
             </tds:hasPermission>
 		<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
@@ -157,7 +158,7 @@ boolean isIE6 = tds.isIE6()
                   </td>
                 </tr>
 
-                <tds:hasPermission permission='PersonExpiryDate'>
+                <tds:hasPermission permission="${Permission.PersonExpiryDate}">
                     <tr class="prop">
                         <td valign="top" class="name">
                             <label for="expiryDateId"><b>Expiry Date:<span style="color: red">*</span></b></label>
@@ -179,11 +180,11 @@ boolean isIE6 = tds.isIE6()
                             <label for="startPage">Start Page:</label>
                         </td>
                         <td valign="top" class="value">
-	                     <tds:hasPermission permission='AdminMenuView'>
+	                     <tds:hasPermission permission="${Permission.AdminMenuView}">
                             <g:select name="startPage" from="${['Project Settings','Planning Dashboard','Admin Portal']}"
                             value="${tds.startPage()}"/>
                         </tds:hasPermission>
-	                     <tds:lacksPermission permission='AdminMenuView'>
+	                     <tds:lacksPermission permission="${Permission.AdminMenuView}">
 		                     <g:select name="startPage" from="${['Project Settings','Planning Dashboard']}" value="${tds.startPage()}"/>
 	                     </tds:lacksPermission>
                         </td>

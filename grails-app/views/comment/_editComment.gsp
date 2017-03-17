@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <div draggable id="editCommentPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-front" style="width: 700px" tabindex="-1" >
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
 		<span id="ui-id-5" class="ui-dialog-title">{{(isEdit)?'Edit Comment':'Create Comment'}}</span>
@@ -49,7 +50,7 @@
 				</table>
 			</div>
 		</form>
-		<tds:hasPermission permission='CommentView'>
+		<tds:hasPermission permission="${Permission.CommentView}">
 			<div class="buttons">
 				<span class="button">
 					<input class="save" type="button" id="saveAndViewBId" value="Save" ng-click="saveComment(true)" ng-disabled="form.$invalid" ng-show="ac.canEdit" />

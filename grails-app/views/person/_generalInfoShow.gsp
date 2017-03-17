@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.domain.Person" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <div class="menu4">
 	<ul>
 		<li>
@@ -7,7 +8,7 @@
 		<li>
 			<a href="#" id="availShowHeadId" class="mobmenu" onclick="Person.switchTab('availabilityShowId','availShowHeadId')">Availability</a>
 		</li>
-		<tds:hasPermission permission='PersonEditTDS'>
+		<tds:hasPermission permission="${Permission.PersonEditTDS}">
 			<li>
 				<a href="#" id="tdsShowHeadId" class="mobmenu" onclick="Person.switchTab('tdsUtilityShowId','tdsShowHeadId')">Misc</a>
 			</li>
@@ -208,7 +209,7 @@
              </div>
              </div>
 </div>
-<tds:hasPermission permission='PersonEdit'>
+<tds:hasPermission permission="${Permission.PersonEdit}">
 <div class="footer_buttons">
 	<button class="btn btn-default" role="button" onClick="Person.showPersonDialog(${person.id},'generalInfo','edit')"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
 	<button class="btn btn-default" role="button" onClick="Person.closePersonDiv('personGeneralViewId')"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>

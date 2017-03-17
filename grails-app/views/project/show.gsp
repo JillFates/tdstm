@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -21,7 +22,7 @@
 		<div class="body">
 
 				<div class="nav" style="border: 1px solid #CCCCCC; height: 20px">
-					<tds:hasPermission permission='BundleEdit'>
+					<tds:hasPermission permission="${Permission.BundleEdit}">
 						<span class="menuButton"><g:link class="create" controller="moveBundle" action="planningStats">Planning Dashboard</g:link></span>
 					</tds:hasPermission>
 				</div>
@@ -77,7 +78,7 @@
 									</g:each>
 								</ul>
 								<br>
-								<tds:hasPermission permission='ProjectStaffEdit'>
+								<tds:hasPermission permission="${Permission.ProjectStaffEdit}">
 								<g:link class="mmlink" controller="person" action="manageProjectStaff" params="[role: 'PROJ_MGR', clientStaff: '1']">Manage</g:link>
 								</tds:hasPermission>
 							</td>
@@ -107,12 +108,12 @@
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" value="${projectInstance?.id}" />
-					<tds:hasPermission permission='ProjectEdit'>
+					<tds:hasPermission permission="${Permission.ProjectEdit}">
 						<span class="button">
 							<g:actionSubmit type="button" class="edit" value="Edit"/>
 						</span>
 					</tds:hasPermission>
-					<tds:hasPermission permission='ProjectDelete'>
+					<tds:hasPermission permission="${Permission.ProjectDelete}">
 						<g:if test="${isDeleteable}">
 						<span class="button">
 							<g:actionSubmit class="delete" onclick="return confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?');" value="Delete" />

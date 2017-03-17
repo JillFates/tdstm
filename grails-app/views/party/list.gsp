@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.domain.Party" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -8,7 +9,7 @@
 <body>
 <div class="body">
 	<h1>Party List</h1>
-	<tds:hasPermission permission='PartyCreate'>
+	<tds:hasPermission permission="${Permission.PartyCreate}">
 		<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 			<span class="menuButton"><g:link class="create" action="create">Create Party</g:link></span>
 		</div>

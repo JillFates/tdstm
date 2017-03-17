@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.security.Permission" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -129,7 +130,7 @@ a:hover {
 						</tr>
 						<tr class="odd">
 							<td>
-								<tds:hasPermission permission='ReportViewProjectDailyMetrics'>
+								<tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
 									<g:link controller="project" action="launchProjectDailyMetricsJob" style="color:black">Launch Project Daily Metrics Job</g:link>
 								</tds:hasPermission>
 							</td>

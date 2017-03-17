@@ -1,10 +1,11 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %> 
 
 <table style="border: 0">
 	<tr>
 		<td colspan="2">
-			<div class="dialog" <tds:hasPermission permission='AssetEdit'> ondblclick="EntityCrud.showAssetEditView('${filesInstance?.assetClass}',${filesInstance?.id})"</tds:hasPermission>>
+			<div class="dialog" <tds:hasPermission permission="${Permission.AssetEdit}"> ondblclick="EntityCrud.showAssetEditView('${filesInstance?.assetClass}',${filesInstance?.id})"</tds:hasPermission>>
 			<g:if test="${errors}">
 				<div id="messageDivId" class="message">${errors}</div>
 			</g:if>

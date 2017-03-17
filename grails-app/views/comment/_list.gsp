@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <div draggable id="listCommentsTasksPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 700px" tabindex="-1" >
     <div class="ui-list-comments ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
         <span id="ui-id-5" class="ui-dialog-title">Show Comments{{commentsData[0]?(': ' + commentsData[0].assetType + '/'+ commentsData[0].assetName):''}}</span>
@@ -22,7 +23,7 @@
                 <tbody id="listCommentsTbodyId">
                     <tr class="comments-table-row" ng-repeat="comment in commentsData" id="commentTr_{{comment.commentInstance.id}}" ng-style="rowColor(comment)">
                         <td>
-                        <tds:hasPermission permission='AssetEdit'>
+                        <tds:hasPermission permission="${Permission.AssetEdit}">
                             <a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" name="205873"><img src="${resource(dir:'icons',file:'comment_edit.png')}" border="0"></a>
                         </tds:hasPermission>
                         </td>
@@ -34,7 +35,7 @@
             </table>
         </div>
         <div class="buttons">
-            <tds:hasPermission permission='AssetEdit'>
+            <tds:hasPermission permission="${Permission.AssetEdit}">
                 <a ng-click="createComment()" class="comment-create-button">
                 <img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
                 </a>

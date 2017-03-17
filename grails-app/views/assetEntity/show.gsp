@@ -1,12 +1,13 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
-<%@page defaultCodec="html" %> 
+<%@page import="net.transitionmanager.security.Permission"%>
+<%@page defaultCodec="html" %>
 
 <g:form method="post">
 	<table style="border:0;width:1000px;" class="assetEntity" data-id="${assetEntity?.id}">
 		<tr>
 			<td colspan="2">
 				<div class="dialog"
-				<tds:hasPermission permission='AssetEdit'>ondblclick="EntityCrud.showAssetEditView('${assetEntity.assetClass}', ${assetEntity?.id})"</tds:hasPermission>
+				<tds:hasPermission permission="${Permission.AssetEdit}">ondblclick="EntityCrud.showAssetEditView('${assetEntity.assetClass}', ${assetEntity?.id})"</tds:hasPermission>
 				>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>

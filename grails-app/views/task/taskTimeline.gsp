@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<title>Task Timeline</title>
@@ -66,7 +67,7 @@
 						<form id="preferencesformId">
 							<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
 
-								<tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskViewUnpublished}">
+								<tds:hasPermission permission="${Permission.TaskViewUnpublished}">
 								<h1>HERE</h1>
 									<tr title="Shows tasks that are not published">
 										<td colspan="3" style="padding-left :0px">
@@ -105,7 +106,7 @@
 									</td>
 								</tr>
 
-								<tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskViewCriticalPath}">
+								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
 										<span>

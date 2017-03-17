@@ -1,10 +1,11 @@
 <%@page import="com.tds.asset.AssetType;"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 
 <g:if test="${redirectTo!='dependencyConsole'}">
 	 <span class="button">
 		<input type="button" class="save updateDep" data-action='' value="Update" id="assetUpdateButton">
 	 </span>
-	 <tds:hasPermission permission='AssetDelete'>
+	 <tds:hasPermission permission="${Permission.AssetDelete}">
 		 <span class="button"><g:actionSubmit class="delete" 
 		 	onclick=" return confirm('You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel');" value="Delete" /> </span>
 	 </tds:hasPermission>

@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.domain.Person" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -63,11 +64,11 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var listCaption ="Staff: \
-				<tds:hasPermission permission='PersonCreate'>\
+				<tds:hasPermission permission="${Permission.PersonCreate}">\
 					<span class=\"button\"><input type=\"button\" value=\"Create Staff\" class=\"create\" onClick=\"createDialog()\"/></span> \
 				</tds:hasPermission>\
 				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='Person.compareOrMerge()' disabled='disabled'/></span>\
-				<tds:hasPermission permission='PersonBulkDelete'>\
+				<tds:hasPermission permission="${Permission.PersonBulkDelete}">\
 					<span class='capBtn'><input type='button' id='bulkDelete' value='Bulk Delete' onclick='Person.showBulkDeleteModal()' /></span>\
 				</tds:hasPermission>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })

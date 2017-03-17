@@ -2,6 +2,7 @@
 <%@page import="com.tds.asset.Application"%>
 <%@page import="com.tds.asset.Database"%>
 <%@page import="com.tds.asset.Files"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new Files()).assetClass}" />
 
@@ -54,11 +55,11 @@
 				var toValidate = '${toValidate}'
 				var unassigned = '${unassigned}'
 				
-				var listCaption ='Storages: <tds:hasPermission permission="AssetEdit"> \
+				var listCaption ='Storages: <tds:hasPermission permission="${Permission.AssetEdit}"> \
 					<span class="capBtn">\
 						<input type="button" value="Create Storage" onclick="EntityCrud.showAssetCreateView(\'${assetClass}\')"/>\
 					</span></tds:hasPermission>\
-					<tds:hasPermission permission="AssetDelete">\
+					<tds:hasPermission permission="${Permission.AssetDelete}">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Files\')" disabled="disabled"/></span>\
 					</tds:hasPermission>\
 						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\

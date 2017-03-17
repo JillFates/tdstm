@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -23,7 +24,7 @@
 				$("#editEntityView").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })
 				var listCaption ="Dependencies: \
-					<tds:hasPermission permission='AssetDelete'>\
+					<tds:hasPermission permission="${Permission.AssetDelete}">\
 					<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"dependencies\")' disabled='disabled'/></span>\
 					</tds:hasPermission>"
 				<jqgrid:grid id="dependencyGridId" url="'${createLink(action: 'listDepJson')}'"

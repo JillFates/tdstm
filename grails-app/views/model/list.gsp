@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -17,7 +18,7 @@
 				$("#createModelView").dialog({ autoOpen: false })
 				$("#showModelView").dialog({ autoOpen: false })
 				$("#showOrMergeId").dialog({ autoOpen: false })
-				var listCaption ="Models: \ <tds:hasPermission permission='AssetEdit'> \
+				var listCaption ="Models: \ <tds:hasPermission permission="${Permission.AssetEdit}"> \
 					<span class='capBtn'><input type='button' value='Create Model' onclick='createModelManuDetails(\"model\",\"Model\")'/></span> \
 					<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>\
 					<span class='capBtn'><input type='button' id='deleteModelId' value='Bulk Delete' onclick='deleteModels()' disabled='disabled'/></span> </tds:hasPermission>"

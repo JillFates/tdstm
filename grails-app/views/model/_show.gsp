@@ -1,4 +1,5 @@
 <%@page import="com.tdssrc.grails.WebUtil";%>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -198,7 +199,7 @@
 	<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
-					<tds:hasPermission permission="ModelEdit">
+					<tds:hasPermission permission="${Permission.ModelEdit}">
 						<g:form action="update" >
 							<input name="id" value="${modelInstance.id}" type="hidden"/>
 							 <input type="hidden" name="redirectTo" value="${redirectTo}" />

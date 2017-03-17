@@ -3,6 +3,7 @@
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 <g:set var="now" value="${TimeUtil.nowGMT()}" />
 <%--
 /*
@@ -112,7 +113,7 @@
 							</g:if>
 
 
-							<tds:hasPermission permission="${net.transitionmanager.security.Permission.CommentView}">
+							<tds:hasPermission permission="${Permission.CommentView}">
 								<g:if test="${issue.item.status == AssetCommentStatus.READY && !(item.category in AssetComment.moveDayCategories)}">
 									<span class="delay_myTasks">Delay for:</span>
 									<tds:actionButton label="1 day" icon="ui-icon-seek-next" id="${item?.id}"

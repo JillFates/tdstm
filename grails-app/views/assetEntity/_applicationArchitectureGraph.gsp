@@ -1,4 +1,5 @@
 <%@page defaultCodec="none" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <div id="scriptDivId">
 <style>
 /* 	these styles must be included here due to a bug in firefox
@@ -864,7 +865,7 @@ function buildMap (width, height) {
 						EntityCrud.showAssetDetailView(data.assetClass, id);
 					});
 					
-					//<tds:hasPermission permission='AssetEdit'>
+					//<tds:hasPermission permission="${Permission.AssetEdit}">
 					var editAssetItem = '<li class="tempItem edit" id="editAssetItemId">Edit Asset</li>';
 					$(".customMenu").append(editAssetItem);
 					$("#editAssetItemId").on('click', function (a, b) {

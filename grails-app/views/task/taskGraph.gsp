@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<title>Task Graph</title>
@@ -373,7 +374,7 @@
 						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer" onclick="GraphUtil.zoomOut()"></div>
 
 						<!-- View unpublished checkbox (if the user has permission) -->
-						<tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskPublish}">
+						<tds:hasPermission permission="${Permission.TaskPublish}">
 							<span class="checkboxContainer">
 								<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } />
 								<label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>

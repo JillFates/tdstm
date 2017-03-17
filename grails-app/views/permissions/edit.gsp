@@ -1,5 +1,6 @@
 <%@page import="net.transitionmanager.domain.Permissions" %>
 <%@page import="net.transitionmanager.domain.RolePermissions" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -12,7 +13,7 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<tds:hasPermission permission='AdminMenuView'>
+	<tds:hasPermission permission="${Permission.AdminMenuView}">
 		<tds:subHeader title="Role Permissions" crumbs="['Admin','Roles','Edit']"/><br/>
 		<div class="body">
 			<g:form action="update">

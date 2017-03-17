@@ -1,4 +1,4 @@
-
+<%@page import="net.transitionmanager.security.Permission"%>
 
 <!-- Assets show template -->
 <div ng-hide="editMode(type.name)" class="fieldsPane">
@@ -6,7 +6,7 @@
 		<tr id="buttonRowId">
 			<td colspan="10" class="buttons">
 				<div>
-					<tds:hasPermission permission='ProjectFieldSettingsEdit'>
+					<tds:hasPermission permission="${Permission.ProjectFieldSettingsEdit}">
 						<span class="button">
 							<input type="button" value="Edit" class="edit" ng-click="toggleEditMode(type.name)" />
 						</span>

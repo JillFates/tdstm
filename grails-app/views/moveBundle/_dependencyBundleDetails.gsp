@@ -1,4 +1,5 @@
 <%@page defaultCodec="none" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <div style="margin-top: 10px; float: left;">
 	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
@@ -6,7 +7,7 @@
 			<div class="message" id="messageId" style="display:none">${flash.message}</div>
         	<div style="width: 250px; margin-bottom: 3px">
 				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;
-				<tds:hasPermission permission='DepAnalyzerGenerate'>
+				<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
 				<input  type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
 				</tds:hasPermission>
 			</div>

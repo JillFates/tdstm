@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -16,7 +17,7 @@
 							<g:select from="${moveEventList}" name="eventId" id="eventList" optionKey="id" optionValue="name" noSelection="['':'please select']" value="${tds.currentMoveEventId()}"/>
 						</td></tr>
 
-						<tds:hasPermission permission="TaskPublish">
+						<tds:hasPermission permission="${Permission.TaskPublish}">
 							<tr>
 								<td>
 									<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="clearResults()"/>

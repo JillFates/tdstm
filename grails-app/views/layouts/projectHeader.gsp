@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -102,18 +103,18 @@ int minPasswordLength = tds.minPasswordLength()
       <g:if test="${currProject}">
 	      <div class="menu2">
 	      <ul>
-			<tds:hasPermission permission='AdminMenuView'>
+			<tds:hasPermission permission="${Permission.AdminMenuView}">
 			<li id="adminMenuId" class="menuLiIndex"><a class="home menuhideright headerClass" onmouseover="hoverMegaMenu('#adminMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#adminMegaMenu')">Admin</a>
 				<div class="megamenu admin inActive" id="adminMegaMenu">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top" nowrap="nowrap"><span class="megamenuSection">Administration</span><br />
 						<ul >
 							<li><g:link class="mmlink" controller="admin" action="home" onclick="hideMegaMenu('adminMegaMenu')">Admin Portal</g:link> </li>
-							<tds:hasPermission permission='RolePermissionView'>
+							<tds:hasPermission permission="${Permission.RolePermissionView}">
 							<li><g:link class="mmlink" controller="permissions" action="show" onclick="hideMegaMenu('adminMegaMenu')">Role Permissions</g:link> </li>
 							</tds:hasPermission>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetOptions" onclick="hideMegaMenu('adminMegaMenu')">Asset Options</g:link> </li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
 							</tds:hasPermission>
 
@@ -123,16 +124,16 @@ int minPasswordLength = tds.minPasswordLength()
 						<ul >
 							<li><g:link class="mmlink" controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Companies</g:link></li>
 							<li><g:link class="mmlink" controller="person" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Staff</g:link></li>
-							<tds:hasPermission permission='UserView'>
+							<tds:hasPermission permission="${Permission.UserView}">
 							<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Users</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='PersonImport'>
+							<tds:hasPermission permission="${Permission.PersonImport}">
 							<li><g:link class="mmlink" controller="admin" action="importAccounts" onclick="hideMegaMenu('adminMegaMenu')">Import Accounts</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='PersonExport'>
+							<tds:hasPermission permission="${Permission.PersonExport}">
 							<li><g:link class="mmlink" controller="admin" action="exportAccounts" onclick="hideMegaMenu('adminMegaMenu')">Export Accounts</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -140,7 +141,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
 						<ul >
 							<li><g:link class="mmlink" controller="workflow" action="home" onclick="hideMegaMenu('adminMegaMenu')">List Workflows </g:link> </li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -150,7 +151,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Manufacturers</g:link></li>
 							<li><g:link class="mmlink" controller="model" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Models</g:link></li>
 							<li><g:link class="mmlink" controller="model" action="importExport" onclick="hideMegaMenu('adminMegaMenu')">Sync Libraries</g:link></li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -172,7 +173,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<ul >
 								<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProject.name.size()>20}">${currProject.name.substring(0,20)+'...'}</g:if><g:else>${currProject.name}</g:else> Details</g:link></li>
 								<li><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
-								<tds:hasPermission permission='UserSendActivations'>
+								<tds:hasPermission permission="${Permission.UserSendActivations}">
 									<li><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link> </li>
 								</tds:hasPermission>
 								<li><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('projectMegaMenu')">Field Settings</g:link> </li>
@@ -181,7 +182,7 @@ int minPasswordLength = tds.minPasswordLength()
 						<span class="megamenuSection">No Project Selected</strong></span><br />
 							<ul>
 					</g:else>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');"  onclick="hideMegaMenu('projectMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -199,10 +200,10 @@ int minPasswordLength = tds.minPasswordLength()
 							<g:if test="${roomId}">
 								<li><g:link class="mmlink" params="[roomId:roomId]" controller="room" onclick="hideMegaMenu('racksMegaMenu')">Room ${room?.location}/${room?.roomName}</g:link></li>
 							</g:if>
-							<tds:hasPermission permission='AssetEdit'>
+							<tds:hasPermission permission="${Permission.AssetEdit}">
 							<li><g:link class="mmlink" controller="rackLayouts" action="create" onclick="hideMegaMenu('racksMegaMenu')">Rack Elevations</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 								<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -210,7 +211,7 @@ int minPasswordLength = tds.minPasswordLength()
 					</tr></table>
 				</div>
 			</li>
-	        <tds:hasPermission permission='AssetMenuView'>
+	        <tds:hasPermission permission="${Permission.AssetMenuView}">
 			<li id="assetMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#assetMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#assetMegaMenu')" >Assets</a>
 				<div class="megamenu rooms inActive" id="assetMegaMenu" >
 					<table class="mmtable room_rack"><tr>
@@ -270,7 +271,7 @@ int minPasswordLength = tds.minPasswordLength()
 									<div>Dependencies</div>
 								</g:link>
 							</li>
-							<tds:hasPermission permission='DepAnalyzerView'>
+							<tds:hasPermission permission="${Permission.DepAnalyzerView}">
 							  <li>
 							  	<g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
 							  		<g:img uri="/icons/brick_magnify.png" width="16" height="16"/>
@@ -278,7 +279,7 @@ int minPasswordLength = tds.minPasswordLength()
 							  	</g:link>
 							  </li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='ArchitectureView'>
+							<tds:hasPermission permission="${Permission.ArchitectureView}">
 							  <li>
 							  	<g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
 							  		<g:img uri="/icons/chart_organisation.png" width="16" height="16"/>
@@ -286,7 +287,7 @@ int minPasswordLength = tds.minPasswordLength()
 							  	</g:link>
 							  </li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -294,16 +295,16 @@ int minPasswordLength = tds.minPasswordLength()
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 
 						<ul>
-							<tds:hasPermission permission='AssetImport'>
+							<tds:hasPermission permission="${Permission.AssetImport}">
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport"  onclick="hideMegaMenu('assetMegaMenu')">Import Assets</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='AssetImport'>
+							<tds:hasPermission permission="${Permission.AssetImport}">
 							<li><g:link class="mmlink" controller="dataTransferBatch" action="index" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='AssetExport'>
+							<tds:hasPermission permission="${Permission.AssetExport}">
 							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets"  onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -312,7 +313,7 @@ int minPasswordLength = tds.minPasswordLength()
 				</div>
 			</li>
 			</tds:hasPermission>
-			<tds:hasPermission permission='EventMenuView'>
+			<tds:hasPermission permission="${Permission.EventMenuView}">
 			<li id="eventMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#bundleMegaMenu')">Planning</a>
 				<div class="megamenu rooms inActive" id="bundleMegaMenu">
 					<table class="mmtable " ><tr>
@@ -323,14 +324,14 @@ int minPasswordLength = tds.minPasswordLength()
 								<span class="megamenuSection"> </span>
 								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEvent.id}" onclick="hideMegaMenu('bundleMegaMenu')">${moveEvent.name} Event Details</g:link></li>
 							</g:if>
-							<tds:hasPermission permission='ShowListNews'>
+							<tds:hasPermission permission="${Permission.ShowListNews}">
 							<li><g:link class="mmlink" controller="newsEditor"  onclick="hideMegaMenu('consoleMegaMenu')">List Event News</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission="ReportViewEventPrep">
+							<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
 							<li style="white-space:nowrap;"><g:link class="mmlink" controller="reports" action="preMoveCheckList" onclick="hideMegaMenu('bundleMegaMenu')">Pre-event Checklist</g:link></li>
 							</tds:hasPermission>
 							<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="exportRunbook" onclick="hideMegaMenu('bundleMegaMenu')">Export Runbook</g:link></li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMEvents?cover=print','help');" onclick="hideMegaMenu('bundleMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -343,7 +344,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<li><g:link class="mmlink" controller="moveBundle" action="show"  onclick="hideMegaMenu('bundleMegaMenu')">${moveBundle.name} Bundle Details</g:link></li>
 							<li><g:link class="mmlink" controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle.id]" onclick="hideMegaMenu('bundleMegaMenu')">Bundled Assets</g:link> </li>
 					</g:if>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');" onclick="hideMegaMenu('bundleMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -354,7 +355,7 @@ int minPasswordLength = tds.minPasswordLength()
 			</tds:hasPermission>
 
 			<%-- Task Menu --%>
-			<tds:hasPermission permission='BundleMenuView'>
+			<tds:hasPermission permission="${Permission.BundleMenuView}">
 			<li id="teamMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#teamMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#teamMegaMenu')">Tasks</a>
 				<div class="megamenu rooms inActive" id="teamMegaMenu" >
 					<table class="mmtable"><tr>
@@ -362,27 +363,27 @@ int minPasswordLength = tds.minPasswordLength()
 						<ul>
 							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/task/listUserTasks" onclick="hideMegaMenu('teamMegaMenu')">My Tasks
 							(<span id="todoCountProjectId">&nbsp;</span>)</a></li>
-							<tds:hasPermission permission='TaskManagerView'>
+							<tds:hasPermission permission="${Permission.TaskManagerView}">
 							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[initSession:true]" onclick="hideMegaMenu('teamMegaMenu')">Task Manager</g:link></li>
 							</tds:hasPermission>
 
-							<tds:hasPermission permission='TaskGraphView'>
+							<tds:hasPermission permission="${Permission.TaskGraphView}">
 							<li><g:link class="mmlink" controller="task" action="taskGraph"  params="[initSession:true]" onclick="hideMegaMenu('teamMegaMenu')">Task Graph</g:link></li>
 							</tds:hasPermission>
 
-							<tds:hasPermission permission='TaskTimelineView'>
+							<tds:hasPermission permission="${Permission.TaskTimelineView}">
 							<li><g:link class="mmlink" controller="task" action="taskTimeline" onclick="hideMegaMenu('teamMegaMenu')">Task Timeline</g:link></li>
 							</tds:hasPermission>
 
-							<tds:hasPermission permission="RecipeView">
+							<tds:hasPermission permission="${Permission.RecipeView}"
 							<li><g:link class="mmlink" controller="cookbook" action="index" onclick="hideMegaMenu('teamMegaMenu')">Cookbook</g:link></li>
 							</tds:hasPermission>
 
-							<tds:hasPermission permission="RecipeGenerateTasks">
+							<tds:hasPermission permission="${Permission.RecipeGenerateTasks}"
 							<li><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
 							</tds:hasPermission>
 
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -392,23 +393,23 @@ int minPasswordLength = tds.minPasswordLength()
 			</li>
             </tds:hasPermission>
 
-			<tds:hasPermission permission='DashBoardMenuView'>
+			<tds:hasPermission permission="${Permission.DashboardMenuView}">
 			<li id="dashboardMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#dashboardMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#dashboardMegaMenu')">Dashboards</a>
 				<div class="megamenu rooms inActive" id="dashboardMegaMenu">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
 						<ul>
 							<li><g:link class="home mmlink" controller="dashboard" action="userPortal" onclick="hideMegaMenu('dashboardMegaMenu')">User Dashboard</g:link></li>
-							<tds:hasPermission permission='ReportViewPlanning'>
+							<tds:hasPermission permission="${Permission.ReportViewPlanning}">
 							<li><g:link class="home mmlink" controller="moveBundle" action="planningStats" onclick="hideMegaMenu('dashboardMegaMenu')">Planning Dashboard</g:link></li>
 							</tds:hasPermission>
 							<li><g:link class="home mmlink" controller="dashboard" onclick="hideMegaMenu('dashboardMegaMenu')">Event Dashboard</g:link></li>
 							<%-- Removed until this report will be implemented using tasks
-							<tds:hasPermission permission='ShowCartTracker'>
+							<tds:hasPermission permission="${eermission.howCartTracker}">
 							<li><g:link class="mmlink" controller="cartTracking" action="cartTracking"  onclick="hideMegaMenu('consoleMegaMenu')">Cart Tracker</g:link></li>
 							</tds:hasPermission-->
 							--%>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');" onclick="hideMegaMenu('dashboardMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -418,17 +419,17 @@ int minPasswordLength = tds.minPasswordLength()
 			</li>
 			</tds:hasPermission>
 
-			<tds:hasPermission permission='ReportMenuView'>
+			<tds:hasPermission permission="${Permission.ReportMenuView}">
 			<li id="reportsMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#reportsMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#reportsMegaMenu')">Reports</a>
 				<div class="megamenu reports inActive" id="reportsMegaMenu">
 					<table class="mmtable "><tr>
-					<tds:hasPermission permission='ReportViewDiscovery'>
+					<tds:hasPermission permission="${Permission.ReportViewDiscovery}">
 					<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
 						<ul>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Conflict</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Data</a> </li>
 							<li><a href="/tdstm/reports/powerReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Power</a> </li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -440,35 +441,35 @@ int minPasswordLength = tds.minPasswordLength()
 							<li><a href="/tdstm/reports/applicationConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Conflicts</a> </li>
 							<li><a href="/tdstm/reports/serverConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Server Conflicts</a> </li>
 							<li><a href="/tdstm/reports/databaseConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Database Conflicts</a> </li>
-							<tds:hasPermission permission='ReportViewPlanning'>
+							<tds:hasPermission permission="${Permission.ReportViewPlanning}">
 								<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report"  class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Task Report</a> </li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='ReportViewProjectDailyMetrics'>
+							<tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
 								<li><a href="/tdstm/reports/projectActivityMetrics" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Activity Metrics</a> </li>
 							</tds:hasPermission>
 						</ul>
 					</td>
-					<tds:hasPermission permission='ReportViewEventPrep'>
+					<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
 					<td style="vertical-align:top"><span class="megamenuSection">Event Prep</span><br />
 						<ul >
-							<tds:hasPermission permission="ReportViewEventPrep">
+							<tds:hasPermission permission="${Permission.ReportViewEventPrep}"
 							<li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
 							</tds:hasPermission>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Transport Worksheets</a></li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
 					</td>
 					</tds:hasPermission>
-					<tds:hasPermission permission='ReportViewEventDay'>
+					<tds:hasPermission permission="${Permission.ReportViewEventDay}">
 					<td style="vertical-align:top"><span class="megamenuSection">Event Day</span><br />
 						<ul>
 							<li><a href="/tdstm/reports/applicationMigrationReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Issue Report</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling QA</a> </li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
