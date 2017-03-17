@@ -105,7 +105,7 @@ class UserLoginController implements ControllerMethods {
 			query.append(" AND u.expiry_date > '$presentDate' ")
 		else
 			query.append(" OR u.expiry_date < '$presentDate' ")
-		if (securityService.hasPermission("UserListAll")) {
+		if (securityService.hasPermission(Permission.UserListAll)) {
 			if (params.id && params.id != "All") {
 				// If companyId is requested
 				companyId = params.id

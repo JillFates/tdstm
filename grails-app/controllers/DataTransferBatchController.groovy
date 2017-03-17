@@ -100,7 +100,7 @@ class DataTransferBatchController implements ControllerMethods {
 		while (true) {
 			try {
 				Project project = controllerService.getProjectForPage(this)
-				if (!project || !controllerService.checkPermission(this, 'AssetImport')) {
+				if (!project || !controllerService.checkPermission(this, Permission.AssetImport)) {
 					error = flash.message
 					flash.message = null
 					break

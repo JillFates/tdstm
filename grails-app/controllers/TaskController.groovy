@@ -212,7 +212,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')"))
 			}
 
-			if (securityService.hasPermission("CommentView") && comment.status == READY &&
+			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetCommentCategory.moveDayCategories)) {
 
 				actionBar << '<td class="delay_taskManager"><span>Delay for:</span></td>'
@@ -267,7 +267,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')") << "</span>"
 			}
 
-			if (securityService.hasPermission("CommentView") && comment.status == READY &&
+			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 
 				actionBar << "<span id='1dEst_$comment.id' width='8%' nowrap='nowrap'>" <<
@@ -332,7 +332,7 @@ class TaskController implements ControllerMethods {
 				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
 			}
 
-			if (securityService.hasPermission("CommentView") && comment.status == READY &&
+			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 
 				actionBar << [label: 'Delay for:']
@@ -393,7 +393,7 @@ class TaskController implements ControllerMethods {
 			boolean viewUnpublished = params.viewUnpublished && params.viewUnpublished == "1"
 
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED,
-				securityService.hasPermission("TaskPublish") && viewUnpublished)
+				securityService.hasPermission(Permission.TaskPublish) && viewUnpublished)
 
 			// check if the specified task is unpubublished and the user shouldn't see it
 			if (!viewUnpublished && !rootTask.isPublished) {
@@ -531,7 +531,7 @@ digraph runbook {
 			} catch(e) {
 				errorMessage = 'Encounted an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
-				if (securityService.hasPermission("RoleTypeCreate")) {
+				if (securityService.hasPermission(Permission.RoleTypeCreate)) {
 					errorMessage += "<br><pre>$e.message</pre>"
 				}
 			}
@@ -588,7 +588,7 @@ digraph runbook {
 				log.warn "The wrong mode [$mode] was specified"
 			}
 
-			def viewUnpublished = securityService.hasPermission("TaskPublish") && params.viewUnpublished == '1'
+			def viewUnpublished = securityService.hasPermission(Permission.TaskPublish) && params.viewUnpublished == '1'
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished)
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, moveEventId)
 
@@ -716,7 +716,7 @@ digraph runbook {
 			} catch (e) {
 				errorMessage = 'Encounted an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
-				if (securityService.hasPermission("RoleTypeCreate")) {
+				if (securityService.hasPermission(Permission.RoleTypeCreate)) {
 					errorMessage += "<br><pre>$e.message</pre>"
 				}
 			}

@@ -94,6 +94,7 @@ interface Permission {
 			PartyTypeEdit                 = 'PartyTypeEdit',
 			PartyTypeView                 = 'PartyTypeView',
 			PartyView                     = 'PartyView',
+			AddPerson					  = 'AddPerson',   //todo: 03/17 this should be fixed, let it be in the meantime
 			PersonBulkDelete              = 'PersonBulkDelete',
 			PersonCreate                  = 'PersonCreate',
 			PersonDelete                  = 'PersonDelete',
@@ -135,7 +136,6 @@ interface Permission {
 			RecipeGenerateTasks           = 'RecipeGenerateTasks',
 			RecipeRelease				  = 'RecipeRelease',
 			RecipeView                    = 'RecipeView',
-			ReleaseRecipe                 = 'ReleaseRecipe',
 			ReportMenuView                = 'ReportMenuView',
 			ReportViewDiscovery           = 'ReportViewDiscovery',
 			ReportViewEventDay            = 'ReportViewEventDay',
@@ -189,5 +189,9 @@ interface Permission {
 			WorkflowDelete                = 'WorkflowDelete',
 			WorkflowEdit                  = 'WorkflowEdit',
 			WorkflowList                  = 'WorkflowList',
-			WorkflowView                  = 'WorkflowView'
+			WorkflowView                  = 'WorkflowView',
+
+	//Refactor the following:
+			moveBundleShowView			  = 'moveBundleShowView',
+			rackLayouts					  = 'rackLayouts'
 }

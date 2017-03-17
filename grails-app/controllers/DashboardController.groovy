@@ -88,7 +88,7 @@ class DashboardController implements ControllerMethods {
 
 			def model = [project: project, projectLogo: projectLogo, moveEvent: moveEvent, moveEventsList: moveEventsList,
 			             moveBundleList: moveBundleList, timeToUpdate: timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : 'never',
-			             manualOverrideViewPermission: securityService.hasPermission('EventDashboardDialOverride'),
+			             manualOverrideViewPermission: securityService.hasPermission(Permission.EventDashboardDialOverride),
 			             viewUnpublished: viewUnpublished ? '1' : '0']
 			try {
 				def taskSummary = dashboardService.getTaskSummaryModel(moveEvent.id, 6, viewUnpublished)
@@ -134,7 +134,7 @@ class DashboardController implements ControllerMethods {
 		if (!project) return
 
 		def projects = [project]
-		def userProjects = projectService.getUserProjects(securityService.hasPermission("ProjectShowAll"), ProjectStatus.ACTIVE)
+		def userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
 		if (userProjects) {
 			projects = (userProjects + project).unique()
 		}

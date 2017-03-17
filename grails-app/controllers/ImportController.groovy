@@ -54,7 +54,7 @@ class ImportController implements ControllerMethods {
 		while (true) {
 			try {
 				Project project = controllerService.getProjectForPage(this)
-				if (!project || !controllerService.checkPermission(this, 'AssetImport')) {
+				if (!project || !controllerService.checkPermission(this, Permission.AssetImport)) {
 					errorMsg = flash.message
 					flash.message = null
 					break
@@ -151,7 +151,7 @@ class ImportController implements ControllerMethods {
 		while (true) {
 			try {
 				Project project = controllerService.getProjectForPage(this)
-				if (!project || !controllerService.checkPermission(this, 'AssetImport')) {
+				if (!project || !controllerService.checkPermission(this, Permission.AssetImport)) {
 					errorMsg = flash.message
 					flash.message = null
 					break
@@ -250,7 +250,7 @@ class ImportController implements ControllerMethods {
 		while (true) {
 			try {
 				Project project = controllerService.getProjectForPage(this)
-				if (!project || !controllerService.checkPermission(this, 'AssetImport')) {
+				if (!project || !controllerService.checkPermission(this, Permission.AssetImport)) {
 					errorMsg = flash.message
 					flash.message = null
 					break

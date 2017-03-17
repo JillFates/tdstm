@@ -2192,7 +2192,7 @@ class AssetEntityController implements ControllerMethods {
 
 		def entities = assetEntityService.entityInfo(project)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		boolean canEditComments = securityService.hasPermission('AssetEdit')
+		boolean canEditComments = securityService.hasPermission(Permission.AssetEdit)
 
 		[rediectTo: 'comment', servers: entities.servers, applications: entities.applications, dbs: entities.dbs,
 		 files: entities.files, dependencyType: entities.dependencyType, dependencyStatus: entities.dependencyStatus,
@@ -2824,7 +2824,7 @@ class AssetEntityController implements ControllerMethods {
 		model.asset = params.entity
 		model.orderBy = orderBy
 		model.sortBy = sortOn
-		model.haveAssetEditPerm = securityService.hasPermission('AssetEdit')
+		model.haveAssetEditPerm = securityService.hasPermission(Permission.AssetEdit)
 
 		// Switch on the desired entity type to be shown, and render the page for that type
 		switch(params.entity) {
@@ -4576,7 +4576,7 @@ class AssetEntityController implements ControllerMethods {
 	 * Check if a user have permissions to create/edit comments
 	 */
 	private boolean userCanEditComments(commentType) {
-		commentType == AssetCommentType.TASK || securityService.hasPermission('AssetEdit')
+		commentType == AssetCommentType.TASK || securityService.hasPermission(Permission.AssetEdit)
 	}
 
 	private String getImageName(String assetClassId, String type) {

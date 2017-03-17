@@ -89,7 +89,7 @@ class RackLayoutsController implements ControllerMethods {
 
 		[backCheck: backCheck, bundle: bundle, currentBundle: currentBundle, frontCheck: frontCheck,
 		 isCurrentBundle: isCurrentBundle, moveBundleList: moveBundleList, rackFilters: rackFilters,
-		 rackLayoutsHasPermission: securityService.hasPermission('rackLayouts'), sourceRackFilter: sourceRack,
+		 rackLayoutsHasPermission: securityService.hasPermission(Permission.rackLayouts), sourceRackFilter: sourceRack,
 		 targetRackFilter: targetRack, wBundleCheck: wBundleCheck, wDCheck: wDCheck, woBundleCheck: woBundleCheck]
 	}
 
@@ -130,7 +130,7 @@ class RackLayoutsController implements ControllerMethods {
 			def bundlesString = bundleIds.toString().replace("[", "(").replace("]", ")")
 			moveBundles = MoveBundle.findAll("from MoveBundle where id in ${bundlesString} ")
 		}
-		def rackLayoutsHasPermission = securityService.hasPermission('RackLayoutModify')
+		def rackLayoutsHasPermission = securityService.hasPermission(Permission.RackLayoutModify)
 
 		List<Rack> sourceRacks = findRacks('sourcerack', moveBundles, true)
 		List<Rack> targetRacks = findRacks('targetrack', moveBundles, false)

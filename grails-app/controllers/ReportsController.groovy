@@ -956,7 +956,7 @@ class ReportsController implements ControllerMethods {
 			// handle unpublished tasks
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, params.viewUnpublished as Boolean)
 
-			boolean viewUnpublished = securityService.hasPermission("TaskPublish") && params.viewUnpublished
+			boolean viewUnpublished = securityService.hasPermission(Permission.TaskPublish) && params.viewUnpublished
 			if (!viewUnpublished) {
 				taskListHql += " AND isPublished = :isPublished "
 				argMap.isPublished = true
@@ -1320,7 +1320,7 @@ class ReportsController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		def userProjects = projectService.getUserProjects(securityService.hasPermission("ProjectShowAll"), ProjectStatus.ACTIVE)
+		def userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
 		def startDate = Calendar.instance
 		startDate.set(Calendar.DATE, 1)
 		startDate.add(Calendar.MONTH, -2)
@@ -1357,7 +1357,7 @@ class ReportsController implements ControllerMethods {
 		if (projectIds && validDates) {
 			boolean allProjects = projectIds.find { it == 'all' }
 			boolean badProjectIds = false
-			List<Project> userProjects = projectService.getUserProjects(securityService.hasPermission("ProjectShowAll"), ProjectStatus.ACTIVE)
+			List<Project> userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
 			Map<Long, Project> userProjectsMap = [:]
 			List<Long> invalidProjectIds = []
 			List<Long> allProjectIds = []

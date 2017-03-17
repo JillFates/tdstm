@@ -9,6 +9,7 @@ import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import org.springframework.web.context.request.RequestContextHolder
 
 /**
@@ -42,8 +43,10 @@ class ControllerService implements ServiceMethods {
 	/**
 	 * Validates is the user have the permission and if not redirect to default page
 	 * @param controller - a reference to the controller
-	 * @param perm - the permission (String) or permissions List<String> that the user requires (optional)
+	 * @param perm - the permission (String) or permissions List<String> that the user requires (optional),
+	 * 			PLEASE PLEASE PLEASE use Permission.<Constant> for permission reference
 	 * @return true if the user have the permission
+	 * @see net.transitionmanager.security.Permission
 	 */
 	boolean checkPermission(controller, String perm) {
 		if (!securityService.hasPermission(perm)) {
@@ -59,7 +62,9 @@ class ControllerService implements ServiceMethods {
 	/**
 	 * Validates is the user have the permission
 	 *
-	 * @param perm - the permission that the user requires
+	 * @param perm - the permission that the user requires, PLEASE PLEASE PLEASE use Permission.<Constant>
+	 *     for permission reference
+	 * @see net.transitionmanager.security.Permission
 	 */
 	void checkPermissionForWS(String perm) {
 		if (!securityService.hasPermission(perm)) {
@@ -218,7 +223,7 @@ class ControllerService implements ServiceMethods {
 
 		try {
 			Project project = getProjectForPage(controller)
-			if (project && checkPermission(controller, 'AssetEdit')) {
+			if (project && checkPermission(controller, Permission.AssetEdit)) {
 				if (isNew) {
 					log.debug "saveUpdateAssetHandler() calling saveAssetFromForm()"
 					asset = assetService.saveAssetFromForm(project, params)

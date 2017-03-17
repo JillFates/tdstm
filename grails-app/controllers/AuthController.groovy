@@ -87,7 +87,7 @@ class AuthController implements ControllerMethods {
 				uri = '/projectUtil'
 			}
 			else if (startPage == 'Current Dashboard') {
-				if (securityService.hasPermission('BundleView')) {
+				if (securityService.hasPermission(Permission.BundleView)) {
 					uri = '/moveBundle/planningStats'
 				}
 				else {

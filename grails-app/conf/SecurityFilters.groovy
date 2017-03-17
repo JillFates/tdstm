@@ -2,6 +2,7 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.MaintService
 import net.transitionmanager.service.SecurityService
@@ -90,7 +91,7 @@ class SecurityFilters {
 						return false
 					}
 
-					if (securityService.hasPermission('EventChangeStatus')) { // verify the user role as ADMIN
+					if (securityService.hasPermission(Permission.EventChangeStatus)) { // verify the user role as ADMIN
 						return true
 					}
 

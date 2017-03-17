@@ -61,7 +61,7 @@ class ProjectUtilController implements ControllerMethods {
 		List<Project> projectList
 		String sort = params.sort ?: 'dateCreated'
 		String order = params.order ?: 'desc'
-		if (securityService.hasPermission('ProjectShowAll')) {
+		if (securityService.hasPermission(Permission.ProjectShowAll)) {
 			projectList = Project.findAll(sort: sort, order: order)
 		}
 		else {

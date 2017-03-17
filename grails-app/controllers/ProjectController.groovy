@@ -77,7 +77,7 @@ class ProjectController implements ControllerMethods {
 
 		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive) ?: ProjectStatus.COMPLETED
 
-		def projectList = projectService.getUserProjects(securityService.hasPermission('ProjectShowAll'), projectStatus, searchParams)
+		def projectList = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), projectStatus, searchParams)
 
 		int totalRows = projectList?.isEmpty() ? 0 : projectList?.getTotalCount()
 		int numberOfPages = totalRows ? Math.ceil(totalRows / maxRows) : 1
@@ -572,7 +572,7 @@ class ProjectController implements ControllerMethods {
 	@HasPermission(Permission.ProjectFieldSettingsView)
 	def fieldImportance() {
 		[project: securityService.userCurrentProject,
-		 hasProjectFieldSettingsEditPermission: securityService.hasPermission("ProjectFieldSettingsEdit")]
+		 hasProjectFieldSettingsEditPermission: securityService.hasPermission(Permission.ProjectFieldSettingsEdit)]
 	}
 
 	/**

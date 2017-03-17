@@ -292,7 +292,7 @@ class ModelController implements ControllerMethods {
 				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
 				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas,
-				                 modelHasPermission: securityService.hasPermission("ModelValidate"),
+				                 modelHasPermission: securityService.hasPermission(Permission.ModelValidate),
 				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model)]
 
 				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")

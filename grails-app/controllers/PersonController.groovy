@@ -162,8 +162,8 @@ class PersonController implements ControllerMethods {
 
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the
 		// only simple way to have the links work correctly
-		boolean canCreate = securityService.hasPermission('UserCreate')
-		boolean canEdit = securityService.hasPermission('UserEdit')
+		boolean canCreate = securityService.hasPermission(Permission.UserCreate)
+		boolean canEdit = securityService.hasPermission(Permission.UserEdit)
 		String userLoginCreateLink = createLink(controller: 'userLogin', action: 'create')
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
 		String userAddPng = resource(dir: 'icons', file: 'user_add.png', absolute: false)
@@ -220,7 +220,7 @@ class PersonController implements ControllerMethods {
 
 		try {
 			Person byWhom = securityService.getUserLoginPerson()
-			controllerService.checkPermissionForWS('PersonBulkDelete')
+			controllerService.checkPermissionForWS(Permission.PersonBulkDelete)
 
 			boolean deleteIfAssocWithAssets = (params.deleteIfAssocWithAssets == 'true')
 			Map results = personService.bulkDelete(byWhom, idsToDelete, deleteIfAssocWithAssets)
@@ -467,7 +467,7 @@ class PersonController implements ControllerMethods {
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff(projectId,'')
 		def projectCompanies = partyRelationshipService.getProjectCompanies(projectId)
 		[projectStaff: projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies,
-		 projectId: projectId, submit: submit, personHasPermission: securityService.hasPermission("AddPerson")]
+		 projectId: projectId, submit: submit, personHasPermission: securityService.hasPermission(Permission.AddPerson)]
 	}
 
 	/*
@@ -490,7 +490,7 @@ class PersonController implements ControllerMethods {
 						"delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",
 						[moveEvents:moveEvents, person:personParty,role:RoleType.load(roleType)])
 			} else if (personService.hasAccessToProject(personParty, project) ||
-				        (!(partyRelationshipService.isTdsEmployee(personId) && !securityService.hasPermission("PersonEditTDS")))) {
+				        (!(partyRelationshipService.isTdsEmployee(personId) && !securityService.hasPermission(Permission.PersonEditTDS)))) {
 				partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", personParty, roleType)
 			}else{
 				message = "This person doesn't have access to the selected project"
@@ -685,7 +685,7 @@ class PersonController implements ControllerMethods {
 		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
 
 		[project: project, projects: projects, projectId: project.id, roleTypes: roleTypes,
-		 editPermission: securityService.hasPermission('ProjectStaffEdit'), assigned: assigned,
+		 editPermission: securityService.hasPermission(Permission.ProjectStaffEdit), assigned: assigned,
 		 onlyClientStaff: onlyClientStaff, currRole: currRole]
 	}
 
@@ -923,7 +923,7 @@ class PersonController implements ControllerMethods {
 
 		render(template: "projectStaffTable",
 		       model: [staffList: staffList, moveEventList: retrieveBundleHeader(moveEvents), projectId: projectId,
-		               firstProp: params.firstProp, editPermission: securityService.hasPermission('ProjectStaffEdit'),
+		               firstProp: params.firstProp, editPermission: securityService.hasPermission(Permission.ProjectStaffEdit),
 		               project: project, sortOn: params.sortOn, orderBy: paramsMap.orderBy])
 	}
 
