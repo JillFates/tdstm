@@ -316,10 +316,10 @@
 			});
 		}
 		$(document).ready(function() {
-			$("#editDialog,#createRoomDialog,#mergeRoomDialog,#listDialog").dialog({ autoOpen: false,open:function(){
+			$("#editDialog,#createRoomDialog,#mergeRoomDialog,#listDialog").dialog({modal: true, autoOpen: false,open:function(){
 				$('.ui-dialog-titlebar-close').html('')
 				.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
-			} });
+			},close:function(){ location.reload();} });
 			$("#manufacturerShowDialog,#modelShowDialog").dialog({autoOpen: false})
 			$("#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({ autoOpen: false })
 			$("#editCommentDialog,#editManufacturerView").dialog({ autoOpen: false})
