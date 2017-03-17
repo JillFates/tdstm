@@ -99,7 +99,7 @@ class AdminController implements ControllerMethods {
 
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def orphanSummary() {
-		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
 			return
 		}
