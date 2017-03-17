@@ -9,11 +9,15 @@
                     </div><!-- /.box-tools -->
                 </div><!-- /.box-header -->
                 <div class="box-body">
-                    sdadasdsa
                     <form class="formly" role="form" novalidate [formGroup]="form" (ngSubmit)="submit(user)">
+                        <formly-form [model]="user" [fields]="userFields">
 
+                        </formly-form>
                     </form>
                 </div><!-- /.box-body -->
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-default">Button</button>
+                </div><!-- box-footer -->
             </div><!-- /.box -->
         </div>
     </section>

@@ -5,6 +5,7 @@
 // Angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 // Routing Logic
 import { UIRouterModule } from 'ui-router-ng2';
 import { TASK_MANAGER_STATES } from './task-manager-routing.states';
@@ -15,7 +16,7 @@ import { SharedModule } from '../../shared/shared.module';
 // Import Kendo Modules
 import { GridModule } from '@progress/kendo-angular-grid';
 // Formly
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormlyModule, FormlyBootstrapModule} from 'ng-formly';
 
 @NgModule({
     imports: [
@@ -24,6 +25,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
         GridModule,
         FormsModule,
         ReactiveFormsModule,
+        FormlyModule.forRoot(),
+        FormlyBootstrapModule,
         UIRouterModule.forChild({ states: TASK_MANAGER_STATES }), // Same as { states: [state1, state2 ] }
     ],
     declarations: [
