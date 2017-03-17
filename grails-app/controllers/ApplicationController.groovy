@@ -12,6 +12,7 @@ import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
@@ -43,7 +44,7 @@ class ApplicationController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def list() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -64,7 +65,7 @@ class ApplicationController implements ControllerMethods {
 	/**
 	 * Used by JQgrid to load appList
 	 */
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def listJson() {
 		String sortIndex = params.sidx ?: 'assetName'
 		String sortOrder = params.sord ?: 'asc'
@@ -273,7 +274,7 @@ class ApplicationController implements ControllerMethods {
 	 * @param from
 	 * @render true
 	 */
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def columnAssetPref() {
 		def column = params.columnValue
 		String fromKey = params.from
@@ -288,7 +289,7 @@ class ApplicationController implements ControllerMethods {
 		render true
 	}
 
-	@HasPermission('AssetCreate')
+	@HasPermission(Permission.AssetCreate)
 	def create() {
 		def application = new Application()
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -312,7 +313,7 @@ class ApplicationController implements ControllerMethods {
 			availabaleRoles: availabaleRoles, environmentOptions: environmentOptions?.value, highlightMap: highlightMap]
 	}
 
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def show() {
 		def app
 		Project project = controllerService.getProjectForPage(this)
@@ -338,7 +339,7 @@ class ApplicationController implements ControllerMethods {
 	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
 	 * to auditEdit view
 	 */
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -365,7 +366,7 @@ class ApplicationController implements ControllerMethods {
 		 assetEntityService.getDefaultModelForEdits('Application', project, application, params)
 	}
 
-	@HasPermission('AssetCreate')
+	@HasPermission(Permission.AssetCreate)
 	def save() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, applicationService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -373,7 +374,7 @@ class ApplicationController implements ControllerMethods {
 		session.APP?.JQ_FILTERS = params
 	}
 
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def update() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, applicationService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -422,7 +423,7 @@ class ApplicationController implements ControllerMethods {
 		*/
 	}
 
-	@HasPermission('AssetDelete')
+	@HasPermission(Permission.AssetDelete)
 	def delete() {
 		def application = Application.get(params.id)
 		if (!application) {
@@ -443,7 +444,7 @@ class ApplicationController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('AssetDelete')
+	@HasPermission(Permission.AssetDelete)
 	def deleteBulkAsset() {
 		String ids = params.id
 		List<String> assetNames = []

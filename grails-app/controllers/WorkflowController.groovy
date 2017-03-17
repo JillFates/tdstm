@@ -13,6 +13,7 @@ import net.transitionmanager.domain.Swimlane
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.domain.WorkflowTransitionMap
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
@@ -43,7 +44,7 @@ class WorkflowController implements ControllerMethods {
 	/**
 	 * Renders Workflow data.
 	 */
-	@HasPermission('WorkflowList')
+	@HasPermission(Permission.WorkflowList)
 	def home() {
 		flash.message = params.message
 		[workflowInstanceList: Workflow.list(params)]
@@ -53,7 +54,7 @@ class WorkflowController implements ControllerMethods {
 	 * Renders Workflow steps for selected workflow
 	 * @param : workfow
 	 */
-	@HasPermission('WorkflowView')
+	@HasPermission(Permission.WorkflowView)
 	def workflowList() {
 		String workflowId = params.workflow
 		if (!workflowId) {
@@ -86,7 +87,7 @@ class WorkflowController implements ControllerMethods {
 	/**
 	 * Create  new workflow workflow
 	 */
-	@HasPermission('WorkflowCreate')
+	@HasPermission(Permission.WorkflowCreate)
 	def createWorkflow() {
 		def process = params.process
 		if (!process || !securityService.loggedIn) {
@@ -162,7 +163,7 @@ class WorkflowController implements ControllerMethods {
 	 * Update the workflow steps for selected workflow.
 	 * @param : workflowId, steps
 	 */
-	@HasPermission('WorkflowEdit')
+	@HasPermission(Permission.WorkflowEdit)
 	def updateWorkflowSteps() {
 		def workflowId = params.workflow
 		def workflowTransitionsList = []
@@ -233,7 +234,7 @@ class WorkflowController implements ControllerMethods {
 		render(view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow, roles:roles ])
 	}
 
-	@HasPermission('WorkflowEdit')
+	@HasPermission(Permission.WorkflowEdit)
 	def updateWorkflowRoles() {
 		def currentStatus = params.currentStatus
 		def workflowId = params.workflow
@@ -308,7 +309,7 @@ class WorkflowController implements ControllerMethods {
 	 * @param : workfow, workflowTransition
 	 * Delete the workflowTransition and associated data.
 	 */
-	@HasPermission('WorkflowEdit')
+	@HasPermission(Permission.WorkflowEdit)
 	def deleteTransitionFromWorkflow() {
 		Workflow workflow = Workflow.get(params.workflow)
 		workflow.updatedBy = securityService.loadCurrentPerson()
@@ -352,7 +353,7 @@ class WorkflowController implements ControllerMethods {
 	 * @param : workfow
 	 * Delete the workflow and associated projects and project's data.
 	 */
-	@HasPermission('WorkflowDelete')
+	@HasPermission(Permission.WorkflowDelete)
 	def deleteWorkflow() {
 		def workflowId = params.id
 		if (workflowId) {
@@ -383,7 +384,7 @@ class WorkflowController implements ControllerMethods {
 	 *  @param : workflow, swimlaneName, actorId
 	 *  @return : updated actorId
 	 */
-	@HasPermission('WorkflowEdit')
+	@HasPermission(Permission.WorkflowEdit)
 	def saveActorName() {
 		def actorId = params.actorId
 		def workFlowId = params.workflow

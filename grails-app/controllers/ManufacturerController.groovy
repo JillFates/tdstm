@@ -7,6 +7,7 @@ import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.ManufacturerService
 import org.hibernate.criterion.Order
@@ -23,13 +24,13 @@ class ManufacturerController implements ControllerMethods {
 	SecurityService securityService
 	ManufacturerService manufacturerService
 
-	@HasPermission('ManufacturerList')
+	@HasPermission(Permission.ManufacturerList)
 	def list() {}
 
 	/**
 	 * Used by JQgrid to load manufacturerList.
 	 */
-	@HasPermission('ManufacturerList')
+	@HasPermission(Permission.ManufacturerList)
 	def listJson() {
 		String sortIndex = params.sidx ?: 'modelName'
 		String sortOrder  = params.sord ?: 'asc'
@@ -69,7 +70,7 @@ class ManufacturerController implements ControllerMethods {
 		render jsonData as JSON
 	}
 
-	@HasPermission('ManufacturerView')
+	@HasPermission(Permission.ManufacturerView)
 	def show() {
 		def manufacturer = Manufacturer.get(params.id)
 		if (!manufacturer) {
@@ -82,7 +83,7 @@ class ManufacturerController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ManufacturerDelete')
+	@HasPermission(Permission.ManufacturerDelete)
 	def delete() {
 		def manufacturer = Manufacturer.get(params.id)
 		if (manufacturer) {
@@ -98,7 +99,7 @@ class ManufacturerController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ManufacturerEdit')
+	@HasPermission(Permission.ManufacturerEdit)
 	def edit() {
 		def manufacturer = Manufacturer.get(params.id)
 
@@ -111,7 +112,7 @@ class ManufacturerController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ManufacturerEdit')
+	@HasPermission(Permission.ManufacturerEdit)
 	def update() {
 
 		def manufacturer = Manufacturer.get(params.id)
@@ -143,12 +144,12 @@ class ManufacturerController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ManufacturerCreate')
+	@HasPermission(Permission.ManufacturerCreate)
 	def create() {
 		[manufacturerInstance: new Manufacturer(params)]
 	}
 
-	@HasPermission('ManufacturerCreate')
+	@HasPermission(Permission.ManufacturerCreate)
 	def save() {
 		def manufacturer = new Manufacturer(params)
 		if (!manufacturer.hasErrors() && manufacturer.save()) {
@@ -168,7 +169,7 @@ class ManufacturerController implements ControllerMethods {
 	/*
 	 *  Send List of Manufacturer as JSON object
 	 */
-	@HasPermission('ManufacturerView')
+	@HasPermission(Permission.ManufacturerView)
 	def retrieveManufacturersListAsJSON() {
 		String assetType = params.assetType
 		boolean includeAlias = params.includeAlias == 'true'
@@ -195,7 +196,7 @@ class ManufacturerController implements ControllerMethods {
 	/**
 	 *  Send Manufacturer details as JSON object
 	 */
-	@HasPermission('ManufacturerView')
+	@HasPermission(Permission.ManufacturerView)
 	def retrieveManufacturerAsJSON() {
 		def manufacturer = Manufacturer.get(params.id)
 		def jsonMap = [manufacturer: manufacturer,
@@ -210,7 +211,7 @@ class ManufacturerController implements ControllerMethods {
 	* @param: parentName, name of the manufacturer to validate the alias with (not needed if the manufacturer's name hasn't changed)
 	* @return: "valid" if the alias is valid, "invalid" otherwise
 	*/
-	@HasPermission('ManufacturerEdit')
+	@HasPermission(Permission.ManufacturerEdit)
 	def validateAliasForForm() {
 		def alias = params.alias
 		def manufacturerId = params.id
@@ -230,7 +231,7 @@ class ManufacturerController implements ControllerMethods {
 	 * render a list of suggestions for manufacturer's initial.
 	 * @param : value is initial for which user wants suggestions .
 	 */
-	@HasPermission('ManufacturerView')
+	@HasPermission(Permission.ManufacturerView)
 	def autoCompleteManufacturer() {
 		[manufacturers: params.value ? Manufacturer.findAllByNameIlike(params.value + "%") : []]
 	}

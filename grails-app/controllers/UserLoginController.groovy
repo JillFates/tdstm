@@ -12,6 +12,7 @@ import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException
@@ -38,7 +39,7 @@ class UserLoginController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('UserView')
+	@HasPermission(Permission.UserView)
 	def list() {
 
 		def listJsonUrl
@@ -59,7 +60,7 @@ class UserLoginController implements ControllerMethods {
 		[companyId: companyId, partyGroupList: partyGroupList,listJsonUrl: listJsonUrl]
 	}
 
-	@HasPermission('UserView')
+	@HasPermission(Permission.UserView)
 	def listJson() {
 		String sortIndex = params.sidx ?: 'username'
 		String sortOrder  = params.sord ?: 'asc'
@@ -163,7 +164,7 @@ class UserLoginController implements ControllerMethods {
 		render jsonData as JSON
 	}
 
-	@HasPermission('UserView')
+	@HasPermission(Permission.UserView)
 	def show() {
 		UserLogin showUser = UserLogin.get(params.id)
 		def companyId = params.companyId
@@ -193,7 +194,7 @@ class UserLoginController implements ControllerMethods {
 	 * @param id - the ID of the user login to be removed
 	 * @param companyId - the ID of the company that is selected for filtering the User List
 	 */
-	@HasPermission('UserDelete')
+	@HasPermission(Permission.UserDelete)
 	def delete() {
 		def companyId = params.companyId
 		UserLogin userToDelete = UserLogin.get(params.id)
@@ -214,7 +215,7 @@ class UserLoginController implements ControllerMethods {
 	/*
 	 *  Return userdetails and roles to Edit form
 	 */
-	@HasPermission('UserEdit')
+	@HasPermission(Permission.UserEdit)
 	def edit() {
 		UserLogin editUser = UserLogin.get(params.id)
 		def companyId = params.companyId
@@ -243,7 +244,7 @@ class UserLoginController implements ControllerMethods {
 	/*
 	 * update user details and set the User Roles to the Person
 	 */
-	@HasPermission('UserEdit')
+	@HasPermission(Permission.UserEdit)
 	def update() {
 		UserLogin userLogin
 		String errMsg
@@ -281,7 +282,7 @@ class UserLoginController implements ControllerMethods {
 	}
 
 	// set the User Roles to the Person
-	@HasPermission('UserEdit')
+	@HasPermission(Permission.UserEdit)
 	def addRoles() {
 		List<String> assignedRoles = params.assignedRoleId.split(',') as List
 		if (params.actionType != "remove") {
@@ -294,7 +295,7 @@ class UserLoginController implements ControllerMethods {
 	}
 
 	// return userlogin details to create form
-	@HasPermission('UserCreate')
+	@HasPermission(Permission.UserCreate)
 	def create() {
 		Person person
 		if (params.id) {
@@ -318,7 +319,7 @@ class UserLoginController implements ControllerMethods {
 	/*
 	 *  Save the User details and set the user roles for Person
 	 */
-	@HasPermission('UserCreate')
+	@HasPermission(Permission.UserCreate)
 	def save() {
 		UserLogin newUserLogin
 		String errMsg
@@ -348,7 +349,7 @@ class UserLoginController implements ControllerMethods {
 	/*======================================================
 	 *  Update recent page load time into userLogin
 	 *=====================================================*/
-	@HasPermission('UserGeneralAccess')
+	@HasPermission(Permission.UserGeneralAccess)
 	def updateLastPageLoad() {
 		UserLogin userLogin = securityService.userLogin
 		if (userLogin) {
@@ -362,7 +363,7 @@ class UserLoginController implements ControllerMethods {
 	/**
 	 * The 1st phase of user changing password during the forced password change process
 	 */
-	@HasPermission('UserResetOwnPassword')
+	@HasPermission(Permission.UserResetOwnPassword)
 	def changePassword() {
 		[userLoginInstance: securityService.userLogin,
 		 minPasswordLength: securityService.getUserLocalConfig().minPasswordLength ?: 8]
@@ -372,7 +373,7 @@ class UserLoginController implements ControllerMethods {
 	 * The 2nd phase (last) of user changing password during the forced password change process.
 	 * The new password will be saved during this call.
 	 */
-	@HasPermission('UserResetOwnPassword')
+	@HasPermission(Permission.UserResetOwnPassword)
 	def updatePassword() {
 		UserLogin userLogin = securityService.userLogin
 		String msg
@@ -428,7 +429,7 @@ class UserLoginController implements ControllerMethods {
 	/**
 	 * Triggers the password reset on a selected account.
 	 */
-	@HasPermission('UserResetPassword')
+	@HasPermission(Permission.UserResetPassword)
 	def sendPasswordReset() {
 		UserLogin userLogin = UserLogin.get(params.id)
 		if (userLogin.canResetPasswordByAdmin()) {

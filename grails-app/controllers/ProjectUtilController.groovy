@@ -20,6 +20,7 @@ import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.RoleType
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
@@ -37,7 +38,7 @@ class ProjectUtilController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('ProjectView')
+	@HasPermission(Permission.ProjectView)
 	def index() {
 		Project project = securityService.userCurrentProject
 		if (project) {
@@ -55,7 +56,7 @@ class ProjectUtilController implements ControllerMethods {
 	/**
 	 * Return a list of projects , sorted desc by dateCreated
 	 */
-	@HasPermission('ProjectView')
+	@HasPermission(Permission.ProjectView)
 	def searchList() {
 		List<Project> projectList
 		String sort = params.sort ?: 'dateCreated'
@@ -95,7 +96,7 @@ class ProjectUtilController implements ControllerMethods {
 		[projectList: projectList]
 	}
 
-	@HasPermission('UserGeneralAccess')
+	@HasPermission(Permission.UserGeneralAccess)
 	def addUserPreference() {
 		Project project = Project.findByProjectCode(params.selectProject)
 		userPreferenceService.setCurrentProjectId(project.id)
@@ -106,13 +107,13 @@ class ProjectUtilController implements ControllerMethods {
 	/**
 	 * show the project demo create project
 	 */
-	@HasPermission('ProjectCreate')
+	@HasPermission(Permission.ProjectCreate)
 	def createDemo() {}
 
 	/**
 	 *  Copy all the temp project associates to demo project
 	 */
-	@HasPermission('ProjectCreate')
+	@HasPermission(Permission.ProjectCreate)
 	def saveDemoProject() {
 		def template = params.template
 		def name = params.name

@@ -14,6 +14,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AccountImportExportService
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.ControllerService
@@ -52,13 +53,13 @@ class AdminController implements ControllerMethods {
 
 	private static final int thirtyDaysInMS = 60 * 24 * 30 * 1000
 
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def index() {}
 
 	/**
 	 * Renders the Application Restart Form
 	 */
-	@HasPermission('ApplicationRestart')
+	@HasPermission(Permission.ApplicationRestart)
 	def restartAppServiceForm() {
 		String restartCmd = coreService.getAppConfigSetting(APP_RESTART_CMD_PROPERTY)
 		int activityTimeLimit = 5
@@ -72,7 +73,7 @@ class AdminController implements ControllerMethods {
 	 * a proper command. Looks for the tdstm.admin.serviceRestartCommand property and
 	 * attempts to shell out to the OS and run if defined.
 	 */
-	@HasPermission('ApplicationRestart')
+	@HasPermission(Permission.ApplicationRestart)
 	def restartAppServiceAction() {
 		String cmd = coreService.getAppConfigSetting(APP_RESTART_CMD_PROPERTY)
 		if (cmd == null) {
@@ -96,7 +97,7 @@ class AdminController implements ControllerMethods {
 		render 'OK'
 	}
 
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def orphanSummary() {
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) {
@@ -453,7 +454,7 @@ class AdminController implements ControllerMethods {
 		[summaryRecords: summaryRecords]
 	}
 
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def orphanDetails() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1038,7 +1039,7 @@ class AdminController implements ControllerMethods {
 	 * @param deleteHistory : the time constraint the end user want to delete the records .
 	 * @return : count of record that is deleted.
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def processOldData() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1073,7 +1074,7 @@ class AdminController implements ControllerMethods {
 	 * @params N/A :
 	 * @return : String formatted to display processed and pending batches and records
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def retrieveBatchRecords() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1102,7 +1103,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Get the Asset type and their respective Asset Count and Model Count.
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def retrieveAssetTypes() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1129,7 +1130,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Clean the Unused Asset types.
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def cleanAssetTypes() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1157,7 +1158,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Renders the Export Accounts form.
 	 */
-	@HasPermission('PersonExport')
+	@HasPermission(Permission.PersonExport)
 	def exportAccounts() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1175,7 +1176,7 @@ class AdminController implements ControllerMethods {
 	 * Exports project staff and users to a spreadsheet.
 	 * @response Excel Spreadsheet
 	 */
-	@HasPermission('PersonExport')
+	@HasPermission(Permission.PersonExport)
 	def exportAccountsProcess() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1206,7 +1207,7 @@ class AdminController implements ControllerMethods {
 	 * Downloads the spreadsheet import template
 	 */
 	// /('P_PersonImport')
-	@HasPermission('PersonImport')
+	@HasPermission(Permission.PersonImport)
 	def importAccountsTemplate() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1238,7 +1239,7 @@ class AdminController implements ControllerMethods {
 	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
 	 * @return JSON{ accounts: List of accounts }
 	 */
-	@HasPermission('PersonImport')
+	@HasPermission(Permission.PersonImport)
 	def importAccountsReviewData() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1272,7 +1273,7 @@ class AdminController implements ControllerMethods {
 	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
 	 * @return JSON{ accounts: List of accounts }
 	 */
-	@HasPermission('PersonImport')
+	@HasPermission(Permission.PersonImport)
 	def importAccountsPostResultsData() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1306,7 +1307,7 @@ class AdminController implements ControllerMethods {
 	 *     post   - The previously confirmed and this submission will reload the saved spreadsheet and post the
 	 *              changes to the database and delete the spreadsheet.
 	 */
-	@HasPermission('UserImport')
+	@HasPermission(Permission.UserImport)
 	def importAccounts() {
 		// TODO : JPM 4/2016 : importAccounts - check permissions based on importing person and users (options if person but not user should update the import form as well)
 		Project project = controllerService.getProjectForPage(this)
@@ -1424,7 +1425,7 @@ class AdminController implements ControllerMethods {
 	 * @param params.filename - the filename that the temporary uploaded spreadsheet was saved as
 	 * @return JSON{ accounts: List of accounts }
 	 */
-	@HasPermission('PersonImport')
+	@HasPermission(Permission.PersonImport)
 	def cancelImport() {
 		try {
 			Project project = controllerService.getProjectForPage(this)
@@ -1449,7 +1450,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Shows project Summary report filters.
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def projectReport() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1460,7 +1461,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Generates the project Summary Web report
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def projectSummaryReport() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1473,7 +1474,7 @@ class AdminController implements ControllerMethods {
 	}
 
 	// Gets the number of assets with a desync between the device's assetType and its model's assetType
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def countAssetsOutOfSync() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1492,7 +1493,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Used to reconcile assetTypes of devices with the assetType of their models
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def reconcileAssetTypes() {
 		Project project = controllerService.getProjectForPage(this)
 
@@ -1513,7 +1514,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Hash a value.
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def encryptValue() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1538,7 +1539,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 * Used to display the application memory consumption along with runtime configuration and performance data
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def systemInfo() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -1605,7 +1606,7 @@ class AdminController implements ControllerMethods {
 	/**
 	 *  The admin control home page.
 	 */
-	@HasPermission('AdminUtilitiesAccess')
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def home() {
 		long timeNow = TimeUtil.nowGMT().time
 		def dateNowSQL = TimeUtil.nowGMTSQLFormat()

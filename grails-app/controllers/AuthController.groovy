@@ -18,6 +18,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.EmailDispatchService
@@ -211,7 +212,7 @@ class AuthController implements ControllerMethods {
 	/**
 	 * The 3rd step in the password reset process where the user is prompted for their email address and their new password.
 	 */
-	@HasPermission('UserResetOwnPassword')
+	@HasPermission(Permission.UserResetOwnPassword)
 	def resetPassword() {
 		String token = params.token
 		PasswordReset pr
@@ -237,7 +238,7 @@ class AuthController implements ControllerMethods {
 	 * to their landing page along with a message that their password was changed. If it fails it will return to the
 	 * reset password form.
 	 */
-	@HasPermission('UserResetOwnPassword')
+	@HasPermission(Permission.UserResetOwnPassword)
 	def applyNewPassword() {
 		try {
 			PasswordReset pr = securityService.applyPasswordFromPasswordReset(params.token, params.password, params.email)

@@ -6,6 +6,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectTeam
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SecurityService
@@ -25,13 +26,13 @@ class MoveBundleAssetController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def list() {
 		if (!params.max) params.max = 10
 		[moveBundleAssetInstanceList: AssetEntity.list(params)]
 	}
 
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def show() {
 		AssetEntity moveBundleAsset = AssetEntity.get(params.id)
 		if (!moveBundleAsset) {
@@ -43,7 +44,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		[moveBundleAssetInstance: moveBundleAsset]
 	}
 
-	@HasPermission('AssetDelete')
+	@HasPermission(Permission.AssetDelete)
 	def delete() {
 		AssetEntity moveBundleAsset = AssetEntity.get(params.id)
 		if (moveBundleAsset) {
@@ -56,7 +57,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		redirect(action: "list")
 	}
 
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def edit() {
 		def moveBundleAsset = AssetEntity.get(params.id)
 		if (!moveBundleAsset) {
@@ -68,7 +69,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		[moveBundleAssetInstance: moveBundleAsset]
 	}
 
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def update() {
 		def moveBundleAsset = AssetEntity.get(params.id)
 		if (moveBundleAsset) {
@@ -87,12 +88,12 @@ class MoveBundleAssetController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('AssetCreate')
+	@HasPermission(Permission.AssetCreate)
 	def create() {
 		[moveBundleAssetInstance: new AssetEntity(params)]
 	}
 
-	@HasPermission('AssetCreate')
+	@HasPermission(Permission.AssetCreate)
 	def save() {
 		def moveBundleAsset = new AssetEntity(params)
 		if (!moveBundleAsset.hasErrors() && moveBundleAsset.save()) {
@@ -104,7 +105,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def assignAssetsToBundle() {
 		Project project = securityService.userCurrentProject
 		def moveBundle
@@ -126,7 +127,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		         params: [bundleLeft: moveBundleLeft.id, bundleRight: moveBundle.id])
 	}
 
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def assignAssetsToBundleChange() {
 		def bundleRight = params.bundleRight
 		def bundleLeft = params.bundleLeft
@@ -189,7 +190,7 @@ class MoveBundleAssetController implements ControllerMethods {
 	/*
 	 *  Sort Assets By Selected Row Column
 	 */
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def sortAssetList() {
 		def rightBundleId = params.rightBundle
 		def leftBundleId = params.leftBundle
@@ -289,7 +290,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		               moveBundleAssets: moveBundleAssets, sideField: params.side])
 	}
 
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def saveAssetsToBundle() {
 		def bundleFrom = params.bundleFrom
 		def bundleTo = params.bundleTo
@@ -308,7 +309,7 @@ class MoveBundleAssetController implements ControllerMethods {
 	}
 
 	//get teams for selected bundles.
-	@HasPermission('MoveBundleView')
+	@HasPermission(Permission.BundleView)
 	def retrieveTeamsForBundles() {
 		def bundleId = params.bundleId
 		List<ProjectTeam> teams
@@ -324,13 +325,13 @@ class MoveBundleAssetController implements ControllerMethods {
 	}
 
 	//Get the List of Racks corresponding to Selected Bundle
-	@HasPermission('MoveBundleView')
+	@HasPermission(Permission.BundleView)
 	def retrieveRacksForBundles() {
 		def assetEntityList = AssetEntity.findAllByMoveBundle(MoveBundle.load(params.bundleId))
 		renderAsJson(assetEntityList.collect { [id: it.sourceRack, name: it.sourceRack] })
 	}
 
-	@HasPermission('RackView')
+	@HasPermission(Permission.RackView)
 	def retrieveRackDetails() {
 		Long bundleId = params.long('bundleId')
 		def sourceRackList
@@ -367,7 +368,7 @@ class MoveBundleAssetController implements ControllerMethods {
 		renderAsJson([[sourceRackList: sourceRackList, targetRackList: targetRackList]])
 	}
 
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def retrieveAssetTagLabelData() {
 		def moveBundleId = params.moveBundle
 		def projectId = params.project

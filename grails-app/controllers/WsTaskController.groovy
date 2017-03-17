@@ -4,6 +4,7 @@ import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
@@ -26,7 +27,7 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * Publishes a TaskBatch that has been generated before
 	 */
-	@HasPermission('TaskPublish')
+	@HasPermission(Permission.TaskPublish)
 	def publish() {
 		try {
 			renderSuccessJson(tasksUpdated: taskService.publish(params.id))
@@ -39,7 +40,7 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * Unpublishes a TaskBatch that has been generated before
 	 */
-	@HasPermission('TaskPublish')
+	@HasPermission(Permission.TaskPublish)
 	def unpublish() {
 		try {
 			renderSuccessJson(tasksUpdated: taskService.unpublish(params.id))
@@ -52,7 +53,7 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * Deletes a TaskBatch.
 	 */
-	@HasPermission('TaskBatchDelete')
+	@HasPermission(Permission.TaskBatchDelete)
 	def deleteBatch() {
 		try {
 			taskService.deleteBatch(params.id)
@@ -66,7 +67,7 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * Generates a set of tasks based on a recipe
 	 */
-	@HasPermission('RecipeGenerateTasks')
+	@HasPermission(Permission.RecipeGenerateTasks)
 	def generateTasks() {
 		try {
 			def result = taskService.initiateCreateTasksWithRecipe(params.contextId, params.recipeId,
@@ -84,7 +85,7 @@ class WsTaskController implements ControllerMethods {
 	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
 	 * @return A taskBatch object if found or null
 	 */
-	@HasPermission('TaskBatchView')
+	@HasPermission(Permission.TaskBatchView)
 	def findTaskBatchByRecipeAndContext() {
 		try {
 			def result = taskService.findTaskBatchByRecipeAndContext(params.recipeId, params.contextId, params.logs)
@@ -98,7 +99,7 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * List the TaskBatch using the parameters passed in the request
 	 */
-	@HasPermission('TaskBatchView')
+	@HasPermission(Permission.TaskBatchView)
 	def listTaskBatches() {
 		try {
 			renderSuccessJson(list: taskService.listTaskBatches(params.recipeId, params.limitDays))
@@ -111,7 +112,7 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * Gets a TaskBatch based on a id
 	 */
-	@HasPermission('TaskBatchView')
+	@HasPermission(Permission.TaskBatchView)
 	def retrieveTaskBatch() {
 		try {
 			renderSuccessJson(taskBatch: taskService.getTaskBatch(params.id))
@@ -121,7 +122,7 @@ class WsTaskController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('RecipeGenerateTasks')
+	@HasPermission(Permission.RecipeGenerateTasks)
 	def taskReset() {
 		try {
 			taskService.resetTasksOfTaskBatch(params.id)
@@ -132,7 +133,7 @@ class WsTaskController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('TaskBatchView')
+	@HasPermission(Permission.TaskBatchView)
 	def retrieveTasksOfTaskBatch() {
 		try {
 			renderSuccessJson(tasks: taskService.getTasksOfBatch(params.id))
@@ -146,7 +147,7 @@ class WsTaskController implements ControllerMethods {
 	 * Sign a Provided Message using the QZCertificate
 	 * @see https://qz.io/wiki/2.0-signing-messages
 	 */
-	@HasPermission('TaskSignMessage')
+	@HasPermission(Permission.TaskSignMessage)
 	def qzSignMessage() {
 		try {
 			String message = params.request

@@ -14,6 +14,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectLogo
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DashboardService
@@ -37,7 +38,7 @@ class DashboardController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	UserService userService
 
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def index() {
 		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this, 'to view User Dashboard')
@@ -103,7 +104,7 @@ class DashboardController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('NewsCreate')
+	@HasPermission(Permission.NewsCreate)
 	def saveNews() {
 		def moveEventNewsInstance = new MoveEventNews(params)
 		moveEventNewsInstance.createdBy = securityService.loadCurrentPerson()
@@ -117,7 +118,7 @@ class DashboardController implements ControllerMethods {
 		redirect(action: "index")
 	}
 
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def taskSummary() {
 		try {
 			render(template: 'taskSummary',
@@ -127,7 +128,7 @@ class DashboardController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def userPortal() {
 		Project project = controllerService.getProjectForPage(this, 'to view User Dashboard')
 		if (!project) return
@@ -145,7 +146,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : events template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveEventsList() {
 		def result = userService.getEventDetails(getProjectOrAll()).values().collect { value -> [
 				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
@@ -160,7 +161,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : events template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveEvents() {
 		Project project = getProjectOrAll()
 		render (template: 'events',
@@ -173,7 +174,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : events template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveEventsNewsList() {
 		// TODO : JPM 6/2016 : SECURITY : Users should only have the projects that they can access
 		Map map = [project: null, newsList: []]
@@ -211,7 +212,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : eventNews template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveEventsNews() {
 		Project project = getProjectOrAll(false)
 		render(template: 'eventNews', model: [newsList: userService.getEventNews(project), project: project])
@@ -222,7 +223,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : tasks template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveTaskSummaryList() {
 		Project project = getProjectOrAll(false)
 
@@ -265,7 +266,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : tasks template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveTaskSummary() {
 		Project project = getProjectOrAll(false)
 		def taskSummary = userService.getTaskSummary(project)
@@ -279,7 +280,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : application template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveApplicationsList() {
 		// [appList: List<Application>, relationList: Map<Long, String>]
 		Map<String, Object> appSummary = userService.getApplications(getProjectOrAll())
@@ -300,7 +301,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : application template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveApplications() {
 		Project project = getProjectOrAll(false)
 		def appSummary = userService.getApplications(project)
@@ -313,7 +314,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : activePeople template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveActivePeopleList() {
 		renderAsJson userService.getActivePeople(getProjectOrAll()).collect { login ->
 			[personId: login.personId, projectName: login.projectName,
@@ -326,7 +327,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : activePeople template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveActivePeople() {
 		Project project = getProjectOrAll(false)
 		render (template: 'activePeople', model: [recentLogin:userService.getActivePeople(project), project:project ])
@@ -337,7 +338,7 @@ class DashboardController implements ControllerMethods {
 	 * @param : project id of selected project
 	 * @render : activePeople template
 	 */
-	@HasPermission('DashboardMenuView')
+	@HasPermission(Permission.DashboardMenuView)
 	def retrieveRelatedEntities() {
 		def entities = [:]
 		def moveBundleList = []

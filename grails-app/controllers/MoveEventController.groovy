@@ -17,6 +17,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.ProjectService
@@ -91,10 +92,10 @@ class MoveEventController implements ControllerMethods {
 	                                                    'taskDependencies', 'duration', 'estStart', 'estFinish',
 	                                                    'actStart', 'actFinish', 'workflow']
 
-	@HasPermission('EventView')
+	@HasPermission(Permission.EventView)
 	def list() {}
 
-	@HasPermission('EventView')
+	@HasPermission(Permission.EventView)
 	def listJson() {
 
 		String sortIndex = params.sidx ?: 'assetName'
@@ -133,7 +134,7 @@ class MoveEventController implements ControllerMethods {
 		render jsonData as JSON
 	}
 	
-	@HasPermission('EventView')
+	@HasPermission(Permission.EventView)
 	def show() {
 		String moveEventId = params.id
 		if (moveEventId) {
@@ -170,7 +171,7 @@ class MoveEventController implements ControllerMethods {
 	 * @param : MoveEvent Id
 	 * @return : list of remaining MoveEvents
 	 */
-	@HasPermission('EventDelete')
+	@HasPermission(Permission.EventDelete)
 	def delete() {
 		try {
 			MoveEvent moveEvent = MoveEvent.get(params.id)
@@ -196,7 +197,7 @@ class MoveEventController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 	
-	@HasPermission('EventEdit')
+	@HasPermission(Permission.EventEdit)
 	def edit() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
 		if (!moveEvent) {
@@ -208,7 +209,7 @@ class MoveEventController implements ControllerMethods {
 		[moveEventInstance: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
 	}
 	
-	@HasPermission('EventEdit')
+	@HasPermission(Permission.EventEdit)
 	def update() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
 		if (!moveEvent) {
@@ -235,12 +236,12 @@ class MoveEventController implements ControllerMethods {
 		}
 	}
 	
-	@HasPermission('EventCreate')
+	@HasPermission(Permission.EventCreate)
 	def create() {
 		[moveEventInstance: new MoveEvent(params)]
 	}
 	
-	@HasPermission('EventCreate')
+	@HasPermission(Permission.EventCreate)
 	def save() {
 		if (params.estStartTime) {
 			params.estStartTime = TimeUtil.parseDateTime(params.estStartTime) ?: params.estStartTime
@@ -265,8 +266,8 @@ class MoveEventController implements ControllerMethods {
 	 * return the list of MoveBundles which are associated to the selected Project
 	 * @return : return the list of MoveBundles as JSON object
 	 */
-	@HasPermission('BundleView')
-	@HasPermission('EventView')
+	@HasPermission(Permission.BundleView)
+	@HasPermission(Permission.EventView)
 	def retrieveMoveBundles() {
 		def moveBundles
 		Project project = securityService.userCurrentProject
@@ -279,7 +280,7 @@ class MoveEventController implements ControllerMethods {
 	/**
 	 * Clear out any snapshot data records and reset any summary steps for given event.
 	 */
-	@HasPermission('EventEdit')
+	@HasPermission(Permission.EventEdit)
 	def clearHistoricData() {
 		Long moveEventId = params.long('moveEventId')
 		if (moveEventId) {
@@ -309,8 +310,8 @@ class MoveEventController implements ControllerMethods {
 	 * @return text
 	 * @usage ajax
 	 */
-	@HasPermission('EventEdit')
-	@HasPermission('TaskDelete')
+	@HasPermission(Permission.EventEdit)
+	@HasPermission(Permission.TaskDelete)
 	def clearTaskData() {
 		Project project = securityService.userCurrentProject
 		def moveEvent
@@ -347,7 +348,7 @@ class MoveEventController implements ControllerMethods {
 	 * Return the list of active news for a selected moveEvent and status of that evnt.
 	 * @param id - the moveEvent to get the news for
 	 */
-	@HasPermission('EventView')
+	@HasPermission(Permission.EventView)
 	def retrieveMoveEventNewsAndStatus() {
 		
 		// Make sure that the user is trying to access a valid event
@@ -427,7 +428,7 @@ class MoveEventController implements ControllerMethods {
 	 * @author : Lokanada Reddy
 	 * @param  : moveEventId and moveEvent dialIndicatorValue
 	 */
-	@HasPermission('EventEdit')
+	@HasPermission(Permission.EventEdit)
 	def updateEventSumamry() {
 		MoveEvent moveEvent = MoveEvent.get(params.moveEventId)
 		def dialIndicator
@@ -453,7 +454,7 @@ class MoveEventController implements ControllerMethods {
 	/**
 	 * The front-end UI to exporting a Runbook spreadsheet
 	 */
-	@HasPermission('TaskView')
+	@HasPermission(Permission.TaskView)
 	def exportRunbook() {
 		Project project = controllerService.getProjectForPage(this, 'to view Export Runbook')
 		if (!project) return
@@ -465,7 +466,7 @@ class MoveEventController implements ControllerMethods {
 	/**
 	 * This provides runbookStats that is rendered into a window of the runbook exporting
 	 */
-	@HasPermission('TaskView')
+	@HasPermission(Permission.TaskView)
 	def runbookStats() {
 		def moveEventId = params.id
 		Project project = securityService.userCurrentProject
@@ -506,7 +507,7 @@ class MoveEventController implements ControllerMethods {
 	/**
 	 * The controller that actually does the runbook export generation to an Excel spreadsheet
 	 */
-	@HasPermission('TaskView')
+	@HasPermission(Permission.TaskView)
 	def exportRunbookToExcel() {
 
 		Project project = controllerService.getProjectForPage(this)
@@ -649,7 +650,7 @@ class MoveEventController implements ControllerMethods {
 	 * @param moveEventId
 	 * @return  Count of record affected with this update or Error Message if any
 	 */
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def markEventAssetAsMoved() {
 		// if (params.containsKey("moveEventId")) {
 		// 	if (params.moveEventId.isNumber()) {
@@ -690,7 +691,7 @@ class MoveEventController implements ControllerMethods {
 	 * @param newsBarMode with what character user filterd newsBarMode property
 	 * @return matched db property of newsBarMode
 	 */
-	@HasPermission('EventView')
+	@HasPermission(Permission.EventView)
 	private List<String> retrieveNewsBMList(String newsBarMode) {
 		if (!newsBarMode) return null
 

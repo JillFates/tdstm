@@ -1,6 +1,7 @@
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ProgressService
 import com.tdsops.common.security.spring.HasPermission
 
@@ -18,7 +19,7 @@ class WsProgressController implements ControllerMethods {
 	/**
 	 * Gets the status of the progress of a async task
 	 */
-	@HasPermission('ProgressView')
+	@HasPermission(Permission.ProgressView)
 	def retrieveStatus() {
 		try {
 			renderSuccessJson(progressService.get(params.id))
@@ -31,7 +32,7 @@ class WsProgressController implements ControllerMethods {
 	/**
 	 * Gets the status of the progress of a async task
 	 */
-	@HasPermission('ProgressView')
+	@HasPermission(Permission.ProgressView)
 	def retrieveData() {
 		try {
 			renderSuccessJson(progressService.getData(params.id, params.dataKey))
@@ -44,7 +45,7 @@ class WsProgressController implements ControllerMethods {
 	/**
 	 * Returns the list of pending progresses
 	 */
-	@HasPermission('ProgressList')
+	@HasPermission(Permission.ProgressList)
 	def list() {
 		try {
 			renderSuccessJson(progressService.list())
@@ -57,7 +58,7 @@ class WsProgressController implements ControllerMethods {
 	/**
 	 * Returns the list of pending progresses
 	 */
-	@HasPermission('ProgressView')
+	@HasPermission(Permission.ProgressView)
 	def demo() {
 		try {
 			renderSuccessJson(progressService.demo())
@@ -70,7 +71,7 @@ class WsProgressController implements ControllerMethods {
 	/**
 	 * Returns the list of pending progresses
 	 */
-	@HasPermission('ProgressView')
+	@HasPermission(Permission.ProgressView)
 	def demoFailed() {
 		try {
 			renderSuccessJson(progressService.demoFailed())

@@ -32,6 +32,7 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.MoveBundleService
@@ -1314,7 +1315,7 @@ class ReportsController implements ControllerMethods {
 	/**
 	 * Used to generate project activity metrics Report.
 	 */
-	@HasPermission('ReportViewProjectDailyMetrics')
+	@HasPermission(Permission.ReportViewProjectDailyMetrics)
 	def projectActivityMetrics() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1333,7 +1334,7 @@ class ReportsController implements ControllerMethods {
 	/**
 	 * Used to generate project activity metrics excel file.
 	 */
-	@HasPermission('ReportViewProjectDailyMetrics')
+	@HasPermission(Permission.ReportViewProjectDailyMetrics)
 	def projectActivityMetricsExport() {
 
 		Project project = controllerService.getProjectForPage(this)

@@ -22,6 +22,7 @@ import net.transitionmanager.domain.ModelSyncBatch
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ModelService
@@ -48,7 +49,7 @@ class ModelController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('ModelList')
+	@HasPermission(Permission.ModelList)
 	def list() {
 		Map modelPref = assetEntityService.getExistingPref('Model_Columns')
 		Map attributes = Model.getModelFieldsAndlabels()
@@ -60,7 +61,7 @@ class ModelController implements ControllerMethods {
 	/**
 	* This method is used by JQgrid to load modelList
 	*/
-	@HasPermission('ModelList')
+	@HasPermission(Permission.ModelList)
 	def listJson() {
 		String sortOrder = params.sord in ['asc','desc'] ? params.sord : 'asc'
 		int maxRows = params.int('rows')
@@ -108,7 +109,7 @@ class ModelController implements ControllerMethods {
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
-	@HasPermission('ModelCreate')
+	@HasPermission(Permission.ModelCreate)
 	def displayModelValues(value, model) {
 		switch (value) {
 			case ~/dateCreated|lastModified|endOfLifeDate/: TimeUtil.formatDate(model[value])
@@ -117,7 +118,7 @@ class ModelController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ModelCreate')
+	@HasPermission(Permission.ModelCreate)
 	def create(String modelId) {
 		List<ModelConnector> modelConnectors
 		Model modelTemplate
@@ -136,7 +137,7 @@ class ModelController implements ControllerMethods {
 		 modelTemplate: modelTemplate, powerType: userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)]
 	}
 
-	@HasPermission('ModelEdit')
+	@HasPermission(Permission.ModelEdit)
 	def save() {
 		try {
 			def modelId = params.modelId
@@ -279,7 +280,7 @@ class ModelController implements ControllerMethods {
 		}
 	}
 	
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def show() {
 		def modelId = params.id
 		if (modelId && modelId.isNumber()) {
@@ -307,7 +308,7 @@ class ModelController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ModelEdit')
+	@HasPermission(Permission.ModelEdit)
 	def edit() {
 		def modelId = params.id
 		if (modelId && modelId.isNumber()) {
@@ -341,7 +342,7 @@ class ModelController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ModelEdit')
+	@HasPermission(Permission.ModelEdit)
 	def update() {
 		try{
 			def modelInstance = Model.get(params.id)
@@ -579,7 +580,7 @@ class ModelController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('ModelDelete')
+	@HasPermission(Permission.ModelDelete)
 	def delete() {
 		def model = Model.get(params.id)
 		def modelRef = AssetEntity.findByModel(model)
@@ -621,7 +622,7 @@ class ModelController implements ControllerMethods {
 	/*
 	 * Send FrontImage as inputStream
 	 */
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def retrieveFrontImage() {
 		if (params.id) {
 			def model = Model.get(params.id)
@@ -636,7 +637,7 @@ class ModelController implements ControllerMethods {
 	/*
 	 * Send RearImage as inputStream
 	 */
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def retrieveRearImage() {
 		if (params.id) {
 			def model = Model.get(params.id)
@@ -651,7 +652,7 @@ class ModelController implements ControllerMethods {
 	/*
 	 * Send List of model as JSON object
 	 */
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def retrieveModelsListAsJSON() {
 		def manufacturer = params.manufacturer
 		def assetType = params.assetType
@@ -674,7 +675,7 @@ class ModelController implements ControllerMethods {
 	/*
 	 * check to see that if they were any Asset records exist for the selected model before deleting it
 	 */
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def checkModelDependency() {
 		def modelId = params.modelId
 		def modelInstance = Model.get(modelId)
@@ -689,7 +690,7 @@ class ModelController implements ControllerMethods {
 	/*
 	 * Return AssetCables to alert the user while deleting the connectors
 	*/
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def retrieveAssetCablesForConnector() {
 		def modelId = params.modelId
 		def modelInstance = Model.get(modelId)
@@ -705,7 +706,7 @@ class ModelController implements ControllerMethods {
 	/*
 	 * TEMP method to redirect to action : show
 	 */
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def cancel() {
 		redirect(action: "show", id: params.id)
 	}
@@ -717,7 +718,7 @@ class ModelController implements ControllerMethods {
 	*	3. Delete model record
 	*	4. Return to model list view with the flash message "Merge completed."
 	*/
-	@HasPermission('ModelMerge')
+	@HasPermission(Permission.ModelMerge)
 	def merge() {
 		// Get the Model instances for params ids
 		def toModel = Model.get(params.id)
@@ -734,7 +735,7 @@ class ModelController implements ControllerMethods {
 	* @param : fromId[] id of model that is being merged
 	* @return : message
 	*/
-	@HasPermission('ModelMerge')
+	@HasPermission(Permission.ModelMerge)
 	def mergeModels() {
 
 		Model toModel = Model.get(params.toId)
@@ -761,7 +762,7 @@ class ModelController implements ControllerMethods {
 		render msg + mergedModel.size() + " models were merged to $toModel.modelName . $assetUpdated assets were updated."
 	}
 
-	@HasPermission('ModelExport')
+	@HasPermission(Permission.ModelExport)
 	def importExport() {
 		if (params.message) {
 			flash.message = params.message
@@ -774,7 +775,7 @@ class ModelController implements ControllerMethods {
 	* Use excel format with the manufacturer,model and connector sheets.
 	* The file name should be of the format TDS-Sync-Data-2011-05-02.xls with the current date.
 	*/
-	@HasPermission('ModelExport')
+	@HasPermission(Permission.ModelExport)
 	def export() {
 		//get template Excel
 		try {
@@ -870,7 +871,7 @@ class ModelController implements ControllerMethods {
 	*2b If it is lower, skip it.
 	*3. Report the number of Model records updated.
 	*/
-	@HasPermission('ModelImport')
+	@HasPermission(Permission.ModelImport)
 	def upload() {
 		DataTransferBatch.withTransaction { status ->
 			UserLogin userLogin = securityService.userLogin
@@ -1196,7 +1197,7 @@ class ModelController implements ControllerMethods {
 		return missingHeader
 	}
 
-	@HasPermission('ModelImport')
+	@HasPermission(Permission.ModelImport)
 	def manageImports() {
 		[modelSyncBatch: ModelSyncBatch.list()]
 	}
@@ -1204,7 +1205,7 @@ class ModelController implements ControllerMethods {
 	/*
 	 * Send Model details as JSON object
 	 */
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def retrieveModelAsJSON() {
 		def id = params.id
 		def model = Model.get(params.id)
@@ -1241,7 +1242,7 @@ class ModelController implements ControllerMethods {
 		render modelMap as JSON
 	}
 	
-	@HasPermission('ModelValidate')
+	@HasPermission(Permission.ModelValidate)
 	def validateModel() {
 		def modelInstance = Model.get(params.id)
 		if (securityService.loggedIn) {
@@ -1263,7 +1264,7 @@ class ModelController implements ControllerMethods {
 	* @param: parentName, name of the model to validate the alias with (not needed if the model's name hasn't changed)
 	* @return: "valid" if the alias is valid, "invalid" otherwise
 	*/
-	@HasPermission('ModelEdit')
+	@HasPermission(Permission.ModelEdit)
 	def validateAliasForForm() {
 		def alias = params.alias
 		def modelId = params.id
@@ -1284,7 +1285,7 @@ class ModelController implements ControllerMethods {
 	 * Updates a model for audit view , not using update method as there have a lot of code in update action might degrade performance.
 	 * @param id : id of model for update
 	 */
-	@HasPermission('ModelEdit')
+	@HasPermission(Permission.ModelEdit)
 	def updateModel() {
 		def modelId = params.id
 		if (modelId && modelId.isNumber()) {
@@ -1306,7 +1307,7 @@ class ModelController implements ControllerMethods {
 	* @param : value is initial for which user wants suggestions .
 	* @return : sugesstion template.
 	*/
-	@HasPermission('ModelEdit')
+	@HasPermission(Permission.ModelEdit)
 	def autoCompleteModel() {
 		def initials = params.value
 		def manufacturer = params.manufacturer
@@ -1324,7 +1325,7 @@ class ModelController implements ControllerMethods {
 	* @return model's assetType
 	*
 	*/
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def retrieveModelType() {
 		def modelName = params.value
 		def model = Model.findByModelName(modelName)
@@ -1338,7 +1339,7 @@ class ModelController implements ControllerMethods {
 	* @param manufacturerName : name of manufacturer
 	* @return : modelAuditEdit template
 	*/
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def retrieveModelDetailsByName() {
 		def modelName = params.modelName
 		def manufacturerName = params.manufacturerName
@@ -1355,7 +1356,7 @@ class ModelController implements ControllerMethods {
 	*@param : ids[] list of ids to compare
 	*@return
 	*/
-	@HasPermission('ModelView')
+	@HasPermission(Permission.ModelView)
 	def compareOrMerge() {
 		def ids = params.list("ids[]")
 		def models = []
@@ -1404,7 +1405,7 @@ class ModelController implements ControllerMethods {
 	* @param modelLists
 	* @render resp message.
 	*/
-	@HasPermission('ModelDelete')
+	@HasPermission(Permission.ModelDelete)
 	def deleteBulkModels() {
 		def resp
 		def deletedModels = []

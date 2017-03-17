@@ -8,6 +8,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DomainUpdateException
@@ -41,7 +42,7 @@ class DataTransferBatchController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('AssetImport')
+	@HasPermission(Permission.AssetImport)
 	def importResults() {
 		def dtb = DataTransferBatch.get(params.id)
 		if (!dtb) {
@@ -56,7 +57,7 @@ class DataTransferBatchController implements ControllerMethods {
 	 * Return list of dataTransferBatchs for associated Project and Mode = Import
 	 * @return dataTransferBatchList
 	 */
-	@HasPermission('DataTransferBatchView')
+	@HasPermission(Permission.DataTransferBatchView)
 	def list() {
 		if (params.message) {
 			flash.message = params.message
@@ -91,7 +92,7 @@ class DataTransferBatchController implements ControllerMethods {
 	 * @param params.id - the id of the DataTransferBatch
 	 * @return JSON response containing the information and other attributes regarding the process
 	 */
-	@HasPermission('DataTransferBatchProcess')
+	@HasPermission(Permission.DataTransferBatchProcess)
 	def processImportBatch() {
 		String error
 		Map results
@@ -142,7 +143,7 @@ class DataTransferBatchController implements ControllerMethods {
 	 * Used to generate the List for Manage Asset Import Batches using Kendo Grid.
 	 * @return : list of batches process as JSON
 	 */
-	@HasPermission('DataTransferBatchView')
+	@HasPermission(Permission.DataTransferBatchView)
 	def retrieveManageBatchList() {
 		Project project = securityService.userCurrentProject
 		if (!project) {
@@ -204,7 +205,7 @@ class DataTransferBatchController implements ControllerMethods {
 	 * @param  : processed and total assts from session
 	 *	@return : processed data for Batch progress bar
 	 */
-	@HasPermission('DataTransferBatchView')
+	@HasPermission(Permission.DataTransferBatchView)
 	def retrieveProgress() {
 		def progressData = [[processed: session.getAttribute("TOTAL_PROCESSES_ASSETS"),
 		                     total: session.getAttribute("TOTAL_BATCH_ASSETS")]]
@@ -214,7 +215,7 @@ class DataTransferBatchController implements ControllerMethods {
 	/**
 	 * data transfer batch error list
 	 */
-	@HasPermission('DataTransferBatchView')
+	@HasPermission(Permission.DataTransferBatchView)
 	def errorsListView() {
 		long dataTransferBatchId = params.long('id')
 		
@@ -244,7 +245,7 @@ class DataTransferBatchController implements ControllerMethods {
 	/**
 	 * Delete the Data Transfer Batch Instance
 	 */
-	@HasPermission('DataTransferBatchDelete')
+	@HasPermission(Permission.DataTransferBatchDelete)
 	def delete() {
 		try {
 			DataTransferBatch dtb = DataTransferBatch.get(params.batchId)

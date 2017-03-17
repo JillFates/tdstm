@@ -10,6 +10,7 @@ import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
@@ -34,7 +35,7 @@ class PartyGroupController implements ControllerMethods {
 	/**
 	 * Used to render the Company List view which will call back to the listJson for the actual data
 	 */
-	@HasPermission('CompanyView')
+	@HasPermission(Permission.CompanyView)
 	def list() {
 		[listJsonUrl: createLink(controller: 'person', action: 'listJson')]
 	}
@@ -42,7 +43,7 @@ class PartyGroupController implements ControllerMethods {
 	/**
 	 * Used by the List view JQGrid
 	 */
-	@HasPermission('CompanyView')
+	@HasPermission(Permission.CompanyView)
 	def listJson() {
 
     	Person whom = securityService.userLoginPerson
@@ -108,7 +109,7 @@ class PartyGroupController implements ControllerMethods {
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
-	@HasPermission('CompanyView')
+	@HasPermission(Permission.CompanyView)
 	def show() {
 		PartyGroup partyGroup = PartyGroup.get(params.id)
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
@@ -122,7 +123,7 @@ class PartyGroupController implements ControllerMethods {
 		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup), projectPartner: isAProjectPartner(partyGroup)]
 	}
 
-	@HasPermission('CompanyDelete')
+	@HasPermission(Permission.CompanyDelete)
 	def delete() {
 
 		PartyGroup partyGroupInstance = PartyGroup.get(params.id)
@@ -183,7 +184,7 @@ class PartyGroupController implements ControllerMethods {
 
 	}
 
-	@HasPermission('CompanyEdit')
+	@HasPermission(Permission.CompanyEdit)
 	def edit() {
 		PartyGroup partyGroup = PartyGroup.get( params.id )
 		userPreferenceService.setPreference(PREF.PARTY_GROUP, partyGroup?.id)
@@ -196,7 +197,7 @@ class PartyGroupController implements ControllerMethods {
 		[partyGroupInstance: partyGroup, partner: isAPartner(partyGroup), projectPartner: isAProjectPartner(partyGroup)]
 	}
 
-	@HasPermission('CompanyEdit')
+	@HasPermission(Permission.CompanyEdit)
 	def update() {
 		PartyGroup partyGroup = PartyGroup.get( params.id )
 		//partyGroup.lastUpdated = new Date()
@@ -227,12 +228,12 @@ class PartyGroupController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('CompanyCreate')
+	@HasPermission(Permission.CompanyCreate)
     def create() {
         [partyGroupInstance: new PartyGroup(params)]
     }
 
-	@HasPermission('CompanyCreate')
+	@HasPermission(Permission.CompanyCreate)
     def save() {
 
     	Person whom = securityService.userLoginPerson

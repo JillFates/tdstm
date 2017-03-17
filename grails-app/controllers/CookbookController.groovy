@@ -1,4 +1,5 @@
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
@@ -8,7 +9,7 @@ class CookbookController implements ControllerMethods {
 
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('CookbookView')
+	@HasPermission(Permission.CookbookView)
 	def index() {
 		licenseAdminService.checkValidForLicense()
 		[userPreferenceService: userPreferenceService]

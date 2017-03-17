@@ -1,6 +1,7 @@
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.EventService
 import com.tdsops.common.security.spring.HasPermission
 
@@ -15,7 +16,7 @@ class WsEventController implements ControllerMethods {
 
 	EventService eventService
 
-	@HasPermission('MoveEventView')
+	@HasPermission(Permission.MoveEventView)
 	def listEventsAndBundles() {
 		try {
 			renderSuccessJson(list: eventService.listEventsAndBundles())
@@ -29,7 +30,7 @@ class WsEventController implements ControllerMethods {
 	 * All bundles associated to a specified move event or if id=0 then unassigned bundles
 	 * for the user's current project
 	 */
-	@HasPermission('BundleView')
+	@HasPermission(Permission.BundleView)
 	def listBundles() {
 		try {
 			renderSuccessJson(list: eventService.listBundles(params.id, params.useForPlanning))

@@ -14,6 +14,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.RackService
@@ -37,7 +38,7 @@ class RoomController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('RackMenuView')
+	@HasPermission(Permission.RackMenuView)
 	def list() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -77,12 +78,12 @@ class RoomController implements ControllerMethods {
 		return model
 	}
 
-	@HasPermission('RoomCreate')
+	@HasPermission(Permission.RoomCreate)
 	def create() {
 		[roomInstance: new Room(params)]
 	}
 
-	@HasPermission('RoomCreate')
+	@HasPermission(Permission.RoomCreate)
 	def save() {
 		Room room = new Room(params)
 		if (room.save(flush: true)) {
@@ -99,7 +100,7 @@ class RoomController implements ControllerMethods {
 		redirect(action: "list", params: [viewType: "list"])
 	}
 
-	@HasPermission('RoomView')
+	@HasPermission(Permission.RoomView)
 	def show() {
 
 		session.removeAttribute("RACK_ID")
@@ -175,7 +176,7 @@ class RoomController implements ControllerMethods {
 		 browserTestiPad: browserTestiPad, statusList: statusList, bundleList: bundleLists, moveBundleId: moveBundleId]
 	}
 
-	@HasPermission('RoomEdit')
+	@HasPermission(Permission.RoomEdit)
 	def edit() {
 		Room room = Room.get(params.id)
 		if (!room) {
@@ -202,7 +203,7 @@ class RoomController implements ControllerMethods {
 	 * @param id:Rack id
 	 * @return room layout
 	 */
-	@HasPermission('RoomEdit')
+	@HasPermission(Permission.RoomEdit)
 	def roomObject() {
 		def rack = Rack.get(params.id) ?: new Rack()
 		render(template: "roomObject", model: [rack: rack, rackId: params.id])
@@ -211,7 +212,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Update Room and Rack information
 	 */
-	@HasPermission('RoomEdit')
+	@HasPermission(Permission.RoomEdit)
 	def update() {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
@@ -241,7 +242,7 @@ class RoomController implements ControllerMethods {
 	 * Used to delete one or more rooms that do not have associated assets assigned to the room
 	 * @param checkbox_{roomId}
 	 */
-	@HasPermission('RoomDelete')
+	@HasPermission(Permission.RoomDelete)
 	def delete() {
 		Project project = securityService.userCurrentProject
 		def roomIds = []
@@ -274,7 +275,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Verify if rack has associated with any assets before deleting it.
 	 */
-	@HasPermission('RoomEdit')
+	@HasPermission(Permission.RoomEdit)
 	def verifyRackAssociatedRecords() {
 		AssetEntity assetEntity
 		Rack rack = Rack.get(params.rackId)
@@ -292,7 +293,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Verify if Room has associated with any assets before deleting it.
 	 */
-	@HasPermission('RoomEdit')
+	@HasPermission(Permission.RoomEdit)
 	def verifyRoomAssociatedRecords() {
 		Room room = Room.get(params.roomId)
 		def associatedRecords
@@ -311,7 +312,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Merge Racks and delete the selected Room and Racks
 	 */
-	@HasPermission('RoomMerge')
+	@HasPermission(Permission.RoomMerge)
 	def mergeRoom() {
 		def sourceRoomId = params.sourceRoom
 		def targetRoomId = params.targetRoom
@@ -345,7 +346,7 @@ class RoomController implements ControllerMethods {
 		      roomTarget: targetRoom.id, sourceRoomId: sourceRoom.id])
 	}
 
-	@HasPermission('RoomMerge')
+	@HasPermission(Permission.RoomMerge)
 	def updateRackToMergeRooms(sourceRoom,targetRoom) {
 		def sourceRoomRacks = Rack.findAllByRoom(sourceRoom)
 		sourceRoomRacks.each { sourceRack ->
@@ -367,7 +368,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 *  Return Power details as string to show at room layout.
 	 */
-	@HasPermission('RoomView')
+	@HasPermission(Permission.RoomView)
 	def retrieveRackPowerData() {
 		def room = Room.read(params.roomId)
 		def racks = Rack.findAllByRoom(room)
@@ -527,7 +528,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 *  Return assets list as html row format to assign racks
 	 */
-	@HasPermission('RoomView')
+	@HasPermission(Permission.RoomView)
 	def retrieveAssetsListToAddRack() {
 		def order = params.order ?: 'asc'
 		Project project = securityService.userCurrentProject
@@ -575,7 +576,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 *  Return blades list as html row format to assign blade chassis
 	 */
-	@HasPermission('RoomView')
+	@HasPermission(Permission.RoomView)
 	def retrieveBladeAssetsListToAddRack() {
 		def source = params.source
 		
@@ -615,7 +616,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Room Capacity Scaling
 	 */
-	@HasPermission('RoomView')
+	@HasPermission(Permission.RoomView)
 	def retrieveCapacityView() {
 		def capacityData = [:]
 		def room = Room.read(params.roomId)
@@ -812,7 +813,7 @@ class RoomController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('RoomEdit')
+	@HasPermission(Permission.RoomEdit)
 	def setDraggableRackPref() {
 		userPreferenceService.setPreference(PREF.DRAGGABLE_RACK, params.prefVal)
 		render 'success'

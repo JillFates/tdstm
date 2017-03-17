@@ -12,6 +12,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ProjectService
@@ -39,7 +40,7 @@ class FilesController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def list() {
 		def filters = session.FILES?.JQ_FILTERS
 		session.FILES?.JQ_FILTERS = []
@@ -57,7 +58,7 @@ class FilesController implements ControllerMethods {
 	/**
 	 * Used by JQgrid to load assetList
 	 */
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def listJson() {
 		String sortIndex = params.sidx ?: 'assetName'
 		String sortOrder  = params.sord ?: 'asc'
@@ -225,7 +226,7 @@ class FilesController implements ControllerMethods {
 		render jsonData as JSON
 	}
 
-	@HasPermission('AssetCreate')
+	@HasPermission(Permission.AssetCreate)
 	def create() {
 		// TODO : JPM 10/2014 : refactor create to get model from service layer
 		Files files = new Files(appOwner:'TDS')
@@ -241,7 +242,7 @@ class FilesController implements ControllerMethods {
 		 highlightMap: assetEntityService.getHighlightedInfo('Files', files, configMap), project:project]
 	}
 
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def show(String id) {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -254,7 +255,7 @@ class FilesController implements ControllerMethods {
 		}
 	}
 	
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -269,7 +270,7 @@ class FilesController implements ControllerMethods {
 		assetEntityService.getDefaultModelForEdits('Files', project, fileInstance, params)
 	}
 
-	@HasPermission('AssetCreate')
+	@HasPermission(Permission.AssetCreate)
 	def save() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, storageService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -277,7 +278,7 @@ class FilesController implements ControllerMethods {
 		session.FILES?.JQ_FILTERS = params
 	}
 
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def update() {
 		String errorMsg = controllerService.saveUpdateAssetHandler(this, storageService, params)
 		if (errorMsg) session.AE?.JQ_FILTERS = params
@@ -324,7 +325,7 @@ class FilesController implements ControllerMethods {
 
 	}
 
-	@HasPermission('AssetDelete')
+	@HasPermission(Permission.AssetDelete)
 	def delete() {
 		Files files = Files.get(params.id)
 		if (!files) {
@@ -346,7 +347,7 @@ class FilesController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission('AssetDelete')
+	@HasPermission(Permission.AssetDelete)
 	def deleteBulkAsset() {
 		def assetNames = []
 

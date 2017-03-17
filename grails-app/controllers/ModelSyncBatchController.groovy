@@ -8,6 +8,7 @@ import net.transitionmanager.domain.ModelConnector
 import net.transitionmanager.domain.ModelConnectorSync
 import net.transitionmanager.domain.ModelSync
 import net.transitionmanager.domain.ModelSyncBatch
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
 
 import grails.plugin.springsecurity.annotation.Secured
@@ -19,14 +20,14 @@ class ModelSyncBatchController implements ControllerMethods {
 
 	SecurityService securityService
 
-	@HasPermission('ModelImport')
+	@HasPermission(Permission.ModelImport)
 	def list() {
       	//params.max = Math.min(params.max ? params.int('max') : 20, 100)
 		[modelSyncBatchInstanceList: ModelSyncBatch.list(sort: 'id', order: 'desc'),
 		modelSyncBatchInstanceTotal: ModelSyncBatch.count()]
 	}
 
-	@HasPermission('ModelImport')
+	@HasPermission(Permission.ModelImport)
 	def process() {
 		def modelBatch = params.batchId
 		def modelSyncBatch = ModelSyncBatch.get(modelBatch)

@@ -3,6 +3,7 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.StateEngineService
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -17,7 +18,7 @@ class MoveEventNewsController implements ControllerMethods {
 	 * @param : moveEventId?type=[N|I}&state=[L|A]&maxLen= n &sort=[A|D]
 	 * @return : union (AssetComments , MoveEventNews)
 	 */
-	@HasPermission('NewsView')
+	@HasPermission(Permission.NewsView)
 	def list() {
 		def projectId = securityService.userCurrentProjectId
 		def moveEventId = params.id

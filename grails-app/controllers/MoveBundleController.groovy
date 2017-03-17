@@ -30,6 +30,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.LicenseAdminService
@@ -65,14 +66,14 @@ class MoveBundleController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('MoveBundleView')
+	@HasPermission(Permission.BundleView)
 	def list() {}
 
 	/**
 	 * Used to generate the List for Bundles using jqgrid.
 	 * @return : list of bundles as JSON
 	 */
-	@HasPermission('MoveBundleView')
+	@HasPermission(Permission.BundleView)
 	def listJson() {
 		String sortOrder  = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
@@ -96,7 +97,7 @@ class MoveBundleController implements ControllerMethods {
 	 * Generates the List for Bundles using Kendo Grid.
 	 * @return : list of bundles as JSON
 	 */
-	@HasPermission('MoveBundleView')
+	@HasPermission(Permission.BundleView)
 	def retrieveBundleList() {
 		List<MoveBundle> bundleList = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
 		renderAsJson bundleList.collect { MoveBundle entry -> [
@@ -110,7 +111,7 @@ class MoveBundleController implements ControllerMethods {
 		]}
 	}
 
-	@HasPermission('MoveBundleShow')
+	@HasPermission(Permission.BundleView)
 	def show() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -142,7 +143,7 @@ class MoveBundleController implements ControllerMethods {
 		 dashboardSteps: dashboardSteps, isDefaultBundle: moveBundle.id == project.defaultBundle.id]
 	}
 
-	@HasPermission('MoveBundleDelete')
+	@HasPermission(Permission.BundleDelete)
 	def delete() {
 		String message = moveBundleService.deleteBundle(MoveBundle.get(params.id),
 			securityService.loadUserCurrentProject())
@@ -150,7 +151,7 @@ class MoveBundleController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
-	@HasPermission('MoveBundleDelete')
+	@HasPermission(Permission.BundleDelete)
 	def deleteBundleAndAssets() {
 		MoveBundle moveBundle = MoveBundle.get(params.id)
 		if (moveBundle) {
@@ -174,7 +175,7 @@ class MoveBundleController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
-	@HasPermission('MoveBundleEdit')
+	@HasPermission(Permission.BundleEdit)
 	def edit() {
 		MoveBundle moveBundle = MoveBundle.get(params.id)
 		if (!moveBundle) {
@@ -199,7 +200,7 @@ class MoveBundleController implements ControllerMethods {
 		 rooms: Room.findAllByProject(project)]
 	}
 
-	@HasPermission('MoveBundleEdit')
+	@HasPermission(Permission.BundleEdit)
 	def update() {
 
 		// TODO : Security : Get User's project and attempt to find the project before blindly updating it
@@ -285,14 +286,14 @@ class MoveBundleController implements ControllerMethods {
 		               workflowCodes: stateEngineService.getWorkflowCode()])
 	}
 
-	@HasPermission('MoveBundleCreate')
+	@HasPermission(Permission.BundleCreate)
 	def create() {
 		Project project = securityService.userCurrentProject
 		[moveBundleInstance: new MoveBundle(params), managers: partyRelationshipService.getProjectStaff(project.id),
 		 projectInstance: project, workflowCodes: stateEngineService.getWorkflowCode(), rooms: Room.findAllByProject(project)]
 	}
 
-	@HasPermission('MoveBundleCreate')
+	@HasPermission(Permission.BundleCreate)
 	def save() {
 
 		def startTime = params.startTime
@@ -339,7 +340,7 @@ class MoveBundleController implements ControllerMethods {
 	 * If the checkbox is subsequently checked and the form submitted, a new MoveBundleStep shall be created for that transition.
 	 * @return  new moveBundleStep
 	 */
-	@HasPermission('MoveBundleEdit')
+	@HasPermission(Permission.BundleEdit)
 	MoveBundleStep createMoveBundleStep() {
 		def moveBundle = MoveBundle.get(params.moveBundleId)
 		int transitionId = params.int('transitionId')
@@ -362,7 +363,7 @@ class MoveBundleController implements ControllerMethods {
 	 * @param  : moveBundleId, list of unchecked steps
 	 * @return : success / failure
 	 *---------------------------------------------------*/
-	@HasPermission('MoveBundleView')
+	@HasPermission(Permission.BundleView)
 	def checkStepSnapshotRecord() {
 		def steps = params.steps
 		MoveBundle moveBundle = MoveBundle.get(params.moveBundleId)
@@ -384,7 +385,7 @@ class MoveBundleController implements ControllerMethods {
 		render message
 	}
 
-	@HasPermission('MoveBundleView')
+	@HasPermission(Permission.BundleView)
 	def projectMoveBundles() {
 		Project project = securityService.loadUserCurrentProject()
 		def moveBundlesList
@@ -394,7 +395,7 @@ class MoveBundleController implements ControllerMethods {
 		render moveBundlesList as JSON
 	}
 
-	@HasPermission('MenuDashboardView')
+	@HasPermission(Permission.MoveDashboardView)
 	def planningStats() {
 		Project project = securityService.userCurrentProject
 
@@ -842,7 +843,7 @@ class MoveBundleController implements ControllerMethods {
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
 	 */
-	@HasPermission('DepAnalyzerView')
+	@HasPermission(Permission.DepAnalyzerView)
 	def dependencyConsole() {
 		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this)
@@ -860,7 +861,7 @@ class MoveBundleController implements ControllerMethods {
 	/*
 	 * Controller to render the Dependency Bundle Details
 	 */
-	@HasPermission('DepAnalyzerView')
+	@HasPermission(Permission.DepAnalyzerView)
 	def dependencyBundleDetails() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -871,7 +872,7 @@ class MoveBundleController implements ControllerMethods {
 		       model: moveBundleService.dependencyConsoleMap(project, params.bundle, isAssigned, null))
 	}
 
-	@HasPermission('DepAnalyzerGenerate')
+	@HasPermission(Permission.DepAnalyzerGenerate)
 	def generateDependency() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -916,7 +917,7 @@ class MoveBundleController implements ControllerMethods {
 	/**
 	 * Assigns one or more assets to a specified bundle
 	 */
-	@HasPermission('AssetEdit')
+	@HasPermission(Permission.AssetEdit)
 	def saveAssetsToBundle() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -942,7 +943,7 @@ class MoveBundleController implements ControllerMethods {
 	 * @return - error Message - if any else success Message
 	 * TODO -- THIS METHOD CAN BE REMOVED AS IT IS NOT USED ANY MORE
 	 */
-	@HasPermission('TaskCreate')
+	@HasPermission(Permission.TaskCreate)
 	def createTask() {
 
 		def bundleId = params.bundleId
@@ -1065,7 +1066,7 @@ class MoveBundleController implements ControllerMethods {
 	 * @param filteredAppCount : This is filtered app based on PlanStatus
 	 * @return : Percentage of Calculated app
 	 */
-	@HasPermission('AssetView')
+	@HasPermission(Permission.AssetView)
 	def countAppPercentage(int totalAppCount, int filteredAppCount) {
 		return totalAppCount ? Math.round((filteredAppCount /  totalAppCount) * 100) : 0
 	}
@@ -1073,7 +1074,7 @@ class MoveBundleController implements ControllerMethods {
 	/**
 	 * Sets compactControl preference
 	 */
-	@HasPermission('UserGeneralAccess')
+	@HasPermission(Permission.UserGeneralAccess)
 	def setCompactControlPref() {
 		String key = params.prefFor
 		String selected = params.selected
