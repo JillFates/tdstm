@@ -4,6 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>TransitionManager&trade; - Unauthorized (401)</title>
+	<!-- HTTP_CODE=401 -->
 
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
