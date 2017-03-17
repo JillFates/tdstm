@@ -9,7 +9,7 @@
     <div class="body">
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
-	          <tds:hasPermission permission='RoleTypeCreate'>
+	          <tds:hasPermission permission="${net.transitionmanager.security.Permission.RoleTypeCreate}">
 	            <span class="menuButton"><g:link class="create" action="create">Create RoleType</g:link></span>
 	          </tds:hasPermission>
         	</div>
@@ -60,15 +60,17 @@
           </tbody>
         </table>
       </div>
-      <tds:hasPermission permission='RoleTypeView'>
       <div class="buttons">
         <g:form>
           <input type="hidden" name="id" value="${roleTypeInstance?.id}" />
+          <tds:hasPermission permission="${net.transitionmanager.security.Permission.RoleTypeEdit}">
           <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
+          </tds:hasPermission>
+          <tds:hasPermission permission="${net.transitionmanager.security.Permission.RoleTypeDelete}">
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+          </tds:hasPermission>
         </g:form>
       </div>
-      </tds:hasPermission>
     </div>
   </body>
 </html>

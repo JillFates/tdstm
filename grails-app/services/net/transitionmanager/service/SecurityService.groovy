@@ -68,14 +68,14 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	static final String DEFAULT_SECURITY_ROLE_CODE = USER.name()
 
-	AuditService auditService
-	EmailDispatchService emailDispatchService
-	GrailsApplication grailsApplication
+	def auditService
+	def emailDispatchService
+	def grailsApplication
+	def partyRelationshipService
+	def personService
+	def springSecurityService
+	def userPreferenceService
 	JdbcTemplate jdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	SpringSecurityService springSecurityService
-	UserPreferenceService userPreferenceService
 
 	private Map ldapConfigMap
 	private Map loginConfigMap
@@ -1207,13 +1207,11 @@ logger.debug "mergePersonsUserLogin() entered"
 				if (reportIfViolation) {
 					reportViolation("attempted action requiring unallowed permission $permission", user.toString())
 				}
-			}
-			else {
+			} else {
 				logger.error 'hasPermission() called with unknown permission code {} by {}', permission, user
 				reportIfViolation = false 	// disabling because the error log is good enough
 			}
-		}
-		else {
+		} else {
 			logger.error 'hasPermission() called by {} that has no assiged roles', user
 		}
 
@@ -1256,6 +1254,16 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		if (principal.hasPermission(permission)) {
 			return true
+		} else {
+			// Validate that the permission requested is valid, otherwise log an error
+			List count = Permissions.createCriteria().list {
+				projections { count() }
+				eq ('permissionItem', permission)
+			}
+			if (count[0] != 1) {
+				logger.error 'hasPermission() called with invalid permission code {}', permission
+				// throw new RuntimeException("Invalid permission code $permission")
+			}
 		}
 
 		if (reportIfViolation) {

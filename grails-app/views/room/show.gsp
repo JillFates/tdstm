@@ -29,10 +29,10 @@
 							<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a><br />
 							<input type="hidden" name="viewType" value="list" />
 							<button type="submit" class="btn btn-default" ><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> List</button>
-							<tds:hasPermission permission='RoomEdit'>
+							<tds:hasPermission permission="${net.transitionmanager.security.Permission.RoomEdit}">
 								<button type="button" value="Edit" class="btn btn-default" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Edit</button>
 							</tds:hasPermission>
-							<tds:hasPermission permission='AssetEdit'>
+							<tds:hasPermission permission="${net.transitionmanager.security.Permission.AssetEdit}">
 								<input type="checkbox" id="auditCheckId" ${auditPref=='1' ? 'checked="checked"  value="1"' : 'value="0"'}
 								onclick="if(this.checked){this.value = 1} else {this.value = 0 }; saveAuditPref(this.value, ${roomInstance.id})" />
 								<label for="auditCheckId"><b>Audit</b></label>

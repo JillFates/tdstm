@@ -11,7 +11,7 @@
 		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="progressTimer.js" />
-		
+
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
@@ -65,8 +65,9 @@
 					<div id="controlPanelId" class="graphPanel">
 						<form id="preferencesformId">
 							<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
-								
-								<tds:hasPermission permission="TaskPublish">
+
+								<tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskViewUnpublished}">
+								<h1>HERE</h1>
 									<tr title="Shows tasks that are not published">
 										<td colspan="3" style="padding-left :0px">
 											<span class="checkboxContainer">
@@ -76,7 +77,7 @@
 										</td>
 									</tr>
 								</tds:hasPermission>
-								
+
 								<tr title="Sets the hight of an individual task">
 									<td colspan="3" style="padding-left :0px">
 										<span>
@@ -85,7 +86,7 @@
 										</span>
 									</td>
 								</tr>
-								
+
 								<tr title="Sets if tasks should become taller to fill the empty space">
 									<td colspan="3" style="padding-left :0px">
 										<span class="checkboxContainer">
@@ -94,7 +95,7 @@
 										</span>
 									</td>
 								</tr>
-								
+
 								<tr title="Hides task dependencies that are redundant">
 									<td colspan="3" style="padding-left :0px">
 										<span class="checkboxContainer">
@@ -103,8 +104,8 @@
 										</span>
 									</td>
 								</tr>
-								
-								<tds:hasPermission permission='TaskViewCriticalPath'>
+
+								<tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskViewCriticalPath}">
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
 										<span>
@@ -113,7 +114,7 @@
 									</td>
 								</tr>
 								</tds:hasPermission>
-								
+
 							</table>
 						</form>
 					</div>
@@ -132,11 +133,11 @@
 					progressTimer.resetTimer();
 				});
 			})
-			
+
 			function reloadGraph () {
 				submitForm();
 			}
-			
+
 			$(".menu-parent-tasks-task-timeline").addClass('active');
 			$(".menu-parent-tasks").addClass('active');
 		</script>

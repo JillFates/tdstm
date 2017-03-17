@@ -209,7 +209,7 @@
                         <g:if test="${currProject && moveEvent}">
                             <li class="menu-child-item menu-parent-planning-event-detail-list"><g:link controller="moveEvent" action="show" id="${moveEvent.id}">${moveEvent.name} Event Details</g:link></li>
                         </g:if>
-                        <tds:hasPermission permission='ShowListNews'>
+                        <tds:hasPermission permission="${net.transitionmanager.security.Permission.NewsEdit}">
                             <li class="menu-child-item menu-parent-planning-event-news"><g:link controller="newsEditor" >List Event News</g:link></li>
                         </tds:hasPermission>
                         <tds:hasPermission permission="ReportViewEventPrep">
@@ -263,12 +263,10 @@
                         <tds:hasPermission permission='HelpMenuView'>
                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a></li>
                         </tds:hasPermission>
-
-
                     </ul>
                 </li>
             </tds:hasPermission>
-            <tds:hasPermission permission='DashBoardMenuView'>
+            <tds:hasPermission permission="${net.transitionmanager.security.Permission.DashboardMenuView}">
                 <li class="dropdown menu-parent-dashboard">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards<span class="caret"></span></a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">

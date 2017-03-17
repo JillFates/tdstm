@@ -45,7 +45,7 @@
 					Include only remaining tasks in report
 				</td>
 			</tr>
-			<tds:hasPermission permission="TaskPublish">
+			<tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskViewUnpublished}">
 			<tr>
 				<td></td>
 				<td style="width:auto;">

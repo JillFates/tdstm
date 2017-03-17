@@ -64,7 +64,7 @@
 									<thead>
 										<tr>
 
-											 <tds:hasPermission permission='RoomListActionColumn'><th><a href="#">Action</a></th></tds:hasPermission>
+											<tds:hasPermission permission="${net.transitionmanager.security.Permission.RoomListActionColumn}"><th><a href="#">Action</a></th></tds:hasPermission>
 
 											<g:sortableColumn property="location" title="Data Center" />
 
@@ -85,7 +85,7 @@
 										<g:each in="${roomInstanceList}" status="i" var="roomInstance">
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-												 <tds:hasPermission permission='RoomListActionColumn'>
+												 <tds:hasPermission permission="${net.transitionmanager.security.Permission.RoomListActionColumn}">
 													<td><input type="checkbox" class="listCheck" name="checkbox_${roomInstance.id}" id="roomCheckBoxId" onclick="enableActions()"></td>
 												</tds:hasPermission>
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
@@ -107,13 +107,13 @@
 								</table>
 								<div class="buttons">
 									<span class="button">
-									 <tds:hasPermission permission='RoomDelete'>
-										<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close'); saveData();"/>
-									 </tds:hasPermission>
-										 <tds:hasPermission permission='RoomMerge'>
+									    <tds:hasPermission permission="${net.transitionmanager.security.Permission.RoomCreate}">
+										   <input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close'); saveData();"/>
+									    </tds:hasPermission>
+										<tds:hasPermission permission="${net.transitionmanager.security.Permission.RoomMerge}">
 											<span class="button"><input class="create disableButton" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" disabled="disabled" /></span>
-										 </tds:hasPermission>
-										 <tds:hasPermission permission='RoomDelete'>
+										</tds:hasPermission>
+										<tds:hasPermission permission="${net.transitionmanager.security.Permission.RoomDelete}">
 											<g:actionSubmit class="delete disableButton" action="delete" id="deleteId" value="Delete" disabled="disabled"/>
 										</tds:hasPermission>
 									</span>
