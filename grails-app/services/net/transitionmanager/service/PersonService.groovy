@@ -27,6 +27,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
@@ -872,7 +873,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 	 * @return A map containing the looked up project, person, teamRoleType
 	 */
 	private Map validateUserCanEditStaffing(UserLogin user, projectId, personId, String teamCode) {
-		if (!securityService.hasPermission(user, 'EditProjectStaff')) {
+		if (!securityService.hasPermission(user, Permission.ProjectStaffEdit)) {
 			throw new UnauthorizedException("Do not have permission to edit staff")
 		}
 
@@ -950,7 +951,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		List currentUserProjects = getAvailableProjects(byWhom)*.id
 		List personProjects = getAvailableProjects(personToAccess)*.id
 
-		if (forEdit && !securityService.hasPermission('UserEdit')) {
+		if (forEdit && !securityService.hasPermission(Permission.UserEdit)) {
 			if (reportViolation) {
 				reportViolation("attempted to edit person $personToAccess ($personToAccess.id) without permission")
 			}
@@ -1481,7 +1482,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		} else {
 			UserLogin user = person.userLogin
 			if (user) {
-				boolean hasShowAllProj = securityService.hasPermission(user, 'ShowAllProjects')
+				boolean hasShowAllProj = securityService.hasPermission(user, Permission.ProjectShowAll)
 				if (person.company.id == project.owner.id && hasShowAllProj) {
 					hasAccess = true
 				} else {
@@ -1539,7 +1540,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		// If not edit own account, the user must have privilege to edit the account
 		boolean editSelf = NumberUtil.toLong(personId) == byWhom.id
 		if (!editSelf) {
-			if (! securityService.hasPermission(byWhom.userLogin, 'PersonEdit', true)) {
+			if (! securityService.hasPermission(byWhom.userLogin, Permission.PersonEdit, true)) {
 				throw new EmptyResultException('You do not have access to referenced person')
 			}
 			//securityService.requirePermission('PersonEditView', false,

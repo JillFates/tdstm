@@ -33,6 +33,7 @@ import net.transitionmanager.domain.RolePermissions
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
@@ -189,7 +190,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * TODO : JPM 4/2016 : isChangePendingStatusAllowed method here is OBSCURED and should be removed but used in tasks
 	 */
 	boolean isChangePendingStatusAllowed() {
-		hasPermission('TaskChangeStatus')
+		hasPermission(Permission.TaskChangeStatus)
 	}
 
 	/**
@@ -1369,7 +1370,7 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		List assignableRoles = []
 
-		if (hasPermission(person, 'UserEdit')) {
+		if (hasPermission(person, Permission.UserEdit)) {
 			RoleType maxRoleOfPerson = getMaxAssignedRole(person)
 			if (maxRoleOfPerson) {
 				assignableRoles = getAllRoles(maxRoleOfPerson.level)
