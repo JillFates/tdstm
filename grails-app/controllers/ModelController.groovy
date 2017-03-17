@@ -426,29 +426,35 @@ class ModelController implements ControllerMethods {
 				}else{
 					modelInstance.updatedBy = person
 				}
+				
+				def manufacturer = params.manufacturer ?: modelInstance.manufacturer
+				def nameChanged = (params.modelName) && (params.modelName != modelInstance.modelName)
+				def oldName = modelInstance.modelName
+				def hasNameError = nameChanged && ! modelService.isValidAlias(params.modelName, modelInstance)
 				modelInstance.properties = params
 				modelInstance.rearImage = rearImage
 				modelInstance.frontImage = frontImage
-
+				// validate that the model name is unique
+				if (hasNameError) {
+					flash.message = "New model name '${params.modelName}' is not unqiue and was therefore ignored"
+					modelInstance.modelName = oldName
+				}
+				
 				if (!modelInstance.hasErrors() && modelInstance.save(flush:true)) {
-
+					
 					def deletedAka = params.deletedAka
 					def akaToSave = params.list('aka')
 					if (deletedAka) {
 						ModelAlias.executeUpdate("delete ModelAlias where id in (:ids)", [ids:deletedAka.split(",").collect{NumberUtils.toDouble(it,0).round()}])
 					}
 					def modelAliasList = ModelAlias.findAllByModel(modelInstance)
-					log.info "akaToSave = ${akaToSave}"
-					log.info "modelAliasList = ${modelAliasList}"
 					modelAliasList.each { modelAlias ->
-						log.info "old alias: ${modelAlias.name}"
 						modelAlias.name = params["aka_"+modelAlias.id]
 						if (!modelAlias.save()) {
 							modelAlias.errors.allErrors.each {println it}
 						}
 					}
 					akaToSave.each { aka ->
-						log.info "new alias: ${aka}"
 						modelInstance.findOrCreateAliasByName(aka, true)
 					}
 
@@ -548,11 +554,15 @@ class ModelController implements ControllerMethods {
 					}
 					modelInstance.save(flush: true)
 
-					flash.message = "$modelInstance.modelName Updated"
-					if (params.redirectTo == "assetAudit") {
-						render(template: "modelAuditView", model: [modelInstance:modelInstance])
+					if (hasNameError) {
+						forward(action: "edit", params:[id: modelInstance.id, redirectTo:params.redirectTo])
+					} else {
+						flash.message = "$modelInstance.modelName Updated"
+						if (params.redirectTo == "assetAudit") {
+							render(template: "modelAuditView", model: [modelInstance:modelInstance])
+						}
+						forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
 					}
-					forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
 
 				} else {
 					modelInstance.errors.allErrors.each {log.error it}
