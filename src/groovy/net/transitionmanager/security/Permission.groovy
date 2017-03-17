@@ -133,6 +133,7 @@ interface Permission {
 			RecipeDelete                  = 'RecipeDelete',
 			RecipeEdit                    = 'RecipeEdit',
 			RecipeGenerateTasks           = 'RecipeGenerateTasks',
+			RecipeRelease				  = 'RecipeRelease',
 			RecipeView                    = 'RecipeView',
 			ReleaseRecipe                 = 'ReleaseRecipe',
 			ReportMenuView                = 'ReportMenuView',
