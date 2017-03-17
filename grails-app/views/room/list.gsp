@@ -320,9 +320,9 @@
 				$('.ui-dialog-titlebar-close').html('')
 				.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 			},close:function(){ location.reload();} });
-			$("#manufacturerShowDialog,#modelShowDialog").dialog({autoOpen: false})
-			$("#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({ autoOpen: false })
-			$("#editCommentDialog,#editManufacturerView").dialog({ autoOpen: false})
+			$("#manufacturerShowDialog,#modelShowDialog").dialog({modal: true,autoOpen: false})
+			$("#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({modal: true, autoOpen: false })
+			$("#editCommentDialog,#editManufacturerView").dialog({modal: true, autoOpen: false})
 			$(document).on('entityAssetCreated', function(e) { updateRackLayoutView(); });
 			$(document).on('entityAssetUpdated', function(e) { updateRackLayoutView(); });
 		});
