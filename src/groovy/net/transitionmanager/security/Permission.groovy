@@ -158,6 +158,7 @@ interface Permission {
 			RoomMerge                     = 'RoomMerge',
 			RoomView                      = 'RoomView',
 			SequenceGetNext               = 'SequenceGetNext',
+			ShowListNews				  = 'ShowListNews',
 			TaskBatchDelete               = 'TaskBatchDelete',
 			TaskBatchRefresh              = 'TaskBatchRefresh',
 			TaskBatchView                 = 'TaskBatchView',

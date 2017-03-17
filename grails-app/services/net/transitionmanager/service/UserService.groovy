@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.security.Permission
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
 
@@ -429,7 +430,7 @@ class UserService implements ServiceMethods {
 
 	private List<Project> getSelectedProject(Project project) {
 		if (project == Project.ALL) {
-			projectService.getUserProjects(securityService.hasPermission("ProjectShowAll"), ProjectStatus.ACTIVE)
+			projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
 		}
 		else {
 			[project]

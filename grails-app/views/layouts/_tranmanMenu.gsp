@@ -277,11 +277,11 @@
                             <li class="menu-child-item menu-parent-dashboard-planning-dashboard"><g:link controller="moveBundle" action="planningStats" >Planning Dashboard</g:link></li>
                         </tds:hasPermission>
                         <li class="menu-child-item menu-parent-dashboard-event-dashboard"><g:link controller="dashboard">Event Dashboard</g:link></li>
-                    <!-- <%-- Removed until this report will be implemented using tasks
-                                            <tds:hasPermission permission="${Permission.>>
-                                                <li class="menu-child-item"><g:link controller="cartTracking" action="cartTracking" >Cart Tracker</g:link></li>
-                                            </tds:hasPermission>
-                                        --%> -->
+                    <%-- Removed until this report will be implemented using tasks
+                            <tds:hasPermission permission="${Permission.ShowCartTracker}">
+                                <li class="menu-child-item"><g:link controller="cartTracking" action="cartTracking" >Cart Tracker</g:link></li>
+                            </tds:hasPermission>
+                    --%>
                         <tds:hasPermission permission="${Permission.HelpMenuView}">
                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');" >help</a></li>
                         </tds:hasPermission>

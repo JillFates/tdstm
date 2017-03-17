@@ -1,4 +1,5 @@
 import grails.util.Environment
+import net.transitionmanager.security.Permission
 
 tdstm.license =[
 	password: 'sampleKey1984',
@@ -321,7 +322,7 @@ grails {
 				'/app-js/**'		:'permitAll', // Angular - resources
 				'/i18n/**'			:'permitAll', // Angular - Translate
 				'/test/**'			:'permitAll', // Angular - Test
-				'/monitoring'		:'hasPermission(request, "AdminUtilitiesAccess")',
+				'/monitoring'		:"hasPermission(request, '${Permission.AdminUtilitiesAccess}')", //todo: @crisemy does this work?
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',

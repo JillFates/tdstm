@@ -1389,7 +1389,7 @@ logger.debug "mergePersonsUserLogin() entered"
 		/*
 			// JPM 4/2016 : this was some of the logic for filter but wasn't used so stripped out
 			def assignableRoles = []
-			if (person && hasPermission(person, "UserEdit")) {
+			if (person && hasPermission(person, Permission.UserEdit)) {
 				// All roles
 				def roles = getAllRoles()
 				// Assumes getAssignedRoles sorts by level desc.
@@ -1599,7 +1599,7 @@ logger.debug "mergePersonsUserLogin() entered"
 	}
 
 	boolean viewUnpublished() {
-		hasPermission('TaskPublish') && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true'
+		hasPermission(Permission.TaskPublish) && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true'
 	}
 
 	@Transactional

@@ -17,6 +17,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.TaskBatch
+import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
@@ -528,7 +529,7 @@ class CookbookService implements ServiceMethods {
 						throw new UnauthorizedException('The current user does not have access to the project')
 					}
 					def userProjectIds = projectService.getUserProjects(
-							securityService.hasPermission('ProjectShowAll'), ProjectStatus.ANY)*.id
+							securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ANY)*.id
 
 					if (!Project.isDefaultProject(projectById) && !userProjectIds.contains(projectById.id)) {
 						throw new UnauthorizedException("The current user doesn't have access to the project")

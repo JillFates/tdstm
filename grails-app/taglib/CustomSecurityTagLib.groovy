@@ -7,7 +7,9 @@ class CustomSecurityTagLib {
 	SecurityService securityService
 
 	/**
-	 * @attr permission REQUIRED  the permission name
+	 * @attr permission REQUIRED  the permission name (String)
+	 * 		Use Permission.<Constant> for permission reference
+	 * @see net.transitionmanager.security.Permission
 	 */
 	def hasPermission = { attrs, body ->
 		if (permitted(attrs)) {
@@ -16,7 +18,9 @@ class CustomSecurityTagLib {
 	}
 
 	/**
-	 * @attr permission REQUIRED  the permission name
+	 * @attr permission REQUIRED  the permission name (String)
+	 * 		Use Permission.<Constant> for permission reference
+	 * @see net.transitionmanager.security.Permission
 	 */
 	def lacksPermission = { attrs, body ->
 		if (!permitted(attrs)) {

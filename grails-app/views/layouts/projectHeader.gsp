@@ -405,7 +405,7 @@ int minPasswordLength = tds.minPasswordLength()
 							</tds:hasPermission>
 							<li><g:link class="home mmlink" controller="dashboard" onclick="hideMegaMenu('dashboardMegaMenu')">Event Dashboard</g:link></li>
 							<%-- Removed until this report will be implemented using tasks
-							<tds:hasPermission permission="${eermission.howCartTracker}">
+							<tds:hasPermission permission="${Permission.howCartTracker}">
 							<li><g:link class="mmlink" controller="cartTracking" action="cartTracking"  onclick="hideMegaMenu('consoleMegaMenu')">Cart Tracker</g:link></li>
 							</tds:hasPermission-->
 							--%>

@@ -12,6 +12,7 @@ import grails.transaction.Transactional
 import groovy.json.JsonBuilder
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -228,7 +229,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @controllerMethod
 	 */
 	Map processFileUpload(HttpServletRequest request, Project project, Map formOptions) {
-		if (! securityService.hasPermission('RecipeGenerateTasks', true)) {
+		if (! securityService.hasPermission(Permission.RecipeGenerateTasks, true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import task information')
 		}
 
@@ -634,7 +635,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @controllerMethod
 	 */
 	Map generateModelForReview(Project project, Map formOptions) {
-		if (formOptions.flagToUpdatePerson && ! securityService.hasPermission('PersonImport', true)) {
+		if (formOptions.flagToUpdatePerson && ! securityService.hasPermission(Permission.PersonImport, true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
 		}
 
@@ -696,7 +697,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @param formOptions - the params which will include the filename
 	 */
 	void deletePreviousUpload(Map formOptions) {
-		if (!securityService.hasPermission('RecipeGenerateTasks', false)) {
+		if (!securityService.hasPermission(Permission.RecipeGenerateTasks, false)) {
 			securityService.reportViolation("attempted to delete an uploaded task import spreadsheet(${formOptions.filename})")
 			throw new UnauthorizedException('Do not have the required permission perform this action')
 		}
@@ -732,7 +733,7 @@ class TaskImportExportService implements ServiceMethods {
 	 * @controllerMethod
 	 */
 	List generateReviewData(Project project, String filename, Map formOptions) {
-		if (!securityService.hasPermission('RecipeGenerateTasks', true)) {
+		if (!securityService.hasPermission(Permission.RecipeGenerateTasks, true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import task information')
 		}
 
@@ -903,7 +904,7 @@ class TaskImportExportService implements ServiceMethods {
 	@Transactional
 	Map postChangesToTasks(Project project, formOptions) {
 
-		if (!securityService.hasPermission('RecipeGenerateTasks', true)) {
+		if (!securityService.hasPermission(Permission.RecipeGenerateTasks, true)) {
 			throw new UnauthorizedException('Do not have the required permission to import task information')
 		}
 

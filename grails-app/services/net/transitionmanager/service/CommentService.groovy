@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.security.Permission
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -54,7 +55,7 @@ class CommentService implements ServiceMethods {
 	 */
 	@Transactional
 	def saveUpdateCommentAndNotes(String tzId, String userDTFormat, Map params, boolean isNew=true, flash) {
-		boolean canEditAsset = securityService.hasPermission('AssetEdit')
+		boolean canEditAsset = securityService.hasPermission(Permission.AssetEdit)
 		String currentUsername = securityService.currentUsername
 		Person currentPerson = securityService.loadCurrentPerson()
 		Project project = securityService.userCurrentProject

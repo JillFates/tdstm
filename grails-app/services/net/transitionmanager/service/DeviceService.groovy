@@ -16,6 +16,7 @@ import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.security.Permission
 
 @Slf4j(value='logger')
 @Transactional
@@ -108,7 +109,7 @@ class DeviceService implements ServiceMethods {
 		}
 
 		def model = [assetEntity: assetEntity, label: frontEndLabel,
-		             canEdit: securityService.hasPermission("AssetEdit"),
+		             canEdit: securityService.hasPermission(Permission.AssetEdit),
 		             deleteChassisWarning: deleteChassisWarning] +
 		             assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
 
