@@ -1,22 +1,23 @@
 #!/usr/bin/env groovy
-import com.google.gson.Gson
-
-// usage: groovy -Djava.util.logging.config.file=logging.properties permissions_check.groovy
-//        groovy permissions_check.groovy
-//        groovy permissions_check.groovy > /dev/null 2>role_USER.txt
-//        groovy permissions_check.groovy > /dev/null 2>role_EDITOR.txt
-
+// usage:
+//        groovy permissions_check.groovy <logLevel> <methodsFilePath> <permissionsFilePath> <username> <password> <role>
+//
 // https://mvnrepository.com/artifact/org.codehaus.groovy.modules.http-builder/http-builder
 @GrabResolver(name = 'mvnrepository', root = 'https://mvnrepository.com/', m2Compatible = 'true')
 @Grab(group = 'org.codehaus.groovy.modules.http-builder', module = 'http-builder', version = '0.7.1')
 @Grab(group = 'org.apache.httpcomponents', module = 'httpclient', version = '4.5.3')
 @Grab(group = 'org.apache.httpcomponents', module = 'httpcore', version = '4.4.6')
 @Grab(group='com.google.code.gson', module='gson', version='2.8.0')
+@Grab(group='log4j', module='log4j', version='1.2.17')
 @GrabExclude(group = 'commons-lang', module = 'commons-lang')
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
+import org.apache.http.ConnectionClosedException
+import org.apache.log4j.ConsoleAppender
+import org.apache.log4j.Level
+import org.apache.log4j.PatternLayout
 
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
@@ -27,10 +28,10 @@ import org.apache.http.impl.client.LaxRedirectStrategy
 import org.apache.http.impl.client.DefaultRedirectStrategy
 import org.apache.http.protocol.*
 
-import groovy.util.logging.Log
-import java.util.logging.Level
+import com.google.gson.Gson
+import groovy.util.logging.Log4j
 
-@Log
+@Log4j
 class Main {
     private static final Gson gson = new Gson();
     private static enum ResponseCode { HTTP_CODE_NOT_FOUND, HTML_FOUND, JSON_FOUND, NO_RESPONSE_FOUND }
@@ -40,31 +41,44 @@ class Main {
     def cookies
 
     def methods
-    def methodsExclude = ["restartAppServiceAction","exportSpecialReport"]
+    def methodsExclude = [
+            "/admin/restartAppServiceAction",
+//            "/assetEntity/exportSpecialReport",
+//            "/modelSyncBatch/list",
+//            "/modelSyncBatch/process",
+//            "/moveBundleAsset/list"
+    ]
 
     def rolePermissions
 
-    Main() {
+    Main(Level logLevel) {
+        // Programmatic log format configuration
+        log.setLevel(logLevel ?: Level.INFO)
+        log.setAdditivity(false)
+
+        ConsoleAppender consoleAppender = new ConsoleAppender()
+        consoleAppender.setWriter(new OutputStreamWriter(System.out));
+        consoleAppender.setLayout(new PatternLayout("%d [%-5p] %m%n"))
+
+        log.removeAllAppenders()
+        log.addAppender(consoleAppender)
+
         baseUrl = "http://localhost:8080"
         httpBuilder = initializeHttpBuilder()
         cookies = []
         methods = [[:]]
         rolePermissions = [[:]]
-
-        // Programmatic log format configuration
-        System.setProperty("java.util.logging.SimpleFormatter.format", "%1\$tY-%1\$tm-%1\$td %1\$tH:%1\$tM:%1\$tS.%1\$tL %4\$-7s [%3\$s] %5\$s %6\$s%n");
-        log.setLevel(Level.INFO)
     }
 
-    def readMethodsCsvData() {
+    def readMethodsCsvData(String path) {
         methods = []
-        new File("/Users/sidar/Downloads/MethodAnnotations.csv").splitEachLine(",") { fields ->
+        new File(path).splitEachLine(",") { fields ->
             methods.add(
                     [
                             controller: fields[0],
                             method    : fields[1],
                             annotation: fields[2],
-                            httpMethod: GET // defaulting to HTTP GET
+                            httpMethod: GET  // defaulting to HTTP GET
                     ]
             )
         }
@@ -74,9 +88,9 @@ class Main {
         }
     }
 
-    def readRolesPermissionsCsvData() {
+    def readRolesPermissionsCsvData(String path) {
         rolePermissions = []
-        new File("/Users/sidar/Downloads/RolePermissions_csv.csv").splitEachLine(",") { fields ->
+        new File(path).splitEachLine(",") { fields ->
             rolePermissions.add(
                     [
                             permission       : fields[0],
@@ -96,36 +110,38 @@ class Main {
     }
 
     def request(Method method, ContentType contentType, String url, Map<String, Serializable> params) {
-        if (log.level == Level.FINEST) {
-            debug("Send ${method} request to ${this.baseUrl}${url}: ${params}")
-        }
-        httpBuilder.request(method, contentType) { request ->
-            uri.path = url
-            if (method == POST) {
-                body = params
-            } else {
-                uri.query = params
+        log.debug("Send ${method} request to ${this.baseUrl}${url}: ${params}")
+
+        try {
+            httpBuilder.request(method, contentType) { request ->
+                uri.path = url
+                if (method == POST) {
+                    body = params
+                } else {
+                    uri.query = params
+                }
+                headers['User-Agent'] = 'TDSTM/4.1.0'
+                headers['Accept'] = ANY
+                headers['Cookie'] = cookies.join(';')
             }
-            headers['User-Agent'] = 'TDSTM/4.1.0'
-            headers['Accept'] = ANY
-            headers['Cookie'] = cookies.join(';')
+        } catch (ConnectionClosedException e) {
+            log.fatal(e.message + "in ${this.baseUrl}${url}:", e)
         }
     }
 
     def login(String username, String password) {
-//        request(POST, URLENC, '/tdstm/auth/signIn', ['username': 'tdsadmin', 'password': 'zelda123!', 'targetUri': ''])
-//        request(POST, URLENC, '/tdstm/auth/signIn', ['username': 'testuser@mailinator.com', 'password': 'zelda123!'])
         cookies = []
         request(POST, URLENC, '/tdstm/auth/signIn', ["username": username, "password": password])
     }
 
     def performMethodSecurityCheck(String userRole) {
         methods.each { controllerMethod ->
-            if (controllerMethod.method in methodsExclude) {
-                debug("Method excluded: /${controllerMethod.controller}/${controllerMethod.method}")
+            def uri = "/" + controllerMethod.controller + "/" + controllerMethod.method
+            log.debug(uri)
+            if (methodsExclude.contains(uri)) {
+                log.info("Method excluded: ${uri}")
             } else {
-                //debugResponse(request(controllerMethod.httpMethod, TEXT, "/tdstm/" + controllerMethod.controller + "/" + controllerMethod.method, null))
-                evalResult(controllerMethod as Map, userRole, request(controllerMethod.httpMethod, TEXT, "/tdstm/" + controllerMethod.controller + "/" + controllerMethod.method, null))
+                evalResult(controllerMethod as Map, userRole, request(controllerMethod.httpMethod, TEXT, "/tdstm" + uri, null))
             }
         }
     }
@@ -133,31 +149,25 @@ class Main {
     def evalResult(Map controllerMethod, String userRole, String resp) {
         if (controllerMethod.annotation) {
             def permission = findPermissionByRole(controllerMethod.annotation)
+            def uri = "/tdstm/" + controllerMethod.controller + "/" + controllerMethod.method
             if (permission) {
-                def uri = "/tdstm/" + controllerMethod.controller + "/" + controllerMethod.method
-
-                if (log.level == Level.FINEST) {
-                    debug("(Role: ${userRole}, Permission: ${permission.permission}) => Should be allowed: " + (permission["role_${userRole}"] == true))
-                }
+                log.debug("(Role: ${userRole}, Permission: ${permission.permission}) => Should be allowed: " + (permission["role_${userRole}"] == true))
 
                 String responseErrorCode = findResponseErrorCode(resp)
                 if (permission["role_${userRole}"] == true) {
-                    //debug("Call allowed: (Role: ${userRole}, Permission: ${permission.permission}) " + uri + " - " + findResponseErrorCode(resp))
                     if (isFailure(responseErrorCode)) {
-                        debug("Call allowed but: (Role: ${userRole}, Permission: ${permission.permission}) " + uri + " - " + responseErrorCode)
+                        log.error("Call allowed but: (Role: ${userRole}, Permission: ${permission.permission}) => " + uri + " - " + responseErrorCode)
                     }
                 } else {
-                    //debug("Call should fail: (Role: ${userRole}, Permission: ${permission.permission}) " + uri + " - " + findResponseErrorCode(resp))
-                    //String responseErrorCode = findResponseErrorCode(resp)
                     if (!isFailure(responseErrorCode)) {
-                        debug("Call should fail but: (Role: ${userRole}, Permission: ${permission.permission}) " + uri + " - " + responseErrorCode)
+                        log.error("Call should fail but: (Role: ${userRole}, Permission: ${permission.permission}) => " + uri + " - " + responseErrorCode)
                     }
                 }
             } else {
-                warn("Permission not found: ${controllerMethod.annotation}")
+                log.warn("Permission not found: ${controllerMethod.annotation} - " + uri)
             }
         } else {
-            debug("Method call does not have explicit permissions check: ${controllerMethod as String}")
+            log.info("Method call does not have explicit permissions check: ${controllerMethod as String}")
         }
     }
 
@@ -203,19 +213,33 @@ class Main {
         }
     }
 
-    def run() {
-        readMethodsCsvData()
-        readRolesPermissionsCsvData()
+    def run(String methodsFilePath, String permissionsFilePath, String username, String password, String role) {
+        readMethodsCsvData(methodsFilePath)
+        readRolesPermissionsCsvData(permissionsFilePath)
 
-        login("testuser@mailinator.com", "zelda123!")
-//        login("testeditor@mailinator.com", "zelda123!")
-
-        performMethodSecurityCheck("USER")
-//        performMethodSecurityCheck("EDITOR")
+        login(username, password)
+        performMethodSecurityCheck(role.toUpperCase())
     }
 
     static void main(String... args) {
-        new Main().run()
+        if (args.size() < 6) {
+            println("""
+Usage: 
+    logLevel            : INFO|ERROR|DEBUG|ALL
+    methodsFilePath     : Controllers and Methods CSV file location
+    permissionsFilePath : Permissions and Roles matrix CSV file location
+    username            : Username desired to run the test
+    password            : Username password
+    role                : CLIENT_ADMIN|CLIENT_MGR|SUPERVISOR|EDITOR|USER 
+                            
+    groovy permissions_check.groovy <logLevel> <methodsFilePath> <permissionsFilePath> <username> <password> <role>
+    
+e.g. 
+    groovy permissions_check.groovy INFO /tmp/MethodAnnotations.csv /tmp/RolePermissions.csv tdsadmin *SECRET* ADMIN
+""")
+        } else {
+            new Main(Level.toLevel(args[0].toUpperCase())).run(args[1], args[2], args[3], args[4], args[5])
+        }
     }
 
     private HTTPBuilder initializeHttpBuilder() {
@@ -234,49 +258,33 @@ class Main {
         })
 
         httpBuilder.handler.success = { HttpResponseDecorator resp, InputStreamReader reader ->
-            if (log.level == Level.FINEST) {
-                def respHeadersString = 'Headers:';
-                resp.headers.each() { header -> respHeadersString += "\n\t${header.name}=\"${header.value}\"" }
-                debug(respHeadersString)
-            }
+            debugResponse(resp)
 
             resp.getHeaders('Set-Cookie').each {
                 //[Set-Cookie: JSESSIONID=E68D4799D4D6282F0348FDB7E8B88AE9; Path=/tdstm/; HttpOnly]
                 String cookie = it.value.split(';')[0]
-                debug("Adding cookie to collection: $cookie")
+                log.info("Adding cookie to collection: $cookie")
                 cookies.add(cookie)
             }
-            //debug("Response: ${reader}")
-            //debug("Response Code: ${resp.statusLine}")
+            //log.trace("Response: ${reader}")
+            //log.trace("Response Code: ${resp.statusLine}")
             return reader?.text
         }
         httpBuilder.handler.failure = { HttpResponseDecorator resp, InputStreamReader reader ->
-            if (log.level == Level.FINEST) {
-                def respHeadersString = 'Headers:';
-                resp.headers.each() { header -> respHeadersString += "\n\t${header.name}=\"${header.value}\"" }
-                debug(respHeadersString)
-            }
-            //debug("Response: ${reader}")
-            //debug("Response Code: ${resp.statusLine}")
+            debugResponse(resp)
+            //log.trace("Response: ${reader}")
+            //log.trace("Response Code: ${resp.statusLine}")
             return reader?.text
         }
         return httpBuilder
     }
 
     def debugResponse(resp) {
-        debug("Method call response: ${resp.statusLine}")
-        if (log.level == Level.FINEST) {
+        if (resp) {
+            log.debug("Method call response: ${resp.statusLine}")
             def respHeadersString = 'Headers:';
             resp.headers.each() { header -> respHeadersString += "\n\t${header.name}=\"${header.value}\"" }
-            debug(respHeadersString)
+            log.debug(respHeadersString)
         }
-    }
-
-    def debug(String message) {
-        log.log(log.level, message)
-    }
-
-    def warn(String message) {
-        log.log(Level.WARNING, message)
     }
 }
