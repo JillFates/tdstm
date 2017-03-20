@@ -776,4 +776,32 @@ databaseChangeLog = {
 			}
 		}
 	}
+
+	changeSet(author: "oluna", id: "20170227 TM-5576-5") {
+		comment('add new permissions to cover License Admin features')
+
+		grailsChange {
+			change {
+				def perms = [
+						'LicenseView'          : [
+								group      : 'NONE',
+								description: 'Can View License Information',
+								roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+						],
+						'LicenseAdministration': [
+								group      : 'NONE',
+								description: 'Can Do changes on Licenses (Request, Upload)',
+								roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+						],
+						'LicenseDelete'        : [
+								group      : 'NONE',
+								description: 'Can Delete Licenses',
+								roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+						]
+				]
+
+				ctx.getBean('databaseMigrationService').addPermissions(sql, perms)
+			}
+		}
+	}
 }
