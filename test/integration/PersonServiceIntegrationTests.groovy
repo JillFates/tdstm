@@ -1,4 +1,4 @@
-
+import spock.lang.*
 import com.tds.asset.Application
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -12,6 +12,7 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SecurityService
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.PartyGroup
 
 import org.apache.commons.lang.RandomStringUtils as RSU
 import groovy.time.TimeCategory
@@ -50,6 +51,7 @@ class PersonServiceIntegrationTests extends Specification {
 		assert adminUser.username
 		//adminUser = UserLogin.findByUsername('tdsadmin')
 
+		// logs the admin user into the system
 		securityService.assumeUserIdentity(adminUser.username, false)
 		println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
 		assert securityService.isLoggedIn()
@@ -91,6 +93,29 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.hasAccessToProject(newPerson, project)
 		and: 'the person is assigned to the project'
 			personService.isAssignedToProject(project, newPerson)
+
+		when: 'a new project for the newPerson.company as the owner is created'
+			Project newProject = projectHelper.createProject()
+			newProject.owner = newPerson.company
+		then: 'the newPerson should not have access to the project'
+			!personService.hasAccessToProject(newPerson, newProject)
+		and: 'the newPerson is not assigned to the project'
+			!personService.isAssignedToProject(newProject, newPerson)
+
+		when: 'the newPerson is given the ADMIN security role'
+			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+		then: 'the newPerson should have access to the new project'
+			personService.hasAccessToProject(newPerson, newProject)
+		and: 'the newPerson should still NOT be assigned to the project'
+			!personService.isAssignedToProject(newProject, newPerson)
+
+		when: 'an unrelatedProject is created with the default project.client as the owner'
+			Project unrelatedProject = projectHelper.createProject()
+			unrelatedProject.owner = project.client
+		then: 'the newPerson should not have access to the unrelatedProject'
+			!personService.hasAccessToProject(newPerson, unrelatedProject)
+		and: 'the newPerson is not assigned to the unrelatedProject'
+			!personService.isAssignedToProject(unrelatedProject, newPerson)
 	}
 
 	def '03. Test client staff access to a project'() {
@@ -116,9 +141,70 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.hasAccessToProject(newPerson, project)
 		and: 'the person is assigned to the project'
 			personService.isAssignedToProject(project, newPerson)
+
+		when: 'a new project for the newPerson.company as the owner is created'
+			Project newProject = projectHelper.createProject()
+			newProject.owner = newPerson.company
+		then: 'the newPerson should not have access to the project'
+			!personService.hasAccessToProject(newPerson, newProject)
+		and: 'the newPerson is not assigned to the project'
+			!personService.isAssignedToProject(newProject, newPerson)
+
+		when: 'the newPerson is given the ADMIN security role'
+			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+		then: 'the newPerson should have access to the new project'
+			personService.hasAccessToProject(newPerson, newProject)
+		and: 'the newPerson should still NOT be assigned to the project'
+			!personService.isAssignedToProject(newProject, newPerson)
+
+		when: 'an unrelatedProject is created with the default project.owner as the owner'
+			Project unrelatedProject = projectHelper.createProject()
+			unrelatedProject.owner = project.owner
+		then: 'the newPerson should not have access to the unrelatedProject'
+			!personService.hasAccessToProject(newPerson, unrelatedProject)
+		and: 'the newPerson is not assigned to the unrelatedProject'
+			!personService.isAssignedToProject(unrelatedProject, newPerson)
 	}
 
-	def '04. Test finding persons by their name using a string that must be parsed'() {
+	def '04. Test partner staff access to a project'() {
+
+		when: 'a partner and partnerStaff with USER role are created '
+			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+			Person newPerson = personHelper.createPerson(adminPerson, partner)
+			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.USER}"])
+		then: 'the partnerStaff should NOT have access to any projects'
+			!personService.hasAccessToProject(newPerson, project)
+		when: 'the partner is added to the default project'
+			partyRelationshipService.assignPartnerToProject(partner, project)
+		then: 'the partnerStaff should still NOT have access to any projects'
+			!personService.hasAccessToProject(newPerson, project)
+
+		when: 'the partnerStaff is added to the default project'
+			personService.addToProject(adminUser, project.id.toString(), newPerson.id.toString())
+		then: 'the partnerStaff should have access to the project'
+			personService.hasAccessToProject(newPerson, project)
+		and: 'the partnerStaff should be assigned to the project'
+			personService.isAssignedToProject(project, newPerson)
+
+		when: 'an unrelatedProject is created where the owner is the same as the default project.owner'
+			Project unrelatedProject = projectHelper.createProject(project.owner)
+		then: 'the partnerStaff should NOT have access to the unrelatedProject'
+			!personService.hasAccessToProject(newPerson, unrelatedProject)
+
+		when: 'a partnerProject is created where the owner is the the default project.owner and the partner company is a partner'
+			Project partnerProject = projectHelper.createProject(project.owner)
+			partyRelationshipService.assignPartnerToProject(partner, partnerProject)
+		then: 'the partnerStaff should NOT have access to the partnerProject'
+			!personService.hasAccessToProject(newPerson, partnerProject)
+		when: 'the partnerStaff is given the ADMIN security role'
+			securityService.assignRoleCode(newPerson, "${SecurityRole.ADMIN}")
+		then: 'the partnerStaff should still NOT have access to the unrelatedProject'
+			!personService.hasAccessToProject(newPerson, unrelatedProject)
+		//and: 'the partnerStaff should now have access to the partnerProject'
+		//	personService.hasAccessToProject(newPerson, partnerProject)
+	}
+
+	def '05. Test finding persons by their name using a string that must be parsed'() {
 		// Know person for the project
 		when:
 			personHelper.createPerson(adminPerson, project.client, null, [lastName: 'Banks', firstName: 'Robin'])
@@ -150,7 +236,7 @@ class PersonServiceIntegrationTests extends Specification {
 			results.person == null
 	}
 
-	def '05. Test finding persons by their name using a mapped name'() {
+	def '06. Test finding persons by their name using a mapped name'() {
 		// Know person for the project
 		when:
 			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin', middleName: ''])
@@ -190,7 +276,7 @@ class PersonServiceIntegrationTests extends Specification {
 		//	results.person == null
 	}
 
-	def '06. Test project team assignment when creating person'() {
+	def '07. Test project team assignment when creating person'() {
 		when:
 			Person person = personHelper.createPerson(adminPerson, project.client, null,
 				[lastName:'Buster', firstName:'Brock'],
@@ -220,7 +306,7 @@ class PersonServiceIntegrationTests extends Specification {
 			!personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
 	}
 
-	def '07. Test assigning a person to a move event team directly by an admin user'() {
+	def '08. Test assigning a person to a move event team directly by an admin user'() {
 		setup: 'create an event for the project'
 			String errMsg
 			// personService.addToProjectSecured(project, adminPerson)
@@ -274,7 +360,7 @@ class PersonServiceIntegrationTests extends Specification {
 	}
 	*/
 
-	def '09. Test findByCompanyAndEmail method'() {
+	def '10. Test findByCompanyAndEmail method'() {
 		when:
 			def company = projectHelper.createCompany()
 			Person p1 = personHelper.createStaff(company, null, null, null, null)
@@ -303,7 +389,7 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.findByCompanyAndEmail(company, null) == []
 	}
 
-	def '10. Test findByCompanyAndName method'() {
+	def '11. Test findByCompanyAndName method'() {
 		when: 'Try finding a single exact match on full name'
 			def company = projectHelper.createCompany()
 			Person p1 = personHelper.createStaff(company)
@@ -350,7 +436,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 	}
 
-	def "11. Delete Person Tests"() {
+	def "12. Delete Person Tests"() {
 		when: 'creating a new person with a user account'
 			Person newPerson = personHelper.createPerson(adminPerson, project.client)
 			Long newPID = newPerson.id
@@ -386,7 +472,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 	}
 
-	def "12. Merge Person with no user login accounts"() {
+	def "13. Merge Person with no user login accounts"() {
 		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
@@ -445,7 +531,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 	}
 
-	def "13. Merge Person with login account only associated with From person"() {
+	def "14. Merge Person with login account only associated with From person"() {
 		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
@@ -488,7 +574,7 @@ class PersonServiceIntegrationTests extends Specification {
 */
 	}
 
-	def "14. Merge Person with login accounts associated with both persons"() {
+	def "15. Merge Person with login accounts associated with both persons"() {
 		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
 
 		when: 'getting the Person userLogin property'
@@ -552,7 +638,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 	}
 
-	def "15. Bulk Delete Persons Test"() {
+	def "16. Bulk Delete Persons Test"() {
 		when: 'creating a new person with a user account'
 		Person newPerson = personHelper.createPerson(adminPerson, project.client)
 		Long newPID = newPerson.id
@@ -571,6 +657,53 @@ class PersonServiceIntegrationTests extends Specification {
 		then: 'deleted count should greater than zero'
 		result['deleted'] == 1
 	}
+
+
+
+
+
+
+	def "17. Test for TM-6141 - Add an admin new person to a project as client staff, log in with that user, remove and re-attach itself to the project"() {
+
+		setup: 'create a person and user as staff with ADMIN role for the project client so that'
+			Person newPerson = personHelper.createPerson(adminPerson, project.client)
+			UserLogin newUser = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+
+		when: 'the newUser logs into the system'
+			securityService.assumeUserIdentity(newUser.username, false)
+
+		then: 'the newUser is correctly logged into the system and has the ShowAllProjects permission'
+			assert securityService.isLoggedIn()
+			securityService.hasPermission(newUser, 'ShowAllProjects')
+		and: 'the newPerson should be able to access the project'
+			personService.hasAccessToProject(newPerson, project)
+		and: 'the newPerson is NOT assigned to the project'
+			!personService.isAssignedToProject(project, newPerson)
+
+		when: 'adding the person to the project'
+		personService.addToProject(adminUser, project.id.toString(), newPerson.id.toString())
+		then: 'the person should be able to access the project'
+		personService.hasAccessToProject(newPerson, project)
+		and: 'the person is assigned to the project'
+		personService.isAssignedToProject(project, newPerson)
+
+		when: 'removing the newUser from the project'
+			personService.removeFromProject(project.id.toString(), newPerson.id.toString())
+		then: 'the person should be able to access the project'
+			personService.hasAccessToProject(newPerson, project)
+		and: 'the person is NOT assigned to the project'
+			!personService.isAssignedToProject(project, newPerson)
+
+		when: 'the person re-attach himself to the project'
+			personService.addToProject(adminUser, project.id.toString(), newPerson.id.toString())
+		then: 'the person should be able to access the project'
+			personService.hasAccessToProject(newPerson, project)
+		and: 'the person is assigned to the project'
+			personService.isAssignedToProject(project, newPerson)
+	}
+
+
+
 
 	// Used to convert a person object into a map used by the PersonService
 	private Map personToNameMap(Person p) {

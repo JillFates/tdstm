@@ -33,6 +33,8 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
+
+
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */
@@ -872,7 +874,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 	 * @return A map containing the looked up project, person, teamRoleType
 	 */
 	private Map validateUserCanEditStaffing(UserLogin user, projectId, personId, String teamCode) {
-		if (!securityService.hasPermission(user, 'EditProjectStaff')) {
+			if (!securityService.hasPermission(user, 'EditProjectStaff')) {
 			throw new UnauthorizedException("Do not have permission to edit staff")
 		}
 
@@ -1066,10 +1068,10 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 	 * Associate a person to a project as staff (Secured) which is only used if permissions were already checked
 	 * @param projectId - the id number of the project to remove the person from
 	 * @param personId - the id of the person to update
-	 * @return String - any value indicates an error otherwise blank means succes
+	 * @return String - any value indicates an error otherwise blank means success
 	 */
 	private void addToProjectSecured(Project project, Person person) {
-		// Add to the project if not assiged already
+		// Add to the project if not assigned already
 		if (!isAssignedToProject(project, person)) {
 			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, 'STAFF')) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project $project.name as STAFF")
@@ -1177,7 +1179,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 
 		Map metrics = [teamsUnassigned: 0, appOwnerUnassigned: 0, smeUnassigned: 0, sme2Unassigned: 0]
 
-		// Remove all of the person's MoveEventStaff relationships for the project
+		// Remove all of the person's MoveEventStaff relationships for the proje ct
 		metrics.eventsUnassigned = deleteFromEvent(map.project, null, map.person, map.teamRoleType)
 
 		// Remove the Project Staff relationship for the project
@@ -1482,14 +1484,16 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 			UserLogin user = person.userLogin
 			if (user) {
 				boolean hasShowAllProj = securityService.hasPermission(user, 'ShowAllProjects')
-				if (person.company.id == project.owner.id && hasShowAllProj) {
+				if (hasShowAllProj && (person.company.id == project.owner.id || person.company.id == project.client.id)) {
 					hasAccess = true
-				} else {
-					List projects = projectService.getUserProjects(false, ProjectStatus.ANY, [:], user)
-					log.debug "hasAccessToProject() user has these projects $projects"
-					if (projects) {
-						hasAccess = projects.any { it.id == project.id }
-					}
+				} else if (hasShowAllProj) {
+					// Check if person is staff for a partner on the project
+					List partnerProjects = partyRelationshipService.getProjectPartners(project)
+					hasAccess = partnerProjects.find { it.id == project.id }
+				}
+				if (!hasAccess ) {
+					// Check to see if person is assigned directly to project
+					hasAccess = isAssignedToProject(project, person)
 				}
 			} else {
 				log.warn "hasAccessToProject() called for a person that has no UserLogin (${person.id}:$person"

@@ -102,6 +102,8 @@ class PersonTestHelper {
 	}
 
 	/**
+	 * @deprecated This method has been replaced by createPerson method.
+	 *
 	 * Used to create the person that will be the staff of a company. The first, middle or last name can be assigned
 	 * but if not then a random string is set for the properties.
 	 * @param company - the company to assign the staff to
@@ -109,6 +111,7 @@ class PersonTestHelper {
 	 * @param middleName
 	 * @param lastName
 	 * @return the person that was created and assigned to the company
+	 *
 	 */
 	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null) {
 		Person staff = createPerson(firstName, middleName, lastName, email)
