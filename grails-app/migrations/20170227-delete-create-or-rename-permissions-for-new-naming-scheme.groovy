@@ -777,7 +777,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "oluna", id: "20170227 TM-5576-5") {
+	changeSet(author: "oluna", id: "20170227 TM-5576-5.v2") {
 		comment('add new permissions to cover License Admin features')
 
 		grailsChange {
@@ -786,21 +786,23 @@ databaseChangeLog = {
 						'LicenseView'          : [
 								group      : 'NONE',
 								description: 'Can View License Information',
-								roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+								roles      : ['ADMIN']
 						],
 						'LicenseAdministration': [
 								group      : 'NONE',
-								description: 'Can Do changes on Licenses (Request, Upload)',
-								roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+								description: 'Can perform License administration tasks',
+								roles      : ['ADMIN']
 						],
 						'LicenseDelete'        : [
 								group      : 'NONE',
 								description: 'Can Delete Licenses',
-								roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+								roles      : ['ADMIN']
 						]
 				]
 
-				ctx.getBean('databaseMigrationService').addPermissions(sql, perms)
+				def databaseMigrationService = ctx.getBean('databaseMigrationService')
+				databaseMigrationService.removePermissions(sql, perms.keySet().asList())
+				databaseMigrationService.addPermissions(sql, perms)
 			}
 		}
 	}
