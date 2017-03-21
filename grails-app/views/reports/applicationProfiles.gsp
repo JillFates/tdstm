@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -38,7 +39,7 @@
 							</td>
 						</tr>
 						<tr class="buttonR">
-							<tds:hasPermission permission="ShowMovePrep">
+							<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
 								<td colspan="2">
 									<button type="button" class="btn btn-default" id="applicationProfilesButton"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Generate</button>
 								</td>

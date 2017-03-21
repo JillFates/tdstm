@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.SortOrder
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 
@@ -33,7 +34,7 @@ class WsProjectController implements ControllerMethods {
 		searchParams.sortOrder = SortOrder.valueOfParam(params.sortOrder)
 
 		try {
-			def projects = projectService.getUserProjects(securityService.hasPermission("ShowAllProjects"), projectStatus, searchParams)
+			def projects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), projectStatus, searchParams)
 			def dataMap = [:]
 			def results = []
 			projects.each { project ->

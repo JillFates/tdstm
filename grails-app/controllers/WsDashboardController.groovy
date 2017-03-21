@@ -1,4 +1,5 @@
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
 import groovy.util.logging.Slf4j
@@ -8,6 +9,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.StepSnapshot
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
@@ -27,6 +29,7 @@ class WsDashboardController implements ControllerMethods {
 	 * @param moveEventId
 	 * @return JSON map
 	 */
+	@HasPermission(Permission.DashboardMenuView)
 	def bundleData() {
 		String error = ""
 		Project project = securityService.userCurrentProject

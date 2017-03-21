@@ -2,7 +2,7 @@
   -- Used to present the user with their profile information that they can edit and change
   -- @params user - the user information
   --%>
-
+<%@page import="net.transitionmanager.security.Permission"%>
 <div id="personDialog" title="Edit Person" style="display:none;" class="static-dialog">
 	<div class="dialog">
 		<table>
@@ -76,11 +76,11 @@
 					<label for="startPage">Start Page:</label>
 				</td>
 				<td valign="top" class="value">
-					<tds:hasPermission permission='AdminMenuView'>
+					<tds:hasPermission permission="${Permission.AdminMenuView}">
 						<g:select name="startPage" value="${tds.startPage()}"
 						         from="${['Project Settings','Planning Dashboard','Admin Portal', 'User Dashboard']}" />
 					</tds:hasPermission>
-					<tds:lacksPermission permission='AdminMenuView'>
+					<tds:lacksPermission permission="${Permission.AdminMenuView}">
 						<g:select name="startPage" value="${tds.startPage()}"
 						          from="${['Project Settings','Planning Dashboard', 'User Dashboard']}" />
 					</tds:lacksPermission>

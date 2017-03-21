@@ -1,8 +1,10 @@
 import com.tds.asset.AssetEntity
+import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.ProjectTeam
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SecurityService
 
@@ -16,6 +18,7 @@ class ProjectTeamController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	SecurityService securityService
 
+	@HasPermission(Permission.ProjectTeamView)
 	def list(Long bundleId) {
 		MoveBundle moveBundle = bundleId ?
 			MoveBundle.get(bundleId) :
@@ -24,6 +27,7 @@ class ProjectTeamController implements ControllerMethods {
 		 bundleInstance: moveBundle]
 	}
 
+	@HasPermission(Permission.ProjectTeamView)
 	def show(Long bundleId) {
 		ProjectTeam projectTeam = projectTeamFromParams()
 		if (!projectTeam) return
@@ -32,6 +36,7 @@ class ProjectTeamController implements ControllerMethods {
 		 teamMembers: partyRelationshipService.getBundleTeamMembers(projectTeam)]
 	}
 
+	@HasPermission(Permission.ProjectTeamDelete)
 	def delete() {
 		ProjectTeam projectTeam = projectTeamFromParams()
 		if (!projectTeam) return
@@ -57,6 +62,7 @@ class ProjectTeamController implements ControllerMethods {
 		redirect(action: 'list', params: [bundleId: params.bundleId])
 	}
 
+	@HasPermission(Permission.ProjectTeamEdit)
 	def edit(Long bundleId, Long id) {
 		ProjectTeam projectTeam = projectTeamFromParams()
 		if (!projectTeam) return
@@ -68,6 +74,7 @@ class ProjectTeamController implements ControllerMethods {
 		 teamMembers: partyRelationshipService.getBundleTeamMembers(projectTeam)]
 	}
 
+	@HasPermission(Permission.ProjectTeamEdit)
 	def update(Long bundleId, Long id) {
 
 		// TODO : Security : Need to check to see if the person is associated to the project and has permissions.
@@ -96,12 +103,14 @@ class ProjectTeamController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.ProjectTeamCreate)
 	def create() {
 		MoveBundle moveBundle = MoveBundle.get(params.bundleId)
 		[projectTeamInstance: new ProjectTeam(params), bundleInstance: moveBundle,
 		 availableStaff: partyRelationshipService.getProjectStaff(moveBundle.projectId)]
 	}
 
+	@HasPermission(Permission.ProjectTeamCreate)
 	def save(Long bundleId) {
 		MoveBundle moveBundle = MoveBundle.get(bundleId)
 		ProjectTeam projectTeam = new ProjectTeam(params)

@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -19,14 +20,14 @@
 	     <th style="text-align:center;"><g:link controller="files" action="list">Logical Storage</g:link></th>
 	   </tr>
     </thead>
-   
+
    <tbody>
    <g:each in="${assetSummaryList}" var="assetSummary" status="i">
          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 	          <td>
-				<tds:hasPermission permission="moveBundleShowView"><a href=../moveBundle/show/${assetSummary.id}></tds:hasPermission>
-				  ${assetSummary.name}
-				<tds:hasPermission permission="moveBundleShowView"></a></tds:hasPermission>
+				<tds:hasPermission permission="${Permission.BundleView}">
+					<a href=../moveBundle/show/${assetSummary.id}>${assetSummary.name}</a>
+				</tds:hasPermission>
 			  </td>
 	          <g:if test="${assetSummary.applicationCount>0}">
 	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[filter:"application", moveBundleId:"${assetSummary.id}"]'>${assetSummary.applicationCount}</g:link></td>
@@ -58,7 +59,7 @@
 	          <g:else>
 	           <td  style="text-align:right;"></td>
 	          </g:else>
-         </tr>    
+         </tr>
     </g:each>
         <tr class='odd'>
 	          <td  style="text-align:right;"><b>Total</b></td>
@@ -67,7 +68,7 @@
 	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list" params="[filter:'physical']">${totalPhysical}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="database" action="list">${totalDatabase}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="files" action="list">${totalFiles}</g:link></b></td>
-         </tr> 
+         </tr>
     </tbody>
 
   </table>

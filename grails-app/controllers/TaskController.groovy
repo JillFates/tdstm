@@ -17,6 +17,7 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
@@ -72,11 +73,13 @@ class TaskController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
+	@HasPermission(Permission.TaskView)
 	def index() { }
 
 	/**
 	 * Used by the myTasks and Task Manager to update tasks appropriately.
 	 */
+	@HasPermission(Permission.TaskEdit)
 	def update() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
@@ -110,6 +113,7 @@ class TaskController implements ControllerMethods {
 	 * @params : id, status
 	 * @return : user full name and errorMessage if status changed by accident.
 	 */
+	@HasPermission(Permission.TaskEdit)
 	def assignToMe() {
 		def task = AssetComment.get(params.id)
 		Project project = securityService.userCurrentProject
@@ -165,6 +169,7 @@ class TaskController implements ControllerMethods {
 	 *  @params id - the task (aka AssetComment) id number for the task bark
 	 *  @return : actions bar as HTML (Start, Done, Details, Assign To Me)
 	 */
+	@HasPermission(Permission.TaskView)
 	def genActionBarHTML() {
 		def actionBar = retrieveActionBarData(AssetComment.get(params.id))
 		render actionBar.toString()
@@ -175,6 +180,7 @@ class TaskController implements ControllerMethods {
 	 * @param comment : instance of asset comment
 	 * @return : Action Bar HTML code.
 	 */
+	@HasPermission(Permission.TaskView)
 	def retrieveActionBarData(comment) {
 		// There are a total of 13 columns so we'll subtract for each conditional button
 		def cols = 12
@@ -206,7 +212,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')"))
 			}
 
-			if (securityService.hasPermission("CommentCrudView") && comment.status == READY &&
+			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetCommentCategory.moveDayCategories)) {
 
 				actionBar << '<td class="delay_taskManager"><span>Delay for:</span></td>'
@@ -233,6 +239,7 @@ class TaskController implements ControllerMethods {
 	 * @param asset comment id.
 	 * @render : Action Bar HTML code.
 	 */
+	@HasPermission(Permission.TaskView)
 	def genActionBarForShowView() {
 		AssetComment comment = AssetComment.get(params.id)
 		StringBuilder actionBar = new StringBuilder("""<span class="slide" style=" margin-top: 4px;">""")
@@ -260,7 +267,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')") << "</span>"
 			}
 
-			if (securityService.hasPermission("CommentCrudView") && comment.status == READY &&
+			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 
 				actionBar << "<span id='1dEst_$comment.id' width='8%' nowrap='nowrap'>" <<
@@ -285,6 +292,7 @@ class TaskController implements ControllerMethods {
 	 * @param asset comment id.
 	 * @render : Action Bar JSON code.
 	 */
+	@HasPermission(Permission.TaskView)
 	def genActionBarForShowViewJson() {
 		def comment = AssetComment.get(params.id)
 		Project project = securityService.userCurrentProject
@@ -324,7 +332,7 @@ class TaskController implements ControllerMethods {
 				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
 			}
 
-			if (securityService.hasPermission("CommentCrudView") && comment.status == READY &&
+			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 
 				actionBar << [label: 'Delay for:']
@@ -347,6 +355,7 @@ class TaskController implements ControllerMethods {
 	/**
 	* Used by the getActionBarHTML to wrap the button HTML into <td>...</td>
 	*/
+	@HasPermission(Permission.TaskView)
 	String _actionButtonTd(tdId, button) {
 		"""<td id="$tdId" width="8%" nowrap="nowrap">$button</td>"""
 	}
@@ -356,6 +365,7 @@ class TaskController implements ControllerMethods {
 	 * @param taskId
 	 * @return redirect to URI of image or HTML showing the error
 	 */
+	@HasPermission(Permission.TaskGraphView)
 	def neighborhoodGraphSvg() {
 		def errorMessage = ''
 
@@ -383,7 +393,7 @@ class TaskController implements ControllerMethods {
 			boolean viewUnpublished = params.viewUnpublished && params.viewUnpublished == "1"
 
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED,
-				securityService.hasPermission("PublishTasks") && viewUnpublished)
+				securityService.hasPermission(Permission.TaskPublish) && viewUnpublished)
 
 			// check if the specified task is unpubublished and the user shouldn't see it
 			if (!viewUnpublished && !rootTask.isPublished) {
@@ -521,7 +531,7 @@ digraph runbook {
 			} catch(e) {
 				errorMessage = 'Encounted an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
-				if (securityService.hasPermission("RoleTypeCreate")) {
+				if (securityService.hasPermission(Permission.RoleTypeCreate)) {
 					errorMessage += "<br><pre>$e.message</pre>"
 				}
 			}
@@ -543,6 +553,7 @@ digraph runbook {
 	 * @param mode - flag as to what mode to display the graph as (s=status, ?=default)
 	 * @return redirect to URI of image or HTML showing the error
 	 */
+	@HasPermission(Permission.TaskGraphView)
 	def moveEventTaskGraphSvg() {
 		def errorMessage = ''
 
@@ -577,7 +588,7 @@ digraph runbook {
 				log.warn "The wrong mode [$mode] was specified"
 			}
 
-			def viewUnpublished = securityService.hasPermission("PublishTasks") && params.viewUnpublished == '1'
+			def viewUnpublished = securityService.hasPermission(Permission.TaskPublish) && params.viewUnpublished == '1'
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished)
 			userPreferenceService.setPreference(PREF.MOVE_EVENT, moveEventId)
 
@@ -705,7 +716,7 @@ digraph runbook {
 			} catch (e) {
 				errorMessage = 'Encounted an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
-				if (securityService.hasPermission("RoleTypeCreate")) {
+				if (securityService.hasPermission(Permission.RoleTypeCreate)) {
 					errorMessage += "<br><pre>$e.message</pre>"
 				}
 			}
@@ -724,6 +735,7 @@ digraph runbook {
 	/**
 	 * Used to render neighborhood task graphs by passing the id argument to the taskGraph
 	 */
+	@HasPermission(Permission.TaskGraphView)
 	def neighborhoodGraph() {
 		forward action:'taskGraph', params: ['neighborhoodTaskId': params.id]
 	}
@@ -731,7 +743,7 @@ digraph runbook {
 	/**
 	 * Generates the main view for Event Task and Neighborhood Task Graphs
 	 */
-	@HasPermission('ViewTaskGraph')
+	@HasPermission(Permission.TaskGraphView)
 	def taskGraph() {
 		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this)
@@ -802,6 +814,7 @@ digraph runbook {
 	 * @param prefFor - Key
 	 * @param selected : value
 	 */
+	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
 		def key = params.prefFor
 		def selected = params.list('selected[]')[0] ?:params.selected
@@ -817,6 +830,7 @@ digraph runbook {
 	 * @param : id[] : list of id whose status is ready or started
 	 * @return : map consist of id of task and action bar
 	 */
+	@HasPermission(Permission.TaskView)
 	def genBulkActionBarHTML() {
 		def taskIds =  params.list("id[]")
 		def resultMap = [:]
@@ -835,6 +849,7 @@ digraph runbook {
 	 * @param : commentId.
 	 * @return : retMap.
 	 */
+	@HasPermission(Permission.TaskManagerView)
 	def changeEstTime() {
 		String etext = ''
 		def comment
@@ -880,6 +895,7 @@ digraph runbook {
 		render retMap as JSON
 	}
 
+	@HasPermission(Permission.TaskTimelineView)
 	def taskTimeline() {
 		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this, 'to use the task timeline')
@@ -902,6 +918,7 @@ digraph runbook {
 	}
 
 	// gets the JSON object used to populate the task graph timeline
+	@HasPermission(Permission.TaskTimelineView)
 	def taskTimelineData() {
 
 		Long projectId = controllerService.getProjectForPage(this, 'before using the task graph')?.id
@@ -1018,16 +1035,19 @@ digraph runbook {
 		render([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
 	}
 
+	@HasPermission(Permission.TaskEdit)
 	def editTask() {
 		render(view: "_editTask", model: [])
 	}
 
+	@HasPermission(Permission.TaskView)
 	def showTask() {
 		//def instructionsLink = AssetComment.read(params.taskId)?.instructionsLink
 		//log.error instructionsLink
 		render(view: "_showTask", model: [])
 	}
 
+	@HasPermission(Permission.TaskView)
 	def list() {
 		render(view: "_list", model: [])
 	}
@@ -1035,7 +1055,7 @@ digraph runbook {
 	/**
 	 * Get task roles
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.TaskView)
 	def retrieveStaffRoles() {
 		try {
 			renderSuccessJson(taskService.getRolesForStaff())
@@ -1050,7 +1070,7 @@ digraph runbook {
 	 * @param params.eventId - the event id to generate the data for or default to the user's current event
 	 * @param params.showAll - flag to indicate including all columns of just the planning ones (true|false)
 	 */
-	@HasPermission('CriticalPathExport')
+	@HasPermission(Permission.TaskViewCriticalPath)
 	def eventTimelineResults() {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
@@ -1228,6 +1248,7 @@ digraph runbook {
 	 * params:
 	 *		tab - all or todo
 	 */
+	@HasPermission(Permission.TaskView)
 	def listUserTasks() {
 		licenseAdminService.checkValidForLicense()
 		Project project = controllerService.getProjectForPage(this)
@@ -1354,6 +1375,7 @@ digraph runbook {
 	 * @author Ross Macfarlane
 	 * @return JSON response containing the number of tasks assigned to the current user {count:#}
 	 */
+	@HasPermission(Permission.TaskView)
 	def retrieveUserToDoCount() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1369,6 +1391,7 @@ digraph runbook {
 	 * @param issueId
 	 * @return HTML that is used by an AJax call
 	 */
+	@HasPermission(Permission.TaskView)
 	def showIssue() {
 
 		Project project = securityService.userCurrentProject
@@ -1464,6 +1487,7 @@ function goBack() { window.history.back() }
 	 * @param task/comment id
 	 * @return HTML that is used to display a task form an email
 	 */
+	@HasPermission(Permission.TaskView)
 	def userTask() {
 		def task
 		if (params.id != null) {

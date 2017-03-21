@@ -1,8 +1,10 @@
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CookbookService
 
 /**
@@ -16,6 +18,7 @@ class WsCookbookController implements ControllerMethods {
 
 	CookbookService cookbookService
 
+	@HasPermission(Permission.RecipeCreate)
 	def createRecipe(String name, String description, String context, Long clonedFrom) {
 		try {
 			def recipeVersion = cookbookService.createRecipe(name, description, context, clonedFrom)
@@ -26,6 +29,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeCreate)
 	def cloneRecipe(Long recipeVersionid, String name, String description) {
 		try {
 			RecipeVersion rv = cookbookService.cloneRecipe(recipeVersionid, name, description)
@@ -36,6 +40,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeDelete)
 	def deleteRecipeOrVersion(Long id) {
 		try {
 			def version = params.version
@@ -52,6 +57,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeEdit)
 	def updateRecipe(Long id) {
 		try {
 			def json = request.JSON
@@ -63,6 +69,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeEdit)
 	def saveRecipeVersion(Long id, Long recipeVersionId) {
 		try {
 			cookbookService.saveOrUpdateWIPRecipe(id, recipeVersionId, params.name, params.description,
@@ -77,6 +84,7 @@ class WsCookbookController implements ControllerMethods {
 	/**
 	 * Releases a recipe that is WIP
 	 */
+	@HasPermission(Permission.RecipeRelease)
 	def releaseRecipe(Long recipeId) {
 		try {
 			cookbookService.releaseRecipe(recipeId)
@@ -90,6 +98,7 @@ class WsCookbookController implements ControllerMethods {
 	/**
 	 * Reverts a recipe to the previous release version
 	 */
+	@HasPermission(Permission.RecipeEdit)
 	def revert(Long id) {
 		try {
 			cookbookService.revertRecipe(id)
@@ -103,6 +112,7 @@ class WsCookbookController implements ControllerMethods {
 	/**
 	 * Obtains the information about a recipe
 	 */
+	@HasPermission(Permission.RecipeView)
 	def recipe(Long id, Integer version) {
 		try {
 			Map result = cookbookService.getRecipe(id, version)
@@ -130,6 +140,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeView)
 	def recipeList(String archived, String context) {
 		try {
 			def results = cookbookService.findRecipes(archived, context, params.search, params.projectType)
@@ -140,6 +151,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeView)
 	def recipeVersionList() {
 		try {
 			def results = cookbookService.findRecipeVersions(params.id)
@@ -153,6 +165,7 @@ class WsCookbookController implements ControllerMethods {
 	/**
 	 * Validates the syntax of the source code of a recipe
 	 */
+	@HasPermission(Permission.RecipeView)
 	def validateSyntax() {
 		try {
 			def results = cookbookService.validateSyntaxForUser(params.sourceCode)
@@ -168,6 +181,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeEdit)
 	def archiveRecipe() {
 		try {
 			cookbookService.archivedUnarchived(params.id, true)
@@ -178,6 +192,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeEdit)
 	def unarchiveRecipe() {
 		try {
 			cookbookService.archivedUnarchived(params.id, false)
@@ -188,6 +203,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeView)
 	def groups() {
 		try {
 			def groups = cookbookService.getGroups(params.recipeVersionId, params.contextId, params.contextType, params.sourceCode)
@@ -198,6 +214,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeEdit)
 	def defineRecipeContext() {
 		try {
 			cookbookService.defineRecipeContext(params.recipeId, params.contextId)
@@ -208,6 +225,7 @@ class WsCookbookController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RecipeEdit)
 	def deleteRecipeContext() {
 		try {
 			cookbookService.deleteRecipeContext(params.recipeId)

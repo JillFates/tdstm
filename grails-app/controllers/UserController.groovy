@@ -1,4 +1,6 @@
 import net.transitionmanager.controller.ControllerMethods
+import com.tdsops.common.security.spring.HasPermission
+import net.transitionmanager.security.Permission
 
 import static net.transitionmanager.utils.Profiler.KEY_NAME
 
@@ -9,6 +11,7 @@ class UserController implements ControllerMethods {
 	/**
 	 * Toggles the profiler session variable on/off for performance troubleshooting.
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def profilerToggle() {
 		def value = session[KEY_NAME]
 		if (value) {
@@ -23,6 +26,7 @@ class UserController implements ControllerMethods {
 	/**
 	 * Show the state of the profiler session variable.
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def profilerStatus() {
 		render "The Profiler is: " + profilerState()
 	}

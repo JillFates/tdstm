@@ -1,12 +1,13 @@
 <%@page import="com.tds.asset.AssetType;"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 
-<tds:hasPermission permission='AssetEdit'>
+<tds:hasPermission permission="${Permission.AssetEdit}">
     <button class="btn btn-default" type="button" onclick="EntityCrud.showAssetEditView('${assetEntity.assetClass}', ${assetEntity?.id});">
         <img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px"/> Edit
     </button>
 </tds:hasPermission>
 
-<tds:hasPermission permission='AssetDelete'>
+<tds:hasPermission permission="${Permission.AssetDelete}">
 	<g:if test="${deleteChassisWarning}">
         <button class="btn btn-default" type="submit" onclick="return confirm('This chassis has blades assigned to it. Deleting the chassis will clear the reference for all associated blades. Click OK to continue otherwise click Cancel.');">
             <img src="${resource(dir:'icons',file:'database_delete.png')}" border="0px"/> Delete
@@ -37,7 +38,7 @@
     </button>
 </g:if>
 
-<tds:hasPermission permission='ArchitectureView'>
+<tds:hasPermission permission="${Permission.ArchitectureView}">
 
 <g:link controller="assetEntity" action="architectureViewer" params="[assetId:assetEntity?.id, level:2]" class="btn btn-default" role="button">
     <input type="button" class="architectureGraph" value="Arch Graph" />

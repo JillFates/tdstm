@@ -3,6 +3,7 @@
 <%@page import="com.tds.asset.Application" %>
 <%@page import="com.tds.asset.Database" %>
 <%@page import="com.tds.asset.Files" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new AssetEntity()).assetClass}" />
 
@@ -87,13 +88,13 @@
 				var windowWidth = $(window).width() - $(window).width()*5/100 ;
 				var sizePref = '${sizePref}';
 				var unassigned = '${unassigned}';
-				var listCaption = '<tds:hasPermission permission="AssetEdit">\
+				var listCaption = '<tds:hasPermission permission="${Permission.AssetEdit}">\
 					Device:&nbsp;&nbsp;\
 					<span class="button">\
 						<input type="button" value="Create Device" class="create" \
 							onclick="EntityCrud.showAssetCreateView(\'${assetClass}\');"/>\
 					</span></tds:hasPermission>\
-					<tds:hasPermission permission="AssetDelete"> \
+					<tds:hasPermission permission="${Permission.AssetDelete}"> \
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span> \
 					</tds:hasPermission> \
 					<span><input type="checkbox" id="justPlanning" ${ (justPlanning == "true" ? "checked" : "") } onclick="toggleJustPlanning($(this))"/><label for="justPlanning"> Just Planning</label></span> \

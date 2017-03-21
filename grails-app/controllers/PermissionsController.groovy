@@ -2,6 +2,7 @@ import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Permissions
 import net.transitionmanager.domain.RolePermissions
+import net.transitionmanager.security.Permission
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
@@ -12,28 +13,27 @@ class PermissionsController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate
 
-	@HasPermission('RolePermissionView')
+	@HasPermission(Permission.RolePermissionView)
 	def show() {
 		def permissions = Permissions.withCriteria {
 			and {
-			   order('permissionGroup','asc')
 			   order('permissionItem','asc')
 			}
 		}
 		[permissions:permissions]
 	}
 
-	@HasPermission('RolePermissionView')
+	@HasPermission(Permission.RolePermissionEdit)
 	def edit() {
 		List permissions = Permissions.withCriteria {
 			and {
-				order('permissionGroup','asc')
 				order('permissionItem','asc')
 			}
 		}
 		[permissions:permissions]
 	}
 
+	@HasPermission(Permission.RolePermissionEdit)
 	def update() {
 		def paramList = params.column
 		jdbcTemplate.update("delete from role_permissions")

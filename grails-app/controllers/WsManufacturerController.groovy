@@ -1,5 +1,7 @@
 import groovy.util.logging.Slf4j
+import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ManufacturerService
 
@@ -20,9 +22,10 @@ class WsManufacturerController implements ControllerMethods {
 	/**
 	 * Merge to manufacturers
 	 */
+	@HasPermission(Permission.ManufacturerMerge)
 	def merge() {
 		try {
-			controllerService.checkPermissionForWS('EditModel')
+			controllerService.checkPermissionForWS(Permission.ModelEdit)
 			manufacturerService.merge(params.id, params.fromId)
 			renderSuccessJson()
 		}

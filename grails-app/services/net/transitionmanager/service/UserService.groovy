@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.security.Permission
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
 
@@ -429,7 +430,7 @@ class UserService implements ServiceMethods {
 
 	private List<Project> getSelectedProject(Project project) {
 		if (project == Project.ALL) {
-			projectService.getUserProjects(securityService.hasPermission("ShowAllProjects"), ProjectStatus.ACTIVE)
+			projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
 		}
 		else {
 			[project]
@@ -617,7 +618,6 @@ class UserService implements ServiceMethods {
 	 * Used to retrieve a list of users with recent activity
 	 * @param inPastMinutes - the number of minutes since latest activity (default 5)
 	 * @return A list of the username
-	 * @Permission RestartApplication
 	 * TODO : JPM 3/2016 : Change to use new permission that is more applicable
 	 */
 	List usernamesWithRecentActivity(int inPastMinutes=5) {

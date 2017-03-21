@@ -10,7 +10,9 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.security.Permission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.springframework.dao.DataIntegrityViolationException
@@ -37,7 +39,7 @@ class RoomService implements ServiceMethods {
 		try {
 			while (true) {
 
-				if (!securityService.hasPermission('RoomEditView')) {
+				if (!securityService.hasPermission(Permission.RoomEdit)) {
 					log.warn "SECURITY : User $username attempted to edit a room without permission for project $project"
 					msg = 'Sorry but you do not appear to have the security rights to modify Room and Rack information'
 					break
@@ -211,7 +213,7 @@ class RoomService implements ServiceMethods {
 	 * @param roomIds - an id or a list of ids of the room to be deleted
 	 */
 	List deleteRoom(Project project, roomIds) {
-		securityService.requirePermission 'DeleteRoom'
+		securityService.requirePermission Permission.RoomDelete
 
 		def skippedRooms = []
 		def userPrefRoom = userPreferenceService.getPreference(PREF.CURR_ROOM)

@@ -3,6 +3,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
@@ -16,6 +17,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.ProjectService
@@ -90,8 +92,10 @@ class MoveEventController implements ControllerMethods {
 	                                                    'taskDependencies', 'duration', 'estStart', 'estFinish',
 	                                                    'actStart', 'actFinish', 'workflow']
 
+	@HasPermission(Permission.EventView)
 	def list() {}
 
+	@HasPermission(Permission.EventView)
 	def listJson() {
 
 		String sortIndex = params.sidx ?: 'assetName'
@@ -129,7 +133,8 @@ class MoveEventController implements ControllerMethods {
 
 		render jsonData as JSON
 	}
-
+	
+	@HasPermission(Permission.EventView)
 	def show() {
 		String moveEventId = params.id
 		if (moveEventId) {
@@ -166,6 +171,7 @@ class MoveEventController implements ControllerMethods {
 	 * @param : MoveEvent Id
 	 * @return : list of remaining MoveEvents
 	 */
+	@HasPermission(Permission.EventDelete)
 	def delete() {
 		try {
 			MoveEvent moveEvent = MoveEvent.get(params.id)
@@ -190,7 +196,8 @@ class MoveEventController implements ControllerMethods {
 		}
 		redirect(action: 'list')
 	}
-
+	
+	@HasPermission(Permission.EventEdit)
 	def edit() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
 		if (!moveEvent) {
@@ -201,7 +208,8 @@ class MoveEventController implements ControllerMethods {
 
 		[moveEventInstance: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
 	}
-
+	
+	@HasPermission(Permission.EventEdit)
 	def update() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
 		if (!moveEvent) {
@@ -227,11 +235,13 @@ class MoveEventController implements ControllerMethods {
 			render(view: 'edit', model: [moveEventInstance: moveEvent])
 		}
 	}
-
+	
+	@HasPermission(Permission.EventCreate)
 	def create() {
 		[moveEventInstance: new MoveEvent(params)]
 	}
-
+	
+	@HasPermission(Permission.EventCreate)
 	def save() {
 		if (params.estStartTime) {
 			params.estStartTime = TimeUtil.parseDateTime(params.estStartTime) ?: params.estStartTime
@@ -250,24 +260,27 @@ class MoveEventController implements ControllerMethods {
 		else {
 			render(view: 'create', model: [moveEventInstance: moveEvent])
 		}
-   }
+	}
 
-   /*
+	/*
 	 * return the list of MoveBundles which are associated to the selected Project
 	 * @return : return the list of MoveBundles as JSON object
 	 */
-   def retrieveMoveBundles() {
+	@HasPermission(Permission.BundleView)
+	@HasPermission(Permission.EventView)
+	def retrieveMoveBundles() {
 		def moveBundles
 		Project project = securityService.userCurrentProject
 		if (project) {
 			moveBundles = MoveBundle.findAllByProject(project)
 		}
-   	render moveBundles as JSON
-   }
+		render moveBundles as JSON
+	}
 
-   /**
-    * Clear out any snapshot data records and reset any summary steps for given event.
-    */
+	/**
+	 * Clear out any snapshot data records and reset any summary steps for given event.
+	 */
+	@HasPermission(Permission.EventEdit)
 	def clearHistoricData() {
 		Long moveEventId = params.long('moveEventId')
 		if (moveEventId) {
@@ -288,15 +301,17 @@ class MoveEventController implements ControllerMethods {
 				moveEventId)
 		}
 		render "success"
-   }
+	}
 
 	/**
 	 * Used to clear or reset any Task data for selected event.
-    * @param moveEventId
-    * @param type (delete/clear)
+	 * @param moveEventId
+	 * @param type (delete/clear)
 	 * @return text
 	 * @usage ajax
 	 */
+	@HasPermission(Permission.EventEdit)
+	@HasPermission(Permission.TaskDelete)
 	def clearTaskData() {
 		Project project = securityService.userCurrentProject
 		def moveEvent
@@ -329,12 +344,13 @@ class MoveEventController implements ControllerMethods {
 		render msg
 	}
 
-   /**
-     * Return the list of active news for a selected moveEvent and status of that evnt.
-     * @param id - the moveEvent to get the news for
-     */
-   def retrieveMoveEventNewsAndStatus() {
-
+	/**
+	 * Return the list of active news for a selected moveEvent and status of that evnt.
+	 * @param id - the moveEvent to get the news for
+	 */
+	@HasPermission(Permission.EventView)
+	def retrieveMoveEventNewsAndStatus() {
+		
 		// Make sure that the user is trying to access a valid event
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) {
@@ -342,9 +358,9 @@ class MoveEventController implements ControllerMethods {
 			flash.message = ''
 			renderWarningJson("User presently has no selected project")
 			return
-   	}
-   	def moveEvent = controllerService.getEventForPage(this, project, params.id)
-   	if (!moveEvent) {
+		}
+		def moveEvent = controllerService.getEventForPage(this, project, params.id)
+		if (!moveEvent) {
 			// TODO - switch to getEventForWS when available to avoid the flash.message
 			flash.message = ''
 			renderWarningJson("Event id was not found")
@@ -353,7 +369,7 @@ class MoveEventController implements ControllerMethods {
 
 		def statusAndNewsList = []
 		if (moveEvent) {
-	    	def moveEventNewsQuery = """
+			def moveEventNewsQuery = """
 				SELECT mn.date_created as created, mn.message as message from move_event_news mn
 				left join move_event me on (me.move_event_id = mn.move_event_id)
 				left join project p on (p.project_id = me.project_id)
@@ -365,8 +381,8 @@ class MoveEventController implements ControllerMethods {
 			def news = new StringBuffer()
 
 			moveEventNews.each {
-	    		news.append(String.valueOf(TimeUtil.formatDateTime(it.created) + "&nbsp;:&nbsp;" + it.message + ".&nbsp;&nbsp;"))
-	    	}
+				news.append(String.valueOf(TimeUtil.formatDateTime(it.created) + "&nbsp;:&nbsp;" + it.message + ".&nbsp;&nbsp;"))
+			}
 
 			// append recent tasks  whose status is completed, moveEvent is newsBarMode
 			def transitionComment = new StringBuffer()
@@ -385,11 +401,11 @@ class MoveEventController implements ControllerMethods {
 				}
 			}
 
-	    	def moveEventSnapshot = MoveEventSnapshot.executeQuery('''
+			def moveEventSnapshot = MoveEventSnapshot.executeQuery('''
 				FROM MoveEventSnapshot WHERE moveEvent=? AND type=?
 				ORDER BY dateCreated DESC
 			''', [moveEvent , "P"])[0]
-	    	def cssClass = "statusbar_good"
+			def cssClass = "statusbar_good"
 			def status = "GREEN"
 			def dialInd = moveEventSnapshot?.dialIndicator
 			dialInd = dialInd || dialInd == 0 ? dialInd : 100
@@ -400,43 +416,45 @@ class MoveEventController implements ControllerMethods {
 				cssClass = "statusbar_yellow"
 				status = "YELLOW"
 			}
-	    	statusAndNewsList << [news: news.toString() + "<span style='font-weight:normal'>" + transitionComment + "</span>",
-	                            cssClass: cssClass, status: status]
+			statusAndNewsList << [news: news.toString() + "<span style='font-weight:normal'>" + transitionComment + "</span>",
+				cssClass: cssClass, status: status]
 
 		}
 		render statusAndNewsList as JSON
-   }
+	}
 
-   /*
-    * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
-    * @author : Lokanada Reddy
-    * @param  : moveEventId and moveEvent dialIndicatorValue
-    */
-   def updateEventSumamry() {
-	   MoveEvent moveEvent = MoveEvent.get(params.moveEventId)
-   	def dialIndicator
-	   if (params.checkbox == 'true') {
-		   dialIndicator = params.value
-	   }
- 		if (dialIndicator  || dialIndicator == 0) {
-		   MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent, planDelta: 0,
-				   dialIndicator: dialIndicator, type: 'P')
-		   saveWithWarnings moveEventSnapshot
-	    	if (moveEventSnapshot.hasErrors()) {
+	/*
+	 * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
+	 * @author : Lokanada Reddy
+	 * @param  : moveEventId and moveEvent dialIndicatorValue
+	 */
+	@HasPermission(Permission.EventEdit)
+	def updateEventSumamry() {
+		MoveEvent moveEvent = MoveEvent.get(params.moveEventId)
+		def dialIndicator
+		if (params.checkbox == 'true') {
+			dialIndicator = params.value
+		}
+		if (dialIndicator  || dialIndicator == 0) {
+			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent, planDelta: 0,
+				dialIndicator: dialIndicator, type: 'P')
+			saveWithWarnings moveEventSnapshot
+			if (moveEventSnapshot.hasErrors()) {
 				moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
 			}
-	      else {
+			else {
 				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
 			}
-
-      	saveWithWarnings moveEvent
+			
+			saveWithWarnings moveEvent
 			render "success"
-	   }
-    }
+		}
+	}
 
 	/**
 	 * The front-end UI to exporting a Runbook spreadsheet
 	 */
+	@HasPermission(Permission.TaskView)
 	def exportRunbook() {
 		Project project = controllerService.getProjectForPage(this, 'to view Export Runbook')
 		if (!project) return
@@ -448,6 +466,7 @@ class MoveEventController implements ControllerMethods {
 	/**
 	 * This provides runbookStats that is rendered into a window of the runbook exporting
 	 */
+	@HasPermission(Permission.TaskView)
 	def runbookStats() {
 		def moveEventId = params.id
 		Project project = securityService.userCurrentProject
@@ -488,6 +507,7 @@ class MoveEventController implements ControllerMethods {
 	/**
 	 * The controller that actually does the runbook export generation to an Excel spreadsheet
 	 */
+	@HasPermission(Permission.TaskView)
 	def exportRunbookToExcel() {
 
 		Project project = controllerService.getProjectForPage(this)
@@ -630,6 +650,7 @@ class MoveEventController implements ControllerMethods {
 	 * @param moveEventId
 	 * @return  Count of record affected with this update or Error Message if any
 	 */
+	@HasPermission(Permission.AssetEdit)
 	def markEventAssetAsMoved() {
 		// if (params.containsKey("moveEventId")) {
 		// 	if (params.moveEventId.isNumber()) {
@@ -670,6 +691,7 @@ class MoveEventController implements ControllerMethods {
 	 * @param newsBarMode with what character user filterd newsBarMode property
 	 * @return matched db property of newsBarMode
 	 */
+	@HasPermission(Permission.EventView)
 	private List<String> retrieveNewsBMList(String newsBarMode) {
 		if (!newsBarMode) return null
 

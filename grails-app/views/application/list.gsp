@@ -3,6 +3,7 @@
 <%@page import="com.tds.asset.Files" %>
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tds.asset.Application" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
 
@@ -66,10 +67,10 @@
 				
 				var sizePref = '${sizePref}'
 				var listCaption = 'Application: \
-					<tds:hasPermission permission="AssetEdit">\
+					<tds:hasPermission permission="${Permission.AssetEdit}">\
 						<span class="capBtn"><input type="button" value="Create App" onclick="EntityCrud.showAssetCreateView(\'${assetClass}\');"/></span>\
 					</tds:hasPermission>\
-					<tds:hasPermission permission="AssetDelete">\
+					<tds:hasPermission permission="${Permission.AssetDelete}">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Application\')" disabled="disabled"/></span>\
 					</tds:hasPermission>\
 						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\

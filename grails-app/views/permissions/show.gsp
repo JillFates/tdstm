@@ -1,5 +1,6 @@
 <%@page import="net.transitionmanager.domain.Permissions" %>
 <%@page import="net.transitionmanager.domain.RolePermissions" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -11,7 +12,7 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<tds:hasPermission permission='AdminMenuView'>
+	<tds:hasPermission permission="${Permission.AdminMenuView}">
 		<tds:subHeader title="Role Permissions" crumbs="['Admin','Roles']"/>
 	<div class="body">
 
@@ -26,7 +27,6 @@
 			<table id="showPermissionsTableId">
 				<thead class="needHeaderBorder">
 					<tr id="headerRowId" class="needsBorder" style="border: ; text-align: left">
-						<th>Group</th>
 						<th>Permission Item</th>
 						<g:each in="${Permissions.Roles.values()}">
 							<th>${it}</th>
@@ -37,9 +37,6 @@
 				<tbody>
 					<g:each in="${permissions}" var="permission" status="i">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
-							<td style="text-align: left;">
-								${permission.permissionGroup.key}
-							</td>
 							<td style="text-align: left;">
 								${permission.permissionItem}
 							</td>

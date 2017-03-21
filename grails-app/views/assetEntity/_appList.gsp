@@ -4,15 +4,16 @@
 <%@page defaultCodec="html" %> 
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tds.asset.Application" %>
-<g:set var="assetClass" value="${(new Application()).assetClass}" />
 
+<g:set var="assetClass" value="${(new Application()).assetClass}" />
+<%@page import="net.transitionmanager.security.Permission"%>
 <div class="tabs">
 
 	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
 	<div id="selectionAppId" class="tabControls">
 		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 		<input type="hidden" id="assetTypesId" name="assetType" value="apps" />
-		<tds:hasPermission permission='AssetEdit'>
+		<tds:hasPermission permission="${Permission.AssetEdit}">
 			<input id="state" type="button"  class="submit pointer" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${appList?.asset?.id},'${session.ASSIGN_BUNDLE}')"  />
 		</tds:hasPermission>
 	</div>

@@ -1,6 +1,7 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
@@ -19,6 +20,7 @@ import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.RoleType
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
@@ -36,6 +38,7 @@ class ProjectUtilController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
+	@HasPermission(Permission.ProjectView)
 	def index() {
 		Project project = securityService.userCurrentProject
 		if (project) {
@@ -53,11 +56,12 @@ class ProjectUtilController implements ControllerMethods {
 	/**
 	 * Return a list of projects , sorted desc by dateCreated
 	 */
+	@HasPermission(Permission.ProjectView)
 	def searchList() {
 		List<Project> projectList
 		String sort = params.sort ?: 'dateCreated'
 		String order = params.order ?: 'desc'
-		if (securityService.hasPermission('ShowAllProjects')) {
+		if (securityService.hasPermission(Permission.ProjectShowAll)) {
 			projectList = Project.findAll(sort: sort, order: order)
 		}
 		else {
@@ -92,6 +96,7 @@ class ProjectUtilController implements ControllerMethods {
 		[projectList: projectList]
 	}
 
+	@HasPermission(Permission.UserGeneralAccess)
 	def addUserPreference() {
 		Project project = Project.findByProjectCode(params.selectProject)
 		userPreferenceService.setCurrentProjectId(project.id)
@@ -102,11 +107,13 @@ class ProjectUtilController implements ControllerMethods {
 	/**
 	 * show the project demo create project
 	 */
+	@HasPermission(Permission.ProjectCreate)
 	def createDemo() {}
 
 	/**
 	 *  Copy all the temp project associates to demo project
 	 */
+	@HasPermission(Permission.ProjectCreate)
 	def saveDemoProject() {
 		def template = params.template
 		def name = params.name

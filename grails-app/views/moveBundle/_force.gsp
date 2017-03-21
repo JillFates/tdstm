@@ -1,4 +1,5 @@
 <%@page defaultCodec="none" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <div id="scriptDivId">
 <style type="text/css">
 /* 	these styles must be included here due to a bug in firefox
@@ -810,7 +811,7 @@ function drawContextMenu() {
 					EntityCrud.showAssetDetailView(data.assetClass, data.id);
 				});
 
-				//<tds:hasPermission permission='AssetEdit'>
+				//<tds:hasPermission permission="${Permission.AssetEdit}">
 				var editAssetItem = '<li class="tempItem edit" id="editAssetItemId">Edit Asset</li>';
 				$(".customMenu").append(editAssetItem);
 				$("#editAssetItemId").on('click', function (a, b) {

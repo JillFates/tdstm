@@ -41,7 +41,7 @@ import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
-
+import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
@@ -1289,7 +1289,7 @@ class AssetEntityService implements ServiceMethods {
 		 redirectTo: params.redirectTo,
 		 supportAssets: supportAssets,
 		 viewUnpublishedValue: viewUnpublishedValue,
-		 hasPublishPermission: securityService.hasPermission("PublishTasks")]
+		 hasPublishPermission: securityService.hasPermission(Permission.TaskPublish)]
 	}
 
 	/**
@@ -1306,19 +1306,19 @@ class AssetEntityService implements ServiceMethods {
 		Map model = [
 			assetClassOptions: AssetClass.classOptions,
 			assetDependency: new AssetDependency(),
-			attributesList: [],		// Set below
+			attributesList: [],        // Set below
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			event: params.moveEvent,
 			fixedFilter: params.filter as Boolean,
 			filter: params.filter,
-			hasPerm: securityService.hasPermission("AssetEdit"),
+			hasPerm: securityService.hasPermission(Permission.AssetEdit),
 			justPlanning: userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true',
-			modelPref: null,		// Set below
+			modelPref: null,        // Set below
 			moveBundleId: params.moveBundleId,
 			moveBundle: filters?.moveBundleFilter ?: '',
 			moveBundleList: getMoveBundles(project),
-			moveEvent: null,		// Set below
+			moveEvent: null,        // Set below
 			planStatus: filters?.planStatusFilter ?:'',
 			plannedStatus: params.plannedStatus,
 			projectId: project.id,

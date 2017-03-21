@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -9,7 +10,7 @@
 <div class="body">
  <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
-	             <tds:hasPermission permission='CreateRoleType'>
+	             <tds:hasPermission permission="${Permission.RoleTypeCreate}">
 	            	<span class="menuButton"><g:link class="create" action="create">Create RoleType</g:link></span>
 	            </tds:hasPermission>
         	</div>
@@ -30,7 +31,7 @@
 
 
 			<g:if test="${roleTypeInstance.type == 'SECURITY'}">
-	            
+
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Level:</label></td>
 				<td valign="top"class="value ${hasErrors(bean:roleTypeInstance,field:'level','errors')}">

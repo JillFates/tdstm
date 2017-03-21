@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 public @interface HasPermission {
 
 	/**
-	 * One or more required permission names (e.g. "AssetEdit", "DeleteTaskBatch", etc.).
+	 * One or more required permission names (e.g. "AssetEdit", "TaskBatchDelete", etc.).
 	 *
 	 * @return the names
 	 */

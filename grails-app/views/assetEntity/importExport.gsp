@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -212,7 +213,7 @@
                         </div>
                     </div><!-- /.box-body -->
 
-                    <tds:hasPermission permission="Import">
+                    <tds:hasPermission permission="${Permission.AssetImport}">
                         <div class="box-footer">
                             <button type="submit" id="run"  class="btn btn-primary">Import Spreadsheet&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
                             <div class="box-footer-url-right"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></div>

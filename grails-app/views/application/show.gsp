@@ -1,4 +1,5 @@
 <%@page import="com.tds.asset.Application"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %> 
 
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
@@ -7,7 +8,7 @@
 	<tr>
 	
 		<td colspan="2"><div class="dialog" 
-			<tds:hasPermission permission='AssetEdit'>
+			<tds:hasPermission permission="${Permission.AssetEdit}">
 				ondblclick="EntityCrud.showAssetEditView('${assetClass}', ${applicationInstance?.id});"
 			</tds:hasPermission>>
 				<g:if test="${errors}">

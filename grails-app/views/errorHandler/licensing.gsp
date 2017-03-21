@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="layout" content="topNav"/>
     <title>TransitionManager&trade; - Licensing Error (500)</title>
+    <!-- HTTP_CODE=500 -->
 
 </head>
 <body class="hold-transition skin-blue layout-top-nav error-handling">

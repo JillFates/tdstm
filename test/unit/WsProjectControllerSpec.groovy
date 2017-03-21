@@ -44,7 +44,7 @@ class WsProjectControllerSpec extends AbstractUnitSpec {
 
 		controller.securityService = new SecurityService() {
 			boolean hasPermission(String permission) {
-				assert permission == 'ShowAllProjects'
+				assert permission == 'ProjectShowAll'
 				showAllProjPermExpected
 			}
 		}

@@ -1,4 +1,5 @@
 <%@page defaultCodec="none" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -58,7 +59,7 @@
 								<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
 								<h2>${rackLayoutIt?.rack} in ${rackLayoutIt?.room} (Back)
 								<g:if test="${generateView}">
-									<tds:hasPermission permission="AssetEdit">
+									<tds:hasPermission permission="${Permission.AssetEdit}">
 										<g:if test="${showIconPref == 'true'}">
 											<span id="span_${rackLayoutIt?.rackId}" onclick="disableCreateIcon(${rackLayoutIt?.rackId})"> 
 												<img src="${resource(dir:'images',file:'plus_disabled.gif')}" />

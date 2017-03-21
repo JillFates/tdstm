@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -30,7 +31,7 @@
 						</td>
 					</tr>
 					<tr class="buttonR">
-					<tds:hasPermission permission="ShowMovePrep">
+					<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
 						<td>
 							<button type="submit" class="btn btn-default" onclick="return verifyEvent();">
 								Generate

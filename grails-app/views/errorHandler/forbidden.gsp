@@ -4,6 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>TransitionManager&trade; - Forbidden (403)</title>
+	<!-- HTTP_CODE=403 -->
 
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">

@@ -1,9 +1,11 @@
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.ProgressService
@@ -25,6 +27,7 @@ class ImportController implements ControllerMethods {
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
+	@HasPermission(Permission.AssetImport)
 	def listJobs() {
 		List jobs = progressService.list()
 		if (jobs) {
@@ -37,8 +40,9 @@ class ImportController implements ControllerMethods {
 	/**
 	 * Review batch and find error in Excel import if any.
 	 * @param : id- data transfer batch id
-	 * @return map containing error message if any and import permission  (NewModelsFromImport)
+	 * @return map containing error message if any and import permission  (ModelCreateFromImport)
 	 */
+	@HasPermission(Permission.AssetImport)
 	def invokeAssetImportReview() {
 		String methodName = 'invokeAssetReviewProcess()'
 		Map results = [info:'', hasPerm:false]
@@ -50,7 +54,7 @@ class ImportController implements ControllerMethods {
 		while (true) {
 			try {
 				Project project = controllerService.getProjectForPage(this)
-				if (!project || !controllerService.checkPermission(this, 'Import')) {
+				if (!project || !controllerService.checkPermission(this, Permission.AssetImport)) {
 					errorMsg = flash.message
 					flash.message = null
 					break
@@ -135,6 +139,7 @@ class ImportController implements ControllerMethods {
 	 * @param params.id - the DataTransferBatch id to be processed
 	 * @return A JSON object with various data attributes in it
 	 */
+	@HasPermission(Permission.AssetImport)
 	def invokeAssetImportProcess() {
 		String errorMsg
 		String progressKey
@@ -146,7 +151,7 @@ class ImportController implements ControllerMethods {
 		while (true) {
 			try {
 				Project project = controllerService.getProjectForPage(this)
-				if (!project || !controllerService.checkPermission(this, 'Import')) {
+				if (!project || !controllerService.checkPermission(this, Permission.AssetImport)) {
 					errorMsg = flash.message
 					flash.message = null
 					break
@@ -237,6 +242,7 @@ class ImportController implements ControllerMethods {
 	 * @param params.id - the id number of the batch
 	 * @return The standard ServiceResults object with the value in var results (JSON)
 	 */
+	@HasPermission(Permission.AssetImport)
 	def importResults() {
 		String errorMsg
 		Map results = [:]
@@ -244,7 +250,7 @@ class ImportController implements ControllerMethods {
 		while (true) {
 			try {
 				Project project = controllerService.getProjectForPage(this)
-				if (!project || !controllerService.checkPermission(this, 'Import')) {
+				if (!project || !controllerService.checkPermission(this, Permission.AssetImport)) {
 					errorMsg = flash.message
 					flash.message = null
 					break

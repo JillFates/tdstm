@@ -14,6 +14,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.RackService
@@ -37,7 +38,7 @@ class RoomController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 
-	@HasPermission('RackMenuView')
+	@HasPermission(Permission.RackMenuView)
 	def list() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -77,10 +78,12 @@ class RoomController implements ControllerMethods {
 		return model
 	}
 
+	@HasPermission(Permission.RoomCreate)
 	def create() {
 		[roomInstance: new Room(params)]
 	}
 
+	@HasPermission(Permission.RoomCreate)
 	def save() {
 		Room room = new Room(params)
 		if (room.save(flush: true)) {
@@ -97,6 +100,7 @@ class RoomController implements ControllerMethods {
 		redirect(action: "list", params: [viewType: "list"])
 	}
 
+	@HasPermission(Permission.RoomView)
 	def show() {
 
 		session.removeAttribute("RACK_ID")
@@ -172,6 +176,7 @@ class RoomController implements ControllerMethods {
 		 browserTestiPad: browserTestiPad, statusList: statusList, bundleList: bundleLists, moveBundleId: moveBundleId]
 	}
 
+	@HasPermission(Permission.RoomEdit)
 	def edit() {
 		Room room = Room.get(params.id)
 		if (!room) {
@@ -198,6 +203,7 @@ class RoomController implements ControllerMethods {
 	 * @param id:Rack id
 	 * @return room layout
 	 */
+	@HasPermission(Permission.RoomEdit)
 	def roomObject() {
 		def rack = Rack.get(params.id) ?: new Rack()
 		render(template: "roomObject", model: [rack: rack, rackId: params.id])
@@ -206,6 +212,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Update Room and Rack information
 	 */
+	@HasPermission(Permission.RoomEdit)
 	def update() {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
@@ -235,6 +242,7 @@ class RoomController implements ControllerMethods {
 	 * Used to delete one or more rooms that do not have associated assets assigned to the room
 	 * @param checkbox_{roomId}
 	 */
+	@HasPermission(Permission.RoomDelete)
 	def delete() {
 		Project project = securityService.userCurrentProject
 		def roomIds = []
@@ -267,6 +275,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Verify if rack has associated with any assets before deleting it.
 	 */
+	@HasPermission(Permission.RoomEdit)
 	def verifyRackAssociatedRecords() {
 		AssetEntity assetEntity
 		Rack rack = Rack.get(params.rackId)
@@ -284,6 +293,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Verify if Room has associated with any assets before deleting it.
 	 */
+	@HasPermission(Permission.RoomEdit)
 	def verifyRoomAssociatedRecords() {
 		Room room = Room.get(params.roomId)
 		def associatedRecords
@@ -302,6 +312,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 * Merge Racks and delete the selected Room and Racks
 	 */
+	@HasPermission(Permission.RoomMerge)
 	def mergeRoom() {
 		def sourceRoomId = params.sourceRoom
 		def targetRoomId = params.targetRoom
@@ -335,6 +346,7 @@ class RoomController implements ControllerMethods {
 		      roomTarget: targetRoom.id, sourceRoomId: sourceRoom.id])
 	}
 
+	@HasPermission(Permission.RoomMerge)
 	def updateRackToMergeRooms(sourceRoom,targetRoom) {
 		def sourceRoomRacks = Rack.findAllByRoom(sourceRoom)
 		sourceRoomRacks.each { sourceRack ->
@@ -356,6 +368,7 @@ class RoomController implements ControllerMethods {
 	/**
 	 *  Return Power details as string to show at room layout.
 	 */
+	@HasPermission(Permission.RoomView)
 	def retrieveRackPowerData() {
 		def room = Room.read(params.roomId)
 		def racks = Rack.findAllByRoom(room)
@@ -370,7 +383,7 @@ class RoomController implements ControllerMethods {
 		if (bundleIds && !bundleIds.contains("all") && params.otherBundle != "on") {
 			moveBundles = MoveBundle.getAll(bundleId*.toLong()).findAll()
 		}
-
+		
 		racks.each { obj ->
 			totalPower += obj.powerA + obj.powerB + obj.powerC
 			totalSpace += obj.rackType == 'Rack' ? (obj.model?.usize ?: 42) : 0
@@ -390,12 +403,12 @@ class RoomController implements ControllerMethods {
 				}
 			}
 		}
-
+		
 		if (params.capacityType != "Used") {
 			spaceUsed = totalSpace - spaceUsed
 			powerUsed = totalPower - powerUsed
 		}
-
+		
 		powerUsed = convertPower(powerUsed, powerType)
 		totalPower = convertPower(totalPower, powerType)
 		def powerA = 0
@@ -419,119 +432,120 @@ class RoomController implements ControllerMethods {
 				assets = AssetEntity.findAllByRackTarget(rack)
 			}
 			int thisRackTotalSpace = rack.model?.usize ?: 42
-
-		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort: 'sourceRackPosition']) :
+			
+			def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack, [sort: 'sourceRackPosition']) :
 			                                          AssetEntity.findAllByRackTarget(rack, [sort: 'targetRackPosition'])
-		   def assetPos = 0
-		   def prevUsize = 0
-		   assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
-			   // Calculating current assets's position .
-			   def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
-			   thisRackUsedSpace += posResult.assetUsize
-
-			   // Assigning rack position to keep track on upcoming asset's position in loop .
-			   assetPos = posResult.assetUsize > 0 ? posResult.currAssetPos : assetPos
-			   prevUsize = posResult.thisUsize > 0 ? posResult.thisUsize : prevUsize
-		   }
-		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace - thisRackUsedSpace) +
-		   	" remaining of " + thisRackTotalSpace + " RU" :
-		   	thisRackUsedSpace + " used of " + thisRackTotalSpace + " RU"
-		   assets.each { asset->
-			   def assetPowerCabling = AssetCableMap.executeQuery(
-			   	'FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ?',["Power",asset])
-			   def powerConnectors = assetPowerCabling.size()
-			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
-
-			   def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
-			   totalPowerInRack = powerDesign + totalPowerInRack
-			   assetPowerCabling.each {
-				   if (it.toPower==null) {
-					   unassignedPowerInRack = powerDesign/powerConnectors + unassignedPowerInRack
+			def assetPos = 0
+			def prevUsize = 0
+			assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
+				// Calculating current assets's position .
+				def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
+				thisRackUsedSpace += posResult.assetUsize
+				
+				// Assigning rack position to keep track on upcoming asset's position in loop .
+				assetPos = posResult.assetUsize > 0 ? posResult.currAssetPos : assetPos
+				prevUsize = posResult.thisUsize > 0 ? posResult.thisUsize : prevUsize
+			}
+			spaceString = params.capacityType != "Used" ? (thisRackTotalSpace - thisRackUsedSpace) +
+				" remaining of " + thisRackTotalSpace + " RU" :
+				thisRackUsedSpace + " used of " + thisRackTotalSpace + " RU"
+			assets.each { asset->
+				def assetPowerCabling = AssetCableMap.executeQuery(
+					'FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ?',["Power",asset])
+				def powerConnectors = assetPowerCabling.size()
+				def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
+				
+				def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
+				totalPowerInRack = powerDesign + totalPowerInRack
+				assetPowerCabling.each {
+					if (it.toPower==null) {
+						unassignedPowerInRack = powerDesign/powerConnectors + unassignedPowerInRack
 					}
 				}
-			   if (powerConnectorsAssigned) {
-				   def powerUseForConnector = powerDesign ? (powerDesign / powerConnectors) : 0
-				   assetPowerCabling.each { cables ->
-					   if (cables.toPower) {
-						   switch(cables.toPower) {
-							   case "A": powerA += powerUseForConnector; break
-							   case "B": powerB += powerUseForConnector; break
-							   case "C": powerC += powerUseForConnector; break
-						   }
-					   }
-				   }
-			  }
-					powerX = unassignedPowerInRack
-		   }
-
+				if (powerConnectorsAssigned) {
+					def powerUseForConnector = powerDesign ? (powerDesign / powerConnectors) : 0
+					assetPowerCabling.each { cables ->
+						if (cables.toPower) {
+							switch(cables.toPower) {
+								case "A": powerA += powerUseForConnector; break
+								case "B": powerB += powerUseForConnector; break
+								case "C": powerC += powerUseForConnector; break
+							}
+						}
+					}
+				}
+				powerX = unassignedPowerInRack
+			}
+			
 			powerA = convertPower(powerA, powerType)
 			powerB = convertPower(powerB, powerType)
 			powerC = convertPower(powerC, powerType)
 			powerX = convertPower(powerX, powerType)
-
+			
 			rackPowerA = convertPower(rack.powerA, powerType)
 			rackPowerB = convertPower(rack.powerB, powerType)
 			rackPowerC = convertPower(rack.powerC, powerType)
-	   }
-
-	   def redTBD = false
-	   if ((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC)) {
-		   redTBD = true
-	   }
-	   def op="""<table style='width:300px;padding:0px;border:0px;'>
-		   <tr>
+		}
+		
+		def redTBD = false
+		if ((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC)) {
+			redTBD = true
+		}
+		def op="""<table style='width:300px;padding:0px;border:0px;'>
+			<tr>
 				<td class='powertable_H'>Room <br />Totals: </td>
 				<td colspan=2 class='powertable_H' >Space: (RU)<br />$spaceUsed / $totalSpace</td>
 				<td colspan=2 class='powertable_H' >Power ($powerString):<br />$powerUsed / $totalPower</td>
-		   </tr>
-		   <tr><td class='powertable_L'>&nbsp;</td></tr>"""
-	   if (rack) {
-		   op += """
-				   <tr>
+			</tr>
+			<tr><td class='powertable_L'>&nbsp;</td></tr>"""
+		if (rack) {
+			op += """
+					<tr>
 						<td colspan=2 class='powertable_L'><b>Rack : ${rack?.tag ?:""}</b></td>
 						<td colspan=3 class='powertable_L' nowrap>$spaceString</td>
-				   </tr>
-				   <tr>
-					   <td class='powertable_L'>Power ($powerString)</td>
-					   <td style='background:${powerA > rackPowerA ? 'red' : ''};' class='powertable_R'>A</td>
-					   <td style='background:${powerB > rackPowerB ? 'red' : ''};' class='powertable_R'>B</td>
-					   <td style='background:${powerC > rackPowerC ? 'red' : ''};' class='powertable_R'>C</td>
-					   <td style='background:${redTBD ? 'red':''};' class='powertable_R'>TBD</td>
-				   </tr>
-				   <tr>
-					   <td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>$rackPowerA</td>
-					   <td class='powertable_R'>$rackPowerB</td><td class='powertable_R'>$rackPowerC</td>
-					   <td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td>
-					   <td class='powertable_R'>$powerA</td><td class='powertable_R'>$powerB</td><td class='powertable_R'>$powerC</td>
-					   <td class='powertable_R'>$powerX</td>
-				   </tr></table>"""
-	   } else {
+					</tr>
+					<tr>
+						<td class='powertable_L'>Power ($powerString)</td>
+						<td style='background:${powerA > rackPowerA ? 'red' : ''};' class='powertable_R'>A</td>
+						<td style='background:${powerB > rackPowerB ? 'red' : ''};' class='powertable_R'>B</td>
+						<td style='background:${powerC > rackPowerC ? 'red' : ''};' class='powertable_R'>C</td>
+						<td style='background:${redTBD ? 'red':''};' class='powertable_R'>TBD</td>
+					</tr>
+					<tr>
+						<td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>$rackPowerA</td>
+						<td class='powertable_R'>$rackPowerB</td><td class='powertable_R'>$rackPowerC</td>
+						<td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td>
+						<td class='powertable_R'>$powerA</td><td class='powertable_R'>$powerB</td><td class='powertable_R'>$powerC</td>
+						<td class='powertable_R'>$powerX</td>
+					</tr></table>"""
+		} else {
 			op += "</table>"
-	   }
-
+		}
+		
 		render  op
-   }
-
-   /**
+	}
+	
+	/**
 	 *  Return assets list as html row format to assign racks
 	 */
-   def retrieveAssetsListToAddRack() {
-	   def order = params.order ?: 'asc'
-	   Project project = securityService.userCurrentProject
-	   def source = params.source
-	   def sort = params.sort ?: 'assetName'
-	   def assign = params.assign
-	   def excludeAssetType = ['Blade', 'Application', 'Database', 'Files', 'VM', 'Virtual', 'Virtual Machine']
-	   def query = "from AssetEntity where project =:project and assetType not in (:excludeAssetType) and assetClass =:assetClass "
-	   if (assign != 'all') {
-		   query += ' and (rack' + (source == '1' ? 'Source' : 'Target') + ') is null'
-	   }
-	   order = order == 'asc' ? 'desc' : 'asc'
-	   query += " order by $sort $order"
-	   def entities = AssetEntity.findAll(query,[project:project, excludeAssetType:excludeAssetType, assetClass: AssetClass.DEVICE ])
-
-	   def html = new StringBuffer()
-	   html.append("""
+	@HasPermission(Permission.RoomView)
+	def retrieveAssetsListToAddRack() {
+		def order = params.order ?: 'asc'
+		Project project = securityService.userCurrentProject
+		def source = params.source
+		def sort = params.sort ?: 'assetName'
+		def assign = params.assign
+		def excludeAssetType = ['Blade', 'Application', 'Database', 'Files', 'VM', 'Virtual', 'Virtual Machine']
+		def query = "from AssetEntity where project =:project and assetType not in (:excludeAssetType) and assetClass =:assetClass "
+		if (assign != 'all') {
+			query += ' and (rack' + (source == '1' ? 'Source' : 'Target') + ') is null'
+		}
+		order = order == 'asc' ? 'desc' : 'asc'
+		query += " order by $sort $order"
+		def entities = AssetEntity.findAll(query,[project:project, excludeAssetType:excludeAssetType, assetClass: AssetClass.DEVICE ])
+		
+		def html = new StringBuffer()
+		html.append("""
 			<div class="dialog" >
 			<table id="listDiv">
 			<thead>
@@ -543,63 +557,66 @@ class RoomController implements ControllerMethods {
 			</thead>
 			<tbody class="tbody" >
 			""")
-	   if (entities) {
-		   entities.eachWithIndex{ obj, i ->
-			   html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('$obj.assetClass',$obj.id,'$source','$params.rack','$params.roomName','$params.location','$params.position');closeAssignAssetListDialog();">
+		if (entities) {
+			entities.eachWithIndex{ obj, i ->
+				html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('$obj.assetClass',$obj.id,'$source','$params.rack','$params.roomName','$params.location','$params.position');closeAssignAssetListDialog();">
 					<td>$obj.assetName</td>
 					<td>$obj.assetTag</td>
 					<td>${obj.model ? obj.model.modelName : ''}</td>
 				</tr>""")
-		   }
-	   } else {
+			}
+		} else {
 			html.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
-	   }
-	   html.append("</tbody></table></div>")
-
-	   render html.toString()
-   }
-
-   /**
+		}
+		html.append("</tbody></table></div>")
+		
+		render html.toString()
+	}
+	
+	/**
 	 *  Return blades list as html row format to assign blade chassis
 	 */
-   def retrieveBladeAssetsListToAddRack() {
-	   def source = params.source
-
+	@HasPermission(Permission.RoomView)
+	def retrieveBladeAssetsListToAddRack() {
+		def source = params.source
+		
 		String middle = ''
-	   if (params.assign == 'assign') {
-	   	middle = (source == '1' ? 'source' : 'target') + 'Chassis is null and '
-	   }
+		if (params.assign == 'assign') {
+			middle = (source == '1' ? 'source' : 'target') + 'Chassis is null and '
+		}
 		String hql = 'from AssetEntity where ' + middle + "project=:projectId and assetType = 'Blade'"
-	   List<AssetEntity> entities = AssetEntity.executeQuery(hql, [projectId: securityService.userCurrentProjectId])
-
-	   def html = new StringBuffer()
-
-	   def bladeAsset = AssetEntity.get(params.blade)
-	   def bladeAssetId = bladeAsset?.id
-	   def bundleId = bladeAsset?.moveBundleId
+		List<AssetEntity> entities = AssetEntity.executeQuery(hql, [projectId: securityService.userCurrentProjectId])
+		
+		def html = new StringBuffer()
+		
+		def bladeAsset = AssetEntity.get(params.blade)
+		def bladeAssetId = bladeAsset?.id
+		def bundleId = bladeAsset?.moveBundleId
 		html.append("""
 			<div class="dialog" >
 			<table id="listDiv">
 			<tbody class="tbody" >
 			""")
-	   if (entities) {
-		   entities.eachWithIndex{ obj, i ->
-			   html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="editBladeDialog('$obj.assetClass',$obj.id,'$source','$bladeAssetId','$params.roomName','$params.location','$params.position')">
+		if (entities) {
+			entities.eachWithIndex{ obj, i ->
+				html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="editBladeDialog('$obj.assetClass',$obj.id,'$source','$bladeAssetId','$params.roomName','$params.location','$params.position')">
 											<td>$obj.assetName</td>
 											<td>$obj.assetTag</td>
 											<td>${obj.model ? obj.model.modelName : ''}</td>
 										</tr>""")
-		   }
-	   } else {
-		   html.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
-	   }
-	   html.append("</tbody></table></div>")
-
-	   render html.toString()
-   }
+			}
+		} else {
+			html.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
+		}
+		html.append("</tbody></table></div>")
+		
+		render html.toString()
+	}
+	
 	/**
 	 * Room Capacity Scaling
 	 */
+	@HasPermission(Permission.RoomView)
 	def retrieveCapacityView() {
 		def capacityData = [:]
 		def room = Room.read(params.roomId)
@@ -796,6 +813,7 @@ class RoomController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RoomEdit)
 	def setDraggableRackPref() {
 		userPreferenceService.setPreference(PREF.DRAGGABLE_RACK, params.prefVal)
 		render 'success'
@@ -813,7 +831,7 @@ class RoomController implements ControllerMethods {
 		                       AssetEntity.findAllByTargetRackPositionAndRackTarget(assetEntity.targetRackPosition, rack)
 	}
 
-   /**
+	/**
 	 * Get information of assets and there relevant pos., and usize to count rack used count .
 	 * @param assetEntity : instance of assetEntity .
 	 * @param assetPos : previous asset rack position .

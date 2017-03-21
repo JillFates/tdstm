@@ -7,6 +7,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.SpringSecurityService
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.codehaus.groovy.grails.plugins.testing.AbstractGrailsMockHttpServletResponse
@@ -27,8 +28,14 @@ abstract class AbstractUnitSpec extends Specification {
 
 	// TODO populate the test db with real data
 	protected static final List<String> ROLE_USER_PERMISSIONS = [
-			'ArchitectureView', 'AssetMenuView', 'AssetTrackerMenuView', 'DashBoardMenuView',
-			'ProjectStaffList', 'ProjectStaffShow', 'RackMenuView', 'ViewTaskGraph']
+		Permission.ArchitectureView,
+		Permission.AssetMenuView,
+		Permission.AssetTrackerMenuView,
+		Permission.DashBoardMenuView,
+		Permission.ProjectStaffList,
+		Permission.ProjectStaffShow,
+		Permission.RackMenuView,
+		Permission.TaskGraphView ]
 
 	void setup() {
 		// it's assumed here that the test class is annotated with @TestFor or mixes in
@@ -99,8 +106,9 @@ abstract class AbstractUnitSpec extends Specification {
 		}
 
 		List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority('USER'))
+		// Setup a user with a set of Permissions
 		TdsUserDetails principal = new TdsUserDetails(USERNAME, 'password', true, true, true, true,
-				authorities, userLogin.id, userLogin.personId, 'salt', ROLE_USER_PERMISSIONS)
+			authorities, userLogin.id, userLogin.personId, 'salt', ROLE_USER_PERMISSIONS)
 		SecurityContextHolder.context.authentication = new TestingAuthenticationToken(principal, null, authorities)
 
 		userLogin

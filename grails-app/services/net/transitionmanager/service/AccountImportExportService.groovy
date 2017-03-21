@@ -17,6 +17,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import org.apache.commons.lang.RandomStringUtils as RSU
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.ss.usermodel.Workbook
@@ -306,7 +307,7 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param filename - the name of the file that the download should have for the mime-type
 	 */
 	void generateImportTemplateToBrowser(response, Project project, String filename) {
-		securityService.requirePermission('PersonExport', true)
+		securityService.requirePermission(Permission.PersonExport, true)
 
 		Workbook workbook = getAccountExportTemplate()
 		Map sheetOptions = getUserPreferences()
@@ -321,12 +322,12 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param response - the HttpResponse object to write the spreadsheet to
 	 * @param project - the user's current project
 	 * @param formOptions - the params values used by the request
-	 * @permission PersonExport, EditUserLogin
+	 * @permission PersonExport, UserEdit
 	 */
 	void generateAccountsExportToBrowser(response, Project project, Map formOptions) {
-		securityService.requirePermission('PersonExport', true)
+		securityService.requirePermission(Permission.PersonExport, true)
 		if (shouldUpdateUserLogin(formOptions)) {
-			securityService.requirePermission('ExportUserLogin', true)
+			securityService.requirePermission(Permission.UserExport, true)
 		}
 
 		int loginChoice = NumberUtil.toPositiveLong(formOptions.loginChoice, -1)
@@ -362,10 +363,10 @@ class AccountImportExportService implements ServiceMethods {
 	 */
 	Map processFileUpload(request, Project project, Map formOptions) {
 		if (formOptions.flagToUpdatePerson) {
-			securityService.requirePermission('PersonImport', true)
+			securityService.requirePermission(Permission.PersonImport, true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission(Permission.UserImport, true)
 		}
 
 		Map model = [:]
@@ -421,9 +422,9 @@ class AccountImportExportService implements ServiceMethods {
 	 * @controllerMethod
 	 */
 	List generateReviewData(Project project, String filename, Map formOptions) {
-		securityService.requirePermission('PersonImport', true)
+		securityService.requirePermission(Permission.PersonImport, true)
 		if (shouldUpdateUserLogin(formOptions)) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission(Permission.UserImport, true)
 		}
 
 		// Load the spreadsheet
@@ -445,9 +446,9 @@ class AccountImportExportService implements ServiceMethods {
 	 * @return the spreadsheet file
 	 */
 	File generatePostResultsData(String filename, Map formOptions) {
-		securityService.requirePermission('PersonImport', true)
+		securityService.requirePermission(Permission.PersonImport, true)
 		if (shouldUpdateUserLogin(formOptions)) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission(Permission.UserImport, true)
 		}
 
 		File file = new File(getJsonFilename(filename))
@@ -473,10 +474,10 @@ class AccountImportExportService implements ServiceMethods {
 	 */
 	Map generateModelForReview(Project project, Map formOptions) {
 		if (formOptions.flagToUpdatePerson) {
-			securityService.requirePermission('PersonImport', true)
+			securityService.requirePermission(Permission.PersonImport, true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission(Permission.UserImport, true)
 		}
 
 		Map model = [:]
@@ -526,10 +527,10 @@ class AccountImportExportService implements ServiceMethods {
 	 */
 	Map generateModelForPostResults(Project project, Map formOptions) {
 		if (formOptions.flagToUpdatePerson) {
-			securityService.requirePermission('PersonImport', true)
+			securityService.requirePermission(Permission.PersonImport, true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission(Permission.UserImport, true)
 		}
 
 		Map model = [:]
@@ -561,10 +562,10 @@ class AccountImportExportService implements ServiceMethods {
 	@Transactional
 	Map postChangesToAccounts(Project project, Object formOptions) {
 		if (formOptions.flagToUpdatePerson) {
-			securityService.requirePermission('PersonImport', true)
+			securityService.requirePermission(Permission.PersonImport, true)
 		}
 		if (formOptions.flagToUpdateUserLogin) {
-			securityService.requirePermission('ImportUserLogin', true)
+			securityService.requirePermission(Permission.UserImport, true)
 		}
 
 		Workbook workbook = readImportSpreadsheet(formOptions.filename)
@@ -774,7 +775,7 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param params - the parameters from the HttpRequest
 	 */
 	void cancelPreviousUpload(Project project, Map formOptions) {
-		securityService.requirePermission(['PersonImport', 'ImportUserLogin'], false,
+		securityService.requirePermission([Permission.PersonImport, Permission.UserImport], false,
 			"attempted to cancel an account import for project $project")
 
 		deleteUploadedSpreadsheet(formOptions.filename)
@@ -785,7 +786,7 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param formOptions - the params which will include the filename
 	 */
 	void deletePreviousUpload(Map formOptions) {
-		securityService.requirePermission(['PersonImport', 'ImportUserLogin'], false,
+		securityService.requirePermission([Permission.PersonImport, Permission.UserImport], false,
 			"attempted to delete an uploaded account import spreadsheet($formOptions.filename)")
 
 		deleteUploadedSpreadsheet(formOptions.filename)
@@ -1584,8 +1585,10 @@ class AccountImportExportService implements ServiceMethods {
 	 * @param formOptions - a map of options from the user input fomr
 	 * @param sheetInfoOpts - a map of options used in formating dates in the sheet
 	 */
-	private void populateAccountSpreadsheet(Project project, List persons, Workbook workbook,
-	                                        Map formOptions, Map<String, Object> sheetInfoOpts) {
+	private void populateAccountSpreadsheet(
+		Project project, List persons, Workbook workbook,
+		Map formOptions,
+		Map<String, Object> sheetInfoOpts ) {
 
 		List elapsedNow = [new Date()]
 
@@ -2615,7 +2618,7 @@ class AccountImportExportService implements ServiceMethods {
 		panicButton ''	// Initialize the map without an error message
 
 		List remainingCodes = []
-		
+
 		def person = securityService.userLogin.person
 
 		List authorizedRoleCodes = securityService.getAssignableRoleCodes(person)

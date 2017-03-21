@@ -21,6 +21,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException
@@ -57,7 +58,7 @@ class PersonController implements ControllerMethods {
 	 * @param id - company id
 	 * @param companyName - optional search by name or 'ALL'
 	 */
-	@HasPermission('PersonListView')
+	@HasPermission(Permission.PersonStaffList)
 	def list() {
 
 		def listJsonUrl
@@ -87,7 +88,7 @@ class PersonController implements ControllerMethods {
 		 listJsonUrl: listJsonUrl, availabaleRoles: partyRelationshipService.getStaffingRoles(false)]
 	}
 
-	@HasPermission('PersonListView')
+	@HasPermission(Permission.PersonStaffList)
 	def listJson() {
 
 		String sortIndex = params.sidx ?: 'lastname'
@@ -161,8 +162,8 @@ class PersonController implements ControllerMethods {
 
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the
 		// only simple way to have the links work correctly
-		boolean canCreate = securityService.hasPermission('CreateUserLogin')
-		boolean canEdit = securityService.hasPermission('EditUserLogin')
+		boolean canCreate = securityService.hasPermission(Permission.UserCreate)
+		boolean canEdit = securityService.hasPermission(Permission.UserEdit)
 		String userLoginCreateLink = createLink(controller: 'userLogin', action: 'create')
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
 		String userAddPng = resource(dir: 'icons', file: 'user_add.png', absolute: false)
@@ -178,23 +179,29 @@ class PersonController implements ControllerMethods {
 	/**
 	 * Creates an anchor for specific user based on user permission
 	 *
-	 * @param haveCreateUserLoginPerm  if the user has CreateUserLoginPerm
-	 * @param haveEditUserLoginPerm  if the user has EditUserLoginPerm
+	 * @param haveUserCreatePerm  if the user has UserCreatePerm
+	 * @param haveUserEditPerm  if the user has UserEditPerm
 	 * @param createUrl  url used to create a new login for the current person
 	 * @param editUrl url used to edit login configuration for the current person
 	 * @param personData person data from the database query
 	 */
-	private String genCreateEditLink(boolean haveCreateUserLoginPerm, boolean haveEditUserLoginPerm, String createUrl,
-	                                 String editUrl, String addUserIconUrl, Map personData) {
+	private String genCreateEditLink(
+		boolean haveUserCreatePerm,
+		boolean haveUserEditPerm,
+		String createUrl,
+		String editUrl,
+		String addUserIconUrl,
+		Map personData) {
+
 		String element
 		if (personData.userLoginId) {
-			if (haveEditUserLoginPerm) {
+			if (haveUserEditPerm) {
 				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + personData.userLogin + '</a>'
 			} else {
 				element = personData.userLogin
 			}
 		} else {
-			if (haveCreateUserLoginPerm) {
+			if (haveUserCreatePerm) {
 				element = '<a href="' + createUrl + '/' + personData.personId + '"><img src="' + addUserIconUrl + '" /> Create User</a>'
 			} else {
 				element = ''
@@ -207,6 +214,7 @@ class PersonController implements ControllerMethods {
 	 * Bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
 	 * @param ids[] - a list of person ids to be deleted
 	 */
+	@HasPermission(Permission.PersonDelete)
 	def bulkDelete() {
 		def ids = params.get("ids[]")
 		if (!ids) {
@@ -218,7 +226,7 @@ class PersonController implements ControllerMethods {
 
 		try {
 			Person byWhom = securityService.getUserLoginPerson()
-			controllerService.checkPermissionForWS('BulkDeletePerson')
+			controllerService.checkPermissionForWS(Permission.PersonBulkDelete)
 
 			boolean deleteIfAssocWithAssets = (params.deleteIfAssocWithAssets == 'true')
 			Map results = personService.bulkDelete(byWhom, idsToDelete, deleteIfAssocWithAssets)
@@ -232,7 +240,7 @@ class PersonController implements ControllerMethods {
 	/**
 	 * Note: No reference found to this method
 	 */
-	@HasPermission('PersonEditView')
+	@HasPermission(Permission.PersonView)
 	def show() {
 		Person person = Person.get(params.id)
 		def companyId = params.companyId
@@ -247,7 +255,7 @@ class PersonController implements ControllerMethods {
 	/**
 	 * Note: No reference found to this method
 	 */
-	@HasPermission('PersonDeleteView')
+	@HasPermission(Permission.PersonDelete)
 	def delete() {
 		Person person = Person.get(params.id)
 
@@ -275,7 +283,7 @@ class PersonController implements ControllerMethods {
 	 * return person details to EDIT form
 	 * Note: No reference found to this method
 	 */
-	@HasPermission('PersonEditView')
+	@HasPermission(Permission.PersonEdit)
 	def edit() {
 		Person person = Person.get(params.id)
 		def companyId = params.companyId
@@ -291,7 +299,7 @@ class PersonController implements ControllerMethods {
 	 * Used to update the Person domain objects
 	 * Note: No reference found to this method
 	 */
-	@HasPermission('PersonEditView')
+	@HasPermission(Permission.PersonEdit)
 	def update() {
 		def person = Person.get(params.id)
 
@@ -326,7 +334,7 @@ class PersonController implements ControllerMethods {
 	 * Used to save a new Person domain object
 	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
 	 */
-	@HasPermission('PersonCreateView')
+	@HasPermission(Permission.PersonCreate)
 	def save() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -378,7 +386,7 @@ class PersonController implements ControllerMethods {
 	 *  Remote method to edit Staff Details
 	 *  Note: No reference found to this method
 	 */
-	@HasPermission('PersonEditView')
+	@HasPermission(Permission.PersonEdit)
 	def editShow(String companyId) {
 		Person person = Person.get(params.id)
 		if (!person) {
@@ -398,7 +406,7 @@ class PersonController implements ControllerMethods {
 	 *  Remote method to edit Staff Details
 	 *  Note: Used only in projectStaff.gsp
 	 */
-	@HasPermission('EditProjectStaff')
+	@HasPermission(Permission.ProjectStaffEdit)
 	def editStaff() {
 		Person person = Person.read(params.id)
 		def role = params.role
@@ -419,7 +427,7 @@ class PersonController implements ControllerMethods {
 	 *  Remote method to update Staff Details
 	 *  Note: Used only in projectStaff.gsp
 	 */
-	@HasPermission('EditProjectStaff')
+	@HasPermission(Permission.ProjectStaffEdit)
 	def updateStaff() {
 		Person person = Person.get(params.id)
 		def projectId = securityService.userCurrentProjectId
@@ -457,7 +465,7 @@ class PersonController implements ControllerMethods {
 	 *  Return Project Staff
 	 *  Note: there is no direct call to this method
 	 */
-	@HasPermission('ProjectStaffList')
+	@HasPermission(Permission.ProjectStaffList)
 	def projectStaff() {
 		def projectId = securityService.userCurrentProjectId
 		def submit = params.submit
@@ -465,13 +473,13 @@ class PersonController implements ControllerMethods {
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff(projectId,'')
 		def projectCompanies = partyRelationshipService.getProjectCompanies(projectId)
 		[projectStaff: projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies,
-		 projectId: projectId, submit: submit, personHasPermission: securityService.hasPermission("AddPerson")]
+		 projectId: projectId, submit: submit, personHasPermission: securityService.hasPermission(Permission.AddPerson)]
 	}
 
 	/*
 	 * Method to add Staff to project through Ajax Overlay
 	 */
-	@HasPermission('EditProjectStaff')
+	@HasPermission(Permission.ProjectStaffEdit)
 	def saveProjectStaff() {
 		def flag = false
 		def message = ''
@@ -488,7 +496,7 @@ class PersonController implements ControllerMethods {
 						"delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",
 						[moveEvents:moveEvents, person:personParty,role:RoleType.load(roleType)])
 			} else if (personService.hasAccessToProject(personParty, project) ||
-				        (!(partyRelationshipService.isTdsEmployee(personId) && !securityService.hasPermission("EditTDSPerson")))) {
+				        (!(partyRelationshipService.isTdsEmployee(personId) && !securityService.hasPermission(Permission.PersonEditTDS)))) {
 				partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", personParty, roleType)
 			}else{
 				message = "This person doesn't have access to the selected project"
@@ -508,7 +516,7 @@ class PersonController implements ControllerMethods {
 	 * Method to save person details and create party relation with Project as well
 	 * Note: Used only in projectStaff.gsp
 	 */
-	@HasPermission('PersonCreateView')
+	@HasPermission(Permission.PersonCreate)
 	def savePerson() {
 		Person person = new Person(params)
 		if (person.lastName == null) {
@@ -542,6 +550,7 @@ class PersonController implements ControllerMethods {
 	 * @param  : person details and user password
 	 * @return : person firstname
 	 */
+	@HasPermission(Permission.PersonEdit)
 	def updatePerson() {
 		try {
 			String tzId = userPreferenceService.timeZone
@@ -566,6 +575,7 @@ class PersonController implements ControllerMethods {
 	 * @param  params.id - the person id
 	 * @return person details as JSON
 	 */
+	@HasPermission(Permission.PersonView)
 	def retrievePersonDetails() {
 		try {
 			Person person = personService.validatePersonAccess(params.id)
@@ -584,6 +594,7 @@ class PersonController implements ControllerMethods {
 	 * @param  : person id and input password
 	 * @return : pass:"no" or the return of the update method
 	 */
+	@HasPermission(Permission.UserUpdateOwnAccount)
 	def updateAccount() {
 		String errMsg = ''
 		Map results = [:]
@@ -618,6 +629,7 @@ class PersonController implements ControllerMethods {
 	 * Used to clear out person's preferences. User can clear out own or requires permission
 	 */
 // TODO : JPM 8/31/2015 : Need to test
+	@HasPermission(Permission.UserGeneralAccess)
 	def resetPreferences() {
 		try {
 			Person person = personService.validatePersonAccess(params.user)
@@ -660,7 +672,7 @@ class PersonController implements ControllerMethods {
 	 * leverages the loadFilteredStaff method to populate list in an Ajax call
 	 * @return The HTML for the controls at the top of the form and the Javascript to load the data.
 	 */
-	@HasPermission('ProjectStaffList')
+	@HasPermission(Permission.ProjectStaffList)
 	def manageProjectStaff() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -679,7 +691,7 @@ class PersonController implements ControllerMethods {
 		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
 
 		[project: project, projects: projects, projectId: project.id, roleTypes: roleTypes,
-		 editPermission: securityService.hasPermission('EditProjectStaff'), assigned: assigned,
+		 editPermission: securityService.hasPermission(Permission.ProjectStaffEdit), assigned: assigned,
 		 onlyClientStaff: onlyClientStaff, currRole: currRole]
 	}
 
@@ -696,7 +708,7 @@ class PersonController implements ControllerMethods {
 	 * @param onlyClientStaff - flag if 1 indicates only include staff of the client, 0 indicates all available staff
 	 * @return HTML table of the data
 	 */
-	@HasPermission('ProjectStaffList')
+	@HasPermission(Permission.ProjectStaffList)
 	def loadFilteredStaff() {
 		//Date start = new Date()
 
@@ -917,7 +929,7 @@ class PersonController implements ControllerMethods {
 
 		render(template: "projectStaffTable",
 		       model: [staffList: staffList, moveEventList: retrieveBundleHeader(moveEvents), projectId: projectId,
-		               firstProp: params.firstProp, editPermission: securityService.hasPermission('EditProjectStaff'),
+		               firstProp: params.firstProp, editPermission: securityService.hasPermission(Permission.ProjectStaffEdit),
 		               project: project, sortOn: params.sortOn, orderBy: paramsMap.orderBy])
 	}
 
@@ -926,7 +938,7 @@ class PersonController implements ControllerMethods {
 	 *@param person Id is id of person
 	 *@return NA
 	 */
-	@HasPermission('ProjectStaffShow')
+	@HasPermission(Permission.ProjectStaffShow)
 	def loadGeneral() {
 		log.debug "loadGeneral() class: ${params.personId.getClass()} value: $params.personId"
 
@@ -949,6 +961,9 @@ class PersonController implements ControllerMethods {
 	 *@param moveEvents list of moveEvent for selected project
 	 *@return MAP of bundle header containing projectName ,event name, start time and event id
 	 */
+	@HasPermission(Permission.EventView)
+	@HasPermission(Permission.BundleView)
+	@HasPermission(Permission.PersonShowView)
 	private List<Map> retrieveBundleHeader(moveEvents) {
 		// TODO : JPM 5/2015 : Need to add security controls
 		Project project = securityService.userCurrentProject
@@ -978,6 +993,7 @@ class PersonController implements ControllerMethods {
 	 * @param id as composite id contains personId , MoveEventId and roleType id with separated of '-'
 	 * @return if updated successful return true else return false
 	 */
+	@HasPermission(Permission.ProjectStaffEdit)
 	def saveEventStaff() {
 		// Security is checked in the service method
 		try {
@@ -996,6 +1012,7 @@ class PersonController implements ControllerMethods {
 	 * @param prefCode : Preference Code that is requested for being deleted
 	 * @return : boolean
 	 */
+	@HasPermission(Permission.UserGeneralAccess)
 	def removeUserPreference() {
 		// TODO : JPM 5/2015 : Improve removeUserPreference - validate it was successful, return SecurityService.success
 		String prefCode = params.prefCode
@@ -1006,6 +1023,7 @@ class PersonController implements ControllerMethods {
 		render true
 	}
 
+	@HasPermission(Permission.UserGeneralAccess)
 	def savePreferences() {
 		// Checks that timezone is valid
 		def timezone = TimeZone.getTimeZone(params.timezone)
@@ -1024,6 +1042,7 @@ class PersonController implements ControllerMethods {
 	 *
 	 * @return : A Map containing key as preference code and value as map'svalue.
 	 */
+	@HasPermission(Permission.UserGeneralAccess)
 	def editPreference() {
 
 		def prefMap = [:]
@@ -1107,6 +1126,7 @@ class PersonController implements ControllerMethods {
 	 * @param N/A :
 	 * @return : A Map containing key as preference code and value as map'svalue.
 	 */
+	@HasPermission(Permission.UserUpdateOwnAccount)
 	def editTimezone () {
 		def currDateTimeFormat = userPreferenceService.dateFormat ?: TimeUtil.getDefaultFormatType()
 
@@ -1120,7 +1140,7 @@ class PersonController implements ControllerMethods {
 	 * @param : ids[] is array of 2 id which user want to compare or merge
 	 * @return : all column list , person list and userlogin list which we are display at client side
 	 */
-	@HasPermission('PersonEditView')
+	@HasPermission(Permission.PersonEdit)
 	def compareOrMerge() {
 
 		Map<Person, Long> personsMap = [:]
@@ -1171,7 +1191,7 @@ class PersonController implements ControllerMethods {
 	 * @param fromId is requested id of person which will be merged
 	 * @return The appropriate message after merging completed or error message
 	 */
-	@HasPermission('PersonEditView')
+	@HasPermission(Permission.PersonEdit)
 	def mergePerson(PersonCO cmdObj) {
 		String msg
 		UserLogin byWhom = securityService.getUserLogin()
@@ -1197,6 +1217,7 @@ class PersonController implements ControllerMethods {
 	 * @params params.personId
 	 * @return JSON response
 	 */
+	@HasPermission(Permission.ProjectStaffEdit)
 	def addProjectStaff() {
 		String userMsg
 		try {
@@ -1223,6 +1244,7 @@ class PersonController implements ControllerMethods {
 	 * @params params.personId
 	 * @return JSON response
 	 */
+	@HasPermission(Permission.ProjectStaffEdit)
 	def removeProjectStaff() {
 		String userMsg
 		try {
@@ -1249,6 +1271,7 @@ class PersonController implements ControllerMethods {
 	 * @params params.teamCode
 	 * @return JSON response
 	 */
+	@HasPermission(Permission.ProjectStaffEdit)
 	def addProjectTeam() {
 		String userMsg
 		try {
@@ -1275,6 +1298,7 @@ class PersonController implements ControllerMethods {
 	 * @params params.teamCode
 	 * @return JSON response
 	 */
+	@HasPermission(Permission.ProjectStaffEdit)
 	def removeProjectTeam() {
 		String userMsg
 		try {
@@ -1298,6 +1322,7 @@ class PersonController implements ControllerMethods {
 	 * Method to add Staff to project through Ajax Overlay
 	 * @
 	 */
+	@HasPermission(Permission.ProjectStaffEdit)
 	def addEventStaff() {
 		String userMsg
 		try {
@@ -1320,6 +1345,7 @@ class PersonController implements ControllerMethods {
 	 * Method to add Staff to project through Ajax Overlay
 	 * @
 	 */
+	@HasPermission(Permission.ProjectStaffEdit)
 	def removeEventStaff() {
 		String userMsg
 		try {

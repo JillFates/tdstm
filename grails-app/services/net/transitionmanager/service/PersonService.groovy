@@ -27,6 +27,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
@@ -631,8 +632,8 @@ class PersonService implements ServiceMethods {
 	}
 
 	/**
-	 * This method deletes a person and other entities
-	 * related to the instance, such as party and party role.
+	 * This method deletes a person and other entities related to the instance such as partyRelationships,
+	 * UserLogin, etc.  This version of the method is called from untrusted/non-validated consumers of the service.
 	 * @param byWhom - the User that invoked the deleting of the person
 	 * @param person - Person Instance to be deleted
 	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.
@@ -644,13 +645,54 @@ class PersonService implements ServiceMethods {
 	 *		deleted: a boolean indicating if the person was deleted
 	 */
 	@Transactional
-	Map deletePerson(Person byWhom, Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets){
+	Map deletePerson(Person byWhom, Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets) {
+		validatePersonAccess(person.id, byWhom)
+
+		return deletePersonSecure(person, deleteIfUserLogin, deleteIfAssocWithAssets)
+	}
+
+	/**
+	 * This method deletes a person and other entities related to the instance such as partyRelationships,
+	 * UserLogin, etc.  This version of the method is only for legacy migration scripts and should NOT be used
+	 * and will throw an exception if used in the context of a user.
+	 * @param person - Person Instance to be deleted
+	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.
+	 * @param deleteIfAssocWithAssets - boolean that indicates if a person with relationships with assets must
+	 * 		be deleted (see PERSON_DELETE_EXCEPTIONS_MAP)
+	 * @return A map containing the following:
+	 *		messages: String[] containing errors and other messages
+	 *		cleared: the number of assets cleared
+	 *		deleted: a boolean indicating if the person was deleted
+	 * @deprecated This method is only to support legacy migration scripts. Please see other deletePerson methods.
+	 */
+	@Deprecated
+	@Transactional
+	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets) {
+		if (securityService.isLoggedIn()) {
+			throw new UnauthorizedException('This deletePerson is not supported')
+		}
+		return deletePersonSecure(person, deleteIfUserLogin, deleteIfAssocWithAssets)
+	}
+
+
+	/**
+	 * This method deletes a person and other entities related to the instance such as partyRelationships,
+	 * UserLogin, etc.  This version of the method is called from trusted/validated consumers of the service.
+	 * @param person - Person Instance to be deleted
+	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.
+	 * @param deleteIfAssocWithAssets - boolean that indicates if a person with relationships with assets must
+	 * 		be deleted (see PERSON_DELETE_EXCEPTIONS_MAP)
+	 * @return A map containing the following:
+	 *		messages: String[] containing errors and other messages
+	 *		cleared: the number of assets cleared
+	 *		deleted: a boolean indicating if the person was deleted
+	 */
+	@Transactional
+	Map deletePersonSecure(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets){
 
 		int cleared = 0
 		boolean deleted = false
 		String messages = []
-
-		validatePersonAccess(person.id, byWhom)
 
 		UserLogin userLogin = person.userLogin
 
@@ -750,7 +792,6 @@ class PersonService implements ServiceMethods {
 					if (person) {
 						// Deletes the person and other related entities.
 						Map deleteResultMap = deletePerson(byWhom, person, true, deleteIfAssocWithAssets)
-log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 						// Updates variables that comput different results.
 						cleared += deleteResultMap.cleared
 						if (deleteResultMap.deleted) {
@@ -791,7 +832,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 	 */
 	@Transactional
 	String assignToProjectEvent(personId, eventId, teamCode, toAssign) {
-		securityService.requirePermission 'EditProjectStaff'
+		securityService.requirePermission Permission.ProjectStaffEdit
 
 		String message = ""
 
@@ -874,7 +915,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 	 * @return A map containing the looked up project, person, teamRoleType
 	 */
 	private Map validateUserCanEditStaffing(UserLogin user, projectId, personId, String teamCode) {
-			if (!securityService.hasPermission(user, 'EditProjectStaff')) {
+		if (!securityService.hasPermission(user, Permission.ProjectStaffEdit)) {
 			throw new UnauthorizedException("Do not have permission to edit staff")
 		}
 
@@ -952,7 +993,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		List currentUserProjects = getAvailableProjects(byWhom)*.id
 		List personProjects = getAvailableProjects(personToAccess)*.id
 
-		if (forEdit && !securityService.hasPermission('EditUserLogin')) {
+		if (forEdit && !securityService.hasPermission(Permission.UserEdit)) {
 			if (reportViolation) {
 				reportViolation("attempted to edit person $personToAccess ($personToAccess.id) without permission")
 			}
@@ -1470,7 +1511,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 	 * Used to determine if the person is associated with the project and therefore has access. Access is allowed
 	 * for the following scenarios:
 	 *    a) System User account(s) (e.g. Automatic User)
-	 *    b) Staff of the project owner with the 'ShowAllProjects' permission
+	 *    b) Staff of the project owner with the 'ProjectShowAll' permission
 	 *    c) Anybody assigned to the project regardless as to if the person is staff of the owner, client or partner of the project
 	 * @param person - the person to check
 	 * @param project - the project to see if person has access to
@@ -1483,7 +1524,7 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		} else {
 			UserLogin user = person.userLogin
 			if (user) {
-				boolean hasShowAllProj = securityService.hasPermission(user, 'ShowAllProjects')
+				boolean hasShowAllProj = securityService.hasPermission(user, Permission.ProjectShowAll)
 				if (hasShowAllProj && (person.company.id == project.owner.id || person.company.id == project.client.id)) {
 					hasAccess = true
 				} else if (hasShowAllProj) {
@@ -1543,10 +1584,10 @@ log.debug "bulkDelete() deleting $person, deleteResultMap=$deleteResultMap"
 		// If not edit own account, the user must have privilege to edit the account
 		boolean editSelf = NumberUtil.toLong(personId) == byWhom.id
 		if (!editSelf) {
-			if (! securityService.hasPermission(byWhom.userLogin, 'PersonEditView', true)) {
+			if (! securityService.hasPermission(byWhom.userLogin, Permission.PersonEdit, true)) {
 				throw new EmptyResultException('You do not have access to referenced person')
 			}
-			//securityService.requirePermission('PersonEditView', false,
+			// securityService.requirePermission(Permission.PersonEdit', false,
 			//	"$securityService.currentUsername attempted to edit Person($personId) without necessary permission")
 		}
 

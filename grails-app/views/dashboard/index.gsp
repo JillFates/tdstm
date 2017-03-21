@@ -1,4 +1,5 @@
 <%@ page import="net.transitionmanager.domain.MoveBundleStep" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -37,7 +38,7 @@
 										</option>
 									</g:each>
 								</select>
-								<tds:hasPermission permission="PublishTasks">
+								<tds:hasPermission permission="${Permission.TaskPublish}">
 									<span class="checkboxContainer">
 										&nbsp;&nbsp;
 										<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="toggleUnpublished(event)"/><!--
@@ -66,7 +67,7 @@
 							<div class="col-md-3">
 								<div class="gauge-graph-wrapper">
 									<div id="summary_gauge_div" align="center">
-										<g:if test="${manualOverrideViewPermission}">
+										<g:if test="${EventDashboardDialOverridePerm}">
 											<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();">
 												<img id="summary_gauge" alt="Event Summary" src="${resource(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
 											</a>
@@ -79,7 +80,7 @@
 									<span id="manualSumStatusSpan" style="display: none; width: 10px;">
 										<input type="hidden" name="manual" value="M" id="checkBoxId" />
 										<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3"
-											onblur="validateManulaSummary(this.value)" />&nbsp;
+											onblur="validateManualSummary(this.value)" />&nbsp;
 										<input type="button" value="Save" onclick="changeEventSummary()" />
 									</span>
 								</div>
@@ -200,7 +201,7 @@
 												</li>
 											</ul>
 											<!-- <div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
-															<tds:hasPermission permission='ViewPacingMeters'>
+															<tds:hasPermission permission="${Permission.ViewPacingMeters}">
 												<img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
 																	src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
 											</tds:hasPermission>
@@ -896,7 +897,7 @@
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
-					/*<tds:hasPermission permission='ViewPacingMeters'>*/
+					/*<tds:hasPermission permission="${Permission.ViewPacingMeters}">*/
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
 					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
 					// post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
@@ -1163,7 +1164,7 @@
 
 
 	// validate the manual summary input value
-	function validateManulaSummary(value){
+	function validateManualSummary(value){
 		var check = true;
 		if ( !isNaN(parseFloat(value)) && isFinite(value) ) {
 			if(value > 100){
@@ -1185,7 +1186,7 @@
 	// send the request to update the manual summary value if it is valid
 	function changeEventSummary(){
 		var value = $("#manualSummaryStatusId").val();
-		if (validateManulaSummary( value )) {
+		if (validateManualSummary( value )) {
 			//var checkbox = $('#checkBoxId').is(":checked");
 			var checkbox = true;
 			var moveEvent = $("#moveEventId").val();

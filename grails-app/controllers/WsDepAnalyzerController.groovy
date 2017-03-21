@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.service.InvalidParamException
@@ -25,7 +26,7 @@ class WsDepAnalyzerController implements ControllerMethods {
 	 * @param depGroup - the dependency group number or 'onePlus'
 	 * @return List of persons as JSON
 	 */
-	@HasPermission('DepAnalyzerView')
+	@HasPermission(Permission.DepAnalyzerView)
 	def peopleAssociatedToDepGroup () {
 		// validate the parameters
 		def depGroup = NumberUtil.isLong(params.depGroup) ? NumberUtil.toInteger(params.depGroup) : (params.depGroup == 'onePlus' ? 'onePlus' : null)
@@ -59,7 +60,7 @@ class WsDepAnalyzerController implements ControllerMethods {
 	 * @param isRegex
 	 * @return A list of assets found by filter as JSON
 	 */
-	@HasPermission('DepAnalyzerView')
+	@HasPermission(Permission.DepAnalyzerView)
 	def filteredAssetList () {
 		// validate the parameters
 		String nameFilter = params.nameFilter ? params.nameFilter.toUpperCase() : ''

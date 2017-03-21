@@ -1,3 +1,4 @@
+import com.tdsops.common.security.spring.HasPermission
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
@@ -6,6 +7,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.ProjectService
@@ -19,7 +21,6 @@ import net.transitionmanager.controller.ServiceResults
  * Created by octavio on 11/14/16.
  */
 @Secured('isAuthenticated()')
-@Slf4j
 @Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class WsLicenseAdminController implements ControllerMethods {
 	LicenseCommonService licenseCommonService
@@ -75,10 +76,12 @@ class WsLicenseAdminController implements ControllerMethods {
 	}
 
 	/* list the licenses */
+	@HasPermission(Permission.LicenseView)
 	def getLicenses(){
 		renderSuccessJson(License.findAll()*.toJsonMap())
 	}
 
+	@HasPermission(Permission.LicenseView)
 	def getLicense(){
 		Long id = params.id
 		License lic
@@ -96,6 +99,7 @@ class WsLicenseAdminController implements ControllerMethods {
 
 	}
 
+	@HasPermission(Permission.LicenseView)
 	def getLicenseRequestHash(){
 		def id = params.id
 		License lic
@@ -113,7 +117,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	}
 
 
-
+	@HasPermission(Permission.LicenseDelete)
     def deleteLicense(String id){
         if(licenseAdminService.deleteLicense(id)) {
             renderSuccessJson("Successful Deleted")
@@ -123,7 +127,7 @@ class WsLicenseAdminController implements ControllerMethods {
     }
 
 
-
+	@HasPermission(Permission.LicenseAdministration)
     def generateRequest() {
 
         try {
@@ -151,7 +155,7 @@ class WsLicenseAdminController implements ControllerMethods {
     }
 
 
-
+	@HasPermission(Permission.LicenseAdministration)
 	def loadLicense(){ // Apply license
 		try{
 			def json = request.JSON
@@ -184,6 +188,7 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.LicenseAdministration)
 	def emailRequest(String id){
 		if(licenseAdminService.resubmitRequest(id)){
 			renderSuccessJson("Ok")

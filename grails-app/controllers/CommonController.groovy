@@ -8,6 +8,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.KeyValue
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ProjectService
@@ -22,6 +23,7 @@ class CommonController implements ControllerMethods {
 	ProjectService projectService
 	SecurityService securityService
 
+	// TODO: This should be deleted
 	def index() { }
 
 	/**
@@ -29,6 +31,7 @@ class CommonController implements ControllerMethods {
 	 * @param : entityType type of entity.
 	 * @return : Json data.
 	 */
+	@HasPermission(Permission.ProjectFieldSettingsView)
 	def tooltips() {
 		def entityType = request.JSON.entityType
 		def keyValueMap = [:]
@@ -56,7 +59,7 @@ class CommonController implements ControllerMethods {
 	 * @param : entityType type of entity.
 	 * @return success string.
 	 */
-	@HasPermission('EditProjectFieldSettings')
+	@HasPermission(Permission.ProjectFieldSettingsEdit)
 	def tooltipsUpdate() {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
@@ -105,11 +108,13 @@ class CommonController implements ControllerMethods {
 	 * @param : entityType type of entity.
 	 * @return : json data.
 	 */
+	@HasPermission(Permission.UserGeneralAccess)
 	def retrieveTooltips() {
 		renderAsJson assetEntityService.retrieveTooltips(EntityType.getKeyByText(params.type),
 				securityService.userCurrentProject)
 	}
 
+	@HasPermission(Permission.UserGeneralAccess)
 	def tmLinkableUrl() {
 		String errMsg
 		try {

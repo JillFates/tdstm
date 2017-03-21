@@ -4,6 +4,7 @@
 <%@page defaultCodec="html" %> 
 <%@page import="com.tds.asset.AssetComment"%>
 <%@page import="com.tds.asset.Files" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new Files()).assetClass}" />
 
@@ -12,7 +13,7 @@
 	<div id="selectionFilesId" class="tabControls">
 		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 		<input type="hidden" id="assetTypesId" name="assetType" value="files" />
-		<tds:hasPermission permission='AssetEdit'>
+		<tds:hasPermission permission="${Permission.AssetEdit}">
 			<input id="state" type="button"  class="submit pointer" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${filesList?.asset?.id},'${session.ASSIGN_BUNDLE}')"  />
 		</tds:hasPermission>
 	</div>

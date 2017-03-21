@@ -1,6 +1,7 @@
 <%@page expressionCodec="none" %>
 <%@page import="net.transitionmanager.domain.Manufacturer" %>
 <%@page import="net.transitionmanager.domain.ModelConnector" %>
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -316,7 +317,7 @@
 	<tr>
 		<td colspan="2">
 			<div class="buttons" style="margin-left: 10px;margin-right: 10px;">
-				<tds:hasPermission permission="EditModel">
+				<tds:hasPermission permission="${Permission.ModelEdit}">
 					<input id="modelId" name="id" value="${modelInstance.id}" type="hidden"/>
 					<input type="hidden" name="redirectTo" value="${redirectTo }" />
 					<span class="button">

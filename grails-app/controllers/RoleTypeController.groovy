@@ -1,13 +1,17 @@
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.RoleType
+import com.tdsops.common.security.spring.HasPermission
 
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.security.Permission
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoleTypeController implements ControllerMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
+	@HasPermission(Permission.RoleTypeView)
 	def list() {
 		if (!params.max) params.max = 25
 
@@ -21,6 +25,7 @@ class RoleTypeController implements ControllerMethods {
 		[roleTypeInstanceList: roleTypes]
 	}
 
+	@HasPermission(Permission.RoleTypeView)
 	def show() {
 		RoleType roleType = RoleType.get(params.id)
 		if (!roleType) {
@@ -32,6 +37,7 @@ class RoleTypeController implements ControllerMethods {
 		[roleTypeInstance: roleType]
 	}
 
+	@HasPermission(Permission.RoleTypeDelete)
 	def delete() {
 		try{
 			RoleType roleType = RoleType.get(params.id)
@@ -50,6 +56,7 @@ class RoleTypeController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
+	@HasPermission(Permission.RoleTypeEdit)
 	def edit() {
 		RoleType roleType = RoleType.get(params.id)
 		if (!roleType) {
@@ -61,6 +68,7 @@ class RoleTypeController implements ControllerMethods {
 		[roleTypeInstance : roleType]
 	}
 
+	@HasPermission(Permission.RoleTypeEdit)
 	def update() {
 		RoleType roleType = RoleType.get(params.roleTypeId)
 		if (roleType) {
@@ -79,10 +87,12 @@ class RoleTypeController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.RoleTypeCreate)
 	def create() {
 		[roleTypeInstance: new RoleType(params)]
 	}
 
+	@HasPermission(Permission.RoleTypeCreate)
 	def save() {
 		boolean idCheck = false
 		if (RoleType.exists(params.id)) {

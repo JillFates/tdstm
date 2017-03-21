@@ -2,19 +2,24 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.RoleType
+import com.tdsops.common.security.spring.HasPermission
 
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.security.Permission
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PartyRoleController implements ControllerMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
+	@HasPermission(Permission.PartyRoleView)
 	def list() {
 		if (!params.max) params.max = 10
 		[partyRoleInstanceList: PartyRole.list(params)]
 	}
 
+	@HasPermission(Permission.PartyRoleView)
 	def show() {
 		PartyRole partyRole = fromParams()
 		if (!partyRole) return
@@ -22,6 +27,7 @@ class PartyRoleController implements ControllerMethods {
 		[partyRoleInstance: partyRole]
 	}
 
+	@HasPermission(Permission.PartyRoleDelete)
 	def delete() {
 		PartyRole partyRole = fromParams()
 		if (!partyRole) return
@@ -31,6 +37,7 @@ class PartyRoleController implements ControllerMethods {
 		redirect(action: 'list')
 	}
 
+	@HasPermission(Permission.PartyRoleEdit)
 	def edit() {
 		PartyRole partyRole = fromParams()
 		if (!partyRole) return
@@ -38,6 +45,7 @@ class PartyRoleController implements ControllerMethods {
 		[partyRoleInstance: partyRole]
 	}
 
+	@HasPermission(Permission.PartyRoleEdit)
 	def update() {
 		PartyRole partyRoleDel = fromParams()
 		if (!partyRoleDel) return
@@ -53,10 +61,12 @@ class PartyRoleController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.PartyRoleCreate)
 	def create() {
 		[partyRoleInstance: new PartyRole(params)]
 	}
 
+	@HasPermission(Permission.PartyRoleCreate)
 	def save() {
 		def partyRole = new PartyRole(params)
 		if (!partyRole.hasErrors() && partyRole.save()) {

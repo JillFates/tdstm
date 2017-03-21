@@ -1,6 +1,5 @@
 package net.transitionmanager.domain
 
-import com.tdsops.tm.enums.domain.PermissionGroup
 import groovy.transform.CompileStatic
 
 class Permissions {
@@ -18,7 +17,6 @@ class Permissions {
 	}
 
 	String permissionItem
-	PermissionGroup permissionGroup
 	String description
 
 	String toString() { permissionItem }

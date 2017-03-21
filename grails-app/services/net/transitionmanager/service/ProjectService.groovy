@@ -27,6 +27,7 @@ import grails.converters.JSON
 import grails.transaction.Transactional
 import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.*
+import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -554,7 +555,7 @@ class ProjectService implements ServiceMethods {
 	@Transactional
 	def deleteProject(prokectId, includeProject=false) throws UnauthorizedException {
 		def message
-		def projects = getUserProjects(securityService.hasPermission("ShowAllProjects"))
+		def projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
 		def projectInstance = Project.get(prokectId)
 
 		if(!(projectInstance in projects)){
@@ -1532,7 +1533,7 @@ class ProjectService implements ServiceMethods {
 	}
 
 	boolean hasAccessToProject(UserLogin userLogin = null, long projectId) {
-		return projectId in (getUserProjects(securityService.hasPermission("ShowAllProjects"), null, null, userLogin)*.id)
+		return projectId in (getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), null, null, userLogin)*.id)
 	}
 
 	        /**

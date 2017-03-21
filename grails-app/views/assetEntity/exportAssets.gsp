@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -148,7 +149,7 @@
 									</div>
 								</div>
 							</div>
-							<tds:hasPermission permission="Export">
+							<tds:hasPermission permission="${Permission.AssetExport}">
 							<div class="form-group">
 								<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
 							</div>

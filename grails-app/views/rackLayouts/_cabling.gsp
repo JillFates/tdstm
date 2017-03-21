@@ -1,4 +1,5 @@
 <%@page import="com.tds.asset.AssetCableMap"%>
+<%@page import="net.transitionmanager.security.Permission"%>
 <script type="text/javascript">
 var app = angular.module("cablingApp${assetId}", ['ui']);
 
@@ -28,7 +29,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	}
 	var tempId=''
 	$scope.showEditRow = function(id) {
-		<tds:hasPermission permission="EditModel">
+		<tds:hasPermission permission="${Permission.ModelEdit}">
 			var asset = $("#fromAsset_"+id).val();
 			var type = $("#connectType_"+id).val();
 			var roomType = $("#roomType").val();
@@ -319,7 +320,7 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
 		     </span>
       </td>
       <td ng-show="showRow(cable.cableId)">
-      	<tds:hasPermission permission="EditModel">
+      	<tds:hasPermission permission="${Permission.ModelEdit}">
 	     	<img src="${resource(dir:'icons',file:'cancel.png')}" id="cancelButton_{{cable.cableId}}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;" title="Cancel Changes"/>
 			<img src="${resource(dir:'icons',file:'accept.png')}" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;" title="Save Changes"/>
 		</tds:hasPermission>

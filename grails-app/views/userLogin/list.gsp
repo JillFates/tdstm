@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -33,21 +34,19 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 
-
 				$("#unlockUserDialog").dialog({
       				autoOpen: false,
       				modal: true
     			});
 
-
 				var listCaption = "Users: \
-				<tds:hasPermission permission='CreateUserLogin'>\
+				<tds:hasPermission permission="${Permission.UserCreate}">\
 					<span class='capBtn'><input type='button' value='Create User Login' onClick=\"redirectToListStaff()\"/></span> \
 				</tds:hasPermission>\
 				<span class='capBtn'><input type='button' value=' Show ${isActive == 'N' ? 'Active' : 'Inactive'} Users' onClick=\"$(\'#showActiveId\').val(${(session.getAttribute('InActive') == 'N')?"\'Y\'":"\'N\'"});submitForm();\"/></span>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
-				
+
 				$("#filterSelect").change(function(ev) {
 					ev.preventDefault();
 					submitForm();
@@ -73,11 +72,11 @@
 				TDS.jqGridFilterToolbar('userLoginId');
 
 				$.jgrid.formatter.integer.thousandsSeparator='';
-				
+
 				function actionFormatter (cellVal, options, rowObject) {
 					var unlockButton = '';
 					<g:if test="${isActive != 'N'}">
-						<tds:hasPermission permission="UnlockUserLogin">
+						<tds:hasPermission permission="${Permission.UserUnlock}">
 							if (cellVal.lockedOutUntil && cellVal.lockedOutTime.charAt(0) != '-')
 								unlockButton += "<img tm-unlock-account src='${resource(dir:'icons',file:'lock_delete.png')}' border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
 						</tds:hasPermission>
@@ -85,9 +84,9 @@
 					return unlockButton;
 				}
 
-				
+
 			})
-			
+
 			function submitForm () {
 				$("#formId").submit();
 			}
@@ -96,7 +95,7 @@
 	<body>
 	<tds:subHeader title="UserLogin List - ${isActive == 'N' ? 'Inactive' : 'Active'} Users" crumbs="['Admin','Client', 'Users','List', isActive == 'N' ? 'Inactive' : 'Active']"/>
 		<div id="unlockUserDialog" title="Unlock User Login">
-	
+
 		</div>
 
 		<div class="body fluid" ng-app="tdsAdmin" ng-controller="tds.admin.controller.MainController as admin">

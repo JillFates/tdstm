@@ -10,6 +10,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
@@ -29,6 +30,7 @@ class NewsEditorController implements ControllerMethods {
 	/**
 	 * Union of assets issues and move event news
 	 */
+	@HasPermission(Permission.NewsView)
 	def newsEditorList() {
 		Project project = controllerService.getProjectForPage(this, 'to view News')
 		if (!project) return
@@ -66,8 +68,9 @@ class NewsEditorController implements ControllerMethods {
 
 		[moveEventId: moveEvent == null ? null : moveEvent.id, viewFilter: params.viewFilter, bundleId: params.moveBundle,
 		 moveBundlesList: moveBundles, moveEventsList: MoveEvent.findAllByProject(project)]
-    }
+	}
 
+	@HasPermission(Permission.NewsView)
 	def listEventNewsJson() {
 
 		Project project = securityService.userCurrentProject
@@ -174,6 +177,7 @@ class NewsEditorController implements ControllerMethods {
 		render jsonData as JSON
 	}
 
+	@HasPermission(Permission.NewsView)
 	def getEventNewsList() {
 
 		Project project = securityService.userCurrentProject
@@ -241,6 +245,7 @@ class NewsEditorController implements ControllerMethods {
 	/**
 	 * @return assetComment / moveEventNews object based on comment Type as JSON object
 	 */
+	@HasPermission(Permission.NewsView)
 	def retrieveCommetOrNewsData() {
 		def personResolvedObj
 		def personCreateObj
@@ -284,7 +289,8 @@ class NewsEditorController implements ControllerMethods {
 
 	/**
 	 * Saves the data and redirects to action newsEditorList
-    */
+	 */
+	@HasPermission(Permission.NewsEdit)
 	def updateNewsOrComment() {
 		String commentType = params.commentType
 		if (commentType == "issue") {
@@ -331,7 +337,7 @@ class NewsEditorController implements ControllerMethods {
 	 * @param isArchived
 	 * @param resolution
 	 */
-	@HasPermission('CreateNews')
+	@HasPermission(Permission.NewsCreate)
 	def saveNews() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -377,7 +383,7 @@ class NewsEditorController implements ControllerMethods {
 	 * @param isArchived
 	 * @param resolution
 	 */
-	@HasPermission('CreateNews')
+	@HasPermission(Permission.NewsEdit)
 	def updateNews() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
@@ -453,7 +459,7 @@ class NewsEditorController implements ControllerMethods {
 	 * Used to update an exiting MoveEventNews record that returns AJax Response
 	 * @param id
 	 */
-	@HasPermission('CreateNews')
+	@HasPermission(Permission.NewsDelete)
 	def deleteNews() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {

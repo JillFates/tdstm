@@ -14,7 +14,7 @@ class WsManufacturerControllerSpec extends AbstractUnitSpec {
 
 		controller.controllerService = new ControllerService() {
 			void checkPermissionForWS(String perm) {
-				assert perm == 'EditModel'
+				assert perm == 'ModelEdit'
 				called = true
 			}
 		}

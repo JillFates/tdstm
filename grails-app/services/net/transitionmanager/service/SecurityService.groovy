@@ -33,6 +33,7 @@ import net.transitionmanager.domain.RolePermissions
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
@@ -67,14 +68,14 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	static final String DEFAULT_SECURITY_ROLE_CODE = USER.name()
 
-	AuditService auditService
-	EmailDispatchService emailDispatchService
-	GrailsApplication grailsApplication
+	def auditService
+	def emailDispatchService
+	def grailsApplication
+	def partyRelationshipService
+	def personService
+	def springSecurityService
+	def userPreferenceService
 	JdbcTemplate jdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	SpringSecurityService springSecurityService
-	UserPreferenceService userPreferenceService
 
 	private Map ldapConfigMap
 	private Map loginConfigMap
@@ -189,7 +190,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * TODO : JPM 4/2016 : isChangePendingStatusAllowed method here is OBSCURED and should be removed but used in tasks
 	 */
 	boolean isChangePendingStatusAllowed() {
-		hasPermission('ChangePendingStatus')
+		hasPermission(Permission.TaskChangeStatus)
 	}
 
 	/**
@@ -374,7 +375,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	@Transactional
 	void unlockAccount(UserLogin account) {
-		requirePermission 'UnlockUserLogin'
+		requirePermission Permission.UserUnlock
 
 		account.lockedOutUntil = null
 		save account
@@ -1206,13 +1207,11 @@ logger.debug "mergePersonsUserLogin() entered"
 				if (reportIfViolation) {
 					reportViolation("attempted action requiring unallowed permission $permission", user.toString())
 				}
-			}
-			else {
+			} else {
 				logger.error 'hasPermission() called with unknown permission code {} by {}', permission, user
 				reportIfViolation = false 	// disabling because the error log is good enough
 			}
-		}
-		else {
+		} else {
 			logger.error 'hasPermission() called by {} that has no assiged roles', user
 		}
 
@@ -1255,6 +1254,16 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		if (principal.hasPermission(permission)) {
 			return true
+		} else {
+			// Validate that the permission requested is valid, otherwise log an error
+			List count = Permissions.createCriteria().list {
+				projections { count() }
+				eq ('permissionItem', permission)
+			}
+			if (count[0] != 1) {
+				logger.error 'hasPermission() called with invalid permission code {}', permission
+				// throw new RuntimeException("Invalid permission code $permission")
+			}
 		}
 
 		if (reportIfViolation) {
@@ -1360,7 +1369,7 @@ logger.debug "mergePersonsUserLogin() entered"
 	/**
 	 * The list of security roles that a person can assign base on the individual's highest priviledged
 	 * role. The list should include that role plus all lessor roles. If the person doesn't have
-	 * the EditUserLogin permission then no roles are assignable hence an empty list.
+	 * the UserEdit permission then no roles are assignable hence an empty list.
 	 * @param person - the person for whom we are determining can assign some roles
 	 * @return The list of security role that the individual can assign
 	 */
@@ -1369,7 +1378,7 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		List assignableRoles = []
 
-		if (hasPermission(person, 'EditUserLogin')) {
+		if (hasPermission(person, Permission.UserEdit)) {
 			RoleType maxRoleOfPerson = getMaxAssignedRole(person)
 			if (maxRoleOfPerson) {
 				assignableRoles = getAllRoles(maxRoleOfPerson.level)
@@ -1380,7 +1389,7 @@ logger.debug "mergePersonsUserLogin() entered"
 		/*
 			// JPM 4/2016 : this was some of the logic for filter but wasn't used so stripped out
 			def assignableRoles = []
-			if (person && hasPermission(person, "EditUserLogin")) {
+			if (person && hasPermission(person, Permission.UserEdit)) {
 				// All roles
 				def roles = getAllRoles()
 				// Assumes getAssignedRoles sorts by level desc.
@@ -1398,7 +1407,7 @@ logger.debug "mergePersonsUserLogin() entered"
 
 	/**
 	 * The list of security role codes that a person can assign. If the person
-	 * doesn't have _EditUserLogin_ then no roles are returned.
+	 * doesn't have _UserEdit_ then no roles are returned.
 	 */
 	List<String> getAssignableRoleCodes(Person person = null) {
 		getAssignableRoles(resolve(person))*.id
@@ -1590,7 +1599,7 @@ logger.debug "mergePersonsUserLogin() entered"
 	}
 
 	boolean viewUnpublished() {
-		hasPermission('PublishTasks') && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true'
+		hasPermission(Permission.TaskPublish) && userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true'
 	}
 
 	@Transactional
