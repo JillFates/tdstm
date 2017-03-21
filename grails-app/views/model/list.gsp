@@ -86,6 +86,11 @@
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message" >${flash.message}</div>
 			</g:if>
+			<g:hasErrors bean="${modelInstance}">
+				<div id="messageDivId" class="message">
+					<g:renderErrors bean="${modelInstance}"/>
+				</div>
+			</g:hasErrors>
 			<div >
 				<div id="messageId" class="message" style="display:none">
 				</div>

@@ -255,15 +255,24 @@ class ModelController implements ControllerMethods {
 				flash.message = "$modelInstance.modelName created"
 				redirect(action:"list" , id: modelInstance.id)
 			} else {
-				flash.message = modelInstance.errors.allErrors.each {  log.error it }
+				modelInstance.errors.allErrors.each {  log.error it }
+
 				def modelConnectors = modelTemplate ? ModelConnector.findAllByModel(modelTemplate) : null
 				def otherConnectors = []
 				def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
 				for(int i = existingConnectors ; i<51; i++) {
 					otherConnectors << i
 				}
+
+				Map modelPref = assetEntityService.getExistingPref('Model_Columns')
+				Map attributes = Model.getModelFieldsAndlabels()
+				Map columnLabelpref = [:]
+				modelPref.each { key, value -> columnLabelpref[key] = attributes[value] }
 				render(view: "list", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
-											   otherConnectors:otherConnectors, modelTemplate:modelTemplate ] )
+											   otherConnectors:otherConnectors, modelTemplate:modelTemplate,
+											 modelPref: modelPref,
+											 attributesList: attributes.keySet().sort(),
+											 columnLabelpref: columnLabelpref ] )
 			}
 		}catch(RuntimeException rte) {
 			flash.message = rte.getMessage()
