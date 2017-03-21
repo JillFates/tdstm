@@ -1,7 +1,9 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.service.UserPreferenceService
 import test.AbstractUnitSpec
+import spock.lang.Ignore
 
+@Ignore
 @TestFor(WsUserController)
 class WsUserControllerSpec extends AbstractUnitSpec {
 

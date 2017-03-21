@@ -1,7 +1,9 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.service.ProgressService
 import test.AbstractUnitSpec
+import spock.lang.Ignore
 
+@Ignore
 @TestFor(WsProgressController)
 class WsProgressControllerSpec extends AbstractUnitSpec {
 

@@ -1,8 +1,10 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.service.TaskService
 import test.AbstractUnitSpec
+import spock.lang.Ignore
 
 @TestFor(WsTaskController)
+@Ignore
 class WsTaskControllerSpec extends AbstractUnitSpec {
 
 	void testPublish() {
@@ -101,7 +103,8 @@ class WsTaskControllerSpec extends AbstractUnitSpec {
 
 		controller.taskService = new TaskService() {
 			Map initiateCreateTasksWithRecipe(String contextId, String recipeId, Boolean deletePrevious,
-			                                  Boolean useWIP, Boolean publishTasks) {
+            	Boolean useWIP, Boolean publishTasks) {
+
 				assert contextId == contextIdExpected
 				assert recipeId == recipeIdExpected
 				assert deletePrevious == deletePreviousExpected

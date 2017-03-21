@@ -26,12 +26,11 @@ abstract class AbstractUnitSpec extends Specification {
 	protected static final String USERNAME = '__test_user__'
 	protected static final Map<String, String> PERSON_DATA = [firstName: 'Hunter', middleName: 'S', lastName: 'Thompson']
 
-	// TODO populate the test db with real data
+	// TODO populate the test with random real data
 	protected static final List<String> ROLE_USER_PERMISSIONS = [
 		Permission.ArchitectureView,
 		Permission.AssetMenuView,
-		Permission.AssetTrackerMenuView,
-		Permission.DashBoardMenuView,
+		Permission.DashboardMenuView,
 		Permission.ProjectStaffList,
 		Permission.ProjectStaffShow,
 		Permission.RackMenuView,

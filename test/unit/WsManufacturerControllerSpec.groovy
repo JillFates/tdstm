@@ -2,7 +2,9 @@ import grails.test.mixin.TestFor
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ManufacturerService
 import test.AbstractUnitSpec
+import spock.lang.Ignore
 
+@Ignore
 @TestFor(WsManufacturerController)
 class WsManufacturerControllerSpec extends AbstractUnitSpec {
 

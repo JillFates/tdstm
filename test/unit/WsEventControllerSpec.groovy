@@ -1,7 +1,9 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.service.EventService
 import test.AbstractUnitSpec
+import spock.lang.Ignore
 
+@Ignore
 @TestFor(WsEventController)
 class WsEventControllerSpec extends AbstractUnitSpec {
 

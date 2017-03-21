@@ -1,7 +1,9 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.service.SequenceService
 import test.AbstractUnitSpec
+import spock.lang.Ignore
 
+@Ignore
 @TestFor(WsSequenceController)
 class WsSequenceControllerSpec extends AbstractUnitSpec {
 
