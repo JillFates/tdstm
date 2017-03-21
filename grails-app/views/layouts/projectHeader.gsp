@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.security.Permission"%>
+<% @page import="net.transitionmanager.security.Permission"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -375,7 +375,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<li><g:link class="mmlink" controller="task" action="taskTimeline" onclick="hideMegaMenu('teamMegaMenu')">Task Timeline</g:link></li>
 							</tds:hasPermission>
 
-							<tds:hasPermission permission="${Permission.RecipeView}"
+							<tds:hasPermission permission="${Permission.RecipeView}">
 							<li><g:link class="mmlink" controller="cookbook" action="index" onclick="hideMegaMenu('teamMegaMenu')">Cookbook</g:link></li>
 							</tds:hasPermission>
 
