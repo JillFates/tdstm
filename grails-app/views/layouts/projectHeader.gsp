@@ -379,7 +379,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<li><g:link class="mmlink" controller="cookbook" action="index" onclick="hideMegaMenu('teamMegaMenu')">Cookbook</g:link></li>
 							</tds:hasPermission>
 
-							<tds:hasPermission permission="${Permission.RecipeGenerateTasks}"
+							<tds:hasPermission permission="${Permission.RecipeGenerateTasks}">
 							<li><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
 							</tds:hasPermission>
 
