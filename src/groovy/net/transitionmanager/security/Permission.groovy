@@ -71,7 +71,6 @@ interface Permission {
 			ModelMerge                    = 'ModelMerge',
 			ModelValidate                 = 'ModelValidate',
 			ModelView                     = 'ModelView',
-			MoveDashboardView			  = 'MoveDashboardView',
 			MoveEventView				  = 'MoveEventView',
 			NewsCreate                    = 'NewsCreate',
 			NewsDelete                    = 'NewsDelete',
@@ -195,7 +194,8 @@ interface Permission {
 			WorkflowList                  = 'WorkflowList',
 			WorkflowView                  = 'WorkflowView',
 
-	//Refactor the following:
+			// Refactor the following:
 			moveBundleShowView			  = 'moveBundleShowView',
 			rackLayouts					  = 'rackLayouts'
+			// MoveDashboardView			  = 'MoveDashboardView',
 }

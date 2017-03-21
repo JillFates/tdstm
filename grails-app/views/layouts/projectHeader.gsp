@@ -1,4 +1,5 @@
-<% @page import="net.transitionmanager.security.Permission"%>
+<%@ page import="net.transitionmanager.security.Permission" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -452,7 +453,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
 					<td style="vertical-align:top"><span class="megamenuSection">Event Prep</span><br />
 						<ul >
-							<tds:hasPermission permission="${Permission.ReportViewEventPrep}"
+							<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
 							<li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
 							</tds:hasPermission>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
