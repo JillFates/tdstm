@@ -30,7 +30,7 @@ export const taskListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
     name: TaskStates.LIST.name,
     url: TaskStates.LIST.url,
     data: {
-        page: {title: 'Task Manager', instruction: '', menu: ['Task', 'List']},
+        page: {title: 'Task Manager', instruction: 'Current list of available tasks', menu: ['Task', 'List']},
         requiresAuth: true
     },
     views: {
@@ -46,7 +46,7 @@ export const taskViewState: Ng2StateDeclaration = <Ng2StateDeclaration>{
     name: TaskStates.CREATE.name,
     url: TaskStates.CREATE.url,
     data: {
-        page: {title: 'Create Task', instruction: '', menu: ['Task', 'List', 'Create']},
+        page: {title: 'Create Task', instruction: 'Please provide the information required to create a task', menu: ['Task', 'List', 'Create']},
         requiresAuth: true
     },
     views: {

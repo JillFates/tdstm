@@ -2,23 +2,23 @@
 <div class="content body">
     <section>
         <div>
-            <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Default Box Example</h3>
-                    <div class="box-tools pull-right">
-                    </div><!-- /.box-tools -->
-                </div><!-- /.box-header -->
-                <div class="box-body">
-                    <form class="formly" role="form" novalidate [formGroup]="form" (ngSubmit)="submit(user)">
+            <form class="formly form-horizontal" role="form" novalidate [formGroup]="form" (ngSubmit)="createTask()">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Task Form</h3>
+                        <div class="box-tools pull-right">
+                        </div><!-- /.box-tools -->
+                    </div><!-- /.box-header -->
+                    <div class="box-body">
                         <formly-form [model]="user" [fields]="userFields">
-
                         </formly-form>
-                    </form>
-                </div><!-- /.box-body -->
-                <div class="box-footer">
-                    <button type="submit" class="btn btn-default">Button</button>
-                </div><!-- box-footer -->
-            </div><!-- /.box -->
+                    </div><!-- /.box-body -->
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span> Save</button>
+                        <button type="button" (click)="onCancelCreateTask()" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+                    </div><!-- box-footer -->
+                </div><!-- /.box -->
+            </form>
         </div>
     </section>
 </div>

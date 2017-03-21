@@ -15,6 +15,7 @@ import { TaskStates } from '../../task-manager-routing.states';
 export class TaskListComponent implements OnInit {
 
     private moduleName = '';
+    private taskList = [];
 
     /**
      * @constructor
@@ -22,6 +23,9 @@ export class TaskListComponent implements OnInit {
      */
     constructor(private stateService: StateService) {
         this.moduleName = 'Task Manager List';
+
+        this.taskList.push({ title: 'example 1'});
+        this.taskList.push({ title: 'example 2'});
     }
 
     /**
@@ -38,5 +42,4 @@ export class TaskListComponent implements OnInit {
     ngOnInit(): void {
         console.log('Init');
     }
-
 }

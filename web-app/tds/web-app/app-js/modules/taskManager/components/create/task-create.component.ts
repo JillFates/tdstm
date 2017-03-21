@@ -3,8 +3,10 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {Validators, FormGroup} from '@angular/forms';
 import {FormlyFieldConfig} from 'ng-formly';
+import {FormGroup} from '@angular/forms';
+import {StateService} from 'ui-router-ng2';
+import {TaskStates} from '../../task-manager-routing.states';
 
 @Component({
     moduleId: module.id,
@@ -21,47 +23,58 @@ export class TaskCreateComponent implements OnInit {
 
     public user = {
         email: 'email@gmail.com',
-        checked: false
+        checked: false,
+        taskName: ''
     };
 
     /**
      * @constructor
      */
-    constructor() {
+    constructor(private stateService: StateService) {
         this.moduleName = 'Task Manager List';
     }
 
-
     prepareUserFields(): void {
-        this.userFields = [{
-            className: 'row',
-            fieldGroup: [{
-                className: 'col-xs-6',
-                key: 'email',
-                type: 'input',
-                templateOptions: {
-                    type: 'email',
-                    label: 'Email address',
-                    placeholder: 'Enter email'
-                },
-                validators: {
-                    validation: Validators.compose([Validators.required])
+        this.userFields = [
+        {
+            id: 'taskName',
+            key: 'taskName',
+            type: 'formlyInputHorizontalWrapper',
+            templateOptions: {
+                label: 'Task',
+                placeholder: 'Task Name',
+                validate: true,
+                required: true,
+                options: [{maxWidth: 500}]
+            },
+            validation: {
+                show: true
+            }
+        },
+        {
+            fieldGroup: [
+                {
+                    id: 'personTeam',
+                    key: 'personTeam',
+                    type: 'formlySelectHorizontalWrapper',
+                    templateOptions: {
+                        label: 'Person/Team',
+                        options: [{maxWidth: 300}]
+                    }
                 }
-            }, {
-                className: 'col-xs-6',
-                key: 'password',
-                type: 'input',
-                templateOptions: {
-                    type: 'password',
-                    label: 'Password',
-                    placeholder: 'Password',
-                    pattern: ''
-                },
-                validators: {
-                    validation: Validators.compose([Validators.required])
-                }
-            }]
+            ]
         }];
+    }
+    createTask(): void {
+        console.log(this.user);
+    }
+
+    /**
+     * On Cancel new Creation
+     * @listens onEditCreateNotice
+     */
+    onCancelCreateTask(): void {
+        this.stateService.go(TaskStates.LIST.name);
     }
 
     /**
@@ -71,5 +84,4 @@ export class TaskCreateComponent implements OnInit {
         console.log('Init');
         this.prepareUserFields();
     }
-
 }
