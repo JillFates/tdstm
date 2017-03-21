@@ -22,10 +22,10 @@ describe('NoticeListComponent:', () => {
     let spyGet: jasmine.Spy;
 
     let mockData: Array<NoticeModel> = [
-        new NoticeModel(new Date(Date.now()), 'Mario', 'Description', 1),
-        new NoticeModel(new Date(Date.now()), 'Peach', 'Description', 2),
-        new NoticeModel(new Date(Date.now()), 'Luigi', 'Description', 3),
-        new NoticeModel(new Date(Date.now()), 'Kappa', 'Description', 4)
+        new NoticeModel(),
+        new NoticeModel(),
+        new NoticeModel(),
+        new NoticeModel()
     ];
 
     beforeEach(async(() => {

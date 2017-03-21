@@ -48,7 +48,7 @@ export class UIActiveDialogService {
      * Close the dialog and resolve the Promise
      * @param value The value to be resolved by the Promise
      */
-    close(value: any): void {
+    close(value?: any): void {
         if (this.isDialogOpen()) {
             this.notifier.broadcast({
                 name: 'dialog.close',
@@ -61,7 +61,7 @@ export class UIActiveDialogService {
      * Dismiss the dialog and reject the promise
      * @param value The value to be rejected by the Promise
      */
-    dismiss(value: any): void {
+    dismiss(value?: any): void {
         if (this.isDialogOpen()) {
             this.notifier.broadcast({
                 name: 'dialog.dismiss',

@@ -4,9 +4,14 @@ export enum NoticeType {
 }
 
 export class NoticeModel {
-    constructor(public id: Date,
-                public author: string,
-                public text: string,
-                public age: Number) {
-    }
+    acknowledgeable: boolean;
+    active: boolean;
+    createdBy: any;
+    dateCreated: string;
+    htmlText: string;
+    id: number;
+    lastModified: string;
+    rawText: string;
+    title: string;
+    typeId: number;
 }

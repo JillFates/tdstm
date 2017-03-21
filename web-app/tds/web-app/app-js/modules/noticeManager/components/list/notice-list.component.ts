@@ -1,17 +1,20 @@
 import { Component, ViewChild, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { NoticeService } from '../../service/notice.service';
 import { NoticeModel } from '../../model/notice.model';
+import { NoticeFormComponent } from '../form/notice-form.component';
 
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { ActionType } from '../../../../shared/model/action-type.enum';
 
 import { GridComponent } from '@progress/kendo-angular-grid';
+import { SortDescriptor, orderBy } from '@progress/kendo-data-query';
 
 @Component({
     moduleId: module.id,
     selector: 'notice-list',
     encapsulation: ViewEncapsulation.None,
     templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
-    providers: [NoticeService, { provide: NoticeModel, useValue: {} }]
+    providers: [NoticeService]
 })
 
 export class NoticeListComponent implements OnInit {
@@ -19,6 +22,10 @@ export class NoticeListComponent implements OnInit {
     private moduleName = '';
     private title = '';
     noticeList: NoticeModel[] = [];
+    sort: SortDescriptor[] = [{
+        dir: 'asc',
+        field: 'title'
+    }];
 
     ActionType: typeof ActionType = ActionType;
 
@@ -28,7 +35,7 @@ export class NoticeListComponent implements OnInit {
      * @constructor
      * @param {NoticeService} noticeService
      */
-    constructor(private noticeService: NoticeService) {
+    constructor(private noticeService: NoticeService, private dialogService: UIDialogService) {
         this.moduleName = 'Notice List';
     }
 
@@ -56,6 +63,14 @@ export class NoticeListComponent implements OnInit {
      * @listens onCreateNotice
      */
     public onCreateNotice(): void {
+        this.dialogService.open(NoticeFormComponent, [
+            { provide: NoticeModel, useValue: new NoticeModel() },
+            { provide: Number, useValue: ActionType.Create }
+        ]).then(result => {
+            console.log(result);
+        }, error => {
+            console.log(error);
+        });
         console.log('Clicked on create notice');
     }
 
@@ -64,7 +79,15 @@ export class NoticeListComponent implements OnInit {
      * @listens onEditCreateNotice
      * @param {NoticeModel} dataItem
      */
-    public onEditCreateNotice(dataItem: NoticeModel): void {
+    public onEditNotice(dataItem: NoticeModel): void {
+        this.dialogService.open(NoticeFormComponent, [
+            { provide: NoticeModel, useValue: dataItem as NoticeModel },
+            { provide: Number, useValue: ActionType.Edit }
+        ]).then(result => {
+            console.log(result);
+        }, error => {
+            console.log(error);
+        });
         console.log('Clicked on ', dataItem);
     }
 
@@ -75,4 +98,8 @@ export class NoticeListComponent implements OnInit {
         this.getNoticeList();
     }
 
+    protected sortChange($event): void {
+        this.sort = $event;
+        this.noticeList = orderBy(this.noticeList, this.sort);
+    }
 }
