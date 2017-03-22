@@ -5,6 +5,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
@@ -63,7 +64,7 @@ class PersonServiceIntegrationTests extends Specification {
 		expect: 'admin person is setup correctly'
 			adminPerson
 			adminPerson.userLogin
-			securityService.hasPermission(adminUser, 'ShowAllProjects')
+			securityService.hasPermission(adminUser, Permission.AdminUtilitiesAccess)
 			personService.hasAccessToProject(adminPerson, project)
 	}
 
@@ -672,9 +673,9 @@ class PersonServiceIntegrationTests extends Specification {
 		when: 'the newUser logs into the system'
 			securityService.assumeUserIdentity(newUser.username, false)
 
-		then: 'the newUser is correctly logged into the system and has the ShowAllProjects permission'
+		then: 'the newUser is correctly logged into the system and has an Admin permission'
 			assert securityService.isLoggedIn()
-			securityService.hasPermission(newUser, 'ShowAllProjects')
+			securityService.hasPermission(newUser, Permission.AdminUtilitiesAccess)
 		and: 'the newPerson should be able to access the project'
 			personService.hasAccessToProject(newPerson, project)
 		and: 'the newPerson is NOT assigned to the project'
