@@ -188,6 +188,7 @@ interface Permission {
 			UserUnlock                    = 'UserUnlock',
 			UserUpdateOwnAccount          = 'UserUpdateOwnAccount',
 			UserView                      = 'UserView',
+			ViewPacingMeters			  = 'ViewPacingMeters',
 			WorkflowCreate                = 'WorkflowCreate',
 			WorkflowDelete                = 'WorkflowDelete',
 			WorkflowEdit                  = 'WorkflowEdit',
