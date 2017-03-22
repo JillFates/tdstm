@@ -90,7 +90,7 @@ class ApplicationController implements ControllerMethods {
 		session.APP = [:]
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 		if (params.event && params.event.isNumber()) {
-			moveBundleList = MoveEvent.read(params.event)?.moveBundles?.findAll { it.useForPlanning }
+			moveBundleList = MoveEvent.read(params.event)?.moveBundles?.findAll { it.useForPlanning }?.flatten() as List<MoveBundle>
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(securityService.loadUserCurrentProject(), true)
 		}
