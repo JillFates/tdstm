@@ -344,7 +344,7 @@ class SecurityServiceTests extends Specification {
 	}
 
 	def '11. Test hasPermission() with nonexistent permission should throw a RuntimeException'() {
-		when: 'called with a in inexistent permission'
+		when: 'called with an inexistent permission'
 			securityService.hasPermission(Permission.MoveEventView)
 		then: 'it should throw an exception'
 			thrown RuntimeException
