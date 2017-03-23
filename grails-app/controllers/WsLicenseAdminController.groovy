@@ -159,7 +159,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	def loadLicense(){ // Apply license
 		try{
 			def json = request.JSON
-			log.info("license ID: {}", params.id)
+			//logger.info("license ID: {}", params.id)
 			License lic = License.get(params.id)
 
 			if(lic){
