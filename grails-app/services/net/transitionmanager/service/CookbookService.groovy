@@ -46,14 +46,15 @@ class CookbookService implements ServiceMethods {
 	private static final List<String> allowedCatalogs = ['Event', 'Bundle', 'Application'].asImmutable()
 	private static final List<String> searchAllowedCatalogs = ['All', 'Event', 'Bundle', 'Application'].asImmutable()
 
-	ControllerService controllerService
+	def controllerService
 	GrailsApplication grailsApplication
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	ProjectService projectService
-	SecurityService securityService
-	TaskService taskService
+	def partyRelationshipService
+	def personService
+	def projectService
+	def securityService
+	def taskService
 
 	/**
 	 * Checks if current user can access project. If it can't then it throws an {@link UnauthorizedException}
@@ -64,10 +65,11 @@ class CookbookService implements ServiceMethods {
 			return
 		}
 
-		List<Long> peopleIdsInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)*.id
-		if (project.id != DEFAULT_PROJECT_ID && !peopleIdsInProject.contains(securityService.currentPersonId)) {
-			logger.warn('''Person doesn't have access to the project''')
-			throw new UnauthorizedException('''The current user doesn't have access to the project''')
+		if (! personService.hasAccessToProject(project)) {
+		// List<Long> peopleIdsInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)*.id
+		// if (project.id != DEFAULT_PROJECT_ID && !peopleIdsInProject.contains(securityService.currentPersonId)) {
+			logger.warn('CookbookService.checkAccess: Person does not have access to the project')
+			throw new UnauthorizedException('The current user does not have access to the project')
 		}
 	}
 

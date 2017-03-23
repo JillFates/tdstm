@@ -65,16 +65,16 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
 @Transactional
 class TaskService implements ServiceMethods {
 
-	ControllerService controllerService
-	CookbookService cookbookService
+	def controllerService
+	def cookbookService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	ProgressService progressService
+	def partyRelationshipService
+	def personService
+	def progressService
 	Scheduler quartzScheduler
-	SecurityService securityService
-	SequenceService sequenceService
+	def securityService
+	def sequenceService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -3660,6 +3660,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	Map<String,List> fetchGroups(recipe, contextObject, exceptions) {
 		def groups = [:]
 
+//log.debug contextObject.getClass().getName()
+//throw new InvalidParamException(contextObject.getClass().getName())
+
+		if ( (contextObject instanceof MoveEvent) && ! contextObject.moveBundles) {
+			throw new InvalidParamException('The currently selected event has no assigned bundles')
+		}
+
 		if (!(recipe instanceof Map)) {
 			throw new InvalidParamException('The receipe must be of the LinkedHashMap type')
 		}
@@ -3667,7 +3674,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// First load up the 'groups' if any are defined
 		if (recipe.containsKey('groups')) {
 			if (!(recipe.groups instanceof List)) {
-				throw new InvalidParamException('The receipe.groups element must the List type')
+				throw new InvalidParamException('The recipe.groups element must the List type')
 			}
 
 			def gCount = 0
@@ -4044,7 +4051,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			} catch (e) {
 				msg = "An unexpected error occurred while trying to locate assets for filter $filter: $e"
-				log.error "$msg\n${ExceptionUtil.stackTraceToString(e)}"
+				log.error "$msg\nSQL: $sql\nPARAMS: $map\n${ExceptionUtil.stackTraceToString(e)}"
 				throw new RuntimeException("$msg<br>$e.message")
 			}
 

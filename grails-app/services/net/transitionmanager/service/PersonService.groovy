@@ -1513,6 +1513,20 @@ class PersonService implements ServiceMethods {
 	 *    a) System User account(s) (e.g. Automatic User)
 	 *    b) Staff of the project owner with the 'ProjectShowAll' permission
 	 *    c) Anybody assigned to the project regardless as to if the person is staff of the owner, client or partner of the project
+	 * @param project - the project to see if person has access to
+	 * @return true if person is associated otherwise false
+	 */
+	boolean hasAccessToProject(Project project) {
+		Person person = securityService.getUserLoginPerson()
+		return hasAccessToProject(person, project)
+	}
+
+	/**
+	 * Used to determine if the person is associated with the project and therefore has access. Access is allowed
+	 * for the following scenarios:
+	 *    a) System User account(s) (e.g. Automatic User)
+	 *    b) Staff of the project owner with the 'ProjectShowAll' permission
+	 *    c) Anybody assigned to the project regardless as to if the person is staff of the owner, client or partner of the project
 	 * @param person - the person to check
 	 * @param project - the project to see if person has access to
 	 * @return true if person is associated otherwise false
