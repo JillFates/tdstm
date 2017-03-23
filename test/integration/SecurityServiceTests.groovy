@@ -1,6 +1,7 @@
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
@@ -342,5 +343,11 @@ class SecurityServiceTests extends Specification {
 			thrown RuntimeException
 	}
 
+	def '11. Test hasPermission() with nonexistent permission should throw a RuntimeException'() {
+		when: 'called with a in inexistent permission'
+			securityService.hasPermission(Permission.MoveEventView)
+		then: 'it should throw an exception'
+			thrown RuntimeException
+	}
 
 }

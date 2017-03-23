@@ -16,7 +16,7 @@ class WsEventController implements ControllerMethods {
 
 	EventService eventService
 
-	@HasPermission(Permission.MoveEventView)
+	@HasPermission(Permission.EventView)
 	def listEventsAndBundles() {
 		try {
 			renderSuccessJson(list: eventService.listEventsAndBundles())

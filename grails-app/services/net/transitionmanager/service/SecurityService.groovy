@@ -1262,7 +1262,7 @@ logger.debug "mergePersonsUserLogin() entered"
 			}
 			if (count[0] != 1) {
 				logger.error 'hasPermission() called with invalid permission code {}', permission
-				// throw new RuntimeException("Invalid permission code $permission")
+				throw new RuntimeException("Invalid permission code $permission")
 			}
 		}
 
