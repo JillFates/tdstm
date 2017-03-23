@@ -27,6 +27,7 @@ databaseChangeLog = {
 			}
 		}
 	}
+
 	changeSet(author: "rmacfarlane", id: "20170227 TM-5576-3") {
 		comment('Rename permissions to follow the new naming convention of NounVerb')
 
@@ -374,6 +375,7 @@ databaseChangeLog = {
 			}
 		}
 	}
+
 	changeSet(author: "rmacfarlane", id: "20170227 TM-5576-4") {
 		comment('add new permissions to cover previously not secured features')
 
@@ -803,6 +805,22 @@ databaseChangeLog = {
 				def databaseMigrationService = ctx.getBean('databaseMigrationService')
 				databaseMigrationService.removePermissions(sql, perms.keySet().asList())
 				databaseMigrationService.addPermissions(sql, perms)
+			}
+		}
+	}
+
+	changeSet(author: "jmartin", id: "20170227 TM-5576-6") {
+		comment('Renamed the ReleaseRecipe permission')
+
+		grailsChange {
+			change {
+				def perms = [
+					'RecipeRelease': [
+						description:'Can release a recipe for production use',
+						oldName:'ReleaseRecipe'
+					]
+				]
+				ctx.getBean('databaseMigrationService').renamePermissions(sql, perms)
 			}
 		}
 	}
