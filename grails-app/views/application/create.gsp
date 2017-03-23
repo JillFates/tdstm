@@ -70,7 +70,7 @@
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
 								<td class="label ${config.sme}  ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
-								<td >
+								<td data-for="sme" class="${config.sme}" >
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect"  optionKey="personId" 
 										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
@@ -102,7 +102,7 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
 								<td class="label ${config.sme2}  ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td class="suffleTd">
+								<td data-for="sme2" class="${config.sme2} suffleTd">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="personId" 
 										optionValue="${{it.fullName}}" 
@@ -137,7 +137,7 @@
 									value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
 								<td class="label ${config.appOwner}  ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
-								<td class="suffleTd">
+								<td class="suffleTd ${config.appOwner}" data-for="appOwner">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.appOwner} suffleSelect personContact assetSelect" optionKey="personId" 
 										optionValue="${{it.fullName}}" 
@@ -219,7 +219,7 @@
 								
 							</tr>
 							<tr>
-								<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="license">URL</label></td>
+								<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="url">URL</label></td>
 								<td><input type="text" id="url" class="${config.url}" name="url" value="${applicationInstance.url}" tabindex="19" />
 								</td>
 								<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
@@ -227,7 +227,7 @@
 									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" 
 										value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
-								<td colspan="1" nowrap="nowrap">
+								<td colspan="1" nowrap="nowrap" data-for="shutdownBy" class="${config.shutdownBy}">
 								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:'${config.shutdownBy} assetSelect']"></g:render>
 									<input type="checkbox" id="shutdownByIdFixed" name="shutdownFixed" value="0"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" disabled="disabled"/>Fixed
@@ -243,7 +243,7 @@
 							</tr>
 							<tr>
 							<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
-								<td colspan="1" nowrap="nowrap">
+								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${config.startupBy}">
 								   <g:render template="bySelect"  model="[name:'startupBy', id:'startupById', className:'${config.startupBy} assetSelect']"></g:render>
 									<input type="checkbox" id="startupByIdFixed"  name="startupFixed" value="0"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"  disabled="disabled"/>Fixed
@@ -256,7 +256,7 @@
 								</td>
 								
 								<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
-								<td colspan="1" nowrap="nowrap">
+								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${config.testingBy}">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingById', className:'${config.testingBy} assetSelect']"></g:render>
 									<input type="checkbox" id="testingByIdFixed" name="testingFixed" value="0"  disabled="disabled"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />Fixed
@@ -291,7 +291,7 @@
 
 <script>
 	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')
+	$("#assetMenuId a").css('background-color','#003366');
 </script>
 <style>
 	#select2-drop{ width: 200px !important; } 

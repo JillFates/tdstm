@@ -84,7 +84,7 @@
 							<td class="label ${config.model} ${highlightMap.model?:''}" nowrap="nowrap">
 								<label for="model"><div id="assetTypeLabel">Device Type</div></label>
 							</td>
-							<td style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+							<td class="${config.model}" data-for="model" style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="modelEditId">
 									<div id="assetTypeSelect" tabindex="102">
 									</div>
@@ -112,7 +112,7 @@
 									<label for="manufacturer">Manufacturer</label>
 								</g:else>
 							</td>
-							<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+							<td class="${config.manufacturer}" data-for="manufacturer" style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="manufacturerEditId" style="display:inline">
 									<div id="manufacturerSelect" tabindex="103">
 									</div>
@@ -189,7 +189,7 @@
 							<td class="label ${config.assetType} ${highlightMap.assetType?:''}" nowrap="nowrap">
 								<label for="assetType">Model</label>
 							</td>
-							<td style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+							<td class="${config.assetType}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="modelSelect" tabindex="104">
 								</div>
 								<input type="hidden" value="${assetEntityInstance?.model?.id}" id="hiddenModel" name="model">
@@ -514,7 +514,6 @@
 
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
-
 	})(jQuery);
 
 </script>

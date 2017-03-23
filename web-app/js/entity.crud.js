@@ -2051,7 +2051,7 @@ function assetFieldImportance(phase, type) {
 			for (var key in resp) {
 				var value = resp[key]
 				$(".dialog input[name=" + key + "],select[name=" + key + "],input[name='" + key + ".id'],select[name='" + key + ".id'],div[id*='" + key + "'] .select2-choice,td[data-for*='" + key + "']").addClass(value);
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").parent().addClass(value);
+				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").closest('td').addClass(value);
 			}
 		},
 		error: function (jqXHR, textStatus, errorThrown) {

@@ -589,7 +589,7 @@ td[data-for].H .select2-choice,
 
 td[data-for].U .select2-choice,
 .U{
-	color:darkgray !important;
+	background-color:#f3f4f6 !important;
 	background-image: none !important;
 }
 

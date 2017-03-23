@@ -116,5 +116,5 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
-	$('#tabType').val($('#assetTypesId').val())
+	$('#tabType').val($('#assetTypesId').val());
 </script>

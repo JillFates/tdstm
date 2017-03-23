@@ -95,7 +95,7 @@
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
 								<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
-								<td>
+								<td data-for="sme" class="${config.sme}">
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}"
@@ -121,7 +121,7 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
 								<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td class="suffleTd">
+								<td data-for="sme2" class="${config.sme2} suffleTd">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -150,7 +150,7 @@
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
 								<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
-								<td class="suffleTd">
+								<td class="suffleTd ${config.appOwner}" data-for="appOwner">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwnerEdit" class="${config.appOwner} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -231,15 +231,15 @@
 
 							</tr>
 							<tr>
-								<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="license">URL</label></td>
-								<td ><input type="text" id="url" name="url" value="${applicationInstance.url}" tabindex="18" />
+								<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="url">URL</label></td>
+								<td ><input type="text" class="${config.url}" id="url" name="url" value="${applicationInstance.url}" tabindex="18" />
 								</td>
 								<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 								<td>
 									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId"
 									value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
-								<td >
+								<td class="${config.shutdownBy}" data-for="shutdownBy" >
 								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'${config.shutdownBy} assetSelect']"></g:render>
 									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
 										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
@@ -249,14 +249,14 @@
 								<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
 								<td>
-									<input type="text" id="shutdownDuration" name="shutdownDuration"
+									<input type="text" id="shutdownDuration" name="shutdownDuration" class="${config.shutdownDuration}"
 										value="${applicationInstance.shutdownDuration}" tabindex="55" size="7"/>m
 								</td>
 							</tr>
 							<tr>
 								<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
-								<td colspan="1" nowrap="nowrap">
-								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'${config.startupBy} assetSelect']"></g:render>
+								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${config.startupBy}">
+								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']"></g:render>
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
@@ -270,7 +270,7 @@
 
 
 								<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
-								<td colspan="1" nowrap="nowrap">
+								<td colspan="1" nowrap="nowrap" class="${config.testingBy}" data-for="testingBy">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'${config.testingBy} assetSelect']"></g:render>
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
 										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
@@ -312,5 +312,5 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
-	$('#tabType').val($('#assetTypesId').val())
+	$('#tabType').val($('#assetTypesId').val());
 </script>
