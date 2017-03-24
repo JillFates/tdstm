@@ -7,7 +7,7 @@ import org.codehaus.groovy.grails.plugins.codecs.MD5Codec
 /**
  * Created by octavio on 12/27/16.
  */
-@Slf4j(value='log', category='net.transitionmanager.service.LicenseCommon')
+@Slf4j
 class LicenseCommonService {
 	/* TAG grapper for messaging */
 	public static BEGIN_LIC_TAG = "-----BEGIN LICENSE-----"
@@ -96,8 +96,12 @@ class LicenseCommonService {
 	 * @return true if the licensing should be enabled
 	 */
 	boolean isAdminEnabled(){
-		Boolean lic_enabled = grailsApplication.config.tdstm?.license?.enabled
-		return (lic_enabled != null)?lic_enabled:true
+		boolean enabled = true
+		if(grailsApplication.config.tdstm?.license?.hasProperty("enabled")){
+			enabled = grailsApplication.config.tdstm.license.enabled
+		}
+
+		return enabled
 	}
 
 	/**

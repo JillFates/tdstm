@@ -43,14 +43,7 @@ class LicenseAdminService extends LicenseCommonService {
 	 * @return
 	 */
 	def initialize() {
-		/* //Using the enviromnment variable
-		def tdslm = System.getenv("TDS_LM")
-		if(tdslm){
-			grailsApplication.config.tdstm.license.enabled = true
-		}
-		*/
-
-		log.info("LM is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
+		log.info("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
 		if(isEnabled() && !loaded) {
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
