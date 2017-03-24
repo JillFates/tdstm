@@ -201,10 +201,8 @@
 												</li>
 											</ul>
 											<!-- <div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
-															<tds:hasPermission permission="${Permission.ViewPacingMeters}">
 												<img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
 																	src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
-											</tds:hasPermission>
 														</div> -->
 										</div>
 									</g:each>
@@ -897,38 +895,36 @@
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
-					/*<tds:hasPermission permission="${Permission.ViewPacingMeters}">*/
-					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
-					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
-					// post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
-					/*</tds:hasPermission>*/
-				} else {
-					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
-				}
-			}
-			//Append recent changes to status bar
-			${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'onEvenNewstHeaderLoad(XMLHttpRequest)')}
-			setStepsWidth();
-			//$("#bdltabs").css("width",$(".mod").css("width"));
-		} catch (ex) {
-		}
+                    $("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
+                    post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
+                    // post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
+                } else {
+                    $("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
+                }
+            }
+            //Append recent changes to status bar
+            ${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'onEvenNewstHeaderLoad(XMLHttpRequest)')}
+            setStepsWidth();
+            //$("#bdltabs").css("width",$(".mod").css("width"));
+        } catch (ex) {
+        }
 
-	}
+    }
 
-	/* function to render the dials */
-	function post_init( divId, dialInd ){
-		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
-		var src = "../i/dials/dial-"+dInd+"sm.png";
-		$("#"+divId).attr("src", src);
-		$("#"+divId).attr("title", dialInd);
+    /* function to render the dials */
+    function post_init( divId, dialInd ){
+        var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
+        var src = "../i/dials/dial-"+dInd+"sm.png";
+        $("#"+divId).attr("src", src);
+        $("#"+divId).attr("title", dialInd);
 
-	}
-	function updateSummaryGauge( divId, dialInd ){
-		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
-		var src = "../i/dials/dial-"+dInd+".png";
-		$("#"+divId).attr("src", src);
-		$("#"+divId).attr("title", dialInd);
-		<%--//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
+    }
+    function updateSummaryGauge( divId, dialInd ){
+        var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
+        var src = "../i/dials/dial-"+dInd+".png";
+        $("#"+divId).attr("src", src);
+        $("#"+divId).attr("title", dialInd);
+        <%--//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
         updateChartXML(divId, summaryDialData( dialInd ) );
         //myChart.setDataXML( xmlData );
         //myChart.render(divId);--%>
