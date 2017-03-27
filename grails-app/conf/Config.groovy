@@ -1,14 +1,6 @@
 import grails.util.Environment
 import net.transitionmanager.security.Permission
 
-tdstm.license =[
-	password: 'sampleKey1984',
-	enabled : false,
-	manager :[
-		enabled : false
-	]
-]
-
 // This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
 println()
 
