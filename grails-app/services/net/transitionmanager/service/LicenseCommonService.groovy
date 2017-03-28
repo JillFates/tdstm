@@ -93,16 +93,15 @@ class LicenseCommonService {
 	/**
 	 * Is the License Admin capabilities enabled for this instance?
 	 * Enforce the licensing!, by default if the config property is not present (NULL) the license is enabled
-	 * for checking if a property is set in a config object we use the 'isSet' function in 'ConfigObject'
-	 * (from Groovy 2.3)
-	 * @see http://mrhaki.blogspot.mx/2014/05/groovy-goodness-check-configuration.html
 	 * @return true if the licensing should be enabled
 	 */
 	boolean isAdminEnabled(){
 		boolean enabled = true
 
-		if(grailsApplication.config.tdstm?.license?.isSet("enabled")){
-			enabled = grailsApplication.config.tdstm.license.enabled
+		ConfigObject licenseConfig = grailsApplication.config.tdstm?.license
+
+		if(licenseConfig != null && licenseConfig.isSet("enabled")){
+			enabled = licenseConfig.enabled
 		}
 
 		return enabled
