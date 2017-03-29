@@ -44,7 +44,7 @@ export class NoticeListComponent implements OnInit {
      * @param noticeList
      */
     private onLoadNoticeList(noticeList): void {
-        this.noticeList = noticeList.notices;
+        this.noticeList = orderBy(noticeList.notices as NoticeModel[], this.sort);
     }
 
     private getNoticeList(): void {
@@ -67,7 +67,7 @@ export class NoticeListComponent implements OnInit {
             { provide: NoticeModel, useValue: new NoticeModel() },
             { provide: Number, useValue: ActionType.Create }
         ]).then(result => {
-            console.log(result);
+            this.getNoticeList();
         }, error => {
             console.log(error);
         });
@@ -84,7 +84,7 @@ export class NoticeListComponent implements OnInit {
             { provide: NoticeModel, useValue: dataItem as NoticeModel },
             { provide: Number, useValue: ActionType.Edit }
         ]).then(result => {
-            console.log(result);
+            this.getNoticeList();
         }, error => {
             console.log(error);
         });
@@ -98,8 +98,4 @@ export class NoticeListComponent implements OnInit {
         this.getNoticeList();
     }
 
-    protected sortChange($event): void {
-        this.sort = $event;
-        this.noticeList = orderBy(this.noticeList, this.sort);
-    }
 }

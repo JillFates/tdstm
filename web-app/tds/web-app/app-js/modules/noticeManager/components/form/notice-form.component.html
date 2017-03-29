@@ -16,8 +16,9 @@
                 <div class="form-group">
                     <label for="selectType" class="col-sm-3 control-label">Type: <span class="required_field">*</span></label>
                     <div class="col-sm-9">
-                        <kendo-dropdownlist [defaultItem]="defaultItem" [data]="typeDataSource" [textField]="'name'" [valueField]="'typeId'" [valuePrimitive]="true"
-                            id="selectType" class="form-control" [value]="model.typeId" required>
+                        <kendo-dropdownlist #typeIdField="kendoDropDownList" [defaultItem]="defaultItem" [data]="typeDataSource" [textField]="'name'"
+                            [valueField]="'typeId'" [valuePrimitive]="true" id="selectType" class="form-control" [(value)]="model.typeId"
+                            required>
                         </kendo-dropdownlist>
                     </div>
                 </div>
@@ -29,17 +30,18 @@
                         </label>
                     </div>
                 </div>
-                <!--<div class="form-group">
+                <div class="form-group">
                     <div class="col-sm-12">
-                        <textarea id="kendo-editor-create-edit" kendo-editor k-tools="editNotice.kendoEditorTools" k-ng-model="editNotice.editModel.htmlText"
-                            k-stylesheets="editNotice.kendoStylesheets" style="height: 400px;"></textarea>
+                        <rich-text-editor #htmlTextField="richTextEditor" [elementId]="'htmlText'" [required]="true" [name]="'htmlText'" [(rawValue)]="model.rawText"
+                            [(value)]="model.htmlText">
+                        </rich-text-editor>
                     </div>
-                </div>-->
+                </div>
             </div>
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button (click)="saveNotice()" [disabled]="noticeForm.form.invalid" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span> Save</button>
+        <button (click)="saveNotice()" [disabled]="!formValid()" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span> Save</button>
         <button (click)="deleteNotice()" *ngIf="action===1" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete</button>
         <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>

@@ -95,6 +95,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
      */
     ngOnDestroy(): void {
         if (this.cmpRef) {
+            this.tdsUiDialog.modal('hide');
             this.cmpRef.destroy();
         }
         this.openNotifier();

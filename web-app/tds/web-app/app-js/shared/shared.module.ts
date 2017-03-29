@@ -17,7 +17,8 @@ import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 // Shared Components
 import { HeaderComponent } from './modules/header/header.component';
-import {FormlyInputHorizontal} from './modules/formly/formly-input-horizontal.component';
+import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
+import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-editor.component';
 
 @NgModule({
     imports: [CommonModule],
@@ -27,7 +28,8 @@ import {FormlyInputHorizontal} from './modules/formly/formly-input-horizontal.co
         UIBooleanPipe,
         UIDialogDirective,
         HeaderComponent,
-        FormlyInputHorizontal
+        FormlyInputHorizontal,
+        RichTextEditorComponent
     ],
     providers: [
         AuthService,
@@ -43,7 +45,8 @@ import {FormlyInputHorizontal} from './modules/formly/formly-input-horizontal.co
         UIDialogDirective,
         UIBooleanPipe,
         HeaderComponent,
-        FormlyInputHorizontal]
+        FormlyInputHorizontal,
+        RichTextEditorComponent]
 })
 export class SharedModule {
 }
