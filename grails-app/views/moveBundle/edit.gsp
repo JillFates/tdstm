@@ -37,7 +37,7 @@
 	</script>
 </head>
 <body>
-<tds:subHeader title="Bundle List" crumbs="['Planning','Bundles', 'Edit']"/>
+<tds:subHeader title="Bundle Edit" crumbs="['Planning','Bundles', 'Edit']"/>
 
 <g:form method="post" >
     <div class="body" style="width: 442px;">
