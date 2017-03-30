@@ -14,7 +14,7 @@
 				<jqgrid:grid id="moveEventListId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Name','Estimated Start', 'Description','News Bar Mode', 'Runbook Status', 'Bundles'"
 					colModel="{name:'name',index: 'name', width:'300',formatter: linkFormatter},
-						{name:'estStartTime', search:false, formatter: dateFormatter},
+						{name:'estStartTime', search:false, formatter: tdsCommon.jqgridDateTimeCellFormatter},
 						{name:'description'},
 						{name:'newsBarMode'}, 
 						{name:'runbookStatus'},
@@ -34,16 +34,6 @@
 				var value = cellvalue ? cellvalue : ''
 				return "<a href="+contextPath+"/moveEvent/show/"+options.rowId+">"+value+"</a>"
 			}
-			
-			function dateFormatter(cellvalue, options, rowObjcet) {
-			    var value ='';
-                if(cellvalue)
-				{
-					var date =  new Date(cellvalue);
-					value = date.toLocaleDateString() +' '+ date.toLocaleTimeString();
-				}
-				return value;
-            }
 
 		</script>
 		
