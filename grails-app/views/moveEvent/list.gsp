@@ -34,16 +34,6 @@
 				var value = cellvalue ? cellvalue : ''
 				return "<a href="+contextPath+"/moveEvent/show/"+options.rowId+">"+value+"</a>"
 			}
-			
-			function dateFormatter(cellvalue, options, rowObjcet) {
-			    var value ='';
-                if(cellvalue)
-				{
-					var date =  new Date(cellvalue);
-					value = date.toLocaleDateString() +' '+ date.toLocaleTimeString();
-				}
-				return value;
-            }
 
 		</script>
 		
