@@ -14,7 +14,7 @@
 				<jqgrid:grid id="moveEventListId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Name','Estimated Start', 'Description','News Bar Mode', 'Runbook Status', 'Bundles'"
 					colModel="{name:'name',index: 'name', width:'300',formatter: linkFormatter},
-						{name:'estStartTime', search:false, formatter: dateFormatter},
+						{name:'estStartTime', search:false, formatter: tdsCommon.jqgridDateTimeCellFormatter},
 						{name:'description'},
 						{name:'newsBarMode'}, 
 						{name:'runbookStatus'},
