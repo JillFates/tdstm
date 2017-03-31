@@ -8,7 +8,7 @@ import net.transitionmanager.service.ModelService
 import spock.lang.Specification
 
 
-//@TestFor(ModelService)
+
 class ModelServiceTests extends Specification {
 	
 	ModelService modelService
