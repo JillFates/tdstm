@@ -2572,6 +2572,8 @@ class AssetEntityController implements ControllerMethods {
 					userSelectedCols[1], // taskManagerValues(taskPref["2"],it),
 					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
 					dueDate,
+					TimeUtil.formatDateTime(it.estFinish),
+					TimeUtil.formatDateTime(it.actFinish),
 					status ?: '',
 					userSelectedCols[2], // taskManagerValues(taskPref["3"],it),
 					userSelectedCols[3], // taskManagerValues(taskPref["4"],it),
