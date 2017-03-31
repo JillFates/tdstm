@@ -8,7 +8,7 @@ import net.transitionmanager.service.ManufacturerService
 import spock.lang.Specification
 
 
-@TestFor(ManufacturerService)
+//@TestFor(ManufacturerService)
 class ManufacturerServiceTests extends Specification {
 
 	ManufacturerService manufacturerService
