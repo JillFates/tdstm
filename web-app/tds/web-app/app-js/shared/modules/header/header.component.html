@@ -6,9 +6,9 @@
     </h1>
     <ol class="breadcrumb">
         <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}">
-            <a *ngIf="!last" href="#">{{menu}}</a>
+            <a *ngIf="!last" href="#">{{menu | translate}}</a>
             <ng-container *ngIf="last">
-                {{menu}}
+                {{menu | translate }}
             </ng-container>
         </li>
     </ol>
