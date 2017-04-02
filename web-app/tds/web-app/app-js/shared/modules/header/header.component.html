@@ -1,8 +1,8 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
-        {{pageMetaData.title}}
-        <small>{{pageMetaData.instruction}}</small>
+        {{pageMetaData.title | translate}}
+        <small>{{pageMetaData.instruction | translate}}</small>
     </h1>
     <ol class="breadcrumb">
         <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}">
