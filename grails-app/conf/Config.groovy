@@ -132,7 +132,7 @@ grails {
 			excludes = ['*', '**/WEB-INF/**','**/META-INF/**']
 			includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**',
 			            '/js/**', '/app-js/**', '/i18n/**', '/test/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**',
-			            '/plugins/**', '/d3/**', '/dist/**', '/tds/web-app/dist/**', '/tds/web-app/app-js/**']
+			            '/plugins/**', '/d3/**', '/dist/**', '/tds/web-app/dist/**', '/tds/node_modules/**', '/tds/web-app/app-js/**', '/tds/web-app/i18n/**']
 			patterns = []
 		}
 		rewrite.css = false
@@ -312,14 +312,15 @@ grails {
 				'/**/icons/**'		:'permitAll',
 				'/**/favicon.ico'	:'permitAll',
 				'/app-js/**'		:'permitAll', // Angular - resources
-				'/tds/web-app/**'	:'permitAll', // Angular - resources
 				'/i18n/**'			:'permitAll', // Angular - Translate
+				'/tds/web-app/**'	:'permitAll', // Angular - resources
 				'/test/**'			:'permitAll', // Angular - Test
 				'/monitoring'		:"hasPermission(request, '${Permission.AdminUtilitiesAccess}')", //todo: oluna: Awesome! does it work??
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',
 			]
+
 			ldap.active = false
 		}
 	}

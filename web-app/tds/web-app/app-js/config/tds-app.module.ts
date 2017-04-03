@@ -4,13 +4,12 @@
  */
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
-import {HttpModule} from '@angular/http';
+import {HttpModule, Http} from '@angular/http';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateModule, TranslateLoader, TranslateStaticLoader} from 'ng2-translate';
 
 import {TDSAppComponent} from './tds-app.component';
-// Providers
-
 // Feature modules
 import {SharedModule} from'../shared/shared.module';
 import {GamesModule} from '../modules/games/games.module';
@@ -33,6 +32,12 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         NoticesManagerModule,
         TaskManagerModule,
         GamesModule,
+        // Translator
+        TranslateModule.forRoot({
+            provide: TranslateLoader,
+            useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
+            deps: [Http]
+        }),
         // Routing Modules using UI Router
         UIRouterModule.forRoot(<UIRouterModule>{
             states: TDSRoutingStates,
