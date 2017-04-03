@@ -80,10 +80,9 @@ module.exports = function(config) {
             { pattern: testingSrcBase + '**/*.ts', included: false, watched: false },
             { pattern: testingBase + '**/*.js.map', included: false, watched: false},
 
-            'node_modules/@progress/kendo-angular-grid/dist/cdn/js/kendo-angular-grid.js',
-            'node_modules/@progress/kendo-angular-intl/dist/cdn/js/kendo-angular-intl.js',
-            'node_modules/@progress/kendo-angular-l10n/dist/cdn/js/kendo-angular-l10n.js',
-            'node_modules/@ng-bootstrap/ng-bootstrap/bundles/ng-bootstrap.js'
+            // 'node_modules/@progress/kendo-angular-grid/dist/cdn/js/kendo-angular-grid.js',
+            // 'node_modules/@progress/kendo-angular-intl/dist/cdn/js/kendo-angular-intl.js',
+            // 'node_modules/@progress/kendo-angular-l10n/dist/cdn/js/kendo-angular-l10n.js',
         ],
 
         // Proxied base paths for loading assets

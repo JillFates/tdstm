@@ -12,7 +12,6 @@ import {TranslateModule, TranslateLoader, TranslateStaticLoader} from 'ng2-trans
 import {TDSAppComponent} from './tds-app.component';
 // Feature modules
 import {SharedModule} from'../shared/shared.module';
-import {GamesModule} from '../modules/games/games.module';
 import {NoticesManagerModule} from '../modules/noticeManager/notice-manager.module';
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 // Router Logic
@@ -31,7 +30,6 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         SharedModule,
         NoticesManagerModule,
         TaskManagerModule,
-        GamesModule,
         // Translator
         TranslateModule.forRoot({
             provide: TranslateLoader,
