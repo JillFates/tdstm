@@ -6,5 +6,16 @@
     "LIST": "List",
     "TASK": "Task",
     "TASK_MANAGER": "Task Manager"
+  },
+  "NOTICE_MANAGER": {
+    "NOTICE_ADMINISTRATION": "Notice Administration",
+    "ADMIN": "Admin",
+    "NOTICE": "Notice",
+    "LIST": "List",
+    "CREATE_NOTICE": "Create Notice",
+    "EDIT_NOTICE": "Edit Notice",
+    "SAVE": "Save",
+    "DELETE": "Delete",
+    "CANCEL": "Cancel"
   }
 }

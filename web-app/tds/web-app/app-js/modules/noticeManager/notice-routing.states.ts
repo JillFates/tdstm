@@ -1,6 +1,6 @@
-import {Ng2StateDeclaration} from 'ui-router-ng2';
-import {NoticeListComponent} from './components/list/notice-list.component';
-import {HeaderComponent} from '../../shared/modules/header/header.component';
+import { Ng2StateDeclaration } from 'ui-router-ng2';
+import { NoticeListComponent } from './components/list/notice-list.component';
+import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 export class NoticeStates {
     public static readonly LIST = {
@@ -16,14 +16,18 @@ export class NoticeStates {
  */
 export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
     name: NoticeStates.LIST.name,
-    url:  NoticeStates.LIST.url,
+    url: NoticeStates.LIST.url,
     data: {
-        page: {title: 'Notice Administration', instruction: '', menu: ['Admin', 'Notice', 'List']},
+        page: {
+            title: 'NOTICE_MANAGER.NOTICE_ADMINISTRATION',
+            instruction: '',
+            menu: ['NOTICE_MANAGER.ADMIN', 'NOTICE_MANAGER.NOTICE', 'NOTICE_MANAGER.LIST']
+        },
         requiresAuth: true
     },
     views: {
-        'headerView@tds': {component: HeaderComponent},
-        'containerView@tds': {component: NoticeListComponent}
+        'headerView@tds': { component: HeaderComponent },
+        'containerView@tds': { component: NoticeListComponent }
     }
 };
 
