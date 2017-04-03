@@ -19,6 +19,7 @@ export default class LicenseDetail {
 						projectName: params.license.project.name,
 						clientName: params.license.client.name,
 						email: params.license.email,
+						toEmail: params.license.toEmail,
 						environment: params.license.environment,
 						inception: params.license.requestDate,
 						expiration: params.license.expirationDate,

@@ -3,6 +3,7 @@ package net.transitionmanager.domain
 import com.github.icedrake.jsmaz.Smaz
 import groovy.json.JsonBuilder
 import org.apache.commons.codec.binary.Base64
+import org.codehaus.groovy.grails.commons.GrailsApplication
 
 /**
  * Created by octavio on 9/20/16.
@@ -55,6 +56,9 @@ class License {
 		bannerMessage	nullable:true
 	}
 
+	GrailsApplication grailsApplication
+	static transients = ['grailsApplication']
+
 	boolean isActive(){
 		return (hash)? true : false
 	}
@@ -86,9 +90,12 @@ class License {
 			dProject.name = prj?.name
 		}
 
+		String toEmail = (grailsApplication.config.tdstm?.license?.request_email) ?: ''
+
 		Map data = [
 			id				: id,
 			email			: email,
+			toEmail			: toEmail,
 			environment		: environment?.name(),
 			owner: [
 				id: owner?.id,
