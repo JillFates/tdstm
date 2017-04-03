@@ -25,9 +25,11 @@
             '@angular/http': 'npm:@angular/http/bundles/http.umd.js',
             '@angular/router': 'npm:@angular/router/bundles/router.umd.js',
             '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
-            // '@progress/kendo-angular-grid': 'npm:@progress/kendo-angular-grid/dist/cdn/js/kendo-angular-grid.js',
-            // '@progress/kendo-angular-intl': 'npm:@progress/kendo-angular-intl/dist/cdn/js/kendo-angular-intl.js',
-            // '@progress/kendo-angular-l10n': 'npm:@progress/kendo-angular-l10n/dist/cdn/js/kendo-angular-l10n.js',
+            '@progress/kendo-angular-grid': 'npm:@progress/kendo-angular-grid',
+            '@progress/kendo-angular-dropdowns': 'npm:@progress/kendo-angular-dropdowns',
+            '@progress/kendo-data-query': 'npm:@progress/kendo-data-query',
+            // '@progress/kendo-angular-intl': 'npm:@progress/kendo-angular-intl',
+            // '@progress/kendo-angular-l10n': 'npm:@progress/kendo-angular-l10n',
             // other libraries
             'rxjs': 'npm:rxjs',
             // 'angular-in-memory-web-api': 'npm:angular-in-memory-web-api/bundles/in-memory-web-api.umd.js'
@@ -39,6 +41,26 @@
                 defaultExtension: 'js'
             },
             rxjs: {
+                defaultExtension: 'js'
+            },
+            '@progress/kendo-angular-grid':{
+                main: './dist/es/main.js',
+                defaultExtension: 'js'
+            },
+            '@progress/kendo-angular-dropdowns':{
+                main: './dist/es/main.js',
+                defaultExtension: 'js'
+            },
+            '@progress/kendo-data-query':{
+                main: './dist/es/main.js',
+                defaultExtension: 'js'
+            },
+            '@progress/kendo-angular-intl':{
+                main: './dist/es/main.js',
+                defaultExtension: 'js'
+            },
+            '@progress/kendo-angular-l10n':{
+                main: './dist/es/main.js',
                 defaultExtension: 'js'
             }
         }

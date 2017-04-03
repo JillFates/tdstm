@@ -1,69 +1,39 @@
-// /**
-//  * Created by aaferreira on 13/02/2017.
-//  */
-// import { ComponentFixture, TestBed, async, fakeAsync, tick } from '@angular/core/testing';
-// import { By } from '@angular/platform-browser';
-// import { DebugElement } from '@angular/core';
-// import { HttpModule } from '@angular/http';
+/**
+ * Created by aaferreira on 13/02/2017.
+ */
+import { ComponentFixture, TestBed, async, fakeAsync, tick } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
+import { HttpModule } from '@angular/http';
+import { FormsModule } from '@angular/forms';
+import { Observable, Scheduler, TestScheduler } from 'rxjs/Rx';
+import { GridModule } from '@progress/kendo-angular-grid';
+import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 
-// import { NoticeListComponent } from '../components/list/notice-list.component';
-// import { NoticeService } from '../service/notice.service';
-// import { NoticeModel } from '../model/notice.model';
-// import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
-// import { NotifierService } from '../../../shared/services/notifier.service';
-// import { Observable, Scheduler, TestScheduler } from 'rxjs/Rx';
+import { SharedModule } from '../../../shared/shared.module';
+import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
+import { NotifierService } from '../../../shared/services/notifier.service';
 
-// describe('NoticeListComponent:', () => {
-//     let fixture: ComponentFixture<NoticeListComponent>;
-//     let comp: NoticeListComponent;
+import { NoticeListComponent } from '../components/list/notice-list.component';
+import { NoticeService } from '../service/notice.service';
 
-//     let noticeService: NoticeService;
-//     let notifierService: NotifierService;
-//     let spyGet: jasmine.Spy;
+describe('NoticeListComponent:', () => {
+    let fixture: ComponentFixture<NoticeListComponent>;
+    let comp: NoticeListComponent;
 
-//     let mockData: Array<NoticeModel> = [
-//         new NoticeModel(),
-//         new NoticeModel(),
-//         new NoticeModel(),
-//         new NoticeModel()
-//     ];
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            imports: [HttpModule, FormsModule, SharedModule, DropDownListModule],
+            declarations: [NoticeListComponent],
+            providers: [NoticeService, HttpServiceProvider, NotifierService]
+        }).compileComponents();
+    }));
 
-//     beforeEach(async(() => {
-//         TestBed.configureTestingModule({
-//             imports: [HttpModule],
-//             declarations: [NoticeListComponent],
-//             providers: [NoticeService, { provide: String, multi: false, useValue: '' }, { provide: NoticeModel, useValue: {} },
-//                 HttpServiceProvider, NotifierService]
-//         }).compileComponents();
-//     }));
+    beforeEach(() => {
+        fixture = TestBed.createComponent(NoticeListComponent);
+        comp = fixture.componentInstance;
+    });
 
-//     beforeEach(() => {
-//         fixture = TestBed.createComponent(NoticeListComponent);
-//         comp = fixture.componentInstance;
-//         noticeService = fixture.debugElement.injector.get(NoticeService);
-//         notifierService = fixture.debugElement.injector.get(NotifierService);
-//         spyGet = spyOn(noticeService, 'getNoticesList')
-//             .and.returnValue(Observable.from(mockData).bufferCount(mockData.length));
-//     });
-
-//     it('should create component', () => expect(comp).toBeDefined());
-
-//     it('should call getNoticesList and retrive notice list', done => {
-//         expect(spyGet.calls.any()).toBe(false);
-
-//         fixture.detectChanges();
-//         expect(spyGet.calls.count()).toBe(1);
-//         spyGet.calls.mostRecent().returnValue.subscribe(
-//             (noticeList) => {
-//                 expect(noticeList.length).toBe(4);
-//             },
-//             (err) => {
-//                 console.log('error');
-//             },
-//             () => { // completed callback
-//                 expect(comp.noticeList.length).toBe(4);
-//                 done();
-//             }
-//         );
-//     });
-// });
+    it('should create component', () => expect(comp).toBeDefined());
+   
+});
