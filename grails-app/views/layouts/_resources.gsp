@@ -29,8 +29,8 @@
 <script  src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
   integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
   crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.5/jquery.tinymce.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.5/themes/modern/theme.min.js"></script>
+<script src="${resource(dir: 'dist/js/vendors/tinymce', file: 'tinymce.min.js')}"></script>
+<script src="${resource(dir: 'dist/js/vendors/tinymce', file: 'theme.min.js')}"></script>
 <!-- LEGACY CODE END -->
 
 <!-- Boosttrap -->
