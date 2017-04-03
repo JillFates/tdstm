@@ -40,7 +40,7 @@
 	<div class="buttons">
 		<g:if test="${userPref}">
 			<span class="button"><input type="button" class="save" value="Save" onclick="UserPreference.savePreferences('userTimezoneForm')" /> </span>
-			<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetTimezonePrefs(${tds.currentPersonId()})" value="Reset All"/> </span>
+			<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetTimezonePrefs(${tds.currentPersonId()})" value="Reset"/> </span>
 		</g:if>
 		<g:else>
 			<span class="button"><input type="button" class="edit" value="Select" onclick="Project.setTimeZone('dateTimezone', 'timezone')" /> </span>

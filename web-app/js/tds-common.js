@@ -330,7 +330,21 @@ var tdsCommon = {
 		}
 	},
 
-	jqgridPrefCellFormatter: function (cellvalue, options, rowObject) {
+    jqgridDateTimeCellFormatter: function (cellvalue, options, rowObject) {
+        if (cellvalue) {
+            var result = "";
+            var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+            if (momentObj) {
+                momentObj.tz(tdsCommon.timeZone());
+                result = momentObj.format(tdsCommon.defaultDateTimeFormat());
+            }
+            return result;
+        } else {
+            return '';
+        }
+    },
+
+    jqgridPrefCellFormatter: function (cellvalue, options, rowObject) {
 		var result = cellvalue;
 		switch (options.colModel.name) {
 			case "lastUpdated":
