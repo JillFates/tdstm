@@ -73,7 +73,6 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
-			var status = '${status}'
 			var step = "${step}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var taskManagerUrl = "/assetEntity/listTasks"
@@ -269,10 +268,10 @@
 			<div id="columnCustomDiv_${taskPref[key]}" style="display:none;">
 				<div class="columnDiv_${key} customScroll customizeDiv">
 					<input type="hidden" id="previousValue_${key}" value="${taskPref[key]}" />
-					<g:each var="attribute" in="${attributesList}">
-						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute}"
-							${taskPref[key]==attribute ? 'checked' : '' }
-							onchange="setColumnAssetPref(this.value,'${key}','Task_Columns')"/> ${attribute}</label><br>
+					<g:each var="attribute" in="${assetCommentFields}">
+						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute.key}"
+							${taskPref[key]==attribute.key ? 'checked' : '' }
+							onchange="setColumnAssetPref(this.value,'${key}','Task_Columns')"/> ${attribute.value}</label><br>
 					</g:each>
 				</div>
 			</div>
