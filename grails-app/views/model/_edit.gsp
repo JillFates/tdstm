@@ -322,7 +322,7 @@
 					<input type="hidden" name="redirectTo" value="${redirectTo }" />
 					<span class="button">
 					 <g:if test="${redirectTo=='modelDialog'}">
-						<input type="button" class="save" id="saveModelId" value="Update" onclick="updateModel('Model', 'modelForm')"/>
+						<input type="submit" class="save" id="saveModelId" value="Update" onclick="return updateModel('Model', 'modelForm', true)"/>
 					</g:if>
 					<g:else>
 						<input type="submit" class="save" id="saveModelId" value="Update" />

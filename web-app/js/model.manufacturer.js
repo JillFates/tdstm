@@ -290,7 +290,7 @@ function updateTitle(type, view, name) {
 	$("#" + view + "" + type + "View").dialog("option", "title", name + " " + type);
 }
 
-function updateModel(forWhom, formName) {
+function updateModel(forWhom, formName, formSubmitPrevent) {
 	$("#" + formName).ajaxSubmit({
 		success: function (data) {
 			$("#editModelView").dialog('close')
@@ -303,7 +303,11 @@ function updateModel(forWhom, formName) {
 			}).dialog('open');
 
 		},
-		error: function (request, errordata, errorObject) { alert(errorObject.toString()); }
+		error: function (request, errordata, errorObject) { alert(errorObject.toString()); },
+
+		if(formSubmitPrevent) {
+			return false;
+		}
 	});
 }
 
