@@ -35,5 +35,5 @@ describe('NoticeListComponent:', () => {
     });
 
     it('should create component', () => expect(comp).toBeDefined());
-   
+
 });

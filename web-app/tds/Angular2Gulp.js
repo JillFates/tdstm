@@ -209,9 +209,8 @@ function validateJS(src) {
         .pipe(tslint.report())
 };
 
-gulp.task('typescript-compile', shell.task(['tsc -p web-app']));
-gulp.task('build-test', ['typescript-compile'], shell.task(['karma start karma.conf.js']));
-gulp.task('build-test-report', ['typescript-compile'], shell.task(['karma start karma.production.conf.js']));
+gulp.task('build-test', shell.task(['karma start karma.conf.js']));
+gulp.task('build-test-report', shell.task(['karma start karma.production.conf.js']));
 
 gulp.task('tiny-mce-files', function () {
     gulp.src(['node_modules/tinymce/tinymce.min.js',

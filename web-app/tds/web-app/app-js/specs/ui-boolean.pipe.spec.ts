@@ -18,5 +18,4 @@ describe('UIBooleanPipe:', () => {
         expect(pipe.transform(true)).toBe('Yes');
     });
 
-
 });
