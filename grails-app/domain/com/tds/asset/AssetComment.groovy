@@ -275,7 +275,7 @@ class AssetComment {
 		actStart: 'Actual Start:', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
 		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
 		duration: 'Duration', durationScale: 'Duration Scale', estStart: 'Estimated Start',
-		hardAssigned: 'Hard Assignement', isPublished: 'Is Published', sendNotification: 'Send Notification',
+		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', sendNotification: 'Send Notification',
 		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
 		instructionsLink: 'instructionsLink', bundle: 'Move Bundle'

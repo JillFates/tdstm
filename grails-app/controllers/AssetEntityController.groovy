@@ -37,6 +37,7 @@ import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
+import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -2163,19 +2164,41 @@ class AssetEntityController implements ControllerMethods {
 			def moveBundleList = MoveBundle.findAllByProject(project, [sort: 'name'])
 			def companiesList = partyRelationshipService.getCompaniesList()
 			def role = filters?.role ?: params.role ?: ''
-			return [timeToUpdate: timeToRefresh ?: 60, servers: entities.servers, applications: entities.applications,
-			        dbs: entities.dbs, files: entities.files, networks: entities.networks, moveEvents:moveEvents,
-			        dependencyType: entities.dependencyType, dependencyStatus: entities.dependencyStatus,
-			        assetDependency: new AssetDependency(), filterEvent: filterEvent, justRemaining: justRemaining,
-			        justMyTasks: justMyTasks, filter: params.filter, comment: filters?.comment ?:'', role: role,
-			        taskNumber: filters?.taskNumber ?:'', assetName: filters?.assetEntity ?:'', modelPref: modelPref,
-			        assetType: filters?.assetType ?:'', dueDate: filters?.dueDate ?:'', status: filters?.status ?:'',
-			        assignedTo: filters?.assignedTo ?:'', category: filters?.category ?:'', moveEvent: moveEvent,
-			        moveBundleList: moveBundleList, viewUnpublished: viewUnpublished, taskPref: taskPref,
-			        staffRoles: taskService.getTeamRolesForTasks(), attributesList: assetCommentFields.keySet().sort(),
-			        //staffRoles: taskService.getRolesForStaff(),
-			        sizePref: userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE) ?: '25', status: params.status,
-			        partyGroupList: companiesList, company: project.client, step: params.step]
+			return [
+					timeToUpdate: timeToRefresh ?: 60,
+					servers: entities.servers,
+					applications: entities.applications,
+			        dbs: entities.dbs,
+					files: entities.files,
+					networks: entities.networks,
+					moveEvents:moveEvents,
+			        dependencyType: entities.dependencyType,
+					dependencyStatus: entities.dependencyStatus,
+			        assetDependency: new AssetDependency(),
+					filterEvent: filterEvent,
+					justRemaining: justRemaining,
+			        justMyTasks: justMyTasks,
+					filter: params.filter,
+					comment: filters?.comment ?:'',
+					role: role,
+			        taskNumber: filters?.taskNumber ?:'',
+					assetName: filters?.assetEntity ?:'',
+					modelPref: modelPref,
+			        assetType: filters?.assetType ?:'',
+					dueDate: filters?.dueDate ?:'',
+					status: filters?.status ?:'',
+			        assignedTo: filters?.assignedTo ?:'',
+					category: filters?.category ?:'',
+					moveEvent: moveEvent,
+			        moveBundleList: moveBundleList,
+					viewUnpublished: viewUnpublished,
+					taskPref: taskPref,
+			        staffRoles: taskService.getTeamRolesForTasks(),
+					assetCommentFields: assetCommentFields.sort { it.value },
+			        sizePref: userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE) ?: '25',
+			        partyGroupList: companiesList,
+					company: project.client,
+					step: params.step]
 		} catch (RuntimeException e) {
 			log.error e.message, e
 			response.sendError(401, "Unauthorized Error")
