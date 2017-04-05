@@ -44,6 +44,7 @@ export class NoticeListComponent implements OnInit {
      * @param noticeList
      */
     private onLoadNoticeList(noticeList): void {
+        console.log(noticeList);
         this.noticeList = orderBy(noticeList.notices as NoticeModel[], this.sort);
     }
 

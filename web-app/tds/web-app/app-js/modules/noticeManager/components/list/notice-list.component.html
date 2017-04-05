@@ -3,7 +3,7 @@
     <section>
         <div>
             <div class="box-body box-with-empty-header">
-                <kendo-grid [kendoGridBinding]="noticeList" [sortable]="{ mode:'single' }" [(sort)]="sort" [pageSize]="10" [pageable]="{ pageSizes: true, info: true}">
+                <kendo-grid [data]="noticeList" [sortable]="{ mode:'single' }" [(sort)]="sort" [pageSize]="10" [pageable]="{ pageSizes: true, info: true}">
                     <kendo-grid-toolbar>
                         <button type="button" class="btn btn-default kendo-grid-toolbar__add-btn" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE_MANAGER.CREATE_NOTICE' | translate }}</button>
                         <div (click)="reloadNoticeList()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
