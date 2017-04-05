@@ -79,7 +79,7 @@
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType', 'Event'"
-					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false, width:'65', fixed:true},
+					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false, width:'90', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${appPref['1']}',width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${appPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
@@ -125,14 +125,18 @@
 				return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+')">'+value+'</a>'
 			}
 
-			function myCustomFormatter (cellVal,options,rowObject) {
-				var editButton = '';
-				if (${hasPerm}) {
-					editButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>'+
+			function myCustomFormatter (cellVal, options, rowObject) {
+				var actionButton = '';
+				if (${hasPerm}) { // Valid what? what does it means hasPerm, perm on what?
+                    actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>'+
 					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 				}
-				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[8] + "' tasks='" + rowObject[7] + "' comments='" + rowObject[10] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
-				return editButton
+                actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[8] + "' tasks='" + rowObject[7] + "' comments='" + rowObject[10] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
+
+                actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\','+options.rowId+');" title=\'Clone Asset\'>'+
+                    "<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
+
+				return actionButton;
 			}
 			function deleteMessage(response, postdata) {
 				 $("#messageId").show()
