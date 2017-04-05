@@ -82,7 +82,7 @@ databaseChangeLog = {
 	include file: '20150430-remove-asset-transition.groovy'
 	include file: '20150519-rename-in-progress-to-news-bar-mode.groovy'
 	include file: '20150526-assettype-defaulted-to-server-null-values.groovy'
-	include file: '20150526-delete-orphaned-dependency-bundles.groovy'	
+	include file: '20150526-delete-orphaned-dependency-bundles.groovy'
 	include file: '20150526-add-import-export-staff-permissions.groovy'
 	include file: '20150520-create-column-send-notification-in-asset-comment.groovy'
 	include file: '20150529-drop-party-column-from-project-logo.groovy'
@@ -164,4 +164,5 @@ databaseChangeLog = {
 	include file: "20170307-change-license-installation-column-spelling.groovy"
 	include file: "20170308-nullout-orphaned-asset-comments-by-workflow-transition.groovy"
 	include file: "20170227-delete-create-or-rename-permissions-for-new-naming-scheme.groovy"
+	include file: "20170403-remove-racks-and-rooms-for-VMs.groovy"
 }

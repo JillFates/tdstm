@@ -26,6 +26,18 @@ class WebUtil {
 	}
 
 	/**
+	 * Returns multi-value String of a List containing string objects.
+	 */
+	static String listOfStringsAsMultiValueString(Iterable<String> list) {
+		String values = list?.join("', '") ?: ""
+		if(values) {
+			values = "'${values}'"
+		}
+		return values
+	}
+
+
+	/**
 	 * Concatenates a list of strings in <li> HTML tag to display.
 	 * @param strings  the list of warning strings
 	 */
