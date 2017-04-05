@@ -66,7 +66,10 @@ var tdsCommon = {
 					var dialog = $("#" + this.element[0].id)
 					if (dialog.length > 0) {
 						// Need to close any Select2 controls that might still be open
-						dialog.find('.select2-container').select2('close');
+						var select2 = dialog.find('.select2-container');
+						if(select2 && select2.length > 0) {
+                            dialog.find('.select2-container').select2('close');
+						}
 
 						if (!dialog.hasClass('static-dialog')) {
 							dialog.html('');

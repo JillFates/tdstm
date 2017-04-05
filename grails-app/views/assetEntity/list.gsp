@@ -164,7 +164,7 @@
 					}
                     actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] + "' tasks='" + rowObject[13] + "' comments='" + rowObject[16] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
 
-                    actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\','+options.rowId+');" title=\'Clone Asset\'>'+
+                    actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', '+options.rowId+');" title=\'Clone Asset\'>'+
                         "<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
 
 					return actionButton;
