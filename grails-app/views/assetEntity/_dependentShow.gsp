@@ -28,12 +28,12 @@
 								</td>
 								<g:if test="${support?.asset?.moveBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
 									<td style="background-color: lightpink">
-										${support?.asset?.moveBundle}&nbsp;?
+										${support?.asset?.moveBundle}&nbsp;<g:img uri="/icons/link_error.png" style="margin-top:-8px;" width="18" height="18" alt="..." data-toggle="tooltip" title="The two assets of this dependency are assigned to different bundles which may be a concern if they need to be migrated together. The background will be highlighted if the status is Validated."/>
 									</td>
 								</g:if>
 								<g:elseif test="${support?.asset?.moveBundle!=assetEntity.moveBundle }" >
 									<td class="dep-${support.status}">
-										<b>${support?.asset?.moveBundle}&nbsp;?</b>
+										<b>${support?.asset?.moveBundle}&nbsp;<g:img uri="/icons/link_error.png" style="margin-top:-8px;" width="18" height="18" alt="..." data-toggle="tooltip" title="The two assets of this dependency are assigned to different bundles which may be a concern if they need to be migrated together. The background will be highlighted if the status is Validated."/></b>
 									</td>
 								</g:elseif>
 								<g:else>
@@ -82,12 +82,12 @@
 								</td>
 								<g:if test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
 									<td style="background-color: lightpink">
-										${dependent.dependent?.moveBundle}&nbsp;?
+										${dependent.dependent?.moveBundle}&nbsp;<g:img uri="/icons/link_error.png" style="margin-top:-8px;" width="18" height="18" alt="..." data-toggle="tooltip" title="The two assets of this dependency are assigned to different bundles which may be a concern if they need to be migrated together. The background will be highlighted if the status is Validated."/>
 									</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle }" >
 									<td class="dep-${dependent.status}">
-										<b>${dependent.dependent?.moveBundle}&nbsp;?</b>
+										<b>${dependent.dependent?.moveBundle}&nbsp;<g:img uri="/icons/link_error.png" style="margin-top: -8px;" width="18" height="18" alt="..." data-toggle="tooltip" title="The two assets of this dependency are assigned to different bundles which may be a concern if they need to be migrated together. The background will be highlighted if the status is Validated."/></b>
 									</td>
 								 </g:elseif>
 								 <g:else>
