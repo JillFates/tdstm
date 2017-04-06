@@ -278,6 +278,6 @@ class AssetComment {
 		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', sendNotification: 'Send Notification',
 		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
-		instructionsLink: 'instructionsLink', bundle: 'Move Bundle'
+		instructionsLink: 'Instructions Link', bundle: 'Move Bundle'
 	].asImmutable()
 }
