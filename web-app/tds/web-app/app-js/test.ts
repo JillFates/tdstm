@@ -11,6 +11,7 @@ import './specs/ui-boolean.pipe.spec';
 import './specs/ui-loader.directive.spec';
 import './specs/ui-toast.directive.spec';
 import './specs/component-creator.service.spec';
+import './specs/rich-text-editor.component.spec';
 import './modules/noticeManager/specs/notice-list.component.spec';
 // Unfortunately there's no typing for the `__karma__` variable. Just declare it as any.
 declare var __karma__: any;

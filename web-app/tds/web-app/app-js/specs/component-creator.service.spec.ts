@@ -13,14 +13,14 @@ import { ComponentCreatorService } from '../shared/services/component-creator.se
     exports: [EmptyComponent],
     entryComponents: [EmptyComponent]
 })
-class HolderModule { }
+class ContainerModule { }
 
 @Component({
     moduleId: module.id,
-    selector: 'holder-component',
+    selector: 'container-component',
     template: '<div #container></div>',
 })
-class HolderComponent {
+class ContainerComponent {
     @ViewChild('container', { read: ViewContainerRef }) view: ViewContainerRef;
 
     constructor(compCreatorService: ComponentCreatorService) {
@@ -30,8 +30,8 @@ class HolderComponent {
 
 describe('ComponentCreatorService:', () => {
 
-    let fixture: ComponentFixture<HolderComponent>;
-    let comp: HolderComponent;
+    let fixture: ComponentFixture<ContainerComponent>;
+    let comp: ContainerComponent;
     let de: DebugElement;
     let compCreatorService: ComponentCreatorService;
 
@@ -45,14 +45,14 @@ describe('ComponentCreatorService:', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports: [HolderModule],
-            declarations: [HolderComponent],
+            imports: [ContainerModule],
+            declarations: [ContainerComponent],
             providers: [ComponentCreatorService],
         }).compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(HolderComponent);
+        fixture = TestBed.createComponent(ContainerComponent);
         comp = fixture.componentInstance;
         compCreatorService = fixture.debugElement.injector.get(ComponentCreatorService);
     });
