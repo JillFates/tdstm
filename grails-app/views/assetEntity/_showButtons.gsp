@@ -21,7 +21,7 @@
 
 </tds:hasPermission>
 
-<button type="button" class="btn btn-default" name="_action_clone" value="Clone" onclick="EntityCrud.cloneAssetView('${assetEntity.assetClass}', ${assetEntity?.id});">
+<button type="button" class="btn btn-default" name="_action_clone" value="Clone" onclick="EntityCrud.cloneAssetView('${assetEntity.assetClass}', ${assetEntity?.id}, EntityCrud.cloneTypeFrom.VIEW);">
     <img src="${resource(dir:'icons',file:'database_copy.png')}" border="0px"/> Clone
 </button>
 

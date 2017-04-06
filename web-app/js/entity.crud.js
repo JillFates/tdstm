@@ -26,6 +26,9 @@ var EntityCrud = (function ($) {
 
 	var assetFormName = "createEditAssetForm";
 
+	// Keep reference to the behaves depending on where the clone asset event was executed
+    pub.cloneTypeFrom = { LIST: 'LIST', VIEW: 'VIEW', EDIT: 'EDIT' };
+	pub.cloneFrom = { type:  pub.cloneTypeFrom.LIST, assetClass: 'APPLICATION' };
 
 	// ------------------
 	// Private Methods
@@ -251,6 +254,10 @@ var EntityCrud = (function ($) {
 				}
 			}
 		});
+	};
+
+	pub.getSearchQuietMillis = function() {
+        return quietMillis;
 	};
 
 	// Used on populate the Manufacturer SELECT to toggle various form fields
@@ -1250,18 +1257,13 @@ var EntityCrud = (function ($) {
      * @param assetId
      * @returns {boolean}
      */
-	pub.cloneAssetView = function (assetClass, assetId) {
-
-        var $asset = angular.element("#" + assetId)
-        if ($asset.scope()) {
-            var $rootScope = $asset.scope().$root
-            $rootScope.$apply(function () {
-                $rootScope.selectedAsset = assetId
-            })
-        }
+	pub.cloneAssetView = function (assetClass, assetId, cloneFrom) {
 
 		var assetType = assetClass.toLowerCase();
 		assetType = assetType.charAt(0).toUpperCase() + assetType.slice(1);
+
+        pub.cloneFrom.type = cloneFrom;
+        pub.cloneFrom.assetClass = assetClass;
 
         return fetchCloneView(assetId, assetType);
 
