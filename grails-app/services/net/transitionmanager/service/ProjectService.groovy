@@ -334,7 +334,7 @@ class ProjectService implements ServiceMethods {
 	 * @return newly formatted assetTag
 	 */
 	String getNextAssetTag(Project project) {
-		"TM-" + String.format("%05d", sequenceService.next(project.clientId, 'AssetTag'))
+		"TM-" + String.format("%05d", sequenceService.next(project.client.id, 'AssetTag'))
 	}
 
 	/**
