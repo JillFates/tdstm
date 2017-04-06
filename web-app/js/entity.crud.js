@@ -1578,7 +1578,7 @@ function updateAssetTitle(type) {
 	EntityCrud.getCreateModal().dialog("option", "title", type + ' Create');
 	EntityCrud.getShowModal().dialog("option", "title", type + ' Detail');
 	EntityCrud.getEditModal().dialog("option", "title", type + ' Edit');
-    EntityCrud.getCreateCloneModal().dialog("option", "title", type + ' Clone');
+    EntityCrud.getCreateCloneModal().dialog("option", "title", 'Clone Asset');
 }
 
 function showManufacView(e, forWhom) {

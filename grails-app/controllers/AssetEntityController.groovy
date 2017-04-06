@@ -1989,6 +1989,9 @@ class AssetEntityController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
+		def (device, Map model) = assetEntityService.getDeviceModelForEdit(project, params.id, params)
+
+		return [asset: model]
 	}
 
 	/**
