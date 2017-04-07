@@ -8,9 +8,11 @@ module.exports = function (config) {
     plugins: [
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
+      require('karma-phantomjs-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-junit-reporter'),
-      require('karma-browserify')
+      require('karma-browserify'),
+      require('karma-mocha-reporter')
     ],
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
@@ -61,7 +63,11 @@ module.exports = function (config) {
       '/tds/web-app/app-js/': "/base/web-app/app-js/",
       '/base/web-app/specs-dist/modules/noticeManager/tds/web-app/app-js/': "/base/web-app/app-js/"
     },
-    reporters: ['progress', 'kjhtml'],
+    phantomjsLauncher: {
+      // Have phantomjs exit if a ResourceError is encountered (useful if karma exits without killing phantom) 
+      exitOnResourceError: true
+    },
+    reporters: ['mocha', 'kjhtml'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
