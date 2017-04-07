@@ -8,7 +8,6 @@ import { HttpModule, Http } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
 import { GridModule } from '@progress/kendo-angular-grid';
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { TranslateModule, TranslateLoader, TranslateStaticLoader, TranslateService } from 'ng2-translate';
 
 import { SharedModule } from '../../../shared/shared.module';
@@ -55,7 +54,7 @@ describe('NoticeListComponent:', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports: [HttpModule, FormsModule, SharedModule, DropDownListModule, GridModule,
+            imports: [HttpModule, FormsModule, SharedModule, GridModule,
                 TranslateModule.forRoot({
                     provide: TranslateLoader,
                     useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
