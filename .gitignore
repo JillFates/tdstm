@@ -6,3 +6,5 @@ target/
 plugins/
 run.sh
 node_modules/
+.slcache/
+

@@ -29,6 +29,16 @@ class UrlMappings {
 			action = [GET:"listInBundle"]
 		}
 
+		/**
+		 * Asset WS
+		 */
+		"/ws/asset/isunique" {
+			controller = "wsAsset"
+			action = [
+			        POST:"checkForUniqueName"
+			]
+		}
+
 		"/ws/moveEventNews/$id?" {
 			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
