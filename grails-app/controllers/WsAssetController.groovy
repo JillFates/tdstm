@@ -20,7 +20,11 @@ class WsAssetController implements ControllerMethods {
 	 * @param name 	Name of the asset to check
 	 * @param assetId	asset
 	 */
-	def checkForUniqueName(String name, Long assetId){
+	def checkForUniqueName(){
+		def jsonRequest = request.JSON
+		String name = jsonRequest.name ?: ""
+		Long assetId = jsonRequest.assetId
+
 		boolean unique = true
 		AssetClass assetClassSample
 		long foundAssetId = 0L
