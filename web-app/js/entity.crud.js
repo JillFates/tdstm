@@ -26,10 +26,6 @@ var EntityCrud = (function ($) {
 
 	var assetFormName = "createEditAssetForm";
 
-	// Keep reference to the behaves depending on where the clone asset event was executed
-    pub.cloneTypeFrom = { LIST: 'LIST', VIEW: 'VIEW', EDIT: 'EDIT' };
-	pub.cloneFrom = { type:  pub.cloneTypeFrom.LIST, assetClass: 'APPLICATION' };
-
 	// ------------------
 	// Private Methods
 	// ------------------
@@ -1137,9 +1133,6 @@ var EntityCrud = (function ($) {
         var showModal = pub.getCreateCloneModal();
 
         if (showModal.length) {
-            pub.closeCreateModal();
-            pub.closeEditModal();
-            pub.closeShowModal();
             showModal.html(html);
             showModal.dialog('option', 'width', 'auto');
             showModal.dialog('option', 'modal', 'true');
@@ -1222,7 +1215,7 @@ var EntityCrud = (function ($) {
      */
     pub.isAssetUnique = function(assetId, assetName, callback) {
         var url = tdsCommon.createAppURL('/ws/asset/isunique');
-        jQuery.ajax({
+        var xhr = jQuery.ajax({
             url: url,
             type: 'POST',
             data: 'assetId='+assetId+'&name='+assetName,
@@ -1231,12 +1224,37 @@ var EntityCrud = (function ($) {
                 return callback(resp);
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                var err = jqXHR.responseText;
-                alert("An error occurred while loading the asset show view." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
                 return false;
             }
         });
+
+        xhr.loadingRequest = true;
+        return xhr;
 	};
+
+    /**
+     * Public method to verify that an Asset is Unique or not
+     * @param assetId
+     * @param assetName
+     */
+    pub.cloneAsset = function(assetId, assetName, dependencies, callback) {
+        var url = tdsCommon.createAppURL('/ws/asset/clone');
+        var xhr = jQuery.ajax({
+            url: url,
+            type: 'POST',
+            data: 'assetId='+assetId+'&dependencies='+dependencies+'&name='+assetName,
+            dataType: 'json',
+            success: function (resp) {
+                return callback(resp);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                return false;
+            }
+        });
+
+        xhr.loadingRequest = true;
+        return xhr;
+    };
 
 	// Called from the page to popup the Asset Entity details dialog
 	// getEntityDetails
@@ -1280,15 +1298,12 @@ var EntityCrud = (function ($) {
      * @param assetId
      * @returns {boolean}
      */
-	pub.cloneAssetView = function (assetClass, assetId, cloneFrom) {
+	pub.cloneAssetView = function (assetClass, assetName, assetId) {
 
 		var assetType = assetClass.toLowerCase();
 		assetType = assetType.charAt(0).toUpperCase() + assetType.slice(1);
 
-        pub.cloneFrom.type = cloneFrom;
-        pub.cloneFrom.assetClass = assetClass;
-
-        return fetchCloneView(assetId, assetType);
+        return fetchCloneView(assetId, assetName);
 
     };
 
@@ -1603,7 +1618,7 @@ function updateAssetTitle(type) {
 	EntityCrud.getCreateModal().dialog("option", "title", type + ' Create');
 	EntityCrud.getShowModal().dialog("option", "title", type + ' Detail');
 	EntityCrud.getEditModal().dialog("option", "title", type + ' Edit');
-    EntityCrud.getCreateCloneModal().dialog("option", "title", 'Clone Asset');
+    EntityCrud.getCreateCloneModal().dialog("option", "title", type + ' Clone');
 }
 
 function showManufacView(e, forWhom) {
