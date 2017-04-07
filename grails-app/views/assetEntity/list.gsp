@@ -106,7 +106,7 @@
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions', 'Name', 'Device Type', 'Manufacturer', 'Model', 'Location','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','Plan Status','Bundle', 'id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false,width:'65', fixed:true},
+					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false,width:'90', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType', width:'110', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'manufacturer', width:'120', formatter:tdsCommon.jqgridTextCellFormatter},
@@ -157,14 +157,17 @@
 				}
 
 				function myCustomFormatter (cellVal,options,rowObject) {
-					var editButton = ''
+					var actionButton = ''
 					if (${hasPerm}) {
-						editButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\',' + options.rowId + ');" title=\'Edit Asset\'>' +
+                        actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\',' + options.rowId + ');" title=\'Edit Asset\'>' +
 							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					}
-					editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] + "' tasks='" + rowObject[13] + "' comments='" + rowObject[16] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
+                    actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] + "' tasks='" + rowObject[13] + "' comments='" + rowObject[16] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
 
-					return editButton
+                    actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', '+options.rowId+');" title=\'Clone Asset\'>'+
+                        "<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
+
+					return actionButton;
 				}
 
 				function deleteMessage (response, postdata) {
