@@ -1215,6 +1215,29 @@ var EntityCrud = (function ($) {
         });
     };
 
+    /**
+	 * Public method to verify that an Asset is Unique or not
+     * @param assetId
+     * @param assetName
+     */
+    pub.isAssetUnique = function(assetId, assetName, callback) {
+        var url = tdsCommon.createAppURL('/ws/asset/isunique');
+        jQuery.ajax({
+            url: url,
+            type: 'POST',
+            data: 'assetId='+assetId+'&name='+assetName,
+            dataType: 'json',
+            success: function (resp) {
+                return callback(resp);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                var err = jqXHR.responseText;
+                alert("An error occurred while loading the asset show view." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
+                return false;
+            }
+        });
+	};
+
 	// Called from the page to popup the Asset Entity details dialog
 	// getEntityDetails
 	pub.showAssetDetailView = function (assetClass, assetId) {
