@@ -29,10 +29,11 @@ class WsAssetController implements ControllerMethods {
 		Long assetId = jsonRequest.assetId
 		*/
 
+		/*
 		List<AssetEntity> list = AssetEntity.list()
 		list.each {
 			log.info("Asset: {}", it)
-		}
+		}*/
 
 		boolean unique = true
 		AssetClass assetClassSample
