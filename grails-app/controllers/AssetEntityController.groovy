@@ -1571,11 +1571,11 @@ class AssetEntityController implements ControllerMethods {
 		}
 		renderAsJson items
 	}
-	
+
 	@HasPermission(Permission.AssetView)
 	def retrieveAttributes() {
 		def items = []
-		
+
 		if (params.attribSet) {
 			Project project = securityService.userCurrentProject
 			List<EavEntityAttribute> entityAttributes = EavEntityAttribute.executeQuery('''
@@ -1599,10 +1599,10 @@ class AssetEntityController implements ControllerMethods {
 				}
 			}
 		}
-		
+
 		renderAsJson items
 	}
-	
+
 	@HasPermission(Permission.AssetView)
 	def retrieveAssetAttributes() {
 		def items = []
@@ -2218,7 +2218,7 @@ class AssetEntityController implements ControllerMethods {
 			  and commentType=:comment
 			  and str(lastUpdated) like :lastUpdated
 		''', [project: project, comment: AssetCommentType.COMMENT, lastUpdated: '%' + params.lastUpdated + '%']) : []
-		
+
 		def assetCommentList = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.COMMENT)
@@ -2572,8 +2572,6 @@ class AssetEntityController implements ControllerMethods {
 					userSelectedCols[1], // taskManagerValues(taskPref["2"],it),
 					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
 					dueDate,
-					TimeUtil.formatDateTime(it.estFinish),
-					TimeUtil.formatDateTime(it.actFinish),
 					status ?: '',
 					userSelectedCols[2], // taskManagerValues(taskPref["3"],it),
 					userSelectedCols[3], // taskManagerValues(taskPref["4"],it),

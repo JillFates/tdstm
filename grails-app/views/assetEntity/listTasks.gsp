@@ -33,17 +33,17 @@
 
 	<script type="text/javascript">
 		var progressTimer;
-       
+
 		$(document).ready(function() {
 
 			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
 				reloadGrid();
 				progressTimer.resetTimer();
 			});
-			
+
 			$('#assetMenu').show();
 			$("#showEntityView").dialog({ autoOpen: false })
-			
+
 			$("#editManufacturerView").dialog({ autoOpen: false})
 			$("#manufacturerShowDialog").dialog({ autoOpen: false })
 			$("#modelShowDialog").dialog({ autoOpen: false })
@@ -53,7 +53,7 @@
 			$(".menu-parent-tasks-task-manager").addClass('active');
 			$(".menu-parent-tasks").addClass('active');
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
-			
+
 			var event = ${filterEvent}
 			var justRemaining = ${justRemaining}
 			var justMyTasks = ${justMyTasks}
@@ -64,8 +64,6 @@
 			var assetEntity = '${assetName}'
 			var assetType = '${assetType}'
 			var dueDate = '${dueDate}'
-			var estFinish = '${estFinish}'
-			var dateResolved = '${dateResolved}'
 			var dueDate = '${dateResolved}'
 			var status = '${status}'
 			var assignedTo = '${assignedTo}'
@@ -83,7 +81,7 @@
 				<tdsactionbutton id='clearFilters' icon='' label='Clear Filters' link='" + taskManagerUrl + "'></tdsactionbutton>"
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
-				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Est. Finish', 'Act. Finish', 'Status',
+				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
 					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:myLinkFormatter, width:60, fixed:true},
@@ -92,8 +90,6 @@
 					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
 					{name:'dueDate', formatter: dueFormatter},
-					{name:'estFinish', formatter: taskFormatter},
-					{name:'dateResolved', formatter: taskFormatter},
 					{name:'status', formatter: statusFormatter},
 					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
@@ -107,7 +103,7 @@
 				scrollOffset="0"
 				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
-					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, estFinish:estFinish, dateResolved:dateResolved, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, step:step }"
+					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, step:step }"
 				showPager="true">
 				<jqgrid:navigation id="taskListId" add="false" edit="false" del="false" search="false" refresh="false" />
 				<jqgrid:refreshButton id="taskListId" />
@@ -118,13 +114,13 @@
 
 			<g:each var="key" in="['1','2','3','4','5']">
 				var taskPref= '${taskPref[key]}';
-				
+
 				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+"')\">");
 			</g:each>
 		})
-		
+
 		$.jgrid.formatter.integer.thousandsSeparator='';
-		
+
 		function checkSelectedEvent (event) {
 			var moveEvent = $("#moveEventId").val();
 			if (moveEvent == '0') {
@@ -148,32 +144,32 @@
 			return editButton
 		}
 		function isPublishedFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[19] ? rowObject[19] : "false") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
 		}
 
 		function taskViewFormatter(cellVal,options,rowObject) {
-			return '<span title="View Task '+ (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") +'" class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[18]+'" status="'+rowObject[9]+'" instructions-link="'+rowObject[21]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
+			return '<span title="View Task '+ (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") +'" class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[18]+'" status="'+rowObject[9]+'" instructions-link="'+rowObject[21]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
 		}
 		function statusFormatter(cellVal,options,rowObject){
-			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[15] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[18]+'" status="'+rowObject[9]+'" instructions-link="'+rowObject[21]+'">' + cellVal + '</span>';
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		 }
 
 		function updatedFormatter(cellVal,options,rowObject){
-			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[16] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[18]+'" status="'+rowObject[9]+'" instructions-link="'+rowObject[21]+'">' + cellVal + '</span>';
+			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
-			return '<span id="span_'+options.rowId+'" class=" '+rowObject[17] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[18]+'" status="'+rowObject[9]+'" instructions-link="'+rowObject[21]+'">' + cellVal + '</span>';
+			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function assetFormatter(cellVal,options,rowObject){
-			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[20]+'\', '+rowObject[18]+')\" >' + _.escape(cellVal) + '</span>' :
+			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[18]+'\', '+rowObject[16]+')\" >' + _.escape(cellVal) + '</span>' :
 				(cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")
 		}
 
 		function instructionsLinkFormatter(cellVal,options,rowObject){
-			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[15] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[18]+'" status="'+rowObject[21]+'" instructions-link="'+rowObject[9]+'">' + cellVal + '</span>';
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[19]+'" instructions-link="'+rowObject[7]+'">' + cellVal + '</span>';
 		}
 
 
@@ -181,7 +177,7 @@
 				var value = cellvalue ? _.escape(cellvalue) : ''
 				return "<a href=\"javascript:showAssetComment(" + options.rowId + ", 'show' );\">" + value + "</a>"
 			}
-		
+
 		function populateFilter(){
 			$("#gs_comment").val('${comment}')
 			$("#gs_taskNumber").val('${taskNumber}')
