@@ -77,7 +77,6 @@
     });
 
     $('.clone-action-btn').click(function() {
-        debugger;
         var action = $(this).attr('action');
         if(assetExist) {
             var confirmationDialogOnClone = $('#confirmationDialogOnClone');
@@ -101,7 +100,8 @@
             });
         } else {
             var newAssetName = $('#newAssetName').val();
-            EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName);
+            var includeDependencies = $('#includeDependencies').prop('checked');
+            EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName, includeDependencies);
             document.title = title;
             $('#confirmationDialogOnClone').dialog('close');
         }

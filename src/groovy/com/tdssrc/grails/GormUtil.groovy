@@ -580,7 +580,28 @@ public class GormUtil {
 	 * @param deleteOriginal - a flag if the original domain should be deleted (default:false)
 	 * @return the cloned object
 	 */
-	static Object cloneDomain(Object originalDomain, Map replaceKeys, boolean deleteOriginal=false) {
+	static Object cloneDomain(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal=false) {
+		Object newDomain = domainClone(originalDomain, replaceKeys)
+
+		newDomain.save(flush:true)
+
+		if (deleteOriginal) {
+			originalDomain.delete(flush:true)
+		}
+
+		return newDomain
+	}
+
+
+	/**
+	 * Used to clone a domain object to a new object subsituting key properties,
+	 * NOTE: the new object is NOT persisted in the Database
+	 * @param originalDomain - the domain to clone properties from
+	 * @param replaceKeys - a Map of property name(s) and the associated values to set, if value is null then it is not set
+	 * @return the cloned object
+	 */
+	static Object domainClone(Object originalDomain,  Map replaceKeys = [:]) {
+		logger.debug("** Clonning: {} *****", originalDomain.getClass())
 		if (!isDomainClass(originalDomain.getClass())) {
 			throw new RuntimeException('a Grails domain object parameter is required')
 		}
@@ -602,12 +623,6 @@ public class GormUtil {
 		props = props - keys
 		props.each { p ->
 			newDomain[p] = originalDomain[p]
-		}
-
-		newDomain.save(flush:true)
-
-		if (deleteOriginal) {
-			originalDomain.delete(flush:true)
 		}
 
 		return newDomain
@@ -657,7 +672,7 @@ public class GormUtil {
 		}
 
 		String hqlStr = hql.toString()
-		logger.debug "findCloneDomainTarget() query=$hql, params=$params"
+		logger.debug("findCloneDomainTarget() query={}, params={}", hql, params)
 		Object record = domainObj.getClass().find(hqlStr, params)
 
 		return record
@@ -708,7 +723,7 @@ public class GormUtil {
 			params << value
 		}
 		String hqlStr = hql.toString()
-		//logger.debug "findAllByProperties() query=$hql, params=$params"
+		//logger.debug("findAllByProperties() query={}, params={}", hql, params)
 
 		List rows = domainClass.findAll(hqlStr, params)
 		return rows
@@ -865,7 +880,7 @@ public class GormUtil {
 
 		// After replacing references we can look to delete the original domain
 		if (deleteFrom) {
-			logger.debug "Deleting ${fromDomain.getClass().getName()} $fromDomain"
+			logger.debug("Deleting {} {}", fromDomain.getClass().getName(), fromDomain)
 			domainClass.executeUpdate("delete $domainName x where x.id=:id", [id:fromDomain.id])
 			//fromDomain.delete(flush:true)
 		}

@@ -1,5 +1,6 @@
 package com.tds.asset
 
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.Person
 
@@ -60,5 +61,26 @@ class AssetDependency {
 	}
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
+	}
+
+	AssetDependency clone(Map replaceKeys = [:]){
+		AssetDependency clonedAsset = GormUtil.domainClone(this, replaceKeys) as AssetDependency
+
+		return clonedAsset
+	}
+
+	/** Helper Fetchers ************************/
+	static List<AssetDependency> fetchSupportedDependenciesOf(AssetEntity assetEntity){
+		return AssetDependency.findAll(
+			'from AssetDependency where dependent=? order by asset.assetType, asset.assetName asc',
+			[assetEntity]
+		)
+	}
+
+	static List<AssetDependency> fetchRequiredDependenciesOf(AssetEntity assetEntity){
+		return AssetDependency.findAll(
+			'from AssetDependency where asset=? order by dependent.assetType, dependent.assetName asc',
+			[assetEntity]
+		)
 	}
 }
