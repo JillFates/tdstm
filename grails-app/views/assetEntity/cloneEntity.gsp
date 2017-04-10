@@ -15,9 +15,9 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="includeDependencies" class="col-sm-4 control-label">Include Dependencies: </label>
+        <label for="includeDependencies" class="col-sm-4 control-label">Include Dependencies:</label>
         <div class="col-sm-7">
-            <input type="checkbox" id="includeDependencies" style="margin-top: 11px;">
+            <input type="checkbox" id="includeDependencies" style="margin-top: 11px;"> <i data-toggle="tooltip" data-placement="right" title="Clone all existing dependencies as well but will change the status of each to Questioned." class="fa fa-fw fa-question-circle"></i>
         </div>
     </div>
 
@@ -91,21 +91,30 @@
             $('[data-toggle="popover"]').popover();
 
             $('.accept-confirmation-btn').on('click', function(){
-                console.log(action);
-                document.title = title;
                 $('#confirmationDialogOnClone').dialog('close');
+                cloneAsset(action);
             });
 
             $('.cancel-confirmation-btn').on('click', function(){
                 $('#confirmationDialogOnClone').dialog('close');
             });
         } else {
-            var newAssetName = $('#newAssetName').val();
-            EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName);
-            document.title = title;
-            $('#confirmationDialogOnClone').dialog('close');
+            cloneAsset(action);
         }
     });
+
+    /**
+     * Excutes the Clone Action, if edit action mode, the it will promp the edit view.
+     * @param action
+     */
+    function cloneAsset(action) {
+        var newAssetName = $('#newAssetName').val();
+        var includeDependencies = ($('#includeDependencies').is(":checked")? '1' : '0');
+        EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName, includeDependencies, function(){
+            document.title = title;
+            $('#confirmationDialogOnClone').dialog('close');
+        });
+    }
 
     $('.open-asset-detail-btn').click(function() {
         document.title = title;
