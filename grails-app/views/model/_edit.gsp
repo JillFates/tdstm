@@ -19,7 +19,7 @@
 	<div style="border: 0px;margin-top: 5px;" >
 	<fieldset>
 	<legend><b>Edit Model</b></legend>
-	<g:form action="update"  enctype="multipart/form-data" name="modelForm">
+	<g:form action="update"  enctype="multipart/form-data" name="modelForm" onsubmit="updateModel('Model', 'modelForm');">
 	<div style="margin-left: 10px;margin-right: 10px; width: auto;">
 	<table style="border: 0px;">
 	<tbody>
@@ -122,13 +122,13 @@
 		<tr>
 			<td>Power (Max/Design/Avg):</td>
 			<td>
-				<input type="number" size="4" name="powerNameplate" id="powerNameplateEditId" value="${tds.rackPower(power: modelInstance?.powerNameplate, blankZero: true)}" style="width: 50px;"
+				<input type="number" size="4" min="0" name="powerNameplate" id="powerNameplateEditId" value="${tds.rackPower(power: modelInstance?.powerNameplate, blankZero: true)}" style="width: 50px;"
 					onblur="changePowerValue('Edit')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;"
 					onclick="setStanderdPower('Edit')"> >> </a>
 				<input type="hidden" id="powerNameplateIdH" value="${modelInstance?.powerNameplate}">
-				<input type="number" size="4" name="powerDesign" id="powerDesignEditId" style="width: 50px;" value="${tds.rackPower(power: modelInstance?.powerDesign, blankZero: true)}" >&nbsp;
+				<input type="number" min="0" size="4" name="powerDesign" id="powerDesignEditId" style="width: 50px;" value="${tds.rackPower(power: modelInstance?.powerDesign, blankZero: true)}" >&nbsp;
 				<input type="hidden" id="powerDesignIdH" value="${modelInstance?.powerDesign}" >
-				<input type="number" size="4" name="powerUse" id="powerUseEditId" style="width: 50px;" value="${tds.rackPower(power: modelInstance?.powerUse, blankZero: true)}" >&nbsp;
+				<input type="number" min="0" size="4" name="powerUse" id="powerUseEditId" style="width: 50px;" value="${tds.rackPower(power: modelInstance?.powerUse, blankZero: true)}" >&nbsp;
 				<input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
 				<g:select id="ptype" name='powerType' value="${tds.powerType()}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value,'Edit')"/>
 			</td>
@@ -324,12 +324,13 @@
 					 <g:if test="${redirectTo=='modelDialog'}">
 						 <script>
 							 $(document).ready(function(){
-                                 $(document).on('submit','#modelForm',function(){
+                                 $(document).on('submit','#modelForm',function(e){
+									
 									return false;
 								 });
 							 });
 						 </script>
-						<input type="submit" class="save" id="saveModelId" value="Update" onclick="updateModel('Model', 'modelForm')"/>
+						<input type="submit" class="save" id="saveModelId" value="Update"/>
 					</g:if>
 					<g:else>
 						<input type="submit" class="save" id="saveModelId" value="Update" />
