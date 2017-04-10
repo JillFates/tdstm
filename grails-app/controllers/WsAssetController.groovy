@@ -1,6 +1,7 @@
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -24,16 +25,6 @@ class WsAssetController implements ControllerMethods {
 	 * 	@param assetId <asset to filter the class from>
 	 */
 	def checkForUniqueName(String name, Long assetId){
-		/*def jsonRequest = request.JSON
-		String name = jsonRequest.name ?: ""
-		Long assetId = jsonRequest.assetId
-		*/
-
-		/*
-		List<AssetEntity> list = AssetEntity.list()
-		list.each {
-			log.info("Asset: {}", it)
-		}*/
 
 		boolean unique = true
 		AssetClass assetClassSample
@@ -71,35 +62,41 @@ class WsAssetController implements ControllerMethods {
 	 *
 	 * @param id
 	 * @param name
-	 * @param dependencies default "0"
+	 * @param dependencies default (groovy)false
 	 */
-	def clone(Long id, String name, String dependencies){
-		/*
-		def jsonRequest = request.JSON
-		Long id = jsonRequest.id
-		String name = jsonRequest.name
-		String dependencies = jsonRequest.dependencies
+	def clone(Long assetId, String name, Boolean dependencies){
+		log.info("assetId: {}, name: {}, dependencies: {}", assetId, name, dependencies)
 
-
-		AssetEntity assetToClone = AssetEntity.get(id)
-		AssetEntity clonedAsset = GormUtil.cloneDomain(assetToClone)
-
+		AssetEntity assetToClone = AssetEntity.get(assetId)
+		AssetEntity clonedAsset = assetToClone.clone()
+		log.info("clonedAsset.entityAttribute: {}", clonedAsset.entityAttribute)
 		clonedAsset.assetName = name
 
 		clonedAsset.validation = com.tdsops.tm.enums.domain.ValidationType.DIS
 
-		// Cloning assets
-		if (params.cloneDependencies=='1') {
+
+
+		// Cloning assets if requested
+		if (clonedAsset.save() && dependencies) {
 			for (dependency in assetToClone.supportedDependencies() ) {
-				AssetDependency clonedDependency = GormUtil.cloneDomain(dependency, [asset:clonedAsset])
-				clonedDependency.status = com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
+				AssetDependency clonedDependency = dependency.clone([
+						dependent : clonedAsset,
+						status	  : AssetDependencyStatus.QUESTIONED
+				])
+
+				clonedDependency.save()
 			}
 			for (dependency in assetToClone.requiredDependencies() ) {
-				AssetDependency clonedDependency = GormUtil.cloneDomain(dependency, [dependent:clonedAsset])
-				clonedDependency.status = com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
+				AssetDependency clonedDependency = dependency.clone([
+						asset  : clonedAsset,
+						status : AssetDependencyStatus.QUESTIONED
+				])
+
+				clonedDependency.save()
 			}
 		}
-		*/
+
+		renderAsJson([assetId : clonedAsset.id])
 	}
 
 }

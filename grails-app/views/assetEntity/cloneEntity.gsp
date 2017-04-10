@@ -77,7 +77,6 @@
     });
 
     $('.clone-action-btn').click(function() {
-        debugger;
         var action = $(this).attr('action');
         if(assetExist) {
             var confirmationDialogOnClone = $('#confirmationDialogOnClone');
@@ -99,6 +98,9 @@
                 $('#confirmationDialogOnClone').dialog('close');
             });
         } else {
+            var newAssetName = $('#newAssetName').val();
+            var includeDependencies = $('#includeDependencies').prop('checked');
+            EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName, includeDependencies);
             cloneAsset(action);
         }
     });
