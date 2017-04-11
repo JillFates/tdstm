@@ -33,17 +33,17 @@
 
 	<script type="text/javascript">
 		var progressTimer;
-       
+
 		$(document).ready(function() {
 
 			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
 				reloadGrid();
 				progressTimer.resetTimer();
 			});
-			
+
 			$('#assetMenu').show();
 			$("#showEntityView").dialog({ autoOpen: false })
-			
+
 			$("#editManufacturerView").dialog({ autoOpen: false})
 			$("#manufacturerShowDialog").dialog({ autoOpen: false })
 			$("#modelShowDialog").dialog({ autoOpen: false })
@@ -53,7 +53,7 @@
 			$(".menu-parent-tasks-task-manager").addClass('active');
 			$(".menu-parent-tasks").addClass('active');
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
-			
+
 			var event = ${filterEvent}
 			var justRemaining = ${justRemaining}
 			var justMyTasks = ${justMyTasks}
@@ -64,13 +64,13 @@
 			var assetEntity = '${assetName}'
 			var assetType = '${assetType}'
 			var dueDate = '${dueDate}'
+			var dueDate = '${dateResolved}'
 			var status = '${status}'
 			var assignedTo = '${assignedTo}'
 			var sendNotification = '${sendNotification}'
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
-			var status = '${status}'
 			var step = "${step}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var taskManagerUrl = "/assetEntity/listTasks"
@@ -113,13 +113,13 @@
 
 			<g:each var="key" in="['1','2','3','4','5']">
 				var taskPref= '${taskPref[key]}';
-				
+
 				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+"')\">");
 			</g:each>
 		})
-		
+
 		$.jgrid.formatter.integer.thousandsSeparator='';
-		
+
 		function checkSelectedEvent (event) {
 			var moveEvent = $("#moveEventId").val();
 			if (moveEvent == '0') {
@@ -155,7 +155,7 @@
 		function statusFormatter(cellVal,options,rowObject){
 			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		 }
-		
+
 		function updatedFormatter(cellVal,options,rowObject){
 			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
@@ -166,7 +166,7 @@
 			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[18]+'\', '+rowObject[16]+')\" >' + _.escape(cellVal) + '</span>' :
 				(cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")
 		}
-		
+
 		function instructionsLinkFormatter(cellVal,options,rowObject){
 			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[19]+'" instructions-link="'+rowObject[7]+'">' + cellVal + '</span>';
 		}
@@ -176,7 +176,7 @@
 				var value = cellvalue ? _.escape(cellvalue) : ''
 				return "<a href=\"javascript:showAssetComment(" + options.rowId + ", 'show' );\">" + value + "</a>"
 			}
-		
+
 		function populateFilter(){
 			$("#gs_comment").val('${comment}')
 			$("#gs_taskNumber").val('${taskNumber}')
@@ -264,19 +264,19 @@
 			<div id="columnCustomDiv_${taskPref[key]}" style="display:none;">
 				<div class="columnDiv_${key} customScroll customizeDiv">
 					<input type="hidden" id="previousValue_${key}" value="${taskPref[key]}" />
-					<g:each var="attribute" in="${attributesList}">
-						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute}" 
-							${taskPref[key]==attribute ? 'checked' : '' } 
-							onchange="setColumnAssetPref(this.value,'${key}','Task_Columns')"/> ${attribute}</label><br>
+					<g:each var="attribute" in="${assetCommentFields}">
+						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute.key}"
+							${taskPref[key]==attribute.key ? 'checked' : '' }
+							onchange="setColumnAssetPref(this.value,'${key}','Task_Columns')"/> ${attribute.value}</label><br>
 					</g:each>
 				</div>
 			</div>
 		</g:each>
-			
+
 		<g:render template="../assetEntity/modelDialog" />
 		<g:render template="../assetEntity/entityCrudDivs" />
 		<g:render template="../assetEntity/dependentAdd" />
-		
+
 		<g:render template="../layouts/error"/>
 	</div>
 	<div id="createStaffDialog" style="display:none;" class="static-dialog">
