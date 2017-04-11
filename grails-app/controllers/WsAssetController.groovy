@@ -48,7 +48,9 @@ class WsAssetController implements ControllerMethods {
 			assetClassSample = sampleAssetEntity.assetClass
 		}
 
-		if(!errors) {
+		if(errors){
+			renderFailureJson(errors)
+		} else {
 			AssetEntity assetEntity
 			if (assetClassSample) {
 				assetEntity = AssetEntity.findByAssetNameAndAssetClass(name, assetClassSample)
@@ -68,9 +70,7 @@ class WsAssetController implements ControllerMethods {
 				jsonMap.assetClass = assetClass
 			}
 
-			renderAsJson(jsonMap)
-		}else{
-			renderFailureJson(errors)
+			renderSuccessJson(jsonMap)
 		}
 	}
 
@@ -95,14 +95,20 @@ class WsAssetController implements ControllerMethods {
 		if(dependencies &&
 				!securityService.hasPermission(Permission.AssetCloneDependencies)
 		){
-			renderFailureJson("You don't have the correct permission to Clone Assets Dependencies")
-			return
+			log.error(
+					"Security Violation, user {} doesn't have the correct permission to Clone Asset Dependencies",
+					securityService.getCurrentUsername()
+			)
+			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
 
 
 		if(!errors) {
 			AssetEntity assetToClone = AssetEntity.get(assetId)
-			if(assetToClone) {
+			if(!assetToClone) {
+				errors << "The asset specified to clone was not found"
+
+			}else{
 				//check that the asset is part of the project
 				if(!securityService.isCurrentProjectId(assetToClone.projectId)){
 					log.error(
@@ -138,15 +144,13 @@ class WsAssetController implements ControllerMethods {
 						}
 					}
 				}
-			}else{
-				errors << "The asset specified to clone was not found"
 			}
 		}
 
-		if(!errors){
-			renderAsJson([assetId : clonedAsset.id])
-		}else{
+		if(errors){
 			renderFailureJson(errors)
+		}else{
+			renderSuccessJson([assetId : clonedAsset.id])
 		}
 	}
 
