@@ -62,7 +62,7 @@
     });
 
     var currentAssetId = ${asset.assetEntityInstance.id};
-    var currentAssetClass = '${asset.assetEntityInstance.assetType}'.toUpperCase();
+    var currentAssetClass = '${asset.assetEntityInstance.assetClass}'.toUpperCase();
     var assetExist = true;
     var lastXHRREquest = {};
     $('#confirmationDialogOnClone').dialog({ autoOpen: false });
@@ -100,7 +100,6 @@
         } else {
             var newAssetName = $('#newAssetName').val();
             var includeDependencies = $('#includeDependencies').prop('checked');
-            EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName, includeDependencies);
             cloneAsset(action);
         }
     });
@@ -112,9 +111,14 @@
     function cloneAsset(action) {
         var newAssetName = $('#newAssetName').val();
         var includeDependencies = ($('#includeDependencies').is(":checked")? '1' : '0');
-        EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName, includeDependencies, function(){
+        debugger;
+        EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName, includeDependencies, function(resp){
             document.title = title;
-            $('#confirmationDialogOnClone').dialog('close');
+            if(resp.assetId && action == 'edit') {
+                EntityCrud.showAssetEditView('${asset.assetEntityInstance.assetClass}'.toUpperCase(), resp.assetId);
+            }
+            $(document).trigger('entityAssetCreated', null);
+            $('#cloneEntityView').dialog('close');
         });
     }
 

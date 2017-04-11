@@ -35,7 +35,9 @@
                 $('#applicationIdGrid').trigger("reloadGrid");
             });
             $(document).on('entityAssetCreated',function (e,obj) {
-                $("#messageId").html(obj.asset.assetName + ' Created').show();
+                if(obj != null){
+                	$("#messageId").html(obj.asset.assetName + ' Created').show();
+                }
                 $('#applicationIdGrid').trigger("reloadGrid");
             });
 			$(document).ready(function() {

@@ -28,7 +28,9 @@
                 $('#databaseIdGrid').trigger("reloadGrid");
             });
             $(document).on('entityAssetCreated',function (e,obj) {
-                $("#messageId").html(obj.asset.assetName + ' Created').show();
+                if(obj != null) {
+                    $("#messageId").html(obj.asset.assetName + ' Created').show();
+                }
                 $('#databaseIdGrid').trigger("reloadGrid");
             });
 
@@ -72,7 +74,7 @@
 				<jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false, width:'50', fixed:false},
+					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false, width:'90', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${dbPref['1']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${dbPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
@@ -116,13 +118,18 @@
 			}
 			
 			function myCustomFormatter (cellVal,options,rowObject) {
-				var editButton = '';
+				var actionButton = '';
 				if (${hasPerm}) {
-					editButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')" title=\'Edit Asset\'>'+
+                    actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')" title=\'Edit Asset\'>'+
 					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 				}
-				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[7] + "' comments='" + rowObject[9] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
-				return editButton
+                actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[7] + "' comments='" + rowObject[9] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
+
+                var value = rowObject[1] ? _.escape(rowObject[1]) : '';
+                actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' + value + '\', '+options.rowId+');" title=\'Clone Asset\'>'+
+                    "<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
+
+                return actionButton;
 			}
 			function deleteMessage(response, postdata){
 				 $("#messageId").show()

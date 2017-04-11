@@ -38,7 +38,9 @@
 				$('#assetListIdGrid').trigger("reloadGrid");
 			});
 			$(document).on('entityAssetCreated',function (e,obj) {
-				$("#messageId").html(obj.asset.assetName + ' Created').show();
+                if(obj != null) {
+                    $("#messageId").html(obj.asset.assetName + ' Created').show();
+                }
 				$('#assetListIdGrid').trigger("reloadGrid");
 			});
 			$(document).ready(function() {
@@ -153,6 +155,7 @@
 				$.jgrid.formatter.integer.thousandsSeparator = '';
 				function myLinkFormatter (cellvalue, options, rowObject) {
 					var value = cellvalue ? _.escape(cellvalue) : '';
+					debugger;
 					return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\',' + options.rowId + ');">' + value + '</a>';
 				}
 
