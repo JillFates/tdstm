@@ -1,13 +1,14 @@
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.ValidationType
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.service.AssetEntityService
-import org.hibernate.Criteria
+import net.transitionmanager.security.Permission
+import net.transitionmanager.service.SecurityService
 
 /**
  * Created by @oluna on 4/5/17.
@@ -16,7 +17,7 @@ import org.hibernate.Criteria
 @Slf4j
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
-	//AssetEntityService assetEntityService
+	SecurityService securityService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -24,6 +25,7 @@ class WsAssetController implements ControllerMethods {
 	 * 	@param name <Name of the asset to check>
 	 * 	@param assetId <asset to filter the class from>
 	 */
+	@HasPermission(Permission.AssetView)
 	def checkForUniqueName(String name, Long assetId){
 
 		boolean unique = true
@@ -31,31 +33,45 @@ class WsAssetController implements ControllerMethods {
 		long foundAssetId = 0L
 		String assetClass = ""
 
+		List<String> errors = []
+
 		if(assetId){
 			AssetEntity sampleAssetEntity = AssetEntity.get(assetId)
+			//check that the asset is part of the project
+			if(!securityService.isCurrentProjectId(sampleAssetEntity.projectId)){
+				log.error(
+						"Security Violation, user {} attempted to access an asset not associated to the project",
+						securityService.getCurrentUsername()
+				)
+				errors << "Asset not found in current project"
+			}
 			assetClassSample = sampleAssetEntity.assetClass
 		}
 
-		AssetEntity assetEntity
-		if(assetClassSample){
-			assetEntity = AssetEntity.findByAssetNameAndAssetClass(name, assetClassSample)
+		if(!errors) {
+			AssetEntity assetEntity
+			if (assetClassSample) {
+				assetEntity = AssetEntity.findByAssetNameAndAssetClass(name, assetClassSample)
+			} else {
+				assetEntity = AssetEntity.findByAssetName(name)
+			}
+
+			if (assetEntity) {
+				unique = false
+				foundAssetId = assetEntity.id
+				assetClass = assetEntity.assetClass.toString()
+			}
+
+			Map<String, ?> jsonMap = [unique: unique]
+			if (!unique) {
+				jsonMap.assetId = foundAssetId
+				jsonMap.assetClass = assetClass
+			}
+
+			renderAsJson(jsonMap)
 		}else{
-			assetEntity = AssetEntity.findByAssetName(name)
+			renderFailureJson(errors)
 		}
-
-		if(assetEntity){
-			unique = false
-			foundAssetId = assetEntity.id
-			assetClass = assetEntity.assetClass.toString()
-		}
-
-		Map<String, ?> jsonMap = [unique:unique]
-		if(!unique){
-			jsonMap.assetId = foundAssetId
-			jsonMap.assetClass = assetClass
-		}
-
-		renderAsJson(jsonMap)
 	}
 
 	/**
@@ -64,39 +80,74 @@ class WsAssetController implements ControllerMethods {
 	 * @param name
 	 * @param dependencies default (groovy)false
 	 */
+	@HasPermission(Permission.AssetCreate)
 	def clone(Long assetId, String name, Boolean dependencies){
-		log.info("assetId: {}, name: {}, dependencies: {}", assetId, name, dependencies)
+		log.debug("assetId: {}, name: {}, dependencies: {}", assetId, name, dependencies)
 
-		AssetEntity assetToClone = AssetEntity.get(assetId)
-		AssetEntity clonedAsset = assetToClone.clone()
-		log.info("clonedAsset.entityAttribute: {}", clonedAsset.entityAttribute)
-		clonedAsset.assetName = name
+		List<String> errors = []
+		if(!assetId){
+			errors << "The asset id was missing"
+		}
+		if(!name){
+			errors << "The new asset name is missing"
+		}
 
-		clonedAsset.validation = com.tdsops.tm.enums.domain.ValidationType.DIS
+		if(dependencies &&
+				!securityService.hasPermission(Permission.AssetCloneDependencies)
+		){
+			renderFailureJson("You don't have the correct permission to Clone Assets Dependencies")
+			return
+		}
 
 
+		if(!errors) {
+			AssetEntity assetToClone = AssetEntity.get(assetId)
+			if(assetToClone) {
+				//check that the asset is part of the project
+				if(!securityService.isCurrentProjectId(assetToClone.projectId)){
+					log.error(
+							"Security Violation, user {} attempted to access an asset not associated to the project",
+							securityService.getCurrentUsername()
+					)
+					errors << "Asset not found in current project"
+				}
 
-		// Cloning assets if requested
-		if (clonedAsset.save() && dependencies) {
-			for (dependency in assetToClone.supportedDependencies() ) {
-				AssetDependency clonedDependency = dependency.clone([
-						dependent : clonedAsset,
-						status	  : AssetDependencyStatus.QUESTIONED
-				])
+				if(!errors) {
+					AssetEntity clonedAsset = assetToClone.clone([
+							assetName : name,
+							validation: ValidationType.DIS
+					])
 
-				clonedDependency.save()
-			}
-			for (dependency in assetToClone.requiredDependencies() ) {
-				AssetDependency clonedDependency = dependency.clone([
-						asset  : clonedAsset,
-						status : AssetDependencyStatus.QUESTIONED
-				])
+					// Cloning assets dependencies if requested
+					if (clonedAsset.save() && dependencies) {
+						for (dependency in assetToClone.supportedDependencies()) {
+							AssetDependency clonedDependency = dependency.clone([
+									dependent: clonedAsset,
+									status   : AssetDependencyStatus.QUESTIONED
+							])
 
-				clonedDependency.save()
+							clonedDependency.save()
+						}
+						for (dependency in assetToClone.requiredDependencies()) {
+							AssetDependency clonedDependency = dependency.clone([
+									asset : clonedAsset,
+									status: AssetDependencyStatus.QUESTIONED
+							])
+
+							clonedDependency.save()
+						}
+					}
+				}
+			}else{
+				errors << "The asset specified to clone was not found"
 			}
 		}
 
-		renderAsJson([assetId : clonedAsset.id])
+		if(!errors){
+			renderAsJson([assetId : clonedAsset.id])
+		}else{
+			renderFailureJson(errors)
+		}
 	}
 
 }

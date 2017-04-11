@@ -63,9 +63,13 @@ class AssetDependency {
 		lastUpdated = TimeUtil.nowGMT()
 	}
 
+	/**
+	 * Clone this Entity and replace properties if a map is specified
+	 * @param replaceKeys
+	 * @return
+	 */
 	AssetDependency clone(Map replaceKeys = [:]){
 		AssetDependency clonedAsset = GormUtil.domainClone(this, replaceKeys) as AssetDependency
-
 		return clonedAsset
 	}
 

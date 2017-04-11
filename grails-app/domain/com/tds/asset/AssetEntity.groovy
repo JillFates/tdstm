@@ -467,9 +467,13 @@ class AssetEntity extends EavEntity {
 		return AssetDependency.fetchRequiredDependenciesOf(this)
 	}
 
+	/**
+	 * Clone this Entity and replace properties if a map is specified
+	 * @param replaceKeys
+	 * @return
+	 */
 	AssetEntity clone(Map replaceKeys = [:]){
 		AssetEntity clonedAsset = GormUtil.domainClone(this, replaceKeys) as AssetEntity
-
 		return clonedAsset
 	}
 }
