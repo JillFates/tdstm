@@ -14,12 +14,14 @@
             <span class="glyphicon glyphicon-remove icon-clone-exist" style="margin-top: 9px; margin-left: -18px; color: #dd4b39;"></span>
         </div>
     </div>
-    <div class="form-group">
-        <label for="includeDependencies" class="col-sm-4 control-label">Include Dependencies:</label>
-        <div class="col-sm-7">
-            <input type="checkbox" id="includeDependencies" style="margin-top: 11px;"> <i data-toggle="tooltip" data-placement="right" title="Clone all existing dependencies as well but will change the status of each to Questioned." class="fa fa-fw fa-question-circle"></i>
+    <tds:hasPermission permission="${Permission.AssetCloneDependencies}">
+        <div class="form-group">
+            <label for="includeDependencies" class="col-sm-4 control-label">Include Dependencies:</label>
+            <div class="col-sm-7">
+                <input type="checkbox" id="includeDependencies" style="margin-top: 11px;"> <i data-toggle="tooltip" data-placement="right" title="Clone all existing dependencies as well but will change the status of each to Questioned." class="fa fa-fw fa-question-circle"></i>
+            </div>
         </div>
-    </div>
+    </tds:hasPermission>
 
     <div class="modal-footer" style="margin-top: 25px;">
         <div style="float: left;">
@@ -116,8 +118,10 @@
         debugger;
         EntityCrud.cloneAsset(${asset.assetEntityInstance.id}, newAssetName, includeDependencies, function(resp){
             document.title = title;
-            if(resp.assetId && action == 'edit') {
-                EntityCrud.showAssetEditView('${asset.assetEntityInstance.assetClass}'.toUpperCase(), resp.assetId);
+            if(resp && resp.status === 'success' && resp.data.assetId && action == 'edit') {
+                EntityCrud.showAssetEditView('${asset.assetEntityInstance.assetClass}'.toUpperCase(), resp.data.assetId);
+            } else if(resp && resp.status !== 'success'){
+                alert(resp.data)
             }
             $(document).trigger('entityAssetCreated', null);
             $('#cloneEntityView').dialog('close');
@@ -144,14 +148,17 @@
                 $('.clone-action-btn').prop('disabled', false);
                 $('.lbl-clone-name-missing').hide();
                 lastXHRREquest = EntityCrud.isAssetUnique(${asset.assetEntityInstance.id}, newAssetName, function(resp){
-                    if(resp && resp.unique) {
+                    debugger;
+                    if(resp && resp.status === 'success' && resp.data.unique) {
                         $('.lbl-clone-exist').hide();
                         $('.icon-clone-exist').hide();
                         $('.icon-clone-ok').show();
                         assetExist = false;
+                    } else if(resp && resp.status !== 'success'){
+                        alert(resp.data)
                     } else {
-                        currentAssetId =  resp.assetId;
-                        currentAssetClass = resp.assetClass;
+                        currentAssetId =  resp.data.assetId;
+                        currentAssetClass = resp.data.assetClass;
                         $('.lbl-clone-exist').show();
                         $('.icon-clone-exist').show();
                         $('.icon-clone-ok').hide();
