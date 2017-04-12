@@ -23,7 +23,6 @@ import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-ed
 // Jquery Kendo Grid
 import { JqueryKendoGridComponent } from './modules/jquery-kendo-grid/jquery-kendo-grid.component';
 import { JqueryKendoGridColumnComponent } from './modules/jquery-kendo-grid/jquery-kendo-grid-column.component';
-import { JqueryKendoGridModel } from './modules/jquery-kendo-grid/jquery-kendo-grid.model';
 
 @NgModule({
     imports: [

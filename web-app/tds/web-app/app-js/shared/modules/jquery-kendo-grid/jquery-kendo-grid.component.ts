@@ -1,7 +1,6 @@
 import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
 
 import { JqueryKendoGridModel } from './jquery-kendo-grid.model';
-import { JqueryKendoGridService } from './jquery-kendo-grid.service';
 
 declare var jQuery: any;
 
@@ -10,7 +9,7 @@ declare var jQuery: any;
     selector: 'jquery-kendo-grid',
     template: `<div #grid><ng-content select="jquery-kendo-grid-column"></ng-content></div>`,
     exportAs: 'JqueryKendoGrid',
-    providers: [JqueryKendoGridService]
+    providers: [JqueryKendoGridModel]
 })
 export class JqueryKendoGridComponent implements AfterViewInit, OnChanges {
     @ViewChild('grid') el: ElementRef;
@@ -20,22 +19,24 @@ export class JqueryKendoGridComponent implements AfterViewInit, OnChanges {
     @Input() sort: any;
     @Input('page-size') pageSize: number;
     @Input() data: Array<any>;
+    @Input() columns: Array<any>;
 
     kendoGrid: any;
 
-    constructor(private gridService: JqueryKendoGridService) { }
+    constructor(private model: JqueryKendoGridModel) { }
 
     ngAfterViewInit(): void {
-        this.gridService.model.pageable = this.pageable;
-        this.gridService.model.sortable = this.sortable;
-        this.gridService.model.dataSource = {
+        this.model.pageable = this.pageable;
+        this.model.sortable = this.sortable;
+        this.model.columns = this.model.columns.concat(this.columns || []);
+        this.model.dataSource = {
             pageSize: this.pageSize,
             transport: {
                 read: e => e.success(this.data ? this.data : [])
             },
             sort: this.sort
         };
-        this.initializeKendoGrid(this.gridService.model);
+        this.initializeKendoGrid(this.model);
     }
 
     ngOnChanges(changes: SimpleChanges): void {

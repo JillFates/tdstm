@@ -9,6 +9,8 @@
                     [sortable]="true">
                     <jquery-kendo-grid-column field="id" hidden="true"></jquery-kendo-grid-column>
                     <jquery-kendo-grid-column field="htmlText" hidden="true"></jquery-kendo-grid-column>
+                    <jquery-kendo-grid-column field="action" title="Action" [template]="onEditTemplate">
+                    </jquery-kendo-grid-column>
                     <jquery-kendo-grid-column title="Title" field="title"></jquery-kendo-grid-column>
                     <jquery-kendo-grid-column title="Active" field="active" [template]="'#if(active) {# Yes #} else {# No #}#'"></jquery-kendo-grid-column>
                 </jquery-kendo-grid>

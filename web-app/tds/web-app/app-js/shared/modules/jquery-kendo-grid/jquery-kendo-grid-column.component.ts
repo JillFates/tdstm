@@ -1,12 +1,14 @@
-import { Component, Input, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
-import { JqueryKendoGridService } from './jquery-kendo-grid.service';
+import { JqueryKendoGridModel } from './jquery-kendo-grid.model';
 
+declare var jQuery: any;
+declare var kendo: any;
 @Component({
     moduleId: module.id,
     selector: 'jquery-kendo-grid-column',
     template: '',
-    exportAs: 'JqueryKendoGridColumn',
+    exportAs: 'JqueryKendoGridColumn'
 })
 export class JqueryKendoGridColumnComponent implements OnInit {
     @Input() title: string;
@@ -15,15 +17,15 @@ export class JqueryKendoGridColumnComponent implements OnInit {
     @Input() hidden: boolean;
     @Input() template: string;
 
-    constructor(private gridService: JqueryKendoGridService) { }
+    constructor(private model: JqueryKendoGridModel) { }
 
     ngOnInit(): void {
-        this.gridService.model.columns.push({
+        this.model.columns.push({
             title: this.title,
             field: this.field,
             width: this.width,
             hidden: this.hidden,
-            template: this.template
+            template: this.template ? kendo.template(this.template) : null
         });
     }
 }

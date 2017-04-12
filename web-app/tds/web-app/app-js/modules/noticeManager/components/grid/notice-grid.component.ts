@@ -13,6 +13,7 @@ import { NoticeModel } from '../../model/notice.model';
 export class NoticeGridComponent implements OnInit {
     private moduleName = '';
     noticeList: NoticeModel[];
+    onEditTemplate = '<button class="btn btn-default" (click)="onEditNotice(this)"><span class="glyphicon glyphicon-pencil"></span></button>';
 
     constructor(private noticeService: NoticeService) {
         this.moduleName = 'Notice Grid';
@@ -20,14 +21,10 @@ export class NoticeGridComponent implements OnInit {
 
     private onLoadNoticeList(noticeList: any): void {
         this.noticeList = noticeList.notices as NoticeModel[];
-
     }
 
-    public add(): void {
-        let notice = new NoticeModel();
-        notice.title = 'Teste';
-        notice.active = false;
-        this.noticeList.push(notice);
+    public onEditNotice(notice): void {
+        console.log(notice);
     }
 
     ngOnInit(): void {
