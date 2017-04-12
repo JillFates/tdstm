@@ -102,7 +102,7 @@ class WsAssetController implements ControllerMethods {
 			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
 
-
+		AssetEntity clonedAsset
 		if(!errors) {
 			AssetEntity assetToClone = AssetEntity.get(assetId)
 			if(!assetToClone) {
@@ -119,7 +119,7 @@ class WsAssetController implements ControllerMethods {
 				}
 
 				if(!errors) {
-					AssetEntity clonedAsset = assetToClone.clone([
+					clonedAsset = assetToClone.clone([
 							assetName : name,
 							validation: ValidationType.DIS
 					])
