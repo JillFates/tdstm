@@ -167,10 +167,11 @@
 					}
                     actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] + "' tasks='" + rowObject[13] + "' comments='" + rowObject[16] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
 
-                    var value = rowObject[1] ? _.escape(rowObject[1]) : ''
-                    actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' + value + '\', '+options.rowId+');" title=\'Clone Asset\'>'+
-                        "<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
-
+					<tds:hasPermission permission="${Permission.AssetCreate}">
+						var value = rowObject[1] ? _.escape(rowObject[1]) : ''
+						actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' + value + '\', '+options.rowId+');" title=\'Clone Asset\'>'+
+							"<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
+                    </tds:hasPermission>
 					return actionButton;
 				}
 

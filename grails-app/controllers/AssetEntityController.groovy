@@ -1982,9 +1982,9 @@ class AssetEntityController implements ControllerMethods {
 
 	/**
 	 * Render the clone view.
-	 * @return : render the clone view for clonning assets
+	 * @return : render the clone view for cloning assets
 	 */
-	@HasPermission(Permission.AssetEdit)
+	@HasPermission(Permission.AssetCreate)
 	def cloneEntity() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
