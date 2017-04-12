@@ -20,7 +20,6 @@ import { NoticeFormComponent } from '../components/form/notice-form.component';
 import { NoticeService } from '../service/notice.service';
 import { NoticeModel } from '../model/notice.model';
 
-
 describe('NoticeFormComponent:', () => {
     let fixture: ComponentFixture<NoticeFormComponent>;
     let comp: NoticeFormComponent;
@@ -48,7 +47,7 @@ describe('NoticeFormComponent:', () => {
                     deps: [Http]
                 })
             ],
-            declarations: [NoticeFormComponent,],
+            declarations: [NoticeFormComponent],
             providers: [NoticeService, HttpServiceProvider, NotifierService, TranslateService, UIActiveDialogService,
                 { provide: NoticeModel, useValue: notice },
                 { provide: Number, useValue: ActionType.Edit }]
@@ -63,9 +62,9 @@ describe('NoticeFormComponent:', () => {
 
     it('should create component', () => expect(comp).toBeDefined());
 
-    it('should display valid form',()=>{
+    it('should display valid form', () => {
         fixture.detectChanges();
         expect(comp.noticeForm.valid).toBeTruthy();
-    })
+    });
 
 });

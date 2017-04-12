@@ -1,5 +1,6 @@
 import { Ng2StateDeclaration } from 'ui-router-ng2';
-import { NoticeListComponent } from './components/list/notice-list.component';
+// import { NoticeListComponent } from './components/list/notice-list.component';
+import { NoticeGridComponent } from './components/grid/notice-grid.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 export class NoticeStates {
@@ -27,7 +28,7 @@ export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
     },
     views: {
         'headerView@tds': { component: HeaderComponent },
-        'containerView@tds': { component: NoticeListComponent }
+        'containerView@tds': { component: NoticeGridComponent }
     }
 };
 

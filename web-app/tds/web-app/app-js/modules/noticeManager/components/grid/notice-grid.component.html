@@ -1,0 +1,19 @@
+<!-- Main content -->
+<div class="content body">
+    <section>
+        <div>
+            <div class="box-body box-with-empty-header">
+                <!--<button (click)="add()">add</button>
+                <div id="grid"></div>-->
+                <jquery-kendo-grid [data]="noticeList" page-size="10" [sort]="{field: 'title', dir: 'asc'}" [pageable]="{ refresh: true, pageSizes: true, buttonCount: 5 }"
+                    [sortable]="true">
+                    <jquery-kendo-grid-column field="id" hidden="true"></jquery-kendo-grid-column>
+                    <jquery-kendo-grid-column field="htmlText" hidden="true"></jquery-kendo-grid-column>
+                    <jquery-kendo-grid-column title="Title" field="title"></jquery-kendo-grid-column>
+                    <jquery-kendo-grid-column title="Active" field="active" [template]="'#if(active) {# Yes #} else {# No #}#'"></jquery-kendo-grid-column>
+                </jquery-kendo-grid>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </section>
+</div>

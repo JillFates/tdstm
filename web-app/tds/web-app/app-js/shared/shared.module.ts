@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {TranslateModule} from 'ng2-translate';
+import { TranslateModule } from 'ng2-translate';
 
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
@@ -20,6 +20,10 @@ import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 import { HeaderComponent } from './modules/header/header.component';
 import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
 import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-editor.component';
+// Jquery Kendo Grid
+import { JqueryKendoGridComponent } from './modules/jquery-kendo-grid/jquery-kendo-grid.component';
+import { JqueryKendoGridColumnComponent } from './modules/jquery-kendo-grid/jquery-kendo-grid-column.component';
+import { JqueryKendoGridModel } from './modules/jquery-kendo-grid/jquery-kendo-grid.model';
 
 @NgModule({
     imports: [
@@ -33,7 +37,9 @@ import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-ed
         UIDialogDirective,
         HeaderComponent,
         FormlyInputHorizontal,
-        RichTextEditorComponent
+        RichTextEditorComponent,
+        JqueryKendoGridComponent,
+        JqueryKendoGridColumnComponent
     ],
     providers: [
         AuthService,
@@ -51,7 +57,9 @@ import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-ed
         HeaderComponent,
         FormlyInputHorizontal,
         RichTextEditorComponent,
-        TranslateModule
+        TranslateModule,
+        JqueryKendoGridComponent,
+        JqueryKendoGridColumnComponent
     ]
 })
 export class SharedModule {
