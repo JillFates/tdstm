@@ -37,6 +37,7 @@ export default class LicenseManagerList {
                 {field: 'project.name', title: 'Project', template: '<span style="text-transform: capitalize;">#=((data.project && data.project.name)? data.project.name.toLowerCase(): "" )#</span>'},
                 {field: 'email', title: 'Contact Email'},
                 {field: 'status', title: 'Status', template: '<span style="text-transform: capitalize;">#=((data.status)? data.status.toLowerCase(): "" )#</span>'},
+                {field: 'websitename', title: 'Website Name'},
                 {field: 'type.name', title: 'Type',  template: '#if(data.type && data.type.name === "MULTI_PROJECT"){# Global # } else {# Single #}#'},
                 {field: 'method.name', title: 'Method', template: '<span style="text-transform: capitalize;">#=((data.method && data.method.name)? data.method.name.toLowerCase(): "" )#</span>'},
                 {field: 'method.max', title: 'Server/Tokens'},
