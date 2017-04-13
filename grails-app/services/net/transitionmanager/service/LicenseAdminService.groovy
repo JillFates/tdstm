@@ -43,7 +43,7 @@ class LicenseAdminService extends LicenseCommonService {
 	 * @return
 	 */
 	def initialize() {
-		log.info("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
+		log.debug("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
 		if(isEnabled() && !loaded) {
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
@@ -55,12 +55,11 @@ class LicenseAdminService extends LicenseCommonService {
 				licenseCache.addCache(memoryOnlyCache)
 			}
 
-			log.info("load LM?: ${isLGen()}")
+			log.debug("load LM?: ${isLGen()}")
 			if(isLGen()) {
-				log.info("License Manager Enabled")
+				log.debug("License Manager Enabled")
 				String keyFile = grailsApplication.config.manager?.license?.key
 				String password = grailsApplication.config.manager?.license?.password
-				log.info("Manager Key: '{}', password: '{}'", keyFile, password)
 
 				File file = new File(keyFile)
 
@@ -83,7 +82,7 @@ class LicenseAdminService extends LicenseCommonService {
 				// BEGIN: TEST MANAGER LICENSE //
 				//String id = "84612874-7d78-4a69-906c-2e02c27ab54d"
 				//String key = licenseManagerService.getLicenseKey(id)
-				//log.info("OLB ($id) License Key: $key")
+				//log.debug("OLB ($id) License Key: $key")
 				// END: TEST MANAGER LICENSE //
 			}
 
@@ -523,7 +522,7 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	private boolean sendMailRequest(DomainLicense license){
-		log.info("SEND License Request")
+		log.debug("SEND License Request")
 		String toEmail = grailsApplication.config.tdstm?.license?.request_email
 
 		if(toEmail) {
@@ -546,7 +545,6 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 	}
 
-
     /**
      * Deletes a License Request.
      *
@@ -568,6 +566,5 @@ class LicenseAdminService extends LicenseCommonService {
             return false
         }
     }
-
 
 }
