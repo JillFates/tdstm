@@ -1233,16 +1233,16 @@ var EntityCrud = (function ($) {
 	};
 
     /**
-     * Public method to verify that an Asset is Unique or not
+     * Public method to Create the new Asset from the Clone feature.
      * @param assetId
      * @param assetName
      */
-    pub.cloneAsset = function(assetId, assetName, dependencies, callback) {
+    pub.cloneAsset = function(assetToClone, callback) {
         var url = tdsCommon.createAppURL('/ws/asset/clone');
         var xhr = jQuery.ajax({
             url: url,
             type: 'POST',
-            data: 'assetId='+assetId+'&dependencies='+dependencies+'&name='+assetName,
+            data: assetToClone,
             dataType: 'json',
             success: function (resp) {
                 return callback(resp);
