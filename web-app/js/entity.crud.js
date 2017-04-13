@@ -1214,7 +1214,7 @@ var EntityCrud = (function ($) {
      * @param assetName
      */
     pub.isAssetUnique = function(assetId, assetName, callback) {
-        var url = tdsCommon.createAppURL('/ws/asset/isunique');
+        var url = tdsCommon.createAppURL('/ws/asset/checkForUniqueName');
         var xhr = jQuery.ajax({
             url: url,
             type: 'POST',

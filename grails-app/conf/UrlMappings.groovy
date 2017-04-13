@@ -32,7 +32,8 @@ class UrlMappings {
 		/********************************************************
 		 * Asset WS
 		 ********************************************************/
-		"/ws/asset/isunique" {
+
+		"/ws/asset/checkForUniqueName" {
 			controller = "wsAsset"
 			action = [
 			        POST:"checkForUniqueName"
@@ -45,6 +46,7 @@ class UrlMappings {
 					POST:"clone"
 			]
 		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {

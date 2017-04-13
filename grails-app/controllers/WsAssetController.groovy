@@ -9,6 +9,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
+import org.grails.datastore.mapping.query.api.BuildableCriteria
 
 /**
  * Created by @oluna on 4/5/17.
@@ -30,7 +31,7 @@ class WsAssetController implements ControllerMethods {
 
 		boolean unique = true
 		AssetClass assetClassSample
-		long foundAssetId = 0L
+		Long foundAssetId
 		String assetClass = ""
 
 		List<String> errors = []
@@ -38,10 +39,9 @@ class WsAssetController implements ControllerMethods {
 		if(assetId){
 			AssetEntity sampleAssetEntity = AssetEntity.get(assetId)
 			//check that the asset is part of the project
-			if(!securityService.isCurrentProjectId(sampleAssetEntity.projectId)){
-				log.error(
-						"Security Violation, user {} attempted to access an asset not associated to the project",
-						securityService.getCurrentUsername()
+			if(!securityService.isCurrentProjectId(sampleAssetEntity?.project.id)){
+				securityService.reportViolation(
+						"Security Violation, user {} attempted to access an asset not associated to the project"
 				)
 				errors << "Asset not found in current project"
 			}
@@ -50,12 +50,15 @@ class WsAssetController implements ControllerMethods {
 
 		if(errors){
 			renderFailureJson(errors)
+
 		} else {
-			AssetEntity assetEntity
-			if (assetClassSample) {
-				assetEntity = AssetEntity.findByAssetNameAndAssetClass(name, assetClassSample)
-			} else {
-				assetEntity = AssetEntity.findByAssetName(name)
+			AssetEntity assetEntity = AssetEntity.createCriteria().get {
+				and {
+					eq('assetName', name, [ignoreCase: true])
+					if(assetClassSample){
+						eq('assetClass', assetClassSample)
+					}
+				}
 			}
 
 			if (assetEntity) {
@@ -76,9 +79,10 @@ class WsAssetController implements ControllerMethods {
 
 	/**
 	 *
-	 * @param id
-	 * @param name
-	 * @param dependencies default (groovy)false
+	 * @param assetId	Id of the asset that we are going to clone
+	 * @param name		name of the new cloned instance
+	 * @param dependencies if true we will clone all the *supported* and *required* dependencies of
+	 * 			the original asset into the new one. defaults to false
 	 */
 	@HasPermission(Permission.AssetCreate)
 	def clone(Long assetId, String name, Boolean dependencies){
@@ -95,9 +99,8 @@ class WsAssetController implements ControllerMethods {
 		if(dependencies &&
 				!securityService.hasPermission(Permission.AssetCloneDependencies)
 		){
-			log.error(
-					"Security Violation, user {} doesn't have the correct permission to Clone Asset Dependencies",
-					securityService.getCurrentUsername()
+			securityService.reportViolation(
+					"Security Violation, user {} doesn't have the correct permission to Clone Asset Dependencies"
 			)
 			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
