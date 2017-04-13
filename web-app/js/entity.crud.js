@@ -1213,12 +1213,12 @@ var EntityCrud = (function ($) {
      * @param assetId
      * @param assetName
      */
-    pub.isAssetUnique = function(assetId, assetName, callback) {
+    pub.isAssetUnique = function(assetToValid, callback) {
         var url = tdsCommon.createAppURL('/ws/asset/checkForUniqueName');
         var xhr = jQuery.ajax({
             url: url,
             type: 'POST',
-            data: 'assetId='+assetId+'&name='+assetName,
+            data: assetToValid,
             dataType: 'json',
             success: function (resp) {
                 return callback(resp);

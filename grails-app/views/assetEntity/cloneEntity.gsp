@@ -149,7 +149,13 @@
             } else {
                 $('.clone-action-btn').prop('disabled', false);
                 $('.lbl-clone-name-missing').hide();
-                lastXHRREquest = EntityCrud.isAssetUnique(${asset.assetEntityInstance.id}, newAssetName, function(resp){
+
+                var assetToValid =  {
+                    assetId: ${asset.assetEntityInstance.id},
+                    name: newAssetName
+                };
+
+                lastXHRREquest = EntityCrud.isAssetUnique(assetToValid, function(resp){
 
                     if(resp && resp.status === 'success' && resp.data.unique) {
                         $('.lbl-clone-exist').hide();
