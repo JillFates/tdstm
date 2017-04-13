@@ -159,25 +159,16 @@ class WsLicenseAdminController implements ControllerMethods {
 	def loadLicense(){ // Apply license
 		try{
 			def json = request.JSON
-			//logger.info("license ID: {}", params.id)
 			License lic = License.get(params.id)
 
 			if(lic){
-				/*
-				if(lic.hash){
-					response.status = 302 //Found
-					log.info("License Hash: {}", lic.hash)
-					render "${lic.id} already has a license"
-				}else {
-				*/
-					lic.hash = json.hash
+				lic.hash = json.hash
 
-					if (licenseAdminService.load(lic)) {
-						renderSuccessJson("Ok")
-					} else {
-						throw new Exception("Error while loading the license")
-					}
-				//}
+				if (licenseAdminService.load(lic)) {
+					renderSuccessJson("Ok")
+				} else {
+					throw new Exception("Error while loading the license")
+				}
 			}else{
 				response.status = 404 //Not Found
 				render "${params.id} not found."
