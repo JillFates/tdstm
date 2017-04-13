@@ -81,15 +81,26 @@ class AssetTestHelper {
 				currentAssetType: assetType,
 				moveBundle: project.projectDefaultBundle,
 				"moveBundle.id": project.projectDefaultBundle.id.toString(),
-				rackId: "-1",
 				roomSourceId: "-1",
+				sourceLocation: "",
+				sourceRoom: "",
 				roomTargetId: "-1",
+				targetLocation: "",
+				targetRoom: "",
 				rackSourceId: "-1",
-				rackTargetId: "-1",
+				sourceRack: "",
 				newRackSourceId: "-1",
+				rackTargetId: "-1",
+				targetRack: "",
 				newRackTargetId: "-1",
-				sourceLocation: "TBD", // This value is not set in the create page, though without it the room won't be created.
-				targetLocation: "TBD", // This value is not set in the create page, though without it the room won't be created.
+				sourceChassis: "0",
+				targetChassis: "0",
+				sourceRackPosition: "",
+				targetRackPosition: "",
+				sourceBladePosition: "",
+				targetBladePosition: "",
+				sourceLocation: "TBD",
+				targetLocation: "TBD",
 		 ]
 		 defaultValues.each{ key, val->
 			 if(!params.containsKey(key)) {

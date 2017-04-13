@@ -337,10 +337,6 @@ class AssetEntityService implements ServiceMethods {
 
 		String srcOrTarget = isSource ? 'Source' : 'Target'
 		def roomProp = "room$srcOrTarget"
-		if (asset.isaBlade() || asset.isaVM()) {
-				asset[roomProp] = null
-				return
-		}
 		Long id = NumberUtil.toLong(roomId)
 		if (id == null) {
 			log.warn "assignAssetToRoom() called with invalid room id ($roomId)"
@@ -348,19 +344,12 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
-
 		switch (id) {
 			case -1:
 				// Create a new room
-				/*
-				if (location.trim().size() == 0 || roomName.trim().size() == 0) {
+				if (location.trim().size() == 0 && roomName.trim().size() == 0) {
 					throw new InvalidRequestException("Creating a $srcOrTarget room requires both the location and room name".toString())
 				}
-
-				arecordon: commenting out this code because the findOrCreateRoom
-						will try to default some values if not present.
-
-				*/
 
 				def room = roomService.findOrCreateRoom(project, location, roomName, '', isSource)
 				if (room) {
@@ -419,13 +408,10 @@ class AssetEntityService implements ServiceMethods {
 		if (asset.isaBlade() || asset.isaVM()) {
 			// If asset model is VM or BLADE we should remove rack assignments period
 			asset[rackProp] = null
-			if (isSource) {
-				asset.sourceBladePosition = null
-				asset.sourceRackPosition = null
-			} else {
-				asset.targetBladePosition = null
-				asset.targetRackPosition = null
-			}
+			asset.sourceBladePosition = null
+			asset.sourceRackPosition = null
+			asset.targetBladePosition = null
+			asset.targetRackPosition = null
 			return
 		}
 
