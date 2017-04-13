@@ -303,7 +303,7 @@ function updateModel(forWhom, formName) {
 			}).dialog('open');
 
 		},
-		error: function (request, errordata, errorObject) { alert(errorObject.toString()); }
+		error: function (request, errordata, errorObject) { alert(errorObject.toString()); },
 	});
 }
 
