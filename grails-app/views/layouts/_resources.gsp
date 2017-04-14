@@ -43,4 +43,4 @@
 <script src="${resource(dir: 'dist/js', file: 'TDSTMLayout.min.js')}"></script>
 
 <!-- Kendo -->
-<script src="${resource(dir: 'dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
+<script src="${resource(dir: 'tds/web-app/dist', file: 'kendo.all.min.js')}"></script>

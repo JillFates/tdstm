@@ -6,7 +6,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
 import {HttpModule, Http} from '@angular/http';
 
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateModule, TranslateLoader, TranslateStaticLoader} from 'ng2-translate';
 
 import {TDSAppComponent} from './tds-app.component';
@@ -24,8 +23,6 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         // Angular Modules
         BrowserModule,
         HttpModule,
-        // Bootstrap Module
-        NgbModule.forRoot(),
         // Feature Modules
         SharedModule,
         NoticesManagerModule,
