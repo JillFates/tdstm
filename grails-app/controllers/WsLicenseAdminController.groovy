@@ -102,15 +102,12 @@ class WsLicenseAdminController implements ControllerMethods {
 	@HasPermission(Permission.LicenseView)
 	def getLicenseRequestHash(){
 		def id = params.id
-		License lic
-		if(id) {
-			lic = License.get(id)
-		}
 
-		if(lic) {
-			renderSuccessJson(lic.toEncodedMessage())
+		String hash = licenseAdminService.getLicenseRequestBody(id)
+
+		if(hash) {
+			renderSuccessJson(hash)
 		}else{
-			//TODO: OLB 20170124 Change this to the AJax Approach
 			response.status = 404 //Not Found
 			render "${id} not found."
 		}

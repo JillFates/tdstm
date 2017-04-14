@@ -185,7 +185,11 @@ class LicenseManagerService extends LicenseCommonService{
 		String toEmail = licensedClient.email
 
 		if(toEmail) {
-			String message = getLicenseKey(licensedClient)
+			String message = """
+				|Website Name: ${licensedClient.websitename}
+				|
+				|${getLicenseKey(licensedClient)}
+			""".stripMargin().trim()
 			String buff = ""
 			message.eachLine{ line ->
 				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'

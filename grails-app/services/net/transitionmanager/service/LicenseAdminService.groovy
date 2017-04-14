@@ -522,16 +522,40 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 	}
 
+	String getLicenseRequestBody(String uuid) {
+		DomainLicense lic
+
+		if (uuid) {
+			lic = DomainLicense.get(uuid)
+		}
+
+		return getLicenseRequestBody(lic)
+	}
+
+	String getLicenseRequestBody(DomainLicense lic) {
+		String buff
+		if(lic) {
+			String body = """
+				|Website Name: ${lic.websitename}
+				|
+				|${lic.toEncodedMessage()}
+			""".stripMargin().trim()
+
+			buff = ""
+			body.eachLine{ line ->
+				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'
+			}
+
+		}
+		return buff
+	}
+
 	private boolean sendMailRequest(DomainLicense license){
 		log.info("SEND License Request")
 		String toEmail = grailsApplication.config.tdstm?.license?.request_email
 
 		if(toEmail) {
-			String message = license.toEncodedMessage()
-			String buff = ""
-			message.eachLine{ line ->
-				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'
-			}
+			String buff = getLicenseRequestBody(license)
 
 			mailService.sendMail {
 				to toEmail
