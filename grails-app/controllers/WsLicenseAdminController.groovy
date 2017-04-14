@@ -99,6 +99,11 @@ class WsLicenseAdminController implements ControllerMethods {
 
 	}
 
+	/**
+	 * get the license request body used to present the hash and other information to the user
+	 * so he can request the license
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseView)
 	def getLicenseRequestHash(){
 		def id = params.id
@@ -113,7 +118,11 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 	}
 
-
+	/**
+	 * Delete license
+	 * @param id identifier of the license to delete
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseDelete)
     def deleteLicense(String id){
         if(licenseAdminService.deleteLicense(id)) {
@@ -123,7 +132,10 @@ class WsLicenseAdminController implements ControllerMethods {
         }
     }
 
-
+	/**
+	 * generate a license request
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseAdministration)
     def generateRequest() {
 
@@ -151,7 +163,10 @@ class WsLicenseAdminController implements ControllerMethods {
 
     }
 
-
+	/**
+	 * Load a license to match against a request
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseAdministration)
 	def loadLicense(){ // Apply license
 		try{
@@ -185,6 +200,11 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 	}
 
+	/**
+	 * Email a license request
+	 * @param id identifier of the license request to email
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseAdministration)
 	def emailRequest(String id){
 		if(licenseAdminService.resubmitRequest(id)){
