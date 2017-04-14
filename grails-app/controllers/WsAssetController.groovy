@@ -39,13 +39,13 @@ class WsAssetController implements ControllerMethods {
 		if(assetId){
 			AssetEntity sampleAssetEntity = AssetEntity.get(assetId)
 			//check that the asset is part of the project
-			if(!securityService.isCurrentProjectId(sampleAssetEntity?.project.id)){
+			if(!securityService.isCurrentProjectId(sampleAssetEntity?.projectId)){
 				securityService.reportViolation(
 						"Security Violation, user {} attempted to access an asset not associated to the project"
 				)
 				errors << "Asset not found in current project"
 			}
-			assetClassSample = sampleAssetEntity.assetClass
+			assetClassSample = sampleAssetEntity?.assetClass
 		}
 
 		if(errors){
