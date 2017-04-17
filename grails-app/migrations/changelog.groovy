@@ -164,4 +164,5 @@ databaseChangeLog = {
 	include file: "20170307-change-license-installation-column-spelling.groovy"
 	include file: "20170308-nullout-orphaned-asset-comments-by-workflow-transition.groovy"
 	include file: "20170227-delete-create-or-rename-permissions-for-new-naming-scheme.groovy"
+	include file: "20170417-remove-orphan-move-event-asset-comments-user-preferences-references.groovy"
 }
