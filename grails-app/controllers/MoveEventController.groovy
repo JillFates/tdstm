@@ -206,7 +206,8 @@ class MoveEventController implements ControllerMethods {
 			return
 		}
 
-		[moveEventInstance: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
+		[moveEventInstance: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project),
+		dateFormat: userPreferenceService.dateFormat]
 	}
 	
 	@HasPermission(Permission.EventEdit)
