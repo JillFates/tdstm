@@ -283,7 +283,7 @@ class ApplicationController implements ControllerMethods {
 		if (key) {
 			existingColsMap[key] = params.previousValue
 		}
-		
+
 		existingColsMap[fromKey] = column
 		userPreferenceService.setPreference(params.type, existingColsMap as JSON)
 		render true
@@ -432,7 +432,7 @@ class ApplicationController implements ControllerMethods {
 			return
 		}
 
-		deleteApp application
+		deleteApp(application)
 
 		flash.message = "Application $application.assetName deleted"
 		if (params.dstPath == 'dependencyConsole') {
@@ -462,7 +462,7 @@ class ApplicationController implements ControllerMethods {
 		assetEntityService.deleteAsset(application)
 
 		AppMoveEvent.withNewSession { newSession ->
-			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application=:application', [application: this])
+			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application=:application', [application: application])
 			newSession.flush()
 		}
 
