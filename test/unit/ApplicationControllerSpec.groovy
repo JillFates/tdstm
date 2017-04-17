@@ -3,12 +3,10 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.grails.NumberUtil
 import grails.test.GrailsMock
 import grails.test.mixin.TestFor
-import grails.plugin.springsecurity.SpringSecurityUtils
 
-import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.SecurityService
 
 import org.apache.commons.lang3.RandomStringUtils
@@ -18,36 +16,24 @@ import spock.lang.Specification
 import test.AbstractUnitSpec
 
 @TestFor(ApplicationController)
-@Mock([AssetEntityService, SecurityService, Application, UserLogin, AppMoveEvent])
+@Mock([ApplicationService, SecurityService, Application, UserLogin])
 class ApplicationControllerSpec extends AbstractUnitSpec {
 
 
 	void "test the application delete"() {
 
-		given:
-			/* When mocking method implementations we need to provide the number
-			of calls we're expecting to make (1 is the default). */
+		given: "An initial setup"
 			int numberOfScenarios = 2
-
-			GrailsMock mockAppMoveEvent = mockFor(AppMoveEvent)
-			mockAppMoveEvent.demand.static.withNewSession(numberOfScenarios){Closure c ->
-				//c.call()
+			GrailsMock mockApplicationService = mockFor(ApplicationService)
+			mockApplicationService.demand.deleteApplication(numberOfScenarios){ Application application ->
 			}
 
-			// Setting up the AssetEntityService mock
-			GrailsMock mockAssetEntityService = mockFor(AssetEntityService)
-			mockAssetEntityService.demand.deleteAsset(numberOfScenarios){ AssetEntity asset ->
-				// do nothing.
-			}
-
-			controller.assetEntityService = mockAssetEntityService.createMock()
+			controller.applicationService = mockApplicationService.createMock()
 
 			String expectedAppId = RandomStringUtils.randomNumeric(6)
 			String invalidAppId = RandomStringUtils.randomNumeric(6)
 			String appName = RandomStringUtils.randomAlphabetic(15)
 
-
-			// Mocking an Application domain object to override the static get method.
 			GrailsMock mockApp = mockFor(Application)
 
 			mockApp.demand.static.get(numberOfScenarios){String id ->
@@ -64,8 +50,8 @@ class ApplicationControllerSpec extends AbstractUnitSpec {
 			controller.params.id = invalidAppId
 			request.method = "POST"
 			controller.delete()
-		then:
-			assertEquals(flash.message, "Application not found with id ${params.id}")
+		then: "The application reports not being able to locate the application."
+			flash.message == "Application not found with id ${params.id}"
 
 		when: "Valid app id"
 			response.reset()
@@ -73,7 +59,7 @@ class ApplicationControllerSpec extends AbstractUnitSpec {
 			request.method = "POST"
 			controller.delete()
 
-		then:
-			assertEquals(flash.message, "Application $appName deleted")
+		then: "The application deletes the application and returns a confirmation message."
+			flash.message == "Application $appName deleted"
 	}
 }
