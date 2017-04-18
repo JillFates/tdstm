@@ -3976,10 +3976,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							where = SqlUtil.appendToWhere(where, "a.assetType IN ('virtual', 'vm')")
 						} else if (filter?.asset?.containsKey('physical')) {
 							// Just Physical devices
-							where = SqlUtil.appendToWhere(where, "IFNULL(a.assetType,'') NOT IN ('application', 'database', 'files', 'virtual', 'vm')")
+							where = SqlUtil.appendToWhere(where, "IFNULL(a.assetType,'') NOT IN ('application', 'database', 'files', 'virtual', 'vm', 'Logical Storage')")
 						} else {
 							// All Devices
-							where = SqlUtil.appendToWhere(where, "IFNULL(a.assetType,'') NOT IN ('application', 'database', 'files')")
+							where = SqlUtil.appendToWhere(where, "IFNULL(a.assetType,'') NOT IN ('application', 'database', 'files', 'Logical Storage')")
 						}
 
 						// Add any devices specific attribute filters
