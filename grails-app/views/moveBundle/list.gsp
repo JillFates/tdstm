@@ -125,21 +125,13 @@
 
 		function displayFormatedDate(date){
 			if(date && moment(date).isValid()){
-				return moment(date).tz(currentTz || 'GMT').format((currentDtFormat || 'MM/DD/YYYY')+' hh:mm A');
+				return moment(date).format(tdsCommon.defaultDateTimeFormat());
 			} else {
 				return '';
 			}
 		}
 		$(function(){
-			$.ajax({
-				type:'GET',
-				url:'../ws/user/preferences/CURR_DT_FORMAT,CURR_TZ',
-				success:function(result){
-					currentDtFormat = result.data.preferences.CURR_DT_FORMAT;
-					currentTz = result.data.preferences.CURR_TZ;
-					loadGridBundleList();
-				}
-			});
+			loadGridBundleList();
 		});
 	</script>
 
