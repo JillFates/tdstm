@@ -347,7 +347,7 @@ class AssetEntityService implements ServiceMethods {
 		switch (id) {
 			case -1:
 				// Create a new room
-				if (location.trim().size() == 0 && roomName.trim().size() == 0) {
+				if (StringUtil.isBlank(location) && StringUtil.isBlank(roomName)) {
 					throw new InvalidRequestException("Creating a $srcOrTarget room requires both the location and room name".toString())
 				}
 
@@ -408,10 +408,12 @@ class AssetEntityService implements ServiceMethods {
 		if (asset.isaBlade() || asset.isaVM()) {
 			// If asset model is VM or BLADE we should remove rack assignments period
 			asset[rackProp] = null
-			asset.sourceBladePosition = null
-			asset.sourceRackPosition = null
-			asset.targetBladePosition = null
-			asset.targetRackPosition = null
+			with(asset){
+				sourceBladePosition = null
+				sourceRackPosition = null
+				targetBladePosition = null
+				targetRackPosition = null
+			}
 			return
 		}
 
@@ -427,12 +429,6 @@ class AssetEntityService implements ServiceMethods {
 			case -1:
 				// Create a new rack
 				rackName = rackName?.trim()
-				/*
-				if (!rackName) {
-					throw new InvalidRequestException("Creating a $srcOrTarget rack requires a name".toString())
-				}
-				arecordon: I'm commenting out this code because the findOrCreate will default the tag if not present.
-				*/
 				def rack = rackService.findOrCreateRack(room, rackName)
 				if (rack) {
 					asset[rackProp] = rack
