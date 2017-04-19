@@ -286,22 +286,22 @@ var tdsCommon = {
 		return this.config.jQueryDateTimeFormat;
 	},
 	kendoDateFormat: function () {
-		if (this.config.dateFormat == null) {
-			this.config.dateFormat = "MM/dd/yyyy";
+		if (this.config.kendoDateFormat == null) {
+			this.config.kendoDateFormat = "MM/dd/yyyy";
 			if (!this.isFormatMMDDYYYY()) {
-				this.config.dateFormat = "dd/MM/yyyy";
+				this.config.kendoDateFormat = "dd/MM/yyyy";
 			}
 		}
-		return this.config.dateFormat;
+		return this.config.kendoDateFormat;
 	},
 	kendoDateTimeFormat: function () {
-		if (this.config.dateTimeFormat == null) {
-			this.config.dateTimeFormat = "MM/dd/yyyy hh:mm tt";
+		if (this.config.kendoDateTimeFormat == null) {
+			this.config.kendoDateTimeFormat = "MM/dd/yyyy hh:mm tt";
 			if (!this.isFormatMMDDYYYY()) {
-				this.config.dateTimeFormat = "dd/MM/yyyy hh:mm tt";
+				this.config.kendoDateTimeFormat = "dd/MM/yyyy hh:mm tt";
 			}
 		}
-		return this.config.dateTimeFormat;
+		return this.config.kendoDateTimeFormat;
 	},
 	parseDateTimeFromZulu: function (stringValue, format) {
 		return moment(stringValue);
