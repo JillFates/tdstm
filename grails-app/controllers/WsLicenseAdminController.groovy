@@ -99,24 +99,30 @@ class WsLicenseAdminController implements ControllerMethods {
 
 	}
 
+	/**
+	 * get the license request body used to present the hash and other information to the user
+	 * so he can request the license
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseView)
 	def getLicenseRequestHash(){
 		def id = params.id
-		License lic
-		if(id) {
-			lic = License.get(id)
-		}
 
-		if(lic) {
-			renderSuccessJson(lic.toEncodedMessage())
+		String hash = licenseAdminService.getLicenseRequestBody(id)
+
+		if(hash) {
+			renderSuccessJson(hash)
 		}else{
-			//TODO: OLB 20170124 Change this to the AJax Approach
 			response.status = 404 //Not Found
 			render "${id} not found."
 		}
 	}
 
-
+	/**
+	 * Delete license
+	 * @param id identifier of the license to delete
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseDelete)
     def deleteLicense(String id){
         if(licenseAdminService.deleteLicense(id)) {
@@ -126,7 +132,10 @@ class WsLicenseAdminController implements ControllerMethods {
         }
     }
 
-
+	/**
+	 * generate a license request
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseAdministration)
     def generateRequest() {
 
@@ -154,30 +163,24 @@ class WsLicenseAdminController implements ControllerMethods {
 
     }
 
-
+	/**
+	 * Load a license to match against a request
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseAdministration)
 	def loadLicense(){ // Apply license
 		try{
 			def json = request.JSON
-			//logger.info("license ID: {}", params.id)
 			License lic = License.get(params.id)
 
 			if(lic){
-				/*
-				if(lic.hash){
-					response.status = 302 //Found
-					log.info("License Hash: {}", lic.hash)
-					render "${lic.id} already has a license"
-				}else {
-				*/
-					lic.hash = json.hash
+				lic.hash = json.hash
 
-					if (licenseAdminService.load(lic)) {
-						renderSuccessJson("Ok")
-					} else {
-						throw new Exception("Error while loading the license")
-					}
-				//}
+				if (licenseAdminService.load(lic)) {
+					renderSuccessJson("Ok")
+				} else {
+					throw new Exception("Error while loading the license")
+				}
 			}else{
 				response.status = 404 //Not Found
 				render "${params.id} not found."
@@ -188,6 +191,11 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 	}
 
+	/**
+	 * Email a license request
+	 * @param id identifier of the license request to email
+	 * @return
+	 */
 	@HasPermission(Permission.LicenseAdministration)
 	def emailRequest(String id){
 		if(licenseAdminService.resubmitRequest(id)){

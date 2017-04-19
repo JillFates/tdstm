@@ -783,7 +783,7 @@ class PartyRelationshipService implements ServiceMethods {
 			  and partyIdTo.id=:staffId
 			  and roleTypeCodeTo in (:codes)
 		''', [project: project, staffId: NumberUtil.toLong(staffId),
-		      codes: RoleType.getAll(CollectionUtils.asCollection('MOVE_TECH')).findAll()])[0] > 0
+			  codes: RoleType.getAll(CollectionUtils.asCollection(functionCodes)).findAll()])[0] > 0
 	}
 
 	String getProjectManagers(Project project) {

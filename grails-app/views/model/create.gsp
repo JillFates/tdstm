@@ -67,7 +67,7 @@
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Model Weight:</td>
 			<td>
-				<input type="number" max="10000" name="weight" id="weightId" value=""/>
+				<input type="number" min="0" max="10000" name="weight" id="weightId" value=""/>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Layout Style:</td>
 			<td>

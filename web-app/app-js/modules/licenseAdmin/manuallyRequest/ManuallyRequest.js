@@ -14,6 +14,7 @@ export default class ManuallyRequest {
         this.licenseModel = {
             id:  params.license.id,
             email: params.license.email,
+            toEmail: params.license.toEmail,
             encryptedDetail: ''
         };
 

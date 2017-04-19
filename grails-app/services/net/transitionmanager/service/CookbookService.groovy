@@ -595,22 +595,24 @@ class CookbookService implements ServiceMethods {
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
 	List<Map> findRecipeVersions(recipeId) {
-
 		Project project = controllerService.requiredProject
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject recipe, project
 
-		jdbcTemplate.query('''
+		def arguments = [
+				"recipeId" : recipeId
+		]
+
+		return namedParameterJdbcTemplate.query("""
 			SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,
-			       recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
-			       CONCAT(person.first_name, ' ', person.last_name) as createdBy,
-			       if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
+							recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
+							CONCAT(person.first_name, ' ', person.last_name) as createdBy, if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
 			FROM recipe
 			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id
 			INNER JOIN person ON person.person_id = recipe_version.created_by_id
-			WHERE recipe.recipe_id=?
+			WHERE recipe.recipe_id = :recipeId
 			ORDER BY version_number DESC
-			''', new RecipeVersionMapper(), [recipeId])
+			""", arguments, new RecipeVersionMapper())
 	}
 
 	/**
@@ -621,8 +623,6 @@ class CookbookService implements ServiceMethods {
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
 	def findRecipeVersionsWithSourceCode(recipeId) {
-
-		Project project = controllerService.requiredProject
 		// arecordon: it seems that there are places where a string is passed, instead of a long.
 		recipeId = NumberUtil.toLong(recipeId)
 
@@ -630,15 +630,20 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
+		def arguments = [
+				"recipeId" : recipeId
+		]
 
-		jdbcTemplate.query("SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,"
-			       + " recipe_version.source_code as sourceCode, recipe_version.changelog as changelog,"
-			       + " recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,"
-			       + " if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion"
-	       + " FROM recipe"
-			+ " INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id"
-			+ " WHERE recipe.recipe_id=?"
-			+ " ORDER BY version_number ASC", new RecipeVersionCompleteMapper(), [recipeId])
+		return namedParameterJdbcTemplate.query("""
+			SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,
+							recipe_version.source_code as sourceCode, recipe_version.changelog as changelog,
+							recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
+							if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
+			FROM recipe
+			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id
+			WHERE recipe.recipe_id = :recipeId
+			ORDER BY version_number ASC
+			""", arguments, new RecipeVersionCompleteMapper())
 	}
 
 	/**
