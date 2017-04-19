@@ -292,6 +292,12 @@ var tdsCommon = {
 				this.config.dateFormat = "dd/MM/yyyy";
 			}
 		}
+
+        if (this.config.dateTimeFormat !== null) {
+            this.config.dateTimeFormat = this.config.dateTimeFormat.replace('DD', 'dd');
+            this.config.dateTimeFormat = this.config.dateTimeFormat.replace('YYYY', 'yyyy');
+        }
+
 		return this.config.dateFormat;
 	},
 	kendoDateTimeFormat: function () {
@@ -301,6 +307,12 @@ var tdsCommon = {
 				this.config.dateTimeFormat = "dd/MM/yyyy hh:mm tt";
 			}
 		}
+
+        if (this.config.dateTimeFormat !== null) {
+            this.config.dateTimeFormat = this.config.dateTimeFormat.replace('DD', 'dd');
+            this.config.dateTimeFormat = this.config.dateTimeFormat.replace('YYYY', 'yyyy');
+        }
+
 		return this.config.dateTimeFormat;
 	},
 	parseDateTimeFromZulu: function (stringValue, format) {

@@ -42,7 +42,7 @@
 							<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}"><label for="retireDate">Retire Date:</label></td>
 							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'retireDate','errors')}">
 							    <script type="text/javascript" charset="utf-8">
-									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format: "MM/dd/yyyy" }); });
+									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
 							    </script>
 
 							    <input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 138px;" name="retireDate" id="retireDate"
