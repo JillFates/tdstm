@@ -1108,5 +1108,5 @@ div.customHoover div.tooltip-inner {
 }
 
 div.customHoover div.tooltip-arrow {
-   border-top-color: #fff;
+   border-top-color: #fff !important;
 }
