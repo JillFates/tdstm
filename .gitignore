@@ -4,7 +4,7 @@
 *.iws
 target/
 plugins/
-.slcache/
 run.sh
 node_modules/
 .slcache/
+

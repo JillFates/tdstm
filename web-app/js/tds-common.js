@@ -52,6 +52,18 @@ var tdsCommon = {
 		return str.charAt(0).toUpperCase() + str.substring(1);
 	},
 
+    /**
+	 * Applies a more smooth delay, extending the setTimeout
+     * @returns {Function}
+     */
+    delayEvent:  (function(){
+        var timer = 0;
+        return function(callback, ms){
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        };
+    })(),
+
 	/**
 	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was 
 	 * done to correct a problem with DIVs being populated with content that would not be cleared out and duplicate
@@ -68,7 +80,10 @@ var tdsCommon = {
 					var dialog = $("#" + this.element[0].id)
 					if (dialog.length > 0) {
 						// Need to close any Select2 controls that might still be open
-						dialog.find('.select2-container').select2('close');
+						var select2 = dialog.find('.select2-container');
+						if(select2 && select2.length > 0) {
+                            dialog.find('.select2-container').select2('close');
+						}
 
 						if (!dialog.hasClass('static-dialog')) {
 							dialog.html('');
@@ -547,3 +562,12 @@ $.fn.serializeObject = function () {
 	});
 	return o;
 };
+
+(function($) {
+    $.fn.focusToEnd = function() {
+        return this.each(function() {
+            var v = $(this).val();
+            $(this).focus().val("").val(v);
+        });
+    };
+})(jQuery);
