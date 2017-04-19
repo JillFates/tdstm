@@ -293,9 +293,9 @@ var tdsCommon = {
 			}
 		}
 
-        if (this.config.dateTimeFormat !== null) {
-            this.config.dateTimeFormat = this.config.dateTimeFormat.replace('DD', 'dd');
-            this.config.dateTimeFormat = this.config.dateTimeFormat.replace('YYYY', 'yyyy');
+        if (this.config.dateFormat !== null) {
+            this.config.dateFormat = this.config.dateFormat.replace('DD', 'dd');
+            this.config.dateFormat = this.config.dateFormat.replace('YYYY', 'yyyy');
         }
 
 		return this.config.dateFormat;
