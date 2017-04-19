@@ -2,6 +2,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.ExportUtil
@@ -181,7 +182,7 @@ class MoveEventController implements ControllerMethods {
 				jdbcTemplate.update('DELETE FROM move_event_snapshot             WHERE move_event_id = ?', moveEventId)
 				jdbcTemplate.update('DELETE FROM move_event_news                 WHERE move_event_id = ?', moveEventId)
 				jdbcTemplate.update('UPDATE move_bundle SET move_event_id = NULL WHERE move_event_id = ?', moveEventId)
-				jdbcTemplate.update('DELETE FROM user_preference                 WHERE value =         ?', moveEventId)
+				jdbcTemplate.update('DELETE FROM user_preference WHERE preference_code = ? and value = ?', UserPreferenceEnum.MOVE_EVENT as String, moveEventId)
 				AppMoveEvent.executeUpdate('DELETE AppMoveEvent                  WHERE moveEvent.id =  ?', [moveEventId])
 
 				moveEvent.delete()
@@ -192,6 +193,7 @@ class MoveEventController implements ControllerMethods {
         	}
 		}
 		catch (e) {
+			log.error(e.message, e)
 			flash.message = e
 		}
 		redirect(action: 'list')

@@ -12,7 +12,9 @@ var tdsCommon = {
 		dateTimeFormat: null,
 		dateShortFormat: null,
 		jQueryDateFormat: null,
-		jQueryDateTimeFormat: null
+		jQueryDateTimeFormat: null,
+		kendoDateFormat: null,
+		kendoDateTimeFormat: null
 	},
 
 	// creates relative or fully qualified url to for the application
@@ -298,7 +300,24 @@ var tdsCommon = {
 		}
 		return this.config.jQueryDateTimeFormat;
 	},
-
+	kendoDateFormat: function () {
+		if (this.config.kendoDateFormat == null) {
+			this.config.kendoDateFormat = "MM/dd/yyyy";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.kendoDateFormat = "dd/MM/yyyy";
+			}
+		}
+		return this.config.kendoDateFormat;
+	},
+	kendoDateTimeFormat: function () {
+		if (this.config.kendoDateTimeFormat == null) {
+			this.config.kendoDateTimeFormat = "MM/dd/yyyy hh:mm tt";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.kendoDateTimeFormat = "dd/MM/yyyy hh:mm tt";
+			}
+		}
+		return this.config.kendoDateTimeFormat;
+	},
 	parseDateTimeFromZulu: function (stringValue, format) {
 		return moment(stringValue);
 	},
@@ -345,21 +364,21 @@ var tdsCommon = {
 		}
 	},
 
-    jqgridDateTimeCellFormatter: function (cellvalue, options, rowObject) {
-        if (cellvalue) {
-            var result = "";
-            var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
-            if (momentObj) {
-                momentObj.tz(tdsCommon.timeZone());
-                result = momentObj.format(tdsCommon.defaultDateTimeFormat());
-            }
-            return result;
-        } else {
-            return '';
-        }
-    },
+	jqgridDateTimeCellFormatter: function (cellvalue, options, rowObject) {
+		if (cellvalue) {
+			var result = "";
+			var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+			if (momentObj) {
+				momentObj.tz(tdsCommon.timeZone());
+				result = momentObj.format(tdsCommon.defaultDateTimeFormat());
+			}
+			return result;
+		} else {
+			return '';
+		}
+	},
 
-    jqgridPrefCellFormatter: function (cellvalue, options, rowObject) {
+	jqgridPrefCellFormatter: function (cellvalue, options, rowObject) {
 		var result = cellvalue;
 		switch (options.colModel.name) {
 			case "lastUpdated":
@@ -485,7 +504,7 @@ var UserPreference = function () {
 			params.dateTimezoneOnly = true
 		jQuery.ajax({
 			url: '/tdstm/person/resetPreferences',
-			data:params,
+			data: params,
 			success: function (e) {
 				changeResetMessage(e)
 			}

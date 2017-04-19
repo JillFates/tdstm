@@ -19,7 +19,7 @@
 	<div style="border: 0px;margin-top: 5px;" >
 	<fieldset>
 	<legend><b>Edit Model</b></legend>
-	<g:form action="update"  enctype="multipart/form-data" name="modelForm">
+	<g:form action="update"  enctype="multipart/form-data" name="modelForm" onsubmit="updateModel('Model', 'modelForm');">
 	<div style="margin-left: 10px;margin-right: 10px; width: auto;">
 	<table style="border: 0px;">
 	<tbody>
@@ -59,15 +59,15 @@
 			</td>
 			<td>Dimensions(inches):</td>
 			<td>
-			H:<input type="text" size="3" name="modelHeight" id="heightId" value="${modelInstance?.height}">
+			H:<input type="number" min="0" size="3" name="modelHeight" id="heightId" value="${modelInstance?.height}" style="width: 44px;">
 				<g:hasErrors bean="${modelInstance}" field="modelHeight">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelHeight" /></div>
 				</g:hasErrors>
-			W:<input type="text" size="3" name="modelWidth" id="widthId" value="${modelInstance?.width}">
+			W:<input type="number" min="0" size="3" name="modelWidth" id="widthId" value="${modelInstance?.width}" style="width: 44px;">
 				<g:hasErrors bean="${modelInstance}" field="modelWidth">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelWidth" /></div>
 				</g:hasErrors>
-			D:<input type="text" size="3" name="modelDepth" id="depthId" value="${modelInstance?.depth}">
+			D:<input type="number" min="0" size="3" name="modelDepth" id="depthId" value="${modelInstance?.depth}" style="width: 44px;">
 				<g:hasErrors bean="${modelInstance}" field="modelDepth">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelDepth" /></div>
 				</g:hasErrors>
@@ -75,7 +75,7 @@
 		</tr>
 		<tr>
 			<td>Weight (pounds):</td>
-			<td><input type="text" name="modelWeight" id="weightId" value="${modelInstance?.weight}">
+			<td><input type="number" min="0" max="10000" name="modelWeight" id="weightId" value="${modelInstance?.weight}">
 				<g:hasErrors bean="${modelInstance}" field="modelWeight">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelWeight" /></div>
 				</g:hasErrors>
@@ -122,13 +122,13 @@
 		<tr>
 			<td>Power (Max/Design/Avg):</td>
 			<td>
-				<input type="text" size="4" name="powerNameplate" id="powerNameplateEditId" value="${tds.rackPower(power: modelInstance?.powerNameplate, blankZero: true)}"
+				<input type="number" size="4" min="0" name="powerNameplate" id="powerNameplateEditId" value="${tds.rackPower(power: modelInstance?.powerNameplate, blankZero: true)}" style="width: 50px;"
 					onblur="changePowerValue('Edit')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;"
 					onclick="setStanderdPower('Edit')"> >> </a>
 				<input type="hidden" id="powerNameplateIdH" value="${modelInstance?.powerNameplate}">
-				<input type="text" size="4" name="powerDesign" id="powerDesignEditId" value="${tds.rackPower(power: modelInstance?.powerDesign, blankZero: true)}" >&nbsp;
+				<input type="number" min="0" size="4" name="powerDesign" id="powerDesignEditId" style="width: 50px;" value="${tds.rackPower(power: modelInstance?.powerDesign, blankZero: true)}" >&nbsp;
 				<input type="hidden" id="powerDesignIdH" value="${modelInstance?.powerDesign}" >
-				<input type="text" size="4" name="powerUse" id="powerUseEditId" value="${tds.rackPower(power: modelInstance?.powerUse, blankZero: true)}" >&nbsp;
+				<input type="number" min="0" size="4" name="powerUse" id="powerUseEditId" style="width: 50px;" value="${tds.rackPower(power: modelInstance?.powerUse, blankZero: true)}" >&nbsp;
 				<input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
 				<g:select id="ptype" name='powerType' value="${tds.powerType()}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value,'Edit')"/>
 			</td>
@@ -303,10 +303,10 @@
 					<td><a href="javascript:verifyAndDeleteConnector(${count})"><span class="clear_filter"><u>X</u></span></a>&nbsp;<g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
 					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
-					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 25px;" type="text" value="0"></td>
+					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 35px;" type="number" value="0"></td>
 					<td>
 						<input id="connectorId${count}" maxlength="5" style="width: 35px;" type="hidden" value="${count}">
-						<input id="connectorPosYId${count}" maxlength="3" style="width: 25px;" type="text" value="360">
+						<input id="connectorPosYId${count}" maxlength="3" style="width: 35px;" type="number" value="360">
 						<input id="statusId${count}" type="hidden">
 					</td>
 				</tr>
@@ -322,7 +322,15 @@
 					<input type="hidden" name="redirectTo" value="${redirectTo }" />
 					<span class="button">
 					 <g:if test="${redirectTo=='modelDialog'}">
-						<input type="button" class="save" id="saveModelId" value="Update" onclick="updateModel('Model', 'modelForm')"/>
+						 <script>
+							 $(document).ready(function(){
+                                 $(document).on('submit','#modelForm',function(e){
+									
+									return false;
+								 });
+							 });
+						 </script>
+						<input type="submit" class="save" id="saveModelId" value="Update"/>
 					</g:if>
 					<g:else>
 						<input type="submit" class="save" id="saveModelId" value="Update" />

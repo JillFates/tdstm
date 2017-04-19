@@ -744,7 +744,8 @@ class ReportsController implements ControllerMethods {
 		if (!project) return
 
 		List<MoveBundle> moveBundles = MoveBundle.findAllByProject(project)
-		Long moveBundleId = userPreferenceService.moveBundleId ?: moveBundles[0]?.id
+		String bundleId = (userPreferenceService.moveBundleId ?: moveBundles[0]?.id).toString()
+		Long moveBundleId = NumberUtil.toLong(bundleId)
 
 		[moveBundles: moveBundles, moveBundleId: moveBundleId,
 		 appOwnerList: reportsService.getSmeList(moveBundleId, false)]
