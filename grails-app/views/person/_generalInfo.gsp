@@ -178,9 +178,9 @@
 	<div id="availabilityEditId" class="person" style="display: none;">
 		<div>
 			<script type="text/javascript" charset="utf-8">
-				jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
+				jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 				function showCalender(id){
-					jQuery(function($){ $(id).kendoDatePicker({ animation: false }); });
+					jQuery(function($){ $(id).kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 				}
 			</script>
 			<table class="personTable" >

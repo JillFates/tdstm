@@ -52,7 +52,7 @@
 				<td valign="top" class="value">
 					<script type="text/javascript" charset="utf-8">
 					 $(document).ready(function(){
-						  $("#startDateId").kendoDatePicker({ animation: false });
+						  $("#startDateId").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() });
 	                    });
                   	</script>
                   	<input type="text" class="dateRange" size="15" style="width: 138px;"  name="startDate" id="startDateId" value="${startDate}"/>
@@ -67,7 +67,7 @@
 				<td valign="top" class="value">
 				<script type="text/javascript" charset="utf-8">
 				$(document).ready(function(){
-					$("#cleanupDateId").kendoDatePicker({ animation: false });
+					$("#cleanupDateId").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() });
                   });
                 </script>
                 <input type="text" class="dateRange" size="15" style="width: 138px;"  id="cleanupDateId"	name="cleanupDate" value="${cleanupDate}"/>
