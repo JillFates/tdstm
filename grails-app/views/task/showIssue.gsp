@@ -97,7 +97,7 @@
 				<td valign="top" class="name"><label for="dueDateCreateId">Due Date:</label></td>
 				<td>
 					<script type="text/javascript" charset="utf-8">
-						jQuery(function($){ $(".dateEditRange").kendoDatePicker({ animation: false }); });
+						jQuery(function($){ $(".dateEditRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
             		</script>
 	          		<input type="text" class="dateEditRange" size="15" style="" name="dueDateCreateId" id="dueDateCreateId"
 							value="${dueDate}" />

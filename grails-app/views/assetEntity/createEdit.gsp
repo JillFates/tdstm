@@ -363,7 +363,7 @@
 							</td>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
+									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 								</script>
 								<input type="text" id="retireDate" name="retireDate"
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
