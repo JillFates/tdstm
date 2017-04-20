@@ -88,7 +88,7 @@
 					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
 					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
-					{name:'dueDate', formatter: dueFormatter},
+					{name:'dueDate', formatter: taskFormatter},
 					{name:'status', formatter: statusFormatter},
 					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
@@ -160,7 +160,11 @@
 			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
-			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+			return '<span id="span_'+options.rowId+'" class=" ' +
+				rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
+				options.rowId+
+				'" asset-id="'+
+				rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function assetFormatter(cellVal,options,rowObject){
 			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[18]+'\', '+rowObject[16]+')\" >' + _.escape(cellVal) + '</span>' :
