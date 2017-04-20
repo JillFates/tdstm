@@ -714,11 +714,13 @@ class TimeUtil {
 
 
 	private static String getFromHttpSession(HttpSession session, String key, String defaultValue = null) {
-		def value = null
-		if(session){
-			def map = session.getAttribute(key) ?: [:]
-			value = map[key]
+		def value = session?.getAttribute(key)
+		/*
+		//The following code is a failsafe due to a change in the preferences (TM-5572) should never be called
+		if(value instanceof Map){
+			value = value[key]
 		}
+		*/
 		return value ?: defaultValue
 	}
 

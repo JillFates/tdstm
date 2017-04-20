@@ -295,22 +295,17 @@ class AccountImportExportTests extends Specification {
 
 	def 'Test the getUserPreferences'() {
 		setup:
-		String tzId = 'GMT'
+			String tzId = 'GMT'
 
-		// Mock the bullshit format of session attributes ...
-		def mockSession = new GrailsHttpSession(new MockHttpServletRequest())
-		mockSession.setAttribute('CURR_DT_FORMAT', [CURR_DT_FORMAT: TimeUtil.MIDDLE_ENDIAN])
-		mockSession.setAttribute('CURR_TZ', [CURR_TZ: tzId])
-
-		// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
-		long oneDay = 60 * 60 * 24 * 1000
-		Timestamp timestamp = new Timestamp(oneDay)
-		Map userPref = accountImportExportService.getUserPreferences(mockSession)
+			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
+			long oneDay = 60 * 60 * 24 * 1000
+			Timestamp timestamp = new Timestamp(oneDay)
+			Map userPref = accountImportExportService.getUserPreferences()
 
 		expect:
-		userPref.userTzId == tzId
-		userPref.userDateFormat == TimeUtil.MIDDLE_ENDIAN
-		TimeUtil.formatDate(timestamp, userPref.dateFormatter) == '01/02/1970'
-		TimeUtil.formatDateTimeWithTZ(userPref.userTzId, timestamp, userPref.dateTimeFormatter) == '01/02/1970 12:00:00 AM'
+			userPref.userTzId == tzId
+			userPref.userDateFormat == TimeUtil.MIDDLE_ENDIAN
+			TimeUtil.formatDate(timestamp, userPref.dateFormatter) == '01/02/1970'
+			TimeUtil.formatDateTimeWithTZ(userPref.userTzId, timestamp, userPref.dateTimeFormatter) == '01/02/1970 12:00:00 AM'
 	}
 }

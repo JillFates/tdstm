@@ -103,31 +103,43 @@ class UserPreferenceService implements ServiceMethods {
 	]
 
 	String getPreference(UserLogin userLogin = null, UserPreferenceEnum preference, String defaultIfNotSet = null) {
-		getPreference userLogin, preference.value(), defaultIfNotSet
+		getPreference(userLogin, preference.value(), defaultIfNotSet)
 	}
 
+	/**
+	 * Get the Preference of a user, if the user is the same that the one logged in,
+	 * store the value in the session for speed
+	 * @param userLogin			User with the requested preference
+	 * @param preferenceCode	requested preference code
+	 * @param defaultIfNotSet	default value in case that is not set
+	 * @return
+	 */
 	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null) {
-		userLogin = resolve(userLogin)
-		if (!userLogin) return
+		def userPrefValue
 
-		boolean isCurrent = userLogin.id == securityService.currentUserLoginId
+		userLogin = resolve(userLogin)
+
+		boolean isCurrent = (userLogin != null && userLogin.id == securityService.currentUserLoginId)
+
+		//if we are getting the current user preference check in session first
 		if (isCurrent) {
-			def holder = session.getAttribute(preferenceCode)
-			def userPrefValue = holder
-			if (holder != null) {
-				if(holder instanceof Map){
-					userPrefValue = holder[preferenceCode] ?: defaultIfNotSet
-				}
-				return userPrefValue
+			userPrefValue = session.getAttribute(preferenceCode)
+		}
+
+		//if the value is not in the session get it from the Preferences Storage of the user
+		if(userPrefValue == null && userLogin){
+			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
+
+			userPrefValue = userPreference?.value
+
+			//if we are getting the current user preference store it in the session for speed
+			if(isCurrent){
+				session.setAttribute(preferenceCode, userPreference?.value)
 			}
 		}
 
-		UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
-		if (isCurrent) {
-			session.setAttribute preferenceCode, [(preferenceCode): userPreference?.value]
-		}
-
-		userPreference?.value ?: defaultIfNotSet
+		//return the preference value or the default if not set
+		return userPrefValue ?: defaultIfNotSet
 	}
 
 	/**
@@ -237,7 +249,7 @@ class UserPreferenceService implements ServiceMethods {
 			}
 		}
 
-		session.removeAttribute prefCode
+		session.removeAttribute(prefCode)
 	}
 
 	/**
