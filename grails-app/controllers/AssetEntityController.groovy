@@ -1982,6 +1982,20 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	/**
+	 * Render the clone view.
+	 * @return : render the clone view for cloning assets
+	 */
+	@HasPermission(Permission.AssetCreate)
+	def cloneEntity() {
+		Project project = controllerService.getProjectForPage(this)
+		if (!project) return
+
+		def (device, Map model) = assetEntityService.getDeviceModelForEdit(project, params.id, params)
+
+		return [asset: model]
+	}
+
+	/**
 	 * Used to create and save a new device and associated dependencies. Upon success or failure it will redirect the
 	 * user to the place that they came from based on the params.redirectTo param. The return content varies based on that
 	 * param as well.

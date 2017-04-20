@@ -152,6 +152,12 @@ class LicenseManagerService extends LicenseCommonService{
 		return trns
 	}
 
+	/**
+	 * Activate a license
+	 * @param id
+	 * @return
+	 * @throws InvalidLicenseException
+	 */
 	String activate(String id) throws InvalidLicenseException{
 		LicensedClient lic = fetch(id)
 		if(lic) {
@@ -166,8 +172,13 @@ class LicenseManagerService extends LicenseCommonService{
 		}
 	}
 
-	List<LicenseActivityTrack> activityLog(String id){
-		LicensedClient licensedClient = fetch(id)
+	/**
+	 * Get the activity log on a license object
+	 * @param uuid identifier of the License to get the log from
+	 * @return List of activity tracks
+	 */
+	List<LicenseActivityTrack> activityLog(String uuid){
+		LicensedClient licensedClient = fetch(uuid)
 		List<LicenseActivityTrack> log = []
 		if(licensedClient){
 			log = LicenseActivityTrack.findAllByLicensedClient(licensedClient, [sort: "dateCreated", order:"desc"])
@@ -175,17 +186,31 @@ class LicenseManagerService extends LicenseCommonService{
 		log
 	}
 
-	boolean emailLicense(String id){
-		LicensedClient licensedClient = fetch(id)
+	/**
+	 * Email a license to the stored client email
+	 * @param uuid identifier of the license
+	 * @return
+	 */
+	boolean emailLicense(String uuid){
+		LicensedClient licensedClient = fetch(uuid)
 		emailLicense(licensedClient)
 	}
 
+	/**
+	 * Email a license to the stored client email
+	 * @param licensedClient license client object with the license information
+	 * @return
+	 */
 	boolean emailLicense(LicensedClient licensedClient){
 		log.info("SEND License Request")
 		String toEmail = licensedClient.email
 
 		if(toEmail) {
-			String message = getLicenseKey(licensedClient)
+			String message = """
+				|Website Name: ${licensedClient.websitename}
+				|
+				|${getLicenseKey(licensedClient)}
+			""".stripMargin().trim()
 			String buff = ""
 			message.eachLine{ line ->
 				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'

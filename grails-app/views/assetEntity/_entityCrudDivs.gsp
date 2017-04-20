@@ -1,6 +1,7 @@
 <%-- These are the common DIVs used by the Entity Crud logic and need to be loaded by the asset lists --%>
 
 <div id="createEntityView" style="display: none;"></div>
+<div id="cloneEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="cablingDialogId" style="display: none;"></div>
@@ -21,7 +22,8 @@
 <script>
 // Set the dialogs when DocumentReady and JQuery is available
 ( function($) {
-	$("#createEntityView").dialog({ autoOpen: false })
+	$("#createEntityView").dialog({ autoOpen: false });
+    $("#cloneEntityView").dialog({ autoOpen: false })
 	$("#editEntityView").dialog({ autoOpen: false })
 	$("#showEntityView").dialog({ autoOpen: false })
 	$("#cablingDialogId").dialog({ autoOpen:false })
