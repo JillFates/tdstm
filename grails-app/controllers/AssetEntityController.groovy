@@ -2569,11 +2569,9 @@ class AssetEntityController implements ControllerMethods {
 			}
 
 			String dueDate = ''
-			if (isRunbookTask) {
-				dueDate = TimeUtil.formatDateTime(it.estFinish, TimeUtil.FORMAT_DATE_TIME_4)
-			} else {
+
 				dueDate = TimeUtil.formatDate(it.dueDate)
-			}
+			
 
 			def deps = TaskDependency.findAllByPredecessor(it)
 			def depCount = 0
