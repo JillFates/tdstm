@@ -173,4 +173,14 @@ class ApplicationService implements ServiceMethods {
 
 		return asset
 	}
+
+	/**
+	 * This method deletes an application and all related data.
+	 * @param application
+	 */
+	void deleteApplication(Application application) {
+		assetEntityService.deleteAsset(application)
+		AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application=:application', [application: application])
+		application.delete()
+	}
 }
