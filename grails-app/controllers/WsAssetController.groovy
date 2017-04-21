@@ -59,6 +59,7 @@ class WsAssetController implements ControllerMethods {
 						eq('assetClass', assetClassSample)
 					}
 				}
+				maxResults(1)
 			}
 
 			if (assetEntity) {
