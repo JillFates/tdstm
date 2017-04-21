@@ -166,5 +166,4 @@ databaseChangeLog = {
 	include file: "20170227-delete-create-or-rename-permissions-for-new-naming-scheme.groovy"
 	include file: "20170413-add-new-permission-to-clone-assets-feature.groovy"
 	include file: "20170417-remove-orphan-move-event-asset-comments-user-preferences-references.groovy"
-	include file: "20170403-remove-racks-and-rooms-for-VMs.groovy"
 }
