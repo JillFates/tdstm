@@ -1761,7 +1761,7 @@ class AssetEntityService implements ServiceMethods {
 					query += "CONCAT_WS(' ', p3.first_name, p3.middle_name, p3.last_name) AS appOwner,"
 					joinQuery += "\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n"
 					break
-				case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownBy|shutdownDuration|startupBy|startupFixed|startupDuration|testingBy|testingFixed|testingDuration/:
+				case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownDuration|startupFixed|startupDuration|testingFixed|testingDuration/:
 					query += "a.${WebUtil.splitCamelCase(value)} AS $value,"
 					break
 				case ~/custom\d{1,3}/:
@@ -1770,12 +1770,22 @@ class AssetEntityService implements ServiceMethods {
 				case ~/validation|latency|planStatus|moveBundle/:
 					// Handled by the calling routine
 					break
+				case ~/shutdownBy|startupBy|testingBy/:
+					Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
+					String byProperty = WebUtil.splitCamelCase(value)
+					String prefix = byPrefixes[value]
+					query += """
+						(IF(${byProperty} REGEXP '^[0-9]{1,}\$', 
+      					TRIM( REPLACE( CONCAT(${prefix}.first_name,' ', ${prefix}.middle_name, ' ', ${prefix}.last_name), '  ', ' ')),a.${byProperty})) 
+      					as ${value}, """
+      				joinQuery += "\n LEFT OUTER JOIN person ${prefix} ON ${prefix}.person_id=a.${byProperty} \n"
+					
+					break
 				default:
 					query +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
 			}
 		}
-
-		[query: query, joinQuery: joinQuery]
+		return [query: query, joinQuery: joinQuery]
 	}
 
 	/**
