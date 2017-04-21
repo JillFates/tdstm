@@ -12,17 +12,15 @@ import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 
 import spock.lang.Specification
-
 import test.AbstractUnitSpec
 
 @TestFor(ApplicationController)
 @Mock([ApplicationService, SecurityService, Application, UserLogin])
 class ApplicationControllerSpec extends AbstractUnitSpec {
 
+	void 'test the application delete'() {
 
-	void "test the application delete"() {
-
-		given: "An initial setup"
+		setup: 'a user with necessary permission is accessing the application delete action'
 			int numberOfScenarios = 2
 			GrailsMock mockApplicationService = mockFor(ApplicationService)
 			mockApplicationService.demand.deleteApplication(numberOfScenarios){ Application application ->
@@ -36,9 +34,9 @@ class ApplicationControllerSpec extends AbstractUnitSpec {
 
 			GrailsMock mockApp = mockFor(Application)
 
-			mockApp.demand.static.get(numberOfScenarios){String id ->
+			mockApp.demand.static.get(numberOfScenarios) { String id ->
 				Application app = null
-				if(expectedAppId == id){
+				if (expectedAppId == id) {
 					app = new Application()
 					app.id = NumberUtil.toLong(id)
 					app.assetName = appName
@@ -46,20 +44,20 @@ class ApplicationControllerSpec extends AbstractUnitSpec {
 				return app
 			}
 			login()
-		when: "Invalid App Id provided."
+
+		when: 'the user provides an invalid app id'
 			controller.params.id = invalidAppId
-			request.method = "POST"
+			request.method = 'POST'
 			controller.delete()
-		then: "The application reports not being able to locate the application."
+		then: 'the user receives an appropriate flash error message'
 			flash.message == "Application not found with id ${params.id}"
 
-		when: "Valid app id"
+		when: 'the user provides a valid app id'
 			response.reset()
 			controller.params.id = expectedAppId
-			request.method = "POST"
+			request.method = 'POST'
 			controller.delete()
-
-		then: "The application deletes the application and returns a confirmation message."
+		then: 'the user receives a confirmation flash message that the application was deleted'
 			flash.message == "Application $appName deleted"
 	}
 }
