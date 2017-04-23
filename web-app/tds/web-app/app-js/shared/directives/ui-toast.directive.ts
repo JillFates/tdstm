@@ -11,7 +11,7 @@ import {AlertType, AlertModel} from '../model/alert.model';
 
 @Component({
     selector: 'tds-ui-toast',
-    templateUrl: '../../tds/web-app/app-js/shared/directives/ui-toast.directive.html'
+    templateUrl: '../tds/web-app/app-js/shared/directives/ui-toast.directive.html'
 })
 
 export class UIToastDirective {

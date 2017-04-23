@@ -5,7 +5,7 @@ import {TranslateService} from 'ng2-translate';
 @Component({
     moduleId: module.id,
     selector: 'header',
-    templateUrl: '../../tds/web-app/app-js/shared/modules/header/header.component.html',
+    templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
 })
 
 export class HeaderComponent {

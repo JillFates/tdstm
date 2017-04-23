@@ -9,7 +9,7 @@ import { TaskStates } from '../../task-manager-routing.states';
 @Component({
     moduleId: module.id,
     selector: 'task-list',
-    templateUrl: '../../tds/web-app/app-js/modules/taskManager/components/list/task-list.component.html'
+    templateUrl: '../tds/web-app/app-js/modules/taskManager/components/list/task-list.component.html'
 })
 
 export class TaskListComponent implements OnInit {

@@ -13,7 +13,7 @@ import { SortDescriptor, orderBy } from '@progress/kendo-data-query';
     moduleId: module.id,
     selector: 'notice-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
+    templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
     providers: [NoticeService]
 })
 

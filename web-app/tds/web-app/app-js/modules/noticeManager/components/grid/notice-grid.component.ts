@@ -6,7 +6,7 @@ import { NoticeModel } from '../../model/notice.model';
 @Component({
     moduleId: module.id,
     selector: 'notice-grid',
-    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/grid/notice-grid.component.html',
+    templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/grid/notice-grid.component.html',
     providers: [NoticeService]
 })
 

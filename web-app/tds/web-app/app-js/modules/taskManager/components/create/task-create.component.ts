@@ -11,7 +11,7 @@ import {TaskStates} from '../../task-manager-routing.states';
 @Component({
     moduleId: module.id,
     selector: 'task-create',
-    templateUrl: '../../tds/web-app/app-js/modules/taskManager/components/create/task-create.component.html'
+    templateUrl: '../tds/web-app/app-js/modules/taskManager/components/create/task-create.component.html'
 })
 
 export class TaskCreateComponent implements OnInit {

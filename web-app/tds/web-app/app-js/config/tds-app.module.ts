@@ -30,7 +30,7 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         // Translator
         TranslateModule.forRoot({
             provide: TranslateLoader,
-            useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
+            useFactory: (http: Http) => new TranslateStaticLoader(http, '../tds/web-app/i18n', '.json'),
             deps: [Http]
         }),
         // Routing Modules using UI Router

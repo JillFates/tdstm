@@ -15,7 +15,7 @@ import 'rxjs/add/operator/catch';
 export class NoticeService {
 
     // private instance variable to hold base url
-    private noticeListUrl = '../../ws/notices';
+    private noticeListUrl = '../ws/notices';
 
     // Resolve HTTP using the constructor
     constructor(private http: HttpInterceptor) { }

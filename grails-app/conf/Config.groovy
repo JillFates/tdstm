@@ -132,7 +132,7 @@ grails {
 			excludes = ['*', '**/WEB-INF/**','**/META-INF/**']
 			includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**',
 			            '/js/**', '/app-js/**', '/i18n/**', '/test/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**',
-			            '/plugins/**', '/d3/**', '/dist/**', '/tds/web-app/dist/**', '/tds/node_modules/**', '/tds/web-app/app-js/**', '/tds/web-app/i18n/**']
+			            '/plugins/**', '/d3/**', '/dist/**', '/tds/web-app/dist/**', '/tds/node_modules/**', '/tds/web-app/app-js/**', '/tds/web-app/i18n/**', '/module/**']
 			patterns = []
 		}
 		rewrite.css = false
@@ -311,9 +311,10 @@ grails {
 				'/i/**'				:'permitAll',
 				'/**/icons/**'		:'permitAll',
 				'/**/favicon.ico'	:'permitAll',
-				'/app-js/**'		:'permitAll', // Angular - resources
+				'/app-js/**'		:'permitAll', // Angular1.6 - resources
 				'/i18n/**'			:'permitAll', // Angular - Translate
-				'/tds/web-app/**'	:'permitAll', // Angular - resources
+				'/tds/web-app/**'	:'permitAll', // Angular2* - resources
+				'/module/**'		:'permitAll', // Angular2  - router access
 				'/test/**'			:'permitAll', // Angular - Test
 				'/monitoring'		:"hasPermission(request, '${Permission.AdminUtilitiesAccess}')", //todo: oluna: Awesome! does it work??
 				'/components/**'	:'permitAll',
