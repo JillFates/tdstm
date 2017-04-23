@@ -89,7 +89,7 @@ class RackLayoutsController implements ControllerMethods {
 
 		[backCheck: backCheck, bundle: bundle, currentBundle: currentBundle, frontCheck: frontCheck,
 		 isCurrentBundle: isCurrentBundle, moveBundleList: moveBundleList, rackFilters: rackFilters,
-		 rackLayoutsHasPermission: securityService.hasPermission(Permission.rackLayouts), sourceRackFilter: sourceRack,
+		 rackLayoutsHasPermission: securityService.hasPermission(Permission.RackCreate), sourceRackFilter: sourceRack,
 		 targetRackFilter: targetRack, wBundleCheck: wBundleCheck, wDCheck: wDCheck, woBundleCheck: woBundleCheck]
 	}
 

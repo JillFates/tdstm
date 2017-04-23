@@ -181,7 +181,7 @@
 								<td valign="top"
 									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
-										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
+										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 									</script>
 									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="26"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}" />" /> 

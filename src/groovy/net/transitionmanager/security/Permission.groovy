@@ -17,6 +17,7 @@ interface Permission {
 			ApplicationRestart            = 'ApplicationRestart',
 			ArchitectureView              = 'ArchitectureView',
 			AssetCreate                   = 'AssetCreate',
+			AssetCloneDependencies		  = 'AssetCloneDependencies',
 			AssetDelete                   = 'AssetDelete',
 			AssetEdit                     = 'AssetEdit',
 			AssetExport                   = 'AssetExport',

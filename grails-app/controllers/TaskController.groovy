@@ -687,6 +687,12 @@ digraph runbook {
 				//def url = createLink(controller:'task', action:'neighborhoodGraph', id:"$it.id", absolute:false)
 
 				task = (task.size() > 35) ? task[0..34] : task
+
+				// string escaping: TM-3951, TM-5530
+				if (task.endsWith("\\")) { // prevents unclosed strings like \"
+					task = task.replace("\\", "\\\\")
+				}
+
 				dotText << """\t$it.task_number [label="$task"  id="$it.id", style="$style", $attribs, tooltip="$tooltip"];\n"""
 				def successors = it.successors
 

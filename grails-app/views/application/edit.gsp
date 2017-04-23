@@ -212,7 +212,7 @@
 							    <td  class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
-										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
+										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 									</script>
 									<input type="text" class="dateRange ${config.maintExpDate}"
 										size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" tabindex="27"

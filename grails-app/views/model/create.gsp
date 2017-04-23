@@ -67,7 +67,7 @@
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Model Weight:</td>
 			<td>
-				<input type="number" max="10000" name="weight" id="weightId" value=""/>
+				<input type="number" min="0" max="10000" name="weight" id="weightId" value=""/>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Layout Style:</td>
 			<td>
@@ -88,7 +88,7 @@
 			<td><label for="endOfLifeDate"> End of Life Date:</label></td>
 			<td class="value ${hasErrors(bean:modelInstance ,field:'endOfLifeDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
-					jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false }); });
+					jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
 				</script> <input type="text" class="dateRange" size="15" style="width: 138px;" name="endOfLifeDate" id="endOfLifeDateId"
 					value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" />" />
 				<g:hasErrors bean="${modelInstance}" field="endOfLifeDate">

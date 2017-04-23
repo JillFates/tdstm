@@ -1262,12 +1262,9 @@ class AssetEntityService implements ServiceMethods {
 
 		def projectAttributes = projectService.getAttributes(type)
 		def configMap = getConfig(type, assetEntity.validation, projectAttributes)
-		List<AssetDependency> dependentAssets = AssetDependency.executeQuery(
-			'from AssetDependency where asset=? order by dependent.assetType, dependent.assetName asc',
-			[assetEntity])
-		def supportAssets = AssetDependency.executeQuery(
-			'from AssetDependency a where dependent=? order by a.asset.assetType, a.asset.assetName asc',
-			[assetEntity])
+		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
+		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
+
 		def highlightMap = getHighlightedInfo(type, assetEntity, configMap, projectAttributes)
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'

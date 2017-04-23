@@ -35,7 +35,7 @@
 		currentMenuId = "#eventMenu";
 		$(".menu-parent-planning-list-bundles").addClass('active');
 		$(".menu-parent-planning").addClass('active');
-
+		var currentDtFormat, currentTz;
 
 		/**
 		 * Implementing Kendo Grid for Bundle List
@@ -103,13 +103,13 @@
 					},
 					{
 						field: "startDate",
-						title: "Start",
-						format: "{0:MM/dd/yyyy}"
+						title: "Start Time",
+						template:"#= displayFormatedDate(startDate)#"
 					},
 					{
 						field: "completion",
-						title: "Completion",
-						format: "{0:MM/dd/yyyy}"
+						title: "Completion Time",
+						template: "#= displayFormatedDate(completion)#"
 					}
 				],
                 height: 540,
@@ -123,8 +123,16 @@
 			});
 		}
 
-		loadGridBundleList();
-
+		function displayFormatedDate(date){
+			if(date && moment(date).isValid()){
+				return moment(date).format(tdsCommon.defaultDateTimeFormat());
+			} else {
+				return '';
+			}
+		}
+		$(function(){
+			loadGridBundleList();
+		});
 	</script>
 
 	</body>

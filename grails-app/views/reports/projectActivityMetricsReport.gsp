@@ -80,7 +80,7 @@
 </div>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() {
-	$(".dateRange").kendoDatePicker({ animation: false });
+	$(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() });
 })
 $('.menu-reports-activity-metrics').addClass('active');
 $('.menu-parent-reports').addClass('active');

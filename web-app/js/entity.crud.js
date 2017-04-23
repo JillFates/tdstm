@@ -26,7 +26,6 @@ var EntityCrud = (function ($) {
 
 	var assetFormName = "createEditAssetForm";
 
-
 	// ------------------
 	// Private Methods
 	// ------------------
@@ -176,6 +175,7 @@ var EntityCrud = (function ($) {
 	// ------------------
 
 	pub.getCreateModal = function () { return $('#createEntityView'); };
+	pub.getCreateCloneModal = function() { return $('#cloneEntityView'); }
 	pub.getEditModal = function () { return $('#editEntityView'); };
 	pub.getShowModal = function () { return $('#showEntityView'); };
 
@@ -250,6 +250,10 @@ var EntityCrud = (function ($) {
 				}
 			}
 		});
+	};
+
+	pub.getSearchQuietMillis = function() {
+        return quietMillis;
 	};
 
 	// Used on populate the Manufacturer SELECT to toggle various form fields
@@ -1124,6 +1128,29 @@ var EntityCrud = (function ($) {
 		return false;
 	};
 
+    // Displays the detail view of the asset from ajax call in model popup
+    var presentCloneShowView = function (html, fieldHelpType) {
+        var showModal = pub.getCreateCloneModal();
+
+        if (showModal.length) {
+            showModal.html(html);
+            showModal.dialog('option', 'width', 'auto');
+            showModal.dialog('option', 'modal', 'true');
+            showModal.dialog('option', 'position', ['center', 'top']);
+            showModal.dialog('open');
+            if (typeof timerBar !== 'undefined')
+                timerBar.Pause();
+            updateAssetTitle(fieldHelpType);
+
+            $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+            $('[data-toggle="popover"]').popover();
+
+            return true;
+        }
+        return false;
+    };
+
+
 	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
 	var fetchAssetShowView = function (controller, fieldHelpType, assetId) {
@@ -1150,6 +1177,84 @@ var EntityCrud = (function ($) {
 			}
 		});
 	};
+
+    /**
+	 * Opens the Clone Dialog that holds the info for the clonning Asset
+     * @param assetId
+     * @param fieldHelpType
+     */
+    var fetchCloneView = function (assetId, fieldHelpType) {
+        var url = tdsCommon.createAppURL('/assetEntity/cloneEntity/' + assetId);
+        jQuery.ajax({
+            url: url,
+            type: 'POST',
+            success: function (resp) {
+                if (typeof resp === 'object') {
+                    if (resp.status == 'error') {
+                        alert("An error occurred: " + resp.errors);
+                        return false;
+                    }
+                    console.log("fetchCloneView() had unexpected response");
+                    return false;
+                }
+                // Load the edit entity view
+                return presentCloneShowView(resp, fieldHelpType);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                var err = jqXHR.responseText;
+                alert("An error occurred while loading the asset show view." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
+                return false;
+            }
+        });
+    };
+
+    /**
+	 * Public method to verify that an Asset is Unique or not
+     * @param assetId
+     * @param assetName
+     */
+    pub.isAssetUnique = function(assetToValid, callback) {
+        var url = tdsCommon.createAppURL('/ws/asset/checkForUniqueName');
+        var xhr = jQuery.ajax({
+            url: url,
+            type: 'POST',
+            data: assetToValid,
+            dataType: 'json',
+            success: function (resp) {
+                return callback(resp);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                return false;
+            }
+        });
+
+        xhr.loadingRequest = true;
+        return xhr;
+	};
+
+    /**
+     * Public method to Create the new Asset from the Clone feature.
+     * @param assetId
+     * @param assetName
+     */
+    pub.cloneAsset = function(assetToClone, callback) {
+        var url = tdsCommon.createAppURL('/ws/asset/clone');
+        var xhr = jQuery.ajax({
+            url: url,
+            type: 'POST',
+            data: assetToClone,
+            dataType: 'json',
+            success: function (resp) {
+                return callback(resp);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                return false;
+            }
+        });
+
+        xhr.loadingRequest = true;
+        return xhr;
+    };
 
 	// Called from the page to popup the Asset Entity details dialog
 	// getEntityDetails
@@ -1186,6 +1291,21 @@ var EntityCrud = (function ($) {
 		}
 
 	};
+
+    /**
+	 * Opens The clone views that allow the user to copy over an entire asset based on a Name plus Id
+     * @param assetClass
+     * @param assetId
+     * @returns {boolean}
+     */
+	pub.cloneAssetView = function (assetClass, assetName, assetId) {
+
+		var assetType = assetClass.toLowerCase();
+		assetType = assetType.charAt(0).toUpperCase() + assetType.slice(1);
+
+        return fetchCloneView(assetId, assetName);
+
+    };
 
 	// Private method called by fetchAssetCreateView to present the various asset create modal window
 	var presentAssetCreateView = function (html, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
@@ -1498,6 +1618,7 @@ function updateAssetTitle(type) {
 	EntityCrud.getCreateModal().dialog("option", "title", type + ' Create');
 	EntityCrud.getShowModal().dialog("option", "title", type + ' Detail');
 	EntityCrud.getEditModal().dialog("option", "title", type + ' Edit');
+    EntityCrud.getCreateCloneModal().dialog("option", "title", 'Clone ' + type);
 }
 
 function showManufacView(e, forWhom) {

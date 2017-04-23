@@ -29,6 +29,7 @@ abstract class AbstractUnitSpec extends Specification {
 	// TODO populate the test with random real data
 	protected static final List<String> ROLE_USER_PERMISSIONS = [
 		Permission.ArchitectureView,
+		Permission.AssetDelete,
 		Permission.AssetMenuView,
 		Permission.DashboardMenuView,
 		Permission.ProjectStaffList,
