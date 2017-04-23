@@ -36,7 +36,6 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         // Routing Modules using UI Router
         UIRouterModule.forRoot(<UIRouterModule>{
             states: TDSRoutingStates,
-            useHash: true,
             config: AuthConfig,
         }),
     ],
