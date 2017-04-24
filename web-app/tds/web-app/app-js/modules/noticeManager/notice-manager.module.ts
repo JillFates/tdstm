@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 // Routing Logic
-import { UIRouterModule } from 'ui-router-ng2';
+import { UIRouterModule } from '@uirouter/angular';
 import { NOTICE_STATES } from './notice-routing.states';
 // Components
 import { NoticeListComponent } from './components/list/notice-list.component';
@@ -25,7 +25,7 @@ import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
     ],
     declarations: [NoticeListComponent, NoticeFormComponent, NoticeGridComponent],
     entryComponents: [NoticeFormComponent],
-    exports: [NoticeGridComponent]
+    exports: [NoticeListComponent]
 })
 
 export class NoticesManagerModule {

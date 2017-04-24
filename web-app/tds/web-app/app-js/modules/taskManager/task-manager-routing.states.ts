@@ -2,7 +2,7 @@
  * Created by Jorge Morayta on 3/15/2017.
  */
 
-import {Ng2StateDeclaration} from 'ui-router-ng2';
+import {Ng2StateDeclaration} from '@uirouter/angular';
 import {TaskListComponent} from './components/list/task-list.component';
 import {TaskCreateComponent} from './components/create/task-create.component';
 import {HeaderComponent} from '../../shared/modules/header/header.component';

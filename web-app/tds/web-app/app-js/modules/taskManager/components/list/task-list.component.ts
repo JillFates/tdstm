@@ -3,7 +3,7 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import { StateService } from 'ui-router-ng2';
+import { StateService } from '@uirouter/angular';
 import { TaskStates } from '../../task-manager-routing.states';
 
 @Component({

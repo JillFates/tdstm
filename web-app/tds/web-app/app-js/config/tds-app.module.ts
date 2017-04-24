@@ -14,7 +14,7 @@ import {SharedModule} from'../shared/shared.module';
 import {NoticesManagerModule} from '../modules/noticeManager/notice-manager.module';
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 // Router Logic
-import {UIRouterModule, UIView} from 'ui-router-ng2';
+import {UIRouterModule, UIView} from '@uirouter/angular';
 import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
 
 // Decorator that tells to Angular is a module.

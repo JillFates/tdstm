@@ -6,8 +6,8 @@ import { NoticeFormComponent } from '../form/notice-form.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { ActionType } from '../../../../shared/model/action-type.enum';
 
-import { GridComponent } from '@progress/kendo-angular-grid';
-import { SortDescriptor, orderBy } from '@progress/kendo-data-query';
+import { GridComponent, GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { SortDescriptor, orderBy, process, State } from '@progress/kendo-data-query';
 
 @Component({
     moduleId: module.id,
@@ -21,11 +21,16 @@ export class NoticeListComponent implements OnInit {
 
     private moduleName = '';
     private title = '';
-    noticeList: NoticeModel[] = [];
-    sort: SortDescriptor[] = [{
-        dir: 'asc',
-        field: 'title'
-    }];
+    noticeList: NoticeModel[];
+    gridData: GridDataResult;
+    private state: State = {
+        skip: 0,
+        take: 10,
+        sort: [{
+            dir: 'asc',
+            field: 'title'
+        }]
+    };
 
     ActionType: typeof ActionType = ActionType;
 
@@ -44,7 +49,8 @@ export class NoticeListComponent implements OnInit {
      * @param noticeList
      */
     private onLoadNoticeList(noticeList): void {
-        this.noticeList = orderBy(noticeList.notices as NoticeModel[], this.sort);
+        this.noticeList = noticeList.notices as NoticeModel[];
+        this.gridData = process(this.noticeList, this.state);
     }
 
     private getNoticeList(): void {
@@ -95,6 +101,11 @@ export class NoticeListComponent implements OnInit {
      */
     ngOnInit(): void {
         this.getNoticeList();
+    }
+
+    protected dataStateChange(state: DataStateChangeEvent): void {
+        this.state = state;
+        this.gridData = process(this.noticeList, this.state);
     }
 
 }

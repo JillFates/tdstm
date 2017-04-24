@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {StateService} from 'ui-router-ng2';
+import {StateService} from '@uirouter/angular';
 import {TranslateService} from 'ng2-translate';
 
 @Component({

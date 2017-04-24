@@ -3,7 +3,7 @@
  * Defines the top-level states such as home, welcome, and login
  */
 import { TDSAppComponent } from './tds-app.component';
-import { UIRouter, TransitionService } from 'ui-router-core';
+import { UIRouter, TransitionService } from '@uirouter/core';
 import { AuthService } from '../shared/services/auth.service';
 
 export const tdsRoot = {
