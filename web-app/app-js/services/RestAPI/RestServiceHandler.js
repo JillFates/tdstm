@@ -79,6 +79,11 @@ export default class RestServiceHandler {
                 this.req.url =  '../ws/license/' + licenseId + '/hash';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
+            getEmailContent:  (licenseId, onSuccess, onError) => {
+                this.req.method = 'GET';
+                this.req.url =  '../ws/license/' + licenseId + '/email/request';
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
+            },
             //--------------------------------------------
             resubmitLicenseRequest: (licenseId, onSuccess, onError) => {
                 this.req.method = 'POST';
