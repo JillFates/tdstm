@@ -191,6 +191,8 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			queries["query"] == "ae.some_property AS someProperty," +
 								"ae.some_other_property AS someOtherProperty,"
 
+		and: "No additional table is joined"
+			queries["joinQuery"] == ""
 	}
 
 	// Helper functions ////////////////////
