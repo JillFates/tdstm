@@ -1105,8 +1105,10 @@ div.customHoover div.tooltip-inner {
    background-color: white;
    color:#000;
    text-align: left;
+   border: #b3b3b3 1px solid;
+   box-shadow: 1px 1px #b3b3b3;
 }
 
 div.customHoover div.tooltip-arrow {
-   border-top-color: #fff !important;
+   border-top-color: #b3b3b3 !important;
 }
