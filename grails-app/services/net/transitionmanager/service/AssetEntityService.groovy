@@ -1729,62 +1729,63 @@ class AssetEntityService implements ServiceMethods {
 	def getAppCustomQuery(appPref) {
 		String query = ''
 		String joinQuery = ''
-		for (String value in appPref.values()) {
-			/*
-			 TODO: the logic for sme, sme2 and 'by' fields needs to be changed.
-			 We'll probably address that with TM-5931. In the meantime I'm using
-			 CONCAT_WS for sme and sme2, to join first, middle and last name
-			 with a separator.
-			*/
-			switch (value) {
-				case 'sme':
-					query += "CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS sme,"
-					joinQuery += "\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n"
-					break
-				case 'sme2':
-					query += "CONCAT_WS(' ', p1.first_name, p1.middle_name, p1.last_name) AS sme2,"
-					joinQuery += "\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n"
-					break
-				case 'modifiedBy':
-					query += "CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,"
-					joinQuery += "\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n"
-					break
-				case 'lastUpdated':
-					query += "ee.last_updated AS $value,"
-					joinQuery += "\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
-					break
-				case 'event':
-					query += "me.move_event_id AS event,"
-					joinQuery += "\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n"
-					break
-				case 'appOwner':
-					query += "CONCAT_WS(' ', p3.first_name, p3.middle_name, p3.last_name) AS appOwner,"
-					joinQuery += "\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n"
-					break
-				case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownDuration|startupFixed|startupDuration|testingFixed|testingDuration/:
-					query += "a.${WebUtil.splitCamelCase(value)} AS $value,"
-					break
-				case ~/custom\d{1,3}/:
-					query += "ae.$value AS $value,"
-					break
-				case ~/validation|latency|planStatus|moveBundle/:
-					// Handled by the calling routine
-					break
-				case ~/shutdownBy|startupBy|testingBy/:
-					Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
-					String byProperty = WebUtil.splitCamelCase(value)
-					String prefix = byPrefixes[value]
-					query += """
-						(IF(${byProperty} REGEXP '^[0-9]{1,}\$', 
-      					TRIM( REPLACE( CONCAT(${prefix}.first_name,' ', ${prefix}.middle_name, ' ', ${prefix}.last_name), '  ', ' ')),a.${byProperty})) 
-      					as ${value}, """
-      				joinQuery += "\n LEFT OUTER JOIN person ${prefix} ON ${prefix}.person_id=a.${byProperty} \n"
-					
-					break
-				default:
-					query +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
+		if(appPref){
+			for (String value in appPref.values()) {
+				/*
+				 TODO: the logic for sme, sme2 and 'by' fields needs to be changed.
+				 We'll probably address that with TM-5931. In the meantime I'm using
+				 CONCAT_WS for sme and sme2, to join first, middle and last name
+				 with a separator.
+				*/
+				switch (value) {
+					case 'sme':
+						query += "CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS sme,"
+						joinQuery += "\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n"
+						break
+					case 'sme2':
+						query += "CONCAT_WS(' ', p1.first_name, p1.middle_name, p1.last_name) AS sme2,"
+						joinQuery += "\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n"
+						break
+					case 'modifiedBy':
+						query += "CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,"
+						joinQuery += "\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n"
+						break
+					case 'lastUpdated':
+						query += "ee.last_updated AS $value,"
+						joinQuery += "\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
+						break
+					case 'event':
+						query += "me.move_event_id AS event,"
+						joinQuery += "\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n"
+						break
+					case 'appOwner':
+						query += "CONCAT_WS(' ', p3.first_name, p3.middle_name, p3.last_name) AS appOwner,"
+						joinQuery += "\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n"
+						break
+					case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownDuration|startupFixed|startupDuration|testingFixed|testingDuration/:
+						query += "a.${WebUtil.splitCamelCase(value)} AS $value,"
+						break
+					case ~/custom\d{1,3}/:
+						query += "ae.$value AS $value,"
+						break
+					case ~/validation|latency|planStatus|moveBundle/:
+						// Handled by the calling routine
+						break
+					case ~/shutdownBy|startupBy|testingBy/:
+						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
+						String byProperty = WebUtil.splitCamelCase(value)
+						String prefix = byPrefixes[value]
+						query += "(IF(${byProperty} REGEXP '^[0-9]{1,}\$', TRIM( REPLACE( CONCAT(${prefix}.first_name,' '," +
+								"${prefix}.middle_name, ' ', ${prefix}.last_name), '  ', ' ')),a.${byProperty})) as ${value},"
+	      				joinQuery += "\n LEFT OUTER JOIN person ${prefix} ON ${prefix}.person_id=a.${byProperty} \n"
+						
+						break
+					default:
+						query +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
+				}
 			}
 		}
+
 		return [query: query, joinQuery: joinQuery]
 	}
 
