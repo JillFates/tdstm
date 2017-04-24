@@ -218,7 +218,7 @@ class LicenseManagerService extends LicenseCommonService{
 
 			mailService.sendMail {
 				to toEmail
-				subject "TM License"
+				subject "TM License - ${licensedClient.websitename}"
 				body buff
 			}
 			true
