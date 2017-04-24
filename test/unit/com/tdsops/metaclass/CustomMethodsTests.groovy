@@ -4,18 +4,18 @@ import spock.lang.Specification
 
 class CustomMethodsTests extends Specification {
 
-	void setupSpec() {
+	def setupSpec() {
 		// Initialize the metaClass settings
-		CustomMethods.initialize()
+		CustomMethods.initialize(true)
 	}
 
-	void testAsYN() {
+	def testAsYN() {
 		expect:
 		true.asYN() == 'Y'
 		false.asYN() == 'N'
 	}
 
-	void testAsMap() {
+	def testAsMap() {
 		List beatles = [
 			['John', 1, 'Guitar', true],
 			['Paul', 2, 'Bass', true],
