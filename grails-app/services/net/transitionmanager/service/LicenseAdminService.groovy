@@ -645,7 +645,7 @@ class LicenseAdminService extends LicenseCommonService {
 		String subject
 		String body
 
-		//marshaler to avoid to render the 'class' property loaded when the Type is first loaded
+		//marshaller to avoid to render the 'class' property loaded when the Type is first loaded
 		static {
 			grails.converters.JSON.registerObjectMarshaller(EmailHolder) {
 				return it.properties.findAll{k, v -> k != 'class'}
