@@ -38,6 +38,12 @@ export default class LicenseAdminService {
         });
     }
 
+    getEmailContent(licenseId, onSuccess) {
+        this.restService.licenseAdminServiceHandler().getEmailContent(licenseId, (data) => {
+            return onSuccess(data.data);
+        });
+    }
+
     /**
      * Create a New License passing params
      * @param newLicense

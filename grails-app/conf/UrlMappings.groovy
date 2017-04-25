@@ -309,6 +309,7 @@ class UrlMappings {
 		"/ws/license/$id/email/request" {
 			controller = "wsLicenseAdmin"
 			action = [
+					GET:  "emailRequestData",
 					POST: "emailRequest"
 			]
 		}

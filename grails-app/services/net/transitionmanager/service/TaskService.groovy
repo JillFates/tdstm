@@ -3970,16 +3970,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// Assemble the SQL and attempt to execute it
 			try {
 				switch(queryOn) {
+
 					case 'device':
+						where = SqlUtil.appendToWhere(where, "a.assetClass=:assetClass")
+						map.assetClass = AssetClass.DEVICE
 						if (filter?.asset?.containsKey('virtual')) {
 							// Just Virtual devices
-							where = SqlUtil.appendToWhere(where, "a.assetType IN ('virtual', 'vm')")
+							where = SqlUtil.appendToWhere(where, "a.assetType IN (:vm_types)")
+							map.vm_types = AssetType.virtualServerTypes
 						} else if (filter?.asset?.containsKey('physical')) {
 							// Just Physical devices
-							where = SqlUtil.appendToWhere(where, "IFNULL(a.assetType,'') NOT IN ('application', 'database', 'files', 'virtual', 'vm')")
-						} else {
-							// All Devices
-							where = SqlUtil.appendToWhere(where, "IFNULL(a.assetType,'') NOT IN ('application', 'database', 'files')")
+							where = SqlUtil.appendToWhere(where, "IFNULL(a.assetType,'') NOT IN (:vm_types)")
+							map.vm_types = AssetType.virtualServerTypes
 						}
 
 						// Add any devices specific attribute filters
