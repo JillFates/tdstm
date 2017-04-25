@@ -23,20 +23,20 @@
 								<td class="dep-${support.status}">
 									${support?.asset?.assetType}
 								</td>
-								<td class="dep-${support.status}">
+								<td class="dep-${support.status}" style="min-width:80px">
 									${support?.asset?.assetName}
 								</td>
 								<g:if test="${support?.asset?.moveBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
-									<td style="background-color: lightpink;min-width:140px;">
-										<div class="" style="padding: 5px;float:left;max-width:100px;">${support?.asset?.moveBundle}</div>
-										<div class="text-center customHoover" style="padding: 5px;float:left;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
+									<td style="background-color: lightpink;position:relative;">
+										<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
+										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 									</td>
 								</g:if>
 								<g:elseif test="${support?.asset?.moveBundle!=assetEntity.moveBundle }" >
-									<td class="dep-${support.status}" style="min-width:140px;">
+									<td class="dep-${support.status}" style="position:relative;">
 										<b>
-											<div class="" style="padding: 5px;float:left;max-width:100px;">${support?.asset?.moveBundle}</div>
-											<div class="text-center customHoover" style="padding: 5px;float:left;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles."/></div>
+											<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
+											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles."/></div>
 										</b>
 									</td>
 								</g:elseif>
@@ -81,20 +81,20 @@
 								<td class="dep-${dependent.status}">
 									${dependent.dependent?.assetType}
 								</td>
-								<td class="dep-${dependent.status}">
+								<td class="dep-${dependent.status}" style="min-width:80px">
 									${dependent.dependent?.assetName}
 								</td>
 								<g:if test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
-									<td style="background-color: lightpink;min-width:140px;">
-										<div class="col-xs-9" style="padding: 5px;float:left;max-width:100px;">${dependent.dependent?.moveBundle}</div>
-										<div class="col-xs-3 text-center customHoover" style="padding: 5px;float:left;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
+									<td style="background-color: lightpink;position:relative;">
+										<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 									</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle }" >
-									<td class="dep-${dependent.status}" style="min-width:140px;">
+									<td class="dep-${dependent.status}" style="position:relative;">
 										<b>
-											<div class="" style="padding: 5px;float:left;max-width:100px;">${dependent.dependent?.moveBundle}</div>
-											<div class="text-center customHoover" style="padding: 5px;float:left;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
+											<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 										</b>
 									</td>
 								 </g:elseif>
