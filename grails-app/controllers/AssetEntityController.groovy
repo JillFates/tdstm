@@ -2558,6 +2558,7 @@ class AssetEntityController implements ControllerMethods {
 				} else if (dueInSecs >= 300) {
 					updatedClass='task_tardy'
 				}
+
 			}
 
 			if (it.estFinish) {
@@ -2571,7 +2572,20 @@ class AssetEntityController implements ControllerMethods {
 			String dueDate = ''
 
 				dueDate = TimeUtil.formatDate(it.dueDate)
-			
+
+			// Add styling to Due Date column
+			if (it.dueDate && AssetComment.isActionable(it.status))
+
+				if (new Date(dueDate).clearTime() > today.clearTime())
+					dueClass =	''
+					else if (new Date(dueDate).clearTime() < today.clearTime())
+						dueClass = 'task_late'
+					 else
+						dueClass = 'task_tardy'
+
+
+
+
 
 			def deps = TaskDependency.findAllByPredecessor(it)
 			def depCount = 0
