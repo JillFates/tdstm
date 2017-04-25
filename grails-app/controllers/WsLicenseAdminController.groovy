@@ -205,6 +205,21 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 	}
 
+	/**
+	 * Email a license request
+	 * @param id identifier of the license request to email
+	 * @return
+	 */
+	@HasPermission(Permission.LicenseAdministration)
+	def emailRequestData(String id){
+		LicenseAdminService.EmailHolder emailData = licenseAdminService.emailRequestData(id)
+		if(emailData){
+			renderSuccessJson(emailData)
+		}else{
+			renderFailureJson("Could not get Email Data")
+		}
+	}
+
 
 	/*** HELPER *************************/
 	/* I believe that this should be on the trait  ¬¬ */

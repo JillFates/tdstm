@@ -527,6 +527,35 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	/**
+	 * Return a map with the information to build an email to request a license
+	 * @param uuid
+	 * @return Map with the information to build the email
+	 */
+	EmailHolder emailRequestData(String uuid){
+		DomainLicense license = DomainLicense.get(uuid)
+		return emailRequestData(license)
+	}
+
+	/**
+	 * Return a map with the information to build an email to request a license
+	 * @param license Object
+	 * @return EmailHolder with the information to build the email
+	 */
+	EmailHolder emailRequestData(DomainLicense license){
+		EmailHolder emailHolder
+		if(license){
+			String toEmail = grailsApplication.config.tdstm?.license?.request_email
+			emailHolder = [:]
+			emailHolder.subject = "License Request - ${license.websitename}"
+			emailHolder.toEmail = toEmail
+			emailHolder.ccEmail = license.email
+			emailHolder.body = getLicenseRequestBody(license)
+		}
+
+		return emailHolder
+	}
+
+	/**
 	 * Retrieve license request body used to send email and pressent to the user
 	 * @param uuid identifier of the stored license
 	 * @return String reptresentation of the hash request
@@ -571,20 +600,18 @@ class LicenseAdminService extends LicenseCommonService {
 	 */
 	private boolean sendMailRequest(DomainLicense license){
 		log.debug("SEND License Request")
-		String toEmail = grailsApplication.config.tdstm?.license?.request_email
+		EmailHolder emailData = emailRequestData(license)
 
-		if(toEmail) {
-			String buff = getLicenseRequestBody(license)
-
+		if(emailData) {
 			mailService.sendMail {
-				to toEmail
-				subject "License Request"
-				body buff
+				to emailData.toEmail
+				subject emailData.subject
+				body email.body
 			}
 			true
 
 		}else{
-			log.error("tdstm.license.request_email not found in the configuration")
+			log.error("could not send email, not properly configured")
 			false
 		}
 	}
@@ -608,5 +635,23 @@ class LicenseAdminService extends LicenseCommonService {
             return false
         }
     }
+
+	/**
+	 * Objecto to hold the Email data in static Type style
+	 */
+	class EmailHolder {
+		String toEmail
+		String ccEmail
+		String subject
+		String body
+
+		//marshaller to avoid to render the 'class' property loaded when the Type is first loaded
+		static {
+			grails.converters.JSON.registerObjectMarshaller(EmailHolder) {
+				return it.properties.findAll{k, v -> k != 'class'}
+			}
+
+		}
+	}
 
 }
