@@ -53,7 +53,7 @@
 
 
 					<%-- Bundle select --%>
-					<td>
+					<td class='combo-td'>
 						<g:set var="supportBundle" value="${support?.asset?.moveBundle}"></g:set>
 						<%-- Used to show bundle colors based on bundleConflicts --%>
 						<g:if test="${supportBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
@@ -151,7 +151,7 @@
 					</td>
 
 					<%-- Move Bundle Select --%>
-					<td>
+					<td class='combo-td'>
 						<g:set var="depBundle" value="${dependent?.dependent?.moveBundle}"></g:set>
 						<%--Used to show bundle colors based on bundleConflicts--%>
 						<g:if test="${depBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
