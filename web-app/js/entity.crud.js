@@ -1,8 +1,10 @@
 /*
  * Javascript functions used by the Entity CRUD forms and Lists
  */
-
 var EntityCrud = (function ($) {
+
+	// Overrides the default select2-input matcher.
+	$.fn.select2.defaults.matcher = matchStart
 
 	var pub = {};	// public methods
 
@@ -2416,3 +2418,62 @@ function updateAuditModelPanel(selectedModel) {
 		$('#modelAuditPanel').hide();
 	}
 }
+
+
+/*
+ * This function executes an alternative matcher for the select2-input.
+ * It will try to find exact matches for the first words and a partial
+ * match for the last.
+ *
+ * The search is case-insensitive.
+ *
+ * @param userInput: user's input
+ * @param dropdownElement: current element in the dropdown to be compared.
+ *
+ * @return true: they match, false: otherwise.
+ */
+function matchStart (userInput, dropdownElement) {
+
+	// Checks the input is not empty.
+	if(userInput && userInput.trim().length > 0){
+		// Splits the dropdown element into an array of strings.
+		var dropdownElementTokens = dropdownElement.toUpperCase().trim().split(/\W+/)
+		// Splits the user's input into an array of strings.
+		var inputTokens = userInput.toUpperCase().trim().split(/\W+/)
+
+		// Determines how many exact matches should be found.
+		var exactMatches = inputTokens.length - 1
+		// Iterates over the first words looking for exact matches.
+		for (var i = 0; i < exactMatches; i++) {
+			// Determines if there's any match for the current word.
+			var index = dropdownElementTokens.indexOf(inputTokens[i])
+			// Checks if there was a match.
+			if (index > -1){
+				// Removes the current match to avoid duplicates.
+				dropdownElementTokens.splice(index, 1)
+			} else {
+				// If there was no match for any of the words in the user's input, we discard the current word.
+				return false
+			}
+		}
+
+			// The last word in the user's input.
+		var partialMatch = inputTokens[exactMatches]
+
+		// Iterate over the remaining words.
+		for (var t = 0; t < dropdownElementTokens.length; t++) {
+			// Check if the last words matches the beginning of the current word.
+			if (dropdownElementTokens[t].indexOf(partialMatch) == 0) {
+				return true
+			}
+		}
+		// We exhausted all remaining words and we didn't find a match.
+		return false
+	} else {
+		// If the user's input is empty, all elements in the dropdown are still valid.
+		return true
+	}
+		
+        
+}
+
