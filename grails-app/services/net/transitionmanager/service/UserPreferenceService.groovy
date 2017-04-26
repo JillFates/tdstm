@@ -134,7 +134,7 @@ class UserPreferenceService implements ServiceMethods {
 
 			//if we are getting the current user preference store it in the session for speed
 			if(isCurrent){
-				session.setAttribute(preferenceCode, userPreference?.value)
+				session.setAttribute(preferenceCode, userPrefValue)
 			}
 		}
 

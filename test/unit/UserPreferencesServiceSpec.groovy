@@ -22,18 +22,20 @@ class UserPreferencesServiceSpec extends AbstractUnitSpec {
 	}
 
 	def 'test preference stored in session is the actual value'() {
-		when:
+		when: 'Getting the preference CURR_TZ from the UserPreferenceService'
 			def prefValue = service.getPreference(UserPreferenceEnum.CURR_TZ)
 
-		then:
+		then: 'the value in the session should be the same that the one in the preferences'
 			session.getAttribute(UserPreferenceEnum.CURR_TZ.toString()) == prefValue
 	}
 
-	def 'test that the preference stored is not a Map (TM-5572)'() {
-		when:
+	def 'test that the preference stored is the same type that the one on the session (TM-5572)'() {
+		when: '''Getting the preference CURR_TZ from the UserPreferenceService and 
+				getting the same value from the session'''
 			def prefValue = service.getPreference(UserPreferenceEnum.CURR_TZ)
+			def sessionValue = session.getAttribute(UserPreferenceEnum.CURR_TZ.toString())
 
-		then:
-			!(prefValue instanceof Map)
+		then: 'both values should be of the same type'
+			prefValue.class == sessionValue.class
 	}
 }
