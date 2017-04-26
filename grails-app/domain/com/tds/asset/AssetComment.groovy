@@ -207,7 +207,7 @@ class AssetComment {
 
 	static transients = ['actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
 	                     'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
-	                     'tmpIsFunnellingTask']
+	                     'tmpIsFunnellingTask', 'isActionable']
 
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique
 
@@ -268,6 +268,13 @@ class AssetComment {
 
 	String toString() {
 		(taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
+	}
+
+   /**
+    * isActionable - return indicator that the status of the task is Actionable
+    */
+	boolean isActionable() {
+		!(status in [ AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED ])
 	}
 
 	// task Manager column header names and its labels

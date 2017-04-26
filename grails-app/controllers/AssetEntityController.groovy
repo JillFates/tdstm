@@ -2318,7 +2318,7 @@ class AssetEntityController implements ControllerMethods {
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 
 		Project project = securityService.userCurrentProject
-		def today = new Date()
+		def today = new Date().clearTime()
 		def moveEvent
 		if (params.moveEvent) {
 			// zero (0) = All events
@@ -2558,6 +2558,7 @@ class AssetEntityController implements ControllerMethods {
 				} else if (dueInSecs >= 300) {
 					updatedClass='task_tardy'
 				}
+
 			}
 
 			if (it.estFinish) {
@@ -2569,11 +2570,25 @@ class AssetEntityController implements ControllerMethods {
 			}
 
 			String dueDate = ''
-			if (isRunbookTask) {
-				dueDate = TimeUtil.formatDateTime(it.estFinish, TimeUtil.FORMAT_DATE_TIME_4)
-			} else {
-				dueDate = TimeUtil.formatDate(it.dueDate)
+			dueDate = TimeUtil.formatDate(it.dueDate)
+
+			// Clears time portion of dueDate for date comparison
+			Date due = it.dueDate?.clearTime()
+
+			// Add styling to Due Date column
+			if (it.dueDate && it.isActionable()) {
+
+				if (due > today) {
+					dueClass = ''
+				} else {
+					if (due < today)
+						dueClass = 'task_late'
+					else
+						dueClass = 'task_tardy' // due == today
+				}
 			}
+
+
 
 			def deps = TaskDependency.findAllByPredecessor(it)
 			def depCount = 0
