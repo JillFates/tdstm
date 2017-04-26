@@ -1,6 +1,5 @@
 import { Ng2StateDeclaration } from '@uirouter/angular';
 import { NoticeListComponent } from './components/list/notice-list.component';
-import { NoticeGridComponent } from './components/grid/notice-grid.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 export class NoticeStates {

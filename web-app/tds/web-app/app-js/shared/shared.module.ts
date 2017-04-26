@@ -20,9 +20,6 @@ import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 import { HeaderComponent } from './modules/header/header.component';
 import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
 import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-editor.component';
-// Jquery Kendo Grid
-import { JqueryKendoGridComponent } from './modules/jquery-kendo-grid/jquery-kendo-grid.component';
-import { JqueryKendoGridColumnComponent } from './modules/jquery-kendo-grid/jquery-kendo-grid-column.component';
 
 @NgModule({
     imports: [
@@ -37,8 +34,6 @@ import { JqueryKendoGridColumnComponent } from './modules/jquery-kendo-grid/jque
         HeaderComponent,
         FormlyInputHorizontal,
         RichTextEditorComponent,
-        JqueryKendoGridComponent,
-        JqueryKendoGridColumnComponent
     ],
     providers: [
         AuthService,
@@ -56,9 +51,7 @@ import { JqueryKendoGridColumnComponent } from './modules/jquery-kendo-grid/jque
         HeaderComponent,
         FormlyInputHorizontal,
         RichTextEditorComponent,
-        TranslateModule,
-        JqueryKendoGridComponent,
-        JqueryKendoGridColumnComponent
+        TranslateModule
     ]
 })
 export class SharedModule {
