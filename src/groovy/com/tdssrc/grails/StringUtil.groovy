@@ -2,7 +2,7 @@ package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
 import groovy.json.StringEscapeUtils
-import org.apache.commons.lang.StringUtils
+import org.springframework.util.StringUtils
 
 /**
  * String manipulation methods.
@@ -50,7 +50,8 @@ class StringUtil {
 	 * @return true if blank
 	 */
 	static boolean isBlank(String subject) {
-		!subject?.trim()
+		//!subject?.trim()
+		return StringUtils.isEmpty(subject)
 	}
 
 	/**
@@ -337,7 +338,7 @@ class StringUtil {
 		String result = ""
 		if( list?.size() > 0){
 			String itemsDelimiter = "\"" + baseDelimiter + "\""
-			result = "\"" + StringUtils.join(list , itemsDelimiter) + "\""
+			result = "\"" + org.apache.commons.lang.StringUtils.join(list , itemsDelimiter) + "\""
 		}
 		return result
 	}

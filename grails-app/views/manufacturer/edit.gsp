@@ -10,6 +10,11 @@
 					<g:renderErrors bean="${manufacturerInstance}" as="list" />
 				</div>
 			</g:hasErrors>
+			<g:if test="${flash.message}">
+				<div class="errors">
+					<div id="messageDivId" class="message">${flash.message}</div>
+				</div>
+			</g:if>
 			<g:form method="post" action="update" name="editManufacturerFormId">
 				<input type="hidden" id="manufacturerId" name="id" value="${manufacturerInstance?.id}" />
 				<div class="dialog">
@@ -23,7 +28,7 @@
 									<label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:manufacturerInstance,field:'name','errors')}">
-									<input type="text" id="name" name="name" value="${fieldValue(bean:manufacturerInstance,field:'name')}"/>
+									<input type="text" id="name" name="name" onchange="akaUtil.handleAkaChange(this, 'manufacturer', '${manufacturerInstance?.id}')" value="${fieldValue(bean:manufacturerInstance,field:'name')}"/>
 								</td>
 							</tr>
 							

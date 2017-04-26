@@ -90,10 +90,10 @@ var akaUtil = (function ($) {
 			var duplicateOf = 'none'
 
 			// check if the AKA matches the parent's name
-			if (akaName == parentName)
+			if (tdsCommon.compareStringsIgnoreCase(akaName, parentName))
 				duplicateOf = 'parent'
 			// check if the AKA matches another AKA on the list
-			else if (akaList.indexOf(akaName) != -1)
+			else if (tdsCommon.arrayContainsStringIgnoreCase(akaList, akaName))
 				duplicateOf = 'local'
 			// if this AKA is new, check it's validity against other models on the server
 			else if (akaRow.attr('js-is-unique') == 'unknown')

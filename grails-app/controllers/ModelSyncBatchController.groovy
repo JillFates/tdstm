@@ -9,6 +9,8 @@ import net.transitionmanager.domain.ModelConnectorSync
 import net.transitionmanager.domain.ModelSync
 import net.transitionmanager.domain.ModelSyncBatch
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ManufacturerService
+import net.transitionmanager.service.ModelService
 import net.transitionmanager.service.SecurityService
 
 import grails.plugin.springsecurity.annotation.Secured
@@ -19,6 +21,8 @@ class ModelSyncBatchController implements ControllerMethods {
 	static defaultAction = 'list'
 
 	SecurityService securityService
+	ManufacturerService manufacturerService
+	ModelService modelService
 
 	@HasPermission(Permission.ModelImport)
 	def list() {
@@ -55,7 +59,8 @@ class ModelSyncBatchController implements ControllerMethods {
 									akas.each {
 										def manuExist = Manufacturer.findByName(it.trim())
 										if (!manuExist) {
-											manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+											//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+											manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
 										}
 									}
 							    }
@@ -75,7 +80,8 @@ class ModelSyncBatchController implements ControllerMethods {
 									akas.each {
 										def manuExist = Manufacturer.findByName(it.trim())
 										if (!manuExist) {
-											manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+											//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+											manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
 										}
 									}
 							    }
@@ -96,7 +102,8 @@ class ModelSyncBatchController implements ControllerMethods {
 								akas.each {
 									def manuExist = Manufacturer.findByName(it.trim())
 									if (!manuExist) {
-										manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+										//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+										manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
 									}
 
 								}
@@ -149,10 +156,12 @@ class ModelSyncBatchController implements ControllerMethods {
 							} else {
 							    if (modelSync.aka) {
 									def akas = modelSync.aka?.split(",")
-									akas.each {
-										def akaExist = Model.findByName(it.trim())
+									akas.each { String aka ->
+										aka = aka.trim()
+										def akaExist = Model.findByModelName(aka)
 										if (!akaExist) {
-											modelInstance.findOrCreateAliasByName(it.trim(), true)
+											//modelInstance.findOrCreateAliasByName(it.trim(), true)
+											modelService.findOrCreateAliasByName(modelInstance, aka, true)
 										}
 									}
 							    }
@@ -193,10 +202,12 @@ class ModelSyncBatchController implements ControllerMethods {
 								} else {
 									if (modelSync.aka) {
 										def akas = modelSync.aka?.split(",")
-										akas.each {
-											def akaExist = Model.findByModelName(it.trim())
+										akas.each { String aka ->
+											aka = aka.trim()
+											def akaExist = Model.findByModelName(aka)
 											if (!akaExist) {
-												modelInstance.findOrCreateAliasByName(it.trim(), true)
+												//modelInstance.findOrCreateAliasByName(it.trim(), true)
+												modelService.findOrCreateAliasByName(modelInstance, aka, true)
 											}
 										}
 									}
@@ -240,11 +251,13 @@ class ModelSyncBatchController implements ControllerMethods {
 							} else {
 								if (modelSync.aka) {
 									def akas = modelSync.aka?.split(",")
-									akas.each {
+									akas.each { String aka ->
+										aka = aka.trim()
 										// TODO - THIS should be checking if model exists by model name AND manufacturer. The model name is NOT unique
-										def modelExist = Model.findByModelName(it.trim())
+										def modelExist = Model.findByModelName(aka)
 										if (!modelExist) {
-											modelInstance.findOrCreateAliasByName(it.trim(), true)
+											//modelInstance.findOrCreateAliasByName(it.trim(), true)
+											modelService.findOrCreateAliasByName(modelInstance, aka, true)
 										}
 									}
 								}

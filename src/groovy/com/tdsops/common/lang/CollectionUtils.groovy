@@ -54,4 +54,22 @@ class CollectionUtils {
 			return comp
     }
 	}
+
+	/**
+	 * Return {@code true} if the supplied Collection is {@code null} or empty.
+	 * @param collection
+	 * @return
+	 */
+	static boolean isEmpty(Collection<?> collection) {
+		return org.springframework.util.CollectionUtils.isEmpty(collection);
+	}
+
+	/**
+	 * Return {@code false} if the supplied Collection is not {@code null} or not empty.
+	 * @param collection
+	 * @return
+	 */
+	static boolean isNotEmpty(Collection<?> collection) {
+		return !isEmpty(collection)
+	}
 }

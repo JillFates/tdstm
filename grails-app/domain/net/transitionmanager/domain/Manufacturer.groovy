@@ -1,13 +1,11 @@
 package net.transitionmanager.domain
 
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-import net.transitionmanager.service.ManufacturerService
 
 class Manufacturer {
 	
 	def manufacturerService
-	
+
 	String name
 	String description
 	String corporateName
@@ -49,10 +47,11 @@ class Manufacturer {
 	 *   4. TODO - What about the sync tables?
 	 */
 	def beforeDelete = {
-		withNewSession {
+		// <SL> moved to ManufacturerService
+		/*withNewSession {
 			executeUpdate('update AssetEntity set manufacturer=null where manufacturer=?', [this])
 			executeUpdate('delete ManufacturerAlias where manufacturer=?', [this])
-		}
+		}*/
 	}
 
 	/**
@@ -74,17 +73,11 @@ class Manufacturer {
 	 * @param name - name of the manufacturer alias
 	 * @param createIfNotFound - optional flag to indicating if record should be created (default false)
 	 * @return a ManufacturerAlias object if found or was successfully created , or null if not found or not created
+	 *
+	 * @deprecated use {@link net.transitionmanager.service.ManufacturerService#findOrCreateAliasByName(net.transitionmanager.domain.Manufacturer, java.lang.String, boolean) ManufacturerService} instead.
 	 */
+	@Deprecated
 	ManufacturerAlias findOrCreateAliasByName(String name, boolean createIfNotFound = false) {
-		ManufacturerAlias alias = ManufacturerAlias.findByNameAndManufacturer(name, this)
-		if (!alias && createIfNotFound) {
-			def isValid = manufacturerService.isValidAlias(name, this, false)
-			alias = new ManufacturerAlias(name: name.trim(), manufacturer: this)
-			if (!isValid || !alias.save(flush: true)) {
-				log.error GormUtil.allErrorsString(alias)
-				return null
-			}
-		}
-		alias
+		return manufacturerService.findOrCreateAliasByName(this, name, createIfNotFound)
 	}
 }
