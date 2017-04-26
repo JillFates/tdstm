@@ -250,4 +250,17 @@ class StringUtilTests extends Specification {
 		'file'          | false
 		''              | false
 	}
+
+	void "Test the listOfStringsAsMultiValueString"(){
+		expect:
+			StringUtil.listOfStringsAsMultiValueString(value) == result
+		where:
+			value           						| result
+				[]									| ""
+				null								| ""
+				["one"]								| "\"one\""
+				["one", "two", "three"]				| "\"one\", \"two\", \"three\""
+				["\'one\'", "'two'", "\"three\""]	| "\"\'one\'\", \"'two'\", \"\"three\"\""
+
+	}
 }

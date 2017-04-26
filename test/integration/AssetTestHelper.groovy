@@ -11,20 +11,24 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import org.apache.commons.lang3.RandomStringUtils
 
 import com.tds.asset.Application
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.eav.EavAttributeSet
+import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 
 class AssetTestHelper {
+	DeviceService deviceService
 	PersonService personService
 	SecurityService securityService
 
 	Long adminPersonId = 100
 
 	AssetTestHelper() {
+		deviceService = ApplicationContextHolder.getService('deviceService')
 		personService = ApplicationContextHolder.getService('personService')
 		securityService = ApplicationContextHolder.getService('securityService')
 		assert (personService instanceof PersonService)
@@ -61,5 +65,49 @@ class AssetTestHelper {
 
 		return app
 	}
+
+
+	/**
+	 * This method creates a random device using the deviceService.saveAssetFromForm
+	 * @param project: prroject to be assigned.
+	 * @param assetType: what kind of asset it should be. It has to be a String because
+	 *    not all the possible values have a corresponding keyword.
+	 */
+	 public AssetEntity createDevice(Project project, String assetType, Map params = [:]) {
+		 /* Most the values in this map replicate what the front-end sends to the
+		 back-end when creating a device. */
+		 Map defaultValues = [
+		 		assetName: RandomStringUtils.randomAlphabetic(15),
+				currentAssetType: assetType,
+				moveBundle: project.projectDefaultBundle,
+				"moveBundle.id": project.projectDefaultBundle.id.toString(),
+				roomSourceId: "-1",
+				sourceLocation: "",
+				sourceRoom: "",
+				roomTargetId: "-1",
+				targetLocation: "",
+				targetRoom: "",
+				rackSourceId: "-1",
+				sourceRack: "",
+				newRackSourceId: "-1",
+				rackTargetId: "-1",
+				targetRack: "",
+				newRackTargetId: "-1",
+				sourceChassis: "0",
+				targetChassis: "0",
+				sourceRackPosition: "",
+				targetRackPosition: "",
+				sourceBladePosition: "",
+				targetBladePosition: "",
+				sourceLocation: "TBD",
+				targetLocation: "TBD",
+		 ]
+		 defaultValues.each{ key, val->
+			 if(!params.containsKey(key)) {
+				 params[key] = val
+			 }
+		 }
+		return deviceService.saveAssetFromForm(project, params)
+	 }
 
 }

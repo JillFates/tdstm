@@ -379,7 +379,7 @@ class AssetEntity extends EavEntity {
 	 * Whether the asset is a VM
 	 */
 	boolean isaVM() {
-		assetClass == DEVICE && (model?.assetType == VM.toString() || assetType == VM.toString())
+		assetClass == DEVICE && (model?.assetType in AssetType.virtualServerTypes || assetType in AssetType.virtualServerTypes)
 	}
 
 	/**

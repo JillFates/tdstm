@@ -335,6 +335,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @param isSource - true indicates that the assignment will be assigned to the source otherwise at the target
 	 */
 	void assignAssetToRoom(Project project, AssetEntity asset, String roomId, String location, String roomName, boolean isSource) {
+
 		String srcOrTarget = isSource ? 'Source' : 'Target'
 		def roomProp = "room$srcOrTarget"
 		Long id = NumberUtil.toLong(roomId)
@@ -344,11 +345,10 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
-
 		switch (id) {
 			case -1:
 				// Create a new room
-				if (location.trim().size() == 0 || roomName.trim().size() == 0) {
+				if (StringUtil.isBlank(location) && StringUtil.isBlank(roomName)) {
 					throw new InvalidRequestException("Creating a $srcOrTarget room requires both the location and room name".toString())
 				}
 
@@ -406,15 +406,14 @@ class AssetEntityService implements ServiceMethods {
 
 		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
 		def assetType = asset.model?.assetType
-		if ([AssetType.BLADE.toString(), AssetType.VM.toString()].contains(assetType)) {
+		if (asset.isaBlade() || asset.isaVM()) {
 			// If asset model is VM or BLADE we should remove rack assignments period
 			asset[rackProp] = null
-			if (isSource) {
-				asset.sourceBladePosition = null
-				asset.sourceRackPosition = null
-			} else {
-				asset.targetBladePosition = null
-				asset.targetRackPosition = null
+			with(asset){
+				sourceBladePosition = null
+				sourceRackPosition = null
+				targetBladePosition = null
+				targetRackPosition = null
 			}
 			return
 		}
@@ -431,10 +430,6 @@ class AssetEntityService implements ServiceMethods {
 			case -1:
 				// Create a new rack
 				rackName = rackName?.trim()
-				if (!rackName) {
-					throw new InvalidRequestException("Creating a $srcOrTarget rack requires a name".toString())
-				}
-
 				def rack = rackService.findOrCreateRack(room, rackName)
 				if (rack) {
 					asset[rackProp] = rack
