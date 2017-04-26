@@ -270,7 +270,10 @@ class AssetComment {
 		(taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
 	}
 
-	static boolean isActionable(status) {
+   /**
+    * isActionable - return indicator that the status of the task is Actionable
+    */
+	boolean isActionable() {
 		!(status in [ AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED ])
 	}
 

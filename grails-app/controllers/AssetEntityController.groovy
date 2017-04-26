@@ -2318,7 +2318,7 @@ class AssetEntityController implements ControllerMethods {
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 
 		Project project = securityService.userCurrentProject
-		def today = new Date()
+		def today = new Date().clearTime()
 		def moveEvent
 		if (params.moveEvent) {
 			// zero (0) = All events
@@ -2570,20 +2570,23 @@ class AssetEntityController implements ControllerMethods {
 			}
 
 			String dueDate = ''
+			dueDate = TimeUtil.formatDate(it.dueDate)
 
-				dueDate = TimeUtil.formatDate(it.dueDate)
+			// Clears time portion of dueDate for date comparison
+			Date due = it.dueDate?.clearTime()
 
 			// Add styling to Due Date column
-			if (it.dueDate && AssetComment.isActionable(it.status))
+			if (it.dueDate && it.isActionable()) {
 
-				if (new Date(dueDate).clearTime() > today.clearTime())
-					dueClass =	''
-					else if (new Date(dueDate).clearTime() < today.clearTime())
+				if (due > today) {
+					dueClass = ''
+				} else {
+					if (due < today)
 						dueClass = 'task_late'
-					 else
-						dueClass = 'task_tardy'
-
-
+					else
+						dueClass = 'task_tardy' // due == today
+				}
+			}
 
 
 
