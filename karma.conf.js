@@ -19,7 +19,6 @@ module.exports = function (config) {
             './node_modules/phantomjs-polyfill/bind-polyfill.js', // Support to bind on PhantomJS, will be at 2.0
             './web-app/app-js/config/App.js',
             './web-app/app-js/vendors/jquery/dist/jquery.min.js',
-            './web-app/dist/js/vendors/kendo/kendo.all.min.js',
             './web-app/test/Hook/i18.base.spec.js', // Support to avoid Angular Js Translate issues
             './web-app/test/mockupData/**/*.json',
             './web-app/test/spec/**/*.js',
