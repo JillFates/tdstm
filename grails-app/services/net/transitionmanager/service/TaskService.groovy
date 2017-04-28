@@ -15,15 +15,9 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.domain.AssetEntityHelper
-import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.*
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
-import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.ContextType
-import com.tdsops.tm.enums.domain.RoleTypeGroup
-import com.tdsops.tm.enums.domain.TimeConstraintType
-import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
@@ -32,20 +26,11 @@ import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveBundleStep
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Recipe
-import net.transitionmanager.domain.RecipeVersion
-import net.transitionmanager.domain.TaskBatch
-import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -68,16 +53,16 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
 @Transactional
 class TaskService implements ServiceMethods {
 
-	def controllerService
-	def cookbookService
+	ControllerService controllerService
+	CookbookService cookbookService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	def partyRelationshipService
-	def personService
-	def progressService
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
+	ProgressService progressService
 	Scheduler quartzScheduler
-	def securityService
-	def sequenceService
+	SecurityService securityService
+	SequenceService sequenceService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -555,58 +540,83 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
+	 * Returns a list of tasks paginated and filtered
 	 * @param project - the project object to filter tasks to include
 	 * @param category - a task category to filter on (optional)
-	 * @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
+	 * @param taskToIgnore - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
+	 * @param moveEventId - an optionel move event to filter on
 	 * @param page - page to load
 	 * @param pageSize - page size to use
-	 * @param filterDesc - filter by task description
-	 * @return String the SELECT control
+	 * @param searchText - an optional filter to search by either task id or comment
+	 * @return
 	 */
-	def genSelectForPredecessors(project, category, task, moveEventId, page=-1, pageSize=50, filterDesc=null) {
+	def search(Project project, String category, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
 
-		StringBuffer queryList = new StringBuffer("FROM AssetComment a ")
-		StringBuffer queryCount = new StringBuffer("SELECT count(*) FROM AssetComment a ")
-		StringBuffer query = new StringBuffer("WHERE a.project=$project.id AND a.commentType='$AssetCommentType.TASK' ")
+		StringBuilder queryList = new StringBuilder("FROM AssetComment a ")
+		StringBuilder queryCount = new StringBuilder("SELECT count(*) FROM AssetComment a ")
+		StringBuilder query = new StringBuilder("WHERE a.project.id = :projectId AND a.commentType = :commentType ")
+		def params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
 		if (category) {
 			if (categoryList.contains(category)) {
-				query.append("AND a.category='$category' ")
+				query.append("AND a.category = :category ")
+				params["category"] = category
 			} else {
-				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
-				category=''
+				log.warn "genSelectForPredecessors - unexpected category filter '${category}'"
+				category = ""
 			}
 		}
-		if (filterDesc) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
-			query.append("AND (a.taskNumber like '%$filterDesc%' or a.comment like '%$filterDesc%') ")
+		if (searchText) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
+			// if searchText is a number, then only using task taskNumber attribute
+			if (searchText ==~ /^[0-9]+$/) {
+				query.append("AND a.taskNumber like '%${searchText}%' ")
+			} else {
+				query.append("AND a.comment like :searchText ")
+				params["searchText"] = "%" + StringEscapeUtils.escapeSql(searchText) + "%"
+			}
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
-		if (task) {
-			if (! category && task.category) {
-				query.append("AND a.category='$task.category' ")
+		if (taskToIgnore) {
+			if (!category && taskToIgnore.category) {
+				query.append("AND a.category = :category ")
+				params["category"] = taskToIgnore.category
 			}
-			query.append("AND a.id != $task.id ")
+			query.append("AND a.id != :taskId ")
+			params["taskId"] = taskToIgnore.id
 
-			if (task.moveEvent) {
-				query.append("AND a.moveEvent.id=$task.moveEvent.id ")
+			if (taskToIgnore.moveEvent) {
+				query.append("AND a.moveEvent.id = :moveEventId ")
+				params["moveEventId"] = taskToIgnore.moveEvent.id
 			}
 		} else {
 			if (moveEventId) {
-				query.append("AND a.moveEvent.id='$moveEventId' ")
+				query.append("AND a.moveEvent.id = :moveEventId ")
+				params["moveEventId"] = moveEventId
 			} else {
 				query.append("AND a.moveEvent is null ")
 			}
 		}
 
-		// Add the sort and generate the list
-		query.append('ORDER BY a.taskNumber ASC')
-		log.info(query)
-		def resultTotal = AssetComment.executeQuery(queryCount.append(query).toString())
+		def list = []
+		def resultTotal = [0]
+		try {
+			// execute count query
+			queryCount.append(query)
+			resultTotal = AssetComment.executeQuery(queryCount.toString(), params)
 
-		Map paginationArgs = page == -1 ? [:] : [max: pageSize, offset: ((page - 1) * pageSize)]
-		[list: AssetComment.executeQuery(queryList.append(query).toString(), [:], paginationArgs),
-		 total: resultTotal[0]]
+			// Add the sort and generate the list
+			query.append('ORDER BY a.taskNumber ASC')
+
+			// execute list query
+			Map paginationArgs = (page == -1 ? [:] : [max: pageSize, offset: ((page - 1) * pageSize)])
+			queryList.append(query)
+			list = AssetComment.executeQuery(queryList.toString(), params, paginationArgs)
+		} catch (Exception e) {
+			log.error(e.message, e)
+		}
+
+		return [list: list, total: resultTotal[0]]
 	}
 
 	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
