@@ -24,6 +24,10 @@ class EnvironmentService implements InitializingBean, ServiceMethods {
 
 	// gets the version and build data as a string
 	String getVersionText() {
-		"Version $version ($build)"
+		String versionText = "Version $version"
+		if(build) {
+			versionText = "$versionText ($build)"
+		}
+		return versionText
 	}
 }
