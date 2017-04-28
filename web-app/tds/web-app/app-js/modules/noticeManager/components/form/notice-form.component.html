@@ -1,7 +1,7 @@
 <div class="modal-content">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-        <h4 class="modal-title">{{ action===0 ? 'Create':'Edit'}} Notice</h4>
+        <h4 class="modal-title">{{ (action===0 ? 'NOTICE_MANAGER.CREATE_NOTICE':'NOTICE_MANAGER.EDIT_NOTICE') | translate }}</h4>
     </div>
     <div class="modal-body">
         <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
@@ -41,8 +41,8 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button (click)="saveNotice()" [disabled]="!formValid()" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span> Save</button>
-        <button (click)="deleteNotice()" *ngIf="action===1" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete</button>
-        <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+        <button (click)="saveNotice()" [disabled]="!formValid()" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span>{{ 'NOTICE_MANAGER.SAVE' | translate }}</button>
+        <button (click)="deleteNotice()" *ngIf="action===1" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> {{ 'NOTICE_MANAGER.DELETE' | translate }}</button>
+        <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'NOTICE_MANAGER.CANCEL' | translate }}</button>
     </div>
 </div>

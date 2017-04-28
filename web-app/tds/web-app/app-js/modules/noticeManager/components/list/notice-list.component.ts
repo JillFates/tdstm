@@ -6,14 +6,14 @@ import { NoticeFormComponent } from '../form/notice-form.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { ActionType } from '../../../../shared/model/action-type.enum';
 
-import { GridComponent } from '@progress/kendo-angular-grid';
-import { SortDescriptor, orderBy } from '@progress/kendo-data-query';
+import { GridComponent, GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { SortDescriptor, orderBy, process, State, FilterDescriptor } from '@progress/kendo-data-query';
 
 @Component({
     moduleId: module.id,
     selector: 'notice-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
+    templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
     providers: [NoticeService]
 })
 
@@ -21,15 +21,29 @@ export class NoticeListComponent implements OnInit {
 
     private moduleName = '';
     private title = '';
-    noticeList: NoticeModel[] = [];
-    sort: SortDescriptor[] = [{
-        dir: 'asc',
-        field: 'title'
-    }];
-
-    ActionType: typeof ActionType = ActionType;
-
-    @ViewChild(GridComponent) private grid: GridComponent;
+    private noticeList: NoticeModel[];
+    private gridData: GridDataResult;
+    private state: State = {
+        skip: 0,
+        take: 10,
+        sort: [{
+            dir: 'asc',
+            field: 'title'
+        }],
+        filter: {
+            filters: [
+                { field: 'active', operator: 'eq', value: false }
+            ],
+            logic: 'and'
+        }
+    };
+    private defaultItem: any = {
+        typeId: null, name: 'Select a Type'
+    };
+    private typeDataSource: Array<any> = [
+        { typeId: 1, name: 'Prelogin' },
+        { typeId: 2, name: 'Postlogin' }
+    ];
 
     /**
      * @constructor
@@ -44,7 +58,8 @@ export class NoticeListComponent implements OnInit {
      * @param noticeList
      */
     private onLoadNoticeList(noticeList): void {
-        this.noticeList = orderBy(noticeList.notices as NoticeModel[], this.sort);
+        this.noticeList = noticeList.notices as NoticeModel[];
+        this.gridData = process(this.noticeList, this.state);
     }
 
     private getNoticeList(): void {
@@ -54,7 +69,6 @@ export class NoticeListComponent implements OnInit {
     }
 
     public reloadNoticeList(): void {
-        console.log(this.grid);
         this.getNoticeList();
     }
 
@@ -88,7 +102,6 @@ export class NoticeListComponent implements OnInit {
         }, error => {
             console.log(error);
         });
-        console.log('Clicked on ', dataItem);
     }
 
     /**
@@ -96,6 +109,29 @@ export class NoticeListComponent implements OnInit {
      */
     ngOnInit(): void {
         this.getNoticeList();
+    }
+
+    protected dataStateChange(state: DataStateChangeEvent): void {
+        this.state = state;
+        this.gridData = process(this.noticeList, this.state);
+    }
+
+    protected applyCustomFilter(value: number): void {
+        let index = this.state.filter.filters.findIndex(filter => {
+            let x = filter as FilterDescriptor;
+            return x.field === 'typeId';
+        });
+        if (index !== -1) {
+            this.state.filter.filters.splice(index, 1);
+        }
+        if (value) {
+            this.state.filter.filters.push({
+                field: 'typeId',
+                operator: 'eq',
+                value: value
+            });
+        }
+        this.gridData = process(this.noticeList, this.state);
     }
 
 }

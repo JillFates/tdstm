@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from 'ng2-translate';
 
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
@@ -21,7 +22,10 @@ import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.
 import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-editor.component';
 
 @NgModule({
-    imports: [CommonModule],
+    imports: [
+        CommonModule,
+        TranslateModule
+    ],
     declarations: [
         UILoaderDirective,
         UIToastDirective,
@@ -29,7 +33,7 @@ import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-ed
         UIDialogDirective,
         HeaderComponent,
         FormlyInputHorizontal,
-        RichTextEditorComponent
+        RichTextEditorComponent,
     ],
     providers: [
         AuthService,
@@ -46,7 +50,9 @@ import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-ed
         UIBooleanPipe,
         HeaderComponent,
         FormlyInputHorizontal,
-        RichTextEditorComponent]
+        RichTextEditorComponent,
+        TranslateModule
+    ]
 })
 export class SharedModule {
 }

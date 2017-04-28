@@ -15,7 +15,7 @@ import 'rxjs/add/operator/catch';
 export class NoticeService {
 
     // private instance variable to hold base url
-    private noticeListUrl = '../../ws/notices';
+    private noticeListUrl = '../ws/notices';
 
     // Resolve HTTP using the constructor
     constructor(private http: HttpInterceptor) { }
@@ -31,17 +31,13 @@ export class NoticeService {
     }
 
     createNotice(notice: NoticeModel): Observable<NoticeModel[]> {
-        let headers = new Headers({ 'Content-Type': 'application/json' });
-        let options = new RequestOptions({ headers: headers });
-        return this.http.post(this.noticeListUrl, JSON.stringify(notice), options)
+        return this.http.post(this.noticeListUrl, JSON.stringify(notice))
             .map((res: Response) => res.json())
             .catch((error: any) => Observable.throw(error.json() || 'Server error'));
     }
 
     editNotice(notice: NoticeModel): Observable<NoticeModel[]> {
-        let headers = new Headers({ 'Content-Type': 'application/json' });
-        let options = new RequestOptions({ headers: headers });
-        return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice), options)
+        return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice))
             .map((res: Response) => res.json())
             .catch((error: any) => Observable.throw(error.json() || 'Server error'));
     }

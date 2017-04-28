@@ -8,12 +8,8 @@ import grails.plugin.springsecurity.annotation.Secured
 
 @Secured('isAuthenticated()')
 class AppController {
-
 	/*
 	 * It show the index.gsp that draw the AngularJs App
 	 */
-
-	def index() { }
-
-	def angular() { }
+	def index() {}
 }

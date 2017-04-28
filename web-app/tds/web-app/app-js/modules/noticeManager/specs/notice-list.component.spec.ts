@@ -4,36 +4,65 @@
 import { ComponentFixture, TestBed, async, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http } from '@angular/http';
+import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs/Rx';
+import { GridModule } from '@progress/kendo-angular-grid';
+import { TranslateModule, TranslateLoader, TranslateStaticLoader, TranslateService } from 'ng2-translate';
+
+import { SharedModule } from '../../../shared/shared.module';
+import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
+import { NotifierService } from '../../../shared/services/notifier.service';
 
 import { NoticeListComponent } from '../components/list/notice-list.component';
 import { NoticeService } from '../service/notice.service';
 import { NoticeModel } from '../model/notice.model';
-import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
-import { NotifierService } from '../../../shared/services/notifier.service';
-import { Observable, Scheduler, TestScheduler } from 'rxjs/Rx';
 
 describe('NoticeListComponent:', () => {
     let fixture: ComponentFixture<NoticeListComponent>;
     let comp: NoticeListComponent;
 
     let noticeService: NoticeService;
-    let notifierService: NotifierService;
+    let mockData: any = [{
+        notices: [
+            {
+                id: 1,
+                title: 'NOTICE_1',
+                active: true,
+                acknowledgeable: true,
+                createdBy: 'TEST',
+                dateCreated: new Date(Date.now()).toDateString(),
+                htmlText: '<p>this is a paragraph</p>',
+                rawText: '<p>this is a paragraph</p>',
+                lastModified: new Date(Date.now()).toDateString(),
+                typeId: 1
+            }, {
+                id: 2,
+                title: 'NOTICE_2',
+                active: true,
+                acknowledgeable: true,
+                createdBy: 'TEST',
+                dateCreated: new Date(Date.now()).toDateString(),
+                htmlText: '<p>this is a paragraph</p>',
+                rawText: '<p>this is a paragraph</p>',
+                lastModified: new Date(Date.now()).toDateString(),
+                typeId: 1
+            }
+        ]
+    }];
     let spyGet: jasmine.Spy;
-
-    let mockData: Array<NoticeModel> = [
-        new NoticeModel(),
-        new NoticeModel(),
-        new NoticeModel(),
-        new NoticeModel()
-    ];
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports: [HttpModule],
+            imports: [HttpModule, FormsModule, SharedModule, GridModule,
+                TranslateModule.forRoot({
+                    provide: TranslateLoader,
+                    useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
+                    deps: [Http]
+                })
+            ],
             declarations: [NoticeListComponent],
-            providers: [NoticeService, { provide: String, multi: false, useValue: '' }, { provide: NoticeModel, useValue: {} },
-                HttpServiceProvider, NotifierService]
+            providers: [NoticeService, HttpServiceProvider, NotifierService, TranslateService]
         }).compileComponents();
     }));
 
@@ -41,29 +70,21 @@ describe('NoticeListComponent:', () => {
         fixture = TestBed.createComponent(NoticeListComponent);
         comp = fixture.componentInstance;
         noticeService = fixture.debugElement.injector.get(NoticeService);
-        notifierService = fixture.debugElement.injector.get(NotifierService);
         spyGet = spyOn(noticeService, 'getNoticesList')
-            .and.returnValue(Observable.from(mockData).bufferCount(mockData.length));
+            .and.returnValue(Observable.from(mockData));
     });
 
     it('should create component', () => expect(comp).toBeDefined());
 
-    it('should call getNoticesList and retrive notice list', done => {
-        expect(spyGet.calls.any()).toBe(false);
-
-        fixture.detectChanges();
-        expect(spyGet.calls.count()).toBe(1);
-        spyGet.calls.mostRecent().returnValue.subscribe(
-            (noticeList) => {
-                expect(noticeList.length).toBe(4);
-            },
-            (err) => {
-                console.log('error');
-            },
-            () => { // completed callback
-                expect(comp.noticeList.length).toBe(4);
-                done();
-            }
-        );
+    it('should call getNoticesList at start', done => {
+        fixture.whenStable().then(() => {
+            fixture.detectChanges();
+            expect(spyGet.calls.any()).toBe(true);
+            spyGet.calls.mostRecent().returnValue.subscribe(
+                (noticeList) => { expect(noticeList.notices.length).toBe(2); },
+                (err) => { console.log('error'); },
+                () => { done(); });
+        });
     });
+
 });

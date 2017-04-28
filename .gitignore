@@ -5,6 +5,6 @@
 target/
 plugins/
 run.sh
-node_modules/
 .slcache/
-
+node_modules/
+specs-dist/

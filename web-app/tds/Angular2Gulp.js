@@ -49,7 +49,7 @@ gulp.task('build-app', function () {
     // Exclude all NPM Package from the build
     getNPMPackageIds().forEach(function (id) {
         // Does not exclude
-        if(id !== 'rxjs' && id !== '@angular/http') {
+        if (id !== 'rxjs' && id !== '@angular/http') {
             browserifyProcesor.external(id);
         }
     });
@@ -80,7 +80,7 @@ gulp.task('watch-build-app', function () {
     // Exclude all NPM Package from the build
     getNPMPackageIds().forEach(function (id) {
         // Does not exclude
-        if(id !== 'rxjs' && id !== '@angular/http') {
+        if (id !== 'rxjs' && id !== '@angular/http') {
             browserifyProcesor.external(id);
         }
     });
@@ -92,7 +92,7 @@ gulp.task('watch-build-app', function () {
     var updateStart = Date.now();
     return watcher
         .plugin("tsify")
-        .on('update', function(){
+        .on('update', function () {
             var updateStart = Date.now();
             console.log('Building app.js');
             watcher.plugin("tsify")
@@ -122,8 +122,8 @@ gulp.task('watch-build-app', function () {
 gulp.task('sass-compiler', function () {
     return gulp.src('./web-app/css/style.sass')
         .pipe(sourcemaps.init())
-        .pipe(sass({errLogToConsole: true}))
-        .pipe(autoprefixer({browsers: ['last 2 version'], cascade: false}))
+        .pipe(sass({ errLogToConsole: true }))
+        .pipe(autoprefixer({ browsers: ['last 2 version'], cascade: false }))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('./web-app/css'));
 });
@@ -159,8 +159,8 @@ gulp.task('build-vendor', function () {
     // Include all NPM Package from the build
     getNPMPackageIds().forEach(function (id) {
         // Does not include
-        if(id !== 'zone.js' && id !== 'core-js' && id !== 'rxjs'){
-            browserifyProcesor.require(nodeResolve.sync(id), {expose: id});
+        if (id !== 'zone.js' && id !== 'core-js' && id !== 'rxjs') {
+            browserifyProcesor.require(nodeResolve.sync(id), { expose: id });
         }
     });
 
@@ -209,6 +209,12 @@ function validateJS(src) {
         .pipe(tslint.report())
 };
 
-gulp.task('typescript-compile', shell.task(['tsc -p web-app']));
-gulp.task('build-test',['typescript-compile'], shell.task(['karma start karma.conf.js']));
-gulp.task('build-test-report',['typescript-compile'], shell.task(['karma start karma.production.conf.js']));
+gulp.task('build-test', shell.task(['karma start karma.conf.js']));
+gulp.task('build-test-report', shell.task(['karma start karma.production.conf.js']));
+
+gulp.task('tiny-mce-files', function () {
+    gulp.src(['node_modules/tinymce/tinymce.min.js',
+        'node_modules/tinymce/themes/modern/theme.min.js',
+        'node_modules/tinymce/skins/**'])
+        .pipe(gulp.dest('../dist/js/vendors/tinymce'));
+});

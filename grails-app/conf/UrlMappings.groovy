@@ -423,10 +423,11 @@ class UrlMappings {
 			]
 		}
 
+		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
-
-		///// LICENSES Admin API (Client Side) /////////
-
+		// Angular 2 and future latest version
+		"/module/" ( controller: 'singleApp', action: 'index' )
+		"/module/**/*" ( controller: 'singleApp', action: 'index' )
 
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")
