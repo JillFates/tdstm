@@ -44,13 +44,6 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 			auditService.saveUserAudit UserAuditBuilder.login()
 
-			// pre-load some common preference values
-			userPreferenceService.getCurrentProjectId()
-			userPreferenceService.getMoveBundleId()
-			userPreferenceService.getMoveEventId()
-			userPreferenceService.getTimeZone()
-			userPreferenceService.getDateFormat()
-
 			userService.updateLastLogin()
 
 			// checkFailsCount

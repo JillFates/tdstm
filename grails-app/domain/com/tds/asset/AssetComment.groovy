@@ -207,7 +207,7 @@ class AssetComment {
 
 	static transients = ['actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
 	                     'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
-	                     'tmpIsFunnellingTask']
+	                     'tmpIsFunnellingTask', 'isActionable']
 
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique
 
@@ -270,14 +270,21 @@ class AssetComment {
 		(taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
 	}
 
+   /**
+    * isActionable - return indicator that the status of the task is Actionable
+    */
+	boolean isActionable() {
+		!(status in [ AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED ])
+	}
+
 	// task Manager column header names and its labels
 	static final Map<String, List<String>> taskCustomizeFieldAndLabel = [
-		actStart: 'Actual Start:', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
+		actStart: 'Actual Start', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
 		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
-		duration: 'Duration', durationScale: 'Duration Scale', estFinish: 'Estimated Finish:', estStart: 'Estimated Start',
-		hardAssigned: 'Hard Assignement', isPublished: 'Is Published', sendNotification: 'Send Notification',
+		duration: 'Duration', durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', actFinish: 'Actual Finish',
+		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', sendNotification: 'Send Notification',
 		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
-		instructionsLink: 'instructionsLink', bundle: 'Move Bundle'
+		instructionsLink: 'Instructions Link', bundle: 'Move Bundle'
 	].asImmutable()
 }

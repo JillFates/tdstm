@@ -6,7 +6,7 @@ class CustomMethodsTests extends Specification {
 
 	void setupSpec() {
 		// Initialize the metaClass settings
-		CustomMethods.initialize()
+		CustomMethods.initialize(true)
 	}
 
 	void testAsYN() {

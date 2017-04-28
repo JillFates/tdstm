@@ -3,7 +3,7 @@
 <td valign="top">
 			<div>
 				<h1>Supports:</h1>
-				<table style="min-width: 400px;" class="planning-application-table">
+				<table style="min-width: 400px;" class="planning-application-table table-responsive">
 					<thead>
 						<tr>
 							<th>Frequency</th>
@@ -23,17 +23,21 @@
 								<td class="dep-${support.status}">
 									${support?.asset?.assetType}
 								</td>
-								<td class="dep-${support.status}">
+								<td class="dep-${support.status}" style="min-width:80px">
 									${support?.asset?.assetName}
 								</td>
 								<g:if test="${support?.asset?.moveBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
-									<td style="background-color: lightpink">
-										${support?.asset?.moveBundle}&nbsp;?
+									<td style="background-color: lightpink;position:relative;">
+										<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
+										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 									</td>
 								</g:if>
 								<g:elseif test="${support?.asset?.moveBundle!=assetEntity.moveBundle }" >
-									<td class="dep-${support.status}">
-										<b>${support?.asset?.moveBundle}&nbsp;?</b>
+									<td class="dep-${support.status}" style="position:relative;">
+										<b>
+											<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
+											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles."/></div>
+										</b>
 									</td>
 								</g:elseif>
 								<g:else>
@@ -57,7 +61,7 @@
 		<td valign="top">
 			<div>
 				<h1>Is dependent on:</h1>
-				<table style="min-width: 400px;" class="planning-application-table">
+				<table style="min-width: 400px;" class="planning-application-table table-responsive">
 					<thead>
 						<tr>
 							<th>Frequency</th>
@@ -77,17 +81,21 @@
 								<td class="dep-${dependent.status}">
 									${dependent.dependent?.assetType}
 								</td>
-								<td class="dep-${dependent.status}">
+								<td class="dep-${dependent.status}" style="min-width:80px">
 									${dependent.dependent?.assetName}
 								</td>
 								<g:if test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
-									<td style="background-color: lightpink">
-										${dependent.dependent?.moveBundle}&nbsp;?
+									<td style="background-color: lightpink;position:relative;">
+										<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 									</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle }" >
-									<td class="dep-${dependent.status}">
-										<b>${dependent.dependent?.moveBundle}&nbsp;?</b>
+									<td class="dep-${dependent.status}" style="position:relative;">
+										<b>
+											<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
+										</b>
 									</td>
 								 </g:elseif>
 								 <g:else>

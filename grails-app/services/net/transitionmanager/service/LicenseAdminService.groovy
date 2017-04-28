@@ -43,7 +43,7 @@ class LicenseAdminService extends LicenseCommonService {
 	 * @return
 	 */
 	def initialize() {
-		log.info("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
+		log.debug("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
 		if(isEnabled() && !loaded) {
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
@@ -55,12 +55,11 @@ class LicenseAdminService extends LicenseCommonService {
 				licenseCache.addCache(memoryOnlyCache)
 			}
 
-			log.info("load LM?: ${isLGen()}")
+			log.debug("load LM?: ${isLGen()}")
 			if(isLGen()) {
-				log.info("License Manager Enabled")
+				log.debug("License Manager Enabled")
 				String keyFile = grailsApplication.config.manager?.license?.key
 				String password = grailsApplication.config.manager?.license?.password
-				log.info("Manager Key: '{}', password: '{}'", keyFile, password)
 
 				File file = new File(keyFile)
 
@@ -83,7 +82,7 @@ class LicenseAdminService extends LicenseCommonService {
 				// BEGIN: TEST MANAGER LICENSE //
 				//String id = "84612874-7d78-4a69-906c-2e02c27ab54d"
 				//String key = licenseManagerService.getLicenseKey(id)
-				//log.info("OLB ($id) License Key: $key")
+				//log.debug("OLB ($id) License Key: $key")
 				// END: TEST MANAGER LICENSE //
 			}
 
@@ -512,6 +511,11 @@ class LicenseAdminService extends LicenseCommonService {
         }
     }
 
+	/**
+	 * resend the mail request
+	 * @param uuid identifier of the license
+	 * @return true if the mail was sent, false otherwise
+	 */
 	boolean resubmitRequest(String uuid){
 		DomainLicense license = DomainLicense.get(uuid)
 		if(license){
@@ -522,35 +526,98 @@ class LicenseAdminService extends LicenseCommonService {
 		}
 	}
 
-	private boolean sendMailRequest(DomainLicense license){
-		log.info("SEND License Request")
-		String toEmail = grailsApplication.config.tdstm?.license?.request_email
+	/**
+	 * Return a map with the information to build an email to request a license
+	 * @param uuid
+	 * @return Map with the information to build the email
+	 */
+	EmailHolder emailRequestData(String uuid){
+		DomainLicense license = DomainLicense.get(uuid)
+		return emailRequestData(license)
+	}
 
-		if(toEmail) {
-			String message = license.toEncodedMessage()
-			String buff = ""
-			message.eachLine{ line ->
+	/**
+	 * Return a map with the information to build an email to request a license
+	 * @param license Object
+	 * @return EmailHolder with the information to build the email
+	 */
+	EmailHolder emailRequestData(DomainLicense license){
+		EmailHolder emailHolder
+		if(license){
+			String toEmail = grailsApplication.config.tdstm?.license?.request_email
+			emailHolder = [:]
+			emailHolder.subject = "License Request - ${license.websitename}"
+			emailHolder.toEmail = toEmail
+			emailHolder.ccEmail = license.email
+			emailHolder.body = getLicenseRequestBody(license)
+		}
+
+		return emailHolder
+	}
+
+	/**
+	 * Retrieve license request body used to send email and pressent to the user
+	 * @param uuid identifier of the stored license
+	 * @return String reptresentation of the hash request
+	 */
+	String getLicenseRequestBody(String uuid) {
+		DomainLicense lic
+
+		if (uuid) {
+			lic = DomainLicense.get(uuid)
+		}
+
+		return getLicenseRequestBody(lic)
+	}
+
+	/**
+	 * Retrieve license request body used to send email and pressent to the user
+	 * @param lic license object
+	 * @return String reptresentation of the hash request
+	 */
+	String getLicenseRequestBody(DomainLicense lic) {
+		String buff
+		if(lic) {
+			String body = """
+				|Website Name: ${lic.websitename}
+				|
+				|${lic.toEncodedMessage()}
+			""".stripMargin().trim()
+
+			buff = ""
+			body.eachLine{ line ->
 				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'
 			}
 
+		}
+		return buff
+	}
+
+	/**
+	 * Send license request mail back to License Manager
+	 * @param license License Object
+	 * @return true if the mail was sent, false otherwise
+	 */
+	private boolean sendMailRequest(DomainLicense license){
+		log.debug("SEND License Request")
+		EmailHolder emailData = emailRequestData(license)
+
+		if(emailData) {
 			mailService.sendMail {
-				to toEmail
-				subject "License Request"
-				body buff
+				to emailData.toEmail
+				subject emailData.subject
+				body emailData.body
 			}
 			true
 
 		}else{
-			log.error("tdstm.license.request_email not found in the configuration")
+			log.error("could not send email, not properly configured")
 			false
 		}
 	}
 
-
     /**
      * Deletes a License Request.
-     *
-     *
      * @param uuid - the id of the License.
      * @return true if the license was successfully deleted. false if the license does not exist.
      *
@@ -569,5 +636,22 @@ class LicenseAdminService extends LicenseCommonService {
         }
     }
 
+	/**
+	 * Objecto to hold the Email data in static Type style
+	 */
+	class EmailHolder {
+		String toEmail
+		String ccEmail
+		String subject
+		String body
+
+		//marshaller to avoid to render the 'class' property loaded when the Type is first loaded
+		static {
+			grails.converters.JSON.registerObjectMarshaller(EmailHolder) {
+				return it.properties.findAll{k, v -> k != 'class'}
+			}
+
+		}
+	}
 
 }

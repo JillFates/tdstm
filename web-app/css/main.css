@@ -752,7 +752,10 @@ svg {
 	padding:3px !important;
 }
 .combo-td {
-	width: 120px !important;
+	width: 180px !important;
+}
+.combo-td .select2-container {
+	width: inherit !important;
 }
 .depSelect {
 	width: 135px
@@ -799,6 +802,9 @@ svg {
 .assetLink{
 	color : blue;
 	cursor: pointer;
+}
+.ui-dialog.ui-widget.ui-draggable.ui-resizable{
+	max-width: 90vw;
 }
 .ui-dialog th {
 	background: #CCCCCC !important;

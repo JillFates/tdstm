@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.eav.EavEntity
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -378,7 +379,7 @@ class AssetEntity extends EavEntity {
 	 * Whether the asset is a VM
 	 */
 	boolean isaVM() {
-		assetClass == DEVICE && (model?.assetType == VM.toString() || assetType == VM.toString())
+		assetClass == DEVICE && (model?.assetType in AssetType.virtualServerTypes || assetType in AssetType.virtualServerTypes)
 	}
 
 	/**
@@ -455,5 +456,24 @@ class AssetEntity extends EavEntity {
 	 */
 	boolean isCableExist() {
 		AssetCableMap.countByAssetFrom(this)
+	}
+
+
+	List<AssetDependency> supportedDependencies(){
+		return AssetDependency.fetchSupportedDependenciesOf(this)
+	}
+
+	List<AssetDependency> requiredDependencies(){
+		return AssetDependency.fetchRequiredDependenciesOf(this)
+	}
+
+	/**
+	 * Clone this Entity and replace properties if a map is specified
+	 * @param replaceKeys
+	 * @return
+	 */
+	AssetEntity clone(Map replaceKeys = [:]){
+		AssetEntity clonedAsset = GormUtil.domainClone(this, replaceKeys) as AssetEntity
+		return clonedAsset
 	}
 }

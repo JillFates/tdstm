@@ -162,7 +162,7 @@
 				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estStartTime','errors')}">
 				                  <script type="text/javascript">
 				                    $(document).ready(function(){
-                                        $("#estStartTime").kendoDateTimePicker({ animation: false });
+                                        $("#estStartTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat() });
 				                    });
 				                  </script> <input type="text" class="dateRange" size="15" style="width: 210px;" id="estStartTime" name="estStartTime"
 				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />" />

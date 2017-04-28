@@ -29,6 +29,26 @@ class UrlMappings {
 			action = [GET:"listInBundle"]
 		}
 
+		/********************************************************
+		 * Asset WS
+		 ********************************************************/
+
+		"/ws/asset/checkForUniqueName" {
+			controller = "wsAsset"
+			action = [
+			        POST:"checkForUniqueName"
+			]
+		}
+
+		"/ws/asset/clone" {
+			controller = "wsAsset"
+			action = [
+					POST:"clone"
+			]
+		}
+
+		/******************************************************/
+
 		"/ws/moveEventNews/$id?" {
 			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
@@ -289,6 +309,7 @@ class UrlMappings {
 		"/ws/license/$id/email/request" {
 			controller = "wsLicenseAdmin"
 			action = [
+					GET:  "emailRequestData",
 					POST: "emailRequest"
 			]
 		}

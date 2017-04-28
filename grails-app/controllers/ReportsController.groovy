@@ -744,7 +744,8 @@ class ReportsController implements ControllerMethods {
 		if (!project) return
 
 		List<MoveBundle> moveBundles = MoveBundle.findAllByProject(project)
-		Long moveBundleId = userPreferenceService.moveBundleId ?: moveBundles[0]?.id
+		String bundleId = (userPreferenceService.moveBundleId ?: moveBundles[0]?.id).toString()
+		Long moveBundleId = NumberUtil.toLong(bundleId)
 
 		[moveBundles: moveBundles, moveBundleId: moveBundleId,
 		 appOwnerList: reportsService.getSmeList(moveBundleId, false)]
@@ -840,11 +841,12 @@ class ReportsController implements ControllerMethods {
 		applicationList.eachWithIndex { app, idx ->
 			def assetEntity = AssetEntity.get(app.id)
 			Application application = Application.get(app.id)
+
+			// assert assetEntity != null  //TODO: oluna should I add an assertion here?
+
 			def assetComment
-			def dependentAssets = AssetDependency.findAll(
-					"from AssetDependency as a where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-			def supportAssets = AssetDependency.findAll(
-					"from AssetDependency as a where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
+			List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
+			List<AssetDependency> supportAssets =  assetEntity.supportedDependencies()
 			if (AssetComment.countByAssetEntityAndCommentTypeAndIsResolved(application, 'issue', 0)) {
 				assetComment = "issue"
 			} else if (AssetComment.countByAssetEntity(application)) {
