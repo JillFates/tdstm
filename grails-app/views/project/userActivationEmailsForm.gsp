@@ -69,7 +69,7 @@
 								</td>
 
 								<td style="text-align: left;">
-									${account.expiry}
+									<tds:convertDateTime date="${account?.expiry}" timeZone="${tds.timeZone()}" />
 								</td>
 
 								<td style="text-align: left;">
