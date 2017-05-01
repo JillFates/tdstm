@@ -52,6 +52,8 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
+import java.text.DateFormat
+
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
@@ -5001,6 +5003,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
 		queryResults.collect { TaskBatch taskBatch -> [
 			id: taskBatch.id,
 			recipeId : taskBatch.recipe?.id ?: 0,
@@ -5009,7 +5013,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			taskCount: taskBatch.taskCount,
 			exceptionCount: taskBatch.exceptionCount,
 			createdBy: taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
-			dateCreated: taskBatch.dateCreated,
+			dateCreated: TimeUtil.formatDateTime(taskBatch.dateCreated, formatter),
 			status: taskBatch.status,
 			exceptionLog: taskBatch.exceptionLog,
 			infoLog: taskBatch.infoLog,
