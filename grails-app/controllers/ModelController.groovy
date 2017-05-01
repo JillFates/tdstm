@@ -34,6 +34,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
+import java.text.DateFormat
 
 import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -111,10 +112,18 @@ class ModelController implements ControllerMethods {
 
 	@HasPermission(Permission.ModelCreate)
 	def displayModelValues(value, model) {
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
 		switch (value) {
-			case ~/dateCreated|lastModified|endOfLifeDate/: TimeUtil.formatDate(model[value])
-			case 'modelConnectors':                         model.noOfConnectors
-			default:                                        model[value]
+			case ~/dateCreated|lastModified|endOfLifeDate/: 
+				TimeUtil.formatDateTime(model[value], formatter)
+				break
+			case 'modelConnectors':                         
+				model.noOfConnectors
+				break
+			default:
+				model[value]
+				break
 		}
 	}
 
