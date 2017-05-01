@@ -264,7 +264,7 @@
                     {
                         field: "importedAt",
                         title: "Imported At",
-                        format: "{0:MM/dd/yyyy hh:mm tt}"
+                        format: "{0: " + tdsCommon.kendoDateTimeFormat() + "}"
                     },
                     {
                         field: "importedBy",
