@@ -41,7 +41,7 @@
 		 * Implementing Kendo Grid for Bundle List
 		 */
 		function loadGridBundleList() {
-			$("#gridBundleList").kendoGrid({
+		 var grid =	$("#gridBundleList").kendoGrid({
 				toolbar: kendo.template('<tds:hasPermission permission="${Permission.BundleEdit}"><button type="button" class="btn btn-default action-toolbar-btn" onClick=\"window.location.href=\'#=contextPath#/moveBundle/create\'\"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</button></tds:hasPermission> <div onclick="loadGridBundleList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
 				dataSource: {
 					type: "json",
@@ -104,12 +104,34 @@
 					{
 						field: "startDate",
 						title: "Start Time",
-						template:"#= displayFormatedDate(startDate)#"
+						template:"#= displayFormatedDate(startDate)#",
+						filterable: {
+							cell: {
+								template: function(args) {
+									args.element.kendoDatePicker({ 
+										animation: false, format:tdsCommon.kendoDateFormat(),
+										change: function(){ tdsCommon.addNextDayKendoGridFilter(grid,'startDate',this.value())} 
+									});
+								},
+								operator:'gte'
+							}
+						}
 					},
 					{
 						field: "completion",
 						title: "Completion Time",
-						template: "#= displayFormatedDate(completion)#"
+						template: "#= displayFormatedDate(completion)#",
+						filterable: {
+							cell: {
+								template: function(args) {
+									args.element.kendoDatePicker({ 
+										animation: false, format:tdsCommon.kendoDateFormat(),
+										change: function(){ tdsCommon.addNextDayKendoGridFilter(grid,'completion',this.value())}
+									});
+								},
+								operator:'gte'
+							}
+						}
 					}
 				],
                 height: 540,
@@ -119,8 +141,11 @@
 				},
 				pageable: {
 					pageSize: 20
+				},
+				refresh:function(){
+					console.log(this);
 				}
-			});
+			}).data("kendoGrid");
 		}
 
 		function displayFormatedDate(date){
