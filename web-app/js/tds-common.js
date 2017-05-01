@@ -56,13 +56,13 @@ var tdsCommon = {
 	 * Applies a more smooth delay, extending the setTimeout
      * @returns {Function}
      */
-    delayEvent:  (function(){
-        var timer = 0;
-        return function(callback, ms){
-            clearTimeout (timer);
-            timer = setTimeout(callback, ms);
-        };
-    })(),
+	delayEvent: (function () {
+		var timer = 0;
+		return function (callback, ms) {
+			clearTimeout(timer);
+			timer = setTimeout(callback, ms);
+		};
+	})(),
 
 	/**
 	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was 
@@ -81,8 +81,8 @@ var tdsCommon = {
 					if (dialog.length > 0) {
 						// Need to close any Select2 controls that might still be open
 						var select2 = dialog.find('.select2-container');
-						if(select2 && select2.length > 0) {
-                            dialog.find('.select2-container').select2('close');
+						if (select2 && select2.length > 0) {
+							dialog.find('.select2-container').select2('close');
 						}
 
 						if (!dialog.hasClass('static-dialog')) {
@@ -434,6 +434,16 @@ var tdsCommon = {
 	timeZone: function () {
 		var tz = $("#tzId").val();
 		return tz;
+	},
+
+	addNextDayKendoGridFilter: function (grid, field, value) {
+		var nextDay = moment(value).add(1, 'd').toDate();
+		grid.dataSource._filter.filters.push({
+			field: field,
+			operator: "lt",
+			value: nextDay
+		});
+		grid.thead.find('tr th:first').trigger('click');
 	}
 
 }
@@ -563,11 +573,11 @@ $.fn.serializeObject = function () {
 	return o;
 };
 
-(function($) {
-    $.fn.focusToEnd = function() {
-        return this.each(function() {
-            var v = $(this).val();
-            $(this).focus().val("").val(v);
-        });
-    };
+(function ($) {
+	$.fn.focusToEnd = function () {
+		return this.each(function () {
+			var v = $(this).val();
+			$(this).focus().val("").val(v);
+		});
+	};
 })(jQuery);

@@ -110,15 +110,7 @@
 								template: function(args) {
 									args.element.kendoDatePicker({ 
 										animation: false, format:tdsCommon.kendoDateFormat(),
-										change: function() {
-											var nextDay = moment(this.value()).add(1,'d').toDate();
-											grid.dataSource._filter.filters.push({
-												field:"startDate",
-												operator:"lt",
-												value:nextDay
-											});
-											grid.thead.find('tr th:first').trigger('click');
-										} 
+										change: function(){ tdsCommon.addNextDayKendoGridFilter(grid,'startDate',this.value())} 
 									});
 								},
 								operator:'gte'
@@ -134,15 +126,7 @@
 								template: function(args) {
 									args.element.kendoDatePicker({ 
 										animation: false, format:tdsCommon.kendoDateFormat(),
-										change: function() {
-											var nextDay = moment(this.value()).add(1,'d').toDate();
-											grid.dataSource._filter.filters.push({
-												field:"completion",
-												operator:"lt",
-												value:nextDay
-											});
-											grid.thead.find('tr th:first').trigger('click');
-										} 
+										change: function(){ tdsCommon.addNextDayKendoGridFilter(grid,'completion',this.value())}
 									});
 								},
 								operator:'gte'
