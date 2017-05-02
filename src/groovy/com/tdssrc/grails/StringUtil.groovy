@@ -279,6 +279,11 @@ class StringUtil {
 	 	sanitize(str).replaceAll(/\s/, "+")
 	 }
 
+	/**
+	 * Escape string being used in Dot graphs to avoid unterminated strings
+	 * @param str
+	 * @return
+	 */
 	static String sanitizeDotString(String str) {
 		return StringEscapeUtils.escapeJava(str)
 	}
