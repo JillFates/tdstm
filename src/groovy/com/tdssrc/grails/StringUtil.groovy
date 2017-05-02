@@ -1,7 +1,7 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
-
+import groovy.json.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 
 /**
@@ -278,6 +278,10 @@ class StringUtil {
 	 static String sanitizeAndStripSpaces(String str){
 	 	sanitize(str).replaceAll(/\s/, "+")
 	 }
+
+	static String sanitizeDotString(String str) {
+		return StringEscapeUtils.escapeJava(str)
+	}
 
 	/**
 	 * Compare various string values as boolean
