@@ -280,6 +280,15 @@ class StringUtil {
 	 }
 
 	/**
+	 * Escape string being used in Dot graphs to avoid unterminated strings
+	 * @param str
+	 * @return
+	 */
+	static String sanitizeDotString(String str) {
+		return StringEscapeUtils.escapeJava(str)
+	}
+
+	/**
 	 * Compare various string values as boolean
 	 * @param str - the string to compare
 	 * @return true/false if it matches either list otherwize null for undeterminable

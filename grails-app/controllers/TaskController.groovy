@@ -27,7 +27,6 @@ import net.transitionmanager.service.RunbookService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
