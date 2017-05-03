@@ -85,7 +85,7 @@
 						<td valign="top" class="name" style="vertical-align: middle"><label for="dueDateEditSpanId">Due Date</label></td>
 						<td valign="top" class="value" colspan="4">
 							<span id="dueDateEditSpanId">
-								<input kendo-date-picker class="dateEditRange" name="dueDate" id="dueDate" k-ng-model="ac.dueDate"  k-format="'MM/dd/yyyy'" k-parse-formats ="['MM/dd/yyyy']" />
+								<input kendo-date-picker class="dateEditRange" name="dueDate" id="dueDate" k-ng-model="ac.dueDate"  k-format="kendoDateFormat" k-parse-formats ="[kendoDateFormat]" />
 								<span class="error-msg" ng-show="form.dueDate.$error.date">Invalid date.</span>
 							</span>
 						</td>
