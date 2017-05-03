@@ -53,13 +53,13 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
 @Transactional
 class TaskService implements ServiceMethods {
 
-	ControllerService controllerService
-	CookbookService cookbookService
+	def controllerService
+	def cookbookService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	ProgressService progressService
+	def partyRelationshipService
+	def personService
+	def progressService
 	Scheduler quartzScheduler
 	SecurityService securityService
 	SequenceService sequenceService
