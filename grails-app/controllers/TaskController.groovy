@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import groovy.time.TimeCategory
@@ -27,7 +28,6 @@ import net.transitionmanager.service.RunbookService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -440,10 +440,13 @@ digraph runbook {
 				if (! tasks.contains(task.id) && (viewUnpublished || task.isPublished)) {
 					tasks << task.id
 
-					def label = "$task.taskNumber:" + StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+					// string escaping: TM-3951, TM-5530, TM-6265
+					def label = "${task.taskNumber}:${task.comment}"
+					def tooltip = new String(label)
 					label = (label.size() < 31) ? label : label[0..30]
+					label = StringUtil.sanitizeDotString(label)
+					tooltip = StringUtil.sanitizeDotString(tooltip)
 
-					def tooltip = "$task.taskNumber:" + StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 					def colorKey = taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
 					def fillcolor = taskStatusColorMap[colorKey][1]
 					//def url = createLink(controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false)
@@ -662,8 +665,8 @@ digraph runbook {
 
 			tasks.each {
 
-				def task = "$it.task_number:" + it.task.encodeAsJSON()
-			    def tooltip  = "$it.task_number:" + it.task.encodeAsJSON()
+				def task = "${it.task_number}:${it.task}"
+			    def tooltip  = new String(task)
 
 				def colorKey = taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
 
@@ -688,10 +691,9 @@ digraph runbook {
 
 				task = (task.size() > 35) ? task[0..34] : task
 
-				// string escaping: TM-3951, TM-5530
-				if (task.endsWith("\\")) { // prevents unclosed strings like \"
-					task = task.replace("\\", "\\\\")
-				}
+				// string escaping: TM-3951, TM-5530, TM-6265
+				task = StringUtil.sanitizeDotString(task)
+				tooltip = StringUtil.sanitizeDotString(tooltip)
 
 				dotText << """\t$it.task_number [label="$task"  id="$it.id", style="$style", $attribs, tooltip="$tooltip"];\n"""
 				def successors = it.successors
