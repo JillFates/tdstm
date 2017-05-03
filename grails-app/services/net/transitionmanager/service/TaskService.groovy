@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
 import com.tds.asset.CommentNote
 import com.tds.asset.Database
 import com.tds.asset.Files
