@@ -47,6 +47,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/$id" {
+			controller = "wsAsset"
+			action = [
+					GET:"getAsset"
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
