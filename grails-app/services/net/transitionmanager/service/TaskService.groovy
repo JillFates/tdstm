@@ -53,13 +53,13 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
 @Transactional
 class TaskService implements ServiceMethods {
 
-	ControllerService controllerService
-	CookbookService cookbookService
+	def controllerService
+	def cookbookService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	ProgressService progressService
+	def partyRelationshipService
+	def personService
+	def progressService
 	Scheduler quartzScheduler
 	SecurityService securityService
 	SequenceService sequenceService
@@ -555,7 +555,7 @@ class TaskService implements ServiceMethods {
 		StringBuilder queryList = new StringBuilder("FROM AssetComment a ")
 		StringBuilder queryCount = new StringBuilder("SELECT count(*) FROM AssetComment a ")
 		StringBuilder query = new StringBuilder("WHERE a.project.id = :projectId AND a.commentType = :commentType ")
-		def params = [projectId: project.id, commentType: AssetCommentType.TASK]
+		Map params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
 		if (category) {
 			if (categoryList.contains(category)) {
@@ -572,7 +572,7 @@ class TaskService implements ServiceMethods {
 				query.append("AND a.taskNumber like '%${searchText}%' ")
 			} else {
 				query.append("AND a.comment like :searchText ")
-				params["searchText"] = "%" + StringEscapeUtils.escapeSql(searchText) + "%"
+				params["searchText"] = "%" + searchText + "%"
 			}
 		}
 
@@ -598,23 +598,17 @@ class TaskService implements ServiceMethods {
 			}
 		}
 
-		def list = []
-		def resultTotal = [0]
-		try {
-			// execute count query
-			queryCount.append(query)
-			resultTotal = AssetComment.executeQuery(queryCount.toString(), params)
+		// execute count query
+		queryCount.append(query)
+		def resultTotal = AssetComment.executeQuery(queryCount.toString(), params)
 
-			// Add the sort and generate the list
-			query.append('ORDER BY a.taskNumber ASC')
+		// Add the sort and generate the list
+		query.append('ORDER BY a.taskNumber ASC')
 
-			// execute list query
-			Map paginationArgs = (page == -1 ? [:] : [max: pageSize, offset: ((page - 1) * pageSize)])
-			queryList.append(query)
-			list = AssetComment.executeQuery(queryList.toString(), params, paginationArgs)
-		} catch (Exception e) {
-			log.error(e.message, e)
-		}
+		// execute list query
+		Map paginationArgs = (page == -1 ? [:] : [max: pageSize, offset: ((page - 1) * pageSize)])
+		queryList.append(query)
+		def list = AssetComment.executeQuery(queryList.toString(), params, paginationArgs)
 
 		return [list: list, total: resultTotal[0]]
 	}
