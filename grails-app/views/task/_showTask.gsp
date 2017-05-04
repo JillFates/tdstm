@@ -106,8 +106,8 @@
 						<td valign="top" colspan="3">
 							<table class="inner">
 								<tr>
-									<td width="50%">Predecessors:</td>
-									<td width="50%">Successors:</td>
+									<td width="50%">Predecessors <a ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#"><img src="/tdstm/static/icons/add.png" border="0px"></a>:</td>
+									<td width="50%">Successors <a ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#"><img src="/tdstm/static/icons/add.png" border="0px"></a>:</td>
 								</tr>
 								<tr>
 									<td valign = "top">
