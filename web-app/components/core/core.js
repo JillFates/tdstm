@@ -108,6 +108,18 @@ tds.core.utils = function(servRootPath) {
 			return currentDate
 		}
 
+		function defaultDateFormat() {
+			return tdsCommon.defaultDateFormat();
+		}
+
+		function kendoDateFormat() {
+            return tdsCommon.kendoDateFormat();
+		}
+
+		function kendoDateTimeFormat() {
+            return tdsCommon.kendoDateTimeFormat();
+        }
+
 		function formatDate(dateObj) {
 			return tdsCommon.formatDateTime(dateObj, tdsCommon.defaultDateFormat());
 		}
@@ -144,7 +156,10 @@ tds.core.utils = function(servRootPath) {
 			createDateTimeFromString: createDateTimeFromString,
 			formatDuration: formatDuration,
 			isValidDate: isValidDate,
-			isValidDateTime: isValidDateTime
+			isValidDateTime: isValidDateTime,
+            kendoDateFormat: kendoDateFormat,
+            kendoDateTimeFormat: kendoDateTimeFormat,
+            defaultDateFormat: defaultDateFormat
 		};
 
 	}();

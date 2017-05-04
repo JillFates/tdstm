@@ -434,6 +434,8 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 	}
 	$scope.acData = {};
 
+	$scope.kendoDateFormat = utils.date.kendoDateFormat();
+
 	$scope.dependencies = commentUtils.createDependencies();
 
 	$scope.cssForCommentStatus = "name";
@@ -576,12 +578,6 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				EntityCrud.assetNameSelect2($("#currentAsset"));
 			}
 		});
-		// commentService.getClassForAsset($scope.commentInfo.currentAsset).then(function (data) {
-		// 	$scope.commentInfo.currentAssetClass = data
-		// 	commentService.getAssetsByClass(data).then(function (data2) {
-		// 		$scope.commentInfo.assets = data2
-		// 	})
-		// });
 	}
 
 	function editComment(data) {
@@ -651,7 +647,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 			alert("You must fill in all the required fields.")
 		} else {
 			if ($scope.ac.dueDate) {
-				$scope.ac.dueDate = moment($scope.ac.dueDate).format('MM/DD/YYYY');
+				$scope.ac.dueDate = moment($scope.ac.dueDate).format(utils.date.defaultDateFormat());
 			}
 			$scope.ac.id = $scope.ac.commentId;
 			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
