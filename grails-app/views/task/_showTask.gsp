@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.domain.Person" %>
+<%@ page import="net.transitionmanager.security.Permission" %>
 <div draggable id="showTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" role="dialog" style="width: 1000px" tabindex="-1">
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
@@ -106,8 +107,18 @@
 						<td valign="top" colspan="3">
 							<table class="inner">
 								<tr>
-									<td width="50%">Predecessors <a ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#"><img src="/tdstm/static/icons/add.png" border="0px"></a>:</td>
-									<td width="50%">Successors <a ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#"><img src="/tdstm/static/icons/add.png" border="0px"></a>:</td>
+									<td width="50%">
+									Predecessors
+										<tds:hasPermission permission="${Permission.TaskCreate}"> 
+											<a id="createSucTask" ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#" data-toggle="tooltip" data-trigger="hover" title="Create Predecessor task"><img src="${resource(dir:'icons',file:'add.png')}"  alt="..."  border="0px"></a>
+										</tds:hasPermission>:
+									</td>
+									<td width="50%">
+									Successors
+										<tds:hasPermission permission="${Permission.TaskCreate}">  
+											<a id="createPredTask" ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#" data-toggle="tooltip" data-trigger="hover" title="Create Successor task"><img src="${resource(dir:'icons',file:'add.png')}"  alt="..." border="0px"></a>
+										</tds:hasPermission>:
+									</td>
 								</tr>
 								<tr>
 									<td valign = "top">
