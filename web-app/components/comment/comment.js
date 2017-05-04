@@ -434,6 +434,8 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 	}
 	$scope.acData = {};
 
+	$scope.kendoDateFormat = utils.date.kendoDateFormat();
+
 	$scope.dependencies = commentUtils.createDependencies();
 
 	$scope.cssForCommentStatus = "name";
@@ -630,7 +632,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 			alert("You must fill in all the required fields.")
 		}else{
 			if($scope.ac.dueDate){
-				$scope.ac.dueDate = moment($scope.ac.dueDate).format('MM/DD/YYYY');
+				$scope.ac.dueDate = moment($scope.ac.dueDate).format(utils.date.defaultDateFormat());
 			}
 			$scope.ac.id = $scope.ac.commentId;
 			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
