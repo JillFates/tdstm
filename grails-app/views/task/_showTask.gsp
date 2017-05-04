@@ -108,16 +108,16 @@
 							<table class="inner">
 								<tr>
 									<td width="50%">
-									Predecessors
+									<label>Predecessors:</label> 
 										<tds:hasPermission permission="${Permission.TaskCreate}"> 
-											<a id="createSucTask" ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#" data-toggle="tooltip" data-trigger="hover" title="Create Predecessor task"><img src="${resource(dir:'icons',file:'add.png')}"  alt="..."  border="0px"></a>
-										</tds:hasPermission>:
+											<a id="createSucTask" class="button" ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Predecessor task"><i class="fa fa-plus"></i> Create</a>
+										</tds:hasPermission>
 									</td>
 									<td width="50%">
-									Successors
+									<label>Successors:</label> 
 										<tds:hasPermission permission="${Permission.TaskCreate}">  
-											<a id="createPredTask" ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#" data-toggle="tooltip" data-trigger="hover" title="Create Successor task"><img src="${resource(dir:'icons',file:'add.png')}"  alt="..." border="0px"></a>
-										</tds:hasPermission>:
+											<a id="createPredTask" class="button" ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Successor task"><i class="fa fa-plus"></i> Create</a>
+										</tds:hasPermission>
 									</td>
 								</tr>
 								<tr>
@@ -203,3 +203,4 @@
 		<loading-indicator></loading-indicator>
 	</div>
 </div>
+<script>$('[data-toggle="popover"]').popover();</script>

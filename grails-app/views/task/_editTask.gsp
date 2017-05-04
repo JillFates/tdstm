@@ -131,12 +131,12 @@
 							<table style="border: none;">
 								<tr class="prop" id="predecessorHeadTrId">
 									<td valign="top" class="name" style="width: 50%">
-										<label>Predecessors</label>
-										<a class="button" href="javascript:" ng-click="$broadcast('addDependency','predecessor')"> Add </a>
+										<label>Predecessors:</label> 
+										<a class="button" href="javascript:" ng-click="$broadcast('addDependency','predecessor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add Predecessor task"><i class="fa fa-plus"></i> Add </a>
 									</td>
 									<td valign="top" class="name" style="width: 50%">
-										<label>Successors</label>
-										<a class="button" href="javascript:" ng-click="$broadcast('addDependency','successor')"> Add </a>
+										<label>Successors:</label> 
+										<a class="button" href="javascript:" ng-click="$broadcast('addDependency','successor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add Successor task"><i class="fa fa-plus"></i> Add </a>
 									</td>
 								</tr>
 								<tr>
