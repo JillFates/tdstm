@@ -5,6 +5,4 @@
 target/
 plugins/
 run.sh
-.slcache/
-node_modules/
 projectFilesBackup
