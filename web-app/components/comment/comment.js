@@ -479,6 +479,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				initAsset();
 				if (task.ac) {
 					$scope.ac.category = task.ac.category;
+					$scope.ac.moveEvent = task.ac.moveEvent;
 					var dependecy = {
 						taskId: task.ac.commentId,
 						category: task.ac.category,
@@ -495,7 +496,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 						default:
 							break;
 					}
-
+					
 				}
 				if (defaultCommentType == 'comment') {
 					$scope.$broadcast("noPendingRequests");
@@ -707,7 +708,6 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 			}
 		}
 	}
-
 };
 
 /************************
