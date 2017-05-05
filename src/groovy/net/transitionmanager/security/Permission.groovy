@@ -155,7 +155,6 @@ interface Permission {
 			RoomDelete                    = 'RoomDelete',
 			RoomEdit                      = 'RoomEdit',
 			RoomListActionColumn          = 'RoomListActionColumn',
-			RoomMerge                     = 'RoomMerge',
 			RoomView                      = 'RoomView',
 			SequenceGetNext               = 'SequenceGetNext',
 			ShowListNews				  = 'ShowListNews',
