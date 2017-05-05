@@ -1094,8 +1094,8 @@ class AdminController implements ControllerMethods {
 
 		def recordsLegend = jdbcTemplate.queryForList(queryForRecords)
 
-		String pendingInfo = 'Current: ${recordsLegend[0].batchCount} batches / ${recordsLegend[0].records} records process,' +
-				(recordsLegend[1] ? '${recordsLegend[1].batchCount} batches / ${recordsLegend[1].records} records pending' : '0 batches / 0 records pending')
+		String pendingInfo = "Current: ${recordsLegend[0].batchCount} batches / ${recordsLegend[0].records} records process," +
+				(recordsLegend[1] ? "${recordsLegend[1].batchCount} batches / ${recordsLegend[1].records} records pending" : "0 batches / 0 records pending")
 
 		render pendingInfo
 	}
