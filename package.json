@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "description": "Transition Manager",
   "main": "index.html",
+  "scripts": {
+    "build": "node ./node_modules/gulp/bin/gulp.js build --PROD"
+  },
   "dependencies": {
     "angular": "1.5.1",
     "angular-animate": "1.5.1",
