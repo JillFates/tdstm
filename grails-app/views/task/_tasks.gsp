@@ -85,7 +85,7 @@
 							</g:if>
 							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }">
 							<tds:actionButton label="Done" icon="ui-icon-check" id="${item?.id}"
-								onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')"/>
+								onclick="changeStatus('${item?.id}','${AssetCommentStatus.COMPLETED}', '${item?.status}', 'taskManager')"/>
 							</g:if>
 
 							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${item?.id}"
