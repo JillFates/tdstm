@@ -145,12 +145,6 @@
 				},
 				pageable: {
 					pageSize: 20
-				},
-				dataBound: function(e) {
-					console.log("dataBound");
-				},
-				filtering:function(e){
-					console.log(e);
 				}
 			}).data("kendoGrid");
 
