@@ -3,6 +3,7 @@
  */
 
 var _ = require('lodash'),
+    argv = require('yargs').argv,
     autoprefixer = require('gulp-autoprefixer'),
     browserify = require("browserify"),
     buffer = require('vinyl-buffer'),
@@ -20,6 +21,11 @@ var _ = require('lodash'),
     tslint = require("gulp-tslint"),
     uglify = require('gulp-uglify'),
     watchify = require('watchify');
+
+/* Command line arg, e.g.: gulp --PROD */
+var prodEnv = argv.PROD === true;
+//prodEnv = true;
+console.log('Production environment = ' + prodEnv);
 
 gulp.task('build', ['build-app', 'build-vendor']);
 
@@ -43,7 +49,7 @@ gulp.task('build-app', function () {
 
     browserifyProcesor = browserify({
         entries: ['web-app/app-js/main.ts'],
-        debug: false, // SourceMapping
+        debug: !prodEnv, // SourceMapping
     }).plugin("tsify");
 
     // Exclude all NPM Package from the build
