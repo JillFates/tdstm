@@ -2140,7 +2140,7 @@ class AssetEntityController implements ControllerMethods {
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
 			long filterEvent = NumberUtil.toPositiveLong(params.moveEvent, 0L)
-			def formatterMap = assetEntityService.getFormatterMap()
+			def formatterMap = [assetEntity:'assetFormatter', estStart:'estStartFormatter', estFinish: 'estFinishFormatter']
 			def moveEvent
 
 
