@@ -133,13 +133,13 @@
 									<td valign="top" class="name" style="width: 50%">
 										<label>Predecessors:</label> 
 										<a class="button btn" href="javascript:" ng-class="{'btn-default':hoverPredecessor}" ng-mouseenter="hoverPredecessor=true" ng-mouseleave="hoverPredecessor=false"
-										 ng-click="$broadcast('addDependency','predecessor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add Predecessor task">
+										 ng-click="$broadcast('addDependency','predecessor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add link to a Predecessor task">
 											<i class="fa fa-plus-circle"></i> Add </a>
 									</td>
 									<td valign="top" class="name" style="width: 50%">
 										<label>Successors:</label> 
 										<a class="button btn" href="javascript:" ng-class="{'btn-default':hoverSuccessor}" ng-mouseenter="hoverSuccessor=true" ng-mouseleave="hoverSuccessor=false"
-										 ng-click="$broadcast('addDependency','successor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add Successor task">
+										 ng-click="$broadcast('addDependency','successor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add link to a Successor task">
 										 	<i class="fa fa-plus-circle"></i> Add </a>
 									</td>
 								</tr>

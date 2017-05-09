@@ -103,7 +103,7 @@
 					</tr>
 					<%-- Dependencies Section --%>
 					<tr>
-						<td valign="top">Dependencies:</td>
+						<td valign="top"><label>Dependencies:</label></td>
 						<td valign="top" colspan="3">
 							<table class="inner">
 								<tr>
