@@ -1833,6 +1833,14 @@ class AssetEntityService implements ServiceMethods {
 		return colPref
 	}
 
+   /**
+	* Returns the formatter for the default optional/customizable columns
+	* @return formatterMap
+	*/
+	Map getFormatterMap() {
+		return [assetEntity:'assetFormatter', estStart:'estStartFormatter', estFinish: 'estFinishFormatter']
+	}
+
 	/**
 	 * Save cabling data to database while importing.
 	 */

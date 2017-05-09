@@ -2140,7 +2140,9 @@ class AssetEntityController implements ControllerMethods {
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
 			long filterEvent = NumberUtil.toPositiveLong(params.moveEvent, 0L)
+			def formatterMap = assetEntityService.getFormatterMap()
 			def moveEvent
+
 
 			if (params.containsKey("justRemaining")) {
 				userPreferenceService.setPreference(PREF.JUST_REMAINING, params.justRemaining)
@@ -2207,6 +2209,7 @@ class AssetEntityController implements ControllerMethods {
 			        moveBundleList: moveBundleList,
 					viewUnpublished: viewUnpublished,
 					taskPref: taskPref,
+					formatterMap: formatterMap,
 			        staffRoles: taskService.getTeamRolesForTasks(),
 					assetCommentFields: assetCommentFields.sort { it.value },
 			        sizePref: userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE) ?: '25',
@@ -2532,8 +2535,11 @@ class AssetEntityController implements ControllerMethods {
 		def updatedTime
 		def updatedClass
 		def dueClass
+		def estStartClass
+		def estFinishClass
 		def nowGMT = TimeUtil.nowGMT()
 		def taskPref = assetEntityService.getExistingPref('Task_Columns')
+
 
 		def results = tasks?.collect {
 			def isRunbookTask = it.isRunbookTask()
@@ -2569,13 +2575,51 @@ class AssetEntityController implements ControllerMethods {
 				}
 			}
 
+
+
+
+			// TM-6318 : Highlight Estimated Start and Estimated Finish columns for tardy and late tasks
+			def tardyFactor = computeTardyFactor(it.durationInMinutes())
+
+			estStartClass = ''
+			if (it.estStart && it.isActionable() && it.status != AssetCommentStatus.STARTED) {
+
+				if (it.estStart > nowGMT) {
+					estStartClass = 'task_late'
+				} else {
+					if (addMinutes(it.estStart, tardyFactor) >= nowGMT) {
+						estStartClass = 'task_tardy'
+					}
+				}
+			}
+
+			estFinishClass = ''
+			if (it.estFinish && it.isActionable()) {
+				if (it.status == AssetCommentStatus.STARTED) {
+					if (addMinutes(it.actStart, it.durationInMinutes()) > nowGMT) {
+						estFinishClass = 'task_late'
+					} else {
+						if (addMinutes(it.actStart, it.durationInMinutes() + tardyFactor) >= nowGMT)
+							estFinishClass = 'task_tardy'
+					}
+				} else { // status == not started
+						if (substractMinutes(it.estFinish, it.durationInMinutes()) > nowGMT) {
+							estFinishClass = 'task_late'
+						} else {
+							if (substractMinutes(it.estFinish, it.durationInMinutes() + tardyFactor) >= nowGMT)
+								estStartClass = 'task_tardy'
+						}
+				}
+			}
+
+
 			String dueDate = ''
 			dueDate = TimeUtil.formatDate(it.dueDate)
 
 			// Clears time portion of dueDate for date comparison
 			Date due = it.dueDate?.clearTime()
 
-			// Add styling to Due Date column
+			// Highlight Due Date column for tardy and late tasks
 			if (it.dueDate && it.isActionable()) {
 
 				if (due > today) {
@@ -2636,7 +2680,9 @@ class AssetEntityController implements ControllerMethods {
 					it.assetEntity?.id, // 16
 					it.assetEntity?.assetType, // 17
 					it.assetEntity?.assetClass?.toString(), // 18
-					instructionsLinkURL // 19
+					instructionsLinkURL, // 19
+					estStartClass,	// 20
+					estFinishClass	// 21
 			],
 			  id:it.id
 			]
@@ -4668,5 +4714,42 @@ class AssetEntityController implements ControllerMethods {
 
 	private void setTotalAssets(long count) {
 		session.setAttribute 'TOTAL_ASSETS', count
+	}
+
+	/**
+	 * Computes the tardy factor.
+	 * The intent is to adjust the factor as a percent of the duration of the task to factor in
+	 * the additional buffer of time with a minimum factor of 5 minutes and a maximum of 30 minutes.
+	 * @param date : The task duration in minutes.
+	 * @return : the tardy factor.
+	 */
+	private Integer computeTardyFactor(Integer durationInMinutes) {
+		return Math.min(30, Math.max(5, (Integer)(durationInMinutes * 0.1)))
+	}
+
+	/**
+	 * Adds minutes to a given Date.
+	 * @param date : The original date where the minutes will be added.
+	 * @param minutes : The minutes to be added to the date.
+	 * @return : the date with the added minutes.
+	 */
+	private Date addMinutes(Date date, Integer minutes) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date)
+		cal.add(Calendar.MINUTE, minutes)
+		return cal.getTime()
+	}
+
+	/**
+	 * Substracts minutes from a given Date
+	 * @param date : The original date where the minutes will be substracted.
+	 * @param minutes : The minutes to be substracted from the date.
+	 * @return : the date with the substracted minutes.
+	 */
+	private Date substractMinutes(Date date, Integer minutes) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date)
+		cal.add(Calendar.MINUTE, - minutes)
+		return cal.getTime()
 	}
 }
