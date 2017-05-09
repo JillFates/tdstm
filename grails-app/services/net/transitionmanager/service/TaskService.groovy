@@ -879,6 +879,9 @@ class TaskService implements ServiceMethods {
 	}
 
 	List<Map<String, Object>> getTasksOfBatch(String taskBatchId) {
+
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
 		AssetComment.findAllByTaskBatch(TaskBatch.load(taskBatchId)).collect { assetComment -> [
 			id: assetComment.taskNumber,
 			commentId: assetComment.id,
@@ -886,7 +889,7 @@ class TaskService implements ServiceMethods {
 			asset: assetComment.assetEntity?.assetName,
 			team: assetComment.role ?: '',
 			person: (assetComment.assignedTo ?: '').toString(),
-			dueDate: assetComment.dueDate,
+			dueDate: TimeUtil.formatDateTime(assetComment.dueDate, formatter),
 			status: assetComment.status,
 		]}
 	}
