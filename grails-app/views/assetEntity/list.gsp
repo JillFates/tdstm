@@ -155,7 +155,6 @@
 				$.jgrid.formatter.integer.thousandsSeparator = '';
 				function myLinkFormatter (cellvalue, options, rowObject) {
 					var value = cellvalue ? _.escape(cellvalue) : '';
-					debugger;
 					return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\',' + options.rowId + ');">' + value + '</a>';
 				}
 
