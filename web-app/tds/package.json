@@ -6,8 +6,8 @@
   "keywords": [],
   "author": "TransitionManager",
   "scripts": {
-    "build-prod1": "node ./node_modules/gulp/bin/gulp.js build --PROD & node ./node_modules/gulp/bin/gulp.js sass-compiler --PROD",
-    "build-dev": "node ./node_modules/gulp/bin/gulp.js build & node ./node_modules/gulp/bin/gulp.js sass-compiler & node ./node_modules/gulp/bin/gulp.js sass-compiler-manager"
+    "build-prod": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler --PROD",
+    "build-dev": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler"
   },
   "dependencies": {
     "@angular/common": "~2.4.0",
