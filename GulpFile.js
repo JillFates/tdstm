@@ -50,7 +50,7 @@ gulp.task('build-app', function () {
 
     browserifyProcesor = browserify({
         entries: ['./web-app/app-js/main.js'],
-        debug: prodEnv, // SourceMapping
+        debug: !prodEnv, // SourceMapping
     }).transform(babelify.configure());
 
     // Exclude all NPM Package from the build
@@ -83,7 +83,7 @@ gulp.task('build-vendor', function () {
     console.error('Compiling Vendors.js file.');
 
     b = browserify({
-        debug: !prodEnv, // SourceMapping
+        debug: false, // SourceMapping
     });
 
     // Include all NPM Package from the build
@@ -96,8 +96,8 @@ gulp.task('build-vendor', function () {
             this.emit("end");
         })
         .pipe(source('Vendors.js'))
-        .pipe(gulpif(prodEnv, buffer()))
-        .pipe(gulpif(prodEnv, uglify()))
+        .pipe(gulpif(true, buffer()))
+        .pipe(gulpif(true, uglify()))
         .pipe(gulp.dest('./web-app/dist/'));
 
     return stream;

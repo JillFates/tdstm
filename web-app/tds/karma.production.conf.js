@@ -34,7 +34,12 @@ module.exports = function (config) {
             'node_modules/zone.js/dist/jasmine-patch.js',
             'node_modules/zone.js/dist/async-test.js',
             'node_modules/zone.js/dist/fake-async-test.js',
-
+            // External resources
+            { pattern: 'node_modules/tinymce/skins/lightgray/**/*.*', included: false, watched: false },
+            { pattern: 'node_modules/jquery/dist/jquery.min.js', included: true },
+            { pattern: 'node_modules/tinymce/tinymce.js', included: true },
+            { pattern: 'node_modules/tinymce/themes/modern/theme.min.js', included: true },
+            
             { pattern: appSrcBase + '**/*.html', included: false, watched: true },
             { pattern: appSrcBase + '**/*.css', included: false, watched: true },
 
@@ -51,6 +56,7 @@ module.exports = function (config) {
             'text/x-typescript': ['ts', 'tsx']
         },
         proxies: {
+            '/dist/js/vendors/tinymce/lightgray/': '/base/node_modules/tinymce/skins/lightgray/',
             '/base/web-app/specs-dist/modules/tds/web-app/app-js/': "/base/web-app/app-js/",//sweet!!
             '/tds/web-app/app-js/': "/base/web-app/app-js/",
             '/base/web-app/specs-dist/modules/noticeManager/tds/web-app/app-js/': "/base/web-app/app-js/"
