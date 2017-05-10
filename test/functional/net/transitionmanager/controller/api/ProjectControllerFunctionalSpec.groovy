@@ -3,7 +3,6 @@ package net.transitionmanager.controller.api
 import grails.plugins.rest.client.RestBuilder
 import grails.test.spock.IntegrationSpec
 import groovy.json.JsonOutput
-import net.transitionmanager.domain.UserLogin
 import spock.lang.Shared
 
 import javax.servlet.http.HttpServletResponse
@@ -85,126 +84,130 @@ class ProjectControllerFunctionalSpec extends IntegrationSpec implements LoginAs
         resp.status == HttpServletResponse.SC_UNAUTHORIZED
     }
 
-    def "test description is present in /api/projects json payload of Api 1.0"() {
-        given:
-        RestBuilder rest = new RestBuilder()
+//    <SL> Commented out since API Projects Controller was removed during merge of the functionality
+//    def "test description is present in /api/projects json payload of Api 1.0"() {
+//        given:
+//        RestBuilder rest = new RestBuilder()
+//
+//        when:
+//        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
+//
+//        then:
+//        accessToken
+//
+//        when: 'Requesting projects for version 1.0'
+//        def resp = rest.get("${grailServerUrl()}/api/projects") {
+//            accept("application/json")
+//            header("Accept-Version", "1.0")
+//            header("Authorization", "Bearer ${accessToken}")
+//        }
+//
+//        then:
+//        resp.status == HttpServletResponse.SC_OK
+//
+//        and: 'the response is a JSON Payload'
+//        resp.headers.get('Content-Type') == ['application/json;charset=UTF-8']
+//
+//        and: 'json payload contains an array of projects with a description property'
+//        resp.json.each {
+//            assert it.keySet().contains('description')
+//        }
+//    }
 
-        when:
-        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
+//    <SL> Commented out since API Projects Controller was removed during merge of the functionality
+//    def "test description is NOT present in projects json payload of Api 2.0"() {
+//        given:
+//        RestBuilder rest = new RestBuilder()
+//
+//        when:
+//        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
+//
+//        then:
+//        accessToken
+//
+//        when: 'Requesting projects for version 2.0'
+//        def resp = rest.get("${grailServerUrl()}/api/projects") {
+//            accept("application/json")
+//            header("Accept-Version", "2.0")
+//            header("Authorization", "Bearer ${accessToken}")
+//        }
+//
+//        then: 'the request was successful'
+//        resp.status == HttpServletResponse.SC_OK
+//
+//        and: 'the response is a JSON Payload'
+//        resp.headers.get('Content-Type') == ['application/json;charset=UTF-8']
+//
+//        and: 'json payload contains an array of projects, those projects do not contain a description property'
+//        resp.json.each {
+//            assert !it.keySet().contains('description')
+//        }
+//    }
 
-        then:
-        accessToken
+//    <SL> Commented out since API Projects Controller was removed during merge of the functionality
+//    def "Validate failed API call with JWT token to endpoint that account does not have permission to execute."() {
+//        given:
+//        RestBuilder rest = new RestBuilder()
+//
+//        when:
+//        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
+//
+//        then:
+//        accessToken
+//
+//        when: 'Request projects list to get a project id'
+//        def resp = rest.get("${grailServerUrl()}/api/projects") {
+//            accept("application/json")
+//            header("Accept-Version", "1.0")
+//            header("Authorization", "Bearer ${accessToken}")
+//        }
+//        def projectId = resp.json.first()['id'] as Long
+//
+//        then:
+//        resp.status == HttpServletResponse.SC_OK
+//
+//        when:
+//        resp = rest.get("${grailServerUrl()}/api/projects/${projectId}") {
+//            accept("application/json")
+//            header("Accept-Version", "1.0")
+//            header("Authorization", "Bearer ${accessToken}")
+//        }
+//
+//        then:
+//        resp.status == HttpServletResponse.SC_FORBIDDEN
+//    }
 
-        when: 'Requesting projects for version 1.0'
-        def resp = rest.get("${grailServerUrl()}/api/projects") {
-            accept("application/json")
-            header("Accept-Version", "1.0")
-            header("Authorization", "Bearer ${accessToken}")
-        }
-
-        then:
-        resp.status == HttpServletResponse.SC_OK
-
-        and: 'the response is a JSON Payload'
-        resp.headers.get('Content-Type') == ['application/json;charset=UTF-8']
-
-        and: 'json payload contains an array of projects with a description property'
-        resp.json.each {
-            assert it.keySet().contains('description')
-        }
-    }
-
-    def "test description is NOT present in projects json payload of Api 2.0"() {
-        given:
-        RestBuilder rest = new RestBuilder()
-
-        when:
-        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
-
-        then:
-        accessToken
-
-        when: 'Requesting projects for version 2.0'
-        def resp = rest.get("${grailServerUrl()}/api/projects") {
-            accept("application/json")
-            header("Accept-Version", "2.0")
-            header("Authorization", "Bearer ${accessToken}")
-        }
-
-        then: 'the request was successful'
-        resp.status == HttpServletResponse.SC_OK
-
-        and: 'the response is a JSON Payload'
-        resp.headers.get('Content-Type') == ['application/json;charset=UTF-8']
-
-        and: 'json payload contains an array of projects, those projects do not contain a description property'
-        resp.json.each {
-            assert !it.keySet().contains('description')
-        }
-    }
-
-    def "Validate failed API call with JWT token to endpoint that account does not have permission to execute."() {
-        given:
-        RestBuilder rest = new RestBuilder()
-
-        when:
-        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
-
-        then:
-        accessToken
-
-        when: 'Request projects list to get a project id'
-        def resp = rest.get("${grailServerUrl()}/api/projects") {
-            accept("application/json")
-            header("Accept-Version", "1.0")
-            header("Authorization", "Bearer ${accessToken}")
-        }
-        def projectId = resp.json.first()['id'] as Long
-
-        then:
-        resp.status == HttpServletResponse.SC_OK
-
-        when:
-        resp = rest.get("${grailServerUrl()}/api/projects/${projectId}") {
-            accept("application/json")
-            header("Accept-Version", "1.0")
-            header("Authorization", "Bearer ${accessToken}")
-        }
-
-        then:
-        resp.status == HttpServletResponse.SC_FORBIDDEN
-    }
-
-    def "Validate successful API call with JWT token to an endpoint for which the logged account does have permission to execute."() {
-
-        given:
-        RestBuilder rest = new RestBuilder()
-
-        when:
-        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
-
-        then:
-        accessToken
-
-        when: 'Request projects list to get a project id'
-        def resp = rest.get("${grailServerUrl()}/api/projects") {
-            accept("application/json")
-            header("Accept-Version", "1.0")
-            header("Authorization", "Bearer ${accessToken}")
-        }
-        def projectId = resp.json.first()['id'] as Long
-
-        then: 'the request was successful'
-        resp.status == HttpServletResponse.SC_OK
-
-        when:
-        resp = rest.get("${grailServerUrl()}/api/projects/${projectId}") {
-            accept("application/json")
-            header("Accept-Version", "2.0")
-            header("Authorization", "Bearer ${accessToken}")
-        }
-
-        then:
-        resp.status == HttpServletResponse.SC_OK
-    }
+//    <SL> Commented out since API Projects Controller was removed during merge of the functionality
+//    def "Validate successful API call with JWT token to an endpoint for which the logged account does have permission to execute."() {
+//
+//        given:
+//        RestBuilder rest = new RestBuilder()
+//
+//        when:
+//        def accessToken = loginAs(TEST_USERNAME, TEST_PASSWORD).accessToken
+//
+//        then:
+//        accessToken
+//
+//        when: 'Request projects list to get a project id'
+//        def resp = rest.get("${grailServerUrl()}/api/projects") {
+//            accept("application/json")
+//            header("Accept-Version", "1.0")
+//            header("Authorization", "Bearer ${accessToken}")
+//        }
+//        def projectId = resp.json.first()['id'] as Long
+//
+//        then: 'the request was successful'
+//        resp.status == HttpServletResponse.SC_OK
+//
+//        when:
+//        resp = rest.get("${grailServerUrl()}/api/projects/${projectId}") {
+//            accept("application/json")
+//            header("Accept-Version", "2.0")
+//            header("Authorization", "Bearer ${accessToken}")
+//        }
+//
+//        then:
+//        resp.status == HttpServletResponse.SC_OK
+//    }
 }
