@@ -2,6 +2,8 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
 import org.codehaus.groovy.grails.web.util.WebUtils
+
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
 
 trait ServiceMethods {
@@ -81,6 +83,8 @@ trait ServiceMethods {
 	}
 
 	HttpSession getSession() {
-		WebUtils.retrieveGrailsWebRequest().session
+		HttpServletRequest request = WebUtils.retrieveGrailsWebRequest().currentRequest
+		HttpSession session = request.session
+		return session
 	}
 }

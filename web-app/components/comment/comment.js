@@ -101,11 +101,14 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		});
 	}
 
-	this.createCommentBy = function (commentType, assetId, assetType) {
-		this.createComment(commentType, commentUtils.assetTO(assetId, assetType));
+	this.createCommentBy = function (commentType, assetId, assetType, ac, actionType) {
+		this.createComment(commentType, commentUtils.assetTO(assetId, assetType), {
+			ac: ac,
+			type: actionType
+		});
 	}
 
-	this.createComment = function (commentType, assetTO) {
+	this.createComment = function (commentType, assetTO, parentTask) {
 		scope.$broadcast('forceDialogClose', ['crud']);
 		var view = (commentType == 'comment') ? '/comment/editComment' : '/task/editTask';
 		modal.open({
@@ -124,6 +127,9 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 				},
 				commentTO: function () {
 					return null;
+				},
+				task: function () {
+					return parentTask;
 				}
 			}
 		});
@@ -177,6 +183,9 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 				},
 				commentTO: function () {
 					return commentTO;
+				},
+				task: function () {
+					return null;
 				}
 			}
 		});
@@ -416,7 +425,7 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 /*****************************************
  * Controller use to edit a comment
  */
-tds.comments.controller.EditCommentDialogController = function ($scope, $modalInstance, $log, $timeout, commentService, alerts, assetTO, defaultCommentType, commentTO, appCommonData, utils, commentUtils) {
+tds.comments.controller.EditCommentDialogController = function ($scope, $modalInstance, $log, $timeout, commentService, alerts, assetTO, defaultCommentType, commentTO, appCommonData, utils, commentUtils, task) {
 
 	$scope.comments = [];
 	$scope.isEdit = (commentTO != null);
@@ -468,6 +477,27 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				);
 			} else {
 				initAsset();
+				if (task.ac) {
+					$scope.ac.category = task.ac.category;
+					$scope.ac.moveEvent = task.ac.moveEvent;
+					var dependecy = {
+						taskId: task.ac.commentId,
+						category: task.ac.category,
+						desc: task.ac.comment,
+						taskNumber: task.ac.taskNumber
+					}
+					switch (task.type) {
+						case 'PREDECESSOR':
+							$scope.dependencies.predecessors.push(dependecy);
+							break;
+						case 'SUCCESSOR':
+							$scope.dependencies.successors.push(dependecy);
+							break;
+						default:
+							break;
+					}
+					
+				}
 				if (defaultCommentType == 'comment') {
 					$scope.$broadcast("noPendingRequests");
 				}
@@ -631,9 +661,6 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 		//	$("select.assetSelect").select2();
 	}
 
-
-
-
 	//
 	// Invoked by createCommentForm and editCommentDialog to make Ajax call to persist changes of new and existing assetComment classes
 	//
@@ -691,7 +718,6 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 			}
 		}
 	}
-
 };
 
 /************************

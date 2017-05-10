@@ -5,6 +5,10 @@
   "description": "TDS has upgrade is base code to use Angular 2, old version was using 1.6 and 1.3",
   "keywords": [],
   "author": "TransitionManager",
+  "scripts": {
+    "build-prod": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler --PROD",
+    "build-dev": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler"
+  },
   "dependencies": {
     "@angular/common": "~2.4.0",
     "@angular/compiler": "~2.4.0",
@@ -21,8 +25,8 @@
     "@progress/kendo-angular-intl": "^0.11.1",
     "@progress/kendo-angular-l10n": "^0.2.1",
     "@progress/kendo-data-query": "^0.5.0",
-    "@uirouter/angular": "^1.0.0-beta.4",
-    "@uirouter/core": "^5.0.0",
+    "@uirouter/angular": "1.0.0-beta.5",
+    "@uirouter/core": "5.0.0",
     "angular-in-memory-web-api": "~0.2.4",
     "core-js": "^2.4.1",
     "jquery": "^3.2.1",
@@ -39,6 +43,7 @@
     "browserify": "^14.1.0",
     "canonical-path": "0.0.2",
     "concurrently": "^3.1.0",
+    "gulp": "3.9.1",
     "gulp-autoprefixer": "3.1.0",
     "gulp-filter": "2.0.2",
     "gulp-if": "2.0.1",
