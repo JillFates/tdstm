@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.domain.Person" %>
+<%@ page import="net.transitionmanager.security.Permission" %>
 <div draggable id="showTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" role="dialog" style="width: 1000px" tabindex="-1">
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
@@ -102,12 +103,26 @@
 					</tr>
 					<%-- Dependencies Section --%>
 					<tr>
-						<td valign="top">Dependencies:</td>
+						<td valign="top"><label>Dependencies:</label></td>
 						<td valign="top" colspan="3">
 							<table class="inner">
 								<tr>
-									<td width="50%">Predecessors:</td>
-									<td width="50%">Successors:</td>
+									<td width="50%">
+									<label>Predecessors:</label> 
+										<tds:hasPermission permission="${Permission.TaskCreate}"> 
+											<a id="createSucTask" class="button btn" ng-class="{'btn-default':hoverPredecessor}" ng-mouseenter="hoverPredecessor=true" ng-mouseleave="hoverPredecessor=false"
+											 ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Predecessor task">
+											 	<i class="fa fa-plus-circle"></i> Create</a>
+										</tds:hasPermission>
+									</td>
+									<td width="50%">
+									<label>Successors:</label> 
+										<tds:hasPermission permission="${Permission.TaskCreate}">  
+											<a id="createPredTask" class="button btn" ng-class="{'btn-default':hoverSuccessor}" ng-mouseenter="hoverSuccessor=true" ng-mouseleave="hoverSuccessor=false"
+											 ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Successor task">
+											 	<i class="fa fa-plus-circle"></i> Create</a>
+										</tds:hasPermission>
+									</td>
 								</tr>
 								<tr>
 									<td valign = "top">
@@ -192,3 +207,4 @@
 		<loading-indicator></loading-indicator>
 	</div>
 </div>
+<script>$('[data-toggle="popover"]').popover();</script>
