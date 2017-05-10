@@ -546,14 +546,9 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 		var startDate = utils.date.createDateTimeFromString($scope.ac.estStart);
 		var endDate = utils.date.createDateTimeFromString($scope.ac.estFinish);
 		if (startDate.isValid() && endDate.isValid()) {
-			var diff = startDate.diff(endDate);
-			if (diff != 0) {
-				diff = (diff.valueOf() * -1);
-			}
+			// b - a > 0	
+			var diff = endDate.diff(startDate);
 			$scope.acData.durationTime = diff;
-			if (!$scope.$$phase) {
-				$scope.$apply();
-			}
 		}
 	}
 
@@ -606,6 +601,21 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				alerts.addAlertMsg(data[0].error);
 			} else {
 				var ac = commentUtils.commentTemplateFromEditResponse(data[0]);
+				// sometimes the duration property has and old value that does not
+				// represent the correct diff between estStart/estFinish causing
+				// an infinite loop of changes between the properties
+				// the following if statement will always consider the diff 
+				// between estStart/estFinish as the duration value
+				if (ac.estStart && ac.estFinish) {
+					var startDate = utils.date.createDateTimeFromString(ac.estStart);
+					var endDate = utils.date.createDateTimeFromString(ac.estFinish);
+					if (startDate.isValid() && endDate.isValid()) {
+						var diff = endDate.diff(startDate, 'minutes');
+						if (ac.duration != diff) {
+							ac.duration = diff;
+						}
+					}
+				}
 				angular.copy(data[0], $scope.acData);
 				angular.copy(ac, $scope.ac);
 				angular.copy(ac, $scope.acBackup);
