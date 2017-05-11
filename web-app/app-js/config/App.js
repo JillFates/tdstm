@@ -12,7 +12,7 @@ require('angular-resource');
 require('angular-translate');
 require('angular-translate-loader-partial');
 require('angular-ui-bootstrap');
-require('ngClipboard');
+require('ngclipboard');
 require('ui-router');
 require('rx-angular');
 require('api-check');
