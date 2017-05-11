@@ -1628,6 +1628,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def contextObj = getContextObject(taskBatch.contextType, (int)taskBatch.contextId)
 		def assets = getAssocAssets(contextObj)
 
+		List teamCodeList = getTeamRolesForTasks()
+
 		List<Long> bundleIds = []
 		if (assets) {
 			// Derive the unique bundle ids from the list of assets found
@@ -1856,6 +1858,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					percComplete += percIncrFull
 					return
 				}
+
+				// Adds the available teams to the task spec.
+				taskSpec["teamCodes"] = teamCodeList
 
 				def tasksNeedingPredecessors = []	// Used for wiring up predecessors in 2nd half of method
 				isAsset = false
@@ -4504,11 +4509,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff) {
 		def msg
-
-		List teamCodeList = getTeamRolesForTasks()
-
-		def msg1 = assignTeam(task, taskSpec, workflow, projectStaff, teamCodeList)
-		def msg2 = assignWhom(task, taskSpec, workflow, projectStaff, teamCodeList)
+		def msg1 = assignTeam(task, taskSpec, workflow, projectStaff)
+		def msg2 = assignWhom(task, taskSpec, workflow, projectStaff)
 
 		if (msg1) {
 			if (msg2) {
@@ -4540,9 +4542,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *
 	 * @param task - the task object to perform the assignment on
 	 * @param taskSpec - the map with all of the task
-	 * @param teamCodeList - available teams.
 	 */
-	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff, List teamCodeList) {
+	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff) {
 		def person
 
 		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1) {
@@ -4592,6 +4593,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (whom[0] == '@') {
 					// team reference
 					def teamAssign = whom[1..-1]
+					List teamCodeList = taskSpec["teamCodes"]
 					if (teamCodeList.contains(teamAssign)) {
 						task.role = teamAssign
 					} else {
@@ -4657,11 +4659,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param taskSpec - a map with all the task info.
 	 * @param workflow
 	 * @param projectStaff 
-	 * @param teamCodeList - available teams.
 	 *
 	 * @return error msg, null if none.
 	 */
-	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff, List teamCodeList) {
+	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff) {
 		// Set the Team independently of the direct person assignment
 		if (taskSpec.containsKey('team')) {
 			def team = taskSpec.team
@@ -4695,6 +4696,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 			// Validate that the string is correct
+			List teamCodeList = taskSpec["teamCodes"]
 			if (teamCodeList.contains(team)) {
 				task.role = team
 			} else {
