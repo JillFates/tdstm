@@ -91,6 +91,7 @@ import org.springframework.util.StreamUtils
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
+import java.sql.Timestamp
 import java.text.DateFormat
 
 @SuppressWarnings('GrMethodMayBeStatic')
@@ -2581,13 +2582,13 @@ class AssetEntityController implements ControllerMethods {
 			// TM-6318 : Highlight Estimated Start and Estimated Finish columns for tardy and late tasks
 			def tardyFactor = computeTardyFactor(it.durationInMinutes())
 
-			estStartClass = ''
+ 			estStartClass = ''
 			if (it.estStart && it.isActionable() && it.status != AssetCommentStatus.STARTED) {
 
-				if (it.estStart > nowGMT) {
+				if (it.estStart < nowGMT) {
 					estStartClass = 'task_late'
 				} else {
-					if (addMinutes(it.estStart, tardyFactor) >= nowGMT) {
+					if (subtractMinutes(it.estStart, tardyFactor) <= nowGMT) {
 						estStartClass = 'task_tardy'
 					}
 				}
@@ -2596,17 +2597,17 @@ class AssetEntityController implements ControllerMethods {
 			estFinishClass = ''
 			if (it.estFinish && it.isActionable()) {
 				if (it.status == AssetCommentStatus.STARTED) {
-					if (addMinutes(it.actStart, it.durationInMinutes()) > nowGMT) {
+					if (addMinutes(it.actStart, it.durationInMinutes()) < nowGMT) {
 						estFinishClass = 'task_late'
 					} else {
-						if (addMinutes(it.actStart, it.durationInMinutes() + tardyFactor) >= nowGMT)
+						if (addMinutes(it.actStart, it.durationInMinutes() - tardyFactor) <= nowGMT)
 							estFinishClass = 'task_tardy'
 					}
 				} else { // status == not started
-						if (substractMinutes(it.estFinish, it.durationInMinutes()) > nowGMT) {
+						if (subtractMinutes(it.estFinish, it.durationInMinutes()) < nowGMT) {
 							estFinishClass = 'task_late'
 						} else {
-							if (substractMinutes(it.estFinish, it.durationInMinutes() + tardyFactor) >= nowGMT)
+							if (subtractMinutes(it.estFinish, it.durationInMinutes() - tardyFactor) <= nowGMT)
 								estStartClass = 'task_tardy'
 						}
 				}
@@ -4741,12 +4742,12 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	/**
-	 * Substracts minutes from a given Date
-	 * @param date : The original date where the minutes will be substracted.
-	 * @param minutes : The minutes to be substracted from the date.
-	 * @return : the date with the substracted minutes.
+	 * Subtracts minutes from a given Date
+	 * @param date : The original date where the minutes will be subtracted.
+	 * @param minutes : The minutes to be subtracted from the date.
+	 * @return : the date with the subtracted minutes.
 	 */
-	private Date substractMinutes(Date date, Integer minutes) {
+	private Date subtractMinutes(Date date, Integer minutes) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date)
 		cal.add(Calendar.MINUTE, - minutes)
