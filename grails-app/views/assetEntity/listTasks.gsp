@@ -168,7 +168,7 @@
 		}
 
         function estStartFormatter(cellVal,options,rowObject){
-            return '<span id="span_'+options.rowId+'" class=" ' +
+            return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
                 rowObject[20] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
                 options.rowId+
                 '" asset-id="'+
@@ -176,7 +176,7 @@
         }
 
         function estFinishFormatter(cellVal,options,rowObject){
-            return '<span id="span_'+options.rowId+'" class=" ' +
+            return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
                 rowObject[21] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
                 options.rowId+
                 '" asset-id="'+
