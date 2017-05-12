@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "description": "Transition Manager",
   "main": "index.html",
+  "scripts": {
+    "build-prod": "node ./node_modules/gulp/bin/gulp.js build --PROD & node ./node_modules/gulp/bin/gulp.js sass-compiler --PROD & node ./node_modules/gulp/bin/gulp.js sass-compiler-manager --PROD",
+    "build-dev": "node ./node_modules/gulp/bin/gulp.js build & node ./node_modules/gulp/bin/gulp.js sass-compiler & node ./node_modules/gulp/bin/gulp.js sass-compiler-manager"
+  },
   "dependencies": {
     "angular": "1.5.1",
     "angular-animate": "1.5.1",
