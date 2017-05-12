@@ -3,6 +3,7 @@ import net.transitionmanager.security.Permission
 
 // This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
 println()
+tdstm.license.enabled = false
 // copy binding variables into properties in the config for visibility in external scripts; as of 2.5.4 the
 // vars are: appName, appVersion, basedir, baseFile, baseName, grailsHome,
 //           grailsSettings, grailsVersion, groovyVersion, springVersion, userHome

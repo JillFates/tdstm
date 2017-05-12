@@ -425,7 +425,7 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 /*****************************************
  * Controller use to edit a comment
  */
-tds.comments.controller.EditCommentDialogController = function ($scope, $modalInstance, $log, $timeout, commentService, alerts, assetTO, defaultCommentType, commentTO, appCommonData, utils, commentUtils, task) {
+tds.comments.controller.EditCommentDialogController = function ($scope, $modalInstance, $log, $timeout, $q, commentService, alerts, assetTO, defaultCommentType, commentTO, appCommonData, utils, commentUtils, task) {
 
 	$scope.comments = [];
 	$scope.isEdit = (commentTO != null);
@@ -496,7 +496,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 						default:
 							break;
 					}
-					
+
 				}
 				if (defaultCommentType == 'comment') {
 					$scope.$broadcast("noPendingRequests");
