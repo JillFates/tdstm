@@ -568,26 +568,40 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 	$scope.commentInfo.assetClasses = []
 
 	$scope.commentInfo.currentAssetClass = null
-
+	$scope.commentInfo.currentAsset = "";
 	$scope.commentInfo.assets = []
 
 	$scope.assetClassChanged = function () {
-		commentService.getAssetsByClass($scope.commentInfo.currentAssetClass).then(function (data) {
-			$scope.commentInfo.assets = data
-			$scope.commentInfo.currentAsset = null
-		})
+		$("#currentAsset").data('asset-type', $scope.commentInfo.currentAssetClass);
+		$("#currentAsset").data('asset-id', '');
+		$("#currentAsset").data('asset-name', '');
+		$("#currentAsset").val('');
+		EntityCrud.assetNameSelect2($("#currentAsset"));
 	}
 
-	commentService.getAssetClasses().then(function (data) {
-		$scope.commentInfo.assetClasses = data
-	});
+	$scope.assetChanged = function () {
+		console.log($scope.commentInfo.currentAsset);
+	}
 
 	function initAsset() {
-		commentService.getClassForAsset($scope.commentInfo.currentAsset).then(function (data) {
-			$scope.commentInfo.currentAssetClass = data
-			commentService.getAssetsByClass(data).then(function (data2) {
-				$scope.commentInfo.assets = data2
-			})
+		commentService.getAssetClasses().then(function (data) {
+			$scope.commentInfo.assetClasses = data;
+			if ($scope.commentInfo.currentAsset) {
+				$q.all([commentService.getClassForAsset($scope.commentInfo.currentAsset),
+				commentService.getAssetById($scope.commentInfo.currentAsset)])
+					.then(function (values) {
+						$scope.commentInfo.currentAssetClass = values[0];
+						$scope.commentInfo.currentAssetName = values[1].data.result.assetName;
+						$("#currentAsset").data('asset-id', $scope.commentInfo.currentAsset);
+						$("#currentAsset").data('asset-name', $scope.commentInfo.currentAssetName);
+						$("#currentAsset").data('asset-type', $scope.commentInfo.currentAssetClass);
+						$("#currentAsset").val($scope.commentInfo.currentAsset);
+						EntityCrud.assetNameSelect2($("#currentAsset"));
+					});
+			}
+			else {
+				EntityCrud.assetNameSelect2($("#currentAsset"));
+			}
 		});
 	}
 
@@ -665,6 +679,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 	// Invoked by createCommentForm and editCommentDialog to make Ajax call to persist changes of new and existing assetComment classes
 	//
 	$scope.saveComment = function (viewAfterSave, invalid) {
+		$scope.commentInfo.currentAsset = $("#currentAsset").val();
 		if (invalid) {
 			alert("You must fill in all the required fields.")
 		} else {
@@ -1141,6 +1156,18 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+	var getAssetById = function (id) {
+		var deferred = q.defer();
+		http.get(utils.url.applyRootPath('/ws/asset/' + id)).
+			success(function (data, status, headers, config) {
+				deferred.resolve(data);
+			}).
+			error(function (data, status, headers, config) {
+				deferred.reject(data);
+			});
+		return deferred.promise;
+	};
+
 	return {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
@@ -1165,7 +1192,8 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		getAssetClasses: getAssetClasses,
 		getClassForAsset: getClassForAsset,
 		getAssetsByClass: getAssetsByClass,
-		setViewUnpublishedPreference: setViewUnpublishedPreference
+		setViewUnpublishedPreference: setViewUnpublishedPreference,
+		getAssetById: getAssetById
 	};
 
 };
