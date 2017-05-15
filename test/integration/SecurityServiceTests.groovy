@@ -7,6 +7,7 @@ import net.transitionmanager.PasswordReset
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.EmailDispatchService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
@@ -20,6 +21,7 @@ class SecurityServiceTests extends Specification {
 
 	// IOC
 	SecurityService securityService
+	EmailDispatchService emailDispatchService
 
 	private static final List<String> privRoles = ['ADMIN', 'EDITOR', 'USER']
 
@@ -355,12 +357,19 @@ class SecurityServiceTests extends Specification {
 			thrown RuntimeException
 	}
 
+	/**
 	@See("https://support.transitionmanager.com/browse/TM-6346")
+	 */
 	def '12. Test Password Reset expiration date'() {
 		setup: 'a valid username and Reset Data'
 			createPrivAccount()
 			String token = "SomeToken"
 			String ipAddress = "127.0.0.1"
+			EmailDispatchOrigin dispatchOrigin = EmailDispatchOrigin.ACTIVATION
+			String bodyTemplate = "accountActivation"
+			String personFromEmail = "develop@tmsi.com"
+			String subject = "Welcome to TransitionManager"
+
 			EmailDispatch ed = null //Not really needed
 			PasswordResetType resetType = PasswordResetType.WELCOME
 			long tokenTTL = securityService.accountActivationTTL
