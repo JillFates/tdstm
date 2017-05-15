@@ -583,16 +583,16 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		switch (resetType) {
 			case PasswordResetType.ADMIN_RESET:
 			case PasswordResetType.FORGOT_MY_PASSWORD:
-				tokenTTL = userLocalConfig.forgotMyPasswordResetTimeLimit * 60 * 1000
+				tokenTTL = forgotMyPasswordResetTimeLimitMillis
 				break
 			case PasswordResetType.WELCOME:
-				tokenTTL = userLocalConfig.accountActivationTimeLimit * 60 * 1000
+				tokenTTL = accountAcctivationTimeLimitMillis
 				break
 			default:
 				logger.error 'createPasswordReset() has unhandled switch for option {}', resetType
 				throw new ServiceException('Unable to initiate a password reset request')
 		}
-		Date expTime = new Date(System.currentTimeMillis() + tokenTTL)
+		Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
 
 		// Create a new token
 		PasswordReset pr = save new PasswordReset(
@@ -608,6 +608,22 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		if (!pr.hasErrors()) {
 			return pr
 		}
+	}
+
+	/**
+	 * Returns the configuration Account Acctivation Time frame in Milliseconds
+	 * @return
+	 */
+	long getForgotMyPasswordResetTimeLimitMillis(){
+		return userLocalConfig.forgotMyPasswordResetTimeLimit * 60 * 1000
+	}
+
+	/**
+	 * Returns the configuration Account Acctivation Time frame in Milliseconds
+	 * @return
+	 */
+	long getAccountAcctivationTimeLimitMillis(){
+		return userLocalConfig.accountActivationTimeLimit * 60 * 1000
 	}
 
 	/**
