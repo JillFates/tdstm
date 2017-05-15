@@ -199,16 +199,36 @@ var akaUtil = (function ($) {
 function convertPowerType(value, whom) {
 	if (value == "Watts") {
 		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() : ($('#powerUse' + whom + 'Id').val() * 120)
-		var powerNameplate = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() : ($('#powerNameplate' + whom + 'Id').val() * 120)
+
+		console.log('about to convert to Watts');
+        console.log('1. powerNameplateEditId: '+$('#powerNameplate' + whom + 'Id').val());
+        console.log('2. powerNameplateEditId*120: '+$('#powerNameplate' + whom + 'Id').val() * 120);
+
+        var powerNameplate = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() : ($('#powerNameplate' + whom + 'Id').val() * 120)
+        console.log('3. powerNameplate: '+powerNameplate);
+        console.log('\n');
 		var powerDesign = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() : ($('#powerDesign' + whom + 'Id').val() * 120)
 		$('#powerUse' + whom + 'Id').val(powerUsed);
 		$('#powerNameplate' + whom + 'Id').val(powerNameplate);
 		$('#powerDesign' + whom + 'Id').val(powerDesign);
 	} else if (value == "Amps") {
-		var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
+        var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
 		$('#powerUse' + whom + 'Id').val(powerUseA.toFixed(1));
+
+        console.log('about to convert to Amps');
+        console.log('1. powerNameplateEditId: '+$('#powerNameplate' + whom + 'Id').val());
+        console.log('2. powerNameplateEditId/120: '+$('#powerNameplate' + whom + 'Id').val() / 120);
+
 		var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() / 120 : ($('#powerNameplate' + whom + 'Id').val() / 120);
+
+        console.log('3. powerNameplateA: '+powerNameplateA);
+
 		$('#powerNameplate' + whom + 'Id').val(powerNameplateA.toFixed(1));
+
+        console.log('4. powerNameplateA.toFixed(1): '+powerNameplateA.toFixed(1));
+        console.log('\n');
+
+
 		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() / 120 : ($('#powerDesign' + whom + 'Id').val() / 120);
 		$('#powerDesign' + whom + 'Id').val(powerDesignA.toFixed(1));
 	}
