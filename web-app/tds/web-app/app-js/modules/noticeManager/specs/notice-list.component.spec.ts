@@ -17,6 +17,7 @@ import { NotifierService } from '../../../shared/services/notifier.service';
 import { NoticeListComponent } from '../components/list/notice-list.component';
 import { NoticeService } from '../service/notice.service';
 import { NoticeModel } from '../model/notice.model';
+import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 
 describe('NoticeListComponent:', () => {
     let fixture: ComponentFixture<NoticeListComponent>;
@@ -54,7 +55,7 @@ describe('NoticeListComponent:', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports: [HttpModule, FormsModule, SharedModule, GridModule,
+            imports: [HttpModule, FormsModule, SharedModule, GridModule, DropDownListModule,
                 TranslateModule.forRoot({
                     provide: TranslateLoader,
                     useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
