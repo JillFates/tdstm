@@ -17,10 +17,9 @@ class AssetCommentStatus {
 	public static final String PENDING    = 'Pending'
 	public static final String STARTED    = 'Started'
 	public static final String COMPLETED  = 'Completed'
-	public static final String DONE       = 'Completed'
 	public static final String TERMINATED = 'Terminated'
 
-	static final List<String> list = [PLANNED, PENDING, READY, STARTED, DONE, HOLD].asImmutable()
+	static final List<String> list = [PLANNED, PENDING, READY, STARTED, COMPLETED, HOLD].asImmutable()
 
-	static final List<String> topStatusList = [PENDING, READY, STARTED, HOLD, DONE].asImmutable()
+	static final List<String> topStatusList = [PENDING, READY, STARTED, HOLD, COMPLETED].asImmutable()
 }

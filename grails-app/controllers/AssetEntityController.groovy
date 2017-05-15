@@ -109,17 +109,17 @@ class AssetEntityController implements ControllerMethods {
 			(AssetCommentStatus.READY):   AssetCommentStatus.list,
 			(AssetCommentStatus.STARTED): AssetCommentStatus.list,
 			(AssetCommentStatus.HOLD):    AssetCommentStatus.list,
-			(AssetCommentStatus.DONE):    AssetCommentStatus.list
+			(AssetCommentStatus.COMPLETED):    AssetCommentStatus.list
 		],
 		LIMITED: [
 			'*EMPTY*':                    [AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING, AssetCommentStatus.HOLD],
 			(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
 			(AssetCommentStatus.PENDING): [AssetCommentStatus.PENDING],
 			(AssetCommentStatus.READY):   [AssetCommentStatus.READY, AssetCommentStatus.STARTED,
-			                               AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
+			                               AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
 			(AssetCommentStatus.STARTED): [AssetCommentStatus.READY, AssetCommentStatus.STARTED,
-			                               AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
-			(AssetCommentStatus.DONE):    [AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
+			                               AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
+			(AssetCommentStatus.COMPLETED):    [AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
 			(AssetCommentStatus.HOLD):    [AssetCommentStatus.HOLD]
 		]
 	]

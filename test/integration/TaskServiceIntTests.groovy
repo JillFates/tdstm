@@ -36,14 +36,14 @@ class TaskServiceIntTests extends IntegrationSpec {
 				task.actFinish == null
 				0 == task.isResolved
 
-				// Test bumping status to DONE after STARTED
+				// Test bumping status to COMPLETED after STARTED
 				task.previousStatus = task.status
-				taskService.setTaskStatus( task, AssetCommentStatus.DONE, whom )
+				taskService.setTaskStatus( task, AssetCommentStatus.COMPLETED, whom )
 				assertNotNull task.actStart
 				assertNotNull task.actFinish
 				assertNotNull task.assignedTo
 				assertNotNull task.resolvedBy
-				assertEquals AssetCommentStatus.DONE, task.status
+				assertEquals AssetCommentStatus.COMPLETED, task.status
 				assertEquals 1, task.isResolved
 			}
 
@@ -89,14 +89,14 @@ class TaskServiceIntTests extends IntegrationSpec {
 			assertNull task.actFinish
 			assertEquals 0, task.isResolved
 
-			// Test bumping status to DONE after STARTED
+			// Test bumping status to COMPLETED after STARTED
 			task.previousStatus = task.status
-			taskService.setTaskStatus( task, AssetCommentStatus.DONE, whom )
+			taskService.setTaskStatus( task, AssetCommentStatus.COMPLETED, whom )
 			assertNotNull task.actStart
 			assertNotNull task.actFinish
 			assertNotNull task.assignedTo
 			assertNotNull task.resolvedBy
-			assertEquals AssetCommentStatus.DONE, task.status
+			assertEquals AssetCommentStatus.COMPLETED, task.status
 			assertEquals 1, task.isResolved
 		}
 
