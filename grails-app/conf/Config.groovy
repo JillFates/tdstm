@@ -265,6 +265,14 @@ tdsops.buildFile = "/build.txt"
 grails {
 	plugin {
 		springsecurity {
+			// Refer to spring security REST Plugin configuration:
+			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
+			filterChain.chainMap = [
+					'/api/projects/heartbeat':'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+					'/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter',  // Stateless chain
+					'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter' // Traditional chain
+			]
+
 			// Refer to information on these settings please refer to:
 			//    https://grails-plugins.github.io/grails-spring-security-core/v2/guide/urlProperties.html
 			adh {
@@ -320,9 +328,20 @@ grails {
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',
+				'/oauth/access_token':'permitAll'
 			]
 
 			ldap.active = false
+
+			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
+			rest {
+				token {
+					validation {
+						enableAnonymousAccess = true
+					}
+				}
+			}
+
 		}
 	}
 }
