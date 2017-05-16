@@ -7,7 +7,8 @@
   "author": "TransitionManager",
   "scripts": {
     "build-prod": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler --PROD",
-    "build-dev": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler"
+    "build-dev": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler",
+    "karma-unit-test": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build-test-report"
   },
   "dependencies": {
     "@angular/common": "~2.4.0",
