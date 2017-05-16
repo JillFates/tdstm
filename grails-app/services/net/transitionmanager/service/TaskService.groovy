@@ -83,9 +83,6 @@ class TaskService implements ServiceMethods {
 	private static final List<String> categoryList = ACC.list
 	private static final List<String> statusList = ACS.list
 
-	// The RoleTypes for Staff (populated in init())
-	private static List staffingRoles
-
 	private static final List<String> coreFilterProperties = [
 		'assetName', 'assetTag', 'assetType', 'costCenter', 'department',
 	    'description', 'environment', 'externalRefId', 'planStatus',
@@ -96,7 +93,6 @@ class TaskService implements ServiceMethods {
 
 	void init() {
 		// called in Bootstrap so GORM is available
-		staffingRoles = partyRelationshipService.getStaffingRoles()*.id.asImmutable()
 		commonFilterProperties = (coreFilterProperties +
 				(1..Project.CUSTOM_FIELD_COUNT).collect { 'custom' + it }).asImmutable()
 	}
@@ -1999,6 +1995,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					stepType = taskSpec.containsKey('type') ? taskSpec.type : 'asset'
 				}
 
+				// List of all available teams.
+				List teamCodeList = getTeamRolesForTasks()
+
 				// Collection of the task settings passed around to functions more conveniently
 				settings = [
 					type:stepType,
@@ -2009,7 +2008,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					eventTimes:eventTimes,
 					clientId:project.client.id,
 					taskBatch:taskBatch,
-					publishTasks:publishTasks
+					publishTasks:publishTasks,
+					teamCodes: teamCodeList
 				]
 				log.debug "##### settings: $settings"
 
@@ -3366,7 +3366,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// Perform the assignment logic
-		errMsg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff)
+		errMsg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff, settings)
 		if (errMsg)
 			exceptions.append("$errMsg<br>")
 
@@ -4401,7 +4401,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				task.setTmpAssociatedAssets(assocAssets)
 
 				// Perform the AssignedTo logic
-				msg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff)
+				msg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff, settings)
 				if (msg)
 					exceptions.append(msg).append('<br>')
 
@@ -4507,13 +4507,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param The recipe task specification
 	 * @param The workflow object associated with the taskSpec
 	 * @param The list of staff associated with the project
+	 * @param settings : general settings for task generation.
 	 * @return Return null if successfor or a String error message indicating the cause of the failure
 	 */
-	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff) {
+	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
 		def msg
-
-		def msg1 = assignTeam(task, taskSpec, workflow, projectStaff)
-		def msg2 = assignWhom(task, taskSpec, workflow, projectStaff)
+		def msg1 = assignTeam(task, taskSpec, workflow, projectStaff, settings)
+		def msg2 = assignWhom(task, taskSpec, workflow, projectStaff, settings)
 
 		if (msg1) {
 			if (msg2) {
@@ -4545,8 +4545,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *
 	 * @param task - the task object to perform the assignment on
 	 * @param taskSpec - the map with all of the task
+	 * @param settings - map of settings for task generation.
 	 */
-	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff) {
+	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
 		def person
 
 		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1) {
@@ -4596,7 +4597,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (whom[0] == '@') {
 					// team reference
 					def teamAssign = whom[1..-1]
-					if (staffingRoles.contains(teamAssign)) {
+					List teamCodeList = settings["teamCodes"]
+					if (teamCodeList.contains(teamAssign)) {
 						task.role = teamAssign
 					} else {
 						return "Unknown team ($taskSpec.team) indirectly referenced"
@@ -4654,7 +4656,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return null
 	}
 
-	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff) {
+	/**
+	 * Assigns a team to a task.
+	 *
+	 * @param task - current task.
+	 * @param taskSpec - a map with all the task info.
+	 * @param workflow
+	 * @param projectStaff
+	 * @param settings : map of settings for task generation.
+	 *
+	 * @return error msg, null if none.
+	 */
+	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
 		// Set the Team independently of the direct person assignment
 		if (taskSpec.containsKey('team')) {
 			def team = taskSpec.team
@@ -4688,7 +4701,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 			// Validate that the string is correct
-			if (staffingRoles.contains(team)) {
+			List teamCodeList = settings["teamCodes"]
+			if (teamCodeList.contains(team)) {
 				task.role = team
 			} else {
 				return "Invalid team specified ($taskSpec.team)"
