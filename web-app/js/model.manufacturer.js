@@ -205,11 +205,19 @@ function convertPowerType(value, whom) {
         console.log('2. powerNameplateEditId*120: '+$('#powerNameplate' + whom + 'Id').val() * 120);
 
         var powerNameplate = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() : ($('#powerNameplate' + whom + 'Id').val() * 120)
+		// If this field has a real amp conversion result, use it, this result in a exact conversion back.
+		if($('#powerNameplate' + whom + 'Id').data('ampsConverted') && $.isNumeric($('#powerNameplate' + whom + 'Id').data('ampsConverted'))){
+        	powerNameplate = $('#powerNameplate' + whom + 'Id').data('ampsConverted') * 120;
+            $('#powerNameplate' + whom + 'Id').val(powerNameplate.toFixed(0));
+		}else{
+            $('#powerNameplate' + whom + 'Id').val(powerNameplate);
+		}
         console.log('3. powerNameplate: '+powerNameplate);
         console.log('\n');
+
 		var powerDesign = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() : ($('#powerDesign' + whom + 'Id').val() * 120)
 		$('#powerUse' + whom + 'Id').val(powerUsed);
-		$('#powerNameplate' + whom + 'Id').val(powerNameplate);
+
 		$('#powerDesign' + whom + 'Id').val(powerDesign);
 	} else if (value == "Amps") {
         var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
@@ -223,11 +231,12 @@ function convertPowerType(value, whom) {
 
         console.log('3. powerNameplateA: '+powerNameplateA);
 
+        // store real conversion result so we can use it later to convert it back to Watts	 if we want.
+        $('#powerNameplate' + whom + 'Id').data('ampsConverted',powerNameplateA);
 		$('#powerNameplate' + whom + 'Id').val(powerNameplateA.toFixed(1));
 
         console.log('4. powerNameplateA.toFixed(1): '+powerNameplateA.toFixed(1));
         console.log('\n');
-
 
 		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() / 120 : ($('#powerDesign' + whom + 'Id').val() / 120);
 		$('#powerDesign' + whom + 'Id').val(powerDesignA.toFixed(1));
