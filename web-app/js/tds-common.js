@@ -52,6 +52,11 @@ var tdsCommon = {
 		return str.charAt(0).toUpperCase() + str.substring(1);
 	},
 
+	// Compare 2 strings
+	// @param string1 the string to compare
+	// @param string2 the string to compare
+	// @param ignoreCase whether to use case sensitive comparison
+	// @param useLocale whether to use host's current locale while comparing strings
   compareStrings: function(string1, string2, ignoreCase, useLocale) {
   	if (ignoreCase) {
     	if (useLocale) {
@@ -65,6 +70,9 @@ var tdsCommon = {
   	return string1 === string2;
 	},
 
+	// Compare 2 strings using case insensitive
+  // @param string1 the string to compare
+  // @param string2 the string to compare
   compareStringsIgnoreCase: function(string1, string2) {
 		return this.compareStrings(string1, string2, true, false);
 	},

@@ -146,22 +146,6 @@ class ModelController implements ControllerMethods {
 			def powerType = params.powerType
 			def endOfLifeDate = params.endOfLifeDate
 
-			// <SL> Could this be a function?
-			if (securityService.loggedIn) {
-				Person person = securityService.userLoginPerson
-				if (person) {
-					int score = person.modelScore ?: 0
-					if (params.modelStatus == "new" || params.modelStatus == "full") {
-						person.modelScore = score + 10
-					} else {
-						person.modelScore = score + 20
-					}
-					if (!person.save(flush: true)) {
-						person.errors.allErrors.each { log.error it }
-					}
-				}
-			}
-
 			if (endOfLifeDate) {
 				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
 			}
@@ -312,25 +296,9 @@ class ModelController implements ControllerMethods {
 			def modelStatus = modelInstance?.modelStatus
 			def endOfLifeDate = params.endOfLifeDate
 
-			// <SL> Could this be a function?
 			Person person = null
 			if (securityService.loggedIn) {
 				person = securityService.userLoginPerson
-				if (person) {
-					def score = person?.modelScore ?: 0
-					if (params.modelStatus == "full" && modelStatus != params.modelStatus) {
-						person.modelScore = score+20
-					}else if (params.modelStatus == "valid" && modelStatus != params.modelStatus) {
-						if (modelInstance?.validatedBy?.id == person?.id && modelInstance.updatedBy?.id != person?.id) {
-							person.modelScore = score+20
-						} else {
-							person.modelScore = score+50
-						}
-					}
-					if (!person.save(flush:true)) {
-						person.errors.allErrors.each { log.error it }
-					}
-				}
 			}
 
 			if (endOfLifeDate) {
