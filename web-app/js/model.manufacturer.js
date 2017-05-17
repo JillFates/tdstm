@@ -199,16 +199,29 @@ var akaUtil = (function ($) {
 function convertPowerType(value, whom) {
 	if (value == "Watts") {
 		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() : ($('#powerUse' + whom + 'Id').val() * 120)
+
 		var powerNameplate = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() : ($('#powerNameplate' + whom + 'Id').val() * 120)
+		// If this field has a real amp conversion result, use it, this result in a exact conversion back.
+		if($('#powerNameplate' + whom + 'Id').data('ampsConverted') && $.isNumeric($('#powerNameplate' + whom + 'Id').data('ampsConverted'))){
+        	powerNameplate = $('#powerNameplate' + whom + 'Id').data('ampsConverted') * 120;
+            $('#powerNameplate' + whom + 'Id').val(powerNameplate.toFixed(0));
+		}else{
+            $('#powerNameplate' + whom + 'Id').val(powerNameplate);
+		}
+
 		var powerDesign = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() : ($('#powerDesign' + whom + 'Id').val() * 120)
 		$('#powerUse' + whom + 'Id').val(powerUsed);
-		$('#powerNameplate' + whom + 'Id').val(powerNameplate);
+
 		$('#powerDesign' + whom + 'Id').val(powerDesign);
 	} else if (value == "Amps") {
-		var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
+        var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
 		$('#powerUse' + whom + 'Id').val(powerUseA.toFixed(1));
-		var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() / 120 : ($('#powerNameplate' + whom + 'Id').val() / 120);
+
+        var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() / 120 : ($('#powerNameplate' + whom + 'Id').val() / 120);
+        // store real conversion result so we can use it later to convert it back to Watts	 if we want.
+        $('#powerNameplate' + whom + 'Id').data('ampsConverted',powerNameplateA);
 		$('#powerNameplate' + whom + 'Id').val(powerNameplateA.toFixed(1));
+
 		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() / 120 : ($('#powerDesign' + whom + 'Id').val() / 120);
 		$('#powerDesign' + whom + 'Id').val(powerDesignA.toFixed(1));
 	}
@@ -343,6 +356,9 @@ function changePowerValue(whom) {
 		if (whom == 'Edit')
 			$("#powerUseIdH").val(parseInt(namePlatePower) * 0.33)
 	}
+
+	// reset amp stored calculation values
+    $("#powerNameplate" + whom + "Id").removeData('ampsConverted');
 }
 
 function setStanderdPower(whom) {
