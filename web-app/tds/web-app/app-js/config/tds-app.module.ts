@@ -6,7 +6,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
 import {HttpModule, Http} from '@angular/http';
 
-import {TranslateModule, TranslateLoader, TranslateStaticLoader} from 'ng2-translate';
+// import {TranslateModule, TranslateLoader, TranslateStaticLoader} from 'ng2-translate';
 
 import {TDSAppComponent} from './tds-app.component';
 // Feature modules
@@ -28,11 +28,11 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         NoticesManagerModule,
         TaskManagerModule,
         // Translator
-        TranslateModule.forRoot({
-            provide: TranslateLoader,
-            useFactory: (http: Http) => new TranslateStaticLoader(http, '../tds/web-app/i18n', '.json'),
-            deps: [Http]
-        }),
+        // TranslateModule.forRoot({
+        //     provide: TranslateLoader,
+        //     useFactory: (http: Http) => new TranslateStaticLoader(http, '../tds/web-app/i18n', '.json'),
+        //     deps: [Http]
+        // }),
         // Routing Modules using UI Router
         UIRouterModule.forRoot(<UIRouterModule>{
             states: TDSRoutingStates,
