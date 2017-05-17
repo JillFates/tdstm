@@ -19,7 +19,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.plugin.springsecurity.SpringSecurityService
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
@@ -34,7 +33,6 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
@@ -364,10 +362,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		//println "retainDays: ${retainDays}"
 
 		jdbcTemplate.update("DELETE FROM password_reset WHERE created_date < (now() - INTERVAL $retainDays DAY)")
+
 		def now = TimeUtil.nowGMT()
-
-		def expireMinutes = userLocalConfig.forgotMyPasswordResetTimeLimit
-
 		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' and expires_after < ?", now)
 
 		logger.info('Cleanup Password Reset: Finished.')
