@@ -1,47 +1,30 @@
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.ExportUtil
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.WorkbookUtil
+import com.tdssrc.grails.*
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.DataTransferBatch
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.ManufacturerSync
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
-import net.transitionmanager.domain.ModelConnector
-import net.transitionmanager.domain.ModelSync
-import net.transitionmanager.domain.ModelSyncBatch
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityAttributeLoaderService
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.ModelService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.math.NumberUtils
+import net.transitionmanager.service.*
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.MediaType
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 import java.text.DateFormat
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ModelController implements ControllerMethods {
-
 	static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
 	static defaultAction = 'list'
+	static final OK_CONTENTS = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	AssetEntityService assetEntityService
@@ -146,135 +129,84 @@ class ModelController implements ControllerMethods {
 		 modelTemplate: modelTemplate, powerType: userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)]
 	}
 
+	private boolean isValidImage(MultipartFile file) {
+		if (file && file.getContentType() != MediaType.APPLICATION_OCTET_STREAM_VALUE) {
+			return OK_CONTENTS.contains(file.getContentType())
+		}
+		return false
+	}
+
 	@HasPermission(Permission.ModelEdit)
 	def save() {
 		try {
 			def modelId = params.modelId
-			def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
-			def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
-			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
+			def powerNameplate = params.float("powerNameplate", 0f)
+			def powerDesign = params.float("powerDesign", 0f)
+			def powerUsed = params.float("powerUse", 0f)
 			def powerType = params.powerType
 			def endOfLifeDate = params.endOfLifeDate
-			if (securityService.loggedIn) {
-				Person person = securityService.userLoginPerson
-				if (person) {
-					int score = person.modelScore ?: 0
-					if (params.modelStatus == "new" || params.modelStatus == "full") {
-						person.modelScore = score + 10
-					} else {
-						person.modelScore = score + 20
-					}
-					if (!person.save(flush: true)) {
-						person.errors.allErrors.each { println it }
-					}
-				}
-			}
-			
+
 			if (endOfLifeDate) {
 				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
 			}
-			
+
 			if (powerType == "Amps") {
 				powerNameplate *= 120
 				powerDesign *= 120
 				powerUsed *= 120
 			}
-			
+
 			Model modelTemplate = modelId ? Model.get(modelId) : null
-			params.useImage = params.useImage == 'on' ? 1 : 0
-			params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
-			params.roomObject = params.roomObject == 'on'
+			params.useImage = params.boolean("useImage", false) ? 1 : 0
+			params.sourceTDS = params.boolean("sourceTDS", false) ? 1 : 0
+			params.roomObject = params.boolean("roomObject", false)
 			params.powerUse = powerUsed
-			
+
 			def modelInstance = new Model(params)
 			modelInstance.powerUse = powerUsed
 			modelInstance.powerDesign = powerDesign
 			modelInstance.powerNameplate = powerNameplate
+
 			if (params.modelStatus == 'valid') {
 				modelInstance.validatedBy = securityService.loadCurrentPerson()
 			}
-			def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+
 			def frontImage = request.getFile('frontImage')
-			if (frontImage?.bytes?.size() > 0) {
-				if (frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream") {
-					if (! okcontents.contains(frontImage.getContentType())) {
-						flash.message = "Front Image must be one of: $okcontents"
-						render(view: "create", model: [modelInstance: modelInstance])
-						return
-					}
+			if (frontImage && frontImage?.bytes?.size() > 0) {
+				if (!isValidImage(frontImage)) {
+					flash.message = "Front Image must be one of: ${OK_CONTENTS}"
+					render(view: "create", model: [modelInstance: modelInstance])
+					return
 				}
 			} else if (modelTemplate) {
 				modelInstance.frontImage = modelTemplate.frontImage
 			} else {
 				modelInstance.frontImage = null
 			}
+
 			def rearImage = request.getFile('rearImage')
-			if (rearImage?.bytes?.size() > 0) {
-				if (rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream") {
-					if (! okcontents.contains(rearImage.getContentType())) {
-						flash.message = "Rear Image must be one of: $okcontents"
-						render(view: "create", model: [modelInstance: modelInstance])
-						return
-					}
+			if (rearImage && rearImage?.bytes?.size() > 0) {
+				if (!isValidImage(rearImage)) {
+					flash.message = "Rear Image must be one of: ${OK_CONTENTS}"
+					render(view: "create", model: [modelInstance: modelInstance])
+					return
 				}
 			} else if (modelTemplate) {
 				modelInstance.rearImage = modelTemplate.rearImage
 			} else {
 				modelInstance.rearImage = null
 			}
-			if (modelInstance.save(flush: true)) {
-				def connectorCount = Integer.parseInt(params.connectorCount)
-				if (connectorCount > 0) {
-					for(int i=1; i<=connectorCount; i++) {
-						def modelConnector = new ModelConnector(model : modelInstance,
-							connector : params['connector' + i],
-							label : params['label' + i],
-							type :params['type' + i],
-							labelPosition : params['labelPosition' + i],
-							connectorPosX : Integer.parseInt(params['connectorPosX' + i]),
-							connectorPosY : Integer.parseInt(params['connectorPosY' + i]),
-							status:params['status' + i])
-						
-						if (!modelConnector.hasErrors())
-							modelConnector.save(flush: true)
-					}
-				} else {
-					def powerConnector = new ModelConnector(model : modelInstance,
-						connector : 1,
-						label : "Pwr1",
-						type : "Power",
-						labelPosition : "Right",
-						connectorPosX : 0,
-						connectorPosY : 0,
-						status: "missing"
-						)
-					
-					if (!powerConnector.save(flush: true)) {
-						def etext = "Unable to create Power Connectors for $modelInstance" +
-						GormUtil.allErrorsString(powerConnector)
-						println etext
-					}
-				}
-				
-				modelInstance.sourceTDSVersion = 1
-				modelInstance.save(flush: true)
-				def akaNames = params.list('aka')
-				akaNames.each { aka ->
-					aka = aka.trim()
-					if (aka) {
-						def isValid = modelService.isValidAlias(aka, modelInstance, false)
-						modelInstance.findOrCreateAliasByName(aka, true)
-					}
-				}
-				flash.message = "$modelInstance.modelName created"
-				redirect(action:"list" , id: modelInstance.id)
+
+			if (modelService.save(modelInstance, params)) {
+				flash.message = "${modelInstance.modelName} created"
+				redirect(action: "list", id: modelInstance.id)
 			} else {
 				modelInstance.errors.allErrors.each {  log.error it }
 
 				def modelConnectors = modelTemplate ? ModelConnector.findAllByModel(modelTemplate) : null
 				def otherConnectors = []
 				def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
-				for(int i = existingConnectors ; i<51; i++) {
+				for (int i = existingConnectors ; i<51; i++) { // <SL> magic number 51?
 					otherConnectors << i
 				}
 
@@ -283,21 +215,18 @@ class ModelController implements ControllerMethods {
 				Map columnLabelpref = [:]
 				modelPref.each { key, value -> columnLabelpref[key] = attributes[value] }
 				render(view: "list", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
-											   otherConnectors:otherConnectors, modelTemplate:modelTemplate,
+											 otherConnectors:otherConnectors, modelTemplate:modelTemplate,
 											 modelPref: modelPref,
 											 attributesList: attributes.keySet().sort(),
 											 columnLabelpref: columnLabelpref ] )
 			}
-		}catch(RuntimeException rte) {
-			flash.message = rte.getMessage()
-			redirect(controller:'model', action: 'list')
-		}
-		catch (RuntimeException rte) {
-			flash.message = rte.message
-			redirect(controller: 'project', action: 'list')
+		} catch (ServiceException e) {
+			log.error(e.message, e)
+			flash.message = e.message
+			redirect(action: 'list')
 		}
 	}
-	
+
 	@HasPermission(Permission.ModelView)
 	def show() {
 		def modelId = params.id
@@ -366,250 +295,105 @@ class ModelController implements ControllerMethods {
 			def modelInstance = Model.get(params.id)
 			def modelStatus = modelInstance?.modelStatus
 			def endOfLifeDate = params.endOfLifeDate
-			Person person
+
+			Person person = null
 			if (securityService.loggedIn) {
-			person = securityService.userLoginPerson
-				if (person) {
-					def score = person?.modelScore ?: 0
-					if (params.modelStatus == "full" && modelStatus != params.modelStatus) {
-						person.modelScore = score+20
-					}else if (params.modelStatus == "valid" && modelStatus != params.modelStatus) {
-						if (modelInstance?.validatedBy?.id == person?.id && modelInstance.updatedBy?.id != person?.id) {
-							person.modelScore = score+20
-						} else {
-							person.modelScore = score+50
-						}
-					}
-					if (!person.save(flush:true)) {
-						person.errors.allErrors.each {println it }
-					}
-				}
+				person = securityService.userLoginPerson
 			}
+
 			if (endOfLifeDate) {
 				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
 			}
 
 			if (modelInstance) {
-				def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
-				def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
-				def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
+				def powerNameplate = params.float("powerNameplate", 0f)
+				def powerDesign = params.float("powerDesign", 0f)
+				def powerUsed = params.float("powerUse", 0f)
 				def powerType = params.powerType
+
 				if (powerType == "Amps") {
 					powerNameplate = powerNameplate * 120
 					powerDesign = powerDesign * 120
 					powerUsed = powerUsed * 120
 				}
-				params.useImage = params.useImage == 'on' ? 1 : 0
-				params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
+
+				params.useImage = params.boolean("useImage", false) ? 1 : 0
+				params.sourceTDS = params.boolean("sourceTDS", false) ? 1 : 0
 				params.powerNameplate = powerNameplate
 				params.powerDesign = powerDesign
 				params.powerUse = powerUsed
-				def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-				def frontImage
-				if (request?.getFile('frontImage')) {
-					frontImage = request?.getFile('frontImage')
-					if (frontImage?.getContentType() && frontImage?.getContentType() != "application/octet-stream") {
-						if (! okcontents.contains(frontImage.getContentType())) {
-							flash.message = "Front Image must be one of: $okcontents"
-							render(view: "create", model: [modelInstance: modelInstance])
-							return
-						}
-						frontImage = frontImage.bytes
+
+				def frontImage = request.getFile("frontImage")
+				if (frontImage && frontImage?.getBytes()?.getSize() > 0) {
+					if (!isValidImage(frontImage)) {
+						flash.message = "Front Image must be one of: ${OK_CONTENTS}"
+						render(view: "create", model: [modelInstance: modelInstance])
+						return
 					}
-					else {
-						frontImage = modelInstance.frontImage
-					}
-				}
-				else {
+					frontImage = frontImage.bytes
+				} else {
 					frontImage = modelInstance.frontImage
 				}
-				def rearImage
-				if (request?.getFile('rearImage')) {
-					rearImage = request?.getFile('rearImage')
-					if (rearImage?.getContentType() && rearImage?.getContentType() != "application/octet-stream") {
-						if (! okcontents.contains(rearImage.getContentType())) {
-							flash.message = "Rear Image must be one of: $okcontents"
+
+				def rearImage = request?.getFile('rearImage')
+				if (request && rearImage?.getBytes()?.getSize() > 0) {
+						if (!isValidImage(rearImage)) {
+							flash.message = "Rear Image must be one of: ${OK_CONTENTS}"
 							render(view: "create", model: [modelInstance: modelInstance])
 							return
 						}
 						rearImage = rearImage.bytes
-					}
-					else {
-						rearImage = modelInstance.rearImage
-					}
-				}
-				else {
+				} else {
 					rearImage = modelInstance.rearImage
 				}
-				modelInstance.height = params.modelHeight != "" ? NumberUtils.toDouble(params.modelHeight,0).round():0
-				modelInstance.weight = params.modelWeight != "" ? NumberUtils.toDouble(params.modelWeight,0).round():0
-				modelInstance.depth = params.modelDepth != "" ? NumberUtils.toDouble(params.modelDepth,0).round():0
-				modelInstance.width = params.modelWidth != "" ? NumberUtils.toDouble(params.modelWidth,0).round():0
+
+				modelInstance.height = params.double("modelHeight", 0).round()
+				modelInstance.weight = params.double("modelWeight", 0).round()
+				modelInstance.depth = params.double("modelDepth", 0).round()
+				modelInstance.width = params.double("modelWidth", 0).round()
+
 				if (params.modelStatus == 'valid' && modelStatus == 'full') {
 					modelInstance.validatedBy = person
 					modelInstance.updatedBy = modelInstance.updatedBy
-				}else{
+				} else {
 					modelInstance.updatedBy = person
 				}
-				
-				def manufacturer = params.manufacturer ?: modelInstance.manufacturer
-				def nameChanged = (params.modelName) && (params.modelName != modelInstance.modelName)
-				def oldName = modelInstance.modelName
-				def hasNameError = nameChanged && ! modelService.isValidAlias(params.modelName, modelInstance)
+
 				modelInstance.properties = params
 				modelInstance.rearImage = rearImage
 				modelInstance.frontImage = frontImage
-				// validate that the model name is unique
-				if (hasNameError) {
-					flash.message = "New model name '${params.modelName}' is not unqiue and was therefore ignored"
-					modelInstance.modelName = oldName
-				}
-				
-				if (!modelInstance.hasErrors() && modelInstance.save(flush:true)) {
-					
-					def deletedAka = params.deletedAka
-					def akaToSave = params.list('aka')
-					if (deletedAka) {
-						ModelAlias.executeUpdate("delete ModelAlias where id in (:ids)", [ids:deletedAka.split(",").collect{NumberUtils.toDouble(it,0).round()}])
-					}
-					def modelAliasList = ModelAlias.findAllByModel(modelInstance)
-					modelAliasList.each { modelAlias ->
-						modelAlias.name = params["aka_"+modelAlias.id]
-						if (!modelAlias.save()) {
-							modelAlias.errors.allErrors.each {println it}
-						}
-					}
-					akaToSave.each { aka ->
-						modelInstance.findOrCreateAliasByName(aka, true)
-					}
 
-					def connectorCount = 0
-					if (params.connectorCount) {
-						connectorCount = NumberUtils.toDouble(params.connectorCount,0).round()
-					}
-					if (connectorCount > 0) {
-						for(int i=1; i<=connectorCount; i++) {
-							def connector = params['connector' + i]
-							ModelConnector modelConnector = ModelConnector.findByModelAndConnector(modelInstance, connector ?: i)
-							if (!connector && modelConnector) {
-								modelConnector.delete(flush:true)
-							}
-							else {
-								if (modelConnector) {
-									modelConnector.connector = params['connector' + i]
-									modelConnector.label = params['label' + i]
-									modelConnector.type = params['type' + i]
-									modelConnector.labelPosition = params['labelPosition' + i]
-									modelConnector.connectorPosX = NumberUtils.toDouble(params['connectorPosX' + i],0).round()
-									modelConnector.connectorPosY = NumberUtils.toDouble(params['connectorPosY' + i],0).round()
-									modelConnector.status = params['status' + i]
-								} else if (connector) {
-									modelConnector = new ModelConnector(
-										model: modelInstance,
-										connector: params['connector' + i],
-										label: params['label' + i],
-										type: params['type' + i],
-										labelPosition: params['labelPosition' + i],
-										connectorPosX: NumberUtils.toDouble(params['connectorPosX' + i],0).round(),
-										connectorPosY: NumberUtils.toDouble(params['connectorPosY' + i],0).round(),
-										status: params['status' + i])
-								}
-								if (modelConnector && !modelConnector.hasErrors()) {
-									modelConnector.save(flush: true)
-								}
-							}
-						}
-					}
-					else {
-						if (!powerConnector.save(flush: true)) {
-							def etext = "Unable to create Power Connectors for $modelInstance: ${GormUtil.allErrorsString(powerConnector)}"
-							println etext
-						}
-					}
-
-					def assetEntitysByModel = AssetEntity.findAllByModel(modelInstance)
-					def assetConnectors = ModelConnector.findAllByModel(modelInstance)
-					assetEntitysByModel.each { assetEntity ->
-						assetConnectors.each {connector ->
-
-							def assetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort(assetEntity, connector)
-							if (!assetCableMap) {
-								assetCableMap = new AssetCableMap(
-									cable : "Cable"+connector.connector,
-									assetFrom: assetEntity,
-									assetFromPort : connector,
-									cableStatus : connector.status,
-									cableComment : "Cable"+connector.connector)
-							}
-							if (assetEntity?.rackTarget && connector.type == "Power" &&
-								connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower) {
-								assetCableMap.assetToPort = null
-								assetCableMap.toPower = "A"
-								assetCableMap.cableStatus= connector.status
-								assetCableMap.cableComment= "Cable"
-							}
-							if (!assetCableMap.validate() || !assetCableMap.save()) {
-								def etext = "Unable to create assetCableMap for assetEntity $assetEntity" +
-								GormUtil.allErrorsString(assetCableMap)
-								println etext
-								log.error(etext)
-							}
-						}
-						def assetCableMaps = AssetCableMap.findAllByAssetFrom(assetEntity)
-						assetCableMaps.each {assetCableMap ->
-							if (!assetConnectors.id?.contains(assetCableMap.assetFromPort?.id)) {
-								AssetCableMap.executeUpdate('''
-									update AssetCableMap
-									set cableStatus=?, assetTo=null, assetToPort=null
-									where assetToPort=?
-								''', [AssetCableStatus.UNKNOWN, assetCableMap.assetFromPort])
-								AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = ${assetCableMap.assetFromPort?.id}")
-							}
-						}
-					}
-
-					// TODO : JPM 9/2014 : assetType Legacy code that shoule be removed at some point when we normalize out the assetType from AssetEntity
-					def updateAssetsQuery = "update asset_entity set asset_type = '$modelInstance.assetType' where model_id='$modelInstance.id'"
-					jdbcTemplate.update(updateAssetsQuery)
-
-					if (modelInstance.sourceTDSVersion) {
-						modelInstance.sourceTDSVersion ++
-					} else {
-						modelInstance.sourceTDSVersion = 1
-					}
-					modelInstance.save(flush: true)
-
-					if (hasNameError) {
-						forward(action: "edit", params:[id: modelInstance.id, redirectTo:params.redirectTo])
-					} else {
+				try {
+					if (modelService.update(modelInstance, params)) {
 						flash.message = "$modelInstance.modelName Updated"
 						if (params.redirectTo == "assetAudit") {
-							render(template: "modelAuditView", model: [modelInstance:modelInstance])
+							render(template: "modelAuditView", model: [modelInstance: modelInstance])
+						} else {
+							forward(action: "show", params: [id: modelInstance.id, redirectTo: params.redirectTo])
 						}
-						forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
+					} else {
+						modelInstance.errors.allErrors.each { log.error it }
+						flash.message = "Unable to update model."
+						forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
 					}
-
-				} else {
-					modelInstance.errors.allErrors.each {log.error it}
-					def modelConnectors = ModelConnector.findAllByModel(modelInstance)
-					def otherConnectors = []
-					for(int i = modelConnectors.size()+1 ; i<51; i++) {
-						otherConnectors << i
-					}
-					render(view: "edit", model: [modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors])
+				} catch (ServiceException e) {
+					log.error(e.message, e)
+					flash.message = e.message
+					forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
 				}
 			} else {
-				flash.message = "Model not found with Id $params.id"
+				flash.message = "Model not found with Id ${params.id}"
 				redirect(action: "list")
 			}
 		} catch(RuntimeException rte) {
+			log.error(rte.message, rte)
 			flash.message = rte.message
 			redirect(controller:'model', action: 'list')
 		}
 	}
 
 	@HasPermission(Permission.ModelDelete)
-	def delete() {
+	def delete_old() {
 		def model = Model.get(params.id)
 		def modelRef = AssetEntity.findByModel(model)
 		if (!modelRef) {
@@ -643,6 +427,23 @@ class ModelController implements ControllerMethods {
 			}
 		} else{
 			flash.message = "Model $model.modelName can not be deleted, it is referenced ."
+			redirect(action: "list")
+		}
+	}
+
+	@HasPermission(Permission.ModelDelete)
+	def delete() {
+		Model model = Model.get(params.id)
+		try {
+			modelService.delete(model)
+			flash.message = "${model} deleted"
+			redirect(action: "list")
+		} catch (DataIntegrityViolationException e) {
+			log.error(e.message, e)
+			flash.message = "${model} not deleted"
+			redirect(action: "show", id: params.id)
+		} catch (ServiceException e) {
+			log.error(e.message, e)
 			redirect(action: "list")
 		}
 	}
@@ -1439,11 +1240,12 @@ class ModelController implements ControllerMethods {
 		def deletedModels = []
 		def skippedModels = []
 		def modelList = params.list("modelLists[]")
-		try{
+		try {
 			Model.getAll(modelList*.toLong()).findAll().each { model ->
 				if (!AssetEntity.countByModel(model)) {
 					deletedModels << model
-					model.delete()
+					//model.delete()
+					modelService.delete(model)
 				}else {
 					skippedModels << model
 				}
@@ -1452,9 +1254,8 @@ class ModelController implements ControllerMethods {
 			def skipModelNames = WebUtil.listAsMultiValueString(skippedModels)
 			resp = (delModelNames ? "Models $delModelNames are deleted.</br> " : "No Models Deleted </br>") +
 					(skipModelNames ? " Models $skipModelNames skipped due to Asset Reference" : "")
-		}
-		catch (e) {
-			e.printStackTrace()
+		} catch (e) {
+			log.error(e.message, e)
 			resp = "Error while deleting Models"
 		}
 		render resp

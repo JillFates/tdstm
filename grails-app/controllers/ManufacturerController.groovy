@@ -1,19 +1,19 @@
 import com.tds.asset.AssetEntity
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.ManufacturerService
+import net.transitionmanager.service.SecurityService
 import org.hibernate.criterion.Order
 import org.springframework.jdbc.core.JdbcTemplate
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ManufacturerController implements ControllerMethods {
 
@@ -87,14 +87,11 @@ class ManufacturerController implements ControllerMethods {
 	def delete() {
 		def manufacturer = Manufacturer.get(params.id)
 		if (manufacturer) {
-			def manuAlias = ManufacturerAlias.findAllByManufacturer(manufacturer)
-			manuAlias*.delete()
-			ModelAlias.executeUpdate("delete from ModelAlias ma where ma.manufacturer.id = $manufacturer.id")
-			manufacturer.delete(flush:true)
+			manufacturerService.delete(manufacturer)
 			flash.message = "Manufacturer ${manufacturer.name} deleted"
 			redirect(action: 'list')
 		} else {
-			flash.message = "Manufacturer not found with id $params.id"
+			flash.message = "Manufacturer not found with id ${params.id}"
 			redirect(action: 'list')
 		}
 	}
@@ -114,33 +111,32 @@ class ManufacturerController implements ControllerMethods {
 
 	@HasPermission(Permission.ManufacturerEdit)
 	def update() {
-
 		def manufacturer = Manufacturer.get(params.id)
 		if (manufacturer) {
-			manufacturer.properties = params
-			def deletedAka = params.deletedAka
-			def akaToSave = params.list('aka')
-			if (deletedAka) {
-				ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.id in ($deletedAka)")
-			}
-			def manufacturerAliasList = ManufacturerAlias.findAllByManufacturer(manufacturer)
-			manufacturerAliasList.each { manufacturerAlias ->
-				manufacturerAlias.name = params["aka_"+manufacturerAlias.id]
-				manufacturerAlias.save(flush:true)
-			}
-			akaToSave.each { aka ->
-				manufacturer.findOrCreateAliasByName(aka, true)
-			}
-
-			if (!manufacturer.hasErrors() && manufacturer.save()) {
-				flash.message = "Manufacturer $params.id updated"
-				redirect(action: "show", id: manufacturer.id)
-			} else {
-				render(view: 'edit', model: [manufacturerInstance: manufacturer])
+			try {
+				manufacturer.properties = params
+				String deletedAka = params.deletedAka
+				List<String> akaToSave = params.list('aka')
+				Map<String, String> akaToUpdate = params.subMap(params.findAll { it.key =~ /^aka_\d+$/ }.collect {
+					it.key
+				})
+				if (manufacturerService.update(manufacturer, deletedAka, akaToSave, akaToUpdate)) {
+					flash.message = "Manufacturer ${params.id} updated"
+					redirect(action: "show", id: manufacturer.id)
+				} else {
+					def manuAlias = ManufacturerAlias.findAllByManufacturer(manufacturer)
+					render(view: 'edit', model: [manufacturerInstance: manufacturer, manuAlias: manuAlias])
+				}
+			} catch (ServiceException e) {
+				log.error(e.message, e)
+				flash.message = e.message
+				manufacturer.clearErrors()
+				def manuAlias = ManufacturerAlias.findAllByManufacturer(manufacturer)
+				render(view: 'edit', model: [manufacturerInstance: manufacturer, manuAlias: manuAlias])
 			}
 		} else {
 			flash.message = "Manufacturer not found with id $params.id"
-			redirect(action:"edit",id:params.id)
+			redirect(action:"edit", id:params.id)
 		}
 	}
 
@@ -152,17 +148,15 @@ class ManufacturerController implements ControllerMethods {
 	@HasPermission(Permission.ManufacturerCreate)
 	def save() {
 		def manufacturer = new Manufacturer(params)
-		if (!manufacturer.hasErrors() && manufacturer.save()) {
-			def akaNames = params.list('aka')
-			if ((akaNames.size() > 0) && ! (akaNames.size() == 1 && akaNames[0].equals(''))) {
-				akaNames.each { aka ->
-					manufacturer.findOrCreateAliasByName(aka, true)
-				}
+		try {
+			if (manufacturerService.save(manufacturer, params.list('aka'))) {
+				render(text: "Manufacturer ${manufacturer.name} created")
+			} else {
+				render(view: 'create', model: [manufacturerInstance: manufacturer])
 			}
-
-			 render "Manufacturer $manufacturer.name created"
-		} else {
-			render(view:'create',model:[manufacturerInstance:manufacturer])
+		} catch (ServiceException e) {
+			log.error(e.message, e)
+			render(text: e.message)
 		}
 	}
 

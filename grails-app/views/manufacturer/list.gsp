@@ -16,6 +16,7 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
+		<g:javascript src="tds-common.js" />
 		<g:javascript src="model.manufacturer.js" />
 		<script type="text/javascript">
 		$(document).ready(function() {

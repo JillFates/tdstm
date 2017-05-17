@@ -25,7 +25,7 @@
 									<label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:manufacturerInstance,field:'name','errors')}">
-									<input type="text" id="name" name="name" value="${fieldValue(bean:manufacturerInstance,field:'name')}"/>
+									<input type="text" id="name" name="name" onchange="akaUtil.handleAkaChange(this, 'manufacturer', '')" value="${fieldValue(bean:manufacturerInstance,field:'name')}"/>
 								</td>
 							</tr>
 							
