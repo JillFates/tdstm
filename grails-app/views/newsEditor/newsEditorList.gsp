@@ -465,7 +465,8 @@ $('#reportsMenu').hide();
 								mode: "row"
 							},
 							pageable: {
-								pageSize: 20
+								pageSize: 25,
+								pageSizes: [25, 100, 500, 1000]
 							}
 						});
 					}
