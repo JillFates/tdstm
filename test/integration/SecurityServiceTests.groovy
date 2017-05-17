@@ -1,4 +1,4 @@
-import com.tdsops.tm.enums.domain.EmailDispatchOrigin
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdssrc.grails.TimeUtil
 import groovy.time.TimeCategory
@@ -7,10 +7,10 @@ import net.transitionmanager.PasswordReset
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.EmailDispatchService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
+import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Stepwise
 import spock.util.mop.ConfineMetaClassChanges
@@ -20,7 +20,6 @@ class SecurityServiceTests extends Specification {
 
 	// IOC
 	SecurityService securityService
-	EmailDispatchService emailDispatchService
 
 	private static final List<String> privRoles = ['ADMIN', 'EDITOR', 'USER']
 
@@ -356,30 +355,97 @@ class SecurityServiceTests extends Specification {
 			thrown RuntimeException
 	}
 
-	/**
-	 * TM-6346 activation expiress in less than 24 HRS
-	 */
+	@See("https://support.transitionmanager.com/browse/TM-6346")
 	def '12. Test Password Reset expiration date'() {
 		setup: 'a valid username and Reset Data'
 			createPrivAccount()
 			String token = "SomeToken"
 			String ipAddress = "127.0.0.1"
-			EmailDispatchOrigin dispatchOrigin = EmailDispatchOrigin.ACTIVATION
-			String bodyTemplate = "accountActivation"
-			String personFromEmail = "develop@tmsi.com"
-			String subject = "Welcome to TransitionManager"
-
-			EmailDispatch ed = emailDispatchService.basicEmailDispatchEntity(dispatchOrigin, subject, bodyTemplate, [:], personFromEmail, privPerson.email, privPerson, privPerson)
+			EmailDispatch ed = null //Not really needed
 			PasswordResetType resetType = PasswordResetType.WELCOME
-			long tokenTTL = securityService.accountAcctivationTimeLimitMillis
-			long _5sec = 5*1000
+			long tokenTTL = securityService.accountActivationTTL
+			long FIVE_SECONDS = 5*1000
 
 		when: "a Pasword reset is created"
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
+
 			Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
 
 		then: "the PaswordReset whould expire between 5 seconds of the manually calculated expiration Time"
-			((expTime.time - _5sec) <= pr.expiresAfter.time) && (pr.expiresAfter.time <= (expTime.time + _5sec) )
+			((expTime.time - FIVE_SECONDS) <= pr.expiresAfter.time) && (pr.expiresAfter.time <= (expTime.time + FIVE_SECONDS) )
 	}
 
+	def '13. Test Password Reset valid and expired after a TTL'() {
+		setup: 'a valid username and Reset Data'
+			long THREE_SECONDS = 3000
+
+			createPrivAccount()
+			//init values for user configuration
+			privUser.expiryDate = new Date(new Date().time + 24 * 60 * 60 * 1000) //24Hrs
+			privUser.active = 'Y'
+			privPerson.active = 'Y'
+
+			securityService.setAccountActivationTTL(THREE_SECONDS)
+			String token = "SomeToken"
+			String ipAddress = "127.0.0.1"
+			EmailDispatch ed = null //Not really needed
+			PasswordResetType resetType = PasswordResetType.WELCOME
+			long tokenTTL = securityService.accountActivationTTL
+
+		when: "a Pasword reset is created"
+			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
+
+			Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
+
+		then: "the PaswordReset should be valid just after being created"
+			PasswordReset pr2 = securityService.validateToken(token)
+			pr2 != null
+
+		when: "Wait for expiration"
+			sleep(THREE_SECONDS)
+			String message = ""
+			try{
+				PasswordReset pr3 = securityService.validateToken(token)
+			}catch(ServiceException se) {
+				message = se.message
+			}
+
+		then: "The Password reset should have expired, exception message is expected"
+			message.startsWith("The password reset token has expired")
+	}
+
+	def '14. Test Password Reset expiration Cron cleanup'() {
+		setup: 'a valid username and Reset Data'
+			long THREE_SECONDS = 3000
+			createPrivAccount()
+			//init values for user configuration
+			privUser.expiryDate = new Date(new Date().time + 24 * 60 * 60 * 1000) //24Hrs
+			privUser.active = 'Y'
+			privPerson.active = 'Y'
+
+			securityService.setAccountActivationTTL(THREE_SECONDS)
+			String token = "SomeToken"
+			String ipAddress = "127.0.0.1"
+			EmailDispatch ed = null //Not really needed
+			PasswordResetType resetType = PasswordResetType.WELCOME
+
+		when: "a Pasword reset is created and we check how many Passwords are in the DB"
+			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
+
+			//int counter = PasswordReset.countByStatus("PENDING")
+			List<PasswordReset> lista = PasswordReset.findAllByStatus("PENDING") ?: []
+			int counter = lista.size()
+
+		then: "We have Pending for approval"
+			counter > 0
+
+		when: "Wait for expiration, cleanup and check again"
+			sleep(THREE_SECONDS)
+			securityService.cleanupPasswordReset()
+			List<PasswordReset> list = PasswordReset.findAllByStatus("PENDING") ?: []
+			int afterCounter = list.size()
+
+		then: "All pending request are removed"
+			afterCounter == 0
+	}
 }

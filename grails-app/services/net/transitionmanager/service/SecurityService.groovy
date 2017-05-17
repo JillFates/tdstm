@@ -19,7 +19,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.plugin.springsecurity.SpringSecurityService
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
@@ -34,7 +33,6 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
@@ -48,11 +46,6 @@ import org.springframework.web.context.request.RequestContextHolder
 
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.USER
-
-// import javax.servlet.http.HttpSession
-// import org.apache.shiro.SecurityUtils
-// import org.springframework.web.context.request.RequestContextHolder
-// import groovy.time.TimeCategory
 
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
@@ -80,6 +73,12 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	private Map ldapConfigMap
 	private Map loginConfigMap
 	private Map userLocalConfigMap
+
+	/*
+	 * Time to live data catched for testing status
+	 */
+	private long forgotMyPasswordResetTTL = 0
+	private long accountActivationTTL = 0
 
 	void afterPropertiesSet() {
 
@@ -360,12 +359,12 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		logger.info('Cleanup Password Reset: Started.')
 
 		def retainDays = userLocalConfig.forgotMyPasswordRetainHistoryDays
+		//println "retainDays: ${retainDays}"
 
-		jdbcTemplate.update("DELETE FROM password_reset WHERE created_date < (now() - INTERVAL $retainDays DAY) AND password_reset_id > 0 ")
+		jdbcTemplate.update("DELETE FROM password_reset WHERE created_date < (now() - INTERVAL $retainDays DAY)")
 
-		def expireMinutes = userLocalConfig.forgotMyPasswordResetTimeLimit
-
-		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE created_date < (now() - INTERVAL $expireMinutes MINUTE) AND password_reset_id > 0 ")
+		def now = TimeUtil.nowGMT()
+		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' and expires_after < ?", now)
 
 		logger.info('Cleanup Password Reset: Finished.')
 	}
@@ -583,10 +582,10 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		switch (resetType) {
 			case PasswordResetType.ADMIN_RESET:
 			case PasswordResetType.FORGOT_MY_PASSWORD:
-				tokenTTL = forgotMyPasswordResetTimeLimitMillis
+				tokenTTL = getForgotMyPasswordResetTTL()
 				break
 			case PasswordResetType.WELCOME:
-				tokenTTL = accountAcctivationTimeLimitMillis
+				tokenTTL = getAccountActivationTTL()
 				break
 			default:
 				logger.error 'createPasswordReset() has unhandled switch for option {}', resetType
@@ -614,16 +613,30 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * Returns the configuration Account Acctivation Time frame in Milliseconds
 	 * @return
 	 */
-	long getForgotMyPasswordResetTimeLimitMillis(){
-		return userLocalConfig.forgotMyPasswordResetTimeLimit * 60 * 1000
+	long getForgotMyPasswordResetTTL(){
+		if(!forgotMyPasswordResetTTL){
+			forgotMyPasswordResetTTL = userLocalConfig.forgotMyPasswordResetTimeLimit * 60 * 1000
+		}
+		return forgotMyPasswordResetTTL
+	}
+
+	void setForgotMyPasswordResetTTL(long ttlMillis){
+		forgotMyPasswordResetTTL = ttlMillis
 	}
 
 	/**
 	 * Returns the configuration Account Acctivation Time frame in Milliseconds
 	 * @return
 	 */
-	long getAccountAcctivationTimeLimitMillis(){
-		return userLocalConfig.accountActivationTimeLimit * 60 * 1000
+	long getAccountActivationTTL(){
+		if(!accountActivationTTL){
+			accountActivationTTL = userLocalConfig.accountActivationTimeLimit * 60 * 1000
+		}
+		return accountActivationTTL
+	}
+
+	void setAccountActivationTTL(long ttlMillis){
+		accountActivationTTL = ttlMillis
 	}
 
 	/**
