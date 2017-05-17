@@ -1,8 +1,8 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
-
-import org.apache.commons.lang.StringUtils
+import groovy.json.StringEscapeUtils
+import org.apache.commons.lang3.StringUtils
 
 /**
  * String manipulation methods.
@@ -50,7 +50,7 @@ class StringUtil {
 	 * @return true if blank
 	 */
 	static boolean isBlank(String subject) {
-		!subject?.trim()
+		return StringUtils.isBlank(subject)
 	}
 
 	/**
