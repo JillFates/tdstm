@@ -2577,39 +2577,39 @@ class AssetEntityController implements ControllerMethods {
 			}
 
 
+		// TM-6318 : Highlight Estimated Start and Estimated Finish columns for tardy and late tasks
+			Integer durationInMinutes = it.durationInMinutes()
+			Integer nowGMTInMinutes = nowGMT.getTime() / 1000 / 60
+			Integer estimatedStartInMinutes = (it.estStart != null) ? it.estStart.getTime() / 1000 / 60 : null
+			Integer estimatedFinishInMinutes = (it.estFinish != null) ? it.estFinish.getTime() / 1000 / 60 : null
+			Integer actualStartInMinutes = (it.actStart != null) ? it.actStart.getTime() / 1000 / 60 : null
 
+			Integer tardyFactor = computeTardyFactor(durationInMinutes)
 
-			// TM-6318 : Highlight Estimated Start and Estimated Finish columns for tardy and late tasks
-			def tardyFactor = computeTardyFactor(it.durationInMinutes())
-
+			estFinishClass = ''
  			estStartClass = ''
 			if (it.estStart && it.isActionable() && it.status != AssetCommentStatus.STARTED) {
 
 				if (it.estStart < nowGMT) {
 					estStartClass = 'task_late'
+					estFinishClass = 'task_late'
 				} else {
-					if (subtractMinutes(it.estStart, tardyFactor) <= nowGMT) {
+					if (estimatedStartInMinutes - tardyFactor <= nowGMTInMinutes) {
 						estStartClass = 'task_tardy'
+						estFinishClass = 'task_tardy'
 					}
 				}
 			}
 
-			estFinishClass = ''
 			if (it.estFinish && it.isActionable()) {
 				if (it.status == AssetCommentStatus.STARTED) {
-					if (addMinutes(it.actStart, it.durationInMinutes()) < nowGMT) {
+					if (actualStartInMinutes + durationInMinutes > estimatedFinishInMinutes) {
+						estStartClass = 'task_late'
 						estFinishClass = 'task_late'
-					} else {
-						if (addMinutes(it.actStart, it.durationInMinutes() - tardyFactor) <= nowGMT)
-							estFinishClass = 'task_tardy'
+					} else if (actualStartInMinutes + durationInMinutes + tardyFactor >= estimatedFinishInMinutes) {
+						estStartClass = 'task_tardy'
+						estFinishClass = 'task_tardy'
 					}
-				} else { // status == not started
-						if (subtractMinutes(it.estFinish, it.durationInMinutes()) < nowGMT) {
-							estFinishClass = 'task_late'
-						} else {
-							if (subtractMinutes(it.estFinish, it.durationInMinutes() - tardyFactor) <= nowGMT)
-								estStartClass = 'task_tardy'
-						}
 				}
 			}
 
@@ -4728,29 +4728,4 @@ class AssetEntityController implements ControllerMethods {
 		return Math.min(30, Math.max(5, (Integer)(durationInMinutes * 0.1)))
 	}
 
-	/**
-	 * Adds minutes to a given Date.
-	 * @param date : The original date where the minutes will be added.
-	 * @param minutes : The minutes to be added to the date.
-	 * @return : the date with the added minutes.
-	 */
-	private Date addMinutes(Date date, Integer minutes) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date)
-		cal.add(Calendar.MINUTE, minutes)
-		return cal.getTime()
-	}
-
-	/**
-	 * Subtracts minutes from a given Date
-	 * @param date : The original date where the minutes will be subtracted.
-	 * @param minutes : The minutes to be subtracted from the date.
-	 * @return : the date with the subtracted minutes.
-	 */
-	private Date subtractMinutes(Date date, Integer minutes) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date)
-		cal.add(Calendar.MINUTE, - minutes)
-		return cal.getTime()
-	}
 }
