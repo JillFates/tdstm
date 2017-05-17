@@ -610,9 +610,12 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	}
 
 	/**
-	 * Returns the configuration Account Acctivation Time frame in Milliseconds
+	 * Returns the configuration Forgot My Password Reset Time frame in Milliseconds
+	 * If the forgotMyPasswordResetTTL is not set (or 0) we will get it from the user configuration,
+	 * this works with setForgotMyPasswordResetTTL in a way that we can set our own value i.e. when testing.
 	 * @return
 	 */
+	synchronized
 	long getForgotMyPasswordResetTTL(){
 		if(!forgotMyPasswordResetTTL){
 			forgotMyPasswordResetTTL = userLocalConfig.forgotMyPasswordResetTimeLimit * 60 * 1000
@@ -620,14 +623,18 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		return forgotMyPasswordResetTTL
 	}
 
+	synchronized
 	void setForgotMyPasswordResetTTL(long ttlMillis){
 		forgotMyPasswordResetTTL = ttlMillis
 	}
 
 	/**
 	 * Returns the configuration Account Acctivation Time frame in Milliseconds
+	 * If the accountActivationTTL is not set (or 0) we will get it from the user configuration,
+	 * this works with setAccountActivationTTL in a way that we can set our own value i.e. when testing.
 	 * @return
 	 */
+	synchronized
 	long getAccountActivationTTL(){
 		if(!accountActivationTTL){
 			accountActivationTTL = userLocalConfig.accountActivationTimeLimit * 60 * 1000
@@ -635,6 +642,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		return accountActivationTTL
 	}
 
+	synchronized
 	void setAccountActivationTTL(long ttlMillis){
 		accountActivationTTL = ttlMillis
 	}

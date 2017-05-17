@@ -368,7 +368,6 @@ class SecurityServiceTests extends Specification {
 
 		when: "a Pasword reset is created"
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
-
 			Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
 
 		then: "the PaswordReset whould expire between 5 seconds of the manually calculated expiration Time"
@@ -378,13 +377,11 @@ class SecurityServiceTests extends Specification {
 	def '13. Test Password Reset valid and expired after a TTL'() {
 		setup: 'a valid username and Reset Data'
 			long THREE_SECONDS = 3000
-
 			createPrivAccount()
 			//init values for user configuration
 			privUser.expiryDate = new Date(new Date().time + 24 * 60 * 60 * 1000) //24Hrs
 			privUser.active = 'Y'
 			privPerson.active = 'Y'
-
 			securityService.setAccountActivationTTL(THREE_SECONDS)
 			String token = "SomeToken"
 			String ipAddress = "127.0.0.1"
@@ -394,7 +391,6 @@ class SecurityServiceTests extends Specification {
 
 		when: "a Pasword reset is created"
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
-
 			Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
 
 		then: "the PaswordReset should be valid just after being created"
@@ -403,15 +399,11 @@ class SecurityServiceTests extends Specification {
 
 		when: "Wait for expiration"
 			sleep(THREE_SECONDS)
-			String message = ""
-			try{
-				PasswordReset pr3 = securityService.validateToken(token)
-			}catch(ServiceException se) {
-				message = se.message
-			}
+			securityService.validateToken(token)
 
 		then: "The Password reset should have expired, exception message is expected"
-			message.startsWith("The password reset token has expired")
+			ServiceException ex = thrown()
+			ex.message.startsWith("The password reset token has expired")
 	}
 
 	def '14. Test Password Reset expiration Cron cleanup'() {
@@ -422,7 +414,6 @@ class SecurityServiceTests extends Specification {
 			privUser.expiryDate = new Date(new Date().time + 24 * 60 * 60 * 1000) //24Hrs
 			privUser.active = 'Y'
 			privPerson.active = 'Y'
-
 			securityService.setAccountActivationTTL(THREE_SECONDS)
 			String token = "SomeToken"
 			String ipAddress = "127.0.0.1"
@@ -431,8 +422,6 @@ class SecurityServiceTests extends Specification {
 
 		when: "a Pasword reset is created and we check how many Passwords are in the DB"
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
-
-			//int counter = PasswordReset.countByStatus("PENDING")
 			List<PasswordReset> lista = PasswordReset.findAllByStatus("PENDING") ?: []
 			int counter = lista.size()
 
