@@ -374,15 +374,13 @@ class SecurityServiceTests extends Specification {
 			((expTime.time - FIVE_SECONDS) <= pr.expiresAfter.time) && (pr.expiresAfter.time <= (expTime.time + FIVE_SECONDS) )
 	}
 
-	def '13. Test Password Reset valid and expired after a TTL'() {
+	def '13. Test Password Reset valid before TTL'() {
 		setup: 'a valid username and Reset Data'
-			long THREE_SECONDS = 3000
 			createPrivAccount()
 			//init values for user configuration
 			privUser.expiryDate = new Date(new Date().time + 24 * 60 * 60 * 1000) //24Hrs
 			privUser.active = 'Y'
 			privPerson.active = 'Y'
-			securityService.setAccountActivationTTL(THREE_SECONDS)
 			String token = "SomeToken"
 			String ipAddress = "127.0.0.1"
 			EmailDispatch ed = null //Not really needed
@@ -391,14 +389,30 @@ class SecurityServiceTests extends Specification {
 
 		when: "a Pasword reset is created"
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
-			Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
 
-		then: "the PaswordReset should be valid just after being created"
+		then: "the PaswordReset should be valid"
 			PasswordReset pr2 = securityService.validateToken(token)
 			pr2 != null
 
-		when: "Wait for expiration"
-			sleep(THREE_SECONDS)
+	}
+
+	def '14. Test PasswordReset invalid if an already expired TTL is selected'() {
+		setup: 'a valid username and Reset Data'
+			long THREE_SECONDS_AGO = -3000
+			createPrivAccount()
+			//init values for user configuration
+			privUser.expiryDate = new Date(new Date().time + 24 * 60 * 60 * 1000) //24Hrs
+			privUser.active = 'Y'
+			privPerson.active = 'Y'
+			securityService.setAccountActivationTTL(THREE_SECONDS_AGO)
+			String token = "SomeToken"
+			String ipAddress = "127.0.0.1"
+			EmailDispatch ed = null //Not really needed
+			PasswordResetType resetType = PasswordResetType.WELCOME
+			long tokenTTL = securityService.accountActivationTTL
+
+		when: "An already expired PaswordReset is created & we try to validate the Token"
+			securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
 			securityService.validateToken(token)
 
 		then: "The Password reset should have expired, exception message is expected"
@@ -406,21 +420,21 @@ class SecurityServiceTests extends Specification {
 			ex.message.startsWith("The password reset token has expired")
 	}
 
-	def '14. Test Password Reset expiration Cron cleanup'() {
+	def '15. Test Password Reset expiration Cron cleanup'() {
 		setup: 'a valid username and Reset Data'
-			long THREE_SECONDS = 3000
+			long THREE_SECONDS_AGO = -3000
 			createPrivAccount()
 			//init values for user configuration
 			privUser.expiryDate = new Date(new Date().time + 24 * 60 * 60 * 1000) //24Hrs
 			privUser.active = 'Y'
 			privPerson.active = 'Y'
-			securityService.setAccountActivationTTL(THREE_SECONDS)
+			securityService.setAccountActivationTTL(THREE_SECONDS_AGO)
 			String token = "SomeToken"
 			String ipAddress = "127.0.0.1"
 			EmailDispatch ed = null //Not really needed
 			PasswordResetType resetType = PasswordResetType.WELCOME
 
-		when: "a Pasword reset is created and we check how many Passwords are in the DB"
+		when: "An already expired PaswordReset is created and we check how many Passwords are in the DB"
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
 			List<PasswordReset> lista = PasswordReset.findAllByStatus("PENDING") ?: []
 			int counter = lista.size()
@@ -428,8 +442,7 @@ class SecurityServiceTests extends Specification {
 		then: "We have Pending for approval"
 			counter > 0
 
-		when: "Wait for expiration, cleanup and check again"
-			sleep(THREE_SECONDS)
+		when: "cleanup and check again"
 			securityService.cleanupPasswordReset()
 			List<PasswordReset> list = PasswordReset.findAllByStatus("PENDING") ?: []
 			int afterCounter = list.size()
