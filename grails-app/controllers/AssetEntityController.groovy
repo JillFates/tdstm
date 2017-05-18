@@ -2576,43 +2576,11 @@ class AssetEntityController implements ControllerMethods {
 				}
 			}
 
+			Integer tardyFactor = computeTardyFactor(it.durationInMinutes())
+			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, tardyFactor, nowGMT)
 
-		// TM-6318 : Highlight Estimated Start and Estimated Finish columns for tardy and late tasks
-			Integer durationInMinutes = it.durationInMinutes()
-			Integer nowGMTInMinutes = nowGMT.getTime() / 1000 / 60
-			Integer estimatedStartInMinutes = (it.estStart != null) ? it.estStart.getTime() / 1000 / 60 : null
-			Integer estimatedFinishInMinutes = (it.estFinish != null) ? it.estFinish.getTime() / 1000 / 60 : null
-			Integer actualStartInMinutes = (it.actStart != null) ? it.actStart.getTime() / 1000 / 60 : null
-
-			Integer tardyFactor = computeTardyFactor(durationInMinutes)
-
-			estFinishClass = ''
- 			estStartClass = ''
-			if (it.estStart && it.isActionable() && it.status != AssetCommentStatus.STARTED) {
-
-				if (it.estStart < nowGMT) {
-					estStartClass = 'task_late'
-					estFinishClass = 'task_late'
-				} else {
-					if (estimatedStartInMinutes - tardyFactor <= nowGMTInMinutes) {
-						estStartClass = 'task_tardy'
-						estFinishClass = 'task_tardy'
-					}
-				}
-			}
-
-			if (it.estFinish && it.isActionable()) {
-				if (it.status == AssetCommentStatus.STARTED) {
-					if (actualStartInMinutes + durationInMinutes > estimatedFinishInMinutes) {
-						estStartClass = 'task_late'
-						estFinishClass = 'task_late'
-					} else if (actualStartInMinutes + durationInMinutes + tardyFactor >= estimatedFinishInMinutes) {
-						estStartClass = 'task_tardy'
-						estFinishClass = 'task_tardy'
-					}
-				}
-			}
-
+			estStartClass = estimatedColumnsCSS['estStartClass']
+			estFinishClass = estimatedColumnsCSS['estFinishClass']
 
 			String dueDate = ''
 			dueDate = TimeUtil.formatDate(it.dueDate)
@@ -4717,7 +4685,64 @@ class AssetEntityController implements ControllerMethods {
 		session.setAttribute 'TOTAL_ASSETS', count
 	}
 
+
+
 	/**
+	 * TODO This method should be refactored to another class.
+	 * Returns a Map with the Estimated Start and Estimated Finish columns CSS class names, according to
+	 * the relation between those estimates and the current date/time. Also uses the Actual Start value
+	 * to make the calculations in case the task is in STARTED status, and a tardy factor value to
+	 * determine when a task is not late yet but it's going to be soon.
+	 * If a task estimate values are not late or tardy, it returns an empty string for the class name.
+	 * For more information see TM-6318.
+	 *
+	 * @param task : The task.
+	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
+	 * @param nowGMT : The actual time in GMT.
+	 * @return : A Map with estStartClass and estFinishClass.
+	 */
+	Map getEstimatedColumnsCSS(AssetComment task, Integer tardyFactor, Date nowGMT) {
+
+		def estStartClass = ''
+		def estFinishClass = ''
+
+		Integer durationInMinutes = task.durationInMinutes()
+		Integer nowGMTInMinutes = nowGMT.getTime() / 1000 / 60
+		Integer estimatedStartInMinutes = (task.estStart != null) ? task.estStart.getTime() / 1000 / 60 : null
+		Integer estimatedFinishInMinutes = (task.estFinish != null) ? task.estFinish.getTime() / 1000 / 60 : null
+		Integer actualStartInMinutes = (task.actStart != null) ? task.actStart.getTime() / 1000 / 60 : null
+
+		if (task.estStart && task.isActionable() && task.status != AssetCommentStatus.STARTED) {
+
+			if (task.estStart < nowGMT) {
+				estStartClass = 'task_late'
+				estFinishClass = 'task_late'
+			} else {
+				if (estimatedStartInMinutes - tardyFactor <= nowGMTInMinutes) {
+					estStartClass = 'task_tardy'
+					estFinishClass = 'task_tardy'
+				}
+			}
+		}
+
+		if (task.estFinish && task.isActionable()) {
+			if (task.status == AssetCommentStatus.STARTED) {
+				if (actualStartInMinutes + durationInMinutes > estimatedFinishInMinutes) {
+					estStartClass = 'task_late'
+					estFinishClass = 'task_late'
+				} else if (actualStartInMinutes + durationInMinutes + tardyFactor >= estimatedFinishInMinutes) {
+					estStartClass = 'task_tardy'
+					estFinishClass = 'task_tardy'
+				}
+			}
+		}
+
+		return [estStartClass: estStartClass, estFinishClass: estFinishClass]
+	}
+
+
+	/**
+	 * TODO This method should be refactored to another class.
 	 * Computes the tardy factor.
 	 * The intent is to adjust the factor as a percent of the duration of the task to factor in
 	 * the additional buffer of time with a minimum factor of 5 minutes and a maximum of 30 minutes.
