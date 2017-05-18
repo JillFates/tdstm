@@ -32,7 +32,7 @@
     "angular-in-memory-web-api": "^0.3.2",
     "core-js": "^2.4.1",
     "jquery": "^3.2.1",
-    "ng-formly": "^1.0.0-rc.0",
+    "ng-formly": "^1.0.0-rc.5",
     "rxjs": "^5.4.0",
     "tinymce": "^4.5.5",
     "zone.js": "^0.8.10"
