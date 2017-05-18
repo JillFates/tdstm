@@ -64,7 +64,8 @@ module.exports = function (config) {
         reporters: ['dots', 'junit'],
         junitReporter: {
             outputDir: 'web-app/test/',
-            outputFile: 'test-results.xml'
+            outputFile: 'test-results.xml',
+            useBrowserName: false
         },
         port: 9876,
         colors: true,
