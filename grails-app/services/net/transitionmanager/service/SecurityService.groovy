@@ -1247,8 +1247,10 @@ logger.debug "mergePersonsUserLogin() entered"
 	 */
 	boolean hasPermission(String permission, boolean reportIfViolation = false) {
 		TdsUserDetails principal = getCurrentUserDetails()
-		if (!principal && reportIfViolation) {
-			reportViolation("an unauthenticated person attempted an action requiring '$permission permission")
+		if (!principal){
+			if(reportIfViolation) {
+				reportViolation("an unauthenticated person attempted an action requiring '$permission permission")
+			}
 			return false
 		}
 
