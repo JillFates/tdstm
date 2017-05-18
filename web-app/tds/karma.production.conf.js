@@ -5,24 +5,18 @@ module.exports = function (config) {
     config.set({
         basePath: '',
         frameworks: ['browserify', 'jasmine'],
+        browsers: ['PhantomJS'],
         plugins: [
             require('karma-jasmine'),
             require('karma-phantomjs-launcher'),
             require('karma-jasmine-html-reporter'),
+            require('karma-html-reporter'),
             require('karma-junit-reporter'),
             require('karma-browserify')
         ],
         client: {
-            clearContext: false // leave Jasmine Spec Runner output visible in browser
+            captureConsole: true
         },
-        /*customLaunchers: {
-            // From the CLI. Not used here but interesting
-            // chrome setup for travis CI using chromium
-            Chrome_travis_ci: {
-                base: 'Chrome',
-                flags: ['--no-sandbox']
-            }
-        },*/
         files: [
             // Polyfills
             'node_modules/core-js/client/shim.js',
@@ -70,8 +64,6 @@ module.exports = function (config) {
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
-        autoWatch: true,
-        browsers: ['PhantomJS'],
         singleRun: true
     });
 };
