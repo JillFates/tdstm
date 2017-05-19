@@ -60,15 +60,19 @@ class EmailDispatchService implements ServiceMethods {
 		Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
 
 		// Add any additional information to the job
+		// TODO - does this need to be a closure or can we just merge the dataMap onto jobDataMap?
 		dataMap.each { k, v -> trigger.jobDataMap[k] = v }
 
 		trigger.jobDataMap.edId = emailDispatch.id
 
-		/*For later use when assuming the identity of this user during the
-		 execution of the Quartz Job.*/
-		if(!trigger.jobDataMap.username){
-				trigger.jobDataMap.username = securityService.currentUsername
-				trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
+		/* For later use when assuming the identity of this user during the
+		 execution of the Quartz Job. */
+		if (!trigger.jobDataMap.username) {
+			trigger.jobDataMap.username = securityService.currentUsername
+			if (! trigger.jobDataMap.username) {
+				// TODO TM-6428 - throw an exception here - need to test the that the UI handles the exception
+			}
+			// trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
 		}
 
 		trigger.setJobName("EmailDispatchJob")
