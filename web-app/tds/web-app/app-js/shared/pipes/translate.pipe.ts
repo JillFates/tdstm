@@ -1,30 +1,18 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { en_DICTIONARY } from '../i18n/en.dictionary';
+import {Inject, Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({ name: 'translate' })
 export class TranslatePipe implements PipeTransform {
 
     private dictionary: Object = {};
 
-    constructor() {
-
-        /*
-         TODO: Will look for dictionary file here based on user locale code (i.e. 'es.json'), by the moment will always load default en.json
-         */
-        let found = false;
-        let localizaedDictionary: Object;
-
-        // If not found grab default english dictionmary
-        if (!found) {
-            localizaedDictionary = en_DICTIONARY;
-        }
+    constructor(@Inject('localizedDictionary') localizedDictionary) {
 
         /*
          For performance reasons we will load properties from dictionary at first so we avoid iterate through it
          everytime a translation is required.
          */
-        for (let property of Object.keys(localizaedDictionary)) {
-            this.traverse(property, localizaedDictionary[property]);
+        for (let property of Object.keys(localizedDictionary)) {
+            this.traverse(property, localizedDictionary[property]);
         }
     }
 

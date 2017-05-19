@@ -21,6 +21,8 @@ import { TranslatePipe } from './pipes/translate.pipe';
 import { HeaderComponent } from './modules/header/header.component';
 import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
 import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-editor.component';
+// Dictionaries
+import { en_DICTIONARY } from './i18n/en.dictionary';
 
 @NgModule({
     imports: [
@@ -44,7 +46,8 @@ import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-ed
         HttpServiceProvider,
         ComponentCreatorService,
         UIDialogService,
-        UIActiveDialogService
+        UIActiveDialogService,
+        {provide: 'localizedDictionary', useValue: en_DICTIONARY}
     ],
     exports: [UILoaderDirective,
         UIToastDirective,
