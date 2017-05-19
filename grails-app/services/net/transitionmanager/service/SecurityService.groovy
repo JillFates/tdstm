@@ -531,6 +531,12 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				bodyTemplate = "adminResetPassword"
 			}
 
+			// If the user forgot his password, we'll use his userlogin to configure the email job.
+			else if (resetType == PasswordResetType.FORGOT_MY_PASSWORD) {
+				emailParams["username"] = userLogin.username
+				emailParams["userLoginId"] = userLogin.id
+			}
+
 			EmailDispatch ed = emailDispatchService.basicEmailDispatchEntity(dispatchOrigin, subject, bodyTemplate,
 					emailParams as JSON, personFromEmail, person.email, person, createdBy)
 
