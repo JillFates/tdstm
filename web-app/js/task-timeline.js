@@ -1,12 +1,12 @@
 
 // global functions for accessing the graph outside the scope of the main function
-var getData = function () {return null}
-var forceDisplay = function () {return null}
+var getData = function () { return null }
+var forceDisplay = function () { return null }
 var debug = {};
 
 $(document).ready(function () {
 	// check keyup on the search field for the enter key
-	$('#searchBoxId').keyup( function (e) {
+	$('#searchBoxId').keyup(function (e) {
 		if (e.keyCode == 13)
 			$('#SubmitButtonId').submit();
 	});
@@ -25,7 +25,7 @@ $(document).ready(function () {
 function displayWarningOrErrorMsg(isCyclical) {
 	var message = d3.select('div.body')
 		.append('div')
-		.attr('class','chart');
+		.attr('class', 'chart');
 	if (isCyclical)
 		message.html('The task data for this event contains cyclical dependency mappings that thereby preventing graph generation');
 	else
@@ -40,31 +40,31 @@ function displayWarningOrErrorMsg(isCyclical) {
  * @param response
  * @param status
  */
-function buildGraph (response, status) {
-	
+function buildGraph(response, status) {
+
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
-	
+
 	// restore export button
 	$('#exportCriticalPathButton').removeClass('disabledLabel');
-	
+
 	// check for errors in the ajax call
 	if (status == 'error') {
 		displayWarningOrErrorMsg(response.responseText == 'cyclical')
 		return;
 	}
-	
+
 	// parse the data received from the server
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
 	var ready = false;
-	
+
 	// if the event has no tasks show an error message and exit
 	if (data.items.size() == 0) {
 		displayWarningOrErrorMsg(false)
 		return;
 	}
-	
+
 	// graph default config
 	var miniRectStroke = 1.0;
 	var miniRectHeight = 7 - miniRectStroke;
@@ -72,12 +72,12 @@ function buildGraph (response, status) {
 	var backgroundExtraHeight = 200;
 	var initialExtent = 1000000;
 	var anchorOffset = 10; // the length of the "point" at the end of task polygons
-	var margin = {top: 20, right: 0, bottom: 15, left: 0};
+	var margin = { top: 20, right: 0, bottom: 15, left: 0 };
 	var minExtentRange = 10;
 	var labelFloatOffset = 1;
 	var labelPadding = 10;
 	var scrollingLabelsPerformanceCutoff = 50;
-	
+
 	// data received from the server
 	var items = data.items;
 	var starts = data.starts;
@@ -85,20 +85,20 @@ function buildGraph (response, status) {
 	var siblingGroups = [];
 	var siblingGroupsReduced = [];
 	var parsedHeight = parseInt($('#mainHeightFieldId').val());
-	if (! isNaN(parsedHeight))
+	if (!isNaN(parsedHeight))
 		mainRectHeight = parsedHeight;
-	
+
 	// data from current user config
 	var hideRedundant = $('#hideRedundantCheckBoxId').is(':checked');
 	var highlightCritical = $('#highlightCriticalPathId').is(':checked');
 	var useHeights = $('#useHeightCheckBoxId').is(':checked');
 	var taskSelected = null;
-	
+
 	// perform all necesary precalculations on the data
 	sanitizeData(items, dependencies);
-	
+
 	// sort the tasks chronologically for the stacking algorithm
-	items.sort( function (a,b) {
+	items.sort(function (a, b) {
 		var t1 = a.start ? (new Date(a.start)).getTime() : 0;
 		var t2 = b.start ? (new Date(b.start)).getTime() : 0;
 		if (t1 > t2)
@@ -120,55 +120,55 @@ function buildGraph (response, status) {
 		else
 			return 0;
 	});
-	
+
 	// set up the ranges for the mini and main graphs
 	var windowWidth = $(window).width(); // the width of the browser window
 	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
 	var graphExtraPadding = 10; // extra padding width for the graph on the page
 	var zoomScale = 2;
-	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length-1].end);
+	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length - 1].end);
 	var x = d3.time.scale()
-		.domain([parseStartDate(data.startDate), items[items.length-1].end])
+		.domain([parseStartDate(data.startDate), items[items.length - 1].end])
 		.range([0, windowWidth - graphPageOffset * 2 - graphExtraPadding]);
 	var x1 = d3.time.scale()
 		.domain(x.domain())
 		.range([0, x.range()[1] * zoomScale]);
-	
+
 	// perform the stacking layout algorithm then determine the width and height of the graphs
 	var maxStack = calculateStacks();
-	var mainHeight = ((maxStack+1)*mainRectHeight*1.5);
-	var miniHeight = ((maxStack+1)*miniRectHeight) + miniRectStroke;
+	var mainHeight = ((maxStack + 1) * mainRectHeight * 1.5);
+	var miniHeight = ((maxStack + 1) * miniRectHeight) + miniRectStroke;
 	if (miniHeight <= 10) {
 		miniHeight = 100;
 		miniRectHeight = 100;
 	}
 	var height = mainHeight + miniHeight + margin.top + margin.bottom;
 	var width = x.range()[1];
-	
+
 	// predeclarations of graph elements
 	var svgContainer = null;
 	var chart = null;
 	var main = null;
 	var mini = null;
 	var brushContainer = null;
-	
+
 	// populate the Team select
 	var teamSelect = null;
 	populateTeamSelect();
-	
-	
+
+
 	// stores data and functions used for dragging on the mini graph
 	var miniDrag = {
 		tempBrush: null,
 		tempBrushXInitial: 0,
 		drawing: 0,
-		
+
 		// handle panning and time selection behavior on the mini graph
 		drawStart: function () {
 			miniDrag.tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
 
 			// if we are outside the brush, we are drawing a new region or setting a new brush position
-			if ( (d3.event.sourceEvent.which == 1) && (x.invert(miniDrag.tempBrushXInitial + 4) < brush.extent()[0] || x.invert(miniDrag.tempBrushXInitial - 4) > brush.extent()[1]) ) {
+			if ((d3.event.sourceEvent.which == 1) && (x.invert(miniDrag.tempBrushXInitial + 4) < brush.extent()[0] || x.invert(miniDrag.tempBrushXInitial - 4) > brush.extent()[1])) {
 				miniDrag.drawing = 1;
 				miniDrag.tempBrush = brushContainer.append('svg:rect')
 					.attr('class', 'tempBrush hidden')
@@ -177,7 +177,7 @@ function buildGraph (response, status) {
 					.attr('x', d3.mouse(chart.node())[0] - margin.left)
 					.attr('y', 0);
 
-			// otherwise we are panning the brush
+				// otherwise we are panning the brush
 			} else {
 				mini.classed('brushMoving', true)
 				miniDrag.tempBrushXInitial = 0;
@@ -190,8 +190,8 @@ function buildGraph (response, status) {
 			if (miniDrag.drawing == 1) {
 				miniDrag.tempBrush.classed('hidden', false);
 				miniDrag.tempBrush
-					.attr( 'x', Math.min(miniDrag.tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left) )
-					.attr( 'width', Math.abs(miniDrag.tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
+					.attr('x', Math.min(miniDrag.tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left))
+					.attr('width', Math.abs(miniDrag.tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)));
 				display(false, false);
 				chart.classed('resizing', true);
 			} else {
@@ -207,10 +207,10 @@ function buildGraph (response, status) {
 		drawEnd: function () {
 			if (miniDrag.drawing == 1) {
 				var xStart = miniDrag.tempBrushXInitial
-				var xEnd =  d3.mouse(chart.node())[0] - margin.left
+				var xEnd = d3.mouse(chart.node())[0] - margin.left
 				var xa = Math.min(xStart, xEnd);
 				var xb = Math.max(xStart, xEnd);
-				
+
 				// if the user clicked, move the current brush to that position
 				if (xb - xa < 6) {
 					var width = x(brush.extent()[1]) - x(brush.extent()[0])
@@ -231,20 +231,20 @@ function buildGraph (response, status) {
 			chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 1000000) + ')';
 		}
 	}
-	
+
 	// Sets the custom dragging behavior
 	miniDrag.behavior = d3.behavior.drag()
 		.on("dragstart", miniDrag.drawStart)
 		.on("drag", miniDrag.drawMove)
 		.on("dragend", miniDrag.drawEnd);
-	
+
 	// stores data and functions used for dragging on the main graph
 	var mainDrag = {
 		mainSelection: null,
 		mainSelectionXInitial: 0,
 		selectingMain: false,
 		dragging: false,
-		
+
 		// handle panning and time selection behavior on the main graph
 		dragStart: function () {
 			mainDrag.dragging = false;
@@ -266,15 +266,15 @@ function buildGraph (response, status) {
 				mainDrag.dragging = true;
 			if (mainDrag.selectingMain) {
 				mainDrag.mainSelection
-					.attr( 'x', Math.min(mainDrag.mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left) )
-					.attr( 'width', Math.abs(mainDrag.mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
+					.attr('x', Math.min(mainDrag.mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left))
+					.attr('width', Math.abs(mainDrag.mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)));
 				if (mainDrag.dragging)
 					chart.classed('resizing', true);
 			} else {
 				var minExtent = brush.extent()[0];
 				var maxExtent = brush.extent()[1];
 				var timeShift = (maxExtent - minExtent) * (d3.event.dx / width);
-				brush.extent([new Date(minExtent-timeShift), new Date(maxExtent-timeShift)]);
+				brush.extent([new Date(minExtent - timeShift), new Date(maxExtent - timeShift)]);
 				display(false, false);
 				if (mainDrag.dragging)
 					chart.classed('dragging', true);
@@ -288,8 +288,8 @@ function buildGraph (response, status) {
 				var b = Math.abs(mainDrag.mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) + Math.min(mainDrag.mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left);
 				var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 				var width = x.range()[1];
-				var xa = x(brush.extent()[0]) + (a/width)*extentWidth;
-				var xb = x(brush.extent()[0]) + (b/width)*extentWidth;
+				var xa = x(brush.extent()[0]) + (a / width) * extentWidth;
+				var xb = x(brush.extent()[0]) + (b / width) * extentWidth;
 				brush.extent([x.invert(xa), x.invert(xb)]);
 
 				mainDrag.selectingMain = false;
@@ -311,18 +311,18 @@ function buildGraph (response, status) {
 			chart.classed('resizing', false);
 		}
 	}
-	
+
 	// Sets the custom dragging behavior
 	mainDrag.behavior = d3.behavior.drag()
 		.on("dragstart", mainDrag.dragStart)
 		.on("drag", mainDrag.dragMove)
 		.on("dragend", mainDrag.dragEnd);
-	
-	
+
+
 	// gets the container that will hold the svg
 	svgContainer = d3.select('div#svgContainerId')
 		.style('display', null)
-	
+
 	// construct the SVG
 	chart = svgContainer
 		.append('svg:svg')
@@ -362,9 +362,9 @@ function buildGraph (response, status) {
 			0   1.2 0   0   0\
 			0   0   1.2 0   0\
 			0   0   0   1   0');
-	
-	
-	
+
+
+
 
 	// construct the mini graph
 	mini = chart.append('svg:g')
@@ -373,7 +373,7 @@ function buildGraph (response, status) {
 		.attr('class', 'mini')
 		.attr('height', miniHeight)
 		.call(miniDrag.behavior)
-	
+
 	// construct the main graph
 	main = chart.append('svg:g')
 		.attr('transform', 'translate(' + margin.left + ',' + (miniHeight + 60) + ')')
@@ -383,19 +383,19 @@ function buildGraph (response, status) {
 		.append('svg:g')
 		.attr('class', 'mainContent')
 		.call(mainDrag.behavior)
-		
+
 	// construct the area behind the objects in the main graph
 	var background = main.append('svg:rect')
 		.attr('width', width)
 		.attr('height', mainHeight + backgroundExtraHeight)
 		.attr('class', 'background')
-		
+
 	// construct the main graph translator
 	mainTranslator = main.append('svg:g')
 		.attr('transform', 'translate(' + 0 + ',' + 0 + ')')
 		.attr('id', 'mainTranslatorId')
-	
-	
+
+
 
 	// define the arrowhead marker used for marking dependencies
 	var arrowheadNames = ["arrowhead", "arrowheadSelected", "arrowheadCritical", "arrowheadRedundant", "arrowheadCyclical"];
@@ -412,9 +412,9 @@ function buildGraph (response, status) {
 			.append("svg:path")
 			.attr("d", "M0,-5L10,0L0,5");
 
-	
-	
-	
+
+
+
 	// stores the internal d3 definitions for the axis
 	var axisDefs = {
 		// construct the minutes axis for the mini graph
@@ -424,7 +424,7 @@ function buildGraph (response, status) {
 			.ticks(d3Linear.time, d3Linear.tick)
 			.tickFormat(d3Linear.format)
 			.tickSize(6, 0, 0),
-		
+
 		// construct the hours axis for the mini graph
 		xHourAxis: d3.svg.axis()
 			.scale(x)
@@ -432,7 +432,7 @@ function buildGraph (response, status) {
 			.ticks(d3Linear.time, d3Linear.tick)
 			.tickFormat(d3Linear.format)
 			.tickSize(6, 0, 0),
-		
+
 		// construct the hours axis for the main graph
 		x1MainGraphAxis: d3.svg.axis()
 			.scale(x1)
@@ -441,39 +441,39 @@ function buildGraph (response, status) {
 			.tickFormat(d3Linear.format)
 			.tickSize(6, 0, 0)
 	}
-	
+
 	// stores the svg elements for the graph axis
 	var axisElements = {
 		mainMinuteAxis: mainTranslator.append('svg:g')
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'main axis minute')
 			.call(axisDefs.x1MainGraphAxis),
-		
+
 		miniMinuteAxis: mini.append('svg:g')
 			.attr('transform', 'translate(0,' + miniHeight + ')')
 			.attr('class', 'axis minute')
 			.call(axisDefs.xMinuteAxis),
-		
+
 		miniHourAxis: mini.append('svg:g')
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'axis hour')
 			.call(axisDefs.xHourAxis)
 	}
-	
-	
+
+
 	// construct the line representing the current time
 	var mainNowLine = mainTranslator.append('svg:line')
 		.attr('y1', 0)
 		.attr('y2', mainHeight)
 		.attr('class', 'main todayLine')
-	
+
 	var miniNowLine = mini.append('svg:line')
 		.attr('x1', x(now()) + 0.5)
 		.attr('y1', 0)
 		.attr('x2', x(now()) + 0.5)
 		.attr('y2', miniHeight)
 		.attr('class', 'todayLine');
-	
+
 	// shift the today line every 3000 miliseconds
 	d3.timer(function () {
 		mainNowLine
@@ -483,7 +483,7 @@ function buildGraph (response, status) {
 			.attr('x1', x(now()) + 0.5)
 			.attr('x2', x(now()) + 0.5);
 	}, 3000);
-	
+
 	// construct the container for the task polygons
 	var itemPolys = mainTranslator.append('svg:g')
 
@@ -492,7 +492,7 @@ function buildGraph (response, status) {
 
 	// construct the container for the task labels
 	var itemLabels = mainTranslator.append('svg:g')
-	
+
 	// construct the polys in the mini graph
 	var miniPolys = mini.append('svg:g')
 		.attr('class', 'miniItems')
@@ -500,11 +500,11 @@ function buildGraph (response, status) {
 		.data(items, function (d) { return d.id; })
 		.enter()
 		.append('svg:polygon')
-		.attr('id', function(d) { return 'mini-' + d.id; })
+		.attr('id', function (d) { return 'mini-' + d.id; })
 		.attr('class', 'miniItem')
-		.attr('points', function(d) { return getPointsMini(d); });
-	
-	
+		.attr('points', function (d) { return getPointsMini(d); });
+
+
 	// invisible hit area to move around the selection window
 	mini.append('svg:rect')
 		.attr('id', 'miniBackgroundId')
@@ -513,46 +513,46 @@ function buildGraph (response, status) {
 		.attr('height', miniHeight)
 		.attr('visibility', 'hidden')
 		.on('mouseup', moveBrush);
-	
-	
+
+
 	// draw the selection area
 	var brush = d3.svg.brush()
 		.x(x)
 		.on("brush", brushed)
 		.on("brushend", brushedEnd)
-		.extent([parseStartDate(data.startDate), new Date( Math.min( parseStartDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime() ) )])
-	
+		.extent([parseStartDate(data.startDate), new Date(Math.min(parseStartDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
+
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 	zoomScale = extentWidth / width;
 	x1.range([0, width / zoomScale]);
-	
+
 	// construct the container for the brush
 	brushContainer = mini.append('svg:g')
 		.attr('class', 'brushContainer');
-	
+
 	// construct the mini graph brush
 	brushContainer.append('svg:g')
 		.attr('class', 'x brush')
 		.call(brush)
-		.on("mousedown", function () {return})
+		.on("mousedown", function () { return })
 		.call(d3.behavior.drag())
 		.selectAll('rect')
 		.attr('y', 1)
 		.attr('height', miniHeight - 1);
-	
+
 	mini.selectAll('rect.background').remove()
-	
-	
-	
+
+
+
 	// setup all the heights to fit to the rect height
 	setupHeights(mainRectHeight);
-	
+
 	$('#spinnerId').css('display', 'none');
-	var offsetInitial =  -1 * x(brush.extent()[0]);
+	var offsetInitial = -1 * x(brush.extent()[0]);
 	ready = true;
 	display(true, true);
 	display(true, true);
-	
+
 	// add the key listeners to the graph
 	addKeyBindings();
 	GraphUtil.addTimelineKeyListeners(brush, x1, mainTranslator, function (resize) {
@@ -562,14 +562,14 @@ function buildGraph (response, status) {
 		correctLabelPositions();
 		display(false, resize, true);
 	});
-	window.scrollTo(window);
-	
+	window.scrollTo(0, 0);
+
 	// add references to internal values to the debug object
 	debug.x = x
 	debug.x1 = x1
 	debug.brush = brush
-	
-	
+
+
 	/* define the global accessor functions */
 	getData = function () {
 		return data;
@@ -578,8 +578,8 @@ function buildGraph (response, status) {
 	forceDisplay = function () {
 		display(false, true);
 	}
-	
-	function addKeyBindings () {
+
+	function addKeyBindings() {
 		// handle events from the task height text box
 		$('#mainHeightFieldId').on('change', function () {
 			var parsedHeight = parseInt($(this).val());
@@ -588,10 +588,10 @@ function buildGraph (response, status) {
 		})
 		$('#mainHeightFieldId').on('keyup', function (e) {
 			var parsedHeight = parseInt($(this).val());
-			if ( (e.keyCode == 13) && (parsedHeight != mainRectHeight) )
+			if ((e.keyCode == 13) && (parsedHeight != mainRectHeight))
 				setupHeights(parsedHeight);
 		})
-		
+
 		// handle the checkbox to toggle hiding of redundant dependencies
 		$('#hideRedundantCheckBoxId').on('change', function (a, b) {
 			hideRedundant = $(this).is(':checked');
@@ -609,12 +609,12 @@ function buildGraph (response, status) {
 			useHeights = $(this).is(':checked');
 			fullRedraw();
 		});
-		
+
 		// handle when the user changes the team filtering select
 		teamSelect.on('change', function () {
 			display(true, true);
 		});
-		
+
 		// bind the zoom button listeners
 		$('#zoomInButtonId').on('click', function () {
 			GraphUtil.timelineZoom(brush, 'in', zoomCallback)
@@ -622,8 +622,8 @@ function buildGraph (response, status) {
 		$('#zoomOutButtonId').on('click', function () {
 			GraphUtil.timelineZoom(brush, 'out', zoomCallback)
 		})
-		
-		function zoomCallback () {
+
+		function zoomCallback() {
 			if (GraphUtil.isIE())
 				calculateLabelVisWidths();
 			correctLabelPositions();
@@ -633,22 +633,22 @@ function buildGraph (response, status) {
 	}
 
 	// populate the team select
-	function populateTeamSelect () {
+	function populateTeamSelect() {
 		teamSelect = $("#teamSelectId")
 		teamSelect.children().remove();
 		teamSelect.append('<option value="ALL">All Teams</option>');
 		teamSelect.append('<option value="NONE">No Team Assignment</option>');
 		teamSelect.append('<option disabled>──────────</option>');
-		
+
 		$.each(data.roles, function (index, team) {
 			teamSelect.append('<option value="' + team + '">' + team + '</option>');
 		});
-		
+
 		teamSelect.val('ALL');
 	}
 
 	// called when the brush is dragged
-	function brushed () {
+	function brushed() {
 		var brushRange = Math.abs(brush.extent()[1] - brush.extent()[0]);
 		var minRange = Math.abs(x.invert(minExtentRange) - x.invert(0));
 		if (brushRange < minRange)
@@ -663,12 +663,12 @@ function buildGraph (response, status) {
 	}
 
 	// called when the brush is released
-	function brushedEnd () {
+	function brushedEnd() {
 		correctLabelPositions();
 	}
 
 	// updates the svg
-	function display (resized, scaled, repainting) {
+	function display(resized, scaled, repainting) {
 		if (!ready)
 			return;
 
@@ -685,10 +685,10 @@ function buildGraph (response, status) {
 
 		mini.select('.brush').call(brush.extent([minExtent, maxExtent]));
 		var offset = -1 * x1(brush.extent()[0]) - offsetInitial;
-		
+
 		mainTranslator.attr('transform', 'translate(' + offset + ', 0)');
-		
-		if ( (! scaled) && (! repainting) )
+
+		if ((!scaled) && (!repainting))
 			return;
 
 		if (scaled) {
@@ -715,37 +715,37 @@ function buildGraph (response, status) {
 			.data(visItems, function (d) { return d.id; });
 
 		if (scaled)
-			polys.attr('points', function(d) {
+			polys.attr('points', function (d) {
 				var p = d.points;
 				return p.x + ',' + p.y + ' '
 					+ p.x2 + ',' + p.y + ' '
-					+ (p.x+p.w) + ',' + p.y2 + ' '
-					+ p.x2 + ',' + (p.y+p.h) + ' '
-					+ p.x + ',' + (p.y+p.h) + ' ';
+					+ (p.x + p.w) + ',' + p.y2 + ' '
+					+ p.x2 + ',' + (p.y + p.h) + ' '
+					+ p.x + ',' + (p.y + p.h) + ' ';
 			})
-		polys.attr('class', function(d) { return 'mainItem ' + getClasses(d); });
+		polys.attr('class', function (d) { return 'mainItem ' + getClasses(d); });
 
 		// add any task polys in the new domain extents
 		polys.enter()
 			.append('svg:polygon')
-			.attr('points', function(d) {
+			.attr('points', function (d) {
 				var p = d.points;
 				return p.x + ',' + p.y + ' '
 					+ p.x2 + ',' + p.y + ' '
-					+ (p.x+p.w) + ',' + p.y2 + ' '
-					+ p.x2 + ',' + (p.y+p.h) + ' '
-					+ p.x + ',' + (p.y+p.h) + ' ';
+					+ (p.x + p.w) + ',' + p.y2 + ' '
+					+ p.x2 + ',' + (p.y + p.h) + ' '
+					+ p.x + ',' + (p.y + p.h) + ' ';
 			})
-			.attr('class', function(d) { return 'mainItem ' + getClasses(d); })
-			.attr('id', function(d) { return 'task-' + d.id; })
-			.on("click", function(d) {
+			.attr('class', function (d) { return 'mainItem ' + getClasses(d); })
+			.attr('id', function (d) { return 'task-' + d.id; })
+			.on("click", function (d) {
 				toggleTaskSelection(d);
 			})
-			.on("dblclick", function(d) {
+			.on("dblclick", function (d) {
 				showAssetComment(d.id, 'show');
 			})
 			.append('svg:title')
-			.html(function(d) {
+			.html(function (d) {
 				return d.number
 					+ ': ' + d.name
 					+ ' - ' + ((d.assignedTo != 'null') ? (d.assignedTo) : ('Unassigned'))
@@ -760,50 +760,50 @@ function buildGraph (response, status) {
 
 		if (scaled)
 			lines
-				.attr('x1', function(d) {
+				.attr('x1', function (d) {
 					var start = x1(d.predecessor.start);
 					var end = x1(d.predecessor.end);
 					var lowest = start + (end - start) * 0.75;
-					return Math.round(Math.max( lowest, end-anchorOffset ));
+					return Math.round(Math.max(lowest, end - anchorOffset));
 				})
-				.attr('x2', function(d) {
+				.attr('x2', function (d) {
 					var start = x1(d.successor.start);
 					var end = x1(d.successor.end);
 					var highest = start + (end - start) * 0.25;
-					return Math.round(Math.min( highest, start+anchorOffset ));
+					return Math.round(Math.min(highest, start + anchorOffset));
 				})
 
 		if (resized)
 			lines
-				.attr('y1', function(d) { return d.predecessor.points.y2; })
-				.attr('y2', function(d) { return d.successor.points.y2; })
-		lines.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
+				.attr('y1', function (d) { return d.predecessor.points.y2; })
+				.attr('y2', function (d) { return d.successor.points.y2; })
+		lines.attr('class', function (d) { return 'dependency mainItem ' + getClasses(d); });
 
 		// add any dependency lines in the new domain extents
 		lines.enter().insert('svg:line')
-			.attr('x1', function(d) {
+			.attr('x1', function (d) {
 				var start = x1(d.predecessor.start);
 				var end = x1(d.predecessor.end);
 				var lowest = start + (end - start) * 0.75;
-				return Math.round(Math.max( lowest, end-anchorOffset ));
+				return Math.round(Math.max(lowest, end - anchorOffset));
 			})
-			.attr('x2', function(d) {
+			.attr('x2', function (d) {
 				var start = x1(d.successor.start);
 				var end = x1(d.successor.end);
 				var highest = start + (end - start) * 0.25;
-				return Math.round(Math.min( highest, start+anchorOffset ));
+				return Math.round(Math.min(highest, start + anchorOffset));
 			})
-			.attr('y1', function(d) { return d.predecessor.points.y2; })
-			.attr('y2', function(d) { return d.successor.points.y2; })
-			.attr('id', function(d) { return 'dep-' + d.predecessor.id + '-' + d.successor.id; })
-			.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
+			.attr('y1', function (d) { return d.predecessor.points.y2; })
+			.attr('y2', function (d) { return d.successor.points.y2; })
+			.attr('id', function (d) { return 'dep-' + d.predecessor.id + '-' + d.successor.id; })
+			.attr('class', function (d) { return 'dependency mainItem ' + getClasses(d); });
 
-		
+
 		// move any selected lines to the top of the DOM
 		if (taskSelected != null)
 			lines.sort(function (a, b) { return a.selected - b.selected; });
 		lines.exit().remove();
-		
+
 		if (scaled || resized)
 			GraphUtil.forceReflow(itemArrows)
 
@@ -816,14 +816,14 @@ function buildGraph (response, status) {
 
 			if (scaled)
 				labels
-					.attr('x', function(d) { return d.points.x; })
-					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
+					.attr('x', function (d) { return d.points.x; })
+					.attr('width', function (d) { return Math.max(0, d.points.w - anchorOffset); })
 
 			if (resized)
 				labels
-					.attr('y', function(d) { return d.points.y2 + 3; })
-					.attr('height', function(d) { return d.points.h; })
-			labels.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
+					.attr('y', function (d) { return d.points.y2 + 3; })
+					.attr('height', function (d) { return d.points.h; })
+			labels.attr('class', function (d) { return 'itemLabel unselectable mainItem ' + getClasses(d); });
 
 			// update the item labels' children
 			itemLabels.selectAll('text')
@@ -833,64 +833,64 @@ function buildGraph (response, status) {
 				.append('svg:g')
 				.attr('class', 'itemLabel')
 				.append('text')
-				.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
-				.attr('id', function(d) { return 'label-' + d.id; })
-				.attr('x', function(d) { return d.points.x; })
-				.attr('y', function(d) { return d.points.y2 + 3; })
-				.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
-				.attr('height', function(d) { return d.points.h; })
+				.attr('class', function (d) { return 'itemLabel unselectable mainItem ' + getClasses(d); })
+				.attr('id', function (d) { return 'label-' + d.id; })
+				.attr('x', function (d) { return d.points.x; })
+				.attr('y', function (d) { return d.points.y2 + 3; })
+				.attr('width', function (d) { return Math.max(0, d.points.w - anchorOffset); })
+				.attr('height', function (d) { return d.points.h; })
 				.text(function (d) { return d.number + ': ' + d.name; });
 
 
 			if (scaled || resized)
 				GraphUtil.forceReflow(itemLabels)
-			
+
 			labels.exit().remove();
 		} else {
-			
+
 			// update the item labels
-			labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
+			labels = itemLabels.selectAll(function () { return this.getElementsByTagName("foreignObject"); })
 				.data(visItems, function (d) { return d.id; });
 
 			if (scaled)
 				labels
-					.attr('x', function(d) { return d.points.x; })
-					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); });
+					.attr('x', function (d) { return d.points.x; })
+					.attr('width', function (d) { return Math.max(0, d.points.w - anchorOffset); });
 
 			if (resized)
 				labels
-					.attr('y', function(d) { return d.points.y; })
-					.attr('height', function(d) { return d.points.h; })
-			labels.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
+					.attr('y', function (d) { return d.points.y; })
+					.attr('height', function (d) { return d.points.h; })
+			labels.attr('class', function (d) { return 'itemLabel unselectable mainItem ' + getClasses(d); });
 
 			// update the item labels' children
-			itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
+			itemLabels.selectAll(function () { return this.getElementsByTagName("foreignObject"); })
 				.select(':first-child')
-				.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+				.attr('style', function (d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 				.select(':first-child')
 				.select(':first-child')
-				.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; });
+				.attr('style', function (d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; });
 
 			// add any labels in the new domain extents
 			labels.enter()
 				.append('svg:g')
 				.attr('class', 'itemLabel')
 				.append('svg:foreignObject')
-				.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
-				.attr('id', function(d) { return 'label-' + d.id; })
-				.attr('x', function(d) { return d.points.x; })
-				.attr('y', function(d) { return d.points.y; })
-				.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
-				.attr('height', function(d) { return d.points.h; })
+				.attr('class', function (d) { return 'itemLabel unselectable mainItem ' + getClasses(d); })
+				.attr('id', function (d) { return 'label-' + d.id; })
+				.attr('x', function (d) { return d.points.x; })
+				.attr('y', function (d) { return d.points.y; })
+				.attr('width', function (d) { return Math.max(0, d.points.w - anchorOffset); })
+				.attr('height', function (d) { return d.points.h; })
 				.append('xhtml:body')
-				.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+				.attr('style', function (d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 				.attr('class', 'itemLabel')
 				.append('div')
 				.attr('class', 'itemLabel')
 				.attr('align', 'center')
 				.append('p')
 				.attr('class', 'itemLabel')
-				.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+				.attr('style', function (d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 				.append('span')
 				.attr('class', 'itemLabel')
 				.html(function (d) { return d.number + ': ' + d.name; });
@@ -910,7 +910,7 @@ function buildGraph (response, status) {
 
 		// updates the mini graph
 		miniPolys
-			.attr('class', function(d) { return 'miniItem ' + getClasses(d); });
+			.attr('class', function (d) { return 'miniItem ' + getClasses(d); });
 
 
 		if (window.performance && window.performance.now)
@@ -918,37 +918,37 @@ function buildGraph (response, status) {
 	}
 
 	// clears all items from the main group then redraws them
-	function fullRedraw () {
+	function fullRedraw() {
 		itemPolys.selectAll('polygon').remove();
 		itemArrows.selectAll('line').remove();
 		if (GraphUtil.isIE())
 			itemLabels.selectAll('g').remove();
 		else
-			itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); }).remove();
-		miniPolys.attr('points', function(d) { return getPointsMini(d); });
+			itemLabels.selectAll(function () { return this.getElementsByTagName("foreignObject"); }).remove();
+		miniPolys.attr('points', function (d) { return getPointsMini(d); });
 		display(true, true);
 	}
-	
+
 	// calculate the full widths of the labels
-	function calculateLabelMaxWidths () {
+	function calculateLabelMaxWidths() {
 		$('text.itemLabel').each(function (i, o) {
 			var d = o.__data__
 			if (d.labelWidth == null)
 				d.labelWidth = o.getBoundingClientRect().width
 		});
 	}
-	
+
 	// calculate the widths of the labels bounded by the box of their task
-	function calculateLabelBoundedWidths () {
+	function calculateLabelBoundedWidths() {
 		$('text.itemLabel').each(function (i, o) {
 			var d = o.__data__
 			var boundWidth = Math.max(0, d.points.x2 - d.points.x)
 			d.boundedWidth = Math.min(d.labelWidth, boundWidth)
 		});
 	}
-	
+
 	// calculate the widths of the labels bounded by the current view
-	function calculateLabelVisWidths () {
+	function calculateLabelVisWidths() {
 		$('text.itemLabel').each(function (i, o) {
 			var d = o.__data__
 			var leftX = Math.max(x1(brush.extent()[0]), d.points.x)
@@ -958,7 +958,7 @@ function buildGraph (response, status) {
 		});
 	}
 
-	function calculateLabelOffsets () {
+	function calculateLabelOffsets() {
 		var pageOffset = x1(brush.extent()[0]);
 		var svgOffset = $(chart[0][0]).offset().left;
 		var labelElements = $('span.itemLabel')
@@ -978,18 +978,18 @@ function buildGraph (response, status) {
 	debug.calculateLabelOffsets = calculateLabelOffsets;
 
 	// Offsets the labels horizontally so that they aren't cut off by the sides of the screen
-	function correctLabelPositions () {
+	function correctLabelPositions() {
 
 		var visStart = x1(brush.extent()[0]);
 		var visEnd = x1(brush.extent()[1]);
 
-		labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
+		labels = itemLabels.selectAll(function () { return this.getElementsByTagName("foreignObject"); })
 		if (GraphUtil.isIE())
 			labels = itemLabels.selectAll('g')
-		
+
 		labels.data(items, function (d) { return d.id; });
 
-		labels[0].each( function (o,i) {
+		labels[0].each(function (o, i) {
 
 			var d = o.__data__;
 			var pageX = visStart - d.labelStart;
@@ -1019,7 +1019,7 @@ function buildGraph (response, status) {
 
 			o.__data__.labelX = newX;
 			o.__data__.labelW = newW;
-			
+
 			if (GraphUtil.isIE())
 				d3.select(o)
 					.select(':first-child')
@@ -1028,7 +1028,7 @@ function buildGraph (response, status) {
 							return newX
 						return d.labelStart
 					})
-					.attr('textLength', function(d) { 
+					.attr('textLength', function (d) {
 						if (d.visWidth < d.labelWidth)
 							return Math.max(d.visWidth, 0.01)
 						return ''
@@ -1038,19 +1038,19 @@ function buildGraph (response, status) {
 					.attr('x', newX)
 					.attr('width', newW)
 					.select(':first-child')
-					.attr('style', function(d) { return 'height: ' + o.__data__.points.h + 'px !important;max-width: ' + newW + 'px !important;'; })
+					.attr('style', function (d) { return 'height: ' + o.__data__.points.h + 'px !important;max-width: ' + newW + 'px !important;'; })
 					.select(':first-child')
 					.select(':first-child')
-					.attr('style', function(d) { return 'width: ' + newW + 'px !important;max-width: ' + newW + 'px !important;'; });
+					.attr('style', function (d) { return 'width: ' + newW + 'px !important;max-width: ' + newW + 'px !important;'; });
 
 		});
 	}
 	debug.correctLabelPositions = correctLabelPositions;
 
 	// setup all the heights to fit to the rect height
-	function setupHeights (newRectHeight) {
+	function setupHeights(newRectHeight) {
 		mainRectHeight = isNaN(newRectHeight) ? mainRectHeight : newRectHeight;
-		mainHeight = ((maxStack+1)*mainRectHeight) + margin.bottom;
+		mainHeight = ((maxStack + 1) * mainRectHeight) + margin.bottom;
 		height = mainHeight + miniHeight + margin.top + margin.bottom;
 		$('.main').height(mainHeight);
 		$('clippath rect').height(mainHeight);
@@ -1061,7 +1061,7 @@ function buildGraph (response, status) {
 	}
 
 	// gets the css classes that apply to task @param d
-	function getClasses (d) {
+	function getClasses(d) {
 		var classString = 'unselectable '
 			+ (d.selected ? 'selected ' : '')
 			+ (d.milestone ? 'milestone ' : '')
@@ -1087,24 +1087,24 @@ function buildGraph (response, status) {
 	}
 
 	// gets the points string for task polygons
-	function getPoints (d) {
+	function getPoints(d) {
 		var points = {};
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
 		var offset = Math.floor((taskHeight - 1) / 2);
-		var y = (d.stack-offset) * mainRectHeight + 0.4 * mainRectHeight + 0.5;
+		var y = (d.stack - offset) * mainRectHeight + 0.4 * mainRectHeight + 0.5;
 		var w = x1(d.end) - x1(d.start) - 2;
 		var h = (mainRectHeight) * taskHeight - (mainRectHeight * 0.2);
 		var x2 = Math.max(x + anchorOffset - 2, x + w - anchorOffset);
 		if (w < anchorOffset)
 			x2 = x + w;
-		var y2 = y + (h/2);
-		return {x:x, y:y, x2:x2, y2:y2, w:w, h:h};
+		var y2 = y + (h / 2);
+		return { x: x, y: y, x2: x2, y2: y2, w: w, h: h };
 	}
 
 
 	// gets the points string for mini polygons
-	function getPointsMini (d) {
+	function getPointsMini(d) {
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var offset = Math.floor((taskHeight - 1) / 2);
 		var xa = Math.floor(x(d.start));
@@ -1112,21 +1112,21 @@ function buildGraph (response, status) {
 		var w = Math.max(Math.floor(x(d.end)) - Math.floor(x(d.start)) - miniRectStroke, 1);
 		var h = (miniRectHeight) * taskHeight - miniRectStroke;
 		return xa + ',' + ya + ' '
-			+ (xa+w) + ',' + ya + ' '
-			+ (xa+w) + ',' + (ya+h) + ' '
-			+ xa + ',' + (ya+h) + ' ';
+			+ (xa + w) + ',' + ya + ' '
+			+ (xa + w) + ',' + (ya + h) + ' '
+			+ xa + ',' + (ya + h) + ' ';
 
 	}
 
 	// used to get the offset used for dependency arrows' links to the task rects
-	function getAnchorLocation (d) {
+	function getAnchorLocation(d) {
 		var p = d.predecessor;
 		var s = d.successor;
 		var ps = p.start.getTime();
 		var pe = p.end.getTime();
 		var ss = s.start.getTime();
 		var se = s.end.getTime();
-		return [ x1(new Date(ps + 0.9*(pe-ps))), x1(new Date(se - 0.9*(se-ss))) ];
+		return [x1(new Date(ps + 0.9 * (pe - ps))), x1(new Date(se - 0.9 * (se - ss)))];
 	}
 
 
@@ -1149,42 +1149,42 @@ function buildGraph (response, status) {
 			toggleTaskSelection(taskSelected, true) // if another task is selected, deselect that one first
 			taskSelected = taskObject;
 		}
-		
+
 		// recursively style all tasks and dependencies connected to this task
-		function styleDependencies (task, direction) {
+		function styleDependencies(task, direction) {
 			if (selecting != task.selected) {
 				task.selected = selecting;
 
 				if (direction == 'left' || direction == 'both')
-					$.each(task.predecessors.concat(task.redundantPredecessors), function(i, d) {
+					$.each(task.predecessors.concat(task.redundantPredecessors), function (i, d) {
 						d.selected = selecting;
-						styleDependencies(d.predecessor ,'left');
+						styleDependencies(d.predecessor, 'left');
 					});
 				if (direction == 'right' || direction == 'both')
-					$.each(task.successors.concat(task.redundantSuccessors), function(i, d) {
+					$.each(task.successors.concat(task.redundantSuccessors), function (i, d) {
 						d.selected = selecting;
-						styleDependencies(d.successor ,'right');
+						styleDependencies(d.successor, 'right');
 					});
 			}
 		}
 
 		styleDependencies(taskObject, 'both');
 
-		if ( ! selecting )
+		if (!selecting)
 			taskSelected = null;
 
-		if ( ! skipRepaint ) {
+		if (!skipRepaint) {
 			display(false, false, true);
 			correctLabelPositions()
 		}
 	}
 
 	// moves the brush to the selected location
-	function moveBrush () {
+	function moveBrush() {
 		var origin = d3.mouse(this);
 		var point = x.invert(origin[0]);
 
-		if ( ! brush.empty() ) {
+		if (!brush.empty()) {
 			var halfExtent = (brush.extent()[1].getTime() - brush.extent()[0].getTime()) / 2;
 			var start = new Date(point.getTime() - halfExtent);
 			var end = new Date(point.getTime() + halfExtent);
@@ -1194,19 +1194,19 @@ function buildGraph (response, status) {
 			var end = new Date(point.getTime() + halfExtent);
 		}
 
-		brush.extent([start,end]);
+		brush.extent([start, end]);
 		display(true, false);
 	}
 
 	// cuts off any labels that extend outside of their task's polygon
-	function trimLabels () {
+	function trimLabels() {
 		$('.itemLabel').each(function (i, label) {
 			var poly = $('#task-');
 		});
 	}
 
 	// calculate stacking values for @param task
-	function calculateStacks () {
+	function calculateStacks() {
 
 		var waiting = true;
 		var stack = [];
@@ -1214,7 +1214,7 @@ function buildGraph (response, status) {
 		var maxIndex = 1000;
 		var rectHeight = 20;
 
-		function calculateStack (task) {
+		function calculateStack(task) {
 
 			// check if this task has already been placed
 			if (task == null || task.stack != null)
@@ -1225,7 +1225,7 @@ function buildGraph (response, status) {
 				return;
 
 			// the ideal location for any given task is the average of its predecessors
-			var ideal = minIndex + Math.round((maxIndex-minIndex) / 2);
+			var ideal = minIndex + Math.round((maxIndex - minIndex) / 2);
 			if (task.predecessors.length > 0)
 				ideal = getIdealStackLocation(task, getPredecessors(task), 'p');
 			addTask(task, ideal, false);
@@ -1239,10 +1239,10 @@ function buildGraph (response, status) {
 		}
 
 		// inserts @param task as close to @param row as possible
-		function addTask (task, ideal, correcting) {
+		function addTask(task, ideal, correcting) {
 
 			// first check if the ideal location is availible
-			if ( ! stack[ideal] || canFitInRow(task, stack, ideal) ) {
+			if (!stack[ideal] || canFitInRow(task, stack, ideal)) {
 				insertIntoStack(task, stack, ideal);
 
 				// if not, move outwards from that location, until an empty location or a location worth switching for
@@ -1277,12 +1277,12 @@ function buildGraph (response, status) {
 		}
 
 		// Sorts the successors of @param task
-		function sortSuccessors (task) {
+		function sortSuccessors(task) {
 			var toSort = getSuccessors(task);
 			var sorted = [];
 			while (toSort.size() > 0) {
 				for (var i = 1; i < toSort.size(); ++i) {
-					if ( (toSort[0].predecessorIds.valueOf() == toSort[i].predecessorIds.valueOf()) && (getSuccessors(toSort[0]).valueOf() == getSuccessors(toSort[i]).valueOf()) ) {
+					if ((toSort[0].predecessorIds.valueOf() == toSort[i].predecessorIds.valueOf()) && (getSuccessors(toSort[0]).valueOf() == getSuccessors(toSort[i]).valueOf())) {
 						sorted.push(toSort[i]);
 						toSort.splice(i, 1);
 					}
@@ -1294,39 +1294,39 @@ function buildGraph (response, status) {
 			return sorted;
 		}
 
-		function hasUndefinedPredecessors (task) {
+		function hasUndefinedPredecessors(task) {
 			for (var i = 0; i < task.predecessors.length; ++i)
 				if (task.predecessors[i].predecessor.stack == null)
 					return true;
 			return false;
 		}
 
-		function hasUndefindedSuccessors (task) {
+		function hasUndefindedSuccessors(task) {
 			for (var i = 0; i < task.successors.length; ++i)
 				if (task.successors[i].successor.stack == null)
 					return true;
 			return false;
 		}
 
-		function insertIntoStack (task, stack, row) {
+		function insertIntoStack(task, stack, row) {
 			insertIntoStack2(task, stack, row);
 		}
-		function insertIntoStack2 (task, stack, row) {
-			var low = Math.floor((Math.max(1, task.height)-1)/2);
-			var high = Math.ceil((Math.max(1, task.height)-1)/2);
+		function insertIntoStack2(task, stack, row) {
+			var low = Math.floor((Math.max(1, task.height) - 1) / 2);
+			var high = Math.ceil((Math.max(1, task.height) - 1) / 2);
 			maxIndex = Math.max(maxIndex, row + high);
 			minIndex = Math.min(minIndex, row - low);
 
-			for (var r = 0-low; r <= high; ++r) {
-				if (stack[row+r] == null)
-					stack[row+r] = [];
-				stack[row+r].push([x(task.start), x(task.end)]);
+			for (var r = 0 - low; r <= high; ++r) {
+				if (stack[row + r] == null)
+					stack[row + r] = [];
+				stack[row + r].push([x(task.start), x(task.end)]);
 			}
 			task.stack = row;
 		}
 
 		// gets the best stack location for task (object) based on related tasks.
-		function getIdealStackLocation (task, related, direction) {
+		function getIdealStackLocation(task, related, direction) {
 
 			// if only a single parent is involved, fill its height
 			if (related.size() == 1) {
@@ -1334,9 +1334,9 @@ function buildGraph (response, status) {
 				for (var i = 0; i < getSuccessors(related[0]).size(); ++i)
 					if (getPredecessors(getSuccessors(related[0])[i]).size() == 1)
 						siblings.push(getSuccessors(related[0])[i]);
-				var offsetFromParent = Math.floor((Math.max(1, related[0].height)-1)/2);
+				var offsetFromParent = Math.floor((Math.max(1, related[0].height) - 1) / 2);
 				var offsetFromSiblings = 0;
-				var offsetFromHeight = Math.floor((Math.max(1, task.height)-1)/2);
+				var offsetFromHeight = Math.floor((Math.max(1, task.height) - 1) / 2);
 				if (siblings.indexOf(task) != -1) {
 					for (var i = 0; i < siblings.indexOf(task); i++)
 						offsetFromSiblings += Math.max(1, siblings[i].height);
@@ -1368,45 +1368,45 @@ function buildGraph (response, status) {
 			}
 
 			// check if the ideal location is directly between 2 values
-			if ((sum/count) - Math.floor(sum/count) == 0.5) {
+			if ((sum / count) - Math.floor(sum / count) == 0.5) {
 
 
 				if ((task.height % 2) == 0)
-					return Math.floor(sum/count);
-				return Math.ceil(sum/count);
+					return Math.floor(sum / count);
+				return Math.ceil(sum / count);
 			}
 			if (sum == 0)
 				return 0;
-			if (Math.abs((sum/count) - Math.round(sum / count)) == 0.5) {
+			if (Math.abs((sum / count) - Math.round(sum / count)) == 0.5) {
 
 			}
 
 			return Math.round(sum / count);
 		}
 
-		function getTimeBetween (taskA, taskB) {
-			return Math.min( Math.abs(x(taskA.start)-x(taskB.end)),
-				Math.abs(x(taskB.start)-x(taskA.end)) );
+		function getTimeBetween(taskA, taskB) {
+			return Math.min(Math.abs(x(taskA.start) - x(taskB.end)),
+				Math.abs(x(taskB.start) - x(taskA.end)));
 		}
 
-		function getDependentTasks (task) {
+		function getDependentTasks(task) {
 			return getPredecessors(task).concat(getSuccessors(task));
 		}
 
 		// checks if a task can fit in a row in the stack
-		function canFitInRow (task, stack, row) {
-			var low = Math.floor((Math.max(1, task.height)-1)/2);
-			var high = Math.ceil((Math.max(1, task.height)-1)/2);
-			for (var r = 0-low; r <= high; ++r) {
-				if (stack[row+r] != null)
-					for (var i = 0; i < stack[row+r].length; ++i) {
-						var startsBefore = stack[row+r][i][0] < x(task.exEnd);
-						var endsAfter = stack[row+r][i][1] > x(task.start);
+		function canFitInRow(task, stack, row) {
+			var low = Math.floor((Math.max(1, task.height) - 1) / 2);
+			var high = Math.ceil((Math.max(1, task.height) - 1) / 2);
+			for (var r = 0 - low; r <= high; ++r) {
+				if (stack[row + r] != null)
+					for (var i = 0; i < stack[row + r].length; ++i) {
+						var startsBefore = stack[row + r][i][0] < x(task.exEnd);
+						var endsAfter = stack[row + r][i][1] > x(task.start);
 						if (startsBefore && endsAfter)
 							return false;
 					}
 				else
-					stack[row+r] = [];
+					stack[row + r] = [];
 			}
 			return true;
 		}
@@ -1420,7 +1420,7 @@ function buildGraph (response, status) {
 		return maxIndex - minIndex;
 	}
 
-	function getSuccessors (task) {
+	function getSuccessors(task) {
 		if (!task)
 			return;
 		var tasks = [];
@@ -1429,7 +1429,7 @@ function buildGraph (response, status) {
 		return tasks;
 	}
 
-	function getPredecessors (task) {
+	function getPredecessors(task) {
 		if (!task)
 			return;
 		var tasks = [];
@@ -1439,7 +1439,7 @@ function buildGraph (response, status) {
 	}
 
 	// increases/decreases the current brush extent. called when the user scrolls on the mini graph.
-	function zoom () {
+	function zoom() {
 		var delta = 1;
 		var halfExtent = (brush.extent()[1].getTime() - brush.extent()[0].getTime()) / 2;
 		if (d3.event.sourceEvent.deltaY < 0)
@@ -1447,9 +1447,9 @@ function buildGraph (response, status) {
 		if (d3.event.sourceEvent.deltaY > 0 && halfExtent > 50000)
 			delta = 0.8;
 		var midpoint = (brush.extent()[1].getTime() + brush.extent()[0].getTime()) / 2;
-		var newStart = midpoint - (halfExtent*delta);
-		var newEnd = midpoint + (halfExtent*delta);
-		brush.extent([new Date(newStart),new Date(newEnd)]);
+		var newStart = midpoint - (halfExtent * delta);
+		var newEnd = midpoint + (halfExtent * delta);
+		brush.extent([new Date(newStart), new Date(newEnd)]);
 		display(true, true);
 	}
 
@@ -1460,7 +1460,7 @@ function buildGraph (response, status) {
 	 - converting the start and completion times for tasks from date Strings to javascript Dates
 	 - populates the dependencies list from data in the items list
 	 - corrects any impossible start times for tasks */
-	function sanitizeData (tasks, dependencies) {
+	function sanitizeData(tasks, dependencies) {
 
 		data.searchFilter = '';
 
@@ -1474,13 +1474,13 @@ function buildGraph (response, status) {
 		// if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
 		for (var i = 0; i < Object.keys(data.cyclicals).size(); i++) {
 			var key = parseInt(Object.keys(data.cyclicals)[i]);
-			var predecessor = items[binarySearch(items, key, 0, items.length-1)];
+			var predecessor = items[binarySearch(items, key, 0, items.length - 1)];
 			var stack = data.cyclicals[Object.keys(data.cyclicals)[i]];
 			for (var j = 0; j < stack.size(); ++j) {
-				var node = items[binarySearch(items, stack[j], 0, items.length-1)];
+				var node = items[binarySearch(items, stack[j], 0, items.length - 1)];
 				if (node.predecessorIds.indexOf(key) != -1) {
 					// construct a dependency object and move the predecessorId to the redundant list
-					var depObject = { "predecessor":predecessor, "successor":node, "modifier":"hidden", "selected":false, "redundant":true, "cyclical":true };
+					var depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
 					depObject.root = predecessor.root;
 					predecessor.redundantSuccessors.push(depObject);
 					node.redundantPredecessors.push(depObject);
@@ -1499,7 +1499,7 @@ function buildGraph (response, status) {
 		if (starts.size() > 1) {
 			var earliest = starts[0].startInitial;
 			for (var i = 0; i < starts.size(); i++) {
-				var task = items[binarySearch(items, starts[i], 0, items.length-1)];
+				var task = items[binarySearch(items, starts[i], 0, items.length - 1)];
 				task.predecessorIds.push(-10);
 				earliest = Math.min(earliest, task.startInitial);
 			}
@@ -1513,15 +1513,15 @@ function buildGraph (response, status) {
 			items = [root].concat(items);
 			data.root = root;
 		} else if (items.size() > 0) {
-			data.root = items[binarySearch(items, starts[0], 0, items.length-1)];
+			data.root = items[binarySearch(items, starts[0], 0, items.length - 1)];
 		}
 
 		// convert all data to its proper format
 		var startTime = parseStartDate(data.startDate);
 		for (var i = 0; i < items.length; ++i) {
 			items[i].milestone = (items[i].startInitial == items[i].endInitial);
-			items[i].startInitial = new Date(startTime.getTime() + (items[i].startInitial)*60000);
-			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone)*60000);
+			items[i].startInitial = new Date(startTime.getTime() + (items[i].startInitial) * 60000);
+			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone) * 60000);
 			items[i].start = null;
 			items[i].end = null;
 			items[i].exChild = null;
@@ -1542,17 +1542,19 @@ function buildGraph (response, status) {
 
 		// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created
 		for (var i = 0; i < items.length; ++i)
-			if (items[i].predecessorIds)
+			if (items[i] && items[i].predecessorIds)
 				for (var j = 0; j < items[i].predecessorIds.length; ++j) {
-					var predecessorIndex = binarySearch(items, items[i].predecessorIds[j], 0, items.length-1)
-					var depObject = { "predecessor":items[predecessorIndex], "successor":items[i], "modifier":"hidden", "selected":false, "redundant":false, "cyclical":false, "criticalPath":false};
-					if (items[predecessorIndex].criticalPath && items[i].criticalPath)
-						depObject.criticalPath = true;
-					if (predecessorIndex != -1) {
-						depObject.root = items[predecessorIndex].root;
-						items[predecessorIndex].successors.push(depObject);
-						items[i].predecessors.push(depObject);
-						dependencies.push(depObject);
+					var predecessorIndex = binarySearch(items, items[i].predecessorIds[j], 0, items.length - 1)
+					if (items[predecessorIndex]) {
+						var depObject = { "predecessor": items[predecessorIndex], "successor": items[i], "modifier": "hidden", "selected": false, "redundant": false, "cyclical": false, "criticalPath": false };
+						if (items[predecessorIndex].criticalPath && items[i].criticalPath)
+							depObject.criticalPath = true;
+						if (predecessorIndex != -1) {
+							depObject.root = items[predecessorIndex].root;
+							items[predecessorIndex].successors.push(depObject);
+							items[i].predecessors.push(depObject);
+							dependencies.push(depObject);
+						}
 					}
 				}
 
@@ -1564,7 +1566,7 @@ function buildGraph (response, status) {
 				searchForRedundency(queue.pop());
 		}
 
-		function searchForRedundency (node) {
+		function searchForRedundency(node) {
 
 			/* 	Mark this node as checked.
 			 Because nodes are only added to the queue when all their predecessors
@@ -1609,7 +1611,7 @@ function buildGraph (response, status) {
 
 		/*	Searches for @param target from @param start by searching up the tree, ignoring dependency @param ignore.
 		 Returns true if the dependency is redundant. */
-		function searchUp (target, start, ignore, checked) {
+		function searchUp(target, start, ignore, checked) {
 
 			// if we found a path that reaches the target, the dependency is redundent
 			if (target == start)
@@ -1625,7 +1627,7 @@ function buildGraph (response, status) {
 
 			// search from each of this node's predecessors
 			for (var i = 0; i < start.predecessors.size(); ++i)
-				if ( start.predecessors[i] != ignore && searchUp(target, start.predecessors[i].predecessor, ignore, checked) )
+				if (start.predecessors[i] != ignore && searchUp(target, start.predecessors[i].predecessor, ignore, checked))
 					return true;
 
 			// we can't reach the target from this node, so add it to the checked list and return false
@@ -1647,7 +1649,7 @@ function buildGraph (response, status) {
 			var nonExclusiveSet = [];
 			for (var j = 0; j < exSet.size(); ++j)
 				for (var k = 0; k < getSuccessors(exSet[j]).size(); ++k)
-					if ( (exSet.indexOf(getSuccessors(exSet[j])[k]) == -1) && (nonExclusiveSet.indexOf(getSuccessors(exSet[j])[k]) == -1) )
+					if ((exSet.indexOf(getSuccessors(exSet[j])[k]) == -1) && (nonExclusiveSet.indexOf(getSuccessors(exSet[j])[k]) == -1))
 						nonExclusiveSet.push(getSuccessors(exSet[j])[k]);
 			if (nonExclusiveSet.size() == 1)
 				items[i].endOfExclusive = nonExclusiveSet[0];
@@ -1680,7 +1682,7 @@ function buildGraph (response, status) {
 				// reduce group 2
 				for (var j = 0; j < group2.length; ++j) {
 
-					var searching  = true;
+					var searching = true;
 					while (group2[j].predecessors.size() > 0 && searching) {
 
 						searching = false;
@@ -1770,7 +1772,7 @@ function buildGraph (response, status) {
 					}
 
 					for (var k = 0; k < newSuccessors.size(); ++k)
-						if ( (!inserted) && (haveSameSuccessors(newSuccessors[k].successor, oldSuccessors[j].successor, true) == 1) ) {
+						if ((!inserted) && (haveSameSuccessors(newSuccessors[k].successor, oldSuccessors[j].successor, true) == 1)) {
 							newSuccessors.splice(k, 0, oldSuccessors[j]);
 							location = k;
 							inserted = true;
@@ -1779,10 +1781,10 @@ function buildGraph (response, status) {
 
 					// keep trying, ignoring an increasing number of non-matches
 					var tolerance = 0;
-					while ( ! inserted ) {
+					while (!inserted) {
 						++tolerance;
 						for (var k = 0; k < newSuccessors.size(); ++k) {
-							if ( (!inserted) && (haveSameSuccessors(newSuccessors[k].successor, oldSuccessors[j].successor, false) <= tolerance) ) {
+							if ((!inserted) && (haveSameSuccessors(newSuccessors[k].successor, oldSuccessors[j].successor, false) <= tolerance)) {
 								newSuccessors.splice(k, 0, oldSuccessors[j]);
 								inserted = true;
 								grouped = true;
@@ -1798,7 +1800,7 @@ function buildGraph (response, status) {
 					if (!inserted) {
 						newSuccessors.push(oldSuccessors[j]);
 						if (!grouped)
-							newSuccessors = newSuccessors.sort(function (a, b) {return b.height-a.height});
+							newSuccessors = newSuccessors.sort(function (a, b) { return b.height - a.height });
 					}
 				}
 
@@ -1929,8 +1931,8 @@ function buildGraph (response, status) {
 							pushConstraintsSatisfied = 0;
 							unshiftConstraintsSatisfied = 0;
 
-							pushMatches = getMatchingGroups(bufferList[j].groups, newList[newList.length-1].groups);
-							unshiftMatches = getMatchingGroups(bufferList[j].groups, newList[newList.length-1].groups);
+							pushMatches = getMatchingGroups(bufferList[j].groups, newList[newList.length - 1].groups);
+							unshiftMatches = getMatchingGroups(bufferList[j].groups, newList[newList.length - 1].groups);
 
 							for (var k = 0; k < constraints.length; ++k) {
 
@@ -1970,11 +1972,11 @@ function buildGraph (response, status) {
 							var score = 0;
 							if (usable == -1 || usable == -2)
 								for (var k = 0; k < groups.length; ++k)
-									if ( (groups[k].indexOf(newList[0]) != -1) && (groups[k].indexOf(bufferList[j]) != -1) )
+									if ((groups[k].indexOf(newList[0]) != -1) && (groups[k].indexOf(bufferList[j]) != -1))
 										score += usable;
 							if (usable == 1 || usable == 2)
 								for (var k = 0; k < groups.length; ++k)
-									if ( (groups[k].indexOf(newList[0]) != -1) && (groups[k].indexOf(bufferList[j]) != -1) )
+									if ((groups[k].indexOf(newList[0]) != -1) && (groups[k].indexOf(bufferList[j]) != -1))
 										score += usable;
 
 
@@ -1983,11 +1985,11 @@ function buildGraph (response, status) {
 							else
 								score = (fitsConstraints && pushConstraintsSatisfied > 0) ? ++score : 0;
 
-							if ( Math.abs(score) > Math.abs(bestScore) ) {
+							if (Math.abs(score) > Math.abs(bestScore)) {
 								bestScore = score;
 								bestTask = j;
 							}
-							if ( Math.abs(score) > Math.abs(bestScore) ) {
+							if (Math.abs(score) > Math.abs(bestScore)) {
 								bestScore = score;
 								constraint = j;
 							}
@@ -2102,7 +2104,7 @@ function buildGraph (response, status) {
 					 display(newList, groups);
 					 */
 
-					function display (list, groups) {
+					function display(list, groups) {
 						console.log('--------------------------------------------');
 						for (var j = 0; j < list.length; ++j) {
 							var output = list[j].id + ' : ';
@@ -2131,7 +2133,7 @@ function buildGraph (response, status) {
 			}
 		}
 
-		function getMatchingGroups (list1, list2) {
+		function getMatchingGroups(list1, list2) {
 			var matches = 0;
 			for (var i = 0; i < Object.keys(list1).length; ++i) {
 				var key = Object.keys(list1)[i];
@@ -2141,7 +2143,7 @@ function buildGraph (response, status) {
 			return matches;
 		}
 
-		function evaluateStack (list, groups) {
+		function evaluateStack(list, groups) {
 			var score = 0;
 			var tempScore = 0;
 			var foundFirst = false;
@@ -2165,7 +2167,7 @@ function buildGraph (response, status) {
 		}
 
 
-		function removeDuplicates (list, groups) {
+		function removeDuplicates(list, groups) {
 
 			var uniqueRows = [];
 			var returnList = [];
@@ -2191,7 +2193,7 @@ function buildGraph (response, status) {
 			return returnList;
 		}
 
-		function outputChildMatrix (node) {
+		function outputChildMatrix(node) {
 			var successors = getSuccessors(node);
 			console.log('child matrix for node [' + node.id + '] ' + node.name);
 			console.log('----------------------');
@@ -2211,7 +2213,7 @@ function buildGraph (response, status) {
 
 		/*	compares two tasks, returning true if they have the same siblingGroups.
 		 assumes siblingGroupParents is sorted. */
-		function haveSameSuccessors (task1, task2, fullMatch) {
+		function haveSameSuccessors(task1, task2, fullMatch) {
 
 			var returnVal = true;
 			var parents1 = task1.siblingGroupParents;
@@ -2219,7 +2221,7 @@ function buildGraph (response, status) {
 			var matches = 0;
 			var possibleMatches = Math.max(parents1.size(), parents2.size());
 
-			if ( (fullMatch) && (parents1.size() != parents2.size()) ) {
+			if ((fullMatch) && (parents1.size() != parents2.size())) {
 				return 0;
 			}
 
@@ -2235,7 +2237,7 @@ function buildGraph (response, status) {
 		/*	fills @param set with all nodes that can only be
 		 reached from @param node and its children.
 		 (This only works if successors are in chronological order)*/
-		function getExclusiveSet (node, set) {
+		function getExclusiveSet(node, set) {
 			set.push(node);
 			getSuccessors(node).forEach(function (c) {
 
@@ -2260,7 +2262,7 @@ function buildGraph (response, status) {
 		}
 
 		// gets the exclusive height for @param task recursively
-		function getExHeight (task) {
+		function getExHeight(task) {
 			var set = [];
 			getExclusiveSet(task, set);
 			var height = 0;
@@ -2271,7 +2273,7 @@ function buildGraph (response, status) {
 		}
 
 		// gets the exclusive end for @param task
-		function getExEnd (task) {
+		function getExEnd(task) {
 			var set = [];
 			getExclusiveSet(task, set);
 			var end = set[0].end;
@@ -2289,7 +2291,7 @@ function buildGraph (response, status) {
 
 		/*	Calculates the exclusive heights of all tasks in @param set
 		 that are reachable from the root @param task.	*/
-		function exclusiveHeight (task, set) {
+		function exclusiveHeight(task, set) {
 
 			// if this task is not a leaf, check its successors
 			if (intersection(getSuccessors(task), set).size() > 0) {
@@ -2327,7 +2329,7 @@ function buildGraph (response, status) {
 							successor.exParent = newList[0];
 						}
 						for (var i = 0; i < successor.height; ++i)
-							++(oldList.sort(function (a, b) {return a.height-b.height})[0].height)
+							++(oldList.sort(function (a, b) { return a.height - b.height })[0].height)
 					}
 
 					// remove this successor from the set
@@ -2343,7 +2345,7 @@ function buildGraph (response, status) {
 		}
 
 		// gets the intersection of two sets
-		function intersection (set1, set2) {
+		function intersection(set1, set2) {
 			var set3 = [];
 			for (var i = 0; i < set1.size(); ++i)
 				if (set2.indexOf(set1[i]) != -1)
@@ -2353,8 +2355,8 @@ function buildGraph (response, status) {
 	}
 
 	// ensures times are correct
-	function calculateTimes (task, checking) {
-		if ( ! task.start ) {
+	function calculateTimes(task, checking) {
+		if (!task.start) {
 			if (task.predecessors.length == 0) {
 				task.start = task.startInitial;
 			} else {
@@ -2369,12 +2371,12 @@ function buildGraph (response, status) {
 				task.start = latest;
 			}
 		}
-		if ( ! task.end ) {
+		if (!task.end) {
 			if (task.root) {
-				task.start = new Date(task.start.getTime()-2);
-				task.end = new Date(task.start.getTime()-1);
+				task.start = new Date(task.start.getTime() - 2);
+				task.end = new Date(task.start.getTime() - 1);
 			} else {
-				task.end = new Date(task.start.getTime() + (task.endInitial.getTime()-task.startInitial.getTime()));
+				task.end = new Date(task.start.getTime() + (task.endInitial.getTime() - task.startInitial.getTime()));
 			}
 		}
 		return task.end;
@@ -2384,19 +2386,19 @@ function buildGraph (response, status) {
 	function binarySearch(list, key, imin, imax) {
 		if (imax < imin) return -1;
 		var imid = Math.round((imin + imax) / 2);
-		if (list[imid].id > key) return binarySearch(list, key, imin, imid-1);
-		else if (list[imid].id < key) return binarySearch(list, key, imid+1, imax);
+		if (list[imid].id > key) return binarySearch(list, key, imin, imid - 1);
+		else if (list[imid].id < key) return binarySearch(list, key, imid + 1, imax);
 		else return imid;
 	}
 
 	// gets the current time as a Date object
-	function now () {
+	function now() {
 		var now = new Date();
 		return new Date(now.getTime());
 	}
 
 	// returns true if all of task d's predecessors are completed
-	function isReady (d) {
+	function isReady(d) {
 		for (var i = 0; i < d.predecessors.length; ++i)
 			if (d.predecessors[i].predecessor.status != 'Completed')
 				return false;
@@ -2404,14 +2406,14 @@ function buildGraph (response, status) {
 	}
 
 	// returns true if the event was a left click, return false if it was a different kind of click
-	function isLeftClick () {
+	function isLeftClick() {
 		if (d3.event.isLeftClick == undefined)
 			return d3.event.button == 0
 		return d3.event.isLeftClick()
 	}
 }
 
-function submitForm () {
+function submitForm() {
 	$('.chart').remove();
 	d3.select('#svgContainerId').style('display', 'none')
 	generateGraph($('#moveEventId').val());
@@ -2421,11 +2423,11 @@ function submitForm () {
 /**
  * Call the REST API to grab the data to generate the Timeline
  */
-function generateGraph (event) {
+function generateGraph(event) {
 	var params = {};
 
 	if (event != 0) {
-		params = {'moveEventId':event};
+		params = { 'moveEventId': event };
 	}
 
 	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? '1' : '0';
@@ -2436,17 +2438,17 @@ function generateGraph (event) {
 		dataType: 'json',
 		url: 'taskTimelineData',
 		data: params,
-		type:'GET',
+		type: 'GET',
 		complete: buildGraph
 	});
 }
 
 // highlight tasks matching the user's regex
-function performSearch () {
+function performSearch() {
 	if ($('svg#timelineSVGId') != null) {
 		var searchString = $('#searchBoxId').val();
 		var data = getData();
-		var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length-1) == '/');
+		var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length - 1) == '/');
 		var isRegex = false;
 		var regex = /.*/;
 
@@ -2454,7 +2456,7 @@ function performSearch () {
 		// check if the user entered an invalid regex
 		if (hasSlashes) {
 			try {
-				regex = new RegExp(searchString.substring(1, searchString.length-1));
+				regex = new RegExp(searchString.substring(1, searchString.length - 1));
 				isRegex = _.isRegExp(regex);
 			} catch (e) {
 				alert(e);
@@ -2488,13 +2490,13 @@ function performSearch () {
 	return false;
 }
 
-function clearFilter () {
+function clearFilter() {
 	$('#searchBoxId').val('');
 	handleClearFilterStatus();
 	performSearch();
 }
 
-function handleClearFilterStatus () {
+function handleClearFilterStatus() {
 	if ($('#searchBoxId').val() != '')
 		$('#filterClearId').removeClass('disabled');
 	else
@@ -2552,39 +2554,39 @@ function dateDiffByDef(date1, date2, _DEF) {
  * @param period 'years', 'months', 'weeks', 'days', 'hours', 'minutes'
  * @returns {number}
  */
-function specifTimeDiff(startDate, endDate, period){
+function specifTimeDiff(startDate, endDate, period) {
 	var start = moment(startDate);
 	var end = moment(endDate);
 	return end.diff(start, period);
 }
 
 function applyScaleDefinition(msConversion, scale, differScaleTime) {
-	if( msConversion === _MS_PER_MIN) {
+	if (msConversion === _MS_PER_MIN) {
 		scale.time = d3.time.minute;
 		scale.tick = 10;
 		scale.format = d3.time.format('%I:%M%p');
 	}
-	if( msConversion === _MS_PER_HOUR) {
+	if (msConversion === _MS_PER_HOUR) {
 		scale.time = d3.time.hour;
 		scale.tick = 5;
 		scale.format = d3.time.format('%b %d, %I %p');
 	}
-	if( msConversion === _MS_PER_DAY) {
+	if (msConversion === _MS_PER_DAY) {
 		scale.time = d3.time.day;
 		scale.tick = 1;
 		scale.format = d3.time.format('%b %d');
 	}
-	if( msConversion === _MS_PER_WEEK) {
+	if (msConversion === _MS_PER_WEEK) {
 		scale.time = d3.time.week;
 		scale.tick = 2;
 		scale.format = d3.time.format('%b %d');
 	}
-	if( msConversion === _MS_PER_MONTH) {
+	if (msConversion === _MS_PER_MONTH) {
 		scale.time = d3.time.month;
 		scale.tick = 1;
 		scale.format = d3.time.format('%b %Y');
 	}
-	if( msConversion === _MS_PER_YEAR) {
+	if (msConversion === _MS_PER_YEAR) {
 		scale.time = d3.time.year;
 		scale.tick = 1;
 		scale.format = d3.time.format('%Y');
@@ -2616,61 +2618,61 @@ function getTimeFormatToDraw(startDate, endDate, increasePer) {
 	var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 		difference = 0,
 		maxTick = _MAX_TICK_PERFORMANCE,
-		scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute, zoomTime: 30 * _MS_PER_MIN};
+		scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute, zoomTime: 30 * _MS_PER_MIN };
 
 
-	for(var i = 0; i < msConversion.length; i++) {
+	for (var i = 0; i < msConversion.length; i++) {
 
-		if(increasePer && msConversion[i] === _MS_PER_MIN) {
+		if (increasePer && msConversion[i] === _MS_PER_MIN) {
 			maxTick = 25;
 		}
 
-		if(increasePer && msConversion[i] === _MS_PER_WEEK) {
+		if (increasePer && msConversion[i] === _MS_PER_WEEK) {
 			maxTick = 25;
 		}
 
 		difference = dateDiffByDef(startDate, endDate, msConversion[i]);
-		if(difference <= maxTick ) {
+		if (difference <= maxTick) {
 			applyScaleDefinition(msConversion[i], scale, true);
 
-			if(increasePer && msConversion[i] === _MS_PER_HOUR) {
+			if (increasePer && msConversion[i] === _MS_PER_HOUR) {
 				scale.tick = 1;
 				scale.format = d3.time.format('%I:%M%p');
 
 				var hours = specifTimeDiff(startDate, endDate, 'hours');
-				if(!isNaN(hours) && hours >=  10 ) {
+				if (!isNaN(hours) && hours >= 10) {
 					scale.tick = 2;
 				}
 
-				if(!isNaN(hours) && hours >=  20 ) {
+				if (!isNaN(hours) && hours >= 20) {
 					scale.tick = 5;
 					scale.format = d3.time.format('%b %d, %I %p');
 				}
 
 			}
 
-			if(increasePer && msConversion[i] === _MS_PER_WEEK) {
+			if (increasePer && msConversion[i] === _MS_PER_WEEK) {
 				scale.format = d3.time.format('%b %d (week %W)');
 			}
 
-			if(increasePer && msConversion[i] === _MS_PER_DAY) {
+			if (increasePer && msConversion[i] === _MS_PER_DAY) {
 				var weeks = specifTimeDiff(startDate, endDate, 'weeks');
-				if(!isNaN(weeks) && weeks >=  2 ) {
+				if (!isNaN(weeks) && weeks >= 2) {
 					scale.tick = scale.tick + 2;
 				}
 			}
 
 
-			if(increasePer && msConversion[i] === _MS_PER_MIN) {
+			if (increasePer && msConversion[i] === _MS_PER_MIN) {
 				var hours = specifTimeDiff(startDate, endDate, 'hours');
-				if(!isNaN(hours) && hours >=  2 ) {
+				if (!isNaN(hours) && hours >= 2) {
 					scale.tick = scale.tick + 20;
 				}
 			}
 
-			if(increasePer && msConversion[i] === _MS_PER_WEEK) {
+			if (increasePer && msConversion[i] === _MS_PER_WEEK) {
 				var months = specifTimeDiff(startDate, endDate, 'months');
-				if(!isNaN(months) && months >=  1 ) {
+				if (!isNaN(months) && months >= 1) {
 					scale.tick = scale.tick + months;
 				}
 			}
