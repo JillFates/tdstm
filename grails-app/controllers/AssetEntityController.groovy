@@ -7,6 +7,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
@@ -741,8 +742,12 @@ class AssetEntityController implements ControllerMethods {
 			// Generate the results and save into the batch for historical reference
 			// log.debug "saveProcessResultsToBatch: theSheetName=$theSheetName, theResults = $theResults"
 			StringBuffer sprtbMsg = generateResults(theResults, theResults[theSheetName].skipped, [theSheetName], false)
-			dataTransferBatch.importResults = sprtbMsg.toString()
-			dataTransferBatch.save()
+			if (dataTransferBatch != null) {
+				dataTransferBatch.importResults = sprtbMsg.toString()
+				dataTransferBatch.save()
+			} else {
+				throw new Exception(sprtbMsg.toString())
+			}
 		}
 
 		setBatchId 0
@@ -1359,10 +1364,10 @@ class AssetEntityController implements ControllerMethods {
 
 		} catch(NumberFormatException e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-			forward action:forwardAction, params: [error: e]
+			forward action:forwardAction, params: [error: e.message]
 		} catch(Exception e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-			forward action:forwardAction, params: [error: e]
+			forward action:forwardAction, params: [error: e.message]
 		}
 	}
 
