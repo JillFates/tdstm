@@ -389,7 +389,6 @@ class SecurityServiceTests extends Specification {
 
 		when: "a Pasword reset is created"
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
-
 		then: "the PaswordReset should be valid"
 			PasswordReset pr2 = securityService.validateToken(token)
 			pr2 != null
@@ -411,12 +410,13 @@ class SecurityServiceTests extends Specification {
 			PasswordResetType resetType = PasswordResetType.WELCOME
 			long tokenTTL = securityService.accountActivationTTL
 
-		when: "An already expired PaswordReset is created & we try to validate the Token"
+		when: 'an PasswordReset is created with and expired date'
 			securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
+		and: 'validating the token is attempted'
 			securityService.validateToken(token)
-
-		then: "The Password reset should have expired, exception message is expected"
+		then: 'an exception should be thrown'
 			ServiceException ex = thrown()
+		and: 'the exception has message identify that the token has expired'
 			ex.message.startsWith("The password reset token has expired")
 	}
 
@@ -431,23 +431,21 @@ class SecurityServiceTests extends Specification {
 			securityService.setAccountActivationTTL(THREE_SECONDS_AGO)
 			String token = "SomeToken"
 			String ipAddress = "127.0.0.1"
-			EmailDispatch ed = null //Not really needed
+			EmailDispatch ed = null // Not really needed
 			PasswordResetType resetType = PasswordResetType.WELCOME
+			int initialNumOfPending = PasswordReset.findAllByStatus("PENDING").size()
 
-		when: "An already expired PaswordReset is created and we check how many Passwords are in the DB"
+		when: 'a PasswordReset is created with a past-due expiry date'
 			PasswordReset pr = securityService.createPasswordReset(token, ipAddress, privUser, privPerson, ed, resetType)
+		and:  'we get the list the of PENDING PasswordReset records'
 			List<PasswordReset> lista = PasswordReset.findAllByStatus("PENDING") ?: []
-			int counter = lista.size()
+		then: 'the list should contain an additional PasswordReset record'
+			lista.size() == (initialNumOfPending + 1)
 
-		then: "We have Pending for approval"
-			counter > 0
-
-		when: "cleanup and check again"
+		when: 'the cleanupPasswordReset method is called'
 			securityService.cleanupPasswordReset()
 			List<PasswordReset> list = PasswordReset.findAllByStatus("PENDING") ?: []
-			int afterCounter = list.size()
-
-		then: "All pending request are removed"
-			afterCounter == 0
+		then: 'the expired PasswordReset record should be removed'
+			list.size() <= initialNumOfPending
 	}
 }
