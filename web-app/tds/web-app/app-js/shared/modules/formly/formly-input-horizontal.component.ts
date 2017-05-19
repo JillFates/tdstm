@@ -11,7 +11,7 @@ import {FieldWrapper} from 'ng-formly';
     template: `<div class="form-group" [ngClass]="{'has-danger': !formControl.valid}">
       <label attr.for="{{key}}" class="col-sm-2 control-label">{{to.label}}: {{to.required ? "*" : ""}}</label>
       <div class="col-sm-10" [style.max-width.px]="to.options[0].maxWidth">
-        <template #fieldComponent></template>
+        <ng-template #fieldComponent></ng-template>
       </div>
     </div>`
 })

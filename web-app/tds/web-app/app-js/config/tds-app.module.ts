@@ -2,20 +2,21 @@
  * App or Root Module
  * it identify how the TDS App is being constructed
  */
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
-import {HttpModule, Http} from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader } from '@angular/core';
+import { HttpModule, Http } from '@angular/http';
 
 // import {TranslateModule, TranslateLoader, TranslateStaticLoader} from 'ng2-translate';
 
-import {TDSAppComponent} from './tds-app.component';
+import { TDSAppComponent } from './tds-app.component';
 // Feature modules
-import {SharedModule} from'../shared/shared.module';
-import {NoticesManagerModule} from '../modules/noticeManager/notice-manager.module';
-import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
+import { SharedModule } from '../shared/shared.module';
+import { NoticesManagerModule } from '../modules/noticeManager/notice-manager.module';
+import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 // Router Logic
-import {UIRouterModule, UIView} from '@uirouter/angular';
-import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
+import { UIRouterModule, UIView } from '@uirouter/angular';
+import { TDSRoutingStates, AuthConfig } from './tds-routing.states';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -23,6 +24,7 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         // Angular Modules
         BrowserModule,
         HttpModule,
+        BrowserAnimationsModule,
         // Feature Modules
         SharedModule,
         NoticesManagerModule,
@@ -43,7 +45,7 @@ import {TDSRoutingStates, AuthConfig} from './tds-routing.states';
         TDSAppComponent,
     ], // components, directives and pipes ONLY and only ONCE\
     providers: [
-        {provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader}
+        { provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
     ],
     bootstrap: [UIView]
 })
