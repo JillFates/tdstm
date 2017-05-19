@@ -21,7 +21,7 @@ describe('TranslatePipe:', () => {
                     'Level3B': 'Bar.'
                 }
             }
-        }
+        };
 
         pipe = new TranslatePipe(dictionary);
     });

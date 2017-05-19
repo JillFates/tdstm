@@ -165,7 +165,9 @@ gulp.task('build-vendor', function () {
     // Include all NPM Package from the build
     getNPMPackageIds().forEach(function (id) {
         // Does not include
-        if (id !== 'zone.js' && id !== 'core-js' && id !== 'rxjs') {
+        if (id === 'jszip') {
+            browserifyProcesor.require(nodeResolve.sync(id), { expose: 'jszip/dist/jszip' });
+        } else if (id !== 'zone.js' && id !== 'core-js' && id !== 'rxjs') {
             browserifyProcesor.require(nodeResolve.sync(id), { expose: id });
         }
     });
