@@ -117,7 +117,7 @@ class UserLogin {
 	}
 
 	boolean hasExpired() {
-		expiryDate <= new Date()
+		expiryDate <= TimeUtil.nowGMT()
 	}
 
 	boolean isDisabled() {

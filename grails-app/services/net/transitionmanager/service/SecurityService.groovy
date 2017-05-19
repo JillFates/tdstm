@@ -19,7 +19,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.plugin.springsecurity.SpringSecurityService
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
@@ -34,7 +33,6 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
@@ -48,11 +46,6 @@ import org.springframework.web.context.request.RequestContextHolder
 
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.USER
-
-// import javax.servlet.http.HttpSession
-// import org.apache.shiro.SecurityUtils
-// import org.springframework.web.context.request.RequestContextHolder
-// import groovy.time.TimeCategory
 
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
@@ -80,6 +73,12 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	private Map ldapConfigMap
 	private Map loginConfigMap
 	private Map userLocalConfigMap
+
+	/*
+	 * Time to live data catched for testing status
+	 */
+	private long forgotMyPasswordResetTTL = 0
+	private long accountActivationTTL = 0
 
 	void afterPropertiesSet() {
 
@@ -360,12 +359,12 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		logger.info('Cleanup Password Reset: Started.')
 
 		def retainDays = userLocalConfig.forgotMyPasswordRetainHistoryDays
+		//println "retainDays: ${retainDays}"
 
-		jdbcTemplate.update("DELETE FROM password_reset WHERE created_date < (now() - INTERVAL $retainDays DAY) AND password_reset_id > 0 ")
+		jdbcTemplate.update("DELETE FROM password_reset WHERE created_date < (now() - INTERVAL $retainDays DAY)")
 
-		def expireMinutes = userLocalConfig.forgotMyPasswordResetTimeLimit
-
-		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE created_date < (now() - INTERVAL $expireMinutes MINUTE) AND password_reset_id > 0 ")
+		def now = TimeUtil.nowGMT()
+		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' and expires_after < ?", now)
 
 		logger.info('Cleanup Password Reset: Finished.')
 	}
@@ -457,7 +456,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	@Transactional
 	void sendResetPasswordEmail(String email, String ipAddress, PasswordResetType resetType,
-	                            Map emailParams = [:]) throws ServiceException {
+		Map emailParams = [:]) throws ServiceException {
 
 		// Note - we will not throw exceptions indicating that the account exists or not as this is a method
 		// that hackers poll systems to find valid accounts. The user will get a message that the email was sent
@@ -468,6 +467,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		if (StringUtil.isBlank(email)) {
 			throw new ServiceException("A valid email address is required")
 		}
+
+		UserLogin byWhom = getCurrentUsername()
 
 		while (true) {
 			// Check that exist a person with the given email
@@ -526,9 +527,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				personFromEmail = emailParams.from
 				createdBy = userLogin.person
 				subject = "Welcome to TransitionManager"
-			}
-			else if (resetType == PasswordResetType.ADMIN_RESET) {
+				emailParams["username"] = byWhom
+			} else if (resetType == PasswordResetType.ADMIN_RESET) {
 				bodyTemplate = "adminResetPassword"
+				emailParams["username"] = byWhom
+			} else if (resetType == PasswordResetType.FORGOT_MY_PASSWORD) {
+				// If the user forgot his password, we'll use his userlogin to configure the email job.
+				emailParams["username"] = userLogin.username
 			}
 
 			EmailDispatch ed = emailDispatchService.basicEmailDispatchEntity(dispatchOrigin, subject, bodyTemplate,
@@ -583,16 +588,16 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		switch (resetType) {
 			case PasswordResetType.ADMIN_RESET:
 			case PasswordResetType.FORGOT_MY_PASSWORD:
-				tokenTTL = userLocalConfig.forgotMyPasswordResetTimeLimit * 60 * 1000
+				tokenTTL = getForgotMyPasswordResetTTL()
 				break
 			case PasswordResetType.WELCOME:
-				tokenTTL = userLocalConfig.accountActivationTimeLimit * 60 * 1000
+				tokenTTL = getAccountActivationTTL()
 				break
 			default:
 				logger.error 'createPasswordReset() has unhandled switch for option {}', resetType
 				throw new ServiceException('Unable to initiate a password reset request')
 		}
-		Date expTime = new Date(System.currentTimeMillis() + tokenTTL)
+		Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
 
 		// Create a new token
 		PasswordReset pr = save new PasswordReset(
@@ -608,6 +613,44 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		if (!pr.hasErrors()) {
 			return pr
 		}
+	}
+
+	/**
+	 * Returns the configuration Forgot My Password Reset Time frame in Milliseconds
+	 * If the forgotMyPasswordResetTTL is not set (or 0) we will get it from the user configuration,
+	 * this works with setForgotMyPasswordResetTTL in a way that we can set our own value i.e. when testing.
+	 * @return
+	 */
+	synchronized
+	long getForgotMyPasswordResetTTL(){
+		if(!forgotMyPasswordResetTTL){
+			forgotMyPasswordResetTTL = userLocalConfig.forgotMyPasswordResetTimeLimit * 60 * 1000
+		}
+		return forgotMyPasswordResetTTL
+	}
+
+	synchronized
+	void setForgotMyPasswordResetTTL(long ttlMillis){
+		forgotMyPasswordResetTTL = ttlMillis
+	}
+
+	/**
+	 * Returns the configuration Account Acctivation Time frame in Milliseconds
+	 * If the accountActivationTTL is not set (or 0) we will get it from the user configuration,
+	 * this works with setAccountActivationTTL in a way that we can set our own value i.e. when testing.
+	 * @return
+	 */
+	synchronized
+	long getAccountActivationTTL(){
+		if(!accountActivationTTL){
+			accountActivationTTL = userLocalConfig.accountActivationTimeLimit * 60 * 1000
+		}
+		return accountActivationTTL
+	}
+
+	synchronized
+	void setAccountActivationTTL(long ttlMillis){
+		accountActivationTTL = ttlMillis
 	}
 
 	/**
