@@ -468,7 +468,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			throw new ServiceException("A valid email address is required")
 		}
 
-		UserLogin byWhom = getCurrentUsername()
+		String byWhom = getCurrentUsername()
 
 		while (true) {
 			// Check that exist a person with the given email
