@@ -456,7 +456,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	@Transactional
 	void sendResetPasswordEmail(String email, String ipAddress, PasswordResetType resetType,
-	                            Map emailParams = [:]) throws ServiceException {
+		Map emailParams = [:]) throws ServiceException {
 
 		// Note - we will not throw exceptions indicating that the account exists or not as this is a method
 		// that hackers poll systems to find valid accounts. The user will get a message that the email was sent
@@ -467,6 +467,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		if (StringUtil.isBlank(email)) {
 			throw new ServiceException("A valid email address is required")
 		}
+
+		UserLogin byWhom = getCurrentUsername()
 
 		while (true) {
 			// Check that exist a person with the given email
@@ -525,9 +527,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				personFromEmail = emailParams.from
 				createdBy = userLogin.person
 				subject = "Welcome to TransitionManager"
-			}
-			else if (resetType == PasswordResetType.ADMIN_RESET) {
+				emailParams["username"] = byWhom
+			} else if (resetType == PasswordResetType.ADMIN_RESET) {
 				bodyTemplate = "adminResetPassword"
+				emailParams["username"] = byWhom
+			} else if (resetType == PasswordResetType.FORGOT_MY_PASSWORD) {
+				// If the user forgot his password, we'll use his userlogin to configure the email job.
+				emailParams["username"] = userLogin.username
 			}
 
 			EmailDispatch ed = emailDispatchService.basicEmailDispatchEntity(dispatchOrigin, subject, bodyTemplate,
