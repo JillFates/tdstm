@@ -56,7 +56,7 @@ module.exports = function (config) {
       debug: false,
       configure: function (bundle) {
         bundle.once('prebundle', function () {
-          bundle.require(nodeResolve.sync('@progress/kendo-ooxml'), { expose: '@progress/kendo-ooxml' });
+          bundle.require(nodeResolve.sync('jszip'), { expose: 'jszip/dist/jszip' });
         });
       },
       plugin: ['tsify']
