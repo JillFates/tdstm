@@ -100,6 +100,6 @@ describe('NoticeListComponent:', () => {
                 (err) => { console.log('error'); },
                 () => { done(); });
         });
-    })
+    });
 
 });
