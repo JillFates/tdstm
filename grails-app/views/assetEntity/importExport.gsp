@@ -102,7 +102,7 @@
         <div class="callout callout-warning" style="margin-bottom: 0!important;">
             <h3 class="icon"><i class="fa fa-info"></i></h3>
             <div class="info-content-msg">
-                ${error}
+                ${raw(error)}
             </div>
         </div>
     </div>
