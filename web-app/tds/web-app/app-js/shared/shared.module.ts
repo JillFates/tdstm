@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from 'ng2-translate';
+// import { TranslateModule } from 'ng2-translate';
 
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
@@ -16,20 +16,24 @@ import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
+import { TranslatePipe } from './pipes/translate.pipe';
 // Shared Components
 import { HeaderComponent } from './modules/header/header.component';
 import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
 import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-editor.component';
+// Dictionaries
+import { en_DICTIONARY } from './i18n/en.dictionary';
 
 @NgModule({
     imports: [
         CommonModule,
-        TranslateModule
+        // TranslateModule
     ],
     declarations: [
         UILoaderDirective,
         UIToastDirective,
         UIBooleanPipe,
+        TranslatePipe,
         UIDialogDirective,
         HeaderComponent,
         FormlyInputHorizontal,
@@ -42,16 +46,18 @@ import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-ed
         HttpServiceProvider,
         ComponentCreatorService,
         UIDialogService,
-        UIActiveDialogService
+        UIActiveDialogService,
+        {provide: 'localizedDictionary', useValue: en_DICTIONARY}
     ],
     exports: [UILoaderDirective,
         UIToastDirective,
         UIDialogDirective,
         UIBooleanPipe,
+        TranslatePipe,
         HeaderComponent,
         FormlyInputHorizontal,
         RichTextEditorComponent,
-        TranslateModule
+        // TranslateModule
     ]
 })
 export class SharedModule {

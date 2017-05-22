@@ -8,7 +8,7 @@ import { HttpModule, Http } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
 import { GridModule } from '@progress/kendo-angular-grid';
-import { TranslateModule, TranslateLoader, TranslateStaticLoader, TranslateService } from 'ng2-translate';
+// import { TranslateModule, TranslateLoader, TranslateStaticLoader, TranslateService } from 'ng2-translate';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
@@ -55,15 +55,19 @@ describe('NoticeListComponent:', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports: [HttpModule, FormsModule, SharedModule, GridModule, DropDownListModule,
-                TranslateModule.forRoot({
-                    provide: TranslateLoader,
-                    useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
-                    deps: [Http]
-                })
+            imports: [HttpModule, FormsModule, SharedModule, DropDownListModule,
+                GridModule,
+                // TranslateModule.forRoot({
+                //     provide: TranslateLoader,
+                //     useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
+                //     deps: [Http]
+                // })
             ],
             declarations: [NoticeListComponent],
-            providers: [NoticeService, HttpServiceProvider, NotifierService, TranslateService]
+            providers: [NoticeService, HttpServiceProvider,
+                NotifierService,
+                // TranslateService
+            ]
         }).compileComponents();
     }));
 

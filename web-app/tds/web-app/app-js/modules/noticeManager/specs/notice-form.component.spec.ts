@@ -8,7 +8,7 @@ import { HttpModule, Http } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
-import { TranslateModule, TranslateLoader, TranslateStaticLoader, TranslateService } from 'ng2-translate';
+// import { TranslateModule, TranslateLoader, TranslateStaticLoader, TranslateService } from 'ng2-translate';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
@@ -41,14 +41,16 @@ describe('NoticeFormComponent:', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [HttpModule, FormsModule, SharedModule, DropDownListModule,
-                TranslateModule.forRoot({
-                    provide: TranslateLoader,
-                    useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
-                    deps: [Http]
-                })
+                // TranslateModule.forRoot({
+                //     provide: TranslateLoader,
+                //     useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
+                //     deps: [Http]
+                // })
             ],
             declarations: [NoticeFormComponent],
-            providers: [NoticeService, HttpServiceProvider, NotifierService, TranslateService, UIActiveDialogService,
+            providers: [NoticeService, HttpServiceProvider, NotifierService,
+                // TranslateService,
+                UIActiveDialogService,
                 { provide: NoticeModel, useValue: notice },
                 { provide: Number, useValue: ActionType.Edit }]
         }).compileComponents();

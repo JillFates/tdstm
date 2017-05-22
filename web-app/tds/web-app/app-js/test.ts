@@ -8,6 +8,7 @@ import './specs/highlight.directive.spec';
 import './specs/notifier.service.spec';
 import './specs/tds-app.component.spec';
 import './specs/ui-boolean.pipe.spec';
+import './specs/translate.pipe.spec';
 import './specs/ui-loader.directive.spec';
 import './specs/ui-toast.directive.spec';
 import './specs/component-creator.service.spec';
