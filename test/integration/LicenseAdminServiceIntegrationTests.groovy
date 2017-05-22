@@ -1,3 +1,4 @@
+import com.github.icedrake.jsmaz.Smaz
 import com.tdsops.tm.enums.domain.SecurityRole
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Person
@@ -7,7 +8,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.SecurityService
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.junit.Ignore
+import org.apache.commons.codec.binary.Base64
 import spock.lang.Narrative
 import spock.lang.See
 import spock.lang.Specification
@@ -47,17 +48,17 @@ class LicenseAdminServiceIntegrationTests extends Specification {
 
     void setup() {
         // Enable the License Admin to be able to issue license requests
-        grailsApplication.config.tdstm?.license?.enabled = true
+        grailsApplication.config.tdstm.license = [
+                enabled : true,
+                request_email: "oluna@tdsi.com"
+        ]
+        //licenseAdminService.initialize(true)
         licenseAdminService.initialize()
 
         // Create and admin user to be able to login
         project = projectTestHelper.createProject()
-        project = projectTestHelper.createProject()
-
         adminPerson = personTestHelper.createStaff(project.owner)
-        assert adminPerson
         adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
-
     }
 
     def '01. Test the AdminPerson and AdminUser are setup correctly, and that the License Admin module is enabled'() {
@@ -151,25 +152,40 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
             result == false
     }
 
-    @Ignore
+    //@Ignore
     void "resubmit request" () {
-        // No implemented yet on the service
+
+        setup: 'log in with an admin person and create a new License Request so that'
+            securityService.assumeUserIdentity(adminUser.username, false)
+            println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
+            License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+        when: "a resubmit can be re-requested"
+            boolean resubmited = licenseAdminService.resubmitRequest(licenseRequest.id)
+        then: "the request has been resubmited"
+            resubmited == true
+
     }
 
     // TODO check to retreive non-existent licenses and check for nullity
-    @Ignore
+    //@Ignore
     void "manually submit request" () {
-        // TODO check hash returned. Here we can check how the hash is formed
-        // Generates a license hash with some parameters. Then, we have to retrieve those parameters,
-        // desencrypt them and check that are the same used to generate the license.
-        def encodedLicense = lic.toEncodedMessage()
+        setup: 'log in with an admin person and create a new License Request so that'
+            securityService.assumeUserIdentity(adminUser.username, false)
+            println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
+            License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
 
-        // String body = new String(Base64.encodeBase64(Smaz.compress(toJsonString())))
+        when: 'a manualy submit is invoked'
+            // TODO check hash returned. Here we can check how the hash is formed
+            // Generates a license hash with some parameters. Then, we have to retrieve those parameters,
+            // desencrypt them and check that are the same used to generate the license.
+            def encodedLicense = licenseRequest.toEncodedMessage()
+
+            //Encoding strategy
+            def manualEncodeBody = new String(Base64.encodeBase64(Smaz.compress(licenseRequest.toJsonString())))
+            def manualEncode = "${License.BEGIN_REQ_TAG}\n${manualEncodeBody}\n${License.END_REQ_TAG}"
+
+        then: 'an encoded message is generated'
+            manualEncode == encodedLicense
     }
-
-
-    // APPLY LICENSE: USE LICENSE MANAGER TEST HELPER
-    // TODO then for other tests, the license manager (LicenseManagerService) should be enabled to check on the license requests.
-    // or use a License Manager Test Helper
 
 }

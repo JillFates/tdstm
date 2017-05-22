@@ -40,11 +40,12 @@ class LicenseAdminService extends LicenseCommonService {
 
 	/**
 	 * Initialize the license service
+	 * @param force force the reinitialization of the Service (userd in testing)
 	 * @return
 	 */
-	def initialize() {
+	def initialize(boolean force = false) {
 		log.debug("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
-		if(isEnabled() && !loaded) {
+		if(force || isEnabled() && !loaded) {
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
 
