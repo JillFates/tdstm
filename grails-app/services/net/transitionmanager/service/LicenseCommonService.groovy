@@ -43,7 +43,7 @@ class LicenseCommonService {
 	 * @return String representing the FQDN
 	 */
 	String getFQDN(){
-		URL url = new URL(grailsApplication.config.grails.serverURL)
+		URL url = new URL(grailsApplication.config.grails.serverURL as String)
 		return url.getHost()
 	}
 
