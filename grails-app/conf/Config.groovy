@@ -80,17 +80,6 @@ grails {
 	json.legacy.builder = false
 
 	mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
-	mail {
-		host = "smtp.gmail.com"
-		port = 465
-		username = ""
-		password = ""
-		props = ["mail.smtp.auth":"true",
-		         "mail.smtp.socketFactory.port":"465",
-		         "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-		         "mail.smtp.socketFactory.fallback":"false"
-		]
-	}
 
 	mime {
 		disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
@@ -162,6 +151,19 @@ environments {
 		grails {
 			logging.jul.usebridge = true
 			serverURL = 'http://localhost:8080/tdstm'
+
+			//mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
+			mail {
+				host = "smtp.gmail.com"
+				port = 465
+				username = ""
+				password = ""
+				props = ["mail.smtp.auth":"true",
+						 "mail.smtp.socketFactory.port":"465",
+						 "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+						 "mail.smtp.socketFactory.fallback":"false"
+				]
+			}
 		}
 	}
 	test {
@@ -177,11 +179,26 @@ environments {
 				}
 			}
 		}
+
+		//used for testing email
+		grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
 	}
 	production {
 		grails {
 			logging.jul.usebridge = false
 			// TODO serverURL = 'http://www.changeme.com'
+
+			mail {
+				host = "smtp.gmail.com"
+				port = 465
+				username = ""
+				password = ""
+				props = ["mail.smtp.auth":"true",
+						 "mail.smtp.socketFactory.port":"465",
+						 "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+						 "mail.smtp.socketFactory.fallback":"false"
+				]
+			}
 		}
 	}
 }

@@ -1,17 +1,16 @@
 import com.tdsops.tm.enums.domain.SecurityRole
+import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.SecurityService
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Ignore
-import spock.lang.Specification
 import spock.lang.Narrative
 import spock.lang.See
-import net.transitionmanager.domain.License
-import net.transitionmanager.domain.Project
+import spock.lang.Specification
 
 /**
  * Created by estebancantu on 02/02/17.
@@ -75,7 +74,8 @@ class LicenseAdminServiceIntegrationTests extends Specification {
     def '02. A user with admin level privileges runs TransitionManager and generates a License Request'() {
 
         setup: 'log in with an admin person so that'
-            License licenseRequest
+			//licenseAdminService.mailService = new MailService()
+			License licenseRequest
             securityService.assumeUserIdentity(adminUser.username, false)
             println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
         expect: 'the admin user is logged and'
@@ -125,8 +125,6 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
     }
 
     // TODO test for non-admin user
-
-    @Ignore
     def "04. Delete a License Request"() {
 
         setup: 'log in with an admin person and create a new License Request so that'
@@ -147,7 +145,7 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
             deletedLicense == null
 
         when: "a License Request with a non-existent id is trying to be deleted"
-            def nonexistentId = -1
+            def nonexistentId = "FAKE_UUID"
             result = licenseAdminService.deleteLicense(nonexistentId)
         then: "the method should return false."
             result == false
