@@ -56,6 +56,7 @@ module.exports = function (config) {
       debug: false,
       configure: function (bundle) {
         bundle.once('prebundle', function () {
+          // Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #1
           bundle.require(nodeResolve.sync('jszip'), { expose: 'jszip/dist/jszip' });
         });
       },
