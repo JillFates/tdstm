@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, Inject, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { NoticeService } from '../../service/notice.service';
 import { NoticeModel } from '../../model/notice.model';
 import { NoticeFormComponent } from '../form/notice-form.component';
@@ -13,11 +13,10 @@ import { SortDescriptor, orderBy, process, State, FilterDescriptor } from '@prog
     moduleId: module.id,
     selector: 'notice-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
-    providers: [NoticeService]
+    templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'
 })
 
-export class NoticeListComponent implements OnInit {
+export class NoticeListComponent {
 
     private moduleName = '';
     private title = '';
@@ -49,8 +48,15 @@ export class NoticeListComponent implements OnInit {
      * @constructor
      * @param {NoticeService} noticeService
      */
-    constructor(private noticeService: NoticeService, private dialogService: UIDialogService) {
+    constructor(
+        @Inject('notices') notices,
+        private noticeService: NoticeService,
+        private dialogService: UIDialogService) {
+
         this.moduleName = 'Notice List';
+        notices.subscribe(
+            (noticeList) => this.onLoadNoticeList(noticeList),
+            (err) => this.onLoadNoticeList([]));
     }
 
     /**
@@ -102,13 +108,6 @@ export class NoticeListComponent implements OnInit {
         }, error => {
             console.log(error);
         });
-    }
-
-    /**
-     * Initiates the Notice Module
-     */
-    ngOnInit(): void {
-        this.getNoticeList();
     }
 
     protected dataStateChange(state: DataStateChangeEvent): void {

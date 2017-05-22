@@ -9,6 +9,8 @@ import { NOTICE_STATES } from './notice-routing.states';
 import { NoticeListComponent } from './components/list/notice-list.component';
 import { NoticeFormComponent } from './components/form/notice-form.component';
 import { SharedModule } from '../../shared/shared.module';
+// Services
+import { NoticeService } from './service/notice.service';
 // Import Kendo Modules
 import { GridModule } from '@progress/kendo-angular-grid';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
@@ -23,6 +25,7 @@ import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
         UIRouterModule.forChild({ states: NOTICE_STATES }), // Same as { states: [state1, state2 ] }
     ],
     declarations: [NoticeListComponent, NoticeFormComponent],
+    providers: [NoticeService],
     entryComponents: [NoticeFormComponent],
     exports: [NoticeListComponent]
 })

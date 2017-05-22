@@ -1,6 +1,7 @@
-import { Ng2StateDeclaration } from '@uirouter/angular';
+import { Ng2StateDeclaration, ResolveTypes } from '@uirouter/angular';
 import { NoticeListComponent } from './components/list/notice-list.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
+import { NoticeService } from './service/notice.service';
 
 export class NoticeStates {
     public static readonly LIST = {
@@ -28,7 +29,15 @@ export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
     views: {
         'headerView@tds': { component: HeaderComponent },
         'containerView@tds': { component: NoticeListComponent }
-    }
+    },
+    resolve: [
+        {
+            token: 'notices',
+            policy: { async: 'RXWAIT' },
+            deps: [NoticeService],
+            resolveFn: (service: NoticeService) => service.getNoticesList()
+        }
+    ]
 };
 
 export const NOTICE_STATES = [
