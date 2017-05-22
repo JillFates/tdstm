@@ -1,4 +1,4 @@
-import { Ng2StateDeclaration, ResolveTypes } from '@uirouter/angular';
+import { Ng2StateDeclaration } from '@uirouter/angular';
 import { NoticeListComponent } from './components/list/notice-list.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 import { NoticeService } from './service/notice.service';

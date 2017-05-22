@@ -56,7 +56,7 @@ describe('NoticeListComponent:', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [HttpModule, FormsModule, SharedModule, DropDownListModule,
-                GridModule,
+                GridModule
                 // TranslateModule.forRoot({
                 //     provide: TranslateLoader,
                 //     useFactory: (http: Http) => new TranslateStaticLoader(http, '../../tds/web-app/i18n', '.json'),
@@ -66,6 +66,7 @@ describe('NoticeListComponent:', () => {
             declarations: [NoticeListComponent],
             providers: [NoticeService, HttpServiceProvider,
                 NotifierService,
+                { provide: 'notices', useValue: Observable.from(mockData) }
                 // TranslateService
             ]
         }).compileComponents();
@@ -81,7 +82,16 @@ describe('NoticeListComponent:', () => {
 
     it('should create component', () => expect(comp).toBeDefined());
 
-    it('should call getNoticesList at start', done => {
+    it('should not call getNoticesList at start', done => {
+        fixture.whenStable().then(() => {
+            fixture.detectChanges();
+            expect(spyGet.calls.any()).toBe(false);
+            done();
+        });
+    });
+
+    it('should call getNoticesList when grid is refreshed', done => {
+        comp.reloadNoticeList();
         fixture.whenStable().then(() => {
             fixture.detectChanges();
             expect(spyGet.calls.any()).toBe(true);
@@ -90,6 +100,6 @@ describe('NoticeListComponent:', () => {
                 (err) => { console.log('error'); },
                 () => { done(); });
         });
-    });
+    })
 
 });
