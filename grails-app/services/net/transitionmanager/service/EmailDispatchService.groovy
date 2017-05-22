@@ -72,7 +72,6 @@ class EmailDispatchService implements ServiceMethods {
 			if (! trigger.jobDataMap.username) {
 				// TODO TM-6428 - throw an exception here - need to test the that the UI handles the exception
 			}
-			// trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
 		}
 
 		trigger.setJobName("EmailDispatchJob")
