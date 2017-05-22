@@ -92,28 +92,30 @@ class LicenseAdminService extends LicenseCommonService {
 			String password = grailsApplication.config.tdstm.license.password
 			log.debug("Admin Key: '{}', password: '{}'", keyFile, password)
 
-			File file = new File(keyFile)
+			if(keyFile) {
+				File file = new File(keyFile)
 
-			//if the file doesn't exists load from the web-app resources
-			if(!file.exists()){
-				Resource resource = grailsApplication.parentContext.getResource(keyFile)
-				if(resource.exists()) {
-					file = resource.file
+				//if the file doesn't exists load from the web-app resources
+				if (!file.exists()) {
+					Resource resource = grailsApplication.parentContext.getResource(keyFile)
+					if (resource.exists()) {
+						file = resource.file
+					}
 				}
+
+				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
+
+				// BEGIN: License Admin Configuration //
+
+				LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
+				LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
+				LicenseManagerProperties.setLicenseProvider(licenseProvider)
+				LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
+				// should we set a different password per client?
+				LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
+				// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
+				LicenseManagerProperties.setCacheTimeInMinutes(24 * 60)
 			}
-
-			TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
-
-			// BEGIN: License Admin Configuration //
-
-			LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
-			LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
-			LicenseManagerProperties.setLicenseProvider(licenseProvider)
-			LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
-			// should we set a different password per client?
-			LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
-			// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
-			LicenseManagerProperties.setCacheTimeInMinutes(24 * 60)
 
 			LicenseManager.getInstance()
 

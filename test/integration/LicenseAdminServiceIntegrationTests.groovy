@@ -52,8 +52,7 @@ class LicenseAdminServiceIntegrationTests extends Specification {
                 enabled : true,
                 request_email: "oluna@tdsi.com"
         ]
-        //licenseAdminService.initialize(true)
-        licenseAdminService.initialize()
+        licenseAdminService.initialize(true)
 
         // Create and admin user to be able to login
         project = projectTestHelper.createProject()
@@ -126,7 +125,7 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
     }
 
     // TODO test for non-admin user
-    def "04. Delete a License Request"() {
+    def "03. Delete a License Request"() {
 
         setup: 'log in with an admin person and create a new License Request so that'
             License licenseRequest
@@ -152,8 +151,8 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
             result == false
     }
 
-    //@Ignore
-    void "resubmit request" () {
+
+    void "04. resubmit request" () {
 
         setup: 'log in with an admin person and create a new License Request so that'
             securityService.assumeUserIdentity(adminUser.username, false)
@@ -167,8 +166,7 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
     }
 
     // TODO check to retreive non-existent licenses and check for nullity
-    //@Ignore
-    void "manually submit request" () {
+    void "05. manually submit request" () {
         setup: 'log in with an admin person and create a new License Request so that'
             securityService.assumeUserIdentity(adminUser.username, false)
             println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
