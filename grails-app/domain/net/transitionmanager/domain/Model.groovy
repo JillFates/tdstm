@@ -8,7 +8,6 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.ModelService
 
 @Slf4j(value='logger')
 class Model {
@@ -172,10 +171,11 @@ class Model {
 	}
 
 	def beforeDelete = {
-		withNewSession {
+		// <SL> moved to ModelService
+		/*withNewSession {
 			executeUpdate('update AssetEntity set model=null where model=?', [this])
 			executeUpdate('delete ModelAlias where model=?', [this])
-		}
+		}*/
 	}
 
 	private List<String> getAssetTypeList() {
@@ -216,19 +216,12 @@ class Model {
 	 * Get a ModelAlias object by name and create one (optionally) if it doesn't exist
 	 * @param name  name of the model alias
 	 * @param createIfNotFound  optional flag to indicating if record should be created (default false)
+	 *
+	 * @deprecated use {@link net.transitionmanager.service.ModelService#findOrCreateAliasByName(net.transitionmanager.domain.Model, java.lang.String, boolean) ModelService} instead.
 	 */
+	@Deprecated
 	ModelAlias findOrCreateAliasByName(String name, boolean createIfNotFound = false) {
-		name = name.trim()
-		ModelAlias alias = ModelAlias.findByNameAndModel(name, this)
-		if (!alias && createIfNotFound) {
-			def isValid = modelService.isValidAlias(name, this)
-			alias = new ModelAlias(name: name, model: this, manufacturer: manufacturer)
-			if (!isValid || !alias.save()) {
-				logger.error '{}', GormUtil.allErrorsString(alias)
-				return null
-			}
-		}
-		alias
+		return modelService.findOrCreateAliasByName(this, name, createIfNotFound)
 	}
 
 	/**
@@ -238,7 +231,10 @@ class Model {
 	 * @param manufacturer  the manufacturer
 	 * @param assetType  (optional) asset type of model
 	 * @param usize - (optional)  usize of model
+	 *
+	 * @deprecated <SL> is this being used?
 	 */
+	@Deprecated
 	static Model createModelByModelName(String modelName, Manufacturer manufacturer, String assetType = 'Server',
 	                                    int usize = 1, Person createdBy = null) {
 

@@ -12,7 +12,9 @@ var tdsCommon = {
 		dateTimeFormat: null,
 		dateShortFormat: null,
 		jQueryDateFormat: null,
-		jQueryDateTimeFormat: null
+		jQueryDateTimeFormat: null,
+		kendoDateFormat: null,
+		kendoDateTimeFormat: null
 	},
 
 	// creates relative or fully qualified url to for the application
@@ -50,6 +52,61 @@ var tdsCommon = {
 		return str.charAt(0).toUpperCase() + str.substring(1);
 	},
 
+	// Compare 2 strings
+	// @param string1 the string to compare
+	// @param string2 the string to compare
+	// @param ignoreCase whether to use case sensitive comparison
+	// @param useLocale whether to use host's current locale while comparing strings
+  compareStrings: function(string1, string2, ignoreCase, useLocale) {
+  	if (ignoreCase) {
+    	if (useLocale) {
+      	string1 = string1.toLocaleLowerCase();
+      	string2 = string2.toLocaleLowerCase();
+    	} else {
+      	string1 = string1.toLowerCase();
+      	string2 = string2.toLowerCase();
+    	}
+  	}
+  	return string1 === string2;
+	},
+
+	// Compare 2 strings using case insensitive
+  // @param string1 the string to compare
+  // @param string2 the string to compare
+  compareStringsIgnoreCase: function(string1, string2) {
+		return this.compareStrings(string1, string2, true, false);
+	},
+
+	arrayStringIndexIgnoreCase: function(array, string1) {
+		var $this = this;
+    var index = -1;
+    if(array && array.length) {
+      array.some(function (element, i) {
+        if ($this.compareStringsIgnoreCase(string1, element)) {
+          index = i;
+          return true;
+        }
+      });
+    }
+    return index;
+	},
+
+  arrayContainsStringIgnoreCase: function(array, string1) {
+    return this.arrayStringIndexIgnoreCase(array, string1) >= 0;
+	},
+
+    /**
+	 * Applies a more smooth delay, extending the setTimeout
+     * @returns {Function}
+     */
+	delayEvent: (function () {
+		var timer = 0;
+		return function (callback, ms) {
+			clearTimeout(timer);
+			timer = setTimeout(callback, ms);
+		};
+	})(),
+
 	/**
 	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was 
 	 * done to correct a problem with DIVs being populated with content that would not be cleared out and duplicate
@@ -66,7 +123,10 @@ var tdsCommon = {
 					var dialog = $("#" + this.element[0].id)
 					if (dialog.length > 0) {
 						// Need to close any Select2 controls that might still be open
-						dialog.find('.select2-container').select2('close');
+						var select2 = dialog.find('.select2-container');
+						if (select2 && select2.length > 0) {
+							dialog.find('.select2-container').select2('close');
+						}
 
 						if (!dialog.hasClass('static-dialog')) {
 							dialog.html('');
@@ -283,7 +343,24 @@ var tdsCommon = {
 		}
 		return this.config.jQueryDateTimeFormat;
 	},
-
+	kendoDateFormat: function () {
+		if (this.config.kendoDateFormat == null) {
+			this.config.kendoDateFormat = "MM/dd/yyyy";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.kendoDateFormat = "dd/MM/yyyy";
+			}
+		}
+		return this.config.kendoDateFormat;
+	},
+	kendoDateTimeFormat: function () {
+		if (this.config.kendoDateTimeFormat == null) {
+			this.config.kendoDateTimeFormat = "MM/dd/yyyy hh:mm tt";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.kendoDateTimeFormat = "dd/MM/yyyy hh:mm tt";
+			}
+		}
+		return this.config.kendoDateTimeFormat;
+	},
 	parseDateTimeFromZulu: function (stringValue, format) {
 		return moment(stringValue);
 	},
@@ -330,21 +407,21 @@ var tdsCommon = {
 		}
 	},
 
-    jqgridDateTimeCellFormatter: function (cellvalue, options, rowObject) {
-        if (cellvalue) {
-            var result = "";
-            var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
-            if (momentObj) {
-                momentObj.tz(tdsCommon.timeZone());
-                result = momentObj.format(tdsCommon.defaultDateTimeFormat());
-            }
-            return result;
-        } else {
-            return '';
-        }
-    },
+	jqgridDateTimeCellFormatter: function (cellvalue, options, rowObject) {
+		if (cellvalue) {
+			var result = "";
+			var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+			if (momentObj) {
+				momentObj.tz(tdsCommon.timeZone());
+				result = momentObj.format(tdsCommon.defaultDateTimeFormat());
+			}
+			return result;
+		} else {
+			return '';
+		}
+	},
 
-    jqgridPrefCellFormatter: function (cellvalue, options, rowObject) {
+	jqgridPrefCellFormatter: function (cellvalue, options, rowObject) {
 		var result = cellvalue;
 		switch (options.colModel.name) {
 			case "lastUpdated":
@@ -400,6 +477,16 @@ var tdsCommon = {
 	timeZone: function () {
 		var tz = $("#tzId").val();
 		return tz;
+	},
+
+	addNextDayKendoGridFilter: function (grid, field, value) {
+		var nextDay = moment(value).add(1, 'd').toDate();
+		grid.dataSource._filter.filters.push({
+			field: field,
+			operator: "lt",
+			value: nextDay
+		});
+		grid.thead.find('tr th:first').trigger('click');
 	}
 
 }
@@ -470,7 +557,7 @@ var UserPreference = function () {
 			params.dateTimezoneOnly = true
 		jQuery.ajax({
 			url: '/tdstm/person/resetPreferences',
-			data:params,
+			data: params,
 			success: function (e) {
 				changeResetMessage(e)
 			}
@@ -528,3 +615,12 @@ $.fn.serializeObject = function () {
 	});
 	return o;
 };
+
+(function ($) {
+	$.fn.focusToEnd = function () {
+		return this.each(function () {
+			var v = $(this).val();
+			$(this).focus().val("").val(v);
+		});
+	};
+})(jQuery);

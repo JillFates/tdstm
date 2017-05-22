@@ -35,13 +35,13 @@
 		currentMenuId = "#eventMenu";
 		$(".menu-parent-planning-list-bundles").addClass('active');
 		$(".menu-parent-planning").addClass('active');
-
+		var currentDtFormat, currentTz;
 
 		/**
 		 * Implementing Kendo Grid for Bundle List
 		 */
 		function loadGridBundleList() {
-			$("#gridBundleList").kendoGrid({
+		 var grid =	$("#gridBundleList").kendoGrid({
 				toolbar: kendo.template('<tds:hasPermission permission="${Permission.BundleEdit}"><button type="button" class="btn btn-default action-toolbar-btn" onClick=\"window.location.href=\'#=contextPath#/moveBundle/create\'\"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</button></tds:hasPermission> <div onclick="loadGridBundleList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
 				dataSource: {
 					type: "json",
@@ -103,28 +103,87 @@
 					},
 					{
 						field: "startDate",
-						title: "Start",
-						format: "{0:MM/dd/yyyy}"
+						title: "Start Time",
+						template:"#= displayFormatedDate(startDate)#",
+						filterable: {
+							cell: {
+								template: function(args) {
+									args.element.kendoDatePicker({ 
+										animation: false, format:tdsCommon.kendoDateFormat()
+									});
+								},
+								operator:'gte'
+							}
+						}
 					},
 					{
 						field: "completion",
-						title: "Completion",
-						format: "{0:MM/dd/yyyy}"
+						title: "Completion Time",
+						template: "#= displayFormatedDate(completion)#",
+						filterable: {
+							cell: {
+								template: function(args) {
+									args.element.kendoDatePicker({ 
+										animation: false, format:tdsCommon.kendoDateFormat()
+									});
+								},
+								operator:'gte'
+							}
+						}
 					}
 				],
                 height: 540,
 				sortable: true,
 				filterable: {
-					mode: "row"
+					mode: "row",
+					operators: {
+						date: {
+							gte: "Is after or equal to",
+							lte: "Is before or equal to"
+						}
+					}
 				},
 				pageable: {
-					pageSize: 20
+					pageSize: 25,
+					pageSizes: [25, 100, 500, 1000]
 				}
-			});
+			}).data("kendoGrid");
+
+			grid.dataSource.originalFilter = grid.dataSource.filter;
+			grid.dataSource.filter = function() {
+				var filter = arguments[0];
+				if(filter && filter.filters){
+					filter.filters.forEach(function(f){
+						if(f.field == 'startDate' || f.field == 'completion'){
+							if(f.operator == 'lte'){
+								f.value.setHours(23);
+								f.value.setMinutes(59);
+								f.value.setSeconds(59);
+							} else {
+								f.value.setHours(0);
+								f.value.setMinutes(0);
+								f.value.setSeconds(0);
+							}
+
+						}
+					});
+				}
+				var result = grid.dataSource.originalFilter.apply(this, arguments);
+    			return result;
+			}
+
 		}
 
-		loadGridBundleList();
-
+		function displayFormatedDate(date){
+			if(date && moment(date).isValid()){
+				return moment(date).format(tdsCommon.defaultDateTimeFormat());
+			} else {
+				return '';
+			}
+		}
+		$(function(){
+			loadGridBundleList();
+		});
 	</script>
 
 	</body>

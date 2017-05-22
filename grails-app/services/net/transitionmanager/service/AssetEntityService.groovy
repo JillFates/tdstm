@@ -150,18 +150,19 @@ class AssetEntityService implements ServiceMethods {
 			PowerA: 'powerA', PowerB: 'powerB', PowerC: 'powerC', Type: 'rackType', Front: 'front',
 			Model: 'model', Source: 'source'].asImmutable()
 
-	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	GrailsApplication grailsApplication
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	ProgressService progressService
-	ProjectService projectService
-	RackService rackService
-	RoomService roomService
-	SecurityService securityService
-	TaskService taskService
-	UserPreferenceService userPreferenceService
+
+	def assetEntityAttributeLoaderService
+	def partyRelationshipService
+	def progressService
+	def projectService
+	def rackService
+	def roomService
+	def securityService
+	def taskService
+	def userPreferenceService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -334,6 +335,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @param isSource - true indicates that the assignment will be assigned to the source otherwise at the target
 	 */
 	void assignAssetToRoom(Project project, AssetEntity asset, String roomId, String location, String roomName, boolean isSource) {
+
 		String srcOrTarget = isSource ? 'Source' : 'Target'
 		def roomProp = "room$srcOrTarget"
 		Long id = NumberUtil.toLong(roomId)
@@ -343,11 +345,10 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
-
 		switch (id) {
 			case -1:
 				// Create a new room
-				if (location.trim().size() == 0 || roomName.trim().size() == 0) {
+				if (StringUtil.isBlank(location) && StringUtil.isBlank(roomName)) {
 					throw new InvalidRequestException("Creating a $srcOrTarget room requires both the location and room name".toString())
 				}
 
@@ -405,15 +406,14 @@ class AssetEntityService implements ServiceMethods {
 
 		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
 		def assetType = asset.model?.assetType
-		if ([AssetType.BLADE.toString(), AssetType.VM.toString()].contains(assetType)) {
+		if (asset.isaBlade() || asset.isaVM()) {
 			// If asset model is VM or BLADE we should remove rack assignments period
 			asset[rackProp] = null
-			if (isSource) {
-				asset.sourceBladePosition = null
-				asset.sourceRackPosition = null
-			} else {
-				asset.targetBladePosition = null
-				asset.targetRackPosition = null
+			with(asset){
+				sourceBladePosition = null
+				sourceRackPosition = null
+				targetBladePosition = null
+				targetRackPosition = null
 			}
 			return
 		}
@@ -430,10 +430,6 @@ class AssetEntityService implements ServiceMethods {
 			case -1:
 				// Create a new rack
 				rackName = rackName?.trim()
-				if (!rackName) {
-					throw new InvalidRequestException("Creating a $srcOrTarget rack requires a name".toString())
-				}
-
 				def rack = rackService.findOrCreateRack(room, rackName)
 				if (rack) {
 					asset[rackProp] = rack
@@ -1262,12 +1258,9 @@ class AssetEntityService implements ServiceMethods {
 
 		def projectAttributes = projectService.getAttributes(type)
 		def configMap = getConfig(type, assetEntity.validation, projectAttributes)
-		List<AssetDependency> dependentAssets = AssetDependency.executeQuery(
-			'from AssetDependency where asset=? order by dependent.assetType, dependent.assetName asc',
-			[assetEntity])
-		def supportAssets = AssetDependency.executeQuery(
-			'from AssetDependency a where dependent=? order by a.asset.assetType, a.asset.assetName asc',
-			[assetEntity])
+		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
+		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
+
 		def highlightMap = getHighlightedInfo(type, assetEntity, configMap, projectAttributes)
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
@@ -1730,55 +1723,67 @@ class AssetEntityService implements ServiceMethods {
 	 * @return query,joinQuery
 	 */
 	def getAppCustomQuery(appPref) {
-		String query = ''
-		String joinQuery = ''
-		for (String value in appPref.values()) {
-			/*
-			 TODO: the logic for sme, sme2 and 'by' fields needs to be changed.
-			 We'll probably address that with TM-5931. In the meantime I'm using
-			 CONCAT_WS for sme and sme2, to join first, middle and last name
-			 with a separator.
-			*/
-			switch (value) {
-				case 'sme':
-					query += "CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS sme,"
-					joinQuery += "\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n"
-					break
-				case 'sme2':
-					query += "CONCAT_WS(' ', p1.first_name, p1.middle_name, p1.last_name) AS sme2,"
-					joinQuery += "\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n"
-					break
-				case 'modifiedBy':
-					query += "CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,"
-					joinQuery += "\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n"
-					break
-				case 'lastUpdated':
-					query += "ee.last_updated AS $value,"
-					joinQuery += "\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
-					break
-				case 'event':
-					query += "me.move_event_id AS event,"
-					joinQuery += "\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n"
-					break
-				case 'appOwner':
-					query += "CONCAT_WS(' ', p3.first_name, p3.middle_name, p3.last_name) AS appOwner,"
-					joinQuery += "\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n"
-					break
-				case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownBy|shutdownDuration|startupBy|startupFixed|startupDuration|testingBy|testingFixed|testingDuration/:
-					query += "a.${WebUtil.splitCamelCase(value)} AS $value,"
-					break
-				case ~/custom\d{1,3}/:
-					query += "ae.$value AS $value,"
-					break
-				case ~/validation|latency|planStatus|moveBundle/:
-					// Handled by the calling routine
-					break
-				default:
-					query +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
+		StringBuilder query = new StringBuilder('')
+		StringBuilder joinQuery = new StringBuilder('')
+
+		if(appPref){
+			for (String value in appPref.values()) {
+				/*
+				 TODO: the logic for sme, sme2 and 'by' fields needs to be changed.
+				 We'll probably address that with TM-5931. In the meantime I'm using
+				 CONCAT_WS for sme and sme2, to join first, middle and last name
+				 with a separator.
+				*/
+				switch (value) {
+					case 'sme':
+						query.append("CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS sme,")
+						joinQuery.append("\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n")
+						break
+					case 'sme2':
+						query.append("CONCAT_WS(' ', p1.first_name, p1.middle_name, p1.last_name) AS sme2,")
+						joinQuery.append("\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n")
+						break
+					case 'modifiedBy':
+						query.append("CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,")
+						joinQuery.append("\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n")
+						break
+					case 'lastUpdated':
+						query.append("ee.last_updated AS $value,")
+						joinQuery.append("\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n")
+						break
+					case 'event':
+						query.append("me.move_event_id AS event,")
+						joinQuery.append("\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n")
+						break
+					case 'appOwner':
+						query.append("CONCAT_WS(' ', p3.first_name, p3.middle_name, p3.last_name) AS appOwner,")
+						joinQuery.append("\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n")
+						break
+					case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownDuration|startupFixed|startupDuration|testingFixed|testingDuration/:
+						query.append("a.${WebUtil.splitCamelCase(value)} AS $value,")
+						break
+					case ~/custom\d{1,3}/:
+						query.append("ae.$value AS $value,")
+						break
+					case ~/validation|latency|planStatus|moveBundle/:
+						// Handled by the calling routine
+						break
+					case ~/shutdownBy|startupBy|testingBy/:
+						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
+						String byProperty = WebUtil.splitCamelCase(value)
+						String prefix = byPrefixes[value]
+						query.append("(IF(${byProperty} REGEXP '^[0-9]{1,}\$', CONCAT_WS(' ',${prefix}.first_name," +
+								"${prefix}.middle_name, ${prefix}.last_name), a.${byProperty})) as ${value},")
+	      				joinQuery.append("\n LEFT OUTER JOIN person ${prefix} ON ${prefix}.person_id=a.${byProperty} \n")
+
+						break
+					default:
+						query.append("ae.${WebUtil.splitCamelCase(value)} AS $value,")
+				}
 			}
 		}
 
-		[query: query, joinQuery: joinQuery]
+		return [query: query.toString(), joinQuery: joinQuery.toString()]
 	}
 
 	/**

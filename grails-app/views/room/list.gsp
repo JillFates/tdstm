@@ -109,11 +109,8 @@
 								<div class="buttons">
 									<span class="button">
 									    <tds:hasPermission permission="${Permission.RoomCreate}">
-										   <input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close'); saveData();"/>
+										   <input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open'); saveData();"/>
 									    </tds:hasPermission>
-										<tds:hasPermission permission="${Permission.RoomMerge}">
-											<span class="button"><input class="create disableButton" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" disabled="disabled" /></span>
-										</tds:hasPermission>
 										<tds:hasPermission permission="${Permission.RoomDelete}">
 											<g:actionSubmit class="delete disableButton" action="delete" id="deleteId" value="Delete" disabled="disabled"/>
 										</tds:hasPermission>
@@ -196,29 +193,6 @@
 								<input type="submit" class="save" value="Save" />
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</g:form>
-		</div>
-		<div id="mergeRoomDialog" title="Merge Room" style="display: none;">
-			<g:form method="post" name="mergeRoomForm" action="mergeRoom">
-				<table>
-					<thead>
-						<tr>
-							<th>Data Center<input type="hidden" name="sourceRoom" id="sRoomId"> </th>
-							<th>Room<input type="hidden" name="targetRoom" id="tRoomId"></th>
-						</tr>
-					</thead>
-					<tbody>
-						<g:each in="${roomInstanceList}" status="i" var="roomInstance">
-							<tr class="${(i % 2) == 0 ? 'odd' : 'even'} pointer" id="mergeRow_${roomInstance.id}" onclick="submitMergeForm(this.id)">
-
-								<td>${fieldValue(bean: roomInstance, field: "location")}</td>
-
-								<td>${fieldValue(bean: roomInstance, field: "roomName")}</td>
-
-							</tr>
-						</g:each>
 					</tbody>
 				</table>
 			</g:form>
@@ -317,7 +291,7 @@
 			});
 		}
 		$(document).ready(function() {
-			$("#editDialog,#createRoomDialog,#mergeRoomDialog,#listDialog").dialog({modal: true, autoOpen: false,open:function(){
+			$("#editDialog,#createRoomDialog,#listDialog").dialog({modal: true, autoOpen: false,open:function(){
 				$('.ui-dialog-titlebar-close').html('')
 				.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 			},close:function(){ location.reload();} });
@@ -386,33 +360,6 @@
 			} else {
 				$("#mergeId, #deleteId").attr("disabled", "disabled");
 				$("#mergeId, #deleteId").addClass('disableButton')
-			}
-		}
-		function showMergeDialog(){
-			var inputCheckBox = $("input:checked")
-			var checkBoxId = inputCheckBox.attr('id')
-			var sRoomId = inputCheckBox.attr('name').substring(inputCheckBox.attr('name').indexOf("_")+1,checkBoxId.length)
-
-			$("#mergeRoomDialog tbody tr").each(function() {
-				var rowId = $(this).attr('id')
-				if(rowId.substring(9,rowId.length) == sRoomId){
-					$(this).hide()
-				} else {
-					$(this).show()
-				}
-			});
-			$("#sRoomId").val(sRoomId)
-			$('#createRoomDialog').dialog('close');
-			$('#mergeRoomDialog').dialog('open')
-		}
-		function submitMergeForm(selectedRoom){
-			var tRoomId = selectedRoom.substring(9,selectedRoom.length)
-			if(tRoomId){
-				$("#tRoomId").val(tRoomId)
-				$('.message').hide();
-				$('#mergeRoomDialog').dialog('close');
-				$("#processDiv").show();
-				$("form#mergeRoomForm").submit()
 			}
 		}
 		function validateForm(){

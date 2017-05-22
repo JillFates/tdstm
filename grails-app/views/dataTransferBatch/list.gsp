@@ -264,7 +264,7 @@
                     {
                         field: "importedAt",
                         title: "Imported At",
-                        format: "{0:MM/dd/yyyy hh:mm tt}"
+                        format: "{0: " + tdsCommon.kendoDateTimeFormat() + "}"
                     },
                     {
                         field: "importedBy",
@@ -315,7 +315,8 @@
                     mode: "row"
                 },
                 pageable: {
-                    pageSize: 20
+                    pageSize: 25,
+					pageSizes: [25, 100, 500, 1000]
                 },
                 dataBound: onDataBound
             });

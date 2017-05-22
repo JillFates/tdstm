@@ -144,7 +144,7 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'expiryDate', 'errors')}">
 									<script type="text/javascript">
-										jQuery(function($){ $("#expiryDate").kendoDateTimePicker({ animation: false}); });
+										jQuery(function($){ $("#expiryDate").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat()}); });
 									</script>
 									<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
 										value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
@@ -161,7 +161,7 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'passwordExpirationDate', 'errors')}">
 									<script type="text/javascript">
-										jQuery(function($){ $("#passwordExpirationDateId").kendoDateTimePicker({ animation: false}); });
+										jQuery(function($){ $("#passwordExpirationDateId").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat()}); });
 									</script>
 									<input type="text" class="dateRange" id="passwordExpirationDateId" name="passwordExpirationDate"
 										value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" format="12hrs" />"/>

@@ -421,7 +421,7 @@ $('#reportsMenu').hide();
 								{
 									field: "createdAt",
 									title: "Created At",
-									format: "{0:MM/dd/yyyy}",
+                                    format: "{0: " + tdsCommon.kendoDateFormat() + "}",
 									width: 180
 								},
 								{
@@ -445,7 +445,7 @@ $('#reportsMenu').hide();
 								{
 									field: "resolvedAt",
 									title: "Resolved At",
-									format: "{0:MM/dd/yyyy}",
+                                    format: "{0: " + tdsCommon.kendoDateFormat() + "}",
 									width: 180
 								},
 								{
@@ -465,7 +465,8 @@ $('#reportsMenu').hide();
 								mode: "row"
 							},
 							pageable: {
-								pageSize: 20
+								pageSize: 25,
+								pageSizes: [25, 100, 500, 1000]
 							}
 						});
 					}

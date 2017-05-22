@@ -11,20 +11,18 @@ export default class ManuallyRequest {
         this.scope = $scope;
         this.licenseAdminService = licenseAdminService;
         this.uibModalInstance = $uibModalInstance;
-        this.licenseModel = {
-            id:  params.license.id,
-            email: params.license.email,
-            encryptedDetail: ''
+        this.licenseEmailModel = {
+            id:  params.license.id
         };
 
         // Get the hash code using the id.
-        this.getHashCode();
+        this.getEmailContent();
     }
 
 
-    getHashCode() {
-        this.licenseAdminService.getHashCode(this.licenseModel.id, (data) => {
-            this.licenseModel.encryptedDetail = data;
+    getEmailContent() {
+        this.licenseAdminService.getEmailContent(this.licenseEmailModel.id, (data) => {
+            this.licenseEmailModel = data;
             window.TDSTM.safeApply(this.scope);
         });
     }

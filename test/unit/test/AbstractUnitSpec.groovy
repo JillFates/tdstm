@@ -2,6 +2,7 @@ package test
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.TdsUserDetails
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.SpringSecurityService
@@ -22,13 +23,13 @@ import spock.lang.Specification
 import static org.junit.Assert.fail
 
 abstract class AbstractUnitSpec extends Specification {
-
 	protected static final String USERNAME = '__test_user__'
 	protected static final Map<String, String> PERSON_DATA = [firstName: 'Hunter', middleName: 'S', lastName: 'Thompson']
 
 	// TODO populate the test with random real data
 	protected static final List<String> ROLE_USER_PERMISSIONS = [
 		Permission.ArchitectureView,
+		Permission.AssetDelete,
 		Permission.AssetMenuView,
 		Permission.DashboardMenuView,
 		Permission.ProjectStaffList,
@@ -45,8 +46,10 @@ abstract class AbstractUnitSpec extends Specification {
 
 		ApplicationContextHolder.instance.applicationContext = applicationContext
 
-		session.setAttribute('CURR_DT_FORMAT', [CURR_DT_FORMAT: TimeUtil.MIDDLE_ENDIAN])
-		session.setAttribute('CURR_TZ', [CURR_TZ: 'GMT'])
+		//userPreferenceService.metaClass.session = session
+
+		session.setAttribute('CURR_DT_FORMAT', TimeUtil.MIDDLE_ENDIAN)
+		session.setAttribute('CURR_TZ', 'GMT')
 
 		defineBeans {
 
@@ -110,7 +113,7 @@ abstract class AbstractUnitSpec extends Specification {
 			authorities, userLogin.id, userLogin.personId, 'salt', ROLE_USER_PERMISSIONS)
 		SecurityContextHolder.context.authentication = new TestingAuthenticationToken(principal, null, authorities)
 
-		userLogin
+		return userLogin
 	}
 
 	protected void initAssociationIds() {

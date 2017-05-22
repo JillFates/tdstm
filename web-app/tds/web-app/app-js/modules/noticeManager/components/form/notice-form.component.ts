@@ -13,7 +13,7 @@ import { RichTextEditorComponent } from '../../../../shared/modules/rich-text-ed
 @Component({
     moduleId: module.id,
     selector: 'notice-form',
-    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/form/notice-form.component.html',
+    templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/form/notice-form.component.html',
     providers: [NoticeService]
 })
 export class NoticeFormComponent {

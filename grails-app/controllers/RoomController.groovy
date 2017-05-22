@@ -310,62 +310,6 @@ class RoomController implements ControllerMethods {
 	}
 
 	/**
-	 * Merge Racks and delete the selected Room and Racks
-	 */
-	@HasPermission(Permission.RoomMerge)
-	def mergeRoom() {
-		def sourceRoomId = params.sourceRoom
-		def targetRoomId = params.targetRoom
-		if (!sourceRoomId || !targetRoomId) {
-			redirect(action: "list", params: [viewType: "list"])
-			return
-		}
-
-		def sourceRoom = Room.get(sourceRoomId)
-		def targetRoom = Room.get(targetRoomId)
-		updateAssetEntityToMergeRooms(sourceRoom,targetRoom)
-		updateRackToMergeRooms(sourceRoom,targetRoom)
-		sourceRoom.delete(flush:true)
-		flash.message = "Room:$sourceRoom is merged to Room: $targetRoom successfully."
-		redirect(action: "list", params: [viewType: "list"])
-	}
-
-	private void updateAssetEntityToMergeRooms(Room sourceRoom, Room targetRoom) {
-		AssetEntity.executeUpdate('''
-			update AssetEntity
-			set sourceLocation=:location, sourceRoom=:roomName, roomSource=:targetRoomId
-			where roomSource=:sourceRoomId
-		''', [location: targetRoom.location, roomName: targetRoom.roomName,
-		      targetRoomId: targetRoom.id, sourceRoomId: sourceRoom.id])
-
-		AssetEntity.executeUpdate('''
-			update AssetEntity
-			set targetLocation=:targetLocation, targetRoom=:targetRoom, roomTarget=:roomTarget
-			where roomTarget=:sourceRoomId
-		''', [targetLocation: targetRoom.location, targetRoom: targetRoom.roomName,
-		      roomTarget: targetRoom.id, sourceRoomId: sourceRoom.id])
-	}
-
-	@HasPermission(Permission.RoomMerge)
-	def updateRackToMergeRooms(sourceRoom,targetRoom) {
-		def sourceRoomRacks = Rack.findAllByRoom(sourceRoom)
-		sourceRoomRacks.each { sourceRack ->
-			def rackTarget = Rack.findOrCreateWhere(source: sourceRack.source, 'project.id': sourceRack.project.id,
-				                                     location: sourceRack.location, 'room.id': targetRoom?.id, tag: sourceRack.tag)
-			// Update all assets with this rack info to point to this rack
-			if (!rackTarget) {
-				println "Unable to create rack: $rackTarget.errors"
-				AssetEntity.executeUpdate('update AssetEntity set rackSource=null where rackSource=?', [sourceRack.id])
-				AssetEntity.executeUpdate('update AssetEntity set rackTarget=null where rackTarget=?', [sourceRack.id])
-			} else {
-				AssetEntity.executeUpdate('update AssetEntity set rackSource=? where rackSource=?', [rackTarget.id, sourceRack.id])
-				AssetEntity.executeUpdate('update AssetEntity set rackTarget=? where rackTarget=?', [rackTarget.id, sourceRack.id])
-			}
-			sourceRack.delete(flush:true)
-		}
-	}
-
-	/**
 	 *  Return Power details as string to show at room layout.
 	 */
 	@HasPermission(Permission.RoomView)

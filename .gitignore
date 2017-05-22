@@ -7,4 +7,8 @@ plugins/
 run.sh
 .slcache/
 node_modules/
-projectFilesBackup
+specs-dist/
+web-app/dist/App.js
+web-app/dist/Vendors.js
+web-app/tds/web-app/dist/app.js
+web-app/tds/web-app/dist/vendor.js

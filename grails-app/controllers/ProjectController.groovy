@@ -112,9 +112,11 @@ class ProjectController implements ControllerMethods {
 			imageId = projectLogo.id
 		}
 		session.setAttribute('setImage', imageId)
-
+		boolean isDeleteable = securityService.hasPermission(Permission.ProjectDelete) && !project.isDefaultProject()
+		
 		[projectInstance: project, projectPartners: partyRelationshipService.getProjectPartners(project),
-		 projectManagers: projectService.getProjectManagers(project), projectLogoForProject: projectLogo]
+		 projectManagers: projectService.getProjectManagers(project), projectLogoForProject: projectLogo,
+		 isDeleteable: isDeleteable]
 	}
 
 	/**

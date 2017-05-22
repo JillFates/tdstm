@@ -121,7 +121,7 @@ grails {
 			excludes = ['*', '**/WEB-INF/**','**/META-INF/**']
 			includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**',
 			            '/js/**', '/app-js/**', '/i18n/**', '/test/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**',
-			            '/plugins/**', '/d3/**', '/dist/**']
+			            '/plugins/**', '/d3/**', '/dist/**', '/tds/web-app/dist/**', '/tds/node_modules/**', '/tds/web-app/app-js/**', '/tds/web-app/i18n/**', '/module/**']
 			patterns = []
 		}
 		rewrite.css = false
@@ -282,6 +282,14 @@ tdsops.buildFile = "/build.txt"
 grails {
 	plugin {
 		springsecurity {
+			// Refer to spring security REST Plugin configuration:
+			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
+			filterChain.chainMap = [
+					'/api/projects/heartbeat':'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+					'/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter',  // Stateless chain
+					'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter' // Traditional chain
+			]
+
 			// Refer to information on these settings please refer to:
 			//    https://grails-plugins.github.io/grails-spring-security-core/v2/guide/urlProperties.html
 			adh {
@@ -328,16 +336,29 @@ grails {
 				'/i/**'				:'permitAll',
 				'/**/icons/**'		:'permitAll',
 				'/**/favicon.ico'	:'permitAll',
-				'/app-js/**'		:'permitAll', // Angular - resources
+				'/app-js/**'		:'permitAll', // Angular1.6 - resources
 				'/i18n/**'			:'permitAll', // Angular - Translate
+				'/tds/web-app/**'	:'permitAll', // Angular2* - resources
+				'/module/**'		:'permitAll', // Angular2  - router access
 				'/test/**'			:'permitAll', // Angular - Test
 				'/monitoring'		:"hasPermission(request, '${Permission.AdminUtilitiesAccess}')", //todo: oluna: Awesome! does it work??
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',
+				'/oauth/access_token':'permitAll'
 			]
 
 			ldap.active = false
+
+			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
+			rest {
+				token {
+					validation {
+						enableAnonymousAccess = true
+					}
+				}
+			}
+
 		}
 	}
 }

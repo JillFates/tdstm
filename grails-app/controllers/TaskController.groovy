@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import groovy.time.TimeCategory
@@ -27,13 +28,12 @@ import net.transitionmanager.service.RunbookService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
 
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.DONE
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
@@ -56,7 +56,7 @@ class TaskController implements ControllerMethods {
 		(READY):      ['white',   'green'],
 		(PENDING):    ['black',   'white'],
 		(STARTED):    ['white',   'darkturquoise'],
-		(DONE):       ['white',   '#24488A'],
+		(COMPLETED):       ['white',   '#24488A'],
 		(TERMINATED): ['white',   'black'],
 		'AUTO_TASK':  ['#848484', '#848484'], // [font, edge]
 		'ERROR':      ['red',     'white']    // Use if the status doesn't match
@@ -97,7 +97,7 @@ class TaskController implements ControllerMethods {
 			if (params.containsKey('sort') && params.sort) {
 				redirParams.sort = params.sort
 			}
-			if (params.status == DONE) {
+			if (params.status == COMPLETED) {
 				redirParams.sync = 1
 			}
 			forward(controller: 'task', action: 'listUserTasks', params: redirParams)
@@ -131,10 +131,10 @@ class TaskController implements ControllerMethods {
 				if (! errorMsg && params.status) {
 					if (task.status != params.status) {
 						log.warn "assignToMe - Task(#:$task.taskNumber id:$task.id) status changed around when $securityService.currentUsername was assigning to self"
-						def whoDidIt = (task.status == DONE) ? task.resolvedBy : task.assignedTo
+						def whoDidIt = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
 						switch (task.status) {
 							case STARTED: errorMsg = "The task was STARTED by $whoDidIt"; break
-							case DONE:    errorMsg = "The task was COMPLETED by $whoDidIt"; break
+							case COMPLETED:    errorMsg = "The task was COMPLETED by $whoDidIt"; break
 							default:      errorMsg = "The task status was changed to '$task.status'"
 						}
 					}
@@ -167,7 +167,7 @@ class TaskController implements ControllerMethods {
 	/**
 	 *  Generate action bar for a selected comment in Task Manager
 	 *  @params id - the task (aka AssetComment) id number for the task bark
-	 *  @return : actions bar as HTML (Start, Done, Details, Assign To Me)
+	 *  @return : actions bar as HTML (Start, Completed, Details, Assign To Me)
 	 */
 	@HasPermission(Permission.TaskView)
 	def genActionBarHTML() {
@@ -198,7 +198,7 @@ class TaskController implements ControllerMethods {
 				cols--
 				actionBar << _actionButtonTd("doneTdId_$comment.id",
 					HtmlUtil.actionButton('Done', 'ui-icon-check', comment.id,
-						"changeStatus('$comment.id','$DONE', '$comment.status', 'taskManager')"))
+						"changeStatus('$comment.id','$COMPLETED', '$comment.status', 'taskManager')"))
 			}
 
 			actionBar <<
@@ -257,7 +257,7 @@ class TaskController implements ControllerMethods {
 				cols--
 				actionBar << "<span id='doneTdId_$comment.id' width='8%' nowrap='nowrap'>" <<
 						HtmlUtil.actionButton('Done', 'ui-icon-check', comment.id,
-						"changeStatus('$comment.id','$DONE', '$comment.status', 'taskManager')") << "</span>"
+						"changeStatus('$comment.id','$COMPLETED', '$comment.status', 'taskManager')") << "</span>"
 			}
 
 			if (securityService.currentPersonId != comment.assignedTo?.id && comment.status in [PENDING, READY, STARTED]) {
@@ -309,7 +309,7 @@ class TaskController implements ControllerMethods {
 				actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: STARTED,
 				              redirect: 'taskManager', disabled: comment.status != READY]
 
-				actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: DONE,
+				actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: COMPLETED,
 				              redirect: 'taskManager', disabled: !(comment.status in [READY, STARTED])]
 			}
 
@@ -440,10 +440,13 @@ digraph runbook {
 				if (! tasks.contains(task.id) && (viewUnpublished || task.isPublished)) {
 					tasks << task.id
 
-					def label = "$task.taskNumber:" + StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+					// string escaping: TM-3951, TM-5530, TM-6265
+					def label = "${task.taskNumber}:${task.comment}"
+					def tooltip = new String(label)
 					label = (label.size() < 31) ? label : label[0..30]
+					label = StringUtil.sanitizeDotString(label)
+					tooltip = StringUtil.sanitizeDotString(tooltip)
 
-					def tooltip = "$task.taskNumber:" + StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 					def colorKey = taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
 					def fillcolor = taskStatusColorMap[colorKey][1]
 					//def url = createLink(controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false)
@@ -662,8 +665,8 @@ digraph runbook {
 
 			tasks.each {
 
-				def task = "$it.task_number:" + it.task.encodeAsJSON()
-			    def tooltip  = "$it.task_number:" + it.task.encodeAsJSON()
+				def task = "${it.task_number}:${it.task}"
+			    def tooltip  = new String(task)
 
 				def colorKey = taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
 
@@ -688,10 +691,9 @@ digraph runbook {
 
 				task = (task.size() > 35) ? task[0..34] : task
 
-				// string escaping: TM-3951, TM-5530
-				if (task.endsWith("\\")) { // prevents unclosed strings like \"
-					task = task.replace("\\", "\\\\")
-				}
+				// string escaping: TM-3951, TM-5530, TM-6265
+				task = StringUtil.sanitizeDotString(task)
+				tooltip = StringUtil.sanitizeDotString(tooltip)
 
 				dotText << """\t$it.task_number [label="$task"  id="$it.id", style="$style", $attribs, tooltip="$tooltip"];\n"""
 				def successors = it.successors
@@ -1426,7 +1428,7 @@ function goBack() { window.history.back() }
 		// Determine the cart quantity
 		// The quantity only appears on the last label scanned/printed for a particular cart. This is used to notify
 		// the logistics and transport people that the cart is ready to wrap up.
-		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == "CLEANER" && assetComment.status != DONE) {
+		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == "CLEANER" && assetComment.status != COMPLETED) {
 			def cart = taskService.getCartQuantities(moveEvent, assetComment.assetEntity.cart)
 			if (cart && (cart.total - cart.done) == 1) {
 				// Only set the cartQty if we're printing the LAST set of labels for a cart (done is 1 less than total)
@@ -1467,7 +1469,7 @@ function goBack() { window.history.back() }
 			assignmentPerm = categoryPerm = true
 		} else {
 			// AssignmentPerm can be changed if task is not completed/terminated
-			assignmentPerm = ![DONE, TERMINATED].contains(assetComment.status)
+			assignmentPerm = ![COMPLETED, TERMINATED].contains(assetComment.status)
 		}
 
 		def dueDate = TimeUtil.formatDate(assetComment.dueDate)

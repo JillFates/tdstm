@@ -1,6 +1,8 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
+import groovy.json.StringEscapeUtils
+import org.apache.commons.lang3.StringUtils
 
 /**
  * String manipulation methods.
@@ -48,7 +50,7 @@ class StringUtil {
 	 * @return true if blank
 	 */
 	static boolean isBlank(String subject) {
-		!subject?.trim()
+		return StringUtils.isBlank(subject)
 	}
 
 	/**
@@ -278,6 +280,15 @@ class StringUtil {
 	 }
 
 	/**
+	 * Escape string being used in Dot graphs to avoid unterminated strings
+	 * @param str
+	 * @return
+	 */
+	static String sanitizeDotString(String str) {
+		return StringEscapeUtils.escapeJava(str)
+	}
+
+	/**
 	 * Compare various string values as boolean
 	 * @param str - the string to compare
 	 * @return true/false if it matches either list otherwize null for undeterminable
@@ -311,5 +322,23 @@ class StringUtil {
 			message = message.substring(idxB + openTag.length(), idxE)
 		}
 		message.trim()
+	}
+
+	/**
+	 * This method joins a list of objects into a single string using a given
+	 * delimiter and surrounding each element with double quotes.
+	 *
+	 * @param list: List of strings. Elements can contain escape characters.
+	 * @param baseDelimiter: String to be added between each item.
+	 *
+	 * @return a String containing all the items joined using the provided delimiter.
+	 */
+	static String listOfStringsAsMultiValueString(Iterable list, String baseDelimiter = ", ") {
+		String result = ""
+		if( list?.size() > 0){
+			String itemsDelimiter = "\"" + baseDelimiter + "\""
+			result = "\"" + StringUtils.join(list , itemsDelimiter) + "\""
+		}
+		return result
 	}
 }

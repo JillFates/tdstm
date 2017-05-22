@@ -230,12 +230,12 @@ class NewsEditorController implements ControllerMethods {
 		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery)
 
 		def result = jdbcTemplate.queryForList(queryForCommentsList.toString()).collect {[
-			createdAt: TimeUtil.formatDate(it.createdAt),
+			createdAt: it.createdAt,
 			createdBy: it.createdBy,
 			commentType: it.commentType,
 			comment: it.comment,
 			resolution: it.resolution,
-			resolvedAt: TimeUtil.formatDate(it.resolvedAt),
+			resolvedAt: it.resolvedAt,
 			resolvedBy: it.resolvedBy,
 			newsId: it.id
 		]}

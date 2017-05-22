@@ -14,9 +14,9 @@ import {
     Headers
 } from '@angular/http';
 
-import {Observable} from 'rxjs/Observable';
-import {NotifierService} from '../services/notifier.service';
-import {AlertType} from '../model/alert.model';
+import { Observable } from 'rxjs/Observable';
+import { NotifierService } from '../services/notifier.service';
+import { AlertType } from '../model/alert.model';
 
 export class HttpInterceptor extends Http {
 
@@ -58,13 +58,10 @@ export class HttpInterceptor extends Http {
     }
 
     getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {
+        let headers = new Headers({ 'Content-Type': 'application/json' });
         if (options === null) {
-            options = new RequestOptions();
+            options = new RequestOptions({ headers: headers });
         }
-        if (options.headers === null) {
-            options.headers = new Headers();
-        }
-        options.headers.append('Content-Type', 'application/json');
         return options;
     }
 

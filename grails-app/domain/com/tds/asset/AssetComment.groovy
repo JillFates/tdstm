@@ -13,7 +13,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import org.apache.commons.lang.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.DONE
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
@@ -196,7 +196,7 @@ class AssetComment {
 		// TODO : JPM 11/2015 : TM-4249 Eliminate Timezone computation 'CONVERT_TZ(SUBTIME(NOW(),'00:01:00.0')....' below
 		score formula: "CASE status \
 			WHEN '$HOLD' THEN 900 \
-			WHEN '$DONE' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 800, 200) + status_updated/NOW() \
+			WHEN '$COMPLETED' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 800, 200) + status_updated/NOW() \
 			WHEN '$STARTED' THEN 700 + 1 - IFNULL(est_start,NOW())/NOW() \
 			WHEN '$READY' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
 			WHEN '$PENDING' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
@@ -207,7 +207,7 @@ class AssetComment {
 
 	static transients = ['actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
 	                     'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
-	                     'tmpIsFunnellingTask']
+	                     'tmpIsFunnellingTask', 'isActionable']
 
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique
 
@@ -229,7 +229,7 @@ class AssetComment {
 	}
 
 	boolean isDone() {
-		status == DONE
+		status == COMPLETED
 	}
 
 	boolean isRunbookTask() {
@@ -270,14 +270,21 @@ class AssetComment {
 		(taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
 	}
 
+   /**
+    * isActionable - return indicator that the status of the task is Actionable
+    */
+	boolean isActionable() {
+		!(status in [ AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED ])
+	}
+
 	// task Manager column header names and its labels
 	static final Map<String, List<String>> taskCustomizeFieldAndLabel = [
-		actStart: 'Actual Start:', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
+		actStart: 'Actual Start', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
 		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
-		duration: 'Duration', durationScale: 'Duration Scale', estFinish: 'Estimated Finish:', estStart: 'Estimated Start',
-		hardAssigned: 'Hard Assignement', isPublished: 'Is Published', sendNotification: 'Send Notification',
+		duration: 'Duration', durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', actFinish: 'Actual Finish',
+		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', sendNotification: 'Send Notification',
 		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
-		instructionsLink: 'instructionsLink', bundle: 'Move Bundle'
+		instructionsLink: 'Instructions Link', bundle: 'Move Bundle'
 	].asImmutable()
 }

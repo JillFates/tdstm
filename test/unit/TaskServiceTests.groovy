@@ -21,7 +21,7 @@ class TaskServiceTests extends Specification {
 	void testCompareStatus() {
 		// Groovy compiler doesn't like the -1 parameter unless in parens
 		expect:
-		-1 == service.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.DONE)
+		-1 == service.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.COMPLETED)
 		0 == service.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.STARTED)
 		1 == service.compareStatus(AssetCommentStatus.STARTED, AssetCommentStatus.READY)
 		-1 == service.compareStatus(AssetCommentStatus.STARTED, null)
@@ -44,20 +44,20 @@ class TaskServiceTests extends Specification {
 		task.isResolved == 0
 
 		when:
-		// Test bumping status to DONE after STARTED
+		// Test bumping status to COMPLETED after STARTED
 		task.previousStatus = task.status
-		service.setTaskStatus(task, AssetCommentStatus.DONE, whom)
+		service.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
 
 		then:
 		task.actStart != null
 		task.actFinish != null
 		task.assignedTo != null
 		task.resolvedBy != null
-		AssetCommentStatus.DONE == task.status
+		AssetCommentStatus.COMPLETED == task.status
 		task.isResolved == 1
 
 		when:
-		// Test reverting status TO STARTED from DONE
+		// Test reverting status TO STARTED from COMPLETED
 		def prevStarted = task.actStart
 		task.previousStatus = task.status
 		service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)

@@ -33,6 +33,7 @@ export default class LicenseManagerList {
                 {field: 'id', hidden: true },
                 {field: 'action', filterable: false, title: 'Action', width: 80, template: '<button class="btn btn-default" ng-click="licenseManagerList.onLicenseManagerDetails(this)"><span class="glyphicon glyphicon-pencil"></span></button>' },
                 {field: 'owner.name', title: 'Owner'},
+                {field: 'websitename', title: 'Website Name'},
                 {field: 'client.name', title: 'Client'},
                 {field: 'project.name', title: 'Project', template: '<span style="text-transform: capitalize;">#=((data.project && data.project.name)? data.project.name.toLowerCase(): "" )#</span>'},
                 {field: 'email', title: 'Contact Email'},

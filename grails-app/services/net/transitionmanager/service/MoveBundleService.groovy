@@ -300,20 +300,18 @@ class MoveBundleService implements ServiceMethods {
 				AND if(m.model_id > -1, m.asset_type in ($storageTypes), a.asset_type in ($storageTypes))), 1, 0)) AS storageCount,
 			SUM(if(a.asset_class = '$AssetClass.DATABASE', 1, 0)) AS dbCount,
 			SUM(if(a.asset_class = '$AssetClass.APPLICATION', 1, 0)) AS appCount,
-			( select
-				SUM(if(ad1.status in
-					($reviewCodes) OR ad2.status in ($reviewCodes), 1,0)
-				)
-				from asset_entity sa join asset_dependency_bundle sadb ON sa.asset_entity_id=sadb.asset_id
-				left join asset_dependency ad1 ON ad1.asset_id=sa.asset_entity_id
-				left join asset_dependency ad2 ON ad2.asset_id=sa.asset_entity_id
-				where sadb.project_id=$project.id and sadb.dependency_bundle = adb.dependency_bundle
-			) AS needsReview
+			COALESCE(nr.needsReview, 0) AS needsReview
 
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
 			LEFT OUTER JOIN model m ON a.model_id=m.model_id
-			WHERE adb.project_id=$project.id""")
+			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview 
+				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id 
+				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id 
+				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id 
+				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes})) 
+			GROUP BY adb.dependency_bundle) nr ON nr.dependency_bundle=adb.dependency_bundle
+			WHERE adb.project_id=${project.id}""")
 
 		if (dependencyBundle) {
 			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))

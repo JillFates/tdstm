@@ -90,29 +90,35 @@ var akaUtil = (function ($) {
 			var duplicateOf = 'none'
 
 			// check if the AKA matches the parent's name
-			if (akaName == parentName)
-				duplicateOf = 'parent'
-			// check if the AKA matches another AKA on the list
-			else if (akaList.indexOf(akaName) != -1)
-				duplicateOf = 'local'
-			// if this AKA is new, check it's validity against other models on the server
-			else if (akaRow.attr('js-is-unique') == 'unknown')
-				duplicateOf = private.validateAkaOnServer(forWhom, akaRow, { 'alias': akaName, 'id': parentId, 'manufacturerId': manufacturerId, 'parentName': parentName })
-			// check if this AKA has previously been marked as invalid
-			else if (akaRow.attr('js-is-unique') == 'false')
-				duplicateOf = 'other'
-			// otherwise this AKA is not a duplicate
-			else
-				duplicateOf = 'none'
+			if (tdsCommon.compareStringsIgnoreCase(akaName, parentName)) {
+        duplicateOf = 'parent'
+        // check if the AKA matches another AKA on the list
+      } else if (tdsCommon.arrayContainsStringIgnoreCase(akaList, akaName)) {
+        duplicateOf = 'local'
+        // if this AKA is new, check it's validity against other models on the server
+      } else if (akaRow.attr('js-is-unique') == 'unknown') {
+        duplicateOf = private.validateAkaOnServer(forWhom, akaRow, {
+          'alias': akaName,
+          'id': parentId,
+          'manufacturerId': manufacturerId,
+          'parentName': parentName
+        });
+        // check if this AKA has previously been marked as invalid
+      } else if (akaRow.attr('js-is-unique') == 'false') {
+        duplicateOf = 'other'
+        // otherwise this AKA is not a duplicate
+      } else {
+        duplicateOf = 'none'
 
-			akaList.push(akaName)
-			public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom)
-		})
+        akaList.push(akaName)
+        public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom)
+      }
+		});
 
 		// if there are no AKAs left, enable the save button
 		if (akaList.size() == 0)
 			public.handleAkaForSaveButton(forWhom)
-	}
+	};
 
 	/**
 	 * Checks to see if an AKA exists on the server
@@ -199,16 +205,29 @@ var akaUtil = (function ($) {
 function convertPowerType(value, whom) {
 	if (value == "Watts") {
 		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() : ($('#powerUse' + whom + 'Id').val() * 120)
+
 		var powerNameplate = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() : ($('#powerNameplate' + whom + 'Id').val() * 120)
+		// If this field has a real amp conversion result, use it, this result in a exact conversion back.
+		if($('#powerNameplate' + whom + 'Id').data('ampsConverted') && $.isNumeric($('#powerNameplate' + whom + 'Id').data('ampsConverted'))){
+        	powerNameplate = $('#powerNameplate' + whom + 'Id').data('ampsConverted') * 120;
+            $('#powerNameplate' + whom + 'Id').val(powerNameplate.toFixed(0));
+		}else{
+            $('#powerNameplate' + whom + 'Id').val(powerNameplate);
+		}
+
 		var powerDesign = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() : ($('#powerDesign' + whom + 'Id').val() * 120)
 		$('#powerUse' + whom + 'Id').val(powerUsed);
-		$('#powerNameplate' + whom + 'Id').val(powerNameplate);
+
 		$('#powerDesign' + whom + 'Id').val(powerDesign);
 	} else if (value == "Amps") {
-		var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
+        var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
 		$('#powerUse' + whom + 'Id').val(powerUseA.toFixed(1));
-		var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() / 120 : ($('#powerNameplate' + whom + 'Id').val() / 120);
+
+        var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() / 120 : ($('#powerNameplate' + whom + 'Id').val() / 120);
+        // store real conversion result so we can use it later to convert it back to Watts	 if we want.
+        $('#powerNameplate' + whom + 'Id').data('ampsConverted',powerNameplateA);
 		$('#powerNameplate' + whom + 'Id').val(powerNameplateA.toFixed(1));
+
 		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() / 120 : ($('#powerDesign' + whom + 'Id').val() / 120);
 		$('#powerDesign' + whom + 'Id').val(powerDesignA.toFixed(1));
 	}
@@ -303,7 +322,7 @@ function updateModel(forWhom, formName) {
 			}).dialog('open');
 
 		},
-		error: function (request, errordata, errorObject) { alert(errorObject.toString()); }
+		error: function (request, errordata, errorObject) { alert(errorObject.toString()); },
 	});
 }
 
@@ -343,6 +362,9 @@ function changePowerValue(whom) {
 		if (whom == 'Edit')
 			$("#powerUseIdH").val(parseInt(namePlatePower) * 0.33)
 	}
+
+	// reset amp stored calculation values
+    $("#powerNameplate" + whom + "Id").removeData('ampsConverted');
 }
 
 function setStanderdPower(whom) {

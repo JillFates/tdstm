@@ -148,7 +148,7 @@ class CommentService implements ServiceMethods {
 					if (assetComment.status != params.currentStatus) {
 						log.warn "saveUpdateCommentAndNotes() user $currentUsername attempted to change task ($assetComment.id) status but was already changed"
 						// TODO - assignedTo may be changing at the same time, which is assigned below. Need to review this as it is a potential edge case.
-						Person whoDidIt = (assetComment.status == AssetCommentStatus.DONE) ? assetComment.resolvedBy : assetComment.assignedTo
+						Person whoDidIt = (assetComment.status == AssetCommentStatus.COMPLETED) ? assetComment.resolvedBy : assetComment.assignedTo
 						switch (assetComment.status) {
 							case AssetCommentStatus.READY:
 								// No need to error in this situation
@@ -163,7 +163,7 @@ class CommentService implements ServiceMethods {
 									errorMsg = "The task was previously STARTED by $whoDidIt"
 								}
 								break
-							case AssetCommentStatus.DONE:
+							case AssetCommentStatus.COMPLETED:
 								errorMsg = "The task was previously COMPLETED by $whoDidIt"
 								break
 							default:
