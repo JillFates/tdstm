@@ -521,10 +521,6 @@ var UserPreference = function () {
 		});
 	}
 
-	// resets the user's preferences to their default values
-	var resetTimezonePrefs = function (user) {
-		resetPreference(user, true)
-	}
 
 	// closes the preference dialog then refreshes the page
 	var changeResetMessage = function (e) {
@@ -552,8 +548,7 @@ var UserPreference = function () {
 		savePreferences: savePreferences,
 		resetPreference: resetPreference,
 		changeResetMessage: changeResetMessage,
-		removeUserPrefs: removeUserPrefs,
-		resetTimezonePrefs: resetTimezonePrefs
+		removeUserPrefs: removeUserPrefs
 	}
 }();
 
