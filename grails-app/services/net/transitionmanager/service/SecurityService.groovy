@@ -377,6 +377,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		requirePermission Permission.UserUnlock
 
 		account.lockedOutUntil = null
+		auditService.saveUserAudit UserAuditBuilder.userAccountWasUnlockedBy(getCurrentUsername(), account)
 		save account
 	}
 
@@ -1760,6 +1761,13 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		// removes previous user permission? if loaded
 		userCache.removeUserFromCache(username)
+	}
+
+	/**
+	 * Logout current user
+	 */
+	void logoutCurrentUser() {
+		SecurityContextHolder.getContext().setAuthentication(null)
 	}
 
 	private Person resolve(Person person) {

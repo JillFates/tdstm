@@ -66,6 +66,13 @@ tdstm {
 		// usernamePlaceholder - used to override the placeholder value in the username field
 		usernamePlaceholder = 'Enter your username'
 
+		// Then number of days after which a user account will be automatically locked out
+		// indefinitely upon logging in. Set to zero (0) to disable this feature.
+		inactiveDaysLockout = 60
+
+		// A list of usernames that should be excluded from the Inactivity Lockout behavior.
+		inactivityWhitelist = [ 'tdsadmin' ]
+
 		ldap {
 			// Enables the LDAP authentication when true, options true|false
 			enabled = false

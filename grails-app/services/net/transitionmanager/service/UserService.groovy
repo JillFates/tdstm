@@ -1,7 +1,9 @@
 package net.transitionmanager.service
 
 import com.tds.asset.Application
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ConfigurationException
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
@@ -17,8 +19,8 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
 
@@ -27,6 +29,8 @@ import org.springframework.transaction.TransactionDefinition
  * @author jmartin
  */
 class UserService implements ServiceMethods {
+	private static final int DEFAULT_INACTIVITY_DAYS_LOCKOUT = 60
+	private static final int DEFAULT_LOCKED_OUT_DAYS = 365 * 100
 
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
@@ -35,6 +39,8 @@ class UserService implements ServiceMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	AuditService auditService
+	GrailsApplication grailsApplication
 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
@@ -579,6 +585,7 @@ class UserService implements ServiceMethods {
 			return false
 		}
 
+		// <SL> is this session attribute bein used somehow?
 		Person person = userLogin.person
 		session.setAttribute 'LOGIN_PERSON', [name: person.firstName, id: person.id]
 
@@ -648,5 +655,81 @@ class UserService implements ServiceMethods {
 
 		userPreferenceService.setCurrentProjectId(projectId)
 		true
+	}
+
+	/**
+	 * Reset user account failed login attempts
+	 * @param userLogin
+	 */
+	@Transactional
+	void resetFailedLoginAttempts(UserLogin userLogin) {
+		userLogin.failedLoginAttempts = 0
+		userLogin.save()
+	}
+
+	/**
+	 * Set user account locked out date
+	 * @param userLogin
+	 * @param date
+	 */
+	@Transactional
+	void setLockedOutUntil(UserLogin userLogin, Date date) {
+		userLogin.lockedOutUntil = date
+		userLogin.save()
+	}
+
+	/**
+	 * Determine if a user account must be locked out based on its inactivity or it is whitelisted
+	 * @param userLogin
+	 * @return
+	 */
+	@Transactional
+	boolean shouldLockoutAccount(UserLogin userLogin) {
+		boolean shouldLockoutAccount = false
+		if (isUserInactivityWhiteListed(userLogin.username)) {
+			setLockedOutUntil(userLogin, null)
+			resetFailedLoginAttempts(userLogin)
+			updateLastLogin()
+		} else {
+			if (shouldLockoutAccountByInactivityPeriod(userLogin)) {
+				Date lockedOutUntil = TimeUtil.nowGMT() + DEFAULT_LOCKED_OUT_DAYS
+				setLockedOutUntil(userLogin, lockedOutUntil)
+				auditService.saveUserAudit UserAuditBuilder.userAccountWasLockedOutDueToInactivity(userLogin)
+				updateLastLogin()
+				securityService.logoutCurrentUser()
+				shouldLockoutAccount = true
+			}
+		}
+		return shouldLockoutAccount
+	}
+
+	/**
+	 * Verifies if a user account is whitelisted regarding inactivity
+	 * @param username
+	 * @return
+	 */
+	private boolean isUserInactivityWhiteListed(String username) {
+		List<String> whiteListedUserNames = grailsApplication.config.tdstm.security.inactivityWhitelist
+		if (CollectionUtils.isNotEmpty(whiteListedUserNames)) {
+			return whiteListedUserNames.contains(username)
+		}
+		return false
+	}
+
+	/**
+	 * Determine if a user account should be locked out based on inactivity period
+	 * @param userLogin
+	 * @return
+	 */
+	private boolean shouldLockoutAccountByInactivityPeriod(UserLogin userLogin) {
+		Date now = TimeUtil.nowGMT()
+		Date lastEvent
+		if (userLogin.lastLogin) {
+			lastEvent = userLogin.lastLogin
+		} else {
+			lastEvent = userLogin.createdDate
+		}
+		lastEvent = lastEvent + (grailsApplication.config.tdstm.security.inactiveDaysLockout ?: DEFAULT_INACTIVITY_DAYS_LOCKOUT)
+		return lastEvent < now
 	}
 }
