@@ -18,9 +18,12 @@ class TaskNonTranService implements ServiceMethods {
 
 	static transactional = false
 
+	CommentService commentService
 	JdbcTemplate jdbcTemplate
 	SecurityService securityService
 	TaskService taskService
+	UserPreferenceService userPreferenceService
+	
 
 	/**
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
@@ -96,6 +99,8 @@ class TaskNonTranService implements ServiceMethods {
 							log.info "updateTaskSuccessors: pred task(#:$task.taskNumber Id:$task.id) triggering successor task (#:$successorTask.taskNumber Id:$successorTask.id) to $setStatusTo by $whom"
 							taskService.setTaskStatus(successorTask, setStatusTo, whom, isPM)
 							// log.info "taskStatusChangeEvent: successorTask($successorTask.id) Making READY - Successful"
+							// Validates whether a notification should be issued. This should done before validate() because of the implementation of shouldSendNotification
+							boolean notificationRequired = commentService.shouldSendNotification(successorTask, whom, false, false)
 							if ( ! successorTask.validate() ) {
 								msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) failed READY of successor task(#:$successorTask.taskNumber Id:$successorTask.id) - $whom : ${GormUtil.allErrorsString(successorTask)}"
 								log.error msg
@@ -103,6 +108,12 @@ class TaskNonTranService implements ServiceMethods {
 								if ( successorTask.save(flush:true) ) {
 									msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) successor task(#:$successorTask.taskNumber Id:$successorTask.id) Saved - $whom"
 									success = true
+									if (notificationRequired) {
+										String tzId = userPreferenceService.timeZone
+										String userDTFormat = userPreferenceService.dateFormat
+										// Dispatches the email notification
+										commentService.dispatchTaskEmail([taskId: successorTask.id, tzId: tzId, isNew: false, userDTFormat: userDTFormat])
+									}
 								} else {
 									msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) failed setting successor task(#:$successorTask.taskNumber Id:$successorTask.id) to READY - $whom : ${GormUtil.allErrorsString(successorTask)}"
 									log.error msg
