@@ -5,11 +5,21 @@
 import { TDSAppComponent } from './tds-app.component';
 import { UIRouter, TransitionService } from '@uirouter/core';
 import { AuthService } from '../shared/services/auth.service';
+// Services
+import { TaskService } from '../modules/taskManager/service/task.service';
 
 export const tdsRoot = {
     name: 'tds',
     url: '',
-    component: TDSAppComponent
+    component: TDSAppComponent,
+    resolve: [
+        {
+            token: 'taskCount',
+            policy: { async: 'RXWAIT' },
+            deps: [TaskService],
+            resolveFn: (service: TaskService) => service.retrieveUserToDoCount()
+        }
+    ]
 };
 
 export function requiresAuthHook(transitionService: TransitionService) {
@@ -26,7 +36,7 @@ export function requiresAuthHook(transitionService: TransitionService) {
         }
     };
 
-    transitionService.onBefore(requiresAuthCriteria, redirectToLogin, {priority: 10});
+    transitionService.onBefore(requiresAuthCriteria, redirectToLogin, { priority: 10 });
 }
 
 export function AuthConfig(router: UIRouter) {
