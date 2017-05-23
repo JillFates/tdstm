@@ -115,9 +115,9 @@ class LicenseAdminService extends LicenseCommonService {
 				LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
 				// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
 				LicenseManagerProperties.setCacheTimeInMinutes(24 * 60)
-			}
 
-			LicenseManager.getInstance()
+				LicenseManager.getInstance()
+			}
 
 			// END: License Admin Configuration //
 

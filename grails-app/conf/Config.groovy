@@ -180,10 +180,13 @@ environments {
 			}
 		}
 
+		grails.serverURL = 'http://localhost:8080/tdstm'
+
 		//used for testing email
 		grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
 	}
 	production {
+		greenmail.disabled = true
 		grails {
 			logging.jul.usebridge = false
 			// TODO serverURL = 'http://www.changeme.com'
