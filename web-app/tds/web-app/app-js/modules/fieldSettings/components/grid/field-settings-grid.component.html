@@ -1,0 +1,25 @@
+<kendo-grid [filterable]="true" [filter]="state.filter" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort"
+    [pageSize]="state.take" [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
+    <ng-template kendoGridToolbarTemplate [position]="'top'">
+    </ng-template>
+    <kendo-grid-column field="key" title="Field"></kendo-grid-column>
+    <kendo-grid-column field="label" title="Label"></kendo-grid-column>
+    <kendo-grid-column field="shared" title="Shared" filter="boolean">
+        <ng-template kendoGridCellTemplate let-dataItem>
+            {{dataItem.shared | tdsUIBoolean}}
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="required" title="Required" filter="boolean">
+        <ng-template kendoGridCellTemplate let-dataItem>
+            {{dataItem.required | tdsUIBoolean}}
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="display" title="Display" filter="boolean">
+        <ng-template kendoGridCellTemplate let-dataItem>
+            {{dataItem.display | tdsUIBoolean}}
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="default" title="Default Value"></kendo-grid-column>
+    <kendo-grid-column field="control" title="Control"></kendo-grid-column>
+    <kendo-grid-column field="help" title="Tooltip Help"></kendo-grid-column>
+</kendo-grid>

@@ -1,13 +1,13 @@
-import {Component, ViewChild, Inject, AfterViewInit, ViewEncapsulation} from '@angular/core';
-import {NoticeService} from '../../service/notice.service';
-import {NoticeModel} from '../../model/notice.model';
-import {NoticeFormComponent} from '../form/notice-form.component';
+import { Component, ViewChild, Inject, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { NoticeService } from '../../service/notice.service';
+import { NoticeModel } from '../../model/notice.model';
+import { NoticeFormComponent } from '../form/notice-form.component';
 
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ActionType} from '../../../../shared/model/action-type.enum';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { ActionType } from '../../../../shared/model/action-type.enum';
 
-import {GridComponent, GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
-import {SortDescriptor, orderBy, process, State, FilterDescriptor} from '@progress/kendo-data-query';
+import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { process, State, FilterDescriptor } from '@progress/kendo-data-query';
 
 @Component({
 	moduleId: module.id,
@@ -31,7 +31,7 @@ export class NoticeListComponent {
 		}],
 		filter: {
 			filters: [
-				{field: 'active', operator: 'eq', value: false}
+				{ field: 'active', operator: 'eq', value: false }
 			],
 			logic: 'and'
 		}
@@ -40,15 +40,15 @@ export class NoticeListComponent {
 		typeId: null, name: 'Select a Type'
 	};
 	private typeDataSource: Array<any> = [
-		{typeId: 1, name: 'Prelogin'},
-		{typeId: 2, name: 'Postlogin'}
+		{ typeId: 1, name: 'Prelogin' },
+		{ typeId: 2, name: 'Postlogin' }
 	];
 
 	/**
 	 * @constructor
 	 * @param {NoticeService} noticeService
 	 */
-	constructor(@Inject('notices') notices, private noticeService: NoticeService, private dialogService: UIDialogService) {
+	constructor( @Inject('notices') notices, private noticeService: NoticeService, private dialogService: UIDialogService) {
 
 		this.moduleName = 'Notice List';
 		notices.subscribe(
@@ -81,8 +81,8 @@ export class NoticeListComponent {
 	 */
 	public onCreateNotice(): void {
 		this.dialogService.open(NoticeFormComponent, [
-			{provide: NoticeModel, useValue: new NoticeModel()},
-			{provide: Number, useValue: ActionType.Create}
+			{ provide: NoticeModel, useValue: new NoticeModel() },
+			{ provide: Number, useValue: ActionType.Create }
 		]).then(result => {
 			this.getNoticeList();
 		}, error => {
@@ -98,8 +98,8 @@ export class NoticeListComponent {
 	 */
 	public onEditNotice(dataItem: NoticeModel): void {
 		this.dialogService.open(NoticeFormComponent, [
-			{provide: NoticeModel, useValue: dataItem as NoticeModel},
-			{provide: Number, useValue: ActionType.Edit}
+			{ provide: NoticeModel, useValue: dataItem as NoticeModel },
+			{ provide: Number, useValue: ActionType.Edit }
 		]).then(result => {
 			this.getNoticeList();
 		}, error => {
