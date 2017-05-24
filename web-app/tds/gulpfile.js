@@ -166,6 +166,7 @@ gulp.task('build-vendor', function () {
     getNPMPackageIds().forEach(function (id) {
         // Does not include
         if (id === 'jszip') {
+            // Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #1
             browserifyProcesor.require(nodeResolve.sync(id), { expose: 'jszip/dist/jszip' });
         } else if (id !== 'zone.js' && id !== 'core-js' && id !== 'rxjs') {
             browserifyProcesor.require(nodeResolve.sync(id), { expose: id });

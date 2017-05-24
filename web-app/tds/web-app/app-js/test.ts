@@ -1,7 +1,7 @@
-import { getTestBed } from '@angular/core/testing';
+import {getTestBed} from '@angular/core/testing';
 import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
+	BrowserDynamicTestingModule,
+	platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
 import './specs/highlight.directive.spec';
@@ -21,13 +21,13 @@ declare var __karma__: any;
 
 // Prevent Karma from running prematurely.
 __karma__.loaded = () => {
-  let a = 1;
+	let a = 1;
 };
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
+	BrowserDynamicTestingModule,
+	platformBrowserDynamicTesting()
 );
 
 // Finally, start Karma to run the tests.
