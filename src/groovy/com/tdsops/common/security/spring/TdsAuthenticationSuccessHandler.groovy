@@ -20,9 +20,6 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 
-/**
- * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
- */
 @CompileStatic
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
 
@@ -43,14 +40,18 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			UsernamePasswordAuthorityAuthenticationToken authentication = (UsernamePasswordAuthorityAuthenticationToken) auth
 
 			UserLogin userLogin = securityService.userLogin
-
 			auditService.saveUserAudit UserAuditBuilder.login()
 
-			if (userService.shouldLockoutAccount(userLogin)) {
+			if (securityService.shouldLockoutAccount(userLogin)) {
+				// lock account
+				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
-
 				redirectUri = '/auth/login'
 			} else {
+				userService.updateLastLogin(userLogin)
+				userService.resetFailedLoginAttempts(userLogin)
+				userService.setLockedOutUntil(userLogin, null)
+
 				String userAgent = authentication.userAgent
 				boolean browserTestiPad = userAgent.toLowerCase().contains('ipad')
 				boolean browserTest = userAgent.toLowerCase().contains('mobile')

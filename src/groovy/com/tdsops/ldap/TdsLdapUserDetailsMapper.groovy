@@ -1,6 +1,7 @@
 package com.tdsops.ldap
 
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.UserService
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -21,6 +22,9 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
 
     @Autowired
     UserDetailsService userDetailsService
+
+    @Autowired
+    TdsPreAuthenticationChecks preAuthenticationChecks
 
     ConfigObject ldap
 
@@ -69,6 +73,7 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
         UserLogin userLogin = userService.findOrProvisionUser(userInfo, ldap, authority)
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username)
+        preAuthenticationChecks.check(userDetails)
 
         if (ldap.debug) {
             println("Successfully mapped ldap context to user for username: ${username} and LDAP roles: ${ldapRoles}")
