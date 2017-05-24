@@ -61,8 +61,8 @@ class TaskService implements ServiceMethods {
 	def personService
 	def progressService
 	Scheduler quartzScheduler
-	SecurityService securityService
-	SequenceService sequenceService
+	def securityService
+	def sequenceService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
