@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
-    moduleId: module.id,
-    selector: 'empty-component',
-    template: ''
+	moduleId: module.id,
+	selector: 'empty-component',
+	template: ''
 })
 
-export class EmptyComponent { }
+export class EmptyComponent {
+}

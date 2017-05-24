@@ -5,36 +5,36 @@
  * however a implemented service will be in charge of passing the emitter to this directive
  */
 
-import { Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {NotifierService} from '../services/notifier.service';
 import {AlertType, AlertModel} from '../model/alert.model';
 
 @Component({
-    selector: 'tds-ui-toast',
-    templateUrl: '../tds/web-app/app-js/shared/directives/ui-toast.directive.html'
+	selector: 'tds-ui-toast',
+	templateUrl: '../tds/web-app/app-js/shared/directives/ui-toast.directive.html'
 })
 
 export class UIToastDirective {
 
-    private showsPopUp = false;
-    private alertModel = AlertModel;
-    private alertType = AlertType;
+	private showsPopUp = false;
+	private alertModel = AlertModel;
+	private alertType = AlertType;
 
-    constructor(private notifierService: NotifierService) {
-        this.eventListeners();
-    }
+	constructor(private notifierService: NotifierService) {
+		this.eventListeners();
+	}
 
-    eventListeners() {
-        this.notifierService.on(AlertType.DANGER, (event) => {
-            this.showsPopUp = true;
-            this.alertModel.alertType = this.alertType.DANGER;
-            this.alertModel.message = event.message;
-        });
-    }
+	eventListeners() {
+		this.notifierService.on(AlertType.DANGER, (event) => {
+			this.showsPopUp = true;
+			this.alertModel.alertType = this.alertType.DANGER;
+			this.alertModel.message = event.message;
+		});
+	}
 
-    onCloseDialog() {
-        this.alertModel.alertType = this.alertType.EMPTY;
-        this.alertModel.message = '';
-    }
+	onCloseDialog() {
+		this.alertModel.alertType = this.alertType.EMPTY;
+		this.alertModel.message = '';
+	}
 
 }

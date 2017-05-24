@@ -3,8 +3,8 @@
  */
 
 export enum ActionType {
-    Create,
-    Edit,
-    Delete,
-    Update
+	Create,
+	Edit,
+	Delete,
+	Update
 };
