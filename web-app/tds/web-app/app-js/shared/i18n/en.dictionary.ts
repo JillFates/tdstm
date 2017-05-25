@@ -21,5 +21,9 @@ export const en_DICTIONARY: Object = {
 		'SAVE': 'Save',
 		'DELETE': 'Delete',
 		'CANCEL': 'Cancel'
+	},
+	'FIELD_SETTINGS': {
+		'ASSET_FIELD_SETTING': 'Asset Field Settings',
+		'PROJECT_LIST': 'Project List'
 	}
 };
