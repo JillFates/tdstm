@@ -12,6 +12,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Input('data') fieldsSettings: FieldSettingsModel[];
 	@Input('asset-class') assetClass: string;
 
+	private search: string;
 	private gridData: GridDataResult;
 	private state: State = {
 		skip: 0,
@@ -19,15 +20,36 @@ export class FieldSettingsGridComponent implements OnInit {
 		sort: [{
 			dir: 'asc',
 			field: 'key'
-		}]
+		}],
+		filter: {
+			filters: [{
+				field: 'key',
+				operator: 'contains',
+				value: ''
+			}],
+			logic: 'and'
+		}
 	};
+
+	ngOnInit(): void {
+		this.gridData = process(this.fieldsSettings, this.state);
+	}
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
 		this.state = state;
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
-	ngOnInit(): void {
+	protected onFilter(): void {
+		this.state.filter.filters = [{
+			field: 'key',
+			operator: 'contains',
+			value: this.search
+		}];
 		this.gridData = process(this.fieldsSettings, this.state);
+	}
+
+	protected onEdit(): void {
+		console.log('editig');
 	}
 }

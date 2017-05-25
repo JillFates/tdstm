@@ -1,6 +1,15 @@
-<kendo-grid [filterable]="true" [filter]="state.filter" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort"
-    [pageSize]="state.take" [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
+<kendo-grid [filter]="state.filter" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort" [pageSize]="state.take"
+    [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'">
+        <div class="col-xs-3 col-md-2 col-lg-1">
+            <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()">Edit</button>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <input type="text" class="form-control" name="search" id="search" [(ngModel)]="search" placeholder="Enter field name to filter">
+        </div>
+        <div class="col-xs-3 col-md-2 col-lg-1">
+            <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()">Filter</button>
+        </div>
     </ng-template>
     <kendo-grid-column field="key" title="Field"></kendo-grid-column>
     <kendo-grid-column field="label" title="Label"></kendo-grid-column>

@@ -1,6 +1,7 @@
 // Angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 // Routing Logic
 import { UIRouterModule } from '@uirouter/angular';
 import { FIELD_SETTINGS_STATES } from './field-settings.states';
@@ -17,6 +18,7 @@ import { FieldSettingsService } from './service/field-settings.service';
 	imports: [
 		CommonModule,
 		SharedModule,
+		FormsModule,
 		GridModule,
 		UIRouterModule.forChild({ states: FIELD_SETTINGS_STATES })
 	],
