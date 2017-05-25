@@ -105,6 +105,10 @@ function changePersonDetails () {
 		}
 	}
 	if (returnVal) {
+
+		// TODO: try to move into jquery.ajax() calls to remove prototype dependency.
+
+
 		new Ajax.Request( tdsCommon.createAppURL('/person/updateAccount'), {
 			asynchronous:true,
 			evalScripts:true,
