@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.MoveBundle
@@ -582,6 +583,10 @@ class CommentService implements ServiceMethods {
 	@Transactional
 	def saveAndUpdateTaskDependency(def task, def dependent, def taskDepId, def depId) {
         String errorMsg = ''
+		/* This method is called from different places. Some send the taskDepId as a long,
+			while others send a string. Therefore, it's best to ensure the value is actually
+			a long. */
+		taskDepId = NumberUtil.toLong(taskDepId)
 		def taskDependency = TaskDependency.get(taskDepId)
 		if (taskDependency && taskDependency.predecessor.id != Long.parseLong(depId)) {
 			taskDependency.predecessor = dependent
