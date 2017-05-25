@@ -54,6 +54,7 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-ldap:2.0.1'
 		// Added the acl for some testing JPM 12/2016
 		compile ':spring-security-acl:2.0.0'
+		compile ':greenmail:1.3.4'
 
 		compile ':spring-security-rest:1.5.4'
 		compile ":rest-client-builder:2.1.0"
