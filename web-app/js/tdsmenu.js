@@ -106,25 +106,31 @@ function changePersonDetails () {
 	}
 	if (returnVal) {
 
-		// TODO: try to move into jquery.ajax() calls to remove prototype dependency.
+		var parameters = 'id=' + $('#personId').val()
+        +'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
+        +'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #oldPasswordId').val()
+        +'&newPassword='+$('#personDialog #passwordId').val()
+        +'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
+        +'&powerType='+powerType+'&startPage='+startPage
 
-
-		new Ajax.Request( tdsCommon.createAppURL('/person/updateAccount'), {
-			asynchronous:true,
-			evalScripts:true,
-			onComplete:function(e){ updateWelcome(e) },
-			parameters:'id=' + $('#personId').val() 
-				+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
-				+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #oldPasswordId').val()
-				+'&newPassword='+$('#personDialog #passwordId').val()
-				+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
-				+'&powerType='+powerType+'&startPage='+startPage
-		});
+        jQuery.ajax({
+            url: tdsCommon.createAppURL('/person/updateAccount'),
+            type:'POST',
+			data: parameters,
+            success: function(response) {
+            	tdsCommon.prepareJQueryAjaxResponse(response);
+                updateWelcome(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("/person/updateAccount - " + errorThrown);
+            }
+        });
 	}
 }
 
 function updateWelcome( e ) {
-	var data = tdsCommon.isValidWsResponse(e, "An unexpected error occurred while attempting to perform the update.", false);
+	var data = tdsCommon.isJQueryAjaxResponse(e) ? tdsCommon.isValidWsJQueryAjaxResponse(e, "An unexpected error occurred while attempting to perform the update.", false)
+		: tdsCommon.isValidWsResponse(e, "An unexpected error occurred while attempting to perform the update.", false);
 	if (data !== false) {
 		$("#loginUserId").html(data.name)
 		$("#tzId").html(data.tz)
