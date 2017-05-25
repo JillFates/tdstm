@@ -169,8 +169,8 @@ class SecurityConfigParser {
 			map.usernamePlaceholder = uph
 		}
 
-		map.inactiveDaysLockout = prop(props.inactiveDaysLockout, DEFAULT_INACTIVITY_DAYS_LOCKOUT)
-		map.inactivityWhitelist = prop(props.inactivityWhitelist, [])
+		map.inactiveDaysLockout = prop(props.inactiveDaysLockout ?: null, DEFAULT_INACTIVITY_DAYS_LOCKOUT)
+		map.inactivityWhitelist = prop(props.inactivityWhitelist ?: null, [])
 
 		return map
 	}
