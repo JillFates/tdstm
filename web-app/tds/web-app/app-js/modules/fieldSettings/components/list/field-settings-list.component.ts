@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { FieldSettingsModel } from '../../model/field-settings.model';
+import { DomainModel } from '../../model/domain.model';
 
 @Component({
 	moduleId: module.id,
@@ -8,13 +9,14 @@ import { FieldSettingsModel } from '../../model/field-settings.model';
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/list/field-settings-list.component.html'
 })
 export class FieldSettingsListComponent {
-	public fieldSettings: FieldSettingsModel[];
-	public assetClass = 'Devices';
+	public fieldSettings: any = {};
 
-	constructor( @Inject('fields') fields: Observable<FieldSettingsModel[]>) {
+	constructor( @Inject('fields') fields: Observable<DomainModel[]>) {
 		fields.subscribe(
 			(result) => {
-				this.fieldSettings = result;
+				result.forEach(element => {
+					this.fieldSettings[element.domain] = element;
+				});
 			},
 			(err) => console.log(err));
 	}

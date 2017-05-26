@@ -35,7 +35,7 @@ export const fieldSettingListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 			token: 'fields',
 			policy: { async: 'RXWAIT' },
 			deps: [FieldSettingsService],
-			resolveFn: (service: FieldSettingsService) => service.getFieldSettings()
+			resolveFn: (service: FieldSettingsService) => service.getAssetClassFieldSetting()
 		}
 	]
 };
