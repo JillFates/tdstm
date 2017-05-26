@@ -212,7 +212,7 @@ class AuthController implements ControllerMethods {
 	/**
 	 * The 3rd step in the password reset process where the user is prompted for their email address and their new password.
 	 */
-	@HasPermission(Permission.UserResetOwnPassword)
+	@Secured('! isAuthenticated()')
 	def resetPassword() {
 		String token = params.token
 		PasswordReset pr
@@ -238,7 +238,7 @@ class AuthController implements ControllerMethods {
 	 * to their landing page along with a message that their password was changed. If it fails it will return to the
 	 * reset password form.
 	 */
-	@HasPermission(Permission.UserResetOwnPassword)
+	@Secured('! isAuthenticated()')
 	def applyNewPassword() {
 		try {
 			PasswordReset pr = securityService.applyPasswordFromPasswordReset(params.token, params.password, params.email)
@@ -253,7 +253,7 @@ class AuthController implements ControllerMethods {
 				pr.userLogin.person,
 				pr.userLogin.person
 			)
-			emailDispatchService.createEmailJob(ed, [username:pr.userLogin.username])
+			emailDispatchService.createEmailJob(ed, [username: pr.userLogin.username])
 
 			// Login and redirect to home page
 			params.username = pr.userLogin.username

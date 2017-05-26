@@ -29,6 +29,7 @@ grails.project.dependency.resolution = {
 		compile 'org.apache.poi:ooxml-schemas:1.1'
 		compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
 		compile 'org.apache.poi:poi:3.14'
+		compile 'xml-apis:xml-apis:1.4.01'
 
 		compile 'org.glassfish.external:ant:3.0-b29'
 		runtime 'mysql:mysql-connector-java:5.1.40'
