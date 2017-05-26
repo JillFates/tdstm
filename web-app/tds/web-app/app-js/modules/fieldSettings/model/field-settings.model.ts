@@ -1,14 +1,16 @@
 export class FieldSettingsModel {
-	key: string;
+	field: string;
 	label: string;
-	help: string;
+	tip: string;
+	udf: boolean;
 	shared: boolean;
-	importance: 'C' | 'I' | 'N' | 'U';
+	imp: 'C' | 'I' | 'N' | 'U';
 	required: boolean;
-	display: boolean;
-	type: 'String' | 'Number' | 'Boolean';
+	show: boolean;
+	order?: number;
+	type?: 'String' | 'Number' | 'Boolean' | '';
 	length?: number;
 	default?: any;
-	control?: 'Select' | 'YesNo' | 'Number';
-	controlOpt?: Array<string> | any;
+	control?: 'Select' | 'YesNo' | 'Number' | '';
+	option?: Array<string> | any;
 }

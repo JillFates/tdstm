@@ -1568,5 +1568,7 @@
             "type": "String",
             "default": "",
             "control": ""
-        },
+        }
+    ]
+}
        

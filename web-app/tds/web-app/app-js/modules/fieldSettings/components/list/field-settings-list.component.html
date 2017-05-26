@@ -2,7 +2,33 @@
 	<section>
 		<div>
 			<div class="box-body box-with-empty-header">
-				<field-settings-grid [data]="fieldSettings" [asset-class]="assetClass"></field-settings-grid>
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab_1" data-toggle="tab">Application</a></li>
+						<li><a href="#tab_2" data-toggle="tab">Device</a></li>
+						<li><a href="#tab_3" data-toggle="tab">Database</a></li>
+						<li><a href="#tab_3" data-toggle="tab">Logical Storage</a></li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="tab_1">
+							<field-settings-grid [data]="fieldSettings.application.fields" [asset-class]="application"></field-settings-grid>
+						</div>
+						<!-- /.tab-pane -->
+						<div class="tab-pane" id="tab_2">
+							<field-settings-grid [data]="fieldSettings.device.fields" [asset-class]="device"></field-settings-grid>
+						</div>
+						<!-- /.tab-pane -->
+						<div class="tab-pane" id="tab_3">
+							<field-settings-grid [data]="fieldSettings.database.fields" [asset-class]="database"></field-settings-grid>
+						</div>
+						<!-- /.tab-pane -->
+						<div class="tab-pane" id="tab_4">
+							<field-settings-grid [data]="fieldSettings.storage.fields" [asset-class]="storage"></field-settings-grid>
+						</div>
+						<!-- /.tab-pane -->
+					</div>
+					<!-- /.tab-content -->
+				</div>
 			</div>
 			<!-- /.box-body -->
 		</div>
