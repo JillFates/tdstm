@@ -1785,9 +1785,9 @@ logger.debug "mergePersonsUserLogin() entered"
 	 * @return
 	 */
 	private boolean isUserInactivityWhiteListed(String username) {
-		List<String> whiteListedUserNames = loginConfigMap.inactivityWhitelist
+		List<String> whiteListedUserNames = getLoginConfig().inactivityWhitelist
 		if (CollectionUtils.isNotEmpty(whiteListedUserNames)) {
-			return whiteListedUserNames.contains(username)
+			return whiteListedUserNames*.toLowerCase().contains(username.toLowerCase())
 		}
 		return false
 	}
@@ -1805,7 +1805,7 @@ logger.debug "mergePersonsUserLogin() entered"
 		} else {
 			lastEvent = userLogin.createdDate
 		}
-		lastEvent = lastEvent + loginConfigMap.inactiveDaysLockout
+		lastEvent = lastEvent + getLoginConfig().inactiveDaysLockout
 		return lastEvent < now
 	}
 
