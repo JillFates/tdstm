@@ -1,5 +1,5 @@
-<kendo-grid [filter]="state.filter" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort" [pageSize]="state.take"
-    [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
+<kendo-grid [filter]="state.filter" [skip]="state.skip" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort"
+    [pageSize]="state.take" [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'">
         <div class="col-xs-3 col-md-2 col-lg-1">
             <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> Edit</button>

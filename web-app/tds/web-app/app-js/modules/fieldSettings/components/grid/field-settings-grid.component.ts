@@ -19,11 +19,11 @@ export class FieldSettingsGridComponent implements OnInit {
 		take: 10,
 		sort: [{
 			dir: 'asc',
-			field: 'key'
+			field: 'order'
 		}],
 		filter: {
 			filters: [{
-				field: 'key',
+				field: 'field',
 				operator: 'contains',
 				value: ''
 			}],
@@ -42,7 +42,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onFilter(): void {
 		this.state.filter.filters = [{
-			field: 'key',
+			field: 'field',
 			operator: 'contains',
 			value: this.search
 		}];
