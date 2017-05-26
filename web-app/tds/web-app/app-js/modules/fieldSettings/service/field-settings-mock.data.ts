@@ -102,9 +102,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue',
-				label: 'Customtrue',
-				tip: 'This field is the Customtrue',
+				field: 'custom1',
+				label: 'Custom1',
+				tip: 'This field is the Custom1',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -116,9 +116,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruefalse',
-				label: 'Customtruefalse',
-				tip: 'This field is the Customtruefalse',
+				field: 'custom10',
+				label: 'Custom10',
+				tip: 'This field is the Custom10',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -130,9 +130,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruetrue',
-				label: 'Customtruetrue',
-				tip: 'This field is the Customtruetrue',
+				field: 'custom11',
+				label: 'Custom11',
+				tip: 'This field is the Custom11',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -144,9 +144,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue2',
-				label: 'Customtrue2',
-				tip: 'This field is the Customtrue2',
+				field: 'custom12',
+				label: 'Custom12',
+				tip: 'This field is the Custom12',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -158,9 +158,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue3',
-				label: 'Customtrue3',
-				tip: 'This field is the Customtrue3',
+				field: 'custom13',
+				label: 'Custom13',
+				tip: 'This field is the Custom13',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -172,9 +172,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue4',
-				label: 'Customtrue4',
-				tip: 'This field is the Customtrue4',
+				field: 'custom14',
+				label: 'Custom14',
+				tip: 'This field is the Custom14',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -186,9 +186,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue5',
-				label: 'Customtrue5',
-				tip: 'This field is the Customtrue5',
+				field: 'custom15',
+				label: 'Custom15',
+				tip: 'This field is the Custom15',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -200,9 +200,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue6',
-				label: 'Customtrue6',
-				tip: 'This field is the Customtrue6',
+				field: 'custom16',
+				label: 'Custom16',
+				tip: 'This field is the Custom16',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -214,9 +214,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue7',
-				label: 'Customtrue7',
-				tip: 'This field is the Customtrue7',
+				field: 'custom17',
+				label: 'Custom17',
+				tip: 'This field is the Custom17',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -228,9 +228,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue8',
-				label: 'Customtrue8',
-				tip: 'This field is the Customtrue8',
+				field: 'custom18',
+				label: 'Custom18',
+				tip: 'This field is the Custom18',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -242,9 +242,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue9',
-				label: 'Customtrue9',
-				tip: 'This field is the Customtrue9',
+				field: 'custom19',
+				label: 'Custom19',
+				tip: 'This field is the Custom19',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -270,9 +270,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2false',
-				label: 'Custom2false',
-				tip: 'This field is the Custom2false',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -284,9 +284,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2true',
-				label: 'Custom2true',
-				tip: 'This field is the Custom2true',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -424,9 +424,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3false',
-				label: 'Custom3false',
-				tip: 'This field is the Custom3false',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -438,9 +438,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3true',
-				label: 'Custom3true',
-				tip: 'This field is the Custom3true',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -578,9 +578,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4false',
-				label: 'Custom4false',
-				tip: 'This field is the Custom4false',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -592,9 +592,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4true',
-				label: 'Custom4true',
-				tip: 'This field is the Custom4true',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -732,9 +732,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5false',
-				label: 'Custom5false',
-				tip: 'This field is the Custom5false',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -746,9 +746,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5true',
-				label: 'Custom5true',
-				tip: 'This field is the Custom5true',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -886,9 +886,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6false',
-				label: 'Custom6false',
-				tip: 'This field is the Custom6false',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -900,9 +900,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6true',
-				label: 'Custom6true',
-				tip: 'This field is the Custom6true',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1040,9 +1040,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7false',
-				label: 'Custom7false',
-				tip: 'This field is the Custom7false',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1054,9 +1054,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7true',
-				label: 'Custom7true',
-				tip: 'This field is the Custom7true',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1194,9 +1194,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8false',
-				label: 'Custom8false',
-				tip: 'This field is the Custom8false',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1208,9 +1208,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8true',
-				label: 'Custom8true',
-				tip: 'This field is the Custom8true',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1348,9 +1348,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom9false',
-				label: 'Custom9false',
-				tip: 'This field is the Custom9false',
+				field: 'custom90',
+				label: 'Custom90',
+				tip: 'This field is the Custom90',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1362,9 +1362,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom9true',
-				label: 'Custom9true',
-				tip: 'This field is the Custom9true',
+				field: 'custom90',
+				label: 'Custom90',
+				tip: 'This field is the Custom90',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1717,9 +1717,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue',
-				label: 'Customtrue',
-				tip: 'This field is the Customtrue',
+				field: 'custom1',
+				label: 'Custom1',
+				tip: 'This field is the Custom1',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1731,9 +1731,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruefalse',
-				label: 'Customtruefalse',
-				tip: 'This field is the Customtruefalse',
+				field: 'custom10',
+				label: 'Custom10',
+				tip: 'This field is the Custom10',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1745,9 +1745,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruetrue',
-				label: 'Customtruetrue',
-				tip: 'This field is the Customtruetrue',
+				field: 'custom11',
+				label: 'Custom11',
+				tip: 'This field is the Custom11',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1759,9 +1759,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue2',
-				label: 'Customtrue2',
-				tip: 'This field is the Customtrue2',
+				field: 'custom12',
+				label: 'Custom12',
+				tip: 'This field is the Custom12',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1773,9 +1773,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue3',
-				label: 'Customtrue3',
-				tip: 'This field is the Customtrue3',
+				field: 'custom13',
+				label: 'Custom13',
+				tip: 'This field is the Custom13',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1787,9 +1787,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue4',
-				label: 'Customtrue4',
-				tip: 'This field is the Customtrue4',
+				field: 'custom14',
+				label: 'Custom14',
+				tip: 'This field is the Custom14',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1801,9 +1801,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue5',
-				label: 'Customtrue5',
-				tip: 'This field is the Customtrue5',
+				field: 'custom15',
+				label: 'Custom15',
+				tip: 'This field is the Custom15',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1815,9 +1815,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue6',
-				label: 'Customtrue6',
-				tip: 'This field is the Customtrue6',
+				field: 'custom16',
+				label: 'Custom16',
+				tip: 'This field is the Custom16',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1829,9 +1829,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue7',
-				label: 'Customtrue7',
-				tip: 'This field is the Customtrue7',
+				field: 'custom17',
+				label: 'Custom17',
+				tip: 'This field is the Custom17',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1843,9 +1843,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue8',
-				label: 'Customtrue8',
-				tip: 'This field is the Customtrue8',
+				field: 'custom18',
+				label: 'Custom18',
+				tip: 'This field is the Custom18',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1857,9 +1857,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue9',
-				label: 'Customtrue9',
-				tip: 'This field is the Customtrue9',
+				field: 'custom19',
+				label: 'Custom19',
+				tip: 'This field is the Custom19',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1885,9 +1885,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2false',
-				label: 'Custom2false',
-				tip: 'This field is the Custom2false',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -1899,9 +1899,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2true',
-				label: 'Custom2true',
-				tip: 'This field is the Custom2true',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2039,9 +2039,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3false',
-				label: 'Custom3false',
-				tip: 'This field is the Custom3false',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2053,9 +2053,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3true',
-				label: 'Custom3true',
-				tip: 'This field is the Custom3true',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2193,9 +2193,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4false',
-				label: 'Custom4false',
-				tip: 'This field is the Custom4false',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2207,9 +2207,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4true',
-				label: 'Custom4true',
-				tip: 'This field is the Custom4true',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2347,9 +2347,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5false',
-				label: 'Custom5false',
-				tip: 'This field is the Custom5false',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2361,9 +2361,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5true',
-				label: 'Custom5true',
-				tip: 'This field is the Custom5true',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2501,9 +2501,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6false',
-				label: 'Custom6false',
-				tip: 'This field is the Custom6false',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2515,9 +2515,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6true',
-				label: 'Custom6true',
-				tip: 'This field is the Custom6true',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2655,9 +2655,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7false',
-				label: 'Custom7false',
-				tip: 'This field is the Custom7false',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2669,9 +2669,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7true',
-				label: 'Custom7true',
-				tip: 'This field is the Custom7true',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2809,9 +2809,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8false',
-				label: 'Custom8false',
-				tip: 'This field is the Custom8false',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2823,9 +2823,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8true',
-				label: 'Custom8true',
-				tip: 'This field is the Custom8true',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2963,9 +2963,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom9false',
-				label: 'Custom9false',
-				tip: 'This field is the Custom9false',
+				field: 'custom90',
+				label: 'Custom90',
+				tip: 'This field is the Custom90',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -2977,9 +2977,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom9true',
-				label: 'Custom9true',
-				tip: 'This field is the Custom9true',
+				field: 'custom90',
+				label: 'Custom90',
+				tip: 'This field is the Custom90',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3164,9 +3164,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue',
-				label: 'Customtrue',
-				tip: 'This field is the Customtrue',
+				field: 'custom1',
+				label: 'Custom1',
+				tip: 'This field is the Custom1',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3178,9 +3178,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruefalse',
-				label: 'Customtruefalse',
-				tip: 'This field is the Customtruefalse',
+				field: 'custom10',
+				label: 'Custom10',
+				tip: 'This field is the Custom10',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3192,9 +3192,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruetrue',
-				label: 'Customtruetrue',
-				tip: 'This field is the Customtruetrue',
+				field: 'custom11',
+				label: 'Custom11',
+				tip: 'This field is the Custom11',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3206,9 +3206,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue2',
-				label: 'Customtrue2',
-				tip: 'This field is the Customtrue2',
+				field: 'custom12',
+				label: 'Custom12',
+				tip: 'This field is the Custom12',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3220,9 +3220,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue3',
-				label: 'Customtrue3',
-				tip: 'This field is the Customtrue3',
+				field: 'custom13',
+				label: 'Custom13',
+				tip: 'This field is the Custom13',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3234,9 +3234,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue4',
-				label: 'Customtrue4',
-				tip: 'This field is the Customtrue4',
+				field: 'custom14',
+				label: 'Custom14',
+				tip: 'This field is the Custom14',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3248,9 +3248,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue5',
-				label: 'Customtrue5',
-				tip: 'This field is the Customtrue5',
+				field: 'custom15',
+				label: 'Custom15',
+				tip: 'This field is the Custom15',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3262,9 +3262,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue6',
-				label: 'Customtrue6',
-				tip: 'This field is the Customtrue6',
+				field: 'custom16',
+				label: 'Custom16',
+				tip: 'This field is the Custom16',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3276,9 +3276,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue7',
-				label: 'Customtrue7',
-				tip: 'This field is the Customtrue7',
+				field: 'custom17',
+				label: 'Custom17',
+				tip: 'This field is the Custom17',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3290,9 +3290,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue8',
-				label: 'Customtrue8',
-				tip: 'This field is the Customtrue8',
+				field: 'custom18',
+				label: 'Custom18',
+				tip: 'This field is the Custom18',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3304,9 +3304,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue9',
-				label: 'Customtrue9',
-				tip: 'This field is the Customtrue9',
+				field: 'custom19',
+				label: 'Custom19',
+				tip: 'This field is the Custom19',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3332,9 +3332,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2false',
-				label: 'Custom2false',
-				tip: 'This field is the Custom2false',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3346,9 +3346,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2true',
-				label: 'Custom2true',
-				tip: 'This field is the Custom2true',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3486,9 +3486,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3false',
-				label: 'Custom3false',
-				tip: 'This field is the Custom3false',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3500,9 +3500,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3true',
-				label: 'Custom3true',
-				tip: 'This field is the Custom3true',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3640,9 +3640,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4false',
-				label: 'Custom4false',
-				tip: 'This field is the Custom4false',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3654,9 +3654,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4true',
-				label: 'Custom4true',
-				tip: 'This field is the Custom4true',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3794,9 +3794,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5false',
-				label: 'Custom5false',
-				tip: 'This field is the Custom5false',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3808,9 +3808,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5true',
-				label: 'Custom5true',
-				tip: 'This field is the Custom5true',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3948,9 +3948,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6false',
-				label: 'Custom6false',
-				tip: 'This field is the Custom6false',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -3962,9 +3962,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6true',
-				label: 'Custom6true',
-				tip: 'This field is the Custom6true',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4102,9 +4102,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7false',
-				label: 'Custom7false',
-				tip: 'This field is the Custom7false',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4116,9 +4116,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7true',
-				label: 'Custom7true',
-				tip: 'This field is the Custom7true',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4256,9 +4256,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8false',
-				label: 'Custom8false',
-				tip: 'This field is the Custom8false',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4270,9 +4270,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8true',
-				label: 'Custom8true',
-				tip: 'This field is the Custom8true',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4426,9 +4426,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue',
-				label: 'Customtrue',
-				tip: 'This field is the Customtrue',
+				field: 'custom1',
+				label: 'Custom1',
+				tip: 'This field is the Custom1',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4440,9 +4440,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruefalse',
-				label: 'Customtruefalse',
-				tip: 'This field is the Customtruefalse',
+				field: 'custom10',
+				label: 'Custom10',
+				tip: 'This field is the Custom10',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4454,9 +4454,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtruetrue',
-				label: 'Customtruetrue',
-				tip: 'This field is the Customtruetrue',
+				field: 'custom11',
+				label: 'Custom11',
+				tip: 'This field is the Custom11',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4468,9 +4468,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue2',
-				label: 'Customtrue2',
-				tip: 'This field is the Customtrue2',
+				field: 'custom12',
+				label: 'Custom12',
+				tip: 'This field is the Custom12',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4482,9 +4482,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue3',
-				label: 'Customtrue3',
-				tip: 'This field is the Customtrue3',
+				field: 'custom13',
+				label: 'Custom13',
+				tip: 'This field is the Custom13',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4496,9 +4496,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue4',
-				label: 'Customtrue4',
-				tip: 'This field is the Customtrue4',
+				field: 'custom14',
+				label: 'Custom14',
+				tip: 'This field is the Custom14',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4510,9 +4510,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue5',
-				label: 'Customtrue5',
-				tip: 'This field is the Customtrue5',
+				field: 'custom15',
+				label: 'Custom15',
+				tip: 'This field is the Custom15',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4524,9 +4524,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue6',
-				label: 'Customtrue6',
-				tip: 'This field is the Customtrue6',
+				field: 'custom16',
+				label: 'Custom16',
+				tip: 'This field is the Custom16',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4538,9 +4538,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue7',
-				label: 'Customtrue7',
-				tip: 'This field is the Customtrue7',
+				field: 'custom17',
+				label: 'Custom17',
+				tip: 'This field is the Custom17',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4552,9 +4552,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue8',
-				label: 'Customtrue8',
-				tip: 'This field is the Customtrue8',
+				field: 'custom18',
+				label: 'Custom18',
+				tip: 'This field is the Custom18',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4566,9 +4566,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'customtrue9',
-				label: 'Customtrue9',
-				tip: 'This field is the Customtrue9',
+				field: 'custom19',
+				label: 'Custom19',
+				tip: 'This field is the Custom19',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4594,9 +4594,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2false',
-				label: 'Custom2false',
-				tip: 'This field is the Custom2false',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4608,9 +4608,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom2true',
-				label: 'Custom2true',
-				tip: 'This field is the Custom2true',
+				field: 'custom20',
+				label: 'Custom20',
+				tip: 'This field is the Custom20',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4748,9 +4748,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3false',
-				label: 'Custom3false',
-				tip: 'This field is the Custom3false',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4762,9 +4762,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom3true',
-				label: 'Custom3true',
-				tip: 'This field is the Custom3true',
+				field: 'custom30',
+				label: 'Custom30',
+				tip: 'This field is the Custom30',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4902,9 +4902,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4false',
-				label: 'Custom4false',
-				tip: 'This field is the Custom4false',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -4916,9 +4916,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom4true',
-				label: 'Custom4true',
-				tip: 'This field is the Custom4true',
+				field: 'custom40',
+				label: 'Custom40',
+				tip: 'This field is the Custom40',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5056,9 +5056,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5false',
-				label: 'Custom5false',
-				tip: 'This field is the Custom5false',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5070,9 +5070,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom5true',
-				label: 'Custom5true',
-				tip: 'This field is the Custom5true',
+				field: 'custom50',
+				label: 'Custom50',
+				tip: 'This field is the Custom50',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5210,9 +5210,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6false',
-				label: 'Custom6false',
-				tip: 'This field is the Custom6false',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5224,9 +5224,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom6true',
-				label: 'Custom6true',
-				tip: 'This field is the Custom6true',
+				field: 'custom60',
+				label: 'Custom60',
+				tip: 'This field is the Custom60',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5364,9 +5364,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7false',
-				label: 'Custom7false',
-				tip: 'This field is the Custom7false',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5378,9 +5378,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom7true',
-				label: 'Custom7true',
-				tip: 'This field is the Custom7true',
+				field: 'custom70',
+				label: 'Custom70',
+				tip: 'This field is the Custom70',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5518,9 +5518,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8false',
-				label: 'Custom8false',
-				tip: 'This field is the Custom8false',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
@@ -5532,9 +5532,9 @@ export const FieldSettingsData: Array<DomainModel> = [
 				control: ''
 			},
 			{
-				field: 'custom8true',
-				label: 'Custom8true',
-				tip: 'This field is the Custom8true',
+				field: 'custom80',
+				label: 'Custom80',
+				tip: 'This field is the Custom80',
 				udf: true,
 				shared: false,
 				imp: 'I',
