@@ -1,33 +1,31 @@
 .k-grid
-  // Toolbar
-  .k-grid-toolbar
-    padding: 5px
-    border-color: $color__material--blue1
-    background-color: $color__material--blue1
-    .kendo-grid-toolbar__add-btn
-      height: 27px
-      padding-top: 4px
-      margin-left: 8px
-      font-size: 12px
-      color: $color__url-element--blue
-      font-weight: bold
-    .kendo-grid-toolbar__refresh-btn
-      float: right
-      cursor: pointer
-      font-size: 14px
-      margin-top: 5px
-      margin-right: 5px
-  .k-grid-header
-    .k-grid-header-wrap
-      .k-header
-        border: 0px
-  .k-grid-content
-    tr
-      background-color: transparent
-      td
-        border-left-width: 0
-        border-bottom-width: 1px
-        border-style: solid
-
-  .k-grid-pager
-    border-top: transparent
+    // Toolbar
+    .k-grid-toolbar
+        padding: 2px
+        border-color: $color__material--blue1
+        background-color: $color__material--blue1
+        .kendo-grid-toolbar__add-btn
+            height: 27px
+            padding-top: 4px
+            margin-left: 8px
+            font-size: 12px
+            color: $color__url-element--blue
+            font-weight: bold
+        .kendo-grid-toolbar__refresh-btn
+            float: right
+            cursor: pointer
+            font-size: 14px
+            margin-top: 5px
+            margin-right: 5px
+    .k-grid-header
+        .k-grid-header-wrap
+            .k-header
+                border: 0px
+    .k-grid-content
+        tr
+            background-color: transparent
+            td
+                padding-top: $cell-padding-y - 1
+                border-left-width: 0
+                border-bottom-width: 1px
+                border-style: solid
