@@ -22,7 +22,7 @@ export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 		page: {
 			title: 'NOTICE_MANAGER.NOTICE_ADMINISTRATION',
 			instruction: '',
-			menu: ['NOTICE_MANAGER.ADMIN', 'NOTICE_MANAGER.NOTICE', 'NOTICE_MANAGER.LIST']
+			menu: ['NOTICE_MANAGER.ADMIN', 'NOTICE_MANAGER.NOTICE', 'GLOBAL.LIST']
 		},
 		requiresAuth: true
 	},
