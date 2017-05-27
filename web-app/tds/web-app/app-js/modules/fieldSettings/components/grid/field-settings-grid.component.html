@@ -2,13 +2,13 @@
     [pageSize]="state.take" [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'">
         <div class="col-xs-3 col-md-2 col-lg-1">
-            <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> Edit</button>
+            <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> {{'GLOBAL.EDIT' | translate}}</button>
         </div>
         <div class="col-xs-6 col-md-4">
-            <input type="text" class="form-control" name="search" id="search" [(ngModel)]="search" placeholder="Enter field name to filter">
+            <input type="text" class="form-control" name="search" id="search" [(ngModel)]="search" placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}">
         </div>
         <div class="col-xs-3 col-md-2 col-lg-1">
-            <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> Filter</button>
+            <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
         </div>
     </ng-template>
     <kendo-grid-column field="field" title="Field"></kendo-grid-column>
