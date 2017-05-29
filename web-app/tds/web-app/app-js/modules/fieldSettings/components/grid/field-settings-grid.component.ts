@@ -36,6 +36,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	};
 	private isEditing = false;
 	private isFilterDisabled = false;
+	private sortable: boolean | object = { mode: 'single' };
 
 	constructor(private fieldService: FieldSettingsService) { }
 
@@ -59,15 +60,23 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onEdit(): void {
 		this.isEditing = true;
+		this.sortable = false;
 	}
 
 	protected onSaveAll(): void {
 		this.isEditing = false;
+		this.sortable = { mode: 'single' };
 	}
 
 	protected onCancel(): void {
 		this.isEditing = false;
 		// TODO: need a way to clone this content at init so we can revert the changes
+		this.gridData = process(this.fieldsSettings, this.state);
+		this.sortable = { mode: 'single' };
+	}
+
+	protected onDelete(dataItem: FieldSettingsModel): void {
+		this.fieldsSettings.splice(this.fieldsSettings.indexOf(dataItem), 1);
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 }

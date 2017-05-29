@@ -6,7 +6,7 @@
         <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
     </div>
 </ng-template>
-<kendo-grid [filter]="state.filter" [skip]="state.skip" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort"
+<kendo-grid [filter]="state.filter" [skip]="state.skip" [data]="gridData" [sortable]="sortable" [sort]="state.sort"
     [pageSize]="state.take" [pageable]="{ pageSizes: [25, 100, 500, 1000], info: true}" (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
         <div class="col-xs-4 col-md-3 col-lg-2">
@@ -24,6 +24,11 @@
         </div>
         <div *ngIf="isFilterDisabled; else filterControl"></div>
     </ng-template>
+    <kendo-grid-column title="Action" [width]="80">
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <button class="btn btn-default" [disabled]="!isEditing" *ngIf="dataItem.udf" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+        </ng-template>
+    </kendo-grid-column>
     <kendo-grid-column field="field" title="Field">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
             <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.field" name="field">
