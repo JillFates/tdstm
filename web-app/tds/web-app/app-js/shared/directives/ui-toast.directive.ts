@@ -24,17 +24,44 @@ export class UIToastDirective {
 		this.eventListeners();
 	}
 
+	/**
+	 * Shows the message as a small popup in front of the user.
+	 * @param alertType [WARNING, SUCCESS, DANGER, ERROR]
+	 * @param message
+	 */
+	showPopUp(alertType, message) {
+		this.showsPopUp = true;
+		this.alertModel.alertType = alertType;
+		this.alertModel.message = message;
+		setTimeout(() => this.hidePopUp(), 3000);
+	}
+
 	eventListeners() {
 		this.notifierService.on(AlertType.DANGER, (event) => {
-			this.showsPopUp = true;
-			this.alertModel.alertType = this.alertType.DANGER;
-			this.alertModel.message = event.message;
+			this.showPopUp(AlertType.DANGER, event.message);
+		});
+		this.notifierService.on(AlertType.WARNING, (event) => {
+			this.showPopUp(AlertType.WARNING, event.message);
+		});
+		this.notifierService.on(AlertType.SUCCESS, (event) => {
+			this.showPopUp(AlertType.SUCCESS, event.message);
+		});
+		this.notifierService.on(AlertType.INFO, (event) => {
+			this.showPopUp(AlertType.INFO, event.message);
 		});
 	}
 
-	onCloseDialog() {
+	/**
+	 * Cleans the status and hide all reference to the popups
+	 */
+	hidePopUp() {
+		this.showsPopUp = false;
 		this.alertModel.alertType = this.alertType.EMPTY;
 		this.alertModel.message = '';
+	}
+
+	onCloseDialog() {
+		this.hidePopUp();
 	}
 
 }

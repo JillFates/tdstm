@@ -12,7 +12,8 @@ export const en_DICTIONARY: Object = {
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
-		'PROJECT_LIST': 'Project List'
+		'PROJECT_LIST': 'Project List',
+		'CREATE_CUSTOM': 'Create Custom'
 	},
 	'GLOBAL': {
 		'CANCEL': 'Cancel',
@@ -21,7 +22,8 @@ export const en_DICTIONARY: Object = {
 		'FILTER': 'Filter',
 		'LIST': 'List',
 		'LEGEND': 'Legend',
-		'SAVE': 'Save'
+		'SAVE': 'Save',
+		'SAVE_ALL': 'Save All'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

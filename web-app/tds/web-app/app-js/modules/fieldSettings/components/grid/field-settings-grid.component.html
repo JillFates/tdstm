@@ -1,34 +1,89 @@
+<ng-template #filterControl>
+    <div class="col-xs-3 col-md-4 col-lg-4">
+        <input type="text" class="form-control" name="search" id="search" [(ngModel)]="search" placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}">
+    </div>
+    <div class="col-xs-2 col-md-2 col-lg-1">
+        <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
+    </div>
+</ng-template>
 <kendo-grid [filter]="state.filter" [skip]="state.skip" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort"
-    [pageSize]="state.take" [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
-    <ng-template kendoGridToolbarTemplate [position]="'top'">
-        <div class="col-xs-3 col-md-2 col-lg-1">
-            <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> {{'GLOBAL.EDIT' | translate}}</button>
+    [pageSize]="state.take" [pageable]="{ pageSizes: [25, 100, 500, 1000], info: true}" (dataStateChange)="dataStateChange($event)">
+    <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
+        <div class="col-xs-4 col-md-3 col-lg-2">
+            <button type="button" class="btn btn-default" id="btnSaveAll" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>
+            <button type="button" class="btn btn-default" id="btnCancel" (click)="onCancel()"><i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}</button>
         </div>
-        <div class="col-xs-6 col-md-4">
-            <input type="text" class="form-control" name="search" id="search" [(ngModel)]="search" placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}">
-        </div>
-        <div class="col-xs-3 col-md-2 col-lg-1">
-            <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
+        <div *ngIf="isFilterDisabled; else filterControl" class="col-xs-5 col-md-6 col-lg-5"></div>
+        <div class="col-xs-3 col-md-3 col-lg-5">
+            <button type="button" class="btn btn-default float-right" id="btnAddCustom" (click)="onAddCustom()"><i class="fa fa-fw fa-plus-circle"></i> {{'FIELD_SETTINGS.CREATE_CUSTOM' | translate}}</button>
         </div>
     </ng-template>
-    <kendo-grid-column field="field" title="Field"></kendo-grid-column>
-    <kendo-grid-column field="label" title="Label"></kendo-grid-column>
-    <kendo-grid-column field="shared" title="Shared" filter="boolean">
-        <ng-template kendoGridCellTemplate let-dataItem>
+    <ng-template kendoGridToolbarTemplate [position]="'top'" #defaultToolbar>
+        <div class="col-xs-4 col-md-3 col-lg-2">
+            <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> {{'GLOBAL.EDIT' | translate}}</button>
+        </div>
+        <div *ngIf="isFilterDisabled; else filterControl"></div>
+    </ng-template>
+    <kendo-grid-column field="field" title="Field">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+            <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.field" name="field">
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="order" title="Order">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+            <input type="number" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.order" name="order">
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="label" title="Label">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+            <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.label" name="label">
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="shared" title="Shared">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing; else sharedTemp" let-dataItem>
+            <div class="checkbox text-center">
+                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="required"></label>
+            </div>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem #sharedTemp>
             {{dataItem.shared | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="required" title="Required" filter="boolean">
+    <kendo-grid-column field="imp" title="Importance">
         <ng-template kendoGridCellTemplate let-dataItem>
+            <field-settings-imp [edit]="isEditing" [(model)]="dataItem.imp"></field-settings-imp>
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="required" title="Required">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
+            <div class="checkbox text-center">
+                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.required" name="required"></label>
+            </div>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem #requiredTemp>
             {{dataItem.required | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="show" title="Display" filter="boolean">
-        <ng-template kendoGridCellTemplate let-dataItem>
+    <kendo-grid-column field="show" title="Display">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing; else displayTemp" let-dataItem>
+            <div class="checkbox text-center">
+                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.show" name="required"></label>
+            </div>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem #displayTemp>
             {{dataItem.display | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="default" title="Default Value"></kendo-grid-column>
+    <kendo-grid-column field="default" title="Default Value">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+            <input type="text" class="form-control" [(ngModel)]="dataItem.default" name="default">
+        </ng-template>
+    </kendo-grid-column>
     <kendo-grid-column field="control" title="Control"></kendo-grid-column>
-    <kendo-grid-column field="tip" title="Tooltip Help"></kendo-grid-column>
+    <kendo-grid-column field="tip" title="Tooltip Help">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+            <textarea class="form-control" [(ngModel)]="dataItem.tip" name="tip" rows="2">
+            </textarea>
+        </ng-template>
+    </kendo-grid-column>
 </kendo-grid>
