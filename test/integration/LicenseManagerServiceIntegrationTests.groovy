@@ -117,6 +117,9 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
 
 		when: 'we configure the license'
+			licensedClient.email = testEmail
+			licensedClient.websitename = License.WILDCARD
+			licensedClient.hostName = License.WILDCARD
 			licensedClient.type = License.Type.MULTI_PROJECT
 			licensedClient.max  = 100
 			licensedClient.activationDate = today.toDate()
@@ -142,6 +145,49 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 	}
 
 	def '04. Modify License' () {
+		setup: 'first we generate a new license request with an original ammount of 100 servers'
+			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+			log.info("ID: ${licenseRequest.id}")
+			String encodedMessage  = licenseRequest.toEncodedMessage()
+			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
+			licensedClient.email = testEmail
+			licensedClient.websitename = License.WILDCARD
+			licensedClient.hostName = License.WILDCARD
+			licensedClient.type = License.Type.MULTI_PROJECT
+			licensedClient.max  = 100
+			licensedClient.activationDate = today.toDate()
+			licensedClient.expirationDate = tomorrow.toDate()
+			licensedClient.save()
+		and: 'generate a license key'
+			licenseManagerService.activate(licensedClient.id)
+			String licenseKeyPending = licenseManagerService.getLicenseKey(licensedClient.id)
+			License licDomain = License.get(licensedClient.id)
+			licDomain.hash = licenseKeyPending
+		and: 'load it into the DB'
+			licenseAdminService.load(licDomain)
+
+		when: 'load that recent license from the DB'
+			License persistedLicense = License.get(licensedClient.id)
+
+		then: 'this should match with the data requested'
+			licensedClient.id == persistedLicense.id
+			licensedClient.max == persistedLicense.max
+
+		when: 'we change the max amount of servers to 200'
+			licensedClient.max = 200
+			licensedClient.save()
+		and: 'get the new licence Hash'
+			licenseKeyPending = licenseManagerService.getLicenseKey(licensedClient.id)
+			licDomain = License.get(licensedClient.id)
+			licDomain.hash = licenseKeyPending
+		and: 'load it into the database'
+			licenseAdminService.load(licDomain)
+		and: 'we get the recently changed license from the DB'
+			persistedLicense = License.get(licensedClient.id)
+
+		then: 'this should match with the data requested'
+			licensedClient.id == persistedLicense.id
+			licensedClient.max == persistedLicense.max
 
 	}
 }
