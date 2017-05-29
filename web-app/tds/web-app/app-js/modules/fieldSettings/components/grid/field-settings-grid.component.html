@@ -39,25 +39,36 @@
             <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.label" name="label">
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="shared" title="Shared" filter="boolean">
+    <kendo-grid-column field="shared" title="Shared">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else sharedTemp" let-dataItem>
-            <input type="checkbox" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.shared" name="shared">
+            <div class="checkbox text-center">
+                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="required"></label>
+            </div>
         </ng-template>
         <ng-template kendoGridCellTemplate let-dataItem #sharedTemp>
             {{dataItem.shared | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="required" title="Required" filter="boolean">
+    <kendo-grid-column field="imp" title="Importance">
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <field-settings-imp [edit]="isEditing" [(model)]="dataItem.imp"></field-settings-imp>
+        </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="required" title="Required">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
-            <input type="checkbox" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.required" name="required">
+            <div class="checkbox text-center">
+                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.required" name="required"></label>
+            </div>
         </ng-template>
         <ng-template kendoGridCellTemplate let-dataItem #requiredTemp>
             {{dataItem.required | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="show" title="Display" filter="boolean">
+    <kendo-grid-column field="show" title="Display">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else displayTemp" let-dataItem>
-            <input type="checkbox" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.show" name="show">
+            <div class="checkbox text-center">
+                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.show" name="required"></label>
+            </div>
         </ng-template>
         <ng-template kendoGridCellTemplate let-dataItem #displayTemp>
             {{dataItem.display | tdsUIBoolean}}

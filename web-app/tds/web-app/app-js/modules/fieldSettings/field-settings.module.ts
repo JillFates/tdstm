@@ -8,6 +8,7 @@ import { FIELD_SETTINGS_STATES } from './field-settings.states';
 // Components
 import { FieldSettingsListComponent } from './components/list/field-settings-list.component';
 import { FieldSettingsGridComponent } from './components/grid/field-settings-grid.component';
+import { FieldSettingsImportanceComponent } from './components/imp/field-settings-imp.component';
 import { SharedModule } from '../../shared/shared.module';
 // Import Kendo Modules
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -24,7 +25,8 @@ import { FieldSettingsService } from './service/field-settings.service';
 	],
 	declarations: [
 		FieldSettingsListComponent,
-		FieldSettingsGridComponent
+		FieldSettingsGridComponent,
+		FieldSettingsImportanceComponent
 	],
 	providers: [FieldSettingsService],
 	exports: [FieldSettingsListComponent]
