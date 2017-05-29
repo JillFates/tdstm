@@ -132,7 +132,6 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 		and: 'the license key is blank'
 			StringUtils.isBlank(licenseKeyPending)
 
-
 		when: 'we revoke it'
 			licenseManagerService.revoke(licensedClient.id)
 			String licKey = licenseManagerService.getLicenseKey(licensedClient.id)
