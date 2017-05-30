@@ -167,6 +167,12 @@
 				rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 
+        /**
+		 * Cell formatter for estimated start cells.
+		 * Note that this formatter is not attached statically to any column in particular.
+		 * As the estimated start column is dynamic, this formatter is selected using the fromatterMap,
+		 * depending on which column the user has selected to be the estimated start column.
+         */
         function estStartFormatter(cellVal,options,rowObject){
             return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
                 rowObject[20] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
@@ -175,6 +181,12 @@
                 rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
         }
 
+        /**
+         * Cell formatter for estimated finish cells.
+         * Note that this formatter is not attached statically to any column in particular.
+         * As the estimated finish column is dynamic, this formatter is selected using the fromatterMap,
+         * depending on which column the user has selected to be the estimated finish column.
+         */
         function estFinishFormatter(cellVal,options,rowObject){
             return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
                 rowObject[21] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
