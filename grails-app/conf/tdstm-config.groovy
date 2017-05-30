@@ -42,6 +42,13 @@ grails {
 //
 tdstm {
 	security {
+		// Then number of days after which a user account will be automatically locked out
+		// indefinitely upon logging in. Set to zero (0) to disable this feature.
+		inactiveDaysLockout = 60
+
+		// A list of usernames that should be excluded from the Inactivity Lockout behavior.
+		inactivityWhitelist = [ 'tdsadmin' ]
+
 		localUser {
 
 			// Flag if the local user accounts are supported, values true|false (default true)

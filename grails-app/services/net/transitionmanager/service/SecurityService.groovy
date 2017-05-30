@@ -4,6 +4,7 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
@@ -52,7 +53,6 @@ import static net.transitionmanager.domain.Permissions.Roles.USER
  */
 @Slf4j(value='logger')
 class SecurityService implements ServiceMethods, InitializingBean {
-
 	private static final int ONE_HOUR = 60 * 60 * 1000
 	private static final Collection<String> SECURITY_ROLES = ['USER', 'EDITOR', 'SUPERVISOR']
 
@@ -377,6 +377,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		requirePermission Permission.UserUnlock
 
 		account.lockedOutUntil = null
+		auditService.saveUserAudit UserAuditBuilder.userAccountWasUnlockedBy(getCurrentUsername(), account)
 		save account
 	}
 
@@ -1760,6 +1761,52 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		// removes previous user permission? if loaded
 		userCache.removeUserFromCache(username)
+	}
+
+	/**
+	 * Logout current user
+	 */
+	void logoutCurrentUser() {
+		SecurityContextHolder.getContext().setAuthentication(null)
+	}
+
+	/**
+	 * Determine if a user account must be locked out based on its inactivity or it is whitelisted
+	 * @param userLogin
+	 * @return
+	 */
+	boolean shouldLockoutAccount(UserLogin userLogin) {
+		return !isUserInactivityWhiteListed(userLogin.username) && shouldLockoutAccountByInactivityPeriod(userLogin);
+	}
+
+	/**
+	 * Verifies if a user account is whitelisted regarding inactivity
+	 * @param username
+	 * @return
+	 */
+	private boolean isUserInactivityWhiteListed(String username) {
+		List<String> whiteListedUserNames = getLoginConfig().inactivityWhitelist
+		if (CollectionUtils.isNotEmpty(whiteListedUserNames)) {
+			return whiteListedUserNames*.toLowerCase().contains(username.toLowerCase())
+		}
+		return false
+	}
+
+	/**
+	 * Determine if a user account should be locked out based on inactivity period
+	 * @param userLogin
+	 * @return
+	 */
+	private boolean shouldLockoutAccountByInactivityPeriod(UserLogin userLogin) {
+		Date now = TimeUtil.nowGMT()
+		Date lastEvent
+		if (userLogin.lastLogin) {
+			lastEvent = userLogin.lastLogin
+		} else {
+			lastEvent = userLogin.createdDate
+		}
+		lastEvent = lastEvent + getLoginConfig().inactiveDaysLockout
+		return lastEvent < now
 	}
 
 	private Person resolve(Person person) {

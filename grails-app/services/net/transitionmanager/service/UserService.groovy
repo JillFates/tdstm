@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tds.asset.Application
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -17,7 +18,6 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
@@ -27,6 +27,7 @@ import org.springframework.transaction.TransactionDefinition
  * @author jmartin
  */
 class UserService implements ServiceMethods {
+	private static final int DEFAULT_LOCKED_OUT_YEARS = 100 * 365
 
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
@@ -35,6 +36,7 @@ class UserService implements ServiceMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	AuditService auditService
 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
@@ -572,13 +574,8 @@ class UserService implements ServiceMethods {
 	 * Update the User to log the their last login
 	 */
 	@Transactional
-	boolean updateLastLogin() {
-		UserLogin userLogin = securityService.userLogin
-		if (!userLogin) {
-			log.error "updateLastLogin() was unable to find current user"
-			return false
-		}
-
+	void updateLastLogin(UserLogin userLogin) {
+		// <SL> is this session attribute bein used somehow?
 		Person person = userLogin.person
 		session.setAttribute 'LOGIN_PERSON', [name: person.firstName, id: person.id]
 
@@ -586,8 +583,6 @@ class UserService implements ServiceMethods {
 		userLogin.lastLogin = now
 		userLogin.lastPage = now
 		userLogin.save()
-
-		true
 	}
 
 	/**
@@ -648,5 +643,38 @@ class UserService implements ServiceMethods {
 
 		userPreferenceService.setCurrentProjectId(projectId)
 		true
+	}
+
+	/**
+	 * Reset user account failed login attempts
+	 * @param userLogin
+	 */
+	@Transactional
+	void resetFailedLoginAttempts(UserLogin userLogin) {
+		userLogin.failedLoginAttempts = 0
+		userLogin.save()
+	}
+
+	/**
+	 * Set user account locked out date
+	 * @param userLogin
+	 * @param date
+	 */
+	@Transactional
+	void setLockedOutUntil(UserLogin userLogin, Date date) {
+		userLogin.lockedOutUntil = date
+		userLogin.save()
+	}
+
+	/**
+	 * Lockout user account
+	 * @param userLogin
+	 */
+	void lockoutAccountByInactivityPeriod(UserLogin userLogin) {
+		Date lockedOutUntil = TimeUtil.nowGMT() + DEFAULT_LOCKED_OUT_YEARS
+		auditService.saveUserAudit UserAuditBuilder.userAccountWasLockedOutDueToInactivity(userLogin)
+		setLockedOutUntil(userLogin, lockedOutUntil)
+		updateLastLogin(userLogin)
+		securityService.logoutCurrentUser()
 	}
 }
