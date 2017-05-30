@@ -7,7 +7,7 @@ export const en_DICTIONARY: Object = {
 		'APPLICATION': 'Application',
 		'DATABASE': 'Database',
 		'DEVICE': 'Device',
-		'LOGICAL_STORE': 'Logical Store'
+		'STORAGE': 'Storage'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
