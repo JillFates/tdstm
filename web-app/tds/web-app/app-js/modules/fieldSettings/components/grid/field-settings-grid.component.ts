@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
-import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { GridDataResult, DataStateChangeEvent, GridComponent } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
 
 @Component({
@@ -14,7 +14,8 @@ import { process, State } from '@progress/kendo-data-query';
 })
 export class FieldSettingsGridComponent implements OnInit {
 	@Input('data') fieldsSettings: FieldSettingsModel[];
-	@Input('asset-class') assetClass: string;
+	@Input() domain: string;
+	@ViewChild('fieldSettingGrid') fieldSettingGrid: GridComponent;
 
 	private search: string;
 	private gridData: GridDataResult;
@@ -70,13 +71,26 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onCancel(): void {
 		this.isEditing = false;
-		// TODO: need a way to clone this content at init so we can revert the changes
-		this.gridData = process(this.fieldsSettings, this.state);
+		this.fieldService.getFieldSettingsByDomain(this.domain).subscribe(
+			(result) => {
+				if (result[0]) {
+					this.fieldsSettings = result[0].fields;
+					this.gridData = process(this.fieldsSettings, this.state);
+				}
+			},
+			(err) => console.log(err));
 		this.sortable = { mode: 'single' };
 	}
 
 	protected onDelete(dataItem: FieldSettingsModel): void {
 		this.fieldsSettings.splice(this.fieldsSettings.indexOf(dataItem), 1);
 		this.gridData = process(this.fieldsSettings, this.state);
+	}
+
+	protected onAddCustom(): void {
+		let model = new FieldSettingsModel();
+		this.fieldsSettings.push(model);
+		this.fieldSettingGrid.addRow(model);
+		this.fieldSettingGrid.closeRow(0);
 	}
 }
