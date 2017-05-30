@@ -24,6 +24,18 @@ class CustomDomainService implements ServiceMethods {
         return getFieldSpecs(domain, 0)
     }
 
+    Map allFieldSpecs(String domain){
+        Map fieldSpec = [:]
+        List<String> assetClassTypes = resolveAssetClassType(domain)
+
+        for (String assetClass : assetClassTypes) {
+            def fieldSpecJSON = readFieldSpecFromFileSystem(assetClass)
+            fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecJSON.fields
+        }
+
+        return fieldSpec
+    }
+
     def saveFieldSpecs() {
 
     }

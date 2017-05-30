@@ -9,14 +9,12 @@ import { DomainModel } from '../../model/domain.model';
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/list/field-settings-list.component.html'
 })
 export class FieldSettingsListComponent {
-	public fieldSettings: any = {};
+	public domains: DomainModel[] = [];
 
 	constructor( @Inject('fields') fields: Observable<DomainModel[]>) {
 		fields.subscribe(
 			(result) => {
-				result.forEach(element => {
-					this.fieldSettings[element.domain] = element;
-				});
+				this.domains = result;
 			},
 			(err) => console.log(err));
 	}

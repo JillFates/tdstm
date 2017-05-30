@@ -6,8 +6,9 @@
         <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
     </div>
 </ng-template>
-<kendo-grid [filter]="state.filter" [skip]="state.skip" [data]="gridData" [sortable]="sortable" [sort]="state.sort"
-    [pageSize]="state.take" [pageable]="{ pageSizes: [25, 100, 500, 1000], info: true}" (dataStateChange)="dataStateChange($event)">
+<kendo-grid #fieldSettingGrid="kendoGrid" [filter]="state.filter" [skip]="state.skip" [data]="gridData"
+    [sortable]="sortable" [sort]="state.sort" [pageSize]="state.take" [pageable]="{ pageSizes: [25, 100, 500, 1000], info: true}"
+    (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
         <div class="col-xs-4 col-md-3 col-lg-2">
             <button type="button" class="btn btn-default" id="btnSaveAll" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>

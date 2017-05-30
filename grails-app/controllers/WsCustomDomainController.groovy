@@ -13,7 +13,7 @@ class WsCustomDomainController implements ControllerMethods {
     @HasPermission(Permission.UserGeneralAccess)
     def getFieldSpec() {
         try {
-            renderAsJson(customDomainService.customFieldSpecs(params.domain))
+            renderAsJson(customDomainService.allFieldSpecs(params.domain))
         } catch (e) {
             handleException(e, logger)
         }

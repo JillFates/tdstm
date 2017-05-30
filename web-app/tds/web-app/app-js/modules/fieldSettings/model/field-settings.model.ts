@@ -13,4 +13,8 @@ export class FieldSettingsModel {
 	default?: any;
 	control?: 'Select' | 'YesNo' | 'Number' | '';
 	option?: Array<string> | any;
+
+	constructor() {
+		this.udf = true;
+	}
 }
