@@ -1,12 +1,13 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
-import { GridDataResult, DataStateChangeEvent, GridComponent } from '@progress/kendo-angular-grid';
+import { GridDataResult, DataStateChangeEvent, GridComponent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
 
 @Component({
 	moduleId: module.id,
 	selector: 'field-settings-grid',
+	encapsulation: ViewEncapsulation.None,
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/grid/field-settings-grid.component.html',
 	styles: [`
 		.float-right { float: right;}
@@ -37,17 +38,18 @@ export class FieldSettingsGridComponent implements OnInit {
 	};
 	private isEditing = false;
 	private isFilterDisabled = false;
+	private isSubmitted = false;
 	private sortable: boolean | object = { mode: 'single' };
 
 	constructor(private fieldService: FieldSettingsService) { }
 
 	ngOnInit(): void {
-		this.gridData = process(this.fieldsSettings, this.state);
+		this.refresh();
 	}
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
 		this.state = state;
-		this.gridData = process(this.fieldsSettings, this.state);
+		this.refresh();
 	}
 
 	protected onFilter(): void {
@@ -56,41 +58,61 @@ export class FieldSettingsGridComponent implements OnInit {
 			operator: 'contains',
 			value: this.search
 		}];
-		this.gridData = process(this.fieldsSettings, this.state);
+		this.refresh();
 	}
 
 	protected onEdit(): void {
 		this.isEditing = true;
 		this.sortable = false;
+		this.search = '';
+		this.isFilterDisabled = true;
+		this.onFilter();
 	}
 
 	protected onSaveAll(): void {
-		this.isEditing = false;
-		this.sortable = { mode: 'single' };
+		if (this.fieldsSettings.filter(item =>
+			!item.label || !item.field).length === 0) {
+			this.reset();
+			this.fieldService.saveFieldSettings(this.domain, this.fieldsSettings)
+				.subscribe();
+		} else {
+			this.isSubmitted = true;
+			this.state.skip = 0;
+			this.refresh();
+		}
 	}
 
 	protected onCancel(): void {
-		this.isEditing = false;
+		this.reset();
 		this.fieldService.getFieldSettingsByDomain(this.domain).subscribe(
 			(result) => {
 				if (result[0]) {
 					this.fieldsSettings = result[0].fields;
-					this.gridData = process(this.fieldsSettings, this.state);
+					this.refresh();
 				}
 			},
 			(err) => console.log(err));
-		this.sortable = { mode: 'single' };
 	}
 
 	protected onDelete(dataItem: FieldSettingsModel): void {
 		this.fieldsSettings.splice(this.fieldsSettings.indexOf(dataItem), 1);
-		this.gridData = process(this.fieldsSettings, this.state);
+		this.refresh();
 	}
 
 	protected onAddCustom(): void {
 		let model = new FieldSettingsModel();
 		this.fieldsSettings.push(model);
-		this.fieldSettingGrid.addRow(model);
-		this.fieldSettingGrid.closeRow(0);
+		this.refresh();
+	}
+
+	protected reset(): void {
+		this.isEditing = false;
+		this.isSubmitted = false;
+		this.sortable = { mode: 'single' };
+		this.isFilterDisabled = false;
+	}
+
+	protected refresh(): void {
+		this.gridData = process(this.fieldsSettings, this.state);
 	}
 }

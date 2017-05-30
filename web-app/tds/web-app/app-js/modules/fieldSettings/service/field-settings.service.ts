@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { DomainModel } from '../model/domain.model';
-import { FieldSettingsData } from './field-settings-mock.data';
+import { FieldSettingsModel } from '../model/field-settings.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
@@ -28,5 +28,13 @@ export class FieldSettingsService {
 				return result;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	saveFieldSettings(domain: string, fields: FieldSettingsModel[]): Observable<DomainModel[]> {
+		let payload = {};
+		payload[domain] = fields;
+		return this.http.post(`${this.fieldSettingsUrl}/${domain}`, JSON.stringify(payload))
+			.map((res: Response) => res.json())
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 }
