@@ -430,6 +430,14 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/customDomain/fieldSpec/$domain" {
+			controller = "wsCustomDomain"
+			action = [
+					GET: "getFieldSpec",
+					POST: "saveFieldSpec"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
