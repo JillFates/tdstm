@@ -104,8 +104,8 @@
                                     <li class="user-body">
                                         <ul class="list-group">
                                             <li class="list-group-item"><g:remoteLink controller="person" action="retrievePersonDetails" id="${person?.id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink></li>
-                                            <li class="list-group-item"><span style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</span></li>
-                                            <li class="list-group-item"><span style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</span></li>
+                                            <li class="list-group-item"><span style="font-weight: bold; cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</span></li>
+                                            <li class="list-group-item"><span style="font-weight: bold; cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</span></li>
                                         <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
                                         </ul>
                                     </li>
