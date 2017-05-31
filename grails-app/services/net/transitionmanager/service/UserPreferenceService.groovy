@@ -138,6 +138,16 @@ class UserPreferenceService implements ServiceMethods {
 			}
 		}
 
+
+		//Fixed one for Tasks
+		if(preferenceCode == UserPreferenceEnum.TASK_STATUS.toString()){
+			userPrefValue = "Ready"
+		}else if(preferenceCode == UserPreferenceEnum.TASK_EVENT.toString()){
+			userPrefValue = 22
+		}else if(preferenceCode == UserPreferenceEnum.TASK_CATEGORY.toString()){
+			userPrefValue = "general"
+		}
+
 		//return the preference value or the default if not set
 		return userPrefValue ?: defaultIfNotSet
 	}
