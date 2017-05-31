@@ -441,6 +441,19 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 	if ($scope.isEdit) {
 		$scope.ac.commentId = commentTO.commentId;
 	}
+
+	if(!$scope.isEdit) {
+        commentService.getLastCreatedTaskSessionParams().then(
+            function (result) {
+            	if(result.status) {
+					$scope.ac.moveEvent = result.data.preferences.TASK_EVENT;
+					$scope.ac.category = result.data.preferences.TASK_CATEGORY;
+					$scope.ac.status = result.data.preferences.TASK_STATUS;
+                }
+            }
+        );
+	}
+
 	$scope.acData = {};
 
 	$scope.kendoDateFormat = utils.date.kendoDateFormat();
@@ -767,7 +780,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
 
 		return deferred.promise
-	}
+	};
 
 	var getAssetsByClass = function (assetClass) {
 		var deferred = q.defer()
@@ -1031,6 +1044,18 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+    var getLastCreatedTaskSessionParams = function () {
+        var deferred = q.defer();
+        http.get(utils.url.applyRootPath('/ws/user/preferences/TASK_STATUS,TASK_EVENT,TASK_CATEGORY')).
+        success(function (data, status, headers, config) {
+            deferred.resolve(data);
+        }).
+        error(function (data, status, headers, config) {
+            deferred.reject(data);
+        });
+        return deferred.promise;
+    };
+
 	var getDependencies = function (category, commentId, forWhom, moveEvent) {
 		var deferred = q.defer();
 		http.get(utils.url.applyRootPath('/assetEntity/predecessorSelectHtml?format=json&category=' + category + '&commentId=' + commentId + '&forWhom=' + forWhom + '&moveEvent=' + moveEvent)).
@@ -1172,6 +1197,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
 		getStatusList: getStatusList,
+        getLastCreatedTaskSessionParams: getLastCreatedTaskSessionParams,
 		saveComment: saveComment,
 		updateComment: updateComment,
 		searchComments: searchComments,
