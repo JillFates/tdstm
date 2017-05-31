@@ -1,0 +1,20 @@
+<span #openText (click)="onToggle()" style="cursor: pointer">
+    <!--<i class="fa fa-question"></i>-->
+    open
+</span>
+<kendo-popup [anchor]="openText" [popupClass]="'content popup'" *ngIf="show">
+    <div style="padding: 20px; background-color: #ddd;">
+        <label>Control Configuration</label>
+
+        <!--
+            Select
+        -->
+        <div *ngIf="controlType === 'Select' ">
+            <select name="select" id="select">
+                <option value="">Please select</option>
+                <option value="test">Test</option>
+            </select>
+        </div>
+
+    </div>
+</kendo-popup>

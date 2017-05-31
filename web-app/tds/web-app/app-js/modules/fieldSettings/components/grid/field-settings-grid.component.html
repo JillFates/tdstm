@@ -98,6 +98,7 @@
                 <option value="">Please select</option>
                 <option *ngFor="let c of availableControls" [ngValue]="c">{{c}}</option>
             </select>
+            <control-config-popup *ngIf="dataItem.control==='Select'" [controlType]="dataItem.control"></control-config-popup>
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
