@@ -1,5 +1,4 @@
 <%@page import="net.transitionmanager.domain.MoveEvent" %>
-<%@page import="net.transitionmanager.domain.Project" %>
 <%@page import="net.transitionmanager.domain.Rack" %>
 <html>
     <head>
@@ -53,15 +52,6 @@
                         <tr>
 							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 							</tr>
-                        	<tr class="prop">
-                                <td class="name">
-                                    <label for="project"><b>Project:&nbsp;<span style="color: red">*</span></b></label>
-                                </td>
-                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'project','errors')}">
-                                    <g:select optionKey="id" from="${Project.list()}" name="project.id" id="projectId"
-                                    value="${moveEventInstance?.project?.id}" onchange="loadMoveBundles();"></g:select>
-                                </td>
-                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b> </label>
@@ -171,10 +161,9 @@
             </g:form>
         </div>
         <script type="text/javascript">
-        $("#projectId").val(${tds.currentProjectId()})
         loadMoveBundles();
         function loadMoveBundles(){
-            var projectId = $("#projectId").val()
+            var projectId = ${tds.currentProjectId()}
             ${remoteFunction(action:'retrieveMoveBundles', params:'\'projectId=\' +projectId', onComplete:'updateMoveBundles(XMLHttpRequest)' )}
         }
         function updateMoveBundles( e ){
@@ -187,7 +176,7 @@
             		moveBundlesString += "<input type='checkbox' name='moveBundle' value="+moveBundle.id+"> &nbsp;"+moveBundle.name+"<br>"
 				}
         	} else {
-        		moveBundlesString = "<li> There are no Bundles associsted with selected Project</li>"
+        		moveBundlesString = "<li> There are no Bundles associated with the Project</li>"
         	}
             $("#moveBundleList").html( moveBundlesString )
         }
