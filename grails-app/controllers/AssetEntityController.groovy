@@ -4703,7 +4703,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param nowGMT : The actual time in GMT.
 	 * @return : A Map with estStartClass and estFinishClass.
 	 */
-	Map getEstimatedColumnsCSS(AssetComment task, Integer tardyFactor, Date nowGMT) {
+	private Map getEstimatedColumnsCSS(AssetComment task, Integer tardyFactor, Date nowGMT) {
 
 		def estStartClass = ''
 		def estFinishClass = ''
