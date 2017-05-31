@@ -16,5 +16,6 @@ export class FieldSettingsModel {
 
 	constructor() {
 		this.udf = true;
+		this.imp = 'N';
 	}
 }

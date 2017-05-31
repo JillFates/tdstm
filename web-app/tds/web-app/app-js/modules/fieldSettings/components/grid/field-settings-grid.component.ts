@@ -41,6 +41,9 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isSubmitted = false;
 	private sortable: boolean | object = { mode: 'single' };
 
+	private availableTypes = ['String', 'Number', 'Boolean', 'Date', 'Array'];
+	private availableControls = ['Select', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea', 'Range'];
+
 	constructor(private fieldService: FieldSettingsService) { }
 
 	ngOnInit(): void {

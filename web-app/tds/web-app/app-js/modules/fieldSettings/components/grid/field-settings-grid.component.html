@@ -79,12 +79,27 @@
             {{dataItem.display | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
+    <kendo-grid-column field="type" title="Type">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+            <select [disabled]="!dataItem.udf" name="type" id="type" [(ngModel)]="dataItem.type">
+                <option value="" [ngValue]="null">Please select</option>
+                <option *ngFor="let t of availableTypes" [ngValue]="t">{{t}}</option>
+            </select>
+        </ng-template>
+    </kendo-grid-column>
     <kendo-grid-column field="default" title="Default Value">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
             <input type="text" class="form-control" [(ngModel)]="dataItem.default" name="default">
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="control" title="Control"></kendo-grid-column>
+    <kendo-grid-column field="control" title="Control">
+        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+            <select [disabled]="!dataItem.udf" name="control" id="control" [(ngModel)]="dataItem.control">
+                <option value="">Please select</option>
+                <option *ngFor="let c of availableControls" [ngValue]="c">{{c}}</option>
+            </select>
+        </ng-template>
+    </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
             <textarea class="form-control" [(ngModel)]="dataItem.tip" name="tip" rows="2">
