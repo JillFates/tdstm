@@ -5,19 +5,19 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
 import com.tds.asset.TaskDependency
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import org.quartz.Scheduler
@@ -29,6 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate
  * Methods to manage comments/tasks.
  * @author jmartin
  */
+@Slf4j
 class CommentService implements ServiceMethods {
 
 	private static final List<String> watchProps = ['actStart', 'assetEntity', 'assignedTo', 'comment', 'dueDate',
@@ -202,9 +203,20 @@ class CommentService implements ServiceMethods {
 			// Assign the general params for all types.  Was having an issue with the above binding, which was
 			// setting the assignedTo automatically with a blank Person object even though it was excluded.
 			// TODO : should only set properties base on the commentType
+
+			log.info("OLB params: {}", params)
+			log.info("OLB current data: {}", session.assetCommentDef)
+			if(!session.hasProperty('assetCommentDef')){
+				session.assetCommentDef = [:]
+			}
+
 			if (params.commentType) assetComment.commentType = params.commentType
 			if (params.comment) assetComment.comment = params.comment
-			if (params.category) assetComment.category = params.category
+			if (params.category){
+				assetComment.category = params.category
+				userPreferenceService.setInSessionStorage(PREF.TASK_CATEGORY, params.category)
+			}
+
 			if (params.displayOption) assetComment.displayOption = params.displayOption
 			if (params.attribute) assetComment.attribute = params.attribute
 			assetComment.resolution = params.resolution
@@ -267,6 +279,7 @@ class CommentService implements ServiceMethods {
 						if (params.moveEvent == "0") {
 							assetComment.moveEvent = null
 						} else {
+							userPreferenceService.setInSessionStorage(PREF.TASK_EVENT, params.moveEvent)
 							def moveEvent = MoveEvent.get(params.moveEvent)
 							if (moveEvent) {
 								// Validate that this is a legit moveEvent for this project
@@ -314,6 +327,8 @@ class CommentService implements ServiceMethods {
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This
 			// should be the last update to Task properties before saving.
+			//store default value for the status
+			userPreferenceService.setInSessionStorage(PREF.TASK_STATUS, params.status)
 			taskService.setTaskStatus(assetComment, params.status)
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.

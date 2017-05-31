@@ -266,6 +266,10 @@ class UserPreferenceService implements ServiceMethods {
 		getPreference userLogin, CURR_PROJ
 	}
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
+		//clear Session Stored values
+		clearSessionStorage()
+
+		//Set the preference
 		setPreference userLogin, CURR_PROJ, projectId
 	}
 
@@ -310,6 +314,41 @@ class UserPreferenceService implements ServiceMethods {
 	Map<String, String> getExportPreferences() {
 		getPreferencesMap(UserPreferenceEnum.exportPreferenceKeys)
 	}
+
+	/* Cached session variables not persisted in the DB */
+	/**
+	 * Using the preference enum we can set a sessionStorage (yes I borrow it from the FE)
+	 * to persist across a user session and cleared if we change projects
+	 * @param preference Key to set
+	 * @param value	pair to set into the DB
+	 * @return this Object for a functional nested access (setting multiple)
+	 */
+	UserPreferenceService setInSessionStorage(UserPreferenceEnum preference, Object value){
+		if(!session.hasProperty('sessionStorage')){
+			clearSessionStorage()
+		}
+		session.sessionStorage[key] = value
+		return this
+	}
+
+	/**
+	 * get the Object stored in the sessionStorage
+	 * @param key associated with the object
+	 * @return	the object if the key exists, or null it doesn't
+	 */
+	Object fromSessionStorage(String key){
+		return session.sessionStorage[key]
+	}
+
+	/**
+	 * clear the sessionStorage Map
+	 * @return this Object for a functional nested access (setting multiple)
+	 */
+	UserPreferenceService clearSessionStorage(){
+		session.sessionStorage = [:]
+		return this
+	}
+
 
 	/**
 	 * Return the File Stored Timezones
