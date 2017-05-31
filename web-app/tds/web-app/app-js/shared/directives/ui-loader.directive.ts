@@ -5,8 +5,8 @@
  * however a implemented service will be in charge of passing the emitter to this directive
  */
 
-import {Component} from '@angular/core';
-import {NotifierService} from '../services/notifier.service';
+import { Component } from '@angular/core';
+import { NotifierService } from '../services/notifier.service';
 
 @Component({
 	selector: 'tds-ui-loader',
@@ -15,7 +15,7 @@ import {NotifierService} from '../services/notifier.service';
 
 export class UILoaderDirective {
 
-	private showsLoader = false;
+	private showsLoader = true;
 
 	constructor(private notifierService: NotifierService) {
 		this.httpRequestHandlerInitial();
