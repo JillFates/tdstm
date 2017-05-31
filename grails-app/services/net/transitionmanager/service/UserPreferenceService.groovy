@@ -143,7 +143,7 @@ class UserPreferenceService implements ServiceMethods {
 		if(preferenceCode == UserPreferenceEnum.TASK_STATUS.toString()){
 			userPrefValue = "Ready"
 		}else if(preferenceCode == UserPreferenceEnum.TASK_EVENT.toString()){
-			userPrefValue = 22
+			userPrefValue = "364"
 		}else if(preferenceCode == UserPreferenceEnum.TASK_CATEGORY.toString()){
 			userPrefValue = "general"
 		}
