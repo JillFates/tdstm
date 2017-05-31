@@ -46,9 +46,9 @@ import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
-
 import org.hibernate.Criteria
 import org.hibernate.transform.Transformers
+import java.text.DateFormat
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ReportsController implements ControllerMethods {
@@ -275,6 +275,7 @@ class ReportsController implements ControllerMethods {
 
 		String tzId = userPreferenceService.timeZone
 		def currDate = new Date()
+		DateFormat userDateFormatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 		assetCommentList.each { ac ->
 			def sourceTargetRoom = (ac?.assetEntity?.sourceRoom ?: "--")+
 								"/"+(ac?.assetEntity?.sourceRack ?: "--")+
@@ -295,7 +296,7 @@ class ReportsController implements ControllerMethods {
 								'owner':ac?.assignedTo ? ac?.assignedTo?.firstName+" "+ac?.assignedTo?.lastName : '',
 								'issue':ac?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
 								'clientName':project?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
-								'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate),
+								'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate), userDateFormatter: userDateFormatter,
 								'previousNote':WebUtil.listAsMultiValueString(ac.notes) ]
 			}
 			if( params.reportResolveInfo == "true" && ac.isResolved == 1 ) {
@@ -306,7 +307,7 @@ class ReportsController implements ControllerMethods {
 								'owner':ac?.assignedTo ? ac?.assignedTo?.firstName+" "+ac?.assignedTo?.lastName : '',
 								'issue':ac?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
 								'clientName':project?.client?.name,
-								'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate),
+								'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate), userDateFormatter: userDateFormatter,
 								'previousNote':WebUtil.listAsMultiValueString(ac.notes) ]
 			}
 		}
@@ -323,7 +324,7 @@ class ReportsController implements ControllerMethods {
 							'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'',
 							'projectName':project?.name,
 							'clientName':project?.client?.name,
-							'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate),
+							'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate), userDateFormatter: userDateFormatter,
 							'previousNote':'']
 			}
 
