@@ -18,8 +18,8 @@ import net.sf.ehcache.Element
 import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
-import org.apache.commons.lang.time.DateUtils
 import net.transitionmanager.domain.PartyGroup
+import org.apache.commons.lang3.time.DateUtils
 import org.springframework.core.io.Resource
 
 
@@ -476,7 +476,8 @@ class LicenseAdminService extends LicenseCommonService {
 
 			lic = new DomainLicense()
 			lic.owner = owner
-			lic.requestDate = new Date()
+			//since we are representing this as JSON we get rid of the millisecond part
+			lic.requestDate = DateUtils.truncate(new Date(), Calendar.SECOND)
 			lic.status = DomainLicense.Status.PENDING
 			lic.method = DomainLicense.Method.MAX_SERVERS
 			lic.installationNum = getInstallationId()

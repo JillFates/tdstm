@@ -46,6 +46,7 @@ import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
+import java.text.DateFormat
 import org.hibernate.Criteria
 import org.hibernate.transform.Transformers
 import java.text.DateFormat
@@ -159,6 +160,7 @@ class ReportsController implements ControllerMethods {
 			}
 
 			def currDate = new Date()
+			DateFormat userDateFormatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 			//Source AssetList
 			if( assetEntityList) {
 				assetEntityList.each { asset ->
@@ -192,7 +194,7 @@ class ReportsController implements ControllerMethods {
 					                 location: "Source Team", truck: asset.truck,  room: asset.sourceRoom,
 					                 instructions: assetCommentString, roomTagSort: roomTagSort, truckTagSort: truckTagSort,
 					                 assetTagSort: asset.assetTag ?: "", sourcetargetLoc: "s", usize: asset?.model?.usize,
-					                 timezone: tzId, rptTime: currDate]
+					                 timezone: tzId, rptTime: currDate, userDateFormatter: userDateFormatter]
 				}
 			}
 
