@@ -1,4 +1,4 @@
-import {getTestBed} from '@angular/core/testing';
+import { getTestBed } from '@angular/core/testing';
 import {
 	BrowserDynamicTestingModule,
 	platformBrowserDynamicTesting
@@ -15,6 +15,8 @@ import './specs/component-creator.service.spec';
 import './specs/rich-text-editor.component.spec';
 import './modules/noticeManager/specs/notice-list.component.spec';
 import './modules/noticeManager/specs/notice-form.component.spec';
+import './modules/fieldSettings/specs/field-settings-imp.component.spec';
+import './modules/fieldSettings/specs/field-settings-list.component.spec';
 
 // Unfortunately there's no typing for the `__karma__` variable. Just declare it as any.
 declare var __karma__: any;
