@@ -37,6 +37,15 @@ class UserPreferenceService implements ServiceMethods {
 	                                                             'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb'] // ac:Asset Classes, de: Dependencies, hb: Highlight By
 
+	private static final Map<String, String> SESSION_LIVED_PREFS_DEFAULTS = [:]
+
+	static {
+		//Initializing Constants
+		SESSION_LIVED_PREFS_DEFAULTS[UserPreferenceEnum.MOVE_EVENT.toString()] =  ""
+		SESSION_LIVED_PREFS_DEFAULTS[UserPreferenceEnum.TASK_CATEGORY.toString()] =  "general"
+		SESSION_LIVED_PREFS_DEFAULTS[UserPreferenceEnum.TASK_STATUS.toString()] =  "Ready"
+	}
+
 	private static final Map<String, Map> prefCodeConstraints = [
 		viewUnpublished:  [type: 'boolean'],
 		RefreshEventDB:   [type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
@@ -132,20 +141,15 @@ class UserPreferenceService implements ServiceMethods {
 
 			userPrefValue = userPreference?.value
 
+			//If not is in the storage check the Session lived defaults
+			if(userPrefValue==null && preferenceCode in SESSION_LIVED_PREFS_DEFAULTS.keySet()) {
+				userPrefValue = SESSION_LIVED_PREFS_DEFAULTS[preferenceCode]
+			}
+
 			//if we are getting the current user preference store it in the session for speed
 			if(isCurrent){
 				session.setAttribute(preferenceCode, userPrefValue)
 			}
-		}
-
-
-		//Fixed one for Tasks
-		if(preferenceCode == UserPreferenceEnum.TASK_STATUS.toString()){
-			userPrefValue = "Ready"
-		}else if(preferenceCode == UserPreferenceEnum.TASK_EVENT.toString()){
-			userPrefValue = "364"
-		}else if(preferenceCode == UserPreferenceEnum.TASK_CATEGORY.toString()){
-			userPrefValue = "general"
 		}
 
 		//return the preference value or the default if not set
@@ -276,8 +280,8 @@ class UserPreferenceService implements ServiceMethods {
 		getPreference userLogin, CURR_PROJ
 	}
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
-		//clear Session Stored values
-		clearSessionStorage()
+		//clear Session Lived Preferences
+		clearSessionLivedPreferences()
 
 		//Set the preference
 		setPreference userLogin, CURR_PROJ, projectId
@@ -327,38 +331,25 @@ class UserPreferenceService implements ServiceMethods {
 
 	/* Cached session variables not persisted in the DB */
 	/**
-	 * Using the preference enum we can set a sessionStorage (yes I borrow it from the FE)
-	 * to persist across a user session and cleared if we change projects
+	 * Using the preference enum we can set it to persist across a user session
+	 * and cleared if we change projects
 	 * @param preference Key to set
-	 * @param value	pair to set into the DB
+	 * @param value	pair to set into the Session
+	 */
+	void setSessionLivedPreference(UserPreferenceEnum preference, Object value){
+		session.setAttribute(preference.toString(), value)
+	}
+
+	/**
+	 * clear the sessionLived preferences
 	 * @return this Object for a functional nested access (setting multiple)
 	 */
-	UserPreferenceService setInSessionStorage(UserPreferenceEnum preference, Object value){
-		if(!session.hasProperty('sessionStorage')){
-			clearSessionStorage()
+	synchronized
+	void clearSessionLivedPreferences(){
+		for(String key : SESSION_LIVED_PREFS_DEFAULTS.keySet()) {
+			session.removeAttribute(key)
 		}
-		session.sessionStorage[key] = value
-		return this
 	}
-
-	/**
-	 * get the Object stored in the sessionStorage
-	 * @param key associated with the object
-	 * @return	the object if the key exists, or null it doesn't
-	 */
-	Object fromSessionStorage(String key){
-		return session.sessionStorage[key]
-	}
-
-	/**
-	 * clear the sessionStorage Map
-	 * @return this Object for a functional nested access (setting multiple)
-	 */
-	UserPreferenceService clearSessionStorage(){
-		session.sessionStorage = [:]
-		return this
-	}
-
 
 	/**
 	 * Return the File Stored Timezones

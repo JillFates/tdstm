@@ -44,7 +44,6 @@ enum UserPreferenceEnum {
 	STAFFING_SCALE('StaffingScale'),
 	DEP_CONSOLE_COMPACT('depConsoleCompact'),
 	ASSIGNED_GROUP('AssignedGroup'),
-	TASK_EVENT,
 	TASK_CATEGORY,
 	TASK_STATUS,
 	ImportApplication,

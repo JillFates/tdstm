@@ -446,7 +446,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
         commentService.getLastCreatedTaskSessionParams().then(
             function (result) {
             	if(result.status) {
-					$scope.ac.moveEvent = result.data.preferences.TASK_EVENT;
+					$scope.ac.moveEvent = result.data.preferences.MOVE_EVENT;
 					$scope.ac.category = result.data.preferences.TASK_CATEGORY;
 					$scope.ac.status = result.data.preferences.TASK_STATUS;
                 }
@@ -1046,7 +1046,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getLastCreatedTaskSessionParams = function () {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/ws/user/preferences/TASK_STATUS,TASK_EVENT,TASK_CATEGORY')).
+        http.get(utils.url.applyRootPath('/ws/user/preferences/TASK_STATUS,MOVE_EVENT,TASK_CATEGORY')).
         success(function (data, status, headers, config) {
             deferred.resolve(data);
         }).
