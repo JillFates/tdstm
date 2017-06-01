@@ -250,6 +250,10 @@ class MoveEventController implements ControllerMethods {
 		}
 		MoveEvent moveEvent = new MoveEvent(params)
 
+		// The project is no longer available in the view. We need to retrieve it.
+		Project currentProject = securityService.userCurrentProject
+		moveEvent.project = currentProject
+
 		if (moveEvent.project.runbookOn == 1) {
 			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
 		}
