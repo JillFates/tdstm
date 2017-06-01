@@ -14,6 +14,7 @@ import { SharedModule } from '../../shared/shared.module';
 // Import Kendo Modules
 import { GridModule } from '@progress/kendo-angular-grid';
 import { PopupModule } from '@progress/kendo-angular-popup';
+import { SortableModule } from '@progress/kendo-angular-sortable';
 // Services
 import { FieldSettingsService } from './service/field-settings.service';
 
@@ -24,7 +25,8 @@ import { FieldSettingsService } from './service/field-settings.service';
 		FormsModule,
 		GridModule,
 		UIRouterModule.forChild({ states: FIELD_SETTINGS_STATES }),
-		PopupModule
+		PopupModule,
+		SortableModule
 	],
 	declarations: [
 		FieldSettingsListComponent,
