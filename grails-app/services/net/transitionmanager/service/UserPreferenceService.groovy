@@ -37,13 +37,17 @@ class UserPreferenceService implements ServiceMethods {
 	                                                             'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb'] // ac:Asset Classes, de: Dependencies, hb: Highlight By
 
-	private static final Map<String, String> SESSION_LIVED_PREFS_DEFAULTS = [:]
+	static final Map<String, String> SESSION_LIVED_PREFS_DEFAULTS
 
 	static {
 		//Initializing Constants
-		SESSION_LIVED_PREFS_DEFAULTS[UserPreferenceEnum.MOVE_EVENT.toString()] =  ""
-		SESSION_LIVED_PREFS_DEFAULTS[UserPreferenceEnum.TASK_CATEGORY.toString()] =  "general"
-		SESSION_LIVED_PREFS_DEFAULTS[UserPreferenceEnum.TASK_STATUS.toString()] =  "Ready"
+		Map sessionLivedPrefDefaults = [:]
+		sessionLivedPrefDefaults[UserPreferenceEnum.MOVE_EVENT.toString()] =  ""
+		sessionLivedPrefDefaults[UserPreferenceEnum.TASK_CATEGORY.toString()] =  "general"
+		sessionLivedPrefDefaults[UserPreferenceEnum.TASK_STATUS.toString()] =  "Ready"
+
+		//Set as Immutable constant
+		SESSION_LIVED_PREFS_DEFAULTS = sessionLivedPrefDefaults.asImmutable()
 	}
 
 	private static final Map<String, Map> prefCodeConstraints = [
