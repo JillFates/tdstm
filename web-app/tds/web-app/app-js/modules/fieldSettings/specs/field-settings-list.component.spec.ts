@@ -10,6 +10,7 @@ import { Observable } from 'rxjs/Rx';
 
 import { GridModule } from '@progress/kendo-angular-grid';
 import { PopupModule } from '@progress/kendo-angular-popup';
+import { SortableModule } from '@progress/kendo-angular-sortable';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
@@ -58,7 +59,13 @@ describe('FieldSettingsListComponent:', () => {
 
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
-			imports: [HttpModule, FormsModule, SharedModule, GridModule, PopupModule],
+			imports: [HttpModule,
+				FormsModule,
+				SharedModule,
+				GridModule,
+				PopupModule,
+				SortableModule
+			],
 			declarations: [
 				FieldSettingsListComponent,
 				FieldSettingsGridComponent,
