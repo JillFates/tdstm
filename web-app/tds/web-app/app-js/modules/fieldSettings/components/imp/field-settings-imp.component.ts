@@ -19,7 +19,7 @@ export class FieldSettingsImportanceComponent {
 
 	private values = ['C', 'I', 'N', 'U'];
 
-	protected onModelChange(value: string): void {
+	public onModelChange(value: string): void {
 		this.modelChange.emit(value);
 	}
 
