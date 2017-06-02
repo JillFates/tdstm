@@ -1628,7 +1628,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def contextObj = getContextObject(taskBatch.contextType, (int)taskBatch.contextId)
 		def assets = getAssocAssets(contextObj)
 
-		List teamCodeList = getTeamRolesForTasks()
+		List teamCodeList = getTeamRolesForTasks().id
 
 		List<Long> bundleIds = []
 		if (assets) {
