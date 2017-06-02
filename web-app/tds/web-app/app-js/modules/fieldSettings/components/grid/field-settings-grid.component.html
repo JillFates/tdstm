@@ -24,9 +24,9 @@
         </div>
         <div *ngIf="isFilterDisabled; else filterControl"></div>
     </ng-template>
-    <kendo-grid-column title="Action" [width]="80">
+    <kendo-grid-column title="Action" *ngIf='isEditing' [width]="70">
         <ng-template kendoGridCellTemplate let-dataItem>
-            <button class="btn btn-default" [disabled]="!isEditing" *ngIf="dataItem.udf" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+            <button class="btn btn-default" *ngIf="dataItem.udf" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="field" title="Field">
@@ -34,9 +34,9 @@
             <input type="text" disabled class="form-control" [(ngModel)]="dataItem.field" name="field">
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="order" title="Order">
+    <kendo-grid-column field="order" title="Order" [width]="100">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="number" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.order" name="order">
+            <input type="number" min="0" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.order" name="order">
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="label" title="Label">
@@ -44,7 +44,7 @@
             <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.label" name="label">
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="shared" title="Shared">
+    <kendo-grid-column field="shared" title="Shared" [width]="70">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else sharedTemp" let-dataItem>
             <div class="checkbox text-center">
                 <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="required"></label>
@@ -54,12 +54,12 @@
             {{dataItem.shared | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="imp" title="Importance">
+    <kendo-grid-column field="imp" title="Importance" [width]="100">
         <ng-template kendoGridCellTemplate let-dataItem>
             <field-settings-imp [edit]="isEditing" [(model)]="dataItem.imp"></field-settings-imp>
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="required" title="Required">
+    <kendo-grid-column field="required" title="Required" [width]="80">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
             <div class="checkbox text-center">
                 <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.required" name="required"></label>
@@ -69,7 +69,7 @@
             {{dataItem.required | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="show" title="Display">
+    <kendo-grid-column field="show" title="Display" [width]="80">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else displayTemp" let-dataItem>
             <div class="checkbox text-center">
                 <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.show" name="required"></label>
@@ -79,7 +79,7 @@
             {{dataItem.display | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="type" title="Type">
+    <kendo-grid-column field="type" title="Type" [width]="110">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
             <select [disabled]="!dataItem.udf" name="type" id="type" [(ngModel)]="dataItem.type">
                 <option value="" [ngValue]="null">Please select</option>
@@ -92,13 +92,13 @@
             <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.default" name="default">
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="control" title="Control">
+    <kendo-grid-column field="control" title="Control" [width]="110">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
             <select [disabled]="!dataItem.udf" name="control" id="control" [(ngModel)]="dataItem.control">
                 <option value="">Please select</option>
                 <option *ngFor="let c of availableControls" [ngValue]="c">{{c}}</option>
             </select>
-            <control-config-popup *ngIf="dataItem.control==='Select'" [field]="dataItem"></control-config-popup>
+            <control-config-popup *ngIf="dataItem.control==='Select List'" [field]="dataItem"></control-config-popup>
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
