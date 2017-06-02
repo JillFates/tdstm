@@ -42,7 +42,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	private sortable: boolean | object = { mode: 'single' };
 
 	private availableTypes = ['String', 'Number', 'Boolean', 'Date', 'Array'];
-	private availableControls = ['Select', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea', 'Range'];
+	private availableControls = ['Select List', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea', 'Range'];
 
 	constructor(private fieldService: FieldSettingsService) { }
 
@@ -67,6 +67,13 @@ export class FieldSettingsGridComponent implements OnInit {
 	protected onEdit(): void {
 		this.isEditing = true;
 		this.sortable = false;
+		this.state.sort = [{
+			dir: 'desc',
+			field: 'isNew'
+		}, {
+			dir: 'asc',
+			field: 'order'
+		}];
 		this.search = '';
 		this.isFilterDisabled = true;
 		this.onFilter();
@@ -76,6 +83,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		if (this.fieldsSettings.filter(item =>
 			!item.label || !item.field).length === 0) {
 			this.reset();
+			this.fieldsSettings.filter(x => x.isNew).forEach(x => x.isNew = false);
 			this.fieldService.saveFieldSettings(this.domain, this.fieldsSettings)
 				.subscribe();
 		} else {
@@ -107,6 +115,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		model.field = this.availableCustomNumbers();
 		this.fieldsSettings.push(model);
 		this.refresh();
+		model.order = this.fieldsSettings.length + 1;
 	}
 
 	protected reset(): void {
@@ -114,6 +123,10 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.isSubmitted = false;
 		this.sortable = { mode: 'single' };
 		this.isFilterDisabled = false;
+		this.state.sort = [{
+			dir: 'asc',
+			field: 'order'
+		}];
 	}
 
 	protected refresh(): void {
@@ -125,7 +138,6 @@ export class FieldSettingsGridComponent implements OnInit {
 			.filter(item => /^custom/i.test(item.field))
 			.map((item) => +item.field.replace(/[a-z]/ig, ''))
 			.sort((a, b) => a - b);
-		console.log(custom);
 		let number = custom.findIndex((item, i) => item !== i + 1);
 		return 'custom' + ((number === -1 ? custom.length : number) + 1);
 	}
