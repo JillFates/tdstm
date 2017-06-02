@@ -3,7 +3,6 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.service.UserPreferenceService
@@ -43,29 +42,38 @@ class UserPreferencesServiceSpec extends AbstractUnitSpec {
 
 	@See ('https://support.transitionmanager.com/browse/TM-5696')
 	def 'Test 1: Test that all SESSION LIVED Preferences have the default value'() {
-		when: 'We collect all the preference values of the SessionLivedPrefs as the service retrieves it'
-			def sessionLivedPrefKeys = UserPreferenceService.SESSION_LIVED_PREFS_DEFAULTS.keySet()
-			def collectedValues = sessionLivedPrefKeys.collectEntries{ pref ->
+		when: 'We collect all the preference values of the session only preferences as the service retrieves it'
+			def sessionOnlyPrefs = UserPreferenceEnum.sessionOnlyPreferences.keySet()
+			def collectedValues = sessionOnlyPrefs.collectEntries{ pref ->
 				[(pref): service.getPreference(pref)]
 			}
 
 		then: 'all values should match the defaults'
-			for (String pref : sessionLivedPrefKeys){
-				UserPreferenceService.SESSION_LIVED_PREFS_DEFAULTS[pref] == collectedValues[pref]
+			for (String pref : sessionOnlyPrefs){
+				def defaultValue = UserPreferenceEnum.sessionOnlyPreferences[pref]
+				/*
+				if the default value is another UserPreferenceEnum. this is an alias,
+				get the alias directly from the service to validate
+				*/
+				if(defaultValue instanceof UserPreferenceEnum){
+					defaultValue = service.getPreference(defaultValue)
+				}
+
+				assert defaultValue == collectedValues[pref]
 			}
 
 	}
 
 	def 'Test 2: change a Session Lived Value check the change, switch project and check that it returns to the default'(){
 		when: 'we get the default value of the TASK_STATUS Session lived Preference'
-			def defaultValue = UserPreferenceService.SESSION_LIVED_PREFS_DEFAULTS[UserPreferenceEnum.TASK_STATUS.toString()]
+			def defaultValue = UserPreferenceEnum.sessionOnlyPreferences[UserPreferenceEnum.TASK_STATUS.toString()]
 			def prefValue = service.getPreference(UserPreferenceEnum.TASK_STATUS)
 		then: 'the obtained value and the default must be the same'
 			defaultValue == prefValue
 
 		when: 'we change the prefValue to something else'
 			def newValue = "A NEW VALUE"
-			service.setSessionLivedPreference(UserPreferenceEnum.TASK_STATUS, newValue)
+			service.setPreference(UserPreferenceEnum.TASK_STATUS, newValue)
 		and: 'request the value once again from the service'
 			prefValue = service.getPreference(UserPreferenceEnum.TASK_STATUS)
 

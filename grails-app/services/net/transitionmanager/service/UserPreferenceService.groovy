@@ -16,8 +16,9 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_PROJ
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_ROOM
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_TZ
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.MOVE_EVENT
+import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferences
 
-@Slf4j(value='logger')
+@Slf4j
 class UserPreferenceService implements ServiceMethods {
 
 	SecurityService securityService
@@ -36,19 +37,6 @@ class UserPreferenceService implements ServiceMethods {
 	private static final List<String> archGraphCheckboxLabels = ['showCycles', 'blackBackground', 'appLbl', 'srvLbl',
 	                                                             'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb'] // ac:Asset Classes, de: Dependencies, hb: Highlight By
-
-	static final Map<String, String> SESSION_LIVED_PREFS_DEFAULTS
-
-	static {
-		//Initializing Constants
-		Map sessionLivedPrefDefaults = [:]
-		sessionLivedPrefDefaults[UserPreferenceEnum.MOVE_EVENT.toString()] =  ""
-		sessionLivedPrefDefaults[UserPreferenceEnum.TASK_CATEGORY.toString()] =  "general"
-		sessionLivedPrefDefaults[UserPreferenceEnum.TASK_STATUS.toString()] =  "Ready"
-
-		//Set as Immutable constant
-		SESSION_LIVED_PREFS_DEFAULTS = sessionLivedPrefDefaults.asImmutable()
-	}
 
 	private static final Map<String, Map> prefCodeConstraints = [
 		viewUnpublished:  [type: 'boolean'],
@@ -127,7 +115,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param defaultIfNotSet	default value in case that is not set
 	 * @return
 	 */
-	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null) {
+	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null, List<String> prefCodeStack = []) {
 		def userPrefValue
 
 		userLogin = resolve(userLogin)
@@ -146,8 +134,27 @@ class UserPreferenceService implements ServiceMethods {
 			userPrefValue = userPreference?.value
 
 			//If not is in the storage check the Session lived defaults
-			if(userPrefValue==null && preferenceCode in SESSION_LIVED_PREFS_DEFAULTS.keySet()) {
-				userPrefValue = SESSION_LIVED_PREFS_DEFAULTS[preferenceCode]
+			if(userPrefValue==null && preferenceCode in sessionOnlyPreferences.keySet()) {
+
+				def defaultValue = sessionOnlyPreferences[preferenceCode]
+				//If this Preference is an alias of other get the other Value
+
+				if(defaultValue instanceof UserPreferenceEnum){
+					String preferenceAliasName = defaultValue.toString()
+					prefCodeStack << preferenceAliasName
+
+					/*
+						if there is more than one call to retrieve this Preference Alias,
+						we have a Circular Reference Problem
+					*/
+					if(prefCodeStack.count(preferenceAliasName) > 1){
+						log.error("Problem retrieving a Preference due to an alias circular dependency: {}", prefCodeStack)
+						defaultValue = ""
+					}else{ // look into the alias reference
+						defaultValue = getPreference(userLogin, preferenceAliasName, defaultIfNotSet, prefCodeStack)
+					}
+				}
+				userPrefValue = defaultValue
 			}
 
 			//if we are getting the current user preference store it in the session for speed
@@ -188,18 +195,30 @@ class UserPreferenceService implements ServiceMethods {
 		boolean saved = false
 		value = value?.toString()
 
-		logger.debug 'setPreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
+		log.debug 'setPreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
 
 		// Date start = new Date()
 
 		if (value && value != "null" && userLogin) {
+
+			//If is session only preference just store in the Session and we are done
+			if(UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)){
+				session.setAttribute(preferenceCode, value)
+
+				/*
+				I always wonder if I should break here or assign to the saver variable and
+				add the else block in the next code section, but in other hand I think is cleaner
+				*/
+				return true
+			}
+
 			//remove from the session cache
 			session.removeAttribute(preferenceCode)
 
 			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 			String prefValue = userPreference?.value
 
-			//logger.debug 'setPreference() phase 1 took {}', TimeUtil.elapsed(start)
+			//log.debug 'setPreference() phase 1 took {}', TimeUtil.elapsed(start)
 			//start = new Date()
 
 			//	remove the movebundle and event preferences if user switched to different project
@@ -207,7 +226,7 @@ class UserPreferenceService implements ServiceMethods {
 				removeProjectAssociatedPreferences(userLogin)
 			}
 
-			//logger.debug 'setPreference() phase 2 took {}', TimeUtil.elapsed(start)
+			//log.debug 'setPreference() phase 2 took {}', TimeUtil.elapsed(start)
 			//start = new Date()
 
 			if (userPreference == null) {
@@ -217,13 +236,13 @@ class UserPreferenceService implements ServiceMethods {
 			save userPreference, true
 			saved = !userPreference.hasErrors()
 
-			// logger.debug 'setPreference() phase 3 took {}', TimeUtil.elapsed(start)
+			// log.debug 'setPreference() phase 3 took {}', TimeUtil.elapsed(start)
 			// start = new Date()
 
 			// call getPreference() to load map into session
 			getPreference(userLogin, preferenceCode)
 
-			// logger.debug 'setPreference() phase 4 took {}', TimeUtil.elapsed(start)
+			// log.debug 'setPreference() phase 4 took {}', TimeUtil.elapsed(start)
 		}
 
 		return saved
@@ -259,7 +278,7 @@ class UserPreferenceService implements ServiceMethods {
 
 		int updateCount = UserPreference.where { userLogin == user && preferenceCode == prefCode }.deleteAll()
 		if (updateCount) {
-			logger.debug 'Removed {} preference', prefCode
+			log.debug 'Removed {} preference', prefCode
 
 			//	remove the movebundle and event preferences
 			if (prefCode == CURR_PROJ.value()) {
@@ -285,7 +304,7 @@ class UserPreferenceService implements ServiceMethods {
 	}
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
 		//clear Session Lived Preferences
-		clearSessionLivedPreferences()
+		clearSessionOnlyPreferences()
 
 		//Set the preference
 		setPreference userLogin, CURR_PROJ, projectId
@@ -333,24 +352,11 @@ class UserPreferenceService implements ServiceMethods {
 		getPreferencesMap(UserPreferenceEnum.exportPreferenceKeys)
 	}
 
-	/* Cached session variables not persisted in the DB */
 	/**
-	 * Using the preference enum we can set it to persist across a user session
-	 * and cleared if we change projects
-	 * @param preference Key to set
-	 * @param value	pair to set into the Session
+	 * clear the session only preferences
 	 */
-	void setSessionLivedPreference(UserPreferenceEnum preference, Object value){
-		session.setAttribute(preference.toString(), value)
-	}
-
-	/**
-	 * clear the sessionLived preferences
-	 * @return this Object for a functional nested access (setting multiple)
-	 */
-	synchronized
-	void clearSessionLivedPreferences(){
-		for(String key : SESSION_LIVED_PREFS_DEFAULTS.keySet()) {
+	void clearSessionOnlyPreferences(){
+		for(String key : sessionOnlyPreferences.keySet()) {
 			session.removeAttribute(key)
 		}
 	}
@@ -395,7 +401,7 @@ class UserPreferenceService implements ServiceMethods {
 
 	private void removeProjectAssociatedPreference(UserLogin userLogin, UserPreferenceEnum pref) {
 		if (removePreference(userLogin, pref)) {
-			logger.debug 'Removed {} preference as user switched to other project', pref
+			log.debug 'Removed {} preference as user switched to other project', pref
 			getPreference(userLogin, pref)
 		}
 	}

@@ -212,7 +212,7 @@ class CommentService implements ServiceMethods {
 			if (params.comment) assetComment.comment = params.comment
 			if (params.category){
 				assetComment.category = params.category
-				userPreferenceService.setSessionLivedPreference(PREF.TASK_CATEGORY, params.category)
+				userPreferenceService.setPreference(PREF.TASK_CATEGORY, params.category)
 			}
 
 			if (params.displayOption) assetComment.displayOption = params.displayOption
@@ -277,7 +277,7 @@ class CommentService implements ServiceMethods {
 						if (params.moveEvent == "0") {
 							assetComment.moveEvent = null
 						} else {
-							userPreferenceService.setSessionLivedPreference(PREF.MOVE_EVENT, params.moveEvent)
+							userPreferenceService.setPreference(PREF.TASK_EVENT, params.moveEvent)
 							def moveEvent = MoveEvent.get(params.moveEvent)
 							if (moveEvent) {
 								// Validate that this is a legit moveEvent for this project
@@ -326,7 +326,7 @@ class CommentService implements ServiceMethods {
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This
 			// should be the last update to Task properties before saving.
 			//store default value for the status
-			userPreferenceService.setSessionLivedPreference(PREF.TASK_STATUS, params.status)
+			userPreferenceService.setPreference(PREF.TASK_STATUS, params.status)
 			taskService.setTaskStatus(assetComment, params.status)
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
