@@ -31,7 +31,7 @@
     </kendo-grid-column>
     <kendo-grid-column field="field" title="Field">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.field" name="field">
+            <input type="text" disabled class="form-control" [(ngModel)]="dataItem.field" name="field">
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="order" title="Order">
@@ -89,7 +89,7 @@
     </kendo-grid-column>
     <kendo-grid-column field="default" title="Default Value">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="text" class="form-control" [(ngModel)]="dataItem.default" name="default">
+            <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.default" name="default">
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="control" title="Control">

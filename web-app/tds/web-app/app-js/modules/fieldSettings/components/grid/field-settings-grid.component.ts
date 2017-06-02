@@ -104,6 +104,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onAddCustom(): void {
 		let model = new FieldSettingsModel();
+		model.field = this.availableCustomNumbers();
 		this.fieldsSettings.push(model);
 		this.refresh();
 	}
@@ -117,5 +118,15 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected refresh(): void {
 		this.gridData = process(this.fieldsSettings, this.state);
+	}
+
+	protected availableCustomNumbers(): string {
+		let custom = this.fieldsSettings
+			.filter(item => /^custom/i.test(item.field))
+			.map((item) => +item.field.replace(/[a-z]/ig, ''))
+			.sort((a, b) => a - b);
+		console.log(custom);
+		let number = custom.findIndex((item, i) => item !== i + 1);
+		return 'custom' + ((number === -1 ? custom.length : number) + 1);
 	}
 }
