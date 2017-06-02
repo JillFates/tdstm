@@ -113,6 +113,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param userLogin			User with the requested preference
 	 * @param preferenceCode	requested preference code
 	 * @param defaultIfNotSet	default value in case that is not set
+	 * @param prefCodeStack		stack of preference calls to avoid circular references
 	 * @return
 	 */
 	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null, List<String> prefCodeStack = []) {
@@ -144,7 +145,7 @@ class UserPreferenceService implements ServiceMethods {
 					prefCodeStack << preferenceAliasName
 
 					/*
-						if there is more than one call to retrieve this Preference Alias,
+						if there is more than one call in the stack to retrieve this Preference Alias,
 						we have a Circular Reference Problem
 					*/
 					if(prefCodeStack.count(preferenceAliasName) > 1){
