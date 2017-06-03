@@ -1,0 +1,25 @@
+$palettes: (
+        tranman: (
+                // Blue Based
+                url-element: $color-url-element--blue,
+                action-toolbar: $color-action-toolbar--blue,
+                header-text: $color-header-text--blue,
+                info: $color-info--blue,
+                success: $color-success--blue,
+                // GREY Based
+                font-disabled: $color-font-disabled--gray,
+                menuSelected: $color-menuSelected,
+                // RED Based
+                message-error: $color-message-error--red,
+                danger: $color-danger--red,
+                // YELLOW Based
+                warning: $color-warning--yellow,
+                warning-license: $color-warning-license--yellow
+        )
+);
+
+// Palette function
+// USAGE: palette(tranman, url-element)
+@function palette($palette, $tone: 'base') {
+    @return map-get(map-get($palettes, $palette), $tone);
+}
