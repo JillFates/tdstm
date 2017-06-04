@@ -6,21 +6,22 @@ import { SortableComponent } from '@progress/kendo-angular-sortable';
 
 @Component({
 	moduleId: module.id,
-	selector: 'control-config-popup',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/grid/control-config-popup-component.html',
+	selector: 'selectlist-configuration-popup',
+	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/popup/selectlist-configuration-popup-component.html',
+	styles: [``]
 })
 
-export class ControlConfigPopupComponent {
+export class SelectListConfigurationPopupComponent {
 
-	@Input() controlType: string;
 	@Input() field: any;
 	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
 
 	public items: string[] = [];
 	public newItem = '';
-	private show = false;
+	public show = true; // first time should open automatically.
 
 	private load(): void {
+		this.newItem = '';
 		if (this.field.option) {
 			this.items = this.field.option.slice();  // make a copy to work with.
 		}
