@@ -16,6 +16,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_CUSTOM': 'Create Custom'
 	},
 	'GLOBAL': {
+		'ADD': 'Add',
 		'CANCEL': 'Cancel',
 		'DELETE': 'Delete',
 		'EDIT': 'Edit',
