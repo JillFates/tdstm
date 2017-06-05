@@ -32,6 +32,7 @@ import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
 import org.hibernate.criterion.Order
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.sql.Timestamp
@@ -240,7 +241,20 @@ class MoveEventController implements ControllerMethods {
 	
 	@HasPermission(Permission.EventCreate)
 	def create() {
-		[moveEventInstance: new MoveEvent(params)]
+		Project project = securityService.userCurrentProject
+		// Fetch the existing bundles for the user's project.
+		List bundles = MoveBundle.createCriteria().list{
+			projections{
+				property("id", "id")
+				property("name", "name")
+			}
+			and{
+				eq("project", project)
+			}
+			order("name")
+			resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+		}
+		[moveEventInstance: new MoveEvent(params), bundles: bundles]
 	}
 	
 	@HasPermission(Permission.EventCreate)
@@ -266,21 +280,6 @@ class MoveEventController implements ControllerMethods {
 		else {
 			render(view: 'create', model: [moveEventInstance: moveEvent])
 		}
-	}
-
-	/*
-	 * return the list of MoveBundles which are associated to the selected Project
-	 * @return : return the list of MoveBundles as JSON object
-	 */
-	@HasPermission(Permission.BundleView)
-	@HasPermission(Permission.EventView)
-	def retrieveMoveBundles() {
-		def moveBundles
-		Project project = securityService.userCurrentProject
-		if (project) {
-			moveBundles = MoveBundle.findAllByProject(project)
-		}
-		render moveBundles as JSON
 	}
 
 	/**

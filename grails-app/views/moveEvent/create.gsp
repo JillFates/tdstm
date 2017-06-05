@@ -81,6 +81,14 @@
                                 </td>
                                 <td  style="text-align:left;" class="valueNW">
 	                                <ul id="moveBundleList">
+                                        <g:if test="${bundles.size() > 0}">
+                                            <g:each in="${bundles}" var="bundle">
+                                                <input type="checkbox" name="moveBundle" value="${bundle.id}"> &nbsp;${bundle.name}<br>
+                                            </g:each>
+                                        </g:if>
+                                        <g:else>
+                                            <li>There are no Bundles associated with the Project</li>
+                                        </g:else>
 	                                </ul>
                             	</td>
                             </tr>
@@ -160,27 +168,6 @@
 			</div>
             </g:form>
         </div>
-        <script type="text/javascript">
-        loadMoveBundles();
-        function loadMoveBundles(){
-            var projectId = ${tds.currentProjectId()}
-            ${remoteFunction(action:'retrieveMoveBundles', params:'\'projectId=\' +projectId', onComplete:'updateMoveBundles(XMLHttpRequest)' )}
-        }
-        function updateMoveBundles( e ){
-        	var moveBundles = eval("(" + e.responseText + ")")
-        	var length = moveBundles.length
-        	var moveBundlesString = ""
-        	if(length){
-            	for( i = 0; i < length; i++ ){
-            		var moveBundle = moveBundles[i]
-            		moveBundlesString += "<input type='checkbox' name='moveBundle' value="+moveBundle.id+"> &nbsp;"+moveBundle.name+"<br>"
-				}
-        	} else {
-        		moveBundlesString = "<li> There are no Bundles associated with the Project</li>"
-        	}
-            $("#moveBundleList").html( moveBundlesString )
-        }
-        </script>
 <script>
 	currentMenuId = "#eventMenu";
     $(".menu-parent-planning-event-list").addClass('active');
