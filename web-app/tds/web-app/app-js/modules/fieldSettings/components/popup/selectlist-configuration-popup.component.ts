@@ -7,7 +7,7 @@ import { SortableComponent } from '@progress/kendo-angular-sortable';
 @Component({
 	moduleId: module.id,
 	selector: 'selectlist-configuration-popup',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/popup/selectlist-configuration-popup-component.html',
+	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/popup/selectlist-configuration-popup.component.html',
 	styles: [``]
 })
 
