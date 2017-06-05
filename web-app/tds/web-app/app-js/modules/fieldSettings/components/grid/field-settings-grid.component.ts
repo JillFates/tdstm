@@ -18,7 +18,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Input() domain: string;
 	@ViewChild('fieldSettingGrid') fieldSettingGrid: GridComponent;
 
-	private search: string;
+	private search: '';
+	private fieldType = 'All';
 	private gridData: GridDataResult;
 	private state: State = {
 		skip: 0,
@@ -42,8 +43,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	private sortable: boolean | object = { mode: 'single' };
 
 	private availableTypes = ['String', 'Number', 'Boolean', 'Date', 'Array'];
-	private availableControls = ['Select List', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea', 'Range'];
-
+	private availableControls = ['Select List', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea'];
+	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
 	constructor(private fieldService: FieldSettingsService) { }
 
 	ngOnInit(): void {
@@ -56,11 +57,21 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onFilter(): void {
-		this.state.filter.filters = [{
-			field: 'field',
-			operator: 'contains',
-			value: this.search
-		}];
+		this.state.filter.filters = [];
+		if (this.search !== '') {
+			this.state.filter.filters.push({
+				field: 'field',
+				operator: 'contains',
+				value: this.search
+			});
+		}
+		if (this.fieldType !== 'All') {
+			this.state.filter.filters.push({
+				field: 'udf',
+				operator: 'eq',
+				value: this.fieldType === 'User Defined Fields'
+			});
+		}
 		this.refresh();
 	}
 
