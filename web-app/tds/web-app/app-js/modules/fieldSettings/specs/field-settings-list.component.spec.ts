@@ -18,7 +18,7 @@ import { NotifierService } from '../../../shared/services/notifier.service';
 
 import { FieldSettingsListComponent } from '../components/list/field-settings-list.component';
 import { FieldSettingsGridComponent } from '../components/grid/field-settings-grid.component';
-import { SelectListConfigurationPopupComponent } from '../components/popup/selectlist-configuration-popup-component';
+import { SelectListConfigurationPopupComponent } from '../components/popup/selectlist-configuration-popup.component';
 import { FieldSettingsImportanceComponent } from '../components/imp/field-settings-imp.component';
 import { FieldSettingsService } from '../service/field-settings.service';
 import { DomainModel } from '../model/domain.model';
@@ -87,6 +87,8 @@ describe('FieldSettingsListComponent:', () => {
 	it('should create component', () => expect(comp).toBeDefined());
 
 	it('should create tabs based on domain model length', () => {
+		console.log(comp);
+		console.log(fixture);
 		fixture.detectChanges();
 		de = fixture.debugElement.query(By.css('.nav-tabs'));
 		// Because of the pull-right 'li' element we add one to the assertion
