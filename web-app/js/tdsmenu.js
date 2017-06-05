@@ -68,6 +68,8 @@ function updatePersonDetails( e ){
 		$("#personDialog").dialog('option', 'width', 540);
 		$("#personDialog").dialog('option', 'modal', true);
 		$("#personDialog").dialog("open");
+
+        $('.ui-widget-overlay').addClass('old-legacy-content');
 	}
 }
 function changePersonDetails () {
