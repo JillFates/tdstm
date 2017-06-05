@@ -56,6 +56,20 @@ class UserAuditBuilder {
 		create ADMIN, 'Project configuration changed', project
 	}
 
+	/**
+	 * Creates an UserAudit to indicate that the user account was locked out due to inactivity
+	 */
+	static UserAudit userAccountWasLockedOutDueToInactivity(UserLogin userLogin) {
+		create LOGIN, 'User\'s account was locked out due to inactivity', null, userLogin
+	}
+
+	/**
+	 * Creates an UserAudit to indicate that the user account was unlocked by someone
+	 */
+	static UserAudit userAccountWasUnlockedBy(String unlockedBy, UserLogin userLogin) {
+		create USER_MGMT, 'User\'s account was unlocked by (' + unlockedBy + ')', null, userLogin
+	}
+
 	private static UserAudit create(UserAuditClassification classification, String message,
 	                                Project project = null, UserLogin userLogin = null) {
 		new UserAudit(

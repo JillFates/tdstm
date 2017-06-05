@@ -289,7 +289,7 @@ var GraphUtil = (function ($) {
 	public.populateTeamSelect = function (data) {
 		// get the select element and clear whatever options were in it before
 		teamSelect = $("#teamSelectId");
-		teamSelect.children('.teamOption').remove();
+        teamSelect.children('option').remove();
 
 		// add the default values
 		teamSelect.append('<option value="ALL">All Teams</option>');

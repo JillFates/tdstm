@@ -15,15 +15,9 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.domain.AssetEntityHelper
-import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.*
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
-import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.ContextType
-import com.tdsops.tm.enums.domain.RoleTypeGroup
-import com.tdsops.tm.enums.domain.TimeConstraintType
-import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
@@ -32,20 +26,11 @@ import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveBundleStep
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Recipe
-import net.transitionmanager.domain.RecipeVersion
-import net.transitionmanager.domain.TaskBatch
-import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -197,14 +182,14 @@ class TaskService implements ServiceMethods {
 			sql.append(""",
 				((CASE t.status
 				WHEN '$ACS.HOLD' THEN 900
-				WHEN '$ACS.DONE' THEN IF(t.status_updated >= :minAgo, 800, 200) + UNIX_TIMESTAMP(t.status_updated) / UNIX_TIMESTAMP(:now)
+				WHEN '$ACS.COMPLETED' THEN IF(t.status_updated >= :minAgo, 800, 200) + UNIX_TIMESTAMP(t.status_updated) / UNIX_TIMESTAMP(:now)
 				WHEN '$ACS.STARTED' THEN 700 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
 				WHEN '$ACS.READY' THEN 600 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
 				WHEN '$ACS.PENDING' THEN 500 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
 				ELSE 0
 				END) +
 				IF(t.assigned_to_id=:assignedToId AND t.status IN('$ACS.STARTED','$ACS.READY'), IF(t.hard_assigned=1, 55, 50), 0) +
-				IF(t.assigned_to_id=:assignedToId AND t.status='$ACS.DONE',50, 0) +
+				IF(t.assigned_to_id=:assignedToId AND t.status='$ACS.COMPLETED',50, 0) +
 				IF(t.role='AUTO', -100, 0) +
 				(6 - t.priority) * 5) AS score """)
 		}
@@ -290,12 +275,12 @@ class TaskService implements ServiceMethods {
 		def todoTasks = allTasks.findAll { task ->
 			task.status == ACS.READY ||
 			(task.status == ACS.STARTED && task.assignedTo == personId) ||
-			(task.status == ACS.DONE && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
+			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
 		}
 
 		def assignedTasks = allTasks.findAll { task ->
 			(task.status == ACS.READY && task.assignedTo == personId) || (task.status == ACS.STARTED && task.assignedTo == personId) ||
-			(task.status == ACS.DONE && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
+			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
 		}
 
 		if (countOnly) {
@@ -383,29 +368,29 @@ class TaskService implements ServiceMethods {
 		task.statusUpdated = now
 
 		def previousStatus = task.getPersistentValue('status')
-		// Determine if the status is being reverted (e.g. going from DONE to READY)
+		// Determine if the status is being reverted (e.g. going from COMPLETED to READY)
 		def revertStatus = compareStatus(previousStatus, status) > 0
 
 		log.info "setTaskStatus - task(#:$task.taskNumber Id:$task.id) status=$status, previousStatus=$previousStatus, revertStatus=$revertStatus - $whom"
 
 		// Override the whom if this is an automated task being completed
-		if (task.role == AssetComment.AUTOMATIC_ROLE && status == ACS.DONE) {
+		if (task.role == AssetComment.AUTOMATIC_ROLE && status == ACS.COMPLETED) {
 			whom = getAutomaticPerson()
 		}
 
 		// Setting of AssignedTO:
 		//
-		// We are going to update the AssignedTo when the task is marked Started or Done unless the current user has the
-		// PROJ_MGR role because we want to allow for the PM to mark a task as being started or done on behalf of someone else. The only
+		// We are going to update the AssignedTo when the task is marked Started or Completed unless the current user has the
+		// PROJ_MGR role because we want to allow for the PM to mark a task as being started or completed on behalf of someone else. The only
 		// time we'll set the PM to the AssignedTo property is if it is presently unassigned.
 		//
-		// Setting Status Backwards (e.g. DONE back to READY):
+		// Setting Status Backwards (e.g. COMPLETED back to READY):
 		//
 		// In the rare case that we need to set the status back from a progressive state, we may need to undue some stuff (e.g. mark unresolved, clear
 		// resolvedBy, etc).  We will log a note on the task whenever this occurs.
 		//
 		if (revertStatus) {
-			if (previousStatus == ACS.DONE) {
+			if (previousStatus == ACS.COMPLETED) {
 				task.resolvedBy = null
 				task.actFinish = null
 				// isResolved = 0 -- should be set in the domain class automatically
@@ -446,14 +431,14 @@ class TaskService implements ServiceMethods {
 
 			case ACS.STARTED:
 				task.assignedTo = assignee
-				// We don't want to loose the original started time if we are reverting from DONE to STARTED
+				// We don't want to loose the original started time if we are reverting from COMPLETED to STARTED
 				if (! revertStatus) {
 					task.actStart = now
 					if (task.isRunbookTask()) addNote(task, whom, "Task Started")
 				}
 				break
 
-			case ACS.DONE:
+			case ACS.COMPLETED:
 				if (task.isDirty('status') && task.getPersistentValue('status') != status) {
 					triggerUpdateTaskSuccessors(task.id, status, whom, isPM)
 				}
@@ -555,58 +540,77 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
+	 * Returns a list of tasks paginated and filtered
 	 * @param project - the project object to filter tasks to include
 	 * @param category - a task category to filter on (optional)
-	 * @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
+	 * @param taskToIgnore - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
+	 * @param moveEventId - an optionel move event to filter on
 	 * @param page - page to load
 	 * @param pageSize - page size to use
-	 * @param filterDesc - filter by task description
-	 * @return String the SELECT control
+	 * @param searchText - an optional filter to search by either task id or comment
+	 * @return
 	 */
-	def genSelectForPredecessors(project, category, task, moveEventId, page=-1, pageSize=50, filterDesc=null) {
+	def search(Project project, String category, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
 
-		StringBuffer queryList = new StringBuffer("FROM AssetComment a ")
-		StringBuffer queryCount = new StringBuffer("SELECT count(*) FROM AssetComment a ")
-		StringBuffer query = new StringBuffer("WHERE a.project=$project.id AND a.commentType='$AssetCommentType.TASK' ")
+		StringBuilder queryList = new StringBuilder("FROM AssetComment a ")
+		StringBuilder queryCount = new StringBuilder("SELECT count(*) FROM AssetComment a ")
+		StringBuilder query = new StringBuilder("WHERE a.project.id = :projectId AND a.commentType = :commentType ")
+		Map params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
 		if (category) {
 			if (categoryList.contains(category)) {
-				query.append("AND a.category='$category' ")
+				query.append("AND a.category = :category ")
+				params["category"] = category
 			} else {
-				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
-				category=''
+				log.warn "genSelectForPredecessors - unexpected category filter '${category}'"
+				category = ""
 			}
 		}
-		if (filterDesc) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
-			query.append("AND (a.taskNumber like '%$filterDesc%' or a.comment like '%$filterDesc%') ")
+		if (searchText) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
+			// if searchText is a number, then only using task taskNumber attribute
+			if (searchText ==~ /^[0-9]+$/) {
+				query.append("AND a.taskNumber like '%${searchText}%' ")
+			} else {
+				query.append("AND a.comment like :searchText ")
+				params["searchText"] = "%" + searchText + "%"
+			}
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
-		if (task) {
-			if (! category && task.category) {
-				query.append("AND a.category='$task.category' ")
+		if (taskToIgnore) {
+			if (!category && taskToIgnore.category) {
+				query.append("AND a.category = :category ")
+				params["category"] = taskToIgnore.category
 			}
-			query.append("AND a.id != $task.id ")
+			query.append("AND a.id != :taskId ")
+			params["taskId"] = taskToIgnore.id
 
-			if (task.moveEvent) {
-				query.append("AND a.moveEvent.id=$task.moveEvent.id ")
+			if (taskToIgnore.moveEvent) {
+				query.append("AND a.moveEvent.id = :moveEventId ")
+				params["moveEventId"] = taskToIgnore.moveEvent.id
 			}
 		} else {
 			if (moveEventId) {
-				query.append("AND a.moveEvent.id='$moveEventId' ")
+				query.append("AND a.moveEvent.id = :moveEventId ")
+				params["moveEventId"] = moveEventId
 			} else {
 				query.append("AND a.moveEvent is null ")
 			}
 		}
 
+		// execute count query
+		queryCount.append(query)
+		def resultTotal = AssetComment.executeQuery(queryCount.toString(), params)
+
 		// Add the sort and generate the list
 		query.append('ORDER BY a.taskNumber ASC')
-		log.info(query)
-		def resultTotal = AssetComment.executeQuery(queryCount.append(query).toString())
 
-		Map paginationArgs = page == -1 ? [:] : [max: pageSize, offset: ((page - 1) * pageSize)]
-		[list: AssetComment.executeQuery(queryList.append(query).toString(), [:], paginationArgs),
-		 total: resultTotal[0]]
+		// execute list query
+		Map paginationArgs = (page == -1 ? [:] : [max: pageSize, offset: ((page - 1) * pageSize)])
+		queryList.append(query)
+		def list = AssetComment.executeQuery(queryList.toString(), params, paginationArgs)
+
+		return [list: list, total: resultTotal[0]]
 	}
 
 	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
@@ -875,6 +879,9 @@ class TaskService implements ServiceMethods {
 	}
 
 	List<Map<String, Object>> getTasksOfBatch(String taskBatchId) {
+
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
 		AssetComment.findAllByTaskBatch(TaskBatch.load(taskBatchId)).collect { assetComment -> [
 			id: assetComment.taskNumber,
 			commentId: assetComment.id,
@@ -882,7 +889,7 @@ class TaskService implements ServiceMethods {
 			asset: assetComment.assetEntity?.assetName,
 			team: assetComment.role ?: '',
 			person: (assetComment.assignedTo ?: '').toString(),
-			dueDate: assetComment.dueDate,
+			dueDate: TimeUtil.formatDateTime(assetComment.dueDate, formatter),
 			status: assetComment.status,
 		]}
 	}
@@ -953,7 +960,7 @@ class TaskService implements ServiceMethods {
 		tasksToComplete.each { activeTask ->
 			// activeTask.dateResolved = TimeUtil.nowGMT()
 			// activeTask.resolvedBy = userLogin.person
-			setTaskStatus(activeTask, ACS.DONE)
+			setTaskStatus(activeTask, ACS.COMPLETED)
 			if (!save(activeTask)) {
 				throw new TaskCompletionException("Unable to complete task # $activeTask.taskNumber due to " +
 					GormUtil.allErrorsString(activeTask))
@@ -1186,7 +1193,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				WHERE move_bundle_id IN (:moveBundleIds) AND task.role='CLEANER'
 				AND ae.cart=:cartName
 				ORDER BY cart""",
-				[status: ACS.DONE, moveEventId: moveEvent.id, moveBundleIds: bundleIds, cartName: cartName])
+				[status: ACS.COMPLETED, moveEventId: moveEvent.id, moveBundleIds: bundleIds, cartName: cartName])
 			log.info 'moveEvent {}: bundleIds {} : cart {} : info {}', moveEvent.id, bundleIds, cartName, cartInfo
 			if (cartInfo) {
 				return cartInfo[0]
@@ -1628,8 +1635,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def contextObj = getContextObject(taskBatch.contextType, (int)taskBatch.contextId)
 		def assets = getAssocAssets(contextObj)
 
-		List teamCodeList = getTeamRolesForTasks().id
-
 		List<Long> bundleIds = []
 		if (assets) {
 			// Derive the unique bundle ids from the list of assets found
@@ -1859,9 +1864,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					return
 				}
 
-				// Adds the available teams to the task spec.
-				taskSpec["teamCodes"] = teamCodeList
-
 				def tasksNeedingPredecessors = []	// Used for wiring up predecessors in 2nd half of method
 				isAsset = false
 				isGeneral = false
@@ -1997,6 +1999,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					stepType = taskSpec.containsKey('type') ? taskSpec.type : 'asset'
 				}
 
+				// List of all available teams.
+				List teamCodeList = partyRelationshipService.getTeamCodes(true)
+
 				// Collection of the task settings passed around to functions more conveniently
 				settings = [
 					type:stepType,
@@ -2007,7 +2012,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					eventTimes:eventTimes,
 					clientId:project.client.id,
 					taskBatch:taskBatch,
-					publishTasks:publishTasks
+					publishTasks:publishTasks,
+					teamCodes: teamCodeList
 				]
 				log.debug "##### settings: $settings"
 
@@ -3364,7 +3370,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// Perform the assignment logic
-		errMsg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff)
+		errMsg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff, settings)
 		if (errMsg)
 			exceptions.append("$errMsg<br>")
 
@@ -4399,7 +4405,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				task.setTmpAssociatedAssets(assocAssets)
 
 				// Perform the AssignedTo logic
-				msg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff)
+				msg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff, settings)
 				if (msg)
 					exceptions.append(msg).append('<br>')
 
@@ -4505,12 +4511,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param The recipe task specification
 	 * @param The workflow object associated with the taskSpec
 	 * @param The list of staff associated with the project
+	 * @param settings : general settings for task generation.
 	 * @return Return null if successfor or a String error message indicating the cause of the failure
 	 */
-	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff) {
+	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
 		def msg
-		def msg1 = assignTeam(task, taskSpec, workflow, projectStaff)
-		def msg2 = assignWhom(task, taskSpec, workflow, projectStaff)
+		def msg1 = assignTeam(task, taskSpec, workflow, projectStaff, settings)
+		def msg2 = assignWhom(task, taskSpec, workflow, projectStaff, settings)
 
 		if (msg1) {
 			if (msg2) {
@@ -4542,8 +4549,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *
 	 * @param task - the task object to perform the assignment on
 	 * @param taskSpec - the map with all of the task
+	 * @param settings - map of settings for task generation.
 	 */
-	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff) {
+	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
 		def person
 
 		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1) {
@@ -4593,7 +4601,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (whom[0] == '@') {
 					// team reference
 					def teamAssign = whom[1..-1]
-					List teamCodeList = taskSpec["teamCodes"]
+					List teamCodeList = settings["teamCodes"]
 					if (teamCodeList.contains(teamAssign)) {
 						task.role = teamAssign
 					} else {
@@ -4658,11 +4666,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param task - current task.
 	 * @param taskSpec - a map with all the task info.
 	 * @param workflow
-	 * @param projectStaff 
+	 * @param projectStaff
+	 * @param settings : map of settings for task generation.
 	 *
 	 * @return error msg, null if none.
 	 */
-	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff) {
+	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
 		// Set the Team independently of the direct person assignment
 		if (taskSpec.containsKey('team')) {
 			def team = taskSpec.team
@@ -4696,7 +4705,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 			// Validate that the string is correct
-			List teamCodeList = taskSpec["teamCodes"]
+			List teamCodeList = settings["teamCodes"]
 			if (teamCodeList.contains(team)) {
 				task.role = team
 			} else {

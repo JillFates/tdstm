@@ -16,6 +16,7 @@ import java.security.SecureRandom
  * Note that all references to encryption or decryption actually involve hashing, not encryption.
  */
 class SecurityUtil {
+	public static final String ACCOUNT_LOCKED_OUT = "accountLockedOut"
 
 	private static SecureRandom randomGenerator = new SecureRandom()
 

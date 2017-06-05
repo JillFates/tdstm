@@ -1120,11 +1120,7 @@ class PartyRelationshipService implements ServiceMethods {
 			SELECT * FROM (
 			 (
 				SELECT pr.party_id_to_id AS personId,
-					CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '),
-						IFNULL(p.middle_name,''), IF(p.middle_name IS NULL, '', ' '),
-						COALESCE(p.last_name, ''),
-						', ', pg.name
-					) AS fullName
+					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
 				FROM tdstm.party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
@@ -1146,10 +1142,7 @@ class PartyRelationshipService implements ServiceMethods {
 		query.append("""
 			(
 				SELECT pr.party_id_to_id AS personId,
-					CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '),
-						IFNULL(p.middle_name,''), IF(p.middle_name IS NULL, '', ' '),
-						COALESCE(p.last_name, '')
-					) AS fullName
+					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
 				FROM tdstm.party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
@@ -1164,8 +1157,7 @@ class PartyRelationshipService implements ServiceMethods {
             ) AS appStaff
             ORDER BY fullName
 		""")
-
-		jdbcTemplate.queryForList(query.toString())
+		return jdbcTemplate.queryForList(query.toString())
 	}
 
 	/**

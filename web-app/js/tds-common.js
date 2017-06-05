@@ -52,6 +52,49 @@ var tdsCommon = {
 		return str.charAt(0).toUpperCase() + str.substring(1);
 	},
 
+	// Compare 2 strings
+	// @param string1 the string to compare
+	// @param string2 the string to compare
+	// @param ignoreCase whether to use case sensitive comparison
+	// @param useLocale whether to use host's current locale while comparing strings
+  compareStrings: function(string1, string2, ignoreCase, useLocale) {
+  	if (ignoreCase) {
+    	if (useLocale) {
+      	string1 = string1.toLocaleLowerCase();
+      	string2 = string2.toLocaleLowerCase();
+    	} else {
+      	string1 = string1.toLowerCase();
+      	string2 = string2.toLowerCase();
+    	}
+  	}
+  	return string1 === string2;
+	},
+
+	// Compare 2 strings using case insensitive
+  // @param string1 the string to compare
+  // @param string2 the string to compare
+  compareStringsIgnoreCase: function(string1, string2) {
+		return this.compareStrings(string1, string2, true, false);
+	},
+
+	arrayStringIndexIgnoreCase: function(array, string1) {
+		var $this = this;
+    var index = -1;
+    if(array && array.length) {
+      array.some(function (element, i) {
+        if ($this.compareStringsIgnoreCase(string1, element)) {
+          index = i;
+          return true;
+        }
+      });
+    }
+    return index;
+	},
+
+  arrayContainsStringIgnoreCase: function(array, string1) {
+    return this.arrayStringIndexIgnoreCase(array, string1) >= 0;
+	},
+
     /**
 	 * Applies a more smooth delay, extending the setTimeout
      * @returns {Function}
@@ -521,10 +564,6 @@ var UserPreference = function () {
 		});
 	}
 
-	// resets the user's preferences to their default values
-	var resetTimezonePrefs = function (user) {
-		resetPreference(user, true)
-	}
 
 	// closes the preference dialog then refreshes the page
 	var changeResetMessage = function (e) {
@@ -552,8 +591,7 @@ var UserPreference = function () {
 		savePreferences: savePreferences,
 		resetPreference: resetPreference,
 		changeResetMessage: changeResetMessage,
-		removeUserPrefs: removeUserPrefs,
-		resetTimezonePrefs: resetTimezonePrefs
+		removeUserPrefs: removeUserPrefs
 	}
 }();
 

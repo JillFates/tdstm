@@ -47,6 +47,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/$id" {
+			controller = "wsAsset"
+			action = [
+					GET:"getAsset"
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -431,6 +438,22 @@ class UrlMappings {
 
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")
+
+		// REST API
+		"/api/projects/heartbeat"(controller: 'project', action: 'heartbeat', namespace:"v1", method: "GET")
+
+		"/api/${controller}s"(version: "1.0", namespace: "v1", method: "GET")
+		"/api/${controller}s/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
+		"/api/${controller}s/$id(.$format)?"(action: "delete", version: "1.0", namespace:"v1", method: "DELETE")
+		"/api/${controller}s/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")
+		"/api/${controller}s(.$format)?"(action: "save", version: "1.0", namespace:"v1", method: "POST")
+
+		"/api/${controller}s"(version: "2.0", namespace: "v2", method: "GET")
+		"/api/${controller}s/$id(.$format)?"(version: "2.0", action: "show", namespace: "v2", method: "GET")
+		"/api/${controller}s/$id(.$format)?"(action: "delete", version: "2.0", namespace: "v2", method: "DELETE")
+		"/api/${controller}s/$id(.$format)?"(action: "update", version: "2.0", namespace: "v2", method: "PUT")
+		"/api/${controller}s(.$format)?"(action: "save", version: "2.0", namespace: "v2", method: "POST")
+		// End: REST API
 
 		// Various error pages
 		"401" ( controller: 'errorHandler', action: 'unauthorized' )

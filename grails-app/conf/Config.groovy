@@ -80,17 +80,6 @@ grails {
 	json.legacy.builder = false
 
 	mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
-	mail {
-		host = "smtp.gmail.com"
-		port = 465
-		username = ""
-		password = ""
-		props = ["mail.smtp.auth":"true",
-		         "mail.smtp.socketFactory.port":"465",
-		         "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-		         "mail.smtp.socketFactory.fallback":"false"
-		]
-	}
 
 	mime {
 		disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
@@ -162,6 +151,19 @@ environments {
 		grails {
 			logging.jul.usebridge = true
 			serverURL = 'http://localhost:8080/tdstm'
+
+			//mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
+			mail {
+				host = "smtp.gmail.com"
+				port = 465
+				username = ""
+				password = ""
+				props = ["mail.smtp.auth":"true",
+						 "mail.smtp.socketFactory.port":"465",
+						 "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+						 "mail.smtp.socketFactory.fallback":"false"
+				]
+			}
 		}
 	}
 	test {
@@ -177,11 +179,29 @@ environments {
 				}
 			}
 		}
+
+		grails.serverURL = 'http://localhost:8080/tdstm'
+
+		//used for testing email
+		grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
 	}
 	production {
+		greenmail.disabled = true
 		grails {
 			logging.jul.usebridge = false
 			// TODO serverURL = 'http://www.changeme.com'
+
+			mail {
+				host = "smtp.gmail.com"
+				port = 465
+				username = ""
+				password = ""
+				props = ["mail.smtp.auth":"true",
+						 "mail.smtp.socketFactory.port":"465",
+						 "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+						 "mail.smtp.socketFactory.fallback":"false"
+				]
+			}
 		}
 	}
 }
@@ -265,6 +285,14 @@ tdsops.buildFile = "/build.txt"
 grails {
 	plugin {
 		springsecurity {
+			// Refer to spring security REST Plugin configuration:
+			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
+			filterChain.chainMap = [
+					'/api/projects/heartbeat':'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+					'/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter',  // Stateless chain
+					'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter' // Traditional chain
+			]
+
 			// Refer to information on these settings please refer to:
 			//    https://grails-plugins.github.io/grails-spring-security-core/v2/guide/urlProperties.html
 			adh {
@@ -320,9 +348,20 @@ grails {
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',
+				'/oauth/access_token':'permitAll'
 			]
 
 			ldap.active = false
+
+			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
+			rest {
+				token {
+					validation {
+						enableAnonymousAccess = true
+					}
+				}
+			}
+
 		}
 	}
 }

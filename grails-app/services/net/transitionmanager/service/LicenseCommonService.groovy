@@ -15,6 +15,9 @@ class LicenseCommonService {
 
 	GrailsApplication grailsApplication
 
+	//Singleton cached data
+	private String fqdn
+
 	/**
 	 * @deprecate
 	 * Is not in actual USE....
@@ -31,7 +34,7 @@ class LicenseCommonService {
 		def md5key = MD5Codec.encode(hwkey)
 
 		log.debug("***************************************************************************")
-		log.info("hwkey: $hwkey")
+		log.debug("hwkey: $hwkey")
 		log.debug("md5key: $md5key")
 		log.debug("***************************************************************************")
 
@@ -42,9 +45,17 @@ class LicenseCommonService {
 	 * return the Fully Qualified Domain Name (FQDN) of the server
 	 * @return String representing the FQDN
 	 */
+	synchronized
 	String getFQDN(){
-		URL url = new URL(grailsApplication.config.grails.serverURL)
-		return url.getHost()
+		if(!fqdn) {
+			// oluna: this should be always in the configuration, but let's play safe
+			String serverURL = grailsApplication.config.grails.serverURL ?:
+								"http://${InetAddress.getLocalHost().getHostName()}"
+
+			URL url = new URL(serverURL)
+			fqdn = url.getHost()
+		}
+		return fqdn
 	}
 
 	/**

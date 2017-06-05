@@ -13,7 +13,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import org.apache.commons.lang.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.DONE
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
@@ -196,7 +196,7 @@ class AssetComment {
 		// TODO : JPM 11/2015 : TM-4249 Eliminate Timezone computation 'CONVERT_TZ(SUBTIME(NOW(),'00:01:00.0')....' below
 		score formula: "CASE status \
 			WHEN '$HOLD' THEN 900 \
-			WHEN '$DONE' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 800, 200) + status_updated/NOW() \
+			WHEN '$COMPLETED' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 800, 200) + status_updated/NOW() \
 			WHEN '$STARTED' THEN 700 + 1 - IFNULL(est_start,NOW())/NOW() \
 			WHEN '$READY' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
 			WHEN '$PENDING' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
@@ -229,7 +229,7 @@ class AssetComment {
 	}
 
 	boolean isDone() {
-		status == DONE
+		status == COMPLETED
 	}
 
 	boolean isRunbookTask() {

@@ -173,10 +173,10 @@ class CustomTagLibTests extends AbstractUnitSpec {
 	}
 
 	private void setUserDateFormat(String userDateFormat) {
-		session.setAttribute 'CURR_DT_FORMAT', [CURR_DT_FORMAT: userDateFormat]
+		session.setAttribute('CURR_DT_FORMAT', userDateFormat)
 	}
 
 	private void setTimeZone(String timeZoneId) {
-		session.setAttribute 'CURR_TZ', [CURR_TZ: timeZoneId]
+		session.setAttribute('CURR_TZ', timeZoneId)
 	}
 }

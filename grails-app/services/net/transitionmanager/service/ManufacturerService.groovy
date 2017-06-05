@@ -1,8 +1,14 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetEntity
+import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.lang.CollectionUtils
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
+import net.transitionmanager.domain.ModelAlias
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Transactional
@@ -40,10 +46,12 @@ class ManufacturerService implements ServiceMethods {
 			def fromManufacturerAlias = ManufacturerAlias.findAllByManufacturer(fromManufacturer)
 			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer = $fromManufacturer.id")
 			fromManufacturerAlias.each {
-				toManufacturer.findOrCreateAliasByName(it.name, true)
+				//toManufacturer.findOrCreateAliasByName(it.name, true)
+				findOrCreateAliasByName(toManufacturer, it.trim(), true)
 			}
 			//merging fromManufacturer as AKA of toManufacturer
-			toManufacturer.findOrCreateAliasByName(fromManufacturer.name, true)
+			//toManufacturer.findOrCreateAliasByName(fromManufacturer.name, true)
+			findOrCreateAliasByName(toManufacturer, fromManufacturer.name, true)
 
 			// Delete manufacturer record.
 			fromManufacturer.delete()
@@ -52,7 +60,43 @@ class ManufacturerService implements ServiceMethods {
 			fromManufacturer.delete()
 		}
 	}
-	
+
+	/**
+	 * 1. Manufacturer name must be unique
+	 * 2. Manufacturer name must not duplicate any AKA name within all manufacturers
+	 *
+	 * @param name
+	 * @param id
+	 * @return
+	 */
+	boolean isValidName(String name, Long id) {
+		// rule #1
+		int count = Manufacturer.where {
+			name == name
+			if (id) {
+				id != id
+			}
+		}.count()
+
+		if (count == 0) {
+			// rule #2
+			count = ManufacturerAlias.where {
+				name == name
+			}.count()
+
+			if (count == 0) {
+				return true
+			} else {
+				String error = "Manufacturer name (${name}) duplicates an existing AKA."
+				throw new ServiceException(error)
+			}
+
+		} else {
+			String error = "Manufacturer name (${name}) is not unique."
+			throw new ServiceException(error)
+		}
+	}
+
 	/**
 	 * Validates whether the given alias is valid for the given manufacturer
 	 * @param newAlias, the alias to be added
@@ -97,4 +141,60 @@ class ManufacturerService implements ServiceMethods {
 		// if all the tests were passes, this is a valid alias
 		return true
 	}
+
+	boolean save(Manufacturer manufacturer, List<String> akaNames) {
+		if (isValidName(manufacturer.name, manufacturer.id) && !manufacturer.hasErrors() && manufacturer.save()) {
+			if (CollectionUtils.isNotEmpty(akaNames) && !(akaNames.size() == 1 && StringUtil.isBlank(akaNames[0]))) {
+				akaNames.each { aka ->
+					findOrCreateAliasByName(manufacturer, aka, true)
+				}
+			}
+			return true
+		} else {
+			return false
+		}
+	}
+
+	boolean update(Manufacturer manufacturer, String deletedAka, List<String> akaToSave, Map<String, String> akaToUpdate) {
+		if (deletedAka) {
+			List<Long> maIds = deletedAka.split(",").collect() { it as Long }
+			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.id in :maIds", [maIds: maIds])
+		}
+		def manufacturerAliasList = ManufacturerAlias.findAllByManufacturer(manufacturer)
+		manufacturerAliasList.each { manufacturerAlias ->
+			manufacturerAlias.name = akaToUpdate["aka_${manufacturerAlias.id}"]
+			manufacturerAlias.save(flush:true)
+		}
+		akaToSave.each { aka ->
+			findOrCreateAliasByName(manufacturer, aka, true)
+		}
+		return isValidName(manufacturer.name, manufacturer.id) && !manufacturer.hasErrors() && manufacturer.save()
+	}
+
+	void delete(Manufacturer manufacturer) {
+		ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer.id = :maId", [maId: manufacturer.id])
+		ModelAlias.executeUpdate("delete from ModelAlias ma where ma.manufacturer.id = :maId", [maId: manufacturer.id])
+		AssetEntity.executeUpdate("update AssetEntity ae set ae.manufacturer=null where ae.manufacturer.id = :maId", [maId: manufacturer.id])
+		manufacturer.delete(flush:true)
+	}
+
+	/**
+	 * Get a ManufacturerAlias object by name and create one (optionally) if it doesn't exist
+	 * @param name - name of the manufacturer alias
+	 * @param createIfNotFound - optional flag to indicating if record should be created (default false)
+	 * @return a ManufacturerAlias object if found or was successfully created , or null if not found or not created
+	 */
+	ManufacturerAlias findOrCreateAliasByName(Manufacturer manufacturer, String name, boolean createIfNotFound = false) {
+		ManufacturerAlias alias = ManufacturerAlias.findByNameAndManufacturer(name, manufacturer)
+		if (!alias && createIfNotFound) {
+			def isValid = isValidAlias(name, manufacturer, false)
+			alias = new ManufacturerAlias(name: name.trim(), manufacturer: manufacturer)
+			if (!isValid || !alias.save(flush: true)) {
+				log.error GormUtil.allErrorsString(alias)
+				return null
+			}
+		}
+		return alias
+	}
+
 }

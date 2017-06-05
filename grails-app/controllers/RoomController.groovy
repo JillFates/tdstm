@@ -118,7 +118,7 @@ class RoomController implements ControllerMethods {
 			auditView = params.auditView
 			userPreferenceService.setPreference(PREF.AUDIT_VIEW, params.auditView)
 		} else {
-			auditView = session.AUDIT_VIEW?.AUDIT_VIEW ?: userPreferenceService.getPreference(PREF.AUDIT_VIEW) ?: 0
+			auditView = session.AUDIT_VIEW ?: userPreferenceService.getPreference(PREF.AUDIT_VIEW) ?: 0
 		}
 
 		Project project = securityService.userCurrentProject

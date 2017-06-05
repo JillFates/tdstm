@@ -7,6 +7,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
@@ -91,6 +92,7 @@ import org.springframework.util.StreamUtils
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
+import java.sql.Timestamp
 import java.text.DateFormat
 
 @SuppressWarnings('GrMethodMayBeStatic')
@@ -109,17 +111,17 @@ class AssetEntityController implements ControllerMethods {
 			(AssetCommentStatus.READY):   AssetCommentStatus.list,
 			(AssetCommentStatus.STARTED): AssetCommentStatus.list,
 			(AssetCommentStatus.HOLD):    AssetCommentStatus.list,
-			(AssetCommentStatus.DONE):    AssetCommentStatus.list
+			(AssetCommentStatus.COMPLETED):    AssetCommentStatus.list
 		],
 		LIMITED: [
 			'*EMPTY*':                    [AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING, AssetCommentStatus.HOLD],
 			(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
 			(AssetCommentStatus.PENDING): [AssetCommentStatus.PENDING],
 			(AssetCommentStatus.READY):   [AssetCommentStatus.READY, AssetCommentStatus.STARTED,
-			                               AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
+			                               AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
 			(AssetCommentStatus.STARTED): [AssetCommentStatus.READY, AssetCommentStatus.STARTED,
-			                               AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
-			(AssetCommentStatus.DONE):    [AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
+			                               AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
+			(AssetCommentStatus.COMPLETED):    [AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
 			(AssetCommentStatus.HOLD):    [AssetCommentStatus.HOLD]
 		]
 	]
@@ -741,8 +743,12 @@ class AssetEntityController implements ControllerMethods {
 			// Generate the results and save into the batch for historical reference
 			// log.debug "saveProcessResultsToBatch: theSheetName=$theSheetName, theResults = $theResults"
 			StringBuffer sprtbMsg = generateResults(theResults, theResults[theSheetName].skipped, [theSheetName], false)
-			dataTransferBatch.importResults = sprtbMsg.toString()
-			dataTransferBatch.save()
+			if (dataTransferBatch != null) {
+				dataTransferBatch.importResults = sprtbMsg.toString()
+				dataTransferBatch.save()
+			} else {
+				throw new Exception(sprtbMsg.toString())
+			}
 		}
 
 		setBatchId 0
@@ -1359,10 +1365,10 @@ class AssetEntityController implements ControllerMethods {
 
 		} catch(NumberFormatException e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-			forward action:forwardAction, params: [error: e]
+			forward action:forwardAction, params: [error: e.message]
 		} catch(Exception e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-			forward action:forwardAction, params: [error: e]
+			forward action:forwardAction, params: [error: e.message]
 		}
 	}
 
@@ -2140,7 +2146,11 @@ class AssetEntityController implements ControllerMethods {
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
 			long filterEvent = NumberUtil.toPositiveLong(params.moveEvent, 0L)
+
+			// column name and its associated javascript cell formatter name
+			def formatterMap = [assetEntity:'assetFormatter', estStart:'estStartFormatter', estFinish: 'estFinishFormatter']
 			def moveEvent
+
 
 			if (params.containsKey("justRemaining")) {
 				userPreferenceService.setPreference(PREF.JUST_REMAINING, params.justRemaining)
@@ -2207,6 +2217,7 @@ class AssetEntityController implements ControllerMethods {
 			        moveBundleList: moveBundleList,
 					viewUnpublished: viewUnpublished,
 					taskPref: taskPref,
+					formatterMap: formatterMap,
 			        staffRoles: taskService.getTeamRolesForTasks(),
 					assetCommentFields: assetCommentFields.sort { it.value },
 			        sizePref: userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE) ?: '25',
@@ -2532,8 +2543,11 @@ class AssetEntityController implements ControllerMethods {
 		def updatedTime
 		def updatedClass
 		def dueClass
+		def estStartClass
+		def estFinishClass
 		def nowGMT = TimeUtil.nowGMT()
 		def taskPref = assetEntityService.getExistingPref('Task_Columns')
+
 
 		def results = tasks?.collect {
 			def isRunbookTask = it.isRunbookTask()
@@ -2569,13 +2583,19 @@ class AssetEntityController implements ControllerMethods {
 				}
 			}
 
+			Integer tardyFactor = computeTardyFactor(it.durationInMinutes())
+			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, tardyFactor, nowGMT)
+
+			estStartClass = estimatedColumnsCSS['estStartClass']
+			estFinishClass = estimatedColumnsCSS['estFinishClass']
+
 			String dueDate = ''
 			dueDate = TimeUtil.formatDate(it.dueDate)
 
 			// Clears time portion of dueDate for date comparison
 			Date due = it.dueDate?.clearTime()
 
-			// Add styling to Due Date column
+			// Highlight Due Date column for tardy and late tasks
 			if (it.dueDate && it.isActionable()) {
 
 				if (due > today) {
@@ -2636,7 +2656,9 @@ class AssetEntityController implements ControllerMethods {
 					it.assetEntity?.id, // 16
 					it.assetEntity?.assetType, // 17
 					it.assetEntity?.assetClass?.toString(), // 18
-					instructionsLinkURL // 19
+					instructionsLinkURL, // 19
+					estStartClass,	// 20
+					estFinishClass	// 21
 			],
 			  id:it.id
 			]
@@ -3466,7 +3488,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def taskList = taskService.genSelectForPredecessors(project, params.category, task, moveEventId)
+		def taskList = taskService.search(project, params.category, task, moveEventId)
 
 		if (format=='json') {
 			def list = []
@@ -3505,7 +3527,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def tasksData = taskService.genSelectForPredecessors(project, params.category, task, moveEventId, page, pageSize, filterDesc)
+		def tasksData = taskService.search(project, params.category, task, moveEventId, page, pageSize, filterDesc)
 
 		def list = []
 
@@ -4669,4 +4691,73 @@ class AssetEntityController implements ControllerMethods {
 	private void setTotalAssets(long count) {
 		session.setAttribute 'TOTAL_ASSETS', count
 	}
+
+
+
+	/**
+	 * TODO This method should be refactored to another class.
+	 * Returns a Map with the Estimated Start and Estimated Finish columns CSS class names, according to
+	 * the relation between those estimates and the current date/time. Also uses the Actual Start value
+	 * to make the calculations in case the task is in STARTED status, and a tardy factor value to
+	 * determine when a task is not late yet but it's going to be soon.
+	 * If a task estimate values are not late or tardy, it returns an empty string for the class name.
+	 * For more information see TM-6318.
+	 *
+	 * @param task : The task.
+	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
+	 * @param nowGMT : The actual time in GMT.
+	 * @return : A Map with estStartClass and estFinishClass.
+	 */
+	private Map getEstimatedColumnsCSS(AssetComment task, Integer tardyFactor, Date nowGMT) {
+
+		def estStartClass = ''
+		def estFinishClass = ''
+
+		Integer durationInMinutes = task.durationInMinutes()
+		Integer nowGMTInMinutes = nowGMT.getTime() / 1000 / 60
+		Integer estimatedStartInMinutes = (task.estStart != null) ? task.estStart.getTime() / 1000 / 60 : null
+		Integer estimatedFinishInMinutes = (task.estFinish != null) ? task.estFinish.getTime() / 1000 / 60 : null
+		Integer actualStartInMinutes = (task.actStart != null) ? task.actStart.getTime() / 1000 / 60 : null
+
+		if (task.estStart && task.isActionable() && task.status != AssetCommentStatus.STARTED) {
+
+			if (task.estStart < nowGMT) {
+				estStartClass = 'task_late'
+				estFinishClass = 'task_late'
+			} else {
+				if (estimatedStartInMinutes - tardyFactor <= nowGMTInMinutes) {
+					estStartClass = 'task_tardy'
+					estFinishClass = 'task_tardy'
+				}
+			}
+		}
+
+		if (task.estFinish && task.isActionable()) {
+			if (task.status == AssetCommentStatus.STARTED) {
+				if (actualStartInMinutes + durationInMinutes > estimatedFinishInMinutes) {
+					estStartClass = 'task_late'
+					estFinishClass = 'task_late'
+				} else if (actualStartInMinutes + durationInMinutes + tardyFactor >= estimatedFinishInMinutes) {
+					estStartClass = 'task_tardy'
+					estFinishClass = 'task_tardy'
+				}
+			}
+		}
+
+		return [estStartClass: estStartClass, estFinishClass: estFinishClass]
+	}
+
+
+	/**
+	 * TODO This method should be refactored to another class.
+	 * Computes the tardy factor.
+	 * The intent is to adjust the factor as a percent of the duration of the task to factor in
+	 * the additional buffer of time with a minimum factor of 5 minutes and a maximum of 30 minutes.
+	 * @param date : The task duration in minutes.
+	 * @return : the tardy factor.
+	 */
+	private Integer computeTardyFactor(Integer durationInMinutes) {
+		return Math.min(30, Math.max(5, (Integer)(durationInMinutes * 0.1)))
+	}
+
 }

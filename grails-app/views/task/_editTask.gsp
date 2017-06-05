@@ -17,7 +17,7 @@
 							<label ><b>Task <span ng-show="isEdit" id="taskNumberEditId">#<b>{{ac.taskNumber == null ? '&nbsp;' : ac.taskNumber}}</b></span>:</b></label>&nbsp;<span class="error-msg" ng-show="form.comment.$error.required"><b>*</b></span>
 						</td>
 						<td valign="top" class="value">
-								<textarea required cols="80" rows="2" id="commentEditId" name="comment" ng-model="ac.comment" ng-maxlength="4000"></textarea>
+								<textarea tabindex="0" required cols="80" rows="2" id="commentEditId" name="comment" ng-model="ac.comment" ng-maxlength="4000"></textarea>
 								<pre class="error-msg" ng-show="form.comment.$error.maxlength">Task maximum length is 4000 characters.</pre>
 							</td>
 						</tr>
@@ -66,7 +66,10 @@
 						<td valign="top" class="name"><label for="asset">Asset:</label></td>
 						<td valign="top">
 							<select ng-model="commentInfo.currentAssetClass" ng-change="assetClassChanged()" ng-options="assetClass.key as assetClass.label for assetClass in commentInfo.assetClasses"></select>
-							<select ng-model="commentInfo.currentAsset"  ng-options="asset.id as asset.name for asset in commentInfo.assets"></select>
+							<div style="width:200px;display: inline-block;">
+								<input type="hidden" id="currentAsset" name="commentInfo.currentAsset" ng-model="commentInfo.currentAsset" value="{{commentInfo.currentAsset}}" class="scrollSelect"  
+									data-asset-type="{{commentInfo.currentAssetClass}}" data-asset-id="{{commentInfo.currentAsset}}" data-asset-name="{{commentInfo.currentAssetName}}"/>
+							</div
 						</td>
 					</tr>
 					<tr class="prop">
@@ -131,12 +134,16 @@
 							<table style="border: none;">
 								<tr class="prop" id="predecessorHeadTrId">
 									<td valign="top" class="name" style="width: 50%">
-										<label>Predecessors</label>
-										<a class="button" href="javascript:" ng-click="$broadcast('addDependency','predecessor')"> Add </a>
+										<label>Predecessors:</label> 
+										<a class="button btn" href="javascript:" ng-class="{'btn-default':hoverPredecessor}" ng-mouseenter="hoverPredecessor=true" ng-mouseleave="hoverPredecessor=false"
+										 ng-click="$broadcast('addDependency','predecessor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add link to a Predecessor task">
+											<i class="fa fa-plus-circle"></i> Add </a>
 									</td>
 									<td valign="top" class="name" style="width: 50%">
-										<label>Successors</label>
-										<a class="button" href="javascript:" ng-click="$broadcast('addDependency','successor')"> Add </a>
+										<label>Successors:</label> 
+										<a class="button btn" href="javascript:" ng-class="{'btn-default':hoverSuccessor}" ng-mouseenter="hoverSuccessor=true" ng-mouseleave="hoverSuccessor=false"
+										 ng-click="$broadcast('addDependency','successor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add link to a Successor task">
+										 	<i class="fa fa-plus-circle"></i> Add </a>
 									</td>
 								</tr>
 								<tr>
@@ -188,7 +195,14 @@
 			<button type="button" id="saveAndCloseBId" class="btn btn-default tablesave" ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Save</button>
 			<button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 		</div>
-		<script>$('[data-toggle="popover"]').popover();</script>
+		<script> 
+		$(document).ready(function(){
+			$('[data-toggle="popover"]').popover(); 
+			setTimeout(function(){
+				 $('#commentEditId').trigger('focus');
+			},1000);
+		})
+		</script>
 	</form>
 	</div>
 </div>

@@ -1,3 +1,5 @@
+var nodeResolve = require('resolve');
+
 module.exports = function (config) {
     var appSrcBase = 'web-app/app-js/';       // app source TS files
     var appAssets = 'web-app/app-js/';
@@ -5,23 +7,17 @@ module.exports = function (config) {
     config.set({
         basePath: '',
         frameworks: ['browserify', 'jasmine'],
+        browsers: ['PhantomJS'],
         plugins: [
             require('karma-jasmine'),
-            require('karma-chrome-launcher'),
+            require('karma-phantomjs-launcher'),
             require('karma-jasmine-html-reporter'),
+            require('karma-html-reporter'),
             require('karma-junit-reporter'),
             require('karma-browserify')
         ],
         client: {
-            clearContext: false // leave Jasmine Spec Runner output visible in browser
-        },
-        customLaunchers: {
-            // From the CLI. Not used here but interesting
-            // chrome setup for travis CI using chromium
-            Chrome_travis_ci: {
-                base: 'Chrome',
-                flags: ['--no-sandbox']
-            }
+            captureConsole: true
         },
         files: [
             // Polyfills
@@ -34,6 +30,11 @@ module.exports = function (config) {
             'node_modules/zone.js/dist/jasmine-patch.js',
             'node_modules/zone.js/dist/async-test.js',
             'node_modules/zone.js/dist/fake-async-test.js',
+            // External resources
+            { pattern: 'node_modules/tinymce/skins/lightgray/**/*.*', included: false, watched: false },
+            { pattern: 'node_modules/jquery/dist/jquery.min.js', included: true },
+            { pattern: 'node_modules/tinymce/tinymce.js', included: true },
+            { pattern: 'node_modules/tinymce/themes/modern/theme.min.js', included: true },
 
             { pattern: appSrcBase + '**/*.html', included: false, watched: true },
             { pattern: appSrcBase + '**/*.css', included: false, watched: true },
@@ -45,12 +46,18 @@ module.exports = function (config) {
         },
         browserify: {
             debug: false,
+            configure: function (bundle) {
+                bundle.once('prebundle', function () {
+                    bundle.require(nodeResolve.sync('jszip'), { expose: 'jszip/dist/jszip' });
+                });
+            },
             plugin: ['tsify']
         },
         mime: {
             'text/x-typescript': ['ts', 'tsx']
         },
         proxies: {
+            '/dist/js/vendors/tinymce/lightgray/': '/base/node_modules/tinymce/skins/lightgray/',
             '/base/web-app/specs-dist/modules/tds/web-app/app-js/': "/base/web-app/app-js/",//sweet!!
             '/tds/web-app/app-js/': "/base/web-app/app-js/",
             '/base/web-app/specs-dist/modules/noticeManager/tds/web-app/app-js/': "/base/web-app/app-js/"
@@ -58,13 +65,12 @@ module.exports = function (config) {
         reporters: ['dots', 'junit'],
         junitReporter: {
             outputDir: 'web-app/test/',
-            outputFile: 'test-results.xml'
+            outputFile: 'test-results.xml',
+            useBrowserName: false
         },
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
-        autoWatch: true,
-        browsers: ['Chrome'],
         singleRun: true
     });
 };

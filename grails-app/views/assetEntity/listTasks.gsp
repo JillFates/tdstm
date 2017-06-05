@@ -85,14 +85,14 @@
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:myLinkFormatter, width:60, fixed:true},
 					{name:'comment', width:680, formatter:taskViewFormatter},
-					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
-					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['1']}', formatter:${formatterMap[taskPref['1']] ?: 'taskFormatter'}, width:200},
+					{name:'${taskPref['2']}', formatter:${formatterMap[taskPref['2']] ?: 'taskFormatter'}, width:200},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
 					{name:'dueDate', formatter: dueFormatter},
 					{name:'status', formatter: statusFormatter},
-					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
-					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
-					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['3']}', formatter:${formatterMap[taskPref['3']] ?: 'taskFormatter'}, width:200},
+					{name:'${taskPref['4']}', formatter:${formatterMap[taskPref['4']] ?: 'taskFormatter'}, width:200},
+					{name:'${taskPref['5']}', formatter:${formatterMap[taskPref['5']] ?: 'taskFormatter'}, width:200},
 					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
 					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
@@ -166,6 +166,34 @@
 				'" asset-id="'+
 				rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
+
+        /**
+		 * Cell formatter for estimated start cells.
+		 * Note that this formatter is not attached statically to any column in particular.
+		 * As the estimated start column is dynamic, this formatter is selected using the fromatterMap,
+		 * depending on which column the user has selected to be the estimated start column.
+         */
+        function estStartFormatter(cellVal,options,rowObject){
+            return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
+                rowObject[20] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
+                options.rowId+
+                '" asset-id="'+
+                rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+        }
+
+        /**
+         * Cell formatter for estimated finish cells.
+         * Note that this formatter is not attached statically to any column in particular.
+         * As the estimated finish column is dynamic, this formatter is selected using the fromatterMap,
+         * depending on which column the user has selected to be the estimated finish column.
+         */
+        function estFinishFormatter(cellVal,options,rowObject){
+            return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
+                rowObject[21] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
+                options.rowId+
+                '" asset-id="'+
+                rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+        }
 		function assetFormatter(cellVal,options,rowObject){
 			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[18]+'\', '+rowObject[16]+')\" >' + _.escape(cellVal) + '</span>' :
 				(cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")

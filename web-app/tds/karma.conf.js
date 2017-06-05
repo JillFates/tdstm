@@ -1,3 +1,5 @@
+var nodeResolve = require('resolve');
+
 module.exports = function (config) {
   var appSrcBase = 'web-app/app-js/';       // app source TS files
   var appAssets = 'web-app/app-js/';
@@ -41,7 +43,7 @@ module.exports = function (config) {
       { pattern: 'node_modules/jquery/dist/jquery.min.js', included: true },
       { pattern: 'node_modules/tinymce/tinymce.js', included: true },
       { pattern: 'node_modules/tinymce/themes/modern/theme.min.js', included: true },
-
+      // { pattern: 'node_modules/jzip/', included: true, watched: false },
       { pattern: appSrcBase + '**/*.html', included: false, watched: true },
       { pattern: appSrcBase + '**/*.css', included: false, watched: true },
 
@@ -52,6 +54,12 @@ module.exports = function (config) {
     },
     browserify: {
       debug: false,
+      configure: function (bundle) {
+        bundle.once('prebundle', function () {
+          // Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #1
+          bundle.require(nodeResolve.sync('jszip'), { expose: 'jszip/dist/jszip' });
+        });
+      },
       plugin: ['tsify']
     },
     mime: {
