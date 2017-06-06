@@ -20,21 +20,19 @@ export class FieldSettingsService {
 		return this.http.get(`${this.fieldSettingsUrl}/${domain}`)
 			.map((res: Response) => {
 				let response = res.json();
-				let result = [];
-				Object.keys(response).forEach((key) => result.push({
-					domain: response[key].domain.toUpperCase(),
-					fields: response[key].fields
-				}));
-				return result;
+				return Object.keys(response).map(key => {
+					response[key].domain = response[key].domain.toUpperCase();
+					return response[key];
+				});
 			})
 			.catch((error: any) => error.json());
 	}
 
-	saveFieldSettings(domain: string, fields: FieldSettingsModel[]): Observable<DomainModel[]> {
+	saveFieldSettings(domainModel: DomainModel): Observable<DomainModel[]> {
 		let payload = {};
-		payload[domain] = fields;
-		return this.http.post(`${this.fieldSettingsUrl}/${domain}`, JSON.stringify(payload))
-			.map((res: Response) => res.json())
+		payload[domainModel.domain.toUpperCase()] = domainModel;
+		return this.http.post(`${this.fieldSettingsUrl}/${domainModel.domain}`, JSON.stringify(payload))
+			.map((res: Response) => res)
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 }
