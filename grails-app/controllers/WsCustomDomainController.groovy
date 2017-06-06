@@ -22,7 +22,8 @@ class WsCustomDomainController implements ControllerMethods {
     @HasPermission(Permission.ProjectFieldSettingsEdit)
     def saveFieldSpec() {
         try {
-            renderAsJson(["key": "value"])
+            customDomainService.saveFieldSpecs(params.domain, request.JSON)
+            render status: 200
         } catch (e) {
             handleException(e, logger)
         }
