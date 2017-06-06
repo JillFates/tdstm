@@ -15,7 +15,7 @@ import { NotifierService } from '../services/notifier.service';
 
 export class UILoaderDirective {
 
-	private showsLoader = true;
+	private showsLoader = false;
 
 	constructor(private notifierService: NotifierService) {
 		this.httpRequestHandlerInitial();
