@@ -22,8 +22,8 @@ export class FieldSettingsService {
 				let response = res.json();
 				let result = [];
 				Object.keys(response).forEach((key) => result.push({
-					domain: key.toUpperCase(),
-					fields: response[key]
+					domain: response[key].domain.toUpperCase(),
+					fields: response[key].fields
 				}));
 				return result;
 			})
