@@ -18,7 +18,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Input() domain: string;
 	@ViewChild('fieldSettingGrid') fieldSettingGrid: GridComponent;
 
-	private search: '';
+	private search = '';
 	private fieldType = 'All';
 	private gridData: GridDataResult;
 	private state: State = {
