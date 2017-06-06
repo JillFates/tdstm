@@ -569,11 +569,13 @@ var UserPreference = function () {
 				var prefDialog = $("#userPrefDivId")
 				var pageHeight = Math.max($(window).outerHeight(), 200)
 				prefDialog.html(e)
-				prefDialog.dialog('option', 'width', 'auto')
-				prefDialog.dialog('option', 'maxHeight', pageHeight)
-				prefDialog.dialog('option', 'containment', 'body')
-				prefDialog.dialog('option', 'modal', true)
-				prefDialog.dialog("open")
+				prefDialog.dialog('option', 'width', 'auto');
+				prefDialog.dialog('option', 'maxHeight', pageHeight);
+				prefDialog.dialog('option', 'containment', 'body');
+				prefDialog.dialog('option', 'modal', true);
+				prefDialog.dialog("open");
+
+                $('.ui-widget-overlay').addClass('old-legacy-content');
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while attempting to update task/comment")
