@@ -371,6 +371,9 @@ class ImportService implements ServiceMethods {
 				sb.append("<li>Mfg: $d.mfg | Model: $d.model | $d.count reference${d.count > 1 ? '(s)' : ''}</li>")
 			}
 			sb.append('</ul>')
+
+			// TM-6495 Re-attach to the latest session since we can lose it on the loop above
+			userLogin.attach()
 			if (!securityService.hasPermission(userLogin, Permission.ModelCreateFromImport)) {
 				sb.append("$indent <b>Note: You do not have the permission necessary to create models during import</b><br>")
 			}
