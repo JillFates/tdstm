@@ -15,7 +15,7 @@
 					</ul>
 					<div class="tab-content">
 						<div *ngFor="let value of domains; let i = index; let first = first" [ngClass]="{'active':first}" class="tab-pane" id="tab_{{i}}">
-							<field-settings-grid [data]="value.fields" [domain]="value.domain"></field-settings-grid>
+							<field-settings-grid [data]="value"></field-settings-grid>
 						</div>
 						<!-- /.tab-pane -->
 					</div>

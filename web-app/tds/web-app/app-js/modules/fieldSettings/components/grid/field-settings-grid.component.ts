@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
+import { DomainModel } from '../../model/domain.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
 import { GridDataResult, DataStateChangeEvent, GridComponent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
@@ -14,12 +15,14 @@ import { process, State } from '@progress/kendo-data-query';
 	`]
 })
 export class FieldSettingsGridComponent implements OnInit {
-	@Input('data') fieldsSettings: FieldSettingsModel[];
-	@Input() domain: string;
+	@Input('data') data: DomainModel;
+	private fieldsSettings: FieldSettingsModel[];
 	@ViewChild('fieldSettingGrid') fieldSettingGrid: GridComponent;
 
-	private search = '';
-	private fieldType = 'All';
+	private filter = {
+		search: '',
+		fieldType: 'All'
+	};
 	private gridData: GridDataResult;
 	private state: State = {
 		skip: 0,
@@ -48,6 +51,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	constructor(private fieldService: FieldSettingsService) { }
 
 	ngOnInit(): void {
+		this.fieldsSettings = this.data.fields;
 		this.refresh();
 	}
 
@@ -58,18 +62,18 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onFilter(): void {
 		this.state.filter.filters = [];
-		if (this.search !== '') {
+		if (this.filter.search !== '') {
 			this.state.filter.filters.push({
 				field: 'field',
 				operator: 'contains',
-				value: this.search
+				value: this.filter.search
 			});
 		}
-		if (this.fieldType !== 'All') {
+		if (this.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.fieldType === 'User Defined Fields'
+				value: this.filter.fieldType === 'User Defined Fields'
 			});
 		}
 		this.refresh();
@@ -85,7 +89,10 @@ export class FieldSettingsGridComponent implements OnInit {
 			dir: 'asc',
 			field: 'order'
 		}];
-		this.search = '';
+		this.filter = {
+			search: '',
+			fieldType: 'All'
+		};
 		this.isFilterDisabled = true;
 		this.onFilter();
 	}
@@ -94,9 +101,9 @@ export class FieldSettingsGridComponent implements OnInit {
 		if (this.fieldsSettings.filter(item =>
 			!item.label || !item.field).length === 0) {
 			this.reset();
-			this.fieldsSettings.filter(x => x.isNew).forEach(x => x.isNew = false);
-			this.fieldService.saveFieldSettings(this.domain, this.fieldsSettings)
-				.subscribe();
+			this.fieldsSettings.filter(x => x['isNew']).forEach(x => delete x['isNew']);
+			this.fieldService.saveFieldSettings(this.data)
+				.subscribe((res) => this.refresh(true));
 		} else {
 			this.isSubmitted = true;
 			this.state.skip = 0;
@@ -106,14 +113,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onCancel(): void {
 		this.reset();
-		this.fieldService.getFieldSettingsByDomain(this.domain).subscribe(
-			(result) => {
-				if (result[0]) {
-					this.fieldsSettings = result[0].fields;
-					this.refresh();
-				}
-			},
-			(err) => console.log(err));
+		this.refresh(true);
 	}
 
 	protected onDelete(dataItem: FieldSettingsModel): void {
@@ -124,6 +124,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	protected onAddCustom(): void {
 		let model = new FieldSettingsModel();
 		model.field = this.availableCustomNumbers();
+		model['isNew'] = true;
 		this.fieldsSettings.push(model);
 		this.refresh();
 		model.order = this.fieldsSettings.length + 1;
@@ -140,8 +141,20 @@ export class FieldSettingsGridComponent implements OnInit {
 		}];
 	}
 
-	protected refresh(): void {
-		this.gridData = process(this.fieldsSettings, this.state);
+	protected refresh(fetch = false): void {
+		if (fetch) {
+			this.fieldService.getFieldSettingsByDomain(this.data.domain).subscribe(
+				(result) => {
+					if (result[0]) {
+						this.data = result[0];
+						this.fieldsSettings = this.data.fields;
+						this.refresh();
+					}
+				},
+				(err) => console.log(err));
+		} else {
+			this.gridData = process(this.fieldsSettings, this.state);
+		}
 	}
 
 	protected availableCustomNumbers(): string {
