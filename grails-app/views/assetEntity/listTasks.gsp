@@ -160,7 +160,7 @@
 			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
-			return '<span id="span_'+options.rowId+'" class=" ' +
+			return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
 				rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
 				options.rowId+
 				'" asset-id="'+
