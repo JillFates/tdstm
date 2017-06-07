@@ -1736,11 +1736,11 @@ class AssetEntityService implements ServiceMethods {
 				*/
 				switch (value) {
 					case 'sme':
-						query.append("CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS sme,")
+						query.append("CONCAT_WS(' ', NULLIF(p.first_name, ''), NULLIF(p.middle_name, ''), NULLIF(p.last_name, '')) AS sme,")
 						joinQuery.append("\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n")
 						break
 					case 'sme2':
-						query.append("CONCAT_WS(' ', p1.first_name, p1.middle_name, p1.last_name) AS sme2,")
+						query.append("CONCAT_WS(' ', NULLIF(p1.first_name, ''), NULLIF(p1.middle_name, ''), NULLIF(p1.last_name, '')) AS sme2,")
 						joinQuery.append("\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n")
 						break
 					case 'modifiedBy':
@@ -1756,7 +1756,7 @@ class AssetEntityService implements ServiceMethods {
 						joinQuery.append("\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n")
 						break
 					case 'appOwner':
-						query.append("CONCAT_WS(' ', p3.first_name, p3.middle_name, p3.last_name) AS appOwner,")
+						query.append("CONCAT_WS(' ', NULLIF(p3.first_name, ''), NULLIF(p3.middle_name, ''), NULLIF(p3.last_name, '')) AS appOwner,")
 						joinQuery.append("\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n")
 						break
 					case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownDuration|startupFixed|startupDuration|testingFixed|testingDuration/:
@@ -1772,8 +1772,8 @@ class AssetEntityService implements ServiceMethods {
 						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
 						String byProperty = WebUtil.splitCamelCase(value)
 						String prefix = byPrefixes[value]
-						query.append("(IF(${byProperty} REGEXP '^[0-9]{1,}\$', CONCAT_WS(' ',${prefix}.first_name," +
-								"${prefix}.middle_name, ${prefix}.last_name), a.${byProperty})) as ${value},")
+						query.append("(IF(${byProperty} REGEXP '^[0-9]{1,}\$', CONCAT_WS(' ',  NULLIF(${prefix}.first_name, ''), " +
+								"NULLIF(${prefix}.middle_name, ''), NULLIF(${prefix}.last_name, '')), a.${byProperty})) as ${value},")
 	      				joinQuery.append("\n LEFT OUTER JOIN person ${prefix} ON ${prefix}.person_id=a.${byProperty} \n")
 
 						break
