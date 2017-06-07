@@ -11,7 +11,7 @@ export class PermissionService {
 
 	private permissionUrl = '../wsSecurity/permissions';
 
-	private permissions: any;
+	permissions: any;
 
 	constructor(private http: HttpInterceptor) {
 	}
