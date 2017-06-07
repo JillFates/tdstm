@@ -24,10 +24,10 @@
 			background-color: #ecf0f5 !important;
 		}
 		/*TODO: TM-6499 Adding it here 'cause I don't want it as a part of the normal css*/
-		action-bar.checkboxContainer input[type=checkbox] {
+		.action-bar.checkboxContainer input[type=checkbox] {
 			margin-left: 10px;
 		}
-		action-bar.checkboxContainer label {
+		.action-bar.checkboxContainer label {
 			margin-left: 4px;
 		}
 </style>
