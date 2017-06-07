@@ -2064,13 +2064,17 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 					timerBar.Pause();
 				windowTimedUpdate.pause();
 				var row = angular.element('#' + scope.rowPrefix + scope.commentId);
-				var newRow = compile(content)(scope);
-				row.after(newRow);
-				scope.configTable[scope.commentId] = {
-					"id": scope.commentId,
-					"row": newRow
-				}
-				scope.loading = false;
+                compile(content)(scope, function(newRow) {
+                    if(row.next().find('.statusButtonBar').length == 0) {
+						row.after(newRow);
+						scope.configTable[scope.commentId] = {
+							"id": scope.commentId,
+							"row": newRow
+						}
+						scope.loading = false;
+                    }
+                });
+
 			}
 			if (scope.master) {
 				scope.$on('showActionBars', function(evt) {

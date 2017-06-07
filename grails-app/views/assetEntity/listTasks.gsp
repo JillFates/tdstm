@@ -100,7 +100,7 @@
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
-				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
+				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId'); gridLoadComplete(); }"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, step:step }"
 				showPager="true">
@@ -116,7 +116,7 @@
 
 				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+"')\">");
 			</g:each>
-		})
+		});
 
 		$.jgrid.formatter.integer.thousandsSeparator='';
 
@@ -199,13 +199,23 @@
 			}
 		});
 
+		var initialGridLoad = false;
+		function gridLoadComplete() {
+		    if(!initialGridLoad) {
+            	recompileDOM('taskListIdWrapper');
+            	initialGridLoad = true;
+            } else {
+                recompileDOM('taskListIdGrid');
+			}
+		};
+
 		function reloadGrid () {
 			var postData = $('#taskListIdGrid').jqGrid('getGridParam', 'postData');
 			postData.justRemaining = $('#justRemainingCB').is(':checked') ? 1 : 0;
 			postData.justMyTasks = $('#justMyTasksCB').is(':checked') ? 1 : 0;
 			postData.viewUnpublished = viewUnpublished ? 1 : 0;
 			$('#taskListId').trigger('reloadGrid').trigger('click')
-		}
+		};
 	</script>
 </head>
 <body>
