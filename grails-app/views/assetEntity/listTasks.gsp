@@ -23,7 +23,14 @@
 		div.content-wrapper {
 			background-color: #ecf0f5 !important;
 		}
-	</style>
+		/*TODO: TM-6499 Adding it here 'cause I don't want it as a part of the normal css*/
+		action-bar.checkboxContainer input[type=checkbox] {
+			margin-left: 10px;
+		}
+		action-bar.checkboxContainer label {
+			margin-left: 4px;
+		}
+</style>
 
 	<g:render template="../layouts/responsiveAngularResources" />
 
@@ -262,29 +269,25 @@
 			<span id="controlRowId">
 				<b>Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
-				&nbsp;&nbsp;
-				<span class="checkboxContainer">
+				<span class="checkboxContainer action-bar">
 					<input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" />
-					<label for="justRemainingCB" class="pointer"><b>&nbsp;Just Remaining</b></label>
+					<label for="justRemainingCB" class="pointer"><b>Just Remaining</b></label>
 				</span>
-				&nbsp;&nbsp;
-				<span class="checkboxContainer">
+				<span class="checkboxContainer action-bar">
 					<input type="checkbox" id="justMyTasksCB" class="pointer" ${ (justMyTasks=='1' ? 'checked="checked"' : '') } onclick="reloadGrid()"/>
-					<label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>
+					<label for="justMyTasksCB" class="pointer"><b>Just Mine</b></label>
 				</span>
-				&nbsp;&nbsp;
 				<tds:hasPermission permission="${Permission.TaskPublish}">
-					<span class="checkboxContainer">
+					<span class="checkboxContainer action-bar">
 						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/>
-						<label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>
+						<label for="viewUnpublishedCB" class="pointer"><b>View Unpublished</b></label>
 					</span>
 				</tds:hasPermission>
 
 				<span style="float: right">
 					<span style="margin-right: 30px;">
-						<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
-
-						<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
+						<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
+						<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>
 					</span>
 					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 				</span>
