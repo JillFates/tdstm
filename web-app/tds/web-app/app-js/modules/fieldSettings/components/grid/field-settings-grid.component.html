@@ -16,7 +16,7 @@
     [sort]="state.sort" (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
         <div class="col-xs-9 col-md-9 col-lg-7">
-            <button type="button" class="btn btn-default" id="btnSaveAll" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>
+            <button type="button" class="btn btn-default" id="btnSaveAll" [disabled]="!isEditAvailabe()" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>
             <button type="button" class="btn btn-default" id="btnCancel" (click)="onCancel()"><i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}</button>
         </div>
         <div *ngIf="isFilterDisabled; else filterControl" class="col-xs-5 col-md-6 col-lg-5"></div>
@@ -26,7 +26,7 @@
     </ng-template>
     <ng-template kendoGridToolbarTemplate [position]="'top'" #defaultToolbar>
         <div class="col-xs-4 col-md-3 col-lg-2">
-            <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> {{'GLOBAL.EDIT' | translate}}</button>
+            <button type="button" class="btn btn-default" id="btnEdit" [disabled]="!isEditAvailabe()" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> {{'GLOBAL.EDIT' | translate}}</button>
         </div>
         <div *ngIf="isFilterDisabled; else filterControl"></div>
     </ng-template>

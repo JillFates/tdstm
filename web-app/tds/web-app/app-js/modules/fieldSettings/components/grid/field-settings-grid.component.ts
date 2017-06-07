@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
 import { GridDataResult, DataStateChangeEvent, GridComponent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
 
@@ -46,7 +47,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	private availableTypes = ['String', 'Number', 'Boolean', 'Date', 'Array'];
 	private availableControls = ['Select List', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea'];
 	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
-	constructor(private fieldService: FieldSettingsService) { }
+
+	constructor(private fieldService: FieldSettingsService, private permissionService: PermissionService) { }
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
@@ -96,7 +98,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onSaveAll(): void {
-		if (this.fieldsSettings.filter(item =>
+		if (this.isEditAvailabe() && this.fieldsSettings.filter(item =>
 			!item.label || !item.field).length === 0) {
 			this.reset();
 			this.fieldsSettings.filter(x => x['isNew']).forEach(x => delete x['isNew']);
@@ -161,5 +163,9 @@ export class FieldSettingsGridComponent implements OnInit {
 			.sort((a, b) => a - b);
 		let number = custom.findIndex((item, i) => item !== i + 1);
 		return 'custom' + ((number === -1 ? custom.length : number) + 1);
+	}
+
+	protected isEditAvailabe(): boolean {
+		return this.permissionService.hasPermission('ProjectFieldSettingsEdit');
 	}
 }

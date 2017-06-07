@@ -25,7 +25,7 @@ export const fieldSettingListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 			menu: ['FIELD_SETTINGS.PROJECT_LIST', 'FIELD_SETTINGS.ASSET_FIELD_SETTING']
 		},
 		requiresAuth: true,
-		requiresPermission: 'FieldSettingsView'
+		requiresPermission: 'ProjectFieldSettingsView'
 	},
 	views: {
 		'headerView@tds': { component: HeaderComponent },

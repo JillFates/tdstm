@@ -9,50 +9,51 @@ import { SharedModule } from '../shared/shared.module';
 import { Observable } from 'rxjs/Rx';
 
 describe('PermissionService:', () => {
-    let fixture: ComponentFixture<EmptyComponent>;
-    let comp: EmptyComponent;
-    let permissionService: PermissionService;
-    let spyGet: jasmine.Spy;
+	let fixture: ComponentFixture<EmptyComponent>;
+	let comp: EmptyComponent;
+	let permissionService: PermissionService;
+	let spyGet: jasmine.Spy;
 
-    beforeEach(async(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpModule, SharedModule],
-            declarations: [EmptyComponent],
-            providers: []
-        }).compileComponents();
-    }));
+	beforeEach(async(() => {
+		TestBed.configureTestingModule({
+			imports: [HttpModule, SharedModule],
+			declarations: [EmptyComponent],
+			providers: []
+		}).compileComponents();
+	}));
 
-    beforeEach(() => {
-        fixture = TestBed.createComponent(EmptyComponent);
-        comp = fixture.componentInstance;
-        permissionService = fixture.debugElement.injector.get(PermissionService);
-        spyGet = spyOn(permissionService, 'getPermissions')
-            .and.callFake(() => {
-                let observable = Observable.from([{
-                    FieldSettingsView: 'FieldSettingsView'
-                }]);
-                observable.subscribe((res) => {
-                    permissionService.permissions = res;
-                });
-                return observable;
-            });
-    });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(EmptyComponent);
+		comp = fixture.componentInstance;
+		permissionService = fixture.debugElement.injector.get(PermissionService);
+		spyGet = spyOn(permissionService, 'getPermissions')
+			.and.callFake(() => {
+				let observable = Observable.from([{
+					ProjectFieldSettingsEdit: 'ProjectFieldSettingsEdit',
+					ProjectFieldSettingsView: 'ProjectFieldSettingsView'
+				}]);
+				observable.subscribe((res) => {
+					permissionService.permissions = res;
+				});
+				return observable;
+			});
+	});
 
-    it('should not have permissions at start and return false on permission method', () => {
-        expect(permissionService.permissions).toBeUndefined();
-        expect(spyGet.calls.any()).toBeFalsy();
-        expect(permissionService.hasPermission('FieldSettingsView')).toBeFalsy();
-    });
+	it('should not have permissions at start and return false on permission method', () => {
+		expect(permissionService.permissions).toBeUndefined();
+		expect(spyGet.calls.any()).toBeFalsy();
+		expect(permissionService.hasPermission('ProjectFieldSettingsView')).toBeFalsy();
+	});
 
-    it('should define permissions and return true on permission method', done => {
-        permissionService.getPermissions();
-        spyGet.calls.mostRecent().returnValue.subscribe(
-            (res) => {
-                expect(permissionService.permissions).toBeDefined();
-                expect(permissionService.hasPermission('FieldSettingsView')).toBeTruthy();
-                done();
-            }
-        );
-    });
+	it('should define permissions and return true on permission method', done => {
+		permissionService.getPermissions();
+		spyGet.calls.mostRecent().returnValue.subscribe(
+			(res) => {
+				expect(permissionService.permissions).toBeDefined();
+				expect(permissionService.hasPermission('ProjectFieldSettingsView')).toBeTruthy();
+				done();
+			}
+		);
+	});
 
 });

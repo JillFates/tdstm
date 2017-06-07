@@ -18,7 +18,8 @@ export class PermissionService {
 
 	getPermissions(): Observable<any> {
 		let observable = Observable.from([{
-			FieldSettingsView: 'FieldSettingsView'
+			ProjectFieldSettingsEdit: 'ProjectFieldSettingsEdit',
+			ProjectFieldSettingsView: 'ProjectFieldSettingsView'
 		}]);
 		observable.subscribe((res) => {
 			this.permissions = res;
