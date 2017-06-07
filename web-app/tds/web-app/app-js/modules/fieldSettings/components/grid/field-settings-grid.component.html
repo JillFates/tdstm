@@ -5,14 +5,15 @@
         </select>
     </div>
     <div class="col-xs-3 col-md-4 col-lg-4">
-        <input type="text" class="form-control" name="search" id="search" [(ngModel)]="filter.search" placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}" value="">
+        <input type="text" class="form-control" name="search" id="search" [(ngModel)]="filter.search" placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}"
+            value="">
     </div>
     <div class="col-xs-2 col-md-2 col-lg-1">
         <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
     </div>
 </ng-template>
-<kendo-grid #fieldSettingGrid="kendoGrid" [filter]="state.filter" [skip]="state.skip" [data]="gridData" [sortable]="sortable"
-    [sort]="state.sort" [pageSize]="state.take" [pageable]="{ pageSizes: [25, 100, 500, 1000], info: true}" (dataStateChange)="dataStateChange($event)">
+<kendo-grid #fieldSettingGrid="kendoGrid" style="height:70vh" [filter]="state.filter" [data]="gridData" [sortable]="sortable"
+    [sort]="state.sort" (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
         <div class="col-xs-9 col-md-9 col-lg-7">
             <button type="button" class="btn btn-default" id="btnSaveAll" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>

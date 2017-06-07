@@ -25,8 +25,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	};
 	private gridData: GridDataResult;
 	private state: State = {
-		skip: 0,
-		take: 25,
 		sort: [{
 			dir: 'asc',
 			field: 'order'
@@ -106,7 +104,6 @@ export class FieldSettingsGridComponent implements OnInit {
 				.subscribe((res) => this.refresh(true));
 		} else {
 			this.isSubmitted = true;
-			this.state.skip = 0;
 			this.refresh();
 		}
 	}
