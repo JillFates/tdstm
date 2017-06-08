@@ -4710,13 +4710,32 @@ class AssetEntityController implements ControllerMethods {
 
 		Integer durationInMinutes = task.durationInMinutes()
 		Integer nowGMTInMinutes = nowGMT.getTime() / 1000 / 60
-		Integer estimatedStartInMinutes = (task.estStart != null) ? task.estStart.getTime() / 1000 / 60 : null
-		Integer estimatedFinishInMinutes = (task.estFinish != null) ? task.estFinish.getTime() / 1000 / 60 : null
-		Integer actualStartInMinutes = (task.actStart != null) ? task.actStart.getTime() / 1000 / 60 : null
+
+		Date estStartTZ = null
+		Integer estimatedStartInMinutes = null
+		if (task.estStart != null) {
+			estStartTZ = TimeUtil.moveDateToUserTZ(task.estStart) // first, convert to user Timezone
+			estimatedStartInMinutes = estStartTZ.getTime() / 1000 / 60
+		}
+
+		Date estFinishTZ = null
+		Integer estimatedFinishInMinutes = null
+		if (task.estFinish != null) {
+			estFinishTZ = TimeUtil.moveDateToUserTZ(task.estFinish) // first, convert to user Timezone
+			estimatedFinishInMinutes = estFinishTZ.getTime() / 1000 / 60
+		}
+
+		Date actStartTZ = null
+		Integer actualStartInMinutes = null
+		if (task.actStart != null) {
+			actStartTZ = TimeUtil.moveDateToUserTZ(task.actStart) // first, convert to user Timezone
+			actualStartInMinutes = actStartTZ.getTime() / 1000 / 60
+		}
+
 
 		if (task.estStart && task.isActionable() && task.status != AssetCommentStatus.STARTED) {
 
-			if (task.estStart < nowGMT) {
+			if (estStartTZ < nowGMT) {
 				estStartClass = 'task_late'
 				estFinishClass = 'task_late'
 			} else {

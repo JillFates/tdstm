@@ -608,16 +608,66 @@ class TimeUtil {
 	}
 
 	/**
-	 * Used to adjust a Date from GMT to a specified Timezone
+	 * Used to adjust a Date from a specified Timezone to GMT
 	 * @param date  the date to adjust
-	 * @return The adjusted date
+	 * @param fromTZ - the timezone that the date was generated in
+	 * @return The date Timezone
 	 */
-	static Date moveDateToGMT(Date date, String toTZ) {
+	static Date moveDateToGMT(Date date, String fromTZ) {
+		if (fromTZ == defaultTimeZone) {
+			date
+		}
+		else {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date)
+			TimeZone fromTimeZone = TimeZone.getTimeZone(fromTZ);
+
+			// Apply the offset to move time to UTC
+			calendar.add(Calendar.MILLISECOND, fromTimeZone.getRawOffset() * -1)
+
+			if (fromTimeZone.inDaylightTime(calendar.getTime())) { // Apply time saving offset, if it exsist
+				calendar.add(Calendar.MILLISECOND, calendar.getTimeZone().getDSTSavings() * -1);
+			}
+			int year = calendar.get(Calendar.YEAR)
+			int month = calendar.get(Calendar.MONTH) + 1 // Calendar indexes months from 0-11 and not 1-12 as DateFormat, so we need to add 1 to construct a Date
+			int day = calendar.get(Calendar.DATE)
+			int hour = calendar.get(Calendar.HOUR_OF_DAY)
+			int minutes = calendar.get(Calendar.MINUTE)
+			SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME_25); // "MM/dd/yyyy hh:mm"
+			Date result = sdf.parse(month + '/' + day + '/' + year + ' ' + hour + ':' + minutes)
+			return result
+		}
+	}
+
+	/**
+	 * Used to adjust a Date from GMT to a specified Timezone
+	 * @param date - the date to move
+	 * @param toTZ -  the timezone that the date will be adjusted to
+	 * @return the adjusted date
+	 */
+	private static Date moveDateFromGMTToTZ(Date date, String toTZ) {
 		if (toTZ == defaultTimeZone) {
 			date
 		}
 		else {
-			moveDateToTZ(date, defaultTimeZone, toTZ)
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date)
+			TimeZone toTimeZone = TimeZone.getTimeZone(toTZ);
+
+			// Apply the offset to move GMT time to Timezone
+			calendar.add(Calendar.MILLISECOND, toTimeZone.getRawOffset())
+
+			if (toTimeZone.inDaylightTime(calendar.getTime())) { // Apply time saving offset, if it exsist
+				calendar.add(Calendar.MILLISECOND, calendar.getTimeZone().getDSTSavings());
+			}
+			int year = calendar.get(Calendar.YEAR)
+			int month = calendar.get(Calendar.MONTH) + 1 // Calendar indexes months from 0-11 and not 1-12 as DateFormat, so we need to add 1 to construct a Date
+			int day = calendar.get(Calendar.DATE)
+			int hour = calendar.get(Calendar.HOUR_OF_DAY)
+			int minutes = calendar.get(Calendar.MINUTE)
+			SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME_25); // "MM/dd/yyyy hh:mm"
+			Date result = sdf.parse(month + '/' + day + '/' + year + ' ' + hour + ':' + minutes)
+			return result
 		}
 	}
 
@@ -641,6 +691,29 @@ class TimeUtil {
 		formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
 		formatter.parse(dateFormatted)
 	}
+
+	/**
+	 * A TimeZone Shifter to adjust a date to the User Preference Timezone
+	 * @param date - the date to move
+	 * @return the adjusted date
+	 */
+	private static Date moveDateToUserTZ(Date date) {
+
+		if (date == null) {
+			return date
+		}
+		String userTimezone = userPreferenceService.timeZone
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT_DATE_TIME_15)
+		String localTimezone = formatter.getTimeZone().getID()
+
+		formatter.setTimeZone(TimeZone.getTimeZone(userTimezone))
+		String dateFormatted = formatter.format(date)
+
+		formatter.setTimeZone(TimeZone.getTimeZone(localTimezone))
+		Date result = formatter.parse(dateFormatted)
+		return result
+	}
+
 
 	/**
 	 * Creates a properly denominated TimeDuration object for the given time quantities

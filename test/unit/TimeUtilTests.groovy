@@ -11,6 +11,7 @@ import test.AbstractUnitSpec
 
 import java.sql.Timestamp
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 import static com.tdssrc.grails.TimeUtil.ABBREVIATED
 import static com.tdssrc.grails.TimeUtil.FULL
@@ -299,4 +300,28 @@ class TimeUtilTests extends AbstractUnitSpec {
 			// Testing with a null TimeDuration, including secs and millis.
 			TimeUtil.formatTimeDuration(null, true, true) == "00:00:00:00:00"
 	}
+
+	void 'Test moveDateToGMT(Date date, String fromTZ) and moveDateFromGMTToTZ(Date date, String toTZ)'() {
+
+		when: 'we move a java.util.Date from Japan Timezone (9 hours ahead of GMT) to GMT Time'
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyy hh");
+
+			Date originalDate = sdf.parse('06/20/2017 09') // Interpret this as Japan time, (GMT+9) (remember java.util.Date doesn't have Timezone info!)
+			Date expectedDate = sdf.parse('06/20/2017 00') // This Date should be returned when converted to GMT
+
+			String japanTimezone = 'Japan'
+			Date resultDate = TimeUtil.moveDateToGMT(originalDate, japanTimezone) // Move from Japan Timezone to GMT
+
+		then: 'The resultDate has a 9 hours less than the originalDate'
+			resultDate.compareTo(expectedDate) == 0
+
+		when: ' we move a java.util.Date from GMT to Japan Timezone (9 hours ahead of GMT)'
+			originalDate = sdf.parse('06/20/2017 00') // Interpret this as GMT (remember java.util.Date doesn't have Timezone info!)
+			expectedDate = sdf.parse('06/20/2017 09') // This Date should be returned when converted to GMT Japan time, (GMT+9)
+
+			resultDate = TimeUtil.moveDateFromGMTToTZ(originalDate, japanTimezone) // Move from GMT to Japan Timezone
+		then: 'The resultDate has a 9 hours more than the originalDate'
+			resultDate.compareTo(expectedDate) == 0
+	}
+
 }
