@@ -34,7 +34,11 @@
 						<td valign="top" class="name"><label for="asset">Asset:</label>&nbsp;<span class="error-msg" ng-show="form.assetEntity.$error.required"><b>*</b></span></td>
 						<td valign="top">
 							<select ng-model="commentInfo.currentAssetClass" ng-change="assetClassChanged()" ng-options="assetClass.key as assetClass.label for assetClass in commentInfo.assetClasses"></select>
-							<select ng-model="commentInfo.currentAsset"  ng-options="asset.id as asset.name for asset in commentInfo.assets"></select>
+							<!--<select ng-model="commentInfo.currentAsset"  ng-options="asset.id as asset.name for asset in commentInfo.assets"></select>-->
+							<div style="width:200px;display: inline-block;">
+							    <input type="hidden" id="currentAsset" name="commentInfo.currentAsset" ng-model="commentInfo.currentAsset" value="{{commentInfo.currentAsset}}" class="scrollSelect"
+							            data-asset-type="{{commentInfo.currentAssetClass}}" data-asset-id="{{commentInfo.currentAsset}}" data-asset-name="{{commentInfo.currentAssetName}}"/>
+                            </div>
 						</td>
 					</tr>
 					<tr ng-show="isEdit">

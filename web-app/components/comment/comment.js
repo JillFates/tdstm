@@ -564,11 +564,12 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 	$scope.commentInfo = []
 
 	$scope.commentInfo.currentAsset = parseInt((assetTO) ? assetTO.assetId : $scope.$root.selectedAsset)
+	$scope.commentInfo.currentAssetClass = assetTO && assetTO.assetType ? assetTO.assetType : null;
 
 	$scope.commentInfo.assetClasses = []
 
-	$scope.commentInfo.currentAssetClass = null
-	$scope.commentInfo.currentAsset = "";
+	//$scope.commentInfo.currentAssetClass = null
+	//$scope.commentInfo.currentAsset = "";
 	$scope.commentInfo.assets = []
 
 	$scope.assetClassChanged = function () {
