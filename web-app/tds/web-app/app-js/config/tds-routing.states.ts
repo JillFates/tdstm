@@ -7,6 +7,7 @@ import { TDSAppComponent } from './tds-app.component';
 import { UIRouter, TransitionService } from '@uirouter/core';
 import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
+import { PreferenceService } from '../shared/services/preference.service';
 // Services
 import { TaskService } from '../modules/taskManager/service/task.service';
 
@@ -26,6 +27,12 @@ export const tdsRoot = {
 			policy: { async: 'RXWAIT', when: 'EAGER' },
 			deps: [PermissionService],
 			resolveFn: (service: PermissionService) => service.getPermissions()
+		},
+		{
+			token: 'preferences',
+			policy: { async: 'RXWAIT', when: 'EAGER' },
+			deps: [PreferenceService],
+			resolveFn: (service: PreferenceService) => service.getPreference('CURR_DT_FORMAT')
 		}
 	]
 };

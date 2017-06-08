@@ -17,18 +17,17 @@ export class PermissionService {
 	}
 
 	getPermissions(): Observable<any> {
-		let observable = Observable.from([{
+		return Observable.from([{
 			ProjectFieldSettingsEdit: 'ProjectFieldSettingsEdit',
 			ProjectFieldSettingsView: 'ProjectFieldSettingsView',
 			NoticeCreate: 'NoticeCreate',
 			NoticeDelete: 'NoticeDelete',
 			NoticeEdit: 'NoticeEdit',
 			NoticeView: 'NoticeView'
-		}]);
-		observable.subscribe((res) => {
+		}]).map((res) => {
 			this.permissions = res;
+			return res;
 		});
-		return observable;
 	}
 
 	hasPermission(value: string): boolean {
