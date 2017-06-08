@@ -37,7 +37,9 @@
 		$(document).ready(function() {
 
 			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
-				reloadGrid();
+                if(this.updateTarget) {
+                    reloadGrid();
+                }
 				progressTimer.resetTimer();
 			});
 

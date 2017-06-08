@@ -474,13 +474,23 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		}, 50);
 	});
 
-	$scope.close = function() {
+	$scope.close = function(updateSuccess) {
 		commentUtils.closePopup($scope, 'editComment');
-		if (typeof timerBar !== 'undefined')
-			timerBar.attemptResume();
 
-		if (typeof progressTimer !== 'undefined')
-			progressTimer.attemptResume();
+        var updateTarget = false;
+        if(updateSuccess !== 'undefined' && updateSuccess) {
+            updateTarget = updateSuccess;
+        }
+
+        if (typeof timerBar !== 'undefined') {
+            timerBar.updateTarget = updateTarget;
+            timerBar.attemptResume();
+        }
+
+        if (typeof progressTimer !== 'undefined') {
+            progressTimer.updateTarget = updateTarget;
+            progressTimer.attemptResume();
+        }
 	};
 
 	$scope.$on('forceDialogClose', function(evt, types) {
@@ -492,7 +502,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 	$scope.deleteComment = function() {
 		commentUtils.validateDelete($scope.ac.commentId, $scope.ac.assetEntity, commentService.deleteComment).then(
 			function(data) {
-				$scope.close();
+				$scope.close(true);
 				$scope.$emit("commentDeleted", $scope.ac.commentId, $scope.ac.assetEntity);
 			}
 		);
@@ -643,7 +653,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 							if (data.error) {
 								alerts.addAlertMsg(data.error);
 							} else {
-								$scope.close();
+								$scope.close(true);
 								$scope.$emit("commentUpdated", $scope.ac.id, $scope.ac.assetEntity);
 								if ($scope.ac.assetEntity != $scope.acBackup.assetEntity) {
 									$scope.$emit("commentUpdated", $scope.ac.id, $scope.acBackup.assetEntity);
@@ -664,7 +674,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 								alerts.addAlertMsg(data.error);
 							} else {
 								var comment = commentUtils.commentTemplateFromCreateResponse(data, $scope.ac.assetEntity, $scope.ac.assetType);
-								$scope.close();
+								$scope.close(true);
 								$scope.$emit("commentCreated", comment.commentId, comment.assetEntity);
 								if (open == 'view') {
 									$scope.$emit("viewComment", commentUtils.commentTO(comment.commentId, comment.commentType), 'show');
