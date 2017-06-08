@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
 import groovy.json.StringEscapeUtils
+import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang3.StringUtils
 
 /**
@@ -340,5 +341,14 @@ class StringUtil {
 			result = "\"" + StringUtils.join(list , itemsDelimiter) + "\""
 		}
 		return result
+	}
+
+	/**
+	 * Decode a Base64 encoded string
+	 * @param str
+	 * @return
+	 */
+	static String base64DecodeToString(String str) {
+		return new String(Base64.decodeBase64(str))
 	}
 }
