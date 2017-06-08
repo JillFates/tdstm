@@ -1,7 +1,9 @@
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.CommentService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
+import org.quartz.TriggerKey
 import org.quartz.spi.MutableTrigger
 
 /**
@@ -48,14 +50,19 @@ class SendTaskEmailJob {
 					trigger.jobDataMap.putAll(map)
 					log.info "JobDataMap = $map"
 
+					//TM-6506 calling the 'getKey' accessor and assigning to a variable to enforce type and avoid groovy coersion
+					TriggerKey triggerKey = trigger.getKey()
+
 					// reschedule the job
-					context.scheduler.rescheduleJob(trigger.key, trigger)
+					context.scheduler.rescheduleJob(triggerKey, trigger)
 					log.info("Rescheduled job $trigger.key for ${nextFiringDate}")
 				}
 				else {
 					log.error "Gave up on waiting for task $taskId to create"
 				}
 			}
+		}catch (e) {
+			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 		}
 		finally {
 			GormUtil.releaseLocalThreadMemory()
