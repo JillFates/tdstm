@@ -5,6 +5,7 @@ import { NoticeFormComponent } from '../form/notice-form.component';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { ActionType } from '../../../../shared/model/action-type.enum';
+import { PermissionService } from '../../../../shared/services/permission.service';
 
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 import { process, State, FilterDescriptor } from '@progress/kendo-data-query';
@@ -48,7 +49,11 @@ export class NoticeListComponent {
 	 * @constructor
 	 * @param {NoticeService} noticeService
 	 */
-	constructor( @Inject('notices') notices, private noticeService: NoticeService, private dialogService: UIDialogService) {
+	constructor(
+		@Inject('notices') notices,
+		private noticeService: NoticeService,
+		private dialogService: UIDialogService,
+		private permissionService: PermissionService) {
 
 		this.moduleName = 'Notice List';
 		notices.subscribe(
@@ -128,6 +133,14 @@ export class NoticeListComponent {
 			});
 		}
 		this.gridData = process(this.noticeList, this.state);
+	}
+
+	protected isEditAvailable(): boolean {
+		return this.permissionService.hasPermission('NoticeEdit');
+	}
+
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission('NoticeCreate');
 	}
 
 }

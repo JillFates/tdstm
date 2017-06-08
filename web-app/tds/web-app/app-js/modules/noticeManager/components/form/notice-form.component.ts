@@ -1,14 +1,15 @@
-import {Component, ViewChild} from '@angular/core';
-import {FormControl} from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 
-import {NoticeModel} from '../../model/notice.model';
-import {NoticeService} from '../../service/notice.service';
+import { NoticeModel } from '../../model/notice.model';
+import { NoticeService } from '../../service/notice.service';
 
-import {ActionType} from '../../../../shared/model/action-type.enum';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
+import { ActionType } from '../../../../shared/model/action-type.enum';
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { RichTextEditorComponent } from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
+import { PermissionService } from '../../../../shared/services/permission.service';
 
 @Component({
 	moduleId: module.id,
@@ -26,13 +27,18 @@ export class NoticeFormComponent {
 		typeId: null, name: 'Select a Type'
 	};
 	typeDataSource: Array<any> = [
-		{typeId: 1, name: 'Prelogin'},
-		{typeId: 2, name: 'Postlogin'}
+		{ typeId: 1, name: 'Prelogin' },
+		{ typeId: 2, name: 'Postlogin' }
 	];
 
-	constructor(model: NoticeModel, public action: Number, public activeDialog: UIActiveDialogService, private noticeService: NoticeService) {
+	constructor(
+		model: NoticeModel,
+		public action: Number,
+		public activeDialog: UIActiveDialogService,
+		private noticeService: NoticeService,
+		private permissionService: PermissionService) {
 
-		this.model = {...model};
+		this.model = { ...model };
 	}
 
 	cancelCloseDialog(): void {
@@ -42,21 +48,21 @@ export class NoticeFormComponent {
 	deleteNotice(): void {
 		this.noticeService.deleteNotice(this.model)
 			.subscribe(
-				res => this.activeDialog.close(),
-				error => this.activeDialog.dismiss(error));
+			res => this.activeDialog.close(),
+			error => this.activeDialog.dismiss(error));
 	}
 
 	saveNotice(): void {
 		if (this.model.id) {
 			this.noticeService.editNotice(this.model)
 				.subscribe(
-					notice => this.activeDialog.close(notice),
-					error => this.activeDialog.dismiss(error));
+				notice => this.activeDialog.close(notice),
+				error => this.activeDialog.dismiss(error));
 		} else {
 			this.noticeService.createNotice(this.model)
 				.subscribe(
-					notice => this.activeDialog.close(notice),
-					error => this.activeDialog.dismiss(error));
+				notice => this.activeDialog.close(notice),
+				error => this.activeDialog.dismiss(error));
 
 		}
 
@@ -64,5 +70,15 @@ export class NoticeFormComponent {
 
 	formValid(): boolean {
 		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
+	}
+
+	protected isCreateEditAvailable(): boolean {
+		return this.action === 0 ?
+			this.permissionService.hasPermission('NoticeEdit') :
+			this.permissionService.hasPermission('NoticeEdit');
+	}
+
+	protected isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission('NoticeDelete');
 	}
 }
