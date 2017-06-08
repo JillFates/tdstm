@@ -6,6 +6,7 @@ import { HttpServiceProvider } from '../shared/providers/http-interceptor.provid
 // Shared Services
 import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
+import { PreferenceService } from '../shared/services/preference.service';
 import { UserService } from '../shared/services/user.service';
 import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
@@ -45,6 +46,7 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 	providers: [
 		AuthService,
 		PermissionService,
+		PreferenceService,
 		UserService,
 		NotifierService,
 		HttpServiceProvider,
