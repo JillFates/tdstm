@@ -93,7 +93,15 @@ $(document).ready(function() {
 	</table>
 </div>
 
-<div class="teamBreakdown toprightcontent">  	
+
+
+<g:if test="${teamTaskMatrix.size <= 5}" >
+    <div class="teamBreakdown toprightcontent smallTable">
+</g:if>
+<g:else>
+    <div class="teamBreakdown toprightcontent">
+</g:else>
+
 	<table style="border:none;">
 		<%-- 	
 			This section is going to iterate over the Team Task matrix of data to create the table of the team 

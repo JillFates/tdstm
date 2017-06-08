@@ -765,7 +765,10 @@ list-style-type:none;
 	padding: 2px;
 }
 .teamBreakdown.toprightcontent {
-	width: 650px;
+	width: 630px;
+}
+.teamBreakdown.toprightcontent.smallTable{
+	width: 300px;
 }
 .teamBreakdown {
 	margin-top:5px;
