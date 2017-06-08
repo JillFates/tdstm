@@ -7,10 +7,14 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder as LCH
 
 @CompileStatic
 class SettingService implements ServiceMethods {
     public static final String VERSION_KEY = "version"
+
+    MessageSource messageSource
 
     /**
      * Get project setting from database and return it as JSON
@@ -73,10 +77,8 @@ class SettingService implements ServiceMethods {
      */
     protected Setting getSetting(Project project, SettingType type, String key) {
         if (project) {
-            //return Setting.findByProjectAndTypeAndKey(project, type, key)
             return Setting.findWhere([project: project, type: type, key: key])
         } else {
-            //Setting.findByTypeAndKey(type, key)
             return Setting.findWhere([type: type, key: key])
         }
     }
@@ -90,10 +92,9 @@ class SettingService implements ServiceMethods {
     protected Map getSettingAsMap(Setting setting) {
         if (setting) {
             try {
-                def slurper = new JsonSlurper()
-                Map json = slurper.parseText(setting.json) as Map
-                json[VERSION_KEY] = setting.version
-                return json
+                JSONObject json = new JSONObject(setting.json)
+                json.put(VERSION_KEY, setting.version)
+                return json as Map
             } catch (Exception e) {
                 log.error(e.message, e)
                 return null
@@ -143,7 +144,7 @@ class SettingService implements ServiceMethods {
         if (setting) {
             // verify user is updating the right version of the setting
             if (setting.version != version) {
-                throw new DomainUpdateException("exception.DomainUpdateException.ChangeConflict")
+                throw new DomainUpdateException(messageSource.getMessage("exception.DomainUpdateException.ChangeConflict", null, LCH.getLocale()))
             }
         } else {
             setting = new Setting()
@@ -157,7 +158,7 @@ class SettingService implements ServiceMethods {
             setting.save()
         } catch (Exception e) {
             log.error(e.message, e)
-            throw new DomainUpdateException("Unable to save Setting.")
+            throw new DomainUpdateException("Unable to save Setting")
         }
     }
 
@@ -175,7 +176,7 @@ class SettingService implements ServiceMethods {
             return jsonBuilder.toString()
         } catch (Exception e) {
             log.error(e.message, e)
-            throw new InvalidParamException("JSON is not valid.")
+            throw new InvalidParamException("JSON is not valid")
         }
     }
 
