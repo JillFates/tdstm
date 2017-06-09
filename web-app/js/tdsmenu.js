@@ -68,9 +68,14 @@ function updatePersonDetails( e ){
 		$("#personDialog").dialog('option', 'width', 540);
 		$("#personDialog").dialog('option', 'modal', true);
 		$("#personDialog").dialog("open");
+
+        $('.ui-widget-overlay').addClass('old-legacy-content');
 	}
 }
 function changePersonDetails () {
+    var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+    var dateRegExpForExp = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
+
 	var returnVal = true 
 	var firstName = $("#firstNameId").val()
 	var oldPassword = $("#personDialog #oldPasswordId").val()
@@ -105,22 +110,32 @@ function changePersonDetails () {
 		}
 	}
 	if (returnVal) {
-		new Ajax.Request( tdsCommon.createAppURL('/person/updateAccount'), {
-			asynchronous:true,
-			evalScripts:true,
-			onComplete:function(e){ updateWelcome(e) },
-			parameters:'id=' + $('#personId').val() 
-				+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
-				+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #oldPasswordId').val()
-				+'&newPassword='+$('#personDialog #passwordId').val()
-				+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
-				+'&powerType='+powerType+'&startPage='+startPage
-		});
+
+		var parameters = 'id=' + $('#personId').val()
+        +'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
+        +'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #oldPasswordId').val()
+        +'&newPassword='+$('#personDialog #passwordId').val()
+        +'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
+        +'&powerType='+powerType+'&startPage='+startPage
+
+        jQuery.ajax({
+            url: tdsCommon.createAppURL('/person/updateAccount'),
+            type:'POST',
+			data: parameters,
+            success: function(response) {
+            	tdsCommon.prepareJQueryAjaxResponse(response);
+                updateWelcome(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("/person/updateAccount - " + errorThrown);
+            }
+        });
 	}
 }
 
 function updateWelcome( e ) {
-	var data = tdsCommon.isValidWsResponse(e, "An unexpected error occurred while attempting to perform the update.", false);
+	var data = tdsCommon.isJQueryAjaxResponse(e) ? tdsCommon.isValidWsJQueryAjaxResponse(e, "An unexpected error occurred while attempting to perform the update.", false)
+		: tdsCommon.isValidWsResponse(e, "An unexpected error occurred while attempting to perform the update.", false);
 	if (data !== false) {
 		$("#loginUserId").html(data.name)
 		$("#tzId").html(data.tz)

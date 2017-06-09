@@ -1,5 +1,6 @@
 package com.tdsops.ldap
 
+import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
 import net.transitionmanager.service.UserService
 import org.springframework.ldap.core.DirContextAdapter
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -31,6 +32,7 @@ class TdsLdapUserDetailsMapperSpec extends Specification {
         def mapper = new TdsLdapUserDetailsMapper()
         mapper.userService = Mock(UserService)
         mapper.userDetailsService = Mock(UserDetailsService)
+        mapper.preAuthenticationChecks = Mock(TdsPreAuthenticationChecks)
         mapper.ldap = config
         List<SimpleGrantedAuthority> ldapRoles = [new SimpleGrantedAuthority('APP_TMDEV_CLIENTMGR'), new SimpleGrantedAuthority('APP_TMDEV_EDITOR')]
 
