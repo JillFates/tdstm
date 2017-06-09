@@ -18,7 +18,7 @@ public abstract class SecureJob {
 	Map initialize(JobExecutionContext context) {
 		Map dataMap = context.mergedJobDataMap
 		String username = dataMap.getString('username')
-		Assert.hasText(username, 'Secure jobs must have username specified in job data.')
+		Assert.hasText(username, 'Secure jobs must have username specified in job data')
 
 		// Load the User context to in order to execute the job
 		securityService.assumeUserIdentity(username)

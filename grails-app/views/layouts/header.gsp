@@ -26,6 +26,32 @@
 
     <g:layoutHead />
 
+    <!-- ADDED SUPORT RIGHT MENU START -->
+    <g:javascript src="tdsmenu.js" />
+    <g:javascript src="PasswordValidation.js" />
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#personDialog").dialog({ autoOpen: false });
+            $("#userPrefDivId").dialog({ autoOpen: false });
+            $("#userTimezoneDivId").dialog({ autoOpen: false });
+
+            $('.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+            $('.ui-dialog').addClass('old-legacy-content');
+
+            $('.licensing-error-warning').popover({placement: 'bottom', container: 'body' });
+            $('.licensing-error-warning').click(function(event) { event.preventDefault(); });
+        });
+
+        function updateEventHeader( e ){
+            var newsAndStatus = eval("(" + e.responseText + ")")
+            $("#head_mycrawlerId").html(newsAndStatus[0].news);
+            $("#head_crawler").addClass(newsAndStatus[0].cssClass)
+            $("#moveEventStatus").html(newsAndStatus[0].status)
+        }
+
+    </script>
+    <!-- SUPORT RIGHT MENU END-->
 </head>
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
 <body class="hold-transition skin-blue layout-top-nav">
@@ -57,7 +83,7 @@
                     <g:render template="../layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                 </g:if>
                 <g:else>
-                    <g:render template="../layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
+                    <g:render template="../layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                 </g:else>
 
 
@@ -74,7 +100,9 @@
                             </a>
                         </li>
                         <li>
-                            <tds:licenseWarning />
+                            <g:if test="${!isLicenseManagerEnabled}">
+                                <tds:licenseWarning />
+                            </g:if>
                         </li>
                         <sec:ifLoggedIn>
                             <!-- User Account Menu -->
@@ -91,9 +119,9 @@
                                     <li class="user-body">
                                         <ul class="list-group">
                                             <li class="list-group-item"><g:remoteLink controller="person" action="retrievePersonDetails" id="${person?.id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink></li>
-                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
-                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference()"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
-                                        <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
+                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone();return false;"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
+                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();return false;"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
+                                            <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
                                         </ul>
                                     </li>
                                     <!-- Menu Footer-->
@@ -153,5 +181,17 @@
     </footer>
 </div>
 
+    <%-- DIV for editing User Profile --%>
+    <g:render template="../person/personEdit" model="[user:userLogin, minPasswordLength:minPasswordLength]" />
+
+    <%-- DIV for editing User Preferences --%>
+    <div id="userPrefDivId" style="display: none;" title="${tds.currentPersonName()} Preferences"></div>
+
+    <%-- DIV for editing User date and timezone --%>
+    <div id="userTimezoneDivId" style="display: none;" title="${tds.currentPersonName()} Date and Timezone"></div>
+
 </body>
 </html>
+<%
+    flash.remove('message');
+%>

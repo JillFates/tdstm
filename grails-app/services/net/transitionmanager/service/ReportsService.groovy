@@ -979,7 +979,7 @@ class ReportsService implements ServiceMethods {
 
 			// check for multiple starts
 			if (dfsMap.starts?.size() == 1) {
-				startsError = redSpan('Start Vertices: OK')
+				startsError = greenSpan('Start Vertices: OK')
 			} else if (dfsMap.starts?.size() == 0) {
 				eventErrorList << 'Tasks'
 				startsError = redSpan('Start Vertices: <br> No start task was found.')

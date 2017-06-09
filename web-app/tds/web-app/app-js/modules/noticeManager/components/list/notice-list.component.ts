@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, Inject, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { NoticeService } from '../../service/notice.service';
 import { NoticeModel } from '../../model/notice.model';
 import { NoticeFormComponent } from '../form/notice-form.component';
@@ -6,96 +6,128 @@ import { NoticeFormComponent } from '../form/notice-form.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { ActionType } from '../../../../shared/model/action-type.enum';
 
-import { GridComponent } from '@progress/kendo-angular-grid';
-import { SortDescriptor, orderBy } from '@progress/kendo-data-query';
+import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { process, State, FilterDescriptor } from '@progress/kendo-data-query';
 
 @Component({
-    moduleId: module.id,
-    selector: 'notice-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: '../../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html',
-    providers: [NoticeService]
+	moduleId: module.id,
+	selector: 'notice-list',
+	encapsulation: ViewEncapsulation.None,
+	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'
 })
 
-export class NoticeListComponent implements OnInit {
+export class NoticeListComponent {
 
-    private moduleName = '';
-    private title = '';
-    noticeList: NoticeModel[] = [];
-    sort: SortDescriptor[] = [{
-        dir: 'asc',
-        field: 'title'
-    }];
+	private moduleName = '';
+	private title = '';
+	private noticeList: NoticeModel[];
+	private gridData: GridDataResult;
+	private state: State = {
+		skip: 0,
+		take: 10,
+		sort: [{
+			dir: 'asc',
+			field: 'title'
+		}],
+		filter: {
+			filters: [
+				{ field: 'active', operator: 'eq', value: false }
+			],
+			logic: 'and'
+		}
+	};
+	private defaultItem: any = {
+		typeId: null, name: 'Select a Type'
+	};
+	private typeDataSource: Array<any> = [
+		{ typeId: 1, name: 'Prelogin' },
+		{ typeId: 2, name: 'Postlogin' }
+	];
 
-    ActionType: typeof ActionType = ActionType;
+	/**
+	 * @constructor
+	 * @param {NoticeService} noticeService
+	 */
+	constructor( @Inject('notices') notices, private noticeService: NoticeService, private dialogService: UIDialogService) {
 
-    @ViewChild(GridComponent) private grid: GridComponent;
+		this.moduleName = 'Notice List';
+		notices.subscribe(
+			(noticeList) => this.onLoadNoticeList(noticeList),
+			(err) => this.onLoadNoticeList([]));
+	}
 
-    /**
-     * @constructor
-     * @param {NoticeService} noticeService
-     */
-    constructor(private noticeService: NoticeService, private dialogService: UIDialogService) {
-        this.moduleName = 'Notice List';
-    }
+	/**
+	 * Get the Initial Notice List
+	 * @param noticeList
+	 */
+	private onLoadNoticeList(noticeList): void {
+		this.noticeList = noticeList.notices as NoticeModel[];
+		this.gridData = process(this.noticeList, this.state);
+	}
 
-    /**
-     * Get the Initial Notice List
-     * @param noticeList
-     */
-    private onLoadNoticeList(noticeList): void {
-        this.noticeList = orderBy(noticeList.notices as NoticeModel[], this.sort);
-    }
+	private getNoticeList(): void {
+		this.noticeService.getNoticesList().subscribe(
+			(noticeList) => this.onLoadNoticeList(noticeList),
+			(err) => this.onLoadNoticeList([]));
+	}
 
-    private getNoticeList(): void {
-        this.noticeService.getNoticesList().subscribe(
-            (noticeList) => this.onLoadNoticeList(noticeList),
-            (err) => this.onLoadNoticeList([]));
-    }
+	public reloadNoticeList(): void {
+		this.getNoticeList();
+	}
 
-    public reloadNoticeList(): void {
-        console.log(this.grid);
-        this.getNoticeList();
-    }
+	/**
+	 * Create a new Notice
+	 * @listens onCreateNotice
+	 */
+	public onCreateNotice(): void {
+		this.dialogService.open(NoticeFormComponent, [
+			{ provide: NoticeModel, useValue: new NoticeModel() },
+			{ provide: Number, useValue: ActionType.Create }
+		]).then(result => {
+			this.getNoticeList();
+		}, error => {
+			console.log(error);
+		});
+		console.log('Clicked on create notice');
+	}
 
-    /**
-     * Create a new Notice
-     * @listens onCreateNotice
-     */
-    public onCreateNotice(): void {
-        this.dialogService.open(NoticeFormComponent, [
-            { provide: NoticeModel, useValue: new NoticeModel() },
-            { provide: Number, useValue: ActionType.Create }
-        ]).then(result => {
-            this.getNoticeList();
-        }, error => {
-            console.log(error);
-        });
-        console.log('Clicked on create notice');
-    }
+	/**
+	 * Edit a Task
+	 * @listens onEditCreateNotice
+	 * @param {NoticeModel} dataItem
+	 */
+	public onEditNotice(dataItem: NoticeModel): void {
+		this.dialogService.open(NoticeFormComponent, [
+			{ provide: NoticeModel, useValue: dataItem as NoticeModel },
+			{ provide: Number, useValue: ActionType.Edit }
+		]).then(result => {
+			this.getNoticeList();
+		}, error => {
+			console.log(error);
+		});
+	}
 
-    /**
-     * Edit a Task
-     * @listens onEditCreateNotice
-     * @param {NoticeModel} dataItem
-     */
-    public onEditNotice(dataItem: NoticeModel): void {
-        this.dialogService.open(NoticeFormComponent, [
-            { provide: NoticeModel, useValue: dataItem as NoticeModel },
-            { provide: Number, useValue: ActionType.Edit }
-        ]).then(result => {
-            this.getNoticeList();
-        }, error => {
-            console.log(error);
-        });
-        console.log('Clicked on ', dataItem);
-    }
+	protected dataStateChange(state: DataStateChangeEvent): void {
+		this.state = state;
+		this.gridData = process(this.noticeList, this.state);
+	}
 
-    /**
-     * Initiates the Notice Module
-     */
-    ngOnInit(): void {
-        this.getNoticeList();
-    }
+	protected applyCustomFilter(value: number): void {
+		let index = this.state.filter.filters.findIndex(filter => {
+			let x = filter as FilterDescriptor;
+			return x.field === 'typeId';
+		});
+		if (index !== -1) {
+			this.state.filter.filters.splice(index, 1);
+		}
+		if (value) {
+			this.state.filter.filters.push({
+				field: 'typeId',
+				operator: 'eq',
+				value: value
+			});
+		}
+		this.gridData = process(this.noticeList, this.state);
+	}
 
 }

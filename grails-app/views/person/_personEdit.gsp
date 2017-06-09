@@ -3,7 +3,7 @@
   -- @params user - the user information
   --%>
 <%@page import="net.transitionmanager.security.Permission"%>
-<div id="personDialog" title="Edit Person" style="display:none;" class="static-dialog">
+<div id="personDialog" title="Edit Person" style="display:none;" class="static-dialog old-legacy-content">
 	<div class="dialog">
 		<table>
 		  <tbody>

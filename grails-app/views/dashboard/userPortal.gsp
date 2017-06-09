@@ -347,7 +347,7 @@
                     {
                         field: "startDate",
                         title: "Start Date",
-                        format: "{0:MM/dd/yyyy}"
+                        template:"#= moment(startDate).format(tdsCommon.defaultDateFormat())#"
                     }, {
                         field: "days",
                         title: "Days"
@@ -408,7 +408,7 @@
                     {
                         field: "date",
                         title: "Date",
-                        format: "{0:MM/dd/yyyy hh:mm tt}"
+                        template:"#= moment(date).format(tdsCommon.defaultDateTimeFormat())#"
                     }, {
                         field: "event",
                         title: "Event",
@@ -639,7 +639,8 @@
                     },
                     {
                         field: "lastActivity",
-                        title: "Latest Activity"
+                        title: "Latest Activity",
+                        template:"#= moment(lastActivity).format(tdsCommon.defaultDateTimeFormat())#"
                     }
                 ],
                 selectable: "row",

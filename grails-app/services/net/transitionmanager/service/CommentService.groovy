@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.MoveBundle
@@ -148,7 +149,7 @@ class CommentService implements ServiceMethods {
 					if (assetComment.status != params.currentStatus) {
 						log.warn "saveUpdateCommentAndNotes() user $currentUsername attempted to change task ($assetComment.id) status but was already changed"
 						// TODO - assignedTo may be changing at the same time, which is assigned below. Need to review this as it is a potential edge case.
-						Person whoDidIt = (assetComment.status == AssetCommentStatus.DONE) ? assetComment.resolvedBy : assetComment.assignedTo
+						Person whoDidIt = (assetComment.status == AssetCommentStatus.COMPLETED) ? assetComment.resolvedBy : assetComment.assignedTo
 						switch (assetComment.status) {
 							case AssetCommentStatus.READY:
 								// No need to error in this situation
@@ -163,7 +164,7 @@ class CommentService implements ServiceMethods {
 									errorMsg = "The task was previously STARTED by $whoDidIt"
 								}
 								break
-							case AssetCommentStatus.DONE:
+							case AssetCommentStatus.COMPLETED:
 								errorMsg = "The task was previously COMPLETED by $whoDidIt"
 								break
 							default:
@@ -582,6 +583,10 @@ class CommentService implements ServiceMethods {
 	@Transactional
 	def saveAndUpdateTaskDependency(def task, def dependent, def taskDepId, def depId) {
         String errorMsg = ''
+		/* This method is called from different places. Some send the taskDepId as a long,
+			while others send a string. Therefore, it's best to ensure the value is actually
+			a long. */
+		taskDepId = NumberUtil.toLong(taskDepId)
 		def taskDependency = TaskDependency.get(taskDepId)
 		if (taskDependency && taskDependency.predecessor.id != Long.parseLong(depId)) {
 			taskDependency.predecessor = dependent

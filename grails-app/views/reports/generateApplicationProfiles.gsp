@@ -12,8 +12,8 @@
 	<style type="text/css" media="print">
 	<%--Had given these css property in css file but was not reflecting. so defined in page itself--%>
 	@page {
-		size: auto; /* auto is the current printer page size */
-		margin: 0mm; /* this affects the margin in the printer settings */
+		size: landscape; /* auto is the current printer page size */
+		margin: 4mm; /* this affects the margin in the printer settings */
 	}
 
 	body {
@@ -24,6 +24,7 @@
 		page-break-inside: avoid;
 		-webkit-region-break-inside: avoid;
 		position: relative;
+		margin-left:0px !important;
 	}
 
 	div.onepage {

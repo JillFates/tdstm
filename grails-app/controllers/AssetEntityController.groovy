@@ -7,6 +7,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
@@ -110,17 +111,17 @@ class AssetEntityController implements ControllerMethods {
 			(AssetCommentStatus.READY):   AssetCommentStatus.list,
 			(AssetCommentStatus.STARTED): AssetCommentStatus.list,
 			(AssetCommentStatus.HOLD):    AssetCommentStatus.list,
-			(AssetCommentStatus.DONE):    AssetCommentStatus.list
+			(AssetCommentStatus.COMPLETED):    AssetCommentStatus.list
 		],
 		LIMITED: [
 			'*EMPTY*':                    [AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING, AssetCommentStatus.HOLD],
 			(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
 			(AssetCommentStatus.PENDING): [AssetCommentStatus.PENDING],
 			(AssetCommentStatus.READY):   [AssetCommentStatus.READY, AssetCommentStatus.STARTED,
-			                               AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
+			                               AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
 			(AssetCommentStatus.STARTED): [AssetCommentStatus.READY, AssetCommentStatus.STARTED,
-			                               AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
-			(AssetCommentStatus.DONE):    [AssetCommentStatus.DONE,  AssetCommentStatus.HOLD],
+			                               AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
+			(AssetCommentStatus.COMPLETED):    [AssetCommentStatus.COMPLETED,  AssetCommentStatus.HOLD],
 			(AssetCommentStatus.HOLD):    [AssetCommentStatus.HOLD]
 		]
 	]
@@ -742,8 +743,12 @@ class AssetEntityController implements ControllerMethods {
 			// Generate the results and save into the batch for historical reference
 			// log.debug "saveProcessResultsToBatch: theSheetName=$theSheetName, theResults = $theResults"
 			StringBuffer sprtbMsg = generateResults(theResults, theResults[theSheetName].skipped, [theSheetName], false)
-			dataTransferBatch.importResults = sprtbMsg.toString()
-			dataTransferBatch.save()
+			if (dataTransferBatch != null) {
+				dataTransferBatch.importResults = sprtbMsg.toString()
+				dataTransferBatch.save()
+			} else {
+				throw new Exception(sprtbMsg.toString())
+			}
 		}
 
 		setBatchId 0
@@ -1360,10 +1365,10 @@ class AssetEntityController implements ControllerMethods {
 
 		} catch(NumberFormatException e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-			forward action:forwardAction, params: [error: e]
+			forward action:forwardAction, params: [error: e.message]
 		} catch(Exception e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-			forward action:forwardAction, params: [error: e]
+			forward action:forwardAction, params: [error: e.message]
 		}
 	}
 
@@ -3477,7 +3482,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def taskList = taskService.genSelectForPredecessors(project, params.category, task, moveEventId)
+		def taskList = taskService.search(project, params.category, task, moveEventId)
 
 		if (format=='json') {
 			def list = []
@@ -3516,7 +3521,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def tasksData = taskService.genSelectForPredecessors(project, params.category, task, moveEventId, page, pageSize, filterDesc)
+		def tasksData = taskService.search(project, params.category, task, moveEventId, page, pageSize, filterDesc)
 
 		def list = []
 
@@ -4695,9 +4700,10 @@ class AssetEntityController implements ControllerMethods {
 	 * @param task : The task.
 	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
 	 * @param nowGMT : The actual time in GMT.
-	 * @return : A Map with estStartClass and estFinishClass.
+	 * @return : A Map with estStartClass and estFinishClass
+	 * @todo: refactor getEstimatedColumnsCSS into a service and create test cases
 	 */
-	Map getEstimatedColumnsCSS(AssetComment task, Date nowGMT) {
+	private Map getEstimatedColumnsCSS(AssetComment task, Date nowGMT) {
 
 		String estStartClass = ''
 		String estFinishClass = ''

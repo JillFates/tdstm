@@ -90,29 +90,35 @@ var akaUtil = (function ($) {
 			var duplicateOf = 'none'
 
 			// check if the AKA matches the parent's name
-			if (akaName == parentName)
-				duplicateOf = 'parent'
-			// check if the AKA matches another AKA on the list
-			else if (akaList.indexOf(akaName) != -1)
-				duplicateOf = 'local'
-			// if this AKA is new, check it's validity against other models on the server
-			else if (akaRow.attr('js-is-unique') == 'unknown')
-				duplicateOf = private.validateAkaOnServer(forWhom, akaRow, { 'alias': akaName, 'id': parentId, 'manufacturerId': manufacturerId, 'parentName': parentName })
-			// check if this AKA has previously been marked as invalid
-			else if (akaRow.attr('js-is-unique') == 'false')
-				duplicateOf = 'other'
-			// otherwise this AKA is not a duplicate
-			else
-				duplicateOf = 'none'
+			if (tdsCommon.compareStringsIgnoreCase(akaName, parentName)) {
+        duplicateOf = 'parent'
+        // check if the AKA matches another AKA on the list
+      } else if (tdsCommon.arrayContainsStringIgnoreCase(akaList, akaName)) {
+        duplicateOf = 'local'
+        // if this AKA is new, check it's validity against other models on the server
+      } else if (akaRow.attr('js-is-unique') == 'unknown') {
+        duplicateOf = private.validateAkaOnServer(forWhom, akaRow, {
+          'alias': akaName,
+          'id': parentId,
+          'manufacturerId': manufacturerId,
+          'parentName': parentName
+        });
+        // check if this AKA has previously been marked as invalid
+      } else if (akaRow.attr('js-is-unique') == 'false') {
+        duplicateOf = 'other'
+        // otherwise this AKA is not a duplicate
+      } else {
+        duplicateOf = 'none'
 
-			akaList.push(akaName)
-			public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom)
-		})
+        akaList.push(akaName)
+        public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom)
+      }
+		});
 
 		// if there are no AKAs left, enable the save button
 		if (akaList.size() == 0)
 			public.handleAkaForSaveButton(forWhom)
-	}
+	};
 
 	/**
 	 * Checks to see if an AKA exists on the server
@@ -198,20 +204,58 @@ var akaUtil = (function ($) {
  */
 function convertPowerType(value, whom) {
 	if (value == "Watts") {
-		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() : ($('#powerUse' + whom + 'Id').val() * 120)
-		var powerNameplate = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() : ($('#powerNameplate' + whom + 'Id').val() * 120)
-		var powerDesign = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() : ($('#powerDesign' + whom + 'Id').val() * 120)
-		$('#powerUse' + whom + 'Id').val(powerUsed);
-		$('#powerNameplate' + whom + 'Id').val(powerNameplate);
-		$('#powerDesign' + whom + 'Id').val(powerDesign);
+
+		/* =========
+			Power Max
+		 	========= */
+		var powerNameplate = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() * 120 : ($('#powerNameplate' + whom + 'Id').val() * 120)
+        $('#powerNameplate' + whom + 'Id').val(powerNameplate.toFixed(0));
+
+		/*	===========
+		 	Power Used
+		 	========== */
+        var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() * 120 : ($('#powerUse' + whom + 'Id').val() * 120)
+        $('#powerUse' + whom + 'Id').val(powerUsed.toFixed(0));
+
+        /*	============
+		 	Power Design
+		 	============ */
+		var powerDesign = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() * 120 : ($('#powerDesign' + whom + 'Id').val() * 120)
+        $('#powerDesign' + whom + 'Id').val(powerDesign.toFixed(0));
+
+        updateHiddenPowerValues(whom, powerNameplate, powerUsed, powerDesign);
+
 	} else if (value == "Amps") {
-		var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
-		$('#powerUse' + whom + 'Id').val(powerUseA.toFixed(1));
+
+		/* 	=========
+        	Power Max
+		 	========= */
 		var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0') ? $('#powerNameplateIdH').val() / 120 : ($('#powerNameplate' + whom + 'Id').val() / 120);
 		$('#powerNameplate' + whom + 'Id').val(powerNameplateA.toFixed(1));
+
+		/*	===========
+		 	Power Used
+		 	========== */
+        var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val() / 120 : ($('#powerUse' + whom + 'Id').val() / 120);
+        $('#powerUse' + whom + 'Id').val(powerUseA.toFixed(1));
+
+		/*	============
+			 Power Design
+			 ============ */
 		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() != '0') ? $('#powerDesignIdH').val() / 120 : ($('#powerDesign' + whom + 'Id').val() / 120);
 		$('#powerDesign' + whom + 'Id').val(powerDesignA.toFixed(1));
+
+		updateHiddenPowerValues(whom, powerNameplateA, powerUseA, powerDesignA);
+
 	}
+}
+
+function updateHiddenPowerValues(whom, powerNameplate, powerUse, powerDesign){
+    if (whom == 'Edit'){
+        $('#powerNameplateIdH').val(powerNameplate)
+        $('#powerUseIdH').val(powerUse);
+        $("#powerDesignIdH").val(powerDesign);
+    }
 }
 
 
@@ -333,24 +377,28 @@ function changePowerValue(whom) {
 	var namePlatePower = $("#powerNameplate" + whom + "Id").val()
 	var powerDesign = $("#powerDesign" + whom + "Id").val()
 	var powerUse = $("#powerUse" + whom + "Id").val()
-	if (powerDesign == "" || powerDesign == 0 || powerDesign == 0.0) {
-		$("#powerDesign" + whom + "Id").val(parseInt(namePlatePower) * 0.5)
-		if (whom == 'Edit')
-			$("#powerDesignIdH").val(parseInt(namePlatePower) * 0.5)
-	}
-	if (powerUse == "" || powerUse == 0 || powerUse == 0.0) {
-		$("#powerUse" + whom + "Id").val(parseInt(namePlatePower) * 0.33)
-		if (whom == 'Edit')
-			$("#powerUseIdH").val(parseInt(namePlatePower) * 0.33)
-	}
+
+    var powerUseV = (parseInt(namePlatePower) * 0.33);
+    $("#powerUse" + whom + "Id").val(powerUseV);
+
+	var powerDesignV = (parseInt(namePlatePower) * 0.5);
+	$("#powerDesign" + whom + "Id").val(powerDesignV);
+
+    updateHiddenPowerValues(whom, namePlatePower, powerUseV, powerDesignV);
 }
 
 function setStanderdPower(whom) {
 	var namePlatePower = $("#powerNameplate" + whom + "Id").val()
 	var powerDesign = $("#powerDesign" + whom + "Id").val()
 	var powerUse = $("#powerUse" + whom + "Id").val()
-	$("#powerDesign" + whom + "Id").val((parseInt(namePlatePower) * 0.5).toFixed(0))
-	$("#powerUse" + whom + "Id").val((parseInt(namePlatePower) * 0.33).toFixed(0))
+
+    var powerUseV = (parseInt(namePlatePower) * 0.33);
+    $("#powerUse" + whom + "Id").val(powerUseV) ;
+
+	var powerDesignV = (parseInt(namePlatePower) * 0.5);
+	$("#powerDesign" + whom + "Id").val(powerDesignV);
+
+	updateHiddenPowerValues(whom, namePlatePower, powerUseV, powerDesignV);
 }
 
 function compareOrMerge() {

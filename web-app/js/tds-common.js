@@ -52,17 +52,60 @@ var tdsCommon = {
 		return str.charAt(0).toUpperCase() + str.substring(1);
 	},
 
+	// Compare 2 strings
+	// @param string1 the string to compare
+	// @param string2 the string to compare
+	// @param ignoreCase whether to use case sensitive comparison
+	// @param useLocale whether to use host's current locale while comparing strings
+  compareStrings: function(string1, string2, ignoreCase, useLocale) {
+  	if (ignoreCase) {
+    	if (useLocale) {
+      	string1 = string1.toLocaleLowerCase();
+      	string2 = string2.toLocaleLowerCase();
+    	} else {
+      	string1 = string1.toLowerCase();
+      	string2 = string2.toLowerCase();
+    	}
+  	}
+  	return string1 === string2;
+	},
+
+	// Compare 2 strings using case insensitive
+  // @param string1 the string to compare
+  // @param string2 the string to compare
+  compareStringsIgnoreCase: function(string1, string2) {
+		return this.compareStrings(string1, string2, true, false);
+	},
+
+	arrayStringIndexIgnoreCase: function(array, string1) {
+		var $this = this;
+    var index = -1;
+    if(array && array.length) {
+      array.some(function (element, i) {
+        if ($this.compareStringsIgnoreCase(string1, element)) {
+          index = i;
+          return true;
+        }
+      });
+    }
+    return index;
+	},
+
+  arrayContainsStringIgnoreCase: function(array, string1) {
+    return this.arrayStringIndexIgnoreCase(array, string1) >= 0;
+	},
+
     /**
 	 * Applies a more smooth delay, extending the setTimeout
      * @returns {Function}
      */
-    delayEvent:  (function(){
-        var timer = 0;
-        return function(callback, ms){
-            clearTimeout (timer);
-            timer = setTimeout(callback, ms);
-        };
-    })(),
+	delayEvent: (function () {
+		var timer = 0;
+		return function (callback, ms) {
+			clearTimeout(timer);
+			timer = setTimeout(callback, ms);
+		};
+	})(),
 
 	/**
 	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was 
@@ -81,8 +124,8 @@ var tdsCommon = {
 					if (dialog.length > 0) {
 						// Need to close any Select2 controls that might still be open
 						var select2 = dialog.find('.select2-container');
-						if(select2 && select2.length > 0) {
-                            dialog.find('.select2-container').select2('close');
+						if (select2 && select2.length > 0) {
+							dialog.find('.select2-container').select2('close');
 						}
 
 						if (!dialog.hasClass('static-dialog')) {
@@ -142,6 +185,47 @@ var tdsCommon = {
 
 		return (isValid ? data : false);
 	},
+
+    /**
+	 * Since we are upgrading some ajax calls to use jQuery.ajax() instead of prototype.Ajax()
+     * we need to support also response models by jQuery.ajax() returns;
+	 *
+     * @param response
+     * @param errorMsg
+     * @param alerts
+     */
+	isValidWsJQueryAjaxResponse: function (response, errorMsg, alerts) {
+        var isValid = false;
+        var data = false;
+
+        if (response.status != 200 && response.status !== 'success') {
+            this.displayWsError(response, errorMsg, alerts);
+        } else {
+            isValid = (response.status == 'success');
+            if (isValid) {
+                if (response.data) {
+                    // Remove the nested data structure to just return the data
+                    data = response.data;
+                }
+            } else {
+                if (response.errors) {
+                    alert(response.errors);
+                } else {
+                    alert("An error occurred while updating and/or updating information");
+                }
+            }
+        }
+
+        return (isValid ? data : false);
+    },
+
+	prepareJQueryAjaxResponse: function(response){
+        response.isJQueryAjax = true;
+	},
+
+    isJQueryAjaxResponse: function(response){
+        return response.isJQueryAjax === true;
+    },
 
 	/**
 	 * A common error response handler that display different errors base on http status
@@ -434,6 +518,16 @@ var tdsCommon = {
 	timeZone: function () {
 		var tz = $("#tzId").val();
 		return tz;
+	},
+
+	addNextDayKendoGridFilter: function (grid, field, value) {
+		var nextDay = moment(value).add(1, 'd').toDate();
+		grid.dataSource._filter.filters.push({
+			field: field,
+			operator: "lt",
+			value: nextDay
+		});
+		grid.thead.find('tr th:first').trigger('click');
 	}
 
 }
@@ -454,9 +548,11 @@ var UserPreference = function () {
 			success: function (e) {
 				var prefDialog = $("#userTimezoneDivId")
 				prefDialog.html(e);
-				prefDialog.dialog('option', 'width', 'auto')
-				prefDialog.dialog('option', 'modal', true)
-				prefDialog.dialog("open")
+				prefDialog.dialog('option', 'width', 'auto');
+				prefDialog.dialog('option', 'modal', true);
+				prefDialog.dialog("open");
+
+                $('.ui-widget-overlay').addClass('old-legacy-content');
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while attempting to update task/comment")
@@ -473,11 +569,13 @@ var UserPreference = function () {
 				var prefDialog = $("#userPrefDivId")
 				var pageHeight = Math.max($(window).outerHeight(), 200)
 				prefDialog.html(e)
-				prefDialog.dialog('option', 'width', 'auto')
-				prefDialog.dialog('option', 'maxHeight', pageHeight)
-				prefDialog.dialog('option', 'containment', 'body')
-				prefDialog.dialog('option', 'modal', true)
-				prefDialog.dialog("open")
+				prefDialog.dialog('option', 'width', 'auto');
+				prefDialog.dialog('option', 'maxHeight', pageHeight);
+				prefDialog.dialog('option', 'containment', 'body');
+				prefDialog.dialog('option', 'modal', true);
+				prefDialog.dialog("open");
+
+                $('.ui-widget-overlay').addClass('old-legacy-content');
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while attempting to update task/comment")
@@ -511,10 +609,6 @@ var UserPreference = function () {
 		});
 	}
 
-	// resets the user's preferences to their default values
-	var resetTimezonePrefs = function (user) {
-		resetPreference(user, true)
-	}
 
 	// closes the preference dialog then refreshes the page
 	var changeResetMessage = function (e) {
@@ -527,13 +621,19 @@ var UserPreference = function () {
 
 	// removes the specified preference for the current user
 	var removeUserPrefs = function (prefCode) {
-		new Ajax.Request('/tdstm/person/removeUserPreference?prefCode=' + prefCode, {
-			asynchronous: true,
-			evalScripts: true,
-			onSuccess: function (e) {
-				$("#pref_" + prefCode).remove()
-			}
-		})
+
+		jQuery.ajax({
+            url: '/tdstm/person/removeUserPreference?prefCode=' + prefCode,
+            success: function(response) {
+            	if(response === 'true'){
+                    $("#pref_" + prefCode).remove();
+				}
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("/tdstm/person/removeUserPreference - " + errorThrown);
+            }
+        });
+
 	}
 
 	return {
@@ -542,8 +642,7 @@ var UserPreference = function () {
 		savePreferences: savePreferences,
 		resetPreference: resetPreference,
 		changeResetMessage: changeResetMessage,
-		removeUserPrefs: removeUserPrefs,
-		resetTimezonePrefs: resetTimezonePrefs
+		removeUserPrefs: removeUserPrefs
 	}
 }();
 
@@ -563,11 +662,11 @@ $.fn.serializeObject = function () {
 	return o;
 };
 
-(function($) {
-    $.fn.focusToEnd = function() {
-        return this.each(function() {
-            var v = $(this).val();
-            $(this).focus().val("").val(v);
-        });
-    };
+(function ($) {
+	$.fn.focusToEnd = function () {
+		return this.each(function () {
+			var v = $(this).val();
+			$(this).focus().val("").val(v);
+		});
+	};
 })(jQuery);

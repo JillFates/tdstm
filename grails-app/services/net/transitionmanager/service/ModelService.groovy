@@ -2,20 +2,18 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WebUtil
 import grails.transaction.Transactional
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ModelAlias
-import net.transitionmanager.domain.ModelConnector
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.*
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.hibernate.criterion.CriteriaSpecification
-import org.hibernate.criterion.Order
 
 class ModelService implements ServiceMethods {
 
@@ -71,10 +69,12 @@ class ModelService implements ServiceMethods {
 			ModelAlias.executeUpdate('DELETE ModelAlias WHERE model=?', [fromModel])
 
 			fromModelAlias.each {
-				toModel.findOrCreateAliasByName(it.name, true)
+				//toModel.findOrCreateAliasByName(it.name, true)
+				findOrCreateAliasByName(toModel, it.name, true)
 			}
 			//merging fromModel as AKA of toModel
-			toModel.findOrCreateAliasByName(fromModel.modelName, true)
+			//toModel.findOrCreateAliasByName(fromModel.modelName, true)
+			findOrCreateAliasByName(toModel, fromModel.modelName, true)
 
 			// Delete model record
 			fromModel.delete()
@@ -218,6 +218,45 @@ class ModelService implements ServiceMethods {
 			jdbcTemplate.queryForList(query.toString())
 		}
 	}
+
+	/**
+	 * 1. Model name must be unique within same manufacturer
+	 * 2. Model name must not duplicate any AKA name of the same manufacturer
+	 *
+	 * @param modelName
+	 * @param modelId
+	 * @param manufacturerId
+	 * @return
+	 */
+	boolean isValidName(String modelName, Long modelId, Long manufacturerId) {
+		// rule #1
+		int count = Model.where {
+			modelName == modelName
+			manufacturer.id == manufacturerId
+			if (modelId) {
+				id != modelId
+			}
+		}.count()
+
+		if (count == 0) {
+			// rule #2
+			count = ModelAlias.where {
+				name == modelName
+				manufacturer.id == manufacturerId
+			}.count()
+
+			if (count == 0) {
+				return true
+			} else {
+				String error = "Model name (${modelName}) duplicates an existing AKA."
+				throw new ServiceException(error)
+			}
+
+		} else {
+			String error = "Model name (${modelName}) is not unique within the same manufacturer."
+			throw new ServiceException(error)
+		}
+	}
 	
 	/**
 	 * Validates whether the given alias is valid for the given model
@@ -262,9 +301,220 @@ class ModelService implements ServiceMethods {
 		
 		if (modelsWithAlias)
 			return false
-		
-		
+
 		// if all the tests were passes, this is a valid alias
 		return true
 	}
+
+	boolean save(Model model, GrailsParameterMap params) {
+		if (isValidName(model.modelName, model.id, model.manufacturerId) && model.save(flush: true)) {
+			int connectorCount = params.int("connectorCount", 0)
+			if (connectorCount > 0) {
+				for (int i = 1; i <= connectorCount; i++) {
+					def modelConnector = new ModelConnector(model: model,
+							connector: params['connector' + i],
+							label: params['label' + i],
+							type: params['type' + i],
+							labelPosition: params['labelPosition' + i],
+							connectorPosX: params.int("connectorPosX${i}", 0),
+							connectorPosY: params.int("connectorPosY${i}", 0),
+							status: params['status' + i])
+
+					if (!modelConnector.hasErrors())
+						modelConnector.save(flush: true)
+				}
+			} else {
+				def powerConnector = new ModelConnector(model: model,
+						connector: 1,
+						label: "Pwr1",
+						type: "Power",
+						labelPosition: "Right",
+						connectorPosX: 0,
+						connectorPosY: 0,
+						status: "missing"
+				)
+
+				if (!powerConnector.save(flush: true)) {
+					def errText = "Unable to create Power Connectors for ${model} " +
+							GormUtil.allErrorsString(powerConnector)
+					log.warn(errText)
+				}
+			}
+
+			model.sourceTDSVersion = 1
+			model.save(flush: true)
+			List<String> akaNames = params.list('aka')
+			akaNames.each { aka ->
+				if (!StringUtil.isBlank(aka)) {
+					findOrCreateAliasByName(model, aka, true)
+				}
+			}
+			return true
+		} else {
+			return false
+		}
+	}
+
+	boolean update(Model model, GrailsParameterMap params) {
+		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true)) {
+			String deletedAka = params.deletedAka
+			if (deletedAka) {
+				List<Long> maIds = deletedAka.split(",").collect() { it as Long }
+				ModelAlias.executeUpdate("delete ModelAlias where id in :maIds", [maIds: maIds])
+			}
+
+			def modelAliasList = ModelAlias.findAllByModel(model)
+			modelAliasList.each { modelAlias ->
+				modelAlias.name = params["aka_${modelAlias.id}"]
+				if (!modelAlias.save()) {
+					modelAlias.errors.allErrors.each { log.error it }
+				}
+			}
+
+			List<String> akaToSave = params.list('aka')
+			akaToSave.each { String aka ->
+				findOrCreateAliasByName(model, aka, true)
+			}
+
+			def connectorCount = params.int("connectorCount", 0)
+			if (connectorCount > 0) {
+				for(int i=1; i<=connectorCount; i++) {
+					def connector = params["connector${i}"]
+					ModelConnector modelConnector = ModelConnector.findByModelAndConnector(model, connector ?: i)
+					if (!connector && modelConnector) {
+						modelConnector.delete(flush:true)
+					} else {
+						if (modelConnector) {
+							modelConnector.connector = connector
+							modelConnector.label = params["label${i}"]
+							modelConnector.type = params["type${i}"]
+							modelConnector.labelPosition = params["labelPosition${i}"]
+							modelConnector.connectorPosX = params.int("connectorPosX${i}", 0)
+							modelConnector.connectorPosY = params.int("connectorPosY${i}", 0)
+							modelConnector.status = params["status${i}"]
+						} else if (connector) {
+							modelConnector = new ModelConnector(
+									model: model,
+									connector: connector,
+									label: params["label${i}"],
+									type: params["type${i}"],
+									labelPosition: params["labelPosition${i}"],
+									connectorPosX: params.int("connectorPosX${i}", 0),
+									connectorPosY: params.int("connectorPosY${i}", 0),
+									status: params["status${i}"])
+						}
+						if (modelConnector && !modelConnector.hasErrors()) {
+							modelConnector.save(flush: true)
+						}
+					}
+				}
+			}
+
+			def assetEntitiesByModel = AssetEntity.findAllByModel(model)
+			def assetConnectors = ModelConnector.findAllByModel(model)
+			assetEntitiesByModel.each { assetEntity ->
+				assetConnectors.each { connector ->
+					def assetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort(assetEntity, connector)
+					if (!assetCableMap) {
+						assetCableMap = new AssetCableMap(
+								cable : "Cable"+connector.connector,
+								assetFrom: assetEntity,
+								assetFromPort : connector,
+								cableStatus : connector.status,
+								cableComment : "Cable"+connector.connector)
+					}
+					if (assetEntity?.rackTarget && connector.type == "Power" &&
+							connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower) {
+						assetCableMap.assetToPort = null
+						assetCableMap.toPower = "A"
+						assetCableMap.cableStatus= connector.status
+						assetCableMap.cableComment= "Cable"
+					}
+					if (!assetCableMap.validate() || !assetCableMap.save()) {
+						def errText = "Unable to create assetCableMap for assetEntity $assetEntity" +
+								GormUtil.allErrorsString(assetCableMap)
+						log.error(errText)
+					}
+				}
+
+				def assetCableMaps = AssetCableMap.findAllByAssetFrom(assetEntity)
+				assetCableMaps.each {assetCableMap ->
+					if (!assetConnectors.id?.contains(assetCableMap.assetFromPort?.id)) {
+						AssetCableMap.executeUpdate('''
+									update AssetCableMap
+									set cableStatus=?, assetTo=null, assetToPort=null
+									where assetToPort=?
+								''', [AssetCableStatus.UNKNOWN, assetCableMap.assetFromPort])
+						AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = :aeId", [aeId: assetCableMap.assetFromPort?.id])
+					}
+				}
+			}
+
+			// <SL> should we use AssetEntityService?
+			AssetEntity.executeUpdate("update AssetEntity ae set ae.assetType = :at where ae.model.id = :mId", [at: model.assetType, mId: model.id])
+
+			if (model.sourceTDSVersion) {
+				model.sourceTDSVersion ++
+			} else {
+				model.sourceTDSVersion = 1
+			}
+			model.save(flush: true)
+
+			return true
+		} else {
+			return false
+		}
+	}
+
+	boolean delete(Model model) {
+		AssetEntity modelRef = AssetEntity.findByModel(model)
+		if (!modelRef) {
+			if (model) {
+				UserLogin user = securityService.userLogin
+				Person person = user?.person
+
+				// <SL> should we use AssetEntityService?
+				AssetEntity.executeUpdate('update AssetEntity set model=null where model.id = :modelId', [modelId: model.id])
+				ModelAlias.executeUpdate('delete ModelAlias where model.id = :modelId', [modelId: model.id])
+				model.delete(flush: true)
+
+				// <SL> Could this be a function?
+				if (user) {
+					int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus : 0
+					person.modelScoreBonus = bonusScore + 1
+					int score = person.modelScore ?: 0
+					person.modelScore = score+bonusScore
+				}
+
+				if (!person.save(flush:true)) {
+					person.errors.allErrors.each { log.error it }
+				}
+
+				return true
+			} else {
+				throw new ServiceException("Model not found with Id.")
+			}
+		} else{
+			throw new ServiceException("Model ${model} can not be deleted, it is referenced.")
+		}
+	}
+
+	/**
+	 * Get a ModelAlias object by name and create one (optionally) if it doesn't exist
+	 * @param name  name of the model alias
+	 * @param createIfNotFound  optional flag to indicating if record should be created (default false)
+	 */
+	ModelAlias findOrCreateAliasByName(Model model, String name, boolean createIfNotFound = false) {
+		name = name.trim()
+		ModelAlias alias = ModelAlias.findByNameAndModel(name, model)
+		if (!alias && createIfNotFound) {
+			def isValid = isValidAlias(name, model)
+			alias = new ModelAlias(name: name, model: model, manufacturer: model.manufacturer)
+			if (!isValid || !alias.save()) {
+				throw new ServiceException("AKA or Model with same name already exist: ${name}")
+			}
+		}
+		alias
+	}
+
 }

@@ -180,7 +180,7 @@ class DataTransferBatchController implements ControllerMethods {
 
 			result.add(
 				batchId: entry.id,
-				importedAt: TimeUtil.formatDateTime(entry.dateCreated, formatter),
+				importedAt: entry.dateCreated,
 				importedBy: entry.userLogin?.person ? entry.userLogin.person.firstName + ' ' + entry.userLogin.person.lastName : '',
 				attributeSet: entry.dataTransferSet?.title ?: '',
 				class: domainName,

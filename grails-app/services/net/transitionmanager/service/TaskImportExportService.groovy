@@ -65,6 +65,23 @@ class TaskImportExportService implements ServiceMethods {
 		val?.toString()
 	}
 
+	/**
+	 * Returns a String representation of a Move Event.
+	 * If val is a String, it means the value is coming from the UI and nothing has to be done.
+	 * If it's a MoveEvent instance, we're recording the change before updating the task in the DB.
+	 */
+	static final xfrmMoveEventToString = { val, options ->
+		String result = ''
+		if(val){
+			if (val instanceof String) {
+				result = val
+			} else {
+				result = val.name
+			}
+		}
+		return result
+	}
+
 	// Transformer that is used to populate the spreadsheet using the user's TZ
 	static final xfrmDateTimeToString = { val, options ->
 		if (val == null) return ''
@@ -190,7 +207,7 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Created By', template:changeTmpl('createdBy')],
 
 		moveEvent				: [type: 'string', ssPos:26, formPos:27, domain: 'A', width:120, locked:false, modifiable:true,
-										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmString, foreignKey: true],
+										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmMoveEventToString, foreignKey: true],
 
 		batchId 				: [type:'number', ssPos:27, formPos:28, domain:'C', width:80, locked: false,
 										label: 'Batch Id', transform:xfrmString, template:changeTmpl('batchId')],

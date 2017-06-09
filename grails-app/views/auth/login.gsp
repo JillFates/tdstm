@@ -1,4 +1,4 @@
-<%@page expressionCodec="none" %>
+<%@page import="com.tdsops.common.security.spring.TdsHttpSessionRequestCache; com.tdsops.common.security.SecurityUtil" expressionCodec="none" %>
 <!DOCTYPE>
 <html lang="en">
 <head>
@@ -170,9 +170,12 @@
 				</div>
 			</g:each>
 		</g:if>
-		<g:if test="${session['sessionExpired'] == true}">
+		<g:if test="${session[TdsHttpSessionRequestCache.SESSION_EXPIRED] == true}">
 			<h1 class="login-box-msg message">Your session has expired. Please log in.</h1>
 		</g:if>
+		<g:elseif test="${session[SecurityUtil.ACCOUNT_LOCKED_OUT] == true}">
+			<h1 class="login-box-msg message"><g:message code="userLogin.inactivityLockout.message"/></h1>
+		</g:elseif>
 		<g:else>
 			<h1 class="login-box-msg">Sign in to start your session</h1>
 		</g:else>

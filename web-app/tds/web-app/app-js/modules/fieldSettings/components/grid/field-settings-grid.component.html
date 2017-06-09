@@ -1,0 +1,52 @@
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab_1" data-toggle="tab">Application</a></li>
+        <li><a href="#tab_2" data-toggle="tab">Device</a></li>
+        <li><a href="#tab_3" data-toggle="tab">Database</a></li>
+        <li><a href="#tab_3" data-toggle="tab">Logical Storage</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1">
+            <kendo-grid [filter]="state.filter" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort" [pageSize]="state.take"
+                        [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
+                <ng-template kendoGridToolbarTemplate [position]="'top'">
+                    <div class="col-xs-3 col-md-2 col-lg-1">
+                        <button type="button" class="btn btn-default" id="btnEdit" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> Edit</button>
+                    </div>
+                    <div class="col-xs-6 col-md-4">
+                        <input type="text" class="form-control" name="search" id="search" [(ngModel)]="search" placeholder="Enter field name to filter">
+                    </div>
+                    <div class="col-xs-3 col-md-2 col-lg-1">
+                        <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()">Filter</button>
+                    </div>
+                </ng-template>
+                <kendo-grid-column field="key" title="Field"></kendo-grid-column>
+                <kendo-grid-column field="label" title="Label"></kendo-grid-column>
+                <kendo-grid-column field="shared" title="Shared" filter="boolean">
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                        {{dataItem.shared | tdsUIBoolean}}
+                    </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="required" title="Required" filter="boolean">
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                        {{dataItem.required | tdsUIBoolean}}
+                    </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="display" title="Display" filter="boolean">
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                        {{dataItem.display | tdsUIBoolean}}
+                    </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="default" title="Default Value"></kendo-grid-column>
+                <kendo-grid-column field="control" title="Control"></kendo-grid-column>
+                <kendo-grid-column field="help" title="Tooltip Help"></kendo-grid-column>
+            </kendo-grid>
+        </div><!-- /.tab-pane -->
+        <div class="tab-pane" id="tab_2">
+        </div><!-- /.tab-pane -->
+        <div class="tab-pane" id="tab_3">
+        </div><!-- /.tab-pane -->
+        <div class="tab-pane" id="tab_4">
+        </div><!-- /.tab-pane -->
+    </div><!-- /.tab-content -->
+</div>

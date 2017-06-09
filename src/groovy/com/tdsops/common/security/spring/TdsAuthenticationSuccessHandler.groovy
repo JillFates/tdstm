@@ -1,6 +1,7 @@
 package com.tdsops.common.security.spring
 
 import com.tdsops.common.builder.UserAuditBuilder
+import com.tdsops.common.security.SecurityUtil
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.transaction.Transactional
@@ -19,9 +20,6 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 
-/**
- * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
- */
 @CompileStatic
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
 
@@ -38,46 +36,45 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				'This workflow expects an UsernamePasswordAuthorityAuthenticationToken instance here')
 
 		try {
+			String redirectUri
 			UsernamePasswordAuthorityAuthenticationToken authentication = (UsernamePasswordAuthorityAuthenticationToken) auth
 
 			UserLogin userLogin = securityService.userLogin
-
 			auditService.saveUserAudit UserAuditBuilder.login()
 
-			userService.updateLastLogin()
+			if (securityService.shouldLockoutAccount(userLogin)) {
+				// lock account
+				userService.lockoutAccountByInactivityPeriod(userLogin)
+				setAccountLockedOutAttribute(request)
+				redirectUri = '/auth/login'
+			} else {
+				userService.updateLastLogin(userLogin)
+				userService.resetFailedLoginAttempts(userLogin)
+				userService.setLockedOutUntil(userLogin, null)
 
-			// checkFailsCount
+				String userAgent = authentication.userAgent
+				boolean browserTestiPad = userAgent.toLowerCase().contains('ipad')
+				boolean browserTest = userAgent.toLowerCase().contains('mobile')
 
-			// most of the work for this check is done in the failure handler; here just
-			// reset the count to zero after a successful authentication
-			if (userLogin.failedLoginAttempts) {
-				userLogin.failedLoginAttempts = 0
-			}
-
-			String userAgent = authentication.userAgent
-			boolean browserTestiPad = userAgent.toLowerCase().contains('ipad')
-			boolean browserTest = userAgent.toLowerCase().contains('mobile')
-
-			String redirectUri
-			if (browserTest) {
-				if (browserTestiPad) {
-					redirectUri = '/projectUtil'
+				if (browserTest) {
+					if (browserTestiPad) {
+						redirectUri = '/projectUtil'
+					} else {
+						redirectUri = '/task/listUserTasks?viewMode=mobile'
+					}
+				} else {
+					redirectUri = authentication.savedUrlForwardURI ?:
+							authentication.targetUri ?:
+									requestCache.getRequest(request, response)?.redirectUrl ?:
+											redirectToPrefPage()
 				}
-				else {
-					redirectUri = '/task/listUserTasks?viewMode=mobile'
-				}
-			}
-			else {
-				redirectUri = authentication.savedUrlForwardURI ?:
-				              authentication.targetUri ?:
-				              requestCache.getRequest(request, response)?.redirectUrl ?:
-				              redirectToPrefPage()
+
+				removeAttributeFromSession(request, TdsHttpSessionRequestCache.SESSION_EXPIRED)
+				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
 			}
 
-			removeSessionExpiredAttribute(request)
 			redirectStrategy.sendRedirect request, response, redirectUri
-		}
-		finally {
+		} finally {
 			// always remove the saved request
 			requestCache.removeRequest request, response
 		}
@@ -113,14 +110,26 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 	}
 
 	/**
-	 * Removes TdsHttpSessionRequestCache.SESSION_EXPIRED attribute from session after a successful login.
-	 * TM-6060
+	 * Set account locked session flag used to show message in login screen
 	 * @param request
 	 */
-	private void removeSessionExpiredAttribute(HttpServletRequest request) {
+	private void setAccountLockedOutAttribute(HttpServletRequest request) {
 		HttpSession session = request.getSession()
-		if (session && session[TdsHttpSessionRequestCache.SESSION_EXPIRED]) {
-			session.removeAttribute(TdsHttpSessionRequestCache.SESSION_EXPIRED)
+		if (session) {
+			session.setAttribute(SecurityUtil.ACCOUNT_LOCKED_OUT,  true)
 		}
 	}
+
+	/**
+	 * Removes an attribute from session
+	 * @param request
+	 * @param attribute
+	 */
+	private void removeAttributeFromSession(HttpServletRequest request, String attribute) {
+		HttpSession session = request.getSession()
+		if (session && session[attribute]) {
+			session.removeAttribute(attribute)
+		}
+	}
+
 }

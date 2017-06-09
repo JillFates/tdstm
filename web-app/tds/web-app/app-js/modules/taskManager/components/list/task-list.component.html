@@ -3,25 +3,26 @@
     <section>
         <div>
             <div class="box-body box-with-empty-header">
-                <kendo-grid [kendoGridBinding]="taskList" [pageSize]="10" [pageable]="{ pageSizes: true, info: true}"  >
-                    <kendo-grid-toolbar>
-                        <button type="button" class="btn btn-default kendo-grid-toolbar__add-btn" (click)="onCreateTask()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Task</button> <div (click)="reloadNoticeList()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
-                    </kendo-grid-toolbar>
+                <kendo-grid [kendoGridBinding]="taskList" [pageSize]="10" [pageable]="{ pageSizes: true, info: true}">
+                    <ng-template kendoGridToolbarTemplate [position]="'top'">
+                        <button type="button" class="btn btn-default kendo-grid-toolbar__add-btn" (click)="onCreateTask()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'TASK_MANAGER.CREATE_TASK' | translate }}</button>
+                        <div (click)="reloadNoticeList()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
                     <kendo-grid-column title="Action" [width]="80">
-                        <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                             <button class="btn btn-default" (click)="onEditCreateNotice(ActionType.Edit, dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
-                        </template>
+                        </ng-template>
                     </kendo-grid-column>
                     <kendo-grid-column field="title" title="Title"></kendo-grid-column>
                     <kendo-grid-column field="type" title="Type">
-                        <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                             {{((dataItem.typeId === 1 )? 'Prelogin' : 'Postlogin')}}
-                        </template>
+                        </ng-template>
                     </kendo-grid-column>
                     <kendo-grid-column field="active" title="Active">
-                        <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                             {{dataItem.active | tdsUIBoolean}}
-                        </template>
+                        </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
             </div>

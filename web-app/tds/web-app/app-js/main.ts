@@ -10,13 +10,13 @@ import 'zone.js/dist/zone';
 // TODO: disable for production
 import 'zone.js/dist/long-stack-trace-zone';
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { enableProdMode } from '@angular/core';
-import { environment } from './environment/environment';
-import { TDSAppModule } from './config/tds-app.module';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {enableProdMode} from '@angular/core';
+import {environment} from './environment/environment';
+import {TDSAppModule} from './config/tds-app.module';
 
 if (environment.production) {
-    enableProdMode();
+	enableProdMode();
 }
 
 // Compile and launch the module

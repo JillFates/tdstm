@@ -158,4 +158,14 @@ class WsAssetController implements ControllerMethods {
 		}
 	}
 
+	@HasPermission(Permission.AssetView)
+	def getAsset(Long id){
+		AssetEntity asset = AssetEntity.get(id)
+		if(asset) {
+			renderSuccessJson([result: asset])
+		} else {
+			response.status = 404 //Not Found
+			render "${id} not found."
+		}
+	}
 }

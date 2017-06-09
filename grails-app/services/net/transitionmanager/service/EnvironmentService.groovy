@@ -17,13 +17,17 @@ class EnvironmentService implements InitializingBean, ServiceMethods {
 	void afterPropertiesSet() {
 		Resource resource = grailsApplication.mainContext.getResource(grailsApplication.config.tdsops.buildFile)
 		if (resource) {
-			build = resource.inputStream.text
+			build = (resource?.inputStream.text.trim()) ?: ""
 		}
 		version = Metadata.current['tdstm.application.version']
 	}
 
 	// gets the version and build data as a string
 	String getVersionText() {
-		"Version $version ($build)"
+		String versionText = "Version $version"
+		if(build) {
+			versionText = "$versionText ($build)"
+		}
+		return versionText
 	}
 }

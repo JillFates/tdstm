@@ -37,6 +37,7 @@
 	<field name="commentType" class="java.lang.String"/>
 	<field name="owner" class="java.lang.String"/>
 	<field name="previousNote" class="java.lang.String"/>
+	<field name="userDateFormatter" class="java.text.DateFormat"/>
 	<background>
 		<band/>
 	</background>
@@ -212,7 +213,7 @@
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$F{occuredAt}]]></textFieldExpression>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{userDateFormatter}.format($F{occuredAt})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="679" y="0" width="85" height="20"/>

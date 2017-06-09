@@ -3,27 +3,32 @@
     <section>
         <div>
             <div class="box-body box-with-empty-header">
-                <kendo-grid [kendoGridBinding]="noticeList" [sortable]="{ mode:'single' }" [(sort)]="sort" 
-                    [pageSize]="10" [pageable]="{ pageSizes: true, info: true}">
-                    <kendo-grid-toolbar>
-                        <button type="button" class="btn btn-default kendo-grid-toolbar__add-btn" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Notice</button>
+                <kendo-grid [filterable]="true" [filter]="state.filter" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort"
+                    [pageSize]="state.take" [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
+                    <ng-template kendoGridToolbarTemplate [position]="'top'">
+                        <button type="button" class="btn btn-default kendo-grid-toolbar__add-btn" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE_MANAGER.CREATE_NOTICE' | translate }}</button>
                         <div (click)="reloadNoticeList()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
-                    </kendo-grid-toolbar>
+                    </ng-template>
                     <kendo-grid-column title="Action" [width]="80">
-                        <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                             <button class="btn btn-default" (click)="onEditNotice(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
-                        </template>
+                        </ng-template>
                     </kendo-grid-column>
                     <kendo-grid-column field="title" title="Title"></kendo-grid-column>
-                    <kendo-grid-column field="type" title="Type">
-                        <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <kendo-grid-column field="typeId" title="Type">
+                        <ng-template kendoGridFilterCellTemplate>
+                            <kendo-dropdownlist [defaultItem]="defaultItem" [data]="typeDataSource" [textField]="'name'" [valueField]="'typeId'" [valuePrimitive]="true"
+                                id="selectType" class="form-control" (valueChange)="applyCustomFilter($event)">
+                            </kendo-dropdownlist>
+                        </ng-template>
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                             {{((dataItem.typeId === 1 )? 'Prelogin' : 'Postlogin')}}
-                        </template>
+                        </ng-template>
                     </kendo-grid-column>
-                    <kendo-grid-column field="active" title="Active">
-                        <template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <kendo-grid-column field="active" title="Active" filter="boolean">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                             {{dataItem.active | tdsUIBoolean}}
-                        </template>
+                        </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
             </div>

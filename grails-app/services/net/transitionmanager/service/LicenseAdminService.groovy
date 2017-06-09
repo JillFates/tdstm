@@ -18,8 +18,8 @@ import net.sf.ehcache.Element
 import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
-import org.apache.commons.lang.time.DateUtils
 import net.transitionmanager.domain.PartyGroup
+import org.apache.commons.lang3.time.DateUtils
 import org.springframework.core.io.Resource
 
 
@@ -40,11 +40,12 @@ class LicenseAdminService extends LicenseCommonService {
 
 	/**
 	 * Initialize the license service
+	 * @param force force the reinitialization of the Service (userd in testing)
 	 * @return
 	 */
-	def initialize() {
+	def initialize(boolean force = false) {
 		log.debug("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
-		if(isEnabled() && !loaded) {
+		if(force || isEnabled() && !loaded) {
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
 
@@ -91,30 +92,32 @@ class LicenseAdminService extends LicenseCommonService {
 			String password = grailsApplication.config.tdstm.license.password
 			log.debug("Admin Key: '{}', password: '{}'", keyFile, password)
 
-			File file = new File(keyFile)
+			if(keyFile) {
+				File file = new File(keyFile)
 
-			//if the file doesn't exists load from the web-app resources
-			if(!file.exists()){
-				Resource resource = grailsApplication.parentContext.getResource(keyFile)
-				if(resource.exists()) {
-					file = resource.file
+				//if the file doesn't exists load from the web-app resources
+				if (!file.exists()) {
+					Resource resource = grailsApplication.parentContext.getResource(keyFile)
+					if (resource.exists()) {
+						file = resource.file
+					}
 				}
+
+				TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
+
+				// BEGIN: License Admin Configuration //
+
+				LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
+				LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
+				LicenseManagerProperties.setLicenseProvider(licenseProvider)
+				LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
+				// should we set a different password per client?
+				LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
+				// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
+				LicenseManagerProperties.setCacheTimeInMinutes(24 * 60)
+
+				LicenseManager.getInstance()
 			}
-
-			TDSPasswordProvider tdsPasswordProvider = new TDSPasswordProvider(password)
-
-			// BEGIN: License Admin Configuration //
-
-			LicenseManagerProperties.setPublicKeyDataProvider(new FilePublicKeyDataProvider(file))
-			LicenseManagerProperties.setPublicKeyPasswordProvider(tdsPasswordProvider)
-			LicenseManagerProperties.setLicenseProvider(licenseProvider)
-			LicenseManagerProperties.setLicensePasswordProvider(tdsPasswordProvider)
-			// should we set a different password per client?
-			LicenseManagerProperties.setLicenseValidator(new TDSLicenseValidator())
-			// Optional; defaults to 0, which translates to a 10-second (minimum) cache time
-			LicenseManagerProperties.setCacheTimeInMinutes(24 * 60)
-
-			LicenseManager.getInstance()
 
 			// END: License Admin Configuration //
 
@@ -473,7 +476,8 @@ class LicenseAdminService extends LicenseCommonService {
 
 			lic = new DomainLicense()
 			lic.owner = owner
-			lic.requestDate = new Date()
+			//since we are representing this as JSON we get rid of the millisecond part
+			lic.requestDate = DateUtils.truncate(new Date(), Calendar.SECOND)
 			lic.status = DomainLicense.Status.PENDING
 			lic.method = DomainLicense.Method.MAX_SERVERS
 			lic.installationNum = getInstallationId()

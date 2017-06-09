@@ -128,37 +128,71 @@ class TimeUtilTests extends AbstractUnitSpec {
 		expect: """Iterating through the various date/datetime formats that the createFormatterForType method returns
 				a valid DateFormat object for both the middle-endian and little-endian date formats """
 
-		TimeUtil.createFormatterForType(TimeUtil.MIDDLE_ENDIAN, formatName) instanceof DateFormat
-		TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, formatName) instanceof DateFormat
+		def testDate = new Date()
+
+		testDate.clearTime()
+		testDate.set(year: 2017, month: 9, date: 5)
+		testDate.setHours(14)
+		testDate.setMinutes(15)
+		testDate.setSeconds(30)
+		
+
+		TimeUtil.createFormatterForType(userPrefFormat, formatName).format(testDate) == formatResult
 
 		where:
-		formatName                   | formatValue
-		TimeUtil.FORMAT_DATE         | "MM/dd/yyyy"
-		TimeUtil.FORMAT_DATE_TIME    | "MM/dd/yyyy hh:mm a"
-		TimeUtil.FORMAT_DATE_TIME_2  | "MM-dd-yyyy hh:mm:ss a"
-		TimeUtil.FORMAT_DATE_TIME_3  | "E, d MMM 'at ' HH:mma"
-		TimeUtil.FORMAT_DATE_TIME_4  | "MM/dd kk:mm"
-		TimeUtil.FORMAT_DATE_TIME_5  | "yyyyMMdd"
-		TimeUtil.FORMAT_DATE_TIME_6  | "yyyy-MM-dd"
-		TimeUtil.FORMAT_DATE_TIME_7  | "dd-MMM"
-		TimeUtil.FORMAT_DATE_TIME_8  | "MMM dd,yyyy hh:mm a"
-		TimeUtil.FORMAT_DATE_TIME_9  | "MM-dd-yyyy hh:mm a"
-		TimeUtil.FORMAT_DATE_TIME_10 | "MMM dd"
-		TimeUtil.FORMAT_DATE_TIME_11 | "yyyy/MM/dd hh:mm:ss a"
-		TimeUtil.FORMAT_DATE_TIME_12 | "MM-dd-yyyy"
-		TimeUtil.FORMAT_DATE_TIME_13 | "MM/dd kk:mm:ss"
-		TimeUtil.FORMAT_DATE_TIME_14 | "yyyy-MM-dd hh:mm"
-		TimeUtil.FORMAT_DATE_TIME_15 | "yyyy-MM-dd HH:mm:ss"
-		TimeUtil.FORMAT_DATE_TIME_16 | "yyyy-MM-dd hh:mm a"
-		TimeUtil.FORMAT_DATE_TIME_17 | "MM/dd"
-		TimeUtil.FORMAT_DATE_TIME_18 | "M/d"
-		TimeUtil.FORMAT_DATE_TIME_19 | "M/d kk:mm"
-		TimeUtil.FORMAT_DATE_TIME_20 | "hh:mm"
-		TimeUtil.FORMAT_DATE_TIME_21 | "mm/dd"
-		TimeUtil.FORMAT_DATE_TIME_22 | "MM/dd/yyyy hh:mm:ss a"
-		TimeUtil.FORMAT_DATE_TIME_23 | "MM/dd/yy"
-		TimeUtil.FORMAT_DATE_TIME_24 | "MM/dd/yyyy hh:mm:ss"
-		TimeUtil.FORMAT_DATE_TIME_25 | "MM/dd/yyyy hh:mm"
+		userPrefFormat			| formatName					| formatResult
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE			| "10/05/2017"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE			| "05/10/2017"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME		| "10/05/2017 02:15 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME		| "05/10/2017 02:15 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_2	| "10-05-2017 02:15:30 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_2	| "05-10-2017 02:15:30 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_3	| "Thu, 5 Oct at  02:15 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_3	| "Thu, 5 Oct at  02:15 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_4	| "10/05 14:15"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_4	| "05/10 14:15"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_5	| "20171005"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_5	| "20171005"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_6	| "2017-10-05"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_6	| "2017-10-05"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_7	| "Oct-05"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_7	| "05-Oct"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_8	| "Oct 05,2017 02:15 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_8	| "05 Oct 2017 02:15 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_9	| "10-05-2017 02:15 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_9	| "05-10-2017 02:15 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_10	| "Oct 05"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_10	| "05 Oct"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_11	| "2017/10/05 02:15:30 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_11	| "2017/10/05 02:15:30 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_12	| "10-05-2017"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_12	| "05-10-2017"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_13	| "10/05 14:15:30"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_13	| "05/10 14:15:30"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_14	| "2017-10-05 02:15"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_14	| "2017-10-05 02:15"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_15	| "2017-10-05 14:15:30"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_15	| "2017-10-05 14:15:30"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_16	| "2017-10-05 02:15 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_16	| "2017-10-05 02:15 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_17	| "10/05"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_17	| "05/10"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_18	| "10/5"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_18	| "5/10"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_19	| "10/5 14:15"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_19	| "10/5 14:15"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_20	| "02:15"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_20	| "02:15"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_21	| "15/05"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_21	| "05/15"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_22	| "10/05/2017 02:15:30 PM"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_22	| "05/10/2017 02:15:30 PM"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_23	| "10/05/17"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_23	| "05/10/17"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_24	| "10/05/2017 02:15:30"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_24	| "05/10/2017 02:15:30"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_25	| "10/05/2017 02:15"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_25	| "05/10/2017 02:15"
 	}
 
 	//

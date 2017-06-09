@@ -56,11 +56,6 @@
 	                        <tr>
 								<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 							</tr>
-                        	<tr class="prop">
-	                            <td class="name">Project:</td>
-	                            
-	                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
-                        	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b></label>

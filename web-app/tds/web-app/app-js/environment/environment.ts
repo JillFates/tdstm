@@ -3,5 +3,5 @@
  * @type {{production: boolean}}
  */
 export const environment = {
-    production: false
+	production: false
 };

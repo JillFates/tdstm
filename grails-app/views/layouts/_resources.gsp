@@ -14,7 +14,6 @@
 <link rel="stylesheet" href="${resource(dir: 'dist/css', file: 'TDSTMLayout.min.css')}">
 <!-- General Template Style -->
 <link rel="stylesheet" href="${resource(dir: 'tds/web-app/css', file: 'style.css')}">
-
 <!-- Blue Skin -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
@@ -25,12 +24,37 @@
 <![endif]-->
 
 <!-- jQuery -->
-<script src="${resource(dir: 'dist/js/vendors/jquery/dist', file: 'jquery.min.js')}"></script>
-<script  src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
-  integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
-  crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.5/jquery.tinymce.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.5/themes/modern/theme.min.js"></script>
+<!-- LEGACY CODE START -->
+
+<link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'main.css')}"/>
+<link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds.css')}"/>
+
+<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${resource(dir: 'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness', file: 'jquery-ui-1.8.15.custom.css')}"/>
+
+<g:javascript src="jquery-1.9.1.js"/>
+<g:javascript src="jquery-1.9.1-ui.js"/>
+<%
+    def moveEvent = tds.currentMoveEvent() ?: null
+%>
+
+<g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
+    <g:javascript src="crawler.js" />
+</g:if>
+<g:javascript src="moment.min.js" />
+<g:javascript src="moment-timezone-with-data.min.js" />
+<g:javascript src="daterangepicker.js" />
+<g:javascript src="tds-common.js" />
+<g:javascript src="timezone/jquery.maphilight.min.js" />
+<g:javascript src="timezone/jquery.timezone-picker.min.js" />
+<g:javascript src="person.js"/>
+
+<script type="text/javascript">
+    var contextPath = "${request.contextPath}";
+    var currentMenuId = '';
+</script>
+
+<script src="${resource(dir: 'tds/node_modules/tinymce', file: 'tinymce.min.js')}"></script>
+<script src="${resource(dir: 'tds/node_modules/tinymce/themes/modern', file: 'theme.min.js')}"></script>
 <!-- LEGACY CODE END -->
 
 <!-- Boosttrap -->
