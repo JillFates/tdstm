@@ -71,53 +71,51 @@ var akaUtil = (function ($) {
 	 */
 	public.validateAllAka = function (forWhom) {
 		// get the parent's name and id, along with the manufacturer's id if this is a model AKA
-		var parentName, parentId, manufacturerId
-		if (forWhom == 'model') {
-			parentName = $('#modelNameId').val()
-			parentId = $('input#modelId').val()
-			manufacturerId = $('#manufacturerId').val()
+		var parentName, parentId, manufacturerId;
+		if (forWhom === 'model') {
+			parentName = $('#modelNameId').val();
+			parentId = $('input#modelId').val();
+			manufacturerId = $('#manufacturerId').val();
 		} else {
-			parentName = $('#name').val()
-			parentId = $('input#manufacturerId').val()
+			parentName = $('#name').val();
+			parentId = $('input#manufacturerId').val();
 		}
 
 		// iterate through all the AKAs, performing the necessary validation on each one
-		var akaList = []
+		var akaList = [];
 		$("#addAkaTableId > tr").each(function (i, row) {
-			var akaRow = $(row)
-			var akaName = akaRow.find('.akaValidate').val()
-			var akaErrorDivId = akaRow.find('.errors').attr('id')
-			var duplicateOf = 'none'
+			var akaRow = $(row);
+			var akaName = akaRow.find('.akaValidate').val();
+			var akaErrorDivId = akaRow.find('.errors').attr('id');
+			var duplicateOf = 'none';
 
 			// check if the AKA matches the parent's name
 			if (tdsCommon.compareStringsIgnoreCase(akaName, parentName)) {
-        duplicateOf = 'parent'
-        // check if the AKA matches another AKA on the list
-      } else if (tdsCommon.arrayContainsStringIgnoreCase(akaList, akaName)) {
-        duplicateOf = 'local'
-        // if this AKA is new, check it's validity against other models on the server
-      } else if (akaRow.attr('js-is-unique') == 'unknown') {
-        duplicateOf = private.validateAkaOnServer(forWhom, akaRow, {
-          'alias': akaName,
-          'id': parentId,
-          'manufacturerId': manufacturerId,
-          'parentName': parentName
-        });
-        // check if this AKA has previously been marked as invalid
-      } else if (akaRow.attr('js-is-unique') == 'false') {
-        duplicateOf = 'other'
-        // otherwise this AKA is not a duplicate
-      } else {
-        duplicateOf = 'none'
-
-        akaList.push(akaName)
-        public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom)
-      }
+        		duplicateOf = 'parent'
+        		// check if the AKA matches another AKA on the list
+      		} else if (tdsCommon.arrayContainsStringIgnoreCase(akaList, akaName)) {
+        		duplicateOf = 'local'
+        		// if this AKA is new, check it's validity against other models on the server
+      		} else if (akaRow.attr('js-is-unique') === 'unknown') {
+        		duplicateOf = private.validateAkaOnServer(forWhom, akaRow, {
+          			'alias': akaName,
+          			'id': parentId,
+          			'manufacturerId': manufacturerId,
+          			'parentName': parentName
+        		});
+        		// check if this AKA has previously been marked as invalid
+			} else if (akaRow.attr('js-is-unique') === 'false') {
+        		duplicateOf = 'other';
+        		// otherwise this AKA is not a duplicate
+      		}
+			akaList.push(akaName);
+			public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom);
 		});
 
 		// if there are no AKAs left, enable the save button
-		if (akaList.size() == 0)
-			public.handleAkaForSaveButton(forWhom)
+		if (akaList.size() === 0) {
+            public.handleAkaForSaveButton(forWhom);
+        }
 	};
 
 	/**
@@ -128,25 +126,25 @@ var akaUtil = (function ($) {
 	 * @return 'none' if the AKA is valid, 'other' otherwise
 	 */
 	private.validateAkaOnServer = function (forWhom, akaRow, params) {
-		var duplicateOf
+		var duplicateOf = 'none';
 		$.ajax({
 			url: contextPath + '/' + forWhom + '/validateAliasForForm',
 			data: params,
 			async: false,
 			complete: function (e) {
-				if (e.responseText == 'valid') {
-					duplicateOf = 'none'
+				if (e.responseText === 'valid') {
+					duplicateOf = 'none';
 					akaRow.attr('js-is-unique', 'true')
-				} else if (e.responseText == 'invalid') {
-					duplicateOf = 'other'
+				} else if (e.responseText === 'invalid') {
+					duplicateOf = 'other';
 					akaRow.attr('js-is-unique', 'false')
-				} else if (status == 'error') {
-					alert('An unexpected error occurred while validating AKA')
+				} else if (status === 'error') {
+					alert('An unexpected error occurred while validating AKA');
 				}
 			}
-		})
-		return duplicateOf
-	}
+		});
+		return duplicateOf;
+	};
 
 	/**
 	 * handles showing/hiding the error text for when an AKA is invalid
