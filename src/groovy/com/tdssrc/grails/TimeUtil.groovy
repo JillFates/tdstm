@@ -819,6 +819,15 @@ class TimeUtil {
 	 * it his preferences.
 	 */
 	public static String getDefaultTimeZoneId(){
-		return "GMT"
+		return 'GMT'
+	}
+
+	/**
+	 * Used to convert a datetime to minutes
+	 * @param date - the date to convert to minutes
+	 * @return a date in minutes or null if parameter is null
+	 */
+	public static Integer timeInMinutes(Date datetime) {
+		datetime ? datetime.getTime() / 1000 / 60 : null
 	}
 }
