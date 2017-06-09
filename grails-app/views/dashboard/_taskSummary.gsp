@@ -14,13 +14,29 @@ $(document).ready(function() {
 			<g:set var="teamData" value="${r.getValue()}"/>
 			<g:if test="${teamData.percDone > 0}">$("#team_${teamData.role.id}").animate({width: "${teamData.percDone}%" }, 1000);</g:if>
 		</g:each>
+
+		var scrollTeamsIcon = $('#scrollTeamsIcon');
+		if(scrollTeamsIcon && scrollTeamsIcon.length > 0){
+		    var teamTableHeight = $('#teamTableContent').height();
+		    scrollTeamsIcon.animate({marginTop: (teamTableHeight/2)-5}, 1000);
+		}
 });
 
+var toggleScrollTeamsLeft = true;
 function scrollTeams(){
 		    var scrollSize = $('#teamTableContent').width();
-		    $('#teamTableContent').animate({ scrollLeft: scrollSize }, 1000);
+		    if(toggleScrollTeamsLeft){
+		        $('#teamTableContent').animate({ scrollLeft: scrollSize }, 800);
+		        $('#scrollTeamsLeftIcon').hide();
+		        $('#scrollTeamsRightIcon').show();
+		    }
+		    else{
+		        $('#teamTableContent').animate({ scrollLeft: -scrollSize }, 800);
+		        $('#scrollTeamsRightIcon').hide();
+		        $('#scrollTeamsLeftIcon').show();
+		    }
+		    toggleScrollTeamsLeft = !toggleScrollTeamsLeft;
 }
-
 </script>
 
 <div class="toprightcontent">
@@ -143,11 +159,15 @@ function scrollTeams(){
 			</tr>
 		</g:each>
 	</table>
-
-    <g:if test="${teamMatrixSize > 18}" >
-        <div class="text-right teamScrollButton">
-            <i class="glyphicon glyphicon-menu-right small" onclick="scrollTeams();"></i>
-        </div>
-    </g:if>
-
 </div>
+
+<g:if test="${teamMatrixSize > 18}" >
+    <div id="scrollTeamsIcon" class="text-right toprightcontent teamScrollButton">
+         <a id="scrollTeamsLeftIcon" href="javascript:void(0);" onclick="scrollTeams();">
+            <img src="/tdstm/static/images/right_arrow.png" alt="back" border="0" width="16" height="23" align="right">
+          </a>
+          <a id="scrollTeamsRightIcon" href="javascript:void(0);" onclick="scrollTeams();" style="display: none;">
+            <img src="/tdstm/static/images/left_arrow.png" alt="back" border="0" width="16" height="23" align="right">
+          </a>
+     </div>
+</g:if>

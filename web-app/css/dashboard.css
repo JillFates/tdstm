@@ -220,12 +220,6 @@ Css for client dashboard
 	text-align: center;
 }
 
-.teamScrollButton{
-    font-weight: bold;
-}
-.teamScrollButton i{
-    cursor: pointer;
-}
 .selecttext{
 	font-size:11px;
 	}
@@ -238,6 +232,11 @@ Css for client dashboard
 	font-size:13px;
 	line-height:21px;
 	}
+
+.teamScrollButton{
+	margin-left: 5px;
+	max-width: 10px;
+}
 
 .high{
 	background-color:#259b15;
