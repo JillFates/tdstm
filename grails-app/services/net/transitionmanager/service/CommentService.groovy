@@ -5,7 +5,6 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
 import com.tds.asset.TaskDependency
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -516,11 +515,16 @@ class CommentService implements ServiceMethods {
 			}
 		}
 
-		mailService.sendMail {
-			to assignedTo.email
-			subject sub
-			body(view: "/assetEntity/_taskEMailTemplate",
-			     model: assetCommentModel(assetComment, tzId, userDTFormat))
+		try{
+			mailService.sendMail {
+				to assignedTo.email
+				subject sub
+				body(view: "/assetEntity/_taskEMailTemplate",
+					 model: assetCommentModel(assetComment, tzId, userDTFormat))
+			}
+		}catch(e){
+			log.warn "problem sending email: ${e.getMessage()}"
+			return "reschedule"
 		}
 	}
 
