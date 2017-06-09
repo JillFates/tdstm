@@ -220,6 +220,12 @@ Css for client dashboard
 	text-align: center;
 }
 
+.teamScrollButton{
+    font-weight: bold;
+}
+.teamScrollButton i{
+    cursor: pointer;
+}
 .selecttext{
 	font-size:11px;
 	}
@@ -766,13 +772,15 @@ list-style-type:none;
 }
 .teamBreakdown.toprightcontent {
 	width: 630px;
+    overflow-y: hidden;
 }
 .teamBreakdown.toprightcontent.smallTable{
 	width: 300px;
+    overflow-y: hidden;
 }
 .teamBreakdown {
 	margin-top:5px;
-	margin-left: 15px;
+	margin-left: 50px;
 	overflow: auto;
 }
 .taskSummaryDiv {

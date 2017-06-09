@@ -15,6 +15,12 @@ $(document).ready(function() {
 			<g:if test="${teamData.percDone > 0}">$("#team_${teamData.role.id}").animate({width: "${teamData.percDone}%" }, 1000);</g:if>
 		</g:each>
 });
+
+function scrollTeams(){
+		    var scrollSize = $('#teamTableContent').width();
+		    $('#teamTableContent').animate({ scrollLeft: scrollSize }, 1000);
+}
+
 </script>
 
 <div class="toprightcontent">
@@ -94,12 +100,15 @@ $(document).ready(function() {
 </div>
 
 
-
-<g:if test="${teamTaskMatrix.size <= 5}" >
-    <div class="teamBreakdown toprightcontent smallTable">
+<g:set var="teamMatrixSize" value="${0}"/>
+<g:if test="${teamTaskMatrix.size > 0}">
+    <g:set var="teamMatrixSize" value="${teamTaskMatrix.size * teamTaskMatrix[0].size}" />
+</g:if>
+<g:if test="${teamMatrixSize <= 6}" >
+    <div id="teamTableContent" class="teamBreakdown toprightcontent smallTable">
 </g:if>
 <g:else>
-    <div class="teamBreakdown toprightcontent">
+    <div id="teamTableContent" class="teamBreakdown toprightcontent">
 </g:else>
 
 	<table style="border:none;">
@@ -134,4 +143,11 @@ $(document).ready(function() {
 			</tr>
 		</g:each>
 	</table>
+
+    <g:if test="${teamMatrixSize > 18}" >
+        <div class="text-right teamScrollButton">
+            <i class="glyphicon glyphicon-menu-right small" onclick="scrollTeams();"></i>
+        </div>
+    </g:if>
+
 </div>
