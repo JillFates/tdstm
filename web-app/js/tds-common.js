@@ -186,6 +186,47 @@ var tdsCommon = {
 		return (isValid ? data : false);
 	},
 
+    /**
+	 * Since we are upgrading some ajax calls to use jQuery.ajax() instead of prototype.Ajax()
+     * we need to support also response models by jQuery.ajax() returns;
+	 *
+     * @param response
+     * @param errorMsg
+     * @param alerts
+     */
+	isValidWsJQueryAjaxResponse: function (response, errorMsg, alerts) {
+        var isValid = false;
+        var data = false;
+
+        if (response.status != 200 && response.status !== 'success') {
+            this.displayWsError(response, errorMsg, alerts);
+        } else {
+            isValid = (response.status == 'success');
+            if (isValid) {
+                if (response.data) {
+                    // Remove the nested data structure to just return the data
+                    data = response.data;
+                }
+            } else {
+                if (response.errors) {
+                    alert(response.errors);
+                } else {
+                    alert("An error occurred while updating and/or updating information");
+                }
+            }
+        }
+
+        return (isValid ? data : false);
+    },
+
+	prepareJQueryAjaxResponse: function(response){
+        response.isJQueryAjax = true;
+	},
+
+    isJQueryAjaxResponse: function(response){
+        return response.isJQueryAjax === true;
+    },
+
 	/**
 	 * A common error response handler that display different errors base on http status
 	 */
@@ -507,9 +548,11 @@ var UserPreference = function () {
 			success: function (e) {
 				var prefDialog = $("#userTimezoneDivId")
 				prefDialog.html(e);
-				prefDialog.dialog('option', 'width', 'auto')
-				prefDialog.dialog('option', 'modal', true)
-				prefDialog.dialog("open")
+				prefDialog.dialog('option', 'width', 'auto');
+				prefDialog.dialog('option', 'modal', true);
+				prefDialog.dialog("open");
+
+                $('.ui-widget-overlay').addClass('old-legacy-content');
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while attempting to update task/comment")
@@ -526,11 +569,13 @@ var UserPreference = function () {
 				var prefDialog = $("#userPrefDivId")
 				var pageHeight = Math.max($(window).outerHeight(), 200)
 				prefDialog.html(e)
-				prefDialog.dialog('option', 'width', 'auto')
-				prefDialog.dialog('option', 'maxHeight', pageHeight)
-				prefDialog.dialog('option', 'containment', 'body')
-				prefDialog.dialog('option', 'modal', true)
-				prefDialog.dialog("open")
+				prefDialog.dialog('option', 'width', 'auto');
+				prefDialog.dialog('option', 'maxHeight', pageHeight);
+				prefDialog.dialog('option', 'containment', 'body');
+				prefDialog.dialog('option', 'modal', true);
+				prefDialog.dialog("open");
+
+                $('.ui-widget-overlay').addClass('old-legacy-content');
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while attempting to update task/comment")
@@ -576,13 +621,19 @@ var UserPreference = function () {
 
 	// removes the specified preference for the current user
 	var removeUserPrefs = function (prefCode) {
-		new Ajax.Request('/tdstm/person/removeUserPreference?prefCode=' + prefCode, {
-			asynchronous: true,
-			evalScripts: true,
-			onSuccess: function (e) {
-				$("#pref_" + prefCode).remove()
-			}
-		})
+
+		jQuery.ajax({
+            url: '/tdstm/person/removeUserPreference?prefCode=' + prefCode,
+            success: function(response) {
+            	if(response === 'true'){
+                    $("#pref_" + prefCode).remove();
+				}
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("/tdstm/person/removeUserPreference - " + errorThrown);
+            }
+        });
+
 	}
 
 	return {

@@ -106,7 +106,7 @@ boolean isIE6 = tds.isIE6()
 --%>
       <div class="main_bottom"><g:layoutBody /></div>
     </div>
-    <div id="personDialog" title="Edit Person" style="display:none;">
+    <div id="personDialog" title="Edit Person" style="display:none;" class="old-legacy-content">
       <div class="dialog">
           <div class="dialog">
             <table>
