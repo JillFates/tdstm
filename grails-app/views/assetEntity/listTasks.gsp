@@ -23,7 +23,21 @@
 		div.content-wrapper {
 			background-color: #ecf0f5 !important;
 		}
-	</style>
+		/*TODO: TM-6499 Adding it here 'cause I don't want it as a part of the normal css*/
+		action-bar.checkboxContainer input[type=checkbox] {
+			margin-left: 10px;
+		}
+		action-bar.checkboxContainer label {
+			margin-left: 4px;
+		}
+        div#controlRowId {
+            margin-bottom: 10px;
+            width: 500px;
+        }
+        #timeline {
+            margin-right: 21px;
+        }
+</style>
 
 	<g:render template="../layouts/responsiveAngularResources" />
 
@@ -37,7 +51,7 @@
 		$(document).ready(function() {
 
 			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
-				reloadGrid();
+                reloadGrid();
 				progressTimer.resetTimer();
 			});
 
@@ -100,7 +114,7 @@
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
-				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
+				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId'); gridLoadComplete(); }"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, step:step }"
 				showPager="true">
@@ -116,7 +130,7 @@
 
 				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+"')\">");
 			</g:each>
-		})
+		});
 
 		$.jgrid.formatter.integer.thousandsSeparator='';
 
@@ -199,24 +213,34 @@
 			}
 		});
 
+		var initialGridLoad = false;
+		function gridLoadComplete() {
+		    if(!initialGridLoad) {
+            	recompileDOM('taskListIdWrapper');
+            	initialGridLoad = true;
+            } else {
+                recompileDOM('taskListIdGrid');
+			}
+		};
+
 		function reloadGrid () {
 			var postData = $('#taskListIdGrid').jqGrid('getGridParam', 'postData');
 			postData.justRemaining = $('#justRemainingCB').is(':checked') ? 1 : 0;
 			postData.justMyTasks = $('#justMyTasksCB').is(':checked') ? 1 : 0;
 			postData.viewUnpublished = viewUnpublished ? 1 : 0;
 			$('#taskListId').trigger('reloadGrid').trigger('click')
-		}
+		};
 	</script>
 </head>
 <body>
 <tds:subHeader title="Task Manager" crumbs="['Task','Task Manager']"/>
 	<input type="hidden" id="timeBarValueId" value="0"/>
-	<div id="outerBodyId" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
+	<div id="outerBodyId" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<input type="hidden" id="timeBarValueId" value="0"/>
 		<div class="taskTimebar hide" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
 		</div>
-		<div class="body fluid task-manager-wrapper">
+		<div class="fluid task-manager-wrapper">
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
@@ -231,36 +255,33 @@
 			<input type="hidden" name="justMyTasks" id="justMyTasks" value="${justMyTasks}"/>
 			<input type="hidden" name="viewUnpublished" id="viewUnpublished" value="${viewUnpublished}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
-			<span id="controlRowId">
-				<b>Event </b>
-			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
-				&nbsp;&nbsp;
-				<span class="checkboxContainer">
-					<input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" />
-					<label for="justRemainingCB" class="pointer"><b>&nbsp;Just Remaining</b></label>
-				</span>
-				&nbsp;&nbsp;
-				<span class="checkboxContainer">
-					<input type="checkbox" id="justMyTasksCB" class="pointer" ${ (justMyTasks=='1' ? 'checked="checked"' : '') } onclick="reloadGrid()"/>
-					<label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>
-				</span>
-				&nbsp;&nbsp;
-				<tds:hasPermission permission="${Permission.TaskPublish}">
-					<span class="checkboxContainer">
-						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/>
-						<label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>
-					</span>
-				</tds:hasPermission>
-
-				<span style="float: right">
-					<span style="margin-right: 30px;">
-						<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
-
-						<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
-					</span>
-					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
-				</span>
-			</span>
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="controlRowId">
+                        <b>Event </b>
+                        <g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
+                        <span class="checkboxContainer action-bar">
+                            <input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" />
+                            <label for="justRemainingCB" class="pointer"><b>Just Remaining</b></label>
+                        </span>
+                        <span class="checkboxContainer action-bar">
+                            <input type="checkbox" id="justMyTasksCB" class="pointer" ${ (justMyTasks=='1' ? 'checked="checked"' : '') } onclick="reloadGrid()"/>
+                            <label for="justMyTasksCB" class="pointer"><b>Just Mine</b></label>
+                        </span>
+                        <tds:hasPermission permission="${Permission.TaskPublish}">
+                            <span class="checkboxContainer action-bar">
+                                <input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/>
+                                <label for="viewUnpublishedCB" class="pointer"><b>View Unpublished</b></label>
+                            </span>
+                        </tds:hasPermission>
+                    </div>
+                </div>
+                <div class="col-md-6 text-right">
+                    <tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
+                    <tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>
+                    <g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+                </div>
+            </div>
 			<jqgrid:wrapper id="taskListId" />
 		</div>
 		<input type="hidden" id="customizeFieldCount" value="6" />
