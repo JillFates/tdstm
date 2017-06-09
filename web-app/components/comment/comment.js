@@ -506,13 +506,23 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 		}, 50);
 	});
 
-	$scope.close = function () {
+	$scope.close = function(updateSuccess) {
 		commentUtils.closePopup($scope, 'editComment');
-		if (typeof timerBar !== 'undefined')
-			timerBar.attemptResume();
 
-		if (typeof progressTimer !== 'undefined')
-			progressTimer.attemptResume();
+        var updateTarget = false;
+        if(updateSuccess !== 'undefined' && updateSuccess) {
+            updateTarget = updateSuccess;
+        }
+
+        if (typeof timerBar !== 'undefined') {
+            timerBar.updateTarget = updateTarget;
+            timerBar.attemptResume();
+        }
+
+        if (typeof progressTimer !== 'undefined') {
+            progressTimer.updateTarget = updateTarget;
+            progressTimer.attemptResume();
+        }
 	};
 
 	$scope.$on('forceDialogClose', function (evt, types) {
@@ -523,8 +533,8 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 
 	$scope.deleteComment = function () {
 		commentUtils.validateDelete($scope.ac.commentId, $scope.ac.assetEntity, commentService.deleteComment).then(
-			function (data) {
-				$scope.close();
+			function(data) {
+				$scope.close(true);
 				$scope.$emit("commentDeleted", $scope.ac.commentId, $scope.ac.assetEntity);
 			}
 		);
@@ -697,7 +707,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 							if (data.error) {
 								alerts.addAlertMsg(data.error);
 							} else {
-								$scope.close();
+								$scope.close(true);
 								$scope.$emit("commentUpdated", $scope.ac.id, $scope.ac.assetEntity);
 								if ($scope.ac.assetEntity != $scope.acBackup.assetEntity) {
 									$scope.$emit("commentUpdated", $scope.ac.id, $scope.acBackup.assetEntity);
@@ -718,7 +728,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 								alerts.addAlertMsg(data.error);
 							} else {
 								var comment = commentUtils.commentTemplateFromCreateResponse(data, $scope.ac.assetEntity, $scope.ac.assetType);
-								$scope.close();
+								$scope.close(true);
 								$scope.$emit("commentCreated", comment.commentId, comment.assetEntity);
 								if (open == 'view') {
 									$scope.$emit("viewComment", commentUtils.commentTO(comment.commentId, comment.commentType), 'show');
@@ -2130,13 +2140,17 @@ tds.comments.directive.ActionBarCell = function (commentService, alerts, utils, 
 					timerBar.Pause();
 				windowTimedUpdate.pause();
 				var row = angular.element('#' + scope.rowPrefix + scope.commentId);
-				var newRow = compile(content)(scope);
-				row.after(newRow);
-				scope.configTable[scope.commentId] = {
-					"id": scope.commentId,
-					"row": newRow
-				}
-				scope.loading = false;
+                compile(content)(scope, function(newRow) {
+                    if(row.next().find('.statusButtonBar').length == 0) {
+						row.after(newRow);
+						scope.configTable[scope.commentId] = {
+							"id": scope.commentId,
+							"row": newRow
+						}
+						scope.loading = false;
+                    }
+                });
+
 			}
 			if (scope.master) {
 				scope.$on('showActionBars', function (evt) {
