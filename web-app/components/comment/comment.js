@@ -563,13 +563,18 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 
 	$scope.commentInfo = []
 
-	$scope.commentInfo.currentAsset = parseInt((assetTO) ? assetTO.assetId : $scope.$root.selectedAsset)
+	// if it's not a number skip and initialize variables
+	if(isNaN(assetTO ? assetTO.assetId : $scope.$root.selected)){
+		$scope.commentInfo.currentAsset = ''
+	}
+	// if it is, do the conversion with unary plus conversion (+)
+	else{
+		$scope.commentInfo.currentAsset = +(assetTO ? assetTO.assetId : $scope.$root.selected);
+	}
+
 	$scope.commentInfo.currentAssetClass = assetTO && assetTO.assetType ? assetTO.assetType : null;
 
 	$scope.commentInfo.assetClasses = []
-
-	//$scope.commentInfo.currentAssetClass = null
-	//$scope.commentInfo.currentAsset = "";
 	$scope.commentInfo.assets = []
 
 	$scope.assetClassChanged = function () {
