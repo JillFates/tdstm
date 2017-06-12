@@ -377,6 +377,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		requirePermission Permission.UserUnlock
 
 		account.lockedOutUntil = null
+		account.lastLogin = TimeUtil.nowGMT()
 		auditService.saveUserAudit UserAuditBuilder.userAccountWasUnlockedBy(getCurrentUsername(), account)
 		save account
 	}
