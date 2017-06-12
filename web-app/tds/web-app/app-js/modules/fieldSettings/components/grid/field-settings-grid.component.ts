@@ -1,9 +1,10 @@
-import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { GridDataResult, DataStateChangeEvent, GridComponent, RowClassArgs } from '@progress/kendo-angular-grid';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
 
 @Component({
@@ -17,8 +18,8 @@ import { process, State } from '@progress/kendo-data-query';
 })
 export class FieldSettingsGridComponent implements OnInit {
 	@Input('data') data: DomainModel;
+	private dataSignature: string;
 	private fieldsSettings: FieldSettingsModel[];
-	@ViewChild('fieldSettingGrid') fieldSettingGrid: GridComponent;
 
 	private filter = {
 		search: '',
@@ -48,10 +49,14 @@ export class FieldSettingsGridComponent implements OnInit {
 	private availableControls = ['Select List', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea'];
 	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
 
-	constructor(private fieldService: FieldSettingsService, private permissionService: PermissionService) { }
+	constructor(
+		private fieldService: FieldSettingsService,
+		private permissionService: PermissionService,
+		private prompt: UIPromptService) { }
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
+		this.dataSignature = JSON.stringify(this.data);
 		this.refresh();
 	}
 
@@ -82,13 +87,15 @@ export class FieldSettingsGridComponent implements OnInit {
 	protected onEdit(): void {
 		this.isEditing = true;
 		this.sortable = false;
-		this.state.sort = [{
-			dir: 'desc',
-			field: 'isNew'
-		}, {
-			dir: 'asc',
-			field: 'order'
-		}];
+		this.state.sort = [
+			{
+				dir: 'desc',
+				field: 'isNew'
+			}, {
+				dir: 'asc',
+				field: 'order'
+			}
+		];
 		this.filter = {
 			search: '',
 			fieldType: 'All'
@@ -98,8 +105,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onSaveAll(): void {
-		if (this.isEditAvailabe() && this.fieldsSettings.filter(item =>
-			!item.label || !item.field).length === 0) {
+		if (this.isEditAvailable() && this.isValid()) {
 			this.reset();
 			this.fieldsSettings.filter(x => x['isNew']).forEach(x => delete x['isNew']);
 			this.fieldService.saveFieldSettings(this.data)
@@ -111,8 +117,18 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onCancel(): void {
-		this.reset();
-		this.refresh(true);
+		if (this.isDirty()) {
+			this.prompt.open('Confirmation Required', 'Changes you made may not be saved. Do you want to continue?',
+				'Confirm', 'Cancel').then(result => {
+					if (result) {
+						this.reset();
+						this.refresh(true);
+					}
+				});
+		} else {
+			this.reset();
+			this.refresh();
+		}
 	}
 
 	protected onDelete(dataItem: FieldSettingsModel): void {
@@ -165,7 +181,16 @@ export class FieldSettingsGridComponent implements OnInit {
 		return 'custom' + ((number === -1 ? custom.length : number) + 1);
 	}
 
-	protected isEditAvailabe(): boolean {
+	protected isEditAvailable(): boolean {
 		return this.permissionService.hasPermission('ProjectFieldSettingsEdit');
+	}
+
+	protected isValid(): boolean {
+		return this.fieldsSettings.filter(item =>
+			!item.label || !item.field).length === 0;
+	}
+
+	protected isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify(this.data);
 	}
 }
