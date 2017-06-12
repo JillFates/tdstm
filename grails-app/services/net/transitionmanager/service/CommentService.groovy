@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
 import com.tds.asset.TaskDependency
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -35,6 +36,20 @@ class CommentService implements ServiceMethods {
 	private static final List<String> watchProps = ['actStart', 'assetEntity', 'assignedTo', 'comment', 'dueDate',
 	                                                'estFinish', 'estStart', 'moveEvent', 'priority', 'role',
 	                                                'sendNotification', 'status']
+	static final
+	private Map<PREF, Object> CREATE_TASKS_DEFAULTS
+
+	static {
+		//Initializing Constants
+		// We can AKA to another Pref like TASK_CREATE_EVENT which defaults to MOVE_EVENT
+		Map<PREF, Object> createTasksDefaults = [:]
+		createTasksDefaults[PREF.TASK_CREATE_EVENT] = PREF.MOVE_EVENT
+		createTasksDefaults[PREF.TASK_CREATE_CATEGORY] = AssetCommentCategory.GENERAL
+		createTasksDefaults[PREF.TASK_CREATE_STATUS] = AssetCommentStatus.READY
+
+		//Set as Immutable constant
+		CREATE_TASKS_DEFAULTS = createTasksDefaults.asImmutable()
+	}
 
 	def mailService					// SendMail MailService class
 	AssetEntityService assetEntityService
@@ -212,7 +227,7 @@ class CommentService implements ServiceMethods {
 			if (params.comment) assetComment.comment = params.comment
 			if (params.category){
 				assetComment.category = params.category
-				userPreferenceService.setPreference(PREF.TASK_CATEGORY, params.category)
+				userPreferenceService.setPreference(PREF.TASK_CREATE_CATEGORY, params.category)
 			}
 
 			if (params.displayOption) assetComment.displayOption = params.displayOption
@@ -277,7 +292,7 @@ class CommentService implements ServiceMethods {
 						if (params.moveEvent == "0") {
 							assetComment.moveEvent = null
 						} else {
-							userPreferenceService.setPreference(PREF.TASK_EVENT, params.moveEvent)
+							userPreferenceService.setPreference(PREF.TASK_CREATE_EVENT, params.moveEvent)
 							def moveEvent = MoveEvent.get(params.moveEvent)
 							if (moveEvent) {
 								// Validate that this is a legit moveEvent for this project
@@ -326,7 +341,7 @@ class CommentService implements ServiceMethods {
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This
 			// should be the last update to Task properties before saving.
 			//store default value for the status
-			userPreferenceService.setPreference(PREF.TASK_STATUS, params.status)
+			userPreferenceService.setPreference(PREF.TASK_CREATE_STATUS, params.status)
 			taskService.setTaskStatus(assetComment, params.status)
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
@@ -698,5 +713,16 @@ class CommentService implements ServiceMethods {
 			commentList = [error: errorMsg]
 		}
 		return commentList
+	}
+
+	Map getCreateTasksDefaults() {
+		return CREATE_TASKS_DEFAULTS.collectEntries { PREF pref, ref ->
+			if(ref instanceof PREF){
+				ref = userPreferenceService.getPreference(ref)
+			}
+			String defaultVal = String.valueOf(ref)
+
+			[(pref.toString()): userPreferenceService.getPreference(null, pref, defaultVal)]
+		}
 	}
 }

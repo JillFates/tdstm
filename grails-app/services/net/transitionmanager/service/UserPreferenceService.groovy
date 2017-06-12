@@ -132,31 +132,7 @@ class UserPreferenceService implements ServiceMethods {
 		if(userPrefValue == null && userLogin){
 			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 
-			userPrefValue = userPreference?.value
-
-			//If not is in the storage check the Session lived defaults
-			if(userPrefValue==null && preferenceCode in sessionOnlyPreferences.keySet()) {
-
-				def defaultValue = sessionOnlyPreferences[preferenceCode]
-				//If this Preference is an alias of other get the other Value
-
-				if(defaultValue instanceof UserPreferenceEnum){
-					String preferenceAliasName = defaultValue.toString()
-					prefCodeStack << preferenceAliasName
-
-					/*
-						if there is more than one call in the stack to retrieve this Preference Alias,
-						we have a Circular Reference Problem
-					*/
-					if(prefCodeStack.count(preferenceAliasName) > 1){
-						log.error("Problem retrieving a Preference due to an alias circular dependency: {}", prefCodeStack)
-						defaultValue = ""
-					}else{ // look into the alias reference
-						defaultValue = getPreference(userLogin, preferenceAliasName, defaultIfNotSet, prefCodeStack)
-					}
-				}
-				userPrefValue = defaultValue
-			}
+			userPrefValue = (userPreference?.value) ?: defaultIfNotSet
 
 			//if we are getting the current user preference store it in the session for speed
 			if(isCurrent){
@@ -357,8 +333,8 @@ class UserPreferenceService implements ServiceMethods {
 	 * clear the session only preferences
 	 */
 	void clearSessionOnlyPreferences(){
-		for(String key : sessionOnlyPreferences.keySet()) {
-			session.removeAttribute(key)
+		for(String pref : sessionOnlyPreferences) {
+			session.removeAttribute(pref)
 		}
 	}
 

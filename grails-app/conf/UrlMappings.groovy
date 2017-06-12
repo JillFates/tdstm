@@ -147,6 +147,11 @@ class UrlMappings {
 			action = [GET:"qzSignMessage", POST:"qzSignMessage"]
 		}
 
+		"/ws/task/createTaskDefaults" {
+			controller = "wsTask"
+			action = [GET:"createTaskDefaults"]
+		}
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]

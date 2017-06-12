@@ -5,6 +5,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
@@ -22,6 +23,7 @@ import com.tdsops.common.security.spring.HasPermission
 class WsTaskController implements ControllerMethods {
 
 	TaskService taskService
+	CommentService commentService
 	QzSignService qzSignService
 
 	/**
@@ -158,6 +160,14 @@ class WsTaskController implements ControllerMethods {
 		} catch (e) {
 			preHandleException e
 		}
+	}
+
+	@HasPermission(Permission.TaskCreate)
+	/**
+	 * Return the default values of Create Tasks Properties
+	 */
+	def createTaskDefaults() {
+		renderSuccessJson([preferences: commentService.getCreateTasksDefaults()])
 	}
 
 	private void preHandleException(Exception e, boolean includeException = false) {
