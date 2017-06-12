@@ -221,7 +221,7 @@ class ModelController implements ControllerMethods {
 											 columnLabelpref: columnLabelpref ] )
 			}
 		} catch (ServiceException e) {
-			log.error(e.message, e)
+			//log.error(e.message, e)
 			flash.message = e.message
 			redirect(action: 'list')
 		}
@@ -377,7 +377,7 @@ class ModelController implements ControllerMethods {
 						forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
 					}
 				} catch (ServiceException e) {
-					log.error(e.message, e)
+					//log.error(e.message, e)
 					flash.message = e.message
 					forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
 				}
@@ -386,7 +386,7 @@ class ModelController implements ControllerMethods {
 				redirect(action: "list")
 			}
 		} catch(RuntimeException rte) {
-			log.error(rte.message, rte)
+			//log.error(rte.message, rte)
 			flash.message = rte.message
 			redirect(controller:'model', action: 'list')
 		}
@@ -439,11 +439,11 @@ class ModelController implements ControllerMethods {
 			flash.message = "${model} deleted"
 			redirect(action: "list")
 		} catch (DataIntegrityViolationException e) {
-			log.error(e.message, e)
+			//log.error(e.message, e)
 			flash.message = "${model} not deleted"
 			redirect(action: "show", id: params.id)
 		} catch (ServiceException e) {
-			log.error(e.message, e)
+			//log.error(e.message, e)
 			redirect(action: "list")
 		}
 	}

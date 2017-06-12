@@ -190,8 +190,9 @@ class ManufacturerService implements ServiceMethods {
 			def isValid = isValidAlias(name, manufacturer, false)
 			alias = new ManufacturerAlias(name: name.trim(), manufacturer: manufacturer)
 			if (!isValid || !alias.save(flush: true)) {
-				log.error GormUtil.allErrorsString(alias)
-				return null
+//				log.error GormUtil.allErrorsString(alias)
+//				return null
+				throw new ServiceException("AKA or Manufacturer with same name already exist: ${name}")
 			}
 		}
 		return alias
