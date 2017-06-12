@@ -69,7 +69,7 @@
 							<div style="width:200px;display: inline-block;">
 								<input type="hidden" id="currentAsset" name="commentInfo.currentAsset" ng-model="commentInfo.currentAsset" value="{{commentInfo.currentAsset}}" class="scrollSelect"  
 									data-asset-type="{{commentInfo.currentAssetClass}}" data-asset-id="{{commentInfo.currentAsset}}" data-asset-name="{{commentInfo.currentAssetName}}"/>
-							</div
+							</div>
 						</td>
 					</tr>
 					<tr class="prop">
