@@ -27,9 +27,9 @@ var Cookbook = function (){
   this.diffBtn = $('[ng-click="diff()"]');
 
   this.checkSyntaxBtn = $('[ng-click="validateSyntax()"]');
-  this.checkSyntaxModal = $('#errorModal');
-  this.checkSyntaxErrorDetails = this.checkSyntaxModal.$('#errorModalText');
-  this.closeCheckSyntaxModal = this.checkSyntaxModal.$('button.btn');
+  this.syntaxErrorTab = $('[class="syntaxErrors ng-scope"]');
+  this.checkSyntaxErrorTitle = this.syntaxErrorTab.$('[ng-bind="error.reason"]');
+  this.checkSyntaxErrorDetails = this.syntaxErrorTab.$('[ng-bind-html="secureHTML(error.detail)"]');
   this.loadingIndicator = $('loading-indicator [ng-show="isLoading"]');
   //Editor Modal
   this.editorModal = $('[class="modal fade code-editor-modal in"]');
@@ -49,11 +49,12 @@ var Cookbook = function (){
   this.autoPublishTaskCheck = $('#autoPublishTasks');
 
   this.generateUsingWipLabel = $('[for="generateUsingWIP"]');
-  this.generateUsingWipCheck = $('#generateUsingWIP');
+  this.generateUsingWipCheckBox = $('#generateUsingWIP');
 
   this.generateTasksBtn = $('[ng-click="tasks.generateTask(this)"]');
-  this.errorMsg = $('[ng-bind="alert.msg"]');
-  this.errorMsgCloseBtn = $('[ng-click="alerts.closeAlert($index)"');
+  this.errorModal = $('#errorModal');
+  this.errorModalText = this.errorModal.$('#errorModalText');
+  this.errorModalCloseBtn = this.errorModal.$('[class="btn btn-default"]');
   
   this.taskGenerationTabs = $('#taskGenerationTabs');
   //task Generation Tabs
@@ -75,7 +76,7 @@ Cookbook.prototype.isTaskGenerationTabsDisplayed = function() {
 Cookbook.prototype.isErrorMsgDisplayed = function() {
   var that = this;
   return browser.wait(function () {
-    return that.errorMsg.getText().then(function (text) {
+    return that.errorModalText.getText().then(function (text) {
       return text !== '';
     });
   }).then(function () {
@@ -83,10 +84,21 @@ Cookbook.prototype.isErrorMsgDisplayed = function() {
   });
 };
 
-Cookbook.prototype.isErrorMsgNotDisplayed = function() {
+Cookbook.prototype.isErrorModalDisplayed = function() {
   var that = this;
   return browser.wait(function () {
-    return that.errorMsg.isDisplayed().then(function (valor) {
+    return that.errorModal.isDisplayed().then(function (valor) {
+      return valor;
+    });
+  }).then(function () {
+    return true;
+  });
+};
+
+Cookbook.prototype.isErrorModalNotDisplayed = function() {
+  var that = this;
+  return browser.wait(function () {
+    return that.errorModal.isDisplayed().then(function (valor) {
       return !valor;
     });
   }).then(function () {
@@ -97,17 +109,18 @@ Cookbook.prototype.isErrorMsgNotDisplayed = function() {
 Cookbook.prototype.isCreateRecipeModalOpened = function() {
   return browser.wait(function () {
     return $('body').getAttribute('class').then(function (val) {
-      return val==='modal-open';
+      return val==='skin-blue layout-top-nav modal-open';
     });
   }).then(function () {
     return true;
   });
 };
 
+	
 Cookbook.prototype.isModalClosed = function() {
   return browser.wait(function () {
     return $('body').getAttribute('class').then(function (val) {
-      return val==='';
+      return val==='skin-blue layout-top-nav';
     });
   }).then(function () {
     return true;
@@ -117,8 +130,8 @@ Cookbook.prototype.isModalClosed = function() {
 Cookbook.prototype.isEditorModalOpened = function() {
   var that = this;
   return browser.wait(function () {
-    return that.editorModal.isDisplayed().then(function (valor) {
-      return valor;
+    return that.editorModal.isDisplayed().then(function (value) {
+      return value;
     });
   }).then(function () {
     return true;
@@ -129,11 +142,11 @@ Cookbook.prototype.setTextToEditor = function(recipe) {
   browser.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipe+'"');
 };
 
-Cookbook.prototype.isCheckSyntaxModalOpened = function() {
+Cookbook.prototype.isSyntaxErrorTabSelected = function() {
   var that = this;
   return browser.wait(function () {
-    return that.checkSyntaxModal.getAttribute('style').then(function (style) {
-      return style === 'display: block;';
+    return that.syntaxErrorTab.isDisplayed().then(function (value) {
+      return value;
     });
   }).then(function () {
     return true;

@@ -49,7 +49,6 @@ var Menu = function() {
 		this.getItem = function(itemClass) {
 			return this.getParent().findElement(by.className(itemClass)); // assign IDs when available
 		};
-
 	};
 
 	var that = this;
