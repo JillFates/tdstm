@@ -12,8 +12,8 @@
         <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
     </div>
 </ng-template>
-<kendo-grid #fieldSettingGrid="kendoGrid" style="height:70vh" [filter]="state.filter" [data]="gridData" [sortable]="sortable"
-    [sort]="state.sort" (dataStateChange)="dataStateChange($event)">
+<kendo-grid #fieldSettingGrid="kendoGrid" [filter]="state.filter" [data]="gridData" [sortable]="sortable" [sort]="state.sort"
+    (dataStateChange)="dataStateChange($event)">
     <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
         <div class="col-xs-9 col-md-9 col-lg-7">
             <button type="button" class="btn" [ngClass]="{'btn-default':!isDirty, 'btn-primary':isValid() && isDirty(), 'btn-danger':!isValid() && isDirty()}"
@@ -62,6 +62,9 @@
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="imp" title="Importance" [width]="100">
+        <ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
+            Importance <popup-legends></popup-legends>
+        </ng-template>
         <ng-template kendoGridCellTemplate let-dataItem>
             <field-settings-imp [edit]="isEditing" [(model)]="dataItem.imp"></field-settings-imp>
         </ng-template>

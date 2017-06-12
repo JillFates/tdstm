@@ -14,6 +14,7 @@ import { process, State } from '@progress/kendo-data-query';
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/grid/field-settings-grid.component.html',
 	styles: [`
 		.float-right { float: right;}
+		.k-grid { height:calc(100vh - 225px); }
 	`]
 })
 export class FieldSettingsGridComponent implements OnInit {

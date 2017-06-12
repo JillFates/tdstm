@@ -7,11 +7,6 @@
 						<li *ngFor="let value of domains; let i = index; let first = first" [ngClass]="{'active':first}">
 							<a href="#tab_{{i}}" data-toggle="tab">{{'ASSETS.'+value.domain | translate}}</a>
 						</li>
-						<li class="pull-right">
-							<a>
-								<popup-legends></popup-legends>
-							</a>
-						</li>
 					</ul>
 					<div class="tab-content">
 						<div *ngFor="let value of domains; let i = index; let first = first" [ngClass]="{'active':first}" class="tab-pane" id="tab_{{i}}">
