@@ -9,7 +9,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class PermissionService {
 
-	private permissionUrl = '../wsSecurity/permissions';
+	private permissionUrl = '../ws/security/permissions';
 
 	permissions: any;
 
@@ -17,17 +17,12 @@ export class PermissionService {
 	}
 
 	getPermissions(): Observable<any> {
-		return Observable.from([{
-			ProjectFieldSettingsEdit: 'ProjectFieldSettingsEdit',
-			ProjectFieldSettingsView: 'ProjectFieldSettingsView',
-			NoticeCreate: 'NoticeCreate',
-			NoticeDelete: 'NoticeDelete',
-			NoticeEdit: 'NoticeEdit',
-			NoticeView: 'NoticeView'
-		}]).map((res) => {
-			this.permissions = res;
-			return res;
-		});
+		return this.http.get(this.permissionUrl)
+			.map((res) => {
+				let result = res.json();
+				this.permissions = result.data;
+				return this.permissions;
+			});
 	}
 
 	hasPermission(value: string): boolean {
