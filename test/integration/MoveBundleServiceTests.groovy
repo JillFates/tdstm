@@ -32,13 +32,13 @@ class MoveBundleServiceTests extends Specification {
     }
 
     void "Test Move Bundle Lookup with specific projection fields and sorting criteria" () {
-        given: "A project with a couple of Bundles"
+        given: "A project with a couple of bundles"
             Project project = projectHelper.createProject()
             moveBundleHelper.createBundle(project)
             moveBundleHelper.createBundle(project)
-        when: "Requesting id and workflowCode. Results sorted by id"
+        when: "Requesting id and workflowCode and results sorted by id"
             List bundles = moveBundleService.lookupBundlesByProject(project, ["id", "workflowCode"], "id")
-        then: "The results don't inclde the name of the record (a field not requested)"
+        then: "The results don't include the name of the record (a field not requested)"
             bundles.each{
                 !it.name
             }
@@ -48,7 +48,7 @@ class MoveBundleServiceTests extends Specification {
     }
 
     void "Test Move Bundle Lookup for a project with no bundles" () {
-        given: "A project with a couple of Bundles"
+        given: "A project with no bundles"
             Project project = projectHelper.createProject()
         when: "Requesting bundles with default config."
             List bundles = moveBundleService.lookupBundlesByProject(project)
