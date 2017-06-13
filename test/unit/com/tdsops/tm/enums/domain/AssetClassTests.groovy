@@ -41,4 +41,19 @@ class AssetClassTests extends Specification {
 		// Contains OTHER-DEVICE
 		map.containsKey('OTHER-DEVICE')
 	}
+
+	void "test resolve domain for different AssetType"() {
+		expect: "The corresponding domain is correctly determined for different asset types"
+			AssetClass.getDomainForAssetType(assetType) == domain
+		where:
+			assetType		|	domain
+			null			|	null
+			""				|	null
+			"Files"			|	"Storage"
+			"files"			|	"Storage"
+			"Application"	|	"Application"
+			"Database"		|	"Database"
+			"something"		|	"Device" // TODO: (arecordon) this will be refactored.
+
+	}
 }
