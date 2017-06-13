@@ -2000,7 +2000,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 
 				// List of all available teams.
-				List teamCodeList = getTeamRolesForTasks()
+				List teamCodeList = partyRelationshipService.getTeamCodes(true)
 
 				// Collection of the task settings passed around to functions more conveniently
 				settings = [

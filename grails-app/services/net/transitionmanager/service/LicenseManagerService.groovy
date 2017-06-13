@@ -71,7 +71,7 @@ class LicenseManagerService extends LicenseCommonService{
 	}
 
 	String getLicenseKey(LicensedClient lic) throws InvalidLicenseException{
-		if(lic) {
+		if(lic && lic.status == License.Status.ACTIVE) {
 			String errors = lic.missingPropertyErrors()
 			if(errors){
 				throw new InvalidLicenseException(errors)
@@ -96,14 +96,14 @@ class LicenseManagerService extends LicenseCommonService{
 
 			String licString = ""
 
-			log.info("OLB: Lets Generate a License!!")
+			log.debug("Lets Generate a License!!")
 			if (productKey != null && validAfter != null && validBefore != null && numberOfInstances > 0){
-				log.info("OLB: Generating the License!!")
+				log.debug("Generating the License!!")
 				licString = generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
 			}
 
 			licString = "${BEGIN_LIC_TAG}\n${licString}\n${END_LIC_TAG}"
-			log.info("OLB: licString: {}", licString)
+			log.debug("License String: {}", licString)
 			licString
 		}else{
 			""
@@ -202,7 +202,7 @@ class LicenseManagerService extends LicenseCommonService{
 	 * @return
 	 */
 	boolean emailLicense(LicensedClient licensedClient){
-		log.info("SEND License Request")
+		log.debug("SEND License Request")
 		String toEmail = licensedClient.email
 
 		if(toEmail) {

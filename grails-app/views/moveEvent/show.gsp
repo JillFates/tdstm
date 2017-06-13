@@ -21,10 +21,6 @@
             <div class="dialog">
                 <table>
                     <tbody>
-                    	<tr class="prop">
-                            <td class="name">Project:</td>
-                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
-                        </tr>
                         <tr class="prop">
                             <td class="name">Name:</td>
                             <td class="valueNW"><b>${fieldValue(bean:moveEventInstance, field:'name')}</b></td>

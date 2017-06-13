@@ -34,7 +34,7 @@ class LicenseCommonService {
 		def md5key = MD5Codec.encode(hwkey)
 
 		log.debug("***************************************************************************")
-		log.info("hwkey: $hwkey")
+		log.debug("hwkey: $hwkey")
 		log.debug("md5key: $md5key")
 		log.debug("***************************************************************************")
 

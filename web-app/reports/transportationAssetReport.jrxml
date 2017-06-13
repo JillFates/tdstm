@@ -57,6 +57,7 @@
 	<field name="usize" class="java.lang.String"/>
 	<field name="timezone" class="java.lang.String"/>
 	<field name="rptTime" class="java.lang.String"/>
+	<field name="userDateFormatter" class="java.text.DateFormat"/>
 	<group name="move_bundle_id" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{move_bundle_id}]]></groupExpression>
 		<groupFooter>
@@ -141,19 +142,19 @@
 				</textElement>
 				<text><![CDATA[Complete At:]]></text>
 			</staticText>
-			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
+			<textField isBlankWhenNull="true">
 				<reportElement style="space" x="425" y="60" width="250" height="20"/>
 				<textElement textAlignment="Left">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$F{startAt}]]></textFieldExpression>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{userDateFormatter}.format($F{startAt})]]></textFieldExpression>
 			</textField>
-			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
+			<textField isBlankWhenNull="true">
 				<reportElement style="space" x="425" y="80" width="250" height="20"/>
 				<textElement textAlignment="Left">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$F{completedAt}]]></textFieldExpression>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{userDateFormatter}.format($F{completedAt})]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

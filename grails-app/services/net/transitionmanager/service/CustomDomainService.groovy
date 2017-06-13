@@ -2,14 +2,12 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
-import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
     public static final String ALL_ASSET_CLASSES = "ASSETS"
 
-    def grailsResourceLocator
     SecurityService securityService
     SettingService settingService
 
@@ -82,17 +80,17 @@ class CustomDomainService implements ServiceMethods {
      * @return
      */
     private Map getFilteredFieldSpecs(String domain, int udf, boolean showOnly = false) {
+        Project currentProject = securityService.loadUserCurrentProject()
         Map fieldSpec = [:]
         List<String> assetClassTypes = resolveAssetClassType(domain)
-
         for (String assetClass : assetClassTypes) {
-            def fieldSpecJSON = readFieldSpecFromFileSystem(assetClass)
+            def fieldSpecMap = settingService.getAsMap(currentProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, domain.toUpperCase())
+            fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecMap
             if (showOnly) {
-                fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecJSON.fields.findAll({ field -> field.udf == udf && field.show == 1})
+                fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll({ field -> field.udf == udf && fields.show == 1})
             } else {
-                fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecJSON.fields.findAll({ field -> field.udf == udf })
+                fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll({ field -> field.udf == udf })
             }
-            
         }
 
         return fieldSpec
@@ -115,14 +113,4 @@ class CustomDomainService implements ServiceMethods {
         }
     }
 
-    /**
-     * Load JSON field specs file from filesystem
-     * @param domain
-     * @return
-     */
-    private readFieldSpecFromFileSystem(String domain) {
-        def inputFile = grailsResourceLocator.findResourceForURI("classpath:/customField/${domain}.json").file
-        def inputJSON = new JsonSlurper().parseText(inputFile.text)
-        return inputJSON
-    }
 }

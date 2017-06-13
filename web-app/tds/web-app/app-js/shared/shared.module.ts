@@ -6,6 +6,7 @@ import { HttpServiceProvider } from '../shared/providers/http-interceptor.provid
 // Shared Services
 import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
+import { PreferenceService } from '../shared/services/preference.service';
 import { UserService } from '../shared/services/user.service';
 import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
@@ -14,6 +15,7 @@ import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-di
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
+import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -41,16 +43,19 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		RichTextEditorComponent,
+		UIPromptDirective
 	],
 	providers: [
 		AuthService,
 		PermissionService,
+		PreferenceService,
 		UserService,
 		NotifierService,
 		HttpServiceProvider,
 		ComponentCreatorService,
 		UIDialogService,
 		UIActiveDialogService,
+		UIPromptService,
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],
 	exports: [UILoaderDirective,

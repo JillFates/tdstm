@@ -6,7 +6,6 @@
 <div #openText (click)="onToggle()" class="text-center" style="cursor: pointer; text-decoration: underline;">
     <i class="open-close fa fa-caret-up" *ngIf="show"></i>
     <i class="open-close fa fa-caret-down" *ngIf="!show"></i>
-    <!--<i class="fa fa-cog"></i>-->
 </div>
 <kendo-popup *ngIf="show"
              [anchor]="openText"
@@ -31,6 +30,7 @@
                             [itemStyle]="{'cursor': 'move', 'border-bottom': '1px solid black', 'margin-bottom': '5px'}"
                             [emptyItemStyle] = "{'cursor': 'default'}"
                             [activeItemStyle] = "{'opacity': '.7'}"
+                            emptyText=""
             >
                 <ng-template let-item="item">
                     <div>
@@ -41,7 +41,7 @@
         </div>
         <div class="text-right">
             <button name="saveButton" class="btn btn-default btn-xs" [disabled]="items.length === 0" (click)="onSave()">
-                <i class="fa fa-floppy-o"></i> {{'GLOBAL.SAVE' | translate}}
+                <i class="fa fa-check"></i> {{'GLOBAL.CLOSE' | translate}}
             </button>
             <button name="cancelButton" class="btn btn-default btn-xs" (click)="onToggle()">
                 <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}
