@@ -87,7 +87,7 @@ class CustomDomainService implements ServiceMethods {
         for (String assetClass : assetClassTypes) {
             def fieldSpecMap = settingService.getAsMap(currentProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, domain.toUpperCase())
             if (showOnly) {
-            fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecMap
+                fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll({ field -> field.udf == udf && field.show == 1})
             } else {
             fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll({ field -> field.udf == udf })
             }
