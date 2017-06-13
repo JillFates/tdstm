@@ -438,6 +438,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/security/permissions" {
+			controller = "wsSecurity"
+			action = [
+			        GET: "permissions"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

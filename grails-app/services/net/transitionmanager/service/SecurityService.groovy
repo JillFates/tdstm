@@ -1828,13 +1828,11 @@ logger.debug "mergePersonsUserLogin() entered"
 	}
 
 
-	Set<String> currentUserPermissions() {
-		Set<String> permissions = getCurrentUserDetails()?.permissions
+	Map currentUserPermissionMap() {
+		Set<String> permissions = (getCurrentUserDetails()?.permissions) ?: []
 
-		if(permissions == null){
-			permissions = []
+		permissions.collectEntries {
+			[(it): it]
 		}
-
-		return permissions
 	}
 }
