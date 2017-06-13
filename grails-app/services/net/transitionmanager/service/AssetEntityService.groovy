@@ -155,6 +155,7 @@ class AssetEntityService implements ServiceMethods {
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	def assetEntityAttributeLoaderService
+	def customDomainService
 	def partyRelationshipService
 	def progressService
 	def projectService
@@ -1510,20 +1511,49 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
-		//used to hide the customs whose fieldImportance is "H"
-		def customs = []
-		def hiddenConfig = []
-		if (project.customFieldsShown > 0) {
-			(1..(project.customFieldsShown)).each { i ->
-				customs << i
-				if (config.('custom'+i) == 'H')
-					hiddenConfig << i
+		// Fetch the custom fields settings for visible fields.
+		List customs = getCustomFieldsSettings(type, true)
+
+		return [project: project, config: config, customs: customs]
+	}
+
+	/**
+	 * This method returns the settings for the custom fields for the given
+	 * asset type. Results are sorted by order and field.
+	 *
+	 * Implementation Details: CustomDomainService works with a "domain"
+	 * instead of an "asset type". Also, it returns a Map of the form:
+	 * [domain : list of settings]. This method is responsible for resolving
+	 * the domain for a given asset type, extracting the list of settings
+	 * from the map and sorting the results.
+	 *
+	 * The sorting criteria is: order, field.
+	 *
+	 * @param asset Type :	asset type
+	 * @param showOnly:	flag to request only those fields marked as shown.
+	 *
+	 * @return list with the settings for the custom fields.
+	 */
+	private List getCustomFieldsSettings(String assetType, boolean showOnly) {
+		// This list will contain the settings correctly sorted.
+		List customs
+		// Rersolves the domain for the asset type.
+
+		String domain = AssetClass.getDomainForAssetType(assetType)
+		if (domain) {
+			// Retrieves the settings map.
+			Map settingsMap =  customDomainService.customFieldSpecs(domain, showOnly)
+			if (settingsMap && settingsMap[domain.toUpperCase()]) {
+				// Strips the list of fields from the result map.
+				customs = settingsMap[domain.toUpperCase()]
+				// Sorts the results based on order and field.
+				customs = customs.sort{ i,j ->
+					i.order <=> j.order ?: i.field <=> j.field
+				}
 			}
 		}
 
-		customs.removeAll(hiddenConfig)
-
-		[project: project, config: config, customs: customs]
+		return customs
 	}
 
 	/**
