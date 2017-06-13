@@ -18,6 +18,7 @@ export const en_DICTIONARY: Object = {
 	'GLOBAL': {
 		'ADD': 'Add',
 		'CANCEL': 'Cancel',
+		'CLOSE': 'Close',
 		'DELETE': 'Delete',
 		'EDIT': 'Edit',
 		'FILTER': 'Filter',
