@@ -9,7 +9,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class PermissionService {
 
-	private permissionUrl = '../wsSecurity/permissions';
+	private permissionUrl = '../ws/security/permissions';
 
 	permissions: any;
 
