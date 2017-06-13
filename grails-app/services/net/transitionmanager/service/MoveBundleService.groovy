@@ -36,6 +36,7 @@ import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.UserPreference
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Slf4j(value='logger')
@@ -764,5 +765,39 @@ class MoveBundleService implements ServiceMethods {
 
 	private String listAsPipeSeparatedString(list) {
 		WebUtil.listAsMultiValueString(list).replaceAll(',',  '|')
+	}
+
+	/**
+	 * This method retrieves a list of bundles for the given project using a 
+	 * list of fields and a sorting criteria. 
+	 *
+	 * Joins are currently not supported.
+	 *
+	 * @param project : project instance.
+	 * @param projectionFields : this is a list of fields to be included in the projection.
+	 * 				If none is given, the method will default to 'id' and 'name'.
+	 * @param orderBy : sorting criteria (must be a valid Bundle property). Defaulted to 'name'
+	 *
+	 * @return list of bundles (projected fields only).
+	 */
+	public List lookupBundlesByProject(Project project, List projectionFields = null, String orderBy = "name") {
+		// If no projection fields were given, default to 'id' and 'name'.
+		if(projectionFields == null){
+			projectionFields = ["id", "name"]
+		}
+		List bundles = MoveBundle.createCriteria().list{
+			projections{
+				projectionFields.each{
+					property(it, it)
+				}
+			}
+			and{
+				eq("project", project)
+			}
+			order(orderBy)
+			resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+		}
+
+		return bundles
 	}
 }

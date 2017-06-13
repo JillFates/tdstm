@@ -32,7 +32,6 @@ import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
 import org.hibernate.criterion.Order
-import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.sql.Timestamp
@@ -242,18 +241,7 @@ class MoveEventController implements ControllerMethods {
 	@HasPermission(Permission.EventCreate)
 	def create() {
 		Project project = securityService.userCurrentProject
-		// Fetch the existing bundles for the user's project.
-		List bundles = MoveBundle.createCriteria().list{
-			projections{
-				property("id", "id")
-				property("name", "name")
-			}
-			and{
-				eq("project", project)
-			}
-			order("name")
-			resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
-		}
+		List bundles = moveBundleService.lookupBundlesByProject(project)
 		[moveEventInstance: new MoveEvent(params), bundles: bundles]
 	}
 	
