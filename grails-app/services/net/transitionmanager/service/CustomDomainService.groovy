@@ -16,10 +16,11 @@ class CustomDomainService implements ServiceMethods {
     /**
      * Retrieve custom field specs
      * @param domain
+     * @param showOnly : flag to request only those visible fields.
      * @return
      */
-    Map customFieldSpecs(String domain) {
-        return getFilteredFieldSpecs(domain, 1)
+    Map customFieldSpecs(String domain, boolean showOnly = false) {
+        return getFilteredFieldSpecs(domain, 1, showOnly)
     }
 
     /**
@@ -77,15 +78,21 @@ class CustomDomainService implements ServiceMethods {
      * Get field specs
      * @param domain AssetClass type
      * @param udf whether to return custom or standard fields
+     * @param showOnly flag to filter those fields that shown in views, etc.
      * @return
      */
-    private Map getFilteredFieldSpecs(String domain, int udf) {
+    private Map getFilteredFieldSpecs(String domain, int udf, boolean showOnly = false) {
         Map fieldSpec = [:]
         List<String> assetClassTypes = resolveAssetClassType(domain)
 
         for (String assetClass : assetClassTypes) {
             def fieldSpecJSON = readFieldSpecFromFileSystem(assetClass)
-            fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecJSON.fields.findAll({ field -> field.udf == udf })
+            if (showOnly) {
+                fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecJSON.fields.findAll({ field -> field.udf == udf && field.show == 1})
+            } else {
+                fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecJSON.fields.findAll({ field -> field.udf == udf })
+            }
+            
         }
 
         return fieldSpec
