@@ -1,11 +1,11 @@
-<g:each in="${customs}" var="i" status="j">
+<g:each in="${customs}" var="custom" status="j">
 	<g:if test="${j % 4 == 0}">
 		<tr class="prop">
 	</g:if>
-		<td class="label ${config?.('custom'+i)} ${highlightMap.('custom'+i)?:''}" nowrap="nowrap" >
-			<label for="${'custom'+i}">${project.('custom'+i) ?: 'custom'+i }</label></td>
-		<td class="valueNW ${config?.('custom'+i)}" width="60">
-			<tds:textAsLink text="${assetEntity?.('custom'+i)}" target="_new"/>
+		<td class="label ${custom.imp?:''}" nowrap="nowrap" >
+			<label for="${custom.field}">${custom.label}</label></td>
+		<td class="valueNW ${custom.imp?:''}" width="60">
+			<tds:textAsLink text="${assetEntity?.(custom.field)}" target="_new"/>
 		</td>
 	<g:if test="${j % 4 == 3}">
 		</tr>
