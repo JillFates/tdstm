@@ -548,7 +548,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			if (canCreateMfgAndModel) {
 				modelName = createModelName
 				try {
-					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  createUsize, userLogin?.person)
+					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  NumberUtil.toInteger(createUsize), userLogin?.person)
 					modelWasCreated = true
 					performAssignment(model)
 					logger.info '{}.performCreateMfgModel() Model {} was created (id {})', methodName, modelName, model.id
@@ -952,7 +952,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 							if (! deviceType)
 								deviceType = 'Server'
 
-							model = Model.createModelByModelName(modelName, mfg, deviceType, usize, userLogin)
+							model = Model.createModelByModelName(modelName, mfg, deviceType, NumberUtil.toInteger(usize), userLogin?.person)
 						} else {
 							errorMsg = "Unable to find model ($modelName) for mfg ($mfg)"
 						}
