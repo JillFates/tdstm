@@ -240,7 +240,7 @@ class Model {
 	 * @param usize - (optional)  usize of model
 	 */
 	static Model createModelByModelName(String modelName, Manufacturer manufacturer, String assetType = 'Server',
-	                                    int usize = 1, Person createdBy = null) {
+	                                    Integer usize = 1, Person createdBy = null) {
 
 		Model model = new Model(modelName: modelName, manufacturer: manufacturer, assetType: assetType,
 				sourceTDS: 0, usize: usize, createdBy: createdBy)
