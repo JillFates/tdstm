@@ -166,8 +166,8 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * Return the default values of Create Tasks Properties
 	 */
-	def createTaskDefaults() {
-		renderSuccessJson([preferences: commentService.getCreateTasksDefaults()])
+	def taskCreateDefaults() {
+		renderSuccessJson([preferences: commentService.getTaskCreateDefaults()])
 	}
 
 	private void preHandleException(Exception e, boolean includeException = false) {

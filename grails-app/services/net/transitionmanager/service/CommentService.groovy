@@ -715,7 +715,7 @@ class CommentService implements ServiceMethods {
 		return commentList
 	}
 
-	Map getCreateTasksDefaults() {
+	Map getTaskCreateDefaults() {
 		return CREATE_TASKS_DEFAULTS.collectEntries { PREF pref, ref ->
 			if(ref instanceof PREF){
 				ref = userPreferenceService.getPreference(ref)

@@ -1046,8 +1046,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getLastCreatedTaskSessionParams = function () {
         var deferred = q.defer();
-        //http.get(utils.url.applyRootPath('/ws/user/preferences/TASK_CREATE_STATUS,TASK_CREATE_EVENT,TASK_CREATE_CATEGORY')).
-      	http.get(utils.url.applyRootPath('/ws/task/createTaskDefaults')).
+      	http.get(utils.url.applyRootPath('/ws/task/taskCreateDefaults')).
         success(function (data, status, headers, config) {
             deferred.resolve(data);
         }).
