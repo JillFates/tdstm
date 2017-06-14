@@ -128,20 +128,28 @@ class UserPreferenceService implements ServiceMethods {
 			userPrefValue = session.getAttribute(preferenceCode)
 		}
 
-		//if the value is not in the session get it from the Preferences Storage of the user
-		if(userPrefValue == null && userLogin){
-			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
+		//if the value is not in the session
+		if (userPrefValue == null) {
+			//if a user is loggedIn try to get the value from the Preferences Storage of the user
+			if (userLogin) {
+				UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 
-			userPrefValue = (userPreference?.value) ?: defaultIfNotSet
+				userPrefValue = userPreference?.value
+				if(userPrefValue == null){
+					userPrefValue = defaultIfNotSet
+				}
 
-			//if we are getting the current user preference store it in the session for speed
-			if(isCurrent){
-				session.setAttribute(preferenceCode, userPrefValue)
+				//if we are getting the current user preference store it in the session for speed
+				if(isCurrent){
+					session.setAttribute(preferenceCode, userPrefValue)
+				}
+
+			} else { //If not assign passed default value
+				userPrefValue = defaultIfNotSet
 			}
 		}
 
-		//return the preference value or the default if not set
-		return userPrefValue ?: defaultIfNotSet
+		return userPrefValue
 	}
 
 	/**
