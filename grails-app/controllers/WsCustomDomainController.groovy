@@ -29,4 +29,19 @@ class WsCustomDomainController implements ControllerMethods {
         }
     }
 
+    def distinctValues() {
+        try {
+            renderAsJson(customDomainService.distinctValues(params.id, request.JSON))
+        } catch (e) {
+            handleException(e, logger)
+        }
+    }
+
+    def checkConstraints() {
+
+    }
+
+    def invalidValues() {
+
+    }
 }
