@@ -312,6 +312,24 @@ class CustomTagLib implements InitializingBean {
 	}
 
 	/**
+	 * Render custom fields (Initial Phase)
+	 * use on gsp as -> <tds:customField label="My Select" default="Item 1" option="['Item 1', 'Item 2', 'Item 3', 'Item 4']"/>
+	 */
+	def customField = { Map attrs ->
+
+		String label = attrs.label;
+		def options = attrs.option;
+		String defaultOption = attrs.default;
+
+		out << "<label>" << attrs.label << "</label>"
+		out << "<select>"
+		options.each{
+			out << "<option value=\" " << it << "\">" << it << "</option>"
+		}
+		out << "</select>"
+	}
+
+	/**
 	 * Helper Tag to render breadcrumbs to display
 	 * @param title - the display name of the Page/Module
 	 * @param crumbs - a map of elements what will be part of the crumbs
