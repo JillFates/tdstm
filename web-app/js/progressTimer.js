@@ -8,6 +8,7 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 		public.container = '.progress-bar-svg';
 		public.timerValue = null;
 		public.pausedValue = 0;
+        public.updateTarget = true;
 		public.bindListeners();
 		public.getUserPreference();
 
@@ -53,7 +54,8 @@ var ProgressTimer = function (defaultValue, preferenceName, refreshCallback) {
 	public.showState = function(state, bar, attachment) {
 		// When is completed 1 = 100%
 		if(bar.value() == 1){
-			public.refreshFunction();
+            public.refreshFunction(public.updateTarget);
+            public.updateTarget = true;
 		}
 	}
 

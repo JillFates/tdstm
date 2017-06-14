@@ -4,7 +4,7 @@ import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.service.TaskService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
-import org.quartz.Trigger
+import org.quartz.TriggerKey
 import org.quartz.spi.MutableTrigger
 
 /**
@@ -48,17 +48,18 @@ class GenerateTasksJob {
 				trigger.jobDataMap.putAll(map)
 				log.info "JobDataMap = $map"
 
+				//TM-6506 calling the 'getKey' accessor and assigning to a variable to enforce type and avoid groovy coersion
+				TriggerKey triggerKey = trigger.getKey()
+
 				// reschedule the job
-				context.scheduler.rescheduleJob(trigger.key, trigger)
+				context.scheduler.rescheduleJob(triggerKey, trigger)
 				log.info("Rescheduled job $trigger.key for ${nextFiringDate}, tries=$tries")
 			}
-		}
-		catch (e) {
+		}catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			// TODO : JPM 5/2016 : execute() should update the progress to 100% if an exception occurs
 			// progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage())
-		}
-		finally {
+		}finally {
 			GormUtil.releaseLocalThreadMemory()
 		}
 	}

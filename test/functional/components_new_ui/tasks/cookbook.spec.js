@@ -1,10 +1,10 @@
 'use strict';
 //TM-2995  Unable to regenerate tasks after reverting and deleting version of a recipe
 /*TM-2912 
-user should not be albe to delete the release version
-delete the wip / should only delete the wip and not the release version
-If the user delete the wip and  this is the only recepe versio , the editor should be cleared.
-When you create a recepe description is not required, but it is required when you clone a recipe. - should not have the same behavior on both?
+user should not be able to delete the release version
+delete the WIP / should only delete the WIP and not the release version
+If the user delete the WIP and  this is the only recipe version , the editor should be cleared.
+When you create a recipe description is not required, but it is required when you clone a recipe. - should not have the same behavior on both?
 # tabs are not displayed if recipe list is is empty
 # if you have 1 or more recipes, the  tabs are displayed and the 1st recipe is selected.
 
@@ -12,26 +12,35 @@ When you create a recepe description is not required, but it is required when yo
  checkbox : 
  Generate using WIP recipe - > is only displayed when you select a recipe with wip created
  Delete previously generated tasks that were created using this context & recipe ->  This is only displayed if task are created using that wip recipe 
- # Clone create recipe -> description is not mandaroty
+ # Clone create recipe -> description is not mandatory
 */
 
 var  Menu = require('../menu/menu.po.js');
 var Cookbook = require('./cookbook.po.js');
+
 describe('Cookbook', function(){ 
-  var cookbook = new Cookbook();
+  
+	var cookbook = new Cookbook();
 
   it('should load cookbook page after select Task Cookbook', function(){
     var menu = new Menu();
-    menu.goToTasks('cookbook');
-    expect(menu.getCurrentUrl()).toContain(process.env.BASE_URL+'/tdstm/cookbook/index#/recipes');
+	var tasks = browser.driver.findElement(by.className('menu-parent-tasks'));
+	tasks.click();
+	var isdisp;
+	var items = tasks.findElement(by.className('menu-item-expand'));
+	if (items.isDisplayed()){
+		var cookbook = items.findElement(by.className('menu-parent-tasks-cookbook'));
+		cookbook.click();
+	}
+	expect(menu.getCurrentUrl()).toContain(process.env.BASE_URL+'/tdstm/cookbook/index#/recipes');
   });
 
   describe('Create a recipe', function(){
 
     it('should have "Create Recipe..." as label', function(){
-      expect(cookbook.createRecipeBtn.getText()).toEqual('Create Recipe...');
+        expect(cookbook.createRecipeBtn.getText()).toEqual('Create Recipe...');
     });
-
+ 
     it('should open "Create a Recipe" modal', function() {
       cookbook.createRecipeBtn.click();
       expect(cookbook.isCreateRecipeModalOpened()).toBe(true);
@@ -41,6 +50,7 @@ describe('Cookbook', function(){
       expect(cookbook.modalTitleCss.getText()).toEqual('Create a recipe');
     });
 
+   
     describe('tab nav', function(){
 
       it('should have 2 tabs', function() {
@@ -176,6 +186,8 @@ describe('Cookbook', function(){
 
   });// create a recipe Modal
 
+
+
   describe('Cookbook Page Tabs', function() {
     
     it('should have 4 tabs', function() {
@@ -220,11 +232,11 @@ describe('Cookbook', function(){
       'tasks: [',
       '  [',
       '    id: 1100,',
-      '    description: \'Shutdown ALL applications\',',
-      '    title: \'Shutdown app ${it.assetName}\',',
-      '    workflow: \'AppShutdown\',',
+      '    description: \'Startup ALL applications\',',
+      '    title: \'Startup app ${it.assetName}\',',
+      '    workflow: \'AppStartup\',',
       '    team: \'APP_COORD\',',
-      '    category: \'shutdown\',',
+      '    category: \'startup\',',
       '    duration: 10,',
       '      filter : [',
       '        class: \'application\',',
@@ -272,18 +284,17 @@ describe('Cookbook', function(){
     
     it('should check syntax', function() {
       cookbook.checkSyntaxBtn.click();
-      expect(cookbook.isCheckSyntaxModalOpened()).toBe(true);
+      expect(cookbook.isSyntaxErrorTabSelected()).toBe(true);
     });
-
+    
+    it('should have Invalid syntax displayed',function () {
+      expect(cookbook.checkSyntaxErrorTitle.getText()).toEqual('Invalid syntax');
+    });
+    
     it('should have an error displayed',function () {
       expect(cookbook.checkSyntaxErrorDetails.getText()).toEqual('Task id 1100 \'filter/group\' references an invalid group BET_THIS_DOES_NOT_EXIST');
     });
-
-    it('should close Check Syntax modal', function() {
-      cookbook.closeCheckSyntaxModal.click();
-      expect(cookbook.isCheckSyntaxModalClosed()).toBe(true);
-    });
-
+  
   }); // Check Syntax button
 
   describe('Fix Recipe and check syntax', function() {
@@ -299,11 +310,11 @@ describe('Cookbook', function(){
       'tasks: [',
       '  [',
       '    id: 1100,',
-      '    description: \'Shutdown ALL applications\',',
-      '    title: \'Shutdown app ${it.assetName}\',',
-      '    workflow: \'AppShutdown\',',
+      '    description: \'Startup ALL applications\',',
+      '    title: \'Startup app ${it.assetName}\',',
+      '    workflow: \'AppStartup\',',
       '    team: \'APP_COORD\',',
-      '    category: \'shutdown\',',
+      '    category: \'startup\',',
       '    duration: 10,',
       '      filter : [',
       '        class: \'application\'',
@@ -331,6 +342,11 @@ describe('Cookbook', function(){
       expect(cookbook.isLoadingIndicatorHidden()).toBe(true);
     });
 
+ //  -- DEBUG -- Verify the static values on objects assigned on po's
+    it('should have the message "No errors found" displayed',function () {
+      expect(cookbook.checkSyntaxErrorTitle.getText()).toEqual('No errors found');
+    });
+
   }); //Fix Recipe and check syntax
 
 
@@ -343,7 +359,7 @@ describe('Cookbook', function(){
 
 
     describe('Event Dropdown', function() {
-      
+    
       xit('should have "Event:" as label', function() {
         expect(cookbook.eventLabel.getText()).toEqual('Event:'); 
       });
@@ -421,7 +437,7 @@ describe('Cookbook', function(){
       });
 
       it('should be disabled by default', function() {
-        expect(cookbook.generateUsingWipCheck.getAttribute('checked')).toBe(null);
+        expect(cookbook.generateUsingWipCheckBox.getAttribute('checked')).toBe(null);
         
       });
 
@@ -437,25 +453,26 @@ describe('Cookbook', function(){
 
         it('should click on generate task button and error should be displayed', function() {
           cookbook.generateTasksBtn.click();
-          expect(cookbook.isErrorMsgDisplayed()).toBe(true);
+          expect(cookbook.isErrorModalDisplayed()).toBe(true);
         });
 
         it('should validate error message', function() {
-          expect(cookbook.errorMsg.getText()).toEqual('Error: Unable to generate tasks. There is no released version of the recipe to generate tasks with');
+          expect(cookbook.errorModalText.getText()).toEqual('There is no released version of the recipe to generate tasks with');
         });
 
         it('should close error msg', function() {
-          cookbook.errorMsgCloseBtn.click();
-          expect($('[class="body ng-scope"] span').getAttribute('ng-bind')).toBe(null);
+          cookbook.errorModalCloseBtn.click();
+          expect(cookbook.isErrorModalNotDisplayed()).toBe(true);
+          browser.sleep(2000);
         });
 
       }); //From WIP with "generate using wip recipe" unchecked
 
       describe('From WIP with "Generate using WIP recipe" checked', function() {
-        
-        it('should enable "Generate using WIP Recipe" checkbox', function() {
-          cookbook.generateUsingWipCheck.click();
-          expect(cookbook.generateUsingWipCheck.getAttribute('Checked')).toBe('true');
+      	
+      	it('should enable "Generate using WIP Recipe" checkbox', function() {
+          cookbook.generateUsingWipCheckBox.click();
+          expect(cookbook.generateUsingWipCheckBox.getAttribute('checked')).toBe('true');
         });
 
         it('should click on generate task button', function() {
@@ -464,10 +481,8 @@ describe('Cookbook', function(){
         });
 
         it('should have this result', function() {
-          expect(cookbook.sumaryList.getText()).toEqual('Status: Completed\nTasks Created: 4\nNumber of Exceptions: 4');
+          expect(cookbook.sumaryList.getText()).toEqual('Status: Completed\nTasks Created: 8\nNumber of Exceptions: 8');
         });
-
-
 
       }); //From WIP with "Generate using WIP recipe" checked
 
@@ -475,15 +490,17 @@ describe('Cookbook', function(){
       
         it('should click on generate task button', function() {
           cookbook.generateTasksBtn.click();
+          browser.sleep(2000);
           var alertDialog = browser.driver.switchTo().alert();
           expect(alertDialog.getText()).toEqual('There are tasks previously created with this recipe for the selected context.\n\nPress Okay to delete or Cancel to abort.');
           alertDialog.accept();     
         });
-        
+      
       });
     });// Generate Tasks
   });
 
+      	
 // describe('Editor Tab', function(){
 //   describe ('show diff button', function(){
 
@@ -513,3 +530,4 @@ describe('Cookbook', function(){
 
 
 }); //Cookbook'.modal-body .tabbable'
+

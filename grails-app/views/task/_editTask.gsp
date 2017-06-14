@@ -54,7 +54,7 @@
 						<td valign="top" class="name"><label for="workFlowTransitionEditId">Workflow Step:</label></td>
 						<td valign="top" class="value">
 							<span id="workFlowTransitionEditId">
-							<workflow-transition-select workflows="ds.workflows" comment-id='ac.commentId' category='ac.category'
+							<workflow-transition-select ng-if="ds.workflows.length > 0" workflows="ds.workflows" comment-id='ac.commentId' category='ac.category'
 							 asset-id='ac.assetEntity' ng-model='ac.workflowTransition'></workflow-transition-select>
 							</span>
 							<input type="checkbox" ng-model="ac.override" id="override" name="override" value="0"
@@ -69,7 +69,7 @@
 							<div style="width:200px;display: inline-block;">
 								<input type="hidden" id="currentAsset" name="commentInfo.currentAsset" ng-model="commentInfo.currentAsset" value="{{commentInfo.currentAsset}}" class="scrollSelect"  
 									data-asset-type="{{commentInfo.currentAssetClass}}" data-asset-id="{{commentInfo.currentAsset}}" data-asset-name="{{commentInfo.currentAssetName}}"/>
-							</div
+							</div>
 						</td>
 					</tr>
 					<tr class="prop">

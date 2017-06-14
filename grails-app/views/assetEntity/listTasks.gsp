@@ -99,14 +99,14 @@
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:myLinkFormatter, width:60, fixed:true},
 					{name:'comment', width:680, formatter:taskViewFormatter},
-					{name:'${taskPref['1']}', formatter:${formatterMap[taskPref['1']] ?: 'taskFormatter'}, width:200},
-					{name:'${taskPref['2']}', formatter:${formatterMap[taskPref['2']] ?: 'taskFormatter'}, width:200},
+					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
+					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
 					{name:'dueDate', formatter: dueFormatter},
 					{name:'status', formatter: statusFormatter},
-					{name:'${taskPref['3']}', formatter:${formatterMap[taskPref['3']] ?: 'taskFormatter'}, width:200},
-					{name:'${taskPref['4']}', formatter:${formatterMap[taskPref['4']] ?: 'taskFormatter'}, width:200},
-					{name:'${taskPref['5']}', formatter:${formatterMap[taskPref['5']] ?: 'taskFormatter'}, width:200},
+					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
 					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
 					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
@@ -114,7 +114,7 @@
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
-				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
+				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId'); gridLoadComplete(); }"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, step:step }"
 				showPager="true">
@@ -130,7 +130,7 @@
 
 				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+"')\">");
 			</g:each>
-		})
+		});
 
 		$.jgrid.formatter.integer.thousandsSeparator='';
 
@@ -241,13 +241,23 @@
 			}
 		});
 
+		var initialGridLoad = false;
+		function gridLoadComplete() {
+		    if(!initialGridLoad) {
+            	recompileDOM('taskListIdWrapper');
+            	initialGridLoad = true;
+            } else {
+                recompileDOM('taskListIdGrid');
+			}
+		};
+
 		function reloadGrid () {
 			var postData = $('#taskListIdGrid').jqGrid('getGridParam', 'postData');
 			postData.justRemaining = $('#justRemainingCB').is(':checked') ? 1 : 0;
 			postData.justMyTasks = $('#justMyTasksCB').is(':checked') ? 1 : 0;
 			postData.viewUnpublished = viewUnpublished ? 1 : 0;
 			$('#taskListId').trigger('reloadGrid').trigger('click')
-		}
+		};
 	</script>
 </head>
 <body>

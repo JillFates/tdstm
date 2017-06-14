@@ -1,5 +1,5 @@
 <div class="row progress-bar-container">
-	<div class="col-xs-4 item-wrapper refresh-button" onclick="if(typeof progressTimer !== 'undefined'){ progressTimer.refreshFunction()} else { timerBar.refreshFunction() }">
+	<div class="col-xs-4 item-wrapper refresh-button" onclick="if(typeof progressTimer !== 'undefined'){  progressTimer.updateTarget = true; progressTimer.refreshFunction();} else { timerBar.updateTarget = true; timerBar.refreshFunction(); }">
 		<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 	</div>
 	<div class="col-xs-4 item-wrapper select-timer">

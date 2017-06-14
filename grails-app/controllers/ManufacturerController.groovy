@@ -128,7 +128,7 @@ class ManufacturerController implements ControllerMethods {
 					render(view: 'edit', model: [manufacturerInstance: manufacturer, manuAlias: manuAlias])
 				}
 			} catch (ServiceException e) {
-				log.error(e.message, e)
+				//log.error(e.message, e)
 				flash.message = e.message
 				manufacturer.clearErrors()
 				def manuAlias = ManufacturerAlias.findAllByManufacturer(manufacturer)
@@ -155,7 +155,7 @@ class ManufacturerController implements ControllerMethods {
 				render(view: 'create', model: [manufacturerInstance: manufacturer])
 			}
 		} catch (ServiceException e) {
-			log.error(e.message, e)
+			//log.error(e.message, e)
 			render(text: e.message)
 		}
 	}
