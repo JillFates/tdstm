@@ -63,16 +63,17 @@
     </kendo-grid-column>
     <kendo-grid-column field="imp" title="Importance" [width]="100">
         <ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
-            Importance <popup-legends></popup-legends>
+            Importance
+            <popup-legends></popup-legends>
         </ng-template>
         <ng-template kendoGridCellTemplate let-dataItem>
             <field-settings-imp [edit]="isEditing" [(model)]="dataItem.imp"></field-settings-imp>
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="required" title="Required" [width]="80">
+    <kendo-grid-column field="constraints.required" title="Required" [width]="80">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
             <div class="checkbox text-center">
-                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.required" name="required"></label>
+                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.constraints.required" name="required"></label>
             </div>
         </ng-template>
         <ng-template kendoGridCellTemplate let-dataItem #requiredTemp>
@@ -89,14 +90,6 @@
             {{dataItem.display | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="type" title="Type" [width]="110">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <select class="form-control" [disabled]="!dataItem.udf" name="type" id="type" [(ngModel)]="dataItem.type">
-                <option value="" [ngValue]="null">Please select</option>
-                <option *ngFor="let t of availableTypes" [ngValue]="t">{{t}}</option>
-            </select>
-        </ng-template>
-    </kendo-grid-column>
     <kendo-grid-column field="default" title="Default Value">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
             <input type="text" [disabled]="!dataItem.udf" class="form-control" [(ngModel)]="dataItem.default" name="default">
@@ -108,7 +101,7 @@
                 <option value="">Please select</option>
                 <option *ngFor="let c of availableControls" [ngValue]="c">{{c}}</option>
             </select>
-            <selectlist-configuration-popup *ngIf="dataItem.control==='Select List'" [field]="dataItem"></selectlist-configuration-popup>
+            <selectlist-configuration-popup *ngIf="dataItem.control==='Select List'" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">

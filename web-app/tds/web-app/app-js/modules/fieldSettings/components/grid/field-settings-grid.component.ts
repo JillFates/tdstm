@@ -46,8 +46,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isSubmitted = false;
 	private sortable: boolean | object = { mode: 'single' };
 
-	private availableTypes = ['String', 'Number', 'Boolean', 'Date', 'Array'];
-	private availableControls = ['Select List', 'Checkbox', 'YesNo', 'DatePicker', 'TextArea'];
+	private availableControls = ['Select List', 'String', 'YesNoUnknow'];
 	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
 
 	constructor(
