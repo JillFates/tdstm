@@ -23,6 +23,7 @@ export class PreferenceService {
 				Object.keys(response.data.preferences).forEach((key) => {
 					this.preferences[key] = response.data.preferences[key];
 				});
-			});
+			})
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 }
