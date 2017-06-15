@@ -49,6 +49,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.Criteria
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import grails.converters.JSON
@@ -2787,5 +2788,38 @@ class AssetEntityService implements ServiceMethods {
 		]
 
 		return map
+	}
+
+	/**
+	 * Retrieve distinct asset entity "custom(n)" field values for all or specific asset class
+	 * @param project
+	 * @param fieldName
+	 * @param shared
+	 * @param assetClass
+	 * @return
+	 */
+	List<String> getDistinctAssetEntityCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
+		String query = "SELECT * FROM (SELECT DISTINCT ${fieldName} COLLATE latin1_bin AS ${fieldName} " +
+				"FROM asset_entity WHERE ${fieldName} IS NOT NULL AND project_id = ? ";
+
+		// shared or not
+		if (!shared) {
+			query = query + " AND asset_class = ? "
+		}
+		
+		// order
+		query = query + ") tmp ORDER BY ${fieldName} COLLATE latin1_general_ci ASC";
+
+		List<String> result = []
+		List<Map<String, Object>> values = null
+		if (shared) {
+			values = jdbcTemplate.queryForList(query, project.id)
+		} else {
+			values = jdbcTemplate.queryForList(query, project.id, assetClass.toString())
+		}
+		for (Map<String, Object> value : values) {
+			result.add(value[fieldName])
+		}
+		return result
 	}
 }

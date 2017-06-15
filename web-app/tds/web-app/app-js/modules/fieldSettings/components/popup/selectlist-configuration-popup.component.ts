@@ -19,11 +19,20 @@ export class SelectListConfigurationPopupComponent {
 	public items: string[] = [];
 	public newItem = '';
 	public show = true; // first time should open automatically.
+	public defaultValue: string = null;
 
 	private load(): void {
 		this.newItem = '';
+		this.defaultValue = null;
 		if (this.field.option) {
 			this.items = this.field.option.slice();  // make a copy to work with.
+			this.defaultValue = this.field.default;
+		}
+	}
+
+	public getStyle(index) {
+		if ((index % 2) === 0) {
+			return {'background-color': 'white'};
 		}
 	}
 
@@ -40,6 +49,9 @@ export class SelectListConfigurationPopupComponent {
 
 	public onSave(): void {
 		this.field.option = this.items;
+		if (this.defaultValue != null) {
+			this.field.default = this.defaultValue;
+		}
 		this.onToggle();
 	}
 
@@ -48,6 +60,9 @@ export class SelectListConfigurationPopupComponent {
 			if (this.items[i] === item) {
 				if (remove) {
 					this.items.splice(i, 1);
+					if (this.defaultValue === item) {
+						this.defaultValue = null;
+					}
 					return null;
 				}
 				return this.items[i];
@@ -58,6 +73,10 @@ export class SelectListConfigurationPopupComponent {
 
 	public onToggle(): void {
 		this.show = !this.show;
-		this.show ? this.load() : this.items = [];
+		if (this.show) {
+			this.load();
+		} else {
+			this.items = [];
+		}
 	}
 }

@@ -2,14 +2,18 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
+import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
     public static final String ALL_ASSET_CLASSES = "ASSETS"
+    public static final String CUSTOM_FIELD_NAME_PART = "custom"
 
     SecurityService securityService
     SettingService settingService
+    AssetEntityService assetEntityService
 
     /**
      * Retrieve custom field specs
@@ -38,7 +42,7 @@ class CustomDomainService implements ServiceMethods {
     Map allFieldSpecs(String domain){
         Project currentProject = securityService.loadUserCurrentProject()
         Map fieldSpec = [:]
-        List<String> assetClassTypes = resolveAssetClassType(domain)
+        List<String> assetClassTypes = resolveAssetClassTypes(domain)
 
         for (String assetClassType : assetClassTypes) {
             def fieldSpecMap = settingService.getAsMap(currentProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
@@ -59,7 +63,7 @@ class CustomDomainService implements ServiceMethods {
      */
     void saveFieldSpecs(String domain, JSONObject fieldSpec) {
         Project currentProject = securityService.loadUserCurrentProject()
-        List<String> assetClassTypes = resolveAssetClassType(domain)
+        List<String> assetClassTypes = resolveAssetClassTypes(domain)
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
             if (customFieldSpec) {
@@ -73,6 +77,24 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
+     * Retrieve a list of distinct values found for the specified domain and field spec
+     * @param domain
+     * @param fieldSpec
+     * @param failOnFirst
+     * @return
+     */
+    List<String> distinctValues(String domain, JSONObject fieldSpec, Boolean failOnFirst=false) {
+        Project currentProject = securityService.loadUserCurrentProject()
+        AssetClass assetClass = resolveAssetClassType(domain)
+        JSONObject parsedJson = JsonUtil.parseJson(fieldSpec.toString())
+        String fieldName = parsedJson["fieldSpec"]["field"]
+        boolean shared = parsedJson["fieldSpec"]["shared"]
+
+        validateCustomFieldName(fieldName)
+        return assetEntityService.getDistinctAssetEntityCustomFieldValues(currentProject, fieldName, shared, assetClass)
+    }
+
+    /**
      * Get field specs
      * @param domain AssetClass type
      * @param udf whether to return custom or standard fields
@@ -82,7 +104,7 @@ class CustomDomainService implements ServiceMethods {
     private Map getFilteredFieldSpecs(String domain, int udf, boolean showOnly = false) {
         Project currentProject = securityService.loadUserCurrentProject()
         Map fieldSpec = [:]
-        List<String> assetClassTypes = resolveAssetClassType(domain)
+        List<String> assetClassTypes = resolveAssetClassTypes(domain)
         for (String assetClass : assetClassTypes) {
             def fieldSpecMap = settingService.getAsMap(currentProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, domain.toUpperCase())
             fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecMap
@@ -97,20 +119,58 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
-     * Resolve which AssetClass field specs to return or all
+     * Resolve which AssetClass field specs to return or fail
      * @param domain
      * @return
      */
-    private List<String> resolveAssetClassType(String domain) {
+    private List<String> resolveAssetClassTypes(String domain) {
         if (domain.toUpperCase() == ALL_ASSET_CLASSES) {
             return AssetClass.values().collect({ac -> ac.toString().toUpperCase()})
         } else {
             if (AssetClass.safeValueOf(domain.toUpperCase())) {
                 return [domain.toUpperCase()]
-            } else {
-                throw new InvalidParamException("Invalid AssetClass name: ${domain}")
             }
+            throw new InvalidParamException("Invalid AssetClass name: ${domain}")
         }
     }
 
+    /**
+     * Resolve AssetClass from domain or fail
+     * @param domain
+     * @return
+     */
+    private AssetClass resolveAssetClassType(String domain) {
+        AssetClass assetClass = AssetClass.safeValueOf(domain.toUpperCase())
+        if (assetClass) {
+            return assetClass
+        }
+        throw new InvalidParamException("Invalid AssetClass name: ${domain}")
+    }
+
+    /**
+     * Validate if custom field name is within custom field counts
+     * @param fieldName
+     */
+    private void validateCustomFieldName(String fieldName) {
+        if (!StringUtil.isBlank(fieldName)) {
+            String[] foundField = fieldName.split("(?<=[\\w&&\\D])(?=\\d)")
+            String fieldNamePart = foundField[0]
+            int fieldCountPart = foundField[1] as Integer
+
+            if (!(CUSTOM_FIELD_NAME_PART == fieldNamePart) || !(fieldCountPart > 0 && fieldCountPart <= Project.CUSTOM_FIELD_COUNT)) {
+                reportFieldNameViolation(fieldName)
+            }
+        } else {
+            reportFieldNameViolation(fieldName)
+        }
+    }
+
+    /**
+     * Report security violation and throw an exception
+     * @param fieldName
+     */
+    private void reportFieldNameViolation(String fieldName) {
+        securityService.reportViolation("Attempted to report distinct field values for unexisting field name: [${fieldName}]", securityService.currentUsername)
+        throw new InvalidRequestException("Field name does not exist or not valid: ${fieldName}")
+    }
 }
