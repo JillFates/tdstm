@@ -1546,7 +1546,7 @@ class AssetEntityService implements ServiceMethods {
 			Map settingsMap =  customDomainService.customFieldSpecs(domain, showOnly)
 			if (settingsMap && settingsMap[domain.toUpperCase()]) {
 				// Strips the list of fields from the result map.
-				customs = settingsMap[domain.toUpperCase()]
+				customs = settingsMap[domain.toUpperCase()].fields
 				// Sorts the results based on order and field.
 				customs = customs.sort{ i,j ->
 					i.order <=> j.order ?: i.field <=> j.field
