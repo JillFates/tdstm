@@ -11,6 +11,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FieldSettingsModel } from '../model/field-settings.model';
+import { CustomDomainService } from '../service/custom-domain.service';
 
 describe('SelectListConfigurationPopupComponent:', () => {
 	let fixture: ComponentFixture<SelectListConfigurationPopupComponent>;
@@ -39,7 +40,7 @@ describe('SelectListConfigurationPopupComponent:', () => {
 				PopupModule,
 				SortableModule],
 			declarations: [SelectListConfigurationPopupComponent],
-			providers: []
+			providers: [CustomDomainService]
 		}).compileComponents();
 	}));
 
