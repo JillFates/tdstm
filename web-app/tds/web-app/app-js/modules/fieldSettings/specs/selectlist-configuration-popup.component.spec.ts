@@ -1,16 +1,16 @@
 /**
  * Created by daviD on 04/06/2017.
  */
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {SelectListConfigurationPopupComponent} from '../components/popup/selectlist-configuration-popup.component';
-import {DebugElement} from '@angular/core';
-import {PopupModule} from '@progress/kendo-angular-popup';
-import {SortableModule} from '@progress/kendo-angular-sortable';
-import {FormsModule} from '@angular/forms';
-import {SharedModule} from '../../../shared/shared.module';
-import {By} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {FieldSettingsModel} from '../model/field-settings.model';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { SelectListConfigurationPopupComponent } from '../components/popup/selectlist-configuration-popup.component';
+import { DebugElement } from '@angular/core';
+import { PopupModule } from '@progress/kendo-angular-popup';
+import { SortableModule } from '@progress/kendo-angular-sortable';
+import { FormsModule } from '@angular/forms';
+import { SharedModule } from '../../../shared/shared.module';
+import { By } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FieldSettingsModel } from '../model/field-settings.model';
 
 describe('SelectListConfigurationPopupComponent:', () => {
 	let fixture: ComponentFixture<SelectListConfigurationPopupComponent>;
@@ -22,10 +22,12 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		udf: true,
 		shared: true,
 		imp: 'C',
-		required: true,
+		constraints: {
+			required: true,
+			values: []
+		},
 		show: true,
-		control: 'Select',
-		option: []
+		control: 'Select List'
 	};
 
 	beforeEach(async(() => {
@@ -96,8 +98,8 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		let saveButton: DebugElement;
 		saveButton = fixture.debugElement.query(By.css('button[name=saveButton]'));
 		saveButton.triggerEventHandler('click', null);
-		expect(comp.field.option.length).toEqual(1);
-		expect(comp.field.option[0]).toEqual('Foo');
+		expect(comp.field.constraints.values.length).toEqual(1);
+		expect(comp.field.constraints.values[0]).toEqual('Foo');
 
 	});
 });

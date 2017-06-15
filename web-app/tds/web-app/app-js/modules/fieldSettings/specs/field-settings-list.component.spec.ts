@@ -38,7 +38,9 @@ describe('FieldSettingsListComponent:', () => {
 				udf: true,
 				shared: true,
 				imp: 'C',
-				required: true,
+				constraints: {
+					required: true
+				},
 				show: true
 			}]
 		},
@@ -51,7 +53,9 @@ describe('FieldSettingsListComponent:', () => {
 				udf: true,
 				shared: true,
 				imp: 'C',
-				required: true,
+				constraints: {
+					required: true
+				},
 				show: true
 			}]
 		}

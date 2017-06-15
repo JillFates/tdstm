@@ -22,5 +22,5 @@ export class ConstraintModel {
 	required: boolean;
 	minSize?: Number;
 	maxSize?: Number;
-	values?: Array<string>
+	values?: Array<string>;
 }
