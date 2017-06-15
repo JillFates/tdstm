@@ -1546,7 +1546,7 @@ class AssetEntityService implements ServiceMethods {
 			Map settingsMap =  customDomainService.customFieldSpecs(domain, showOnly)
 			if (settingsMap && settingsMap[domain.toUpperCase()]) {
 				// Strips the list of fields from the result map.
-				customs = settingsMap[domain.toUpperCase()]
+				customs = settingsMap[domain.toUpperCase()].fields
 				// Sorts the results based on order and field.
 				customs = customs.sort{ i,j ->
 					i.order <=> j.order ?: i.field <=> j.field
@@ -2790,9 +2790,17 @@ class AssetEntityService implements ServiceMethods {
 		return map
 	}
 
+	/**
+	 * Retrieve distinct asset entity "custom(n)" field values for all or specific asset class
+	 * @param project
+	 * @param fieldName
+	 * @param shared
+	 * @param assetClass
+	 * @return
+	 */
 	List<String> getDistinctAssetEntityCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
-		String query = "SELECT DISTINCT ${fieldName} COLLATE latin1_bin AS ${fieldName} " +
-				"FROM asset_entity WHERE project_id = ? ";
+		String query = "SELECT * FROM (SELECT DISTINCT ${fieldName} COLLATE latin1_bin AS ${fieldName} " +
+				"FROM asset_entity WHERE ${fieldName} IS NOT NULL AND project_id = ? ";
 
 		// shared or not
 		if (!shared) {
@@ -2800,7 +2808,7 @@ class AssetEntityService implements ServiceMethods {
 		}
 		
 		// order
-		query = query + "ORDER BY UPPER(${fieldName}) ASC";
+		query = query + ") tmp ORDER BY ${fieldName} COLLATE latin1_general_ci ASC";
 
 		List<String> result = []
 		List<Map<String, Object>> values = null
