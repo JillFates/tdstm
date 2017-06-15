@@ -93,7 +93,6 @@ describe('FieldSettingsListComponent:', () => {
 	it('should create tabs based on domain model length', () => {
 		fixture.detectChanges();
 		de = fixture.debugElement.query(By.css('.nav-tabs'));
-		// Because of the pull-right 'li' element we add one to the assertion
-		expect(de.children.length).toBe(mockData.length + 1);
+		expect(de.children.length).toBe(mockData.length);
 	});
 });
