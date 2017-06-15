@@ -17,6 +17,7 @@ import { PopupModule } from '@progress/kendo-angular-popup';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 // Services
 import { FieldSettingsService } from './service/field-settings.service';
+import { CustomDomainService } from './service/custom-domain.service';
 
 @NgModule({
 	imports: [
@@ -34,7 +35,7 @@ import { FieldSettingsService } from './service/field-settings.service';
 		SelectListConfigurationPopupComponent,
 		FieldSettingsImportanceComponent
 	],
-	providers: [FieldSettingsService],
+	providers: [FieldSettingsService, CustomDomainService],
 	exports: [FieldSettingsListComponent]
 })
 
