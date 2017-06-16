@@ -1,0 +1,29 @@
+<div #openText (click)="onToggle()" class="open-close-dropdown-container text-center">
+    <i class="open-close-dropdown-icon fa fa-caret-up" *ngIf="show"></i>
+    <i class="open-close-dropdown-icon fa fa-caret-down" *ngIf="!show"></i>
+</div>
+<kendo-popup *ngIf="show" [anchor]="openText" [popupClass]="" [anchorAlign]="{horizontal: 'center', vertical: 'middle'}"
+    [popupAlign]="{horizontal: 'center', vertical: 'top'}">
+
+    <div class="popup-container">
+        <div class="text-center">
+            <div class="form-group">
+                <label for="minSize">Min Length</label>
+                <input type="number" name="minSize" class="form-control" [(ngModel)]="model.minSize">
+            </div>
+            <div class="form-group">
+                <label for="maxSize">Max Length</label>
+                <input type="number" name="maxSize" class="form-control" [(ngModel)]="model.maxSize">
+            </div>
+        </div>
+        <div class="text-right">
+            <button name="saveButton" class="btn btn-default btn-xs" (click)="onSave()">
+                <i class="fa fa-check"></i> {{'GLOBAL.CLOSE' | translate}}
+            </button>
+            <button name="cancelButton" class="btn btn-default btn-xs" (click)="onToggle()">
+                <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}
+            </button>
+        </div>
+    </div>
+
+</kendo-popup>

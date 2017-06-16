@@ -1,7 +1,7 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SortableComponent } from '@progress/kendo-angular-sortable';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
@@ -9,7 +9,8 @@ import { CustomDomainService } from '../../service/custom-domain.service';
 @Component({
 	moduleId: module.id,
 	selector: 'selectlist-configuration-popup',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/popup/selectlist-configuration-popup.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/select-list/selectlist-configuration-popup.component.html',
+	encapsulation: ViewEncapsulation.None,
 	styles: [``]
 })
 
