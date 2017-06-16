@@ -22,16 +22,32 @@ class CustomDomainService implements ServiceMethods {
      * @return
      */
     Map customFieldSpecs(String domain, boolean showOnly = false) {
-        return getFilteredFieldSpecs(domain, 1, showOnly)
+        Project currentProject = securityService.loadUserCurrentProject()
+        return getFilteredFieldSpecs(currentProject, domain, 1, showOnly)
     }
 
     /**
-     * Retrieve standard field specs
+     * Retrieve standard field specs as map
      * @param domain
      * @return
      */
-    Map standardFieldSpecs(String domain) {
-        return getFilteredFieldSpecs(domain, 0)
+    Map standardFieldSpecsByField(String domain) {
+        Project currentProject = securityService.loadUserCurrentProject()
+        Map fieldSpecs = getFilteredFieldSpecs(currentProject, domain, 0)
+        Map domainFieldSpecs = createFieldSpecsViewMap(fieldSpecs, domain)
+        return domainFieldSpecs
+    }
+
+    /**
+     * Retrieve standard field specs as map
+     * @param project
+     * @param domain
+     * @return
+     */
+    Map standardFieldSpecsByField(Project project, String domain) {
+        Map fieldSpecs = getFilteredFieldSpecs(project, domain, 0)
+        Map domainFieldSpecs = createFieldSpecsViewMap(fieldSpecs, domain)
+        return domainFieldSpecs
     }
 
     /**
@@ -101,12 +117,11 @@ class CustomDomainService implements ServiceMethods {
      * @param showOnly flag to filter those fields that shown in views, etc.
      * @return
      */
-    private Map getFilteredFieldSpecs(String domain, int udf, boolean showOnly = false) {
-        Project currentProject = securityService.loadUserCurrentProject()
+    private Map getFilteredFieldSpecs(Project project, String domain, int udf, boolean showOnly = false) {
         Map fieldSpec = [:]
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
         for (String assetClass : assetClassTypes) {
-            def fieldSpecMap = settingService.getAsMap(currentProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, domain.toUpperCase())
+            def fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, domain.toUpperCase())
             fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecMap
             if (showOnly) {
                 fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll({ field -> field.udf == udf && field.show == 1})
@@ -116,6 +131,24 @@ class CustomDomainService implements ServiceMethods {
         }
 
         return fieldSpec
+    }
+
+    /**
+     * Giving the fields specs map for certain domain/asset class,
+     * it returns the list of fields as a map using the field name as the map key
+     * @param fieldSpecs
+     * @param domain
+     * @return
+     */
+    private Map createFieldSpecsViewMap(Map fieldSpecs, String domain) {
+        List domainFields = fieldSpecs[domain.toUpperCase()]["fields"]
+        Map fieldSpecsMap = [:]
+        if (!domainFields) {
+            return fieldSpecsMap
+        }
+
+        fieldSpecsMap = domainFields.collectEntries { [(it["field"]) : it] }
+        return fieldSpecsMap
     }
 
     /**
