@@ -388,9 +388,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return the UserPreference if found otherwise null
 	 */
 	private UserPreference getUserPreference(UserLogin userLogin, String preferenceCode) {
-		UserPreference.find(
-			'from UserPreference as u where u.userLogin=:user and u.preferenceCode=:pc',
-			[user:userLogin, pc:preferenceCode] )
+		UserPreference.get(new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode))
 	}
 
 	/**
