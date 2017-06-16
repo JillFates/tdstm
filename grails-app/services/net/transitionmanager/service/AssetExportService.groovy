@@ -7,6 +7,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.MoveBundle
@@ -22,6 +23,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.*
 import org.hibernate.transform.Transformers
 
+@Slf4j
 @Transactional
 class AssetExportService {
     private static final ASSET_EXPORT_TEMPLATE = "/templates/TDSMaster_template.xlsx"
@@ -101,10 +103,11 @@ class AssetExportService {
             def principal = params.username
             def loginUser = UserLogin.findByUsername(principal)
 
-            def bundle = params.bundle
-            def bundleSize = bundle.size()
-            bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')
+            List<String> bundle = params.bundle
+            boolean useForPlanning = bundle.remove(MoveBundle.USE_FOR_PLANNING)
+            int bundleSize = bundle.size()
 
+            bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')
 
             def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
@@ -176,6 +179,11 @@ class AssetExportService {
             //def session = sessionFactory.currentSession
             String query = ' WHERE d.project=:project '
             Map queryParams = [project:project]
+
+            if(useForPlanning){
+                query += ' AND d.moveBundle.useForPlanning = TRUE '
+            }
+
             // Setup for multiple bundle selection
             if (bundle[0]) {
                 for ( int i=0; i< bundleSize ; i++ ) {
@@ -645,7 +653,7 @@ class AssetExportService {
                         def a = currentAsset
 
                         if (profilingRow) {
-                            // log.debug "SET VAR TIME = " + profiler.getLapDuration('Devices').toMilliseconds()
+                            // log.debug("SET VAR TIME = {}", profiler.getLapDuration('Devices').toMilliseconds() )
                             lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
                             if (lapDuration > profileThresholdSettingField) {
                                 profiler.log(Profiler.LOG_TYPE.INFO, 'Set var %s (%s msec)', [colName, lapDuration.toString()])
@@ -828,7 +836,7 @@ class AssetExportService {
 
                         // If the column isn't in the spreadsheet we'll skip over it
                         if ( ! appSheetColumnNames.containsKey(colName)) {
-                            log.info "export() : skipping column $colName that is not in spreadsheet"
+                            log.info("export() : skipping column {} that is not in spreadsheet", colName)
                             continue
                         }
 
@@ -855,7 +863,7 @@ class AssetExportService {
                                 break
                             case ~/ShutdownFixed|StartupFixed|TestingFixed/:
                                 colVal = app[assetColName] ? 'Yes' : 'No'
-                                //log.info "export() : field class type=$app[assetColName].className()}"
+                                //log.info("export() : field class type= {}", app[assetColName].className())
                                 break
                             case ~/Retire|MaintExp/:
                                 colVal = app[assetColName] ? TimeUtil.formatDate(userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE) : ''

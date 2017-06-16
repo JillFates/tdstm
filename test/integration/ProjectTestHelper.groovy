@@ -55,6 +55,7 @@ class ProjectTestHelper {
 		if (!company) {
 			company = createCompany('Owner')
 		}
+println "company=$company, partyType=${company?.partyType}(${company?.partyType?.id}"
 
 		Project project = new Project()
 		project.with {
@@ -84,13 +85,14 @@ class ProjectTestHelper {
 	 */
 	PartyGroup createCompany(String prefix) {
 		PartyType pt = PartyType.get('COMPANY')
+		assert pt
 		PartyGroup company = new PartyGroup()
 		company.with {
 			partyType = pt
 			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
 		}
 
-		company.save(failOnError:true)
+		company.save(failOnError:true, flush:true)
 	}
 
 	/**
