@@ -13,7 +13,7 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	@Input() domain: string;
 	@Input() field: FieldSettingsModel;
 
-	public show = true; // first time should open automatically.
+	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 
 	public onSave(): void {
