@@ -1211,6 +1211,12 @@ class AssetEntityService implements ServiceMethods {
 			WHERE project=:project AND assetClass=:ac AND assetType IN (:types)
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
 			*/ // TM-6096
+
+		// Obtains the domain out of the asset type string.
+		String domain = AssetClass.getDomainForAssetType(type)
+		// Retrieves the Spec for the standard fields.
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+
 		[assetId: asset.id,
 		 //assetTypeAttribute: assetTypeAttribute,
 		 //assetTypeOptions: getDeviceAssetTypeOptions(),
@@ -1233,7 +1239,8 @@ class AssetEntityService implements ServiceMethods {
 		 redirectTo: params.redirectTo,
 		 //servers: servers, // TM-6096
 		 //supportAssets: supportAssets, // TM-6096
-		 version: asset.version]
+		 version: asset.version,
+		 standardFieldSpecs: standardFieldSpecs]
 	}
 
 	/**
@@ -1268,6 +1275,11 @@ class AssetEntityService implements ServiceMethods {
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
 
+		// Obtains the domain out of the asset type string.
+		String domain = AssetClass.getDomainForAssetType(type)
+		// Retrieves the Spec for the standard fields.
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+
 		[assetId: assetEntity?.id,
 		 assetComment: assetComment,
 		 assetCommentList: AssetComment.findAllByAssetEntity(assetEntity),
@@ -1284,7 +1296,8 @@ class AssetEntityService implements ServiceMethods {
 		 redirectTo: params.redirectTo,
 		 supportAssets: supportAssets,
 		 viewUnpublishedValue: viewUnpublishedValue,
-		 hasPublishPermission: securityService.hasPermission(Permission.TaskPublish)]
+		 hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
+		 standardFieldSpecs: standardFieldSpecs]
 	}
 
 	/**
