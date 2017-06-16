@@ -20,9 +20,9 @@ export class SelectListConfigurationPopupComponent {
 	@Input() field: FieldSettingsModel;
 	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
 
-	public items: string[] = [];
+	public items: any[] = [];
 	public newItem = '';
-	public show = true; // first time should open automatically.
+	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
 
 	constructor(private customService: CustomDomainService) { }
@@ -30,14 +30,23 @@ export class SelectListConfigurationPopupComponent {
 	private load(): void {
 		this.newItem = '';
 		this.defaultValue = null;
-		console.log(this.field.constraints.values);
 		if (this.field.constraints.values) {
-			this.items = this.field.constraints.values.slice();  // make a copy to work with.
+			this.items = this.field.constraints.values.map(i => {
+				return {
+					deletable: true,
+					value: i
+				};
+			});  // make a copy to work with.
 			this.defaultValue = this.field.default;
 		} else {
 			this.customService.getDistinctValues(this.domain, this.field)
 				.subscribe((value) => {
-					this.items = value;
+					this.items = value.map(i => {
+						return {
+							deletable: false,
+							value: i
+						};
+					});
 				});
 		}
 	}
@@ -49,23 +58,28 @@ export class SelectListConfigurationPopupComponent {
 	}
 
 	public onAdd(): void {
-		if (this.searchItem(this.newItem, false) === null) {
-			this.items.push(this.newItem);
+		if (this.items.filter((i) => i.value === this.newItem).length === 0) {
+			this.items.push({
+				deletable: true,
+				value: this.newItem
+			});
 			this.newItem = '';
 		}
 	}
 
-	public onRemove(item: string): void {
-		this.searchItem(item, true);
+	public onRemove(item: any): void {
+		if (item.deletable) {
+			this.items.splice(this.items.indexOf(item), 1);
+		}
 	}
 
 	public onSave(): void {
 		let fieldModel = { ...this.field };
-		fieldModel.constraints.values = this.items;
+		fieldModel.constraints.values = this.items.map(i => i.value);
 		this.customService.checkConstraints(this.domain, fieldModel)
 			.subscribe(res => {
 				if (res) {
-					this.field.constraints.values = this.items;
+					this.field.constraints.values = this.items.map(i => i.value);
 					if (this.defaultValue != null) {
 						this.field.default = this.defaultValue;
 					}
@@ -73,22 +87,6 @@ export class SelectListConfigurationPopupComponent {
 				}
 			});
 
-	}
-
-	private searchItem(item: string, remove: boolean): string {
-		for (let i = this.items.length - 1; i >= 0; i--) {
-			if (this.items[i] === item) {
-				if (remove) {
-					this.items.splice(i, 1);
-					if (this.defaultValue === item) {
-						this.defaultValue = null;
-					}
-					return null;
-				}
-				return this.items[i];
-			}
-		}
-		return null;
 	}
 
 	public onToggle(): void {

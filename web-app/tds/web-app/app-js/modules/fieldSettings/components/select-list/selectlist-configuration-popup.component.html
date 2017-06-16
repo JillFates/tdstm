@@ -18,9 +18,9 @@
                 [activeItemStyle]="{'opacity': '.7'}" [itemStyle]="{'cursor': 'move', 'margin-bottom': '5px'}" emptyText="">
                 <ng-template let-item="item" let-index="index">
                     <div [ngStyle]="getStyle(index)">
-                        <i class="remove-icon fa fa-fw fa-trash" (click)="onRemove(item)"></i>
-                        <input class="default-input" type="radio" value="{{item}}" name="defaultValue" [(ngModel)]="defaultValue">
-                        <span>{{item}}</span>
+                        <i class="remove-icon fa fa-fw fa-trash" *ngIf="item.deletable" (click)="onRemove(item)"></i>
+                        <input class="default-input" type="radio" value="{{item.value}}" name="defaultValue" [(ngModel)]="defaultValue">
+                        <span>{{item.value}}</span>
                     </div>
                 </ng-template>
             </kendo-sortable>

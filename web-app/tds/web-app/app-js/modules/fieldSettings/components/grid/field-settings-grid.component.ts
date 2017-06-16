@@ -139,6 +139,9 @@ export class FieldSettingsGridComponent implements OnInit {
 	protected onAddCustom(): void {
 		let model = new FieldSettingsModel();
 		model.field = this.availableCustomNumbers();
+		model.constraints = {
+			required: false
+		};
 		model['isNew'] = true;
 		this.fieldsSettings.push(model);
 		this.refresh();
