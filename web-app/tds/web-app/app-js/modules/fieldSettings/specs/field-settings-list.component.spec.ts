@@ -18,7 +18,8 @@ import { NotifierService } from '../../../shared/services/notifier.service';
 
 import { FieldSettingsListComponent } from '../components/list/field-settings-list.component';
 import { FieldSettingsGridComponent } from '../components/grid/field-settings-grid.component';
-import { SelectListConfigurationPopupComponent } from '../components/popup/selectlist-configuration-popup.component';
+import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
+import { MinMaxConfigurationPopupComponent } from '../components/min-max/min-max-configuration-popup.component';
 import { FieldSettingsImportanceComponent } from '../components/imp/field-settings-imp.component';
 import { FieldSettingsService } from '../service/field-settings.service';
 import { DomainModel } from '../model/domain.model';
@@ -38,7 +39,9 @@ describe('FieldSettingsListComponent:', () => {
 				udf: true,
 				shared: true,
 				imp: 'C',
-				required: true,
+				constraints: {
+					required: true
+				},
 				show: true
 			}]
 		},
@@ -51,7 +54,9 @@ describe('FieldSettingsListComponent:', () => {
 				udf: true,
 				shared: true,
 				imp: 'C',
-				required: true,
+				constraints: {
+					required: true
+				},
 				show: true
 			}]
 		}
@@ -70,7 +75,8 @@ describe('FieldSettingsListComponent:', () => {
 				FieldSettingsListComponent,
 				FieldSettingsGridComponent,
 				FieldSettingsImportanceComponent,
-				SelectListConfigurationPopupComponent
+				SelectListConfigurationPopupComponent,
+				MinMaxConfigurationPopupComponent
 			],
 			providers: [FieldSettingsService, HttpServiceProvider,
 				NotifierService,
@@ -89,7 +95,6 @@ describe('FieldSettingsListComponent:', () => {
 	it('should create tabs based on domain model length', () => {
 		fixture.detectChanges();
 		de = fixture.debugElement.query(By.css('.nav-tabs'));
-		// Because of the pull-right 'li' element we add one to the assertion
-		expect(de.children.length).toBe(mockData.length + 1);
+		expect(de.children.length).toBe(mockData.length);
 	});
 });

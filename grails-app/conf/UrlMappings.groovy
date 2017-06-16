@@ -438,6 +438,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/customDomain/distinctValues/$id" {
+			controller = "wsCustomDomain"
+			action = [
+					POST: "distinctValues"
+			]
+		}
+
 		"/ws/security/permissions" {
 			controller = "wsSecurity"
 			action = [

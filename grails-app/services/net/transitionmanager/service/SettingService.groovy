@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.SettingType
+import com.tdssrc.grails.JsonUtil
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
@@ -168,16 +169,9 @@ class SettingService implements ServiceMethods {
      * @return
      */
     private String validateAndOptimizeJSON(String json) {
-        try {
-            JsonSlurper slurper = new JsonSlurper()
-            JSONObject parsedJson = slurper.parseText(json) as JSONObject
-            removeVersionKeyIfPresent(parsedJson)
-            JsonBuilder jsonBuilder = new JsonBuilder(parsedJson)
-            return jsonBuilder.toString()
-        } catch (Exception e) {
-            log.error(e.message, e)
-            throw new InvalidParamException("JSON is not valid")
-        }
+        JSONObject parsedJson = JsonUtil.parseJson(json)
+        removeVersionKeyIfPresent(parsedJson)
+        return JsonUtil.validateJsonAndConvertToString(parsedJson)
     }
 
     /**

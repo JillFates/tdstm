@@ -38,11 +38,13 @@ class CustomDomainServiceTests extends Specification {
             def standardFieldSpecsMap
             customDomainService.saveFieldSpecs(CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Application standard field specs are requested'
-            standardFieldSpecsMap = customDomainService.standardFieldSpecs(domain)
+            standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(domain)
         then: 'Application domain fields are returned'
-            standardFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
+            //standardFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
+            null != standardFieldSpecsMap
         then: 'Only database udf fields are returned'
-            [] == standardFieldSpecsMap[domain]["fields"].findAll({field -> field.udf == 1})
+            //[] == standardFieldSpecsMap[domain]["fields"].findAll({field -> field.udf == 1})
+            [:] == standardFieldSpecsMap.findAll({ k,v -> v['udf'] == 1})
     }
 
     void 'Scenario 3: Saving field specs providing unexisting domain type should throw InvalidParamException'() {

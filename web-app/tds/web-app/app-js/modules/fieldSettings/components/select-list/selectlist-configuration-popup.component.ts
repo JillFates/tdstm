@@ -1,19 +1,23 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import {Component, Input, ViewChild} from '@angular/core';
+import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SortableComponent } from '@progress/kendo-angular-sortable';
+import { FieldSettingsModel } from '../../model/field-settings.model';
+import { CustomDomainService } from '../../service/custom-domain.service';
 
 @Component({
 	moduleId: module.id,
 	selector: 'selectlist-configuration-popup',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/popup/selectlist-configuration-popup.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/select-list/selectlist-configuration-popup.component.html',
+	encapsulation: ViewEncapsulation.None,
 	styles: [``]
 })
 
 export class SelectListConfigurationPopupComponent {
 
-	@Input() field: any;
+	@Input() domain: string;
+	@Input() field: FieldSettingsModel;
 	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
 
 	public items: string[] = [];
@@ -21,18 +25,26 @@ export class SelectListConfigurationPopupComponent {
 	public show = true; // first time should open automatically.
 	public defaultValue: string = null;
 
+	constructor(private customService: CustomDomainService) { }
+
 	private load(): void {
 		this.newItem = '';
 		this.defaultValue = null;
-		if (this.field.option) {
-			this.items = this.field.option.slice();  // make a copy to work with.
+		console.log(this.field.constraints.values);
+		if (this.field.constraints.values) {
+			this.items = this.field.constraints.values.slice();  // make a copy to work with.
 			this.defaultValue = this.field.default;
+		} else {
+			this.customService.getDistinctValues(this.domain, this.field)
+				.subscribe((value) => {
+					this.items = value;
+				});
 		}
 	}
 
 	public getStyle(index) {
 		if ((index % 2) === 0) {
-			return {'background-color': 'white'};
+			return { 'background-color': 'white' };
 		}
 	}
 
@@ -48,11 +60,19 @@ export class SelectListConfigurationPopupComponent {
 	}
 
 	public onSave(): void {
-		this.field.option = this.items;
-		if (this.defaultValue != null) {
-			this.field.default = this.defaultValue;
-		}
-		this.onToggle();
+		let fieldModel = { ...this.field };
+		fieldModel.constraints.values = this.items;
+		this.customService.checkConstraints(this.domain, fieldModel)
+			.subscribe(res => {
+				if (res) {
+					this.field.constraints.values = this.items;
+					if (this.defaultValue != null) {
+						this.field.default = this.defaultValue;
+					}
+					this.onToggle();
+				}
+			});
+
 	}
 
 	private searchItem(item: string, remove: boolean): string {

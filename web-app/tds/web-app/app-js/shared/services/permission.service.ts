@@ -22,7 +22,8 @@ export class PermissionService {
 				let result = res.json();
 				this.permissions = result.data;
 				return this.permissions;
-			});
+			})
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
 	hasPermission(value: string): boolean {

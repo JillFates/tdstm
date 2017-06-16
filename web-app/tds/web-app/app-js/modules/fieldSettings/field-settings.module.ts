@@ -8,7 +8,8 @@ import { FIELD_SETTINGS_STATES } from './field-settings.states';
 // Components
 import { FieldSettingsListComponent } from './components/list/field-settings-list.component';
 import { FieldSettingsGridComponent } from './components/grid/field-settings-grid.component';
-import { SelectListConfigurationPopupComponent } from './components/popup/selectlist-configuration-popup.component';
+import { MinMaxConfigurationPopupComponent } from './components/min-max/min-max-configuration-popup.component';
+import { SelectListConfigurationPopupComponent } from './components/select-list/selectlist-configuration-popup.component';
 import { FieldSettingsImportanceComponent } from './components/imp/field-settings-imp.component';
 import { SharedModule } from '../../shared/shared.module';
 // Import Kendo Modules
@@ -17,6 +18,7 @@ import { PopupModule } from '@progress/kendo-angular-popup';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 // Services
 import { FieldSettingsService } from './service/field-settings.service';
+import { CustomDomainService } from './service/custom-domain.service';
 
 @NgModule({
 	imports: [
@@ -32,9 +34,10 @@ import { FieldSettingsService } from './service/field-settings.service';
 		FieldSettingsListComponent,
 		FieldSettingsGridComponent,
 		SelectListConfigurationPopupComponent,
-		FieldSettingsImportanceComponent
+		FieldSettingsImportanceComponent,
+		MinMaxConfigurationPopupComponent
 	],
-	providers: [FieldSettingsService],
+	providers: [FieldSettingsService, CustomDomainService],
 	exports: [FieldSettingsListComponent]
 })
 
