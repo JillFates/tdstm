@@ -312,21 +312,45 @@ class CustomTagLib implements InitializingBean {
 	}
 
 	/**
-	 * Render custom fields (Initial Phase)
-	 * use on gsp as -> <tds:customField label="My Select" default="Item 1" option="['Item 1', 'Item 2', 'Item 3', 'Item 4']"/>
+	 * Render custom fields
+	 * use on gsp as ->
 	 */
 	def customField = { Map attrs ->
 
-		String label = attrs.label;
-		def options = attrs.option;
-		String defaultOption = attrs.default;
+		def field = attrs.field;
+		String value = attrs.value;
+		def tabOffset = attrs.tabOffset;
 
-		out << "<label>" << attrs.label << "</label>"
-		out << "<select>"
-		options.each{
-			out << "<option value=\" " << it << "\">" << it << "</option>"
+		if(field.control == 'Select List'){
+			def options = field.constraints.values;
+			if(value == null){
+				value = field.default;
+			}
+			out << "<select " +
+					"class='"+field.imp+"'" +
+					"id='" + field.field +"'" +
+					"name='"+field.field +"'" +
+					"title='"+field.tip+"'>"
+			options.each{
+				String setSelected = "";
+				if(value != null && it == value){
+					setSelected = " selected=\"selected\" ";
+				}
+				out << "<option "+setSelected+"  value=\" " << it << "\">" << it << "</option>"
+			}
+			out << "</select>"
+		} else{
+
+			value = (value == null ? "" : value);
+
+			out << "<input type=\"text\"" +
+					"id='" + field.field +"'" +
+					"class='" +field.imp+"'" +
+					"name='" +field.field +"'" +
+					"value='"+value+"'" +
+					"tabindex='"+(tabOffset+1)+"'" +
+					"title='"+field.tip+"'/>"
 		}
-		out << "</select>"
 	}
 
 	/**
