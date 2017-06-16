@@ -21,7 +21,7 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferenc
 @Slf4j
 class UserPreferenceService implements ServiceMethods {
 
-	SecurityService securityService
+	def securityService
 
 	// defaults holds global defaults for certain values
 	// TODO - load these from application settings
@@ -30,14 +30,16 @@ class UserPreferenceService implements ServiceMethods {
 		PRINTER_COPIES : 2
 	]
 
-	private static final List<String> depGraphCheckboxLabels = ['bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl',
-	                                                            'dbLbl', 'spLbl', 'slLbl', 'netLbl']
-	private static final List<String> depGraphColorBy = ['group', 'bundle', 'event', 'environment',
-	                                                     'sourceLocation', 'targetLocation']
-	private static final List<String> archGraphCheckboxLabels = ['showCycles', 'blackBackground', 'appLbl', 'srvLbl',
-	                                                             'dbLbl', 'spLbl', 'slLbl', 'netLbl']
-	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb'] // ac:Asset Classes, de: Dependencies, hb: Highlight By
+	private static final List<String> depGraphCheckboxLabels = [
+		'bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
+	private static final List<String> depGraphColorBy = [
+		'group', 'bundle', 'event', 'environment', 'sourceLocation', 'targetLocation']
+	private static final List<String> archGraphCheckboxLabels = [
+		'showCycles', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
+	// ac:Asset Classes, de: Dependencies, hb: Highlight By
+	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb']
 
+	// TODO - TM-6569 - Refactor the Map definition with the closures
 	private static final Map<String, Map> prefCodeConstraints = [
 		viewUnpublished:  [type: 'boolean'],
 		RefreshEventDB:   [type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
@@ -103,6 +105,13 @@ class UserPreferenceService implements ServiceMethods {
 		}]
 	]
 
+	/**
+	 * Used to retrieve a user preference from the user session or database appropriately.
+	 * @param userLogin
+	 * @param preference
+	 * @param defaultIfNotSet - the default value to return if the preference is not set for the user
+	 * @return the found preference value or the default value if not found
+	 */
 	String getPreference(UserLogin userLogin = null, UserPreferenceEnum preference, String defaultIfNotSet = null) {
 		getPreference(userLogin, preference.value(), defaultIfNotSet)
 	}
@@ -113,38 +122,44 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param userLogin			User with the requested preference
 	 * @param preferenceCode	requested preference code
 	 * @param defaultIfNotSet	default value in case that is not set
-	 * @param prefCodeStack		stack of preference calls to avoid circular references
 	 * @return
 	 */
-	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null, List<String> prefCodeStack = []) {
+	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null) {
 		def userPrefValue
 
 		userLogin = resolve(userLogin)
 
 		boolean isCurrent = (userLogin != null && userLogin.id == securityService.currentUserLoginId)
 
-		//if we are getting the current user preference check in session first
+		// If the userLogin is that of the current user then look in the session first as it maybe cached already
 		if (isCurrent) {
 			userPrefValue = session.getAttribute(preferenceCode)
 		}
 
-		//if the value is not in the session
+		// Skip out if the preference is only maintained in the Session
+		if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
+			// return the current value from session or the default
+			return (userPrefValue != null ? userPrefValue : defaultIfNotSet)
+		}
+
+		// If the value was not in the session, then we'll go to the DB for it
 		if (userPrefValue == null) {
-			//if a user is loggedIn try to get the value from the Preferences Storage of the user
+
+			// If a user is loggedIn try to get the value from the Preferences Storage of the user
 			if (userLogin) {
 				UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 
 				userPrefValue = userPreference?.value
-				if(userPrefValue == null){
+				if (userPrefValue == null) {
 					userPrefValue = defaultIfNotSet
 				}
 
-				//if we are getting the current user preference store it in the session for speed
-				if(isCurrent){
+				// if we are getting the current user preference store it in the session for speed
+				if (isCurrent) {
 					session.setAttribute(preferenceCode, userPrefValue)
 				}
 
-			} else { //If not assign passed default value
+			} else { // If not assign passed default value
 				userPrefValue = defaultIfNotSet
 			}
 		}
@@ -187,7 +202,7 @@ class UserPreferenceService implements ServiceMethods {
 		if (value && value != "null" && userLogin) {
 
 			//If is session only preference just store in the Session and we are done
-			if(UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)){
+			if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
 				session.setAttribute(preferenceCode, value)
 
 				/*
@@ -288,10 +303,10 @@ class UserPreferenceService implements ServiceMethods {
 		getPreference userLogin, CURR_PROJ
 	}
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
-		//clear Session Lived Preferences
+		// clear Session Lived Preferences
 		clearSessionOnlyPreferences()
 
-		//Set the preference
+		// Set the preference
 		setPreference userLogin, CURR_PROJ, projectId
 	}
 
@@ -353,17 +368,29 @@ class UserPreferenceService implements ServiceMethods {
 		JSON.parse(ExportUtil.getResource('templates/timezone/world_map_areas.json').inputStream.text)
 	}
 
+	/**
+	 * Used to load the current user's UserLogin object if not already loaded
+	 * @param userLogin - the reference to the UserLogin object that can be null
+	 * @return the passed in userLogin if already assigned otherwise looks up the current thread's UserLogin object
+	 */
 	private UserLogin resolve(UserLogin userLogin) {
 		if (!userLogin && securityService.loggedIn) {
 			securityService.loadCurrentUserLogin()
-		}
-		else {
+		} else {
 			userLogin
 		}
 	}
 
+	/**
+	 * Used to read the UserPreference setting from the database
+	 * @param userLogin - the user to whom to get the preference for
+	 * @param preferenceCode - the code to look for
+	 * @return the UserPreference if found otherwise null
+	 */
 	private UserPreference getUserPreference(UserLogin userLogin, String preferenceCode) {
-		UserPreference.get(new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode))
+		UserPreference.find(
+			'from UserPreference as u where u.userLogin=:user and u.preferenceCode=:pc',
+			[user:userLogin, pc:preferenceCode] )
 	}
 
 	/**

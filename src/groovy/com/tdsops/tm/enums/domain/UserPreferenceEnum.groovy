@@ -65,9 +65,11 @@ enum UserPreferenceEnum {
 	                                                              ImportStorage, ImportDependency, ImportRoom,
 	                                                              ImportRack, ImportCabling, ImportComment].asImmutable()
 
-	static final List<UserPreferenceEnum> sessionOnlyPreferences = [TASK_CREATE_EVENT,
-																	TASK_CREATE_CATEGORY,
-																	TASK_CREATE_STATUS].asImmutable()
+	static final List<UserPreferenceEnum> sessionOnlyPreferences = [
+		TASK_CREATE_EVENT,
+		TASK_CREATE_CATEGORY,
+		TASK_CREATE_STATUS
+	].asImmutable()
 
 	private final String value
 
