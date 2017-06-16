@@ -20,6 +20,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -32,23 +33,18 @@ import org.springframework.jdbc.core.JdbcTemplate
 @Slf4j
 class CommentService implements ServiceMethods {
 
-	private static final List<String> watchProps = ['actStart', 'assetEntity', 'assignedTo', 'comment', 'dueDate',
-	                                                'estFinish', 'estStart', 'moveEvent', 'priority', 'role',
-	                                                'sendNotification', 'status']
-	static final
-	private Map<PREF, Object> CREATE_TASKS_DEFAULTS
+	private static final List<String> watchProps = [
+		'actStart', 'assetEntity', 'assignedTo', 'comment', 'dueDate',
+		'estFinish', 'estStart', 'moveEvent', 'priority', 'role',
+		'sendNotification', 'status']
 
-	static {
-		//Initializing Constants
-		// We can AKA to another Pref like TASK_CREATE_EVENT which defaults to MOVE_EVENT
-		Map<PREF, Object> createTasksDefaults = [:]
-		createTasksDefaults[PREF.TASK_CREATE_EVENT] = PREF.MOVE_EVENT
-		createTasksDefaults[PREF.TASK_CREATE_CATEGORY] = AssetCommentCategory.GENERAL
-		createTasksDefaults[PREF.TASK_CREATE_STATUS] = AssetCommentStatus.READY
-
-		//Set as Immutable constant
-		CREATE_TASKS_DEFAULTS = createTasksDefaults.asImmutable()
-	}
+	// These are the default values that are remembered during user session for preferences
+	// when creating new tasks (see TM-5696)
+	Map<PREF, Object> TASK_CREATE_DEFAULTS = [
+		(PREF.TASK_CREATE_EVENT): PREF.MOVE_EVENT,
+		(PREF.TASK_CREATE_CATEGORY): AssetCommentCategory.GENERAL,
+		(PREF.TASK_CREATE_STATUS): AssetCommentStatus.READY
+	].asImmutable()
 
 	def mailService					// SendMail MailService class
 	AssetEntityService assetEntityService
@@ -720,7 +716,7 @@ class CommentService implements ServiceMethods {
 	}
 
 	Map getTaskCreateDefaults() {
-		return CREATE_TASKS_DEFAULTS.collectEntries { PREF pref, ref ->
+		return TASK_CREATE_DEFAULTS.collectEntries { PREF pref, ref ->
 			if(ref instanceof PREF){
 				ref = userPreferenceService.getPreference(ref)
 			}
