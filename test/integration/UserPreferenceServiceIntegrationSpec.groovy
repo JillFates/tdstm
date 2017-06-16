@@ -14,7 +14,7 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.tm.enums.domain.SecurityRole
 
-class UserPreferencesServiceIntegrationSpec extends Specification {
+class UserPreferenceServiceIntegrationSpec extends Specification {
 
 	// IOC
 	SecurityService securityService
