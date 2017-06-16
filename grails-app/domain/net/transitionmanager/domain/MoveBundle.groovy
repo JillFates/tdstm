@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.ContextType
 class MoveBundle extends Party {
 
 	static final ContextType contextType = ContextType.B
+	static final String USE_FOR_PLANNING = 'useForPlanning'
 
 	Project project
 	String name

@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="net.transitionmanager.domain.MoveBundle"%>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -67,7 +68,9 @@
 							<div class="form-group col-lg-3 col-md-4">
 								<label for="bundleId">Select one or more bundle(s):</label>
 								<select id="bundleId" name="bundle" multiple="multiple" class="form-control medium-height">
-									<option value="" selected="selected">All</option>
+									<option value="">All Bundles</option>
+									<option value="${MoveBundle.USE_FOR_PLANNING}" selected="selected">Planning Bundles</option>
+									<option value="" disabled>──────────</option>
 									<g:each status="i" in="${moveBundleInstanceList}" var="moveBundle">
 										<option value="${moveBundle?.id}">${moveBundle?.name}</option>
 									</g:each>
