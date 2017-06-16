@@ -2,7 +2,7 @@
  * Created by daviD on 04/06/2017.
  */
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { SelectListConfigurationPopupComponent } from '../components/popup/selectlist-configuration-popup.component';
+import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
 import { DebugElement } from '@angular/core';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { SortableModule } from '@progress/kendo-angular-sortable';

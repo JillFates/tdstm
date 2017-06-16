@@ -102,6 +102,7 @@
                 <option *ngFor="let c of availableControls" [ngValue]="c">{{c}}</option>
             </select>
             <selectlist-configuration-popup *ngIf="dataItem.control==='Select List'" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
+            <min-max-configuration-popup *ngIf="dataItem.control==='String'" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
