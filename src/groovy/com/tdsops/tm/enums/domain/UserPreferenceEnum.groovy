@@ -44,6 +44,9 @@ enum UserPreferenceEnum {
 	STAFFING_SCALE('StaffingScale'),
 	DEP_CONSOLE_COMPACT('depConsoleCompact'),
 	ASSIGNED_GROUP('AssignedGroup'),
+	TASK_CREATE_EVENT,
+	TASK_CREATE_CATEGORY,
+	TASK_CREATE_STATUS,
 	ImportApplication,
 	ImportServer,
 	ImportDatabase,
@@ -62,6 +65,12 @@ enum UserPreferenceEnum {
 	                                                              ImportStorage, ImportDependency, ImportRoom,
 	                                                              ImportRack, ImportCabling, ImportComment].asImmutable()
 
+	static final List<UserPreferenceEnum> sessionOnlyPreferences = [
+		TASK_CREATE_EVENT,
+		TASK_CREATE_CATEGORY,
+		TASK_CREATE_STATUS
+	].asImmutable()
+
 	private final String value
 
 	private UserPreferenceEnum() {
@@ -77,4 +86,11 @@ enum UserPreferenceEnum {
 	}
 
 	String toString() { value() }
+
+	static
+	boolean isSessionOnlyPreference(String preferenceString){
+		sessionOnlyPreferences.find {
+			preferenceString == it.toString()
+		}
+	}
 }
