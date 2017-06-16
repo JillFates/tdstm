@@ -12,6 +12,8 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FieldSettingsModel } from '../model/field-settings.model';
 import { CustomDomainService } from '../service/custom-domain.service';
+import { Observable } from 'rxjs/Rx';
+import { HttpModule, Http } from '@angular/http';
 
 describe('SelectListConfigurationPopupComponent:', () => {
 	let fixture: ComponentFixture<SelectListConfigurationPopupComponent>;
@@ -31,10 +33,13 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		control: 'Select List'
 	};
 
+	let spy: jasmine.Spy;
+
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
 			imports: [
 				BrowserAnimationsModule,
+				HttpModule,
 				SharedModule,
 				FormsModule,
 				PopupModule,
@@ -47,6 +52,10 @@ describe('SelectListConfigurationPopupComponent:', () => {
 	beforeEach(() => {
 		fixture = TestBed.createComponent(SelectListConfigurationPopupComponent);
 		comp = fixture.componentInstance;
+		let customService = fixture.debugElement.injector.get(CustomDomainService);
+		spy = spyOn(customService, 'getDistinctValues').and.callFake(() => {
+			return Observable.from([]).bufferCount(1);
+		});
 	});
 
 	it('should create the component', () => {
