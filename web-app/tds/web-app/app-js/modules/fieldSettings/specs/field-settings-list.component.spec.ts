@@ -19,6 +19,7 @@ import { NotifierService } from '../../../shared/services/notifier.service';
 import { FieldSettingsListComponent } from '../components/list/field-settings-list.component';
 import { FieldSettingsGridComponent } from '../components/grid/field-settings-grid.component';
 import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
+import { MinMaxConfigurationPopupComponent } from '../components/min-max/min-max-configuration-popup.component';
 import { FieldSettingsImportanceComponent } from '../components/imp/field-settings-imp.component';
 import { FieldSettingsService } from '../service/field-settings.service';
 import { DomainModel } from '../model/domain.model';
@@ -74,7 +75,8 @@ describe('FieldSettingsListComponent:', () => {
 				FieldSettingsListComponent,
 				FieldSettingsGridComponent,
 				FieldSettingsImportanceComponent,
-				SelectListConfigurationPopupComponent
+				SelectListConfigurationPopupComponent,
+				MinMaxConfigurationPopupComponent
 			],
 			providers: [FieldSettingsService, HttpServiceProvider,
 				NotifierService,
