@@ -4,7 +4,7 @@ import net.transitionmanager.service.MoveBundleService
 
 import spock.lang.Specification
 
-class MoveBundleServiceTests extends Specification {
+class MoveBundleServiceIntegrationSpec extends Specification {
 
     MoveBundleService moveBundleService
 
