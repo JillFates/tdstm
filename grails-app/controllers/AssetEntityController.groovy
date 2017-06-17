@@ -233,12 +233,16 @@ class AssetEntityController implements ControllerMethods {
 			return
 		}
 
-		def dataTransferSetExport = DataTransferSet.executeQuery("from DataTransferSet where transferMode IN ('B','E') ")
+		List dataTransferSetExport = DataTransferSet.executeQuery("from DataTransferSet where transferMode IN ('B','E') ")
 
-		[dataTransferBatchs: DataTransferBatch.countByProject(project),
-		 prefMap: userPreferenceService.getExportPreferences(),
-		 moveBundleInstanceList: MoveBundle.findAllByProject(project),
-		 dataTransferSetExport: dataTransferSetExport, projectId: project.id]
+		[
+			// dataTransferBatchs: DataTransferBatch.countByProject(project),
+			prefMap: userPreferenceService.getExportPreferences(),
+			//moveBundleInstanceList: moveBundleService.findAllByProject(project),
+			moveBundleList: moveBundleService.lookupList(project),
+			dataTransferSetExport: dataTransferSetExport, projectId: project.id,
+			useForPlanningArgName: MoveBundle.USE_FOR_PLANNING
+		]
 	}
 
 	/**
