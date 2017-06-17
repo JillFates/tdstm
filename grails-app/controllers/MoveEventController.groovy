@@ -134,7 +134,7 @@ class MoveEventController implements ControllerMethods {
 
 		render jsonData as JSON
 	}
-	
+
 	@HasPermission(Permission.EventView)
 	def show() {
 		String moveEventId = params.id
@@ -198,7 +198,7 @@ class MoveEventController implements ControllerMethods {
 		}
 		redirect(action: 'list')
 	}
-	
+
 	@HasPermission(Permission.EventEdit)
 	def edit() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
@@ -210,7 +210,7 @@ class MoveEventController implements ControllerMethods {
 
 		[moveEventInstance: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
 	}
-	
+
 	@HasPermission(Permission.EventEdit)
 	def update() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
@@ -237,14 +237,14 @@ class MoveEventController implements ControllerMethods {
 			render(view: 'edit', model: [moveEventInstance: moveEvent])
 		}
 	}
-	
+
 	@HasPermission(Permission.EventCreate)
 	def create() {
 		Project project = securityService.userCurrentProject
-		List bundles = moveBundleService.lookupBundlesByProject(project)
+		List bundles = moveBundleService.lookupList(project)
 		[moveEventInstance: new MoveEvent(params), bundles: bundles]
 	}
-	
+
 	@HasPermission(Permission.EventCreate)
 	def save() {
 		if (params.estStartTime) {
@@ -343,7 +343,7 @@ class MoveEventController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.EventView)
 	def retrieveMoveEventNewsAndStatus() {
-		
+
 		// Make sure that the user is trying to access a valid event
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) {
@@ -438,7 +438,7 @@ class MoveEventController implements ControllerMethods {
 			else {
 				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
 			}
-			
+
 			saveWithWarnings moveEvent
 			render "success"
 		}
