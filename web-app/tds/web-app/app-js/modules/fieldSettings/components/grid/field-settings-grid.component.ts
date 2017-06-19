@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
@@ -6,6 +6,9 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
+
+import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configuration-popup.component';
+import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
 
 @Component({
 	moduleId: module.id,
@@ -195,5 +198,31 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.data);
+	}
+
+	protected onControlChange(
+		dataItem: FieldSettingsModel,
+		selectList: SelectListConfigurationPopupComponent,
+		minMax: MinMaxConfigurationPopupComponent): void {
+		switch (dataItem.control) {
+			case 'Select List':
+				if (!dataItem.constraints.values ||
+					dataItem.constraints.values.length === 0) {
+					selectList.onToggle();
+				} else {
+					selectList.show = false;
+				}
+				break;
+			case 'String':
+				if (!dataItem.constraints.minSize ||
+					!dataItem.constraints.maxSize) {
+					minMax.onToggle();
+				} else {
+					minMax.show = false;
+				}
+				break;
+			default:
+				break;
+		}
 	}
 }
