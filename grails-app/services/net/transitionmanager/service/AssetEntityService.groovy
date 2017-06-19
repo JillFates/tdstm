@@ -1201,7 +1201,6 @@ class AssetEntityService implements ServiceMethods {
 
 		//def assetTypeAttribute = getPropertyAttribute('assetType') // TM-6096
 		//def validationType = asset.validation
-		def highlightMap = getHighlightedInfo(type, asset, configMap)
 		//def dependentAssets = getDependentAssets(asset) // TM-6096
 		//def supportAssets = getSupportingAssets(asset) // TM-6096
 
@@ -1212,10 +1211,7 @@ class AssetEntityService implements ServiceMethods {
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
 			*/ // TM-6096
 
-		// Obtains the domain out of the asset type string.
-		String domain = AssetClass.getDomainForAssetType(type)
-		// Retrieves the Spec for the standard fields.
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(type)
 
 		[assetId: asset.id,
 		 //assetTypeAttribute: assetTypeAttribute,
@@ -1229,7 +1225,6 @@ class AssetEntityService implements ServiceMethods {
 		 // The name of the asset that is quote escaped to prevent lists from erroring with links
 		 // TODO - this function should be replace with a generic HtmlUtil method - this function is to single purposed...
 		 escapedName: getEscapedName(asset),
-		 highlightMap: highlightMap,
 		 moveBundleList: getMoveBundles(project),
 		 planStatusOptions: getAssetPlanStatusOptions(),
 		 project: project,
@@ -1270,15 +1265,10 @@ class AssetEntityService implements ServiceMethods {
 		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
 		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
 
-		def highlightMap = getHighlightedInfo(type, assetEntity, configMap, projectAttributes)
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
-
-		// Obtains the domain out of the asset type string.
-		String domain = AssetClass.getDomainForAssetType(type)
-		// Retrieves the Spec for the standard fields.
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(type)
 
 		[assetId: assetEntity?.id,
 		 assetComment: assetComment,
@@ -1289,7 +1279,6 @@ class AssetEntityService implements ServiceMethods {
 		 dependentAssets: dependentAssets,
 		 errors: params.errors,
 		 escapedName: getEscapedName(assetEntity),
-		 highlightMap: highlightMap,
 		 prefValue: prefValue,
 		 project: project,
 		 client: project.client,
