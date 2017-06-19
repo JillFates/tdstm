@@ -2583,21 +2583,18 @@ class AssetEntityController implements ControllerMethods {
 				}
 			}
 
-			Integer tardyFactor = computeTardyFactor(it.durationInMinutes())
-			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, tardyFactor, nowGMT)
+			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
 
 			estStartClass = estimatedColumnsCSS['estStartClass']
 			estFinishClass = estimatedColumnsCSS['estFinishClass']
 
-			String dueDate = ''
-			dueDate = TimeUtil.formatDate(it.dueDate)
+			String dueDate = TimeUtil.formatDate(it.dueDate)
 
 			// Clears time portion of dueDate for date comparison
 			Date due = it.dueDate?.clearTime()
 
 			// Highlight Due Date column for tardy and late tasks
 			if (it.dueDate && it.isActionable()) {
-
 				if (due > today) {
 					dueClass = ''
 				} else {
@@ -2608,8 +2605,6 @@ class AssetEntityController implements ControllerMethods {
 				}
 			}
 
-
-
 			def deps = TaskDependency.findAllByPredecessor(it)
 			def depCount = 0
 			deps.each {
@@ -2619,7 +2614,7 @@ class AssetEntityController implements ControllerMethods {
 
 			// Have the dependency count be a link to the Task Neighborhood graph if there are dependencies
 			def nGraphUrl = depCount == 0 ? depCount : '<a href="' + createLink(controller:'task', action:'taskGraph') +
-					'?neighborhoodTaskId=' + it.id + '" target="_blank",>' + depCount + '</a>'
+					'?neighborhoodTaskId=' + it.id + '" target="_blank">' + depCount + '</a>'
 
 			def status = it.status
 			def userSelectedCols = []
@@ -2631,8 +2626,7 @@ class AssetEntityController implements ControllerMethods {
 			def instructionsLinkURL
 			if (HtmlUtil.isMarkupURL(it.instructionsLink)) {
 				instructionsLinkURL = HtmlUtil.parseMarkupURL(it.instructionsLink)[1]
-			}
-			else {
+			} else {
 				instructionsLinkURL = it.instructionsLink
 			}
 
@@ -4706,39 +4700,52 @@ class AssetEntityController implements ControllerMethods {
 	 * @param task : The task.
 	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
 	 * @param nowGMT : The actual time in GMT.
-	 * @return : A Map with estStartClass and estFinishClass.
+	 * @return : A Map with estStartClass and estFinishClass
+	 * @todo: refactor getEstimatedColumnsCSS into a service and create test cases
 	 */
-	private Map getEstimatedColumnsCSS(AssetComment task, Integer tardyFactor, Date nowGMT) {
+	private Map getEstimatedColumnsCSS(AssetComment task, Date nowGMT) {
 
-		def estStartClass = ''
-		def estFinishClass = ''
+		String estStartClass = ''
+		String estFinishClass = ''
 
-		Integer durationInMinutes = task.durationInMinutes()
-		Integer nowGMTInMinutes = nowGMT.getTime() / 1000 / 60
-		Integer estimatedStartInMinutes = (task.estStart != null) ? task.estStart.getTime() / 1000 / 60 : null
-		Integer estimatedFinishInMinutes = (task.estFinish != null) ? task.estFinish.getTime() / 1000 / 60 : null
-		Integer actualStartInMinutes = (task.actStart != null) ? task.actStart.getTime() / 1000 / 60 : null
+		Integer durationInMin = task.durationInMinutes()
+		Integer tardyFactor = computeTardyFactor(durationInMin)
 
-		if (task.estStart && task.isActionable() && task.status != AssetCommentStatus.STARTED) {
+		Integer nowInMin = TimeUtil.timeInMinutes(nowGMT)
+		Integer estStartInMin = TimeUtil.timeInMinutes(task.estStart)
+		Integer estFinishInMin = TimeUtil.timeInMinutes(task.estFinish)
+		Integer actStartInMin = TimeUtil.timeInMinutes(task.actStart)
 
-			if (task.estStart < nowGMT) {
+		boolean taskIsActionable = task.isActionable()
+
+		// Determine the Est Start CSS
+ 		if (estStartInMin && (task.status in [ AssetCommentStatus.PENDING, AssetCommentStatus.READY ]) )  {
+			// Note that in the future when we have have slack calculations in the tasks, we can
+			// flag tasks that started late and won't finished by critical path finish times but for
+			// now we will just flag tasks that didn't start by their est start.
+			if (estStartInMin < nowInMin) {
 				estStartClass = 'task_late'
-				estFinishClass = 'task_late'
-			} else {
-				if (estimatedStartInMinutes - tardyFactor <= nowGMTInMinutes) {
-					estStartClass = 'task_tardy'
-					estFinishClass = 'task_tardy'
-				}
+			} else if ( (estStartInMin - tardyFactor) < nowInMin) {
+				estStartClass = 'task_tardy'
 			}
 		}
 
-		if (task.estFinish && task.isActionable()) {
-			if (task.status == AssetCommentStatus.STARTED) {
-				if (actualStartInMinutes + durationInMinutes > estimatedFinishInMinutes) {
-					estStartClass = 'task_late'
+		// Determine the Estimated Finish CSS
+		if (estFinishInMin && taskIsActionable) {
+			if (actStartInMin) {
+				// If the task was started then see if it should have completed by now and should be
+				// considered tardy started early but didn't finish by duration + tardy factor.
+				if (estFinishInMin < nowInMin) {
 					estFinishClass = 'task_late'
-				} else if (actualStartInMinutes + durationInMinutes + tardyFactor >= estimatedFinishInMinutes) {
-					estStartClass = 'task_tardy'
+				} else if ( (actStartInMin + durationInMin + tardyFactor) < nowInMin ) {
+					// This will clue the PM that the task should have been completed by now
+					estFinishClass = 'task_tardy'
+				}
+			} else {
+				// Check if it would finish late
+				if ( (estFinishInMin - durationInMin) < nowInMin) {
+					estFinishClass = 'task_late'
+				} else if ( (estFinishInMin - durationInMin - tardyFactor) < nowInMin ) {
 					estFinishClass = 'task_tardy'
 				}
 			}
@@ -4756,8 +4763,8 @@ class AssetEntityController implements ControllerMethods {
 	 * @param date : The task duration in minutes.
 	 * @return : the tardy factor.
 	 */
-	private Integer computeTardyFactor(Integer durationInMinutes) {
-		return Math.min(30, Math.max(5, (Integer)(durationInMinutes * 0.1)))
+	private Integer computeTardyFactor(Integer durationInMin) {
+		return Math.min(30, Math.max(5, (Integer)(durationInMin * 0.1)))
 	}
 
 }

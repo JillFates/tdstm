@@ -14,7 +14,29 @@ $(document).ready(function() {
 			<g:set var="teamData" value="${r.getValue()}"/>
 			<g:if test="${teamData.percDone > 0}">$("#team_${teamData.role.id}").animate({width: "${teamData.percDone}%" }, 1000);</g:if>
 		</g:each>
+
+		var scrollTeamsIcon = $('#scrollTeamsIcon');
+		if(scrollTeamsIcon && scrollTeamsIcon.length > 0){
+		    var teamTableHeight = $('#teamTableContent').height();
+		    scrollTeamsIcon.animate({marginTop: (teamTableHeight/2)-5}, 1000);
+		}
 });
+
+var toggleScrollTeamsLeft = true;
+function scrollTeams(){
+		    var scrollSize = $('#teamTableContent').width();
+		    if(toggleScrollTeamsLeft){
+		        $('#teamTableContent').animate({ scrollLeft: scrollSize }, 800);
+		        $('#scrollTeamsLeftIcon').hide();
+		        $('#scrollTeamsRightIcon').show();
+		    }
+		    else{
+		        $('#teamTableContent').animate({ scrollLeft: -scrollSize }, 800);
+		        $('#scrollTeamsRightIcon').hide();
+		        $('#scrollTeamsLeftIcon').show();
+		    }
+		    toggleScrollTeamsLeft = !toggleScrollTeamsLeft;
+}
 </script>
 
 <div class="toprightcontent">
@@ -93,7 +115,18 @@ $(document).ready(function() {
 	</table>
 </div>
 
-<div class="teamBreakdown toprightcontent">  	
+
+<g:set var="teamMatrixSize" value="${0}"/>
+<g:if test="${teamTaskMatrix.size > 0}">
+    <g:set var="teamMatrixSize" value="${teamTaskMatrix.size * teamTaskMatrix[0].size}" />
+</g:if>
+<g:if test="${teamMatrixSize <= 6}" >
+    <div id="teamTableContent" class="teamBreakdown toprightcontent smallTable">
+</g:if>
+<g:else>
+    <div id="teamTableContent" class="teamBreakdown toprightcontent">
+</g:else>
+
 	<table style="border:none;">
 		<%-- 	
 			This section is going to iterate over the Team Task matrix of data to create the table of the team 
@@ -127,3 +160,14 @@ $(document).ready(function() {
 		</g:each>
 	</table>
 </div>
+
+<g:if test="${teamMatrixSize > 18}" >
+    <div id="scrollTeamsIcon" class="text-right toprightcontent teamScrollButton">
+         <a id="scrollTeamsLeftIcon" href="javascript:void(0);" onclick="scrollTeams();">
+            <img src="/tdstm/static/images/right_arrow.png" alt="back" border="0" width="16" height="23" align="right">
+          </a>
+          <a id="scrollTeamsRightIcon" href="javascript:void(0);" onclick="scrollTeams();" style="display: none;">
+            <img src="/tdstm/static/images/left_arrow.png" alt="back" border="0" width="16" height="23" align="right">
+          </a>
+     </div>
+</g:if>
