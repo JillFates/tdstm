@@ -11,7 +11,7 @@ import { CustomDomainService } from '../../service/custom-domain.service';
 	selector: 'selectlist-configuration-popup',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/select-list/selectlist-configuration-popup.component.html',
 	encapsulation: ViewEncapsulation.None,
-	styles: [``]
+	exportAs: 'selectlistConfig'
 })
 
 export class SelectListConfigurationPopupComponent {

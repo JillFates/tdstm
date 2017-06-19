@@ -5,7 +5,7 @@ import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.
 	moduleId: module.id,
 	selector: 'min-max-configuration-popup',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/min-max/min-max-configuration-popup.component.html',
-	styles: [``]
+	exportAs: 'minmaxConfig'
 })
 
 export class MinMaxConfigurationPopupComponent implements OnInit {

@@ -97,12 +97,15 @@
     </kendo-grid-column>
     <kendo-grid-column field="control" title="Control" [width]="110">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <select class="form-control" [disabled]="!dataItem.udf" name="control" id="control" [(ngModel)]="dataItem.control">
+            <select class="form-control" (change)="onControlChange(dataItem,selectList,minMax)" [disabled]="!dataItem.udf" name="control"
+                id="control" [(ngModel)]="dataItem.control">
                 <option value="">Please select</option>
                 <option *ngFor="let c of availableControls" [ngValue]="c">{{c}}</option>
             </select>
-            <selectlist-configuration-popup *ngIf="dataItem.control==='Select List'" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
-            <min-max-configuration-popup *ngIf="dataItem.control==='String'" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
+            <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
+            <div >
+                <min-max-configuration-popup #minMax="minmaxConfig" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
+            </div>
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
