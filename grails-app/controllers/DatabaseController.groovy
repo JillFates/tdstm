@@ -39,6 +39,7 @@ class DatabaseController implements ControllerMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	def customDomainService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -254,11 +255,11 @@ class DatabaseController implements ControllerMethods {
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Database','Discovery')
-		def highlightMap = assetEntityService.getHighlightedInfo('Database', databaseInstance, configMap)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField('Database')
 
 		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 		 planStatusOptions:planStatusOptions?.value, projectId: project.id, project:project,
-		 config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
+		 config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, standardFieldSpecs: standardFieldSpecs]
 	}
 
 	@HasPermission(Permission.AssetEdit)
