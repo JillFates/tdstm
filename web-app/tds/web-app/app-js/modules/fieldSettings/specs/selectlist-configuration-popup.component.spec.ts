@@ -52,6 +52,7 @@ describe('SelectListConfigurationPopupComponent:', () => {
 	beforeEach(() => {
 		fixture = TestBed.createComponent(SelectListConfigurationPopupComponent);
 		comp = fixture.componentInstance;
+		comp.field = mockField;
 		let customService = fixture.debugElement.injector.get(CustomDomainService);
 		spy = spyOn(customService, 'getDistinctValues').and.callFake(() => {
 			return Observable.from([]).bufferCount(1);
@@ -60,14 +61,15 @@ describe('SelectListConfigurationPopupComponent:', () => {
 
 	it('should create the component', () => {
 		expect(comp).toBeDefined();
-		expect(comp === null).toBeFalsy();
 	});
 
-	it('should show the popup on load', () => {
-		expect(comp.show).toBeTruthy();
+	it('should not show the popup on load', () => {
+		expect(comp.show).toBeFalsy();
 	});
 
 	it('should add new item to list', () => {
+		fixture.detectChanges();
+		comp.onToggle();
 		fixture.detectChanges();
 		let addButton: DebugElement;
 		addButton = fixture.debugElement.query(By.css('button[name=addButton]'));
@@ -75,10 +77,12 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		expect(addButton === null).toBeFalsy();
 		addButton.triggerEventHandler('click', null);
 		expect(comp.items.length).toEqual(1);
-		expect(comp.items[0]).toEqual('Foo');
+		expect(comp.items[0].value).toEqual('Foo');
 	});
 
 	it('should add & remove existing item from list', () => {
+		fixture.detectChanges();
+		comp.onToggle();
 		fixture.detectChanges();
 		let addButton: DebugElement;
 		addButton = fixture.debugElement.query(By.css('button[name=addButton]'));
@@ -94,9 +98,8 @@ describe('SelectListConfigurationPopupComponent:', () => {
 	});
 
 	it('should save list', () => {
-
-		comp.field = mockField;
-
+		fixture.detectChanges();
+		comp.onToggle();
 		fixture.detectChanges();
 		let addButton: DebugElement;
 		addButton = fixture.debugElement.query(By.css('button[name=addButton]'));
