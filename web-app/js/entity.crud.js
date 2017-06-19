@@ -36,40 +36,33 @@ var EntityCrud = (function ($) {
 	 * Private method used to validate common fields on any of the asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateCommonFields = function (form, alertErrors) {
-		var ok = false;
+	var validateCommonFields = function (formId, alertErrors) {
+		var ok = true;
+		var errors = '';
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true
 		// Validate that asset name is not blank
-		var fieldVal = $('#' + form + ' #assetName').val();
+		var fieldVal = $('#' + formId + ' #assetName').val();
 		if (fieldVal == '') {
-			if (alertErrors) {
-				alert('Please provide a name for the asset');
-			}
-
-		} else {
-			ok = true
+			errors += 'Please provide a name for the asset';
+			ok = false;
 		}
+
+		// Validate custom fields
+		var form = $('#'+formId)[0];
+        $(form).find( ".customField:invalid" ).each( function( index, node ) {
+            var elementName = $('#'+node.id).data('label');
+            var message = $('#'+node.id).data('message');
+            if(!message || message.length <= 0){
+                message = node.validationMessage;
+			}
+			errors += '\n'+elementName+ ': '+message;
+			ok = false;
+        });
+
+        if (!ok && alertErrors && errors.length > 0) {
+            alert(errors);
+        }
 		return ok;
-	};
-
-	/**
-	 * Private method used to validate the Storage asset create/edit forms
-	 * @return true if valid
-	 **/
-	var validateStorageForm = function (form) {
-		return validateCommonFields(form);
-		/*var ok = validateCommonFields(form);
-		if (ok) {
-			var size = $('#'+form+' #size').val();
-			if ( size=='' || isNaN(size)) {
-				alert("Please enter numeric value for Storage Size");
-				ok = false;
-			} else if ($('#'+form+' #fileFormat').val()=='') {
-				alert("Please enter value for Storage Format");
-				ok = false;
-			}
-		}
-		return ok*/
 	};
 
 	/**
