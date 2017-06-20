@@ -145,8 +145,9 @@
 				<div id="columnCustomDiv_${filesPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width: 13.3% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${filesPref[key]}" />
-						<g:each var="attribute" in="${attributesList}">
-							<label><input type="radio" name="coloumnSelector_${filesPref[key]}" id="coloumnSelector_${filesPref[key]}" value="${attribute.attributeCode}" 
+						%{--<g:each var="attribute" in="${attributesList}">--}%
+						<g:each var="attribute" in="${fieldSpecs}">
+							<label><input type="radio" name="coloumnSelector_${filesPref[key]}" id="coloumnSelector_${filesPref[key]}" value="${attribute.attributeCode}"
 								${filesPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" 
 								onchange="setColumnAssetPref(this.value,'${key}','Storage_Columns')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>
