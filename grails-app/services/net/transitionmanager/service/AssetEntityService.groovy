@@ -1303,7 +1303,7 @@ class AssetEntityService implements ServiceMethods {
 		Map model = [
 			assetClassOptions: AssetClass.classOptions,
 			assetDependency: new AssetDependency(),
-			attributesList: [],        // Set below
+			//attributesList: [],        // Set below, replaced by fieldSpecs
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			event: params.moveEvent,
@@ -1340,9 +1340,37 @@ class AssetEntityService implements ServiceMethods {
 		}
 		model.moveEvent = moveEvent
 
-		// Get the list of attributes that the user can select for columns
-		def attributes = projectService.getAttributes(listType)
+		// Set the list of viewable and selectable field specs
+		model.fieldSpecs = getViewableAndSelectableFieldSpecs(ac)
 
+		// <SL> Remove when JSON field specs get fully implemented
+		// Get the list of attributes that the user can select for columns
+		// List<EavAttribute> attributes = projectService.getAttributes(listType)
+
+		// Used to display column names in jqgrid dynamically
+		def modelPref = [:]
+		fieldPrefs.each { key, value ->
+			modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+		}
+		model.modelPref = modelPref
+
+		// <SL> Kept "attributesList" for debugging but it should be deleted as soon as JSON field specs
+		// get fully implemented
+		//model.attributesListDeprecated = getViewableAndSelectableAttributesList(ac, project, attributes)
+
+		return model
+	}
+
+	/**
+	 * Get viewable and selectable attributes list to construct list view column selector
+	 * for AssetClass.* entities types
+	 * @param assetClass
+	 * @param project
+	 * @param attributes
+	 * @return
+	 */
+	@Deprecated
+	private List<Map<String, String>> getViewableAndSelectableAttributesList(AssetClass assetClass, Project project, List<EavAttribute> attributes) {
 		// Create a list of the "custom##" fields that are currently selectable
 		def projectCustoms = project.customFieldsShown + 1
 		List<String> nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ?
@@ -1351,17 +1379,10 @@ class AssetEntityService implements ServiceMethods {
 		// Remove the non project specific attributes and sort them by attributeCode
 		def appAttributes = attributes.findAll {
 			it.attributeCode != "assetName" &&
-			it.attributeCode != "manufacturer" &&
-			!(it.attributeCode in nonCustomList) &&
-			!COLUMN_PROPS_TO_EXCLUDE[ac].contains(it.attributeCode)
+					it.attributeCode != "manufacturer" &&
+					!(it.attributeCode in nonCustomList) &&
+					!COLUMN_PROPS_TO_EXCLUDE[assetClass].contains(it.attributeCode)
 		}
-
-		// Used to display column names in jqgrid dynamically
-		def modelPref = [:]
-		fieldPrefs.each { key, value ->
-			modelPref[key] = getAttributeFrontendLabel(value, attributes.find { it.attributeCode == value }?.frontendLabel)
-		}
-		model.modelPref = modelPref
 
 		// Compose the list of Asset properties that the user can select and use for filters
 		def attributesList = appAttributes.collect { attribute ->
@@ -1371,9 +1392,36 @@ class AssetEntityService implements ServiceMethods {
 
 		// Sorts attributesList alphabetically
 		attributesList.sort { it.frontendLabel }
-		model.attributesList = attributesList
+		return attributesList
+	}
 
-		return model
+	/**
+	 * Get viewable and selectable field specs to construct list view column selector
+	 * for AssetClass.* entities types
+	 * @param assetClass
+	 * @return
+	 */
+	private List<Map<String, String>> getViewableAndSelectableFieldSpecs(AssetClass assetClass) {
+		Map fieldSpecs = customDomainService.allFieldSpecs(assetClass.toString())
+		List<Map<String, String>> attributes = null
+		if (fieldSpecs) {
+			attributes = fieldSpecs[assetClass.toString()]["fields"]
+			// filter viewable only fields and sort them by label
+			attributes = attributes.findAll({ fieldSpec ->
+				fieldSpec.show == 1 &&
+						fieldSpec.field != "assetName" &&
+						fieldSpec.field != "manufacturer" &&
+						!COLUMN_PROPS_TO_EXCLUDE[assetClass].contains(fieldSpec.field)
+			}).collect {
+				fieldSpec -> [attributeCode: fieldSpec.field, frontendLabel: fieldSpec.label]
+			}.sort {
+				fieldSpecA, fieldSpecB -> fieldSpecA.frontendLabel <=> fieldSpecB.frontendLabel
+			}
+		} else {
+			// edge case
+			attributes = [[:]]
+		}
+		return attributes
 	}
 
 	/**
@@ -1745,7 +1793,7 @@ class AssetEntityService implements ServiceMethods {
 	/**
 	 * Determine the frontEndLabel for the attribute.
 	 */
-	String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
+	private String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
 		Project project = securityService.userCurrentProject
 		return (attributeCode.contains('custom') && project[attributeCode]) ? project[attributeCode] : frontendLabel
 	}
