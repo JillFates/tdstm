@@ -11,6 +11,7 @@ import { UserService } from '../shared/services/user.service';
 import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
+import { UILoaderService } from '../shared/services/ui-loader.service';
 // Shared Directives
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
@@ -51,6 +52,7 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		PreferenceService,
 		UserService,
 		NotifierService,
+		UILoaderService,
 		HttpServiceProvider,
 		ComponentCreatorService,
 		UIDialogService,

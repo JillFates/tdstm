@@ -8,6 +8,7 @@ import { UIRouter, TransitionService } from '@uirouter/core';
 import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
 import { PreferenceService } from '../shared/services/preference.service';
+import { UILoaderService } from '../shared/services/ui-loader.service';
 // Services
 import { TaskService } from '../modules/taskManager/service/task.service';
 
@@ -84,6 +85,21 @@ export function PermissionConfig(router: UIRouter) {
 	requiresPermissionHook(transitionService);
 }
 
+export function LoadingConfig(router: UIRouter) {
+	const transitionService = router.transitionService;
+	transitionService.onStart({
+		to: (state) => state.data
+	}, (transition) => {
+		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
+		loaderService.show();
+	}, { priority: 10 });
+	transitionService.onFinish({
+		to: (state) => state.data
+	}, (transition) => {
+		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
+		setTimeout(() => loaderService.hide());
+	}, { priority: 10 });
+}
 export const TDSRoutingStates = [
 	tdsRoot
 ];
