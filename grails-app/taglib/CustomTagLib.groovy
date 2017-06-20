@@ -312,48 +312,6 @@ class CustomTagLib implements InitializingBean {
 	}
 
 	/**
-	 * Render custom fields
-	 * use on gsp as ->
-	 */
-	def customField = { Map attrs ->
-
-		def field = attrs.field;
-		String value = attrs.value;
-		def tabOffset = attrs.tabOffset;
-
-		if(field.control == 'Select List'){
-			def options = field.constraints.values;
-			if(value == null){
-				value = field.default;
-			}
-			out << "<select " +
-					"class='"+field.imp+"'" +
-					"id='" + field.field +"'" +
-					"name='"+field.field +"'" +
-					"title='"+field.tip+"'>"
-			options.each{
-				String setSelected = "";
-				if(value != null && it == value){
-					setSelected = " selected=\"selected\" ";
-				}
-				out << "<option "+setSelected+"  value=\" " << it << "\">" << it << "</option>"
-			}
-			out << "</select>"
-		} else{
-
-			value = (value == null ? "" : value);
-
-			out << "<input type=\"text\"" +
-					"id='" + field.field +"'" +
-					"class='" +field.imp+"'" +
-					"name='" +field.field +"'" +
-					"value='"+value+"'" +
-					"tabindex='"+(tabOffset+1)+"'" +
-					"title='"+field.tip+"'/>"
-		}
-	}
-
-	/**
 	 * Helper Tag to render breadcrumbs to display
 	 * @param title - the display name of the Page/Module
 	 * @param crumbs - a map of elements what will be part of the crumbs
