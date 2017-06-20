@@ -700,7 +700,7 @@ class ImportService implements ServiceMethods {
 		def eavAttributeSet = data.eavAttributeSet
 		List staffList = data.staffList
 
-		List teams = partyRelationshipService.getStaffingRoles()*.id
+		List teams = partyRelationshipService.getStaffingRoles()
 
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		assetCount = dataTransferValueRowList.size()
