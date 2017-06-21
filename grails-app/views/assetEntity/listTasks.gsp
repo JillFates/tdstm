@@ -30,11 +30,17 @@
 		.action-bar.checkboxContainer label {
 			margin-left: 4px;
 		}
-        div#controlRowId {
-            margin-bottom: 10px;
-            width: 680px;
-        }
-        #timeline {
+		div.action-bar-wrapper {
+			margin-left: 0px;
+			margin-right: 0px;
+		}
+		div.action-bar-wrapper #controlRowId {
+			margin-bottom: 10px;
+		}
+		div.timeline-wrapper{
+			width: 442px;
+		}
+		div.timeline-wrapper #timeline {
             margin-right: 21px;
         }
 </style>
@@ -283,8 +289,8 @@
 			<input type="hidden" name="justMyTasks" id="justMyTasks" value="${justMyTasks}"/>
 			<input type="hidden" name="viewUnpublished" id="viewUnpublished" value="${viewUnpublished}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
-            <div class="row">
-                <div class="col-md-6">
+            <div class="row action-bar-wrapper">
+                <div class="pull-left">
                     <div id="controlRowId">
                         <b>Event </b>
                         <g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
@@ -304,7 +310,7 @@
                         </tds:hasPermission>
                     </div>
                 </div>
-                <div class="col-md-6 text-right">
+                <div class="timeline-wrapper text-right pull-right">
                     <tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
                     <tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>
                     <g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
