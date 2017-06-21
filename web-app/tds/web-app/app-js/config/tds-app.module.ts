@@ -15,6 +15,7 @@ import { SharedModule } from '../shared/shared.module';
 import { NoticesManagerModule } from '../modules/noticeManager/notice-manager.module';
 import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
+import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
 import { TDSRoutingStates, AuthConfig, PermissionConfig, LoadingConfig } from './tds-routing.states';
@@ -31,6 +32,7 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, LoadingConfig } from '.
 		NoticesManagerModule,
 		TaskManagerModule,
 		FieldSettingsModule,
+		AssetExplorerModule,
 		// Routing Modules using UI Router
 		UIRouterModule.forRoot(<UIRouterModule>{
 			states: TDSRoutingStates,

@@ -1,0 +1,35 @@
+<div class="content body">
+	<section>
+		<div>
+			<div class="box-body box-with-empty-header">
+				<kendo-dropdownlist #kendoDropDown="kendoDropDownList" [data]="data" (close)="onClose($event)" [valueField]="'name'" [textField]="'name'">
+					<ng-template kendoDropDownListHeaderTemplate>
+						<div class="has-feedback">
+							<input type="text" class="form-control" (ngModelChange)="onSearch()" [(ngModel)]='search' id="search" placeholder="Search" aria-describedby="search">
+							<i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
+						</div>
+						<div>
+							<a href="" class="btn"><i class="fa fa-plus-square"></i> Create New</a>
+						</div>
+					</ng-template>
+					<ng-template kendoDropDownListItemTemplate let-dataItem>
+						<div class="container">
+							<div class="row" (click)="onFolderClick(dataItem)">
+								<i class="fa" [ngClass]="getFolderStyle(dataItem)"></i> {{dataItem.name}}
+							</div>
+							<div class="row" style="margin-top:5px;" *ngIf="dataItem.open">
+								<li>
+									<ul style="padding-left:10px;margin-top:5px;" *ngFor="let value of dataItem.items">
+										<a href=""><i class="fa fa-file-text-o"></i> {{value.name}}</a>
+									</ul>
+								</li>
+							</div>
+						</div>
+
+
+					</ng-template>
+				</kendo-dropdownlist>
+			</div>
+		</div>
+	</section>
+</div>
