@@ -5,36 +5,38 @@
  * however a implemented service will be in charge of passing the emitter to this directive
  */
 
-import { Component } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { NotifierService } from '../services/notifier.service';
+import { UILoaderService } from '../services/ui-loader.service';
 
 @Component({
 	selector: 'tds-ui-loader',
-	template: '<div id="main-loader" *ngIf="showsLoader"><div id="loader-icon"><div class="loader"></div></div></div>'
+	template: '<div id="main-loader" *ngIf="loaderConfig.show"><div id="loader-icon"><div class="loader"></div></div></div>'
 })
 
 export class UILoaderDirective {
 
-	private showsLoader = false;
+	private loaderConfig: any;
 
-	constructor(private notifierService: NotifierService) {
+	constructor(private notifierService: NotifierService, private loaderService: UILoaderService) {
 		this.httpRequestHandlerInitial();
 		this.httpRequestHandlerCompleted();
+		this.loaderConfig = this.loaderService.loaderConfig;
 	}
 
 	isShowing(): boolean {
-		return this.showsLoader;
+		return this.loaderConfig.show;
 	}
 
 	httpRequestHandlerInitial() {
 		this.notifierService.on('httpRequestInitial', (event) => {
-			this.showsLoader = true;
+			this.loaderService.show();
 		});
 	}
 
 	httpRequestHandlerCompleted() {
 		this.notifierService.on('httpRequestCompleted', (event) => {
-			this.showsLoader = false;
+			this.loaderService.hide();
 		});
 	}
 
