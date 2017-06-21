@@ -113,7 +113,7 @@
 								</td>
 								
 								<td class="label ${standardFieldSpecs.sme2.imp?:''}" nowrap="nowrap"><label for="sme2">${standardFieldSpecs.sme2.label}</label></td>
-								<td data-for="sme2" class="${config.sme2} suffleTd" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip?:''}">
+								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip?:''}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId" 
 										optionValue="${{it.fullName}}" 
@@ -262,7 +262,7 @@
 								</td>
 
 								<td class="label ${standardFieldSpecs.externalRefId.imp?:''}" nowrap="nowrap"><label for="externalRefId">${standardFieldSpecs.externalRefId.label}</label></td>
-								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.externalRefId.tip?:''}"	>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.externalRefId.tip?:''}">
 									<input type="text" id="externalRefId" class="${standardFieldSpecs.externalRefId.imp?:''}" name="externalRefId" 
 										value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								
