@@ -16,6 +16,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
@@ -36,6 +37,7 @@ class ApplicationController implements ControllerMethods {
 	ApplicationService applicationService
 	AssetEntityService assetEntityService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	PartyRelationshipService partyRelationshipService
@@ -306,11 +308,12 @@ class ApplicationController implements ControllerMethods {
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
 
 		[applicationInstance: application, assetTypeOptions: assetTypeOptions?.value, moveBundleList: moveBundleList,
 			planStatusOptions: planStatusOptions?.value, projectId: project.id, project: project,moveEventList: moveEventList,
 			config: configMap.config, customs: configMap.customs, personList: personList, company: project.client,
-			availabaleRoles: availabaleRoles, environmentOptions: environmentOptions?.value, highlightMap: highlightMap]
+			availabaleRoles: availabaleRoles, environmentOptions: environmentOptions?.value, highlightMap: highlightMap, standardFieldSpecs: standardFieldSpecs]
 	}
 
 	@HasPermission(Permission.AssetView)
