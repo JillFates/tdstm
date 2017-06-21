@@ -644,7 +644,10 @@ class ReportsService implements ServiceMethods {
 	 * @param String dotText - the dot sytax used to define the graph
 	 * @return String the URI to access the resulting file
 	 * @throws RuntimeException when the generation fails, the exception message will contain the output from the dot command
+	 *
+	 * @deprecated As of release 4.1.4, replaced by {@link GraphvizService#generateSVGFromDOT()}
 	 */
+	@Deprecated
 	def generateDotGraph( filenamePrefix, dotText ) {
 
 		def conf = grailsApplication.config.graph
