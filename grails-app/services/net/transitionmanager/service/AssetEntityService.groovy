@@ -1211,7 +1211,8 @@ class AssetEntityService implements ServiceMethods {
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
 			*/ // TM-6096
 
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(type)
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
 		[assetId: asset.id,
 		 //assetTypeAttribute: assetTypeAttribute,
@@ -1268,7 +1269,8 @@ class AssetEntityService implements ServiceMethods {
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(type)
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
 		[assetId: assetEntity?.id,
 		 assetComment: assetComment,
