@@ -1257,9 +1257,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 //							GormUtil.asCommaDelimitedString(ids) . ') group by id'
 						def sql = "SELECT $findCol as id, count(*) as cnt FROM task_dependency WHERE $findCol in (" +
 							GormUtil.asCommaDelimitedString(ids) + ") group by id"
-						log.info "SQL = $sql, ids=$ids"
+						log.debug "getNeighborhood: SQL = $sql, ids=$ids"
 						def outerDeps = jdbcTemplate.queryForList(sql)
-						log.info "getNeighborhood() : found ${outerDeps.size()} tasks on the other side of the tracks of $ids"
+						log.debug "getNeighborhood: found ${outerDeps.size()} tasks on the other side of the tracks of $ids"
 						td.each { t ->
 							// Try to match up the outer dep count to the task dependency node
 							def outerDep = outerDeps?.find() { od -> od.id == t[nextProp].id }
@@ -1270,14 +1270,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								t.setTmpSuccessorDepCount(outerDepCount)
 							}
 
-							log.info "getNeighborhood(): Found $outerDepCount outer depend for task # ${t[findProp].taskNumber} (id:${t[findProp].id})"
+							log.debug "getNeighborhood: Found $outerDepCount outer depend for task # ${t[findProp].taskNumber} (id:${t[findProp].id})"
 						}
 					}
 
 					if (depth==1) {
 						td.each { t ->
 							//log.info "getNeighborhood: dependency $t - $depCountName = ${t[depCountName]} outside dep"
-							log.info "getNeighborhood: dependency $t"
+							log.debug "getNeighborhood: dependency $t"
 						}
 					}
 

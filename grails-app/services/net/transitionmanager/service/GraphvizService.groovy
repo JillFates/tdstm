@@ -7,6 +7,9 @@ class GraphvizService {
 
     GrailsApplication grailsApplication
 
+    // The maximum amount of time given to the dot command
+    static final Long DOT_CMD_TIMEOUT_MS = 150000L
+
     /**
      * Attempts to generate an SVG file from DOT text passed. Upon success SVG creation
      * it deletes both the SVG and DOT files
@@ -27,13 +30,14 @@ class GraphvizService {
         def sout = new StringBuffer()
         def serr = new StringBuffer()
         String cmd = "$dotExec -T${graphType} -v -o ${graphFile} ${dotFile}"
-        log.info "generateDotGraph: about to execute command: $cmd"
+        log.debug "generateSVGFromDOT: about to execute command: $cmd"
 
         def proc = cmd.execute()
         proc.consumeProcessOutput(sout, serr)
-        proc.waitForOrKill(150000)
-        log.info "generateDotGraph: process stdout=$sout"
-        log.info "generateDotGraph: process stderr=$serr"
+        proc.waitForOrKill(DOT_CMD_TIMEOUT_MS)
+
+        log.debug "generateSVGFromDOT: process stdout=$sout"
+        log.debug "generateSVGFromDOT: process stderr=$serr"
 
         if (proc.exitValue() != 0) {
             File errFile = touchFile(tmpDir, filenamePrefix, "err")
@@ -80,10 +84,10 @@ class GraphvizService {
     private void deleteFile(File file) {
         try {
             if (file.delete()) {
-                log.info(file.absolutePath + " deleted successfully")
+                log.debug file.absolutePath + " deleted successfully"
             }
         } catch (e) {
-            log.info e.message
+            log.error "Failed to delete ${file.absolutePath} : ${e.message}"
         }
     }
 }
