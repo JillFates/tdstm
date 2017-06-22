@@ -23,6 +23,10 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.model = { ...this.field.constraints };
+		this.model.maxSize = this.model.maxSize || 255;
+		if (this.model.required) {
+			this.model.minSize = this.model.minSize || 1;
+		}
 	}
 
 	public onToggle(): void {

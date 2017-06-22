@@ -19,6 +19,7 @@ import { SelectListConfigurationPopupComponent } from '../select-list/selectlist
 	styles: [`
 		.float-right { float: right;}
 		.k-grid { height:calc(100vh - 225px); }
+		tr .text-center { text-align: center; }
 	`]
 })
 export class FieldSettingsGridComponent implements OnInit {
@@ -42,7 +43,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				operator: 'contains',
 				value: ''
 			}],
-			logic: 'and'
+			logic: 'or'
 		}
 	};
 	private isEditing = false;
@@ -50,7 +51,11 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isSubmitted = false;
 	private sortable: boolean | object = { mode: 'single' };
 
-	private availableControls = ['Select List', 'String', 'YesNoUnknow'];
+	private availableControls = [
+		{ text: 'List', value: 'Select List' },
+		{ text: 'String', value: 'String' },
+		{ text: 'YesNo', value: 'YesNo' }
+	];
 	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
 
 	constructor(
@@ -75,6 +80,11 @@ export class FieldSettingsGridComponent implements OnInit {
 		if (this.filter.search !== '') {
 			this.state.filter.filters.push({
 				field: 'field',
+				operator: 'contains',
+				value: this.filter.search
+			});
+			this.state.filter.filters.push({
+				field: 'label',
 				operator: 'contains',
 				value: this.filter.search
 			});
