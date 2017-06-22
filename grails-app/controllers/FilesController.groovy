@@ -15,6 +15,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
@@ -39,6 +40,7 @@ class FilesController implements ControllerMethods {
 	StorageService storageService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	CustomDomainService customDomainService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -233,13 +235,16 @@ class FilesController implements ControllerMethods {
 		Project project = securityService.userCurrentProject
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Files','Discovery')
+		// Obtains the domain out of the asset type string.
+		String domain = AssetClass.getDomainForAssetType('Files')
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
 		[assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
 		 fileInstance: files, moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
 		 planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
 		 config: configMap.config, customs: configMap.customs,
 		 environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
-		 highlightMap: assetEntityService.getHighlightedInfo('Files', files, configMap), project:project]
+		 standardFieldSpecs: standardFieldSpecs, project:project]
 	}
 
 	@HasPermission(Permission.AssetView)
