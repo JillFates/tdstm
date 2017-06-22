@@ -1270,10 +1270,7 @@ class AssetEntityService implements ServiceMethods {
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
-<<<<<<< HEAD
-		// Obtains the domain out of the asset type string.
-=======
->>>>>>> 767d347f2d770d894ed30ea3a8801cb3844c9639
+		// Obtains the domain out of the asset type string
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
@@ -2863,7 +2860,7 @@ class AssetEntityService implements ServiceMethods {
 		if (!shared) {
 			query = query + " AND asset_class = ? "
 		}
-		
+
 		// order
 		query = query + ") tmp ORDER BY ${fieldName} COLLATE latin1_general_ci ASC";
 

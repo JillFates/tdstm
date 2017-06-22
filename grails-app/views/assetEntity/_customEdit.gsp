@@ -18,7 +18,7 @@
 		</label>
 	</td>
 	<td>
-		<tds:customField field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="$tabOffset"/>
+		<tds:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="$tabOffset"/>
 	</td>
 
 	<g:if test="${j % 4 == 3}">
