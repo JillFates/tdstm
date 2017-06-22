@@ -1203,7 +1203,6 @@ class AssetEntityService implements ServiceMethods {
 		//def validationType = asset.validation
 		//def dependentAssets = getDependentAssets(asset) // TM-6096
 		//def supportAssets = getSupportingAssets(asset) // TM-6096
-
 		// TODO - JPM 8/2014 - Need to see if Edit even uses the servers list at all. If so, this needs to join the model to filter on assetType
 		/*def servers = AssetEntity.executeQuery('''
 			FROM AssetEntity
@@ -1211,6 +1210,8 @@ class AssetEntityService implements ServiceMethods {
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
 			*/ // TM-6096
 
+
+		// Obtains the domain out of the asset type string.
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
@@ -1269,6 +1270,10 @@ class AssetEntityService implements ServiceMethods {
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
+<<<<<<< HEAD
+		// Obtains the domain out of the asset type string.
+=======
+>>>>>>> 767d347f2d770d894ed30ea3a8801cb3844c9639
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
