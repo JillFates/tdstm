@@ -1,14 +1,14 @@
-<div *ngIf="field.control==='Select List'">
+<div style="float:right;" *ngIf="field.control==='Select List'">
     <div #openText (click)="onToggle()" class="open-close-dropdown-container text-center">
-        <i class="open-close-dropdown-icon fa fa-caret-up" *ngIf="show"></i>
-        <i class="open-close-dropdown-icon fa fa-caret-down" *ngIf="!show"></i>
+        <i class="open-close-dropdown-icon fa fa-gear" *ngIf="show"></i>
+        <i class="open-close-dropdown-icon fa fa-gear" *ngIf="!show"></i>
     </div>
     <kendo-popup *ngIf="show" [anchor]="openText" [popupClass]="" [anchorAlign]="{horizontal: 'center', vertical: 'middle'}"
         [popupAlign]="{horizontal: 'center', vertical: 'top'}">
 
         <div class="popup-container">
             <div class="text-center">
-                <input class="value-input" type="text" [(ngModel)]="newItem" placeholder="enter value here">
+                <input class="value-input" type="text" [(ngModel)]="newItem" placeholder="Enter value">
                 <button name="addButton" class="btn btn-default btn-xs" [disabled]="newItem.length === 0" (click)="onAdd()">
                 <i class="fa fa-plus"></i> {{'GLOBAL.ADD' | translate}}
             </button>
@@ -19,7 +19,7 @@
                     [activeItemStyle]="{'opacity': '.7'}" [itemStyle]="{'cursor': 'move', 'margin-bottom': '5px'}" emptyText="">
                     <ng-template let-item="item" let-index="index">
                         <div [ngStyle]="getStyle(index)">
-                            <i class="remove-icon fa fa-fw fa-trash" *ngIf="item.deletable" (click)="onRemove(item)"></i>
+                            <i class="pointer fa fa-fw" [ngClass]="{'fa-trash':item.deletable,'fa-ban':!item.deletable}" (click)="onRemove(item)"></i>
                             <input class="default-input" type="radio" value="{{item.value}}" name="defaultValue" [(ngModel)]="defaultValue">
                             <span>{{item.value}}</span>
                         </div>

@@ -6,7 +6,7 @@
 	</g:if>
 
 	<td class="label ${custom.imp?:''}" nowrap="nowrap">
-		<label for="${custom.field}">${custom.label}</label>
+		<label for="${custom.field}">${custom.label} <g:if test="${custom.constraints.required == true}"><span style="color: red;">*</span></g:if></label>
 	</td>
 	<td>
 		<tds:customField field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="${tabOffset}"/>

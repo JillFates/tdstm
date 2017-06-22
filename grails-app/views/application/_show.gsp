@@ -58,7 +58,7 @@
 		</tr>
 		<tr>
 			<td class="label ${standardFieldSpecs.appTech.imp?:''}" nowrap="nowrap"><label for="appTech">${standardFieldSpecs.appTech.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appVersion.tip?:''}">${applicationInstance.appTech}</td>
+			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appTech.tip?:''}">${applicationInstance.appTech}</td>
 			
 			<td class="label ${standardFieldSpecs.appOwner.imp?:''}" nowrap="nowrap"><label for="appOwner">${standardFieldSpecs.appOwner.label}</label></td>
 			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip?:''}">

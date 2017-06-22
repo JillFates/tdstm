@@ -1853,3 +1853,37 @@
 .old-legacy-content .clearable.x  { background-position: right 5px center; }
 .old-legacy-content .clearable.onX{ cursor: pointer; }
 .old-legacy-content .clearable::-ms-clear {display: none; width:0; height:0;}
+
+
+.old-legacy-content #head_mycrawler {
+	float: left;
+}
+.old-legacy-content #crawlerHead {
+	float: left;
+	width: auto;
+	margin-top: 4px;
+	text-align: right;
+}
+.old-legacy-content .statusbar_good{
+	text-align:center;
+	background-color: #669900;
+	font-size:12px;
+	font-weight:bold;
+	color:#FFFFFF;
+	padding-left: 20px;
+}
+
+.old-legacy-content .statusbar_bad{
+	text-align:center;
+	background-color: #CD3333;
+	font-size:12px;
+	font-weight:bold;
+	color:#FFFFFF;
+}
+.old-legacy-content .statusbar_yellow{
+	text-align:center;
+	background-color: #FFCC33;
+	font-size:12px;
+	font-weight:bold;
+	color:#000;
+}

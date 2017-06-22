@@ -1,9 +1,10 @@
-import {ComponentFixture, TestBed, async} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
-import {DebugElement} from '@angular/core';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 
-import {UILoaderDirective} from '../shared/directives/ui-loader.directive';
-import {NotifierService} from '../shared/services/notifier.service';
+import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
+import { NotifierService } from '../shared/services/notifier.service';
+import { UILoaderService } from '../shared/services/ui-loader.service';
 
 describe('UILoaderDirective:', () => {
 	let fixture: ComponentFixture<UILoaderDirective>;
@@ -14,7 +15,7 @@ describe('UILoaderDirective:', () => {
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
 			declarations: [UILoaderDirective],
-			providers: [NotifierService]
+			providers: [NotifierService, UILoaderService]
 		}).compileComponents();
 	}));
 

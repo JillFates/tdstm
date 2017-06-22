@@ -1,13 +1,12 @@
-import {ComponentFixture, TestBed, async} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
-import {DebugElement} from '@angular/core';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 
-import {TDSAppComponent} from '../config/tds-app.component';
-import {UserService} from '../shared/services/user.service';
-import {HttpServiceProvider} from '../shared/providers/http-interceptor.provider';
-import {NotifierService} from '../shared/services/notifier.service';
-import {UILoaderDirective} from '../shared/directives/ui-loader.directive';
-import {UIToastDirective} from '../shared/directives/ui-toast.directive';
+import { TDSAppComponent } from '../config/tds-app.component';
+import { UserService } from '../shared/services/user.service';
+import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
+import { UIToastDirective } from '../shared/directives/ui-toast.directive';
+import { SharedModule } from '../shared/shared.module';
 
 describe('TDSAppComponent:', () => {
 	let fixture: ComponentFixture<TDSAppComponent>;
@@ -19,10 +18,9 @@ describe('TDSAppComponent:', () => {
 
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
-			declarations: [TDSAppComponent, UILoaderDirective, UIToastDirective],
-			providers: [NotifierService, {provide: UserService, useValue: userStub},
-				HttpServiceProvider
-			]
+			imports: [SharedModule],
+			declarations: [TDSAppComponent],
+			providers: [{ provide: UserService, useValue: userStub }]
 		}).compileComponents();
 	}));
 

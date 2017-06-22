@@ -3,6 +3,7 @@ import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
+import { UILoaderService } from '../../../../shared/services/ui-loader.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
@@ -18,6 +19,7 @@ import { SelectListConfigurationPopupComponent } from '../select-list/selectlist
 	styles: [`
 		.float-right { float: right;}
 		.k-grid { height:calc(100vh - 225px); }
+		tr .text-center { text-align: center; }
 	`]
 })
 export class FieldSettingsGridComponent implements OnInit {
@@ -41,7 +43,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				operator: 'contains',
 				value: ''
 			}],
-			logic: 'and'
+			logic: 'or'
 		}
 	};
 	private isEditing = false;
@@ -49,13 +51,18 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isSubmitted = false;
 	private sortable: boolean | object = { mode: 'single' };
 
-	private availableControls = ['Select List', 'String', 'YesNoUnknow'];
+	private availableControls = [
+		{ text: 'List', value: 'Select List' },
+		{ text: 'String', value: 'String' },
+		{ text: 'YesNo', value: 'YesNo' }
+	];
 	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
 
 	constructor(
 		private fieldService: FieldSettingsService,
 		private permissionService: PermissionService,
-		private prompt: UIPromptService) { }
+		private prompt: UIPromptService,
+		private loaderService: UILoaderService) { }
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
@@ -76,6 +83,11 @@ export class FieldSettingsGridComponent implements OnInit {
 				operator: 'contains',
 				value: this.filter.search
 			});
+			this.state.filter.filters.push({
+				field: 'label',
+				operator: 'contains',
+				value: this.filter.search
+			});
 		}
 		if (this.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
@@ -88,23 +100,27 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onEdit(): void {
-		this.isEditing = true;
-		this.sortable = false;
-		this.state.sort = [
-			{
-				dir: 'desc',
-				field: 'isNew'
-			}, {
-				dir: 'asc',
-				field: 'order'
-			}
-		];
-		this.filter = {
-			search: '',
-			fieldType: 'All'
-		};
-		this.isFilterDisabled = true;
-		this.onFilter();
+		this.loaderService.show();
+		setTimeout(() => {
+			this.isEditing = true;
+			this.sortable = false;
+			this.state.sort = [
+				{
+					dir: 'desc',
+					field: 'isNew'
+				}, {
+					dir: 'asc',
+					field: 'order'
+				}
+			];
+			this.filter = {
+				search: '',
+				fieldType: 'All'
+			};
+			this.isFilterDisabled = true;
+			this.onFilter();
+			this.loaderService.hide();
+		});
 	}
 
 	protected onSaveAll(): void {
