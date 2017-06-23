@@ -29,6 +29,7 @@ class ControlTagLib {
 		// Build the TD element
 		// <td class="label assetName C" nowrap="nowrap">
 		sb.append('<td class="label ')
+		// TODO : Determine if the fieldName is used in the LABEL class attribute
 		sb.append(fieldSpec.field)
 		if (fieldSpec.imp) {
 			sb.append(" ${fieldSpec.imp}")
@@ -73,7 +74,7 @@ class ControlTagLib {
 	 * Used to render any of the supported custom fields input control
 	 * @param field - the field spec Map
 	 * @param value - the current or default value to populate the control with (optional)
-	 * @param tabIndex??? - the tab offset (optional)
+	 * @param size - used to define the HTML size attribute on controls (optional)
 	 * @param tabIndex - the tab offset (optional)
 	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
 	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" tabOffset="400"/>
@@ -90,6 +91,8 @@ class ControlTagLib {
 		String value = ( attrs.value ?: '' )
 		value = (value == null ? '' : value)
 
+		Integer size = NumberUtil.toInteger(attrs.size,null)
+
 		// Get tabIndex from attrib tabIndex, tabindex or tabOffset which if passed will override
 		// the order specified in the fieldSpec.
 		String tabIndex = ( attrs.tabIndex ?: (attrs.tabindex ?: null))
@@ -100,16 +103,16 @@ class ControlTagLib {
 
 		switch (fieldSpec.control) {
 			case 'Select List':
-				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset)
+				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset, size)
 				break
 
 			case 'YesNo':
-				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset)
+				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset, size)
 				break
 
 			case 'String':
 			default:
-				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset)
+				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size)
 		}
 	}
 
@@ -121,11 +124,11 @@ class ControlTagLib {
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @return the SELECT Component HTML
 	 */
-	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset) {
+	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
 		sb.append('>')
 
 		// Add a Select... option at top if the field is required
@@ -166,10 +169,10 @@ class ControlTagLib {
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset) {
+	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
 		'<input' +
 		attribute('type', 'text') +
-		commonAttributes(fieldSpec, value, tabIndex, tabOffset) +
+		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size) +
 		'/>'
 	}
 
@@ -180,11 +183,11 @@ class ControlTagLib {
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset) {
+	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
 		List options = []
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
 		sb.append('>')
 
 		if (fieldSpec.constraints?.required) {
@@ -226,12 +229,13 @@ class ControlTagLib {
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @return the attributes generated in HTML format
 	 */
-	private String commonAttributes(Map fieldSpec, String value=null, String tabIndex=null, String tabOffset=null) {
+	private String commonAttributes(Map fieldSpec, String value=null, String tabIndex=null, String tabOffset=null, Integer size) {
 		idAttrib(fieldSpec) +
 		nameAttrib(fieldSpec) +
 		valueAttrib(fieldSpec, value) +
 		tabIndexAttrib(fieldSpec, tabIndex, tabOffset) +
 		classAttrib(fieldSpec) +
+		sizeAttrib(size) +
 		titleAttrib(fieldSpec) +
 		constraintsAttrib(fieldSpec) +
 		dataLabelAttrib(fieldSpec)
@@ -322,7 +326,6 @@ class ControlTagLib {
 	 * @return The tabIndex attribute HTML for controls
 	 */
 	private String tabIndexAttrib(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
-println "\n${fieldSpec.field}: order=${fieldSpec.order}, tabIndex=$tabIndex, tabOffset=$tabOffset, "
 		Integer ti = NumberUtil.toInteger(tabIndex, -1)
 		if (ti < 1) {
 			ti = fieldSpec.order
@@ -341,6 +344,19 @@ println "\n${fieldSpec.field}: order=${fieldSpec.order}, tabIndex=$tabIndex, tab
 			return " tabindex=\"$ti\""
 		}
 		return ''
+	}
+
+	/**
+	 * Returns the HTML size attribute based on the field specification
+	 * @param field - the Field specification object
+	 * @return The title attribute HTML for controls
+	 */
+	private String sizeAttrib(Integer size) {
+		String r=''
+		if (size && size > 0) {
+			r = " size=\"$size\""
+		}
+		return r
 	}
 
 	/**
