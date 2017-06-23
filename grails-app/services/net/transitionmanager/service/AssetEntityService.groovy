@@ -1203,7 +1203,6 @@ class AssetEntityService implements ServiceMethods {
 		//def validationType = asset.validation
 		//def dependentAssets = getDependentAssets(asset) // TM-6096
 		//def supportAssets = getSupportingAssets(asset) // TM-6096
-
 		// TODO - JPM 8/2014 - Need to see if Edit even uses the servers list at all. If so, this needs to join the model to filter on assetType
 		/*def servers = AssetEntity.executeQuery('''
 			FROM AssetEntity
@@ -1211,7 +1210,10 @@ class AssetEntityService implements ServiceMethods {
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
 			*/ // TM-6096
 
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(type)
+
+		// Obtains the domain out of the asset type string.
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
 		[assetId: asset.id,
 		 //assetTypeAttribute: assetTypeAttribute,
@@ -1268,7 +1270,9 @@ class AssetEntityService implements ServiceMethods {
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(type)
+		// Obtains the domain out of the asset type string
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
 		[assetId: assetEntity?.id,
 		 assetComment: assetComment,
@@ -2856,7 +2860,7 @@ class AssetEntityService implements ServiceMethods {
 		if (!shared) {
 			query = query + " AND asset_class = ? "
 		}
-		
+
 		// order
 		query = query + ") tmp ORDER BY ${fieldName} COLLATE latin1_general_ci ASC";
 

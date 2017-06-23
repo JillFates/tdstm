@@ -35,235 +35,279 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label ${config.assetName}  ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
-								<td colspan="3">
-									<input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${applicationInstance.assetName}" tabindex="9" /></td>
-								<td class="label ${config.description}  ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
-								<td colspan="3">
-									<input type="text" id="description" class="${config.description}" name="description" 
+								<td class="label ${standardFieldSpecs.assetName.imp?:''}" nowrap="nowrap"><label for="assetName">${standardFieldSpecs.assetName.label}<span style="color: red;">*</span></label></td>
+								<td colspan="3" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetName.tip?:''}">
+									<input type="text" id="assetName" class="${standardFieldSpecs.assetName.imp?:''}" name="assetName" value="${applicationInstance.assetName}" tabindex="9" /></td>
+								
+								<td class="label ${standardFieldSpecs.description.imp?:''}" nowrap="nowrap"><label for="description">${standardFieldSpecs.description.label}</label></td>
+								<td colspan="3" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.description.tip?:''}">
+									<input type="text" id="description" class="${standardFieldSpecs.description.imp?:''}" name="description" 
 										value="" size="50" tabindex="10" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
-								<td class="label ${config.supportType}  ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support</label>
+								<td class="label ${standardFieldSpecs.appAccess.imp?:''}" nowrap="nowrap"><label for="assetType">${standardFieldSpecs.appAccess.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appAccess.tip?:''}"><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
+								
+								<td class="label ${standardFieldSpecs.supportType.imp?:''}" nowrap="nowrap"><label for="supportType">${standardFieldSpecs.supportType.label}</label>
 								</td>
-								<td ><input type="text" id="supportType" class="${config.supportType}"
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.supportType.tip?:''}"><input type="text" id="supportType" class="${standardFieldSpecs.supportType.imp?:''}"
 									name="supportType" value="${applicationInstance.supportType}" tabindex="20" />
 								</td>
-								<td class="label ${config.appFunction}  ${highlightMap.appFunction?:''}" nowrap="nowrap"><label for="appFunction">Function</label>
+								
+								<td class="label ${standardFieldSpecs.appFunction.imp?:''}" nowrap="nowrap"><label for="appFunction">${standardFieldSpecs.appFunction.label}</label>
 								</td>
-								<td ><input type="text" id="appFunction" class="${config.appFunction}"
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appFunction.tip?:''}"><input type="text" id="appFunction" class="${standardFieldSpecs.appFunction.imp?:''}"
 									name="appFunction" value="${applicationInstance.appFunction}"  tabindex="31" />
 								</td>
-								<td class="label ${config.userCount}  ${highlightMap.userCount?:''}" nowrap="nowrap"><label for="userCount">Users</label>
+								
+								<td class="label ${standardFieldSpecs.userCount.imp?:''}" nowrap="nowrap"><label for="userCount">${standardFieldSpecs.userCount.label}</label>
 								</td>
-								<td>
-									<input type="text" id="userId" class="${config.userCount}" name="userCount" 
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.userCount.tip?:''}">
+									<input type="text" id="userId" class="${standardFieldSpecs.userCount.imp?:''}" name="userCount" 
 										value="${applicationInstance.userCount}"  tabindex="41" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appVendor}  ${highlightMap.appVendor?:''}" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
-								<td ><input type="text" id="appVendor" class="${config.appVendor}"
-									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
+								<td class="label ${standardFieldSpecs.appVendor.imp?:''}" nowrap="nowrap"><label for="appVendor">${standardFieldSpecs.appVendor.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appVendor.tip?:''}">
+									<input type="text" id="appVendor" class="${standardFieldSpecs.appVendor.imp?:''}"
+										name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
-								<td class="label ${config.sme}  ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
-								<td data-for="sme" class="${config.sme}" >
-									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect"  optionKey="personId" 
+								
+								<td class="label ${standardFieldSpecs.sme.imp?:''}" nowrap="nowrap"><label for="sme">${standardFieldSpecs.sme.label}</label></td>
+								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip?:''}">
+									<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect"  optionKey="personId" 
 										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
 										noSelection="${['null':'Select...']}" 
 										tabIndex="21"
 									/>
 								</td>
-								<td class="label ${config.environment}  ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label>
+								
+								<td class="label ${standardFieldSpecs.environment.imp?:''}" nowrap="nowrap"><label for="environment">${standardFieldSpecs.environment.label}</label>
 								</td>
-								<td >
-									<g:select id="environment" class="${config.environment}" name="environment" 
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip?:''}">
+									<g:select id="environment" class="${standardFieldSpecs.environment.imp?:''}" name="environment" 
 										from="${environmentOptions}" 
 										value="${applicationInstance.environment}" 
 										noSelection="${['':'Select...']}" tabindex="32">
 									</g:select>
 								</td>
-								<td class="label ${config.userLocations}  ${highlightMap.userLocations?:''}" nowrap="nowrap"><label for="userLocations">User Location</label>
+								
+								<td class="label ${standardFieldSpecs.userLocations.imp?:''}" nowrap="nowrap"><label for="userLocations">${standardFieldSpecs.userLocations.label}</label>
 								</td>
-								<td ><input type="text" id="userLocations" class="${config.userLocations}"
-									name="userLocations"
-									value="${applicationInstance.userLocations}" 
-									tabindex="42" />
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.userLocations.tip?:''}">
+									<input type="text" id="userLocations" class="${standardFieldSpecs.userLocations.imp?:''}"
+										name="userLocations"
+										value="${applicationInstance.userLocations}" 
+										tabindex="42" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appVersion}  ${highlightMap.appVersion?:''}" nowrap="nowrap"><label for="appVersion">Version</label>
+								<td class="label ${standardFieldSpecs.appVersion.imp?:''}" nowrap="nowrap"><label for="appVersion">${standardFieldSpecs.appVersion.label}</label>
 								</td>
-								<td ><input type="text" id="appVersion" class="${config.appVersion}"
-									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appVersion.tip?:''}">
+									<input type="text" id="appVersion" class="${standardFieldSpecs.appVersion.imp?:''}"
+										name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
-								<td class="label ${config.sme2}  ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td data-for="sme2" class="${config.sme2} suffleTd">
+								
+								<td class="label ${standardFieldSpecs.sme2.imp?:''}" nowrap="nowrap"><label for="sme2">${standardFieldSpecs.sme2.label}</label></td>
+								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip?:''}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="personId" 
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId" 
 										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="22" 
 										noSelection="${['null':'Select...']}"
 									/>
 								</td>
-								<td class="label ${config.criticality}  ${highlightMap.criticality?:''}" nowrap="nowrap">
-									<label for="criticality">Criticality</label>
+								
+								<td class="label ${standardFieldSpecs.criticality.imp?:''}" nowrap="nowrap">
+									<label for="criticality">${standardFieldSpecs.criticality.label}</label>
 								</td>
-								<td>
-									<g:select id="criticality" class="${config.criticality}" name="criticality" 
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.criticality.tip?:''}">
+									<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality" 
 										from="${applicationInstance.constraints.criticality.inList}" 
 										value="${applicationInstance.criticality}" 
 										noSelection="${['':'Select...']}"
 										tabindex="33">
 									</g:select>
 								</td>
-								<td class="label ${config.useFrequency}  ${highlightMap.useFrequency?:''}" nowrap="nowrap">
-									<label for="useFrequency">Use	Frequency</label>
+								
+								<td class="label ${standardFieldSpecs.userFrequency.imp?:''}" nowrap="nowrap">
+									<label for="useFrequency">${standardFieldSpecs.userFrequency.label}</label>
 								</td>
-								<td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.userFrequency.tip?:''}">
 									<input type="text" id="useFrequency" name="useFrequency" 
-										class="${config.useFrequency}" value="${applicationInstance.useFrequency}" tabindex="43" />
+										class="${standardFieldSpecs.userFrequency.imp?:''}" value="${applicationInstance.useFrequency}" tabindex="43" />
 								</td>
 
 							</tr>
 							<tr>
-								<td class="label ${config.appTech}  ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Technology</label></td>
-								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" 
-									value="${applicationInstance.appTech}" tabindex="13" />
+								<td class="label ${standardFieldSpecs.appTech.imp?:''}" nowrap="nowrap"><label for="appTech">${standardFieldSpecs.appTech.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appTech.tip?:''}">
+									<input type="text" id="appTech" class="${standardFieldSpecs.appTech.imp?:''}" name="appTech" 
+										value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
-								<td class="label ${config.appOwner}  ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
-								<td class="suffleTd ${config.appOwner}" data-for="appOwner">
+
+								<td class="label ${standardFieldSpecs.appOwner.imp?:''}" nowrap="nowrap"><label for="appOwnerId">${standardFieldSpecs.appOwner.label}</label></td>
+								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip?:''}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.appOwner} suffleSelect personContact assetSelect" optionKey="personId" 
+									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" optionKey="personId" 
 										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="23" 
 										noSelection="${['null':' Select...']}" 
 									/>
 								</td>
-								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34" />
+								
+								<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle">${standardFieldSpecs.moveBundle.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:''}">
+									<g:select from="${moveBundleList}" id="moveBundle" class="${standardFieldSpecs.moveBundle.imp?:''}" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
-								<td class="label ${config.drRpoDesc}  ${highlightMap.drRpoDesc?:''}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
+								
+								<td class="label ${standardFieldSpecs.drRpoDesc.imp?:''}" nowrap="nowrap"><label for="drRpoDesc">${standardFieldSpecs.drRpoDesc.label}</label>
 								</td>
-								<td ><input type="text" id="drRpoDesc"	class="${config.drRpoDesc}" name="drRpoDesc" value="${applicationInstance.drRpoDesc}" tabindex="44" />
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.drRpoDesc.tip?:''}">
+									<input type="text" id="drRpoDesc"	class="${standardFieldSpecs.drRpoDesc.imp?:''}" name="drRpoDesc" value="${applicationInstance.drRpoDesc}" tabindex="44" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appSource}  ${highlightMap.appSource?:''}" nowrap="nowrap"><label for="appSource">Source</label></td>
-								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" 
+								<td class="label ${standardFieldSpecs.appSource.imp?:''}" nowrap="nowrap"><label for="appSource">${standardFieldSpecs.appSource.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appSource.tip?:''}">
+									<input type="text" id="appSource"	class="${standardFieldSpecs.appSource.imp?:''}" name="appSource" 
 									value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
-								<td class="label ${config.businessUnit} ${highlightMap.businessUnit?:''}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
+								
+								<td class="label ${standardFieldSpecs.businessUnit.imp?:''}" nowrap="nowrap"><label for="businessUnit">${standardFieldSpecs.businessUnit.label}</label>
 								</td>
-								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.businessUnit.tip?:''}">
+									<input type="text" id="businessUnit" class="${standardFieldSpecs.businessUnit.imp?:''}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
 								</td>
-								<td class="label ${config.planStatus} ${highlightMap.planStatus?:''}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
+								
+								<td class="label ${standardFieldSpecs.planStatus.imp?:''}" nowrap="nowrap"><label for="planStatus">${standardFieldSpecs.planStatus.label}</label>
 								</td>
-								<td ><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="35" />
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.planStatus.tip?:''}">
+									<g:select from="${planStatusOptions}" id="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="35" />
 								</td>
-								<td class="label ${config.drRtoDesc} ${highlightMap.drRtoDesc?:''}" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
+								
+								<td class="label ${standardFieldSpecs.drRtoDesc.imp?:''}" nowrap="nowrap"><label for="drRtoDesc">${standardFieldSpecs.drRtoDesc.label}</label>
 								</td>
-								<td ><input type="text" id="drRtoDesc"	class="${config.drRtoDesc}" name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="45" />
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.drRtoDesc.tip?:''}">
+									<input type="text" id="drRtoDesc"	class="${standardFieldSpecs.drRtoDesc.imp?:''}" name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="45" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.license} ${highlightMap.license?:''}" nowrap="nowrap"><label for="license">License</label></td>
-								<td ><input type="text" id="license" class="${config.license}" name="license" value="${applicationInstance.license}" tabindex="16" />
+								<td class="label ${standardFieldSpecs.license.imp?:''}" nowrap="nowrap"><label for="license">${standardFieldSpecs.license.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.license.tip?:''}">
+									<input type="text" id="license" class="${standardFieldSpecs.license.imp?:''}" name="license" value="${applicationInstance.license}" tabindex="16" />
 								</td>
-								<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}"><label for="retireDate">Retire Date:</label>
+
+								<td class="label ${standardFieldSpecs.retireDate.imp?:''}"><label for="retireDate">${standardFieldSpecs.retireDate.label}</label>
 								</td>
-								<td valign="top"
+								<td valign="top" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip?:''}"
 									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
 										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 									</script>
-									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="26"
+									<input type="text" class="dateRange ${standardFieldSpecs.retireDate.imp?:''}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="26"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}" />" /> 
 								</td>
-								<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label>
+								
+								<td class="label ${standardFieldSpecs.validation.imp?:''}" nowrap="nowrap"><label for="validation">${standardFieldSpecs.validation.label}</label>
 								</td>
-								<td ><g:select  id="validation" class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetFieldImportance(this.value,'Application');highlightCssByValidation(this.value,'Application','');"  value="" tabindex="36" />
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip?:''}">
+									<g:select  id="validation" class="${standardFieldSpecs.validation.imp?:''}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetFieldImportance(this.value,'Application');highlightCssByValidation(this.value,'Application','');"  value="" tabindex="36" />
 								</td>
-								<td class="label ${config.testProc} ${highlightMap.testProc?:''}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
+								
+								<td class="label ${standardFieldSpecs.testProc.imp?:''}" nowrap="nowrap"><label for="testProc">${standardFieldSpecs.testProc.label}</label>
 								</td>
-								<td ><g:select  id="testProc"	class="${config.testProc} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testProc.tip?:''}">
+									<g:select  id="testProc"	class="${standardFieldSpecs.testProc.imp?:''} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" />
 								</td>
 							</tr>
 							<tr>
 							    <td></td>
 							    <td></td>
-							    <td  class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
-								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
-									<input type="text" class="dateRange ${config.maintExpDate}" 
+							    
+								<td  class="label ${standardFieldSpecs.maintExpDate.imp?:''}"><label for="maintExpDate">${standardFieldSpecs.maintExpDate.label}</label></td>
+								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:''}">
+									<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}" 
 										size="15" style="width: 138px;"
 										name="maintExpDate" id="maintExpDate" tabindex="27" 
 										value="<tds:convertDate date="${applicationInstance?.maintExpDate}"  />" /> 
 								</td>
-								<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label>
+
+								<td class="label ${standardFieldSpecs.latency.imp?:''}" nowrap="nowrap"><label for="latency">${standardFieldSpecs.latency.label}</label>
 								</td>
-								<td ><g:select  id="latency" class="${config.latency} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.latency.tip?:''}">
+									<g:select  id="latency" class="${standardFieldSpecs.latency.imp?:''} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="37" />
 								</td>
-								<td class="label ${config.startupProc} ${highlightMap.startupProc?:''}" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
+								
+								<td class="label ${standardFieldSpecs.startupProc.imp?:''}" nowrap="nowrap"><label for="startupProc">${standardFieldSpecs.startupProc.label}</label>
 								</td>
-								<td ><g:select  id="startupProc" class="${config.startupProc} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupProc.tip?:''}">
+									<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="47" />
 								</td>
 								
 							</tr>
 							<tr>
-								<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="url">URL</label></td>
-								<td><input type="text" id="url" class="${config.url}" name="url" value="${applicationInstance.url}" tabindex="19" />
+								<td class="label ${standardFieldSpecs.url.imp?:''}" nowrap="nowrap"><label for="url">${standardFieldSpecs.url.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.url.tip?:''}">
+									<input type="text" id="url" class="${standardFieldSpecs.url.imp?:''}" name="url" value="${applicationInstance.url}" tabindex="19" />
 								</td>
-								<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-								<td>
-									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" 
+
+								<td class="label ${standardFieldSpecs.externalRefId.imp?:''}" nowrap="nowrap"><label for="externalRefId">${standardFieldSpecs.externalRefId.label}</label></td>
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.externalRefId.tip?:''}">
+									<input type="text" id="externalRefId" class="${standardFieldSpecs.externalRefId.imp?:''}" name="externalRefId" 
 										value="${applicationInstance.externalRefId}" tabindex="28" /></td>
-								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
-								<td colspan="1" nowrap="nowrap" data-for="shutdownBy" class="${config.shutdownBy}">
-								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:'${config.shutdownBy} assetSelect']"></g:render>
+								
+								<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap"><label for="shutdownBy">${standardFieldSpecs.shutdownBy.label}</label></td>
+								<td colspan="1" nowrap="nowrap" data-for="shutdownBy" class="${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.shutdownBy.tip?:''}">
+								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:'assetSelect']"></g:render>
 									<input type="checkbox" id="shutdownByIdFixed" name="shutdownFixed" value="0"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" disabled="disabled"/>Fixed
 								</td>
-								<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
+								
+								<td class="label ${standardFieldSpecs.shutdownDuration.imp?:''}" nowrap="nowrap"><label for="shutdownDuration">${standardFieldSpecs.shutdownDuration.label}</label>
 								</td>
-								<td >
+								<td nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.shutdownDuration.tip?:''}">
 									<input type="text" id="shutdownDuration" name="shutdownDuration"
 										value="${applicationInstance.shutdownDuration}" 
-										class="${config.shutdownDuration}"
+										class="${standardFieldSpecs.shutdownDuration.imp?:''}"
 										tabindex="55"  size="7"/>m
 								</td>
 							</tr>
 							<tr>
-							<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
-								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${config.startupBy}">
-								   <g:render template="bySelect"  model="[name:'startupBy', id:'startupById', className:'${config.startupBy} assetSelect']"></g:render>
+								<td class="label ${standardFieldSpecs.startupBy.imp?:''}" nowrap="nowrap"><label for="startupBy">${standardFieldSpecs.startupBy.label}</label></td>
+								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupBy.tip?:''}">
+								   <g:render template="bySelect"  model="[name:'startupBy', id:'startupById', className:' assetSelect']"></g:render>
 									<input type="checkbox" id="startupByIdFixed"  name="startupFixed" value="0"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"  disabled="disabled"/>Fixed
 								</td>
 								
-								<td class="label ${config.startupDuration} ${highlightMap.startupDuration?:''}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
+								<td class="label ${standardFieldSpecs.startupDuration.imp?:''}" nowrap="nowrap"><label for="startupDuration">${standardFieldSpecs.startupDuration.label}</label>
 								</td>
-								<td ><input type="text" id="startupDuration" name="startupDuration" class="${config.startupDuration}"
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupDuration.tip?:''}">
+									<input type="text" id="startupDuration" name="startupDuration" class="${standardFieldSpecs.startupDuration.imp?:''}"
 											value="${applicationInstance.startupDuration}" tabindex="55" size="7"/>m
 								</td>
 								
-								<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
-								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${config.testingBy}">
-								  <g:render template="bySelect" model="[name:'testingBy', id:'testingById', className:'${config.testingBy} assetSelect']"></g:render>
+								<td class="label ${standardFieldSpecs.testingBy.imp?:''}" nowrap="nowrap"><label for="testingBy">${standardFieldSpecs.testingBy.label}</label></td>
+								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testingBy.tip?:''}">
+								  <g:render template="bySelect" model="[name:'testingBy', id:'testingById', className:'assetSelect']"></g:render>
 									<input type="checkbox" id="testingByIdFixed" name="testingFixed" value="0"  disabled="disabled"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />Fixed
 								</td>
-								<td class="label ${config.testingDuration} ${highlightMap.testingDuration?:''}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>
+								
+								<td class="label ${standardFieldSpecs.testingDuration.imp?:''}" nowrap="nowrap"><label for="testingDuration">${standardFieldSpecs.testingDuration.label}</label>
 								</td>
-								<td ><input type="text" id="testingDuration" name="testingDuration" class="${config.testingDuration}"
+								<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testingDuration.tip?:''}">
+									<input type="text" id="testingDuration" name="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}"
 											value="${applicationInstance.testingDuration}" tabindex="55" size="7"/>m
 								</td>
 							</tr>
@@ -292,6 +336,7 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366');
+    $('[data-toggle="popover"]').popover();
 </script>
 <style>
 	#select2-drop{ width: 200px !important; } 

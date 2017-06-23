@@ -15,9 +15,7 @@ import {enableProdMode} from '@angular/core';
 import {environment} from './environment/environment';
 import {TDSAppModule} from './config/tds-app.module';
 
-if (environment.production) {
-	enableProdMode();
-}
+enableProdMode();
 
 // Compile and launch the module
 platformBrowserDynamic().bootstrapModule(TDSAppModule);

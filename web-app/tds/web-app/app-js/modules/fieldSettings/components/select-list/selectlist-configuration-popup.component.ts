@@ -11,7 +11,10 @@ import { CustomDomainService } from '../../service/custom-domain.service';
 	selector: 'selectlist-configuration-popup',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/select-list/selectlist-configuration-popup.component.html',
 	encapsulation: ViewEncapsulation.None,
-	exportAs: 'selectlistConfig'
+	exportAs: 'selectlistConfig',
+	styles: [
+		`.pointer { cursor: pointer; }`
+	]
 })
 
 export class SelectListConfigurationPopupComponent {
@@ -30,25 +33,28 @@ export class SelectListConfigurationPopupComponent {
 	private load(): void {
 		this.newItem = '';
 		this.defaultValue = null;
-		if (this.field.constraints.values) {
-			this.items = this.field.constraints.values.map(i => {
-				return {
-					deletable: true,
-					value: i
-				};
-			});  // make a copy to work with.
-			this.defaultValue = this.field.default;
-		} else {
-			this.customService.getDistinctValues(this.domain, this.field)
-				.subscribe((value) => {
-					this.items = value.map(i => {
-						return {
-							deletable: false,
-							value: i
-						};
-					});
+		this.customService.getDistinctValues(this.domain, this.field)
+			.subscribe((value: string[]) => {
+				let udfValues: any[] = [];
+				if (this.field.constraints.values) {
+					udfValues = this.field.constraints.values
+						.filter(i => value.indexOf(i) === -1)
+						.map(i => {
+							return {
+								deletable: true,
+								value: i
+							};
+						});
+				}
+				let distinct = value.map(i => {
+					return {
+						deletable: false,
+						value: i
+					};
 				});
-		}
+				this.items = distinct.concat(udfValues);
+			});
+		this.defaultValue = this.field.default;
 	}
 
 	public getStyle(index) {
