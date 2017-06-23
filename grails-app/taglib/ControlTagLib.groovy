@@ -14,6 +14,46 @@ class ControlTagLib {
 	static final String MISSING_OPTION_WARNING = 'INVALID'
 	static final int MAX_STRING_LENGTH = 255
 
+
+	/**
+	 * Used to render the LABEL used for an input field
+	 * @param field - the Field Specification (Map)
+	 */
+	def inputLabel = { Map attrs ->
+		Map fieldSpec = attrs.field ?: [:]
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tds:ifInputRequired> tag requires field=fieldSpec Map')
+		}
+		StringBuilder sb = new StringBuilder("\n")
+
+		// Build the TD element
+		// <td class="label assetName C" nowrap="nowrap">
+		sb.append('<td class="label ')
+		sb.append(fieldSpec.field)
+		if (fieldSpec.imp) {
+			sb.append(" ${fieldSpec.imp}")
+		}
+		sb.append('" nowrap="nowrap">')
+		sb.append("\n")
+
+		// Build the LABEL element
+		// <label for="assetName" data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</label>
+		sb.append('<label for="')
+		sb.append(fieldSpec.field)
+		sb.append('" data-toggle="popover" data-trigger="hover" data-content="')
+		sb.append(fieldSpec.field)
+		sb.append('">')
+		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
+		if (fieldSpec.constraints.required) {
+			sb.append('<span style="color: red;">*</span>')
+		}
+		sb.append('</label>')
+
+		// Close out the TD
+		sb.append("\n</td>")
+		out << sb.toString()
+	}
+
 	/**
 	 * Used to render text if the fieldSpec is required
 	 * @param field - the Field Specification (Map)
@@ -85,7 +125,7 @@ class ControlTagLib {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset))
 		sb.append('>')
 
 		// Add a Select... option at top if the field is required
@@ -144,7 +184,7 @@ class ControlTagLib {
 		List options = []
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset))
 		sb.append('>')
 
 		if (fieldSpec.constraints?.required) {
@@ -282,6 +322,7 @@ class ControlTagLib {
 	 * @return The tabIndex attribute HTML for controls
 	 */
 	private String tabIndexAttrib(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
+println "\n${fieldSpec.field}: order=${fieldSpec.order}, tabIndex=$tabIndex, tabOffset=$tabOffset, "
 		Integer ti = NumberUtil.toInteger(tabIndex, -1)
 		if (ti < 1) {
 			ti = fieldSpec.order
