@@ -56,17 +56,25 @@
 						</tr>
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.assetType}"/>
-							<td><input type="text" id="assetType" name="assetType" readonly="readonly" value="${databaseInstance.assetType}" tabindex="12" /></td>
+							<td>
+								<input type="text" id="assetType" name="assetType" readonly="readonly" value="${databaseInstance.assetType}" tabindex="12" />
+							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.supportType}"/>
-							<td><tds:inputControl field="${standardFieldSpecs.supportType}" tabindex="21"/></td>
+							<td>
+								<tds:inputControl field="${standardFieldSpecs.supportType}" tabindex="21"/>
+							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.environment}"/>
-							<td><g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32" /></td>
+							<td>
+								<g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':'Select...']}" tabindex="32" />
+							</td>
 						</tr>
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.dbFormat}"/>
-							<td><tds:inputControl field="${standardFieldSpecs.dbFormat}" tabindex="13"/></td>
+							<td>
+								<tds:inputControl field="${standardFieldSpecs.dbFormat}" tabindex="13"/>
+							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'retireDate','errors')}">
@@ -78,13 +86,15 @@
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}"/>
-							<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${databaseInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" /></td>
+							<td>
+								<g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${databaseInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" />
+							</td>
 						</tr>
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.size}"/>
 							<td nowrap="nowrap" class="sizeScale">
-								<input type="text" id="size" size="3" class="${config.size}" name="size" value="${databaseInstance.size}" tabindex="14" />
-								<g:select from="${databaseInstance.constraints.scale.inList}" class="${config.scale}" id="scale" name="scale" value="${databaseInstance.scale}" optionValue="value" tabindex="15" noSelection="${['':' Please Select']}"/>
+								<tds:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14"/>
+								<g:select from="${databaseInstance.constraints.scale.inList}" class="${config.scale}" id="scale" name="scale" value="${databaseInstance.scale}" optionValue="value" tabindex="15" noSelection="${['':'']}"/>
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
@@ -94,17 +104,25 @@
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}"/>
-							<td><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${databaseInstance.planStatus}" tabindex="34" /></td>
+							<td>
+								<g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${databaseInstance.planStatus}" tabindex="34" />
+							</td>
 						</tr>
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}"/>
-							<td><input type="text" id="rateOfChange" size="3" class="${config?.rateOfChange}" name="rateOfChange" value="${databaseInstance.rateOfChange}" tabindex="17" /></td>
+							<td>
+								<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="17"/>
+							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.externalRefId}"/>
-							<td><tds:inputControl field="${standardFieldSpecs.externalRefId}" tabindex="24"/></td>
+							<td>
+								<tds:inputControl field="${standardFieldSpecs.externalRefId}" tabindex="24"/>
+							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}"/>
-							<td><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'Database');highlightCssByValidation(this.value,'Database','${databaseInstance.id}');" value="${databaseInstance.validation}" tabindex="35"/></td>
+							<td>
+								<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'Database');highlightCssByValidation(this.value,'Database','${databaseInstance.id}');" value="${databaseInstance.validation}" tabindex="35	"/>
+							</td>
 						</tr>
 						<tbody class="customTemplate">
 							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:databaseInstance]"></g:render>

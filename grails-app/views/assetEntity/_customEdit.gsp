@@ -1,8 +1,8 @@
-<g:set var="tabOffset" value="700"/>
 <%-- tabOffset - allows off-setting the tabindex for the custom fields --%>
+<g:set var="tabOffset" value="200"/>
 
-<g:set var="trIsOpen" value="0"/>
 <%-- trIsOpen - used to track if the TR tag needs to be closed after the loop --%>
+<g:set var="trIsOpen" value="0"/>
 
 <g:each in="${customs}" var="custom" status="j">
 	<g:if test="${j % 4 == 0}">
@@ -10,15 +10,10 @@
 		<g:set var="trIsOpen" value="1"/>
 	</g:if>
 
-	<td class="label ${custom.imp?:''}" nowrap="nowrap">
-		<label for="${custom.field}">${custom.label}
-			<tds:ifInputRequired field="${custom}">
-				<span style="color: red;">*</span>
-			</tds:ifInputRequired>
-		</label>
-	</td>
+	<tds:inputLabel field="${custom}"/>
+
 	<td>
-		<tds:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="$tabOffset"/>
+		<tds:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="200"/>
 	</td>
 
 	<g:if test="${j % 4 == 3}">

@@ -14,7 +14,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 
 	// The <tds:inputControl> taglet HTML mockup
 	private static final String inputControlTagTemplate =
-		'<tds:inputControl field="${field}" value="${value}" tabIndex="${tabIndex}" tabOffset="${tabOffset}"/>'
+		'<tds:inputControl field="${field}" value="${value}" tabIndex="${tabIndex}" tabOffset="${tabOffset}" size="${size}"/>'
 
 	// The <tds:ifInputRequired> taglet HTML mockup
 	private static final String ifInputRequiredTagTemplateOpen  = '<tds:ifInputRequired field="${field}">'
@@ -50,6 +50,18 @@ class ControlTagLibTests extends AbstractUnitSpec {
 	void 'test nothing'() {
 		expect:
 		'free beer'
+	}
+
+
+	void 'Test sizeAttrib method'() {
+		expect: 'for each test the results will match'
+			expected == tagLib.sizeAttrib(size)
+		where:
+			size 	| expected
+			0		| ''
+			5		| ' size="5"'
+			null	| ''
+			-5		| ''
 	}
 
 	void 'Test selectOption method'() {
@@ -178,6 +190,13 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			result.contains(" tabindex=\"$tabIndex\" ")
 		and: 'it should end with >'
 			result.endsWith('>')
+		and: 'the size attribute should not be included by default'
+			!result.contains(' size="')
+
+		when: 'the size parameter is included'
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, size:'55'])
+		then: 'the size attribute should be in the HTML'
+			result.contains(' size="55"')
 	}
 
 	void 'Test ifInputRequired Tag'() {
@@ -237,6 +256,13 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			4 == StringUtils.countMatches(result, '<option ')
 		and: 'one of the options should have a MISSING_OPTION_WARNING message'
 			result.contains("<option value=\"bogus\" selected>bogus (${tagLib.MISSING_OPTION_WARNING})</option>")
+		and: 'the size attribute should not be included by default'
+			!result.contains(' size="')
+
+		when: 'the size parameter is included'
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:'size', size:'55'])
+		then: 'the size attribute should be in the HTML'
+			result.contains(' size="55"')
 	}
 
 	void 'Test Select List inputControl Tag'() {
@@ -291,6 +317,14 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			result.contains('><option value=""></option>')
 		and: 'one of the options should have a MISSING_OPTION_WARNING message'
 			result.contains("<option value=\"bogus\" selected>bogus (${tagLib.MISSING_OPTION_WARNING})</option>")
+		and: 'the size attribute should not be included by default'
+			!result.contains(' size="')
+
+		when: 'the size parameter is included'
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:'size', size:'55'])
+		then: 'the size attribute should be in the HTML'
+			result.contains(' size="55"')
+
 	}
 
 }
