@@ -64,7 +64,7 @@ class ControlTagLib {
 				break
 
 			case 'YesNo':
-				out << 'Not Implemented'
+				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset)
 				break
 
 			case 'String':
@@ -92,6 +92,9 @@ class ControlTagLib {
 		// <option value="" selected>Select...</option>
 		if (fieldSpec.constraints?.required) {
 			sb.append(selectOption('', value, SELECT_REQUIRED_PROMPT))
+		} else {
+			// Add a blank option so users can unset a value
+			sb.append(selectOption('', value))
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
@@ -101,7 +104,7 @@ class ControlTagLib {
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
 		if (! StringUtil.isBlank(value) && ! options.contains(value)) {
-			String warning = StringEscapeUtils.escapeHtml(value) + " ($MISSING_OPTION_WARNING)"
+			String warning = "$value ($MISSING_OPTION_WARNING)"
 			sb.append(selectOption(value, value, warning))
 		}
 
@@ -128,6 +131,52 @@ class ControlTagLib {
 		attribute('type', 'text') +
 		commonAttributes(fieldSpec, value, tabIndex, tabOffset) +
 		'/>'
+	}
+
+	/**
+	 * Generates a SELECT HTML control with Yes/No options
+	 * @param fieldSpec - the map of field specifications
+	 * @param value - the value to set the control to
+	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @return the INPUT Component HTML
+	 */
+	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset) {
+		List options = []
+
+		StringBuilder sb = new StringBuilder('<select')
+		sb.append(commonAttributes(fieldSpec, value, tabIndex))
+		sb.append('>')
+
+		if (fieldSpec.constraints?.required) {
+			// Add a Select... option at top if the field is required
+			options << ['', SELECT_REQUIRED_PROMPT]
+		} else {
+			// Put a blank entry in to allow the user to unset a field
+			options << ['', '']
+		}
+
+		options << ['No', 'No']
+		options << ['Yes', 'Yes']
+
+		// Check to see if there is some legacy value that doesn't match the select option values.
+		// If there no match then it will render the option with a warning. This will give the
+		// user a visual indicator that there is an issue. The form submission should error thereby
+		// not allowing the user to save until the proper value is selected.
+		//
+		// <option value="BadData" selected>BadData (INVALID)</option>
+		if (! StringUtil.isBlank(value) && ! options.find{it[0] == value} ) {
+			String warning = "$value ($MISSING_OPTION_WARNING)"
+			options << [value, warning]
+		}
+
+		// Iterate over the fieldSpec option values to create each of the options
+		for (option in options) {
+			sb.append(selectOption(option[0], value, option[1]))
+		}
+
+		sb.append('</select>')
+
+		sb.toString()
 	}
 
 	/**
