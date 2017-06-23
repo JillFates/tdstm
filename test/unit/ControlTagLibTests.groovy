@@ -195,7 +195,51 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			'' == applyTemplate(template, [ field: fs ] )
 	}
 
-	void 'Test inputControl Tag for a Select List control'() {
+	void 'Test YesNo inputControl Tag'() {
+		given: 'a fieldSpec for a YesNo control'
+			Map field = [
+				field: 'active',
+				label: 'Active',
+				tip: 'Is the application actively used?',
+				udf: 1,
+				shared: 0,
+				imp: 'C',
+				show: 1,
+				order: 6,
+				default: '',
+				control: 'YesNo',
+				constraints: [
+					required: 1
+				]
+			]
+		when: 'the template is applied with the parameters'
+			String result = applyTemplate(inputControlTagTemplate, [field:field, value:'No'])
+		then: 'a value should be returned'
+			result
+		and: 'it should start with <input ...'
+			result.startsWith('<select ')
+		and: 'it should end with </select>'
+			result.endsWith('</select>')
+		and: 'it contains 3 options'
+			3 == StringUtils.countMatches(result, '<option ')
+		and: 'the No option should be selected'
+			result.contains('<option value="No" selected>')
+		and: 'there should be a required select option'
+			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
+
+		when: 'the control is not required'
+			field.constraints.required = 0
+		and: 'there is a bogus value used with the YesNo control and it is not re'
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:'bogus'])
+		then: 'there should be an empty option'
+			result.contains('><option value=""></option>')
+		and: 'it should contain 4 options'
+			4 == StringUtils.countMatches(result, '<option ')
+		and: 'one of the options should have a MISSING_OPTION_WARNING message'
+			result.contains("<option value=\"bogus\" selected>bogus (${tagLib.MISSING_OPTION_WARNING})</option>")
+	}
+
+	void 'Test Select List inputControl Tag'() {
 		given: 'a fieldSpec that is a String'
 			Map field = [
 				field: 'color',
@@ -209,7 +253,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				default: '',
 				control: 'Select List',
 				constraints: [
-					required: 0,
+					required: 1,
 					values: ['Blue', 'Green', 'Grey', 'Red', 'Yellow']
 				]
 			]
@@ -232,34 +276,21 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			result.contains(" class=\"${tagLib.CONTROL_CSS_CLASS} ${field.imp}\" ")
 		and: 'it should end with </select>'
 			result.endsWith('</select>')
-		and: 'it contains 5 options'
-			5 == StringUtils.countMatches(result, '<option ')
+		and: 'it contains 6 options'
+			6 == StringUtils.countMatches(result, '<option ')
+		and: 'there should be a required select option'
+			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
 
-		when: 'called with an invalid value'
+		when: 'the control is not required'
+			field.constraints.required = 0
+		and: 'called with a bogus value'
 			result = applyTemplate(inputControlTagTemplate, [field:field, value:'bogus', tabIndex:tabIndex])
 		then: 'there should be an additional option'
-			6 == StringUtils.countMatches(result, '<option ')
+			7 == StringUtils.countMatches(result, '<option ')
+		and: 'there should be an empty option'
+			result.contains('><option value=""></option>')
 		and: 'one of the options should have a MISSING_OPTION_WARNING message'
-			result.contains(">bogus (${tagLib.MISSING_OPTION_WARNING})</option>")
+			result.contains("<option value=\"bogus\" selected>bogus (${tagLib.MISSING_OPTION_WARNING})</option>")
 	}
-
-	/*
-	void 'Test tds:convertDate tag with MIDDLE_ENDIAN'() {
-		setup:
-		setUserDateFormat TimeUtil.MIDDLE_ENDIAN
-
-		when:
-		setTimeZone timezone
-
-		then: 'Test DateTime with MIDDLE_ENDIAN'
-		applyTemplate(convertDateTag, [date: testDate, format: format]) == expectedValue
-
-		where:
-		timezone                            | format                | expectedValue
-		'GMT'                               | TimeUtil.FORMAT_DATE  | '08/21/2012'
-		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '08/21/2012'
-		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '08/21/2012'
-	}
-	*/
 
 }
