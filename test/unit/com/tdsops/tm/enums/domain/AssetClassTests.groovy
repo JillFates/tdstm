@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class AssetClassTests extends Specification {
@@ -42,6 +43,7 @@ class AssetClassTests extends Specification {
 		map.containsKey('OTHER-DEVICE')
 	}
 
+	@Ignore
 	void "test resolve domain for different AssetType"() {
 		expect: "The corresponding domain is correctly determined for different asset types"
 			AssetClass.getDomainForAssetType(assetType) == domain
