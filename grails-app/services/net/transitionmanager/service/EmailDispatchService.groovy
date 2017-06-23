@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -99,6 +100,7 @@ class EmailDispatchService implements ServiceMethods {
 		log.info "sendEmail: edId=$edId to=$ed.toPerson.id/$ed.toPerson.email"
 
 		mailService.sendMail {
+			from getFrom(ed.fromAddress)
 			to ed.toPerson.email
 			subject ed.subject
 			body (
@@ -112,6 +114,19 @@ class EmailDispatchService implements ServiceMethods {
 		if (! ed.validate() || ! ed.save(flush:true)) {
 			log.error "sendEmail() Unable to update email dispatch object: ${GormUtil.allErrorsString(ed)}"
 		}
+	}
+
+	/**
+	 * Return desired from email address if present or default system from email address
+	 * @param from
+	 * @return
+	 */
+	private String getFrom(String from) {
+		String defaultFrom = grailsApplication.config.grails.mail.default.from
+		if (!StringUtil.isBlank(from)) {
+			defaultFrom = from
+		}
+		return defaultFrom.replaceAll("&lt;", "<").replaceAll("&gt;", ">")
 	}
 
 	/**
