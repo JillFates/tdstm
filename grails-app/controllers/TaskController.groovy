@@ -22,6 +22,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.GraphvizService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.RunbookService
@@ -72,6 +73,7 @@ class TaskController implements ControllerMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	GraphvizService graphvizService
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
@@ -519,20 +521,25 @@ digraph runbook {
 			dotText << "}\n"
 
 			try {
-				def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString())
+//				def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString())
+//
+//				// convert the URI to a web safe format
+//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
+//				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
+//
+//				def svgText = svgFile.text
+//				def data = [svgText:svgText, roles:roles, tasks:taskList]
+//				render data as JSON
+//
+//				return false
 
-				// convert the URI to a web safe format
-				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
-
-				def svgText = svgFile.text
+				String svgText = graphvizService.generateSVGFromDOT("neighborhood-${taskId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:taskList]
-				render data as JSON
-
+				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
 				return false
 
 			} catch(e) {
-				errorMessage = 'Encounted an unexpected error while generating the graph'
+				errorMessage = 'Encountered an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
 				if (securityService.hasPermission(Permission.RoleTypeCreate)) {
 					errorMessage += "<br><pre>$e.message</pre>"
@@ -710,19 +717,24 @@ digraph runbook {
 			try {
 				// String svgType = grailsApplication.config.graph.graphViz.graphType ?: 'svg'
 
-				def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString())
-				// convert the URI into a web-safe format
-				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
-				def svgFile = new File(filename)
+//				def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString())
+//				// convert the URI into a web-safe format
+//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
+//				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
+//				def svgFile = new File(filename)
+//
+//				def svgText = svgFile.text
+//				def data = [svgText:svgText, roles:roles, tasks:tasks]
+//				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
+//				return false
 
-				def svgText = svgFile.text
+				String svgText = graphvizService.generateSVGFromDOT("runbook-${moveEventId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:tasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
 				return false
 
 			} catch (e) {
-				errorMessage = 'Encounted an unexpected error while generating the graph'
+				errorMessage = 'Encountered an unexpected error while generating the graph'
 				// TODO : Need to change out permission to ShowDebugInfo
 				if (securityService.hasPermission(Permission.RoleTypeCreate)) {
 					errorMessage += "<br><pre>$e.message</pre>"
@@ -739,6 +751,8 @@ digraph runbook {
 			render errorMessage
 		}
 	}
+
+
 
 	/**
 	 * Used to render neighborhood task graphs by passing the id argument to the taskGraph
