@@ -15,13 +15,24 @@
             </div>
 
             <div class="popup-list">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-1 default-input-column-header">{{ 'GLOBAL.DEFAULT' | translate }}</div>
+                    <div class="col-sm-6"></div>
+                </div>
                 <kendo-sortable #kendoSortableInstance="kendoSortable" [navigatable]="false" [animation]="false" [data]="items" [emptyItemStyle]="{'cursor': 'default'}"
                     [activeItemStyle]="{'opacity': '.7'}" [itemStyle]="{'cursor': 'move', 'margin-bottom': '5px'}" emptyText="">
                     <ng-template let-item="item" let-index="index">
-                        <div [ngStyle]="getStyle(index)">
-                            <i class="pointer fa fa-fw" [ngClass]="{'fa-trash':item.deletable,'fa-ban':!item.deletable}" (click)="onRemove(item)"></i>
-                            <input class="default-input" type="radio" value="{{item.value}}" name="defaultValue" [(ngModel)]="defaultValue">
-                            <span>{{item.value}}</span>
+                        <div [ngStyle]="getStyle(index)" class="row">
+                            <div class="col-sm-1">
+                                <i class="pointer fa fa-fw" [ngClass]="{'fa-trash':item.deletable,'fa-ban':!item.deletable}" (click)="onRemove(item)"></i>
+                            </div>
+                            <div class="col-sm-1 default-input-column">
+                                <input class="default-input" type="radio" value="{{item.value}}" name="defaultValue" [(ngModel)]="defaultValue">
+                            </div>
+                            <div class="col-sm-6 value-column">
+                                <span>{{item.value}}</span>
+                            </div>
                         </div>
                     </ng-template>
                 </kendo-sortable>
