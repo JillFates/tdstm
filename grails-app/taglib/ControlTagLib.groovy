@@ -61,7 +61,7 @@ class ControlTagLib {
 	def labelForShowField = {Map attrs ->
 		def fieldValue = attrs.fieldValue ?: ""
 		StringBuilder sb = new StringBuilder("\n")
-		sb.append("<td class='valueNW'>")
+		sb.append("<td class='valueNW ${attrs.field.imp}'>")
 		sb.append(fieldValue)
 		sb.append("</td>")
 		out << sb.toString()
@@ -129,19 +129,11 @@ class ControlTagLib {
 	}
 
 	/**
-	 * Renders the label and the value for a field. Setting the "mode" attribute to
-	 * anything other than "show" will display the corresponding input for the field.
+	 * Used to render the label and the value for a field.
 	 */
-	def inputLabelAndField = {Map attrs ->
+	def showLabelAndField = {Map attrs ->
 		out << inputLabel(attrs)
-		String mode = attrs.mode ?: "show"
-		if (mode == "show") {
-			out << labelForShowField(attrs)
-		} else {
-			out << "<td>"
-			out << inputControl(attrs)
-			out << "</td>"
-		}
+		out << labelForShowField(attrs)
 		
 	}
 
