@@ -93,7 +93,7 @@ class TaskService implements ServiceMethods {
 	private static final List<String> categoryList = ACC.list
 	private static final List<String> statusList = ACS.list
 
-	private static final List<String> ACTIONABLE_STATUSES = [ACS.READY, ACS.STARTED, ACS.DONE]
+	private static final List<String> ACTIONABLE_STATUSES = [ACS.READY, ACS.STARTED, ACS.COMPLETED]
 
 	// The RoleTypes for Staff (populated in init())
 	private static List staffingRoles
