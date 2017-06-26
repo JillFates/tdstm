@@ -1,0 +1,39 @@
+<div class="content body">
+	<section>
+		<div>
+			<div class="box-body box-with-empty-header">
+				<div class="row">
+					<button type="button" class="btn btn-default" id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+					<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
+					<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
+					<asset-explorer-report-selector [create-new]="false"></asset-explorer-report-selector>
+				</div>
+				<br>
+				<div class="row">
+					<div class="nav-tabs-custom">
+						<ul class="nav nav-tabs">
+							<li role="presentation" class="active">
+								<a href="#tab_1" data-toggle="tab">Asset Classes</a>
+							</li>
+							<li role="presentation" class="disabled">
+								<a href="#tab_2" data-toggle="tab">Columns</a>
+							</li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane active" id="tab_1">
+								<div class="checkbox" *ngFor="let asset of assetClasses">
+									<label>
+										<input type="checkbox"> {{asset}}
+									</label>
+								</div>
+							</div>
+							<div class="tab-pane active" id="tab_2">
+							</div>
+						</div>
+					</div>
+				</div>
+				<a (click)="onBackToStart()" class="btn"><i class="fa fa-chevron-left"></i> Back to Start</a>
+			</div>
+		</div>
+	</section>
+</div>

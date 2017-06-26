@@ -14,8 +14,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 @Component({
 	moduleId: module.id,
 	selector: 'notice-form',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/form/notice-form.component.html',
-	providers: [NoticeService]
+	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/form/notice-form.component.html'
 })
 export class NoticeFormComponent {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;

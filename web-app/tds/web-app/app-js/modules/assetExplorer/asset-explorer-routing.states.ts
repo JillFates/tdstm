@@ -1,5 +1,6 @@
 import { Ng2StateDeclaration } from '@uirouter/angular';
-import { AssetExplorerReportSelectorComponent } from './components/report-selector/asset-explorer-report-selector.component';
+import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
+import { AssetExplorerReportConfigComponent } from './components/report-config/asset-explorer-report-config.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 import { AssetExplorerService } from './service/asset-explorer.service';
@@ -8,6 +9,10 @@ export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
 		name: 'tds.assetexplorer',
 		url: '/assetexplorer/reports'
+	};
+	public static readonly REPORT_CREATE = {
+		name: 'tds.assetexplorer.create',
+		url: '/create'
 	};
 }
 
@@ -30,7 +35,7 @@ export const assetExplorerReportSelectorState: Ng2StateDeclaration = <Ng2StateDe
 	},
 	views: {
 		'headerView@tds': { component: HeaderComponent },
-		'containerView@tds': { component: AssetExplorerReportSelectorComponent }
+		'containerView@tds': { component: AssetExplorerIndexComponent }
 	},
 	resolve: [
 		{
@@ -42,6 +47,27 @@ export const assetExplorerReportSelectorState: Ng2StateDeclaration = <Ng2StateDe
 	]
 };
 
+export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDeclaration>{
+	name: AssetExplorerStates.REPORT_CREATE.name,
+	url: AssetExplorerStates.REPORT_CREATE.url,
+	data: {
+		page: {
+			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
+			instruction: '',
+			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.CREATE']
+		},
+		requiresAuth: true,
+		// requiresPermission: 'AssetExplorerSelection'
+	},
+	views: {
+		'containerView@tds': { component: AssetExplorerReportConfigComponent }
+	},
+	resolve: [
+
+	]
+};
+
 export const ASSET_EXPLORER_STATES = [
-	assetExplorerReportSelectorState
+	assetExplorerReportSelectorState,
+	assetExplorerReportCreatorState
 ];

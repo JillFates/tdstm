@@ -35,15 +35,21 @@ export class AssetExplorerService {
 			items: [{
 				id: 1,
 				name: 'Finance Applications',
-				favorite: false
+				favorite: false,
+				shared: true,
+				subscribe: false
 			}, {
 				id: 2,
 				name: 'HR Applicattions',
-				favorite: false
+				favorite: false,
+				shared: true,
+				subscribe: false
 			}, {
 				id: 3,
 				name: 'Legal Applications',
-				favorite: false
+				favorite: false,
+				shared: true,
+				subscribe: false
 			}]
 		}
 	];
