@@ -47,24 +47,30 @@ var EntityCrud = (function ($) {
 			ok = false;
 		}
 
-		// Validate custom fields
-		var form = $('#'+formId)[0];
-        $(form).find( ".customField:invalid" ).each( function( index, node ) {
-            var elementName = $('#'+node.id).data('label');
-            var message = $('#'+node.id).data('message');
-            if(!message || message.length <= 0){
-                message = node.validationMessage;
-			}
-			errors += '\n'+elementName+ ': '+message;
-			ok = false;
-        });
+		ok = validateCustomFields(formId, alertErrors, errors, ok);
 
-        if (!ok && alertErrors && errors.length > 0) {
-            alert(errors);
-        }
 		return ok;
 	};
 
+
+	/**
+	 * Validations for custom input fields
+	 * @param errors
+	 * @param isFormValid
+	 */
+	function validateCustomFields(formId, alertErrors, errors, isFormValid) {
+
+		var form = $('#'+formId)[0];
+		$(form).submit(function (event) {
+			event.preventDefault();
+		});
+		if(!form.checkValidity()){
+			$('#assetUpdateSubmit').click();
+			return false;
+		}
+		return isFormValid;
+
+	};
 	/**
 	 * Private method used to validate the Database asset create/edit forms
 	 * @return true if valid
