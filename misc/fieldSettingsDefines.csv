@@ -106,7 +106,6 @@
 "application","userCount","TotalUsers","String","text"
 "application","userLocations","UserLocations","String","text"
 "application","validation","Validation","String","text"
-"application","userFrequency","User Frequency","String","text"
 "database","assetName","Name","String","text"
 "database","description","Description","String","text"
 "database","assetType","Type","String","text"
