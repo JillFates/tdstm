@@ -42,7 +42,7 @@ class ControlTagLib {
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('" data-toggle="popover" data-trigger="hover" data-content="')
-		sb.append(fieldSpec.field)
+		sb.append(fieldSpec.tip)
 		sb.append('">')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		if (fieldSpec.constraints.required) {
@@ -52,6 +52,18 @@ class ControlTagLib {
 
 		// Close out the TD
 		sb.append("\n</td>")
+		out << sb.toString()
+	}
+
+	/**
+	 * Creates the cell with the value of a field for displaying in show views.
+	 */
+	def labelForShowField = {Map attrs ->
+		def fieldValue = attrs.fieldValue ?: ""
+		StringBuilder sb = new StringBuilder("\n")
+		sb.append("<td class='valueNW ${attrs.field.imp}'>")
+		sb.append(fieldValue)
+		sb.append("</td>")
 		out << sb.toString()
 	}
 
@@ -114,6 +126,15 @@ class ControlTagLib {
 			default:
 				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size)
 		}
+	}
+
+	/**
+	 * Used to render the label and the value for a field.
+	 */
+	def showLabelAndField = {Map attrs ->
+		out << inputLabel(attrs)
+		out << labelForShowField(attrs)
+		
 	}
 
 	/**
@@ -287,7 +308,7 @@ class ControlTagLib {
 	 * Returns the HTML5 require and min/max appropriately for the field specification control type
 	 * @param fieldSpec - the Field specification object
 	 * @return The required attribute for controls if required otherwise blank
-	 * @example   ' required min="1" maxlength="12"'
+	 * @example   ' required minlength="1" maxlength="12"'
 	 */
 	private String constraintsAttrib(Map fieldSpec) {
 		StringBuilder sb = new StringBuilder()
@@ -305,7 +326,7 @@ class ControlTagLib {
 				min=1
 			}
 			if (min != null && min > 0) {
-				sb.append(" min=\"$min\"")
+				sb.append(" minlength=\"$min\"")
 			}
 
 			// Make sure max is set properly

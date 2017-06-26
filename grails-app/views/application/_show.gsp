@@ -3,128 +3,111 @@
 <table class="planning-application-table">
 	<tbody>
 		<tr>
-			<td class="label ${standardFieldSpecs.assetName.imp?:''}" nowrap="nowrap"><label for="assetName">${standardFieldSpecs.assetName.label}</label></td>
-			<td colspan="3" style="font-weight:bold;" class="" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetName.tip?:''}">${applicationInstance.assetName}</td>
+			<tds:inputLabel field="${standardFieldSpecs.assetName}"/>
+			<td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">${applicationInstance.assetName}</td>
 			
-			<td class="label ${standardFieldSpecs.description.imp?:''}" nowrap="nowrap"><label for="description">${standardFieldSpecs.description.label}</label></td>
-			<td colspan="3" class="" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.description.tip?:''}">${applicationInstance.description}</td>
+			<tds:inputLabel field="${standardFieldSpecs.description}"/>
+			<td colspan="3" class="${standardFieldSpecs.validation.imp}" >${applicationInstance.description}</td>
 		</tr>
 		<tr>
-			<td class="label ${standardFieldSpecs.appAccess.imp?:''}" nowrap="nowrap"><label for="appAccess">${standardFieldSpecs.appAccess.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appAccess.tip?:''}">${applicationInstance.assetType}</td>
-			
-			<td class="label ${standardFieldSpecs.supportType.imp?:''}" nowrap="nowrap"><label for="supportType">${standardFieldSpecs.supportType.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.supportType.tip?:''}">${applicationInstance.supportType}</td>
-			
-			<td class="label ${standardFieldSpecs.appFunction.imp?:''}" nowrap="nowrap"><label for="appFunction">${standardFieldSpecs.appFunction.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appFunction.tip?:''}">${applicationInstance.appFunction}</td>
-			
-			<td class="label ${standardFieldSpecs.userCount.imp?:''}" nowrap="nowrap"><label for="userCount">${standardFieldSpecs.userCount.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.userCount.tip?:''}">${applicationInstance.userCount}</td>
-		</tr>
-		<tr>
-			<td class="label ${standardFieldSpecs.appVendor.imp?:''}" nowrap="nowrap"><label for="appVendor">${standardFieldSpecs.appVendor.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appVendor.tip?:''}">${applicationInstance.appVendor}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.appAccess}" fieldValue="${applicationInstance.assetType}"/>
 
-			<td class="label ${standardFieldSpecs.sme.imp?:''}" nowrap="nowrap"><label for="sme">${standardFieldSpecs.sme.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip?:''}">
+			<tds:showLabelAndField field="${standardFieldSpecs.supportType}" fieldValue="${applicationInstance.supportType}"/>
+			
+			<tds:showLabelAndField field="${standardFieldSpecs.appFunction}" fieldValue="${applicationInstance.appFunction}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.userCount}" fieldValue="${applicationInstance.userCount}"/>
+			
+		</tr>
+		<tr>
+			
+			<tds:showLabelAndField field="${standardFieldSpecs.appVendor}" fieldValue="${applicationInstance.appVendor}"/>
+			
+			<tds:inputLabel field="${standardFieldSpecs.sme}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
 				</span>
 			</td>
 
-			<td class="label ${standardFieldSpecs.environment.imp?:''}" nowrap="nowrap"><label for="environment">${standardFieldSpecs.environment.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip?:''}">${applicationInstance.environment}</td>
-			
-			<td class="label ${standardFieldSpecs.userLocations.imp?:''}" nowrap="nowrap"><label for="userLocations">${standardFieldSpecs.userLocations.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.userLocations.tip?:''}">${applicationInstance.userLocations}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.environment}" fieldValue="${applicationInstance.environment}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.userLocations}" fieldValue="${applicationInstance.userLocations}"/>
+
 		</tr>
 		<tr>
-			<td class="label ${standardFieldSpecs.appVersion.imp?:''}" nowrap="nowrap"><label for="appVersion">${standardFieldSpecs.appVersion.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appVersion.tip?:''}">${applicationInstance.appVersion}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.appVersion}" fieldValue="${applicationInstance.appVersion}"/>
 			
-			<td class="label ${standardFieldSpecs.sme2.imp?:''}" nowrap="nowrap"><label for="sme2">${standardFieldSpecs.sme2.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip?:''}">
+			<tds:inputLabel field="${standardFieldSpecs.sme2}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
 				</span>
 			</td>
 			
-			<td class="label ${standardFieldSpecs.criticality.imp?:''}" nowrap="nowrap"><label for="criticality">${standardFieldSpecs.criticality.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.criticality.tip?:''}">${applicationInstance.criticality}</td>
-			
-			<td class="label ${standardFieldSpecs.userFrequency.imp?:''}" nowrap="nowrap"><label for="useFrequency">${standardFieldSpecs.userFrequency.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.userFrequency.tip?:''}">${applicationInstance.useFrequency}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.criticality}" fieldValue="${applicationInstance.criticality}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.useFrequency}" fieldValue="${applicationInstance.useFrequency}"/>
+
 		</tr>
 		<tr>
-			<td class="label ${standardFieldSpecs.appTech.imp?:''}" nowrap="nowrap"><label for="appTech">${standardFieldSpecs.appTech.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appTech.tip?:''}">${applicationInstance.appTech}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.appTech}" fieldValue="${applicationInstance.appTech}"/>
 			
-			<td class="label ${standardFieldSpecs.appOwner.imp?:''}" nowrap="nowrap"><label for="appOwner">${standardFieldSpecs.appOwner.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip?:''}">
+			<tds:inputLabel field="${standardFieldSpecs.appOwner}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
 				</span>
 			</td>
 			
-			<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:''}">${applicationInstance.moveBundle} : ${dependencyBundleNumber}</td>
-			
-			<td class="label ${standardFieldSpecs.drRpoDesc.imp?:''}" nowrap="nowrap"><label for="drRpoDesc">${standardFieldSpecs.drRpoDesc.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.drRpoDesc.tip?:''}">${applicationInstance.drRpoDesc}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" fieldValue="${applicationInstance.moveBundle}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" fieldValue="${applicationInstance.drRpoDesc}"/>
+		
 		</tr>
 		<tr>
-			<td class="label ${standardFieldSpecs.appSource.imp?:''}" nowrap="nowrap"><label for="appSource">${standardFieldSpecs.appSource.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appSource.tip?:''}">${applicationInstance.appSource}</td>
-			
-			<td class="label ${standardFieldSpecs.businessUnit.imp?:''}" nowrap="nowrap"><label for="businessUnit">${standardFieldSpecs.businessUnit.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.businessUnit.tip?:''}">${applicationInstance.businessUnit}</td>
-			
-			<td class="label ${standardFieldSpecs.planStatus.imp?:''}" nowrap="nowrap"><label for="planStatus">${standardFieldSpecs.planStatus.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.planStatus.tip?:''}">${applicationInstance.planStatus}</td>
-			
-			<td class="label ${standardFieldSpecs.drRtoDesc.imp?:''}" nowrap="nowrap"><label for="drRtoDesc">${standardFieldSpecs.drRtoDesc.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.drRtoDesc.tip?:''}">${applicationInstance.drRtoDesc}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.appSource}" fieldValue="${applicationInstance.appSource}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.businessUnit}" fieldValue="${applicationInstance.businessUnit}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" fieldValue="${applicationInstance.planStatus}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" fieldValue="${applicationInstance.drRtoDesc}"/>
 		</tr>
 		<tr>
-			<td class="label ${standardFieldSpecs.license.imp?:''}" nowrap="nowrap"><label for="license">${standardFieldSpecs.license.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.license.tip?:''}">${applicationInstance.license}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.license}" fieldValue="${applicationInstance.license}"/>
 			
-			<td class="label ${standardFieldSpecs.retireDate.imp?:''}" nowrap="nowrap"><label for="retireDate">${standardFieldSpecs.retireDate.label}</label></td>
-			<td class="" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip?:''}">
+			<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<tds:convertDate date="${applicationInstance?.retireDate}" />
 			</td>
 			
-			<td class="label ${standardFieldSpecs.validation.imp?:''}" nowrap="nowrap"><label for="validation">${standardFieldSpecs.validation.label}</label></td>
-			<td class="" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip?:''}">${applicationInstance.validation}</td>
-			
-			<td class="label ${standardFieldSpecs.testProc.imp?:''}" nowrap="nowrap"><label for="testProc">${standardFieldSpecs.testProc.label}</label></td>
-			<td class="" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testProc.tip?:''}">${applicationInstance.testProc ? applicationInstance.testProc : '?'}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.validation}" fieldValue="${applicationInstance.validation}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.testProc}" fieldValue="${applicationInstance.testProc}"/>
+
 		</tr>
 		<tr>
 			<td></td>
 			<td></td>
 			
-			<td class="label ${standardFieldSpecs.maintExpDate.imp?:''}" nowrap="nowrap"><label for="maintExpDate">${standardFieldSpecs.maintExpDate.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:''}">
+			<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<tds:convertDate date="${applicationInstance?.maintExpDate}" format="12hrs" />
 			</td>
 			
-			<td class="label ${standardFieldSpecs.latency.imp?:''}" nowrap="nowrap"><label for="latency">${standardFieldSpecs.latency.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.latency.tip?:''}">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>
-			
-			<td class="label ${standardFieldSpecs.startupProc.imp?:''}" nowrap="nowrap"><label for="startupProc">${standardFieldSpecs.startupProc.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupProc.tip?:''}">${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.latency}" fieldValue="${applicationInstance.latency}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.startupProc}" fieldValue="${applicationInstance.startupProc}"/>
+
 		</tr>
 		<tr>
-			<td class="label ${standardFieldSpecs.url.imp?:''}" nowrap="nowrap"><label for="url">${standardFieldSpecs.url.label}</label></td>
-			<td class="valueNW" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.url.tip?:''}"><tds:textAsLink text="${applicationInstance.url}" target="_new"/></td>
+			<tds:showLabelAndField field="${standardFieldSpecs.url}" fieldValue="${applicationInstance.url}"/>
 
-			<td class="label ${standardFieldSpecs.externalRefId.imp?:''}" nowrap="nowrap"><label for="externalRefId">${standardFieldSpecs.externalRefId.label}</label></td>
-			<td class="" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.externalRefId.tip?:''}">${applicationInstance.externalRefId}</td>
-
-			<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap"><label for="shutdownBy">${standardFieldSpecs.shutdownBy.label}</label></td>
-			<td class="valueNW" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.shutdownBy.tip?:''}">
+			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" fieldValue="${applicationInstance.externalRefId}"/>
+			
+			<tds:inputLabel field="${standardFieldSpecs.shutdownBy}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
 			<g:if test="${shutdownById == -1}">
 				${shutdownBy}
 			</g:if>
@@ -139,12 +122,12 @@
 			</g:if>
 			</td>
 
-			<td class="label ${standardFieldSpecs.shutdownDuration.imp?:''}" nowrap="nowrap"><label for="shutdownDuration">${standardFieldSpecs.shutdownDuration.label}</label></td>
-			<td class="valueNW" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.shutdownDuration.tip?:''}">${applicationInstance.shutdownDuration ? applicationInstance.shutdownDuration+'m' : ''}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.shutdownDuration}" fieldValue="${applicationInstance.shutdownDuration}"/>
+
 		</tr>
 		<tr>
-			<td class="label ${standardFieldSpecs.startupBy.imp?:''}" nowrap="nowrap"><label for="startupBy">${standardFieldSpecs.startupBy.label}</label></td>
-			<td class="valueNW" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupBy.tip?:''}">
+			<tds:inputLabel field="${standardFieldSpecs.startupBy}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap" >
 			<g:if test="${startupById == -1}">
 				${startupBy}
 			</g:if>
@@ -159,11 +142,10 @@
 			</g:if>
 			</td>
 			
-			<td class="label ${standardFieldSpecs.startupDuration.imp?:''}" nowrap="nowrap"><label for="shutdownDuration">${standardFieldSpecs.startupDuration.label}</label></td>
-			<td class="valueNW" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupDuration.tip?:''}">${applicationInstance.startupDuration ? applicationInstance.startupDuration+'m' :''} </td>
+			<tds:showLabelAndField field="${standardFieldSpecs.startupDuration}" fieldValue="${applicationInstance.startupDuration}"/>
 			
-			<td class="label ${standardFieldSpecs.testingBy.imp?:''}" nowrap="nowrap"><label for="testingBy">${standardFieldSpecs.testingBy.label}</label></td>
-			<td class="valueNW" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testingBy.tip?:''}">
+			<tds:inputLabel field="${standardFieldSpecs.testingBy}"/>
+			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
 			<g:if test="${testingById == -1}">
 				${testingBy}
 			</g:if>
@@ -178,9 +160,9 @@
 			</g:if>
 			</td>
 			
-				<td class="label ${standardFieldSpecs.testingDuration.imp?:''}" nowrap="nowrap"><label for="testingDuration">${standardFieldSpecs.testingDuration.label}</label></td>
-			<td class="valueNW" nowrap="nowrap" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testingDuration.tip?:''}">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>
+			<tds:showLabelAndField field="${standardFieldSpecs.testingDuration}" fieldValue="${applicationInstance.testingDuration}"/>
+
 		</tr>
-		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs, highlightMap:highlightMap]"></g:render>
+		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
 	</tbody>
 </table>
