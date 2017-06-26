@@ -105,9 +105,20 @@ class AssetExportService {
 
             List<String> bundle = params.bundle
             boolean useForPlanning = bundle.remove(MoveBundle.USE_FOR_PLANNING)
+
+            // If no bundle left selected lets all the default 'all bundles'
+            if(bundle.size() == 0){
+                bundle << ''
+            }
+
             int bundleSize = bundle.size()
 
-            bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')
+            bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+' Bundles') : 'All')
+
+            // if use for planning add the for planning specification
+            if(useForPlanning){
+                bundleNameList.append(' - Planning Bundles')
+            }
 
             def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
