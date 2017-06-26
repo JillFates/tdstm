@@ -129,11 +129,22 @@ class ControlTagLib {
 	}
 
 	/**
-	 * Used to render the label and the value for a field.
+	 * Used to render the label and the value for a field in show views.
 	 */
 	def showLabelAndField = {Map attrs ->
 		out << inputLabel(attrs)
 		out << labelForShowField(attrs)
+		
+	}
+
+	/**
+	 * Used to render the label and the corresponding input in create/edit views.
+	 */
+	def inputLabelAndField = {Map attrs ->
+		out << inputLabel(attrs)
+		out << "<td>"
+		out << inputControl(attrs)
+		out << "</td>"
 		
 	}
 
