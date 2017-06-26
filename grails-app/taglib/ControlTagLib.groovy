@@ -42,7 +42,7 @@ class ControlTagLib {
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('" data-toggle="popover" data-trigger="hover" data-content="')
-		sb.append(fieldSpec.field)
+		sb.append(fieldSpec.tip)
 		sb.append('">')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		if (fieldSpec.constraints.required) {
@@ -52,6 +52,18 @@ class ControlTagLib {
 
 		// Close out the TD
 		sb.append("\n</td>")
+		out << sb.toString()
+	}
+
+	/**
+	 * Creates the cell with the value of a field for displaying in show views.
+	 */
+	def labelForShowField = {Map attrs ->
+		def fieldValue = attrs.fieldValue ?: ""
+		StringBuilder sb = new StringBuilder("\n")
+		sb.append("<td class='valueNW'>")
+		sb.append(fieldValue)
+		sb.append("</td>")
 		out << sb.toString()
 	}
 
@@ -114,6 +126,23 @@ class ControlTagLib {
 			default:
 				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size)
 		}
+	}
+
+	/**
+	 * Renders the label and the value for a field. Setting the "mode" attribute to
+	 * anything other than "show" will display the corresponding input for the field.
+	 */
+	def inputLabelAndField = {Map attrs ->
+		out << inputLabel(attrs)
+		String mode = attrs.mode ?: "show"
+		if (mode == "show") {
+			out << labelForShowField(attrs)
+		} else {
+			out << "<td>"
+			out << inputControl(attrs)
+			out << "</td>"
+		}
+		
 	}
 
 	/**
