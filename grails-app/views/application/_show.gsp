@@ -10,18 +10,18 @@
 			<td colspan="3" class="${standardFieldSpecs.validation.imp}" >${applicationInstance.description}</td>
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appAccess}" fieldValue="${applicationInstance.assetType}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.appAccess}" value="${applicationInstance.assetType}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.supportType}" fieldValue="${applicationInstance.supportType}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${applicationInstance.supportType}"/>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.appFunction}" fieldValue="${applicationInstance.appFunction}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.appFunction}" value="${applicationInstance.appFunction}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.userCount}" fieldValue="${applicationInstance.userCount}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.userCount}" value="${applicationInstance.userCount}"/>
 			
 		</tr>
 		<tr>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.appVendor}" fieldValue="${applicationInstance.appVendor}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
 			
 			<tds:inputLabel field="${standardFieldSpecs.sme}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
@@ -30,13 +30,13 @@
 				</span>
 			</td>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.environment}" fieldValue="${applicationInstance.environment}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.userLocations}" fieldValue="${applicationInstance.userLocations}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}"/>
 
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appVersion}" fieldValue="${applicationInstance.appVersion}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
 			
 			<tds:inputLabel field="${standardFieldSpecs.sme2}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
@@ -45,13 +45,13 @@
 				</span>
 			</td>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.criticality}" fieldValue="${applicationInstance.criticality}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.useFrequency}" fieldValue="${applicationInstance.useFrequency}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}"/>
 
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appTech}" fieldValue="${applicationInstance.appTech}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
 			
 			<tds:inputLabel field="${standardFieldSpecs.appOwner}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
@@ -60,31 +60,31 @@
 				</span>
 			</td>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" fieldValue="${applicationInstance.moveBundle}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" fieldValue="${applicationInstance.drRpoDesc}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}"/>
 		
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appSource}" fieldValue="${applicationInstance.appSource}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.businessUnit}" fieldValue="${applicationInstance.businessUnit}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" fieldValue="${applicationInstance.planStatus}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" fieldValue="${applicationInstance.drRtoDesc}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}"/>
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.license}" fieldValue="${applicationInstance.license}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
 			
 			<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<tds:convertDate date="${applicationInstance?.retireDate}" />
 			</td>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.validation}" fieldValue="${applicationInstance.validation}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.testProc}" fieldValue="${applicationInstance.testProc}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}"/>
 
 		</tr>
 		<tr>
@@ -96,15 +96,15 @@
 				<tds:convertDate date="${applicationInstance?.maintExpDate}" format="12hrs" />
 			</td>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.latency}" fieldValue="${applicationInstance.latency}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.startupProc}" fieldValue="${applicationInstance.startupProc}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}"/>
 
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.url}" fieldValue="${applicationInstance.url}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.url}" value="${applicationInstance.url}"/>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" fieldValue="${applicationInstance.externalRefId}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
 			
 			<tds:inputLabel field="${standardFieldSpecs.shutdownBy}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
@@ -122,7 +122,7 @@
 			</g:if>
 			</td>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.shutdownDuration}" fieldValue="${applicationInstance.shutdownDuration}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}"/>
 
 		</tr>
 		<tr>
@@ -142,7 +142,7 @@
 			</g:if>
 			</td>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.startupDuration}" fieldValue="${applicationInstance.startupDuration}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}"/>
 			
 			<tds:inputLabel field="${standardFieldSpecs.testingBy}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
@@ -160,7 +160,7 @@
 			</g:if>
 			</td>
 			
-			<tds:showLabelAndField field="${standardFieldSpecs.testingDuration}" fieldValue="${applicationInstance.testingDuration}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}"/>
 
 		</tr>
 		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>

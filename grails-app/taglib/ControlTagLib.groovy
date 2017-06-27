@@ -13,6 +13,7 @@ class ControlTagLib {
 	static final String SELECT_REQUIRED_PROMPT = 'Select...'
 	static final String MISSING_OPTION_WARNING = 'INVALID'
 	static final int MAX_STRING_LENGTH = 255
+	static final String EMPTY_IMP_CRIT_FIELD_CSS_CLASS = " highField"
 
 
 	/**
@@ -32,7 +33,18 @@ class ControlTagLib {
 		// TODO : Determine if the fieldName is used in the LABEL class attribute
 		sb.append(fieldSpec.field)
 		if (fieldSpec.imp) {
-			sb.append(" ${fieldSpec.imp}")
+			String imp = fieldSpec.imp
+			sb.append(" ${imp}")
+			// Determines if the imp is I)mportant or C)ritical
+			if (imp == "I" || imp == "C") {
+				// Checks if the value for the input was given
+				if (attrs.containsKey("value")) {
+					// If the value for the input is empty, the label will be red.
+					if (!attrs.value) {
+						sb.append(EMPTY_IMP_CRIT_FIELD_CSS_CLASS)
+					}
+				}
+			}
 		}
 		sb.append('" nowrap="nowrap">')
 		sb.append("\n")
@@ -59,7 +71,7 @@ class ControlTagLib {
 	 * Creates the cell with the value of a field for displaying in show views.
 	 */
 	def labelForShowField = {Map attrs ->
-		def fieldValue = attrs.fieldValue ?: ""
+		def fieldValue = attrs.value ?: ""
 		StringBuilder sb = new StringBuilder("\n")
 		sb.append("<td class='valueNW ${attrs.field.imp}'>")
 		sb.append(fieldValue)
