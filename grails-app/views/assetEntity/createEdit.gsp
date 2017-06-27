@@ -66,35 +66,30 @@
 					<table>
 						<tbody>
 						<tr>
-							<td class="label ${config.assetName}" nowrap="nowrap">
-								<label for="assetName">Name*</label>
-							</td>
+							<tds:inputLabel field="${standardFieldSpecs.assetName}"/>
 							<td colspan="3">
-								<input type="text" id="assetName" name="assetName" class="${config.assetName} ${highlightMap.validation?:''}"
-									   value="${quotelessName}" tabindex="100" />
+								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetEntityInstance.assetName}" />	
 							</td>
-							<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap">
-								<label for="description">Description</label></td>
+
+							<tds:inputLabel field="${standardFieldSpecs.description}"/>
 							<td colspan="3">
-								<input type="text" id="description" class="${config.description}" name="description"
-									   value="${assetEntityInstance.description}" tabindex="101" />
+								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="101" value="${assetEntityInstance.assetName}" />	
 							</td>
 						</tr>
 						<tr>
-							<td class="label ${config.model} ${highlightMap.model?:''}" nowrap="nowrap">
+							<td class="label ${standardFieldSpecs.assetType.imp?:''}" nowrap="nowrap">
 								<label for="model"><div id="assetTypeLabel">Device Type</div></label>
 							</td>
-							<td class="${config.model}" data-for="model" style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+							<td class="${standardFieldSpecs.assetType.imp?:''}" data-for="model" style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="modelEditId">
 									<div id="assetTypeSelect" tabindex="102">
 									</div>
 								</div>
 							</td>
-							<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap">
-								<label for="environment">Environment</label>
-							</td>
+							
+							<tds:inputLabel field="${standardFieldSpecs.environment}"/>
 							<td>
-								<g:select id="environment" name="environment" class="${config.environment}" from="${environmentOptions}"
+								<g:select id="environment" name="environment" class="${standardFieldSpecs.environment.imp?:''}" from="${environmentOptions}"
 										  value="${assetEntityInstance.environment}" noSelection="${['':'Please select...']}"
 										  tabindex="205"
 										/>
@@ -104,7 +99,7 @@
 							<td class="label_sm">Target</td>
 						</tr>
 						<tr>
-							<td class="label ${config.manufacturer} ${highlightMap.manufacturer?:''}" nowrap="nowrap">
+							<td class="label ${standardFieldSpecs.manufacturer.imp?:''}" nowrap="nowrap">
 								<g:if test="${assetEntityInstance.manufacturer?.id}">
 									<label for="manufacturer"><a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a></label>
 								</g:if>
@@ -112,31 +107,28 @@
 									<label for="manufacturer">Manufacturer</label>
 								</g:else>
 							</td>
-							<td class="${config.manufacturer}" data-for="manufacturer" style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+							<td class="${standardFieldSpecs.manufacturer.imp?:''}" data-for="manufacturer" style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="manufacturerEditId" style="display:inline">
 									<div id="manufacturerSelect" tabindex="103">
 									</div>
 								</div>
 							</td>
-							<td class="label ${config.priority} ${highlightMap.priority?:''}" nowrap="nowrap">
-								<label for="priority">Priority</label>
-							</td>
+							
+							<tds:inputLabel field="${standardFieldSpecs.priority}"/>
 							<td>
 								<g:select id="priority" name ="priority"
 										  from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':'Please select...']}"
-										  class="${config.priority}" tabindex="210"
+										  class="${standardFieldSpecs.priority.imp?:''}" tabindex="210"
 										/>
 							</td>
-							<td class="label ${config.sourceLocation} ${highlightMap.sourceLocation?:''}" nowrap="nowrap">
-								<label for="sourceLocationId">Location/Room</label>
-							</td>
-							<td class="${config.sourceLocation}" style="vertical-align: text-top;" data-for="sourceLocationId">
+							<tds:inputLabel field="${standardFieldSpecs.sourceLocation}"/>
+							<td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
 									<span class="useRoomS">
 										<g:select id="roomSelectS"  name="roomSourceId"
 												  from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
 												  optionKey="id" optionValue="${{it.value}}"
 												  noSelection="${[0:'Please select...']}"
-												  class="${config.sourceLocation} assetSelect roomSelectS"
+												  class="${standardFieldSpecs.sourceLocation.imp?:''} assetSelect roomSelectS"
 												  onchange="EntityCrud.updateOnRoomSelection(this, 'S', 'Edit')"
 												  tabindex="300"
 												/>
@@ -145,25 +137,25 @@
 									<span class="newRoomS" style="display:none">
 										<input type="text" id="sourceLocationId" name="sourceLocation" value=""
 											   placeholder="Location"
-											   class="${config.sourceLocation}"
+											   class="${standardFieldSpecs.sourceLocation.imp?:''}"
 											   size=10
 											   tabindex="301"
 												/>
 										<input type="text" id="sourceRoomId" name="sourceRoom" value=""
 											   placeholder="Room Name"
-											   class="${config.sourceRoom}"
+											   class="${standardFieldSpecs.sourceRoom.imp?:''}"
 											   size=10
 											   tabindex="302"
 												/>
 									</span>
 							</td>
-							<td nowrap style="vertical-align: text-top;" class="${config.sourceLocation}" data-for="sourceLocationId">
+							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.sourceLocation.imp?:''}" data-for="sourceLocationId">
 									<span class="useRoomT">
 										<g:select id="roomSelectT" name="roomTargetId"
 												  from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
 												  optionKey="id" optionValue="${{it.value}}"
 												  noSelection="${[0:'Please select...']}"
-												  class="${config.targetLocation} assetSelect roomSelectT"
+												  class="${standardFieldSpecs.targetLocation.imp?:''} assetSelect roomSelectT"
 												  onchange="EntityCrud.updateOnRoomSelection(this, 'T', 'Edit')"
 												  tabindex="330"
 												/>
@@ -173,12 +165,12 @@
 										<br/>
 										<input type="text" id="targetLocationId" name="targetLocation" value=""
 											   placeholder="Location"
-											   class="${config.targetLocation}"
+											   class="${standardFieldSpecs.targetLocation.imp?:''}"
 											   size=10 tabindex="331"
 												/>
 										<input type="text" id="targetRoomId" name="targetRoom" value=""
 											   placeholder="Room Name"
-											   class="${config.targetRoom}"
+											   class="${standardFieldSpecs.targetRoom.imp?:''}"
 											   size=10 tabindex="332"
 												/>
 									</span>
@@ -186,30 +178,27 @@
 
 						</tr>
 						<tr>
-							<td class="label ${config.assetType} ${highlightMap.assetType?:''}" nowrap="nowrap">
-								<label for="assetType">Model</label>
-							</td>
-							<td class="${config.assetType}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+							<tds:inputLabel field="${standardFieldSpecs.assetType}"/>
+							<td class="${standardFieldSpecs.assetType.imp?:''}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="modelSelect" tabindex="104">
 								</div>
 								<input type="hidden" value="${assetEntityInstance?.model?.id}" id="hiddenModel" name="model">
 							</td>
-							<td class="label ${config.ipAddress} ${highlightMap.ipAddress?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
+
+							<td class="label ${standardFieldSpecs.ipAddress.imp?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
 							<td>
 								<input type="text" id="ipAddress" name="ipAddress"
 									   value="${assetEntityInstance.ipAddress}"
-									   class="${config.ipAddress}" tabindex="215"
+									   class="${standardFieldSpecs.ipAddress.imp?:''}" tabindex="215"
 										/>
 							</td>
 
-							<td class="label rackLabel ${config.sourceRack} ${highlightMap.sourceRack?:''}" nowrap="nowrap" id="rackId">
-								<label for="sourceRackId">Rack/Cabinet</label>
-							</td>
-							<td class="label bladeLabel ${config.sourceChassis} ${highlightMap.sourceChassis?:''}" nowrap="nowrap" id="bladeId" style="display:none">
+							<tds:inputLabel field="${standardFieldSpecs.sourceRack}"/>
+							<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display:none">
 								<label for="sourceChassisId">Blade Chassis</label>
 							</td>
 
-							<td class="label rackLabel ${config.sourceRack}" data-for="sourceRackId">
+							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
 									<span class="useRackS">
 										<g:render template="deviceRackSelect" model="[clazz:config.sourceRack, options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id,
 											rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
@@ -217,14 +206,14 @@
 									<span class="newRackS">
 										<input type="text" id="sourceRackId" name="sourceRack" value=""
 											   placeholder="New rack name"
-											   class="${config.sourceRack}"
+											   class="${standardFieldSpecs.sourceRack.imp?:''}"
 											   xstyle="display:none"
 											   size=20 tabindex="311"
 												/>
 										<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
 									</span>
 							</td>
-							<td class="label rackLabel ${config.sourceRack}" data-for="sourceRackId">
+							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
 									<span class="useRackT">
 										<g:render template="deviceRackSelect"  model="[clazz:config.targetRack, options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 											rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
@@ -232,7 +221,7 @@
 									<span class="newRackT">
 										<input type="text" id="targetRackId" name="targetRack" value=""
 											   placeholder="New rack name"
-											   class="${config.targetRack}"
+											   class="${standardFieldSpecs.targetRack.imp?:''}"
 											   xstyle="display:none"
 											   size=20 tabindex="341" />
 										<input type="hidden" id="newRackTargetId" name="newRackTargetId" value="-1">
@@ -262,29 +251,19 @@
 
 						</tr>
 						<tr>
-							<td class="label ${config.shortName} ${highlightMap.shortName?:''}" nowrap="nowrap">
-								<label for="shortName">Alt Name</label>
-							</td>
-							<td>
-								<input type="text" id="shortName" name="shortName"
-									   value="${assetEntityInstance.shortName}"
-									   class="${config.shortName}"
-									   tabindex="105"
-										/>
-							</td>
-							<td class="label ${config.os} ${highlightMap.os?:''}" nowrap="nowrap"><label for="os">OS</label></td>
-							<td>
-								<input type="text" id="os" name="os" class="${config.os}" value="${assetEntityInstance.os}" tabindex="220"/>
-							</td>
+							<tds:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntityInstance.shortName}" tabindex="105"/>
+					
+							<tds:inputLabelAndField field="${standardFieldSpecs.os}" value="${assetEntityInstance.os}" tabindex="220"/>
+
 							<%-- Note that the next set of TDs are toggled on/off based on the assetType selected --%>
-							<td class="label positionLabel ${config.sourceRackPosition} ${highlightMap.sourceRackPosition?:''}" nowrap="nowrap">
+							<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
 								<label for="sourceRackPositionId">Position</label>
 							</td>
 							<td class="rackLabel">
 								<input type="text" id="sourceRackPositionId" name="sourceRackPosition"
 									   value="${assetEntityInstance.sourceRackPosition}"
 									   placeholder="U position"
-									   class="${config.sourceRackPosition} useRackS"
+									   class="${standardFieldSpecs.sourceRackPosition.imp?:''} useRackS"
 									   size=10 tabindex="320"
 										/>
 							</td>
@@ -292,14 +271,14 @@
 								<input type="text" id="targetRackPositionId" name="targetRackPosition"
 									   value="${assetEntityInstance.targetRackPosition}"
 									   placeholder="U position"
-									   class="${config.targetRackPosition} useRackT"
+									   class="${standardFieldSpecs.targetRackPosition.imp?:''} useRackT"
 									   size=10 tabindex="350" />
 							</td>
-							<td class="bladeLabel ${config.sourceBladePosition} ${highlightMap.sourceBladePosition?:''}">
+							<td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}">
 								<input type="text" id="sourceBladePositionId" name="sourceBladePosition"
 									   value="${assetEntityInstance.sourceBladePosition}"
 									   placeholder="Chassis position"
-									   class="${config.sourceBladePosition} useBladeS"
+									   class="${standardFieldSpecs.sourceBladePosition.imp?:''} useBladeS"
 									   size=10 tabindex="320"
 										/>
 							</td>
@@ -307,139 +286,106 @@
 								<input type="text" id="targetBladePositionId" name="targetBladePosition"
 									   value="${assetEntityInstance.targetBladePosition}"
 									   placeholder="Chassis position"
-									   class="${config.targetBladePosition} useBladeT"
+									   class="${standardFieldSpecs.targetBladePosition.imp?:''} useBladeT"
 									   size=10 tabindex="350"
 										/>
 							</td>
 						</tr>
 						<tr>
-							<td class="label ${config.serialNumber} ${highlightMap.serialNumber?:''}" nowrap="nowrap">
-								<label for="serialNumber">Serial #</label>
-							</td>
-							<td>
-								<input type="text" id="serialNumber" name="serialNumber"
-									   class="${config.serialNumber}"
-									   value="${assetEntityInstance.serialNumber}" tabindex="106"/>
-							</td>
-							<td class="label ${config.supportType} ${highlightMap.supportType?:''}" nowrap="nowrap">
-								<label for="supportType">Support Type</label>
-							</td>
-							<td ><input type="text" id="supportType" name="supportType" class="${config.supportType}"
-										value="${assetEntityInstance.supportType}" tabindex="225"/>
-							</td>
-							<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap">
-								<label for="moveBundle">Bundle</label>
-							</td>
+							<tds:inputLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntityInstance.serialNumber}" tabindex="106"/>
+
+							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntityInstance.supportType}" tabindex="225"/>
+
+							<tds:inputLabel field="${standardFieldSpecs.moveBundle}"/>
 							<td>
 								<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id"
 										  value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name"
-										  class="${config.moveBundle}"
+										  class="${standardFieldSpecs.moveBundle.imp?:''}"
 										  tabindex="360"
 										/>
 							</td>
-							<td class="label ${config.size} ${highlightMap.size?:''}" nowrap="nowrap">
-								<label for="size">Size/Scale </label>
-							</td>
+							
+							<tds:inputLabel field="${standardFieldSpecs.size}"/>
 							<td nowrap="nowrap" class="sizeScale">
-								<input type="text" id="size" name="size" class="${config.size}" value="${assetEntityInstance.size}" tabindex="410"/>
+								<input type="text" id="size" name="size" class="${standardFieldSpecs.size.imp?:''}" value="${assetEntityInstance.size}" tabindex="410"/>
 								<g:select id="scale" name="scale"
 										  from="${assetEntityInstance.constraints.scale.inList}"
 										  optionValue="value" noSelection="${['':'Please select...']}"
 										  value="${assetEntityInstance.scale}"
-										  class="${config.scale}"
+										  class="${standardFieldSpecs.scale.imp?:''}"
 										  tabindex="412"
 										/>
 							</td>
 						</tr>
 						<tr>
-							<td class="label ${config.assetTag} ${highlightMap.assetTag?:''}" nowrap="nowrap">
-								<label for="assetTag">Tag</label>
-							</td>
-							<td>
-								<input type="text" id="assetTag" class="${config.assetTag}" name="assetTag" value="${assetEntityInstance.assetTag}" tabindex="107"/>
-							</td>
-							<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}">
-								<label for="retireDate">Retire Date:</label>
-							</td>
+							<tds:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntityInstance.assetTag}" tabindex="107"/>
+
+							<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 								</script>
 								<input type="text" id="retireDate" name="retireDate"
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
-									class="dateRange ${config.retireDate}"
+									class="dateRange ${standardFieldSpecs.retireDate.imp?:''}"
 									size="15" style="width: 138px;"
 									tabindex="230"
 								/>
 							</td>
-							<td class="label ${config.planStatus} ${highlightMap.planStatus?:''}" nowrap="nowrap">
-								<label for="planStatus">Plan Status</label>
-							</td>
+
+							<tds:inputLabel field="${standardFieldSpecs.planStatus}"/>
 							<td>
 								<g:select id="planStatus" name ="planStatus"
 										  from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}"
 										  noSelection="${['':'Please select']}"
-										  class="${config.planStatus}"
+										  class="${standardFieldSpecs.planStatus.imp?:''}"
 										  tabindex="365"
 										/>
 							</td>
-							<td class="label ${config.rateOfChange} ${highlightMap.validation?:''}" nowrap="nowrap">
-								<label for="rateOfChange">Rate of Change (%)</label>
-							</td>
-							<td>
-								<input type="text" name="rateOfChange" id="rateOfChange"
-									   value="${assetEntityInstance.rateOfChange}"
-									   class="${config.rateOfChange}" size="3"
-									   tabindex="420">
-							</td>
+							
+							<tds:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntityInstance.rateOfChange}" tabindex="420"/>
 						</tr>
 						<tr>
-							<td class="label ${config.railType}  ${highlightMap.railType?:''}" nowrap="nowrap">
-								<label for="railType">Rail Type</label>
-							</td>
+							<tds:inputLabel field="${standardFieldSpecs.railType}"/>
 							<td>
 								<g:select id="railType" name ="railType"
 										  from="${railTypeOption}" value= "${assetEntityInstance.railType}"
 										  noSelection="${['':'Please select...']}"
-										  class="${config.railType}"
+										  class="${standardFieldSpecs.railType.imp?:''}"
 										  tabindex="108"/>
 							</td>
-							<td  class="label ${config.maintExpDate}  ${highlightMap.maintExpDate?:''}">
-								<label for="maintExpDate">Maint Exp.</label>
-							</td>
+							
+							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
 								<input type="text" id="maintExpDate" name="maintExpDate"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" />"
-									class="dateRange ${config.maintExpDate}"
+									class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
 									size="15" style="width: 138px;"
 									tabindex="235"
 								/>
 							</td>
-							<td class="label ${config.validation} ${highlightMap.validation?:''}"><label for="validation">Validation</label></td>
+
+							<tds:inputLabel field="${standardFieldSpecs.validation}"/>
 							<td  colspan="2">
 								<g:select id="validation" name="validation"
 										  from="${assetEntityInstance.constraints.validation.inList}"
 										  value="${assetEntityInstance.validation}"
 										  onChange="assetFieldImportance(this.value,'AssetEntity');highlightCssByValidation(this.value,'AssetEntity','${assetEntityInstance.id?:0}');"
-										  class="${config.validation}"
+										  class="${standardFieldSpecs.validation.imp?:''}"
 										  tabindex="370"
 										/>
 							</td>
 						</tr>
 						<tr>
-							<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap">
-								<label for="externalRefId">External Ref Id</label>
-							</td>
-							<td>
-								<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${assetEntityInstance.externalRefId}" tabindex="109" />
-							</td>
-							<td class="label ${config.truck} ${highlightMap.truck?:''}" nowrap="nowrap">
+							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntityInstance.externalRefId}" tabindex="109"/>
+
+							<td class="label ${standardFieldSpecs.truck.imp?:''}" nowrap="nowrap">
 								<label for="truck">Truck/Cart/Shelf</label>
 							</td>
 							<td>
-								<input type="text" id="truck" class="${config.truck}" name="truck" value="${assetEntityInstance.truck}" size=3 tabindex="240" />
-								<input type="text" id="cart" class="${config.cart}" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="241" />
-								<input type="text" id="shelf" class="${config.shelf}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="242" />
+								<input type="text" id="truck" class="${standardFieldSpecs.truck.imp?:''}" name="truck" value="${assetEntityInstance.truck}" size=3 tabindex="240" />
+								<input type="text" id="cart" class="${standardFieldSpecs.cart.imp?:''}" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="241" />
+								<input type="text" id="shelf" class="${standardFieldSpecs.shelf.imp?:''}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="242" />
 							</td>
 						</tr>
 						<tbody class="customTemplate">

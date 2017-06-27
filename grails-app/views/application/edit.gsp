@@ -72,7 +72,6 @@
 								</td>
 							</tr>
 							<tr>
-								
 								<tds:inputLabel field="${standardFieldSpecs.appAccess}"/>
 								<td>
 									<input type="text" id="assetType" name="assetType" readonly="readonly" value="${applicationInstance.assetType}" tabindex="12" />
@@ -124,7 +123,6 @@
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.criticality}"/>
-								</td>
 								<td>
 									<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality"
 										from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"
@@ -166,7 +164,6 @@
 								<tds:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}" tabindex="26"/>
 
 								<tds:inputLabel field="${standardFieldSpecs.planStatus}"/>
-								</td>
 								<td>
 									<g:select from="${planStatusOptions}" id="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="36" />
 								</td>
