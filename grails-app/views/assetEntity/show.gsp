@@ -15,10 +15,10 @@
 				<table>
 					<tbody>
 					<tr  class="prop">
-						<tds:inputLabel field="${standardFieldSpecs.assetName}"/>
+						<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}"/>
 						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">${assetEntity.assetName}</td>
 						
-						<tds:inputLabel field="${standardFieldSpecs.description}"/>
+						<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}"/>
 						<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}" >${assetEntity.description}</td>
 					</tr>
 					<tr class="prop">
@@ -31,25 +31,25 @@
 						<td class="label_sm">Target</td>
 					</tr>
 					<tr class="prop">
-						<tds:inputLabel field="${standardFieldSpecs.manufacturer}"/>
+						<tds:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}"/>
 						<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
 						
 						<tds:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
 						
-						<tds:inputLabel field="${standardFieldSpecs.sourceLocation}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceLocation}" value="${assetEntity.sourceLocation}"/>
 						<tds:labelForShowField field="${standardFieldSpecs.sourceLocation}" value="${assetEntity.sourceLocation}"/>
 						<tds:labelForShowField field="${standardFieldSpecs.targetLocation}" value="${assetEntity.targetLocation}"/>
 
 					</tr>
 					<tr class="prop">
-						<tds:inputLabel field="${standardFieldSpecs.model}"/>
+						<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}"/>
 						<td class="valueNW ${standardFieldSpecs.model.imp?:''}"><a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
 							<g:if test="${! assetEntity.model?.isValid()}"> <span style="color: red;"><b>?</b></span></g:if>
 						</td>
 						
 						<tds:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
 						
-						<tds:inputLabel field="${standardFieldSpecs.sourceRoom}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceRoom}" value="${assetEntity.sourceRoom}"/>
 						<tds:labelForShowField field="${standardFieldSpecs.sourceRoom}" value="${roomSource?.roomName}"/>
 						<tds:labelForShowField field="${standardFieldSpecs.targetRoom}" value="${roomTarget?.roomName}"/>
 
@@ -61,13 +61,13 @@
 
 						<%-- The following fields will be displayed based on the assetType --%>
 						<%-- rackable --%>
-						<tds:inputLabel field="${standardFieldSpecs.sourceRack}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceRack}" value="${assetEntity.sourceRack}"/>
 
 						<tds:labelForShowField field="${standardFieldSpecs.sourceRack}" value="${assetEntity.rackSource?.tag}"/>
 						<tds:labelForShowField field="${standardFieldSpecs.targetRack}" value="${assetEntity.rackTarget?.tag}"/>
 
 						<%-- blade --%>
-						<tds:inputLabel field="${standardFieldSpecs.sourceChassis}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceChassis}" value="${assetEntity.sourceChassis}"/>
 						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none">
 							${sourceChassis}
 						</td>
@@ -89,7 +89,7 @@
 					<tr class="prop">
 						<tds:showLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}"/>
 
-						<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
+						<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}"/>
 						<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
 							<tds:convertDate date="${assetEntity?.retireDate}" />
 						</td>
@@ -104,7 +104,7 @@
 					<tr class="prop">
 						<tds:showLabelAndField field="${standardFieldSpecs.railType}" value="${assetEntity.railType}"/>
 
-						<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
+						<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}"/>
 						<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
 							<tds:convertDate date="${assetEntity?.maintExpDate}" />
 						</td>

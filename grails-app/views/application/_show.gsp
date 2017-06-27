@@ -3,10 +3,10 @@
 <table class="planning-application-table">
 	<tbody>
 		<tr>
-			<tds:inputLabel field="${standardFieldSpecs.assetName}"/>
+			<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${applicationInstance.assetName}"/>
 			<td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">${applicationInstance.assetName}</td>
 			
-			<tds:inputLabel field="${standardFieldSpecs.description}"/>
+			<tds:inputLabel field="${standardFieldSpecs.description}" value="${applicationInstance.description}"/>
 			<td colspan="3" class="${standardFieldSpecs.validation.imp}" >${applicationInstance.description}</td>
 		</tr>
 		<tr>
@@ -23,7 +23,7 @@
 			
 			<tds:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
 			
-			<tds:inputLabel field="${standardFieldSpecs.sme}"/>
+			<tds:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
@@ -38,7 +38,7 @@
 		<tr>
 			<tds:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
 			
-			<tds:inputLabel field="${standardFieldSpecs.sme2}"/>
+			<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
@@ -53,7 +53,7 @@
 		<tr>
 			<tds:showLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
 			
-			<tds:inputLabel field="${standardFieldSpecs.appOwner}"/>
+			<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
@@ -77,7 +77,7 @@
 		<tr>
 			<tds:showLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
 			
-			<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
+			<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<tds:convertDate date="${applicationInstance?.retireDate}" />
 			</td>
@@ -91,7 +91,7 @@
 			<td></td>
 			<td></td>
 			
-			<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
+			<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<tds:convertDate date="${applicationInstance?.maintExpDate}" format="12hrs" />
 			</td>
@@ -106,7 +106,7 @@
 
 			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
 			
-			<tds:inputLabel field="${standardFieldSpecs.shutdownBy}"/>
+			<tds:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${applicationInstance.shutdownBy}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
 			<g:if test="${shutdownById == -1}">
 				${shutdownBy}
@@ -126,7 +126,7 @@
 
 		</tr>
 		<tr>
-			<tds:inputLabel field="${standardFieldSpecs.startupBy}"/>
+			<tds:inputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap" >
 			<g:if test="${startupById == -1}">
 				${startupBy}
@@ -144,7 +144,7 @@
 			
 			<tds:showLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}"/>
 			
-			<tds:inputLabel field="${standardFieldSpecs.testingBy}"/>
+			<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
 			<g:if test="${testingById == -1}">
 				${testingBy}
