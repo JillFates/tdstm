@@ -1649,4 +1649,22 @@ class AdminController implements ControllerMethods {
 
 		[recentUsers: recentUsers, moveEventsList: moveEventsList, upcomingBundles: upcomingBundles]
 	}
+
+	/**
+	 *  The admin control home page.
+	 */
+	@HasPermission(Permission.ModelEdit)
+	def modelConflicts() {
+
+		String query = """
+			SELECT mfg.name as mfg, m.model_id as model_id, m.name as model_name
+			from model m
+			join model_alias ma on ma.manufacturer_id = m.manufacturer_id and ma.name=m.name
+			join manufacturer mfg on mfg.manufacturer_id = m.manufacturer_id
+			order by mfg.name, m.name """
+
+		/*TODO: keep adding code to controller ...*/
+
+		[recentUsers: recentUsers, moveEventsList: moveEventsList, upcomingBundles: upcomingBundles]
+	}
 }
