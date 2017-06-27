@@ -49,21 +49,36 @@ var EntityCrud = (function ($) {
 
 		ok = validateCustomFields(formId, alertErrors, errors, ok);
 
+		// Commented out old validation error messages
+		/*if (!ok && alertErrors && errors.length > 0) {
+			alert(errors);
+		}*/
+
 		return ok;
 	};
 
 
 	/**
-	 * Validations for custom input fields
+	 * Validations for Field Spec input fields.
+	 * Simulates a submit of the form, this forces browser to run HTML5 built-in form validation.
+	 * - Validates required fields.
+	 * - Validates text input fields min-max length.
+	 *
 	 * @param errors
+	 * @param formId
 	 * @param isFormValid
+	 * @param alertErrors
 	 */
 	function validateCustomFields(formId, alertErrors, errors, isFormValid) {
 
 		var form = $('#'+formId)[0];
+
+		// Prevent form for being submitted.
 		$(form).submit(function (event) {
 			event.preventDefault();
 		});
+
+		// Submit hidden button clicked by jquery only if form is not valid. See _editButton.gsp
 		if(!form.checkValidity()){
 			$('#assetUpdateSubmit').click();
 			return false;
