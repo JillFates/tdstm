@@ -15,19 +15,83 @@
 							<li role="presentation" class="active">
 								<a href="#tab_1" data-toggle="tab">Asset Classes</a>
 							</li>
-							<li role="presentation" class="disabled">
-								<a href="#tab_2" data-toggle="tab">Columns</a>
+							<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
+								<a *ngIf="!isAssetSelected();else selected">Columns</a>
+								<ng-template #selected>
+									<a href="#tab_2" (click)="onLoadAssetFields()" data-toggle="tab">Columns</a>
+								</ng-template>
 							</li>
 						</ul>
 						<div class="tab-content">
 							<div class="tab-pane active" id="tab_1">
 								<div class="checkbox" *ngFor="let asset of assetClasses">
 									<label>
-										<input type="checkbox"> {{asset}}
+										<input type="checkbox" name="{{asset}}" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
 									</label>
 								</div>
 							</div>
-							<div class="tab-pane active" id="tab_2">
+							<div class="tab-pane" id="tab_2">
+								<div class="row">
+									<div class="col-md-4">
+										<div class="col-md-9">
+											<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search">
+										</div>
+										<div class="col-md-3">
+											<button type="button" class="btn btn-default" id="btnFilter" (click)="ApplyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
+										</div>
+									</div>
+									<div class="col-md-8">
+										<div class="col-md-2">
+											<span class="btn" (click)="onSelectToggle()">
+												<i class="fa" [ngClass]="toggleClass()"></i> Selected
+											</span>
+										</div>
+										<div class="col-md-5">
+											<div class="form-group">
+												<label for="show" class="control-label col-sm-3 pd-top-5">Show:</label>
+												<div class="col-sm-9">
+													<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
+														<option value="all">All Fields</option>
+														<option *ngFor="let asset of selectedAssetClasses" value="asset"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-5">
+											<div class="form-group">
+												<label for="imp" class="control-label col-sm-3 pd-top-5">Importance:</label>
+												<div class="col-sm-9">
+													<select name="imp" id="imp" (change)="ApplyFilters()" [(ngModel)]="filterModel.imp" class="form-control">
+														<option value="all">All</option>
+														<option value="C">Critical</option>
+														<option value="I">Important</option>
+														<option value="N">Normal</option>
+														<option value="U">Uninportant</option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-4" *ngFor="let domain of filteredData;">
+										<div class="form-group">
+											<div class="row">
+												<div class="col-md-12">
+													<label style="text-decoration:underline;" class="control-label pd-top-5">{{ 'ASSETS.'+domain.domain | translate}} Fields</label>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-md-3 col-lg-3" style="padding-right:0px;" *ngFor="let field of domain.fields;">
+													<div class="checkbox {{field.imp}}">
+														<label><input type="checkbox"  name="{{domain.domain+ '.' +field.field}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
 							</div>
 						</div>
 					</div>

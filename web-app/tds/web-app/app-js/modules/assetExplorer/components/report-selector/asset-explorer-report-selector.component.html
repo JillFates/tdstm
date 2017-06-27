@@ -2,7 +2,7 @@
  (close)="onClose($event,false)" [valueField]="'name'" [textField]="'name'">
 	<ng-template kendoDropDownListHeaderTemplate>
 		<div class="has-feedback">
-			<input type="text" class="form-control" (ngModelChange)="onSearch()" [(ngModel)]='search' id="search" placeholder="Search"
+			<input type="text" class="form-control" (keyup)="onSearch()" [(ngModel)]='search' id="search" placeholder="Search"
 			 aria-describedby="search">
 			<i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
 		</div>
