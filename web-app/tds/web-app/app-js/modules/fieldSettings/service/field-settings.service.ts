@@ -28,11 +28,13 @@ export class FieldSettingsService {
 			.catch((error: any) => error.json());
 	}
 
-	saveFieldSettings(domainModel: DomainModel): Observable<DomainModel[]> {
+	saveFieldSettings(domains: DomainModel[]): Observable<DomainModel[]> {
 		let payload = {};
-		payload[domainModel.domain.toUpperCase()] = domainModel;
-		return this.http.post(`${this.fieldSettingsUrl}/${domainModel.domain}`, JSON.stringify(payload))
-			.map((res: Response) => res)
+		domains.forEach(domainModel => {
+			payload[domainModel.domain.toUpperCase()] = domainModel;
+		});
+		return this.http.post(`${this.fieldSettingsUrl}/ASSETS`, JSON.stringify(payload))
+			.map((res: Response) => res['_body'] ? res.json() : { status: 'Ok' })
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 }
