@@ -66,7 +66,7 @@
 							<div class="form-group col-lg-3 col-md-4">
 								<label for="bundleId">Select one or more bundle(s):</label>
 								<select id="bundleId" name="bundle" multiple="multiple" class="form-control medium-height">
-									<option value="">All Bundles</option>
+									<option value="All">All Bundles</option>
 									<option value="${useForPlanningArgName}" selected="selected">Planning Bundles</option>
 									<option value="" disabled>──────────</option>
 									<g:each status="i" in="${moveBundleList}" var="moveBundle">

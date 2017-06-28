@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.*
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
@@ -31,6 +32,8 @@ class AssetExportService {
     // Indicates the number of rows to process before performing a flush/clear of the Hibernate session queue
     private static final int HIBERNATE_BATCH_SIZE = 1000
     private static double MIN_INFLATE_RATIO = 0.0001d
+    private static final String ALL_BUNDLES_OPTION = 'All'
+
     // TODO : JPM 9/2014 : determine if CUSTOM_LABELS is used as it does NOT have all of the values it should
     protected static CUSTOM_LABELS = [
             'Custom1' , 'Custom2' , 'Custom3' , 'Custom4' , 'Custom5' , 'Custom6' , 'Custom7' , 'Custom8' , 'Custom9' , 'Custom10',
@@ -98,33 +101,50 @@ class AssetExportService {
 
             //get project Id
             def dataTransferSet = params.dataTransferSet
-            def bundleNameList = new StringBuffer()
-            def bundles = []
+
             def principal = params.username
-            def loginUser = UserLogin.findByUsername(principal)
+            UserLogin loginUser = UserLogin.findByUsername(principal)
 
             List<String> bundle = params.bundle
+
+            // Set flag if Use for Planning was one of the choosen options and remove from the list
             boolean useForPlanning = bundle.remove(MoveBundle.USE_FOR_PLANNING)
-
-            // If no bundle left selected lets all the default 'all bundles'
-            if(bundle.size() == 0){
-                bundle << ''
-            }
-
+            boolean allBundles = bundle.remove(ALL_BUNDLES_OPTION)
             int bundleSize = bundle.size()
 
-            bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+' Bundles') : 'All')
+            // Determine what will be used for the name of the file + what is shown in the title sheet
+            // Examples:
+            //      project-BundleName-AssetTypes-date.xlsx
+            //      project-2Bundles-AssetTypes-date.xlsx
+            //      project-All-AssetTypes-date.xlsx
+            //      project-Planning-AssetTypes-date.xlsx
+            //      project-Planning+2+Bundles-AssetTypes-date.xlsx
 
-            // if use for planning add the for planning specification
-            if(useForPlanning){
-                bundleNameList.append(' - Planning Bundles')
+            StringBuilder bundleNameList = new StringBuilder()
+
+            if (allBundles) {
+                bundleNameList.append('All Bundles')
+            } else {
+                if (useForPlanning) {
+                    bundleNameList.append('Planning')
+                    if (bundleSize) {
+                        bundleNameList.append("+$bundleSize bundle" + (bundleSize > 1 ? 's' : ''))
+                    }
+                } else {
+                    if (bundleSize==1) {
+                        MoveBundle mb = MoveBundle.read( bundle[0] )
+                        bundleNameList.append(mb.name)
+                    } else {
+                        bundleNameList.append("$bundleSize bundles")
+                    }
+                }
             }
 
             def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
             def project = Project.get(projectId)
             if ( project == null) {
-                progressService.update(key, 100, 'Cancelled', 'Project is required.')
+                progressService.update(key, 100, 'Cancelled', 'Project is required')
                 return
             }
 
@@ -191,16 +211,21 @@ class AssetExportService {
             String query = ' WHERE d.project=:project '
             Map queryParams = [project:project]
 
-            if(useForPlanning){
+            if (! allBundles && useForPlanning) {
                 query += ' AND d.moveBundle.useForPlanning = TRUE '
             }
 
             // Setup for multiple bundle selection
-            if (bundle[0]) {
-                for ( int i=0; i< bundleSize ; i++ ) {
-                    bundles << bundle[i].toLong()
+            if (! allBundles && bundleSize) {
+                List bundleIds = []
+                for ( int i=0; i < bundleSize ; i++ ) {
+                    Long bid = NumberUtil.toPositiveLong(bundle[i], -1)
+                    if (bid > 0) {
+                        // TODO : Check if bundle is in the project
+                        bundleIds << bid
+                    }
                 }
-                def bundleStr = bundles.join(",")
+                String bundleStr = bundleIds.join(',')
                 query += " AND d.moveBundle.id IN(${bundleStr})"
                 //queryParams.bundles = bundles
             }
