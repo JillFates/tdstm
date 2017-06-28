@@ -39,6 +39,7 @@ class Project extends PartyGroup {
 	String depConsoleCriteria
 	MoveBundle defaultBundle
 	Timezone timezone
+	String planMethodology
 
 	// Custom field labels
 	String custom1
