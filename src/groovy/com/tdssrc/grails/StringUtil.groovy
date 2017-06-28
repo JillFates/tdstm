@@ -290,6 +290,15 @@ class StringUtil {
 	}
 
 	/**
+	 * Escape string being used in Javascript to avoid unterminated strings
+	 * @param str
+	 * @return
+	 */
+	static String sanitizeJavaScript(String str) {
+		return StringEscapeUtils.escapeJavaScript(str)
+	}
+
+	/**
 	 * Compare various string values as boolean
 	 * @param str - the string to compare
 	 * @return true/false if it matches either list otherwize null for undeterminable
