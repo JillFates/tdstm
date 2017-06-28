@@ -10,12 +10,25 @@ import { DomainModel } from '../../model/domain.model';
 })
 export class FieldSettingsListComponent {
 	public domains: DomainModel[] = [];
+	selectedTab = '';
+	editing = false;
 
 	constructor( @Inject('fields') fields: Observable<DomainModel[]>) {
 		fields.subscribe(
 			(result) => {
 				this.domains = result;
+				if (this.domains.length > 0) {
+					this.selectedTab = this.domains[0].domain;
+				}
 			},
 			(err) => console.log(err));
+	}
+
+	protected onTabChange(domain: string): void {
+		this.selectedTab = domain;
+	}
+
+	protected isTabSelected(domain: string): boolean {
+		return this.selectedTab === domain;
 	}
 }

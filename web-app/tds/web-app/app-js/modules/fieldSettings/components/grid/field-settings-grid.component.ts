@@ -137,7 +137,9 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onCancel(): void {
 		if (this.isDirty()) {
-			this.prompt.open('Confirmation Required', 'Changes you made may not be saved. Do you want to continue?',
+			this.prompt.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
 				'Confirm', 'Cancel').then(result => {
 					if (result) {
 						this.reset();
@@ -165,6 +167,11 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.fieldsSettings.push(model);
 		this.refresh();
 		model.order = this.fieldsSettings.length + 1;
+	}
+
+	protected onClearTextFilter(): void {
+		this.filter.search = '';
+		this.onFilter();
 	}
 
 	protected reset(): void {
