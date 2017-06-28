@@ -26,6 +26,7 @@ declare var jQuery: any;
 export class FieldSettingsGridComponent implements OnInit {
 	@Output('save') saveEmitter = new EventEmitter<any>();
 	@Output('cancel') cancelEmitter = new EventEmitter<any>();
+	@Output('add') addEmitter = new EventEmitter<any>();
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
@@ -144,17 +145,19 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onAddCustom(): void {
-		let model = new FieldSettingsModel();
-		model.field = this.availableCustomNumbers();
-		model.constraints = {
-			required: false
-		};
-		model['isNew'] = true;
-		this.fieldsSettings.push(model);
-		this.refresh();
-		model.order = this.fieldsSettings.length + 1;
-		setTimeout(function () {
-			jQuery('#' + model.field).focus();
+		this.addEmitter.emit((custom) => {
+			let model = new FieldSettingsModel();
+			model.field = custom;
+			model.constraints = {
+				required: false
+			};
+			model['isNew'] = true;
+			this.fieldsSettings.push(model);
+			this.refresh();
+			model.order = this.fieldsSettings.length + 1;
+			setTimeout(function () {
+				jQuery('#' + model.field).focus();
+			});
 		});
 	}
 
@@ -176,15 +179,6 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected refresh(): void {
 		this.gridData = process(this.fieldsSettings, this.state);
-	}
-
-	protected availableCustomNumbers(): string {
-		let custom = this.fieldsSettings
-			.filter(item => /^custom/i.test(item.field))
-			.map((item) => +item.field.replace(/[a-z]/ig, ''))
-			.sort((a, b) => a - b);
-		let number = custom.findIndex((item, i) => item !== i + 1);
-		return 'custom' + ((number === -1 ? custom.length : number) + 1);
 	}
 
 	protected onControlChange(

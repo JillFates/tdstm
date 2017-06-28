@@ -119,4 +119,15 @@ export class FieldSettingsListComponent implements OnInit {
 		return domain.fields.filter(item =>
 			!item.label || !item.field).length === 0;
 	}
+
+	protected onAdd(callback): void {
+		let custom = this.domains
+			.reduce((p: FieldSettingsModel[], c: DomainModel) => p.concat(c.fields), [])
+			.filter(item => item.udf)
+			.map((item) => +item.field.replace(/[a-z]/ig, ''))
+			.filter((x, i, dt) => dt.indexOf(x) === i)
+			.sort((a, b) => a - b);
+		let number = custom.findIndex((item, i) => item !== i + 1);
+		callback('custom' + ((number === -1 ? custom.length : number) + 1));
+	}
 }
