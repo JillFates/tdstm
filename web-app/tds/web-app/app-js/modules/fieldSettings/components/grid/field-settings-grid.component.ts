@@ -11,6 +11,8 @@ import { process, State } from '@progress/kendo-data-query';
 import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configuration-popup.component';
 import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
 
+declare var jQuery: any;
+
 @Component({
 	moduleId: module.id,
 	selector: 'field-settings-grid',
@@ -167,6 +169,9 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.fieldsSettings.push(model);
 		this.refresh();
 		model.order = this.fieldsSettings.length + 1;
+		setTimeout(function () {
+			jQuery('#' + model.field).focus();
+		});
 	}
 
 	protected onClearTextFilter(): void {
