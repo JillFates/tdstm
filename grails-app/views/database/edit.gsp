@@ -60,11 +60,8 @@
 								<input type="text" id="assetType" name="assetType" readonly="readonly" value="${databaseInstance.assetType}" tabindex="12" />
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.supportType}"/>
-							<td>
-								<tds:inputControl field="${standardFieldSpecs.supportType}" tabindex="21"/>
-							</td>
-
+							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" tabindex="21"/>
+						
 							<tds:inputLabel field="${standardFieldSpecs.environment}"/>
 							<td>
 								<g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':'Select...']}" tabindex="32" />

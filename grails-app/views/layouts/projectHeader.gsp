@@ -177,7 +177,7 @@ int minPasswordLength = tds.minPasswordLength()
 								<tds:hasPermission permission="${Permission.UserSendActivations}">
 									<li><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link> </li>
 								</tds:hasPermission>
-								<li><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('projectMegaMenu')">Field Settings</g:link> </li>
+								<li><g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link> </li>
 					</g:if>
 					<g:else>
 						<span class="megamenuSection">No Project Selected</strong></span><br />

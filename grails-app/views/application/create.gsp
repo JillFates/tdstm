@@ -35,18 +35,18 @@
 					<table>
 						<tbody>
 							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.assetName}"/>
+								<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${applicationInstance.assetName}"/>
 								<td colspan="3">
 									<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${applicationInstance.assetName}" />	
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.description}"/>
+								<tds:inputLabel field="${standardFieldSpecs.description}" value="${applicationInstance.description}"/>
 								<td colspan="3">
 									<tds:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="21" value="${applicationInstance.description}"/>
 								</td>
 							</tr>
 							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.appAccess}"/>
+								<tds:inputLabel field="${standardFieldSpecs.appAccess}" value="${applicationInstance.assetType}"/>
 								<td>
 									<input type="text" id="assetType" name="assetType" readonly="readonly" value="${applicationInstance.assetType}" tabindex="12" />
 								</td>
@@ -60,7 +60,7 @@
 							<tr>
 								<tds:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}" tabindex="13"/>
 								
-								<tds:inputLabel field="${standardFieldSpecs.environment}"/>
+								<tds:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
 								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect"  optionKey="personId" 
 										optionValue="${{it.fullName}}" 
@@ -70,7 +70,7 @@
 									/>
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.environment}"/>
+								<tds:inputLabel field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
 								<td>
 									<g:select id="environment" class="${standardFieldSpecs.environment.imp?:''}" name="environment" 
 										from="${environmentOptions}" 
@@ -84,7 +84,7 @@
 							<tr>
 								<tds:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}" tabindex="14"/>
 								
-								<tds:inputLabel field="${standardFieldSpecs.sme2}"/>
+								<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId" 
@@ -95,7 +95,7 @@
 									/>
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.criticality}"/>
+								<tds:inputLabel field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
 								<td>
 									<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality" 
 										from="${applicationInstance.constraints.criticality.inList}" 
@@ -110,7 +110,7 @@
 							<tr>
 								<tds:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}" tabindex="15"/>
 
-								<tds:inputLabel field="${standardFieldSpecs.appOwner}"/>
+								<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" optionKey="personId" 
@@ -121,7 +121,7 @@
 									/>
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.moveBundle}"/>
+								<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${project.defaultBundle.id}"/>
 								<td>
 									<g:select from="${moveBundleList}" id="moveBundle" class="${standardFieldSpecs.moveBundle.imp?:''}" 
 										name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="35" />
@@ -134,7 +134,7 @@
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}" tabindex="26"/>
 
-								<tds:inputLabel field="${standardFieldSpecs.planStatus}"/>
+								<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
 								<td>
 									<g:select from="${planStatusOptions}" id="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}" 
 										name="planStatus" value="${applicationInstance.planStatus}" tabindex="36" />
@@ -145,7 +145,7 @@
 							<tr>
 								<tds:inputLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}" tabindex="17"/>
 								
-								<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
+								<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
 										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
@@ -154,15 +154,15 @@
 									value="<tds:convertDate date="${applicationInstance?.retireDate}" />" /> 
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.validation}"/>
+								<tds:inputLabel field="${standardFieldSpecs.validation}" value=""/>
 								<td>
 									<g:select  id="validation" class="${standardFieldSpecs.validation.imp?:''}" name="validation" from="${applicationInstance.constraints.validation.inList }" 
 										onChange="assetFieldImportance(this.value,'Application');highlightCssByValidation(this.value,'Application','');"  value="" tabindex="37" />
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.testProc}"/>
+								<tds:inputLabel field="${standardFieldSpecs.testProc}" value="" />
 								<td>
-									<g:select  id="testProc"	class="${standardFieldSpecs.testProc.imp?:''} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
+									<g:select  id="testProc" class="${standardFieldSpecs.testProc.imp?:''} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="47" />
 								</td>
 							</tr>
@@ -170,7 +170,7 @@
 							    <td></td>
 							    <td></td>
 							    
-								<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
+								<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 									<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}" 
 										size="15" style="width: 138px;"
@@ -178,13 +178,13 @@
 										value="<tds:convertDate date="${applicationInstance?.maintExpDate}"  />" /> 
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.latency}"/>
+								<tds:inputLabel field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
 								<td>
 									<g:select  id="latency" class="${standardFieldSpecs.latency.imp?:''} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="38" />
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.startupProc}"/>
+								<tds:inputLabel field="${standardFieldSpecs.startupProc}" value="${applicationInstance.appOwner}"/>
 								<td>
 									<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="48" />
@@ -203,7 +203,7 @@
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" disabled="disabled"/>Fixed
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.shutdownDuration}"/>
+								<tds:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}"/>
 								<td nowrap="nowrap">
 									<input type="text" id="shutdownDuration" name="shutdownDuration"
 										value="${applicationInstance.shutdownDuration}" 
@@ -212,7 +212,7 @@
 								</td>
 							</tr>
 							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.startupBy}"/>
+								<tds:inputLabel field="${standardFieldSpecs.startupBy}" value=""/>
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}" nowrap="nowrap">
 								   <g:render template="bySelect"  model="[name:'startupBy', id:'startupById', className:' assetSelect']"></g:render>
 									<input type="checkbox" id="startupByIdFixed"  name="startupFixed" value="0"
@@ -221,14 +221,14 @@
 								
 								<tds:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}" tabindex="29"/>
 								
-									<tds:inputLabel field="${standardFieldSpecs.testingBy}"/>
+									<tds:inputLabel field="${standardFieldSpecs.testingBy}" value=""/>
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingById', className:'assetSelect']"></g:render>
 									<input type="checkbox" id="testingByIdFixed" name="testingFixed" value="0"  disabled="disabled"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />Fixed
 								</td>
 								
-								<tds:inputLabel field="${standardFieldSpecs.testingDuration}"/>
+								<tds:inputLabel field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}"/>
 								<td>
 									<input type="text" id="testingDuration" name="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}"
 											value="${applicationInstance.testingDuration}" tabindex="55" size="7"/>m
