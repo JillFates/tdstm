@@ -93,26 +93,18 @@ var EntityCrud = (function ($) {
 	var validateDBForm = function (form, alertErrors) {
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true;
 		return validateCommonFields(form, alertErrors);
-		/*var ok = validateCommonFields(form, alertErrors);
-		if (ok) {
-		    var size = $('#'+form+' #size').val();
-		    if ( size=='' || isNaN(size)){
-		    	if(alertErrors){
-		    		alert("Please enter numeric value for DB Size");
-		    	}
-		    	
-				ok = false;
-		    } else if($('#'+form+' #dbFormat').val()==''){
-		    	if(alertErrors){
-		    		alert("Please enter value for DB Format");
-		    	}
-				ok = false;
-		    }
-		}
-		return ok*/
 	};
 
-	/**
+    /**
+     * Private method used to validate the Storage asset create/edit forms
+     * @return true if valid
+     **/
+    var validateStorageForm = function (form) {
+        return validateCommonFields(form);
+    };
+
+
+    /**
 	 * Used to validate the Server/Device asset create/edit forms
 	 * @return true if valid
 	 **/
