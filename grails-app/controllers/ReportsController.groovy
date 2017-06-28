@@ -1189,7 +1189,6 @@ class ReportsController implements ControllerMethods {
 				'FROM WorkflowTransition where workflow=? order by transId', [workflow])
 		def attributes = projectService.getAttributes('Application')
 		def projectCustoms = project.customFieldsShown + 1
-		def nonCustomList = (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it}
 		def appAttributes = attributes.findAll{!(it.attributeCode in nonCustomList)}
 		[moveBundles:moveBundleList, moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},
 		 workflowTransitions:workflowTransitions, appAttributes:appAttributes]
