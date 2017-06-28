@@ -607,7 +607,7 @@ class ProjectController implements ControllerMethods {
 		fieldMap.customs = projectService.getCustoms()
 		render fieldMap as JSON
 	}
-	
+
 	/**
 	 * Initialising importance for a given entity type.
 	 *@param : entityType type of entity.
@@ -694,22 +694,6 @@ class ProjectController implements ControllerMethods {
 	}
 
 	/**
-	 * Projects customFieldsShown
-	 * @param : custom count.
-	 * @render string 'success'.
-	 */
-	@HasPermission(Permission.ProjectFieldSettingsEdit)
-	def updateProjectCustomShown() {
-		Project project = securityService.userCurrentProject
-		project.customFieldsShown = NumberUtils.toInt(request.JSON.customCount,Project.CUSTOM_FIELD_COUNT)
-		if(!project.validate() || !project.save(flush:true)){
-			def etext = "Project customs unable to Update "+GormUtil.allErrorsString( project )
-			log.error( etext )
-		}
-		render "success"
-	}
-
-	/**
 	 * Used to select project time zone
 	 * @param timezone default timezone selected
 	 * @render time zone view
@@ -727,7 +711,7 @@ class ProjectController implements ControllerMethods {
 	def showImportanceFields() {
 		render( view: "showImportance", model: [])
 	}
-	
+
 	@HasPermission(Permission.ProjectFieldSettingsEdit)
 	def editImportanceFields() {
 		render( view: "editImportance", model: [])

@@ -64,18 +64,20 @@ class AssetEntityService implements ServiceMethods {
 	protected static final List<String> customLabels = (1..Project.CUSTOM_FIELD_COUNT).collect { 'Custom' + it }.asImmutable()
 
 	// TODO : JPM 9/2014 : determine if bundleMoveAndClientTeams is used as the team functionality has been RIPPED out of TM
-	protected static final List<String> bundleMoveAndClientTeams = ['sourceTeamMt', 'sourceTeamLog', 'sourceTeamSa',
-	                                                                'sourceTeamDba', 'targetTeamMt', 'targetTeamLog',
-	                                                                'targetTeamSa', 'targetTeamDba'].asImmutable()
+	protected static final List<String> bundleMoveAndClientTeams = [
+		'sourceTeamMt', 'sourceTeamLog', 'sourceTeamSa',
+		'sourceTeamDba', 'targetTeamMt', 'targetTeamLog',
+		'targetTeamSa', 'targetTeamDba' ].asImmutable()
 
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
 			(AssetClass.APPLICATION): [],
 			(AssetClass.DATABASE): [],
-			(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation',
-			                      // TODO : JPM 9/2014 : This list can be removed as part of TM-3311
-			                      'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt',
-			                      'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
+			(AssetClass.DEVICE): [
+				'assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation',
+				// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
+				'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt',
+				'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
 			],
 			(AssetClass.STORAGE): []
 	].asImmutable()
@@ -84,25 +86,26 @@ class AssetEntityService implements ServiceMethods {
 	static final List<String> CUSTOM_PROPERTIES = (1..Project.CUSTOM_FIELD_COUNT).collect { 'custom' + it }.asImmutable()
 
 	// Common properties for all asset classes (Application, Database, Files/Storate, Device)
-	static final List<String> ASSET_PROPERTIES = ['assetName',  'shortName', 'priority', 'planStatus',  'department',
-	                                              'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
-	                                              'description', 'supportType', 'environment', 'serialNumber',
-	                                              'validation', 'externalRefId', 'size', 'scale', 'rateOfChange'].asImmutable()
-	// 'purchaseDate', 'purchasePrice',
+	static final List<String> ASSET_PROPERTIES = [
+		'assetName',  'shortName', 'priority', 'planStatus', 'department',
+		'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
+		'description', 'supportType', 'environment', 'serialNumber',
+		'validation', 'externalRefId', 'size', 'scale', 'rateOfChange'].asImmutable()
 
 	// Properties strictly for DEVICES (a.k.a. AssetEntity)
 	static final List<String> DEVICE_PROPERTIES = [
-			'assetTag', 'assetType', 'ipAddress', 'os', 'usize', 'truck', 'cart', 'shelf', 'railType',
-			'sourceBladePosition', 'targetRackPosition', 'sourceRackPosition', 'targetBladePosition'
+		'assetTag', 'assetType', 'ipAddress', 'os', 'usize', 'truck', 'cart', 'shelf', 'railType',
+		'sourceBladePosition', 'targetRackPosition', 'sourceRackPosition', 'targetBladePosition'
 	].asImmutable()
 
 	// Properties strictly for ASSETS that are date (a.k.a. AssetEntity)
 	static final List<String> ASSET_DATE_PROPERTIES = ['purchaseDate', 'maintExpDate', 'retireDate'].asImmutable()
 
 	// List of all of the Integer properties for the potentially any of the asset classes
-	static final List<String> ASSET_INTEGER_PROPERTIES = ['size', 'rateOfChange', 'priority', 'sourceBladePosition',
-	                                                      'targetBladePosition', 'sourceRackPosition',
-	                                                      'targetRackPosition'].asImmutable()
+	static final List<String> ASSET_INTEGER_PROPERTIES = [
+		'size', 'rateOfChange', 'priority', 'sourceBladePosition',
+		'targetBladePosition', 'sourceRackPosition',
+		'targetRackPosition'].asImmutable()
 
 	static final Map<String, Map<String, String>> ASSET_TYPE_NAME_MAP = [
 			(AssetType.APPLICATION.toString()): [
@@ -1354,7 +1357,8 @@ class AssetEntityService implements ServiceMethods {
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		fieldPrefs.each { key, value ->
-			modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+			//modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+			modelPref[key] = StringUtil.sanitizeJavaScript(model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
 		}
 		model.modelPref = modelPref
 
@@ -1797,6 +1801,7 @@ class AssetEntityService implements ServiceMethods {
 	/**
 	 * Determine the frontEndLabel for the attribute.
 	 */
+	@Deprecated
 	private String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
 		Project project = securityService.userCurrentProject
 		return (attributeCode.contains('custom') && project[attributeCode]) ? project[attributeCode] : frontendLabel
