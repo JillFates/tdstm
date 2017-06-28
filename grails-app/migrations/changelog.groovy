@@ -169,4 +169,5 @@ databaseChangeLog = {
 	include file: "20170417-remove-orphan-move-event-asset-comments-user-preferences-references.groovy"
 	include file: "20170504-delete-room-merge-permission.groovy"
 	include file: "20170530-create-setting-table.groovy"
+	include file: "20170623-add-planMethodology-to-Ptoject.groovy"
 }
