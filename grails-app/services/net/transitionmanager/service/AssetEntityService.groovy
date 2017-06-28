@@ -1354,7 +1354,8 @@ class AssetEntityService implements ServiceMethods {
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		fieldPrefs.each { key, value ->
-			modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+			//modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+			modelPref[key] = StringUtil.sanitizeJavaScript(model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
 		}
 		model.modelPref = modelPref
 
@@ -1797,6 +1798,7 @@ class AssetEntityService implements ServiceMethods {
 	/**
 	 * Determine the frontEndLabel for the attribute.
 	 */
+	@Deprecated
 	private String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
 		Project project = securityService.userCurrentProject
 		return (attributeCode.contains('custom') && project[attributeCode]) ? project[attributeCode] : frontendLabel
