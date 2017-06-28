@@ -306,6 +306,7 @@ class ProjectService implements ServiceMethods {
 	/**
 	 * Get attributes from eavAttribute based on EntityType.
 	 */
+	@Deprecated
 	List<EavAttribute> getAttributes(String entityType) {
 		EavEntityType eavEntityType = EavEntityType.findByDomainName(entityType)
 		List<EavAttribute> attributes = EavAttribute.findAllByEntityType(eavEntityType, [sort: 'frontendLabel'])

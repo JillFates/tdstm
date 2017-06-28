@@ -66,14 +66,14 @@
 					<table>
 						<tbody>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetName}"/>
+							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntityInstance.assetName}"/>
 							<td colspan="3">
 								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetEntityInstance.assetName}" />	
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.description}"/>
+							<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntityInstance.description}"/>
 							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="101" value="${assetEntityInstance.assetName}" />	
+								<tds:inputControl field="${standardFieldSpecs.description}" tabindex="101" value="${assetEntityInstance.description}" />	
 							</td>
 						</tr>
 						<tr>
@@ -87,7 +87,7 @@
 								</div>
 							</td>
 							
-							<tds:inputLabel field="${standardFieldSpecs.environment}"/>
+							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${assetEntityInstance.environment}"/>
 							<td>
 								<g:select id="environment" name="environment" class="${standardFieldSpecs.environment.imp?:''}" from="${environmentOptions}"
 										  value="${assetEntityInstance.environment}" noSelection="${['':'Please select...']}"
@@ -114,14 +114,14 @@
 								</div>
 							</td>
 							
-							<tds:inputLabel field="${standardFieldSpecs.priority}"/>
+							<tds:inputLabel field="${standardFieldSpecs.priority}" value="${assetEntityInstance.priority}"/>
 							<td>
 								<g:select id="priority" name ="priority"
 										  from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':'Please select...']}"
 										  class="${standardFieldSpecs.priority.imp?:''}" tabindex="210"
 										/>
 							</td>
-							<tds:inputLabel field="${standardFieldSpecs.sourceLocation}"/>
+							<tds:inputLabel field="${standardFieldSpecs.sourceLocation}" value="${assetEntityInstance.sourceLocation}"/>
 							<td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
 									<span class="useRoomS">
 										<g:select id="roomSelectS"  name="roomSourceId"
@@ -178,7 +178,7 @@
 
 						</tr>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetType}"/>
+							<tds:inputLabel field="${standardFieldSpecs.assetType}" value="${assetEntityInstance.assetType}"/>
 							<td class="${standardFieldSpecs.assetType.imp?:''}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="modelSelect" tabindex="104">
 								</div>
@@ -193,7 +193,7 @@
 										/>
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.sourceRack}"/>
+							<tds:inputLabel field="${standardFieldSpecs.sourceRack}" value="${assetEntityInstance.sourceRack}"/>
 							<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display:none">
 								<label for="sourceChassisId">Blade Chassis</label>
 							</td>
@@ -296,7 +296,7 @@
 
 							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntityInstance.supportType}" tabindex="225"/>
 
-							<tds:inputLabel field="${standardFieldSpecs.moveBundle}"/>
+							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetEntityInstance.moveBundle?.id}"/>
 							<td>
 								<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id"
 										  value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name"
@@ -305,7 +305,7 @@
 										/>
 							</td>
 							
-							<tds:inputLabel field="${standardFieldSpecs.size}"/>
+							<tds:inputLabel field="${standardFieldSpecs.size}" value="${assetEntityInstance.size}"/>
 							<td nowrap="nowrap" class="sizeScale">
 								<input type="text" id="size" name="size" class="${standardFieldSpecs.size.imp?:''}" value="${assetEntityInstance.size}" tabindex="410"/>
 								<g:select id="scale" name="scale"
@@ -320,7 +320,7 @@
 						<tr>
 							<tds:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntityInstance.assetTag}" tabindex="107"/>
 
-							<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
+							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntityInstance.retireDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
@@ -333,7 +333,7 @@
 								/>
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.planStatus}"/>
+							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetEntityInstance.planStatus}"/>
 							<td>
 								<g:select id="planStatus" name ="planStatus"
 										  from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}"
@@ -346,7 +346,7 @@
 							<tds:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntityInstance.rateOfChange}" tabindex="420"/>
 						</tr>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.railType}"/>
+							<tds:inputLabel field="${standardFieldSpecs.railType}" value="${assetEntityInstance.railType}"/>
 							<td>
 								<g:select id="railType" name ="railType"
 										  from="${railTypeOption}" value= "${assetEntityInstance.railType}"
@@ -355,7 +355,7 @@
 										  tabindex="108"/>
 							</td>
 							
-							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
+							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntityInstance.maintExpDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
 								<input type="text" id="maintExpDate" name="maintExpDate"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" />"
@@ -365,7 +365,7 @@
 								/>
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.validation}"/>
+							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${assetEntityInstance.validation}"/>
 							<td  colspan="2">
 								<g:select id="validation" name="validation"
 										  from="${assetEntityInstance.constraints.validation.inList}"

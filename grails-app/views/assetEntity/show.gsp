@@ -15,59 +15,59 @@
 				<table>
 					<tbody>
 					<tr  class="prop">
-						<tds:inputLabel field="${standardFieldSpecs.assetName}"/>
+						<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}"/>
 						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">${assetEntity.assetName}</td>
 						
-						<tds:inputLabel field="${standardFieldSpecs.description}"/>
+						<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}"/>
 						<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}" >${assetEntity.description}</td>
 					</tr>
 					<tr class="prop">
-						<tds:showLabelAndField field="${standardFieldSpecs.assetType}" fieldValue="${assetEntity.assetType}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}"/>
 						
-						<tds:showLabelAndField field="${standardFieldSpecs.environment}" fieldValue="${assetEntity.environment}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${assetEntity.environment}"/>
 						
 						<td></td>
 						<td class="label_sm">Source</td>
 						<td class="label_sm">Target</td>
 					</tr>
 					<tr class="prop">
-						<tds:inputLabel field="${standardFieldSpecs.manufacturer}"/>
+						<tds:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}"/>
 						<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
 						
-						<tds:showLabelAndField field="${standardFieldSpecs.priority}" fieldValue="${assetEntity.priority}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
 						
-						<tds:inputLabel field="${standardFieldSpecs.sourceLocation}"/>
-						<tds:labelForShowField field="${standardFieldSpecs.sourceLocation}" fieldValue="${assetEntity.sourceLocation}"/>
-						<tds:labelForShowField field="${standardFieldSpecs.targetLocation}" fieldValue="${assetEntity.targetLocation}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceLocation}" value="${assetEntity.sourceLocation}"/>
+						<tds:labelForShowField field="${standardFieldSpecs.sourceLocation}" value="${assetEntity.sourceLocation}"/>
+						<tds:labelForShowField field="${standardFieldSpecs.targetLocation}" value="${assetEntity.targetLocation}"/>
 
 					</tr>
 					<tr class="prop">
-						<tds:inputLabel field="${standardFieldSpecs.model}"/>
+						<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}"/>
 						<td class="valueNW ${standardFieldSpecs.model.imp?:''}"><a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
 							<g:if test="${! assetEntity.model?.isValid()}"> <span style="color: red;"><b>?</b></span></g:if>
 						</td>
 						
-						<tds:showLabelAndField field="${standardFieldSpecs.ipAddress}" fieldValue="${assetEntity.ipAddress}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
 						
-						<tds:inputLabel field="${standardFieldSpecs.sourceRoom}"/>
-						<tds:labelForShowField field="${standardFieldSpecs.sourceRoom}" fieldValue="${roomSource?.roomName}"/>
-						<tds:labelForShowField field="${standardFieldSpecs.targetRoom}" fieldValue="${roomTarget?.roomName}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceRoom}" value="${assetEntity.sourceRoom}"/>
+						<tds:labelForShowField field="${standardFieldSpecs.sourceRoom}" value="${roomSource?.roomName}"/>
+						<tds:labelForShowField field="${standardFieldSpecs.targetRoom}" value="${roomTarget?.roomName}"/>
 
 					</tr>
 					<tr class="prop">
-						<tds:showLabelAndField field="${standardFieldSpecs.shortName}" fieldValue="${assetEntity.shortName}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntity.shortName}"/>
 
-						<tds:showLabelAndField field="${standardFieldSpecs.os}" fieldValue="${assetEntity.os}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.os}" value="${assetEntity.os}"/>
 
 						<%-- The following fields will be displayed based on the assetType --%>
 						<%-- rackable --%>
-						<tds:inputLabel field="${standardFieldSpecs.sourceRack}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceRack}" value="${assetEntity.sourceRack}"/>
 
-						<tds:labelForShowField field="${standardFieldSpecs.sourceRack}" fieldValue="${assetEntity.rackSource?.tag}"/>
-						<tds:labelForShowField field="${standardFieldSpecs.targetRack}" fieldValue="${assetEntity.rackTarget?.tag}"/>
+						<tds:labelForShowField field="${standardFieldSpecs.sourceRack}" value="${assetEntity.rackSource?.tag}"/>
+						<tds:labelForShowField field="${standardFieldSpecs.targetRack}" value="${assetEntity.rackTarget?.tag}"/>
 
 						<%-- blade --%>
-						<tds:inputLabel field="${standardFieldSpecs.sourceChassis}"/>
+						<tds:inputLabel field="${standardFieldSpecs.sourceChassis}" value="${assetEntity.sourceChassis}"/>
 						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none">
 							${sourceChassis}
 						</td>
@@ -76,9 +76,9 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<tds:showLabelAndField field="${standardFieldSpecs.serialNumber}" fieldValue="${assetEntity.serialNumber}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntity.serialNumber}"/>
 
-						<tds:showLabelAndField field="${standardFieldSpecs.supportType}" fieldValue="${assetEntity.supportType}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}"/>
 
 						<td class="label ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap"><label for="sourceRack">Position</label></td>
 						<td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}">${assetEntity.sourceRackPosition}</td>
@@ -87,9 +87,9 @@
 						<td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}" style="display: none" >${assetEntity.targetBladePosition}</td>
 					</tr>
 					<tr class="prop">
-						<tds:showLabelAndField field="${standardFieldSpecs.assetTag}" fieldValue="${assetEntity.assetTag}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}"/>
 
-						<tds:inputLabel field="${standardFieldSpecs.retireDate}"/>
+						<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}"/>
 						<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
 							<tds:convertDate date="${assetEntity?.retireDate}" />
 						</td>
@@ -102,20 +102,20 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<tds:showLabelAndField field="${standardFieldSpecs.railType}" fieldValue="${assetEntity.railType}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.railType}" value="${assetEntity.railType}"/>
 
-						<tds:inputLabel field="${standardFieldSpecs.maintExpDate}"/>
+						<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}"/>
 						<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
 							<tds:convertDate date="${assetEntity?.maintExpDate}" />
 						</td>
 
-						<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" fieldValue="${assetEntity.planStatus}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${assetEntity.planStatus}"/>
 
-						<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" fieldValue="${assetEntity.rateOfChange}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntity.rateOfChange}"/>
 
 					</tr>
 					<tr>
-						<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" fieldValue="${assetEntity.externalRefId}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntity.externalRefId}"/>
 
 						<g:if test="! assetEntity.isVM()">
 							<td class="label ${standardFieldSpecs.truck.imp?:''}" nowrap="nowrap">
@@ -125,7 +125,7 @@
 								${assetEntity.truck ?: '   '} / ${assetEntity.cart ?: '   '} / ${assetEntity.shelf ?: '   '}
 							</td>
 						</g:if>
-						<tds:showLabelAndField field="${standardFieldSpecs.validation}" fieldValue="${assetEntity.validation}"/>
+						<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${assetEntity.validation}"/>
 						<td>&nbsp;</td>
 					</tr>
 					<g:render template="customShow" ></g:render>

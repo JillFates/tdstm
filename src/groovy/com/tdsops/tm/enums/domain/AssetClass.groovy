@@ -119,17 +119,18 @@ enum AssetClass {
 	static String getDomainForAssetType(String assetType) {
 		String domain
 		if(!StringUtil.isBlank(assetType)){
+			assetType = assetType.toUpperCase()
 			switch (assetType) {
-				case "Application":
+				case "APPLICATION":
 					domain = "Application"
 					break
-				case "Files":
+				case "FILES":
 					domain = "Storage"
 					break
-				case "Database":
+				case "DATABASE":
 					domain = "Database"
 					break
-				case "AssetEntity":
+				case "ASSETENTITY":
 					domain = "Device"
 					break
 			}
