@@ -99,7 +99,9 @@
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
-							<td class="valueNW" colspan="3"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+							<td class="name"><label>Plan Methodology:</label></td>
+							<td class="valueNW"> ${planMethodology?.label} </td>
 						</tr>
 					</tbody>
 				</table>
