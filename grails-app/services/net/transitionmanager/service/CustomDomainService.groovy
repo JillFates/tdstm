@@ -11,6 +11,9 @@ class CustomDomainService implements ServiceMethods {
     public static final String ALL_ASSET_CLASSES = "ASSETS"
     public static final String CUSTOM_FIELD_NAME_PART = "custom"
 
+    public static final int USER_DEFINED_FIELD = 1
+    public static final int DEFINED_FIELD = 0
+
     SecurityService securityService
     SettingService settingService
     AssetEntityService assetEntityService
@@ -23,7 +26,25 @@ class CustomDomainService implements ServiceMethods {
      */
     Map customFieldSpecs(String domain, boolean showOnly = false) {
         Project currentProject = securityService.loadUserCurrentProject()
-        return getFilteredFieldSpecs(currentProject, domain, 1, showOnly)
+        return getFilteredFieldSpecs(currentProject, domain, USER_DEFINED_FIELD, showOnly)
+    }
+
+    List<Map> customFieldsList(String domain) {
+        Map applicationCustomFieldsSpec = customFieldSpecs(domain)
+
+        Set<Map.Entry> entrySet = applicationCustomFieldsSpec?.entrySet()
+
+        // Get all the fields in the set
+        List<Map> fields = entrySet?.getAt(0).value?.fields
+        if (!fields) {
+            fields = []
+        }
+
+        return fields
+    }
+
+    Map findCustomField(String domain, Closure findClodure) {
+        customFieldsList(domain)?.find(findClodure)
     }
 
     /**
@@ -33,7 +54,7 @@ class CustomDomainService implements ServiceMethods {
      */
     Map standardFieldSpecsByField(String domain) {
         Project currentProject = securityService.loadUserCurrentProject()
-        Map fieldSpecs = getFilteredFieldSpecs(currentProject, domain, 0)
+        Map fieldSpecs = getFilteredFieldSpecs(currentProject, domain, DEFINED_FIELD)
         Map domainFieldSpecs = createFieldSpecsViewMap(fieldSpecs, domain)
         return domainFieldSpecs
     }
@@ -45,7 +66,7 @@ class CustomDomainService implements ServiceMethods {
      * @return
      */
     Map standardFieldSpecsByField(Project project, String domain) {
-        Map fieldSpecs = getFilteredFieldSpecs(project, domain, 0)
+        Map fieldSpecs = getFilteredFieldSpecs(project, domain, DEFINED_FIELD)
         Map domainFieldSpecs = createFieldSpecsViewMap(fieldSpecs, domain)
         return domainFieldSpecs
     }
