@@ -1,5 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
@@ -15,6 +16,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/list/field-settings-list.component.html'
 })
 export class FieldSettingsListComponent implements OnInit {
+	@ViewChildren('grid') grids: QueryList<FieldSettingsGridComponent>;
 	public domains: DomainModel[] = [];
 	private dataSignature: string;
 	selectedTab = '';
@@ -129,5 +131,61 @@ export class FieldSettingsListComponent implements OnInit {
 			.sort((a, b) => a - b);
 		let number = custom.findIndex((item, i) => item !== i + 1);
 		callback('custom' + ((number === -1 ? custom.length : number) + 1));
+	}
+
+	protected onShare(value: { field: FieldSettingsModel, domain: string }): void {
+		if (value.field['isNew']) {
+			this.handleSharedField(value.field, value.domain);
+		} else {
+			if (value.field.shared) {
+				this.prompt.open(
+					'Confirmation Required',
+					`This will overwrite field ${value.field.field}. Do you want to continue?`,
+					'Confirm', 'Cancel').then(result => {
+						if (result) {
+							this.handleSharedField(value.field, value.domain);
+						} else {
+							value.field.shared = false;
+						}
+					});
+			} else {
+				this.handleSharedField(value.field, value.domain);
+			}
+		}
+	}
+
+	protected onDelete(value: { field: FieldSettingsModel, domain: string, callback: any }): void {
+		this.domains.filter(domain =>
+			value.field.shared ?
+				true : domain.domain === value.domain).forEach(domain => {
+					domain.fields.splice(domain.fields.indexOf(value.field), 1);
+				});
+		this.refreshGrids(value.field.shared, value.callback);
+	}
+
+	public refreshGrids(all, callback: any) {
+		if (all) {
+			this.grids.forEach(grid => grid.refresh());
+		} else {
+			callback();
+		}
+	}
+
+	protected handleSharedField(field: FieldSettingsModel, domain: string) {
+		this.domains
+			.filter(d => d.domain !== domain)
+			.forEach(d => {
+				let indexOf = d.fields.findIndex(f => f.field === field.field);
+				if (field.shared) {
+					if (indexOf === -1) {
+						d.fields.push(field);
+					} else {
+						d.fields.splice(indexOf, 1, field);
+					}
+				} else {
+					d.fields.splice(indexOf, 1, { ...field });
+				}
+			});
+		this.refreshGrids(true, null);
 	}
 }

@@ -20,10 +20,22 @@ export class FieldSettingsService {
 		return this.http.get(`${this.fieldSettingsUrl}/${domain}`)
 			.map((res: Response) => {
 				let response = res.json();
-				return Object.keys(response).map(key => {
+				let domains: DomainModel[] = Object.keys(response).map(key => {
 					response[key].domain = response[key].domain.toUpperCase();
 					return response[key];
 				});
+				if (domain.length > 0) {
+					let sharedFields = domains[0].fields.filter(x => x.shared);
+					domains.forEach(d => {
+						sharedFields.forEach(s => {
+							let indexOf = d.fields.findIndex(f => f.field === s.field);
+							if (indexOf !== -1) {
+								d.fields.splice(indexOf, 1, s);
+							}
+						});
+					});
+				}
+				return domains;
 			})
 			.catch((error: any) => error.json());
 	}
