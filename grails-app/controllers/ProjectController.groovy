@@ -25,6 +25,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
@@ -47,6 +48,7 @@ class ProjectController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	AuditService auditService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
@@ -114,9 +116,13 @@ class ProjectController implements ControllerMethods {
 		session.setAttribute('setImage', imageId)
 		boolean isDeleteable = securityService.hasPermission(Permission.ProjectDelete) && !project.isDefaultProject()
 
+		Map planMethodology = customDomainService.findCustomField("application") {
+			it.field == project.planMethodology
+		}
+
 		[projectInstance: project, projectPartners: partyRelationshipService.getProjectPartners(project),
 		 projectManagers: projectService.getProjectManagers(project), projectLogoForProject: projectLogo,
-		 isDeleteable: isDeleteable]
+		 isDeleteable: isDeleteable, planMethodology:planMethodology]
 	}
 
 	/**
@@ -153,6 +159,8 @@ class ProjectController implements ControllerMethods {
 			projectDetails = projectService.getprojectEditDetails(project)
 			moveBundles = MoveBundle.findAllByProject(project)
 
+			List<Map> planMethodologies = customDomainService.customFieldsList("application")
+
 			List projectManagers = projectService.getProjectManagers(project)
 			projectManagers.sort { a,b ->
 				a.firstName <=> b.firstName ?: a.lastName <=> b.lastName
@@ -172,7 +180,8 @@ class ProjectController implements ControllerMethods {
 				workflowCodes: projectDetails.workflowCodes,
 				projectPartners: projectPartners,
 				projectManagers: projectManagers,
-				moveBundles:moveBundles
+				moveBundles:moveBundles,
+				planMethodologies: planMethodologies
 			]
 		}
 	}
@@ -225,6 +234,7 @@ class ProjectController implements ControllerMethods {
 				def projectPartners = partyRelationshipService.getProjectPartners(project)
 				def projectManagers = projectService.getProjectManagers(project)
 				def moveBundles = MoveBundle.findAllByProject(project)
+				List<Map> planMethodologies = customDomainService.customFieldsList("application")
 
 				def model = [
 						company: company,
@@ -238,10 +248,11 @@ class ProjectController implements ControllerMethods {
 						companyPartners: projectDetails.companyPartners,
 						workflowCodes: projectDetails.workflowCodes,
 						projectLogoForProject: projectDetails.projectLogoForProject,
-						prevParam:params,
+						prevParam: params,
 						projectPartners: projectPartners,
 						projectManagers: projectManagers,
-						moveBundles:moveBundles
+						moveBundles: moveBundles,
+						planMethodologies: planMethodologies
 				]
 
 				render(view: 'edit', model: model)
@@ -278,6 +289,7 @@ class ProjectController implements ControllerMethods {
 				def projectPartners = partyRelationshipService.getProjectPartners(project)
 				def projectManagers = projectService.getProjectManagers(project)
 				def moveBundles = MoveBundle.findAllByProject(project)
+				List<Map> planMethodologies = customDomainService.customFieldsList("application")
 
 				def model = [
 						company: company,
@@ -294,7 +306,8 @@ class ProjectController implements ControllerMethods {
 						prevParam:params,
 						projectPartners: projectPartners,
 						projectManagers: projectManagers,
-						moveBundles:moveBundles
+						moveBundles:moveBundles,
+						planMethodologies: planMethodologies
 				]
 
 				render(view: 'edit', model: model)
@@ -309,10 +322,11 @@ class ProjectController implements ControllerMethods {
 	def create() {
 		PartyGroup company = securityService.userLoginPerson.company
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
+		List<Map> planMethodologies = customDomainService.customFieldsList("application")
 
 		[clients: projectDetails.clients, company: company, managers: projectDetails.managers,
 		 partners: projectDetails.partners, projectInstance: new Project(params),
-		 workflowCodes: projectDetails.workflowCodes]
+		 workflowCodes: projectDetails.workflowCodes, planMethodologies:planMethodologies]
 	}
 
 	/**
