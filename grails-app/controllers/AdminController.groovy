@@ -1651,20 +1651,21 @@ class AdminController implements ControllerMethods {
 	}
 
 	/**
-	 *  The admin control home page.
+	 * Model Alias Conflicts
+	 * @return list of model alias conflicts (result set)
 	 */
 	@HasPermission(Permission.ModelEdit)
 	def modelConflicts() {
 
-		String query = """
-			SELECT mfg.name as mfg, m.model_id as model_id, m.name as model_name
-			from model m
-			join model_alias ma on ma.manufacturer_id = m.manufacturer_id and ma.name=m.name
-			join manufacturer mfg on mfg.manufacturer_id = m.manufacturer_id
-			order by mfg.name, m.name """
+		String modelConflictsQuery = """
+			SELECT mfg.name AS mfg, m.model_id AS model_id, m.name AS model_name
+			FROM model m
+			JOIN model_alias ma ON ma.manufacturer_id = m.manufacturer_id AND ma.name=m.name
+			JOIN manufacturer mfg ON mfg.manufacturer_id = m.manufacturer_id
+			ORDER BY mfg.name, m.name """
 
-		/*TODO: keep adding code to controller ...*/
+		def conflictList = jdbcTemplate.queryForList(modelConflictsQuery)
 
-		[recentUsers: recentUsers, moveEventsList: moveEventsList, upcomingBundles: upcomingBundles]
+		[conflictList: conflictList]
 	}
 }

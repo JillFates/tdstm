@@ -135,6 +135,9 @@ a:hover {
 							</td>
 
 							<td>
+								<tds:hasPermission permission="${Permission.ModelEdit}">
+									<g:link controller="admin" action="modelConflicts" style="color:black">Model / Alias Conflicts</g:link>
+								</tds:hasPermission>
 							</td>
 						</tr>
 
