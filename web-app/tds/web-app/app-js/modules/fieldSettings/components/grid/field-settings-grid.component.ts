@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
-import { FieldSettingsService } from '../../service/field-settings.service';
 
 import { UILoaderService } from '../../../../shared/services/ui-loader.service';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
@@ -16,6 +15,7 @@ declare var jQuery: any;
 	moduleId: module.id,
 	selector: 'field-settings-grid',
 	encapsulation: ViewEncapsulation.None,
+	exportAs: 'fieldSettingsGrid',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/grid/field-settings-grid.component.html',
 	styles: [`
 		.float-right { float: right;}
@@ -27,6 +27,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Output('save') saveEmitter = new EventEmitter<any>();
 	@Output('cancel') cancelEmitter = new EventEmitter<any>();
 	@Output('add') addEmitter = new EventEmitter<any>();
+	@Output('share') shareEmitter = new EventEmitter<any>();
+	@Output('delete') deleteEmitter = new EventEmitter<any>();
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
@@ -63,9 +65,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	];
 	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
 
-	constructor(
-		private fieldService: FieldSettingsService,
-		private loaderService: UILoaderService) { }
+	constructor(private loaderService: UILoaderService) { }
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
@@ -140,8 +140,13 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onDelete(dataItem: FieldSettingsModel): void {
-		this.fieldsSettings.splice(this.fieldsSettings.indexOf(dataItem), 1);
-		this.refresh();
+		this.deleteEmitter.emit({
+			field: dataItem,
+			domain: this.data.domain,
+			callback: () => {
+				this.refresh();
+			}
+		});
 	}
 
 	protected onAddCustom(): void {
@@ -161,6 +166,13 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	protected onShare(field: FieldSettingsModel) {
+		this.shareEmitter.emit({
+			field: field,
+			domain: this.data.domain
+		});
+	}
+
 	protected onClearTextFilter(): void {
 		this.filter.search = '';
 		this.onFilter();
@@ -177,7 +189,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.fieldsSettings = this.data.fields;
 	}
 
-	protected refresh(): void {
+	public refresh(): void {
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 

@@ -64,7 +64,7 @@
     <kendo-grid-column field="shared" title="Shared" [width]="65" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else sharedTemp" let-dataItem>
             <div class="checkbox text-center">
-                <label><input type="checkbox" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="required"></label>
+                <label><input type="checkbox" (change)="onShare(dataItem)" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="required"></label>
             </div>
         </ng-template>
         <ng-template kendoGridCellTemplate class="text-center" let-dataItem #sharedTemp>
