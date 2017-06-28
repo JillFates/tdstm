@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
+import org.apache.commons.lang3.ObjectUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
@@ -32,13 +33,10 @@ class CustomDomainService implements ServiceMethods {
     List<Map> customFieldsList(String domain) {
         Map applicationCustomFieldsSpec = customFieldSpecs(domain)
 
-        Set<Map.Entry> entrySet = applicationCustomFieldsSpec?.entrySet()
-
         // Get all the fields in the set
-        List<Map> fields = entrySet?.getAt(0).value?.fields
-        if (!fields) {
-            fields = []
-        }
+        List<Map> fields = applicationCustomFieldsSpec[domain.toUpperCase()]?.fields
+
+		fields = ObjectUtils.defaultIfNull(fields, [])
 
         return fields
     }
@@ -143,12 +141,19 @@ class CustomDomainService implements ServiceMethods {
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
         for (String assetClass : assetClassTypes) {
             def fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, domain.toUpperCase())
-            fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecMap
-            if (showOnly) {
-                fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll({ field -> field.udf == udf && field.show == 1})
-            } else {
-                fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll({ field -> field.udf == udf })
-            }
+
+			if(fieldSpecMap != null) {
+				fieldSpec["${assetClass.toUpperCase()}"] = fieldSpecMap
+
+				Closure filterClosure
+				if (showOnly) {
+					filterClosure = { field -> field.udf == udf && field.show == 1 }
+				} else {
+					filterClosure = { field -> field.udf == udf }
+				}
+
+				fieldSpec["${assetClass.toUpperCase()}"]["fields"] = fieldSpecMap["fields"].findAll( filterClosure )
+			}
         }
 
         return fieldSpec
