@@ -57,7 +57,7 @@
     </kendo-grid-column>
     <kendo-grid-column field="label" title="Label" [width]="150">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="text" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label" name="label">
+            <input type="text" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label" id="{{dataItem.field}}" name="{{dataItem.field}}">
             <span *ngIf="!dataItem.udf">{{dataItem.label}}</span>
         </ng-template>
     </kendo-grid-column>
@@ -107,7 +107,7 @@
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="control" title="Control" [width]="150">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
+        <ng-template kendoGridCellTemplate *ngIf="isEditing; else controlTemp" let-dataItem>
             <div *ngIf="dataItem.udf">
                 <select class="form-control" style="float:left;width:100px" (change)="onControlChange(dataItem,selectList,minMax)" name="control"
                     id="control" [(ngModel)]="dataItem.control">
@@ -118,6 +118,9 @@
                 <min-max-configuration-popup #minMax="minmaxConfig" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
             </div>
             <span *ngIf="!dataItem.udf">{{dataItem.control}}</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate #controlTemp let-dataItem>
+            {{dataItem.control=='Select List'?'List':dataItem.control}}
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
