@@ -35,32 +35,57 @@ if (!csvData) {
 	println "Failed to read $sourceFile"
 }
 def data = new CsvParser().parse(csvData)
-int order=0
+// int order=0
 String domain=''
 String mapKey=''
 for (line in data) {
 	if (domain != line.domain) {
-		order = 0
+		// order = 0
 		domain = line.domain
 		mapKey = domain.toUpperCase()
 	}
-	println "$order) $line"
-	map[mapKey].fields.add(
-		[
-			field: line.field,
-			label: line.label,
-			tip: "This field is the ${line.label}",
-			udf: (line.field.startsWith('custom') ? 1 : 0 ),
-			default: '',
-			shared: 0,
-			show: 1,
-			control: '',
-			order: ++order,
-			imp: 'I',
-			constraints: [
-				required: (line.field == 'assetName' ? 1 : 0),
-			]
-		] )
+	if (line.order == -1) {
+		// Skip properties marked to be removed
+		continue
+	}
+	// println "$order) $line"
+
+	Map spec = [
+		field: line.field,
+		label: line.label,
+		tip: "This field is the ${line.label}",
+		udf: (line.field.startsWith('custom') ? 1 : 0 ),
+		default: '',
+		shared: 0,
+		show: (line.show == 'true' ? 1 : 0 ),
+		control: line.control,
+		order: line.order,
+		imp: 'I',
+		constraints: [
+			required: (line.field == 'assetName' ? 1 : 0),
+		]
+	]
+
+	// Put in some example data
+	if (line.label == 'Plan Strategy') {
+		switch(mapKey) {
+			case 'APPLICATION':
+				spec.constraints.values=['Rehost', 'Refactor', 'Revise', 'Rebuild', 'Replace', 'Retire']
+				break
+			case 'DATABASE':
+				spec.constraints.values=['Replication', 'Backup/Restore', 'Log Shipping', 'LUN replication']
+				break
+			case 'DEVICE':
+				spec.constraints.values=['Lift&Shift', 'Rebuild', 'P2V', 'V2C']
+				break
+			case 'STORAGE':
+				spec.constraints.values=['Replication', 'Backup/Restore', 'Mirror']
+				break
+		}
+	}
+
+	map[mapKey].fields.add(spec)
+
 }
 
 // Write the whole map out
