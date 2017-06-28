@@ -123,7 +123,7 @@
 						</g:if>
 					</tds:hasPermission>
 					<span class="button">
-						<g:actionSubmit class="show" value="Field Settings" action="fieldImportance" />
+						<input class="show" type="button" value="Field Settings" onclick="window.location='${createLink(controller:'module', action: 'fieldsettings')}/list';" />
 					</span>
 				</g:form>
 			</div>
