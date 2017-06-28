@@ -1,10 +1,9 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
+
 import { UILoaderService } from '../../../../shared/services/ui-loader.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
 
@@ -25,8 +24,11 @@ declare var jQuery: any;
 	`]
 })
 export class FieldSettingsGridComponent implements OnInit {
+	@Output('save') saveEmitter = new EventEmitter<any>();
+	@Output('cancel') cancelEmitter = new EventEmitter<any>();
+
 	@Input('data') data: DomainModel;
-	private dataSignature: string;
+	@Input('state') gridState: any;
 	private fieldsSettings: FieldSettingsModel[];
 
 	private filter = {
@@ -48,9 +50,9 @@ export class FieldSettingsGridComponent implements OnInit {
 			logic: 'or'
 		}
 	};
+
 	private isEditing = false;
 	private isFilterDisabled = false;
-	private isSubmitted = false;
 	private sortable: boolean | object = { mode: 'single' };
 
 	private availableControls = [
@@ -62,13 +64,10 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	constructor(
 		private fieldService: FieldSettingsService,
-		private permissionService: PermissionService,
-		private prompt: UIPromptService,
 		private loaderService: UILoaderService) { }
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
-		this.dataSignature = JSON.stringify(this.data);
 		this.refresh();
 	}
 
@@ -126,32 +125,17 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onSaveAll(): void {
-		if (this.isEditAvailable() && this.isValid()) {
+		this.saveEmitter.emit(() => {
 			this.reset();
-			this.fieldsSettings.filter(x => x['isNew']).forEach(x => delete x['isNew']);
-			this.fieldService.saveFieldSettings(this.data)
-				.subscribe((res) => this.refresh(true));
-		} else {
-			this.isSubmitted = true;
-			this.refresh();
-		}
+		});
+
 	}
 
 	protected onCancel(): void {
-		if (this.isDirty()) {
-			this.prompt.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
-						this.reset();
-						this.refresh(true);
-					}
-				});
-		} else {
+		this.cancelEmitter.emit(() => {
 			this.reset();
 			this.refresh();
-		}
+		});
 	}
 
 	protected onDelete(dataItem: FieldSettingsModel): void {
@@ -181,29 +165,17 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected reset(): void {
 		this.isEditing = false;
-		this.isSubmitted = false;
 		this.sortable = { mode: 'single' };
 		this.isFilterDisabled = false;
 		this.state.sort = [{
 			dir: 'asc',
 			field: 'order'
 		}];
+		this.fieldsSettings = this.data.fields;
 	}
 
-	protected refresh(fetch = false): void {
-		if (fetch) {
-			this.fieldService.getFieldSettingsByDomain(this.data.domain).subscribe(
-				(result) => {
-					if (result[0]) {
-						this.data = result[0];
-						this.fieldsSettings = this.data.fields;
-						this.refresh();
-					}
-				},
-				(err) => console.log(err));
-		} else {
-			this.gridData = process(this.fieldsSettings, this.state);
-		}
+	protected refresh(): void {
+		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
 	protected availableCustomNumbers(): string {
@@ -213,19 +185,6 @@ export class FieldSettingsGridComponent implements OnInit {
 			.sort((a, b) => a - b);
 		let number = custom.findIndex((item, i) => item !== i + 1);
 		return 'custom' + ((number === -1 ? custom.length : number) + 1);
-	}
-
-	protected isEditAvailable(): boolean {
-		return this.permissionService.hasPermission('ProjectFieldSettingsEdit');
-	}
-
-	protected isValid(): boolean {
-		return this.fieldsSettings.filter(item =>
-			!item.label || !item.field).length === 0;
-	}
-
-	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.data);
 	}
 
 	protected onControlChange(
