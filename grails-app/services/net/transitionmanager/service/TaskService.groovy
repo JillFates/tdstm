@@ -3318,6 +3318,31 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// or a numeric value
 		task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
 
+		if (taskSpec.containsKey("docLink")) {
+			String docLink = taskSpec["docLink"]
+			if (docLink[0] == "#") {
+				docLink = docLink.substring(1)
+				Class fieldType = GormUtil.getDomainPropertyTypeForClass(AssetComment, docLink)
+				// If the property doesn't exist, report the error.
+				if (fieldType == null) {
+					exceptions.append("Error while setting the docLink. Reference $docLink not found for taskSpec $id <br>")
+				// If the field is not applicable, add the error.
+				} else if (fieldType != java.lang.String) {
+					exceptions.append("Error while setting the docLink. TaskSpec $id references $docLink, which is not applicable.<br>")
+				} else{
+					// Use the original value, which still has the #.
+					task.instructionsLink = taskSpec["docLink"]
+				}
+			} else {
+				// If it doesn't have a valid InstructionsLink format, report the error.
+				if (! HtmlUtil.isMarkupURL(docLink)) {
+					exceptions.append("Error while setting the docLink. $docLink is not a valid URL for taskSpec $id .<br>")
+				} else {
+					task.instructionsLink = docLink
+				}
+			}
+		}
+
 		// Set the duration appropriately
 		if (taskSpec.containsKey('duration')) {
 			errMsg = setTaskDuration(task, taskSpec.duration)

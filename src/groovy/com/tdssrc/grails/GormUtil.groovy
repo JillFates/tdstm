@@ -893,6 +893,18 @@ public class GormUtil {
 	 * @return the class name of the property as a string
 	 */
 	static Class getDomainPropertyType(Object domainObject, String property) {
-		GrailsClassUtils.getPropertyType(domainObject.getClass(), property)
+		return getDomainPropertyTypeForClass(domainObject.getClass(), property)
+	}
+
+	/**
+	 * Returns the data type for a given property on domain class.
+	 *
+	 * @param clazz : the class to inspect.
+	 * @param property : the property to look up.
+	 *
+	 * @return the data type, null if the property doesn't exist.
+	 */
+	static Class getDomainPropertyTypeForClass(Class clazz, String property) {
+		return GrailsClassUtils.getPropertyType(clazz, property)
 	}
 }

@@ -1,12 +1,13 @@
 package net.transitionmanager.service
-
 import com.tds.asset.Application
+import com.tds.asset.AssetComment
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
@@ -784,6 +785,32 @@ class CookbookService implements ServiceMethods {
 						detail: "$label in element $i must be either true or false"]
 				}
 
+				// For docLink we support valid URLs and any #string referencing another string field.
+				if (n == "docLink") {
+					if (v) {
+						// Check for #string
+						if (v[0] == "#") {
+							v = v.substring(1)
+							Class fieldType = GormUtil.getDomainPropertyTypeForClass(AssetComment, v)
+							// If the property doesn't exist, report the error.
+							if (fieldType == null) {
+								errorList << [error: 1, reason: 'Invalid Reference',
+									detail: "$label in element $i contains unknown indirect reference '$v'"]
+							// If the field is not a string.
+							} else if (fieldType != java.lang.String) {
+								errorList << [error: 1, reason: 'Invalid Reference',
+									detail: "$label in element $i references a field that is not applicable: '$v'"]
+							}
+						} else {
+							// If it doesn't have a valid InstructionsLink format, report the error.
+							if (! HtmlUtil.isMarkupURL(v)) {
+								errorList << [error: 1, reason: 'Invalid Markup',
+									detail: "$label in element $i contains invalid markup '$v'"]
+							}
+						}
+					}
+				}
+
 				if (n=="category" && !(v in AssetCommentCategory.list)) {
 					errorList << [error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'"]
@@ -900,7 +927,8 @@ class CookbookService implements ServiceMethods {
 			],
 			constraintTime:0,
 			constraintType:0,
-			class:['device','database','application','storage']
+			class:['device','database','application','storage'],
+			docLink:0,
 		]
 
 		def teamCodes = []
