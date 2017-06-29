@@ -309,7 +309,7 @@ class ApplicationController implements ControllerMethods {
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
-
+		def customs = assetEntityService.getCustomFieldsSettings("Application", true)
 		[applicationInstance: application, assetTypeOptions: assetTypeOptions?.value, moveBundleList: moveBundleList,
 			planStatusOptions: planStatusOptions?.value, projectId: project.id, project: project,moveEventList: moveEventList,
 			config: configMap.config, customs: configMap.customs, personList: personList, company: project.client,
@@ -332,7 +332,7 @@ class ApplicationController implements ControllerMethods {
 			renderErrorJson(errorMsg)
 			return
 		}
-
+		
 		applicationService.getModelForShow(project, app, params)
 	}
 

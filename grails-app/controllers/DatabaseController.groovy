@@ -255,10 +255,10 @@ class DatabaseController implements ControllerMethods {
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		//fieldImportance for Discovery by default
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField('Database')
-
+		def customs = assetEntityService.getCustomFieldsSettings("Database", true)
 		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 		 planStatusOptions:planStatusOptions?.value, projectId: project.id, project:project,
-		 environmentOptions:environmentOptions?.value, standardFieldSpecs: standardFieldSpecs]
+		 environmentOptions:environmentOptions?.value, standardFieldSpecs: standardFieldSpecs, customs: customs]
 	}
 
 	@HasPermission(Permission.AssetEdit)
