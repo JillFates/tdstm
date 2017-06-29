@@ -1,19 +1,23 @@
 /**
  * Created by daviD on 04/06/2017.
  */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
-import { DebugElement } from '@angular/core';
-import { PopupModule } from '@progress/kendo-angular-popup';
-import { SortableModule } from '@progress/kendo-angular-sortable';
-import { FormsModule } from '@angular/forms';
-import { SharedModule } from '../../../shared/shared.module';
+
 import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FieldSettingsModel } from '../model/field-settings.model';
-import { CustomDomainService } from '../service/custom-domain.service';
 import { Observable } from 'rxjs/Rx';
 import { HttpModule, Http } from '@angular/http';
+
+import { PopupModule } from '@progress/kendo-angular-popup';
+import { SortableModule } from '@progress/kendo-angular-sortable';
+import { DialogModule } from '@progress/kendo-angular-dialog';
+
+import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
+import { SharedModule } from '../../../shared/shared.module';
+import { FieldSettingsModel } from '../model/field-settings.model';
+import { CustomDomainService } from '../service/custom-domain.service';
 
 describe('SelectListConfigurationPopupComponent:', () => {
 	let fixture: ComponentFixture<SelectListConfigurationPopupComponent>;
@@ -43,7 +47,9 @@ describe('SelectListConfigurationPopupComponent:', () => {
 				SharedModule,
 				FormsModule,
 				PopupModule,
-				SortableModule],
+				SortableModule,
+				DialogModule
+			],
 			declarations: [SelectListConfigurationPopupComponent],
 			providers: [CustomDomainService]
 		}).compileComponents();
