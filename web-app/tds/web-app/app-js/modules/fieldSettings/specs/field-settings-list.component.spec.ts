@@ -11,6 +11,7 @@ import { Observable } from 'rxjs/Rx';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { SortableModule } from '@progress/kendo-angular-sortable';
+import { DialogModule } from '@progress/kendo-angular-dialog';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
@@ -69,7 +70,8 @@ describe('FieldSettingsListComponent:', () => {
 				SharedModule,
 				GridModule,
 				PopupModule,
-				SortableModule
+				SortableModule,
+				DialogModule
 			],
 			declarations: [
 				FieldSettingsListComponent,
