@@ -124,6 +124,7 @@ export class FieldSettingsListComponent implements OnInit {
 
 	protected onAdd(callback): void {
 		let custom = this.domains
+			.filter(domain => domain.domain === this.selectedTab)
 			.reduce((p: FieldSettingsModel[], c: DomainModel) => p.concat(c.fields), [])
 			.filter(item => item.udf)
 			.map((item) => +item.field.replace(/[a-z]/ig, ''))
@@ -134,24 +135,21 @@ export class FieldSettingsListComponent implements OnInit {
 	}
 
 	protected onShare(value: { field: FieldSettingsModel, domain: string }): void {
-		if (value.field['isNew']) {
-			this.handleSharedField(value.field, value.domain);
+		if (value.field.shared) {
+			this.prompt.open(
+				'Confirmation Required',
+				`This will overwrite field ${value.field.field}. Do you want to continue?`,
+				'Confirm', 'Cancel').then(result => {
+					if (result) {
+						this.handleSharedField(value.field, value.domain);
+					} else {
+						value.field.shared = false;
+					}
+				});
 		} else {
-			if (value.field.shared) {
-				this.prompt.open(
-					'Confirmation Required',
-					`This will overwrite field ${value.field.field}. Do you want to continue?`,
-					'Confirm', 'Cancel').then(result => {
-						if (result) {
-							this.handleSharedField(value.field, value.domain);
-						} else {
-							value.field.shared = false;
-						}
-					});
-			} else {
-				this.handleSharedField(value.field, value.domain);
-			}
+			this.handleSharedField(value.field, value.domain);
 		}
+
 	}
 
 	protected onDelete(value: { field: FieldSettingsModel, domain: string, callback: any }): void {
