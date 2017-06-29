@@ -127,7 +127,7 @@
                     <option value="">Select...</option>
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
-                <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
+                <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem" *ngIf="dataItem.control==='Select List'"></selectlist-configuration-popup>
                 <min-max-configuration-popup #minMax="minmaxConfig" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
             </div>
             <span *ngIf="!dataItem.udf">{{dataItem.control}}</span>
