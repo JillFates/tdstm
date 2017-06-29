@@ -254,12 +254,11 @@ class DatabaseController implements ControllerMethods {
 		Project project = securityService.userCurrentProject
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		//fieldImportance for Discovery by default
-		def configMap = assetEntityService.getConfig('Database','Discovery')
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField('Database')
 
 		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 		 planStatusOptions:planStatusOptions?.value, projectId: project.id, project:project,
-		 config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, standardFieldSpecs: standardFieldSpecs]
+		 environmentOptions:environmentOptions?.value, standardFieldSpecs: standardFieldSpecs]
 	}
 
 	@HasPermission(Permission.AssetEdit)
