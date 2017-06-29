@@ -16,6 +16,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_CUSTOM': 'Create User Defined Field'
 	},
 	'GLOBAL': {
+		'OK': 'Ok',
 		'ADD': 'Add',
 		'CANCEL': 'Cancel',
 		'CLOSE': 'Close',

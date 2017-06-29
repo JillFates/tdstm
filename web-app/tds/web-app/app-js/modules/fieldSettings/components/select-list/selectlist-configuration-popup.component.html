@@ -47,7 +47,7 @@
             <kendo-dialog-actions>
                 <div class="button-dialog-actions text-right">
                     <button name="saveButton" class="btn btn-default btn-sm" [disabled]="items.length === 0" (click)="onSave()">
-                        <i class="fa fa-check"></i> OK
+                        <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
                     </button>
                     <button name="cancelButton" class="btn btn-default btn-sm" (click)="onToggle()">
                         <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}
@@ -62,6 +62,7 @@
 
 </div>
 
+<!--  OLD POPUP CODE  --->
 <!--
 <div style="float:right;" *ngIf="field.control==='Select List'">
     <div #openText (click)="onToggle()" class="open-close-dropdown-container text-center">
