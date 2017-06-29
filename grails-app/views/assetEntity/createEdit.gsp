@@ -200,7 +200,7 @@
 
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
 									<span class="useRackS">
-										<g:render template="deviceRackSelect" model="[clazz:config.sourceRack, options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id,
+										<g:render template="deviceRackSelect" model="[clazz:standardFieldSpecs.sourceRack.imp?:'', options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id,
 											rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
 									</span>
 									<span class="newRackS">
@@ -215,7 +215,7 @@
 							</td>
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
 									<span class="useRackT">
-										<g:render template="deviceRackSelect"  model="[clazz:config.targetRack, options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
+										<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 											rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
 									</span>
 									<span class="newRackT">
@@ -233,7 +233,7 @@
 										<g:render template="deviceChassisSelect"
 												  model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
 												options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
-												domClass: config.sourceChassis,
+												domClass: standardFieldSpecs.sourceChassis.imp?:'',
 												sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"
 												/>
 									</span>
@@ -243,7 +243,7 @@
 										<g:render template="deviceChassisSelect"
 												  model="[ domId:'targetChassisSelectId', domName:'targetChassis',
 												options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
-												domClass: config.targetChassis,
+												domClass: standardFieldSpecs.targetChassis.imp?:'',
 												sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"
 												/>
 									</span>
