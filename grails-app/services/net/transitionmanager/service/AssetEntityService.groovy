@@ -1200,7 +1200,6 @@ class AssetEntityService implements ServiceMethods {
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
 
 		//assert ['Database'].contains(type)
-		def configMap = getConfig(type, asset?.validation ?: 'Discovery')
 
 		//def assetTypeAttribute = getPropertyAttribute('assetType') // TM-6096
 		//def validationType = asset.validation
@@ -1220,8 +1219,6 @@ class AssetEntityService implements ServiceMethods {
 		[assetId: asset.id,
 		 //assetTypeAttribute: assetTypeAttribute,
 		 //assetTypeOptions: getDeviceAssetTypeOptions(),
-		 config: configMap.config,
-		 customs: configMap.customs,
 		 // dependencyStatus: getDependencyStatuses(), // TM-6096
 		 // dependencyType: getDependencyTypes(), // TM-6096
 		 // dependentAssets: dependentAssets, // TM-6096
@@ -1265,7 +1262,6 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		def projectAttributes = projectService.getAttributes(type)
-		def configMap = getConfig(type, assetEntity.validation, projectAttributes)
 		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
 		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
 
@@ -1279,8 +1275,6 @@ class AssetEntityService implements ServiceMethods {
 		[assetId: assetEntity?.id,
 		 assetComment: assetComment,
 		 assetCommentList: AssetComment.findAllByAssetEntity(assetEntity),
-		 config: configMap.config,
-		 customs: configMap.customs,
 		 dependencyBundleNumber: depBundle,
 		 dependentAssets: dependentAssets,
 		 errors: params.errors,
@@ -1556,7 +1550,9 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Get config by entityType and validation
+	 * @deprecated This function is no longer needed.
 	 */
+	@Deprecated
 	Map getConfig(String type, String validation, projectAttributes = null) {
 		Project project = securityService.userCurrentProject
 		def allconfig = projectService.getConfigByEntity(type)
