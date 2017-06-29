@@ -102,8 +102,20 @@
     </kendo-grid-column>
     <kendo-grid-column field="default" title="Default Value">
         <ng-template kendoGridCellTemplate let-dataItem *ngIf="isEditing">
-            <input [disabled]="dataItem.control=='Select List' || dataItem.control=='YesNo'" type="text" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.default" name="default">
+            <input *ngIf="(dataItem.udf) && (dataItem.control!='Select List' && dataItem.control!='YesNo')" type="text" class="form-control" [(ngModel)]="dataItem.default" name="default">
             <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
+
+            <select *ngIf="dataItem.control=='Select List'" class="form-control" name="default" [(ngModel)]="dataItem.default">
+                <option value="">Select...</option>
+                <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
+            </select>
+
+            <select *ngIf="dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default">
+                <option value="">Select...</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="control" title="Control" [width]="150">
