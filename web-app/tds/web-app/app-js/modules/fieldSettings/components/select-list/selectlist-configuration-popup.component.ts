@@ -59,7 +59,7 @@ export class SelectListConfigurationPopupComponent {
 
 	public getStyle(index) {
 		if ((index % 2) === 0) {
-			return { 'background-color': 'white' };
+			return { 'background-color': '#f6f6f6' };
 		}
 	}
 
