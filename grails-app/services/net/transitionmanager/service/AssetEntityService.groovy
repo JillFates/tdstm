@@ -1157,6 +1157,7 @@ class AssetEntityService implements ServiceMethods {
 		model.targetRackSelect = getRackSelectOptions(project, device?.roomTargetId, true)
 
 		model.putAll(getDefaultModelForEdits('AssetEntity', project, device, params))
+		model.customs = getCustomFieldsSettings("AssetEntity", true)
 
 		if (device) {
 			// TODO : JPM 9/2014 : Need to make the value flip based on user pref to show name or tag (enhancement TM-3390)
@@ -1215,6 +1216,7 @@ class AssetEntityService implements ServiceMethods {
 		// Obtains the domain out of the asset type string.
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		def customs = getCustomFieldsSettings(type, true)
 
 		[assetId: asset.id,
 		 //assetTypeAttribute: assetTypeAttribute,
@@ -1236,6 +1238,7 @@ class AssetEntityService implements ServiceMethods {
 		 //servers: servers, // TM-6096
 		 //supportAssets: supportAssets, // TM-6096
 		 version: asset.version,
+		 customs: customs,
 		 standardFieldSpecs: standardFieldSpecs]
 	}
 
@@ -1286,6 +1289,7 @@ class AssetEntityService implements ServiceMethods {
 		 supportAssets: supportAssets,
 		 viewUnpublishedValue: viewUnpublishedValue,
 		 hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
+		 customs: getCustomFieldsSettings(type, true),
 		 standardFieldSpecs: standardFieldSpecs]
 	}
 

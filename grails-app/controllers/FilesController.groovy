@@ -237,12 +237,12 @@ class FilesController implements ControllerMethods {
 		// Obtains the domain out of the asset type string.
 		String domain = AssetClass.getDomainForAssetType('Files')
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
-
+		def customs = assetEntityService.getCustomFieldsSettings("Files", true)
 		[assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
 		 fileInstance: files, moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
 		 planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
 		 environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
-		 standardFieldSpecs: standardFieldSpecs, project:project]
+		 standardFieldSpecs: standardFieldSpecs, project:project, customs: customs]
 	}
 
 	@HasPermission(Permission.AssetView)
