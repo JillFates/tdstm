@@ -38,6 +38,7 @@
                             <th>Manufacturer</th>
                             <th>Model Id</th>
                             <th>Model Name</th>
+                            <th>Alternate Model</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,6 +47,7 @@
                                 <td>${row.mfg}</td>
                                 <td>${row.model_id}</td>
                                 <td>${row.model_name}</td>
+                                <td>${row.alternate_model}</td>
                             </tr>
                         </g:each>
                     </tbody>

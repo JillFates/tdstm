@@ -1658,11 +1658,16 @@ class AdminController implements ControllerMethods {
 	def modelConflicts() {
 
 		String modelConflictsQuery = """
-			SELECT mfg.name AS mfg, m.model_id AS model_id, m.name AS model_name
-			FROM model m
-			JOIN model_alias ma ON ma.manufacturer_id = m.manufacturer_id AND ma.name=m.name
-			JOIN manufacturer mfg ON mfg.manufacturer_id = m.manufacturer_id
-			ORDER BY mfg.name, m.name """
+			SELECT
+            	mfg.name as mfg,
+            	m.model_id as model_id, m.name as model_name,
+            	m2.model_id as alias_model_id,
+            	if(m.model_id=m2.model_id, '', m2.name) as alternate_model
+            FROM model m
+            JOIN model_alias ma ON ma.manufacturer_id = m.manufacturer_id and ma.name=m.name
+            JOIN model m2 ON m2.model_id = ma.model_id
+            JOIN manufacturer mfg on mfg.manufacturer_id = m.manufacturer_id
+            ORDER BY mfg.name, m.name """
 
 		def conflictList = jdbcTemplate.queryForList(modelConflictsQuery)
 
