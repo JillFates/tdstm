@@ -14,10 +14,7 @@ export class CustomDomainService {
 
 	getDistinctValues(domain: string, field: FieldSettingsModel): Observable<string[]> {
 		return this.http.post(`../wsCustomDomain/distinctValues/${domain}`, JSON.stringify({ fieldSpec: field }))
-			.map(res => {
-				console.log(res.json());
-				return res.json();
-			})
+			.map(res => res.json())
 			.catch((error: any) => error.json());
 	}
 

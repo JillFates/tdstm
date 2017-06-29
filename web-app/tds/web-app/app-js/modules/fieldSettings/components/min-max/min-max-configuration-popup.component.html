@@ -1,4 +1,4 @@
-<div style="float:right;">
+<div style="float:right;" *ngIf="field.control==='String'">
 
     <div #openText (click)="onToggle()" class="open-close-dropdown-container text-center">
         <i class="open-close-dropdown-icon fa fa-gear"></i>
@@ -6,7 +6,7 @@
 
     <div class="minmax-modal-container">
 
-        <kendo-dialog title="List Configuration" *ngIf="show" (close)="onToggle()">
+        <kendo-dialog title="String Configuration - {{field.field}}" *ngIf="show" (close)="onToggle()">
 
             <div class="modal-container">
                 <div class="text-center">
