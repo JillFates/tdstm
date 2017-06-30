@@ -131,14 +131,21 @@ export class FieldSettingsListComponent implements OnInit {
 			.filter((x, i, dt) => dt.indexOf(x) === i)
 			.sort((a, b) => a - b);
 		let number = custom.findIndex((item, i) => item !== i + 1);
-		callback('custom' + ((number === -1 ? custom.length : number) + 1));
+		if (((number === -1 ? custom.length : number) + 1) <= 96) {
+			callback('custom' + ((number === -1 ? custom.length : number) + 1));
+		} else {
+			this.notifier.broadcast({
+				name: AlertType.DANGER,
+				message: 'Custom fields is limited to 96 fields.'
+			});
+		}
 	}
 
 	protected onShare(value: { field: FieldSettingsModel, domain: string }): void {
 		if (value.field.shared) {
 			this.prompt.open(
 				'Confirmation Required',
-				`This will overwrite field ${value.field.field}. Do you want to continue?`,
+				`This will overwrite field ${value.field.field} in all asset classes. Do you want to continue?`,
 				'Confirm', 'Cancel').then(result => {
 					if (result) {
 						this.handleSharedField(value.field, value.domain);
