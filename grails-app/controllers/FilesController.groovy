@@ -14,6 +14,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.ProjectService
@@ -41,6 +42,7 @@ class FilesController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	CustomDomainService customDomainService
+	AssetService assetService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -238,6 +240,7 @@ class FilesController implements ControllerMethods {
 		String domain = AssetClass.getDomainForAssetType('Files')
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 		def customs = assetEntityService.getCustomFieldsSettings("Files", true)
+		assetService.setCustomDefaultValues(files, customs)
 		[assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
 		 fileInstance: files, moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
 		 planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,

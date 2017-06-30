@@ -15,6 +15,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
@@ -45,6 +46,7 @@ class ApplicationController implements ControllerMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	AssetService assetService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -328,6 +330,7 @@ class ApplicationController implements ControllerMethods {
 		def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
 		def customs = assetEntityService.getCustomFieldsSettings("Application", true)
+		assetService.setCustomDefaultValues(application, customs)
 		[applicationInstance: application, assetTypeOptions: assetTypeOptions?.value, moveBundleList: moveBundleList,
 			planStatusOptions: planStatusOptions?.value, projectId: project.id, project: project,moveEventList: moveEventList,
 			config: configMap.config, customs: configMap.customs, personList: personList, company: project.client,
