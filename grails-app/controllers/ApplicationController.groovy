@@ -129,7 +129,7 @@ class ApplicationController implements ControllerMethods {
 				query.append(" AND ")
 
 				def planMethodology = params.planMethodology
-				if (planMethodology == Application.UNDEFINED) {
+				if (planMethodology == Application.UNKNOWN) {
 					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
 				}else{
 					query.append(" ae.`${customField}` = '${params.planMethodology}' ")

@@ -215,7 +215,6 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			'' == applyTemplate(template, [ field: fs ] )
 	}
 
-	@Ignore
 	void 'Test YesNo inputControl Tag'() {
 		given: 'a fieldSpec for a YesNo control'
 			Map field = [
