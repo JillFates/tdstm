@@ -68,12 +68,12 @@
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntityInstance.assetName}"/>
 							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetEntityInstance.assetName}" />	
+								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetEntityInstance.assetName}" />
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntityInstance.description}"/>
 							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.description}" tabindex="101" value="${assetEntityInstance.description}" />	
+								<tds:inputControl field="${standardFieldSpecs.description}" tabindex="101" value="${assetEntityInstance.description}" />
 							</td>
 						</tr>
 						<tr>
@@ -86,7 +86,7 @@
 									</div>
 								</div>
 							</td>
-							
+
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${assetEntityInstance.environment}"/>
 							<td>
 								<g:select id="environment" name="environment" class="${standardFieldSpecs.environment.imp?:''}" from="${environmentOptions}"
@@ -113,7 +113,7 @@
 									</div>
 								</div>
 							</td>
-							
+
 							<tds:inputLabel field="${standardFieldSpecs.priority}" value="${assetEntityInstance.priority}"/>
 							<td>
 								<g:select id="priority" name ="priority"
@@ -200,7 +200,7 @@
 
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
 									<span class="useRackS">
-										<g:render template="deviceRackSelect" model="[clazz:config.sourceRack, options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id,
+										<g:render template="deviceRackSelect" model="[clazz:standardFieldSpecs.sourceRack.imp?:'', options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id,
 											rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
 									</span>
 									<span class="newRackS">
@@ -215,7 +215,7 @@
 							</td>
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
 									<span class="useRackT">
-										<g:render template="deviceRackSelect"  model="[clazz:config.targetRack, options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
+										<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 											rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
 									</span>
 									<span class="newRackT">
@@ -233,7 +233,7 @@
 										<g:render template="deviceChassisSelect"
 												  model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
 												options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
-												domClass: config.sourceChassis,
+												domClass: standardFieldSpecs.sourceChassis.imp?:'',
 												sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"
 												/>
 									</span>
@@ -243,7 +243,7 @@
 										<g:render template="deviceChassisSelect"
 												  model="[ domId:'targetChassisSelectId', domName:'targetChassis',
 												options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
-												domClass: config.targetChassis,
+												domClass: standardFieldSpecs.targetChassis.imp?:'',
 												sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"
 												/>
 									</span>
@@ -252,7 +252,7 @@
 						</tr>
 						<tr>
 							<tds:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntityInstance.shortName}" tabindex="105"/>
-					
+
 							<tds:inputLabelAndField field="${standardFieldSpecs.os}" value="${assetEntityInstance.os}" tabindex="220"/>
 
 							<%-- Note that the next set of TDs are toggled on/off based on the assetType selected --%>
@@ -304,7 +304,7 @@
 										  tabindex="360"
 										/>
 							</td>
-							
+
 							<tds:inputLabel field="${standardFieldSpecs.size}" value="${assetEntityInstance.size}"/>
 							<td nowrap="nowrap" class="sizeScale">
 								<input type="text" id="size" name="size" class="${standardFieldSpecs.size.imp?:''}" value="${assetEntityInstance.size}" tabindex="410"/>
@@ -342,7 +342,7 @@
 										  tabindex="365"
 										/>
 							</td>
-							
+
 							<tds:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntityInstance.rateOfChange}" tabindex="420"/>
 						</tr>
 						<tr>
@@ -354,7 +354,7 @@
 										  class="${standardFieldSpecs.railType.imp?:''}"
 										  tabindex="108"/>
 							</td>
-							
+
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntityInstance.maintExpDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
 								<input type="text" id="maintExpDate" name="maintExpDate"

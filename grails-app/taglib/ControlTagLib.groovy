@@ -23,7 +23,7 @@ class ControlTagLib {
 	def inputLabel = { Map attrs ->
 		Map fieldSpec = attrs.field ?: [:]
 		if (!fieldSpec) {
-			throw new InvalidParamException('<tds:ifInputRequired> tag requires field=fieldSpec Map')
+			throw new InvalidParamException('<tds:inputLabel> tag requires field=fieldSpec Map')
 		}
 		StringBuilder sb = new StringBuilder("\n")
 
@@ -123,7 +123,7 @@ class ControlTagLib {
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
 
 		// println "attrs=${attrs.keySet()}"
-		// println "tabIndex = $tabIndex"
+		// println "tabIndex = $tabIndex; tabOffset=$tabOffset; fieldSpec.order=${fieldSpec.order}"
 
 		switch (fieldSpec.control) {
 			case 'Select List':
@@ -143,21 +143,20 @@ class ControlTagLib {
 	/**
 	 * Used to render the label and the value for a field in show views.
 	 */
-	def showLabelAndField = {Map attrs ->
+	def showLabelAndField = { Map attrs ->
 		out << inputLabel(attrs)
 		out << labelForShowField(attrs)
-		
+
 	}
 
 	/**
 	 * Used to render the label and the corresponding input in create/edit views.
 	 */
-	def inputLabelAndField = {Map attrs ->
+	def inputLabelAndField = { Map attrs ->
 		out << inputLabel(attrs)
-		out << "<td>"
+		out << '<td>'
 		out << inputControl(attrs)
-		out << "</td>"
-		
+		out << '</td>'
 	}
 
 	/**
@@ -229,9 +228,11 @@ class ControlTagLib {
 	 */
 	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
 		List options = []
+		List valid = ['Yes', 'No']
 
 		StringBuilder sb = new StringBuilder('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
+		sb.append(' style="width: 50px;"')
 		sb.append('>')
 
 		if (fieldSpec.constraints?.required) {
@@ -240,10 +241,8 @@ class ControlTagLib {
 		} else {
 			// Put a blank entry in to allow the user to unset a field
 			options << ['', '']
+			valid << ''
 		}
-
-		options << ['No', 'No']
-		options << ['Yes', 'Yes']
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
 		// If there no match then it will render the option with a warning. This will give the
@@ -251,10 +250,13 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		if (! StringUtil.isBlank(value) && ! options.find{it[0] == value} ) {
+		if ( ! valid.contains(value) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			options << [value, warning]
 		}
+
+		options << ['Yes', 'Yes']
+		options << ['No', 'No']
 
 		// Iterate over the fieldSpec option values to create each of the options
 		for (option in options) {

@@ -44,11 +44,10 @@ for (line in data) {
 		domain = line.domain
 		mapKey = domain.toUpperCase()
 	}
-	if (line.order == -1) {
+	if (line.order == '-1') {
 		// Skip properties marked to be removed
 		continue
 	}
-	// println "$order) $line"
 
 	Map spec = [
 		field: line.field,
@@ -59,7 +58,7 @@ for (line in data) {
 		shared: 0,
 		show: (line.show == 'true' ? 1 : 0 ),
 		control: line.control,
-		order: line.order,
+		order: line.order.toLong(),
 		imp: 'I',
 		constraints: [
 			required: (line.field == 'assetName' ? 1 : 0),

@@ -54,6 +54,7 @@
 				// JqGrid implementations 
 				var filter = '${filter}'
 				var latencys = '${latencys}'
+			  	var planMethodology = '${planMethodology}'
 				var event = '${event}'
 				var moveEvent = '${moveEvent}'
 				var plannedStatus = '${plannedStatus}' 
@@ -101,7 +102,7 @@
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					loadComplete="function(){resizeGrid('applicationId')}"
-					postData="{filter: filter, event:event, latencys:latencys, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
+					postData="{filter: filter, event:event, latencys:latencys, planMethodology:planMethodology, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
 						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, 
 						toValidate:toValidate,runbook:runbook, unassigned:unassigned}">
 					<jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
