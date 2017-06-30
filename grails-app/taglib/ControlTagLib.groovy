@@ -228,6 +228,7 @@ class ControlTagLib {
 	 */
 	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
 		List options = []
+		List valid = ['Yes', 'No']
 
 		StringBuilder sb = new StringBuilder('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
@@ -240,6 +241,7 @@ class ControlTagLib {
 		} else {
 			// Put a blank entry in to allow the user to unset a field
 			options << ['', '']
+			valid << ''
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
@@ -248,7 +250,7 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		if (! StringUtil.isBlank(value) && ! options.find{it[0] == value} ) {
+		if ( ! valid.contains(value) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			options << [value, warning]
 		}
