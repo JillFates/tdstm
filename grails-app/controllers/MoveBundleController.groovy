@@ -639,7 +639,7 @@ class MoveBundleController implements ControllerMethods {
 		}
 		def groupValues = Application.executeQuery(groupingSumQuery, [project:project])
 
-		def groupPlanMetodologyCount = groupValues.inject([:]) { groups, it ->
+		def groupPlanMethodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key
 			if(!key) key = Application.UNKNOWN
 
@@ -862,7 +862,7 @@ class MoveBundleController implements ControllerMethods {
 			percentageOtherToValidate:percentageOtherToValidate,
 			percentageUnassignedAppCount:percentageUnassignedAppCount,
 
-			groupPlanMetodologyCount: groupPlanMetodologyCount
+			groupPlanMethodologyCount: groupPlanMethodologyCount
 		]
 	}
 

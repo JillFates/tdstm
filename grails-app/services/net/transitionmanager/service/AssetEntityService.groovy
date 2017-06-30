@@ -1411,7 +1411,7 @@ class AssetEntityService implements ServiceMethods {
 		Map fieldSpecs = customDomainService.allFieldSpecs(assetClass.toString())
 		List<Map<String, String>> attributes = null
 
-		// Todo: OLB find the fields if they exists if is null init as empty list
+		// Find the fields if they exists if is null init as an empty list
 		attributes = fieldSpecs?."${assetClass.toString()}"?.fields
 
 		if (attributes) {
