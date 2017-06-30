@@ -529,7 +529,10 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				personFromEmail = emailParams.from
 				createdBy = userLogin.person
 				subject = "Welcome to TransitionManager"
-				emailParams["username"] = byWhom
+				// Previously, the line inside the 'if' would always override the username of the recipient.
+				if(!emailParams["username"]) {
+					emailParams["username"] = byWhom
+				}
 			} else if (resetType == PasswordResetType.ADMIN_RESET) {
 				bodyTemplate = "adminResetPassword"
 				emailParams["username"] = byWhom
