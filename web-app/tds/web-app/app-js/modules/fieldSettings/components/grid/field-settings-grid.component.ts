@@ -63,7 +63,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		{ text: 'String', value: 'String' },
 		{ text: 'YesNo', value: 'YesNo' }
 	];
-	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
+	private availableyFieldType = ['All', 'Custom Fields', 'Standard Fields'];
 
 	constructor(private loaderService: UILoaderService) { }
 
@@ -95,7 +95,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.filter.fieldType === 'User Defined Fields'
+				value: this.filter.fieldType === 'Custom Fields'
 			});
 		}
 		this.refresh();
@@ -157,9 +157,11 @@ export class FieldSettingsGridComponent implements OnInit {
 				required: false
 			};
 			model['isNew'] = true;
+			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
+			model.order = availableOrder[availableOrder.length - 1] + 1;
 			this.fieldsSettings.push(model);
 			this.refresh();
-			model.order = this.fieldsSettings.length + 1;
+
 			setTimeout(function () {
 				jQuery('#' + model.field).focus();
 			});
