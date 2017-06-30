@@ -641,7 +641,7 @@ class MoveBundleController implements ControllerMethods {
 
 		def groupPlanMetodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key
-			if(!key) key = Application.UNDEFINED
+			if(!key) key = Application.UNKNOWN
 
 			if(!groups[key]) groups[key] = 0
 
