@@ -168,6 +168,7 @@ class AssetEntityService implements ServiceMethods {
 	def securityService
 	def taskService
 	def userPreferenceService
+	def assetService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -1158,6 +1159,8 @@ class AssetEntityService implements ServiceMethods {
 
 		model.putAll(getDefaultModelForEdits('AssetEntity', project, device, params))
 		model.customs = getCustomFieldsSettings("AssetEntity", true)
+
+		assetService.setCustomDefaultValues(device, model.customs)
 
 		if (device) {
 			// TODO : JPM 9/2014 : Need to make the value flip based on user pref to show name or tag (enhancement TM-3390)
