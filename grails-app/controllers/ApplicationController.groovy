@@ -58,7 +58,7 @@ class ApplicationController implements ControllerMethods {
 
 		[appName: filters?.assetNameFilter ?: '', appPref: fieldPrefs, appSme: filters?.appSmeFilter ?: '',
 		 availabaleRoles: partyRelationshipService.getStaffingRoles(), // TODO - This should be replaced with the staffRoles which is in the defaultModel already
-		 company: project.client, latencys: params.latencys,
+		 company: project.client, latencys: params.latencys, planMethodology: params.planMethodology,
 		 partyGroupList: partyRelationshipService.getCompaniesList(), runbook: params.runbook,
 		 validationFilter: filters?.appValidationFilter ?: ''] +
 		 assetEntityService.getDefaultModelForLists(APPLICATION, 'Application', project, fieldPrefs, params, filters)
@@ -118,10 +118,28 @@ class ApplicationController implements ControllerMethods {
 			ae.move_bundle_id,
 			mb.name as moveBundle
 			FROM application a
-			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id''')
+
+		if (params.planMethodology) {
+			Project project = securityService.userCurrentProject
+			String customField = project.planMethodology
+			if(customField){
+				query.append(" AND ")
+
+				def planMethodology = params.planMethodology
+				if (planMethodology == Application.UNKNOWN) {
+					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
+				}else{
+					query.append(" ae.`${customField}` = '${params.planMethodology}' ")
+				}
+			}
+		}
+
+		query.append('''	
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			''')
+
 		if (customizeQuery.joinQuery) {
 			query.append(customizeQuery.joinQuery)
 		}

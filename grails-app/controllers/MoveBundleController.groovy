@@ -629,11 +629,34 @@ class MoveBundleController implements ControllerMethods {
 		def unassignedOtherCount = unassignedAllDeviceCount - unassignedPhysicalServerCount - unassignedVirtualServerCount -
 				unAssignedPhyStorageCount - unAssignedPhyNetworkCount
 
+		// Application Plan Methodology
+		def customField = project.planMethodology ?: "''"
+
+		def groupingSumQuery = "SELECT new map(${customField} as key, COUNT(ae) as count) FROM Application ae WHERE ae.project=:project"
+
+		if (customField) {
+			groupingSumQuery += " group by ${customField}"
+		}
+		def groupValues = Application.executeQuery(groupingSumQuery, [project:project])
+
+		def groupPlanMetodologyCount = groupValues.inject([:]) { groups, it ->
+			def key = it.key
+			if(!key) key = Application.UNKNOWN
+
+			if(!groups[key]) groups[key] = 0
+
+			groups[key] += it.count
+
+			groups
+		}
+/*
 		// TODO - this is unnecessary and could just load the map
+
 		def latencyQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND ae.latency=:latency"
 		def likelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'N'])[0]
 		def unlikelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'Y'])[0]
 		def unknownLatency = applicationCount - likelyLatency - unlikelyLatency
+*/
 
 		// ------------------------------------
 		// Calculate the Plan Status values
@@ -674,11 +697,11 @@ class MoveBundleController implements ControllerMethods {
 		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery + planStatusMovedQuery,
 			countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.allServerTypes])[0] : 0
 		percentageOtherCount = percOfCount(percentageOtherCount, otherAssetCount)
-
+/*
 		def likelyLatencyCount=0
 		def unlikelyLatencyCount=0
 		def unknownLatencyCount=0
-
+*/
 		def pendingAppDependenciesCount = applicationsOfPlanningBundle ?
 			AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
 
@@ -806,11 +829,11 @@ class MoveBundleController implements ControllerMethods {
 			virtServerList: virtServerList,
 
 			unassignedAssetCount:unassignedAssetCount,
-
+/*
 			likelyLatency:likelyLatency, likelyLatencyCount:likelyLatencyCount,
 			unknownLatency:unknownLatency, unknownLatencyCount:unknownLatencyCount,
 			unlikelyLatency:unlikelyLatency, unlikelyLatencyCount:unlikelyLatencyCount,
-
+*/
 			appDependenciesCount:appDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
 			serverDependenciesCount:serverDependenciesCount, pendingServerDependenciesCount:pendingServerDependenciesCount,
 
@@ -837,7 +860,9 @@ class MoveBundleController implements ControllerMethods {
 			percentageDBToValidate:percentageDBToValidate,
 			percentageStorToValidate:percentageStorToValidate,
 			percentageOtherToValidate:percentageOtherToValidate,
-			percentageUnassignedAppCount:percentageUnassignedAppCount
+			percentageUnassignedAppCount:percentageUnassignedAppCount,
+
+			groupPlanMetodologyCount: groupPlanMetodologyCount
 		]
 	}
 
