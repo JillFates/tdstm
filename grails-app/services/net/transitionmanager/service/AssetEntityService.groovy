@@ -1412,8 +1412,11 @@ class AssetEntityService implements ServiceMethods {
 	private List<Map<String, String>> getViewableAndSelectableFieldSpecs(AssetClass assetClass) {
 		Map fieldSpecs = customDomainService.allFieldSpecs(assetClass.toString())
 		List<Map<String, String>> attributes = null
-		if (fieldSpecs) {
-			attributes = fieldSpecs[assetClass.toString()]["fields"]
+
+		// Todo: OLB find the fields if they exists if is null init as empty list
+		attributes = fieldSpecs?."${assetClass.toString()}"?.fields
+
+		if (attributes) {
 			// filter viewable only fields and sort them by label
 			attributes = attributes.findAll({ fieldSpec ->
 				fieldSpec.show == 1 &&
@@ -1429,6 +1432,7 @@ class AssetEntityService implements ServiceMethods {
 			// edge case
 			attributes = [[:]]
 		}
+
 		return attributes
 	}
 
