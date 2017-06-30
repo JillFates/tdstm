@@ -12,11 +12,12 @@
                 <div class="text-center">
                     <div class="form-group">
                         <label for="minSize">Min Length</label>
-                        <input type="number" placeholder="Enter value" name="minSize" min="0" class="form-control minmax-input" [(ngModel)]="model.minSize">
+                        <input type="number" placeholder="Enter value" name="minSize" min="0" max="255" class="form-control minmax-input" [(ngModel)]="model.minSize">
                     </div>
                     <div class="form-group">
                         <label for="maxSize">Max Length</label>
-                        <input type="number" placeholder="Enter value" name="maxSize" min="{{model.minSize}}" class="form-control minmax-input" [(ngModel)]="model.maxSize">
+                        <input type="number" placeholder="Enter value" name="maxSize" max="255" min="{{model.minSize}}" class="form-control minmax-input"
+                            [(ngModel)]="model.maxSize">
                     </div>
                 </div>
             </div>
