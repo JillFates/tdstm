@@ -1,11 +1,11 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="net.transitionmanager.security.Permission"%>
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 
 <table style="border: 0">
 	<tr>
 		<td colspan="2">
-		
+
 			<div class="dialog" <tds:hasPermission permission="${Permission.AssetEdit}"> ondblclick="EntityCrud.showAssetEditView('${databaseInstance.assetClass}',${databaseInstance?.id})" </tds:hasPermission>>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
@@ -19,26 +19,28 @@
 							<td colspan="2" style="max-width: 400px;" class="valueNW" >${databaseInstance.description}</td>
 						</tr>
 						<tr class="prop">
-							<tds:showLabelAndField field="${standardFieldSpecs.assetType}" value="${databaseInstance.assetType}"/>
+							<tds:showLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}"/>
 							<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${databaseInstance.supportType}"/>
 							<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
 						</tr>
 						<tr class="prop">
-							<tds:showLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}"/>
+							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
+							<td class="valueNW">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}</td>
 							<tds:showLabelAndField field="${standardFieldSpecs.retireDate}" value="${databaseInstance.retireDate}"/>
 							<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
 							<td class="valueNW" colspan="3">${databaseInstance?.moveBundle} : ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
-							<td class="valueNW">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}</td>
+							<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance.rateOfChange}"/>
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
 							<td class="valueNW"><tds:convertDate date="${databaseInstance?.maintExpDate}"  /></td>
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
 							<td class="valueNW" colspan="3">${databaseInstance?.planStatus}</td>
 						</tr>
 						<tr>
-							<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance.rateOfChange}"/>
+							<td></td>
+							<td></td>
+
 							<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}"/>
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 							<td class="valueNW" colspan="3">${databaseInstance.validation}</td>
@@ -68,8 +70,8 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
-	
-	$(document).ready(function() { 
+
+	$(document).ready(function() {
 		changeDocTitle('${escapedName}');
 	})
 </script>

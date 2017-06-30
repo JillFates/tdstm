@@ -46,7 +46,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${fileInstance?.assetName}"/>
 							</td>
 							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${fileInstance?.assetName}"/>
+								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${fileInstance?.assetName}"/>
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.description}" value="${fileInstance?.description}"/>
 							<td colspan="3">
@@ -55,50 +55,50 @@
 
 						</tr>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetType}" value="${fileInstance?.assetType}"/>
-							<td>
-								<input type="text" id="assetType" name="assetType" readonly="readonly" value="${fileInstance.assetType}" />
-							</td>
+							<tds:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${fileInstance.fileFormat}" tabindex="12"/>
 
-							<tds:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${fileInstance.LUN}"/>
+							<tds:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${fileInstance.LUN}" tabindex="22"/>
 
-							<td colspan="2"></td>
+
+							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${fileInstance?.supportType}" tabindex="32"/>
+
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
 							<td>
-								<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="34" />
+								<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" tabindex="42" optionKey="id" optionValue="name" tabindex="34" />
 							</td>
 						</tr>
 
-						<tr>
-							<tds:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${fileInstance.fileFormat}"/>
-
-							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
-							<td>
-								<g:select id="environment" name="environment" from="${environmentOptions}" value="${fileInstance.environment}" noSelection="${['':' Please Select']}" />
-							</td>
-							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${fileInstance?.supportType}"/>
-
-							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
-							<td>
-								<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}" />
-							</td>
-						</tr>
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.size}" value="${fileInstance?.size}"/>
 							<td nowrap="nowrap" class="sizeScale">
-								<tds:inputControl field="${standardFieldSpecs.size}" tabindex="11" value="${fileInstance?.size}"/>&nbsp;
-								<g:select from="${fileInstance.constraints.scale.inList}" name="scale" id="scale" value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
-							</td>
-							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${fileInstance?.rateOfChange}"/>
-							<td>
-								<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="3" value="${fileInstance?.rateOfChange}"/>
+								<tds:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${fileInstance?.size}"/>&nbsp;
+								<g:select from="${fileInstance.constraints.scale.inList}" name="scale" id="scale" tabindex="13" value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
 							</td>
 
-							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${fileInstance.externalRefId}" tabindex="11"/>
+							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${fileInstance.externalRefId}" tabindex="23"/>
+
+							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
+							<td>
+								<g:select id="environment" name="environment" from="${environmentOptions}" value="${fileInstance.environment}" tabindex="33" noSelection="${['':' Please Select']}" />
+							</td>
+
+							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
+							<td>
+								<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
+							</td>
+						</tr>
+						<tr>
+							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${fileInstance?.rateOfChange}"/>
+							<td>
+								<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${fileInstance?.rateOfChange}" tabindex="14"/>
+							</td>
+
+							<td colspan="2">
+							<td colspan="2">
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
-								<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" onChange="assetFieldImportance(this.value,'Files');highlightCssByValidation(this.value,'Files','${fileInstance.id}');" value="${fileInstance.validation}"/>
+								<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" onChange="assetFieldImportance(this.value,'Files');highlightCssByValidation(this.value,'Files','${fileInstance.id}');" value="${fileInstance.validation}"/>
 							</td>
 						</tr>
 						<tbody class="customTemplate">

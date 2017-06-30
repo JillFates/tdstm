@@ -5,24 +5,24 @@
 		<tr>
 			<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${applicationInstance.assetName}"/>
 			<td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">${applicationInstance.assetName}</td>
-			
+
 			<tds:inputLabel field="${standardFieldSpecs.description}" value="${applicationInstance.description}"/>
 			<td colspan="3" class="${standardFieldSpecs.validation.imp}" >${applicationInstance.description}</td>
 		</tr>
+
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appAccess}" value="${applicationInstance.assetType}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${applicationInstance.supportType}"/>
-			
+
 			<tds:showLabelAndField field="${standardFieldSpecs.appFunction}" value="${applicationInstance.appFunction}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.userCount}" value="${applicationInstance.userCount}"/>
-			
 		</tr>
+
 		<tr>
-			
-			<tds:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
-			
+			<tds:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
+
 			<tds:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')">
@@ -35,38 +35,41 @@
 			<tds:showLabelAndField field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}"/>
 
 		</tr>
+
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
-			
+			<tds:showLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
+
 			<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
 				</span>
 			</td>
-			
+
 			<tds:showLabelAndField field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}"/>
 
 		</tr>
+
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
-			
+			<tds:showLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}"/>
+
 			<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
 				</span>
 			</td>
-			
+
 			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}"/>
-		
+
 		</tr>
+
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}"/>
 
@@ -74,14 +77,16 @@
 
 			<tds:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}"/>
 		</tr>
+
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
-			
+			<td></td>
+			<td></td>
+
 			<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<tds:convertDate date="${applicationInstance?.retireDate}" />
 			</td>
-			
+
 			<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}"/>
@@ -90,12 +95,12 @@
 		<tr>
 			<td></td>
 			<td></td>
-			
+
 			<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}">
 				<tds:convertDate date="${applicationInstance?.maintExpDate}" format="12hrs" />
 			</td>
-			
+
 			<tds:showLabelAndField field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}"/>
@@ -105,7 +110,7 @@
 			<tds:showLabelAndField field="${standardFieldSpecs.url}" value="${applicationInstance.url}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
-			
+
 			<tds:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${applicationInstance.shutdownBy}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
 			<g:if test="${shutdownById == -1}">
@@ -141,9 +146,9 @@
 				<label for="startupFixedId" >Fixed</label>
 			</g:if>
 			</td>
-			
+
 			<tds:showLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}"/>
-			
+
 			<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
 			<td class="valueNW ${standardFieldSpecs.validation.imp}" nowrap="nowrap">
 			<g:if test="${testingById == -1}">
@@ -159,7 +164,7 @@
 				<label for="testingFixedId" >Fixed</label>
 			</g:if>
 			</td>
-			
+
 			<tds:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}"/>
 
 		</tr>

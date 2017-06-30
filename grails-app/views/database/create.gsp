@@ -34,10 +34,8 @@
 							</td>
 						</tr>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetType}" value="${databaseInstance.assetType}"/>
-							<td>
-								<input type="text" id="assetType" name="assetType" readonly="readonly" value="${databaseInstance.assetType}" tabindex="12" />
-							</td>
+							<tds:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}" tabindex="13"/>
+
 							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${databaseInstance.supportType}" tabindex="26"/>
 
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
@@ -46,7 +44,11 @@
 							</td>
 						</tr>
 						<tr>
-							<tds:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}" tabindex="13"/>
+							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
+							<td nowrap="nowrap" class="sizeScale">
+								<input type="text" id="size" size="3" name="size" value="${databaseInstance.size}" tabindex="14" />
+								<g:select from="${databaseInstance.constraints.scale.inList}" id="scale" name="scale" value="${databaseInstance.scale}" optionValue="value" tabindex="40" noSelection="${['':' Please Select']}"/>
+							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance.retireDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'retireDate','errors')}">
@@ -63,10 +65,9 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
-							<td nowrap="nowrap" class="sizeScale">
-								<input type="text" id="size" size="3" name="size" value="${databaseInstance.size}" tabindex="14" />
-								<g:select from="${databaseInstance.constraints.scale.inList}" id="scale" name="scale" value="${databaseInstance.scale}" optionValue="value" tabindex="40" noSelection="${['':' Please Select']}"/>
+							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance?.rateOfChange}"/>
+							<td>
+								<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="3" value="${databaseInstance.rateOfChange}"/>
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
@@ -80,10 +81,8 @@
 							</td>
 						</tr>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance?.rateOfChange}"/>
-							<td>
-								<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="3" value="${databaseInstance.rateOfChange}"/>
-							</td>
+							<td></td>
+							<td></td>
 
 							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}" tabindex="11"/>
 
