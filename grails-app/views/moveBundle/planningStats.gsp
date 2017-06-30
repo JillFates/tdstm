@@ -295,6 +295,29 @@ $(document).ready(function() {
 							</tr>
 						</g:if>
 					</table>
+
+					<br />
+					<h4>
+						<b>Application Plans</b>
+					</h4>
+					<table class="dashboard_stat_table">
+					<g:each in="${groupPlanMetodologyCount}" var="counter">
+						<tr>
+							<td class="dashboard_stat_td">
+								<g:link controller="application" action="list"
+									params="[filter:'application', planMethodology:counter.key]" class="links">
+								${counter.key}
+								</g:link>
+							</td><td>
+								<g:link controller="application" action="list"
+										params="[filter:'application', planMethodology:counter.key]" class="links">
+									${counter.value}
+								</g:link></td>
+							</tr>
+					</g:each>
+					</table>
+
+		<%--
 					<br />
 					<h4>
 						<b>Application Latency Evaluations</b>
@@ -330,6 +353,7 @@ $(document).ready(function() {
 									params="[filter:'application',latencys:'Y']" class="links">UnLikely</g:link></td>
 						</tr>
 					</table>
+		--%>
 				</div>
 
 	<%-- Execution Phase Section --%>
