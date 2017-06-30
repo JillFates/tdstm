@@ -4,21 +4,6 @@
         "version": 1,
         "fields": [
             {
-                "field": "appAccess",
-                "label": "Access Type",
-                "tip": "This field is the Access Type",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "String",
-                "order": " "-1",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
                 "field": "appFunction",
                 "label": "Function",
                 "tip": "This field is the Function",
@@ -27,7 +12,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "31",
+                "order": 31,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -42,7 +27,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "Person",
-                "order": " "24",
+                "order": 24,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -57,7 +42,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "7",
+                "order": 7,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -72,7 +57,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "6",
+                "order": 6,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -87,7 +72,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "4",
+                "order": 4,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -102,7 +87,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "5",
+                "order": 5,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -117,7 +102,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "1",
+                "order": 1,
                 "imp": "I",
                 "constraints": {
                     "required": 1
@@ -132,7 +117,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "25",
+                "order": 25,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -147,7 +132,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "33",
+                "order": 33,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -162,7 +147,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "2",
+                "order": 2,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -177,7 +162,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "44",
+                "order": 44,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -192,7 +177,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "45",
+                "order": 45,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -207,7 +192,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "32",
+                "order": 32,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -222,7 +207,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "28",
+                "order": 28,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -237,7 +222,7 @@
                 "shared": 0,
                 "show": 0,
                 "control": "String",
-                "order": " "99",
+                "order": 99,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -252,7 +237,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "37",
+                "order": 37,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -267,7 +252,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "8",
+                "order": 8,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -282,22 +267,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "27",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "String",
-                "order": " "-1",
+                "order": 27,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -312,22 +282,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "34",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "moveDowntimeTolerance",
-                "label": "Downtime Tolerance",
-                "tip": "This field is the Downtime Tolerance",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "String",
-                "order": " "-1",
+                "order": 34,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -342,7 +297,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "35",
+                "order": 35,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -357,7 +312,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "26",
+                "order": 26,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -372,7 +327,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "50",
+                "order": 50,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -387,7 +342,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "51",
+                "order": 51,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -402,7 +357,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "52",
+                "order": 52,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -417,7 +372,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "Person",
-                "order": " "22",
+                "order": 22,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -432,7 +387,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "Person",
-                "order": " "23",
+                "order": 23,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -447,7 +402,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "53",
+                "order": 53,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -462,7 +417,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "54",
+                "order": 54,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -477,7 +432,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "55",
+                "order": 55,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -492,7 +447,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "47",
+                "order": 47,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -507,7 +462,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "21",
+                "order": 21,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -522,7 +477,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "56",
+                "order": 56,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -537,7 +492,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "57",
+                "order": 57,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -552,7 +507,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "58",
+                "order": 58,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -567,7 +522,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "46",
+                "order": 46,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -582,7 +537,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "9",
+                "order": 9,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -597,7 +552,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "43",
+                "order": 43,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -612,7 +567,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "41",
+                "order": 41,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -627,7 +582,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "42",
+                "order": 42,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -642,7 +597,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "36",
+                "order": 36,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -656,8 +611,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "List",
-                "order": " "101",
+                "control": "Select List",
+                "order": 101,
                 "imp": "I",
                 "constraints": {
                     "required": 0,
@@ -680,7 +635,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "102",
+                "order": 102,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -695,7 +650,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "103",
+                "order": 103,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -710,7 +665,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "104",
+                "order": 104,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -725,7 +680,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "105",
+                "order": 105,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -740,7 +695,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "106",
+                "order": 106,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -755,7 +710,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "107",
+                "order": 107,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -768,51 +723,6 @@
         "version": 1,
         "fields": [
             {
-                "field": "application",
-                "label": "Application",
-                "tip": "This field is the Application",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "autocomplete",
-                "order": " "-1",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "appOwner",
-                "label": "AppOwner",
-                "tip": "This field is the AppOwner",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Person",
-                "order": " "-1",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "appSme",
-                "label": "SME",
-                "tip": "This field is the SME",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Person",
-                "order": " "-1",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
                 "field": "assetName",
                 "label": "Asset Name",
                 "tip": "This field is the Asset Name",
@@ -821,7 +731,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "1",
+                "order": 1,
                 "imp": "I",
                 "constraints": {
                     "required": 1
@@ -836,7 +746,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "8",
+                "order": 8,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -851,7 +761,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "select",
-                "order": " "3",
+                "order": 3,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -866,7 +776,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "28",
+                "order": 28,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -881,7 +791,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "2",
+                "order": 2,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -896,7 +806,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "21",
+                "order": 21,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -911,7 +821,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "10",
+                "order": 10,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -926,7 +836,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "23",
+                "order": 23,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -941,7 +851,7 @@
                 "shared": 0,
                 "show": 0,
                 "control": "Date",
-                "order": " "99",
+                "order": 99,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -956,7 +866,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "Date",
-                "order": " "26",
+                "order": 26,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -971,7 +881,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "4",
+                "order": 4,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -986,22 +896,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "5",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "String",
-                "order": " "-1",
+                "order": 5,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1016,7 +911,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "50",
+                "order": 50,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1031,7 +926,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "24",
+                "order": 24,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1046,7 +941,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "select",
-                "order": " "51",
+                "order": 51,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1061,7 +956,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "select",
-                "order": " "22",
+                "order": 22,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1076,7 +971,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "select",
-                "order": " "9",
+                "order": 9,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1091,7 +986,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "55",
+                "order": 55,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1106,7 +1001,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "26",
+                "order": 26,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1121,7 +1016,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "54",
+                "order": 54,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1136,7 +1031,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "7",
+                "order": 7,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1151,7 +1046,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "29",
+                "order": 29,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1166,7 +1061,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "6",
+                "order": 6,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1181,7 +1076,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "53",
+                "order": 53,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1196,7 +1091,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "41",
+                "order": 41,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1210,8 +1105,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "40",
+                "control": "Chassis(s)",
+                "order": 40,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1225,8 +1120,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "31",
+                "control": "Location(s)",
+                "order": 31,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1240,8 +1135,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "33",
+                "control": "Rack(s)",
+                "order": 33,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1256,7 +1151,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "34",
+                "order": 34,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1270,8 +1165,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "32",
+                "control": "Room(s)",
+                "order": 32,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1286,7 +1181,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "25",
+                "order": 25,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1301,7 +1196,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "43",
+                "order": 43,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1315,8 +1210,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "42",
+                "control": "Chassis(t)",
+                "order": 42,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1330,8 +1225,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "36",
+                "control": "Location(t)",
+                "order": 36,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1345,8 +1240,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "38",
+                "control": "Rack(t)",
+                "order": 38,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1361,7 +1256,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "39",
+                "order": 39,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1375,8 +1270,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "autocomplete",
-                "order": " "37",
+                "control": "Room(t)",
+                "order": 37,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1391,22 +1286,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "27",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "usize",
-                "label": "Usize",
-                "tip": "This field is the Usize",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "String",
-                "order": " "-1",
+                "order": 27,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1421,22 +1301,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "52",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "virtualHost",
-                "label": "VirtualHost",
-                "tip": "This field is the VirtualHost",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "String",
-                "order": " "-1",
+                "order": 52,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1450,8 +1315,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "List",
-                "order": " "101",
+                "control": "Select List",
+                "order": 1000,
                 "imp": "I",
                 "constraints": {
                     "required": 0,
@@ -1472,7 +1337,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "102",
+                "order": 102,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1487,7 +1352,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "103",
+                "order": 103,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1502,7 +1367,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "104",
+                "order": 104,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1517,7 +1382,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "105",
+                "order": 105,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1532,7 +1397,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "106",
+                "order": 106,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1547,7 +1412,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "107",
+                "order": 107,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1562,7 +1427,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "108",
+                "order": 108,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1577,7 +1442,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "109",
+                "order": 109,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1598,7 +1463,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "1",
+                "order": 1,
                 "imp": "I",
                 "constraints": {
                     "required": 1
@@ -1613,7 +1478,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "2",
+                "order": 2,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1628,7 +1493,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "3",
+                "order": 3,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1643,7 +1508,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "21",
+                "order": 21,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1658,7 +1523,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "31",
+                "order": 31,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1673,7 +1538,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " 24"",
+                "order": 24,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1688,7 +1553,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "4",
+                "order": 4,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1703,7 +1568,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "22",
+                "order": 22,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1718,7 +1583,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "32",
+                "order": 32,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1733,7 +1598,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "5",
+                "order": 5,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1748,7 +1613,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "6",
+                "order": 6,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1763,7 +1628,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "23",
+                "order": 23,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1778,7 +1643,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "33",
+                "order": 33,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1793,7 +1658,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "7",
+                "order": 7,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1808,7 +1673,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "34",
+                "order": 34,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1823,22 +1688,7 @@
                 "shared": 0,
                 "show": 0,
                 "control": "Date",
-                "order": " "99",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Person",
-                "order": " "-1",
+                "order": 99,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1852,8 +1702,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "List",
-                "order": " "101",
+                "control": "Select List",
+                "order": 101,
                 "imp": "I",
                 "constraints": {
                     "required": 0,
@@ -1874,7 +1724,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "102",
+                "order": 102,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1889,7 +1739,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "103",
+                "order": 103,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1904,7 +1754,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "104",
+                "order": 104,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1919,7 +1769,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "105",
+                "order": 105,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1933,8 +1783,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "List",
-                "order": " "106",
+                "control": "Select List",
+                "order": 106,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1949,7 +1799,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "107",
+                "order": 107,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1964,7 +1814,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "108",
+                "order": 108,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -1979,7 +1829,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "109",
+                "order": 109,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2000,7 +1850,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "1",
+                "order": 1,
                 "imp": "I",
                 "constraints": {
                     "required": 1
@@ -2015,7 +1865,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "2",
+                "order": 2,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2030,7 +1880,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "3",
+                "order": 3,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2045,7 +1895,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "21",
+                "order": 21,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2060,7 +1910,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "41",
+                "order": 41,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2075,7 +1925,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "4",
+                "order": 4,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2090,7 +1940,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "22",
+                "order": 22,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2105,7 +1955,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "34",
+                "order": 34,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2120,7 +1970,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "33",
+                "order": 33,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2135,7 +1985,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "42",
+                "order": 42,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2150,7 +2000,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "5",
+                "order": 5,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2165,7 +2015,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "23",
+                "order": 23,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2180,7 +2030,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "43",
+                "order": 43,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2195,52 +2045,7 @@
                 "shared": 0,
                 "show": 0,
                 "control": "Date",
-                "order": " "99",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "maintExpDate",
-                "label": "Maint Expiration",
-                "tip": "This field is the Maint Expiration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": " "-1",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Person",
-                "order": " "",
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "retireDate",
-                "label": "Retire Date",
-                "tip": "This field is the Retire Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": " "",
+                "order": 99,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2255,7 +2060,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "6",
+                "order": 6,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2269,8 +2074,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "List",
-                "order": " "101",
+                "control": "Select List",
+                "order": 101,
                 "imp": "I",
                 "constraints": {
                     "required": 0,
@@ -2290,7 +2095,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "102",
+                "order": 102,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2305,7 +2110,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "103",
+                "order": 103,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2320,7 +2125,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "YesNo",
-                "order": " "104",
+                "order": 104,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2335,7 +2140,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "105",
+                "order": 105,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2349,8 +2154,8 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "List",
-                "order": " "106",
+                "control": "Select List",
+                "order": 106,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2365,7 +2170,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "107",
+                "order": 107,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2380,7 +2185,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "108",
+                "order": 108,
                 "imp": "I",
                 "constraints": {
                     "required": 0
@@ -2395,7 +2200,7 @@
                 "shared": 0,
                 "show": 1,
                 "control": "String",
-                "order": " "",
+                "order": 109,
                 "imp": "I",
                 "constraints": {
                     "required": 0
