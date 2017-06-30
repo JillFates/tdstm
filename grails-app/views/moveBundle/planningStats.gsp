@@ -301,7 +301,7 @@ $(document).ready(function() {
 						<b>Application Plans</b>
 					</h4>
 					<table class="dashboard_stat_table">
-					<g:each in="${groupPlanMetodologyCount}" var="counter">
+					<g:each in="${groupPlanMethodologyCount}" var="counter">
 						<tr>
 							<td class="dashboard_stat_td">
 								<g:link controller="application" action="list"
@@ -312,8 +312,9 @@ $(document).ready(function() {
 								<g:link controller="application" action="list"
 										params="[filter:'application', planMethodology:counter.key]" class="links">
 									${counter.value}
-								</g:link></td>
-							</tr>
+								</g:link>
+							</td>
+						</tr>
 					</g:each>
 					</table>
 
