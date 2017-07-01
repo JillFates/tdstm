@@ -27,7 +27,8 @@ export const en_DICTIONARY: Object = {
 		'LEGEND': 'Legend',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
-		'DEFAULT': 'Default'
+		'DEFAULT': 'Default',
+		'SORT': 'Sort'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
