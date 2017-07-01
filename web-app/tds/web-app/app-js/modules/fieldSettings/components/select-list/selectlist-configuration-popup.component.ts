@@ -6,6 +6,9 @@ import { SortableComponent } from '@progress/kendo-angular-sortable';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 
+/**
+ *
+ */
 @Component({
 	moduleId: module.id,
 	selector: 'selectlist-configuration-popup',
@@ -17,10 +20,20 @@ import { CustomDomainService } from '../../service/custom-domain.service';
 	]
 })
 
+/**
+ *
+ */
 export class SelectListConfigurationPopupComponent {
 
+	/**
+	 * Asset type: DB, Application, etc..
+	 */
 	@Input() domain: string;
+	/**
+	 * Custom Field to edit.
+	 */
 	@Input() field: FieldSettingsModel;
+
 	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
 
 	public items: any[] = [];
@@ -28,8 +41,16 @@ export class SelectListConfigurationPopupComponent {
 	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
 
+	/**
+	 * Class constructor.
+	 * @param customService Service to obtain distinct values.
+	 */
 	constructor(private customService: CustomDomainService) { }
 
+	/**
+	 * Intializes current component based on the @field input parameter.
+	 * Makes a service call to get pre-build distinct values from system.
+	 */
 	private load(): void {
 		this.newItem = '';
 		this.defaultValue = null;
@@ -57,12 +78,21 @@ export class SelectListConfigurationPopupComponent {
 		this.defaultValue = this.field.default;
 	}
 
+	/**
+	 * Helper method to set styling to items rows on a odd-even alternate pattern.
+	 * @param index
+	 * @returns {{background-color: string}}
+	 */
 	public getStyle(index) {
 		if ((index % 2) === 0) {
 			return { 'background-color': '#f6f6f6' };
 		}
 	}
 
+	/**
+	 * Function to handle event click on + Add button
+	 * Adds a new item to the list.
+	 */
 	public onAdd(): void {
 		if (this.items.filter((i) => i.value === this.newItem).length === 0) {
 			this.items.push({
@@ -73,12 +103,21 @@ export class SelectListConfigurationPopupComponent {
 		}
 	}
 
+	/**
+	 * Remove a specific item from the current config select list
+	 * @param item The item to be removed.
+	 */
 	public onRemove(item: any): void {
 		if (item.deletable) {
 			this.items.splice(this.items.indexOf(item), 1);
 		}
 	}
 
+	/**
+	 * Function to handle onclick Save button event.
+	 * Saves the current select list configuration.
+	 * Simply sets current list into the field model and it's default value.
+	 */
 	public onSave(): void {
 		let fieldModel = { ...this.field };
 		fieldModel.constraints.values = this.items.map(i => i.value);
@@ -95,6 +134,28 @@ export class SelectListConfigurationPopupComponent {
 
 	}
 
+	/**
+	 * Function to handle onclick Sort button event.
+	 * Auto-sort the items array, sort order is alphabetic ascending (up).
+	 */
+	public onSort(): void {
+		this.items.sort( comparator );
+
+		function comparator(a, b) {
+			if (a.value < b.value) {
+				return -1;
+			}
+			if (a.value > b.value) {
+				return 1;
+			}
+			return 0;
+		}
+	}
+
+	/**
+	 * Function to handle onclick open/close gear icon button event.
+	 * If it's open event, it preloads and initializes local variables.
+	 */
 	public onToggle(): void {
 		this.show = !this.show;
 		if (this.show) {

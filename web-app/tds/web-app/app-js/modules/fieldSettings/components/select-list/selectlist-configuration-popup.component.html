@@ -9,11 +9,21 @@
         <kendo-dialog title="List Configuration - {{field.field}}" *ngIf="show" (close)="onToggle()">
 
             <div class="modal-container">
-                <div class="text-center">
-                    <input class="value-input" type="text" [(ngModel)]="newItem" placeholder="Enter value">
-                    <button name="addButton" class="btn btn-default btn-xs" [disabled]="newItem.length === 0" (click)="onAdd()">
-                        <i class="fa fa-plus"></i> {{'GLOBAL.ADD' | translate}}
-                    </button>
+
+                <div class="row">
+                    <div class="col-sm-3 col-sm-offset-3">
+                        <input class="value-input" type="text" [(ngModel)]="newItem" placeholder="Enter value">
+                    </div>
+                    <div class="col-sm-1" style="padding-left: 5px;padding-top: 2px;">
+                        <button name="addButton" class="btn btn-default btn-xs" [disabled]="newItem.length === 0" (click)="onAdd()">
+                            <i class="fa fa-plus"></i> {{'GLOBAL.ADD' | translate}}
+                        </button>
+                    </div>
+                    <div class="col-sm-offset-2 col-sm-1" style="padding-top: 2px;">
+                        <button name="addButton" class="btn btn-default btn-xs" [disabled]="items.length === 0" (click)="onSort()">
+                            <i class="fa fa-sort-alpha-asc"></i> {{'GLOBAL.SORT' | translate}}
+                        </button>
+                    </div>
                 </div>
 
                 <div class="modal-list-header">
