@@ -99,16 +99,8 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.loaderService.show();
 		setTimeout(() => {
 			this.isEditing = true;
-			this.sortable = false;
-			this.state.sort = [
-				{
-					dir: 'desc',
-					field: 'isNew'
-				}, {
-					dir: 'asc',
-					field: 'order'
-				}
-			];
+			this.sortable = { mode: 'single' };
+
 			this.filter = {
 				search: '',
 				fieldType: 'All'
@@ -145,6 +137,15 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onAddCustom(): void {
 		this.addEmitter.emit((custom) => {
+			this.state.sort = [
+				{
+					dir: 'desc',
+					field: 'isNew'
+				}, {
+					dir: 'asc',
+					field: 'order'
+				}
+			];
 			let model = new FieldSettingsModel();
 			model.field = custom;
 			model.constraints = {
