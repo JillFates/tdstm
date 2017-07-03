@@ -79,17 +79,11 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onFilter(): void {
 		this.state.filter.filters = [];
+		this.fieldsSettings = this.data.fields;
 		if (this.filter.search !== '') {
-			this.state.filter.filters.push({
-				field: 'field',
-				operator: 'contains',
-				value: this.filter.search
-			});
-			this.state.filter.filters.push({
-				field: 'label',
-				operator: 'contains',
-				value: this.filter.search
-			});
+			this.fieldsSettings = this.data.fields.filter(
+				item => item.field.indexOf(this.filter.search) !== -1 ||
+					item.label.indexOf(this.filter.search) !== -1);
 		}
 		if (this.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
@@ -105,16 +99,8 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.loaderService.show();
 		setTimeout(() => {
 			this.isEditing = true;
-			this.sortable = false;
-			this.state.sort = [
-				{
-					dir: 'desc',
-					field: 'isNew'
-				}, {
-					dir: 'asc',
-					field: 'order'
-				}
-			];
+			this.sortable = { mode: 'single' };
+
 			this.filter = {
 				search: '',
 				fieldType: 'All'
@@ -151,6 +137,15 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onAddCustom(): void {
 		this.addEmitter.emit((custom) => {
+			this.state.sort = [
+				{
+					dir: 'desc',
+					field: 'isNew'
+				}, {
+					dir: 'asc',
+					field: 'order'
+				}
+			];
 			let model = new FieldSettingsModel();
 			model.field = custom;
 			model.constraints = {
