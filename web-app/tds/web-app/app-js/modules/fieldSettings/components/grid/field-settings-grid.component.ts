@@ -79,17 +79,11 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onFilter(): void {
 		this.state.filter.filters = [];
+		this.fieldsSettings = this.data.fields;
 		if (this.filter.search !== '') {
-			this.state.filter.filters.push({
-				field: 'field',
-				operator: 'contains',
-				value: this.filter.search
-			});
-			this.state.filter.filters.push({
-				field: 'label',
-				operator: 'contains',
-				value: this.filter.search
-			});
+			this.fieldsSettings = this.data.fields.filter(
+				item => item.field.indexOf(this.filter.search) !== -1 ||
+					item.label.indexOf(this.filter.search) !== -1);
 		}
 		if (this.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
