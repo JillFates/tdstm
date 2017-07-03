@@ -119,6 +119,27 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		saveButton.triggerEventHandler('click', null);
 		expect(comp.field.constraints.values.length).toEqual(1);
 		expect(comp.field.constraints.values[0]).toEqual('Foo');
+	});
 
+	it('should order the items', () => {
+		comp.onToggle();
+		fixture.detectChanges();
+		comp.items = [
+			{deletable: true, value: 'Z'},
+			{deletable: true, value: 'P'},
+			{deletable: true, value: 'E'},
+			{deletable: true, value: 'A'},
+			{deletable: true, value: 'C'}
+		];
+
+		let sortButton: DebugElement;
+		sortButton = fixture.debugElement.query(By.css('button[name=sortButton]'));
+		sortButton.triggerEventHandler('click', null);
+
+		expect(comp.items[0].value).toEqual('A');
+		expect(comp.items[1].value).toEqual('C');
+		expect(comp.items[2].value).toEqual('E');
+		expect(comp.items[3].value).toEqual('P');
+		expect(comp.items[4].value).toEqual('Z');
 	});
 });
