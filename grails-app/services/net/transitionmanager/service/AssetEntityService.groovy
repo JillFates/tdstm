@@ -1216,6 +1216,7 @@ class AssetEntityService implements ServiceMethods {
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
 			*/ // TM-6096
 
+
 		// Obtains the domain out of the asset type string.
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
