@@ -54,6 +54,7 @@
 				// JqGrid implementations 
 				var filter = '${filter}'
 				var latencys = '${latencys}'
+			  	var planMethodology = '${planMethodology}'
 				var event = '${event}'
 				var moveEvent = '${moveEvent}'
 				var plannedStatus = '${plannedStatus}' 
@@ -101,7 +102,7 @@
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					loadComplete="function(){resizeGrid('applicationId')}"
-					postData="{filter: filter, event:event, latencys:latencys, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
+					postData="{filter: filter, event:event, latencys:latencys, planMethodology:planMethodology, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
 						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, 
 						toValidate:toValidate,runbook:runbook, unassigned:unassigned}">
 					<jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
@@ -183,8 +184,9 @@
 				<div id="columnCustomDiv_${appPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width:13.7% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${appPref[key]}" />
-						<g:each var="attribute" in="${attributesList}">
-							<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}" 
+						%{--<g:each var="attribute" in="${attributesList}">--}%
+						<g:each var="attribute" in="${fieldSpecs}">
+							<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}"
 								${appPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
 								onchange="setColumnAssetPref(this.value,'${key}','App_Columns')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>

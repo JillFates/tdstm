@@ -15,7 +15,9 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
@@ -36,6 +38,7 @@ class ApplicationController implements ControllerMethods {
 	ApplicationService applicationService
 	AssetEntityService assetEntityService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	PartyRelationshipService partyRelationshipService
@@ -43,6 +46,7 @@ class ApplicationController implements ControllerMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	AssetService assetService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -56,7 +60,7 @@ class ApplicationController implements ControllerMethods {
 
 		[appName: filters?.assetNameFilter ?: '', appPref: fieldPrefs, appSme: filters?.appSmeFilter ?: '',
 		 availabaleRoles: partyRelationshipService.getStaffingRoles(), // TODO - This should be replaced with the staffRoles which is in the defaultModel already
-		 company: project.client, latencys: params.latencys,
+		 company: project.client, latencys: params.latencys, planMethodology: params.planMethodology,
 		 partyGroupList: partyRelationshipService.getCompaniesList(), runbook: params.runbook,
 		 validationFilter: filters?.appValidationFilter ?: ''] +
 		 assetEntityService.getDefaultModelForLists(APPLICATION, 'Application', project, fieldPrefs, params, filters)
@@ -116,10 +120,28 @@ class ApplicationController implements ControllerMethods {
 			ae.move_bundle_id,
 			mb.name as moveBundle
 			FROM application a
-			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id''')
+
+		if (params.planMethodology) {
+			Project project = securityService.userCurrentProject
+			String customField = project.planMethodology
+			if(customField){
+				query.append(" AND ")
+
+				def planMethodology = params.planMethodology
+				if (planMethodology == Application.UNKNOWN) {
+					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
+				}else{
+					query.append(" ae.`${customField}` = '${params.planMethodology}' ")
+				}
+			}
+		}
+
+		query.append('''	
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			''')
+
 		if (customizeQuery.joinQuery) {
 			query.append(customizeQuery.joinQuery)
 		}
@@ -306,11 +328,13 @@ class ApplicationController implements ControllerMethods {
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
-
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
+		def customs = assetEntityService.getCustomFieldsSettings("Application", true)
+		assetService.setCustomDefaultValues(application, customs)
 		[applicationInstance: application, assetTypeOptions: assetTypeOptions?.value, moveBundleList: moveBundleList,
 			planStatusOptions: planStatusOptions?.value, projectId: project.id, project: project,moveEventList: moveEventList,
 			config: configMap.config, customs: configMap.customs, personList: personList, company: project.client,
-			availabaleRoles: availabaleRoles, environmentOptions: environmentOptions?.value, highlightMap: highlightMap]
+			availabaleRoles: availabaleRoles, environmentOptions: environmentOptions?.value, highlightMap: highlightMap, standardFieldSpecs: standardFieldSpecs]
 	}
 
 	@HasPermission(Permission.AssetView)
@@ -329,7 +353,7 @@ class ApplicationController implements ControllerMethods {
 			renderErrorJson(errorMsg)
 			return
 		}
-
+		
 		applicationService.getModelForShow(project, app, params)
 	}
 

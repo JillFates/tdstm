@@ -3,27 +3,45 @@
  */
 
 export const en_DICTIONARY: Object = {
+	'ASSETS': {
+		'APPLICATION': 'Application',
+		'DATABASE': 'Database',
+		'DEVICE': 'Device',
+		'STORAGE': 'Storage'
+	},
+	'FIELD_SETTINGS': {
+		'ASSET_FIELD_SETTING': 'Asset Field Settings',
+		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
+		'PROJECT_LIST': 'Project List',
+		'CREATE_CUSTOM': 'Add Custom Field'
+	},
+	'GLOBAL': {
+		'OK': 'Ok',
+		'ADD': 'Add',
+		'CANCEL': 'Cancel',
+		'CLOSE': 'Close',
+		'DELETE': 'Delete',
+		'EDIT': 'Edit',
+		'FILTER': 'Filter',
+		'LIST': 'List',
+		'LEGEND': 'Legend',
+		'SAVE': 'Save',
+		'SAVE_ALL': 'Save All',
+		'DEFAULT': 'Default',
+		'SORT': 'Sort'
+	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',
 		'CREATE_TASK': 'Create Task',
-		'LIST': 'List',
 		'TASK': 'Task',
 		'TASK_MANAGER': 'Task Manager'
 	},
 	'NOTICE_MANAGER': {
-		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'ADMIN': 'Admin',
-		'NOTICE': 'Notice',
-		'LIST': 'List',
 		'CREATE_NOTICE': 'Create Notice',
 		'EDIT_NOTICE': 'Edit Notice',
-		'SAVE': 'Save',
-		'DELETE': 'Delete',
-		'CANCEL': 'Cancel'
-	},
-	'FIELD_SETTINGS': {
-		'ASSET_FIELD_SETTING': 'Asset Field Settings',
-		'PROJECT_LIST': 'Project List'
+		'NOTICE_ADMINISTRATION': 'Notice Administration',
+		'NOTICE': 'Notice',
 	}
 };

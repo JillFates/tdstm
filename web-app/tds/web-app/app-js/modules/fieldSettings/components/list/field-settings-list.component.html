@@ -2,7 +2,21 @@
 	<section>
 		<div>
 			<div class="box-body box-with-empty-header">
-				<field-settings-grid [data]="fieldSettings" [asset-class]="assetClass"></field-settings-grid>
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs">
+						<li *ngFor="let value of domains" [ngClass]="{'active':isTabSelected(value.domain)}">
+							<a (click)="onTabChange(value.domain)" data-toggle="tab">{{'ASSETS.'+value.domain | translate}}</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div *ngFor="let value of domains" [ngClass]="{'active':isTabSelected(value.domain)}" class="tab-pane">
+							<field-settings-grid #grid="fieldSettingsGrid" (save)="onSaveAll($event)" (cancel)="onCancel($event)" (add)="onAdd($event)"
+							 (share)="onShare($event)" (delete)="onDelete($event)" [data]="value" [state]="getCurrentState(value)"></field-settings-grid>
+						</div>
+						<!-- /.tab-pane -->
+					</div>
+					<!-- /.tab-content -->
+				</div>
 			</div>
 			<!-- /.box-body -->
 		</div>

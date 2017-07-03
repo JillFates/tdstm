@@ -153,9 +153,11 @@
                 </g:elseif>
 
                 <g:if test="${showNewsBar}">
-                    <div class="menu3" id="head_crawler" >
-                        <div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
-                        <div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
+                    <div class="old-legacy-content">
+                        <div class="menu3" id="head_crawler" >
+                            <div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
+                            <div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
+                        </div>
                     </div>
                     <script type="text/javascript">
                         ${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEvent.id+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}

@@ -8,6 +8,7 @@ import net.transitionmanager.domain.Person
 class Application extends AssetEntity {
 
 	static final ContextType contextType = ContextType.A
+	static final String UNKNOWN = "Unknown"
 
 	AssetClass assetClass = AssetClass.APPLICATION
 	String appVendor

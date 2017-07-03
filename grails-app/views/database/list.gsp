@@ -158,8 +158,9 @@
 				<div id="columnCustomDiv_${dbPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width: 13.3% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${dbPref[key]}" />
-						<g:each var="attribute" in="${attributesList}">
-							<label><input type="radio" name="coloumnSelector_${dbPref[key]}" id="coloumnSelector_${dbPref[key]}" value="${attribute.attributeCode}" 
+						%{--<g:each var="attribute" in="${attributesList}">--}%
+						<g:each var="attribute" in="${fieldSpecs}">
+							<label><input type="radio" name="coloumnSelector_${dbPref[key]}" id="coloumnSelector_${dbPref[key]}" value="${attribute.attributeCode}"
 								${dbPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
 								onchange="setColumnAssetPref(this.value,'${key}','Database_Columns')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>

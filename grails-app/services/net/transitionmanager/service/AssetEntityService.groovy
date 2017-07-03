@@ -49,6 +49,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.Criteria
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import grails.converters.JSON
@@ -63,18 +64,20 @@ class AssetEntityService implements ServiceMethods {
 	protected static final List<String> customLabels = (1..Project.CUSTOM_FIELD_COUNT).collect { 'Custom' + it }.asImmutable()
 
 	// TODO : JPM 9/2014 : determine if bundleMoveAndClientTeams is used as the team functionality has been RIPPED out of TM
-	protected static final List<String> bundleMoveAndClientTeams = ['sourceTeamMt', 'sourceTeamLog', 'sourceTeamSa',
-	                                                                'sourceTeamDba', 'targetTeamMt', 'targetTeamLog',
-	                                                                'targetTeamSa', 'targetTeamDba'].asImmutable()
+	protected static final List<String> bundleMoveAndClientTeams = [
+		'sourceTeamMt', 'sourceTeamLog', 'sourceTeamSa',
+		'sourceTeamDba', 'targetTeamMt', 'targetTeamLog',
+		'targetTeamSa', 'targetTeamDba' ].asImmutable()
 
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
 			(AssetClass.APPLICATION): [],
 			(AssetClass.DATABASE): [],
-			(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation',
-			                      // TODO : JPM 9/2014 : This list can be removed as part of TM-3311
-			                      'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt',
-			                      'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
+			(AssetClass.DEVICE): [
+				'assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation',
+				// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
+				'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt',
+				'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
 			],
 			(AssetClass.STORAGE): []
 	].asImmutable()
@@ -83,25 +86,26 @@ class AssetEntityService implements ServiceMethods {
 	static final List<String> CUSTOM_PROPERTIES = (1..Project.CUSTOM_FIELD_COUNT).collect { 'custom' + it }.asImmutable()
 
 	// Common properties for all asset classes (Application, Database, Files/Storate, Device)
-	static final List<String> ASSET_PROPERTIES = ['assetName',  'shortName', 'priority', 'planStatus',  'department',
-	                                              'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
-	                                              'description', 'supportType', 'environment', 'serialNumber',
-	                                              'validation', 'externalRefId', 'size', 'scale', 'rateOfChange'].asImmutable()
-	// 'purchaseDate', 'purchasePrice',
+	static final List<String> ASSET_PROPERTIES = [
+		'assetName',  'shortName', 'priority', 'planStatus', 'department',
+		'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
+		'description', 'supportType', 'environment', 'serialNumber',
+		'validation', 'externalRefId', 'size', 'scale', 'rateOfChange'].asImmutable()
 
 	// Properties strictly for DEVICES (a.k.a. AssetEntity)
 	static final List<String> DEVICE_PROPERTIES = [
-			'assetTag', 'assetType', 'ipAddress', 'os', 'usize', 'truck', 'cart', 'shelf', 'railType',
-			'sourceBladePosition', 'targetRackPosition', 'sourceRackPosition', 'targetBladePosition'
+		'assetTag', 'assetType', 'ipAddress', 'os', 'usize', 'truck', 'cart', 'shelf', 'railType',
+		'sourceBladePosition', 'targetRackPosition', 'sourceRackPosition', 'targetBladePosition'
 	].asImmutable()
 
 	// Properties strictly for ASSETS that are date (a.k.a. AssetEntity)
 	static final List<String> ASSET_DATE_PROPERTIES = ['purchaseDate', 'maintExpDate', 'retireDate'].asImmutable()
 
 	// List of all of the Integer properties for the potentially any of the asset classes
-	static final List<String> ASSET_INTEGER_PROPERTIES = ['size', 'rateOfChange', 'priority', 'sourceBladePosition',
-	                                                      'targetBladePosition', 'sourceRackPosition',
-	                                                      'targetRackPosition'].asImmutable()
+	static final List<String> ASSET_INTEGER_PROPERTIES = [
+		'size', 'rateOfChange', 'priority', 'sourceBladePosition',
+		'targetBladePosition', 'sourceRackPosition',
+		'targetRackPosition'].asImmutable()
 
 	static final Map<String, Map<String, String>> ASSET_TYPE_NAME_MAP = [
 			(AssetType.APPLICATION.toString()): [
@@ -155,6 +159,7 @@ class AssetEntityService implements ServiceMethods {
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	def assetEntityAttributeLoaderService
+	def customDomainService
 	def partyRelationshipService
 	def progressService
 	def projectService
@@ -163,6 +168,7 @@ class AssetEntityService implements ServiceMethods {
 	def securityService
 	def taskService
 	def userPreferenceService
+	def assetService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -1152,6 +1158,9 @@ class AssetEntityService implements ServiceMethods {
 		model.targetRackSelect = getRackSelectOptions(project, device?.roomTargetId, true)
 
 		model.putAll(getDefaultModelForEdits('AssetEntity', project, device, params))
+		model.customs = getCustomFieldsSettings("AssetEntity", true)
+
+		assetService.setCustomDefaultValues(device, model.customs)
 
 		if (device) {
 			// TODO : JPM 9/2014 : Need to make the value flip based on user pref to show name or tag (enhancement TM-3390)
@@ -1195,25 +1204,27 @@ class AssetEntityService implements ServiceMethods {
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
 
 		//assert ['Database'].contains(type)
-		def configMap = getConfig(type, asset?.validation ?: 'Discovery')
 
 		//def assetTypeAttribute = getPropertyAttribute('assetType') // TM-6096
 		//def validationType = asset.validation
-		def highlightMap = getHighlightedInfo(type, asset, configMap)
 		//def dependentAssets = getDependentAssets(asset) // TM-6096
 		//def supportAssets = getSupportingAssets(asset) // TM-6096
-
 		// TODO - JPM 8/2014 - Need to see if Edit even uses the servers list at all. If so, this needs to join the model to filter on assetType
 		/*def servers = AssetEntity.executeQuery('''
 			FROM AssetEntity
 			WHERE project=:project AND assetClass=:ac AND assetType IN (:types)
 			ORDER BY assetName''', [project: project, ac: AssetClass.DEVICE, types: AssetType.serverTypes])
 			*/ // TM-6096
+
+
+		// Obtains the domain out of the asset type string.
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		def customs = getCustomFieldsSettings(type, true)
+
 		[assetId: asset.id,
 		 //assetTypeAttribute: assetTypeAttribute,
 		 //assetTypeOptions: getDeviceAssetTypeOptions(),
-		 config: configMap.config,
-		 customs: configMap.customs,
 		 // dependencyStatus: getDependencyStatuses(), // TM-6096
 		 // dependencyType: getDependencyTypes(), // TM-6096
 		 // dependentAssets: dependentAssets, // TM-6096
@@ -1221,7 +1232,6 @@ class AssetEntityService implements ServiceMethods {
 		 // The name of the asset that is quote escaped to prevent lists from erroring with links
 		 // TODO - this function should be replace with a generic HtmlUtil method - this function is to single purposed...
 		 escapedName: getEscapedName(asset),
-		 highlightMap: highlightMap,
 		 moveBundleList: getMoveBundles(project),
 		 planStatusOptions: getAssetPlanStatusOptions(),
 		 project: project,
@@ -1231,7 +1241,9 @@ class AssetEntityService implements ServiceMethods {
 		 redirectTo: params.redirectTo,
 		 //servers: servers, // TM-6096
 		 //supportAssets: supportAssets, // TM-6096
-		 version: asset.version]
+		 version: asset.version,
+		 customs: customs,
+		 standardFieldSpecs: standardFieldSpecs]
 	}
 
 	/**
@@ -1257,32 +1269,32 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		def projectAttributes = projectService.getAttributes(type)
-		def configMap = getConfig(type, assetEntity.validation, projectAttributes)
 		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
 		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
 
-		def highlightMap = getHighlightedInfo(type, assetEntity, configMap, projectAttributes)
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
+		// Obtains the domain out of the asset type string
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
 
 		[assetId: assetEntity?.id,
 		 assetComment: assetComment,
 		 assetCommentList: AssetComment.findAllByAssetEntity(assetEntity),
-		 config: configMap.config,
-		 customs: configMap.customs,
 		 dependencyBundleNumber: depBundle,
 		 dependentAssets: dependentAssets,
 		 errors: params.errors,
 		 escapedName: getEscapedName(assetEntity),
-		 highlightMap: highlightMap,
 		 prefValue: prefValue,
 		 project: project,
 		 client: project.client,
 		 redirectTo: params.redirectTo,
 		 supportAssets: supportAssets,
 		 viewUnpublishedValue: viewUnpublishedValue,
-		 hasPublishPermission: securityService.hasPermission(Permission.TaskPublish)]
+		 hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
+		 customs: getCustomFieldsSettings(type, true),
+		 standardFieldSpecs: standardFieldSpecs]
 	}
 
 	/**
@@ -1299,7 +1311,7 @@ class AssetEntityService implements ServiceMethods {
 		Map model = [
 			assetClassOptions: AssetClass.classOptions,
 			assetDependency: new AssetDependency(),
-			attributesList: [],        // Set below
+			//attributesList: [],        // Set below, replaced by fieldSpecs
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			event: params.moveEvent,
@@ -1336,9 +1348,38 @@ class AssetEntityService implements ServiceMethods {
 		}
 		model.moveEvent = moveEvent
 
-		// Get the list of attributes that the user can select for columns
-		def attributes = projectService.getAttributes(listType)
+		// Set the list of viewable and selectable field specs
+		model.fieldSpecs = getViewableAndSelectableFieldSpecs(ac)
 
+		// <SL> Remove when JSON field specs get fully implemented
+		// Get the list of attributes that the user can select for columns
+		// List<EavAttribute> attributes = projectService.getAttributes(listType)
+
+		// Used to display column names in jqgrid dynamically
+		def modelPref = [:]
+		fieldPrefs.each { key, value ->
+			//modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+			modelPref[key] = StringUtil.sanitizeJavaScript(model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+		}
+		model.modelPref = modelPref
+
+		// <SL> Kept "attributesList" for debugging but it should be deleted as soon as JSON field specs
+		// get fully implemented
+		//model.attributesListDeprecated = getViewableAndSelectableAttributesList(ac, project, attributes)
+
+		return model
+	}
+
+	/**
+	 * Get viewable and selectable attributes list to construct list view column selector
+	 * for AssetClass.* entities types
+	 * @param assetClass
+	 * @param project
+	 * @param attributes
+	 * @return
+	 */
+	@Deprecated
+	private List<Map<String, String>> getViewableAndSelectableAttributesList(AssetClass assetClass, Project project, List<EavAttribute> attributes) {
 		// Create a list of the "custom##" fields that are currently selectable
 		def projectCustoms = project.customFieldsShown + 1
 		List<String> nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ?
@@ -1347,17 +1388,10 @@ class AssetEntityService implements ServiceMethods {
 		// Remove the non project specific attributes and sort them by attributeCode
 		def appAttributes = attributes.findAll {
 			it.attributeCode != "assetName" &&
-			it.attributeCode != "manufacturer" &&
-			!(it.attributeCode in nonCustomList) &&
-			!COLUMN_PROPS_TO_EXCLUDE[ac].contains(it.attributeCode)
+					it.attributeCode != "manufacturer" &&
+					!(it.attributeCode in nonCustomList) &&
+					!COLUMN_PROPS_TO_EXCLUDE[assetClass].contains(it.attributeCode)
 		}
-
-		// Used to display column names in jqgrid dynamically
-		def modelPref = [:]
-		fieldPrefs.each { key, value ->
-			modelPref[key] = getAttributeFrontendLabel(value, attributes.find { it.attributeCode == value }?.frontendLabel)
-		}
-		model.modelPref = modelPref
 
 		// Compose the list of Asset properties that the user can select and use for filters
 		def attributesList = appAttributes.collect { attribute ->
@@ -1367,9 +1401,40 @@ class AssetEntityService implements ServiceMethods {
 
 		// Sorts attributesList alphabetically
 		attributesList.sort { it.frontendLabel }
-		model.attributesList = attributesList
+		return attributesList
+	}
 
-		return model
+	/**
+	 * Get viewable and selectable field specs to construct list view column selector
+	 * for AssetClass.* entities types
+	 * @param assetClass
+	 * @return
+	 */
+	private List<Map<String, String>> getViewableAndSelectableFieldSpecs(AssetClass assetClass) {
+		Map fieldSpecs = customDomainService.allFieldSpecs(assetClass.toString())
+		List<Map<String, String>> attributes = null
+
+		// Find the fields if they exists if is null init as an empty list
+		attributes = fieldSpecs?."${assetClass.toString()}"?.fields
+
+		if (attributes) {
+			// filter viewable only fields and sort them by label
+			attributes = attributes.findAll({ fieldSpec ->
+				fieldSpec.show == 1 &&
+						fieldSpec.field != "assetName" &&
+						fieldSpec.field != "manufacturer" &&
+						!COLUMN_PROPS_TO_EXCLUDE[assetClass].contains(fieldSpec.field)
+			}).collect {
+				fieldSpec -> [attributeCode: fieldSpec.field, frontendLabel: fieldSpec.label]
+			}.sort {
+				fieldSpecA, fieldSpecB -> fieldSpecA.frontendLabel <=> fieldSpecB.frontendLabel
+			}
+		} else {
+			// edge case
+			attributes = [[:]]
+		}
+
+		return attributes
 	}
 
 	/**
@@ -1497,7 +1562,9 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Get config by entityType and validation
+	 * @deprecated This function is no longer needed.
 	 */
+	@Deprecated
 	Map getConfig(String type, String validation, projectAttributes = null) {
 		Project project = securityService.userCurrentProject
 		def allconfig = projectService.getConfigByEntity(type)
@@ -1510,20 +1577,49 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
-		//used to hide the customs whose fieldImportance is "H"
-		def customs = []
-		def hiddenConfig = []
-		if (project.customFieldsShown > 0) {
-			(1..(project.customFieldsShown)).each { i ->
-				customs << i
-				if (config.('custom'+i) == 'H')
-					hiddenConfig << i
+		// Fetch the custom fields settings for visible fields.
+		List customs = getCustomFieldsSettings(type, true)
+
+		return [project: project, config: config, customs: customs]
+	}
+
+	/**
+	 * This method returns the settings for the custom fields for the given
+	 * asset type. Results are sorted by order and field.
+	 *
+	 * Implementation Details: CustomDomainService works with a "domain"
+	 * instead of an "asset type". Also, it returns a Map of the form:
+	 * [domain : list of settings]. This method is responsible for resolving
+	 * the domain for a given asset type, extracting the list of settings
+	 * from the map and sorting the results.
+	 *
+	 * The sorting criteria is: order, field.
+	 *
+	 * @param asset Type :	asset type
+	 * @param showOnly:	flag to request only those fields marked as shown.
+	 *
+	 * @return list with the settings for the custom fields.
+	 */
+	private List getCustomFieldsSettings(String assetType, boolean showOnly) {
+		// This list will contain the settings correctly sorted.
+		List customs
+		// Rersolves the domain for the asset type.
+
+		String domain = AssetClass.getDomainForAssetType(assetType)
+		if (domain) {
+			// Retrieves the settings map.
+			Map settingsMap =  customDomainService.customFieldSpecs(domain, showOnly)
+			if (settingsMap && settingsMap[domain.toUpperCase()]) {
+				// Strips the list of fields from the result map.
+				customs = settingsMap[domain.toUpperCase()].fields
+				// Sorts the results based on order and field.
+				customs = customs.sort{ i,j ->
+					i.order <=> j.order ?: i.field <=> j.field
+				}
 			}
 		}
 
-		customs.removeAll(hiddenConfig)
-
-		[project: project, config: config, customs: customs]
+		return customs
 	}
 
 	/**
@@ -1712,7 +1808,8 @@ class AssetEntityService implements ServiceMethods {
 	/**
 	 * Determine the frontEndLabel for the attribute.
 	 */
-	String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
+	@Deprecated
+	private String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
 		Project project = securityService.userCurrentProject
 		return (attributeCode.contains('custom') && project[attributeCode]) ? project[attributeCode] : frontendLabel
 	}
@@ -2757,5 +2854,38 @@ class AssetEntityService implements ServiceMethods {
 		]
 
 		return map
+	}
+
+	/**
+	 * Retrieve distinct asset entity "custom(n)" field values for all or specific asset class
+	 * @param project
+	 * @param fieldName
+	 * @param shared
+	 * @param assetClass
+	 * @return
+	 */
+	List<String> getDistinctAssetEntityCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
+		String query = "SELECT * FROM (SELECT DISTINCT ${fieldName} COLLATE latin1_bin AS ${fieldName} " +
+				"FROM asset_entity WHERE ${fieldName} IS NOT NULL AND project_id = ? ";
+
+		// shared or not
+		if (!shared) {
+			query = query + " AND asset_class = ? "
+		}
+
+		// order
+		query = query + ") tmp ORDER BY ${fieldName} COLLATE latin1_general_ci ASC";
+
+		List<String> result = []
+		List<Map<String, Object>> values = null
+		if (shared) {
+			values = jdbcTemplate.queryForList(query, project.id)
+		} else {
+			values = jdbcTemplate.queryForList(query, project.id, assetClass.toString())
+		}
+		for (Map<String, Object> value : values) {
+			result.add(value[fieldName])
+		}
+		return result
 	}
 }

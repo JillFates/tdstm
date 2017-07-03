@@ -82,7 +82,7 @@
                         <tds:hasPermission permission="${Permission.UserSendActivations}">
                             <li class="menu-child-item menu-projects-user-activation"><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link></li>
                         </tds:hasPermission>
-                        <li class="menu-child-item menu-projects-field-settings"><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('projectMegaMenu')">Field Settings</g:link></li>
+                        <li class="menu-child-item menu-projects-field-settings"><g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link></li>
                     </g:if>
                     <g:else>
                         <li class="menu-child-warn">No Project Selected</li>

@@ -201,8 +201,20 @@
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
-							<td class="valueNW" colspan="3">
+							<td class="valueNW">
 								<tds:convertDateTime date="${projectInstance?.lastUpdated}" />
+							</td>
+							<td class="name">
+								<label for="projectType"><b>Plan Methodology:&nbsp;</b></label>
+							</td>
+							<td class="valueNW ${hasErrors(bean:projectInstance,field:'planMethodology','errors')}">
+								<g:select id="planMethodology" name="planMethodology" indextab="130"
+										  value="${projectInstance.planMethodology}"
+										  from="${planMethodologies}"
+										  optionKey="field" optionValue="label" />
+								<g:hasErrors bean="${projectInstance}" field="planMethodology">
+									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="planMethodology" /></div>
+								</g:hasErrors>
 							</td>
 						</tr>
 					</tbody>

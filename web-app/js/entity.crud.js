@@ -36,42 +36,56 @@ var EntityCrud = (function ($) {
 	 * Private method used to validate common fields on any of the asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateCommonFields = function (form, alertErrors) {
-		var ok = false;
+	var validateCommonFields = function (formId, alertErrors) {
+		var ok = true;
+		var errors = '';
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true
 		// Validate that asset name is not blank
-		var fieldVal = $('#' + form + ' #assetName').val();
+		var fieldVal = $('#' + formId + ' #assetName').val();
 		if (fieldVal == '') {
-			if (alertErrors) {
-				alert('Please provide a name for the asset');
-			}
-
-		} else {
-			ok = true
+			errors += 'Please provide a name for the asset';
+			ok = false;
 		}
+
+		ok = validateCustomFields(formId, alertErrors, errors, ok);
+
+		// Commented out old validation error messages
+		/*if (!ok && alertErrors && errors.length > 0) {
+			alert(errors);
+		}*/
+
 		return ok;
 	};
 
-	/**
-	 * Private method used to validate the Storage asset create/edit forms
-	 * @return true if valid
-	 **/
-	var validateStorageForm = function (form) {
-		return validateCommonFields(form);
-		/*var ok = validateCommonFields(form);
-		if (ok) {
-			var size = $('#'+form+' #size').val();
-			if ( size=='' || isNaN(size)) {
-				alert("Please enter numeric value for Storage Size");
-				ok = false;
-			} else if ($('#'+form+' #fileFormat').val()=='') {
-				alert("Please enter value for Storage Format");
-				ok = false;
-			}
-		}
-		return ok*/
-	};
 
+	/**
+	 * Validations for Field Spec input fields.
+	 * Simulates a submit of the form, this forces browser to run HTML5 built-in form validation.
+	 * - Validates required fields.
+	 * - Validates text input fields min-max length.
+	 *
+	 * @param errors
+	 * @param formId
+	 * @param isFormValid
+	 * @param alertErrors
+	 */
+	function validateCustomFields(formId, alertErrors, errors, isFormValid) {
+
+		var form = $('#'+formId)[0];
+
+		// Prevent form for being submitted.
+		$(form).submit(function (event) {
+			event.preventDefault();
+		});
+
+		// Submit hidden button clicked by jquery only if form is not valid. See _editButton.gsp
+		if(!form.checkValidity()){
+			$('#assetUpdateSubmit').click();
+			return false;
+		}
+		return isFormValid;
+
+	};
 	/**
 	 * Private method used to validate the Database asset create/edit forms
 	 * @return true if valid
@@ -79,26 +93,18 @@ var EntityCrud = (function ($) {
 	var validateDBForm = function (form, alertErrors) {
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true;
 		return validateCommonFields(form, alertErrors);
-		/*var ok = validateCommonFields(form, alertErrors);
-		if (ok) {
-		    var size = $('#'+form+' #size').val();
-		    if ( size=='' || isNaN(size)){
-		    	if(alertErrors){
-		    		alert("Please enter numeric value for DB Size");
-		    	}
-		    	
-				ok = false;
-		    } else if($('#'+form+' #dbFormat').val()==''){
-		    	if(alertErrors){
-		    		alert("Please enter value for DB Format");
-		    	}
-				ok = false;
-		    }
-		}
-		return ok*/
 	};
 
-	/**
+    /**
+     * Private method used to validate the Storage asset create/edit forms
+     * @return true if valid
+     **/
+    var validateStorageForm = function (form) {
+        return validateCommonFields(form);
+    };
+
+
+    /**
 	 * Used to validate the Server/Device asset create/edit forms
 	 * @return true if valid
 	 **/
