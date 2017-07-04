@@ -170,4 +170,5 @@ databaseChangeLog = {
 	include file: "20170504-delete-room-merge-permission.groovy"
 	include file: "20170530-create-setting-table.groovy"
 	include file: "20170623-add-planMethodology-to-Ptoject.groovy"
+	include file: "20170704-delete-model-alias-records-that-associate-model-of-same-name.groovy"
 }
