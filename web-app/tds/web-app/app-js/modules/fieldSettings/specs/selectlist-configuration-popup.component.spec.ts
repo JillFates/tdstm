@@ -26,14 +26,14 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		field: 'string',
 		label: 'string',
 		tip: 'string',
-		udf: 1,
-		shared: 1,
+		udf: true,
+		shared: true,
 		imp: 'C',
 		constraints: {
-			required: 1,
+			required: true,
 			values: []
 		},
-		show: 1,
+		show: true,
 		control: 'Select List'
 	};
 

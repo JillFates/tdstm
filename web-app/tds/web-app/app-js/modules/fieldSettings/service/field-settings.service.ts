@@ -44,7 +44,7 @@ export class FieldSettingsService {
 		let payload = {};
 		domains
 			.reduce((p: FieldSettingsModel[], c: DomainModel) => p.concat(c.fields), [])
-			.forEach(item => {
+			.forEach((item: any) => {
 				item.constraints.required = +item.constraints.required;
 				item.udf = +item.udf;
 				item.show = +item.show;

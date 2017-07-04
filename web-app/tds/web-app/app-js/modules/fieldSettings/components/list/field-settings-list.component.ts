@@ -150,7 +150,7 @@ export class FieldSettingsListComponent implements OnInit {
 					if (result) {
 						this.handleSharedField(value.field, value.domain);
 					} else {
-						value.field.shared = 0;
+						value.field.shared = false;
 					}
 				});
 		} else {

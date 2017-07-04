@@ -2,10 +2,10 @@ export class FieldSettingsModel {
 	field: string;
 	label: string;
 	tip: string;
-	udf: number;
-	shared: number;
+	udf: boolean;
+	shared: boolean;
 	imp: 'C' | 'I' | 'N' | 'U';
-	show: number;
+	show: boolean;
 	order?: number;
 	length?: number;
 	default?: any;
@@ -14,12 +14,12 @@ export class FieldSettingsModel {
 	style?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 	constructor() {
-		this.udf = 1;
+		this.udf = true;
 		this.imp = 'N';
 	}
 }
 export class ConstraintModel {
-	required: Number;
+	required: boolean;
 	minSize?: Number;
 	maxSize?: Number;
 	values?: Array<string>;
