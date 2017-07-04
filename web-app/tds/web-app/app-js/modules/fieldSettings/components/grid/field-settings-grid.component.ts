@@ -78,18 +78,27 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onFilter(): void {
+
 		this.state.filter.filters = [];
+
 		this.fieldsSettings = this.data.fields;
 		if (this.filter.search !== '') {
+			let search = new RegExp(this.filter.search, 'i');
 			this.fieldsSettings = this.data.fields.filter(
-				item => item.field.indexOf(this.filter.search) !== -1 ||
-					item.label.indexOf(this.filter.search) !== -1);
+				item => search.test(item.field) ||
+					search.test(item.label) ||
+					item['isNew']);
 		}
 		if (this.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
 				value: this.filter.fieldType === 'Custom Fields'
+			});
+			this.state.filter.filters.push({
+				field: 'isNew',
+				operator: 'eq',
+				value: true
 			});
 		}
 		this.refresh();
@@ -100,12 +109,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		setTimeout(() => {
 			this.isEditing = true;
 			this.sortable = { mode: 'single' };
-
-			this.filter = {
-				search: '',
-				fieldType: 'All'
-			};
-			this.isFilterDisabled = true;
+			this.isFilterDisabled = false;
 			this.onFilter();
 			this.loaderService.hide();
 		});
@@ -154,8 +158,8 @@ export class FieldSettingsGridComponent implements OnInit {
 			model['isNew'] = true;
 			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
 			model.order = availableOrder[availableOrder.length - 1] + 1;
-			this.fieldsSettings.push(model);
-			this.refresh();
+			this.data.fields.push(model);
+			this.onFilter();
 
 			setTimeout(function () {
 				jQuery('#' + model.field).focus();
