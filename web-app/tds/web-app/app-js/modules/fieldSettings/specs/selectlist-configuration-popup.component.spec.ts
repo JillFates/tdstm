@@ -26,14 +26,14 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		field: 'string',
 		label: 'string',
 		tip: 'string',
-		udf: true,
-		shared: true,
+		udf: 1,
+		shared: 1,
 		imp: 'C',
 		constraints: {
-			required: true,
+			required: 1,
 			values: []
 		},
-		show: true,
+		show: 1,
 		control: 'Select List'
 	};
 
@@ -125,11 +125,11 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		comp.onToggle();
 		fixture.detectChanges();
 		comp.items = [
-			{deletable: true, value: 'Z'},
-			{deletable: true, value: 'P'},
-			{deletable: true, value: 'E'},
-			{deletable: true, value: 'A'},
-			{deletable: true, value: 'C'}
+			{ deletable: true, value: 'Z' },
+			{ deletable: true, value: 'P' },
+			{ deletable: true, value: 'E' },
+			{ deletable: true, value: 'A' },
+			{ deletable: true, value: 'C' }
 		];
 
 		let sortButton: DebugElement;

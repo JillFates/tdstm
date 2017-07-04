@@ -37,13 +37,13 @@ describe('FieldSettingsListComponent:', () => {
 				field: 'string',
 				label: 'string',
 				tip: 'string',
-				udf: true,
-				shared: true,
+				udf: 1,
+				shared: 1,
 				imp: 'C',
 				constraints: {
-					required: true
+					required: 1
 				},
-				show: true
+				show: 1
 			}]
 		},
 		{
@@ -52,13 +52,13 @@ describe('FieldSettingsListComponent:', () => {
 				field: 'string',
 				label: 'string',
 				tip: 'string',
-				udf: true,
-				shared: true,
+				udf: 1,
+				shared: 1,
 				imp: 'C',
 				constraints: {
-					required: true
+					required: 1
 				},
-				show: true
+				show: 1
 			}]
 		}
 	];
