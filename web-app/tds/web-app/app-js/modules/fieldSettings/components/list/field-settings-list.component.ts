@@ -74,7 +74,7 @@ export class FieldSettingsListComponent implements OnInit {
 				this.selectedTab = invalid[0].domain;
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
-					message: 'Please review your changes. Label is a required and must be unique.'
+					message: 'Label is a required field and must be unique. Please correct before saving.'
 				});
 			}
 		}
