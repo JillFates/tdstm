@@ -14,7 +14,7 @@ class ControlTagLib {
 	static final String MISSING_OPTION_WARNING = 'INVALID'
 	static final int MAX_STRING_LENGTH = 255
 	static final String EMPTY_IMP_CRIT_FIELD_CSS_CLASS = " highField"
-
+	static final List TOOLTIP_DATA_PLACEMENT_VALUES = ["top", "bottom", "left", "right"]
 
 	/**
 	 * Used to render the LABEL used for an input field
@@ -74,7 +74,21 @@ class ControlTagLib {
 		def fieldValue = attrs.value ?: ""
 		StringBuilder sb = new StringBuilder("\n")
 		sb.append("<td class='valueNW ${attrs.field.imp}'>")
+		sb.append("<span data-toggle='popover' ")
+		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
+		// This parameter is optional to modify default tooltip positioning
+		// Also checks that the value is one of the valid data-placement element values
+		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
+		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
+					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+		}
+		if (tooltipDataPlacement !=null) {
+			sb.append("data-placement='${tooltipDataPlacement}' ")
+		}
+		sb.append("data-trigger='hover' data-content='${attrs.field.tip}'>")
 		sb.append(fieldValue)
+		sb.append("</span>")
 		sb.append("</td>")
 		out << sb.toString()
 	}
@@ -125,18 +139,27 @@ class ControlTagLib {
 		// println "attrs=${attrs.keySet()}"
 		// println "tabIndex = $tabIndex; tabOffset=$tabOffset; fieldSpec.order=${fieldSpec.order}"
 
+		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
+		// This parameter is optional to modify default tooltip positioning
+		// Also checks that the value is one of the valid data-placement element values
+		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
+		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
+					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+		}
+
 		switch (fieldSpec.control) {
 			case 'Select List':
-				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset, size)
+				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
 			case 'YesNo':
-				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset, size)
+				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
 			case 'String':
 			default:
-				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size)
+				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 		}
 	}
 
@@ -165,13 +188,14 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to (optional)
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the SELECT Component HTML
 	 */
-	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
+	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 		sb.append('>')
 
 		// Add a Select... option at top if the field is required
@@ -210,12 +234,13 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
+	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		'<input' +
 		attribute('type', 'text') +
-		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size) +
+		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) +
 		'/>'
 	}
 
@@ -224,14 +249,15 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
+	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = []
 		List valid = ['Yes', 'No']
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 		sb.append(' style="width: 50px;"')
 		sb.append('>')
 
@@ -273,16 +299,17 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to (optional)
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the attributes generated in HTML format
 	 */
-	private String commonAttributes(Map fieldSpec, String value=null, String tabIndex=null, String tabOffset=null, Integer size) {
+	private String commonAttributes(Map fieldSpec, String value=null, String tabIndex=null, String tabOffset=null, Integer size, String tooltipDataPlacement=null ) {
 		idAttrib(fieldSpec) +
 		nameAttrib(fieldSpec) +
 		valueAttrib(fieldSpec, value) +
 		tabIndexAttrib(fieldSpec, tabIndex, tabOffset) +
 		classAttrib(fieldSpec) +
 		sizeAttrib(size) +
-		titleAttrib(fieldSpec) +
+		tooltipAttribs(fieldSpec, tooltipDataPlacement) +
 		constraintsAttrib(fieldSpec) +
 		dataLabelAttrib(fieldSpec)
 	}
@@ -412,6 +439,24 @@ class ControlTagLib {
 	 */
 	private String titleAttrib(Map field) {
 		return attribute('title', field?.tip, field?.title)
+	}
+
+	/**
+	 * Returns the HTML tooltip attributes based on the field specification
+	 * @param field - the Field specification object
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
+	 * @return The tooltip attributes HTML for controls
+	 */
+	private String tooltipAttribs(Map field, String tooltipDataPlacement=null ) {
+
+		String attrib=""
+		attrib += attribute('data-toggle', 'popover')
+		attrib += attribute('data-trigger', 'hover')
+		if (tooltipDataPlacement !=null) {
+			attrib += attribute('data-placement', tooltipDataPlacement)
+		}
+		attrib += attribute('data-content', field?.tip, field?.title)
+		return attrib
 	}
 
 	 /**
