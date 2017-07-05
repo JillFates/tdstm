@@ -22,6 +22,11 @@ export class FieldSettingsListComponent implements OnInit {
 	selectedTab = '';
 	editing = false;
 
+	private filter = {
+		search: '',
+		fieldType: 'All'
+	};
+
 	constructor(
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private fieldService: FieldSettingsService,
@@ -107,7 +112,8 @@ export class FieldSettingsListComponent implements OnInit {
 		return {
 			editable: this.isEditAvailable(),
 			dirty: this.isDirty(),
-			valid: this.isValid(domain)
+			valid: this.isValid(domain),
+			filter: this.filter
 		};
 	}
 
@@ -166,6 +172,10 @@ export class FieldSettingsListComponent implements OnInit {
 					domain.fields.splice(domain.fields.indexOf(value.field), 1);
 				});
 		this.refreshGrids(value.field.shared, value.callback);
+	}
+
+	protected onFilter(): void {
+		this.grids.forEach(grid => grid.applyFilter());
 	}
 
 	public refreshGrids(all, callback: any) {
