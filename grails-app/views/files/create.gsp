@@ -32,7 +32,7 @@
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.description}" value="${fileInstance?.description}"/>
 							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.description}" size="50" value="${fileInstance?.description}" tabindex="11"/>
+								<tds:inputControl field="${standardFieldSpecs.description}" size="50" value="${fileInstance?.description}" tabindex="11" tooltipDataPlacement="bottom"/>
 							</td>
 						</tr>
 
@@ -45,7 +45,9 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
 							<td>
+							<span data-toggle="popover" data-trigger="hover" data-placement="left" data-content="${standardFieldSpecs.moveBundle.tip}">
 								<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="42" />
+							</span>
 							</td>
 						</tr>
 
@@ -61,12 +63,16 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
 							<td>
-								<g:select id="environment" name="environment" from="${environmentOptions}" noSelection="${['':' Please Select']}"  tabindex="33"/>
+								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">
+									<g:select id="environment" name="environment" from="${environmentOptions}" noSelection="${['':' Please Select']}"  tabindex="33"/>
+								</span>
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
 							<td>
-								<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
+								<span data-toggle="popover" data-trigger="hover" data-placement="left" data-content="${standardFieldSpecs.planStatus.tip}">
+									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
+								</span>
 							</td>
 
 						</tr>
@@ -81,7 +87,9 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
-								<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" onChange="assetFieldImportance(this.value,'Files');highlightCssByValidation(this.value,'Files','');" value="Discovery" tabindex="44"/>
+								<span data-toggle="popover" data-trigger="hover" data-placement="left" data-content="${standardFieldSpecs.validation.tip}">
+									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" onChange="assetFieldImportance(this.value,'Files');highlightCssByValidation(this.value,'Files','');" value="Discovery" tabindex="44"/>
+								</span>
 							</td>
 						</tr>
 						<tbody class="customTemplate">

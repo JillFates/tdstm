@@ -40,13 +40,16 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
 							<td >
-								<g:select id="environment" name="environment" from="${environmentOptions}" noSelection="${['':' Please Select']}" tabindex="32" />
+								<g:select id="environment" name="environment" from="${environmentOptions}"
+										  noSelection="${['':' Please Select']}" tabindex="32"
+										  data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}"/>
 							</td>
 						</tr>
 						<tr>
 							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
 							<td nowrap="nowrap" class="sizeScale">
-								<input type="text" id="size" size="3" name="size" value="${databaseInstance.size}" tabindex="14" />
+								<input type="text" id="size" size="3" name="size" value="${databaseInstance.size}" tabindex="14"
+									   data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}"/>
 								<g:select from="${databaseInstance.constraints.scale.inList}" id="scale" name="scale" value="${databaseInstance.scale}" optionValue="value" tabindex="40" noSelection="${['':' Please Select']}"/>
 							</td>
 
@@ -55,13 +58,13 @@
 							    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
 							    </script>
-							    <input type="text" class="dateRange" size="15" style="width: 138px;" name="retireDate" id="retireDate"
+							    <input type="text" class="dateRange" size="15" style="width: 138px;" name="retireDate" id="retireDate" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip}"
 								value="<tds:convertDate date="${databaseInstance?.retireDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="27" >
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${databaseInstance.moveBundle}"/>
 							<td >
-								<g:select from="${moveBundleList}" id="moveBundle"  name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34" />
+								<g:select from="${moveBundleList}" id="moveBundle"  name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
 							</td>
 						</tr>
 						<tr>
@@ -72,12 +75,14 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'maintExpDate','errors')}">
-							    <input type="text" class="dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate"
+							    <input type="text" class="dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}"
 									value="<tds:convertDate date="${databaseInstance?.maintExpDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="28" >
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
 							<td>
+							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.planStatus.tip}">
 								<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="35" />
+							</span>
 							</td>
 						</tr>
 						<tr>
@@ -88,7 +93,9 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 							<td>
+							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}">
 								<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" onChange="assetFieldImportance(this.value,'Database');highlightCssByValidation(this.value,'Database','');" name="validation" value="Discovery"/>
+							</span>
 							</td>
 						</tr>
 						<tbody class="customTemplate">
