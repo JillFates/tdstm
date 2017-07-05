@@ -42,6 +42,14 @@ export class FieldSettingsService {
 
 	saveFieldSettings(domains: DomainModel[]): Observable<DomainModel[]> {
 		let payload = {};
+		domains
+			.reduce((p: FieldSettingsModel[], c: DomainModel) => p.concat(c.fields), [])
+			.forEach((item: any) => {
+				item.constraints.required = +item.constraints.required;
+				item.udf = +item.udf;
+				item.show = +item.show;
+				item.shared = +item.shared;
+			});
 		domains.forEach(domainModel => {
 			payload[domainModel.domain.toUpperCase()] = domainModel;
 		});
