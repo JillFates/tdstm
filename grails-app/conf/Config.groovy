@@ -121,7 +121,7 @@ grails {
 			excludes = ['*', '**/WEB-INF/**','**/META-INF/**']
 			includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**',
 			            '/js/**', '/app-js/**', '/i18n/**', '/test/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**',
-			            '/plugins/**', '/d3/**', '/dist/**', '/tds/web-app/dist/**', '/tds/node_modules/**', '/tds/web-app/app-js/**', '/tds/web-app/i18n/**', '/module/**']
+			            '/plugins/**', '/d3/**', '/dist/**', '/tds/web-app/dist/**', '/tds/node_modules/**', '/tds/web-app/app-js/**', '/tds/web-app/css/**', '/tds/web-app/i18n/**', '/module/**']
 			patterns = []
 		}
 		rewrite.css = false
