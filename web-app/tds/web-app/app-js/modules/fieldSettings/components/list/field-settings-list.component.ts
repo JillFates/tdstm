@@ -79,7 +79,7 @@ export class FieldSettingsListComponent implements OnInit {
 				this.selectedTab = invalid[0].domain;
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
-					message: 'Please review your changes.'
+					message: 'Label is a required field and must be unique. Please correct before saving.'
 				});
 			}
 		}
@@ -124,8 +124,10 @@ export class FieldSettingsListComponent implements OnInit {
 	}
 
 	protected isValid(domain: DomainModel): boolean {
+		let values = domain.fields.map(x => x.label);
 		return domain.fields.filter(item =>
-			!item.label || !item.field).length === 0;
+			!item.label || !item.field).length === 0 &&
+			values.filter((l, i) => values.indexOf(l) !== i).length === 0;
 	}
 
 	protected onAdd(callback): void {
