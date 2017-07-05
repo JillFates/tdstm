@@ -29,15 +29,12 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Output('add') addEmitter = new EventEmitter<any>();
 	@Output('share') shareEmitter = new EventEmitter<any>();
 	@Output('delete') deleteEmitter = new EventEmitter<any>();
+	@Output('filter') filterEmitter = new EventEmitter<any>();
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
 	private fieldsSettings: FieldSettingsModel[];
 
-	private filter = {
-		search: '',
-		fieldType: 'All'
-	};
 	private gridData: GridDataResult;
 	private state: State = {
 		sort: [{
@@ -78,22 +75,25 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onFilter(): void {
+		this.filterEmitter.emit(null);
+	}
 
+	public applyFilter(): void {
 		this.state.filter.filters = [];
 
 		this.fieldsSettings = this.data.fields;
-		if (this.filter.search !== '') {
-			let search = new RegExp(this.filter.search, 'i');
+		if (this.gridState.filter.search !== '') {
+			let search = new RegExp(this.gridState.filter.search, 'i');
 			this.fieldsSettings = this.data.fields.filter(
 				item => search.test(item.field) ||
 					search.test(item.label) ||
 					item['isNew']);
 		}
-		if (this.filter.fieldType !== 'All') {
+		if (this.gridState.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.filter.fieldType === 'Custom Fields'
+				value: this.gridState.filter.fieldType === 'Custom Fields'
 			});
 			this.state.filter.filters.push({
 				field: 'isNew',
@@ -175,7 +175,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onClearTextFilter(): void {
-		this.filter.search = '';
+		this.gridState.filter.search = '';
 		this.onFilter();
 	}
 
