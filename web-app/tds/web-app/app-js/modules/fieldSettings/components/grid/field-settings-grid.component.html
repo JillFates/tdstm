@@ -48,7 +48,8 @@
     </kendo-grid-column>
     <kendo-grid-column field="order" title="Order" [width]="100">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else orderTemp" let-dataItem>
-            <input type="number" min="0" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.order" name="order">
+            <input type="number" min="0" *ngIf="dataItem.udf" class="form-control" [ngModel]="dataItem.order" name="order"
+                   (input)="validateOrderValue($event.target, dataItem)">
             <div *ngIf="!dataItem.udf" style="width:45px" class="text-center">{{dataItem.order}}</div>
         </ng-template>
         <ng-template kendoGridCellTemplate class="text-center" let-dataItem #orderTemp>
