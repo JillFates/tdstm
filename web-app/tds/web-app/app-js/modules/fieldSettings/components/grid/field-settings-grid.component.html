@@ -65,7 +65,7 @@
     <kendo-grid-column field="shared" title="Shared" [width]="65" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else sharedTemp" let-dataItem>
             <div class="checkbox text-center">
-                <label><input type="checkbox" (change)="onShare(dataItem)" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="required"></label>
+                <label><input type="checkbox" (change)="onShare(dataItem)" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="shared"></label>
             </div>
         </ng-template>
         <ng-template kendoGridCellTemplate class="text-center" let-dataItem #sharedTemp>
@@ -84,7 +84,7 @@
     <kendo-grid-column field="constraints.required" title="Required" [width]="75" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
             <div class="checkbox text-center">
-                <label><input type="checkbox"  [disabled]="!dataItem.udf" [(ngModel)]="dataItem.constraints.required" name="required"></label>
+                <label><input type="checkbox" (change)="onRequired(dataItem)" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.constraints.required" name="required"></label>
             </div>
         </ng-template>
         <ng-template class="text-center" kendoGridCellTemplate let-dataItem #requiredTemp>
@@ -106,18 +106,10 @@
             <input *ngIf="(dataItem.udf) && (dataItem.control!='Select List' && dataItem.control!='YesNo')" type="text" class="form-control"
                 [(ngModel)]="dataItem.default" name="default">
             <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
-
-            <select *ngIf="dataItem.control=='Select List'" class="form-control" name="default" [(ngModel)]="dataItem.default">
+            <select *ngIf="dataItem.control=='Select List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default">
                 <option value="">Select...</option>
                 <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
             </select>
-
-            <select *ngIf="dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default">
-                <option value="">Select...</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-            </select>
-
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="control" title="Control" [width]="150">

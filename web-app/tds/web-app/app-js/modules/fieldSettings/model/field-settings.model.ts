@@ -9,7 +9,7 @@ export class FieldSettingsModel {
 	order?: number;
 	length?: number;
 	default?: any;
-	control?: 'Select List' | 'String' | 'YesNoUnknow' | '';
+	control?: 'Select List' | 'String' | 'YesNo' | '';
 	constraints: ConstraintModel;
 	style?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 

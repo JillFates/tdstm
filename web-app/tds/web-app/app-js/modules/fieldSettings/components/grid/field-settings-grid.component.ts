@@ -176,6 +176,20 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	protected onRequired(field: FieldSettingsModel) {
+		if (field.constraints.values &&
+			(field.control === 'Select List' || field.control === 'YesNo')) {
+			if (field.constraints.required) {
+				field.constraints.values.splice(field.constraints.values.indexOf(''), 1);
+			} else if (field.constraints.values.indexOf('') === -1) {
+				field.constraints.values.splice(0, 0, '');
+			}
+			if (field.constraints.values.indexOf(field.default) === -1) {
+				field.default = null;
+			}
+		}
+	}
+
 	protected onClearTextFilter(): void {
 		this.gridState.filter.search = '';
 		this.onFilter();
@@ -202,6 +216,12 @@ export class FieldSettingsGridComponent implements OnInit {
 		minMax: MinMaxConfigurationPopupComponent): void {
 		switch (dataItem.control) {
 			case 'Select List':
+
+				if (dataItem.constraints.values &&
+					dataItem.constraints.values.indexOf('Yes') !== -1 &&
+					dataItem.constraints.values.indexOf('No') !== -1) {
+					dataItem.constraints.values = [];
+				}
 				if (!dataItem.constraints.values ||
 					dataItem.constraints.values.length === 0) {
 					selectList.onToggle();
@@ -210,11 +230,21 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 				break;
 			case 'String':
+				dataItem.constraints.values = [];
 				if (!dataItem.constraints.minSize ||
 					!dataItem.constraints.maxSize) {
 					minMax.onToggle();
 				} else {
 					minMax.show = false;
+				}
+				break;
+			case 'YesNo':
+				dataItem.constraints.values = ['Yes', 'No'];
+				if (dataItem.constraints.values.indexOf(dataItem.default) === -1) {
+					dataItem.default = null;
+				}
+				if (!dataItem.constraints.required) {
+					dataItem.constraints.values.splice(0, 0, '');
 				}
 				break;
 			default:
