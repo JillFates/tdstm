@@ -54,11 +54,7 @@ class ControlTagLib {
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('"')
-		if(fieldSpec.tip) {
-			sb.append(' data-toggle="popover" data-trigger="hover" data-content="')
-			sb.append(fieldSpec.tip)
-			sb.append('"')
-		}
+		sb.append(tooltipAttribs(fieldSpec))
 		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		if (fieldSpec.constraints.required) {
@@ -74,23 +70,22 @@ class ControlTagLib {
 	/**
 	 * Creates the cell with the value of a field for displaying in show views.
 	 */
-	def labelForShowField = {Map attrs ->
+	def labelForShowField = { Map attrs ->
+		Map fieldSpec = attrs.field ?: [:]
 		def fieldValue = attrs.value ?: ""
 		StringBuilder sb = new StringBuilder("\n")
-		sb.append("<td class='valueNW ${attrs.field.imp}'>")
-		sb.append("<span data-toggle='popover' ")
-		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
-		// This parameter is optional to modify default tooltip positioning
-		// Also checks that the value is one of the valid data-placement element values
+		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
+		sb.append("<span ")
+        // Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
+        // This parameter is optional to modify default tooltip positioning
+        // Also checks that the value is one of the valid data-placement element values
 		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
-		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+		if (tooltipDataPlacement != null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
 			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
 					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
 		}
-		if (tooltipDataPlacement !=null) {
-			sb.append("data-placement='${tooltipDataPlacement}' ")
-		}
-		sb.append("data-trigger='hover' data-content='${attrs.field.tip}'>")
+		sb.append(tooltipAttribs(fieldSpec, tooltipDataPlacement))
+		sb.append(" >")
 		sb.append(fieldValue)
 		sb.append("</span>")
 		sb.append("</td>")
