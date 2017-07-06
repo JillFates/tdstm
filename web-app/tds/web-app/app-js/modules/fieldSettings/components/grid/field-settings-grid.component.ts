@@ -219,4 +219,18 @@ export class FieldSettingsGridComponent implements OnInit {
 				break;
 		}
 	}
+
+	/**
+	 * Function used by html view to prevent user input negative values on the order number input.
+	 * - Validates input value is not negative (not less than 0).
+	 * @param element HTML element.
+	 * @param field custom field.
+	 */
+	public validateOrder(element, field): void {
+		if ( (+element.value === 0 ) || element.value < 0) {
+			element.value = field.order;
+		} else {
+			field.order = element.value;
+		}
+	}
 }
