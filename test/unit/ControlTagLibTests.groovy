@@ -337,7 +337,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				shared     : 1,
 				imp        : 'C',
 				show       : 1,
-				order      : 3,
+				order      : 1,
 				default    : 'Javascript',
 				control    : 'Select List',
 				constraints: [
