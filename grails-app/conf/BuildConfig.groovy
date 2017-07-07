@@ -68,6 +68,8 @@ grails.project.dependency.resolution = {
 		runtime ':jquery:1.11.1'
 		runtime ':mail:1.0.7'
 		runtime ':resources:1.2.14' // TODO ':asset-pipeline:2.9.1'
+		runtime ':cached-resources:1.0'
+		runtime ':cache-headers:1.1.7'
 
 		test ':functional-test:1.2.7'
 	}
