@@ -12,7 +12,6 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
@@ -24,7 +23,6 @@ import net.transitionmanager.utils.Profiler
 import org.apache.poi.openxml4j.util.ZipSecureFile
 import org.apache.poi.ss.usermodel.*
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.*
 import org.hibernate.transform.Transformers
 
@@ -88,7 +86,6 @@ class AssetExportService {
         try {
             def progressCount = 0
             def progressTotal = 0
-            def missingHeader = ""
 
             //get project Id
             def dataTransferSet = params.dataTransferSet
