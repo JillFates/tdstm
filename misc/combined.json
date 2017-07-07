@@ -20,7 +20,7 @@
             },
             {
                 "field": "appOwner",
-                "label": "AppOwner",
+                "label": "App Owner",
                 "tip": "This field is the App Owner",
                 "udf": 0,
                 "default": "",
@@ -110,7 +110,7 @@
             },
             {
                 "field": "businessUnit",
-                "label": "BusinessUnit",
+                "label": "Business Unit",
                 "tip": "This field is the Business Unit",
                 "udf": 0,
                 "default": "",
@@ -155,7 +155,7 @@
             },
             {
                 "field": "drRpoDesc",
-                "label": "RPO",
+                "label": "DR RPO",
                 "tip": "This field is the DR RPO",
                 "udf": 0,
                 "default": "",
@@ -170,7 +170,7 @@
             },
             {
                 "field": "drRtoDesc",
-                "label": "RTO",
+                "label": "DR RTO",
                 "tip": "This field is the DR RTO",
                 "udf": 0,
                 "default": "",
@@ -200,7 +200,7 @@
             },
             {
                 "field": "externalRefId",
-                "label": "ExternalRefId",
+                "label": "External Ref Id",
                 "tip": "This field is the External Ref Id",
                 "udf": 0,
                 "default": "",
@@ -230,7 +230,7 @@
             },
             {
                 "field": "latency",
-                "label": "Latency",
+                "label": "Latency OK",
                 "tip": "This field is the Latency OK",
                 "udf": 0,
                 "default": "",
@@ -260,7 +260,7 @@
             },
             {
                 "field": "maintExpDate",
-                "label": "MaintExp",
+                "label": "Maint Expiration",
                 "tip": "This field is the Maint Expiration",
                 "udf": 0,
                 "default": "",
@@ -275,7 +275,7 @@
             },
             {
                 "field": "moveBundle",
-                "label": "MoveBundle",
+                "label": "Bundle",
                 "tip": "This field is the Bundle",
                 "udf": 0,
                 "default": "",
@@ -290,7 +290,7 @@
             },
             {
                 "field": "planStatus",
-                "label": "PlanStatus",
+                "label": "Plan Status",
                 "tip": "This field is the Plan Status",
                 "udf": 0,
                 "default": "",
@@ -305,7 +305,7 @@
             },
             {
                 "field": "retireDate",
-                "label": "Retire",
+                "label": "Retire Date",
                 "tip": "This field is the Retire Date",
                 "udf": 0,
                 "default": "",
@@ -320,7 +320,7 @@
             },
             {
                 "field": "shutdownBy",
-                "label": "ShutdownBy",
+                "label": "Shutdown By",
                 "tip": "This field is the Shutdown By",
                 "udf": 0,
                 "default": "",
@@ -335,7 +335,7 @@
             },
             {
                 "field": "shutdownDuration",
-                "label": "ShutdownDuration",
+                "label": "Shutdown Duration",
                 "tip": "This field is the Shutdown Duration",
                 "udf": 0,
                 "default": "",
@@ -350,7 +350,7 @@
             },
             {
                 "field": "shutdownFixed",
-                "label": "ShutdownFixed",
+                "label": "Shutdown Fixed",
                 "tip": "This field is the Shutdown Fixed",
                 "udf": 0,
                 "default": "",
@@ -365,7 +365,7 @@
             },
             {
                 "field": "sme",
-                "label": "SME",
+                "label": "SME1",
                 "tip": "This field is the SME1",
                 "udf": 0,
                 "default": "",
@@ -395,7 +395,7 @@
             },
             {
                 "field": "startupBy",
-                "label": "StartupBy",
+                "label": "Startup By",
                 "tip": "This field is the Startup By",
                 "udf": 0,
                 "default": "",
@@ -410,7 +410,7 @@
             },
             {
                 "field": "startupDuration",
-                "label": "StartupDuration",
+                "label": "Startup Duration",
                 "tip": "This field is the Startup Duration",
                 "udf": 0,
                 "default": "",
@@ -425,7 +425,7 @@
             },
             {
                 "field": "startupFixed",
-                "label": "StartupFixed",
+                "label": "Startup Fixed",
                 "tip": "This field is the Startup Fixed",
                 "udf": 0,
                 "default": "",
@@ -440,7 +440,7 @@
             },
             {
                 "field": "startupProc",
-                "label": "StartupProc",
+                "label": "Startup Proc OK",
                 "tip": "This field is the Startup Proc OK",
                 "udf": 0,
                 "default": "",
@@ -455,7 +455,7 @@
             },
             {
                 "field": "supportType",
-                "label": "SupportType",
+                "label": "Support",
                 "tip": "This field is the Support",
                 "udf": 0,
                 "default": "",
@@ -470,7 +470,7 @@
             },
             {
                 "field": "testingBy",
-                "label": "TestingBy",
+                "label": "Testing By",
                 "tip": "This field is the Testing By",
                 "udf": 0,
                 "default": "",
@@ -485,7 +485,7 @@
             },
             {
                 "field": "testingDuration",
-                "label": "TestingDuration",
+                "label": "Testing Duration",
                 "tip": "This field is the Testing Duration",
                 "udf": 0,
                 "default": "",
@@ -500,7 +500,7 @@
             },
             {
                 "field": "testingFixed",
-                "label": "TestingFixed",
+                "label": "Testing Fixed",
                 "tip": "This field is the Testing Fixed",
                 "udf": 0,
                 "default": "",
@@ -515,7 +515,7 @@
             },
             {
                 "field": "testProc",
-                "label": "TestProc",
+                "label": "Test Proc OK",
                 "tip": "This field is the Test Proc OK",
                 "udf": 0,
                 "default": "",
@@ -530,7 +530,7 @@
             },
             {
                 "field": "url",
-                "label": "Url",
+                "label": "URL",
                 "tip": "This field is the URL",
                 "udf": 0,
                 "default": "",
@@ -545,7 +545,7 @@
             },
             {
                 "field": "useFrequency",
-                "label": "Frequency",
+                "label": "Use Frequency",
                 "tip": "This field is the Use Frequency",
                 "udf": 0,
                 "default": "",
@@ -560,7 +560,7 @@
             },
             {
                 "field": "userCount",
-                "label": "TotalUsers",
+                "label": "Users",
                 "tip": "This field is the Users",
                 "udf": 0,
                 "default": "",
@@ -575,7 +575,7 @@
             },
             {
                 "field": "userLocations",
-                "label": "UserLocations",
+                "label": "User Location",
                 "tip": "This field is the User Location",
                 "udf": 0,
                 "default": "",
@@ -715,51 +715,6 @@
                 "constraints": {
                     "required": 0
                 }
-            },
-            {
-                "field": "appAccess",
-                "label": "AccessType",
-                "tip": "This field is the Access Type",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 108,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "moveDowntimeTolerance",
-                "label": "DowntimeTolerance",
-                "tip": "This field is the Downtime Tolerance",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 108,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": 100,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
             }
         ]
     },
@@ -769,7 +724,7 @@
         "fields": [
             {
                 "field": "assetName",
-                "label": "Name",
+                "label": "Asset Name",
                 "tip": "This field is the Asset Name",
                 "udf": 0,
                 "default": "",
@@ -784,7 +739,7 @@
             },
             {
                 "field": "assetTag",
-                "label": "AssetTag",
+                "label": "Asset Tag",
                 "tip": "This field is the Asset Tag",
                 "udf": 0,
                 "default": "",
@@ -799,7 +754,7 @@
             },
             {
                 "field": "assetType",
-                "label": "Type",
+                "label": "Asset Type",
                 "tip": "This field is the Asset Type",
                 "udf": 0,
                 "default": "",
@@ -859,7 +814,7 @@
             },
             {
                 "field": "externalRefId",
-                "label": "ExternalRefId",
+                "label": "External Ref Id",
                 "tip": "This field is the External Ref Id",
                 "udf": 0,
                 "default": "",
@@ -874,7 +829,7 @@
             },
             {
                 "field": "ipAddress",
-                "label": "IP",
+                "label": "IP1",
                 "tip": "This field is the IP1",
                 "udf": 0,
                 "default": "",
@@ -904,7 +859,7 @@
             },
             {
                 "field": "maintExpDate",
-                "label": "MaintExp",
+                "label": "Maint Expiration",
                 "tip": "This field is the Maint Expiration",
                 "udf": 0,
                 "default": "",
@@ -949,7 +904,7 @@
             },
             {
                 "field": "moveBundle",
-                "label": "MoveBundle",
+                "label": "Move Bundle",
                 "tip": "This field is the Move Bundle",
                 "udf": 0,
                 "default": "",
@@ -979,7 +934,7 @@
             },
             {
                 "field": "planStatus",
-                "label": "PlanStatus",
+                "label": "Plan Status",
                 "tip": "This field is the Plan Status",
                 "udf": 0,
                 "default": "",
@@ -1009,7 +964,7 @@
             },
             {
                 "field": "railType",
-                "label": "RailType",
+                "label": "Rail Type",
                 "tip": "This field is the Rail Type",
                 "udf": 0,
                 "default": "",
@@ -1024,7 +979,7 @@
             },
             {
                 "field": "rateOfChange",
-                "label": "Rate Of Change",
+                "label": "Rate Of Change (%)",
                 "tip": "This field is the Rate Of Change (%)",
                 "udf": 0,
                 "default": "",
@@ -1039,7 +994,7 @@
             },
             {
                 "field": "retireDate",
-                "label": "Retire",
+                "label": "Retire Date",
                 "tip": "This field is the Retire Date",
                 "udf": 0,
                 "default": "",
@@ -1069,7 +1024,7 @@
             },
             {
                 "field": "serialNumber",
-                "label": "S/N",
+                "label": "Serial #",
                 "tip": "This field is the Serial #",
                 "udf": 0,
                 "default": "",
@@ -1099,7 +1054,7 @@
             },
             {
                 "field": "shortName",
-                "label": "ShortName",
+                "label": "Alternate Name",
                 "tip": "This field is the Alternate Name",
                 "udf": 0,
                 "default": "",
@@ -1159,7 +1114,7 @@
             },
             {
                 "field": "sourceLocation",
-                "label": "SourceLoc",
+                "label": "Source Location",
                 "tip": "This field is the Source Location",
                 "udf": 0,
                 "default": "",
@@ -1174,7 +1129,7 @@
             },
             {
                 "field": "sourceRack",
-                "label": "SourceRack",
+                "label": "Source Rack/Cab",
                 "tip": "This field is the Source Rack/Cab",
                 "udf": 0,
                 "default": "",
@@ -1189,7 +1144,7 @@
             },
             {
                 "field": "sourceRackPosition",
-                "label": "SourcePos",
+                "label": "Source Position",
                 "tip": "This field is the Source Position",
                 "udf": 0,
                 "default": "",
@@ -1204,7 +1159,7 @@
             },
             {
                 "field": "sourceRoom",
-                "label": "SourceRoom",
+                "label": "Source Room",
                 "tip": "This field is the Source Room",
                 "udf": 0,
                 "default": "",
@@ -1264,7 +1219,7 @@
             },
             {
                 "field": "targetLocation",
-                "label": "TargetLoc",
+                "label": "Target Location",
                 "tip": "This field is the Target Location",
                 "udf": 0,
                 "default": "",
@@ -1279,7 +1234,7 @@
             },
             {
                 "field": "targetRack",
-                "label": "TargetRack",
+                "label": "Target Rack/Cab",
                 "tip": "This field is the Target Rack/Cab",
                 "udf": 0,
                 "default": "",
@@ -1294,7 +1249,7 @@
             },
             {
                 "field": "targetRackPosition",
-                "label": "TargetPos",
+                "label": "Target Position",
                 "tip": "This field is the Target Position",
                 "udf": 0,
                 "default": "",
@@ -1309,7 +1264,7 @@
             },
             {
                 "field": "targetRoom",
-                "label": "TargetRoom",
+                "label": "Target Room",
                 "tip": "This field is the Target Room",
                 "udf": 0,
                 "default": "",
@@ -1492,66 +1447,6 @@
                 "constraints": {
                     "required": 0
                 }
-            },
-            {
-                "field": "virtualHost",
-                "label": "VirtualHost",
-                "tip": "This field is the Transfer Time",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 110,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "usize",
-                "label": "usize",
-                "tip": "This field is the usize",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 111,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "application",
-                "label": "Application",
-                "tip": "This field is the Application",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 112,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": 113,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
             }
         ]
     },
@@ -1606,7 +1501,7 @@
             },
             {
                 "field": "supportType",
-                "label": "SupportType",
+                "label": "Support",
                 "tip": "This field is the Support",
                 "udf": 0,
                 "default": "",
@@ -1636,7 +1531,7 @@
             },
             {
                 "field": "externalRefId",
-                "label": "ExternalRefId",
+                "label": "External Ref Id",
                 "tip": "This field is the External Ref Id",
                 "udf": 0,
                 "default": "",
@@ -1666,7 +1561,7 @@
             },
             {
                 "field": "retireDate",
-                "label": "Retire",
+                "label": "Retire Date",
                 "tip": "This field is the Retire Date",
                 "udf": 0,
                 "default": "",
@@ -1681,7 +1576,7 @@
             },
             {
                 "field": "moveBundle",
-                "label": "MoveBundle",
+                "label": "Bundle",
                 "tip": "This field is the Bundle",
                 "udf": 0,
                 "default": "",
@@ -1726,7 +1621,7 @@
             },
             {
                 "field": "maintExpDate",
-                "label": "MaintExp",
+                "label": "Maint Expiration",
                 "tip": "This field is the Maint Expiration",
                 "udf": 0,
                 "default": "",
@@ -1741,7 +1636,7 @@
             },
             {
                 "field": "planStatus",
-                "label": "PlanStatus",
+                "label": "Plan Status",
                 "tip": "This field is the Plan Status",
                 "udf": 0,
                 "default": "",
@@ -1756,7 +1651,7 @@
             },
             {
                 "field": "rateOfChange",
-                "label": "Rate Of Change",
+                "label": "Rate Of Change (%)",
                 "tip": "This field is the Rate Of Change (%)",
                 "udf": 0,
                 "default": "",
@@ -1939,21 +1834,6 @@
                 "constraints": {
                     "required": 0
                 }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": 110,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
             }
         ]
     },
@@ -2023,7 +1903,7 @@
             },
             {
                 "field": "moveBundle",
-                "label": "MoveBundle",
+                "label": "Bundle",
                 "tip": "This field is the Bundle",
                 "udf": 0,
                 "default": "",
@@ -2068,7 +1948,7 @@
             },
             {
                 "field": "externalRefId",
-                "label": "ExternalRefId",
+                "label": "External Ref Id",
                 "tip": "This field is the External Ref Id",
                 "udf": 0,
                 "default": "",
@@ -2083,7 +1963,7 @@
             },
             {
                 "field": "supportType",
-                "label": "SupportType",
+                "label": "Support",
                 "tip": "This field is the Support",
                 "udf": 0,
                 "default": "",
@@ -2098,7 +1978,7 @@
             },
             {
                 "field": "planStatus",
-                "label": "PlanStatus",
+                "label": "Plan Status",
                 "tip": "This field is the Plan Status",
                 "udf": 0,
                 "default": "",
@@ -2128,7 +2008,7 @@
             },
             {
                 "field": "rateOfChange",
-                "label": "Rate Of Change",
+                "label": "Rate Of Change (%)",
                 "tip": "This field is the Rate Of Change (%)",
                 "udf": 0,
                 "default": "",
@@ -2321,51 +2201,6 @@
                 "show": 1,
                 "control": "String",
                 "order": 109,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "retireDate",
-                "label": "Retire",
-                "tip": "This field is the Retire Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 110,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "maintExpDate",
-                "label": "MaintExp",
-                "tip": "This field is the Maint Expiration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 111,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "modifiedBy",
-                "label": "Modified By",
-                "tip": "This field is the Modified By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": 112,
                 "imp": "I",
                 "constraints": {
                     "required": 0

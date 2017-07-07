@@ -13,7 +13,7 @@ class CustomDomainService implements ServiceMethods {
     public static final String ALL_ASSET_CLASSES = 'ASSETS'
     public static final String CUSTOM_FIELD_NAME_PART = 'custom'
 
-    public static final int USER_DEFINED_FIELD = 1
+    public static final int CUSTOM_USER_FIELD = 1
     public static final int STANDARD_FIELD = 0
 
     SecurityService securityService
@@ -28,7 +28,7 @@ class CustomDomainService implements ServiceMethods {
      */
     Map customFieldSpecs(String domain, boolean showOnly = false) {
         Project currentProject = securityService.loadUserCurrentProject()
-        return customFieldSpecs(currentProject, domain, showOnly)
+        return getFilteredFieldSpecs(currentProject, domain, CUSTOM_USER_FIELD, showOnly)
     }
 
     /**
@@ -78,7 +78,9 @@ class CustomDomainService implements ServiceMethods {
      */
     Map standardFieldSpecsByField(String domain) {
         Project currentProject = securityService.loadUserCurrentProject()
-        return standardFieldSpecsByField(currentProject, domain)
+        Map fieldSpecs = getFilteredFieldSpecs(currentProject, domain, STANDARD_FIELD)
+        Map domainFieldSpecs = createFieldSpecsViewMap(fieldSpecs, domain)
+        return domainFieldSpecs
     }
 
     /**
