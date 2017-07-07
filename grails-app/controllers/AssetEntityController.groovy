@@ -31,6 +31,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import net.transitionmanager.controller.ControllerMethods
@@ -1936,6 +1937,7 @@ class AssetEntityController implements ControllerMethods {
 	 * to auditCreate view
 	 */
 	@HasPermission(Permission.AssetCreate)
+	@Transactional(readOnly = true)
 	def create() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1965,6 +1967,7 @@ class AssetEntityController implements ControllerMethods {
 	 * to auditEdit view
 	 */
 	@HasPermission(Permission.AssetEdit)
+	@Transactional(readOnly = true)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1975,9 +1978,6 @@ class AssetEntityController implements ControllerMethods {
 			render '<span class="error">Unable to find asset to edit</span>'
 			return
 		}
-
-		// Prevent any changes from occurring
-		// device.discard()
 
 		if (params.redirectTo == "roomAudit") {
 			// TODO : JPM 9/2014 : Need to determine the assetType
