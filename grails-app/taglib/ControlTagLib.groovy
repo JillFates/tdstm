@@ -53,9 +53,9 @@ class ControlTagLib {
 		// <label for="assetName" data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</label>
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
-		sb.append('" data-toggle="popover" data-trigger="hover" data-content="')
-		sb.append(fieldSpec.tip)
-		sb.append('">')
+		sb.append('"')
+		sb.append(tooltipAttrib(fieldSpec))
+		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
@@ -70,23 +70,22 @@ class ControlTagLib {
 	/**
 	 * Creates the cell with the value of a field for displaying in show views.
 	 */
-	def labelForShowField = {Map attrs ->
+	def labelForShowField = { Map attrs ->
+		Map fieldSpec = attrs.field ?: [:]
 		def fieldValue = attrs.value ?: ""
 		StringBuilder sb = new StringBuilder("\n")
-		sb.append("<td class='valueNW ${attrs.field.imp}'>")
-		sb.append("<span data-toggle='popover' ")
-		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
-		// This parameter is optional to modify default tooltip positioning
-		// Also checks that the value is one of the valid data-placement element values
+		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
+		sb.append("<span ")
+        // Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
+        // This parameter is optional to modify default tooltip positioning
+        // Also checks that the value is one of the valid data-placement element values
 		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
-		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+		if (tooltipDataPlacement != null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
 			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
 					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
 		}
-		if (tooltipDataPlacement !=null) {
-			sb.append("data-placement='${tooltipDataPlacement}' ")
-		}
-		sb.append("data-trigger='hover' data-content='${attrs.field.tip}'>")
+		sb.append(tooltipAttrib(fieldSpec, tooltipDataPlacement))
+		sb.append(" >")
 		sb.append(fieldValue)
 		sb.append("</span>")
 		sb.append("</td>")
@@ -309,12 +308,12 @@ class ControlTagLib {
 		tabIndexAttrib(fieldSpec, tabIndex, tabOffset) +
 		classAttrib(fieldSpec) +
 		sizeAttrib(size) +
-		tooltipAttribs(fieldSpec, tooltipDataPlacement) +
+		tooltipAttrib(fieldSpec, tooltipDataPlacement) +
 		constraintsAttrib(fieldSpec) +
 		dataLabelAttrib(fieldSpec)
 	}
 
-   /**
+	/**
 	 * Returns the HTML class attribute with the class for all controllers plus the
 	 * importance class if included in the field specification
 	 * @param field - the Field specification object
@@ -326,34 +325,6 @@ class ControlTagLib {
 			c += " ${fieldSpec.imp}"
 		}
 		return attribute('class', c)
-	}
-
-   /**
-	 * Returns the HTML class attribute with the class for all controllers plus the
-	 * importance class if included in the field specification
-	 * @param field - the Field specification object
-	 * @return The class attribute HTML for controls
-	 */
-	private String dataLabelAttrib(Map fieldSpec) {
-		attribute('data-label', fieldSpec.field)
-	}
-
-   /**
-	 * Returns the HTML id attribute based on the field specification
-	 * @param field - the Field specification object
-	 * @return The id attribute HTML for controls
-	 */
-	private String idAttrib(Map fieldSpec) {
-		return attribute('id', fieldSpec?.field)
-	}
-
-	/**
-	 * Returns the HTML name attribute based on the field specification
-	 * @param field - the Field specification object
-	 * @return The name attribute HTML for controls
-	 */
-	private String nameAttrib(Map fieldSpec) {
-		return attribute('name', fieldSpec?.field)
 	}
 
 	/**
@@ -389,6 +360,34 @@ class ControlTagLib {
 		}
 
 		sb.toString()
+	}
+
+	/**
+	 * Returns the HTML class attribute with the class for all controllers plus the
+	 * importance class if included in the field specification
+	 * @param field - the Field specification object
+	 * @return The class attribute HTML for controls
+	 */
+	private String dataLabelAttrib(Map fieldSpec) {
+		attribute('data-label', fieldSpec.field)
+	}
+
+	/**
+	 * Returns the HTML id attribute based on the field specification
+	 * @param field - the Field specification object
+	 * @return The id attribute HTML for controls
+	 */
+	private String idAttrib(Map fieldSpec) {
+		return attribute('id', fieldSpec?.field)
+	}
+
+	/**
+	 * Returns the HTML name attribute based on the field specification
+	 * @param field - the Field specification object
+	 * @return The name attribute HTML for controls
+	 */
+	private String nameAttrib(Map fieldSpec) {
+		return attribute('name', fieldSpec?.field)
 	}
 
 	/**
@@ -447,16 +446,17 @@ class ControlTagLib {
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return The tooltip attributes HTML for controls
 	 */
-	private String tooltipAttribs(Map field, String tooltipDataPlacement=null ) {
+	private String tooltipAttrib(Map field, String tooltipDataPlacement=null ) {
 
-		String attrib=""
-		attrib += attribute('data-toggle', 'popover')
-		attrib += attribute('data-trigger', 'hover')
+		StringBuilder attrib = new StringBuilder('')
+		attrib.append( attribute('data-toggle', 'popover') )
+		attrib.append( attribute('data-trigger', 'hover') )
 		if (tooltipDataPlacement !=null) {
-			attrib += attribute('data-placement', tooltipDataPlacement)
+			attrib.append( attribute('data-placement', tooltipDataPlacement) )
 		}
-		attrib += attribute('data-content', field?.tip, field?.title)
-		return attrib
+		attrib.append( attribute('data-content', field?.tip, field?.label) )
+
+		return attrib.toString()
 	}
 
 	 /**

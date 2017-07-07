@@ -288,7 +288,6 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			String defValue = field.constraints.values[1]
 		and: 'and a tabOrder of 5'
 			String tabIndex='5'
-
 		when: 'the template is applied with the parameters'
 			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
 		then: 'a value should be returned'
@@ -328,4 +327,43 @@ class ControlTagLibTests extends AbstractUnitSpec {
 
 	}
 
+	void 'Test Tool Tip Attribute '() {
+		given: 'a fieldSpec that is a String'
+		Map field = [
+				field      : 'color',
+				label      : 'Best program language ever <!>',
+				tip        : 'Select an option with a quote (")',
+				udf        : 1,
+				shared     : 1,
+				imp        : 'C',
+				show       : 1,
+				order      : 1,
+				default    : 'Javascript',
+				control    : 'Select List',
+				constraints: [
+						required: 1,
+						values  : ['Java', 'Grails', 'Javascript']
+				]
+		]
+		and: 'there is a default value'
+			String defValue = field.constraints.values[1]
+		and: 'and a tabOrder of 1'
+			String tabIndex='1'
+		when: 'the template is applied with the parameters'
+			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
+		then: 'a value should be returned'
+			result
+		and: 'data-content should contains the tool tip'
+			result.contains(' data-content="Select an option with a quote (&quot;)" ')
+		and: 'it should contain the data-toggle'
+			result.contains(' data-toggle="popover" ')
+		and: 'it should contain the data-trigger'
+			result.contains(' data-trigger="hover" ')
+
+		when: 'the tooltip property is empty'
+			field.tip = ''
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
+		then: 'data-content should contains the label'
+			result.contains(' data-content="Best program language ever &lt;!&gt;" ')
+	}
 }
