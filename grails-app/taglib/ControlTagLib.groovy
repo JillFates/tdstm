@@ -448,14 +448,15 @@ class ControlTagLib {
 	 */
 	private String tooltipAttrib(Map field, String tooltipDataPlacement=null ) {
 
-		String attrib=""
-		attrib += attribute('data-toggle', 'popover')
-		attrib += attribute('data-trigger', 'hover')
+		StringBuilder attrib = new StringBuilder('')
+		attrib.append( attribute('data-toggle', 'popover') )
+		attrib.append( attribute('data-trigger', 'hover') )
 		if (tooltipDataPlacement !=null) {
-			attrib += attribute('data-placement', tooltipDataPlacement)
+			attrib.append( attribute('data-placement', tooltipDataPlacement) )
 		}
-		attrib += attribute('data-content', field?.tip, field?.title)
-		return attrib
+		attrib.append( attribute('data-content', field?.tip, field?.label) )
+
+		return attrib.toString()
 	}
 
 	 /**

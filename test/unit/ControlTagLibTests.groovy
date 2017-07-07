@@ -331,7 +331,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 		given: 'a fieldSpec that is a String'
 		Map field = [
 				field      : 'color',
-				label      : 'Best program language ever',
+				label      : 'Best program language ever <!>',
 				tip        : 'Select an option with a quote (")',
 				udf        : 1,
 				shared     : 1,
@@ -353,11 +353,17 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
 		then: 'a value should be returned'
 			result
-		and: 'it should contains the tool tip'
+		and: 'data-content should contains the tool tip'
 			result.contains(' data-content="Select an option with a quote (&quot;)" ')
 		and: 'it should contain the data-toggle'
 			result.contains(' data-toggle="popover" ')
 		and: 'it should contain the data-trigger'
 			result.contains(' data-trigger="hover" ')
+
+		when: 'the tooltip property is empty'
+			field.tip = ''
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
+		then: 'data-content should contains the label'
+			result.contains(' data-content="Best program language ever &lt;!&gt;" ')
 	}
 }
