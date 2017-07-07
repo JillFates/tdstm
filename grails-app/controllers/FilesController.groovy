@@ -128,7 +128,7 @@ class FilesController implements ControllerMethods {
 										 me.move_event_id AS event,
 										 if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS
 		commentsStatus, """)
-		
+
 		if (temp) {
 			query.append(temp)
 		}
@@ -233,19 +233,26 @@ class FilesController implements ControllerMethods {
 	@HasPermission(Permission.AssetCreate)
 	def create() {
 		// TODO : JPM 10/2014 : refactor create to get model from service layer
-		Files files = new Files(appOwner:'TDS')
+		Files files = new Files()
 		Project project = securityService.userCurrentProject
-		//fieldImportance for Discovery by default
-		// Obtains the domain out of the asset type string.
+		files.project = project
+
+		assetService.setCustomDefaultValues(files)
+
+		// Obtains the domain out of the asset type string
 		String domain = AssetClass.getDomainForAssetType('Files')
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
-		def customs = assetEntityService.getCustomFieldsSettings("Files", true)
-		assetService.setCustomDefaultValues(files, customs)
-		[assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
-		 fileInstance: files, moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
-		 planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
-		 environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
-		 standardFieldSpecs: standardFieldSpecs, project:project, customs: customs]
+		def customFields = assetEntityService.getCustomFieldsSettings(project, files.assetClass.toString(), true)
+
+		[	assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
+			fileInstance: files,
+			moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
+			planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
+			environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
+			standardFieldSpecs: standardFieldSpecs,
+			project:project,
+			customs: customFields
+		]
 	}
 
 	@HasPermission(Permission.AssetView)
@@ -260,7 +267,7 @@ class FilesController implements ControllerMethods {
 			storageService.getModelForShow(project, storage, params)
 		}
 	}
-	
+
 	@HasPermission(Permission.AssetEdit)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)

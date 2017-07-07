@@ -108,10 +108,11 @@ class DeviceService implements ServiceMethods {
 			}
 		}
 
-		def model = [assetEntity: assetEntity, label: frontEndLabel,
-		             canEdit: securityService.hasPermission(Permission.AssetEdit),
-		             deleteChassisWarning: deleteChassisWarning] +
-		             assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
+		def model = [
+			assetEntity: assetEntity, label: frontEndLabel,
+			canEdit: securityService.hasPermission(Permission.AssetEdit),
+			deleteChassisWarning: deleteChassisWarning
+		] + assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
 
 		model.roomSource = null
 		model.roomTarget = null

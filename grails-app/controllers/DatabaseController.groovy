@@ -248,20 +248,27 @@ class DatabaseController implements ControllerMethods {
 
 	@HasPermission(Permission.AssetCreate)
 	def create() {
-		def databaseInstance = new Database(appOwner:'TDS')
+		Database databaseInstance = new Database()
+		Project project = securityService.userCurrentProject
+		databaseInstance.project = project
+
+		assetService.setCustomDefaultValues(databaseInstance)
+
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		Project project = securityService.userCurrentProject
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		//fieldImportance for Discovery by default
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField('Database')
-		def customs = assetEntityService.getCustomFieldsSettings("Database", true)
-		assetService.setCustomDefaultValues(databaseInstance, customs)
-		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-		 planStatusOptions:planStatusOptions?.value, projectId: project.id, project:project,
-		 environmentOptions:environmentOptions?.value, standardFieldSpecs: standardFieldSpecs, customs: customs]
+		def customFields = assetEntityService.getCustomFieldsSettings(project, databaseInstance.assetClass.toString(), true)
+
+		[	databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value,
+			moveBundleList:moveBundleList, planStatusOptions:planStatusOptions?.value,
+			projectId: project.id, project:project,
+			environmentOptions:environmentOptions?.value,
+			standardFieldSpecs: standardFieldSpecs,
+			customs: customFields
+		]
 	}
 
 	@HasPermission(Permission.AssetEdit)
@@ -275,7 +282,7 @@ class DatabaseController implements ControllerMethods {
 			return
 		}
 
-		def model = assetEntityService.getDefaultModelForEdits('Database', project,databaseInstance, params)
+		Map model = assetEntityService.getDefaultModelForEdits('Database', project, databaseInstance, params)
 
 		model.databaseInstance = databaseInstance
 

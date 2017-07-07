@@ -1312,14 +1312,14 @@
                 "label": "Plan Strategy",
                 "tip": "This field is the Plan Strategy",
                 "udf": 1,
-                "default": "",
+                "default": "Rebuild",
                 "shared": 0,
                 "show": 1,
                 "control": "Select List",
                 "order": 1000,
                 "imp": "I",
                 "constraints": {
-                    "required": 0,
+                    "required": 1,
                     "values": [
                         "Lift&Shift",
                         "Rebuild",

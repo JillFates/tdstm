@@ -1976,6 +1976,9 @@ class AssetEntityController implements ControllerMethods {
 			return
 		}
 
+		// Prevent any changes from occurring
+		// device.discard()
+
 		if (params.redirectTo == "roomAudit") {
 			// TODO : JPM 9/2014 : Need to determine the assetType
 			model.assetType = params.assetType
