@@ -26,9 +26,9 @@
 			<tds:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
 
 			<td class="valueNW ${standardFieldSpecs.sme.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')" <span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip}">>
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip}">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
-				</span>
+                </span>
 			</td>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
@@ -43,7 +43,7 @@
 			<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 
 			<td class="valueNW ${standardFieldSpecs.sme2.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')" <span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip}">>
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip}">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
 				</span>
 			</td>
@@ -60,7 +60,7 @@
 			<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 
 			<td class="valueNW ${standardFieldSpecs.appOwner.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')" <span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip}">>
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip}">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
 				</span>
 			</td>
