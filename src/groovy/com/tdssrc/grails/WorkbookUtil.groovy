@@ -1,5 +1,6 @@
 package com.tdssrc.grails
 
+import com.tdsops.tm.asset.WorkbookSheetName
 import groovy.transform.CompileStatic
 import groovy.util.logging.Commons
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -487,6 +488,16 @@ class WorkbookUtil {
 	}
 
 	/**
+	 * Get a workbook sheet
+	 * @param workbook
+	 * @param sheetName
+	 * @return
+	 */
+	static Sheet getSheetFromWorkbook(Workbook workbook, WorkbookSheetName sheetName) {
+		return getSheetFromWorkbook(workbook, sheetName.toString())
+	}
+
+	/**
 	 * Get a SXSSFWorkbook from XSSFWorkbook
 	 * @param workbook
 	 * @return SXSSFWorkbook
@@ -541,5 +552,25 @@ class WorkbookUtil {
 			cellStyle.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
 		}
 		return cellStyle
+	}
+
+	/**
+	 * Assume always row 0 and stops when reach last cell in row or cell value is blank
+	 * @param sheet
+	 * @return
+	 */
+	static List<String> getSheetHeadersAsList(Sheet sheet) {
+		List<String> headers = new ArrayList<>()
+		Row row = sheet.getRow(0)
+		short cellIndex = 0
+		while (true) {
+			Cell cell = row.getCell(cellIndex)
+			if (cell == null || StringUtil.isBlank(cell.getStringCellValue())) {
+				break;
+			}
+			headers.add(cell.getStringCellValue())
+			cellIndex++
+		}
+		return headers
 	}
 }

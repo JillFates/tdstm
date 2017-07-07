@@ -1,6 +1,9 @@
 package net.transitionmanager.service
 
 import com.tds.asset.*
+import com.tdsops.common.lang.CollectionUtils
+import com.tdsops.tm.asset.WorkbookSheetName
+import com.tdsops.tm.asset.export.SpreadsheetColumnMapper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -30,8 +33,6 @@ import org.hibernate.transform.Transformers
 class AssetExportService {
     private static final ASSET_EXPORT_TEMPLATE = "/templates/TDSMaster_template.xlsx"
     private static final DEFAULT_EXPORT_FILE_EXTENSION = "xlsx"
-    // Indicates the number of rows to process before performing a flush/clear of the Hibernate session queue
-    private static final int HIBERNATE_BATCH_SIZE = 1000
     private static double MIN_INFLATE_RATIO = 0.0001d
     private static final String ALL_BUNDLES_OPTION = 'All'
 
@@ -147,11 +148,6 @@ class AssetExportService {
 
             Sheet serverSheet, appSheet, dbSheet, storageSheet, titleSheet
             def exportedEntity = ""
-
-            def serverMap = [:]
-            def appMap = [:]
-            def dbMap = [:]
-            def fileMap = [:]
 
             // Flags to indicate which tabs to export based on which checkboxes selected in the UI
             boolean doDevice = params.asset=='asset'
@@ -298,12 +294,6 @@ class AssetExportService {
             double percentToProfile = 25.0      // Sample 5% of all of data
             double frequencyToProfile = 5.0     // Sample the data every 5% of the way
 
-            // Have to load the maps because we update the column names across the top for all sheets
-            serverDTAMap = getFieldSpecsForAssetClass(AssetClass.DEVICE)
-            appDTAMap = getFieldSpecsForAssetClass(AssetClass.APPLICATION)
-            dbDTAMap = getFieldSpecsForAssetClass(AssetClass.DATABASE)
-            fileDTAMap = getFieldSpecsForAssetClass(AssetClass.STORAGE)
-
             def tzId = params.tzId
             def userDTFormat = params.userDTFormat
             def currDate = TimeUtil.nowGMT()
@@ -331,29 +321,24 @@ class AssetExportService {
             def serverCol, appCol, dbCol, filesCol
 
             // Device
-            String serverSheetName = "Devices"
-            serverSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, serverSheetName)
-            serverMap = mapSheetColumnsToFields(serverSheet, serverDTAMap)
+            serverSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.DEVICES)
+            SpreadsheetColumnMapper serverMap = mapSheetColumnsToFields(AssetClass.DEVICE, serverSheet)
 
             // Application
-            String appSheetName = "Applications"
-            appSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, appSheetName)
-            appMap = mapSheetColumnsToFields(appSheet, appDTAMap)
+            appSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.APPLICATIONS)
+            SpreadsheetColumnMapper appMap = mapSheetColumnsToFields(AssetClass.APPLICATION, appSheet)
 
             // Database
-            String dbSheetName = "Databases"
-            dbSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, dbSheetName)
-            dbMap = mapSheetColumnsToFields(dbSheet, dbDTAMap)
+            dbSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.DATABASES)
+            SpreadsheetColumnMapper dbMap = mapSheetColumnsToFields(AssetClass.DATABASE, dbSheet)
 
             // Storage
-            String fileSheetName = "Storage"
-            storageSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, fileSheetName)
-            fileMap = mapSheetColumnsToFields(storageSheet, fileDTAMap)
+            storageSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.STORAGE)
+            SpreadsheetColumnMapper fileMap = mapSheetColumnsToFields(AssetClass.STORAGE, storageSheet)
 
             // Rack
             def rackSheetColumns = []
-            String rackSheetName = "Rack"
-            def rackSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, rackSheetName)
+            def rackSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.RACK)
             Row refRackRow = rackSheet.getRow(0)
             for ( int c = 0; c < refRackRow.getLastCellNum(); c++ ) {
                 rackSheetColumns << refRackRow.getCell(c).getStringCellValue()
@@ -369,8 +354,22 @@ class AssetExportService {
                 return out
             }
 
+            // check missing headers
+            Set<String> missingHeaders = []
+            missingHeaders.addAll(serverMap.getMissingHeaders())
+            missingHeaders.addAll(appMap.getMissingHeaders())
+            missingHeaders.addAll(dbMap.getMissingHeaders())
+            missingHeaders.addAll(fileMap.getMissingHeaders())
+            profiler.lap(mainProfTag, 'Validated headers')
+
+            // If there are standard headers not found in the workbook, it will return Error message
+            if (CollectionUtils.isNotEmpty(missingHeaders)) {
+                progressService.update(key, 100, 'Cancelled', "Application sheet template is missing fields: ${missingHeaders}.")
+                return
+            }
+
             //Add Title Information to master SpreadSheet
-            titleSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, "Title")
+            titleSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.TITLE)
             addCell(titleSheet, 1, 2, project.client.toString())
             addCell(titleSheet, 1, 3, projectId.toString())
             addCell(titleSheet, 2, 3, project.name.toString())
@@ -395,7 +394,7 @@ class AssetExportService {
 
             profiler.lap(mainProfTag, 'Updating spreadsheet headers')
 
-            def validationSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, "Validation")
+            def validationSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.VALIDATION)
 
             Map optionsSize = [:]
 
@@ -482,11 +481,11 @@ class AssetExportService {
             initWorkbook = null
 
             // Refresh references to workbook sheets
-            serverSheet = WorkbookUtil.getSheetFromWorkbook(workbook, serverSheetName)
-            appSheet = WorkbookUtil.getSheetFromWorkbook(workbook, appSheetName)
-            dbSheet = WorkbookUtil.getSheetFromWorkbook(workbook, dbSheetName)
-            storageSheet = WorkbookUtil.getSheetFromWorkbook(workbook, fileSheetName)
-            rackSheet = WorkbookUtil.getSheetFromWorkbook(workbook, rackSheetName)
+            serverSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.DEVICES)
+            appSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.APPLICATIONS)
+            dbSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.DATABASES)
+            storageSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.STORAGE)
+            rackSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.RACK)
 
             /***************************************************************************/
 
@@ -501,9 +500,9 @@ class AssetExportService {
 
                 profiler.lap("Devices", "Devices Started")
 
-                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap["Environment"]["order"], 1, assetSize)
-                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 1, 1, optionsSize["Priority"], serverMap["Priority"]["order"], 1, assetSize)
-                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 2, 1, optionsSize["PlanStatus"], serverMap["PlanStatus"]["order"], 1, assetSize)
+                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap.getColumnIndexByHeader("Environment"), 1, assetSize)
+                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 1, 1, optionsSize["Priority"], serverMap.getColumnIndexByHeader("Priority"), 1, assetSize)
+                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 2, 1, optionsSize["PlanStatus"], serverMap.getColumnIndexByHeader("PlanStatus"), 1, assetSize)
 
                 profiler.lap("Devices", "Validations added")
 
@@ -519,8 +518,6 @@ class AssetExportService {
                 }
 
                 profiler.lap('Devices', 'Entering while loop')
-
-                int depGroupColNum = serverMap['DepGroup']["order"]
 
                 while (scrollableResults.next()) {
                     AssetEntity currentAsset = (AssetEntity)scrollableResults.get()[0]
@@ -551,25 +548,18 @@ class AssetExportService {
 
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
-                    // Add assetId for walkthrough template only.
-                    if( serverMap.containsKey("assetId") ) {
-                        addCell(serverSheet, 0, deviceCount, currentAsset.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                    }
-
                     if (profilingRow) {
                         profiler.lap('Devices', 'Update Progress')
                         profiler.begin('Device Fields')
                     }
 
-                    for ( int coll = 1; coll < serverMap.size(); coll++ ) {
+                    for (Map.Entry<String, ?> entry : serverMap.getColumnFieldMap()) {
 
-                        def attribute = serverMap.find { field -> field.value["order"] == coll }
-                        def colName = attribute.key
-                        def colNum = attribute.value["order"]
-                        def a = currentAsset
+                        def colName = entry.key
+                        def field = entry.value["field"]
+                        def colNum = entry.value["order"] as int
 
                         if (profilingRow) {
-                            // log.debug("SET VAR TIME = {}", profiler.getLapDuration('Devices').toMilliseconds() )
                             lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
                             if (lapDuration > profileThresholdSettingField) {
                                 profiler.log(Profiler.LOG_TYPE.INFO, 'Set var %s (%s msec)', [colName, lapDuration.toString()])
@@ -578,45 +568,49 @@ class AssetExportService {
                             }
                         }
 
-                        if (attribute) {
-                            def propValue = colName == "DepGroup" ? null : a.(attribute.value["field"])
+                        switch(colName) {
+                            case 'assetId':
+                                addCell(serverSheet, 0, deviceCount, currentAsset.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                                break
 
-                            // Only update if value is not null or if a string is not blank
-                            if ( ! ( propValue == null || ( (propValue instanceof String) && propValue.size() == 0 ))){
-                                switch(colName) {
-                                    case ~/usize|SourcePos|TargetPos/:
-                                        def pos = a[attribute.value["field"]] ?: 0
-                                        // Don't bother populating position if it is a zero
-                                        if (pos == 0) {
-                                            continue
-                                        }
-                                        addCell(serverSheet, colNum, deviceCount, (Double)pos, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                                        break
-
-                                    case ~/Retire|MaintExp/:
-                                        addCell(serverSheet, colNum, deviceCount, TimeUtil.formatDate(userDTFormat, a[attribute.value["field"]], TimeUtil.FORMAT_DATE))
-                                        break
-
-                                    case ~/Modified Date/:
-                                        if (a[attribute.value["field"]]) {
-                                            addCell(serverSheet, colNum, deviceCount, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute.value["field"]], TimeUtil.FORMAT_DATE_TIME))
-                                        }
-                                        break
-
-                                    case ~/Source Blade|Target Blade/:
-                                        def chassis = a[attribute.value["field"]]
-                                        def value = ""
-                                        if (chassis) {
-                                            value = "id:" + chassis.id + " " + chassis.assetName
-                                        }
-                                        addCell(serverSheet, colNum, deviceCount, value)
-                                        break
-
-                                    default:
-                                        def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute.value["field"]]), '')
-                                        addCell(serverSheet, colNum, deviceCount, value)
+                            case 'DepGroup':
+                                def depGroupId = assetDepBundleMap[currentAsset.id.toString()]
+                                if (depGroupId != null) {
+                                    addCell(serverSheet, colNum, deviceCount, depGroupId)
                                 }
-                            }
+                                break
+
+                            case ~/usize|SourcePos|TargetPos/:
+                                def pos = currentAsset[field] ?: 0
+                                // Don't bother populating position if it is a zero
+                                if (pos == 0) {
+                                    continue
+                                }
+                                addCell(serverSheet, colNum, deviceCount, (Double)pos, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                                break
+
+                            case ~/Retire|MaintExp/:
+                                addCell(serverSheet, colNum, deviceCount, TimeUtil.formatDate(userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE))
+                                break
+
+                            case ~/Modified Date/:
+                                if (currentAsset[field]) {
+                                    addCell(serverSheet, colNum, deviceCount, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE_TIME))
+                                }
+                                break
+
+                            case ~/Source Blade|Target Blade/:
+                                def chassis = currentAsset[field]
+                                def value = ""
+                                if (chassis) {
+                                    value = "id:" + chassis.id + " " + chassis.assetName
+                                }
+                                addCell(serverSheet, colNum, deviceCount, value)
+                                break
+
+                            default:
+                                def value = currentAsset[field]
+                                addCell(serverSheet, colNum, deviceCount, value ?: "")
                         }
 
                         if (profilingRow) {
@@ -628,12 +622,7 @@ class AssetExportService {
                             }
                         }
 
-                    }
-
-                    def depGroupId = assetDepBundleMap[currentAsset.id.toString()]
-                    if (depGroupId != null) {
-                        addCell(serverSheet, depGroupColNum, deviceCount, depGroupId)
-                    }
+                    } // end columns loop
 
                     if (profilingRow) {
                         profiler.end('Device Fields')
@@ -672,7 +661,7 @@ class AssetExportService {
 
                     session.evict(currentAsset)
                 } // asset.each
-                //asset = null
+
                 session.close()
 
                 profiler.endInfo("Devices", "processed %d rows", [assetSize])
@@ -695,17 +684,14 @@ class AssetExportService {
                 }
             } else {
                 // Add validations for the first row (which is blank)
-                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap["Environment"]["order"], 1, 1)
-                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 1, 1, optionsSize["Priority"], serverMap["Priority"]["order"], 1, 1)
-                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 2, 1, optionsSize["PlanStatus"], serverMap["PlanStatus"]["order"], 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 0, 1, optionsSize["Environment"], serverMap.getColumnIndexByHeader("Environment"), 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 1, 1, optionsSize["Priority"], serverMap.getColumnIndexByHeader("Priority"), 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, serverSheet, 2, 1, optionsSize["PlanStatus"], serverMap.getColumnIndexByHeader("PlanStatus"), 1, 1)
             }
-
-            //flushAndClearSession()
 
             //
             // Application Export
             //
-            // profiler.lapInfo("EXPORT")
             if ( doApp ) {
                 Session session = sessionFactory.openSession()
                 ScrollableResults scrollableResults = getAssetListScrollable(session, applicationQuery, queryParams)
@@ -714,8 +700,8 @@ class AssetExportService {
 
                 profiler.lap("Applications", "Adding Validations")
 
-                WorkbookUtil.addCellValidation(validationSheet, appSheet, 0, 1, optionsSize["Environment"], appMap["Environment"]["order"], 1, appSize)
-                WorkbookUtil.addCellValidation(validationSheet, appSheet, 2, 1, optionsSize["PlanStatus"], appMap["PlanStatus"]["order"], 1, appSize)
+                WorkbookUtil.addCellValidation(validationSheet, appSheet, 0, 1, optionsSize["Environment"], appMap.getColumnIndexByHeader("Environment"), 1, appSize)
+                WorkbookUtil.addCellValidation(validationSheet, appSheet, 2, 1, optionsSize["PlanStatus"], appMap.getColumnIndexByHeader("PlanStatus"), 1, appSize)
 
                 profiler.lap("Applications", "Validations added.")
 
@@ -724,10 +710,6 @@ class AssetExportService {
                 // This determines which columns are added as Number vs Label
                 def numericCols = []
                 def stringCols = ['Version']
-
-                // Flag to know if the AppId Column exists
-                def idColName = 'appId'
-                def hasIdCol = appMap.containsKey(idColName)
 
                 int applicationCount = 0
                 while (scrollableResults.next()) {
@@ -738,18 +720,14 @@ class AssetExportService {
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
                     applicationCount++
 
-                    // Add the appId column to column 0 if it exists
-                    if (hasIdCol) {
-                        addCell(appSheet, 0, applicationCount, app.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                    }
-
-                    for (int i = 1; i < appMap.size(); i++) {
-                        def attribute = appMap.find { field -> field.value["order"] == i }
-                        def colName = attribute.key
+                    for (Map.Entry<String, ?> entry : appMap.getColumnFieldMap()) {
+                        def colName = entry.key
+                        def field = entry.value["field"]
+                        def colNum = entry.value["order"] as int
 
                         def colVal = ''
                         switch(colName) {
-                            case 'AppId':
+                            case 'appId':
                                 colVal = app.id
                                 break
                             case 'AppOwner':
@@ -760,20 +738,19 @@ class AssetExportService {
                                 colVal = assetDepBundleMap[app.id.toString()]
                                 break
                             case ~/ShutdownBy|StartupBy|TestingBy/:
-                                colVal = app[attribute.value["field"]] ? resolveByName(app[attribute.value["field"]], false)?.toString() : ''
+                                colVal = app[field] ? resolveByName(app[field], false)?.toString() : ''
                                 break
                             case ~/ShutdownFixed|StartupFixed|TestingFixed/:
-                                colVal = app[attribute.value["field"]] ? 'Yes' : 'No'
-                                //log.info("export() : field class type= {}", app[assetColName].className())
+                                colVal = app[field] ? 'Yes' : 'No'
                                 break
                             case ~/Retire|MaintExp/:
-                                colVal = app[attribute.value["field"]] ? TimeUtil.formatDate(userDTFormat, app[attribute.value["field"]], TimeUtil.FORMAT_DATE) : ''
+                                colVal = app[field] ? TimeUtil.formatDate(userDTFormat, app[field], TimeUtil.FORMAT_DATE) : ''
                                 break
                             case ~/Modified Date/:
-                                colVal = app[attribute.value["field"]] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[attribute.value["field"]], TimeUtil.FORMAT_DATE_TIME) : ''
+                                colVal = app[field] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[field], TimeUtil.FORMAT_DATE_TIME) : ''
                                 break
                             default:
-                                colVal = app[attribute.value["field"]]
+                                colVal = app[field]
                         }
 
                         if (!(colVal == null || ( (colVal instanceof String) && colVal.size() == 0 ))) {
@@ -782,26 +759,26 @@ class AssetExportService {
                             }
 
                             if ( numericCols.contains(colName) )
-                                addCell(appSheet, attribute.value["order"], applicationCount, (Double)colVal, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                                addCell(appSheet, colNum, applicationCount, (Double)colVal, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                             else if ( stringCols.contains(colName) ){
-                                addCell(appSheet, attribute.value["order"], applicationCount, colVal.toString(), Cell.CELL_TYPE_STRING, workbookCellStyles)
+                                addCell(appSheet, colNum, applicationCount, colVal.toString(), Cell.CELL_TYPE_STRING, workbookCellStyles)
                             } else {
-                                addCell(appSheet, attribute.value["order"], applicationCount, colVal.toString())
+                                addCell(appSheet, colNum, applicationCount, colVal.toString())
                             }
                         }
-                    }
+                    } // end columns loop
+
                     session.evict(app)
+
                 } // application.each
-                //application = null
+
                 session.close()
                 profiler.endInfo("Applications", "processed %d rows", [appSize])
             } else {
                 // Add validation for the first row
-                WorkbookUtil.addCellValidation(validationSheet, appSheet, 0, 1, optionsSize["Environment"], appMap["Environment"]["order"], 1, 1)
-                WorkbookUtil.addCellValidation(validationSheet, appSheet, 2, 1, optionsSize["PlanStatus"], appMap["PlanStatus"]["order"], 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, appSheet, 0, 1, optionsSize["Environment"], appMap.getColumnIndexByHeader("Environment"), 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, appSheet, 2, 1, optionsSize["PlanStatus"], appMap.getColumnIndexByHeader("PlanStatus"), 1, 1)
             }
-
-            //flushAndClearSession()
 
             //
             // Database
@@ -814,8 +791,8 @@ class AssetExportService {
 
                 profiler.lap("Databases", "Adding Validations")
 
-                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 0, 1, optionsSize["Environment"], dbMap["Environment"]["order"], 1, dbSize)
-                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap["PlanStatus"]["order"], 1, dbSize)
+                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 0, 1, optionsSize["Environment"], dbMap.getColumnIndexByHeader("Environment"), 1, dbSize)
+                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap.getColumnIndexByHeader("PlanStatus"), 1, dbSize)
 
                 profiler.lap("Databases", "Validations added.")
 
@@ -828,20 +805,19 @@ class AssetExportService {
                     databaseCount++
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
-                    //Add assetId for walkthrough template only.
-                    if (dbMap.containsKey("dbId")) {
-                        addCell(dbSheet, 0, databaseCount, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                    }
-                    for ( int coll = 1; coll < dbMap.size(); coll++ ) {
-                        def attribute = dbMap.find { field -> field.value["order"] == coll }
-                        log.debug("Processing Database Field: {}", attribute)
-                        String colName = attribute.key
-                        if (colName == "DepGroup") {
-                            addCell(dbSheet, attribute.value["order"], databaseCount, assetDepBundleMap[currentDatabase.id.toString()])
-                        } else if(attribute.value["field"] in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-                            def dateValue = currentDatabase.(attribute.value["field"])
+                    for (Map.Entry<String, ?> entry : dbMap.getColumnFieldMap()) {
+                        def colName = entry.key
+                        def field = entry.value["field"]
+                        def colNum = entry.value["order"] as int
+
+                        if (colName == "dbId") {
+                            addCell(dbSheet, colNum, databaseCount, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                        } else if (colName == "DepGroup") {
+                            addCell(dbSheet, colNum, databaseCount, assetDepBundleMap[currentDatabase.id.toString()])
+                        } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
+                            def dateValue = currentDatabase[field]
                             if (dateValue) {
-                                if (attribute.value["field"] == 'lastUpdated') {
+                                if (field == 'lastUpdated') {
                                     dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME)
                                 } else {
                                     dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE)
@@ -849,30 +825,30 @@ class AssetExportService {
                             } else {
                                 dateValue = ""
                             }
-                            addCell(dbSheet, attribute.value["order"], databaseCount, dateValue)
+                            addCell(dbSheet, colNum, databaseCount, dateValue)
                         } else {
-                            def prop = currentDatabase[attribute.value["field"]]
+                            def prop = currentDatabase[field]
                             if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                if ( BUNDLE_MOVE_AND_CLIENT_TEAMS.contains(attribute.value["field"]) ) {
-                                    addCell(dbSheet, attribute.value["order"], databaseCount, String.valueOf(currentDatabase[attribute.value["field"]].teamCode))
+                                if ( BUNDLE_MOVE_AND_CLIENT_TEAMS.contains(field) ) {
+                                    addCell(dbSheet, colNum, databaseCount, String.valueOf(currentDatabase[field].teamCode))
                                 } else {
-                                    addCell(dbSheet, attribute.value["order"], databaseCount, String.valueOf(currentDatabase[attribute.value["field"]]))
+                                    addCell(dbSheet, colNum, databaseCount, String.valueOf(currentDatabase[field]))
                                 }
                             }
                         }
-                    }
+                    } // end columns loop
+
                     session.evict(currentDatabase)
+
                 } // database.each
-                //database = null
+
                 session.close()
                 profiler.endInfo("Databases", "processed %d rows", [dbSize])
             } else {
                 // Adds validation to just the first row
-                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 0, 1, optionsSize["Environment"], dbMap["Environment"]["order"], 1, 1)
-                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap["PlanStatus"]["order"], 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 0, 1, optionsSize["Environment"], dbMap.getColumnIndexByHeader("Environment"), 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap.getColumnIndexByHeader("PlanStatus"), 1, 1)
             }
-
-            //flushAndClearSession()
 
             //
             // Storage ( files )
@@ -885,8 +861,8 @@ class AssetExportService {
 
                 profiler.lap("Logical Storage", "Adding Validations")
 
-                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap["Environment"]["order"], 1, fileSize)
-                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"]["order"], 1, fileSize)
+                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap.getColumnIndexByHeader("Environment"), 1, fileSize)
+                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap.getColumnIndexByHeader("PlanStatus"), 1, fileSize)
 
                 profiler.lap("Logical Storage", "Validations added.")
 
@@ -899,21 +875,19 @@ class AssetExportService {
                     filesCount++
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
-                    // Add assetId for walkthrough template only.
-                    if ( fileMap.containsKey("filesId") ) {
-                        addCell(storageSheet, 0, filesCount, (currentFile.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                    }
+                    for (Map.Entry<String, ?> entry : fileMap.getColumnFieldMap()) {
+                        def colName = entry.key
+                        def field = entry.value["field"]
+                        def colNum = entry.value["order"] as int
 
-                    for ( int coll = 1; coll < fileMap.size(); coll++ ) {
-                        def addContentToSheet
-                        def attribute = fileMap.find { field -> field.value["order"] == coll }
-                        def colName = attribute.key
-                        if (colName == "DepGroup") {
-                            addCell(storageSheet, attribute.value["order"], filesCount, assetDepBundleMap[currentFile.id.toString()] )
-                        } else if(attribute.value["field"] in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-                            def dateValue = currentFile.(attribute.value["field"])
+                        if (colName == "filesId") {
+                            addCell(storageSheet, colNum, filesCount, (currentFile.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                        } else if (colName == "DepGroup") {
+                            addCell(storageSheet, colNum, filesCount, assetDepBundleMap[currentFile.id.toString()] )
+                        } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
+                            def dateValue = currentFile[field]
                             if (dateValue) {
-                                if (attribute.value["field"] == 'lastUpdated') {
+                                if (field == 'lastUpdated') {
                                     dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME)
                                 } else {
                                     dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE)
@@ -921,32 +895,32 @@ class AssetExportService {
                             } else {
                                 dateValue = ""
                             }
-                            addCell(storageSheet, attribute.value["order"], filesCount, dateValue)
-                        } else{
-                            def prop = currentFile[attribute.value["field"]]
+                            addCell(storageSheet, colNum, filesCount, dateValue)
+                        } else {
+                            def prop = currentFile[field]
                             if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                addCell(storageSheet, attribute.value["order"], filesCount, String.valueOf(prop))
+                                addCell(storageSheet, colNum, filesCount, String.valueOf(prop))
                             }
                         }
 
-                    }
+                    } // end columns loop
+
                     session.evict(currentFile)
+
                 } // files.each
-                //files = null
+
                 session.close()
                 profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
             } else {
                 // Adds validations to the first row
-                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap["Environment"]["order"], 1, 1)
-                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"]["order"], 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 0, 1, optionsSize["Environment"], fileMap.getColumnIndexByHeader("Environment"), 1, 1)
+                WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap.getColumnIndexByHeader("PlanStatus"), 1, 1)
             }
-
-            //flushAndClearSession()
 
             //
             // Dependencies
             //
-            def dependencySheet = WorkbookUtil.getSheetFromWorkbook(workbook, "Dependencies")
+            def dependencySheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.DEPENDENCIES)
             List depProjectionFields = [
                     'id',
                     'asset.id',
@@ -1022,7 +996,7 @@ class AssetExportService {
 
                 exportedEntity += "R"
 
-                def roomSheet = WorkbookUtil.getSheetFromWorkbook(workbook, "Room")
+                def roomSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.ROOM)
 
                 List projectionFields = [
                         "id",
@@ -1154,7 +1128,7 @@ class AssetExportService {
                 exportedEntity += "c"
 
                 if (cablingSize > 0) {
-                    def cablingSheet = WorkbookUtil.getSheetFromWorkbook(workbook, "Cabling")
+                    def cablingSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.CABLING)
                     def cablingList = AssetCableMap.createCriteria().list {
                         createAlias("assetFrom", "af")
                         and {
@@ -1180,7 +1154,7 @@ class AssetExportService {
                 exportedEntity += "M"
 
                 if (commentSize > 0) {
-                    def commentSheet = WorkbookUtil.getSheetFromWorkbook(workbook, "Comments")
+                    def commentSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.COMMENTS)
 
                     def c = AssetComment.createCriteria()
                     List commentList = c {
@@ -1264,43 +1238,20 @@ class AssetExportService {
         }
     }
 
-
-
-    /* -------------------------------------------------------
-	 * To check the sheet headers
-	 * @param attributeList, SheetColumnNames
-	 * @author Mallikarjun
-	 * @return bollenValue
-	 *------------------------------------------------------- */
-    boolean checkHeader(list, serverSheetColumnNames, missingHeader = "") {
-        def listSize = list.size()
-        for ( int coll = 0; coll < listSize; coll++ ) {
-            if( serverSheetColumnNames.containsKey( list[coll] ) || list[coll] == "DepGroup") {
-                //Nonthing to perform.
-            } else {
-                missingHeader = missingHeader + ", " + list[coll]
-            }
-        }
-        return missingHeader == ""
-    }
-
     /**
      * This method is used to update sheet's column header with custom labels
-     * @param assetClass AssetClass sheet
-     * @param sheet sheet's instance
-     * @param sheetColumnsMap column names
+     * @param assetClass
+     * @param sheet
+     * @param spreadsheetColumnMapper
      * @return
      */
-    private Sheet updateColumnHeaders(AssetClass assetClass, Sheet sheet, Map<String, ?> sheetColumnsMap) {
+    private Sheet updateColumnHeaders(AssetClass assetClass, Sheet sheet, SpreadsheetColumnMapper spreadsheetColumnMapper) {
         log.info("Updating sheet columns headers for: {}", assetClass)
-        Set<String> sheetColumnNames = sheetColumnsMap.sort { a, b -> a.value["order"] <=> b.value["order"] }.keySet()
-        sheetColumnNames.eachWithIndex { String columnHeader, int index ->
-            def cellData = sheet.getRow(0).getCell(index)?.getStringCellValue()
-            if (!cellData) {
-                addCell(sheet, index, 0, columnHeader)
+        spreadsheetColumnMapper.getColumnFieldMap().forEach({ key, value ->
+            if (value["udf"] == CustomDomainService.CUSTOM_USER_FIELD) {
+                addCell(sheet, value["order"], 0, key)
             }
-        }
-
+        })
         return sheet
     }
 
@@ -1316,38 +1267,16 @@ class AssetExportService {
 
     /**
      * Map and match sheet columns header names to field specs
-     * @param sheet sheet's instance
-     * @param fieldSpecs AssetClass field specs
+     * @param assetClass
+     * @param sheet
      * @return
      */
-    private Map mapSheetColumnsToFields(Sheet sheet, List<JSONObject> fieldSpecs) {
-        Map columnsMap = [:]
-        Row refServerRow = sheet.getRow(0)
-        Cell cell = null;
-        int colNum = 0;
-        while (true) {
-            cell = refServerRow.getCell(colNum)
-            if (cell && !StringUtil.isBlank(cell.getStringCellValue())) {
-                String cellContent = cell.getStringCellValue()
-                Map<String, ?> cellRef = ["field": cellContent, "order": colNum++]
-                columnsMap.put(cellContent, cellRef)
-                log.debug("{}: {}", sheet.getSheetName(), cellRef)
-            } else {
-                break
-            }
-        }
-        if (!columnsMap.containsKey("DepGroup")) {
-            columnsMap.put("DepGroup", ["field": "DepGroup", "order": colNum++])
-        }
-        for (JSONObject fieldSpec : fieldSpecs) {
-            Map<String, ?> columnMap = columnsMap[fieldSpec["label"]]
-            if (!columnMap) {
-                columnsMap.put(fieldSpec["label"], ["field": fieldSpec["field"], "order": colNum++])
-            } else {
-                columnMap["field"] = fieldSpec["field"]
-            }
-        }
-        return columnsMap
+    private SpreadsheetColumnMapper mapSheetColumnsToFields(AssetClass assetClass, Sheet sheet) {
+        List<String> templateHaders = WorkbookUtil.getSheetHeadersAsList(sheet)
+        List<Map<String, ?>> fieldSpecs = getFieldSpecsForAssetClass(assetClass)
+
+        SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(templateHaders, fieldSpecs)
+        return spreadsheetColumnMapper
     }
 
     /**
