@@ -332,7 +332,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 		Map field = [
 				field      : 'color',
 				label      : 'Best program language ever',
-				tip        : 'Select an option',
+				tip        : 'Select an option with a quote (")',
 				udf        : 1,
 				shared     : 1,
 				imp        : 'C',
@@ -353,7 +353,11 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
 		then: 'a value should be returned'
 			result
-		then: 'it should contains the tool tip'
-			result.contains('Select an option')
+		and: 'it should contains the tool tip'
+			result.contains(' data-content="Select an option with a quote (&quot;)" ')
+		and: 'it should contain the data-toggle'
+			result.contains(' data-toggle="popover" ')
+		and: 'it should contain the data-trigger'
+			result.contains(' data-trigger="hover" ')
 	}
 }
