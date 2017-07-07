@@ -566,7 +566,7 @@ class ProjectService implements ServiceMethods {
 		// remove preferences
 		def bundleQuery = "select mb.id from MoveBundle mb where mb.project = $projectInstance.id"
 		def eventQuery = "select me.id from MoveEvent me where me.project = $projectInstance.id"
-		UserPreference.executeUpdate("delete from UserPreference up where up.value = $projectInstance.id or up.value in ($bundleQuery) or up.value in ($eventQuery) ")
+		UserPreference.executeUpdate("delete from UserPreference up where up.value = '$projectInstance.id' or up.value in ('$bundleQuery') or up.value in ('$eventQuery') ")
 		//remove the AssetEntity
 		def assetsQuery = "select a.id from AssetEntity a where a.project = $projectInstance.id"
 
