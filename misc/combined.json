@@ -560,8 +560,8 @@
             },
             {
                 "field": "userCount",
-                "label": "Users",
-                "tip": "This field is the Users",
+                "label": "User Count",
+                "tip": "This field is the User Count",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -575,8 +575,8 @@
             },
             {
                 "field": "userLocations",
-                "label": "User Location",
-                "tip": "This field is the User Location",
+                "label": "User Locations",
+                "tip": "This field is the User Locations",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -724,8 +724,8 @@
         "fields": [
             {
                 "field": "assetName",
-                "label": "Asset Name",
-                "tip": "This field is the Asset Name",
+                "label": "Name",
+                "tip": "This field is the Name",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -829,8 +829,8 @@
             },
             {
                 "field": "ipAddress",
-                "label": "IP1",
-                "tip": "This field is the IP1",
+                "label": "IP Address",
+                "tip": "This field is the IP Address",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -904,8 +904,8 @@
             },
             {
                 "field": "moveBundle",
-                "label": "Move Bundle",
-                "tip": "This field is the Move Bundle",
+                "label": "Bundle",
+                "tip": "This field is the Bundle",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -979,8 +979,8 @@
             },
             {
                 "field": "rateOfChange",
-                "label": "Rate Of Change (%)",
-                "tip": "This field is the Rate Of Change (%)",
+                "label": "Rate Of Change",
+                "tip": "This field is the Rate Of Change",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -1099,8 +1099,8 @@
             },
             {
                 "field": "sourceChassis",
-                "label": "Source Blade",
-                "tip": "This field is the Source Blade",
+                "label": "Source Chassis",
+                "tip": "This field is the Source Chassis",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -1129,8 +1129,8 @@
             },
             {
                 "field": "sourceRack",
-                "label": "Source Rack/Cab",
-                "tip": "This field is the Source Rack/Cab",
+                "label": "Source Rack",
+                "tip": "This field is the Source Rack",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -1204,8 +1204,8 @@
             },
             {
                 "field": "targetChassis",
-                "label": "Target Blade",
-                "tip": "This field is the Target Blade",
+                "label": "Target Chassis",
+                "tip": "This field is the Target Chassis",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -1234,8 +1234,8 @@
             },
             {
                 "field": "targetRack",
-                "label": "Target Rack/Cab",
-                "tip": "This field is the Target Rack/Cab",
+                "label": "Target Rack",
+                "tip": "This field is the Target Rack",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -1485,21 +1485,6 @@
                 }
             },
             {
-                "field": "assetType",
-                "label": "Class",
-                "tip": "This field is the Class",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 3,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
                 "field": "supportType",
                 "label": "Support",
                 "tip": "This field is the Support",
@@ -1651,8 +1636,8 @@
             },
             {
                 "field": "rateOfChange",
-                "label": "Rate Of Change (%)",
-                "tip": "This field is the Rate Of Change (%)",
+                "label": "Rate Of Change",
+                "tip": "This field is the Rate Of Change",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
@@ -1872,21 +1857,6 @@
                 }
             },
             {
-                "field": "assetType",
-                "label": "Class",
-                "tip": "This field is the Class",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 3,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
                 "field": "LUN",
                 "label": "LUN",
                 "tip": "This field is the LUN",
@@ -2008,8 +1978,8 @@
             },
             {
                 "field": "rateOfChange",
-                "label": "Rate Of Change (%)",
-                "tip": "This field is the Rate Of Change (%)",
+                "label": "Rate Of Change",
+                "tip": "This field is the Rate Of Change",
                 "udf": 0,
                 "default": "",
                 "shared": 0,
