@@ -351,17 +351,15 @@ class AssetExportService {
                 return out
             }
 
-            // check missing headers
-            Set<String> missingHeaders = []
-            missingHeaders.addAll(serverMap.getMissingHeaders())
-            missingHeaders.addAll(appMap.getMissingHeaders())
-            missingHeaders.addAll(dbMap.getMissingHeaders())
-            missingHeaders.addAll(fileMap.getMissingHeaders())
-            profiler.lap(mainProfTag, 'Validated headers')
-
             // If there are standard headers not found in the workbook, it will return Error message
+            def missingHeaders = []
+            for (SpreadsheetColumnMapper spreadsheetColumnMapper in [serverMap, appMap, dbMap, fileMap]) {
+                if (spreadsheetColumnMapper.hasMissingHeaders()) {
+                    missingHeaders.add("${spreadsheetColumnMapper.getSheetName()} sheet template is missing headers: ${spreadsheetColumnMapper.getMissingHeaders()}")
+                }
+            }
             if (CollectionUtils.isNotEmpty(missingHeaders)) {
-                progressService.update(key, 100, 'Cancelled', "Application sheet template is missing fields: ${missingHeaders}.")
+                progressService.update(key, 100, 'Cancelled', missingHeaders.join("<br/>"))
                 return
             }
 
@@ -1272,7 +1270,7 @@ class AssetExportService {
         List<String> templateHaders = WorkbookUtil.getSheetHeadersAsList(sheet)
         List<Map<String, ?>> fieldSpecs = getFieldSpecsForAssetClass(assetClass)
 
-        SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(templateHaders, fieldSpecs)
+        SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(sheet.getSheetName(), templateHaders, fieldSpecs)
         return spreadsheetColumnMapper
     }
 
