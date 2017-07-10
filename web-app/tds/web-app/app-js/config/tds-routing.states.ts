@@ -9,6 +9,7 @@ import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
 import { PreferenceService } from '../shared/services/preference.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
+import { SharedStates } from '../shared/shared-routing.states';
 // Services
 import { TaskService } from '../modules/taskManager/service/task.service';
 
@@ -68,7 +69,7 @@ function requiresPermissionHook(transitionService: TransitionService) {
 			permissionService.hasPermission(reqPermission) :
 			reqPermission.reduce((p, c) => p && permissionService.hasPermission(c), true);
 		if (!permited) {
-			return $state.target('login', undefined, { location: false });
+			return $state.target(SharedStates.UNAUTHORIZED.name, undefined, { location: false });
 		}
 	};
 
@@ -98,6 +99,13 @@ export function LoadingConfig(router: UIRouter) {
 	}, (transition) => {
 		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
 		setTimeout(() => loaderService.hide());
+	}, { priority: 10 });
+
+	transitionService.onError({
+		to: (state) => state.data
+	}, (transition) => {
+		const $state = transition.router.stateService;
+		return $state.target(SharedStates.ERROR.name, undefined, { location: false });
 	}, { priority: 10 });
 }
 export const TDSRoutingStates = [

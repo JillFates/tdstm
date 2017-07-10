@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PopupModule } from '@progress/kendo-angular-popup';
-// import { TranslateModule } from 'ng2-translate';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
 import { AuthService } from '../shared/services/auth.service';
@@ -27,12 +26,19 @@ import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.
 import { RichTextEditorComponent } from './modules/rich-text-editor/rich-text-editor.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
+// Pages
+import { ErrorPageComponent } from './modules/pages/error-page.component';
+import { UnauthorizedPageComponent } from './modules/pages/unauthorized-page.component';
+import { NotFoundPageComponent } from './modules/pages/not-found-page.component';
+// Routing Logic
+import { UIRouterModule } from '@uirouter/angular';
+import { SHARED_STATES } from './shared-routing.states';
 
 @NgModule({
 	imports: [
 		CommonModule,
 		PopupModule,
-		// TranslateModule
+		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
 	declarations: [
 		UILoaderDirective,
@@ -44,7 +50,10 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		RichTextEditorComponent,
-		UIPromptDirective
+		UIPromptDirective,
+		ErrorPageComponent,
+		NotFoundPageComponent,
+		UnauthorizedPageComponent
 	],
 	providers: [
 		AuthService,
@@ -69,7 +78,6 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		RichTextEditorComponent,
-		// TranslateModule
 	]
 })
 export class SharedModule {
