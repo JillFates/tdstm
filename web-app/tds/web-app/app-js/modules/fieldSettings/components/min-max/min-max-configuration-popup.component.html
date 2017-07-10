@@ -10,41 +10,34 @@
 
             <div class="modal-container">
                 <div class="text-center">
-                    <div class="form-group" [ngClass]="{'error': minInput.errors}">
+                    <div class="form-group">
                         <label for="minSize">Min Length</label>
-                        <input validateOnlyNumbers [ngClass]="{'error': minInput.errors}" #minInput="ngModel"
-                               type="number" placeholder="Enter value" name="minSize" min="0" max="{{model.maxSize}}"
-                               class="form-control minmax-input" [(ngModel)]="model.minSize">
-                        <small [hidden]="!minInput.hasError('notANumber')" class="text-danger">
-                            Not a number.
-                        </small>
-                        <small [hidden]="!minInput.hasError('invalidMin')" class="text-danger">
-                            Min should be greater than 0.
-                        </small>
-                        <small [hidden]="!minInput.hasError('invalidMax')" class="text-danger">
-                            Min should be less than {{model.maxSize}}.
-                        </small>
+                        <kendo-numerictextbox
+                                [format]="'n'"
+                                [(value)]="model.minSize"
+                                [min]="0"
+                                [max]="model.maxSize"
+                                [autoCorrect]="true"
+                                style="width: 70px;"
+                        ></kendo-numerictextbox>
                     </div>
-                    <div class="form-group" [ngClass]="{'error': minInput.errors}">
+                    <div class="form-group">
                         <label for="maxSize">Max Length</label>
-                        <input required validateOnlyNumbers #maxInput="ngModel" [ngClass]="{'error': maxInput.errors}"
-                                type="number" placeholder="Enter value" name="maxSize" max="255" min="{{model.minSize}}" class="form-control minmax-input" [(ngModel)]="model.maxSize">
-                        <small [hidden]="!maxInput.hasError('notANumber') && !maxInput.hasError('required')" class="text-danger">
-                            Not a number.
-                        </small>
-                        <small [hidden]="!maxInput.hasError('invalidMin')" class="text-danger">
-                            Min should be greater than {{model.minSize}}.
-                        </small>
-                        <small [hidden]="!maxInput.hasError('invalidMax')" class="text-danger">
-                            Max should be less than 255.
-                        </small>
+                        <kendo-numerictextbox
+                                [format]="'n'"
+                                [(value)]="model.maxSize"
+                                [min]="model.minSize"
+                                [max]="255"
+                                [autoCorrect]="true"
+                                style="width: 70px;"
+                        ></kendo-numerictextbox>
                     </div>
                 </div>
             </div>
 
             <kendo-dialog-actions>
                 <div class="button-dialog-actions text-right">
-                    <button name="saveButton" class="btn btn-default btn-sm" [disabled]="(minInput.errors || maxInput.errors)" (click)="onSave()">
+                    <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()">
                         <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
                     </button>
                     <button name="cancelButton" class="btn btn-default btn-sm" (click)="onToggle()">

@@ -1,13 +1,11 @@
 import { Component, Input, ViewChild, OnInit } from '@angular/core';
 import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
-import {AllowOnlyNumbersDirective} from '../../../../shared/directives/allow-only-numbers.directive';
 
 @Component({
 	moduleId: module.id,
 	selector: 'min-max-configuration-popup',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/min-max/min-max-configuration-popup.component.html',
-	exportAs: 'minmaxConfig',
-	providers: [AllowOnlyNumbersDirective ]
+	exportAs: 'minmaxConfig'
 })
 
 export class MinMaxConfigurationPopupComponent implements OnInit {

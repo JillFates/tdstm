@@ -48,15 +48,14 @@
     </kendo-grid-column>
     <kendo-grid-column field="order" title="Order" [width]="100">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else orderTemp" let-dataItem>
-            <span *ngIf="dataItem.udf" >
-                <input required validateOnlyNumbers [ngClass]="{'error': orderInput.errors}" #orderInput="ngModel" type="number" min="0" class="form-control" [(ngModel)]="dataItem.order" name="order">
-                <small [hidden]="!orderInput.hasError('notANumber') && !orderInput.hasError('required')" class="text-danger">
-                    Not a number.
-                </small>
-                <small [hidden]="!orderInput.hasError('invalidMin')" class="text-danger">
-                    Invalid order.
-                </small>
-            </span>
+            <kendo-numerictextbox
+                    *ngIf="dataItem.udf"
+                    [format]="'n'"
+                    [(value)]="dataItem.order"
+                    [min]="0"
+                    [autoCorrect]="true"
+                    style="width: 70px;"
+            ></kendo-numerictextbox>
             <div *ngIf="!dataItem.udf" style="width:45px" class="text-center">{{dataItem.order}}</div>
         </ng-template>
         <ng-template kendoGridCellTemplate class="text-center" let-dataItem #orderTemp>

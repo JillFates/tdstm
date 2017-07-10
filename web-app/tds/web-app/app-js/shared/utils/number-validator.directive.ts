@@ -13,7 +13,7 @@ import {ValidationUtils} from '../utils/validation.utils';
  * 3. If max attribute is present, then validates if valid value number is less than max.
  *
  * ## Usage
- *  <input type="number" validateOnlyNumbers #orderInput="ngModel">
+ *  <input type="number" validateNumber #orderInput="ngModel">
  *
  * Different validations error thrown:
  * - notANumber (Validation 1.)
@@ -24,12 +24,12 @@ import {ValidationUtils} from '../utils/validation.utils';
  * 	 <small [hidden]="!orderInput.hasError('notANumber')" class="text-danger">
  */
 @Directive({
-	selector: '[validateOnlyNumbers]',
+	selector: '[validateNumber]',
 	providers: [
-		{ provide: NG_VALIDATORS, useExisting: OnlyNumbersValidator, multi: true }
+		{ provide: NG_VALIDATORS, useExisting: NumberValidator, multi: true }
 	]
 })
-export class OnlyNumbersValidator implements Validator {
+export class NumberValidator implements Validator {
 
 	@Input('min') min: number;
 	@Input('max') max: number;

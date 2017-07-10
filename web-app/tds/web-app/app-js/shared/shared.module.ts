@@ -17,7 +17,6 @@ import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
-import { OnlyNumbersValidator } from './validators/only-numbers-validator.directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -45,8 +44,7 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		RichTextEditorComponent,
-		UIPromptDirective,
-		OnlyNumbersValidator
+		UIPromptDirective
 	],
 	providers: [
 		AuthService,
@@ -70,8 +68,7 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
-		RichTextEditorComponent,
-		OnlyNumbersValidator
+		RichTextEditorComponent
 		// TranslateModule
 	]
 })
