@@ -16,9 +16,6 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 
-	static readonly MIN = 0;
-	static readonly MAX = 255;
-
 	public onSave(): void {
 		this.field.constraints = { ...this.model };
 		this.onToggle();
@@ -34,44 +31,5 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 
 	public onToggle(): void {
 		this.show = !this.show;
-	}
-
-	/**
-	 * - Validates {model.minSize} should not be greater than {model.maxSize}
-	 * - Validates {model.minSize} should not be less than 0 (MIN)
-	 * - Validates {model.minSize} should not be greater than 255 (MAX)
-	 */
-	public validateMinSize(): void {
-		if (this.model.minSize > this.model.maxSize) {
-			this.model.minSize = MinMaxConfigurationPopupComponent.MIN;
-		} else if (this.model.minSize < MinMaxConfigurationPopupComponent.MIN) {
-			this.model.minSize = MinMaxConfigurationPopupComponent.MIN;
-		} else if (this.model.minSize > MinMaxConfigurationPopupComponent.MAX) {
-			this.model.minSize = MinMaxConfigurationPopupComponent.MAX;
-		}
-	}
-
-	/**
-	 * - Validates {model.maxSize} should not be less than {model.minSize}
-	 * - Validates {model.maxSize} should not be greater than 255 (MAX)
-	 * - Validates {model.maxSize} should not be less than 0 (MIN)
-	 */
-	public validateMaxSize(): void {
-		if (this.model.maxSize < this.model.minSize) {
-			this.model.maxSize = MinMaxConfigurationPopupComponent.MAX;
-		} else if (this.model.maxSize > MinMaxConfigurationPopupComponent.MAX) {
-			this.model.maxSize = MinMaxConfigurationPopupComponent.MAX;
-		} else if (this.model.maxSize < MinMaxConfigurationPopupComponent.MIN) {
-			this.model.maxSize = MinMaxConfigurationPopupComponent.MIN;
-		}
-	}
-
-	/**
-	 * Component validation:
-	 * - Validates minSize & maxSize
-	 */
-	public validate(): void {
-		this.validateMinSize();
-		this.validateMaxSize();
 	}
 }

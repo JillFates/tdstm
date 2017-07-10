@@ -11,12 +11,26 @@
             <div class="modal-container">
                 <div class="text-center">
                     <div class="form-group">
-                        <label for="minSize">Min Length</label>
-                        <input type="number" placeholder="Enter value" name="minSize" min="0" max="255" class="form-control minmax-input" [(ngModel)]="model.minSize" (change)="validateMinSize()">
+                        <label for="minSize">{{'FIELD_SETTINGS.MIN_MAX.MIN_LENGTH' | translate}}</label>
+                        <kendo-numerictextbox
+                                [format]="'n'"
+                                [(value)]="model.minSize"
+                                [min]="0"
+                                [max]="model.maxSize"
+                                [autoCorrect]="true"
+                                style="width: 70px;"
+                        ></kendo-numerictextbox>
                     </div>
                     <div class="form-group">
-                        <label for="maxSize">Max Length</label>
-                        <input type="number" placeholder="Enter value" name="maxSize" max="255" min="{{model.minSize}}" class="form-control minmax-input" [(ngModel)]="model.maxSize" (change)="validateMaxSize()">
+                        <label for="maxSize">{{'FIELD_SETTINGS.MIN_MAX.MAX_LENGTH' | translate}}</label>
+                        <kendo-numerictextbox
+                                [format]="'n'"
+                                [(value)]="model.maxSize"
+                                [min]="model.minSize"
+                                [max]="255"
+                                [autoCorrect]="true"
+                                style="width: 70px;"
+                        ></kendo-numerictextbox>
                     </div>
                 </div>
             </div>

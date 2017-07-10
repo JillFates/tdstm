@@ -68,7 +68,7 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
-		RichTextEditorComponent,
+		RichTextEditorComponent
 		// TranslateModule
 	]
 })
