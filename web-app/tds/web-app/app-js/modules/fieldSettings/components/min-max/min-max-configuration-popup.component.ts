@@ -1,11 +1,13 @@
 import { Component, Input, ViewChild, OnInit } from '@angular/core';
 import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
+import {AllowOnlyNumbersDirective} from '../../../../shared/directives/allow-only-numbers.directive';
 
 @Component({
 	moduleId: module.id,
 	selector: 'min-max-configuration-popup',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/min-max/min-max-configuration-popup.component.html',
-	exportAs: 'minmaxConfig'
+	exportAs: 'minmaxConfig',
+	providers: [AllowOnlyNumbersDirective ]
 })
 
 export class MinMaxConfigurationPopupComponent implements OnInit {
@@ -16,8 +18,8 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 
-	static readonly MIN = 0;
-	static readonly MAX = 255;
+	//static readonly MIN_LIMIT = 0;
+	//static readonly MAX_LIMIT = 255;
 
 	public onSave(): void {
 		this.field.constraints = { ...this.model };
@@ -37,41 +39,60 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	}
 
 	/**
+	 * TODO: remove this code
+	 * @param event
+	 * @returns {boolean}
+	 */
+	/*
+	private validateIsANumberValue(event): boolean {
+		if ( isNaN(event.target.valueAsNumber) ) {
+			return false;
+		}
+		return true;
+	}
+	*/
+
+	/**
+	 * TODO: remove this code
 	 * - Validates {model.minSize} should not be greater than {model.maxSize}
 	 * - Validates {model.minSize} should not be less than 0 (MIN)
 	 * - Validates {model.minSize} should not be greater than 255 (MAX)
 	 */
-	public validateMinSize(): void {
-		if (this.model.minSize > this.model.maxSize) {
-			this.model.minSize = MinMaxConfigurationPopupComponent.MIN;
-		} else if (this.model.minSize < MinMaxConfigurationPopupComponent.MIN) {
-			this.model.minSize = MinMaxConfigurationPopupComponent.MIN;
-		} else if (this.model.minSize > MinMaxConfigurationPopupComponent.MAX) {
-			this.model.minSize = MinMaxConfigurationPopupComponent.MAX;
+	/*
+	public validateMinSize(event): void {
+		if (this.validateIsANumberValue(event) ) {
+			let min = event.target.valueAsNumber;
+			if (min > this.model.maxSize
+			|| min < MinMaxConfigurationPopupComponent.MIN_LIMIT
+			|| min > MinMaxConfigurationPopupComponent.MAX_LIMIT) {
+				// do nothing since we want to skip changing model from input
+			} else {
+				this.model.minSize = min;
+			}
 		}
+		event.target.value = this.model.minSize;
 	}
+	*/
 
 	/**
+	 * TODO: remove this code
 	 * - Validates {model.maxSize} should not be less than {model.minSize}
 	 * - Validates {model.maxSize} should not be greater than 255 (MAX)
 	 * - Validates {model.maxSize} should not be less than 0 (MIN)
 	 */
-	public validateMaxSize(): void {
-		if (this.model.maxSize < this.model.minSize) {
-			this.model.maxSize = MinMaxConfigurationPopupComponent.MAX;
-		} else if (this.model.maxSize > MinMaxConfigurationPopupComponent.MAX) {
-			this.model.maxSize = MinMaxConfigurationPopupComponent.MAX;
-		} else if (this.model.maxSize < MinMaxConfigurationPopupComponent.MIN) {
-			this.model.maxSize = MinMaxConfigurationPopupComponent.MIN;
+	/*
+	public validateMaxSize(event): void {
+		if (this.validateIsANumberValue(event) ) {
+			let max = event.target.valueAsNumber;
+			if (max < this.model.minSize
+			|| max > MinMaxConfigurationPopupComponent.MAX_LIMIT
+			|| max < MinMaxConfigurationPopupComponent.MIN_LIMIT) {
+				// do nothing since we want to skip changing model from input
+			} else {
+				this.model.maxSize = max;
+			}
 		}
+		event.target.value = this.model.maxSize;
 	}
-
-	/**
-	 * Component validation:
-	 * - Validates minSize & maxSize
-	 */
-	public validate(): void {
-		this.validateMinSize();
-		this.validateMaxSize();
-	}
+	*/
 }
