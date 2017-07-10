@@ -8,11 +8,11 @@ class TDSPasswordProvider implements PasswordProvider
 	private String pass
 
 	TDSPasswordProvider(String pass){
-		this.pass = new String(pass) //copy String
+		//copy String for security and avoiding future modification
+		this.pass = new String(pass)
 	}
 
 	char[] getPassword() {
-		println("pass : $pass")
 		return pass.toCharArray()
 	}
 }

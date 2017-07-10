@@ -38,7 +38,7 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 
 	@Override
 	protected byte[] getLicenseData(Object o) {
-		log.info("License to retrieve: {}", o)
+		log.debug("License to retrieve: {}", o)
 
 		String license = licenses[o]
 		if(license) {
