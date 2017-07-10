@@ -1,18 +1,21 @@
 package com.tdsops.tm.asset.export
 
+import com.tdsops.common.lang.CollectionUtils
 import net.transitionmanager.service.CustomDomainService
 
 /**
  * Asset export spreadsheet column mapper
  */
 class SpreadsheetColumnMapper {
+    private String sheetName
     private List<String> templateHeaders
     private List<Map<String, ?>> customFields = []
     private List<Map<String, ?>> standardFields = []
     private List<String> fixedColumnHeaders = ["appId", "assetId", "dbId", "filesId", "DepGroup"]
     private Map<String, ?> columnFieldMap = [:]
 
-    SpreadsheetColumnMapper(List<String> templateHeaders, List<Map<String, ?>> fieldSpecs) {
+    SpreadsheetColumnMapper(String sheetName, List<String> templateHeaders, List<Map<String, ?>> fieldSpecs) {
+        this.sheetName = sheetName
         this.templateHeaders = templateHeaders
 
         setFieldSpecs(fieldSpecs)
@@ -41,12 +44,28 @@ class SpreadsheetColumnMapper {
     }
 
     /**
+     * Evaluate whether the spreadsheet has missing headers with respect to the standard fields
+     * @return
+     */
+    boolean hasMissingHeaders() {
+        return CollectionUtils.isNotEmpty(getMissingHeaders())
+    }
+
+    /**
      * Find and returns the list of missing standard column headers in the spreadsheet
      * @return
      */
     Set<String> getMissingHeaders() {
         List<String> standardHeaders = standardFields*.label
         return standardHeaders - templateHeaders
+    }
+
+    /**
+     * Get current column mapper sheet name
+     * @return
+     */
+    String getSheetName() {
+        return this.sheetName
     }
 
     /**
