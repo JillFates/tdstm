@@ -18,9 +18,6 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 
-	// static readonly MIN_LIMIT = 0;
-	// static readonly MAX_LIMIT = 255;
-
 	public onSave(): void {
 		this.field.constraints = { ...this.model };
 		this.onToggle();
