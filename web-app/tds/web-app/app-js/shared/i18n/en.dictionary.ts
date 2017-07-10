@@ -13,7 +13,11 @@ export const en_DICTIONARY: Object = {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
 		'PROJECT_LIST': 'Project List',
-		'CREATE_CUSTOM': 'Add Custom Field'
+		'CREATE_CUSTOM': 'Add Custom Field',
+		'MIN_MAX' : {
+			'MIN_LENGTH' : 'Min Length',
+			'MAX_LENGTH' : 'Max Length',
+		}
 	},
 	'GLOBAL': {
 		'OK': 'Ok',
