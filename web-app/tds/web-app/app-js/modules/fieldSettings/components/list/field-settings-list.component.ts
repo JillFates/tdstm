@@ -9,6 +9,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	moduleId: module.id,
@@ -125,9 +126,16 @@ export class FieldSettingsListComponent implements OnInit {
 
 	protected isValid(domain: DomainModel): boolean {
 		let values = domain.fields.map(x => x.label);
-		return domain.fields.filter(item =>
-			!item.label || !item.field).length === 0 &&
-			values.filter((l, i) => values.indexOf(l) !== i).length === 0;
+
+		// Validates "Field Order" is not null && should be a number on the range of [0, X)
+		let invalidOrderFields = domain.fields.filter(item =>
+			item.order === null || !ValidationUtils.isValidNumber(item.order) || item.order < 0
+		);
+
+		return domain.fields.filter(item => !item.label || !item.field).length === 0
+			// Validates "Field Labels" should be unique by domain
+			&& values.filter((l, i) => values.indexOf(l) !== i).length === 0
+			&& invalidOrderFields.length === 0;
 	}
 
 	protected onAdd(callback): void {

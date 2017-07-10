@@ -77,7 +77,8 @@ import { SHARED_STATES } from './shared-routing.states';
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
-		RichTextEditorComponent,
+		RichTextEditorComponent
+		// TranslateModule
 	]
 })
 export class SharedModule {
