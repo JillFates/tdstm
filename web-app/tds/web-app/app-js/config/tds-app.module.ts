@@ -34,6 +34,7 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, LoadingConfig } from '.
 		// Routing Modules using UI Router
 		UIRouterModule.forRoot(<UIRouterModule>{
 			states: TDSRoutingStates,
+			otherwise: '/pages/notfound',
 			config: (route) => {
 				AuthConfig(route);
 				PermissionConfig(route);

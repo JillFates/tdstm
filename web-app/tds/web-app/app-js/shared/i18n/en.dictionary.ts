@@ -47,5 +47,13 @@ export const en_DICTIONARY: Object = {
 		'EDIT_NOTICE': 'Edit Notice',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
+	},
+	'PAGES': {
+		'ERROR_TITLE': 'Oops! Something went wrong.',
+		'ERROR_MESSAGE': 'The TransitionManager team will fix this as soon as possible.',
+		'UNAUTHORIZED_TITLE': 'You don\'t have permission to view this page.',
+		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
+		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
+		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.'
 	}
 };
