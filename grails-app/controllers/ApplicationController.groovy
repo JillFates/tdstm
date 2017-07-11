@@ -387,12 +387,6 @@ class ApplicationController implements ControllerMethods {
 			return
 		}
 
-		assetEntityService.getMoveEvents(project).each {
-			if (!AppMoveEvent.countByApplicationAndMoveEvent(application, it)) {
-				new AppMoveEvent(application: application, moveEvent: it).save()
-			}
-		}
-
 		// The list to show in the App Owner and SME selects should include ALL staff (project owner and partners)
 		// along with ALL of the client staff that their person accounts are active.
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
