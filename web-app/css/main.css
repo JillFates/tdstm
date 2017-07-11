@@ -801,6 +801,11 @@ svg {
 .suffleTd{
 	position:relative !important;
 }
+
+.suffleTd div.popover {
+	top: -5px !important;
+}
+
 .planBundleSel{
 	margin-left: 274px;
 	margin-top: -28px;
