@@ -2195,6 +2195,7 @@ class AssetEntityController implements ControllerMethods {
 			def moveBundleList = MoveBundle.findAllByProject(project, [sort: 'name'])
 			def companiesList = partyRelationshipService.getCompaniesList()
 			def role = filters?.role ?: params.role ?: ''
+			def status = params.status ?: filters?.status ?: ''
 			return [
 					timeToUpdate: timeToRefresh ?: 60,
 					servers: entities.servers,
@@ -2217,7 +2218,7 @@ class AssetEntityController implements ControllerMethods {
 					modelPref: modelPref,
 			        assetType: filters?.assetType ?:'',
 					dueDate: filters?.dueDate ?:'',
-					status: filters?.status ?:'',
+					status: status,
 			        assignedTo: filters?.assignedTo ?:'',
 					category: filters?.category ?:'',
 					moveEvent: moveEvent,
