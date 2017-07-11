@@ -156,13 +156,14 @@ class Project extends PartyGroup {
 		startDate nullable: true
 		timezone nullable: true
 		workflowCode blank: false
+		planMethodology nullable: true
 
 
 		// custom fields
 
 		// we can save some redundant space by dynamically setting all 96 columns to be nullable in a loop;
 		// since the constraints DSL is implemented as method calls with the property name as the method
-		// name and a single Map argument containing the data for the various contraints, it's simple
+		// name and a single Map argument containing the data for the various constraints, it's simple
 		// to dynamically create a method call to be called on the closure's delegate:
 
 		Map nullableTrue = Collections.singletonMap('nullable', true)
