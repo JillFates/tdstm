@@ -144,6 +144,7 @@ class Project extends PartyGroup {
 	static constraints = {
 		// customFieldsShown inList: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96]
 		defaultBundle nullable: true
+		client nullable: false
 		depConsoleCriteria nullable: true
 		description nullable: true
 		lastAssetId nullable: true
@@ -153,6 +154,7 @@ class Project extends PartyGroup {
 		startDate nullable: true
 		timezone nullable: true
 		workflowCode blank: false
+
 
 		// custom fields
 
