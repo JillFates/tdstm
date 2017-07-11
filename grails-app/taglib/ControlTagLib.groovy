@@ -331,7 +331,7 @@ class ControlTagLib {
 	 * Returns the HTML5 require and min/max appropriately for the field specification control type
 	 * @param fieldSpec - the Field specification object
 	 * @return The required attribute for controls if required otherwise blank
-	 * @example   ' required minlength="1" maxlength="12"'
+	 * @example   ' required pattern=".{3,}" maxlength="12"'
 	 */
 	private String constraintsAttrib(Map fieldSpec) {
 		StringBuilder sb = new StringBuilder()
@@ -348,8 +348,10 @@ class ControlTagLib {
 			if ((min == null || min == 0) && isReq) {
 				min=1
 			}
+			// since minlength validation isn't supported as an standard on all browsers,
+			// we need to use pattern for min length TEXT INPUT constraint.
 			if (min != null && min > 0) {
-				sb.append(" minlength=\"$min\"")
+				sb.append(" pattern=\".{$min,}\"")
 			}
 
 			// Make sure max is set properly
