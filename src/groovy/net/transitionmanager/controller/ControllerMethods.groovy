@@ -5,6 +5,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
+import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
@@ -251,4 +252,11 @@ trait ControllerMethods {
 		parts.findAll().join(separator)
 	}
 
+	Project getProjectForWs() {
+		Project project = securityService.userCurrentProject
+		if (! project) {
+			throw new InvalidRequestException('No current project selected for session')
+		}
+		return project
+	}
 }

@@ -4,6 +4,7 @@ import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.ObjectUtils
@@ -18,6 +19,7 @@ class CustomDomainService implements ServiceMethods {
 
     SecurityService securityService
     SettingService settingService
+    def jdbcTemplate
 
     /**
      * Retrieve custom field specs
@@ -123,14 +125,13 @@ class CustomDomainService implements ServiceMethods {
      * @param fieldSpec
      * TODO : saveFieldSpecs : change method to require the project parameter instead of looking it up
      */
-    void saveFieldSpecs(String domain, JSONObject fieldSpec) {
-        Project currentProject = securityService.loadUserCurrentProject()
+    void saveFieldSpecs(Project project, String domain, JSONObject fieldSpec) {
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
             if (customFieldSpec) {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
-                settingService.save(currentProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType, customFieldSpec.toString(), customFieldSpecVersion)
+                settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType, customFieldSpec.toString(), customFieldSpecVersion)
             } else {
                 throw new InvalidParamException("Custom field specification not provided for class ${assetClassType}")
             }
@@ -138,7 +139,19 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
+     * Save single or all custom field specs
+     * @param domain
+     * @param fieldSpec
+     * TODO : saveFieldSpecs : change method to require the project parameter instead of looking it up
+     */
+    void saveFieldSpecs(String domain, JSONObject fieldSpec) {
+        Project currentProject = securityService.loadUserCurrentProject()
+        saveFieldSpecs(currentProject, domain, fieldSpec)
+    }
+
+    /**
      * Retrieve a list of distinct values found for the specified domain and field spec
+     * @param project - the project to look up asset distinct values on
      * @param domain - the class name of the domain
      * @param fieldSpec - the field specification as JSON data
      * @param failOnFirst - flag fail on the first found not in spec (NOT used...)
@@ -146,16 +159,14 @@ class CustomDomainService implements ServiceMethods {
      * TODO : distinctValues - this method is Asset specific but the method name give no indication of that
      * TODO : distinctValues - should be changed to require project as param
      */
-    List<String> distinctValues(String domain, JSONObject fieldSpec, Boolean failOnFirst=false) {
-        Project currentProject = securityService.loadUserCurrentProject()
+    List<String> distinctValues(Project project, String domain, JSONObject fieldSpec, Boolean failOnFirst=false) {
         AssetClass assetClass = resolveAssetClassType(domain)
-        JSONObject parsedJson = JsonUtil.parseJson(fieldSpec.toString())
-        String fieldName = parsedJson["fieldSpec"]["field"]
-        boolean shared = parsedJson["fieldSpec"]["shared"]
+        String fieldName = fieldSpec.fieldSpec?.field
+        boolean shared = fieldSpec.fieldSpec?.shared
 
         validateCustomFieldName(fieldName)
 
-        return getDistinctAssetCustomFieldValues(currentProject, fieldName, shared, assetClass)
+        return getDistinctAssetCustomFieldValues(project, fieldName, shared, assetClass)
     }
 
     /**
@@ -167,6 +178,7 @@ class CustomDomainService implements ServiceMethods {
      * @return A list of distinct values that are case-sensitive sorted by the values case insensitive ascending
      */
     List<String> getDistinctAssetCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
+        assert project
         StringBuilder query = new StringBuilder("SELECT * FROM (SELECT DISTINCT ${fieldName} COLLATE latin1_bin AS ${fieldName} ")
         query.append("FROM asset_entity WHERE ${fieldName} IS NOT NULL AND project_id = ? ")
 
@@ -282,18 +294,16 @@ class CustomDomainService implements ServiceMethods {
      * @throws InvalidRequestException if the fieldName is invalid
      */
     private void validateCustomFieldName(String fieldName) {
-        if (!StringUtil.isBlank(fieldName)) {
-            String[] foundField = fieldName.split("(?<=[\\w&&\\D])(?=\\d)")
-            // TODO : validateCustomFieldName : What if the regex only returns one part. Could the following lines blow up?
-            String fieldNamePart = foundField[0]
-            int fieldCountPart = foundField[1] as Integer
+        if (! StringUtil.isBlank(fieldName) && fieldName.startsWith(CUSTOM_FIELD_NAME_PART)) {
+            String numberStr = fieldName.substring(CUSTOM_FIELD_NAME_PART.size())
 
-            if (!(CUSTOM_FIELD_NAME_PART == fieldNamePart) || !(fieldCountPart > 0 && fieldCountPart <= Project.CUSTOM_FIELD_COUNT)) {
-                reportFieldNameViolation(fieldName)
+            Integer number = NumberUtil.toInteger(numberStr, -1)
+            if (number > 0 && number <= Project.CUSTOM_FIELD_COUNT) {
+                return
             }
-        } else {
-            reportFieldNameViolation(fieldName)
         }
+        // If we got here then there was an issue...
+        reportFieldNameViolation(fieldName)
     }
 
     /**
@@ -302,7 +312,7 @@ class CustomDomainService implements ServiceMethods {
      */
     private void reportFieldNameViolation(String fieldName) {
         securityService.reportViolation("Attempted to access distinct field values for undefined field name: [${fieldName}]", securityService.currentUsername)
-        throw new InvalidRequestException("Field name does not exist or not valid: ${fieldName}")
+        throw new InvalidRequestException("Invalid field name (${fieldName}) specified")
     }
 
 }
