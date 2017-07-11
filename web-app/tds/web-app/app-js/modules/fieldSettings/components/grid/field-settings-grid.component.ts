@@ -203,7 +203,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			dir: 'asc',
 			field: 'order'
 		}];
-		this.fieldsSettings = this.data.fields;
+		this.applyFilter();
 	}
 
 	public refresh(): void {
