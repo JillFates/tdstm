@@ -134,12 +134,12 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			int max = stringFieldSpec.constraints.maxSize
 		then: 'the result should have required'
 			result.contains(' required ')
-		and: 'min value should default to 1 because it is required'
-			result.contains(' minlength="1" ')
+		and: 'min pattern value should default to 1 because it is required'
+			result.contains(' pattern=".{1,}" ')
 		and: 'max value should be set based on the spec'
 			result.contains(" maxlength=\"$max\"")
 		and: 'the complete formatted string should be'
-			" required minlength=\"1\" maxlength=\"$max\"" == result
+			" required pattern=\".{1,}\" maxlength=\"$max\"" == result
 
 		when: 'calling constraintsAttrib with max value to large'
 			Map altFS = stringFieldSpec
