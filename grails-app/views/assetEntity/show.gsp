@@ -74,7 +74,6 @@
 						<tds:labelForShowField field="${standardFieldSpecs.targetRack}" value="${assetEntity.rackTarget?.tag}"/>
 
 						<%-- blade --%>
-						<tds:inputLabel field="${standardFieldSpecs.sourceChassis}" value="${assetEntity.sourceChassis}" tooltipDataPlacement="left"/>
 						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none">
 						<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceChassis.tip}">
 							${sourceChassis}
