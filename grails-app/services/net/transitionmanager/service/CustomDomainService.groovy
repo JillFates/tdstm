@@ -40,7 +40,7 @@ class CustomDomainService implements ServiceMethods {
      * @return
      */
     Map customFieldSpecs(Project project, String domain, boolean showOnly = false) {
-        return getFilteredFieldSpecs(project, domain, USER_DEFINED_FIELD, showOnly)
+        return getFilteredFieldSpecs(project, domain, CUSTOM_USER_FIELD, showOnly)
     }
 
     /**
