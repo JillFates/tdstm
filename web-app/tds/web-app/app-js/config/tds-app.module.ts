@@ -17,7 +17,7 @@ import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
-import { TDSRoutingStates, AuthConfig, PermissionConfig, LoadingConfig } from './tds-routing.states';
+import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './tds-routing.states';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -38,7 +38,7 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, LoadingConfig } from '.
 			config: (route) => {
 				AuthConfig(route);
 				PermissionConfig(route);
-				LoadingConfig(route);
+				MiscConfig(route);
 			},
 		}),
 	],
