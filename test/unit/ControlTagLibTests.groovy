@@ -292,7 +292,6 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			String tabIndex='5'
 		when: 'the template is applied with the parameters'
 			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
-			System.out.println(result);
 		then: 'a value should be returned'
 			result
 		and: 'it should start with <select ...'
