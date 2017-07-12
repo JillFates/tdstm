@@ -93,9 +93,9 @@ class SettingService implements ServiceMethods {
     protected Map getSettingAsMap(Setting setting) {
         if (setting) {
             try {
-                JSONObject json = new JSONObject(setting.json)
-                json.put(VERSION_KEY, setting.version)
-                return json as Map
+                Map<String, ?> settingMap = JsonUtil.convertJsonToMap(setting.json)
+                settingMap.put(VERSION_KEY, setting.version)
+                return settingMap
             } catch (Exception e) {
                 log.error(e.message, e)
                 return null
