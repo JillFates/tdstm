@@ -803,7 +803,8 @@ svg {
 }
 
 .suffleTd div.popover {
-	top: -5px !important;
+	top: 7px !important;
+	width: 212px  !important;
 }
 
 .planBundleSel{
