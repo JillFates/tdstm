@@ -213,19 +213,18 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-
 		boolean isBlankValue = StringUtil.isBlank(value);
-		if ( (isBlankValue && isRequiredField) || (!isBlankValue && ! options.contains(value)) ) {
+		if (( ! isBlankValue && ! options.contains(value)) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			sb.append(selectOption(value, value, warning))
 		}
 
 		// Iterate over the fieldSpec option values to create each of the options
 		for (option in options) {
-		    if(isRequiredField && StringUtil.isBlank(option)){
-		        continue;
+		    if( ! StringUtil.isBlank(option) ) {
+		        sb.append(selectOption(option, value))
 		    }
-			sb.append(selectOption(option, value))
+
 		}
 
 		sb.append('</select>')
@@ -281,7 +280,8 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		if ( ! valid.contains(value) ) {
+		boolean isBlankValue = StringUtil.isBlank(value);
+		if ( ! isBlankValue && ! valid.contains(value) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			options << [value, warning]
 		}
