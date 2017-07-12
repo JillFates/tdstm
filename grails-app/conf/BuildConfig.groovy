@@ -35,6 +35,9 @@ grails.project.dependency.resolution = {
 		runtime 'mysql:mysql-connector-java:5.1.40'
 		runtime 'org.apache.commons:commons-lang3:3.1'
 
+		// CSV Parser - https://github.com/xlson/groovycsv
+		runtime 'com.xlson.groovycsv:groovycsv:1.2'
+
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
 	}
