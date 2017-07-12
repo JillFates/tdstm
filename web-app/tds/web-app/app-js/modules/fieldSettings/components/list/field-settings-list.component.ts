@@ -1,5 +1,7 @@
 import { Component, Inject, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { StateService } from '@uirouter/angular';
+
 import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
 import { FieldSettingsModel } from '../../model/field-settings.model';
@@ -9,7 +11,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
-import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import { ValidationUtils } from '../../../../shared/utils/validation.utils';
 
 @Component({
 	moduleId: module.id,
@@ -33,7 +35,8 @@ export class FieldSettingsListComponent implements OnInit {
 		private fieldService: FieldSettingsService,
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
-		private notifier: NotifierService
+		private notifier: NotifierService,
+		private state: StateService
 	) {
 		fields.subscribe(
 			(result) => {
@@ -106,7 +109,11 @@ export class FieldSettingsListComponent implements OnInit {
 	}
 
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.domains);
+		let result = this.dataSignature !== JSON.stringify(this.domains);
+		if (this.state && this.state.$current && this.state.$current.data) {
+			this.state.$current.data.hasPendingChanges = result;
+		}
+		return result;
 	}
 
 	protected getCurrentState(domain: DomainModel) {
