@@ -1,5 +1,11 @@
 <div style="float:right;" *ngIf="field.control==='String'">
 
+    <style>
+        div.form-group {
+            margin-bottom: 0px;
+        }
+    </style>
+
     <div #openText (click)="onToggle()" class="open-close-dropdown-container text-center">
         <i class="open-close-dropdown-icon fa fa-gear"></i>
     </div>
@@ -8,36 +14,48 @@
 
         <kendo-dialog title="String Configuration - {{field.field}}" *ngIf="show" (close)="onToggle()">
 
+            <form #templateForm="ngForm">
+
             <div class="modal-container">
                 <div class="text-center">
                     <div class="form-group">
                         <label for="minSize">{{'FIELD_SETTINGS.MIN_MAX.MIN_LENGTH' | translate}}</label>
                         <kendo-numerictextbox
                                 [format]="'n'"
-                                [(value)]="model.minSize"
+                                [(ngModel)]="model.minSize"
                                 [min]="0"
                                 [max]="model.maxSize"
-                                [autoCorrect]="true"
+                                [autoCorrect]="false"
                                 style="width: 70px;"
+                                name="minSize"
                         ></kendo-numerictextbox>
                     </div>
-                    <div class="form-group">
+                    <small class="text-danger" *ngIf="templateForm.controls.minSize.errors">
+                        value must be between 0 and {{model.maxSize}}
+                    </small>
+                    <div class="form-group" style="margin-top: 10px;">
                         <label for="maxSize">{{'FIELD_SETTINGS.MIN_MAX.MAX_LENGTH' | translate}}</label>
                         <kendo-numerictextbox
                                 [format]="'n'"
-                                [(value)]="model.maxSize"
+                                [(ngModel)]="model.maxSize"
                                 [min]="model.minSize"
                                 [max]="255"
-                                [autoCorrect]="true"
+                                [autoCorrect]="false"
                                 style="width: 70px;"
+                                name="maxSize"
                         ></kendo-numerictextbox>
                     </div>
+                    <small class="text-danger" *ngIf="templateForm.controls.maxSize.errors">
+                        value must be between {{model.minSize}} and 255
+                    </small>
                 </div>
             </div>
 
+            </form>
+
             <kendo-dialog-actions>
                 <div class="button-dialog-actions text-right">
-                    <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()">
+                    <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()" [disabled]="!templateForm.valid">
                         <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
                     </button>
                     <button name="cancelButton" class="btn btn-default btn-sm" (click)="onToggle()">
