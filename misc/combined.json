@@ -754,8 +754,8 @@
             },
             {
                 "field": "assetType",
-                "label": "Asset Type",
-                "tip": "This field is the Asset Type",
+                "label": "Device Type",
+                "tip": "This field is the Device Type",
                 "udf": 0,
                 "default": "",
                 "shared": 0,

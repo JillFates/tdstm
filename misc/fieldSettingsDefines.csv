@@ -4,7 +4,7 @@
 "device","appSme","SME","String","Person","false",-1
 "device","assetName","Name","String","String","true",1
 "device","assetTag","Asset Tag","String","String","true",8
-"device","assetType","Asset Type","String","select","true",3
+"device","assetType","Device Type","String","select","true",3
 "device","cart","Cart","String","String","true",28
 "device","description","Description","String","String","true",2
 "device","environment","Environment","String","String","true",21

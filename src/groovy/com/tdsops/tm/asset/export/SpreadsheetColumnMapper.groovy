@@ -107,9 +107,9 @@ class SpreadsheetColumnMapper {
      */
     private Map<String, ?> getCustomFieldsOrdered() {
         Map<String, ?> customFieldsOrdered = [:]
-        customFields.forEach({ Map<String, ?> fieldSpec ->
+        for (fieldSpec in customFields) {
             customFieldsOrdered.put(fieldSpec["label"] as String, fieldSpec)
-        })
+        }
 
         customFieldsOrdered = customFieldsOrdered.sort { a, b ->
             (a.value["order"] as int) <=> (b.value["order"] as int)

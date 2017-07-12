@@ -1242,11 +1242,19 @@ class AssetExportService {
      */
     private Sheet updateColumnHeaders(AssetClass assetClass, Sheet sheet, SpreadsheetColumnMapper spreadsheetColumnMapper) {
         log.info("Updating sheet columns headers for: {}", assetClass)
-        spreadsheetColumnMapper.getColumnFieldMap().forEach({ key, value ->
-            if (value["udf"] == CustomDomainService.CUSTOM_USER_FIELD) {
-                addCell(sheet, value["order"], 0, key)
+        for (map in spreadsheetColumnMapper.getColumnFieldMap()) {
+            Map fieldSpec = map.value
+//println "field isa ${fieldSpec.getClass().getName()} fieldSpec=$fieldSpec"
+            if (fieldSpec.udf == CustomDomainService.CUSTOM_USER_FIELD) {
+                addCell(sheet, fieldSpec.order, 0, fieldSpec.label)
             }
-        })
+        }
+
+//        spreadsheetColumnMapper.getColumnFieldMap().each { key, value ->
+//            if (value["udf"] == CustomDomainService.CUSTOM_USER_FIELD) {
+//                addCell(sheet, value["order"], 0, key)
+//            }
+//        }
         return sheet
     }
 
