@@ -224,7 +224,6 @@ class ControlTagLib {
 		    if( ! StringUtil.isBlank(option) ) {
 		        sb.append(selectOption(option, value))
 		    }
-
 		}
 
 		sb.append('</select>')
