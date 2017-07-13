@@ -1,4 +1,5 @@
 "domain","field","label","type","control","show","order"
+"device","id","Id","int","Number","false",0
 "device","application","Application","String","autocomplete","false",-1
 "device","appOwner","AppOwner","String","Person","false",-1
 "device","appSme","SME","String","Person","false",-1
@@ -20,25 +21,25 @@
 "device","planStatus","Plan Status","String","select","true",51
 "device","priority","Priority","int","select","true",22
 "device","railType","Rail Type","String","select","true",9
-"device","rateOfChange","Rate Of Change","int","String","true",55
+"device","rateOfChange","Rate Of Change","int","Number","true",55
 "device","retireDate","Retire Date","String","String","true",26
 "device","scale","Scale","String","String","true",54
 "device","serialNumber","Serial #","String","String","true",7
 "device","shelf","Shelf","String","String","true",29
 "device","shortName","Alternate Name","String","String","true",6
-"device","size","Size","int","String","true",53
-"device","sourceBladePosition","Source Blade Position","int","String","true",41
+"device","size","Size","int","Number","true",53
+"device","sourceBladePosition","Source Blade Position","int","Number","true",41
 "device","sourceChassis","Source Chassis","String","Chassis.S","true",40
 "device","sourceLocation","Source Location","String","Location.S","true",31
 "device","sourceRack","Source Rack","String","Rack.S","true",33
-"device","sourceRackPosition","Source Position","int","String","true",34
+"device","sourceRackPosition","Source Position","int","Number","true",34
 "device","sourceRoom","Source Room","String","Room.S","true",32
 "device","supportType","SupportType","String","String","true",25
-"device","targetBladePosition","Target Blade Position","int","String","true",43
+"device","targetBladePosition","Target Blade Position","int","Number","true",43
 "device","targetChassis","Target Chassis","String","Chassis.T","true",42
 "device","targetLocation","Target Location","String","Location.T","true",36
 "device","targetRack","Target Rack","String","Rack.T","true",38
-"device","targetRackPosition","Target Position","int","String","true",39
+"device","targetRackPosition","Target Position","int","Number","true",39
 "device","targetRoom","Target Room","String","Room.T","true",37
 "device","truck","Truck","String","String","true",27
 "device","usize","Usize","String","String","false",-1
@@ -53,6 +54,7 @@
 "device","custom7","DNS Change Required","String","YesNo","true",107
 "device","custom8","Wave","String","String","true",108
 "device","custom9","Transfer Time","String","String","true",109
+"application","id","Id","int","Number","false",0
 "application","appAccess","Access Type","String","String","false",-1
 "application","appFunction","Function","String","String","true",31
 "application","appOwner","App Owner","String","Person","true",24
@@ -78,18 +80,18 @@
 "application","planStatus","Plan Status","String","String","true",35
 "application","retireDate","Retire Date","String","String","true",26
 "application","shutdownBy","Shutdown By","String","String","true",50
-"application","shutdownDuration","Shutdown Duration","int","String","true",51
-"application","shutdownFixed","Shutdown Fixed","int","String","true",52
+"application","shutdownDuration","Shutdown Duration","int","Number","true",51
+"application","shutdownFixed","Shutdown Fixed","int","Number","true",52
 "application","sme","SME1","String","Person","true",22
 "application","sme2","SME2","String","Person","true",23
 "application","startupBy","Startup By","String","String","true",53
-"application","startupDuration","Startup Duration","int","String","true",54
-"application","startupFixed","Startup Fixed","int","String","true",55
+"application","startupDuration","Startup Duration","int","Number","true",54
+"application","startupFixed","Startup Fixed","int","Number","true",55
 "application","startupProc","Startup Proc OK","String","YesNo","true",47
 "application","supportType","Support","String","String","true",21
 "application","testingBy","Testing By","String","String","true",56
-"application","testingDuration","Testing Duration","int","String","true",57
-"application","testingFixed","Testing Fixed","int","String","true",58
+"application","testingDuration","Testing Duration","int","Number","true",57
+"application","testingFixed","Testing Fixed","int","Number","true",58
 "application","testProc","Test Proc OK","String","YesNo","true",46
 "application","url","URL","String","String","true",9
 "application","useFrequency","Use Frequency","String","String","true",43
@@ -103,6 +105,7 @@
 "application","custom5","VIP IP","String","String","true",105
 "application","custom6","Requires License","String","YesNo","true",106
 "application","custom7","Vendor Contact","String","String","true",107
+"database","id","Id","int","Number","false",0
 "database","assetName","Name","String","String","true",1
 "database","description","Description","String","String","true",2
 "database","assetType","Class","String","String","true",-1
@@ -116,7 +119,7 @@
 "database","scale","Scale","String","String","true",6
 "database","maintExpDate","Maint Expiration","String","String","true",23
 "database","planStatus","Plan Status","String","String","true",33
-"database","rateOfChange","Rate Of Change","int","String","true",7
+"database","rateOfChange","Rate Of Change","int","Number","true",7
 "database","validation","Validation","String","String","true",34
 "database","lastUpdated","Modified Date","String","Date","false",99
 "database","modifiedBy","Modified By","String","Person","false",-1
@@ -129,6 +132,7 @@
 "database","custom7","Backup Time","String","String","true",107
 "database","custom8","Restore Time","String","String","true",108
 "database","custom9","Clustered","String","YesNo","true",109
+"storage","id","Id","int","Number","false",0
 "storage","assetName","Name","String","String","true",1
 "storage","description","Description","String","String","true",2
 "storage","assetType","Class","String","String","true",-1
@@ -140,7 +144,7 @@
 "storage","supportType","Support","String","String","true",33
 "storage","planStatus","Plan Status","String","String","true",42
 "storage","size","Size","String","String","true",5
-"storage","rateOfChange","Rate Of Change","int","String","true",23
+"storage","rateOfChange","Rate Of Change","int","Number","true",23
 "storage","validation","Validation","String","String","true",43
 "storage","lastUpdated","Modified Date","String","Date","false",99
 "storage","maintExpDate","Maint Expiration","String","Date","false",-1

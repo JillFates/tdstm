@@ -149,6 +149,7 @@ class AssetEntityController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	UserService userService
 	LicenseAdminService licenseAdminService
+	ImportService importService
 
 	/**
 	 * To Filter the Data on AssetEntityList Page
@@ -246,412 +247,7 @@ class AssetEntityController implements ControllerMethods {
 		]
 	}
 
-	/**
-	 * Helper method used get the domain column names as a list substituting the custom labels appropriately
-	 * @param entityDTAMap :  dataTransferEntityMap for entity type
-	 * @param project - the project to match the custom
-	 * @return List
-	 */
-	private List getColumnNamesForDTAMap(List entityDTAMap, Project project) {
-		List columnslist = []
-		entityDTAMap.eachWithIndex { item, pos ->
-			if (AssetEntityService.customLabels.contains(item.columnName)) {
-				columnslist.add(project[item.eavAttribute?.attributeCode] ?: item.columnName)
-			} else {
-				columnslist.add(item.columnName)
-			}
-		}
-		return columnslist
-	}
 
-	/**
-	 * A helper closure used to convert the cells in a row into values for an insert statement
-	 * @param sqlStrBuff - the StringBuffer to append the VALUES sql into
-	 * @param errorMsgList - the running list of error messages
-	 * @param sheetRef - the Sheet being processed
-	 * @param rowOffset - the row # (offset starting at 0)
-	 * @param colOffset - the column # (offset starting at 0)
-	 * @param dtaMapField - the DataTransferAttribute Map property for the current column
-	 * @param entityId - the id of the asset if it was referenced in import
-	 * @param dtBatchId - the batch number of the import
-	 * @references formatDate
-	 * @return An error message if it failed to add the value to the buffer
-	 */
-	private String rowToImportValues(Map sheetInfo, StringBuffer sqlStrBuff, Sheet sheetRef, Integer rowOffset,
-	                                 Integer colOffset, DataTransferAttributeMap dtaMapField, String entityId,
-	                                 Long dtBatchId) {
-		def cellValue
-		String errorMsg = ''
-		boolean isFirstField = !sqlStrBuff
-		// Get the Excel column code (e.g. column 0 = A, column 1 = B)
-		String colCode = WorkbookUtil.columnCode(colOffset)
-
-		try {
-			cellValue = WorkbookUtil.getStringCellValue(sheetRef, colOffset, rowOffset, '', true)
-			if (cellValue == ImportService.NULL_INDICATOR) {
-				// TODO : check for columns that don't support NULL clearing
-			} else {
-				if ((dtaMapField.columnName in importColumnsDateType))  {
-					if (!StringUtil.isBlank(cellValue)) {
-						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, (DateFormat) sheetInfo.dateFormatter)
-						// Convert to string in the Date format
-						if (dateValue) {
-							cellValue = TimeUtil.formatDate(dateValue, sheetInfo.userDateFormatter)
-							//cellValue = TimeUtil.formatDate(dateValue)
-						} else {
-							cellValue = ''
-						}
-					}
-					// log.debug "Processing Date field $dtaMapField.columnName - dateValue=$dateValue, cellValue=$cellValue"
-
-				} else {
-					// TODO : sizeLimit can lookup known properties to know if there are limits
-					int sizeLimit = 255
-					if (cellValue?.size() > sizeLimit) {
-						cellValue = cellValue.substring(0,sizeLimit)
-						errorMsg = "Error column $dtaMapField.columnName ($colCode) value length exceeds $sizeLimit chars"
-					}
-				}
-			}
-		} catch (e) {
-			log.debug "rowToImportValues() exception - ${ExceptionUtil.stackTraceToString(e)}"
-			errorMsg = "Error column $dtaMapField.columnName ($colCode) - $e.message"
-		}
-
-		// Only create a value if the field isn't blank
-		if (cellValue != '') {
-			int cellHasError = errorMsg ? 1 : 0
-			String values = (isFirstField ? '' : ', ') +
-				"($entityId, '$cellValue', $rowOffset, $dtBatchId, $dtaMapField.eavAttribute.id, $cellHasError, '$errorMsg')"
-
-			if (!errorMsg) {
-				sqlStrBuff.append(values)
-			}
-		}
-
-		return errorMsg
-	}
-
-	/**
-	 * A helper closure used to perform the actual insert statement into the dataTransfer table
-	 * @param sheetName - the name of the tab for error reporting
-	 * @param rowOffset - the row # (offset starting at 0)
-	 * @param dtValues - the StringBuffer that contains the VALUES(...), VALUES(...), ...
-	 * @param results - a map that keeps track of errors, skips and rows added
-	 * @return True if insert was successful otherwise false
-	 */
-	private boolean insertRowValues(String sheetName, int rowOffset, StringBuffer dtValues, Map results) {
-		boolean success = true
-
-		// SQL statement that is used to insert values the temporary import table
-		String DTV_INSERT_SQL =
-			'INSERT INTO data_transfer_value ' +
-			'(asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id, has_error, error_text) VALUES '
-
-		try {
-			String sql = DTV_INSERT_SQL + dtValues
-			log.debug "insertRowValues() SQL=$sql"
-			jdbcTemplate.update(sql)
-			results.added ++
-		} catch (Exception e) {
-			results.errors << "Insert failed : $e.message"
-			// skipped << "$sheetName [row ${rowOffset + 1}] <ul><li>${errorMsgList.join('<li>')}</ul>"
-			log.error("insertRowValues() Importing row ${rowOffset + 1} failed : $e.message", e)
-			success = false
-		}
-		return success
-	}
-
-	/**
-	 * Creates the transfer batch header for the various assets. Note that it also sets a value on the Session
-	 * that is used for the progress bar. If it fails, the caller should return to the user.
-	 * @param project
-	 * @param dataTransferSet
-	 * @param entityClassName - The name of the Domain class
-	 * @param numOfAssets - The estimated number of assets to be imported
-	 * @param exportTime - The datetime that the spreadsheet was originally exported
-	 * @return The DataTransferBatch object if successfully created otherwise null
-	 */
-	private DataTransferBatch createTransferBatch(Project project, DataTransferSet dataTransferSet,
-	                                              String entityClassName, int numOfAssets, Date exportTime) {
-
-		def dtb = new DataTransferBatch(
-				statusCode: "PENDING", transferMode: "I", dataTransferSet: dataTransferSet,
-				project: project, userLogin: securityService.loadCurrentUserLogin(),
-				// exportDatetime: GormUtil.convertInToGMT(exportTime, tzId),
-				exportDatetime: exportTime, eavEntityType: EavEntityType.findByDomainName(entityClassName))
-
-		if (!dtb.save()) {
-			log.error "createTransferBatch() failed save - ${GormUtil.allErrorsString(dtb)}"
-			return null
-		}
-
-		setBatchId dtb.id
-		setTotalAssets numOfAssets
-		// log.debug "createTransferBatch() created $dtb"
-		return dtb
-	}
-
-	/**
-	 * @return A map of the various information about the sheet:
-	 * 	sheet                  // The POI Sheet object
-	 * 	sheetName              // The name of the sheet as it appears on the spreadsheet tab
-	 * 	dtaMapList             // The ataTransferAttribute(s) used for this sheet
-	 * 	rowCount               // The number of rows in the spreadsheet
-	 * 	assetCount             // The number of assets (rows with no names are not counted)
-	 * 	columnCount            // The number of columns in the spreadsheet
-	 * 	colNamesOrdinalMap     // Map of the columns an the values being the ordinal position/column in sheet
-	 * 	nameColumnIndex        // int index/offset of the 'Name' column in the spreadsheet
-	 * 	assetIdColumnLabel     // String of column label/header for the asset id property
-	 * 	assetIdColumnIndex     // int of asset id column index/offset/column number
-	 * 	domainPropertyNameList // The list of the column names in the spreadsheet
-	 */
-	private Map getSheetInfo(Project project, Workbook spreadsheetWB, String sheetName, String assetIdColLabel,
-	                         String columnName, int headerRow, DataTransferSet dataTransferSet) {
-		int nameColumnIndex = -1
-		Map colNamesOrdinalMap = [:]
-
-		Sheet sheet
-		try {
-			sheet = spreadsheetWB.getSheet(sheetName)
-		} catch (e) {
-			throw new RuntimeException("The '$sheetName' sheet is missing from the import spreadsheet")
-		}
-
-		// Get the DataTransferAttributeMap list of properties for the sheet
-		String dtaMapName = (sheetName == 'Storage' ? 'Files' : sheetName)
-		List dtaMapList = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName(dataTransferSet, dtaMapName)
-
-		// Get the spreadsheet column header labels as a Map [label:ordinalPosition]
-		int colCount = WorkbookUtil.getColumnsCount(sheet)
-		for (int c = 0; c < colCount; c++) {
-			String cellContent = WorkbookUtil.getStringCellValue(sheet, c, headerRow)
-			colNamesOrdinalMap[cellContent] = c
-		}
-
-		List domainPropertyNameList = getColumnNamesForDTAMap(dtaMapList, project)
-
-		// Make sure that the required columns are in the spreadsheet
-		checkSheetForMissingColumns(sheetName, domainPropertyNameList, colNamesOrdinalMap)
-
-		// Find the 'Name' column index and then look at each row to count how many assets will be imported
-		nameColumnIndex = getColumnIndexForName(sheet, sheetName, columnName, colCount, headerRow)
-
-		int numOfAssets = 0
-		int rowsInSheet = sheet.lastRowNum
-		for (int row = 1; row <= rowsInSheet; row++) {
-			String assetName = WorkbookUtil.getStringCellValue(sheet, nameColumnIndex, row)
-			if (assetName?.trim().size()) numOfAssets++
-		}
-
-		Map sheetInfo = [sheet: sheet, sheetName: sheetName, dtaMapList: dtaMapList, rowCount: rowsInSheet,
-		                 assetCount: numOfAssets, columnCount: colCount, colNamesOrdinalMap: colNamesOrdinalMap,
-		                 nameColumnIndex: nameColumnIndex, assetIdColumnLabel: assetIdColLabel,
-		                 assetIdColumnIndex: 0, domainPropertyNameList: domainPropertyNameList]
-
-		// log.debug "getSheetInfo() $sheetInfo"
-		log.debug "getSheetInfo() dtaMapList=[0] isa ${dtaMapList[0].getClass().name} - ${dtaMapList[0]}"
-		return sheetInfo
-	}
-
-	/**
-	 * A helper to deal with the repeated process for validating each sheet
-	 * @param sheetName - the name of the sheet being validated
-	 * @param entityMapColumnList - the list of the mapped column names expected
-	 * @param sheetColumnNameList - the list of the spreadsheet tab column names
-	 */
-	private void checkSheetForMissingColumns(String sheetName, domainPropertyList, sheetColumnNameList) {
-		List missingCols = getMissingColumns(domainPropertyList, sheetColumnNameList)
-		if (missingCols) {
-			throw new RuntimeException("missing expected columns $sheetName:${missingCols.join(', ')}")
-		}
-	}
-
-	/**
-	 * Used to compare the sheet headers to the eav mapping of expected column names
-	 * @param entityMapColumnList - the names that are expected
-	 * @param sheetColumnNames - the column names in the sheet
-	 * @return a List the missing columns or blank if okay
-	 */
-	private List getMissingColumns(List entityMapColumnList, Map sheetColumnNames) {
-		// assert entityMapColumnList
-		entityMapColumnList.findAll { String name ->
-			name != "DepGroup" && !sheetColumnNames.containsKey(name)
-		}
-	}
-
-	/**
-	 * Look up the column index for a given column name
-	 * @param sheetObject - the actual sheet object
-	 * @param sheetName - the name of the sheet
-	 * @param columnName - the name of the column to lookup
-	 * @param colCount - the number of columns in the sheet
-	 * @param rowOffset - the row offset to the header itself
-	 * @return the index value as an int
-	 */
-	private int getColumnIndexForName(sheetObject, sheetName, columnName, colCount, rowOffset) {
-		for (int index = 0; index <= colCount; index++) {
-			if (WorkbookUtil.getStringCellValue(sheetObject, index, 0) == columnName) {
-				return index
-			}
-		}
-
-		throw new RuntimeException("unable to find '$columnName' column in sheet '$sheetName'")
-	}
-
-	// Method process one of the asset class sheets
-	private Map processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName, assetIdColName,
-	                         assetNameColName, headerRowNum, domainName, timeOfExport, sheetConf) {
-
-		Map results = initializeImportResultsMap()
-		try {
-			Map sheetInfo = getSheetInfo(project, workbook, sheetName, assetIdColName, 'Name', headerRowNum, dataTransferSet)
-			DataTransferBatch dataTransferBatch = createTransferBatch(project, dataTransferSet, domainName,
-				sheetInfo.assetCount, timeOfExport)
-			if (!dataTransferBatch) {
-				forward action: forwardAction, params: [error:
-					"Failed to create import batch for the '$assetSheetName' tab. Please contact support if the problem persists."]
-				return
-			}
-
-			sheetInfo << sheetConf
-			importSheetValues(results, dataTransferBatch, projectCustomLabels, sheetInfo)
-			results.dataTransferBatch = dataTransferBatch
-
-			log.debug "processSheet() sheet $sheetName results = $results"
-		} catch (e) {
-			log.debug "processSheet() exception : ${ExceptionUtil.stackTraceToString(e)}"
-			results.errors << "Sheet $sheetName failed to process - $e.message"
-		}
-
-		return results
-	}
-
-	/**
-	 * Iterates over the spreadsheet rows and loads each of the cells into the DataTransferValue table
-	 * @param results - the map used to track errors, skipped rows and count of what was added
-	 * @param dataTransferBatch - the batch to insert the rows into
-	 * @param projectCustomLabels - the custom label values for the project
-	 * @param sheetInfo - the map of all of the sheet information
-	 * @return a Map containing the following elements
-	 *		List errors - a list of errors
-	 *		List skipped - a list of skipped rows
-	 *		Integer added - a count of rows added
-	 */
-	private Map importSheetValues(Map results, DataTransferBatch dataTransferBatch, Map projectCustomLabels, Map sheetInfo) {
-
-		Sheet sheetObject = sheetInfo.sheet
-		Map colNamesOrdinalMap = sheetInfo.colNamesOrdinalMap
-		int assetNameColIndex = sheetInfo.nameColumnIndex
-		String assetSheetName = sheetInfo.sheetName
-
-		// log.debug "importSheetValues() sheetInfo=sheetInfo"
-
-		Project project = dataTransferBatch.project
-
-		// Verify that the sheet has the Asset Id Column by name that we are expecting
-		if (!colNamesOrdinalMap.containsKey(sheetInfo.assetIdColumnLabel)) {
-			results.errors << "$assetSheetName Sheet - missing asset id column name '$sheetInfo.assetIdColumnLabel'"
-		} else {
-
-			results.rowsProcessed = sheetInfo.rowCount
-
-			// Iterate over each row in the spreadsheet
-			for(int r = 1; r <= sheetInfo.rowCount ; r++) {
-				boolean rowHasErrors = false
-				String errorMsg
-				def assetId
-				StringBuffer sqlValues = new StringBuffer()
-
-				// Make sure that the asset has the mandatory name
-				def assetName = WorkbookUtil.getStringCellValue(sheetObject, assetNameColIndex, r)
-				if (!assetName) {
-					errorMsg = "missing required 'name'"
-					results.errors << "$assetSheetName [row ${r + 1}] - $errorMsg"
-					rowHasErrors = true
-				} else {
-
-					// Now check to see if the asset references a pre-existing asset by id #
-					assetId = WorkbookUtil.getStringCellValue(sheetObject, 0, r)
-					if (assetId) {
-						// Switch to a positive long and if null then it is bogus
-						Long id = NumberUtil.toPositiveLong(assetId)
-						if (id == null) {
-							errorMsg = "invalid assetId format '$assetId'"
-						} else {
-							def asset = AssetEntity.get(id)
-							if (!asset) {
-								errorMsg = "asset not found '$assetId'"
-							} else if (asset.project != project) {
-								errorMsg = "invalid asset id '$assetId'"
-								securityService.reportViolation("attempted to access asset ($assetId) associated to different project")
-							}
-						}
-					} else {
-						assetId = 'null'
-					}
-
-					if (errorMsg) {
-						results.errors << "$assetSheetName [row ${r + 1}] - $errorMsg"
-						continue
-					}
-
-					for (int cols = 0; cols < sheetInfo.columnCount; cols++) {
-						String attribName
-						String columnHeader = WorkbookUtil.getStringCellValue(sheetObject, cols, 0)
-						if (projectCustomLabels.containsKey(columnHeader)) {
-							// A custom column that renamed
-							attribName = projectCustomLabels[columnHeader]
-						} else {
-							attribName = columnHeader
-						}
-						def dtaAttrib = sheetInfo.dtaMapList.find{ it.columnName == attribName }
-
-						if (dtaAttrib != null) {
-
-							// Add the SQL VALUES(...) to the sqlValues StringBuffer for the current spreadsheet cell
-							errorMsg = rowToImportValues(sheetInfo, sqlValues, sheetObject, r, cols, dtaAttrib, assetId, dataTransferBatch.id)
-							if (errorMsg) {
-								rowHasErrors = true
-								results.errors << "$assetSheetName [row ${r + 1}] - $errorMsg"
-							}
-						}
-					}
-				}
-
-				if (rowHasErrors) {
-					log.debug "importSheetValues() rowHasErrors - $errorMsg"
-					// Clear the error msg so it doesn't get reported again below since it was already reported in the above for col loop
-					errorMsg = ''
-				} else {
-					try {
-						// Attempt to actual insert the values that represent the current row of data
-						insertRowValues(assetSheetName, r, sqlValues, results)
-					} catch (e) {
-						log.warn "importSheetValues() insert failed $e.message (sheet:$assetSheetName, row:$r) - ${ExceptionUtil.stackTraceToString(e)}"
-						errorMsg = "Failed to insert data due to $e.message"
-					}
-				}
-
-				if (errorMsg) {
-					results.errors << "$assetSheetName [row ${r + 1}] - $errorMsg"
-				}
-
-			} // for r
-
-			results.summary = "$results.rowsProcessed Rows read, $results.added Loaded, ${results.errors.size()} Errored"
-		}
-
-		return results
-	}
-
-	/**
-	 * Returns the Map used to track the results of imports for each tab
-	 * @return map template of import stats/data
-	 */
-	private Map initializeImportResultsMap() {
-		[errors: [], skipped: [], summary: '', added: 0]
-	}
 
 	/**
 	 * Upload the Data from the ExcelSheet
@@ -659,7 +255,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @return currentPage(assetImport Page)
 	 */
 	@HasPermission(Permission.AssetImport)
-	def upload() {
+	def __upload() {
 		// URL action to forward to if there is an error
 		String forwardAction = 'assetImport'
 
@@ -1377,54 +973,38 @@ class AssetEntityController implements ControllerMethods {
 		}
 	}
 
-	/**
-	 * Used to generate the import results
-	 * @param results - a Map containing the information collected during the import process
-	 * @param skipped - a List of the rows that were skipped
-	 * @param sheetList - a List that contains the name of each sheet that was included in the import process
-	 * @param notifyManageBatches - a boolean to control if the Manage Batches message is included in the results
-	 */
-	private StringBuffer generateResults(Map results, List skipped, List sheetList, boolean notifyManageBatches) {
-		StringBuffer message = new StringBuffer("<h3>Spreadsheet import was successful</h3>\n")
-		if (notifyManageBatches) {
-			message.append("<p>Please click the Manage Batches below to review and post these changes</p><br>\n")
-		}
-		message.append("<p>Results: <ul>\n")
-		sheetList.each {
-			if (results[it].processed) {
-				if (results[it].summary) {
-					message.append("<li>$it: ${results[it].summary}</li>\n")
-				} else {
-					message.append("<li>$it: ${results[it].addedCount} loaded</li>\n")
-				}
-			}
-		}
-		message.append("</ul></p><br>\n")
+	def upload() {
 
-		// Handle the errors and skipped rows
-		if (sheetList.find { results[it].errorList?.size() }) {
-			message.append("<p>Errors: <ul>\n")
-			sheetList.each {
-				if (results[it].processed) {
-					if (results[it].errorList.size()) {
-						message.append("<li>$it:<ul>")
-						message.append(results[it].errorList.collect { "<li>$it</li>"}.join("\n"))
-						message.append("</li></ul>\n")
-					}
-				}
-			}
-			message.append("\n</ul></p>\n")
+		// URL action to forward to if there is an error
+		String forwardAction = 'assetImport'
+
+		Project project = controllerService.getProjectForPage(this)
+		if (!project) {
+			String warnMsg = flash.message
+			flash.message = null
+			forward(action: forwardAction, params: [error: warnMsg])
+			return
 		}
 
-		if (skipped?.size()) {
-			message.append("<br><p>Rows Skipped: <ul>\n")
-			message.append("<li>${skipped.size()} spreadsheet row${skipped.size()==0 ? ' was' : 's were'} skipped: <ul>")
-			message.append(skipped.collect { "<li>$it</li>" }.join("\n"))
-			message.append("\n</ul></p>\n")
+		// closure used to redirect user with an error message for sever issues
+		def failWithError = { message ->
+			log.error "upload() $securityService.currentUsername was $message"
+			forward action: forwardAction, params: [error: message]
 		}
 
-		message.append("</p>\n")
-		return message
+		try {
+			// Get the uploaded spreadsheet file
+			MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
+			CommonsMultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
+
+			StringBuffer message = importService.upload(project, file, params)
+			forward action:forwardAction, params: [ message: message.toString() ]
+
+		} catch (InvalidParamException ipe) {
+			failWithError ipe.message
+		} catch (Exception e) {
+			failWithError e.message
+		}
 	}
 
 	/**
@@ -3683,6 +3263,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param columnslist :  column Names
 	 * @param project :project instance
 	 */
+	@Deprecated
 	private retrieveColumnNames(entityDTAMap, columnslist, project) {
 		entityDTAMap.eachWithIndex { item, pos ->
 			if (AssetEntityService.customLabels.contains(item.columnName)) {

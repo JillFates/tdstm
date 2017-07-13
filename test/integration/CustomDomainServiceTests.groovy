@@ -67,11 +67,12 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Scenario 1: Retrieve custom field specs of any AssetClass'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = AssetClass.DATABASE as String
             loadFieldSpecJson()
             def fieldSpec = loadFieldSpecJson()
             def customFieldSpecsMap
-            customDomainService.saveFieldSpecs(CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+            customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Database custom field specs are requested'
             customFieldSpecsMap = customDomainService.customFieldSpecs(domain)
         then: 'Database domain fields are returned'
@@ -82,10 +83,11 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Scenario 2: Retrieve standard field specs of any AssetClass'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = AssetClass.APPLICATION as String
             def fieldSpec = loadFieldSpecJson()
             def standardFieldSpecsMap
-            customDomainService.saveFieldSpecs(CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+            customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Application standard field specs are requested'
             standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(domain)
         then: 'Application domain fields are returned'
@@ -98,32 +100,35 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Scenario 3: Saving field specs providing unexisting domain type should throw InvalidParamException'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = "-invalid-"
             def fieldSpec = loadFieldSpecJson()
         when: 'Save fields specs providing invalid AssetClass should throw an exception'
-            customDomainService.saveFieldSpecs(domain, fieldSpec)
+            customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'InvalidParamException should be thrown'
             thrown InvalidParamException
     }
 
     void 'Scenario 4: Saving field specs providing all asset classes as domain type should save custom fields specs'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
             def fieldSpec = loadFieldSpecJson()
         when: 'Save fields specs should save without errors'
-            customDomainService.saveFieldSpecs(domain, fieldSpec)
+            customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'Saved fields specs should exists'
-            null != customDomainService.allFieldSpecs(domain)
+            null != customDomainService.allFieldSpecs(project, domain)
     }
 
     void 'Scenario 5: Saving field specs and retrieving them from database should return them'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
             def fieldSpec = loadFieldSpecJson()
-            customDomainService.saveFieldSpecs(domain, fieldSpec)
+            customDomainService.saveFieldSpecs(project, domain, fieldSpec)
             def foundFieldSpec
         when: 'Retrieving fields specs from database should return them'
-            foundFieldSpec = customDomainService.allFieldSpecs(domain)
+            foundFieldSpec = customDomainService.allFieldSpecs(project, domain)
         then: 'Found fields specs are not null'
             null != foundFieldSpec
         then:

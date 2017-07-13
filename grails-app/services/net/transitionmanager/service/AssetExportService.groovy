@@ -130,7 +130,7 @@ class AssetExportService {
 
             def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
-            def project = Project.get(projectId)
+            Project project = Project.get(projectId)
             if ( project == null) {
                 progressService.update(key, 100, 'Cancelled', 'Project is required')
                 return
@@ -319,19 +319,19 @@ class AssetExportService {
 
             // Device
             serverSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.DEVICES)
-            SpreadsheetColumnMapper serverMap = mapSheetColumnsToFields(AssetClass.DEVICE, serverSheet)
+            SpreadsheetColumnMapper serverMap = mapSheetColumnsToFields(AssetClass.DEVICE, serverSheet, project)
 
             // Application
             appSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.APPLICATIONS)
-            SpreadsheetColumnMapper appMap = mapSheetColumnsToFields(AssetClass.APPLICATION, appSheet)
+            SpreadsheetColumnMapper appMap = mapSheetColumnsToFields(AssetClass.APPLICATION, appSheet, project)
 
             // Database
             dbSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.DATABASES)
-            SpreadsheetColumnMapper dbMap = mapSheetColumnsToFields(AssetClass.DATABASE, dbSheet)
+            SpreadsheetColumnMapper dbMap = mapSheetColumnsToFields(AssetClass.DATABASE, dbSheet, project)
 
             // Storage
             storageSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.STORAGE)
-            SpreadsheetColumnMapper fileMap = mapSheetColumnsToFields(AssetClass.STORAGE, storageSheet)
+            SpreadsheetColumnMapper fileMap = mapSheetColumnsToFields(AssetClass.STORAGE, storageSheet, project)
 
             // Rack
             def rackSheetColumns = []
@@ -1261,8 +1261,8 @@ class AssetExportService {
      * @param assetClass
      * @return
      */
-    private List<Map<String, ?>> getFieldSpecsForAssetClass(AssetClass assetClass) {
-        Map fieldSpecs = customDomainService.allFieldSpecs(assetClass.toString())
+    private List<Map<String, ?>> getFieldSpecsForAssetClass(AssetClass assetClass, Project project) {
+        Map fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString())
         return fieldSpecs[assetClass.toString()]["fields"]
     }
 
@@ -1272,9 +1272,9 @@ class AssetExportService {
      * @param sheet
      * @return
      */
-    private SpreadsheetColumnMapper mapSheetColumnsToFields(AssetClass assetClass, Sheet sheet) {
+    private SpreadsheetColumnMapper mapSheetColumnsToFields(AssetClass assetClass, Sheet sheet, Project project) {
         List<String> templateHaders = WorkbookUtil.getSheetHeadersAsList(sheet)
-        List<Map<String, ?>> fieldSpecs = getFieldSpecsForAssetClass(assetClass)
+        List<Map<String, ?>> fieldSpecs = getFieldSpecsForAssetClass(assetClass, project)
 
         SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(sheet.getSheetName(), templateHaders, fieldSpecs)
         return spreadsheetColumnMapper

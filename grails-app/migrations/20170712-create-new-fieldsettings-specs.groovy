@@ -12,7 +12,7 @@ import com.tdssrc.grails.StringUtil
  *   - Custom that were marked hidden now correctly hidden
  */
 databaseChangeLog = {
-    changeSet(author: "jmartin", id: "20170712 TM-6619-v3 Create Field Settings JSON specs") {
+    changeSet(author: "jmartin", id: "20170712v2 TM-6619-v3 Create Field Settings JSON specs") {
         comment('This will aggregate values from various places and create JSON specs for every project')
 
         grailsChange {

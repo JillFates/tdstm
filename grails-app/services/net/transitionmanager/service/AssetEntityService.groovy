@@ -1398,7 +1398,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return
 	 */
 	private List<Map<String, String>> getViewableFieldSpecs(Project project, AssetClass assetClass) {
-		Map fieldSpecs = customDomainService.allFieldSpecs(assetClass.toString())
+		Map fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString())
 		List<Map<String, String>> attributes = null
 
 		// Pull out the field specs from the Map
