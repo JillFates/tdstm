@@ -7,7 +7,7 @@ import { DebugElement } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
-
+import { UIRouterModule, RootModule } from '@uirouter/angular';
 // Kendo Components
 import { GridModule } from '@progress/kendo-angular-grid';
 import { PopupModule } from '@progress/kendo-angular-popup';
@@ -74,7 +74,14 @@ describe('FieldSettingsListComponent:', () => {
 				PopupModule,
 				SortableModule,
 				DialogModule,
-				InputsModule
+				InputsModule,
+				UIRouterModule.forRoot(<RootModule>{
+					useHash: true,
+					states: [{
+						name: 'tds',
+						url: ''
+					}]
+				})
 			],
 			declarations: [
 				FieldSettingsListComponent,
