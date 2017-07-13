@@ -11,7 +11,7 @@ class SpreadsheetColumnMapper {
     private List<String> templateHeaders
     private List<Map<String, ?>> customFields = []
     private List<Map<String, ?>> standardFields = []
-    private List<String> fixedColumnHeaders = ["appId", "assetId", "dbId", "filesId", "DepGroup"]
+    private List<String> fixedColumnHeaders = ['Id', 'DepGroup']
     private Map<String, ?> columnFieldMap = [:]
 
     SpreadsheetColumnMapper(String sheetName, List<String> templateHeaders, List<Map<String, ?>> fieldSpecs) {
@@ -38,7 +38,7 @@ class SpreadsheetColumnMapper {
      */
     int getColumnIndexByHeader(String header) {
         if (columnFieldMap.containsKey(header)) {
-            return columnFieldMap[header]["order"] as int
+            return columnFieldMap[header]['order'] as int
         }
         return -1
     }

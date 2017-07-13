@@ -467,8 +467,6 @@ class AssetExportService {
 
             profiler.log(Profiler.LOG_TYPE.INFO, 'Initialization took (%s)', [profiler.getSinceStart(mainProfTag)])
 
-
-
             /***************************************************************************/
 
             // Save initialization workbook and use it as template for the streaming version of XSSFWorkbook
@@ -564,7 +562,7 @@ class AssetExportService {
                         }
 
                         switch(colName) {
-                            case 'assetId':
+                            case 'Id':
                                 addCell(serverSheet, 0, deviceCount, currentAsset.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                                 break
 
@@ -702,8 +700,8 @@ class AssetExportService {
 
                 exportedEntity += 'A'
 
-                // This determines which columns are added as Number vs Label
-                def numericCols = []
+                // This determines which columns are added as Number vs String
+                def numericCols = ['Id']
                 def stringCols = ['Version']
 
                 int applicationCount = 0
@@ -722,7 +720,7 @@ class AssetExportService {
 
                         def colVal = ''
                         switch(colName) {
-                            case 'appId':
+                            case 'Id':
                                 colVal = app.id
                                 break
                             case 'AppOwner':
@@ -805,7 +803,7 @@ class AssetExportService {
                         def field = entry.value["field"]
                         def colNum = entry.value["order"] as int
 
-                        if (colName == "dbId") {
+                        if (colName == "Id") {
                             addCell(dbSheet, colNum, databaseCount, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else if (colName == "DepGroup") {
                             addCell(dbSheet, colNum, databaseCount, assetDepBundleMap[currentDatabase.id.toString()])
@@ -875,7 +873,7 @@ class AssetExportService {
                         def field = entry.value["field"]
                         def colNum = entry.value["order"] as int
 
-                        if (colName == "filesId") {
+                        if (colName == "Id") {
                             addCell(storageSheet, colNum, filesCount, (currentFile.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else if (colName == "DepGroup") {
                             addCell(storageSheet, colNum, filesCount, assetDepBundleMap[currentFile.id.toString()] )
