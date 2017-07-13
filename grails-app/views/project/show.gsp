@@ -132,23 +132,7 @@
 			currentMenuId = "#projectMenu";
 			$('.menu-projects-current-project').addClass('active');
 			$('.menu-parent-projects').addClass('active');
-
-			$(document).ready(function() {
-				var customCol = ${projectInstance.customFieldsShown}
-				showCustomFields(customCol, 4);
-			});
-			function showCustomFields(value, columnCount) {
-				  $(".custom_table").hide();
-				  if(value=='0'){
-					  $("#custom_table").hide();
-				  } else {
-						 for(i=1;i<=value;){
-							$("#custom_table").show();
-							$("#custom_count_"+i).show();
-							i=i+parseInt(columnCount)
-					 }
-				 }
-			 }
+			
 		</script>
 	</body>
 </html>

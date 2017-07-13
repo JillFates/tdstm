@@ -28,9 +28,6 @@
 				$("#projectPartnerId").val('${prevParam?.projectPartner}');
 			}
 
-			showCustomFields('${prevParam?.customFieldsShown ?: '0'}', 2);
-
-
 			// Initialize company partners
 			var companyPartners = []
 			<g:each status="i" in="${partners}" var="partner">
@@ -70,18 +67,6 @@
 			}
 		  }
 
-		function showCustomFields(value, columnCount) {
-			$(".custom_table").hide();
-			if (value == '0') {
-				$("#custom_table").hide();
-			} else {
-				for(i=1; i<=value;) {
-					$("#custom_table").show();
-					$("#custom_count_"+i).show();
-					i = i + parseInt(columnCount)
-				}
-			}
-		}
 
 		function setCompletionDate(startDate) {
 			var completionDateObj = document.createProjectForm.completionDate;

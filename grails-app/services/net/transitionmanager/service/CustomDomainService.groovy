@@ -16,10 +16,25 @@ class CustomDomainService implements ServiceMethods {
 
     public static final int USER_DEFINED_FIELD = 1
     public static final int STANDARD_FIELD = 0
+    public static final int ALL_FIELDS = 2
 
     SecurityService securityService
     SettingService settingService
     def jdbcTemplate
+
+    /**
+     * This method retrieves the specs for the standard fields.
+     * It's added for consistency with return format of customFieldSpecs
+     * and allFieldSpecs.
+     *
+     * @param project
+     * @param domain
+     * @param showOnly
+     * @return
+     */
+    Map standardFieldSpecs(Project project, String domain, boolean showOnly = false) {
+        return getFilteredFieldSpecs(project, domain, STANDARD_FIELD, showOnly)
+    }
 
     /**
      * Retrieve custom field specs

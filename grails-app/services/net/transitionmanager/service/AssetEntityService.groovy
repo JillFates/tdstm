@@ -1354,41 +1354,8 @@ class AssetEntityService implements ServiceMethods {
 
 		// <SL> Kept "attributesList" for debugging but it should be deleted as soon as JSON field specs
 		// get fully implemented
-		//model.attributesListDeprecated = getViewableAndSelectableAttributesList(ac, project, attributes)
 
 		return model
-	}
-
-	/**
-	 * Get viewable and selectable attributes list to construct list view column selector
-	 * for AssetClass.* entities types
-	 * @param assetClass
-	 * @param project
-	 * @param attributes
-	 * @return
-	 */
-	@Deprecated
-	private List<Map<String, String>> getViewableAndSelectableAttributesList(AssetClass assetClass, Project project, List<EavAttribute> attributes) {
-		// Create a list of the "custom##" fields that are currently selectable
-		def projectCustoms = project.customFieldsShown + 1
-		List<String> nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ?
-			(projectCustoms..Project.CUSTOM_FIELD_COUNT).collect { 'custom' + it } : []
-
-		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll {
-			! (it.attributeCode in nonCustomList) &&
-			! COLUMN_PROPS_TO_EXCLUDE[assetClass].contains(it.attributeCode)
-		}
-
-		// Compose the list of Asset properties that the user can select and use for filters
-		def attributesList = appAttributes.collect { attribute ->
-			[attributeCode: attribute.attributeCode,
-			 frontendLabel: getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
-		}
-
-		// Sorts attributesList alphabetically
-		attributesList.sort { it.frontendLabel }
-		return attributesList
 	}
 
 	/**

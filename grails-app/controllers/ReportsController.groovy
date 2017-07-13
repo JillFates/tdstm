@@ -34,7 +34,9 @@ import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
@@ -55,6 +57,7 @@ import java.text.DateFormat
 class ReportsController implements ControllerMethods {
 
 	AssetEntityService assetEntityService
+	AssetService assetService
 	ControllerService controllerService
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
@@ -1180,16 +1183,13 @@ class ReportsController implements ControllerMethods {
 	def applicationMigrationReport() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')
 		if (!project) return
-
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = userPreferenceService.moveBundleId
 		def smeList = reportsService.getSmeList(moveBundleId, true)
 		def workflow = Workflow.findByProcess(project.workflowCode)
 		def workflowTransitions = WorkflowTransition.findAll(
 				'FROM WorkflowTransition where workflow=? order by transId', [workflow])
-		def attributes = projectService.getAttributes('Application')
-		def projectCustoms = project.customFieldsShown + 1
-		def appAttributes = attributes.findAll{!(it.attributeCode in nonCustomList)}
+		List appAttributes = assetService.fieldSpecs("Application", CustomDomainService.ALL_FIELDS, ["field", "label"])
 		[moveBundles:moveBundleList, moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},
 		 workflowTransitions:workflowTransitions, appAttributes:appAttributes]
 	}

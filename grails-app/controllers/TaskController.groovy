@@ -20,8 +20,10 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.GraphvizService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ReportsService
@@ -64,6 +66,7 @@ class TaskController implements ControllerMethods {
 	]
 
 	AssetEntityService assetEntityService
+	AssetService assetService
 	CommentService commentService
 	ControllerService controllerService
 	JdbcTemplate jdbcTemplate
@@ -1491,11 +1494,19 @@ function goBack() { window.history.back() }
 		def successor = TaskDependency.findAllByPredecessor(assetComment)
 		def projectStaff = partyRelationshipService.getProjectStaff(project.id)*.staff.sort { it.firstName }
 
+		// Retrieve the custom field specs if there's an asset associated with the AssetComment
+		List customs = []
+		if (assetComment?.assetEntity) {
+			String domain = assetComment.assetEntity?.assetClass.toString()
+			customs = assetService.fieldSpecs(domain, CustomDomainService.USER_DEFINED_FIELD, ["field"])
+		}
+
+
 		def model = [assetComment: assetComment, notes: notes, permissionForUpdate: true,
 		             statusWarn: taskService.canChangeStatus(assetComment) ? 0 : 1, assignmentPerm: assignmentPerm,
 		             categoryPerm: categoryPerm, successor: successor, projectStaff: projectStaff, canPrint: canPrint,
 		             dueDate: dueDate, assignToSelect: assignToSelect, assetEntity: assetComment.assetEntity,
-		             cartQty: cartQty, project: project]
+		             cartQty: cartQty, project: project, customs: customs]
 		if (isCleaner) {
 			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY)
 			model.prefPrinter = userPreferenceService.getPreference(PREF.PRINTER_NAME)
