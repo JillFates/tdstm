@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.eav.EavAttribute
@@ -1172,7 +1173,8 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				if (asset.project.id == project.id) {
 					if (dataTransferBatch?.dataTransferSetId == 1L) {
 						// Validate that the AE fields are valid
-						def validateResultList = importValidation(dataTransferBatch, asset, dtvList)
+//						def validateResultList = importValidation(dataTransferBatch, asset, dtvList)
+						def validateResultList = [:] // <SL> skip validations as per comments on TM-6585
 						if (validateResultList.flag) {
 							// The asset has been updated since the last export so we don't want to overwrite any possible changes
 							errorCount++
@@ -1286,10 +1288,12 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		List<String> warnings,
 		Integer errorConflictCount,
 		String tzId,
-		String dtFormat
+		String dtFormat,
+		Map<String, ?> fieldSpec
 	) {
 		// def handled = true
-		String property = dtv.eavAttribute.attributeCode
+//		String property = dtv.eavAttribute.attributeCode
+		String property = fieldSpec["field"]
 		String value = dtv.importValue
 		String newVal
 		String classSimpleName = asset.getClass().name.tokenize('.')[-1]
@@ -1367,7 +1371,8 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				break
 			default:
 				if (value.size()) {
-					if (dtv.eavAttribute.backendType == "int") {
+//					if (dtv.eavAttribute.backendType == "int") {
+					if (fieldSpec["control"] == ControlType.NUMBER.toString()) {
 						def correctedPos
 						try {
 							if (dtv.correctedValue) {
@@ -1380,8 +1385,8 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 								asset[property] = correctedPos
 							}
 						} catch (e) {
-							logger.error 'setCommonProperties() exception 1 : {}', ex.message
-							ex.printStackTrace()
+							logger.error 'setCommonProperties() exception 1 : {}', e.message
+							e.printStackTrace()
 							warnings << "Unable to update $property with value [$value] on $asset.assetName (row $rowNum)"
 							errorConflictCount++
 							dtv.hasError = 1

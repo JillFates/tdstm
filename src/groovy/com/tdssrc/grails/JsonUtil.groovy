@@ -59,6 +59,11 @@ class JsonUtil {
         }
     }
 
+    /**
+     * Convert given json string to a Map representation
+     * @param json
+     * @return
+     */
     static Map<String, ?> convertJsonToMap(String json) {
         Map<String, Object> jsonMap = new ObjectMapper().readValue(json, HashMap.class)
         return jsonMap
