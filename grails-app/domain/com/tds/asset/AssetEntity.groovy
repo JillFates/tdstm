@@ -14,6 +14,9 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.service.CustomDomainService
+import org.apache.commons.lang3.BooleanUtils
+import org.springframework.validation.Errors
 
 import static com.tds.asset.AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
 import static com.tds.asset.AssetOptions.AssetOptionsType.PRIORITY_OPTION
@@ -29,6 +32,7 @@ import static com.tdsops.validators.CustomValidators.inList
 import static com.tdsops.validators.CustomValidators.optionsClosure
 
 class AssetEntity extends EavEntity {
+	CustomDomainService customDomainService
 
 	AssetClass assetClass = DEVICE
 	String application = ''
@@ -258,6 +262,8 @@ class AssetEntity extends EavEntity {
 		scale nullable: true, inList: SizeScale.keys
 		rateOfChange nullable: true
 		modifiedBy nullable: true
+
+		custom1 validator: AssetEntity.validateCustomFields()
 	}
 
 	static mapping = {
@@ -275,7 +281,7 @@ class AssetEntity extends EavEntity {
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
-	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict']
+	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict', 'customDomainService']
 
 	def beforeInsert = {
 		dateCreated = lastUpdated = TimeUtil.nowGMT()
@@ -475,5 +481,69 @@ class AssetEntity extends EavEntity {
 	AssetEntity clone(Map replaceKeys = [:]){
 		AssetEntity clonedAsset = GormUtil.domainClone(this, replaceKeys) as AssetEntity
 		return clonedAsset
+	}
+
+	/**
+	 * Validate the custom Fields in the Class
+	 * @param className
+	 */
+	static Closure validateCustomFields(){
+		return { val, AssetEntity object, Errors errors ->
+			String className = object.class.simpleName
+			List<Map> customFieldSpecs = object.customDomainService.customFieldsList(object.project, className)
+
+			for(Map fieldSpec : customFieldSpecs){
+				boolean required = BooleanUtils.toBoolean(fieldSpec.constraints?.required)
+				String field = fieldSpec.field
+				String label = fieldSpec.label
+				String value = object[field]
+				String control = fieldSpec.control
+
+				switch (control) {
+					case 'YesNo' :
+						List<String> yesNoList = ['Yes', 'No']
+
+						if(!value && required) {
+							errors.rejectValue(field, 'custom.notInList',
+									[value, label, yesNoList.join(', ')].toArray(), "")
+
+						} else if(!value ||
+								yesNoList.contains(value) == false) {
+
+							errors.rejectValue(field, 'custom.notInList',
+									[value, label, "${yesNoList.join(', ')} or BLANK"].toArray(), "")
+						}
+						break
+
+					case 'Select List' :
+						def optValues = fieldSpec.constraints?.values ?: []
+
+						if(!value && required) {
+							errors.rejectValue(field, 'custom.notInList',
+									[value, label, optValues.join()].toArray(), "")
+
+						} else if(value &&
+								optValues.contains(value) == false) {
+							errors.rejectValue(field, 'custom.notInList',
+									[value, label, optValues.join(', ')].toArray(), "")
+						}
+						break
+
+					default :
+						def minSize = fieldSpec.constraints?.minSize ?: 0
+						def maxSize = fieldSpec.constraints?.maxSize ?: Integer.MAX_VALUE
+
+						int size = value?.length() ?:0
+						if(size < minSize && size > maxSize) {
+							errors.rejectValue(field, 'custom.sizeOutOfBounds',
+									[value, label, minSize, maxSize].toArray(), "")
+						}
+						break
+
+				}
+			}
+
+			errors.rejectValue ("custom96", "custom.fail")
+		}
 	}
 }
