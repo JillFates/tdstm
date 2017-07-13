@@ -138,8 +138,10 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			result.contains(' pattern=".{1,}" ')
 		and: 'max value should be set based on the spec'
 			result.contains(" maxlength=\"$max\"")
-		and: 'the complete formatted string should be'
-			" required pattern=\".{1,}\" maxlength=\"$max\"" == result
+		and: 'the complete formatted string should contain'
+			result.contains(" required pattern=\".{1,}\" maxlength=\"$max\"")
+		and: 'the string should contain validation error messages'
+			result.contains(' oninvalid="setCustomValidity(\'')
 
 		when: 'calling constraintsAttrib with max value to large'
 			Map altFS = stringFieldSpec

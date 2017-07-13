@@ -15,6 +15,9 @@ class ControlTagLib {
 	static final int MAX_STRING_LENGTH = 255
 	static final String EMPTY_IMP_CRIT_FIELD_CSS_CLASS = " highField"
 	static final List TOOLTIP_DATA_PLACEMENT_VALUES = ["top", "bottom", "left", "right"]
+	static final String MAX_VALIDATION_MESSAGE = 'Value exceeds the maximum {max} characters.'
+	static final String EXACTLY_MIN_MAX_VALIDATION_MESSAGE = 'Value must be exactly {min} character(s).'
+	static final String BETWEEN_MIN_MAX_VALIDATION_MESSAGE = 'Value must be between {min} and {max} characters.'
 
 	/**
 	 * Used to render the LABEL used for an input field
@@ -333,7 +336,8 @@ class ControlTagLib {
 	}
 
 	/**
-	 * Returns the HTML5 require and min/max appropriately for the field specification control type
+	 * Returns the HTML5 require and min/max appropriately for the field specification control type.
+	 * Since minlength validation isn't supported as an standard on all browsers
 	 * @param fieldSpec - the Field specification object
 	 * @return The required attribute for controls if required otherwise blank
 	 * @example   ' required pattern=".{3,}" maxlength="12"'
@@ -349,7 +353,7 @@ class ControlTagLib {
 		if (fieldSpec?.control in ['', 'String']) {
 			Integer min = fieldSpec.constraints?.minSize
 			Integer max = fieldSpec.constraints?.maxSize
-			// println "min=$min, max=$max"
+            // println "min=$min, max=$max"
 			if ((min == null || min == 0) && isReq) {
 				min=1
 			}
@@ -364,9 +368,37 @@ class ControlTagLib {
 				max = MAX_STRING_LENGTH
 			}
 			sb.append(" maxlength=\"$max\"")
+
+			sb.append(validationMessagesAttrib(min, max))
 		}
 
 		sb.toString()
+	}
+
+	/**
+	 * Returns the HTML attributes to show specific validation error messages for min/max constraints.
+	 * @param min String min length
+	 * @param max String max length
+	 * @return Returns the HTML attributes to show specific validation error messages for min/max constraints.
+	 */
+	private String validationMessagesAttrib(Integer min, Integer max){
+		StringBuilder sb = new StringBuilder()
+		String validationMessage = new String()
+
+		if (min != null && min > 0) {
+			if (min == max) {
+				validationMessage = EXACTLY_MIN_MAX_VALIDATION_MESSAGE.replace('{min}', min.toString())
+			} else {
+				validationMessage = BETWEEN_MIN_MAX_VALIDATION_MESSAGE.replace('{min}', min.toString()).replace('{max}', max.toString())
+			}
+		} else { // This case potenrially will never happen since html input will never let you enter a value with more than configured max. but will leave here just in case.
+			validationMessage = MAX_VALIDATION_MESSAGE.replace('{max}', max.toString())
+		}
+
+		sb.append(attribute('oninvalid', 'setCustomValidity(\''+ validationMessage +'\')'))
+		sb.append(attribute('oninput', 'try{setCustomValidity(\'\')}catch(e){}'))
+
+		return sb.toString();
 	}
 
 	/**
