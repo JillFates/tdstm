@@ -14,6 +14,6 @@ class SingleAppController {
     def index() {
         log.info("Single App Controller - Running under Angular JS")
 
-        [buildTimestamp: environmentService.version]
+        [buildHash: environmentService.buildHash]
     }
 }
