@@ -624,9 +624,10 @@ class ProjectService implements ServiceMethods {
 			(up.preferenceCode = '$roomCode' and up.value in ('$roomQuery'))
 			'''
 		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes]
-	println "\n\n*** prefDelSql=$prefDelSql"
-	println "\n*** prefDelMap=$prefDelMap"
 		UserPreference.executeUpdate(prefDelSql, prefDelMap)
+
+		// Setting Configuration settings
+		Setting.executeUpdate('delete from Setting s where s.project=:p', [p:projectInstance])
 
 		//remove the AssetEntity
 		def assetsQuery = "select a.id from AssetEntity a where a.project = $projectInstance.id"
