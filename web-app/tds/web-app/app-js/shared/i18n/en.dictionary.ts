@@ -17,6 +17,8 @@ export const en_DICTIONARY: Object = {
 		'MIN_MAX' : {
 			'MIN_LENGTH' : 'Min Length',
 			'MAX_LENGTH' : 'Max Length',
+			'MIN_LENGTH_ERROR' : 'Value must be between 0 and {param1}',
+			'MAX_LENGTH_ERROR' : 'Value must be between {param1} and 255'
 		}
 	},
 	'GLOBAL': {

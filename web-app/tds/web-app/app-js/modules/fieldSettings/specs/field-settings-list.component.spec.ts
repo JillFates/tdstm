@@ -8,10 +8,12 @@ import { HttpModule, Http } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
 
+// Kendo Components
 import { GridModule } from '@progress/kendo-angular-grid';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { DialogModule } from '@progress/kendo-angular-dialog';
+import { InputsModule } from '@progress/kendo-angular-inputs';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
@@ -71,7 +73,8 @@ describe('FieldSettingsListComponent:', () => {
 				GridModule,
 				PopupModule,
 				SortableModule,
-				DialogModule
+				DialogModule,
+				InputsModule
 			],
 			declarations: [
 				FieldSettingsListComponent,
