@@ -199,7 +199,8 @@ class ControlTagLib {
 
 		// Add a Select... option at top if the field is required
 		// <option value="" selected>Select...</option>
-		if (fieldSpec.constraints?.required) {
+		boolean isRequiredField = fieldSpec.constraints?.required
+		if (isRequiredField) {
 			sb.append(selectOption('', value, SELECT_REQUIRED_PROMPT))
 		} else {
 			// Add a blank option so users can unset a value
@@ -212,14 +213,17 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		if (! StringUtil.isBlank(value) && ! options.contains(value)) {
+		boolean isBlankValue = StringUtil.isBlank(value);
+		if (( ! isBlankValue && ! options.contains(value)) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			sb.append(selectOption(value, value, warning))
 		}
 
 		// Iterate over the fieldSpec option values to create each of the options
 		for (option in options) {
-			sb.append(selectOption(option, value))
+		    if( ! StringUtil.isBlank(option) ) {
+		        sb.append(selectOption(option, value))
+		    }
 		}
 
 		sb.append('</select>')
@@ -275,7 +279,8 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		if ( ! valid.contains(value) ) {
+		boolean isBlankValue = StringUtil.isBlank(value);
+		if ( ! isBlankValue && ! valid.contains(value) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			options << [value, warning]
 		}

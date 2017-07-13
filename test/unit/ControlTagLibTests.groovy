@@ -246,6 +246,8 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			result.contains('<option value="No" selected>')
 		and: 'there should be a required select option'
 			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
+		and: 'there should NOT be a (INVALID) option for blank value'
+			! result.contains("<option value=\"\">(${tagLib.MISSING_OPTION_WARNING})</option>")
 
 		when: 'the control is not required'
 			field.constraints.required = 0
@@ -281,7 +283,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				control: 'Select List',
 				constraints: [
 					required: 1,
-					values: ['Blue', 'Green', 'Grey', 'Red', 'Yellow']
+					values: ['', 'Blue', 'Green', 'Grey', 'Red', 'Yellow']
 				]
 			]
 		and: 'there is a default value'
@@ -306,6 +308,8 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			6 == StringUtils.countMatches(result, '<option ')
 		and: 'there should be a required select option'
 			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
+		and: 'there should NOT be a (INVALID) option for blank value'
+			! result.contains("<option value=\"\">(${tagLib.MISSING_OPTION_WARNING})</option>")
 
 		when: 'the control is not required'
 			field.constraints.required = 0
