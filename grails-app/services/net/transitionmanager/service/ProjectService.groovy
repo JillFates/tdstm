@@ -565,19 +565,24 @@ class ProjectService implements ServiceMethods {
 		}
 
 		// remove preferences
-		def bundleQuery = "select mb.id from MoveBundle mb where mb.project = $projectInstance.id"
-		def eventQuery = "select me.id from MoveEvent me where me.project = $projectInstance.id"
-		def roomQuery = " select ro.id from Room ro where ro.project = $projectInstance.id"
+		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = $projectInstance.id"
+		String eventQuery = "select me.id from MoveEvent me where me.project = $projectInstance.id"
+		String roomQuery = " select ro.id from Room ro where ro.project = $projectInstance.id"
 		List projectCodes = [UserPreferenceEnum.CURR_PROJ.value()]
 		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.value(), UserPreferenceEnum.CURR_BUNDLE.value()]
 		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.value(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.value()]
 		String roomCode = UserPreferenceEnum.CURR_ROOM.value()
-		UserPreference.executeUpdate("delete from UserPreference up where " +
-				"(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or " +
-				"(up.preferenceCode in :bundleCodesList and up.value in ('$bundleQuery')) or " +
-				"(up.preferenceCode in :eventCodesList and up.value in ('$eventQuery')) or " +
-				"(up.preferenceCode = '$roomCode' and up.value in ('$roomQuery'))",
-				[projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes])
+		String prefDelSql = '''
+			delete from UserPreference up where
+			(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or
+			(up.preferenceCode in :bundleCodesList and up.value in ('$bundleQuery')) or
+			(up.preferenceCode in :eventCodesList and up.value in ('$eventQuery')) or
+			(up.preferenceCode = '$roomCode' and up.value in ('$roomQuery'))
+			'''
+		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes]
+	println "\n\n*** prefDelSql=$prefDelSql"
+	println "\n*** prefDelMap=$prefDelMap"
+		UserPreference.executeUpdate(prefDelSql, prefDelMap)
 
 		//remove the AssetEntity
 		def assetsQuery = "select a.id from AssetEntity a where a.project = $projectInstance.id"
