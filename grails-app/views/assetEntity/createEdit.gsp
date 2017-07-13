@@ -201,10 +201,13 @@
 								</span>
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.sourceRack}" value="${assetEntityInstance.sourceRack}"/>
+							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" nowrap="nowrap" id="rackId">
+								<label for="sourceRackId">Rack/Cabinet</label>
+							</td>
 							<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display:none">
 								<label for="sourceChassisId">Blade Chassis</label>
 							</td>
+							
 
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
 									<span class="useRackS" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRack.tip}">
