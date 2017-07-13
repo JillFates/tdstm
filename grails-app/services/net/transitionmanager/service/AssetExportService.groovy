@@ -746,7 +746,7 @@ class AssetExportService {
                                 colVal = app[field]
                         }
 
-                        if (!(colVal == null || ( (colVal instanceof String) && colVal.size() == 0 ))) {
+                        if ( colVal != null || ( (colVal instanceof String) && colVal.size() > 0 )) {
                             if (colVal?.class.name == 'Person') {
                                 colVal = colVal.toString()
                             }
@@ -806,7 +806,10 @@ class AssetExportService {
                         if (colName == "Id") {
                             addCell(dbSheet, colNum, databaseCount, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else if (colName == "DepGroup") {
-                            addCell(dbSheet, colNum, databaseCount, assetDepBundleMap[currentDatabase.id.toString()])
+                            String depGroupId = assetDepBundleMap[currentDatabase.id.toString()]
+                            if (depGroupId != null) {
+                                addCell(dbSheet, colNum, databaseCount, depGroupId)
+                            }
                         } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
                             def dateValue = currentDatabase[field]
                             if (dateValue) {
@@ -876,7 +879,10 @@ class AssetExportService {
                         if (colName == "Id") {
                             addCell(storageSheet, colNum, filesCount, (currentFile.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else if (colName == "DepGroup") {
-                            addCell(storageSheet, colNum, filesCount, assetDepBundleMap[currentFile.id.toString()] )
+                            String depGroupId = assetDepBundleMap[currentFile.id.toString()]
+                            if (depGroupId != null) {
+                                addCell(storageSheet, colNum, filesCount, depGroupId)
+                            }
                         } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
                             def dateValue = currentFile[field]
                             if (dateValue) {
