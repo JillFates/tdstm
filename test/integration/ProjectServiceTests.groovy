@@ -3,12 +3,18 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
+import com.tdsops.tm.enums.domain.SettingType
 import com.tdsops.tm.enums.domain.SecurityRole
+
+import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
 
 import spock.lang.Specification
 
@@ -250,5 +256,38 @@ class ProjectServiceTests extends Specification {
 		and: 'the new person should be in the list'
 			staff.find { person.id == it.id }
 
+	}
+
+	void '11. Test the cloneDefaultSettings method'() {
+		when: 'a new project is created directly'
+			Project p = projectHelper.createProject()
+		then: 'there should be no Asset Field Settings for the project'
+			0 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
+
+		when: 'the cloneDefaultSettings method is called for the new project'
+			projectService.cloneDefaultSettings(p)
+		then: 'the project should have 4 Asset Field Settings'
+			4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
+
+		when: 'the cloneDefaultSettings method is called a second time'
+			projectService.cloneDefaultSettings(p)
+		then: 'an InvalidRequestException exception should be thrown'
+			thrown InvalidRequestException
+
+		when: 'the cloneDefaultSettings method is called for the default project'
+			Project dp = Project.get(Project.DEFAULT_PROJECT_ID)
+			projectService.cloneDefaultSettings(dp)
+		then: 'an InvalidParamException exception should be thrown'
+			thrown InvalidParamException
+
+		when: 'the Default project is missing the Asset Field Settings'
+			Setting.executeUpdate(
+				'delete Setting s where s.project=:p and type=:t',
+				[p:dp, t:SettingType.CUSTOM_DOMAIN_FIELD_SPEC] )
+		and: 'the cloneDefaultSettings method is called for a new project'
+			Project p2 = projectHelper.createProject()
+			projectService.cloneDefaultSettings(p2)
+		then: 'the ConfigurationException should be thrown'
+			thrown ConfigurationException
 	}
 }

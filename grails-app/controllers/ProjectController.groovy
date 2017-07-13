@@ -33,13 +33,16 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
+
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 
+import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectController implements ControllerMethods {
 
@@ -389,10 +392,11 @@ class ProjectController implements ControllerMethods {
 
 				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 
-				render(view: 'create',
-				       model: [company: company, projectInstance: project, clients: projectDetails.clients,
-				               partners: projectDetails.partners, managers: projectDetails.managers,
-				               workflowCodes: projectDetails.workflowCodes, prevParam: params])
+				render(view: 'create', model: [
+					company: company, projectInstance: project, clients: projectDetails.clients,
+					partners: projectDetails.partners, managers: projectDetails.managers,
+					workflowCodes: projectDetails.workflowCodes, prevParam: params
+				] )
 				return
 			}
 
@@ -400,6 +404,9 @@ class ProjectController implements ControllerMethods {
 
 			// Save the partners to be related to the project
 			projectService.updateProjectPartners(project, partnersIds)
+
+			// Clone any settings from the Default Project
+			projectService.cloneDefaultSettings(project)
 
 			// Deal with the Project Manager if one is supplied
 			Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)
