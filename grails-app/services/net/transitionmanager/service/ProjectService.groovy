@@ -8,15 +8,18 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetType
 import com.tds.asset.FieldImportance
+import net.transitionmanager.domain.Setting
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SettingType
 import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.common.exceptions.ConfigurationException
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
@@ -40,6 +43,8 @@ class ProjectService implements ServiceMethods {
 	SequenceService sequenceService
 	StateEngineService stateEngineService
 	UserPreferenceService userPreferenceService
+
+	static final String ASSET_TAG_PREFIX = 'TM-'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -335,7 +340,7 @@ class ProjectService implements ServiceMethods {
 	 * @return newly formatted assetTag
 	 */
 	String getNextAssetTag(Project project) {
-		"TM-" + String.format("%05d", sequenceService.next(project.client.id, 'AssetTag'))
+		ASSET_TAG_PREFIX + String.format("%05d", sequenceService.next(project.client.id, 'AssetTag'))
 	}
 
 	/**
@@ -346,7 +351,7 @@ class ProjectService implements ServiceMethods {
 	 */
 	String getNewAssetTag(Project project, AssetEntity asset) {
 		if (asset.id) {
-			'TM-' + asset.id
+			ASSET_TAG_PREFIX + asset.id
 		} else {
 			getNextAssetTag(project)
 		}
@@ -547,6 +552,45 @@ class ProjectService implements ServiceMethods {
 		}
 	}
 
+
+    /**
+	 * Used to determine if a company is associated with a project
+	 * @param project - the project to update with default settings
+	 */
+	void cloneDefaultSettings(Project project) {
+
+		// Make sure someone isn't trying to clone the default project onto itself
+		if (Project.isDefaultProject(project)) {
+			throw new InvalidParamException('cloneDefaultSettings not allowed for the Default project')
+		}
+
+		// Make sure this wasn't called before for the project
+		int existingSettings = Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
+		if (existingSettings > 0) {
+			throw new InvalidRequestException('Asset Field Settings already exist for project')
+		}
+
+		// Clone the Field Specifications Setting records
+		Project defProject = Project.get(Project.DEFAULT_PROJECT_ID)
+		List fieldSpecs = Setting.findAllByProjectAndType(defProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)
+		if (fieldSpecs.size() < 4) {
+			throw new ConfigurationException('The Default project is missing the Asset Field Settings')
+		}
+
+		// Loop over the FieldSpecs loaded and create duplicates for the new project
+		for (spec in fieldSpecs) {
+			Setting s = new Setting(
+				project: project,
+				type: spec.type,
+				key: spec.key,
+				json: spec.json)
+			if (!s.save()) {
+				log.error 'cloneDefaultSettings failed : ' + GormUtil.allErrorsString(s)
+				throw new DomainUpdateException('An error occurred while creating the Asset Field Settings')
+			}
+		}
+	}
+
 	/**
 	 *The UserPreferenceService.removeProjectAssociates is moved here and renamed as deleteProject
 	 *@param project
@@ -554,12 +598,12 @@ class ProjectService implements ServiceMethods {
 	 *@return message
 	 */
 	@Transactional
-	def deleteProject(prokectId, includeProject=false) throws UnauthorizedException {
+	def deleteProject(projectId, includeProject=false) throws UnauthorizedException {
 		def message
-		def projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
-		def projectInstance = Project.get(prokectId)
+		List projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
+		Project projectInstance = Project.get(projectId)
 
-		if(!(projectInstance in projects)){
+		if (!(projectInstance in projects)) {
 			throw new UnauthorizedException('You do not have access to the specified project')
 		}
 
