@@ -552,12 +552,12 @@ class AssetEntityService implements ServiceMethods {
 	 * @param params : params map received from client side
 	 */
 	def createOrUpdateAssetEntityAndDependencies(Project project, AssetEntity assetEntity, Map params) {
-		List errors = []
+		String error
 		String errObject = 'dependencies'
 		try {
 			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
 				errObject = 'asset'
-				throw new DomainUpdateException('Unable to update asset ' + GormUtil.allErrorsString(assetEntity))
+				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
 			}
 
 			// Verifying assetEntity assigned to the project
@@ -588,17 +588,17 @@ class AssetEntityService implements ServiceMethods {
 			addOrUpdateDependencies(project, 'dependent', assetEntity,  params)
 
 		} catch (DomainUpdateException | InvalidRequestException e) {
-			errors << e.message
+			error = e.message
 		} catch (RuntimeException rte) {
 			//rte.printStackTrace()
 			log.error ExceptionUtil.stackTraceToString(rte, 60)
-			errors << 'An error occurred that prevented the update'
+			error = 'An error occurred that prevented the update'
 		}
 
-		if (errors.size()) {
+		if (error) {
 			assetEntity.discard()
 			transactionStatus.setRollbackOnly()
-			throw new DomainUpdateException("Unable to update $errObject : $errors".toString())
+			throw new DomainUpdateException(error)
 		}
 	}
 
