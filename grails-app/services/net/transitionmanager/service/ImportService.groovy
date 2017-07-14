@@ -1,6 +1,5 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
@@ -10,9 +9,6 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.SizeScale
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -22,8 +18,6 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdssrc.grails.WorkbookUtil
-import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
@@ -44,13 +38,13 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.grails.datastore.mapping.model.types.Custom
 import org.hibernate.FlushMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.interceptor.TransactionAspectSupport
-import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import java.text.DateFormat
@@ -58,12 +52,14 @@ import java.util.regex.Matcher
 
 import static com.tdsops.tm.enums.domain.AssetClass.*
 
+// <SL>: Commented this out due to multiple implementations of logging
 //@Slf4j
 class ImportService implements ServiceMethods {
 	private Logger log = LoggerFactory.getLogger(ImportService.class)
 
 	// The spreadsheet columns that are Date format
 	private static final List<String> importColumnsDateType = ['MaintExp', 'Retire']
+	// SQL statement that is used to insert values the temporary import table
 	private static final String DTV_INSERT_SQL =
 			"INSERT INTO data_transfer_value " +
 					"(asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id, field_name, has_error, error_text) VALUES "
@@ -79,9 +75,7 @@ class ImportService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	def jdbcTemplate
 	CustomDomainService customDomainService
-
-	// The number of assets to process before clearing the hibernate session
-//	static final int CLEAR_SESSION_AFTER = 100
+	MessageSource messageSource
 
 	static final String indent = '&nbsp;&nbsp;&nbsp;'
 	static final String NULL_INDICATOR='NULL'
@@ -148,9 +142,6 @@ class ImportService implements ServiceMethods {
 			throw new InvalidParamException('Unable to find the specified batch')
 		}
 
-		// log.debug('dataTransferBatch.eavEntityType?.domainName = {}', dataTransferBatch.eavEntityType?.domainName)
-		// log.debug('AssetClass.domainNameFor(assetClass) = {}', AssetClass.domainNameFor(assetClass))
-
 		if (dataTransferBatch.eavEntityType?.domainName != domainNameFor(assetClass)) {
 			throw new InvalidParamException("Specified batch is not for the asset class $assetClass")
 		}
@@ -182,17 +173,6 @@ class ImportService implements ServiceMethods {
 
 		// TODO : JPM 1/2017 : The staffList is getting ONLY the staff of the client but should be getting all staff on the project
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
-
-		def domainName = dtb.eavEntityType?.domainName
-		if (domainName.equals('AssetEntity')) {
-			domainName = 'Server'
-		}
-		// TODO : JPM 11/2014 : loadBatchData() has hard-code AssetEntity to Server switch for EavAttributeSet - someday it should just be Device...
-		data.eavAttributeSet = EavAttributeSet.findByAttributeSetName(domainName)
-		assert data.eavAttributeSet != null
-
-		// log.debug 'loadBatchData({}) for dtb.eavEntityType?.domainName={}, domainName=[{}], data.eavAttributeSet={}',
-		//		dtb.id, dtb.eavEntityType?.domainName, domainName, data.eavAttributeSet
 
 		return data
 	}
@@ -264,7 +244,7 @@ class ImportService implements ServiceMethods {
 		String errorMsg = ''
 
 		String methodName = 'reviewImportBatch()'
-		StringBuffer sb = new StringBuffer()
+		StringBuilder sb = new StringBuilder()
 
 		GormUtil.setSessionFlushMode FlushMode.COMMIT
 
@@ -284,7 +264,7 @@ class ImportService implements ServiceMethods {
 			return [error: 'Unable to locate batch id']
 		}
 
-		// <SL> requires to update tables (data_transfer_batch, eav_entity_type) to use AssetClass instead
+		// <SL> TODO: requires to update tables (data_transfer_batch, eav_entity_type) to use AssetClass instead
 		boolean batchIsForDevices = dtb.eavEntityType?.domainName == "AssetEntity"
 
 		// Get a Device Type Map used to verify that device type are valid
@@ -294,7 +274,7 @@ class ImportService implements ServiceMethods {
 		Map invalidDeviceTypeMap = [:]
 
 		if (performance) now = new Date()
-		def dataTransferValueRowList = DataTransferValue.findAll(
+		List<DataTransferValue> dataTransferValueRowList = DataTransferValue.findAll(
 			"From DataTransferValue d where d.dataTransferBatch=? " +
 			"and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtb])
 		if (performance) {
@@ -309,20 +289,10 @@ class ImportService implements ServiceMethods {
 			log.debug("Fetching existing asset IDS took {}", TimeUtil.elapsed(now))
 		}
 
-//		def eavAttributeSet = EavAttributeSet.get(1)
-
 		def assetIdList = []
 		def dupAssetIds = []
 		def notExistedIds = []
 		Map mfgModelMatches = [:]
-
-		EavEntityType deviceEavEntityType = EavEntityType.findByDomainName('AssetEntity')
-		EavAttribute mfgEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'manufacturer')
-		EavAttribute modelEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'model')
-		EavAttribute deviceTypeEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'assetType')
-
-		log.debug '{} deviceEavEntityType={}, mfgEavAttr={}, modelEavAttr={}, deviceTypeEavAttr={}',
-				methodName, deviceEavEntityType, mfgEavAttr, modelEavAttr, deviceTypeEavAttr
 
 		def assetCount = dataTransferValueRowList.size()
 
@@ -336,11 +306,9 @@ class ImportService implements ServiceMethods {
 			int rowNum = dataTransferValueRow + 1
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 
-			// log.debug '***{} {} of {}', methodName, dataTransferValueRow, assetCount
-
 			if (batchIsForDevices) {
-				String mfgName = DataTransferValue.findWhere(dataTransferBatch: dtb, rowId: rowId, eavAttribute: mfgEavAttr)?.importValue
-				String modelName = DataTransferValue.findWhere(dataTransferBatch: dtb, rowId: rowId, eavAttribute: modelEavAttr)?.importValue
+				String mfgName = DataTransferValue.findWhere(dataTransferBatch: dtb, rowId: rowId, fieldName: "manufacturer")?.importValue
+				String modelName = DataTransferValue.findWhere(dataTransferBatch: dtb, rowId: rowId, fieldName: "model")?.importValue
 
 				mfgName = StringUtil.defaultIfEmpty(mfgName, '')
 				modelName = StringUtil.defaultIfEmpty(modelName, '')
@@ -360,7 +328,7 @@ class ImportService implements ServiceMethods {
 
 				// Validate the device type only if the Mfg/Model were not found
 				if (!found) {
-					String deviceType = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:deviceTypeEavAttr)?.importValue
+					String deviceType = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, fieldName: "assetType")?.importValue
 					String invalidType
 					if (deviceType?.size()) {
 						if (!deviceTypeMap.containsKey(deviceType.toLowerCase())) {
@@ -442,19 +410,15 @@ class ImportService implements ServiceMethods {
 
 		log.info '{} Review process of {} batch records took {}', methodName, assetCount, elapsedTime
 
-		//if (log.debugEnabled) {
-		//	mfgModelMatches.each {k,v -> sb.append("Mfg/Model Matches $k: $v <br>")}
-		//}
-
 		sb.append('<br>Review took ' + elapsedTime + ' to complete')
 
-		String info=sb.toString()
+		String info = sb.toString()
 
 		jobProgressFinish(progressKey, info)
 
 		dtb.importResults = combineDataTransferBatchImportResults(dtb, info)
 
-		return [elapsedTime: elapsedTime, info:info]
+		return [elapsedTime: elapsedTime, info: info]
 	}
 
 	/**
@@ -700,6 +664,8 @@ class ImportService implements ServiceMethods {
 	 * @return map of the various attributes returned from the service
 	 */
 	private Map processApplicationImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId, dtFormat) {
+		AssetClass assetClass = APPLICATION
+		def domainClass = domainClassFor(assetClass)
 
 		// Flag if we want performance information throughout the method
 		boolean performance=true
@@ -734,7 +700,7 @@ class ImportService implements ServiceMethods {
 		Project project = Project.get(projectId)
 		UserLogin userLogin = UserLogin.get(userLoginId)
 
-		DataTransferBatch dataTransferBatch = processValidation(project, userLogin, APPLICATION, batchId)
+		DataTransferBatch dataTransferBatch = processValidation(project, userLogin, assetClass, batchId)
 		if (performance) log.debug "processValidation() took ${TimeUtil.elapsed(startedAt)}"
 
 		// Fetch all of the common data shared by all of the import processes
@@ -742,7 +708,7 @@ class ImportService implements ServiceMethods {
 		Map data = loadBatchData(dataTransferBatch)
 		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
 
-		def eavAttributeSet = data.eavAttributeSet
+		def eavAttributeSet = null
 		List staffList = data.staffList
 
 		List teams = partyRelationshipService.getStaffingRoles()
@@ -758,15 +724,17 @@ class ImportService implements ServiceMethods {
 			log.debug fubar.toString()
 		}
 
-		def nullProps = GormUtil.getDomainPropertiesWithConstraint(Application, 'nullable', true)
-		def blankProps = GormUtil.getDomainPropertiesWithConstraint(Application, 'blank', true)
+		def nullProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'nullable', true)
+		def blankProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'blank', true)
+
+		List<Map<String, ?>> fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString())[assetClass.toString()]["fields"]
+
 		def dtvList
 
 		//
 		// Main loop that will iterate over the row ids from the import batch
 		//
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++) {
-			now = new Date()
 			startedAt = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
@@ -776,21 +744,14 @@ class ImportService implements ServiceMethods {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
 			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			application = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, Application, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
-			if (application == null)
+			application = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
+			if (application == null) {
 				continue
-
-			if (!application.id) {
-				// Initialize extra properties for new application asset
 			}
-
-			List<Map<String, ?>> fieldSpecs = customDomainService.allFieldSpecs(project, APPLICATION.toString())[APPLICATION.toString()]["fields"]
-//			fieldSpecs.add(["field": "id", "label": "Id", "control": "Number"])
 
 			// Iterate over the properties and set them on the asset
 			dtvList.each {
-//				def attribName = it.eavAttribute.attributeCode
-				def attribName = it.fieldName
+				String attribName = it.fieldName
 				Map<String, ?> fieldSpec = fieldSpecs.find { field -> (field["field"] == attribName || field["label"] == attribName) }
 
 				it.importValue = it.importValue.trim()
@@ -1016,14 +977,18 @@ class ImportService implements ServiceMethods {
 		Map mfgModelMap = [:]
 
 		DataTransferBatch dataTransferBatch = processValidation(project, userLogin, assetClass, batchId)
-		if (performance) log.debug "processValidation() took ${TimeUtil.elapsed(startedAt)}"
+		if (performance) {
+			log.debug "processValidation() took ${TimeUtil.elapsed(startedAt)}"
+		}
 
 		// Fetch all of the common data shared by all of the import processes
 		def now = new Date()
 		Map data = loadBatchData(dataTransferBatch)
-		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
+		if (performance) {
+			log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
+		}
 
-		def eavAttributeSet = data.eavAttributeSet
+		def eavAttributeSet = null
 		List staffList = data.staffList
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
@@ -1032,6 +997,8 @@ class ImportService implements ServiceMethods {
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'nullable', true)
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'blank', true)
+
+		List<Map<String, ?>> fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString())[assetClass.toString()]["fields"]
 
 		// Get a Device Type Map used to verify that device type are valid
 		Map deviceTypeMap = getDeviceTypeMap()
@@ -1049,7 +1016,7 @@ class ImportService implements ServiceMethods {
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++) {
 			try {
 				now = new Date()
-			startedAt = new Date()
+				startedAt = new Date()
 
 				def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 				rowNum = rowId+1
@@ -1067,8 +1034,6 @@ class ImportService implements ServiceMethods {
 
 				if (asset.id) {
 					existingAssetsList << asset
-				} else {
-					// Initialize extra properties for new asset
 				}
 
 				def isNewValidate = (!asset.id)
@@ -1084,7 +1049,8 @@ class ImportService implements ServiceMethods {
 
 				// Iterate over the attributes to update the asset with
 				dtvList.each {
-					def attribName = it.eavAttribute.attributeCode
+					String attribName = it.fieldName
+					Map<String, ?> fieldSpec = fieldSpecs.find { field -> (field["field"] == attribName || field["label"] == attribName) }
 
 					// If trying to set to NULL - call the closure to update the property and move on
 					if (it.importValue == "NULL") {
@@ -1097,8 +1063,6 @@ class ImportService implements ServiceMethods {
 						}
 						return
 					}
-
-					// log.debug "Processing attribName=$attribName"
 
 					switch (attribName) {
 						case ~/sourceTeamMt|targetTeamMt|sourceTeamLog|targetTeamLog|sourceTeamSa|targetTeamSa|sourceTeamDba|targetTeamDba/:
@@ -1147,7 +1111,7 @@ class ImportService implements ServiceMethods {
 
 						default:
 							// Try processing all common properties
-							assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
+							assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat, fieldSpec)
 					}
 				}
 
@@ -1203,7 +1167,7 @@ class ImportService implements ServiceMethods {
 				}
 
 				// Update various common properties that may not have been set by the above loop
-				processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat)
+				processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat, fieldSpecs)
 
 				//
 				// Deal with Chassis
@@ -1264,8 +1228,6 @@ class ImportService implements ServiceMethods {
 
 
 				} // ['source', 'target'].each
-
-				// log.debug "$methodName asset $asset $asset.sourceLocation/$asset.sourceRoom/$asset.sourceRack"
 
 				log.debug "$methodName About to try saving isDirty=${asset.isDirty()} asset $asset $asset.model $asset.manufacturer $asset.assetType"
 				// Save the asset if it was changed or is new
@@ -1375,14 +1337,18 @@ class ImportService implements ServiceMethods {
 		def existingAssetsList = []
 
 		DataTransferBatch dataTransferBatch = processValidation(project, userLogin, assetClass, batchId)
-		if (performance) log.debug "processValidation() took ${TimeUtil.elapsed(startedAt)}"
+		if (performance) {
+			log.debug "processValidation() took ${TimeUtil.elapsed(startedAt)}"
+		}
 
 		// Fetch all of the common data shared by all of the import processes
 		def now = new Date()
 		Map data = loadBatchData(dataTransferBatch)
-		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
+		if (performance) {
+			log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
+		}
 
-		def eavAttributeSet = data.eavAttributeSet
+		def eavAttributeSet = null
 		List staffList = data.staffList
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
@@ -1392,10 +1358,11 @@ class ImportService implements ServiceMethods {
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'nullable', true)
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'blank', true)
 
+		List<Map<String, ?>> fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString())[assetClass.toString()]["fields"]
+
 		def dtvList
 
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++) {
-			now = new Date()
 			startedAt = new Date()
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
@@ -1411,12 +1378,9 @@ class ImportService implements ServiceMethods {
 			if (!asset)
 				continue
 
-			if (!asset.id) {
-				// Initialize extra properties for new asset
-			}
-
 			dtvList.each {
-				def attribName = it.eavAttribute.attributeCode
+				String attribName = it.fieldName
+				Map<String, ?> fieldSpec = fieldSpecs.find { field -> (field["field"] == attribName || field["label"] == attribName) }
 
 				// If trying to set to NULL - call the closure to update the property and move on
 				if (it.importValue == "NULL") {
@@ -1424,19 +1388,12 @@ class ImportService implements ServiceMethods {
 					return
 				}
 
-				switch (attribName) {
-					// case ?:
-
-					default:
-						// Try processing all common properties
-						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
-
-				}
-
+				// Try processing all common properties
+				assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat, fieldSpec)
 			}
 
 			// Update various common properties that may not have been set by the above loop
-			processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat)
+			processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat, fieldSpecs)
 
 			// Save the asset if it was changed or is new
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
@@ -1526,7 +1483,7 @@ class ImportService implements ServiceMethods {
 		Map data = loadBatchData(dataTransferBatch)
 		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
 
-		def eavAttributeSet = data.eavAttributeSet
+		def eavAttributeSet = null
 		List staffList = data.staffList
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
@@ -1536,10 +1493,11 @@ class ImportService implements ServiceMethods {
 		List nullProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'nullable', true)
 		List blankProps = GormUtil.getDomainPropertiesWithConstraint(domainClass, 'blank', true)
 
+		List<Map<String, ?>> fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString())[assetClass.toString()]["fields"]
+
 		List dtvList
 
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++) {
-			now = new Date()
 			startedAt = new Date()
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
@@ -1555,15 +1513,11 @@ class ImportService implements ServiceMethods {
 			if (asset == null)
 				continue
 
-			if (!asset.id) {
-				// Initialize extra properties for new asset
-				// asset.scale = SizeScale.GB
-			}
-
 			dtvList.each {
-				def attribName = it.eavAttribute.attributeCode
+				String attribName = it.fieldName
+				Map<String, ?> fieldSpec = fieldSpecs.find { field -> (field["field"] == attribName || field["label"] == attribName) }
 
-println "*** attribName=$attribName, ${it.getClass().getName()}"
+				println "*** attribName=$attribName, ${it.getClass().getName()}"
 
 				// If trying to set to NULL - call the closure to update the property and move on
 				if (it.importValue == "NULL") {
@@ -1577,18 +1531,12 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 					return
 				}
 
-				switch (attribName) {
-					// case ?:
-
-					default:
-						// Try processing all common properties
-						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
-				}
-
+				// Try processing all common properties
+				assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat, fieldSpec)
 			}
 
 			// Update various common properties that may not have been set by the above loop
-			processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat)
+			processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat, fieldSpecs)
 
 			// Save the asset if it was changed or is new
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
@@ -1925,18 +1873,15 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		}
 	}
 
-	def upload(Project project, CommonsMultipartFile file, Map<String, String> params) {
-		// URL action to forward to if there is an error
-//		String forwardAction = 'assetImport'
-
-		//Project project = controllerService.getProjectForPage(this)
-//		if (!project) {
-//			String warnMsg = flash.message
-//			flash.message = null
-//			forward(action: forwardAction, params: [error: warnMsg])
-//			return
-//		}
-
+	/**
+	 * Validates an uploaded asset import workbook and create the corresponding batch
+	 * for reviewing and processing the data
+	 * @param project - the project
+	 * @param file - the workbook
+	 * @param params - http parameters received in the controller
+	 * @return
+	 */
+	def validateAndProcessWorkbookSheets(Project project, CommonsMultipartFile file, Map<String, String> params) {
 		def stopwatch = new StopWatch()
 		stopwatch.start()
 
@@ -1960,21 +1905,9 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 
 		DataTransferBatch dataTransferBatch
 
-		// ------
-		// The following section are a few Closures to help simplify the code
-		// ------
-
-		// closure used to redirect user with an error message for sever issues
-//		def failWithError = { message ->
-//			log.error "upload() $securityService.currentUsername was $message"
-//			forward action: forwardAction, params: [error: message]
-//		}
-
 		// A closure to track the results of the different sheets being processed
 		def processResults = { String theSheetName, theResults ->
 			if (!uploadResults.containsKey(theSheetName)) {
-//				failWithError "Unhandled Sheet '$theSheetName' - please contact support"
-//				return
 				throw new InvalidParamException("Unhandled Sheet \'${theSheetName}\' - please contact support")
 			}
 
@@ -2014,8 +1947,7 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		 */
 		def saveProcessResultsToBatch = { theSheetName, theResults ->
 			// Generate the results and save into the batch for historical reference
-			// log.debug "saveProcessResultsToBatch: theSheetName=$theSheetName, theResults = $theResults"
-			StringBuffer sprtbMsg = generateResults(theResults, theResults[theSheetName].skipped, [theSheetName], false)
+			StringBuilder sprtbMsg = generateResults(theResults, theResults[theSheetName].skipped, [theSheetName], false)
 			if (dataTransferBatch != null) {
 				dataTransferBatch.importResults = sprtbMsg.toString()
 				dataTransferBatch.save()
@@ -2028,15 +1960,11 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		setTotalAssets 0
 
 		if (!params.dataTransferSet) {
-//			failWithError 'Import request was missing expected parameter(s)'
-//			return
 			throw new InvalidParamException("Import request was missing expected parameter(s)")
 		}
 
 		DataTransferSet dataTransferSet = DataTransferSet.get(params.dataTransferSet)
 		if (!dataTransferSet) {
-//			failWithError 'Unable to locate Data Import definition for $params.dataTransferSet'
-//			return
 			throw new InvalidParamException("Unable to locate Data Import definition for ${params.dataTransferSet}")
 		}
 
@@ -2048,10 +1976,6 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 				projectCustomLabels[project[pcKey]] = 'Custom' + i
 			}
 		}
-
-		// Get the uploaded spreadsheet file
-//		MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request
-//		CommonsMultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
 
 		// create workbook
 		def workbook
@@ -2067,20 +1991,8 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		int dbAdded  = 0
 		int filesAdded = 0
 
-		//get column name and sheets
-		//retrieveColumnNames(serverDTAMap, serverColumnslist, project)
-		//retrieveColumnNames(appDTAMap, appColumnslist, project)
-		//retrieveColumnNames(databaseDTAMap, databaseColumnslist, project)
-		//retrieveColumnNames(filesDTAMap, filesColumnslist, project)
-
 		int dependencyCount = 0
 		int cablingCount = 0
-
-		/*
-		def dependencyColumnList = ['DependentId','Type','DataFlowFreq','DataFlowDirection','status','comment']
-		def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
-		def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']
-		*/
 
 		try {
 			workbook = WorkbookFactory.create(file.inputStream)
@@ -2118,13 +2030,9 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 					exportTime = WorkbookUtil.getDateTimeCellValue(titleSheet, 1, 7, tzId, dateTimeFormatter)
 				} catch (Exception e) {
 					log.info "Was unable to read the datetime for 'Export on': $e.message"
-//					failWithError "The 'Exported On' datetime was not found or was invalid in the Title sheet"
-//					return
 					throw new InvalidParamException("The 'Exported On' datetime was not found or was invalid in the Title sheet")
 				}
 			} else {
-//				failWithError 'The required Title sheet was not found in the uploaded spreadsheet'
-//				return
 				throw new InvalidParamException("The required Title sheet was not found in the uploaded spreadsheet")
 			}
 
@@ -2372,7 +2280,7 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 							assetDep = new AssetDependency(createdBy: securityService.loadCurrentPerson())
 							isNew = true
 						} else {
-							String msg = message(code: "assetEntity.dependency.warning", args: [asset.assetName, dependent.assetName])
+							String msg = messageSource.getMessage("assetEntity.dependency.warning", [asset.assetName, dependent.assetName], LocaleContextHolder.getLocale())
 							dependencyError "$msg (row $rowNum)"
 							continue
 						}
@@ -2400,13 +2308,9 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 						}
 						assetDep.status = luv
 
-//						assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "").replace("'","\\'") ?:
-//							(isNew ? "Unknown" : assetDep.dataFlowFreq)
 						if (StringUtils.isNotEmpty(WorkbookUtil.getStringCellValue(dependencySheet, 8, r, ""))) {
 							assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "", true)
 						}
-//						assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "").replace("'","\\'") ?:
-//							(isNew ? "Unknown" : assetDep.dataFlowDirection)
 						if (StringUtils.isNotEmpty(WorkbookUtil.getStringCellValue(dependencySheet, 9, r, ""))) {
 							assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "", true)
 						}
@@ -2638,17 +2542,11 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 
 			} // Process Comment Imports
 
-//			StringBuffer message = generateResults(uploadResults, skipped, sheetList, flagToManageBatches)
-
-//			forward action:forwardAction, params: [ message: message.toString() ]
-
 		} catch(NumberFormatException e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-//			forward action:forwardAction, params: [error: e.message]
 			throw new InvalidParamException(e.message)
 		} catch(Exception e) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
-//			forward action:forwardAction, params: [error: e.message]
 			throw e
 		}
 
@@ -2662,8 +2560,8 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 	 * @param sheetList - a List that contains the name of each sheet that was included in the import process
 	 * @param notifyManageBatches - a boolean to control if the Manage Batches message is included in the results
 	 */
-	private StringBuffer generateResults(Map results, List skipped, List sheetList, boolean notifyManageBatches) {
-		StringBuffer message = new StringBuffer("<h3>Spreadsheet import was successful</h3>\n")
+	private StringBuilder generateResults(Map results, List skipped, List sheetList, boolean notifyManageBatches) {
+		StringBuilder message = new StringBuilder("<h3>Spreadsheet import was successful</h3>\n")
 		if (notifyManageBatches) {
 			message.append("<p>Please click the Manage Batches below to review and post these changes</p><br>\n")
 		}
@@ -2705,27 +2603,9 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		return message
 	}
 
-/**
- * Helper method used get the domain column names as a list substituting the custom labels appropriately
- * @param entityDTAMap :  dataTransferEntityMap for entity type
- * @param project - the project to match the custom
- * @return List
- */
-	private List getColumnNamesForDTAMap(List entityDTAMap, Project project) {
-		List columnslist = []
-		entityDTAMap.eachWithIndex { item, pos ->
-			if (AssetEntityService.customLabels.contains(item.columnName)) {
-				columnslist.add(project[item.eavAttribute?.attributeCode] ?: item.columnName)
-			} else {
-				columnslist.add(item.columnName)
-			}
-		}
-		return columnslist
-	}
-
 	/**
 	 * A helper closure used to convert the cells in a row into values for an insert statement
-	 * @param sqlStrBuff - the StringBuffer to append the VALUES sql into
+	 * @param sqlStrBuff - the StringBuilder to append the VALUES sql into
 	 * @param errorMsgList - the running list of error messages
 	 * @param sheetRef - the Sheet being processed
 	 * @param rowOffset - the row # (offset starting at 0)
@@ -2736,34 +2616,29 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 	 * @references formatDate
 	 * @return An error message if it failed to add the value to the buffer
 	 */
-	private String rowToImportValues(Map sheetInfo, /*StringBuffer*/ StringBuilder sqlStrBuff, Sheet sheetRef, Integer rowOffset,
-									 Integer colOffset, /*DataTransferAttributeMap*/ Map<String, ?> dtaMapField, String entityId,
+	private String rowToImportValues(Map sheetInfo, StringBuilder sqlStrBuff, Sheet sheetRef, Integer rowOffset,
+									 Integer colOffset, Map<String, ?> dtaMapField, String entityId,
 									 Long dtBatchId) {
 		String cellValue = null
 		String errorMsg = ""
-//		boolean isFirstField = !sqlStrBuff
 		// Get the Excel column code (e.g. column 0 = A, column 1 = B)
 		String colCode = WorkbookUtil.columnCode(colOffset)
 
 		try {
 			cellValue = WorkbookUtil.getStringCellValue(sheetRef, colOffset, rowOffset, '', true)
-//			if (cellValue == ImportService.NULL_INDICATOR) {
 			if (cellValue == NULL_INDICATOR) {
 				// TODO : check for columns that don't support NULL clearing
 			} else {
-//				if ((dtaMapField.columnName in importColumnsDateType))  {
 				if ((dtaMapField["label"] in importColumnsDateType))  {
 					if (!StringUtil.isBlank(cellValue)) {
 						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, (DateFormat) sheetInfo.dateFormatter)
 						// Convert to string in the Date format
 						if (dateValue) {
 							cellValue = TimeUtil.formatDate(dateValue, sheetInfo.userDateFormatter)
-							//cellValue = TimeUtil.formatDate(dateValue)
 						} else {
 							cellValue = ""
 						}
 					}
-					// log.debug "Processing Date field $dtaMapField.columnName - dateValue=$dateValue, cellValue=$cellValue"
 
 				} else {
 					// TODO : sizeLimit can lookup known properties to know if there are limits
@@ -2780,17 +2655,7 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		}
 
 		// Only create a value if the field isn't blank
-//		if (cellValue != '') {
 		if (!StringUtil.isBlank(cellValue)) {
-//			int cellHasError = errorMsg ? 1 : 0
-//			String values = (isFirstField ? '' : ', ') +
-//					"($entityId, '$cellValue', $rowOffset, $dtBatchId, $dtaMapField.eavAttribute.id ${dtaMapField["field"]}, $cellHasError, '$errorMsg')"
-
-
-//			if (!errorMsg) {
-//				sqlStrBuff.append(values)
-//			}
-
 			if (!errorMsg) {
 				if (sqlStrBuff && sqlStrBuff.size() > 0) {
 					sqlStrBuff.append(SqlUtil.COMMA)
@@ -2806,8 +2671,6 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 				sqlStrBuff.append(SqlUtil.STRING_QUOTE).append(errorMsg).append(SqlUtil.STRING_QUOTE)
 				sqlStrBuff.append(SqlUtil.RIGHT_PARENTHESIS)
 			}
-
-
 		}
 
 		return errorMsg
@@ -2817,28 +2680,18 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 	 * A helper closure used to perform the actual insert statement into the dataTransfer table
 	 * @param sheetName - the name of the tab for error reporting
 	 * @param rowOffset - the row # (offset starting at 0)
-	 * @param dtValues - the StringBuffer that contains the VALUES(...), VALUES(...), ...
+	 * @param dtValues - the StringBuilder that contains the VALUES(...), VALUES(...), ...
 	 * @param results - a map that keeps track of errors, skips and rows added
 	 * @return True if insert was successful otherwise false
 	 */
-	private boolean insertRowValues(String sheetName, int rowOffset, /*StringBuffer*/ StringBuilder dtValues, Map results) {
+	private boolean insertRowValues(String sheetName, int rowOffset, StringBuilder dtValues, Map results) {
 		boolean success = true
-
-		// SQL statement that is used to insert values the temporary import table
-//		String DTV_INSERT_SQL =
-//				'INSERT INTO data_transfer_value ' +
-//						'(asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id, has_error, error_text) VALUES '
-
 		try {
-//			String sql = DTV_INSERT_SQL + dtValues
-//			log.debug "insertRowValues() SQL=$sql"
 			log.debug "insertRowValues() SQL=${DTV_INSERT_SQL} ${dtValues.toString()}"
-//			jdbcTemplate.update(sql)
 			jdbcTemplate.execute(DTV_INSERT_SQL + dtValues.toString())
 			results.added ++
 		} catch (Exception e) {
 			results.errors << "Insert failed : $e.message"
-			// skipped << "$sheetName [row ${rowOffset + 1}] <ul><li>${errorMsgList.join('<li>')}</ul>"
 			log.error("insertRowValues() Importing row ${rowOffset + 1} failed : $e.message", e)
 			success = false
 		}
@@ -2902,8 +2755,6 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		}
 
 		// Get the DataTransferAttributeMap list of properties for the sheet
-//		String dtaMapName = (sheetName == 'Storage' ? 'Files' : sheetName)
-//		List dtaMapList = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName(dataTransferSet, dtaMapName)
 		List dtaMapList = null
 
 		// Get the spreadsheet column header labels as a Map [label:ordinalPosition]
@@ -2913,26 +2764,10 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 			colNamesOrdinalMap[cellContent] = c
 		}
 
-//		List domainPropertyNameList = getColumnNamesForDTAMap(dtaMapList, project)
 		List<Map<String, ?>> domainPropertyNameList = customDomainService.allFieldSpecs(project, assetClass.toString())[assetClass.toString()]["fields"]
 
 		// Make sure that the required columns are in the spreadsheet
 		checkSheetForMissingColumns(sheetName, domainPropertyNameList, colNamesOrdinalMap)
-		// add id columns
-//		switch (assetClass) {
-//			case APPLICATION:
-//				domainPropertyNameList.add(["field":  "appId", "label": "appId"])
-//				break
-//			case DEVICE:
-//				domainPropertyNameList.add(["field":  "assetId", "label": "assetId"])
-//				break
-//			case DATABASE:
-//				domainPropertyNameList.add(["field":  "dbId", "label": "dbId"])
-//				break
-//			case STORAGE:
-//				domainPropertyNameList.add(["field":  "filesId", "label": "filesId"])
-//				break
-//		}
 
 		// Find the 'Name' column index and then look at each row to count how many assets will be imported
 		nameColumnIndex = getColumnIndexForName(sheet, sheetName, columnName, colCount, headerRow)
@@ -2949,8 +2784,6 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 						 nameColumnIndex: nameColumnIndex, assetIdColumnLabel: assetIdColLabel,
 						 assetIdColumnIndex: 0, domainPropertyNameList: domainPropertyNameList]
 
-		// log.debug "getSheetInfo() $sheetInfo"
-//		log.debug "getSheetInfo() dtaMapList=[0] isa ${dtaMapList[0].getClass().name} - ${dtaMapList[0]}"
 		return sheetInfo
 	}
 
@@ -2974,10 +2807,6 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 	 * @return a List the missing columns or blank if okay
 	 */
 	private List getMissingColumns(List entityMapColumnList, Map sheetColumnNames) {
-		// assert entityMapColumnList
-//		entityMapColumnList.findAll { String name ->
-//			name != "DepGroup" && !sheetColumnNames.containsKey(name)
-//		}
 		entityMapColumnList.findAll { Map<String, ?> field ->
 			field["label"] != "DepGroup" && !sheetColumnNames.containsKey(field["label"])
 		}
@@ -3012,10 +2841,7 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 			DataTransferBatch dataTransferBatch = createTransferBatch(project, dataTransferSet, domainName,
 					sheetInfo.assetCount, timeOfExport)
 			if (!dataTransferBatch) {
-//				forward action: forwardAction, params: [error:
-//																"Failed to create import batch for the '$assetSheetName' tab. Please contact support if the problem persists."]
-//				return
-				throw new InvalidParamException()
+				throw new InvalidParamException("Failed to create import batch for the '$assetSheetName' tab. Please contact support if the problem persists.")
 			}
 
 			sheetInfo << sheetConf
@@ -3049,8 +2875,6 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		int assetNameColIndex = sheetInfo.nameColumnIndex
 		String assetSheetName = sheetInfo.sheetName
 
-		// log.debug "importSheetValues() sheetInfo=sheetInfo"
-
 		Project project = dataTransferBatch.project
 
 		// Verify that the sheet has the Asset Id Column by name that we are expecting
@@ -3065,7 +2889,6 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 				boolean rowHasErrors = false
 				String errorMsg
 				def assetId
-//				StringBuffer sqlValues = new StringBuffer()
 				StringBuilder sqlValues = new StringBuilder()
 
 				// Make sure that the asset has the mandatory name
@@ -3104,20 +2927,12 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 					for (int cols = 0; cols < sheetInfo.columnCount; cols++) {
 						String attribName
 						String columnHeader = WorkbookUtil.getStringCellValue(sheetObject, cols, 0)
-//						if (projectCustomLabels.containsKey(columnHeader)) {
-//							// A custom column that renamed
-//							attribName = projectCustomLabels[columnHeader]
-//						} else {
-//							attribName = columnHeader
-//						}
 						attribName = columnHeader
-//						def dtaAttrib = sheetInfo.dtaMapList.find{ it.columnName == attribName }
 						def dtaAttrib = sheetInfo.domainPropertyNameList.find { Map<String, ?> field ->
 							field["label"] == attribName
 						}
 
 						if (dtaAttrib != null) {
-
 							// Add the SQL VALUES(...) to the sqlValues StringBuffer for the current spreadsheet cell
 							errorMsg = rowToImportValues(sheetInfo, sqlValues, sheetObject, r, cols, dtaAttrib, assetId, dataTransferBatch.id)
 							if (errorMsg) {
@@ -3162,16 +2977,8 @@ println "*** attribName=$attribName, ${it.getClass().getName()}"
 		[errors: [], skipped: [], summary: '', added: 0]
 	}
 
-	private Long getBatchId() {
-		(Long) session.getAttribute('BATCH_ID')
-	}
-
 	private void setBatchId(long id) {
 		session.setAttribute 'BATCH_ID', id
-	}
-
-	private Long getTotalAssets() {
-		(Long) session.getAttribute('TOTAL_ASSETS')
 	}
 
 	private void setTotalAssets(long count) {
