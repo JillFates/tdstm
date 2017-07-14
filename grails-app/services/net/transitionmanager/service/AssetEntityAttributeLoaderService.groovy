@@ -1292,7 +1292,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		Map<String, ?> fieldSpec
 	) {
 		// def handled = true
-//		String property = dtv.eavAttribute.attributeCode
 		String property = fieldSpec["field"]
 		String value = dtv.importValue
 		String newVal
@@ -1371,7 +1370,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				break
 			default:
 				if (value.size()) {
-//					if (dtv.eavAttribute.backendType == "int") {
 					if (fieldSpec["control"] == ControlType.NUMBER.toString()) {
 						def correctedPos
 						try {
