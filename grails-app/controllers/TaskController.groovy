@@ -69,6 +69,7 @@ class TaskController implements ControllerMethods {
 	AssetService assetService
 	CommentService commentService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ReportsService reportsService
@@ -1498,7 +1499,7 @@ function goBack() { window.history.back() }
 		List customs = []
 		if (assetComment?.assetEntity) {
 			String domain = assetComment.assetEntity?.assetClass.toString()
-			customs = assetService.fieldSpecs(domain, CustomDomainService.USER_DEFINED_FIELD, ["field"])
+			customs = customDomainService.fieldSpecs(domain, CustomDomainService.CUSTOM_USER_FIELD, ["field"])
 		}
 
 

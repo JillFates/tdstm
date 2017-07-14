@@ -270,10 +270,10 @@
 								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>
 							</g:else>
 					</g:else>
-						<g:each in="${customs}" var="custom" >
-							<g:if test="${assetComment?.assetEntity?.(custom[field])}">
-								<dt>${project.(custom[field]) ?: custom[field] }:</dt>
-								<dd>&nbsp;<tds:textAsLink text="${assetComment?.assetEntity.(custom[field])}" target="_new"/></dd>
+						<g:each in="${customs}" var="custom" status="i" >
+							<g:if test="${assetComment?.assetEntity?.(custom['field'])}">
+								<dt>${project.(custom['field']) ?: custom['field'] }:</dt>
+								<dd>&nbsp;<tds:textAsLink text="${assetComment?.assetEntity.(custom['field'])}" target="_new"/></dd>
 							</g:if>
 						</g:each>
 				</dl>

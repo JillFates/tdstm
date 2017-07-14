@@ -7,6 +7,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -57,8 +58,8 @@ import java.text.DateFormat
 class ReportsController implements ControllerMethods {
 
 	AssetEntityService assetEntityService
-	AssetService assetService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
 	MoveEventService moveEventService
@@ -1189,7 +1190,8 @@ class ReportsController implements ControllerMethods {
 		def workflow = Workflow.findByProcess(project.workflowCode)
 		def workflowTransitions = WorkflowTransition.findAll(
 				'FROM WorkflowTransition where workflow=? order by transId', [workflow])
-		List appAttributes = assetService.fieldSpecs("Application", CustomDomainService.ALL_FIELDS, ["field", "label"])
+		String domain = AssetClass.APPLICATION.toString()
+		List appAttributes = customDomainService.fieldSpecs(domain, CustomDomainService.ALL_FIELDS, ["field", "label"])
 		[moveBundles:moveBundleList, moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},
 		 workflowTransitions:workflowTransitions, appAttributes:appAttributes]
 	}
