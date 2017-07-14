@@ -158,6 +158,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				required: false
 			};
 			model['isNew'] = true;
+			model.control = 'String';
 			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
 			model.order = availableOrder[availableOrder.length - 1] + 1;
 			this.data.fields.push(model);
