@@ -134,12 +134,14 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			int max = stringFieldSpec.constraints.maxSize
 		then: 'the result should have required'
 			result.contains(' required ')
-		and: 'min value should default to 1 because it is required'
-			result.contains(' minlength="1" ')
+		and: 'min pattern value should default to 1 because it is required'
+			result.contains(' pattern=".{1,}" ')
 		and: 'max value should be set based on the spec'
 			result.contains(" maxlength=\"$max\"")
-		and: 'the complete formatted string should be'
-			" required minlength=\"1\" maxlength=\"$max\"" == result
+		and: 'the complete formatted string should contain'
+			result.contains(" required pattern=\".{1,}\" maxlength=\"$max\"")
+		and: 'the string should contain validation error messages'
+			result.contains(' oninvalid="setCustomValidity(\'')
 
 		when: 'calling constraintsAttrib with max value to large'
 			Map altFS = stringFieldSpec
@@ -246,6 +248,8 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			result.contains('<option value="No" selected>')
 		and: 'there should be a required select option'
 			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
+		and: 'there should NOT be a (INVALID) option for blank value'
+			! result.contains("<option value=\"\">(${tagLib.MISSING_OPTION_WARNING})</option>")
 
 		when: 'the control is not required'
 			field.constraints.required = 0
@@ -281,14 +285,13 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				control: 'Select List',
 				constraints: [
 					required: 1,
-					values: ['Blue', 'Green', 'Grey', 'Red', 'Yellow']
+					values: ['', 'Blue', 'Green', 'Grey', 'Red', 'Yellow']
 				]
 			]
 		and: 'there is a default value'
 			String defValue = field.constraints.values[1]
 		and: 'and a tabOrder of 5'
 			String tabIndex='5'
-
 		when: 'the template is applied with the parameters'
 			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
 		then: 'a value should be returned'
@@ -307,6 +310,8 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			6 == StringUtils.countMatches(result, '<option ')
 		and: 'there should be a required select option'
 			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
+		and: 'there should NOT be a (INVALID) option for blank value'
+			! result.contains("<option value=\"\">(${tagLib.MISSING_OPTION_WARNING})</option>")
 
 		when: 'the control is not required'
 			field.constraints.required = 0
@@ -328,4 +333,43 @@ class ControlTagLibTests extends AbstractUnitSpec {
 
 	}
 
+	void 'Test Tool Tip Attribute '() {
+		given: 'a fieldSpec that is a String'
+		Map field = [
+				field      : 'color',
+				label      : 'Best program language ever <!>',
+				tip        : 'Select an option with a quote (")',
+				udf        : 1,
+				shared     : 1,
+				imp        : 'C',
+				show       : 1,
+				order      : 1,
+				default    : 'Javascript',
+				control    : 'Select List',
+				constraints: [
+						required: 1,
+						values  : ['Java', 'Grails', 'Javascript']
+				]
+		]
+		and: 'there is a default value'
+			String defValue = field.constraints.values[1]
+		and: 'and a tabOrder of 1'
+			String tabIndex='1'
+		when: 'the template is applied with the parameters'
+			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
+		then: 'a value should be returned'
+			result
+		and: 'data-content should contains the tool tip'
+			result.contains(' data-content="Select an option with a quote (&quot;)" ')
+		and: 'it should contain the data-toggle'
+			result.contains(' data-toggle="popover" ')
+		and: 'it should contain the data-trigger'
+			result.contains(' data-trigger="hover" ')
+
+		when: 'the tooltip property is empty'
+			field.tip = ''
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
+		then: 'data-content should contains the label'
+			result.contains(' data-content="Best program language ever &lt;!&gt;" ')
+	}
 }

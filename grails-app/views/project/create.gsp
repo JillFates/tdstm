@@ -131,7 +131,7 @@
 							<td class="name">
 								<label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
-							<td class="valueNW">
+							<td class="valueNW ${hasErrors(bean:projectInstance,field:'client','errors')}">
 								<select id="clientId" name="client.id" tabindex="100"
 								data-placeholder="Please select a client">
 									<option value=""></option>
@@ -139,6 +139,11 @@
 									    <option value="${client.partyIdTo.id}">${client.partyIdTo}</option>
 									</g:each>
 								</select>
+								<g:hasErrors bean="${projectInstance}" field="client">
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list" field="client" />
+									</div>
+								</g:hasErrors>
 							</td>
 							<td class="name">
 								<label for="projectCode"><b>Project Code:&nbsp;<span style="color: red">*</span></b></label>
@@ -302,10 +307,13 @@
 								<label for="projectType"><b>Plan Methodology:&nbsp;</b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'planMethodology','errors')}">
+								<%-- See TM-6673 Removing this select unless the value is going to be populated by default project
 								<g:select id="planMethodology" name="planMethodology" indextab="130"
 										  value="${projectInstance.planMethodology}"
 										  from="${planMethodologies}"
 										  optionKey="field" optionValue="label" />
+								--%>
+								To be set after field specifications are defined
 								<g:hasErrors bean="${projectInstance}" field="planMethodology">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="planMethodology" /></div>
 								</g:hasErrors>

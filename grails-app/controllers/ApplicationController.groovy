@@ -7,6 +7,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
@@ -137,7 +138,7 @@ class ApplicationController implements ControllerMethods {
 			}
 		}
 
-		query.append('''	
+		query.append('''
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			''')
@@ -312,11 +313,17 @@ class ApplicationController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.AssetCreate)
+	@Transactional(readOnly = true)
 	def create() {
-		def application = new Application()
+		Project project = securityService.userCurrentProject
+		Application application = new Application()
+		application.project = project
+
+		// Set the default values on the custom properties
+		assetService.setCustomDefaultValues(application)
+
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		Project project = securityService.userCurrentProject
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort: 'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
@@ -325,16 +332,20 @@ class ApplicationController implements ControllerMethods {
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 
-		//fieldImportance for Discovery by default
-		def configMap = assetEntityService.getConfig('Application','Discovery')
-		def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
-		def customs = assetEntityService.getCustomFieldsSettings("Application", true)
-		assetService.setCustomDefaultValues(application, customs)
-		[applicationInstance: application, assetTypeOptions: assetTypeOptions?.value, moveBundleList: moveBundleList,
-			planStatusOptions: planStatusOptions?.value, projectId: project.id, project: project,moveEventList: moveEventList,
-			config: configMap.config, customs: configMap.customs, personList: personList, company: project.client,
-			availabaleRoles: availabaleRoles, environmentOptions: environmentOptions?.value, highlightMap: highlightMap, standardFieldSpecs: standardFieldSpecs]
+		String domain = application.assetClass.toString()
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		List customFields = assetEntityService.getCustomFieldsSettings(project, domain, true)
+
+		[ 	applicationInstance: application, assetTypeOptions: assetTypeOptions?.value,
+			moveBundleList: moveBundleList, planStatusOptions: planStatusOptions?.value,
+			projectId: project.id, project: project,moveEventList: moveEventList,
+			personList: personList, company: project.client,
+			// TODO : fix misspelled variable availabaleRoles
+			availabaleRoles: availabaleRoles,
+			environmentOptions: environmentOptions?.value,
+			customs: customFields,
+			standardFieldSpecs: standardFieldSpecs
+		]
 	}
 
 	@HasPermission(Permission.AssetView)
@@ -353,7 +364,7 @@ class ApplicationController implements ControllerMethods {
 			renderErrorJson(errorMsg)
 			return
 		}
-		
+
 		applicationService.getModelForShow(project, app, params)
 	}
 
@@ -364,6 +375,7 @@ class ApplicationController implements ControllerMethods {
 	 * to auditEdit view
 	 */
 	@HasPermission(Permission.AssetEdit)
+	@Transactional(readOnly = true)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -375,19 +387,14 @@ class ApplicationController implements ControllerMethods {
 			return
 		}
 
-		assetEntityService.getMoveEvents(project).each {
-			if (!AppMoveEvent.countByApplicationAndMoveEvent(application, it)) {
-				new AppMoveEvent(application: application, moveEvent: it).save()
-			}
-		}
-
 		// The list to show in the App Owner and SME selects should include ALL staff (project owner and partners)
 		// along with ALL of the client staff that their person accounts are active.
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 
-		[applicationInstance: application, availabaleRoles: partyRelationshipService.getStaffingRoles(),
-		  personList: personList] +
-		 assetEntityService.getDefaultModelForEdits('Application', project, application, params)
+		[	applicationInstance: application,
+			availabaleRoles: partyRelationshipService.getStaffingRoles(),
+			personList: personList
+		] + assetEntityService.getDefaultModelForEdits('Application', project, application, params)
 	}
 
 	@HasPermission(Permission.AssetCreate)

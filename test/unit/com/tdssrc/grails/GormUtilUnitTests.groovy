@@ -41,4 +41,15 @@ class GormUtilUnitTests extends Specification {
 			! GormUtil.getDomainPropertyType(asset, 'bogusPropertyName')
 	}
 
+	void 'Test getDomainPropertyType for a Class.'() {
+		expect:
+			GormUtil.getDomainPropertyType(clazz, property) == type
+		where:
+			clazz				|	property			|	type
+			AssetEntity			|	"assetName"			|	java.lang.String
+			AssetEntity			|	"custom1"			|	java.lang.String
+			AssetEntity			|	"priority"			|	java.lang.Integer
+			AssetEntity			|	"bogusPropertyName"	|	null
+	}
+
 }

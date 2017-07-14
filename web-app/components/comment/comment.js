@@ -129,7 +129,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 					return null;
 				},
 				task: function () {
-					return parentTask;
+					return parentTask || { ac: undefined, type: undefined };
 				}
 			}
 		});

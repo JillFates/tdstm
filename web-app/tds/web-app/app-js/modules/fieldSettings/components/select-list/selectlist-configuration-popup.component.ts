@@ -67,6 +67,12 @@ export class SelectListConfigurationPopupComponent {
 							};
 						});
 				}
+				let indexOfBlank = value.indexOf('');
+				if (this.field.constraints.required && indexOfBlank !== -1) {
+					value.splice(indexOfBlank, 1);
+				} else if (!this.field.constraints.required && indexOfBlank === -1) {
+					value.splice(0, 0, '');
+				}
 				let distinct = value.map(i => {
 					return {
 						deletable: false,
@@ -139,7 +145,7 @@ export class SelectListConfigurationPopupComponent {
 	 * Auto-sort the items array, sort order is alphabetic ascending (up).
 	 */
 	public onSort(): void {
-		this.items.sort( comparator );
+		this.items.sort(comparator);
 
 		function comparator(a, b) {
 			if (a.value < b.value) {

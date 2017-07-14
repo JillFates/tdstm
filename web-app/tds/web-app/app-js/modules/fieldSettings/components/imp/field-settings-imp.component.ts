@@ -6,10 +6,6 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/imp/field-settings-imp.component.html',
 	styles: [`
 		span { padding:0 5px; cursor: pointer;}
-        .C { background-color: #F9FF90;}
-        .I { background-color: #D4F8D4;}
-        .N { background-color: #FFF;}
-        .U { background-color: #F3F4F6;}
     `]
 })
 export class FieldSettingsImportanceComponent {

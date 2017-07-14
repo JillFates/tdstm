@@ -29,15 +29,12 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Output('add') addEmitter = new EventEmitter<any>();
 	@Output('share') shareEmitter = new EventEmitter<any>();
 	@Output('delete') deleteEmitter = new EventEmitter<any>();
+	@Output('filter') filterEmitter = new EventEmitter<any>();
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
 	private fieldsSettings: FieldSettingsModel[];
 
-	private filter = {
-		search: '',
-		fieldType: 'All'
-	};
 	private gridData: GridDataResult;
 	private state: State = {
 		sort: [{
@@ -65,6 +62,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	];
 	private availableyFieldType = ['All', 'Custom Fields', 'Standard Fields'];
 
+	static readonly ORDER_MIN_VALUE = 0;
+
 	constructor(private loaderService: UILoaderService) { }
 
 	ngOnInit(): void {
@@ -78,22 +77,25 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onFilter(): void {
+		this.filterEmitter.emit(null);
+	}
 
+	public applyFilter(): void {
 		this.state.filter.filters = [];
 
 		this.fieldsSettings = this.data.fields;
-		if (this.filter.search !== '') {
-			let search = new RegExp(this.filter.search, 'i');
+		if (this.gridState.filter.search !== '') {
+			let search = new RegExp(this.gridState.filter.search, 'i');
 			this.fieldsSettings = this.data.fields.filter(
 				item => search.test(item.field) ||
 					search.test(item.label) ||
 					item['isNew']);
 		}
-		if (this.filter.fieldType !== 'All') {
+		if (this.gridState.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.filter.fieldType === 'Custom Fields'
+				value: this.gridState.filter.fieldType === 'Custom Fields'
 			});
 			this.state.filter.filters.push({
 				field: 'isNew',
@@ -156,6 +158,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				required: false
 			};
 			model['isNew'] = true;
+			model.control = 'String';
 			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
 			model.order = availableOrder[availableOrder.length - 1] + 1;
 			this.data.fields.push(model);
@@ -174,8 +177,22 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	protected onRequired(field: FieldSettingsModel) {
+		if (field.constraints.values &&
+			(field.control === 'Select List' || field.control === 'YesNo')) {
+			if (field.constraints.required) {
+				field.constraints.values.splice(field.constraints.values.indexOf(''), 1);
+			} else if (field.constraints.values.indexOf('') === -1) {
+				field.constraints.values.splice(0, 0, '');
+			}
+			if (field.constraints.values.indexOf(field.default) === -1) {
+				field.default = null;
+			}
+		}
+	}
+
 	protected onClearTextFilter(): void {
-		this.filter.search = '';
+		this.gridState.filter.search = '';
 		this.onFilter();
 	}
 
@@ -187,7 +204,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			dir: 'asc',
 			field: 'order'
 		}];
-		this.fieldsSettings = this.data.fields;
+		this.applyFilter();
 	}
 
 	public refresh(): void {
@@ -200,6 +217,12 @@ export class FieldSettingsGridComponent implements OnInit {
 		minMax: MinMaxConfigurationPopupComponent): void {
 		switch (dataItem.control) {
 			case 'Select List':
+
+				if (dataItem.constraints.values &&
+					dataItem.constraints.values.indexOf('Yes') !== -1 &&
+					dataItem.constraints.values.indexOf('No') !== -1) {
+					dataItem.constraints.values = [];
+				}
 				if (!dataItem.constraints.values ||
 					dataItem.constraints.values.length === 0) {
 					selectList.onToggle();
@@ -208,6 +231,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 				break;
 			case 'String':
+				dataItem.constraints.values = [];
 				if (!dataItem.constraints.minSize ||
 					!dataItem.constraints.maxSize) {
 					minMax.onToggle();
@@ -215,8 +239,18 @@ export class FieldSettingsGridComponent implements OnInit {
 					minMax.show = false;
 				}
 				break;
+			case 'YesNo':
+				dataItem.constraints.values = ['Yes', 'No'];
+				if (dataItem.constraints.values.indexOf(dataItem.default) === -1) {
+					dataItem.default = null;
+				}
+				if (!dataItem.constraints.required) {
+					dataItem.constraints.values.splice(0, 0, '');
+				}
+				break;
 			default:
 				break;
 		}
 	}
+
 }

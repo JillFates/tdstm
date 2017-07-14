@@ -2,6 +2,7 @@ import com.tds.asset.FieldImportance
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -32,13 +33,16 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
+
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 
+import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectController implements ControllerMethods {
 
@@ -116,8 +120,16 @@ class ProjectController implements ControllerMethods {
 		session.setAttribute('setImage', imageId)
 		boolean isDeleteable = securityService.hasPermission(Permission.ProjectDelete) && !project.isDefaultProject()
 
-		Map planMethodology = customDomainService.findCustomField("application") {
-			it.field == project.planMethodology
+		Map planMethodology = [:]
+		if (project.planMethodology) {
+			planMethodology= customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
+				it.field == project.planMethodology
+			}
+		}
+
+		// Log a warning if the planMethodology field spec was not found but one is defined
+		if (!planMethodology && project.planMethodology) {
+			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
 		}
 
 		[projectInstance: project, projectPartners: partyRelationshipService.getProjectPartners(project),
@@ -159,7 +171,11 @@ class ProjectController implements ControllerMethods {
 			projectDetails = projectService.getprojectEditDetails(project)
 			moveBundles = MoveBundle.findAllByProject(project)
 
-			List<Map> planMethodologies = customDomainService.customFieldsList("application")
+			List<Map> planMethodologies = []
+			planMethodologies << [field:'', label:'Select...']
+			planMethodologies.addAll(
+				customDomainService.customFieldsList(project, AssetClass.APPLICATION.toString(), true)
+			)
 
 			List projectManagers = projectService.getProjectManagers(project)
 			projectManagers.sort { a,b ->
@@ -227,6 +243,8 @@ class ProjectController implements ControllerMethods {
 			params.runbookOn = 1
 			project.properties = params
 
+			List<Map> planMethodologies = customDomainService.customFieldsList(project, AssetClass.APPLICATION.toString(), true)
+
 			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
 			if (logoFile instanceof String) {
 				flash.message = logoFile
@@ -234,7 +252,6 @@ class ProjectController implements ControllerMethods {
 				def projectPartners = partyRelationshipService.getProjectPartners(project)
 				def projectManagers = projectService.getProjectManagers(project)
 				def moveBundles = MoveBundle.findAllByProject(project)
-				List<Map> planMethodologies = customDomainService.customFieldsList("application")
 
 				def model = [
 						company: company,
@@ -289,7 +306,6 @@ class ProjectController implements ControllerMethods {
 				def projectPartners = partyRelationshipService.getProjectPartners(project)
 				def projectManagers = projectService.getProjectManagers(project)
 				def moveBundles = MoveBundle.findAllByProject(project)
-				List<Map> planMethodologies = customDomainService.customFieldsList("application")
 
 				def model = [
 						company: company,
@@ -322,7 +338,9 @@ class ProjectController implements ControllerMethods {
 	def create() {
 		PartyGroup company = securityService.userLoginPerson.company
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
-		List<Map> planMethodologies = customDomainService.customFieldsList("application")
+
+		// TODO - create - See TM-6673 - need to remove planMethodologies
+		List<Map> planMethodologies = [] // customDomainService.customFieldsList("application")
 
 		[clients: projectDetails.clients, company: company, managers: projectDetails.managers,
 		 partners: projectDetails.partners, projectInstance: new Project(params),
@@ -374,10 +392,11 @@ class ProjectController implements ControllerMethods {
 
 				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 
-				render(view: 'create',
-				       model: [company: company, projectInstance: project, clients: projectDetails.clients,
-				               partners: projectDetails.partners, managers: projectDetails.managers,
-				               workflowCodes: projectDetails.workflowCodes, prevParam: params])
+				render(view: 'create', model: [
+					company: company, projectInstance: project, clients: projectDetails.clients,
+					partners: projectDetails.partners, managers: projectDetails.managers,
+					workflowCodes: projectDetails.workflowCodes, prevParam: params
+				] )
 				return
 			}
 
@@ -385,6 +404,9 @@ class ProjectController implements ControllerMethods {
 
 			// Save the partners to be related to the project
 			projectService.updateProjectPartners(project, partnersIds)
+
+			// Clone any settings from the Default Project
+			projectService.cloneDefaultSettings(project)
 
 			// Deal with the Project Manager if one is supplied
 			Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)

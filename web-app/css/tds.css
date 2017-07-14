@@ -332,8 +332,9 @@
 	background-image: url(../images/news_bg.jpg);
 	background-size: contain;
 }
-.dashboardContainer > .dashboard_div{
-	height: 500px;
+.dashboardContainer {
+	display: flex;
+	min-height: 200px;
 }
 
 .dashboard_div_subdiv{

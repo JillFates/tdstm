@@ -10,22 +10,22 @@ String csvData = new File(sourceFile).text
 Map map = [
 	APPLICATION: [
 		domain: 'application',
-		version: 1,
+		version: 0,
 		fields: []
 	],
 	DEVICE: [
 		domain: 'device',
-		version: 1,
+		version: 0,
 		fields: []
 	],
 	DATABASE: [
 		domain: 'database',
-		version: 1,
+		version: 0,
 		fields: []
 	],
 	STORAGE: [
 		domain: 'storage',
-		version: 1,
+		version: 0,
 		fields: []
 	]
 ]
@@ -82,7 +82,6 @@ for (line in data) {
 				break
 		}
 	}
-
 	map[mapKey].fields.add(spec)
 
 }
@@ -109,6 +108,8 @@ if (printPrettyJson) {
 writter.flush()
 writter.close()
 println "Created $filename"
+println "\nNote that this file should perhaps be copied to ../grails-app/conf/CustomDomainServiceTests_FieldSpec.json for the Integration Tests."
+
 
 /*
 // Write out the individual maps

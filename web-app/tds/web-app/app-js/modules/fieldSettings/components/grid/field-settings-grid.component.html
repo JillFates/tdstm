@@ -1,12 +1,12 @@
 <ng-template #filterControl>
     <div class="col-xs-2 col-md-2 col-lg-2">
-        <select class="form-control" (change)="onFilter()" name="fieldType" id="type" [(ngModel)]="filter.fieldType">
+        <select class="form-control" (change)="onFilter()" name="fieldType" id="type" [(ngModel)]="gridState.filter.fieldType">
             <option *ngFor="let t of availableyFieldType" [ngValue]="t">{{t}}</option>
         </select>
     </div>
     <div class="col-xs-3 col-md-3 col-lg-2">
         <div class="form-group has-feedback" style="margin-bottom:0px;">
-            <input type="text" class="form-control" (keyup.enter)="onFilter()" name="search" id="search" [(ngModel)]="filter.search"
+            <input type="text" class="form-control searchFilterInput" (keyup.enter)="onFilter()" name="search" id="search" [(ngModel)]="gridState.filter.search"
                 placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}" value="">
             <span style="cursor:pointer;color:#000;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
                 aria-hidden="true"></span>
@@ -48,7 +48,14 @@
     </kendo-grid-column>
     <kendo-grid-column field="order" title="Order" [width]="100">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else orderTemp" let-dataItem>
-            <input type="number" min="0" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.order" name="order">
+            <kendo-numerictextbox
+                    *ngIf="dataItem.udf"
+                    [format]="'n'"
+                    [(value)]="dataItem.order"
+                    [min]="0"
+                    [autoCorrect]="true"
+                    style="width: 70px;"
+            ></kendo-numerictextbox>
             <div *ngIf="!dataItem.udf" style="width:45px" class="text-center">{{dataItem.order}}</div>
         </ng-template>
         <ng-template kendoGridCellTemplate class="text-center" let-dataItem #orderTemp>
@@ -64,7 +71,7 @@
     <kendo-grid-column field="shared" title="Shared" [width]="65" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else sharedTemp" let-dataItem>
             <div class="checkbox text-center">
-                <label><input type="checkbox" (change)="onShare(dataItem)" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="required"></label>
+                <label><input type="checkbox" (change)="onShare(dataItem)" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.shared" name="shared"></label>
             </div>
         </ng-template>
         <ng-template kendoGridCellTemplate class="text-center" let-dataItem #sharedTemp>
@@ -83,7 +90,7 @@
     <kendo-grid-column field="constraints.required" title="Required" [width]="75" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
             <div class="checkbox text-center">
-                <label><input type="checkbox"  [disabled]="!dataItem.udf" [(ngModel)]="dataItem.constraints.required" name="required"></label>
+                <label><input type="checkbox" (change)="onRequired(dataItem)" [disabled]="!dataItem.udf" [(ngModel)]="dataItem.constraints.required" name="required"></label>
             </div>
         </ng-template>
         <ng-template class="text-center" kendoGridCellTemplate let-dataItem #requiredTemp>
@@ -105,18 +112,10 @@
             <input *ngIf="(dataItem.udf) && (dataItem.control!='Select List' && dataItem.control!='YesNo')" type="text" class="form-control"
                 [(ngModel)]="dataItem.default" name="default">
             <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
-
-            <select *ngIf="dataItem.control=='Select List'" class="form-control" name="default" [(ngModel)]="dataItem.default">
+            <select *ngIf="dataItem.control=='Select List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default">
                 <option value="">Select...</option>
                 <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
             </select>
-
-            <select *ngIf="dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default">
-                <option value="">Select...</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-            </select>
-
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="control" title="Control" [width]="150">
@@ -124,7 +123,6 @@
             <div *ngIf="dataItem.udf">
                 <select class="form-control" style="float:left;width:100px" (change)="onControlChange(dataItem,selectList,minMax)" name="control"
                     id="control" [(ngModel)]="dataItem.control">
-                    <option value="">Select...</option>
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
                 <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>

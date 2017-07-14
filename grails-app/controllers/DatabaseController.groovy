@@ -7,6 +7,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -247,24 +248,33 @@ class DatabaseController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.AssetCreate)
+	@Transactional(readOnly = true)
 	def create() {
-		def databaseInstance = new Database(appOwner:'TDS')
+		Database databaseInstance = new Database()
+		Project project = securityService.userCurrentProject
+		databaseInstance.project = project
+
+		assetService.setCustomDefaultValues(databaseInstance)
+
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		Project project = securityService.userCurrentProject
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		//fieldImportance for Discovery by default
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField('Database')
-		def customs = assetEntityService.getCustomFieldsSettings("Database", true)
-		assetService.setCustomDefaultValues(databaseInstance, customs)
-		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-		 planStatusOptions:planStatusOptions?.value, projectId: project.id, project:project,
-		 environmentOptions:environmentOptions?.value, standardFieldSpecs: standardFieldSpecs, customs: customs]
+		def customFields = assetEntityService.getCustomFieldsSettings(project, databaseInstance.assetClass.toString(), true)
+
+		[	databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value,
+			moveBundleList:moveBundleList, planStatusOptions:planStatusOptions?.value,
+			projectId: project.id, project:project,
+			environmentOptions:environmentOptions?.value,
+			standardFieldSpecs: standardFieldSpecs,
+			customs: customFields
+		]
 	}
 
 	@HasPermission(Permission.AssetEdit)
+	@Transactional(readOnly = true)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -275,7 +285,7 @@ class DatabaseController implements ControllerMethods {
 			return
 		}
 
-		def model = assetEntityService.getDefaultModelForEdits('Database', project,databaseInstance, params)
+		Map model = assetEntityService.getDefaultModelForEdits('Database', project, databaseInstance, params)
 
 		model.databaseInstance = databaseInstance
 

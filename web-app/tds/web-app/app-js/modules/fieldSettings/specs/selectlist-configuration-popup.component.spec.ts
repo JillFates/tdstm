@@ -125,11 +125,11 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		comp.onToggle();
 		fixture.detectChanges();
 		comp.items = [
-			{deletable: true, value: 'Z'},
-			{deletable: true, value: 'P'},
-			{deletable: true, value: 'E'},
-			{deletable: true, value: 'A'},
-			{deletable: true, value: 'C'}
+			{ deletable: true, value: 'Z' },
+			{ deletable: true, value: 'P' },
+			{ deletable: true, value: 'E' },
+			{ deletable: true, value: 'A' },
+			{ deletable: true, value: 'C' }
 		];
 
 		let sortButton: DebugElement;

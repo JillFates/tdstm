@@ -66,14 +66,13 @@ class EmailDispatchService implements ServiceMethods {
 
 		trigger.jobDataMap.edId = emailDispatch.id
 
+		String username = emailDispatch.createdBy.userLogin?.username
+		if (!username) {
+			username = emailDispatch.toPerson.userLogin?.username
+		}
 		/* For later use when assuming the identity of this user during the
 		 execution of the Quartz Job. */
-		if (!trigger.jobDataMap.username) {
-			trigger.jobDataMap.username = securityService.currentUsername
-			if (! trigger.jobDataMap.username) {
-				// TODO TM-6428 - throw an exception here - need to test the that the UI handles the exception
-			}
-		}
+		trigger.jobDataMap.username = username
 
 		trigger.setJobName("EmailDispatchJob")
 		trigger.setJobGroup('tdstm-send-email')
@@ -153,13 +152,13 @@ class EmailDispatchService implements ServiceMethods {
 					activationURL : serverURL + "/auth/resetPassword/" + emailParams.token,
 					ttl: emailParams.expiredTime,
 					sysAdminEmail: emailParams.from,
-					username: emailParams.username]
+					username: ed.toPerson.userLogin?.username]
 			case "adminResetPassword":
 				return [
 					person: ed.toPerson.firstName,
 					activationURL : serverURL + "/auth/resetPassword/" + emailParams.token,
 					ttl: emailParams.expiredTime,
-					username: emailParams.username,
+					username: ed.toPerson.userLogin?.username,
 					sysAdminEmail: emailParams.sysAdminEmail]
 		}
 	}

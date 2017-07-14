@@ -14,7 +14,10 @@ class ControlTagLib {
 	static final String MISSING_OPTION_WARNING = 'INVALID'
 	static final int MAX_STRING_LENGTH = 255
 	static final String EMPTY_IMP_CRIT_FIELD_CSS_CLASS = " highField"
-
+	static final List TOOLTIP_DATA_PLACEMENT_VALUES = ["top", "bottom", "left", "right"]
+	static final String MAX_VALIDATION_MESSAGE = 'Value exceeds the maximum {max} characters.'
+	static final String EXACTLY_MIN_MAX_VALIDATION_MESSAGE = 'Value must be exactly {min} character(s).'
+	static final String BETWEEN_MIN_MAX_VALIDATION_MESSAGE = 'Value must be between {min} and {max} characters.'
 
 	/**
 	 * Used to render the LABEL used for an input field
@@ -53,9 +56,9 @@ class ControlTagLib {
 		// <label for="assetName" data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</label>
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
-		sb.append('" data-toggle="popover" data-trigger="hover" data-content="')
-		sb.append(fieldSpec.tip)
-		sb.append('">')
+		sb.append('"')
+		sb.append(tooltipAttrib(fieldSpec))
+		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
@@ -70,11 +73,24 @@ class ControlTagLib {
 	/**
 	 * Creates the cell with the value of a field for displaying in show views.
 	 */
-	def labelForShowField = {Map attrs ->
+	def labelForShowField = { Map attrs ->
+		Map fieldSpec = attrs.field ?: [:]
 		def fieldValue = attrs.value ?: ""
 		StringBuilder sb = new StringBuilder("\n")
-		sb.append("<td class='valueNW ${attrs.field.imp}'>")
+		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
+		sb.append("<span ")
+        // Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
+        // This parameter is optional to modify default tooltip positioning
+        // Also checks that the value is one of the valid data-placement element values
+		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
+		if (tooltipDataPlacement != null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
+					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+		}
+		sb.append(tooltipAttrib(fieldSpec, tooltipDataPlacement))
+		sb.append(" >")
 		sb.append(fieldValue)
+		sb.append("</span>")
 		sb.append("</td>")
 		out << sb.toString()
 	}
@@ -125,18 +141,27 @@ class ControlTagLib {
 		// println "attrs=${attrs.keySet()}"
 		// println "tabIndex = $tabIndex; tabOffset=$tabOffset; fieldSpec.order=${fieldSpec.order}"
 
+		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
+		// This parameter is optional to modify default tooltip positioning
+		// Also checks that the value is one of the valid data-placement element values
+		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
+		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
+					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+		}
+
 		switch (fieldSpec.control) {
 			case 'Select List':
-				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset, size)
+				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
 			case 'YesNo':
-				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset, size)
+				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
 			case 'String':
 			default:
-				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size)
+				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 		}
 	}
 
@@ -165,18 +190,20 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to (optional)
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the SELECT Component HTML
 	 */
-	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
+	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 		sb.append('>')
 
 		// Add a Select... option at top if the field is required
 		// <option value="" selected>Select...</option>
-		if (fieldSpec.constraints?.required) {
+		boolean isRequiredField = fieldSpec.constraints?.required
+		if (isRequiredField) {
 			sb.append(selectOption('', value, SELECT_REQUIRED_PROMPT))
 		} else {
 			// Add a blank option so users can unset a value
@@ -189,14 +216,17 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		if (! StringUtil.isBlank(value) && ! options.contains(value)) {
+		boolean isBlankValue = StringUtil.isBlank(value);
+		if (( ! isBlankValue && ! options.contains(value)) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			sb.append(selectOption(value, value, warning))
 		}
 
 		// Iterate over the fieldSpec option values to create each of the options
 		for (option in options) {
-			sb.append(selectOption(option, value))
+		    if( ! StringUtil.isBlank(option) ) {
+		        sb.append(selectOption(option, value))
+		    }
 		}
 
 		sb.append('</select>')
@@ -210,12 +240,13 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
+	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		'<input' +
 		attribute('type', 'text') +
-		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size) +
+		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) +
 		'/>'
 	}
 
@@ -224,14 +255,15 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size) {
+	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = []
 		List valid = ['Yes', 'No']
 
 		StringBuilder sb = new StringBuilder('<select')
-		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size))
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 		sb.append(' style="width: 50px;"')
 		sb.append('>')
 
@@ -250,7 +282,8 @@ class ControlTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		if ( ! valid.contains(value) ) {
+		boolean isBlankValue = StringUtil.isBlank(value);
+		if ( ! isBlankValue && ! valid.contains(value) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			options << [value, warning]
 		}
@@ -273,21 +306,22 @@ class ControlTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @param value - the value to set the control to (optional)
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the attributes generated in HTML format
 	 */
-	private String commonAttributes(Map fieldSpec, String value=null, String tabIndex=null, String tabOffset=null, Integer size) {
+	private String commonAttributes(Map fieldSpec, String value=null, String tabIndex=null, String tabOffset=null, Integer size, String tooltipDataPlacement=null ) {
 		idAttrib(fieldSpec) +
 		nameAttrib(fieldSpec) +
 		valueAttrib(fieldSpec, value) +
 		tabIndexAttrib(fieldSpec, tabIndex, tabOffset) +
 		classAttrib(fieldSpec) +
 		sizeAttrib(size) +
-		titleAttrib(fieldSpec) +
+		tooltipAttrib(fieldSpec, tooltipDataPlacement) +
 		constraintsAttrib(fieldSpec) +
 		dataLabelAttrib(fieldSpec)
 	}
 
-   /**
+	/**
 	 * Returns the HTML class attribute with the class for all controllers plus the
 	 * importance class if included in the field specification
 	 * @param field - the Field specification object
@@ -301,7 +335,73 @@ class ControlTagLib {
 		return attribute('class', c)
 	}
 
-   /**
+	/**
+	 * Returns the HTML5 require and min/max appropriately for the field specification control type.
+	 * Since minlength validation isn't supported as an standard on all browsers
+	 * @param fieldSpec - the Field specification object
+	 * @return The required attribute for controls if required otherwise blank
+	 * @example   ' required pattern=".{3,}" maxlength="12"'
+	 */
+	private String constraintsAttrib(Map fieldSpec) {
+		StringBuilder sb = new StringBuilder()
+
+		boolean isReq = fieldSpec?.constraints?.required
+		if (isReq) {
+			sb.append(' required')
+		}
+
+		if (fieldSpec?.control in ['', 'String']) {
+			Integer min = fieldSpec.constraints?.minSize
+			Integer max = fieldSpec.constraints?.maxSize
+            // println "min=$min, max=$max"
+			if ((min == null || min == 0) && isReq) {
+				min=1
+			}
+			// since minlength validation isn't supported as an standard on all browsers,
+			// we need to use pattern for min length TEXT INPUT constraint.
+			if (min != null && min > 0) {
+				sb.append(" pattern=\".{$min,}\"")
+			}
+
+			// Make sure max is set properly
+			if (max == null || max > MAX_STRING_LENGTH) {
+				max = MAX_STRING_LENGTH
+			}
+			sb.append(" maxlength=\"$max\"")
+
+			sb.append(validationMessagesAttrib(min, max))
+		}
+
+		sb.toString()
+	}
+
+	/**
+	 * Returns the HTML attributes to show specific validation error messages for min/max constraints.
+	 * @param min String min length
+	 * @param max String max length
+	 * @return Returns the HTML attributes to show specific validation error messages for min/max constraints.
+	 */
+	private String validationMessagesAttrib(Integer min, Integer max){
+		StringBuilder sb = new StringBuilder()
+		String validationMessage = new String()
+
+		if (min != null && min > 0) {
+			if (min == max) {
+				validationMessage = EXACTLY_MIN_MAX_VALIDATION_MESSAGE.replace('{min}', min.toString())
+			} else {
+				validationMessage = BETWEEN_MIN_MAX_VALIDATION_MESSAGE.replace('{min}', min.toString()).replace('{max}', max.toString())
+			}
+		} else { // This case potenrially will never happen since html input will never let you enter a value with more than configured max. but will leave here just in case.
+			validationMessage = MAX_VALIDATION_MESSAGE.replace('{max}', max.toString())
+		}
+
+		sb.append(attribute('oninvalid', 'setCustomValidity(\''+ validationMessage +'\')'))
+		sb.append(attribute('oninput', 'try{setCustomValidity(\'\')}catch(e){}'))
+
+		return sb.toString();
+	}
+
+	/**
 	 * Returns the HTML class attribute with the class for all controllers plus the
 	 * importance class if included in the field specification
 	 * @param field - the Field specification object
@@ -311,7 +411,7 @@ class ControlTagLib {
 		attribute('data-label', fieldSpec.field)
 	}
 
-   /**
+	/**
 	 * Returns the HTML id attribute based on the field specification
 	 * @param field - the Field specification object
 	 * @return The id attribute HTML for controls
@@ -327,41 +427,6 @@ class ControlTagLib {
 	 */
 	private String nameAttrib(Map fieldSpec) {
 		return attribute('name', fieldSpec?.field)
-	}
-
-	/**
-	 * Returns the HTML5 require and min/max appropriately for the field specification control type
-	 * @param fieldSpec - the Field specification object
-	 * @return The required attribute for controls if required otherwise blank
-	 * @example   ' required minlength="1" maxlength="12"'
-	 */
-	private String constraintsAttrib(Map fieldSpec) {
-		StringBuilder sb = new StringBuilder()
-
-		boolean isReq = fieldSpec?.constraints?.required
-		if (isReq) {
-			sb.append(' required')
-		}
-
-		if (fieldSpec?.control in ['', 'String']) {
-			Integer min = fieldSpec.constraints?.minSize
-			Integer max = fieldSpec.constraints?.maxSize
-			// println "min=$min, max=$max"
-			if ((min == null || min == 0) && isReq) {
-				min=1
-			}
-			if (min != null && min > 0) {
-				sb.append(" minlength=\"$min\"")
-			}
-
-			// Make sure max is set properly
-			if (max == null || max > MAX_STRING_LENGTH) {
-				max = MAX_STRING_LENGTH
-			}
-			sb.append(" maxlength=\"$max\"")
-		}
-
-		sb.toString()
 	}
 
 	/**
@@ -412,6 +477,25 @@ class ControlTagLib {
 	 */
 	private String titleAttrib(Map field) {
 		return attribute('title', field?.tip, field?.title)
+	}
+
+	/**
+	 * Returns the HTML tooltip attributes based on the field specification
+	 * @param field - the Field specification object
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
+	 * @return The tooltip attributes HTML for controls
+	 */
+	private String tooltipAttrib(Map field, String tooltipDataPlacement=null ) {
+
+		StringBuilder attrib = new StringBuilder('')
+		attrib.append( attribute('data-toggle', 'popover') )
+		attrib.append( attribute('data-trigger', 'hover') )
+		if (tooltipDataPlacement !=null) {
+			attrib.append( attribute('data-placement', tooltipDataPlacement) )
+		}
+		attrib.append( attribute('data-content', field?.tip, field?.label) )
+
+		return attrib.toString()
 	}
 
 	 /**

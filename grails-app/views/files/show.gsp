@@ -13,9 +13,9 @@
 				<tbody>
 				<tr class="prop">
 					<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${filesInstance?.assetName}"/>
-					<td colspan="3" style="max-width: 400px; font-weight:bold;">${filesInstance.assetName}</td>
+					<td colspan="3" style="	max-width: 400px; font-weight:bold;"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetName.tip}">${filesInstance.assetName}</span></td>
 					<tds:inputLabel field="${standardFieldSpecs.description}" value="${filesInstance?.description}"/>
-					<td colspan="3" style="max-width: 400px;">${filesInstance.description}</td>
+					<td colspan="3" style="max-width: 400px;"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetName.tip}">${filesInstance.description}</span></td>
 				</tr>
 				<tr class="prop">
 					<tds:showLabelAndField field="${standardFieldSpecs.fileFormat}" value="${filesInstance.fileFormat}"/>
@@ -24,16 +24,24 @@
 					<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${filesInstance.supportType}"/>
 
 					<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
-					<td class="valueNW">${filesInstance?.moveBundle} : ${dependencyBundleNumber}</td>
+					<td class="valueNW">
+						<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.moveBundle.tip}">
+							${filesInstance?.moveBundle} : ${dependencyBundleNumber}
+						</span>
+					</td>
 				</tr>
 				<tr class="prop">
 					<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
-					<td class="valueNW">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}</td>
+					<td class="valueNW">
+						<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">
+							${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}
+						</span>
+					</td>
 
 					<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>
 
 					<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${filesInstance.environment}"/>
-					<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}"/>
+					<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}" tooltipDataPlacement="bottom"/>
 				</tr>
 				<tr>
 					<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${filesInstance.rateOfChange}"/>
@@ -44,7 +52,7 @@
 					<td></td>
 					<td></td>
 
-					<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}"/>
+					<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
 				</tr>
 				<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
 				</tbody>

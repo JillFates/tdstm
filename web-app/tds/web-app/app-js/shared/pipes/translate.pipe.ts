@@ -33,12 +33,23 @@ export class TranslatePipe implements PipeTransform {
 
 	}
 
-	transform(value: string): string {
+	/**
+	 * @param value key of translation text.
+	 * @param args param strings to be replaced on translated text.
+	 * @returns {string} Returns localized message from dictionary, if not founded returns key.
+	 */
+	transform(value: string, args: any[]): string {
 
 		let translatedValue: string;
 
 		translatedValue = this.dictionary[value] ? this.dictionary[value] : value;
 
+		if (args && translatedValue !== value) {
+			for (let i = 0; i < args.length; i++) {
+				let arg = args[i];
+				translatedValue = translatedValue.replace('{param' + (i + 1) + '}', arg );
+			}
+		}
 		return translatedValue;
 	}
 }

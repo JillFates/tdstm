@@ -35,6 +35,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
@@ -56,6 +57,7 @@ class ReportsController implements ControllerMethods {
 
 	AssetEntityService assetEntityService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
 	MoveEventService moveEventService
@@ -865,25 +867,25 @@ class ReportsController implements ControllerMethods {
 
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
-			def configMap = assetEntityService.getConfig('Application',validationType)
 			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
 
-			def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
 			// TODO: we'd like to flush the session.
 			// GormUtil.flushAndClearSession(idx)
 			appList.add([app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
 				          redirectTo: params.redirectTo, assetComment: assetComment, assetCommentList: assetCommentList,
 				          appMoveEvent: appMoveEvent, moveEventList: moveEventList, appMoveEvent: appMoveEventlist,
 				          dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
-				          project: project, prefValue: prefValue, config: configMap.config, customs: configMap.customs,
-				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors,
-				          highlightMap: highlightMap])
+				          project: project, prefValue: prefValue,
+				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors])
 		}
 
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
+		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)
+
 		[applicationList: appList, moveBundle: currentBundle ?: 'Planning Bundles', sme: currentSme ?: 'All',
-		 appOwner: applicationOwner ?: 'All', project: project]
+		 appOwner: applicationOwner ?: 'All', project: project, standardFieldSpecs: standardFieldSpecs, customs: customFields]
 	}
 
 	def generateApplicationConflicts() {

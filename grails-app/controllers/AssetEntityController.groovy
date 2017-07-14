@@ -31,6 +31,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import net.transitionmanager.controller.ControllerMethods
@@ -1936,6 +1937,7 @@ class AssetEntityController implements ControllerMethods {
 	 * to auditCreate view
 	 */
 	@HasPermission(Permission.AssetCreate)
+	@Transactional(readOnly = true)
 	def create() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1965,6 +1967,7 @@ class AssetEntityController implements ControllerMethods {
 	 * to auditEdit view
 	 */
 	@HasPermission(Permission.AssetEdit)
+	@Transactional(readOnly = true)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -2192,6 +2195,7 @@ class AssetEntityController implements ControllerMethods {
 			def moveBundleList = MoveBundle.findAllByProject(project, [sort: 'name'])
 			def companiesList = partyRelationshipService.getCompaniesList()
 			def role = filters?.role ?: params.role ?: ''
+			def status = params.status ?: filters?.status ?: ''
 			return [
 					timeToUpdate: timeToRefresh ?: 60,
 					servers: entities.servers,
@@ -2214,7 +2218,7 @@ class AssetEntityController implements ControllerMethods {
 					modelPref: modelPref,
 			        assetType: filters?.assetType ?:'',
 					dueDate: filters?.dueDate ?:'',
-					status: filters?.status ?:'',
+					status: status,
 			        assignedTo: filters?.assignedTo ?:'',
 					category: filters?.category ?:'',
 					moveEvent: moveEvent,
