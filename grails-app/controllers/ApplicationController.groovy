@@ -104,6 +104,8 @@ class ApplicationController implements ControllerMethods {
 		//def validUnkownQuestioned = "'$AssetDependencyStatus.VALIDATED'," + unknownQuestioned
 		String justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
 		Map<String, String> customizeQuery = assetEntityService.getAppCustomQuery(appPref)
+
+		def queryParams = [:]
 		def query = new StringBuilder('''
 			SELECT * FROM (SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency AS latency,
 			                      if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
@@ -133,7 +135,8 @@ class ApplicationController implements ControllerMethods {
 				if (planMethodology == Application.UNKNOWN) {
 					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
 				}else{
-					query.append(" ae.`${customField}` = '${params.planMethodology}' ")
+					query.append(" ae.`${customField}` = :planMethodology ")
+					queryParams['planMethodology'] = params.planMethodology
 				}
 			}
 		}
@@ -183,7 +186,6 @@ class ApplicationController implements ControllerMethods {
 
 		// Handle the filtering by each column's text field
 
-		def queryParams = [:]
 		def whereConditions = []
 		filterParams.each { key, val ->
 			if (val?.trim()) {
