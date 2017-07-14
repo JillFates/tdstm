@@ -123,7 +123,6 @@
             <div *ngIf="dataItem.udf">
                 <select class="form-control" style="float:left;width:100px" (change)="onControlChange(dataItem,selectList,minMax)" name="control"
                     id="control" [(ngModel)]="dataItem.control">
-                    <option value="">Select...</option>
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
                 <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
