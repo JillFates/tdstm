@@ -1,12 +1,18 @@
 import groovy.json.JsonSlurper
 import com.xlson.groovycsv.CsvParser
+import com.tdssrc.grails.StringUtil
 
 /**
  * @author John Martin
  * Ticket TM-6619
+ * version 3
+ *   - fixed issue with all customs being included
+ *   - Tips were not always being added
+ *   - Display value now correctly set
+ *   - Custom that were marked hidden now correctly hidden
  */
 databaseChangeLog = {
-    changeSet(author: "jmartin", id: "20170712 TM-6619 Create Field Settings JSON specs") {
+    changeSet(author: "jmartin", id: "20170712 TM-6619-v3 Create Field Settings JSON specs") {
         comment('This will aggregate values from various places and create JSON specs for every project')
 
         grailsChange {
@@ -37,6 +43,79 @@ def loadCsvData() {
 }
 
 /**
+ * This will return a map by asset class where each will have a map of the fields
+ */
+Map getDomainFieldsAsMap() {
+    Map fields = [:]
+    String domain = ''
+    String mapKey = ''
+    for (line in loadCsvData()) {
+        if (domain != line.domain) {
+            domain = line.domain
+            mapKey = domain.toUpperCase()
+            fields.put(mapKey, [:])
+        }
+        if (line.order == '-1') {
+            // Skip properties marked to be removed
+            continue
+        }
+        if (line.field ==~ /custom(\d{1,2})/ ) {
+            // We'll handle the customs separately
+            continue
+        }
+
+        fields[mapKey].put(line.field, true)
+    }
+println "getDomainFieldsAsMap:  $fields"
+    return fields
+}
+
+/**
+ * Used to load the tooltips into a Map for any field that there is a tooltip
+ */
+Map getTooltips(sql, projectId, assetClass) {
+    Map tips = [:]
+    sql.eachRow ('select * from key_value where project_id=:pid and category=:ac', [pid:projectId, ac:assetClass] )
+    { tip ->
+        if (tip.value != null && tip.value != '') {
+            tips.put(tip.fi_key, tip.value)
+        }
+    }
+    return tips
+}
+
+/**
+ * Used to read through the FieldImportanct to parse out the value set on the BundleReady set
+ */
+Map getFieldImportance(sql, projectId, assetClass) {
+    Map params = [pid:projectId, et:assetClass]
+    // projectId=11322
+    String query = "select config from field_importance where project_id=$projectId and entity_type='$assetClass'"
+    def result = sql.firstRow(query)
+    String jsonText = result ? result.config : ''
+    //println "  getFieldImportance($projectId, $assetClass) $jsonText"
+    Map fields = [:]
+    if (jsonText) {
+        def slurper = new groovy.json.JsonSlurper()
+        def jsonMap = slurper.parseText(jsonText)
+        for (map in jsonMap) {
+            // Grab the value for the BundleReady phase of the the project
+            String imp = ''
+            if ((map instanceof java.util.Map.Entry) && (map.value instanceof Map) && map.value.containsKey('phase') ) {
+                imp = map.value.phase?.B
+            }
+            if (imp != '') {
+                fields.put(map.key, imp)
+            }
+        }
+    } else {
+        println "   No FieldImportance found for assetClass=$assetClass"
+    }
+
+    return fields
+}
+
+/**
  * This method will loop over every project and create field Specifications for each asset class
  * aggregating data from Project.custom*, FieldImportance and KeyValue domains to build a
  * concise JSON object and insert them into the Setting domain
@@ -46,8 +125,11 @@ def loadCsvData() {
 void createFieldSpecsForAllProjects(sql) {
     println "Beginning the Field Settings Migration Script"
 
-    List projects = sql.rows('select * from project order by project_id')
-    //List projects = sql.rows('select * from project where project_id=11500 order by project_id')
+    String projectFilter = ''
+    // projectFilter = 'where project_id=3489'
+    String query = "select * from project ${projectFilter} order by project_id"
+    // println "*** query=$query"
+    List projects = sql.rows(query)
 
     println "${projects.size()} Projects to be migrated"
     int counter = 0
@@ -61,50 +143,7 @@ void createFieldSpecsForAllProjects(sql) {
     println "Purging any pre-existing Asset Field Specs from Setting"
     sql.execute(DELETE_SQL, SETTING_TYPE)
 
-    /**
-     * Used to load the tooltips into a Map for any field that there is a tooltip
-     */
-    def getTooltips = { projectId, assetClass ->
-        Map tips = [:]
-        sql.eachRow ('select * from key_value where project_id=:pid and category=:ac', [pid:projectId, ac:assetClass] )
-        { tip ->
-            if (tip.value != null && tip.value != '') {
-                tips.put(tip.fi_key, tip.value)
-            }
-        }
-        return tips
-    }
-
-    /**
-     * Used to read through the FieldImportanct to parse out the value set on the BundleReady set
-     */
-    def getFieldImportance = { projectId, assetClass ->
-        Map params = [pid:projectId, et:assetClass]
-        // projectId=11322
-        String query = "select config from field_importance where project_id=$projectId and entity_type='$assetClass'"
-        def result = sql.firstRow(query)
-        String jsonText = result ? result.config : ''
-        //println "  getFieldImportance($projectId, $assetClass) $jsonText"
-        Map fields = [:]
-        if (jsonText) {
-            def slurper = new groovy.json.JsonSlurper()
-            def jsonMap = slurper.parseText(jsonText)
-            for (map in jsonMap) {
-                // Grab the value for the BundleReady phase of the the project
-                String imp = ''
-                if ((map instanceof java.util.Map.Entry) && (map.value instanceof Map) && map.value.containsKey('phase') ) {
-                    imp = map.value.phase?.B
-                }
-                if (imp != '') {
-                    fields.put(map.key, imp)
-                }
-            }
-        } else {
-            println "   No FieldImportance found for assetClass=$assetClass"
-        }
-
-        return fields
-    }
+    Map assetFields = getDomainFieldsAsMap()
 
     for (project in projects) {
         counter++
@@ -112,12 +151,12 @@ void createFieldSpecsForAllProjects(sql) {
 
         Map tips = [:]
         [APPLICATION:'tt_app', DEVICE:'tt_asset', DATABASE:'tt_database', STORAGE:'tt_storage'].each { key, assetClass ->
-            tips.put(key, getTooltips(project.project_id, assetClass))
+            tips.put(key, getTooltips(sql, project.project_id, assetClass))
         }
 
         Map imps = [:]
         [APPLICATION:'Application', DEVICE:'AssetEntity', DATABASE:'Database', STORAGE:'Files'].each { key, assetClass ->
-            imps.put(key, getFieldImportance(project.project_id, assetClass))
+            imps.put(key, getFieldImportance(sql, project.project_id, assetClass))
         }
 
         String domain=''
@@ -144,7 +183,9 @@ void createFieldSpecsForAllProjects(sql) {
             }
 
             String importance = (imps[mapKey][line.field] ?: UNIMPORTANT)
-            if (importance == HIDDEN) importance = UNIMPORTANT
+            if (importance == HIDDEN) {
+                importance = UNIMPORTANT
+            }
 
             Map fieldSpec = [
                 field: line.field,
@@ -165,7 +206,6 @@ void createFieldSpecsForAllProjects(sql) {
             domainFieldsMap[mapKey].fields.add(fieldSpec)
         }
 
-        int showMax = project.custom_fields_shown
         // Now go through the custom fields for each of the Asset Classes and add appropriately
         for (domainMap in domainFieldsMap) {
             String assetClass = domainMap.key
@@ -173,29 +213,55 @@ void createFieldSpecsForAllProjects(sql) {
 
             println "   Configuring Custom Fields for $assetClass"
 
-            (1..96).each { num ->
-                boolean addIt=true
+            Map usedNames = [:]     // Will be used to track the names used to prevent duplicates
+
+            for (num in (1..96)) {
                 boolean show=true
                 String fieldName = 'custom' + num
                 String importance
 
-                if (num > showMax) {
-                    // Fields beyond those shown will be included but hidden if the label doesn't match the fieldName
-                    if (! project[fieldName] || project[fieldName].equalsIgnoreCase(fieldName)) {
-                        addIt = false
+                String currentLabel = project[fieldName]
+                if (StringUtil.isBlank(currentLabel)) {
+                    currentLabel = fieldName
+                }
+
+                // Check if the label is a standard field
+                if (assetFields[assetClass][currentLabel]) {
+                    println "   WARNING - $fieldName references standard field $currentLabel, switched to $fieldName"
+                    currentLabel = fieldName
+                }
+
+                // Make sure the label isn't a dup
+                if (usedNames.containsKey(currentLabel)) {
+                    println "   WARNING - $fieldName has duplicated value $currentLabel"
+                    continue
+                }
+
+                // Save that the label has been used
+                usedNames.put(currentLabel, true)
+
+                if (num > project.custom_fields_shown) {
+                    // Hidden Custom Fields
+                    if (currentLabel.equalsIgnoreCase(fieldName)) {
+                        // If the label was not changed then skip it
+                        continue
                     }
                     show = false
                     importance = UNIMPORTANT
                 } else {
+                    // Shown Custom Fields
                     if (imps[assetClass][fieldName]) {
                         importance = imps[assetClass][fieldName]
                     } else {
                         importance = UNIMPORTANT
-                        println "   Unable to find imps for assetClass=$assetClass, fieldName=$fieldName"
+                        // println "   Unable to find imps for assetClass=$assetClass, fieldName=$fieldName"
                     }
                 }
 
-                if (importance == HIDDEN) importance = UNIMPORTANT
+                if (importance == HIDDEN) {
+                    show = false
+                    importance = UNIMPORTANT
+                }
 
                 Map fieldSpec = [
                     field: fieldName,
@@ -204,7 +270,7 @@ void createFieldSpecsForAllProjects(sql) {
                     udf: 1,
                     default: '',
                     shared: 0,
-                    show: (show == 'true' ? 1 : 0 ),
+                    show: (show ? 1 : 0 ),
                     control: 'String',
                     order: 100 + num,
                     imp: importance,
@@ -219,8 +285,10 @@ void createFieldSpecsForAllProjects(sql) {
             }
 
             // Now inject the data into the projects' setting table for each class
-            final String INSERT_SQL = '''insert into setting (project_id, type, setting_key, json, date_created, version)
-                values (:pid, :type, :key, :json, now(), :version)'''
+            final String INSERT_SQL = '''
+                insert into setting (project_id, type, setting_key, json, date_created, version)
+                values (:pid, :type, :key, :json, now(), :version)
+            '''
 
             def builder = new groovy.json.JsonBuilder(domainFieldsMap[assetClass])
             Map params = [
