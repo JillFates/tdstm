@@ -305,56 +305,19 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_td">
 								<g:link controller="application" action="list"
-									params="[filter:'application', planMethodology:counter.key]" class="links">
-								${counter.key}
-								</g:link>
-							</td><td>
-								<g:link controller="application" action="list"
 										params="[filter:'application', planMethodology:counter.key]" class="links">
 									${counter.value}
+								</g:link>
+							</td>
+							<td>
+								<g:link controller="application" action="list"
+										params="[filter:'application', planMethodology:counter.key]" class="links">
+									${counter.key}
 								</g:link>
 							</td>
 						</tr>
 					</g:each>
 					</table>
-
-		<%--
-					<br />
-					<h4>
-						<b>Application Latency Evaluations</b>
-					</h4>
-					<table class="dashboard_stat_table">
-						<tr>
-							<td class="dashboard_stat_td"><g:link
-									controller="application" action="list"
-									params="[filter:'application', latencys:'N']" class="links">
-									${likelyLatency}
-								</g:link></td>
-							<td><g:link controller="application" action="list"
-									params="[filter:'application', latencys:'N']" class="links">Likely</g:link></td>
-						</tr>
-						<tr>
-							<td class="dashboard_stat_td"><g:link
-									controller="application" action="list"
-									params="[filter:'application',latencys:'unknown']"
-									class="links">
-									${unknownLatency}
-								</g:link></td>
-							<td><g:link controller="application" action="list"
-									params="[filter:'application',latencys:'unknown']"
-									class="links">Unknown</g:link></td>
-						</tr>
-						<tr>
-							<td class="dashboard_stat_td"><g:link
-									controller="application" action="list"
-									params="[filter:'application',latencys:'Y']" class="links">
-									${unlikelyLatency }
-								</g:link></td>
-							<td><g:link controller="application" action="list"
-									params="[filter:'application',latencys:'Y']" class="links">UnLikely</g:link></td>
-						</tr>
-					</table>
-		--%>
 				</div>
 
 	<%-- Execution Phase Section --%>
