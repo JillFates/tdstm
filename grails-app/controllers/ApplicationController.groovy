@@ -24,6 +24,7 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
+import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -128,15 +129,18 @@ class ApplicationController implements ControllerMethods {
 		if (params.planMethodology) {
 			Project project = securityService.userCurrentProject
 			String customField = project.planMethodology
+
 			if(customField){
 				query.append(" AND ")
 
-				def planMethodology = params.planMethodology
+				// Unescaping the paramater since it can include HTML encoded characters (like \' == &#39; )
+				def planMethodology = StringEscapeUtils.unescapeHtml(params.planMethodology)
+
 				if (planMethodology == Application.UNKNOWN) {
 					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
 				}else{
 					query.append(" ae.`${customField}` = :planMethodology ")
-					queryParams['planMethodology'] = params.planMethodology
+					queryParams['planMethodology'] = planMethodology
 				}
 			}
 		}
