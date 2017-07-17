@@ -15,10 +15,25 @@ class CustomDomainService implements ServiceMethods {
 
     public static final int CUSTOM_USER_FIELD = 1
     public static final int STANDARD_FIELD = 0
+    public static final int ALL_FIELDS = 2
 
     SecurityService securityService
     SettingService settingService
     def jdbcTemplate
+
+    /**
+     * This method retrieves the specs for the standard fields.
+     * It's added for consistency with return format of customFieldSpecs
+     * and allFieldSpecs.
+     *
+     * @param project
+     * @param domain
+     * @param showOnly
+     * @return
+     */
+    Map standardFieldSpecs(Project project, String domain, boolean showOnly = false) {
+        return getFilteredFieldSpecs(project, domain, STANDARD_FIELD, showOnly)
+    }
 
     /**
      * Retrieve custom field specs
@@ -300,6 +315,64 @@ class CustomDomainService implements ServiceMethods {
     private void reportFieldNameViolation(String fieldName) {
         securityService.reportViolation("Attempted to access distinct field values for undefined field name: [${fieldName}]", securityService.currentUsername)
         throw new InvalidRequestException("Invalid field name (${fieldName}) specified")
+    }
+
+
+    /**
+     * This method retrieves the field specs given a domain and an option of which
+     * fields are needed (standard, custom or all).
+     * It also allows to filter only a particular subset of the keys, for cases
+     * where the whole specs aren't required.
+     *
+     * @param domain - asset domain
+     * @param option - which fields are needed.
+     *             @see ALL_FIELDS
+     *             @see STANDARD_FIELD
+     *             @see CUSTOM_USER_FIELD
+     * @param values - a list of string with the name of the fields to be included in the result.
+     *
+     * @return a list with the specs.
+     */
+    List fieldSpecs(String domain, int option = ALL_FIELDS, List values = null) {
+        Project project = securityService.loadUserCurrentProject()
+        // This list will contain the resulting specs.
+        List fieldSpecs = []
+        // Checks that an actual domain is given.
+        if (domain) {
+            // Retrieves the specs for all available fields for the domain.
+            Map fields = null
+
+            switch (option) {
+                case ALL_FIELDS:
+                    fields = allFieldSpecs(domain)
+                    break
+                case STANDARD_FIELD:
+                    fields = standardFieldSpecs(project, domain)
+                    break
+                case CUSTOM_USER_FIELD:
+                    fields = customFieldSpecs(project, domain)
+                    break
+
+            }
+
+            domain = domain.toUpperCase()
+
+            // Validates that field specs were found and with the right format.
+            if (fields && fields.containsKey(domain)) {
+                // Strips the actual list of specs
+                fieldSpecs = fields[domain].fields
+                // Checks if we need to filter particular values.
+                if (values && values.size()) {
+                    // Creates a list with only the requested fields for each field.
+                    fieldSpecs = fieldSpecs.collect { spec ->
+                        spec.subMap(values).findAll {
+                            it.value
+                        }
+                    }
+                }
+            }
+        }
+        return fieldSpecs
     }
 
 }

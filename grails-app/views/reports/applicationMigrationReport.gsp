@@ -44,7 +44,7 @@
 					</tr>
 					<tr>
 						<td><label for="outageWindow">Outage window:</label></td>
-						<td><g:select from="${appAttributes}" id="outageWindow" name="outageWindow" optionKey="attributeCode" optionValue="frontendLabel" 
+						<td><g:select from="${appAttributes}" id="outageWindow" name="outageWindow" optionKey="field" optionValue="label"
 							value="drRtoDesc" noSelection="['':'Please Select']"/></td>
 					</tr>
 					<tr class="buttonR">

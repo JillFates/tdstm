@@ -6,6 +6,7 @@ import com.tdssrc.grails.StringUtil
 class AssetService {
 
     def customDomainService
+    def securityService
 
     /**
      * Used to set default values for custom fields on the given asset

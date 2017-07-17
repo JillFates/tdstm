@@ -15,17 +15,6 @@
 <body>
 	<tds:subHeader title="Project Field Settings" crumbs="['Project', 'Field Settings']"/>
 	<div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
-		<div style="margin-left:20px;">
-			<h2>Custom Fields Shown in Selectors:
-				<g:if test="${hasProjectFieldSettingsEditPermission}">
-					<g:select ng-model="customShown" name="customFieldSelect" from="${Project.constraints.customFieldsShown.inList}"
-							 value="customShown" ng-change="updateCustomFieldsShown();" />
-				</g:if>
-				<g:else>
-					<span ng-bind="customShown"></span>
-				</g:else>
-			</h2>
-		</div>
 		<div>
 			<div class="legend" >
 				<h1 class="assetImage" ng-click="toggleLegend()">Legend
@@ -59,7 +48,6 @@
 
 			</div>
 			<input type="hidden" id="customfieldShown" name="customfieldShown" value="${Project.CUSTOM_FIELD_COUNT}" />
-			<input type="hidden" id="projectCustomShown" name="projectCustomShown" value="${project.customFieldsShown}" />
 		</div>
 	</div>
 	<script type="text/javascript">

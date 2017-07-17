@@ -39,7 +39,6 @@ class Project extends PartyGroup {
 	String projectType = 'Standard'
 	Integer lastAssetId
 	Integer runbookOn = 1 // Flag that indicates that the project should use the runbook mode for various screens
-	Integer customFieldsShown = 8
 	String depConsoleCriteria
 	MoveBundle defaultBundle
 	Timezone timezone
@@ -148,7 +147,6 @@ class Project extends PartyGroup {
 	static hasMany = [dataTransferBatch: DataTransferBatch]
 
 	static constraints = {
-		// customFieldsShown inList: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96]
 		defaultBundle nullable: true
 		client nullable: false
 		depConsoleCriteria nullable: true
@@ -173,7 +171,6 @@ class Project extends PartyGroup {
 		Map nullableTrue = Collections.singletonMap('nullable', true)
 		(1..96).each { "custom$it"(nullableTrue) }
 
-		customFieldsShown inList: [0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96]
 		lastAssetId nullable: true
 		runbookOn nullable: true
 		depConsoleCriteria nullable: true
