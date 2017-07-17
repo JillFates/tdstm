@@ -38,6 +38,7 @@ class WorkbookUtil {
 
 	/**
 	 * Adds a cell to a XSSFWorkbook
+	 * //TODO: oluna - should we deprecate this and use a wrapper? @see SheetWrapper.groovy
 	 * @param sheet
 	 * @param columnIdx
 	 * @param rowIdx
@@ -56,14 +57,7 @@ class WorkbookUtil {
 		}
 		if (type != null) {
 			cell.setCellType(type)
-			CellStyle style = sheet.workbook.createCellStyle() // TODO <SL> Use createCellStyle()
-			if (type == Cell.CELL_TYPE_NUMERIC) { // This resolves to a Numeric no decimal spaces Value
-				String binFormat = BuiltinFormats.getBuiltinFormat(1) //this is "0" mask format
-				def df = sheet.workbook.createDataFormat().getFormat(binFormat)
-				style.setDataFormat(df)
-			} else if (type == Cell.CELL_TYPE_STRING) {
-				style.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
-			}
+			CellStyle style = createCellStyle(sheet, type)
 			cell.setCellStyle(style)
 		}
 		setCellValue(cell, value)
@@ -572,48 +566,5 @@ class WorkbookUtil {
 			cellIndex++
 		}
 		return headers
-	}
-
-	static class SheetWrapper {
-		Sheet sheet
-		Map<Object, CellStyle> styleMap = [:]
-
-		SheetWrapper(Sheet sheet){
-			this.sheet = sheet
-		}
-
-
-		void addCell(int columnIdx, int rowIdx, Object value, Integer type = null) {
-			def row = sheet.getRow(rowIdx)
-			if (!row) {
-				row = sheet.createRow(rowIdx)
-			}
-			Cell cell = row.getCell(columnIdx)
-			if (!cell) {
-				cell = row.createCell(columnIdx)
-			}
-			if (type != null) {
-				cell.setCellType(type)
-
-				CellStyle style = styleMap[type]
-
-				if( ! style) {
-					style = sheet.workbook.createCellStyle() // TODO <SL> Use createCellStyle()
-					if (type == Cell.CELL_TYPE_NUMERIC) { // This resolves to a Numeric no decimal spaces Value
-						String binFormat = BuiltinFormats.getBuiltinFormat(1) //this is "0" mask format
-						def df = sheet.workbook.createDataFormat().getFormat(binFormat)
-						style.setDataFormat(df)
-					} else if (type == Cell.CELL_TYPE_STRING) {
-						style.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
-					}
-
-					styleMap[type] = style
-				}
-
-				cell.setCellStyle(style)
-
-			}
-			setCellValue(cell, value)
-		}
 	}
 }
