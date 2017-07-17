@@ -34,7 +34,7 @@ describe('SelectListConfigurationPopupComponent:', () => {
 			values: []
 		},
 		show: true,
-		control: 'Select List'
+		control: 'List'
 	};
 
 	let spy: jasmine.Spy;

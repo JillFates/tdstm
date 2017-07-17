@@ -65,7 +65,11 @@ export class FieldSettingsListComponent implements OnInit {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
 				this.domains.forEach(domain => {
-					domain.fields.filter(x => x['isNew']).forEach(x => delete x['isNew']);
+					domain.fields.filter(x => x['isNew'])
+						.forEach(x => {
+							delete x['isNew'];
+							delete x['count'];
+						});
 				});
 				this.fieldService.saveFieldSettings(this.domains)
 					.subscribe((res: any) => {
@@ -78,6 +82,7 @@ export class FieldSettingsListComponent implements OnInit {
 						}
 						this.refresh();
 						callback();
+
 					});
 			} else {
 				this.selectedTab = invalid[0].domain;
@@ -127,7 +132,13 @@ export class FieldSettingsListComponent implements OnInit {
 
 	protected refresh(): void {
 		this.fieldService.getFieldSettingsByDomain().subscribe(
-			(result) => { this.domains = result; },
+			(result) => {
+				this.domains = result;
+				this.dataSignature = JSON.stringify(this.domains);
+				setTimeout(() => {
+					this.grids.forEach(grid => grid.applyFilter());
+				});
+			},
 			(err) => console.log(err));
 	}
 
@@ -139,7 +150,7 @@ export class FieldSettingsListComponent implements OnInit {
 			item.order === null || !ValidationUtils.isValidNumber(item.order) || item.order < 0
 		);
 
-		return domain.fields.filter(item => !item.label || !item.field).length === 0
+		return domain.fields.filter(item => !item.label.trim() || !item.field).length === 0
 			// Validates "Field Labels" should be unique by domain
 			&& values.filter((l, i) => values.indexOf(l) !== i).length === 0
 			&& invalidOrderFields.length === 0;

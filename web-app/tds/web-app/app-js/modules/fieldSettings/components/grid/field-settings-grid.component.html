@@ -48,14 +48,7 @@
     </kendo-grid-column>
     <kendo-grid-column field="order" title="Order" [width]="100">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else orderTemp" let-dataItem>
-            <kendo-numerictextbox
-                    *ngIf="dataItem.udf"
-                    [format]="'n'"
-                    [(value)]="dataItem.order"
-                    [min]="0"
-                    [autoCorrect]="true"
-                    style="width: 70px;"
-            ></kendo-numerictextbox>
+            <kendo-numerictextbox *ngIf="dataItem.udf" [format]="'n'" [(value)]="dataItem.order" [min]="0" [autoCorrect]="true" style="width: 70px;"></kendo-numerictextbox>
             <div *ngIf="!dataItem.udf" style="width:45px" class="text-center">{{dataItem.order}}</div>
         </ng-template>
         <ng-template kendoGridCellTemplate class="text-center" let-dataItem #orderTemp>
@@ -64,7 +57,8 @@
     </kendo-grid-column>
     <kendo-grid-column field="label" title="Label" [width]="150">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="text" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label" id="{{dataItem.field}}" name="{{dataItem.field}}">
+            <input type="text" [ngClass]="{'has-error': hasError(dataItem.label)}" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label"
+                id="{{dataItem.field}}" name="{{dataItem.field}}">
             <span *ngIf="!dataItem.udf">{{dataItem.label}}</span>
         </ng-template>
     </kendo-grid-column>
@@ -109,10 +103,10 @@
     </kendo-grid-column>
     <kendo-grid-column field="default" title="Default Value">
         <ng-template kendoGridCellTemplate let-dataItem *ngIf="isEditing">
-            <input *ngIf="(dataItem.udf) && (dataItem.control!='Select List' && dataItem.control!='YesNo')" type="text" class="form-control"
+            <input *ngIf="(dataItem.udf) && (dataItem.control!='List' && dataItem.control!='YesNo')" type="text" class="form-control"
                 [(ngModel)]="dataItem.default" name="default">
             <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
-            <select *ngIf="dataItem.control=='Select List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default">
+            <select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default">
                 <option value="">Select...</option>
                 <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
             </select>
@@ -121,8 +115,8 @@
     <kendo-grid-column field="control" title="Control" [width]="150">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else controlTemp" let-dataItem>
             <div *ngIf="dataItem.udf">
-                <select class="form-control" style="float:left;width:100px" (change)="onControlChange(dataItem,selectList,minMax)" name="control"
-                    id="control" [(ngModel)]="dataItem.control">
+                <select class="form-control" style="float:left;width:100px" name="control"
+                    id="control{{dataItem.field}}" (ngModelChange)="onControlModelChange($event,dataItem,selectList,minMax)" [ngModel]="dataItem.control">
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
                 <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
@@ -131,7 +125,7 @@
             <span *ngIf="!dataItem.udf">{{dataItem.control}}</span>
         </ng-template>
         <ng-template kendoGridCellTemplate #controlTemp let-dataItem>
-            {{dataItem.control=='Select List'?'List':dataItem.control}}
+            {{dataItem.control}}
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
