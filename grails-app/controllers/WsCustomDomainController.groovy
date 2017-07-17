@@ -16,7 +16,8 @@ class WsCustomDomainController implements ControllerMethods {
     @Transactional(readOnly = true)
     def getFieldSpec() {
         try {
-            renderAsJson(customDomainService.allFieldSpecs(params.domain))
+            Project project = getProjectForWs()
+            renderAsJson(customDomainService.allFieldSpecs(project, params.domain))
         } catch (e) {
             handleException(e, logger)
         }
@@ -25,7 +26,8 @@ class WsCustomDomainController implements ControllerMethods {
     @HasPermission(Permission.ProjectFieldSettingsEdit)
     def saveFieldSpec() {
         try {
-            customDomainService.saveFieldSpecs(params.domain, request.JSON)
+            Project project = getProjectForWs()
+            customDomainService.saveFieldSpecs(project, params.domain, request.JSON)
             render status: 200
         } catch (e) {
             handleException(e, logger)

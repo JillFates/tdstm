@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
-import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
@@ -101,20 +100,18 @@ class CustomDomainService implements ServiceMethods {
      * Retrieve all field specifications as a Map
      * @param domain
      * @return
-     * TODO : allFieldSpecs : Should require the project to be passed in instead of looked up
      */
-    Map allFieldSpecs(String domain){
-        Project currentProject = securityService.loadUserCurrentProject()
+    Map allFieldSpecs(Project project, String domain){
         Map fieldSpec = [:]
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
 
         for (String assetClassType : assetClassTypes) {
-            Map fieldSpecMap = settingService.getAsMap(currentProject, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
+            Map fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
             if (fieldSpecMap) {
                 fieldSpec["${assetClassType.toUpperCase()}"] = fieldSpecMap
             } else {
                 // If the configuration is missing then this is a serious issue for the application and should bail out
-                throw new ConfigurationException("No Field Specification found for project ${currentProject.id} and asset class ${assetClassType}")
+                throw new ConfigurationException("No Field Specification found for project ${project.id} and asset class ${assetClassType}")
             }
         }
 
@@ -125,7 +122,6 @@ class CustomDomainService implements ServiceMethods {
      * Save single or all custom field specs
      * @param domain
      * @param fieldSpec
-     * TODO : saveFieldSpecs : change method to require the project parameter instead of looking it up
      */
     void saveFieldSpecs(Project project, String domain, JSONObject fieldSpec) {
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
@@ -138,17 +134,6 @@ class CustomDomainService implements ServiceMethods {
                 throw new InvalidParamException("Custom field specification not provided for class ${assetClassType}")
             }
         }
-    }
-
-    /**
-     * Save single or all custom field specs
-     * @param domain
-     * @param fieldSpec
-     * TODO : saveFieldSpecs : change method to require the project parameter instead of looking it up
-     */
-    void saveFieldSpecs(String domain, JSONObject fieldSpec) {
-        Project currentProject = securityService.loadUserCurrentProject()
-        saveFieldSpecs(currentProject, domain, fieldSpec)
     }
 
     /**

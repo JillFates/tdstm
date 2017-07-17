@@ -10,7 +10,9 @@ class DataTransferValue {
 	Integer rowId
 	Integer assetEntityId
 	Integer hasError
+	// <SL> TM-6585, TM-6586: remove this attribute when field specs are fully tested and in place
 	EavAttribute eavAttribute
+	String fieldName
 
 	static belongsTo = [dataTransferBatch: DataTransferBatch]
 
