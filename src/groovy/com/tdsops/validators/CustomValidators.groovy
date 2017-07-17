@@ -3,10 +3,12 @@ package com.tdsops.validators
 import com.tds.asset.AssetOptions
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
 
+@Slf4j
 class CustomValidators {
 
 	/**
@@ -67,15 +69,22 @@ class CustomValidators {
 			Map<String, Closure> validatorHandlers = [:]
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
+			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
 
 			// check all the custom fields against the validators
 			for ( Map fieldSpec : customFieldSpecs ) {
 				String field = fieldSpec.field
-				String value = object[field]
+				String value = StringUtils.defaultString(object[field])
+
 				String control = fieldSpec.control
 
 				// TODO: don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
-				Closure validator = validatorHandlers[control] ?: CustomValidators.&controlDefaultValidator
+				Closure validator = validatorHandlers[control]
+
+				if(!validator) {
+					log.error("No validator defined for '{}' Custom Control", control)
+					throw new RuntimeException("No validator defined for '${control}' Custom Control")
+				}
 
 				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec).apply()
 
@@ -102,7 +111,7 @@ class CustomValidators {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				if ( isRequired() && ! value ) {
-					addError ( 'custom.notEmptySelect', [value, getLabel()] )
+					addError ( 'custom.notEmpty', [value, getLabel()] )
 				}
 			}
 		}
@@ -115,14 +124,14 @@ class CustomValidators {
 	 * @return
 	 */
 	static controlYesNoControlValidator ( String value, Map fieldSpec ) {
-		new Validator ( fieldSpec ) {
-			static final List<String> yesNoList = ['Yes', 'No']
+		final List<String> yesNoList = ['Yes', 'No']
 
+		new Validator ( fieldSpec ) {
 			void validate() {
 				// value = StringUtils.defaultString(value)
 				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
 
-				if ( ! hasErrors() && ( ! value || ! yesNoList.contains(value)) ) {
+				if ( ! hasErrors() && StringUtils.isNotBlank(value) && ! yesNoList.contains(value) ) {
 					addError ( 'custom.notInList', [value, getLabel(), "${yesNoList.join(', ')} or BLANK"] )
 				}
 
@@ -143,7 +152,7 @@ class CustomValidators {
 
 				def optValues = fieldSpec.constraints?.values ?: []
 
-				if( ! hasErrors() && (value && ! optValues.contains(value)) ) {
+				if( ! hasErrors() && StringUtils.isNotBlank(value) && ! optValues.contains(value) ) {
 					addError ( 'custom.notInList', [value, getLabel(), optValues.join(', ')] )
 				}
 			}
