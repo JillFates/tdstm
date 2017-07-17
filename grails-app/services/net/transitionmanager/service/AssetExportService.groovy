@@ -1282,6 +1282,7 @@ class AssetExportService {
 
     /**
      * Add a new cell to the given sheet at col, row with provided value, cell type and style
+     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
      * @param sheet
      * @param columnIdx
      * @param rowIdx
@@ -1299,6 +1300,7 @@ class AssetExportService {
 
     /**
      * Add a new cell to the given sheet at col, row with provided value
+     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
      * @param sheet
      * @param columnIdx
      * @param rowIdx
@@ -1310,6 +1312,7 @@ class AssetExportService {
 
     /**
      * creates a new cell style or get one from cache
+     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
      * @param sheet
      * @param cellType
      * @param workbookCellStyles
