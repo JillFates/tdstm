@@ -74,6 +74,7 @@ class CustomValidators {
 				String value = object[field]
 				String control = fieldSpec.control
 
+				// TODO: don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
 				Closure validator = validatorHandlers[control] ?: CustomValidators.&controlDefaultValidator
 
 				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec).apply()
@@ -100,7 +101,7 @@ class CustomValidators {
 	static controlNotEmptyValidator ( String value, Map fieldSpec ) {
 		new Validator ( fieldSpec ) {
 			void validate() {
-				if ( ! value && isRequired() ) {
+				if ( isRequired() && ! value ) {
 					addError ( 'custom.notEmptySelect', [value, getLabel()] )
 				}
 			}
@@ -115,11 +116,11 @@ class CustomValidators {
 	 */
 	static controlYesNoControlValidator ( String value, Map fieldSpec ) {
 		new Validator ( fieldSpec ) {
+			static final List<String> yesNoList = ['Yes', 'No']
+
 			void validate() {
 				// value = StringUtils.defaultString(value)
 				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
-
-				List<String> yesNoList = ['Yes', 'No']
 
 				if ( ! hasErrors() && ( ! value || ! yesNoList.contains(value)) ) {
 					addError ( 'custom.notInList', [value, getLabel(), "${yesNoList.join(', ')} or BLANK"] )
@@ -169,68 +170,6 @@ class CustomValidators {
 		}
 	}
 
-	/*
-	static controlNotEmptyValidator = { String value, Map fieldSpec ->
-		List<ErrorHolder> errors = []
-
-		boolean required = BooleanUtils.toBoolean(fieldSpec.constraints?.required)
-		String field = fieldSpec.field
-		String label = fieldSpec.label
-
-		if( ! value && required) {
-			errors << new ErrorHolder (
-				field,
-				'custom.notInList',
-				[value, label, yesNoList.join(', ')]
-			)
-
-		}
-
-		return errors
-	}
-
-	static controlYesNoControlValidator = { String value, Map fieldSpec ->
-		List<ErrorHolder> errors = controlNotEmptyValidator ( value, fieldSpec )
-
-		List<String> yesNoList = ['Yes', 'No']
-
-		if ( ! errors && ( ! value || ! yesNoList.contains(value)) ) {
-
-			String field = fieldSpec.field
-			String label = fieldSpec.label
-
-			errors << new ErrorHolder (
-					field,
-					'custom.notInList',
-					[value, label, "${yesNoList.join(', ')} or BLANK"]
-			)
-		}
-
-		return errors
-
-	}
-
-	static controlDefaultValidator = { String value, Map fieldSpec ->
-		List<ErrorHolder> errors = []
-
-		def minSize = fieldSpec.constraints?.minSize ?: 0
-		def maxSize = fieldSpec.constraints?.maxSize ?: Integer.MAX_VALUE
-
-		int size = value?.length() ?: 0
-		if( size < minSize && size > maxSize ) {
-			String field = fieldSpec.field
-
-			errors << new ErrorHolder (
-					field,
-					'custom.sizeOutOfBounds',
-					[value, label, minSize, maxSize]
-			)
-		}
-
-		return errors
-	}
-	*/
-
 	/**
 	 * Error holder to return from the validator Function Handlers
 	 */
@@ -258,7 +197,7 @@ class CustomValidators {
 	static private abstract class Validator {
 		private List<ErrorHolder> errors = []
 		private String field
-		public String label
+		private String label
 		private boolean required
 		private Map fieldSpec
 
@@ -267,7 +206,7 @@ class CustomValidators {
 			this.fieldSpec = fieldSpec
 			field = fieldSpec?.field
 			label = fieldSpec?.label
-			required = BooleanUtils.toBoolean(fieldSpec?.constraints?.required)
+			required = BooleanUtils.toBoolean(fieldSpec?.constraints?.required ?: false)
 		}
 
 		/**
