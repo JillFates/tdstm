@@ -6,6 +6,7 @@ import { SortableComponent } from '@progress/kendo-angular-sortable';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 
+declare var jQuery: any;
 /**
  *
  */
@@ -106,6 +107,9 @@ export class SelectListConfigurationPopupComponent {
 				value: this.newItem
 			});
 			this.newItem = '';
+			setTimeout(function () {
+				jQuery('#newItem').focus();
+			});
 		}
 	}
 
