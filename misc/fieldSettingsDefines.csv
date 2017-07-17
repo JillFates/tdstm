@@ -44,7 +44,7 @@
 "device","usize","Usize","String","String","false",-1
 "device","validation","Validation","String","String","true",52
 "device","virtualHost","VirtualHost","String","String","false",-1
-"device","custom1","Plan Strategy","String","Select List","true",1000
+"device","custom1","Plan Strategy","String","List","true",1000
 "device","custom2","Contains PCI","String","YesNo","true",102
 "device","custom3","Contains HIPPA","String","YesNo","true",103
 "device","custom4","Load Balanced","String","YesNo","true",104
@@ -96,7 +96,7 @@
 "application","userCount","User Count","String","String","true",41
 "application","userLocations","User Locations","String","String","true",42
 "application","validation","Validation","String","String","true",36
-"application","custom1","Plan Strategy","String","Select List","true",101
+"application","custom1","Plan Strategy","String","List","true",101
 "application","custom2","Contains PCI","String","YesNo","true",102
 "application","custom3","Contains HIPPA","String","YesNo","true",103
 "application","custom4","Load Balanced","String","YesNo","true",104
@@ -120,12 +120,12 @@
 "database","validation","Validation","String","String","true",34
 "database","lastUpdated","Modified Date","String","Date","false",99
 "database","modifiedBy","Modified By","String","Person","false",-1
-"database","custom1","Plan Strategy","String","Select List","true",101
+"database","custom1","Plan Strategy","String","List","true",101
 "database","custom2","Contains PCI","String","YesNo","true",102
 "database","custom3","Contains HIPPA","String","YesNo","true",103
 "database","custom4","Load Balanced","String","YesNo","true",104
 "database","custom5","VIP IP","String","String","true",105
-"database","custom6","Backup Strategy","String","Select List","true",106
+"database","custom6","Backup Strategy","String","List","true",106
 "database","custom7","Backup Time","String","String","true",107
 "database","custom8","Restore Time","String","String","true",108
 "database","custom9","Clustered","String","YesNo","true",109
@@ -147,12 +147,12 @@
 "storage","modifiedBy","Modified By","String","Person","false",-1
 "storage","retireDate","Retire Date","String","Date","false",-1
 "storage","scale","Scale","String","String","true",6
-"storage","custom1","Plan Strategy","String","Select List","true",101
+"storage","custom1","Plan Strategy","String","List","true",101
 "storage","custom2","Contains PCI","String","YesNo","true",102
 "storage","custom3","Contains HIPPA","String","YesNo","true",103
 "storage","custom4","Load Balanced","String","YesNo","true",104
 "storage","custom5","VIP IP","String","String","true",105
-"storage","custom6","Backup Strategy","String","Select List","true",106
+"storage","custom6","Backup Strategy","String","List","true",106
 "storage","custom7","Backup Time","String","String","true",107
 "storage","custom8","Restore Time","String","String","true",108
 "storage","custom9","Custom9","String","String","true","109"

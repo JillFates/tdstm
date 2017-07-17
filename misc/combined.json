@@ -611,7 +611,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Select List",
+                "control": "List",
                 "order": 101,
                 "imp": "I",
                 "constraints": {
@@ -1105,7 +1105,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Chassis(s)",
+                "control": "Chassis.S",
                 "order": 40,
                 "imp": "I",
                 "constraints": {
@@ -1120,7 +1120,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Location(s)",
+                "control": "Location.S",
                 "order": 31,
                 "imp": "I",
                 "constraints": {
@@ -1135,7 +1135,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Rack(s)",
+                "control": "Rack.S",
                 "order": 33,
                 "imp": "I",
                 "constraints": {
@@ -1165,7 +1165,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Room(s)",
+                "control": "Room.S",
                 "order": 32,
                 "imp": "I",
                 "constraints": {
@@ -1210,7 +1210,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Chassis(t)",
+                "control": "Chassis.T",
                 "order": 42,
                 "imp": "I",
                 "constraints": {
@@ -1225,7 +1225,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Location(t)",
+                "control": "Location.T",
                 "order": 36,
                 "imp": "I",
                 "constraints": {
@@ -1240,7 +1240,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Rack(t)",
+                "control": "Rack.T",
                 "order": 38,
                 "imp": "I",
                 "constraints": {
@@ -1270,7 +1270,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Room(t)",
+                "control": "Room.T",
                 "order": 37,
                 "imp": "I",
                 "constraints": {
@@ -1315,7 +1315,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Select List",
+                "control": "List",
                 "order": 1000,
                 "imp": "I",
                 "constraints": {
@@ -1687,7 +1687,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Select List",
+                "control": "List",
                 "order": 101,
                 "imp": "I",
                 "constraints": {
@@ -1768,7 +1768,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Select List",
+                "control": "List",
                 "order": 106,
                 "imp": "I",
                 "constraints": {
@@ -2044,7 +2044,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Select List",
+                "control": "List",
                 "order": 101,
                 "imp": "I",
                 "constraints": {
@@ -2124,7 +2124,7 @@
                 "default": "",
                 "shared": 0,
                 "show": 1,
-                "control": "Select List",
+                "control": "List",
                 "order": 106,
                 "imp": "I",
                 "constraints": {
