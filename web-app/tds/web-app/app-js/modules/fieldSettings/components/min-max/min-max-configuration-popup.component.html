@@ -20,9 +20,10 @@
                                     [max]="model.maxSize"
                                     style="width: 70px;"
                                     name="minSize"
+                                    (ngModelChange)="validateModel()"
                             ></kendo-numerictextbox>
                         </div>
-                        <small class="text-danger" *ngIf="templateForm.controls.minSize && templateForm.controls.minSize.errors">
+                        <small class="text-danger" *ngIf="templateForm.controls.minSize && templateForm.controls.minSize.errors && !minIsValid">
                             {{'FIELD_SETTINGS.MIN_MAX.MIN_LENGTH_ERROR' | translate : [model.maxSize] }}
                         </small>
                         <div class="form-group" style="margin-top: 10px;">
@@ -34,6 +35,7 @@
                                     [max]="255"
                                     style="width: 70px;"
                                     name="maxSize"
+                                    (ngModelChange)="validateModel()"
                             ></kendo-numerictextbox>
                         </div>
                         <small class="text-danger" *ngIf="templateForm.controls.maxSize && templateForm.controls.maxSize.errors">
@@ -44,8 +46,8 @@
             </form>
 
             <kendo-dialog-actions>
-                <div class="button-dialog-actions text-right">
-                    <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()" [disabled]="!templateForm.valid">
+               <div class="button-dialog-actions text-right">
+                    <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()" [disabled]="!templateForm.valid && !minIsValid">
                         <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
                     </button>
                     <button name="cancelButton" class="btn btn-default btn-sm" (click)="onToggle()">
