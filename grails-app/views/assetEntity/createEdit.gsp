@@ -125,7 +125,9 @@
 										/>
 							</span>
 							</td>
-							<tds:inputLabel field="${standardFieldSpecs.sourceLocation}" value="${assetEntityInstance.sourceLocation}"/>
+							<td class="label {standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
+								<label for="sourceLocationId">Location/Room</label>
+							</td>
 							<td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
 									<span class="useRoomS" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceLocation	.tip}">
 										<g:select id="roomSelectS"  name="roomSourceId"
