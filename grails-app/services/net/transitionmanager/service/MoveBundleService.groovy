@@ -16,6 +16,7 @@ import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.SheetWrapper
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -492,7 +493,7 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		//Lets build a sheetWrapper to hold the map of the styles and other shared resources of the sheet
-		WorkbookUtil.SheetWrapper sheetWrapper = new WorkbookUtil.SheetWrapper(sheet)
+		SheetWrapper sheetWrapper = new SheetWrapper(sheet)
 		int rowCount = exportList.size() + startRow
 
 		for (int r = startRow; r < rowCount; r++) {
@@ -584,10 +585,8 @@ class MoveBundleService implements ServiceMethods {
 				if(cellValue){
 					if (isNumber) {
 						sheetWrapper.addCell(c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
-						// WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
 					} else {
-						sheetWrapper.addCell(c, r, cellValue, Cell.CELL_TYPE_STRING)
-						// WorkbookUtil.addCell(sheet, c, r, cellValue)
+						sheetWrapper.addCell(c, r, cellValue)
 					}
 				}
 
