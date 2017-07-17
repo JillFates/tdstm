@@ -111,7 +111,7 @@ class CustomValidators {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				if ( isRequired() && ! value ) {
-					addError ( 'custom.notEmpty', [value, getLabel()] )
+					addError ( 'field.invalid.notEmpty', [value, getLabel()] )
 				}
 			}
 		}
@@ -132,7 +132,7 @@ class CustomValidators {
 				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
 
 				if ( ! hasErrors() && StringUtils.isNotBlank(value) && ! yesNoList.contains(value) ) {
-					addError ( 'custom.notInList', [value, getLabel(), "${yesNoList.join(', ')} or BLANK"] )
+					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
 				}
 
 			}
@@ -153,7 +153,7 @@ class CustomValidators {
 				def optValues = fieldSpec.constraints?.values ?: []
 
 				if( ! hasErrors() && StringUtils.isNotBlank(value) && ! optValues.contains(value) ) {
-					addError ( 'custom.notInList', [value, getLabel(), optValues.join(', ')] )
+					addError ( 'field.invalid.notInList', [value, getLabel(), optValues.join(', ')] )
 				}
 			}
 		}
@@ -173,7 +173,7 @@ class CustomValidators {
 
 				int size = value?.length() ?: 0
 				if (size < minSize && size > maxSize) {
-					addError( 'custom.sizeOutOfBounds', [value, getLabel(), minSize, maxSize] )
+					addError( 'field.invalid.sizeOutOfBounds', [value, getLabel(), minSize, maxSize] )
 				}
 			}
 		}
