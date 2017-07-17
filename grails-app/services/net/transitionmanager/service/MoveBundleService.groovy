@@ -36,6 +36,7 @@ import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.UserPreference
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.util.SheetUtil
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -490,7 +491,11 @@ class MoveBundleService implements ServiceMethods {
 			TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue)
 		}
 
-		for (int r = startRow; r < (exportList.size() + startRow); r++) {
+		//Lets build a sheetWrapper to hold the map of the styles and other shared resources of the sheet
+		WorkbookUtil.SheetWrapper sheetWrapper = new WorkbookUtil.SheetWrapper(sheet)
+		int rowCount = exportList.size() + startRow
+
+		for (int r = startRow; r < rowCount; r++) {
 			for (int c = 0; c < columnList.size(); ++c) {
 				def cellValue
 				def attribName = columnList[c]
@@ -578,9 +583,11 @@ class MoveBundleService implements ServiceMethods {
 				}
 				if(cellValue){
 					if (isNumber) {
-						WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
+						sheetWrapper.addCell(c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
+						// WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
 					} else {
-						WorkbookUtil.addCell(sheet, c, r, cellValue)
+						sheetWrapper.addCell(c, r, cellValue, Cell.CELL_TYPE_STRING)
+						// WorkbookUtil.addCell(sheet, c, r, cellValue)
 					}
 				}
 
