@@ -372,4 +372,59 @@ class ControlTagLibTests extends AbstractUnitSpec {
 		then: 'data-content should contains the label'
 			result.contains(' data-content="Best program language ever &lt;!&gt;" ')
 	}
+
+	void "Test InputLabel includes the correct CSS if the field is critical, or important, and it's empty." (){
+		given: "a critical field"
+			Map field = [
+					field      : 'someField',
+					label      : 'A generic field',
+					tip        : 'the tip',
+					udf        : 1,
+					shared     : 1,
+					imp        : 'C',
+					show       : 1,
+					order      : 1,
+					default: '',
+					control: 'String',
+					constraints: [
+							required: 1,
+							minSize:1,
+							maxSize:20
+					]
+			]
+			String emptyImpCritClass = ControlTagLib.EMPTY_IMP_CRIT_FIELD_CSS_CLASS
+
+		when: "generating InputLabel for an empty critical field"
+			String label = tagLib.inputLabel([field:field, value: null])
+		then: "the label has the appropriate CSS class"
+			label.contains(emptyImpCritClass)
+
+		when: "generating the InputLabel with some value for a critical field"
+			label = tagLib.inputLabel([field:field, value: "someValue"])
+		then: "the label shouldn't have the CSS class."
+			!label.contains(emptyImpCritClass)
+
+		when: "generating the InputLabel with '0' as value for a critical field"
+			label = tagLib.inputLabel([field:field, value: "0"])
+		then: "the label shouldn't have the CSS class"
+			!label.contains(emptyImpCritClass)
+
+		when: "generating InputLabel for an empty important field"
+			field.imp = "I"
+			label = tagLib.inputLabel([field:field, value: null])
+		then: "the label should have the appropriate CSS class"
+			label.contains(emptyImpCritClass)
+
+		when: "generating InputLabel for an empty field that isn't critical nor important"
+			field.imp = "N"
+			label = tagLib.inputLabel([field:field, value: null])
+		then: "the label shouldn't have the CSS class"
+			!label.contains(emptyImpCritClass)
+
+		when: "generating InputLabel for a field that isn't critical nor important"
+			label = tagLib.inputLabel([field:field, value: "someValue"])
+		then: "the label shouldn't have the CSS class"
+			!label.contains(emptyImpCritClass)
+
+	}
 }
