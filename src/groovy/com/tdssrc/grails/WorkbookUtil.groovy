@@ -38,6 +38,7 @@ class WorkbookUtil {
 
 	/**
 	 * Adds a cell to a XSSFWorkbook
+	 * //TODO: oluna - should we deprecate this and use a wrapper? @see SheetWrapper.groovy
 	 * @param sheet
 	 * @param columnIdx
 	 * @param rowIdx
@@ -56,14 +57,7 @@ class WorkbookUtil {
 		}
 		if (type != null) {
 			cell.setCellType(type)
-			CellStyle style = sheet.workbook.createCellStyle() // TODO <SL> Use createCellStyle()
-			if (type == Cell.CELL_TYPE_NUMERIC) { // This resolves to a Numeric no decimal spaces Value
-				String binFormat = BuiltinFormats.getBuiltinFormat(1) //this is "0" mask format
-				def df = sheet.workbook.createDataFormat().getFormat(binFormat)
-				style.setDataFormat(df)
-			} else if (type == Cell.CELL_TYPE_STRING) {
-				style.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
-			}
+			CellStyle style = createCellStyle(sheet, type)
 			cell.setCellStyle(style)
 		}
 		setCellValue(cell, value)
