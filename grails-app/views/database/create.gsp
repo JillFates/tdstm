@@ -30,7 +30,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.description}" value="${databaseInstance.description}"/>
 							<td colspan="2" style="font-weight:bold;">
-								<tds:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${databaseInstance.description}"/>
+								<tds:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${databaseInstance.description}" tooltipDataPlacement="bottom"/>
 							</td>
 						</tr>
 						<tr>
