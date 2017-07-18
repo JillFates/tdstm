@@ -7,7 +7,7 @@ import grails.test.mixin.TestFor
 import org.apache.commons.lang.StringUtils
 import spock.lang.Ignore
 import test.AbstractUnitSpec
-
+import com.tdsops.tm.enums.ControlType
 
 @TestFor(ControlTagLib)
 // @Mock([UserLogin, UserPreference])
@@ -26,7 +26,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 	private static Map stringFieldSpec = [
 		field: 'nTrack',
 		order: 42,
-		control: 'String',
+		control: ControlType.STRING.toString(),
 		constraints: [
 			required: 1,
 			minSize: 0,
@@ -37,7 +37,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 	private static Map fieldSpec = [
 		field: 'nTrack',
 		order: 42,
-		control: 'Select List',
+		control: ControlType.LIST.toString(),
 		constraints: [
 			required: 1,
 			values: ['1', '2', '3', '4']
@@ -163,7 +163,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				show: 1,
 				order: 6,
 				default: '',
-				control: 'String',
+				control: ControlType.STRING.toString(),
 				constraints: [
 					required: 1,
 					minSize:1,
@@ -229,7 +229,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				show: 1,
 				order: 6,
 				default: '',
-				control: 'YesNo',
+				control: ControlType.YES_NO.toString(),
 				constraints: [
 					required: 1
 				]
@@ -282,7 +282,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				show: 1,
 				order: 6,
 				default: '',
-				control: 'Select List',
+				control: ControlType.LIST.toString(),
 				constraints: [
 					required: 1,
 					values: ['', 'Blue', 'Green', 'Grey', 'Red', 'Yellow']
@@ -345,7 +345,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				show       : 1,
 				order      : 1,
 				default    : 'Javascript',
-				control    : 'Select List',
+				control    : ControlType.LIST.toString(),
 				constraints: [
 						required: 1,
 						values  : ['Java', 'Grails', 'Javascript']
@@ -385,7 +385,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 					show       : 1,
 					order      : 1,
 					default: '',
-					control: 'String',
+					control: ControlType.STRING.toString(),
 					constraints: [
 							required: 1,
 							minSize:1,
