@@ -211,11 +211,11 @@
 							</td>
 
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
-								<span class="useRackS" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRack.tip)}">
+								<span class="useRackS" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceRack.tip)}">
 									<g:render template="deviceRackSelect" model="[clazz:standardFieldSpecs.sourceRack.imp?:'', options:sourceRackSelect, rackId:assetEntityInstance?.rackSource?.id,
 																				  rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
 								</span>
-								<span class="newRackS" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRack.tip)}">
+								<span class="newRackS" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceRack.tip)}">
 									<input type="text" id="sourceRackId" name="sourceRack" value=""
 										   placeholder="New rack name"
 										   class="${standardFieldSpecs.sourceRack.imp?:''}"
@@ -226,11 +226,11 @@
 								</span>
 							</td>
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
-								<span class="useRackT"data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetRack.tip)}">
+								<span class="useRackT"data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetRack.tip)}">
 									<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 																				   rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
 								</span>
-								<span class="newRackT" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetRack.tip)}">
+								<span class="newRackT" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetRack.tip)}">
 									<input type="text" id="targetRackId" name="targetRack" value=""
 										   placeholder="New rack name"
 										   class="${standardFieldSpecs.targetRack.imp?:''}"
@@ -241,7 +241,7 @@
 							</td>
 
 							<td class="label bladeLabel" style="display:none">
-								<span class="useBladeS" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceChassis.tip)}">
+								<span class="useBladeS" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceChassis.tip)}">
 									<g:render template="deviceChassisSelect"
 											  model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
 													   options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
@@ -251,7 +251,7 @@
 								</span>
 							</td>
 							<td class="label bladeLabel" style="display:none">
-								<span class="useBladeT" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetChassis.tip)}">
+								<span class="useBladeT" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetChassis.tip)}">
 									<g:render template="deviceChassisSelect"
 											  model="[ domId:'targetChassisSelectId', domName:'targetChassis',
 													   options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
@@ -272,7 +272,7 @@
 							<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
 								<label for="sourceRackPositionId">Position</label>
 							</td>
-							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRackPosition.tip)}">
+							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceRackPosition.tip)}">
 								<input type="text" id="sourceRackPositionId" name="sourceRackPosition"
 									   value="${assetEntityInstance.sourceRackPosition}"
 									   placeholder="U position"
@@ -280,14 +280,14 @@
 									   size=10 tabindex="320"
 								/>
 							</td>
-							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetRackPosition.tip)}">
+							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetRackPosition.tip)}">
 								<input type="text" id="targetRackPositionId" name="targetRackPosition"
 									   value="${assetEntityInstance.targetRackPosition}"
 									   placeholder="U position"
 									   class="${standardFieldSpecs.targetRackPosition.imp?:''} useRackT"
 									   size=10 tabindex="350" />
 							</td>
-							<td class="bladeLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceBladePosition.tip)}">
+							<td class="bladeLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceBladePosition.tip)}">
 								<input type="text" id="sourceBladePositionId" name="sourceBladePosition"
 									   value="${assetEntityInstance.sourceBladePosition}"
 									   placeholder="Chassis position"
@@ -295,7 +295,7 @@
 									   size=10 tabindex="320"
 								/>
 							</td>
-							<td class="bladeLabel" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetBladePosition.tip)}">
+							<td class="bladeLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetBladePosition.tip)}">
 								<input type="text" id="targetRackPositionId" name="targetBladePosition"
 									   value="${assetEntityInstance.targetBladePosition}"
 									   placeholder="Chassis position"

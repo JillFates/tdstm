@@ -81,10 +81,10 @@
 						<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display: none">
 							<label for="sourceChassisId">Blade Chassis</label>
 						</td>
-						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceChassis.tip)}">
+						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceChassis.tip)}">
 							${sourceChassis}
 						</td>
-						<td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetChassis.tip)}">
+						<td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetChassis.tip)}">
 							${targetChassis}
 						</td>
 
@@ -94,11 +94,11 @@
 
 						<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}"/>
 
-						<td class="label ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap"><label for="sourceRack">Position</label></td>
-						<td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}">${assetEntity.sourceRackPosition}</td>
-						<td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}">${assetEntity.targetRackPosition}</td>
-						<td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}" style="display: none" >${assetEntity.sourceBladePosition}</td>
-						<td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}" style="display: none" >${assetEntity.targetBladePosition}</td>
+						<td class="label ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap"><label for="sourceRack" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceRackPosition.tip)}">Position</label></td>
+						<td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}"><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceRackPosition.tip)}">${assetEntity.sourceRackPosition}</span></td>
+						<td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}"><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetRackPosition.tip)}">${assetEntity.targetRackPosition}</span></td>
+						<td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}" style="	display: none" ><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceBladePosition.tip)}">${assetEntity.sourceBladePosition}</span></td>
+						<td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}" style="display: none" ><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetBladePosition.tip)}">${assetEntity.targetBladePosition}</span></td>
 
 					</tr>
 					<tr class="prop">
