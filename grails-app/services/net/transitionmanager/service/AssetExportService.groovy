@@ -582,7 +582,7 @@ class AssetExportService {
                                 addCell(serverSheet, colNum, deviceCount, (Double)pos, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                                 break
 
-                            case ~/Retire|MaintExp/:
+                            case ~/Retire Date|Maint Expiration/:
                                 addCell(serverSheet, colNum, deviceCount, TimeUtil.formatDate(userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE))
                                 break
 
@@ -736,7 +736,7 @@ class AssetExportService {
                             case ~/ShutdownFixed|StartupFixed|TestingFixed/:
                                 colVal = app[field] ? 'Yes' : 'No'
                                 break
-                            case ~/Retire|MaintExp/:
+                            case ~/Retire Date|Maint Expiration/:
                                 colVal = app[field] ? TimeUtil.formatDate(userDTFormat, app[field], TimeUtil.FORMAT_DATE) : ''
                                 break
                             case ~/Modified Date/:

@@ -22,7 +22,7 @@
 "device","priority","Priority","int","select","true",22
 "device","railType","Rail Type","String","select","true",9
 "device","rateOfChange","Rate Of Change","int","Number","true",55
-"device","retireDate","Retire Date","String","String","true",26
+"device","retireDate","Retire Date","String","Date","true",26
 "device","scale","Scale","String","String","true",54
 "device","serialNumber","Serial #","String","String","true",7
 "device","shelf","Shelf","String","String","true",29
@@ -73,12 +73,12 @@
 "application","lastUpdated","Modified Date","String","String","false",99
 "application","latency","Latency OK","String","YesNo","true",37
 "application","license","License","String","String","true",8
-"application","maintExpDate","Maint Expiration","String","String","true",27
+"application","maintExpDate","Maint Expiration","String","Date","true",27
 "application","modifiedBy","Modified By","String","String","false",-1
 "application","moveBundle","Bundle","String","String","true",34
 "application","moveDowntimeTolerance","Downtime Tolerance","String","String","false",-1
 "application","planStatus","Plan Status","String","String","true",35
-"application","retireDate","Retire Date","String","String","true",26
+"application","retireDate","Retire Date","String","Date","true",26
 "application","shutdownBy","Shutdown By","String","String","true",50
 "application","shutdownDuration","Shutdown Duration","int","Number","true",51
 "application","shutdownFixed","Shutdown Fixed","int","Number","true",52
@@ -113,11 +113,11 @@
 "database","environment","Environment","String","String","true",31
 "database","externalRefId","External Ref Id","String","String","true",24
 "database","dbFormat","Format","String","String","true",4
-"database","retireDate","Retire Date","String","String","true",22
+"database","retireDate","Retire Date","String","Date","true",22
 "database","moveBundle","Bundle","String","String","true",32
 "database","size","Size","String","String","true",5
 "database","scale","Scale","String","String","true",6
-"database","maintExpDate","Maint Expiration","String","String","true",23
+"database","maintExpDate","Maint Expiration","String","Date","true",23
 "database","planStatus","Plan Status","String","String","true",33
 "database","rateOfChange","Rate Of Change","int","Number","true",7
 "database","validation","Validation","String","String","true",34
