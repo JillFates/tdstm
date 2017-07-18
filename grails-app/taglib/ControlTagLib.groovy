@@ -2,6 +2,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.InvalidParamException
+import com.tdsops.tm.enums.ControlType
 
 class ControlTagLib {
 
@@ -151,15 +152,15 @@ class ControlTagLib {
 		}
 
 		switch (fieldSpec.control) {
-			case 'Select List':
+			case ControlType.LIST.toString():
 				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
-			case 'YesNo':
+			case ControlType.YES_NO.toString():
 				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
-			case 'String':
+			case ControlType.STRING.toString():
 			default:
 				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
 		}
