@@ -3,6 +3,7 @@ import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
+import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -83,10 +84,10 @@ class AuthController implements ControllerMethods {
 		String uri
 		String startPage = userPreferenceService.getPreference(PREF.START_PAGE)
 		if (userPreferenceService.currentProjectId) {
-			if (startPage == 'Project Settings') {
+			if (startPage == StartPageEnum.PROJECT_SETTINGS.value) {
 				uri = '/projectUtil'
 			}
-			else if (startPage == 'Current Dashboard') {
+			else if (startPage == StartPageEnum.CURRENT_DASHBOARD.value) {
 				if (securityService.hasPermission(Permission.BundleView)) {
 					uri = '/moveBundle/planningStats'
 				}
@@ -94,17 +95,17 @@ class AuthController implements ControllerMethods {
 					uri = '/projectUtil'
 				}
 			}
-			else if (startPage == 'Admin Portal') {
+			else if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
 				uri = '/admin/home'
 			}
-			else if (startPage == 'User Dashboard' || startPage == null) {
+			else if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
 				uri = '/dashboard/userPortal'
 			}
 			else {
 				uri = '/projectUtil'
 			}
 		}
-		else if (startPage == 'User Dashboard' || startPage == null) {
+		else if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
 			uri = '/dashboard/userPortal'
 		}
 		else {
