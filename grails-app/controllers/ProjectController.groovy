@@ -171,11 +171,7 @@ class ProjectController implements ControllerMethods {
 			projectDetails = projectService.getprojectEditDetails(project)
 			moveBundles = MoveBundle.findAllByProject(project)
 
-			List<Map> planMethodologies = []
-			planMethodologies << [field:'', label:'Select...']
-			planMethodologies.addAll(
-				customDomainService.customFieldsList(project, AssetClass.APPLICATION.toString(), true)
-			)
+			List<Map> planMethodologies = getPlanMethodologiesValues(project)
 
 			List projectManagers = projectService.getProjectManagers(project)
 			projectManagers.sort { a,b ->
@@ -243,7 +239,7 @@ class ProjectController implements ControllerMethods {
 			params.runbookOn = 1
 			project.properties = params
 
-			List<Map> planMethodologies = customDomainService.customFieldsList(project, AssetClass.APPLICATION.toString(), true)
+			List<Map> planMethodologies = getPlanMethodologiesValues(project)
 
 			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
 			if (logoFile instanceof String) {
@@ -340,7 +336,7 @@ class ProjectController implements ControllerMethods {
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 
 		// TODO - create - See TM-6673 - need to remove planMethodologies
-		List<Map> planMethodologies = [] // customDomainService.customFieldsList("application")
+		List<Map> planMethodologies = []
 
 		[clients: projectDetails.clients, company: company, managers: projectDetails.managers,
 		 partners: projectDetails.partners, projectInstance: new Project(params),
@@ -814,4 +810,26 @@ class ProjectController implements ControllerMethods {
 		forward action: 'userActivationEmailsForm'
 	}
 
+	/**
+	 * Helper method to get the PlanMethodologies Values of the Select List in the Project CRUD
+	 * @param project
+	 * @return the list of values or empty list is there is none
+	 */
+	private List<Map<String, String>> getPlanMethodologiesValues(Project project){
+		List<Map> customFields = customDomainService.customFieldsList(
+			project,
+			AssetClass.APPLICATION.toString(),
+			true
+		)
+
+		List<Map> planMethodologies = customFields.collect {
+			[ field: it.field, label: (it.label ?: it.field) ]
+		}
+
+		if(planMethodologies){
+			planMethodologies.add(0, [field:'', label:'Select...'])
+		}
+
+		return planMethodologies
+	}
 }

@@ -208,13 +208,17 @@
 								<label for="projectType"><b>Plan Methodology:&nbsp;</b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'planMethodology','errors')}">
-								<g:select id="planMethodology" name="planMethodology" indextab="130"
-										  value="${projectInstance.planMethodology}"
-										  from="${planMethodologies}"
-										  optionKey="field" optionValue="label" />
-								<g:hasErrors bean="${projectInstance}" field="planMethodology">
-									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="planMethodology" /></div>
-								</g:hasErrors>
+								<g:if test="${planMethodologies}">
+									<g:select id="planMethodology" name="planMethodology" indextab="130"
+											  value="${projectInstance.planMethodology}"
+											  from="${planMethodologies}"
+											  optionKey="field" optionValue="label" />
+									<g:hasErrors bean="${projectInstance}" field="planMethodology">
+										<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="planMethodology" /></div>
+									</g:hasErrors>
+								</g:if><g:else>
+									<g:message code="NO_APP_CUSTOM_FIELDS" />
+								</g:else>
 							</td>
 						</tr>
 					</tbody>
