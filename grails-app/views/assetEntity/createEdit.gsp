@@ -78,10 +78,10 @@
 						</tr>
 						<tr>
 							<td class="label ${standardFieldSpecs.assetType.imp?:''}" nowrap="nowrap">
-								<label for="model"><div id="assetTypeLabel" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip}">Device Type</div></label>
+								<label for="model"><div id="assetTypeLabel" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.assetType.tip)}">Device Type</div></label>
 							</td>
 							<td class="${standardFieldSpecs.assetType.imp?:''}" data-for="model" style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-								<div id="modelEditId" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip}">
+								<div id="modelEditId" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.assetType.tip)}">
 									<div id="assetTypeSelect" tabindex="102">
 									</div>
 								</div>
@@ -89,7 +89,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${assetEntityInstance.environment}"/>
 							<td>
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.environment.tip)}">
 								<g:select id="environment" name="environment" class="${standardFieldSpecs.environment.imp?:''}" from="${environmentOptions}"
 										  value="${assetEntityInstance.environment}" noSelection="${['':'Please select...']}"
 										  tabindex="205"
@@ -103,14 +103,14 @@
 						<tr>
 							<td class="label ${standardFieldSpecs.manufacturer.imp?:''}" nowrap="nowrap">
 								<g:if test="${assetEntityInstance.manufacturer?.id}">
-									<label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip}"><a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a></label>
+									<label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.manufacturer.tip)}"><a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a></label>
 								</g:if>
 								<g:else>
-									<label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip}">Manufacturer</label>
+									<label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.manufacturer.tip)}">Manufacturer</label>
 								</g:else>
 							</td>
 							<td class="${standardFieldSpecs.manufacturer.imp?:''}" data-for="manufacturer" style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-								<div id="manufacturerEditId" style="display:inline" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip}">
+								<div id="manufacturerEditId" style="display:inline" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.manufacturer.tip)}">
 									<div id="manufacturerSelect" tabindex="103">
 									</div>
 								</div>
@@ -118,7 +118,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.priority}" value="${assetEntityInstance.priority}"/>
 							<td>
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.priority.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.priority.tip)}">
 								<g:select id="priority" name ="priority"
 										  from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':'Please select...']}"
 										  class="${standardFieldSpecs.priority.imp?:''}" tabindex="210"
@@ -129,7 +129,7 @@
 								<label for="sourceLocationId">Location/Room</label>
 							</td>
 							<td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
-									<span class="useRoomS" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceLocation	.tip}">
+									<span class="useRoomS" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceLocation	.tip)}">
 										<g:select id="roomSelectS"  name="roomSourceId"
 												  from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
 												  optionKey="id" optionValue="${{it.value}}"
@@ -140,7 +140,7 @@
 												/>
 									</span>
 								<%-- Theses fields are used to allow user to create a source room on the fly --%>
-									<span class="newRoomS" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceLocation.tip}">
+									<span class="newRoomS" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceLocation.tip)}">
 										<input type="text" id="sourceLocationId" name="sourceLocation" value=""
 											   placeholder="Location"
 											   class="${standardFieldSpecs.sourceLocation.imp?:''}"
@@ -156,7 +156,7 @@
 									</span>
 							</td>
 							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.sourceLocation.imp?:''}" data-for="sourceLocationId">
-									<span class="useRoomT" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.targetLocation.tip}">
+									<span class="useRoomT" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetLocation.tip)}">
 										<g:select id="roomSelectT" name="roomTargetId"
 												  from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
 												  optionKey="id" optionValue="${{it.value}}"
@@ -167,7 +167,7 @@
 												/>
 									</span>
 								<%-- Theses fields are used to allow user to create a source room on the fly --%>
-									<span class="newRoomT" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.targetLocation.tip}">
+									<span class="newRoomT" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetLocation.tip)}">
 										<br/>
 										<input type="text" id="targetLocationId" name="targetLocation" value=""
 											   placeholder="Location"
@@ -186,16 +186,16 @@
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.assetType}" value="${assetEntityInstance.assetType}"/>
 							<td class="${standardFieldSpecs.assetType.imp?:''}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.assetType.tip)}">
 								<div id="modelSelect" tabindex="104">
 								</div>
 								<input type="hidden" value="${assetEntityInstance?.model?.id}" id="hiddenModel" name="model">
 							</span>
 							</td>
 
-							<td class="label ${standardFieldSpecs.ipAddress.imp?:''}" nowrap="nowrap"><label for="ipAddress" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.ipAddress.tip}">IP1</label></td>
+							<td class="label ${standardFieldSpecs.ipAddress.imp?:''}" nowrap="nowrap"><label for="ipAddress" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.ipAddress.tip)}">IP1</label></td>
 							<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.ipAddress.tip}">
+								<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.ipAddress.tip)}">
 									<input type="text" id="ipAddress" name="ipAddress"
 										   value="${assetEntityInstance.ipAddress}"
 										   class="${standardFieldSpecs.ipAddress.imp?:''}" tabindex="215"
@@ -209,58 +209,58 @@
 							<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display:none">
 								<label for="sourceChassisId">Blade Chassis</label>
 							</td>
-							
 
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
-									<span class="useRackS" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRack.tip}">
-										<g:render template="deviceRackSelect" model="[clazz:standardFieldSpecs.sourceRack.imp?:'', options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id,
-											rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
-									</span>
-									<span class="newRackS" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRack	.tip}">
-										<input type="text" id="sourceRackId" name="sourceRack" value=""
-											   placeholder="New rack name"
-											   class="${standardFieldSpecs.sourceRack.imp?:''}"
-											   xstyle="display:none"
-											   size=20 tabindex="311"
-												/>
-										<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
-									</span>
+								<span class="useRackS" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRack.tip)}">
+									<g:render template="deviceRackSelect" model="[clazz:standardFieldSpecs.sourceRack.imp?:'', options:sourceRackSelect, rackId:assetEntityInstance?.rackSource?.id,
+																				  rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
+								</span>
+								<span class="newRackS" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRack.tip)}">
+									<input type="text" id="sourceRackId" name="sourceRack" value=""
+										   placeholder="New rack name"
+										   class="${standardFieldSpecs.sourceRack.imp?:''}"
+										   xstyle="display:none"
+										   size=20 tabindex="311"
+									/>
+									<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
+								</span>
 							</td>
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
-									<span class="useRackT" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetRack.tip}">
-										<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
-											rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
-									</span>
-									<span class="newRackT" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetRack.tip}">
-										<input type="text" id="targetRackId" name="targetRack" value=""
-											   placeholder="New rack name"
-											   class="${standardFieldSpecs.targetRack.imp?:''}"
-											   xstyle="display:none"
-											   size=20 tabindex="341" />
-										<input type="hidden" id="newRackTargetId" name="newRackTargetId" value="-1">
-									</span>
+								<span class="useRackT"data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetRack.tip)}">
+									<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
+																				   rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
+								</span>
+								<span class="newRackT" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetRack.tip)}">
+									<input type="text" id="targetRackId" name="targetRack" value=""
+										   placeholder="New rack name"
+										   class="${standardFieldSpecs.targetRack.imp?:''}"
+										   xstyle="display:none"
+										   size=20 tabindex="341" />
+									<input type="hidden" id="newRackTargetId" name="newRackTargetId" value="-1">
+								</span>
 							</td>
 
 							<td class="label bladeLabel" style="display:none">
-									<span class="useBladeS">
-										<g:render template="deviceChassisSelect"
-												  model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
-												options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
-												domClass: standardFieldSpecs.sourceChassis.imp?:'',
-												sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"
-												/>
-									</span>
+								<span class="useBladeS" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceChassis.tip)}">
+									<g:render template="deviceChassisSelect"
+											  model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
+													   options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
+													   domClass: standardFieldSpecs.sourceChassis.imp?:'',
+													   sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"
+									/>
+								</span>
 							</td>
 							<td class="label bladeLabel" style="display:none">
-									<span class="useBladeT">
-										<g:render template="deviceChassisSelect"
-												  model="[ domId:'targetChassisSelectId', domName:'targetChassis',
-												options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
-												domClass: standardFieldSpecs.targetChassis.imp?:'',
-												sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"
-												/>
-									</span>
+								<span class="useBladeT" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetChassis.tip)}">
+									<g:render template="deviceChassisSelect"
+											  model="[ domId:'targetChassisSelectId', domName:'targetChassis',
+													   options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
+													   domClass: standardFieldSpecs.targetChassis.imp?:'',
+													   sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"
+									/>
+								</span>
 							</td>
+
 
 						</tr>
 						<tr>
@@ -270,47 +270,40 @@
 
 							<%-- Note that the next set of TDs are toggled on/off based on the assetType selected --%>
 							<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
-								<label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceRackPosition.tip}">Position</label>
+								<label for="sourceRackPositionId">Position</label>
 							</td>
-							<td class="rackLabel">
-								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip}">
-									<input type="text" id="sourceRackPositionId" name="sourceRackPosition"
-										   value="${assetEntityInstance.sourceRackPosition}"
-										   placeholder="U position"
-										   class="${standardFieldSpecs.sourceRackPosition.imp?:''} useRackS"
-										   size=10 tabindex="320"
-											/>
-								</span>
+							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRackPosition.tip)}">
+								<input type="text" id="sourceRackPositionId" name="sourceRackPosition"
+									   value="${assetEntityInstance.sourceRackPosition}"
+									   placeholder="U position"
+									   class="${standardFieldSpecs.sourceRackPosition.imp?:''} useRackS"
+									   size=10 tabindex="320"
+								/>
 							</td>
-							<td class="rackLabel">
-								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetRackPosition.tip}">
-									<input type="text" id="targetRackPositionId" name="targetRackPosition"
-										   value="${assetEntityInstance.targetRackPosition}"
-										   placeholder="U position"
-										   class="${standardFieldSpecs.targetRackPosition.imp?:''} useRackT"
-										   size=10 tabindex="350" />
-								</span>
+							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetRackPosition.tip)}">
+								<input type="text" id="targetRackPositionId" name="targetRackPosition"
+									   value="${assetEntityInstance.targetRackPosition}"
+									   placeholder="U position"
+									   class="${standardFieldSpecs.targetRackPosition.imp?:''} useRackT"
+									   size=10 tabindex="350" />
 							</td>
-							<td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}">
-								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceBladePosition.tip}">
-									<input type="text" id="sourceBladePositionId" name="sourceBladePosition"
-										   value="${assetEntityInstance.sourceBladePosition}"
-										   placeholder="Chassis position"
-										   class="${standardFieldSpecs.sourceBladePosition.imp?:''} useBladeS"
-										   size=10 tabindex="320"
-											/>
-								</span>
+							<td class="bladeLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceBladePosition.tip)}">
+								<input type="text" id="sourceBladePositionId" name="sourceBladePosition"
+									   value="${assetEntityInstance.sourceBladePosition}"
+									   placeholder="Chassis position"
+									   class="${standardFieldSpecs.sourceRackPosition.imp?:''} useBladeS"
+									   size=10 tabindex="320"
+								/>
 							</td>
-							<td class="bladeLabel">
-								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetBladePosition.tip}">
-									<input type="text" id="targetBladePositionId" name="targetBladePosition"
-										   value="${assetEntityInstance.targetBladePosition}"
-										   placeholder="Chassis position"
-										   class="${standardFieldSpecs.targetBladePosition.imp?:''} useBladeT"
-										   size=10 tabindex="350"
-											/>
-								</span>
+							<td class="bladeLabel" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetBladePosition.tip)}">
+								<input type="text" id="targetRackPositionId" name="targetBladePosition"
+									   value="${assetEntityInstance.targetBladePosition}"
+									   placeholder="Chassis position"
+									   class="${standardFieldSpecs.targetRackPosition.imp?:''} useBladeT"
+									   size=10 tabindex="350"
+								/>
 							</td>
+
 						</tr>
 						<tr>
 							<tds:inputLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntityInstance.serialNumber}" tabindex="106"/>
@@ -319,7 +312,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetEntityInstance.moveBundle?.id}"/>
 							<td>
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.moveBundle.tip)}">
 								<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id"
 										  value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name"
 										  class="${standardFieldSpecs.moveBundle.imp?:''}"
@@ -330,7 +323,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.size}" value="${assetEntityInstance.size}"/>
 							<td nowrap="nowrap" class="sizeScale">
-							<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.size.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.size.tip)}">
 								<input type="text" id="size" name="size" class="${standardFieldSpecs.size.imp?:''}" value="${assetEntityInstance.size}" tabindex="410"/>
 								<g:select id="scale" name="scale"
 										  from="${assetEntityInstance.constraints.scale.inList}"
@@ -347,7 +340,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntityInstance.retireDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.retireDate.tip)}">
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 								</script>
@@ -362,7 +355,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetEntityInstance.planStatus}"/>
 							<td>
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.planStatus.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.planStatus.tip)}">
 								<g:select id="planStatus" name ="planStatus"
 										  from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}"
 										  noSelection="${['':'Please select']}"
@@ -377,7 +370,7 @@
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.railType}" value="${assetEntityInstance.railType}"/>
 							<td>
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.railType.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.railType.tip)}">
 								<g:select id="railType" name ="railType"
 										  from="${railTypeOption}" value= "${assetEntityInstance.railType}"
 										  noSelection="${['':'Please select...']}"
@@ -388,7 +381,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntityInstance.maintExpDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.maintExpDate.tip)}">
 								<input type="text" id="maintExpDate" name="maintExpDate"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" />"
 									class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
@@ -400,7 +393,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${assetEntityInstance.validation}"/>
 							<td  colspan="2">
-							<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.validation.tip)}">
 								<g:select id="validation" name="validation"
 										  from="${assetEntityInstance.constraints.validation.inList}"
 										  value="${assetEntityInstance.validation}"
@@ -415,10 +408,10 @@
 							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntityInstance.externalRefId}" tabindex="109"/>
 
 							<td class="label ${standardFieldSpecs.truck.imp?:''}" nowrap="nowrap">
-								<label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip}">Truck/Cart/Shelf</label>
+								<label for="truck" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.truck.tip)}">Truck/Cart/Shelf</label>
 							</td>
 							<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip}">
+								<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.truck.tip)}">
 									<input type="text" id="truck" class="${standardFieldSpecs.truck.imp?:''}" name="truck" value="${assetEntityInstance.truck}" size=3 tabindex="240" />
 									<input type="text" id="cart" class="${standardFieldSpecs.cart.imp?:''}" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="241" />
 									<input type="text" id="shelf" class="${standardFieldSpecs.shelf.imp?:''}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="242" />
