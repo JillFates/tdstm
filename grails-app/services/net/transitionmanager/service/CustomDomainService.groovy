@@ -344,7 +344,7 @@ class CustomDomainService implements ServiceMethods {
 
             switch (option) {
                 case ALL_FIELDS:
-                    fields = allFieldSpecs(domain)
+                    fields = allFieldSpecs(project, domain)
                     break
                 case STANDARD_FIELD:
                     fields = standardFieldSpecs(project, domain)
