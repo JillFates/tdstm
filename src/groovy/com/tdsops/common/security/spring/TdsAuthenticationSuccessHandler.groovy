@@ -87,7 +87,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			if (startPage == StartPageEnum.PROJECT_SETTINGS.value) {
 				return '/projectUtil'
 			}
-			if (startPage == StartPageEnum.CURRENT_DASHBOARD.value) {
+			if (startPage == StartPageEnum.CURRENT_DASHBOARD.value || startPage == StartPageEnum.PLANNING_DASHBOARD.value) {
 				return securityService.hasPermission('BundleView') ? '/moveBundle/planningStats' : '/projectUtil'
 			}
 			if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
@@ -95,7 +95,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			}
 		}
 
-		if (startPage == StartPageEnum.PLANNING_DASHBOARD.value || startPage == null) {
+		if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
 			'/dashboard/userPortal'
 		}
 		else {
