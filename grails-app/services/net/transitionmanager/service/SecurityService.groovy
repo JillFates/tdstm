@@ -14,6 +14,7 @@ import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetStatus
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -1140,7 +1141,7 @@ logger.debug "mergePersonsUserLogin() entered"
 		}
 
 		if (isNewUser) {
-			userPreferenceService.setPreference(userLogin, PREF.START_PAGE, "User Dashboard")
+			userPreferenceService.setPreference(userLogin, PREF.START_PAGE, StartPageEnum.USER_DASHBOARD.value)
 			// TODO : JPM 3/2016 : Default preferences for user for TZ/Date format should be based on the selected project
 			// The date format should be encapsulated or we should add the default Date format on the project as well.
 			userPreferenceService.setPreference(userLogin, PREF.CURR_TZ, TimeUtil.defaultTimeZone)

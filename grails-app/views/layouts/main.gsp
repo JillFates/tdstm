@@ -1,4 +1,5 @@
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdsops.tm.enums.domain.StartPageEnum"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -181,11 +182,11 @@ boolean isIE6 = tds.isIE6()
                         </td>
                         <td valign="top" class="value">
 	                     <tds:hasPermission permission="${Permission.AdminMenuView}">
-                            <g:select name="startPage" from="${['Project Settings','Planning Dashboard','Admin Portal']}"
+                            <g:select name="startPage" from="${[StartPageEnum.PROJECT_SETTINGS.value,StartPageEnum.PLANNING_DASHBOARD.value, StartPageEnum.ADMIN_PORTAL.value]}"
                             value="${tds.startPage()}"/>
                         </tds:hasPermission>
 	                     <tds:lacksPermission permission="${Permission.AdminMenuView}">
-		                     <g:select name="startPage" from="${['Project Settings','Planning Dashboard']}" value="${tds.startPage()}"/>
+		                     <g:select name="startPage" from="${[StartPageEnum.PROJECT_SETTINGS.value, StartPageEnum.PLANNING_DASHBOARD.value]}" value="${tds.startPage()}"/>
 	                     </tds:lacksPermission>
                         </td>
                     </tr>
