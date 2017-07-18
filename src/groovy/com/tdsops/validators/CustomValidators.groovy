@@ -62,8 +62,7 @@ class CustomValidators {
 	 */
 	static Closure validateCustomFields(){
 		return { val, object, Errors errors ->
-			String className = object.class.simpleName
-			List<Map> customFieldSpecs = object.customDomainService.customFieldsList(object.project, className)
+			List<Map> customFieldSpecs = object.customDomainService.customFieldsList(object.project, object.assetClass.toString())
 
 			// Initializing Validators list
 			Map<String, Closure> validatorHandlers = [:]

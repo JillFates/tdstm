@@ -240,12 +240,10 @@ class ControllerService implements ServiceMethods {
 			}
 			errorMsg = controller.flash.message
 			controller.flash.message = null
-		}
-		catch (InvalidRequestException | EmptyResultException | UnauthorizedException | DomainUpdateException e) {
+		} catch (InvalidRequestException | EmptyResultException | UnauthorizedException | DomainUpdateException e) {
 			errorMsg = e.message
-		}
-		catch (e) {
-			log.error "update() failed ${ExceptionUtil.stackTraceToString(e)}"
+		} catch (e) {
+			log.error ExceptionUtil.stackTraceToString('saveUpdateAssetHandler() failed', e, 80)
 			errorMsg = "An error occurred during the update"
 		}
 
