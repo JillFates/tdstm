@@ -5,6 +5,8 @@ import com.tdssrc.grails.StringUtil
 /**
  * @author John Martin
  * Ticket TM-6619
+ * version 4
+ *   - Changed some properties to Date
  * version 3
  *   - fixed issue with all customs being included
  *   - Tips were not always being added
@@ -12,7 +14,7 @@ import com.tdssrc.grails.StringUtil
  *   - Custom that were marked hidden now correctly hidden
  */
 databaseChangeLog = {
-    changeSet(author: "jmartin", id: "20170712v2 TM-6619-v4 Create Field Settings JSON specs") {
+    changeSet(author: "jmartin", id: "20170712 TM-6619-v4 Create Field Settings JSON specs") {
         comment('This will aggregate values from various places and create JSON specs for every project')
 
         grailsChange {
