@@ -257,10 +257,10 @@ class WsDashboardController implements ControllerMethods {
 				}
 				if (eventStartTime>sysTime) {
 					dayTime = TimeCategory.minus(eventStartTime, sysTime)
-					eventString = "<i>Event Countdown<i>"
+					eventString = "Countdown"
 				} else {
 					dayTime = TimeCategory.minus(sysTime, eventStartTime)
-					eventString = "<i>Event Elapsed Time<i>"
+					eventString = "Elapsed"
 				}
 			}
 			/*
