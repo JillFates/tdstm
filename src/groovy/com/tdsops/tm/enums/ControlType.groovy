@@ -1,5 +1,11 @@
 package com.tdsops.tm.enums
 
+import groovy.transform.CompileStatic
+
+/**
+ * Enumeration that contains the posible Control Types for the Custom Fields
+ */
+@CompileStatic
 enum ControlType {
     STRING("String"),
     LIST("List"),
@@ -16,14 +22,26 @@ enum ControlType {
     DATE("Date"),
     DATETIME("Datetime")
 
-    private String type;
+    private String value
 
-    ControlType(String type) {
-        this.type = type
+    ControlType(String value) {
+        this.value = value
+    }
+
+    /**
+     * Added this way to be coherent with the name() method
+     * @return
+     */
+    String value() { value }
+
+    static ControlType asEnum(String key) {
+        values().find {
+            it.value() == key
+        }
     }
 
     @Override
-    public String toString() {
-        return type
+    String toString() {
+        return value
     }
 }
