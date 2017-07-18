@@ -2,6 +2,7 @@ package com.tdsops.common.security.spring
 
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.transaction.Transactional
@@ -83,18 +84,18 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 	private String redirectToPrefPage() {
 		String startPage = userPreferenceService.getPreference(PREF.START_PAGE)
 		if (userPreferenceService.getCurrentProjectId()) {
-			if (startPage == 'Project Settings') {
+			if (startPage == StartPageEnum.PROJECT_SETTINGS.value) {
 				return '/projectUtil'
 			}
-			if (startPage == 'Current Dashboard') {
+			if (startPage == StartPageEnum.CURRENT_DASHBOARD.value) {
 				return securityService.hasPermission('BundleView') ? '/moveBundle/planningStats' : '/projectUtil'
 			}
-			if (startPage == 'Admin Portal') {
+			if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
 				return '/admin/home'
 			}
 		}
 
-		if (startPage == 'User Dashboard' || startPage == null) {
+		if (startPage == StartPageEnum.PLANNING_DASHBOARD.value || startPage == null) {
 			'/dashboard/userPortal'
 		}
 		else {
