@@ -184,9 +184,9 @@
 
 						</tr>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetType}" value="${assetEntityInstance.assetType}"/>
-							<td class="${standardFieldSpecs.assetType.imp?:''}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.assetType.tip)}">
+							<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntityInstance.model}"/>
+							<td class="${standardFieldSpecs.model.imp?:''}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.model.tip)}">
 								<div id="modelSelect" tabindex="104">
 								</div>
 								<input type="hidden" value="${assetEntityInstance?.model?.id}" id="hiddenModel" name="model">
