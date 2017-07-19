@@ -26,7 +26,8 @@
 						<tr class="prop">
 							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
 							<td class="valueNW"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}</span></td>
-							<tds:showLabelAndField field="${standardFieldSpecs.retireDate}" value="${databaseInstance.retireDate}"/>
+							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance?.retireDate}"/>
+							<td class="valueNW"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip}"><tds:convertDate date="${databaseInstance?.retireDate}"/></span></td>
 							<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
 							<td class="valueNW" colspan="3"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">${databaseInstance?.moveBundle} : ${dependencyBundleNumber}</span></td>
 						</tr>
