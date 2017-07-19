@@ -8,7 +8,7 @@
 "device","assetType","Device Type","String","AssetType","true",3
 "device","cart","Cart","String","String","true",28
 "device","description","Description","String","String","true",2
-"device","environment","Environment","String","String","true",21
+"device","environment","Environment","String","Options.Environment","true",21
 "device","externalRefId","External Ref Id","String","String","true",10
 "device","ipAddress","IP Address","String","String","true",23
 "device","lastUpdated","Modified Date","String","Date","false",99
@@ -43,7 +43,7 @@
 "device","targetRoom","Target Room","String","Room.T","true",37
 "device","truck","Truck","String","String","true",27
 "device","usize","Usize","String","String","false",-1
-"device","validation","Validation","String","String","true",52
+"device","validation","Validation","String","InList","true",52
 "device","virtualHost","VirtualHost","String","String","false",-1
 "device","custom1","Plan Strategy","String","List","true",1000
 "device","custom2","Contains PCI","String","YesNo","true",102
@@ -64,11 +64,11 @@
 "application","appVersion","Version","String","String","true",5
 "application","assetName","Name","String","String","true",1
 "application","businessUnit","Business Unit","String","String","true",25
-"application","criticality","Criticality","String","String","true",33
+"application","criticality","Criticality","String","InList","true",33
 "application","description","Description","String","String","true",2
 "application","drRpoDesc","DR RPO","String","String","true",44
 "application","drRtoDesc","DR RTO","String","String","true",45
-"application","environment","Environment","String","String","true",32
+"application","environment","Environment","String","Options.Environment","true",32
 "application","externalRefId","External Ref Id","String","String","true",28
 "application","lastUpdated","Modified Date","String","String","false",99
 "application","latency","Latency OK","String","YesNo","true",37
@@ -97,7 +97,7 @@
 "application","useFrequency","Use Frequency","String","String","true",43
 "application","userCount","User Count","String","String","true",41
 "application","userLocations","User Locations","String","String","true",42
-"application","validation","Validation","String","String","true",36
+"application","validation","Validation","String","InList","true",36
 "application","custom1","Plan Strategy","String","List","true",101
 "application","custom2","Contains PCI","String","YesNo","true",102
 "application","custom3","Contains HIPPA","String","YesNo","true",103
@@ -110,7 +110,7 @@
 "database","description","Description","String","String","true",2
 "database","assetType","Class","String","String","true",-1
 "database","supportType","Support","String","String","true",21
-"database","environment","Environment","String","String","true",31
+"database","environment","Environment","String","Options.Environment","true",31
 "database","externalRefId","External Ref Id","String","String","true",24
 "database","dbFormat","Format","String","String","true",4
 "database","retireDate","Retire Date","String","Date","true",22
@@ -120,7 +120,7 @@
 "database","maintExpDate","Maint Expiration","String","Date","true",23
 "database","planStatus","Plan Status","String","Options.PlanStatus","true",33
 "database","rateOfChange","Rate Of Change","int","Number","true",7
-"database","validation","Validation","String","String","true",34
+"database","validation","Validation","String","InList","true",34
 "database","lastUpdated","Modified Date","String","Date","false",99
 "database","modifiedBy","Modified By","String","Person","false",-1
 "database","custom1","Plan Strategy","String","List","true",101
@@ -139,13 +139,13 @@
 "storage","LUN","LUN","String","String","true",21
 "storage","moveBundle","Bundle","String","String","true",41
 "storage","fileFormat","Format","String","String","true",4
-"storage","environment","Environment","String","String","true",22
+"storage","environment","Environment","String","Options.Environment","true",22
 "storage","externalRefId","External Ref Id","String","String","true",34
 "storage","supportType","Support","String","String","true",33
 "storage","planStatus","Plan Status","String","Options.PlanStatus","true",42
 "storage","size","Size","String","String","true",5
 "storage","rateOfChange","Rate Of Change","int","Number","true",23
-"storage","validation","Validation","String","String","true",43
+"storage","validation","Validation","String","InList","true",43
 "storage","lastUpdated","Modified Date","String","Date","false",99
 "storage","maintExpDate","Maint Expiration","String","Date","false",-1
 "storage","modifiedBy","Modified By","String","Person","false",-1
