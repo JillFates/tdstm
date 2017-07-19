@@ -352,6 +352,12 @@ var EntityCrud = (function ($) {
 		});
 
 	}
+
+	// Used to hide fields only for VMs
+	pub.hideNonVMFields = function () {
+        $(".nonVMLabel").hide();
+	}
+
 	// Used to display Chassis fields appropriately
 	pub.showChassisFields = function () {
 		$(".positionLabel").show();
@@ -439,6 +445,7 @@ var EntityCrud = (function ($) {
 				pub.hideRackFields();
 				pub.hideChassisFields();
 				pub.showVMFields();
+				pub.hideNonVMFields()
 				break;
 			default:
 				// Rackable device
