@@ -5,7 +5,7 @@ import com.tdssrc.grails.StringUtil
 /**
  * @author John Martin
  * Ticket TM-6619
- * version 6
+ * version 6/7
  *   - Fixed some of the control types that are used for standard fields (superficial)
  * version 5
  *   - Fix issue where custom.title fields sometimes set to null
@@ -18,7 +18,7 @@ import com.tdssrc.grails.StringUtil
  *   - Custom that were marked hidden now correctly hidden
  */
 databaseChangeLog = {
-    changeSet(author: "jmartin", id: "20170712 TM-6619-v6 Create Field Settings JSON specs") {
+    changeSet(author: "jmartin", id: "20170712 TM-6619-v7 Create Field Settings JSON specs") {
         comment('This will aggregate values from various places and create JSON specs for every project')
 
         grailsChange {
