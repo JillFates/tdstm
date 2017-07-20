@@ -50,8 +50,8 @@ class BootStrap {
 
 		//initialize License service to use
 		licenseAdminService.initialize()
-		
-		//initialize exception logger filter to mute GrailsExceptionResolver 
+
+		//initialize exception logger filter to mute GrailsExceptionResolver
 		initializeExceptionLoggerFilter()
 
 		CustomMethods.initialize()
@@ -81,19 +81,19 @@ class BootStrap {
 		qzSignService.getPassphrase()
 		qzSignService.findPrivateKeyFile()
 	}
-	
+
 	/**
 	 * Check Config flags or alert about required information
 	 */
 	private initializeExceptionLoggerFilter(){
-		
+
 		Logger.rootLogger.allAppenders.each { appender ->
             ExceptionLoggerFilter filter = new ExceptionLoggerFilter()
             filter.loggerClass = "org.codehaus.groovy.grails.web.errors.GrailsExceptionResolver"
             filter.activateOptions()
             appender.addFilter(filter)
 		}
-			
+
 	}
 
 	private void createInitialData() {

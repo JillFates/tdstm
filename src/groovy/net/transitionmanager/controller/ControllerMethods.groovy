@@ -13,6 +13,7 @@ import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
+import com.tdsops.common.grails.ApplicationContextHolder
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -253,6 +254,7 @@ trait ControllerMethods {
 	}
 
 	Project getProjectForWs() {
+		SecurityService securityService = ApplicationContextHolder.getBean('securityService')
 		Project project = securityService.userCurrentProject
 		if (! project) {
 			throw new InvalidRequestException('No current project selected for session')
