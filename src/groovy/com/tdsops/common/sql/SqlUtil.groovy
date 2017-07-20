@@ -6,6 +6,11 @@ import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 
 class SqlUtil {
+	public static final String COMMA = ","
+	public static final String STRING_QUOTE = "'"
+	public static final String LEFT_PARENTHESIS = "("
+	public static final String RIGHT_PARENTHESIS = ")"
+	public static final String NULL = "null"
 
 	/**
 	 * Helper class that allows the concatenation of sql with and/or which only adds the logic if the query already contains content

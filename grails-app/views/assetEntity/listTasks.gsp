@@ -30,11 +30,17 @@
 		.action-bar.checkboxContainer label {
 			margin-left: 4px;
 		}
-        div#controlRowId {
-            margin-bottom: 10px;
-            width: 500px;
-        }
-        #timeline {
+		div.action-bar-wrapper {
+			margin-left: 0px;
+			margin-right: 0px;
+		}
+		div.action-bar-wrapper #controlRowId {
+			margin-bottom: 10px;
+		}
+		div.timeline-wrapper{
+			width: 442px;
+		}
+		div.timeline-wrapper #timeline {
             margin-right: 21px;
         }
 </style>
@@ -99,14 +105,14 @@
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:myLinkFormatter, width:60, fixed:true},
 					{name:'comment', width:680, formatter:taskViewFormatter},
-					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
-					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['1']}', formatter:${formatterMap[taskPref['1']] ?: 'taskFormatter'}, width:200},
+                    {name:'${taskPref['2']}', formatter:${formatterMap[taskPref['2']] ?: 'taskFormatter'}, width:200},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
 					{name:'dueDate', formatter: dueFormatter},
 					{name:'status', formatter: statusFormatter},
-					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
-					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
-					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['3']}', formatter:${formatterMap[taskPref['3']] ?: 'taskFormatter'}, width:200},
+                    {name:'${taskPref['4']}', formatter:${formatterMap[taskPref['4']] ?: 'taskFormatter'}, width:200},
+                    {name:'${taskPref['5']}', formatter:${formatterMap[taskPref['5']] ?: 'taskFormatter'}, width:200},
 					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
 					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
@@ -283,8 +289,8 @@
 			<input type="hidden" name="justMyTasks" id="justMyTasks" value="${justMyTasks}"/>
 			<input type="hidden" name="viewUnpublished" id="viewUnpublished" value="${viewUnpublished}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
-            <div class="row">
-                <div class="col-md-6">
+            <div class="row action-bar-wrapper">
+                <div class="pull-left">
                     <div id="controlRowId">
                         <b>Event </b>
                         <g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
@@ -304,7 +310,7 @@
                         </tds:hasPermission>
                     </div>
                 </div>
-                <div class="col-md-6 text-right">
+                <div class="timeline-wrapper text-right pull-right">
                     <tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
                     <tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>
                     <g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>

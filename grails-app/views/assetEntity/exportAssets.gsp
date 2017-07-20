@@ -1,4 +1,3 @@
-<%@page import="net.transitionmanager.security.Permission"%>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -10,7 +9,7 @@
 	<g:render template="../layouts/responsiveAngularResources" />
 
 	<g:javascript src="progressBar.js" />
-	
+
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#exportForm').submit(function(e){
@@ -19,14 +18,14 @@
 		        url = form.attr("action");
 
 				$.post(url, items, function(data) {
-					var progressBar = tds.ui.progressBar(data.data.key, 5000, 
+					var progressBar = tds.ui.progressBar(data.data.key, 5000,
 					function() {
 						window.location="downloadExport?key=" + data.data.key;
 					}, function() {
 					},
 					"Exporting assets");
 				});
-				
+
 		        return false;
 		    });
 		});
@@ -67,8 +66,10 @@
 							<div class="form-group col-lg-3 col-md-4">
 								<label for="bundleId">Select one or more bundle(s):</label>
 								<select id="bundleId" name="bundle" multiple="multiple" class="form-control medium-height">
-									<option value="" selected="selected">All</option>
-									<g:each status="i" in="${moveBundleInstanceList}" var="moveBundle">
+									<option value="All">All Bundles</option>
+									<option value="${useForPlanningArgName}" selected="selected">Planning Bundles</option>
+									<option value="" disabled>──────────</option>
+									<g:each status="i" in="${moveBundleList}" var="moveBundle">
 										<option value="${moveBundle?.id}">${moveBundle?.name}</option>
 									</g:each>
 								</select>
@@ -149,19 +150,12 @@
 									</div>
 								</div>
 							</div>
-							<tds:hasPermission permission="${Permission.AssetExport}">
 							<div class="form-group">
 								<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
 							</div>
 							<div class="">
-								<%--
-									<g:link controller="assetEntity" action="exportSpecialReport">
-										<input class="button" type="button" value="Generate Special" onclick="window.location=this.parentNode.href;"/>
-									</g:link>
-								--%>
 								<button type="submit" class="btn btn-primary">Export Excel (.xlsx)&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
 							</div>
-							</tds:hasPermission>
 						</div><!-- /.box-body -->
 					</g:form>
 

@@ -7,10 +7,13 @@ import { DebugElement } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
-
+import { UIRouterModule, RootModule } from '@uirouter/angular';
+// Kendo Components
 import { GridModule } from '@progress/kendo-angular-grid';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { SortableModule } from '@progress/kendo-angular-sortable';
+import { DialogModule } from '@progress/kendo-angular-dialog';
+import { InputsModule } from '@progress/kendo-angular-inputs';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { HttpServiceProvider } from '../../../shared/providers/http-interceptor.provider';
@@ -69,7 +72,16 @@ describe('FieldSettingsListComponent:', () => {
 				SharedModule,
 				GridModule,
 				PopupModule,
-				SortableModule
+				SortableModule,
+				DialogModule,
+				InputsModule,
+				UIRouterModule.forRoot(<RootModule>{
+					useHash: true,
+					states: [{
+						name: 'tds',
+						url: ''
+					}]
+				})
 			],
 			declarations: [
 				FieldSettingsListComponent,

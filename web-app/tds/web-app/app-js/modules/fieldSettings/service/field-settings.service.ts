@@ -20,19 +20,48 @@ export class FieldSettingsService {
 		return this.http.get(`${this.fieldSettingsUrl}/${domain}`)
 			.map((res: Response) => {
 				let response = res.json();
-				return Object.keys(response).map(key => {
+				let domains: DomainModel[] = Object.keys(response).map(key => {
 					response[key].domain = response[key].domain.toUpperCase();
 					return response[key];
 				});
+				if (domain.length > 0) {
+					let sharedFields = domains[0].fields.filter(x => x.shared);
+					domains.forEach(d => {
+						d.fields.filter(s => s.control === 'YesNo')
+							.forEach(s => {
+								s.constraints.values = ['Yes', 'No'];
+								if (!s.constraints.required) {
+									s.constraints.values.splice(0, 0, '');
+								}
+							});
+						sharedFields.forEach(s => {
+							let indexOf = d.fields.findIndex(f => f.field === s.field);
+							if (indexOf !== -1) {
+								d.fields.splice(indexOf, 1, s);
+							}
+						});
+					});
+				}
+				return domains;
 			})
 			.catch((error: any) => error.json());
 	}
 
-	saveFieldSettings(domainModel: DomainModel): Observable<DomainModel[]> {
+	saveFieldSettings(domains: DomainModel[]): Observable<DomainModel[]> {
 		let payload = {};
-		payload[domainModel.domain.toUpperCase()] = domainModel;
-		return this.http.post(`${this.fieldSettingsUrl}/${domainModel.domain}`, JSON.stringify(payload))
-			.map((res: Response) => res)
+		domains
+			.reduce((p: FieldSettingsModel[], c: DomainModel) => p.concat(c.fields), [])
+			.forEach((item: any) => {
+				item.constraints.required = +item.constraints.required;
+				item.udf = +item.udf;
+				item.show = +item.show;
+				item.shared = +item.shared;
+			});
+		domains.forEach(domainModel => {
+			payload[domainModel.domain.toUpperCase()] = domainModel;
+		});
+		return this.http.post(`${this.fieldSettingsUrl}/ASSETS`, JSON.stringify(payload))
+			.map((res: Response) => res['_body'] ? res.json() : { status: 'Ok' })
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 }

@@ -3,6 +3,7 @@
   -- @params user - the user information
   --%>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdsops.tm.enums.domain.StartPageEnum"%>
 <div id="personDialog" title="Edit Person" style="display:none;" class="static-dialog old-legacy-content">
 	<div class="dialog">
 		<table>
@@ -78,11 +79,11 @@
 				<td valign="top" class="value">
 					<tds:hasPermission permission="${Permission.AdminMenuView}">
 						<g:select name="startPage" value="${tds.startPage()}"
-						         from="${['Project Settings','Planning Dashboard','Admin Portal', 'User Dashboard']}" />
+						         from="${[StartPageEnum.PROJECT_SETTINGS.value,StartPageEnum.PLANNING_DASHBOARD.value,StartPageEnum.ADMIN_PORTAL.value, StartPageEnum.USER_DASHBOARD.value]}" />
 					</tds:hasPermission>
 					<tds:lacksPermission permission="${Permission.AdminMenuView}">
 						<g:select name="startPage" value="${tds.startPage()}"
-						          from="${['Project Settings','Planning Dashboard', 'User Dashboard']}" />
+						          from="${[StartPageEnum.PROJECT_SETTINGS.value,StartPageEnum.PLANNING_DASHBOARD.value, StartPageEnum.USER_DASHBOARD.value]}" />
 					</tds:lacksPermission>
 				</td>
 			</tr>

@@ -134,7 +134,7 @@ class MoveEventController implements ControllerMethods {
 
 		render jsonData as JSON
 	}
-	
+
 	@HasPermission(Permission.EventView)
 	def show() {
 		String moveEventId = params.id
@@ -198,7 +198,7 @@ class MoveEventController implements ControllerMethods {
 		}
 		redirect(action: 'list')
 	}
-	
+
 	@HasPermission(Permission.EventEdit)
 	def edit() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
@@ -210,7 +210,7 @@ class MoveEventController implements ControllerMethods {
 
 		[moveEventInstance: moveEvent, moveBundles: MoveBundle.findAllByProject(moveEvent.project)]
 	}
-	
+
 	@HasPermission(Permission.EventEdit)
 	def update() {
 		MoveEvent moveEvent = MoveEvent.get(params.id)
@@ -237,12 +237,14 @@ class MoveEventController implements ControllerMethods {
 			render(view: 'edit', model: [moveEventInstance: moveEvent])
 		}
 	}
-	
+
 	@HasPermission(Permission.EventCreate)
 	def create() {
-		[moveEventInstance: new MoveEvent(params)]
+		Project project = securityService.userCurrentProject
+		List bundles = moveBundleService.lookupList(project)
+		[moveEventInstance: new MoveEvent(params), bundles: bundles]
 	}
-	
+
 	@HasPermission(Permission.EventCreate)
 	def save() {
 		if (params.estStartTime) {
@@ -266,21 +268,6 @@ class MoveEventController implements ControllerMethods {
 		else {
 			render(view: 'create', model: [moveEventInstance: moveEvent])
 		}
-	}
-
-	/*
-	 * return the list of MoveBundles which are associated to the selected Project
-	 * @return : return the list of MoveBundles as JSON object
-	 */
-	@HasPermission(Permission.BundleView)
-	@HasPermission(Permission.EventView)
-	def retrieveMoveBundles() {
-		def moveBundles
-		Project project = securityService.userCurrentProject
-		if (project) {
-			moveBundles = MoveBundle.findAllByProject(project)
-		}
-		render moveBundles as JSON
 	}
 
 	/**
@@ -356,7 +343,7 @@ class MoveEventController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.EventView)
 	def retrieveMoveEventNewsAndStatus() {
-		
+
 		// Make sure that the user is trying to access a valid event
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) {
@@ -451,7 +438,7 @@ class MoveEventController implements ControllerMethods {
 			else {
 				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
 			}
-			
+
 			saveWithWarnings moveEvent
 			render "success"
 		}

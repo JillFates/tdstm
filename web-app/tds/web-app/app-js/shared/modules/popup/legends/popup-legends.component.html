@@ -1,4 +1,4 @@
-<span #fieldsLegend (click)="onToggle()"><i class="fa  fa-question"></i></span>
+<span style="cursor:pointer;" #fieldsLegend (click)="onToggle()"><i class="fa  fa-question"></i></span>
 <kendo-popup [anchor]="fieldsLegend" [popupClass]="'content popup'" *ngIf="show">
     <table class="legendTable field-importance-table" style="width:300px">
         <tbody>
@@ -15,7 +15,7 @@
             <tr>
                 <td>N)ormal</td>
                 <td class="N">Manufacturer</td>
-                <td class="N">HP</td>
+                <td class="N">Partner</td>
             </tr>
             <tr>
                 <td class="ng-binding">U)nimportant</td>

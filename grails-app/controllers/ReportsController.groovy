@@ -7,6 +7,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -34,7 +35,9 @@ import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
@@ -56,6 +59,7 @@ class ReportsController implements ControllerMethods {
 
 	AssetEntityService assetEntityService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
 	MoveEventService moveEventService
@@ -865,25 +869,25 @@ class ReportsController implements ControllerMethods {
 
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
-			def configMap = assetEntityService.getConfig('Application',validationType)
 			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
 
-			def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
 			// TODO: we'd like to flush the session.
 			// GormUtil.flushAndClearSession(idx)
 			appList.add([app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
 				          redirectTo: params.redirectTo, assetComment: assetComment, assetCommentList: assetCommentList,
 				          appMoveEvent: appMoveEvent, moveEventList: moveEventList, appMoveEvent: appMoveEventlist,
 				          dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
-				          project: project, prefValue: prefValue, config: configMap.config, customs: configMap.customs,
-				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors,
-				          highlightMap: highlightMap])
+				          project: project, prefValue: prefValue,
+				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors])
 		}
 
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
+		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)
+
 		[applicationList: appList, moveBundle: currentBundle ?: 'Planning Bundles', sme: currentSme ?: 'All',
-		 appOwner: applicationOwner ?: 'All', project: project]
+		 appOwner: applicationOwner ?: 'All', project: project, standardFieldSpecs: standardFieldSpecs, customs: customFields]
 	}
 
 	def generateApplicationConflicts() {
@@ -1180,17 +1184,14 @@ class ReportsController implements ControllerMethods {
 	def applicationMigrationReport() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')
 		if (!project) return
-
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = userPreferenceService.moveBundleId
 		def smeList = reportsService.getSmeList(moveBundleId, true)
 		def workflow = Workflow.findByProcess(project.workflowCode)
 		def workflowTransitions = WorkflowTransition.findAll(
 				'FROM WorkflowTransition where workflow=? order by transId', [workflow])
-		def attributes = projectService.getAttributes('Application')
-		def projectCustoms = project.customFieldsShown + 1
-		def nonCustomList = (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it}
-		def appAttributes = attributes.findAll{!(it.attributeCode in nonCustomList)}
+		String domain = AssetClass.APPLICATION.toString()
+		List appAttributes = customDomainService.fieldSpecs(domain, CustomDomainService.ALL_FIELDS, ["field", "label"])
 		[moveBundles:moveBundleList, moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},
 		 workflowTransitions:workflowTransitions, appAttributes:appAttributes]
 	}

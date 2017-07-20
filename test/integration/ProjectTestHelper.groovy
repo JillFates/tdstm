@@ -1,4 +1,5 @@
 import com.tdsops.common.grails.ApplicationContextHolder
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
@@ -19,12 +20,15 @@ class ProjectTestHelper {
 	static ProjectService projectService
 	static PartyRelationshipService partyRelationshipService
 	static final long projectId = 2445
+    private MoveBundleTestHelper bundleHelper
 
 	// Initialize
 	ProjectTestHelper() {
 		projectService = ApplicationContextHolder.getService('projectService')
 		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
+	    bundleHelper = new MoveBundleTestHelper()
 	}
+
 
 	/**
 	 * Get the project to test with
@@ -47,6 +51,15 @@ class ProjectTestHelper {
 		return moveEvent
 	}
 
+	Project createProjectWithDefaultBundle(PartyGroup company=null) {
+		Project project = createProject(company)
+        MoveBundle bundle = bundleHelper.createBundle(project)
+        project.defaultBundle = bundle
+        project.save(flush:true, failOnError:true)
+        return project
+
+	}
+
 	/**
 	 * Create a project
 	 */
@@ -55,6 +68,7 @@ class ProjectTestHelper {
 		if (!company) {
 			company = createCompany('Owner')
 		}
+		// println "company=$company, partyType=${company?.partyType}(${company?.partyType?.id}"
 
 		Project project = new Project()
 		project.with {
@@ -84,13 +98,14 @@ class ProjectTestHelper {
 	 */
 	PartyGroup createCompany(String prefix) {
 		PartyType pt = PartyType.get('COMPANY')
+		assert pt
 		PartyGroup company = new PartyGroup()
 		company.with {
 			partyType = pt
 			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
 		}
 
-		company.save(failOnError:true)
+		company.save(failOnError:true, flush:true)
 	}
 
 	/**

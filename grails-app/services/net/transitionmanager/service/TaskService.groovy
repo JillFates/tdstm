@@ -9,12 +9,14 @@ import com.tds.asset.CommentNote
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.common.exceptions.RecipeException
 import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.domain.AssetEntityHelper
+import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.*
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
@@ -1262,9 +1264,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 //							GormUtil.asCommaDelimitedString(ids) . ') group by id'
 						def sql = "SELECT $findCol as id, count(*) as cnt FROM task_dependency WHERE $findCol in (" +
 							GormUtil.asCommaDelimitedString(ids) + ") group by id"
-						log.info "SQL = $sql, ids=$ids"
+						log.debug "getNeighborhood: SQL = $sql, ids=$ids"
 						def outerDeps = jdbcTemplate.queryForList(sql)
-						log.info "getNeighborhood() : found ${outerDeps.size()} tasks on the other side of the tracks of $ids"
+						log.debug "getNeighborhood: found ${outerDeps.size()} tasks on the other side of the tracks of $ids"
 						td.each { t ->
 							// Try to match up the outer dep count to the task dependency node
 							def outerDep = outerDeps?.find() { od -> od.id == t[nextProp].id }
@@ -1275,14 +1277,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								t.setTmpSuccessorDepCount(outerDepCount)
 							}
 
-							log.info "getNeighborhood(): Found $outerDepCount outer depend for task # ${t[findProp].taskNumber} (id:${t[findProp].id})"
+							log.debug "getNeighborhood: Found $outerDepCount outer depend for task # ${t[findProp].taskNumber} (id:${t[findProp].id})"
 						}
 					}
 
 					if (depth==1) {
 						td.each { t ->
 							//log.info "getNeighborhood: dependency $t - $depCountName = ${t[depCountName]} outside dep"
-							log.info "getNeighborhood: dependency $t"
+							log.debug "getNeighborhood: dependency $t"
 						}
 					}
 
@@ -3317,6 +3319,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Handle setting the task duration which can have an indirect reference to another property as well as a default value
 		// or a numeric value
 		task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
+
+		if (taskSpec.containsKey("docLink")) {
+			try {
+				String docLink = RecipeHelper.resolveDocLink(taskSpec["docLink"], task.assetEntity)
+				task.instructionsLink = docLink
+			} catch (RecipeException re) {
+				exceptions.append("Error while setting the docLink for ${taskSpec.id}. ${re.getMessage()} <br>")
+			}
+
+		}
 
 		// Set the duration appropriately
 		if (taskSpec.containsKey('duration')) {

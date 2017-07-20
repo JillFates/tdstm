@@ -49,21 +49,36 @@ var EntityCrud = (function ($) {
 
 		ok = validateCustomFields(formId, alertErrors, errors, ok);
 
+		// Commented out old validation error messages
+		/*if (!ok && alertErrors && errors.length > 0) {
+			alert(errors);
+		}*/
+
 		return ok;
 	};
 
 
 	/**
-	 * Validations for custom input fields
+	 * Validations for Field Spec input fields.
+	 * Simulates a submit of the form, this forces browser to run HTML5 built-in form validation.
+	 * - Validates required fields.
+	 * - Validates text input fields min-max length.
+	 *
 	 * @param errors
+	 * @param formId
 	 * @param isFormValid
+	 * @param alertErrors
 	 */
 	function validateCustomFields(formId, alertErrors, errors, isFormValid) {
 
 		var form = $('#'+formId)[0];
+
+		// Prevent form for being submitted.
 		$(form).submit(function (event) {
 			event.preventDefault();
 		});
+
+		// Submit hidden button clicked by jquery only if form is not valid. See _editButton.gsp
 		if(!form.checkValidity()){
 			$('#assetUpdateSubmit').click();
 			return false;
@@ -78,26 +93,18 @@ var EntityCrud = (function ($) {
 	var validateDBForm = function (form, alertErrors) {
 		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true;
 		return validateCommonFields(form, alertErrors);
-		/*var ok = validateCommonFields(form, alertErrors);
-		if (ok) {
-		    var size = $('#'+form+' #size').val();
-		    if ( size=='' || isNaN(size)){
-		    	if(alertErrors){
-		    		alert("Please enter numeric value for DB Size");
-		    	}
-		    	
-				ok = false;
-		    } else if($('#'+form+' #dbFormat').val()==''){
-		    	if(alertErrors){
-		    		alert("Please enter value for DB Format");
-		    	}
-				ok = false;
-		    }
-		}
-		return ok*/
 	};
 
-	/**
+    /**
+     * Private method used to validate the Storage asset create/edit forms
+     * @return true if valid
+     **/
+    var validateStorageForm = function (form) {
+        return validateCommonFields(form);
+    };
+
+
+    /**
 	 * Used to validate the Server/Device asset create/edit forms
 	 * @return true if valid
 	 **/
@@ -345,6 +352,12 @@ var EntityCrud = (function ($) {
 		});
 
 	}
+
+	// Used to hide fields only for VMs
+	pub.hideNonVMFields = function () {
+        $(".nonVMLabel").hide();
+	}
+
 	// Used to display Chassis fields appropriately
 	pub.showChassisFields = function () {
 		$(".positionLabel").show();
@@ -432,6 +445,7 @@ var EntityCrud = (function ($) {
 				pub.hideRackFields();
 				pub.hideChassisFields();
 				pub.showVMFields();
+				pub.hideNonVMFields()
 				break;
 			default:
 				// Rackable device

@@ -16,6 +16,8 @@ import { SharedModule } from '../../shared/shared.module';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { SortableModule } from '@progress/kendo-angular-sortable';
+import { DialogModule } from '@progress/kendo-angular-dialog';
+import { InputsModule } from '@progress/kendo-angular-inputs';
 // Services
 import { FieldSettingsService } from './service/field-settings.service';
 import { CustomDomainService } from './service/custom-domain.service';
@@ -28,7 +30,9 @@ import { CustomDomainService } from './service/custom-domain.service';
 		GridModule,
 		UIRouterModule.forChild({ states: FIELD_SETTINGS_STATES }),
 		PopupModule,
-		SortableModule
+		SortableModule,
+		DialogModule,
+		InputsModule
 	],
 	declarations: [
 		FieldSettingsListComponent,

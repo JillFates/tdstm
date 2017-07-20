@@ -9,6 +9,8 @@ import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
 import { PreferenceService } from '../shared/services/preference.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
+import { UIPromptService } from '../shared/directives/ui-prompt.directive';
+import { SharedStates } from '../shared/shared-routing.states';
 // Services
 import { TaskService } from '../modules/taskManager/service/task.service';
 
@@ -68,7 +70,7 @@ function requiresPermissionHook(transitionService: TransitionService) {
 			permissionService.hasPermission(reqPermission) :
 			reqPermission.reduce((p, c) => p && permissionService.hasPermission(c), true);
 		if (!permited) {
-			return $state.target('login', undefined, { location: false });
+			return $state.target(SharedStates.UNAUTHORIZED.name, undefined, { location: false });
 		}
 	};
 
@@ -85,10 +87,11 @@ export function PermissionConfig(router: UIRouter) {
 	requiresPermissionHook(transitionService);
 }
 
-export function LoadingConfig(router: UIRouter) {
+export function MiscConfig(router: UIRouter) {
 	const transitionService = router.transitionService;
 	transitionService.onStart({
-		to: (state) => state.data
+		to: (state) => state.data,
+		exiting: (state) => state.data && !state.data.hasPendingChanges
 	}, (transition) => {
 		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
 		loaderService.show();
@@ -98,6 +101,31 @@ export function LoadingConfig(router: UIRouter) {
 	}, (transition) => {
 		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
 		setTimeout(() => loaderService.hide());
+	}, { priority: 10 });
+
+	transitionService.onError({
+		to: (state) => state.data
+	}, (transition) => {
+		const $state = transition.router.stateService;
+		return $state.target(SharedStates.ERROR.name, undefined, { location: false });
+	}, { priority: 10 });
+
+	transitionService.onExit({
+		exiting: (state) => state.data && state.data.hasPendingChanges
+	}, (transition) => {
+		const promptService = transition.injector().get(UIPromptService) as UIPromptService;
+		let target = transition.to();
+		const $state = transition.router.stateService;
+		promptService.open(
+			'Confirmation Required',
+			'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'Confirm', 'Cancel').then(result => {
+				if (result) {
+					$state.$current.data.hasPendingChanges = false;
+					$state.go(target.name);
+				}
+			});
+		return false;
 	}, { priority: 10 });
 }
 export const TDSRoutingStates = [

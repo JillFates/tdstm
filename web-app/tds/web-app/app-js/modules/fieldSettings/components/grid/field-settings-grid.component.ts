@@ -1,8 +1,7 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
-import { FieldSettingsService } from '../../service/field-settings.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
+
 import { UILoaderService } from '../../../../shared/services/ui-loader.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
@@ -11,26 +10,32 @@ import { process, State } from '@progress/kendo-data-query';
 import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configuration-popup.component';
 import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
 
+declare var jQuery: any;
+
 @Component({
 	moduleId: module.id,
 	selector: 'field-settings-grid',
 	encapsulation: ViewEncapsulation.None,
+	exportAs: 'fieldSettingsGrid',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/grid/field-settings-grid.component.html',
 	styles: [`
 		.float-right { float: right;}
 		.k-grid { height:calc(100vh - 225px); }
 		tr .text-center { text-align: center; }
+		.has-error,.has-error:focus { border: 1px #f00 solid;}
 	`]
 })
 export class FieldSettingsGridComponent implements OnInit {
-	@Input('data') data: DomainModel;
-	private dataSignature: string;
-	private fieldsSettings: FieldSettingsModel[];
+	@Output('save') saveEmitter = new EventEmitter<any>();
+	@Output('cancel') cancelEmitter = new EventEmitter<any>();
+	@Output('add') addEmitter = new EventEmitter<any>();
+	@Output('share') shareEmitter = new EventEmitter<any>();
+	@Output('delete') deleteEmitter = new EventEmitter<any>();
+	@Output('filter') filterEmitter = new EventEmitter<any>();
 
-	private filter = {
-		search: '',
-		fieldType: 'All'
-	};
+	@Input('data') data: DomainModel;
+	@Input('state') gridState: any;
+	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	private state: State = {
 		sort: [{
@@ -46,27 +51,24 @@ export class FieldSettingsGridComponent implements OnInit {
 			logic: 'or'
 		}
 	};
+
 	private isEditing = false;
 	private isFilterDisabled = false;
-	private isSubmitted = false;
 	private sortable: boolean | object = { mode: 'single' };
 
 	private availableControls = [
-		{ text: 'List', value: 'Select List' },
+		{ text: 'List', value: 'List' },
 		{ text: 'String', value: 'String' },
 		{ text: 'YesNo', value: 'YesNo' }
 	];
-	private availableyFieldType = ['All', 'User Defined Fields', 'Standard Fields'];
+	private availableyFieldType = ['All', 'Custom Fields', 'Standard Fields'];
 
-	constructor(
-		private fieldService: FieldSettingsService,
-		private permissionService: PermissionService,
-		private prompt: UIPromptService,
-		private loaderService: UILoaderService) { }
+	static readonly ORDER_MIN_VALUE = 0;
+
+	constructor(private loaderService: UILoaderService, private prompt: UIPromptService) { }
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
-		this.dataSignature = JSON.stringify(this.data);
 		this.refresh();
 	}
 
@@ -76,24 +78,30 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onFilter(): void {
+		this.filterEmitter.emit(null);
+	}
+
+	public applyFilter(): void {
 		this.state.filter.filters = [];
-		if (this.filter.search !== '') {
-			this.state.filter.filters.push({
-				field: 'field',
-				operator: 'contains',
-				value: this.filter.search
-			});
-			this.state.filter.filters.push({
-				field: 'label',
-				operator: 'contains',
-				value: this.filter.search
-			});
+
+		this.fieldsSettings = this.data.fields;
+		if (this.gridState.filter.search !== '') {
+			let search = new RegExp(this.gridState.filter.search, 'i');
+			this.fieldsSettings = this.data.fields.filter(
+				item => search.test(item.field) ||
+					search.test(item.label) ||
+					item['isNew']);
 		}
-		if (this.filter.fieldType !== 'All') {
+		if (this.gridState.filter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.filter.fieldType === 'User Defined Fields'
+				value: this.gridState.filter.fieldType === 'Custom Fields'
+			});
+			this.state.filter.filters.push({
+				field: 'isNew',
+				operator: 'eq',
+				value: true
 			});
 		}
 		this.refresh();
@@ -103,117 +111,108 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.loaderService.show();
 		setTimeout(() => {
 			this.isEditing = true;
-			this.sortable = false;
-			this.state.sort = [
-				{
-					dir: 'desc',
-					field: 'isNew'
-				}, {
-					dir: 'asc',
-					field: 'order'
-				}
-			];
-			this.filter = {
-				search: '',
-				fieldType: 'All'
-			};
-			this.isFilterDisabled = true;
+			this.sortable = { mode: 'single' };
+			this.isFilterDisabled = false;
 			this.onFilter();
 			this.loaderService.hide();
 		});
 	}
 
 	protected onSaveAll(): void {
-		if (this.isEditAvailable() && this.isValid()) {
+		this.saveEmitter.emit(() => {
 			this.reset();
-			this.fieldsSettings.filter(x => x['isNew']).forEach(x => delete x['isNew']);
-			this.fieldService.saveFieldSettings(this.data)
-				.subscribe((res) => this.refresh(true));
-		} else {
-			this.isSubmitted = true;
-			this.refresh();
-		}
+		});
+
 	}
 
 	protected onCancel(): void {
-		if (this.isDirty()) {
-			this.prompt.open('Confirmation Required', 'Changes you made may not be saved. Do you want to continue?',
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
-						this.reset();
-						this.refresh(true);
-					}
-				});
-		} else {
+		this.cancelEmitter.emit(() => {
 			this.reset();
 			this.refresh();
-		}
+		});
 	}
 
 	protected onDelete(dataItem: FieldSettingsModel): void {
-		this.fieldsSettings.splice(this.fieldsSettings.indexOf(dataItem), 1);
-		this.refresh();
+		this.deleteEmitter.emit({
+			field: dataItem,
+			domain: this.data.domain,
+			callback: () => {
+				this.refresh();
+			}
+		});
 	}
 
 	protected onAddCustom(): void {
-		let model = new FieldSettingsModel();
-		model.field = this.availableCustomNumbers();
-		model.constraints = {
-			required: false
-		};
-		model['isNew'] = true;
-		this.fieldsSettings.push(model);
-		this.refresh();
-		model.order = this.fieldsSettings.length + 1;
+		this.addEmitter.emit((custom) => {
+			this.state.sort = [
+				{
+					dir: 'desc',
+					field: 'isNew'
+				}, {
+					dir: 'desc',
+					field: 'count'
+				}
+			];
+			let model = new FieldSettingsModel();
+			model.field = custom;
+			model.constraints = {
+				required: false
+			};
+			model.label = '';
+			model['isNew'] = true;
+			model['count'] = this.data.fields.length;
+			model.control = 'String';
+			model.show = true;
+			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
+			model.order = availableOrder[availableOrder.length - 1] + 1;
+			this.data.fields.push(model);
+			this.onFilter();
+
+			setTimeout(function () {
+				jQuery('#' + model.field).focus();
+			});
+		});
+	}
+
+	protected onShare(field: FieldSettingsModel) {
+		this.shareEmitter.emit({
+			field: field,
+			domain: this.data.domain
+		});
+	}
+
+	protected onRequired(field: FieldSettingsModel) {
+		if (field.constraints.values &&
+			(field.control === 'List' || field.control === 'YesNo')) {
+			if (field.constraints.required) {
+				field.constraints.values.splice(field.constraints.values.indexOf(''), 1);
+			} else if (field.constraints.values.indexOf('') === -1) {
+				field.constraints.values.splice(0, 0, '');
+			}
+			if (field.constraints.values.indexOf(field.default) === -1) {
+				field.default = null;
+			}
+		}
+	}
+
+	protected onClearTextFilter(): void {
+		this.gridState.filter.search = '';
+		this.onFilter();
 	}
 
 	protected reset(): void {
 		this.isEditing = false;
-		this.isSubmitted = false;
 		this.sortable = { mode: 'single' };
 		this.isFilterDisabled = false;
 		this.state.sort = [{
 			dir: 'asc',
 			field: 'order'
 		}];
+		this.applyFilter();
 	}
 
-	protected refresh(fetch = false): void {
-		if (fetch) {
-			this.fieldService.getFieldSettingsByDomain(this.data.domain).subscribe(
-				(result) => {
-					if (result[0]) {
-						this.data = result[0];
-						this.fieldsSettings = this.data.fields;
-						this.refresh();
-					}
-				},
-				(err) => console.log(err));
-		} else {
-			this.gridData = process(this.fieldsSettings, this.state);
-		}
-	}
-
-	protected availableCustomNumbers(): string {
-		let custom = this.fieldsSettings
-			.filter(item => /^custom/i.test(item.field))
-			.map((item) => +item.field.replace(/[a-z]/ig, ''))
-			.sort((a, b) => a - b);
-		let number = custom.findIndex((item, i) => item !== i + 1);
-		return 'custom' + ((number === -1 ? custom.length : number) + 1);
-	}
-
-	protected isEditAvailable(): boolean {
-		return this.permissionService.hasPermission('ProjectFieldSettingsEdit');
-	}
-
-	protected isValid(): boolean {
-		return this.fieldsSettings.filter(item =>
-			!item.label || !item.field).length === 0;
-	}
-
-	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.data);
+	public refresh(): void {
+		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
 	protected onControlChange(
@@ -221,7 +220,13 @@ export class FieldSettingsGridComponent implements OnInit {
 		selectList: SelectListConfigurationPopupComponent,
 		minMax: MinMaxConfigurationPopupComponent): void {
 		switch (dataItem.control) {
-			case 'Select List':
+			case 'List':
+
+				if (dataItem.constraints.values &&
+					dataItem.constraints.values.indexOf('Yes') !== -1 &&
+					dataItem.constraints.values.indexOf('No') !== -1) {
+					dataItem.constraints.values = [];
+				}
 				if (!dataItem.constraints.values ||
 					dataItem.constraints.values.length === 0) {
 					selectList.onToggle();
@@ -230,6 +235,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 				break;
 			case 'String':
+				dataItem.constraints.values = [];
 				if (!dataItem.constraints.minSize ||
 					!dataItem.constraints.maxSize) {
 					minMax.onToggle();
@@ -237,8 +243,47 @@ export class FieldSettingsGridComponent implements OnInit {
 					minMax.show = false;
 				}
 				break;
+			case 'YesNo':
+				dataItem.constraints.values = ['Yes', 'No'];
+				if (dataItem.constraints.values.indexOf(dataItem.default) === -1) {
+					dataItem.default = null;
+				}
+				if (!dataItem.constraints.required) {
+					dataItem.constraints.values.splice(0, 0, '');
+				}
+				break;
 			default:
 				break;
 		}
 	}
+
+	protected onControlModelChange(
+		newValue: 'List' | 'String' | 'YesNo' | '',
+		dataItem: FieldSettingsModel,
+		selectList: SelectListConfigurationPopupComponent,
+		minMax: MinMaxConfigurationPopupComponent) {
+		if (dataItem.control === 'List') {
+			this.prompt.open(
+				'Confirmation Required',
+				'Changing the control will lose all List options. Click Ok to continue otherwise Cancel',
+				'Ok', 'Cancel').then(result => {
+					if (result) {
+						dataItem.control = newValue;
+						this.onControlChange(dataItem, selectList, minMax);
+					} else {
+						setTimeout(() => {
+							jQuery('#control' + dataItem.field).val('List');
+						});
+					}
+				});
+		} else {
+			dataItem.control = newValue;
+			this.onControlChange(dataItem, selectList, minMax);
+		}
+	}
+
+	protected hasError(label: string) {
+		return label.trim() === '' || this.data.fields.filter(item => item.label === label.trim()).length > 1;
+	}
+
 }

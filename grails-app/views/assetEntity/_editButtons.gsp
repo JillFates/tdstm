@@ -4,7 +4,7 @@
 <g:if test="${redirectTo!='dependencyConsole'}">
 	 <span class="button">
 		<input type="button" class="save updateDep" data-action='' value="Update" id="assetUpdateButton">
-		<input type="submit" class="save updateDep" value="Submit" id="assetUpdateSubmit" style="display:none;">
+		<input type="submit" id="assetUpdateSubmit" style="display:none;">
 	 </span>
 	 <tds:hasPermission permission="${Permission.AssetDelete}">
 		 <span class="button"><g:actionSubmit class="delete" 

@@ -1,19 +1,23 @@
 /**
  * Created by daviD on 04/06/2017.
  */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
-import { DebugElement } from '@angular/core';
-import { PopupModule } from '@progress/kendo-angular-popup';
-import { SortableModule } from '@progress/kendo-angular-sortable';
-import { FormsModule } from '@angular/forms';
-import { SharedModule } from '../../../shared/shared.module';
+
 import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FieldSettingsModel } from '../model/field-settings.model';
-import { CustomDomainService } from '../service/custom-domain.service';
 import { Observable } from 'rxjs/Rx';
 import { HttpModule, Http } from '@angular/http';
+
+import { PopupModule } from '@progress/kendo-angular-popup';
+import { SortableModule } from '@progress/kendo-angular-sortable';
+import { DialogModule } from '@progress/kendo-angular-dialog';
+
+import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
+import { SharedModule } from '../../../shared/shared.module';
+import { FieldSettingsModel } from '../model/field-settings.model';
+import { CustomDomainService } from '../service/custom-domain.service';
 
 describe('SelectListConfigurationPopupComponent:', () => {
 	let fixture: ComponentFixture<SelectListConfigurationPopupComponent>;
@@ -30,7 +34,7 @@ describe('SelectListConfigurationPopupComponent:', () => {
 			values: []
 		},
 		show: true,
-		control: 'Select List'
+		control: 'List'
 	};
 
 	let spy: jasmine.Spy;
@@ -43,7 +47,9 @@ describe('SelectListConfigurationPopupComponent:', () => {
 				SharedModule,
 				FormsModule,
 				PopupModule,
-				SortableModule],
+				SortableModule,
+				DialogModule
+			],
 			declarations: [SelectListConfigurationPopupComponent],
 			providers: [CustomDomainService]
 		}).compileComponents();
@@ -113,6 +119,27 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		saveButton.triggerEventHandler('click', null);
 		expect(comp.field.constraints.values.length).toEqual(1);
 		expect(comp.field.constraints.values[0]).toEqual('Foo');
+	});
 
+	it('should order the items', () => {
+		comp.onToggle();
+		fixture.detectChanges();
+		comp.items = [
+			{ deletable: true, value: 'Z' },
+			{ deletable: true, value: 'P' },
+			{ deletable: true, value: 'E' },
+			{ deletable: true, value: 'A' },
+			{ deletable: true, value: 'C' }
+		];
+
+		let sortButton: DebugElement;
+		sortButton = fixture.debugElement.query(By.css('button[name=sortButton]'));
+		sortButton.triggerEventHandler('click', null);
+
+		expect(comp.items[0].value).toEqual('A');
+		expect(comp.items[1].value).toEqual('C');
+		expect(comp.items[2].value).toEqual('E');
+		expect(comp.items[3].value).toEqual('P');
+		expect(comp.items[4].value).toEqual('Z');
 	});
 });

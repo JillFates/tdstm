@@ -5,12 +5,15 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.Resource
 
+import java.security.MessageDigest
+
 class EnvironmentService implements InitializingBean, ServiceMethods {
 
 	static transactional = false
 
 	String version
 	String build
+	String buildHash
 
 	GrailsApplication grailsApplication
 
@@ -20,6 +23,9 @@ class EnvironmentService implements InitializingBean, ServiceMethods {
 			build = (resource?.inputStream.text.trim()) ?: ""
 		}
 		version = Metadata.current['tdstm.application.version']
+
+		String versionBuild = "${version}_${build}"
+		buildHash = MessageDigest.getInstance( "MD5" ).digest( versionBuild.bytes ).encodeHex().toString()
 	}
 
 	// gets the version and build data as a string

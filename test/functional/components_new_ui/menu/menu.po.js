@@ -8,7 +8,7 @@ var Menu = function() {
       	return browser.driver.getCurrentUrl().then(function(url) {
         	return url.indexOf(expUrl) > -1;
       	});
-    	}, 8000).then(function() {
+    	}).then(function() {
         return browser.driver.getCurrentUrl();
       });
     }
@@ -21,7 +21,7 @@ var Menu = function() {
       return browser.driver.getCurrentUrl().then(function(url) {
         return process.env.BASE_URL+expUrl === url;
       });
-    }, 8000).then(function() {
+    }).then(function() {
       return true;
     });
   };
@@ -40,7 +40,7 @@ var Menu = function() {
 			var that = this;
 			return browser.driver.wait(function() {
 				return that.getParent().findElement(by.className('menu-item-expand')).isDisplayed();
-			}, 500).then(function() {
+			}).then(function() {
 				return true;
 			}, function() {
 				return false;

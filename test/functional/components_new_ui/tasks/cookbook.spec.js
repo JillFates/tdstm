@@ -22,11 +22,10 @@ describe('Cookbook', function(){
   
 	var cookbook = new Cookbook();
 
-  it('should load cookbook page after select Task Cookbook', function(){
+  it('should load cookbook page after select Task - Cookbook', function(){
     var menu = new Menu();
 	var tasks = browser.driver.findElement(by.className('menu-parent-tasks'));
 	tasks.click();
-	var isdisp;
 	var items = tasks.findElement(by.className('menu-item-expand'));
 	if (items.isDisplayed()){
 		var cookbook = items.findElement(by.className('menu-parent-tasks-cookbook'));
@@ -480,8 +479,16 @@ describe('Cookbook', function(){
           expect(cookbook.isTaskGenerationTabsDisplayed()).toBe(true);
         });
 
-        it('should have this result', function() {
-          expect(cookbook.sumaryList.getText()).toEqual('Status: Completed\nTasks Created: 8\nNumber of Exceptions: 8');
+        it('should have this result', function(done) {
+        	Promise.all([ 
+        	expect(cookbook.sumaryList.getText()).toContain('Status: Completed'),
+        	expect(cookbook.sumaryList.getText()).toContain('Tasks Created:'),
+        	expect(cookbook.sumaryList.getText()).toContain('Number of Exceptions:'),
+        	]).then(function() {
+            done();
+        }).catch(function() {
+            done.fail('Result text returned is wrong');
+        })
         });
 
       }); //From WIP with "Generate using WIP recipe" checked

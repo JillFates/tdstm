@@ -36,6 +36,7 @@ import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.UserPreference
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Slf4j(value='logger')
@@ -305,11 +306,11 @@ class MoveBundleService implements ServiceMethods {
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
 			LEFT OUTER JOIN model m ON a.model_id=m.model_id
-			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview 
-				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id 
-				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id 
-				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id 
-				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes})) 
+			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview
+				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
+				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id
+				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id
+				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes}))
 			GROUP BY adb.dependency_bundle) nr ON nr.dependency_bundle=adb.dependency_bundle
 			WHERE adb.project_id=${project.id}""")
 
@@ -669,7 +670,7 @@ class MoveBundleService implements ServiceMethods {
 			progressService.update(progressKey, 90I, ProgressService.STARTED, "Finishing")
 
 			graph.destroy()
-			
+
 			logger.info 'Dependency groups generation - Destroy graph time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 100I, ProgressService.COMPLETED, "Finished")
@@ -764,5 +765,36 @@ class MoveBundleService implements ServiceMethods {
 
 	private String listAsPipeSeparatedString(list) {
 		WebUtil.listAsMultiValueString(list).replaceAll(',',  '|')
+	}
+
+	/**
+	 * This method retrieves a list of bundles for the given project using a
+	 * list of fields and a sorting criteria.
+	 *
+	 * @param project : project instance
+	 * @param projectionFields : this is a list of fields to be included in the projection. If none is
+	 *        given the method will default to 'id' and 'name'.
+	 * @param orderBy : valid property name to sort on (default 'name')
+	 *
+	 * @return list of bundles (projected fields only).
+	 */
+	public List<Map> lookupList(Project project, List projectionFields = null, String orderBy = 'name') {
+		if (! projectionFields) {
+			projectionFields = ['id', 'name']
+		}
+		List bundles = MoveBundle.createCriteria().list {
+			projections{
+				projectionFields.each {
+					property(it, it)
+				}
+			}
+			and {
+				eq('project', project)
+			}
+			order(orderBy)
+			resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+		}
+
+		return bundles
 	}
 }
