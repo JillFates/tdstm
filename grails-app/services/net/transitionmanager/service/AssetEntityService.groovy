@@ -2244,12 +2244,9 @@ class AssetEntityService implements ServiceMethods {
 
 		def moveBundleList
 
-//		def attributes = projectService.getAttributes('AssetEntity')
-
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DEVICE.toString(), true)
 
-		// def prefType = (listType == 'server') ? 'Asset_Columns' : 'Physical_Columns'
 		String prefType = 'Asset_Columns'
 		def assetPref= getExistingPref(prefType)
 
@@ -2259,13 +2256,6 @@ class AssetEntityService implements ServiceMethods {
 				filterParams[fieldName] = params[fieldName]
 			}
 		}
-/*
-		attributes.each { attribute ->
-			if (attribute.attributeCode in assetPrefVal) {
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
-			}
-		}
-*/
 
 		// Lookup the field name reference for the sort
 		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')

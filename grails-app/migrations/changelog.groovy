@@ -1,5 +1,4 @@
 databaseChangeLog = {
-	/*
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
 	include file: '20140131-add-missing-version.groovy'
@@ -175,5 +174,4 @@ databaseChangeLog = {
 	include file: "20170714-remove-all-user-preference-for-the-various-asset-list-columns.groovy"
 	include file: '20170712-add-fieldName-to-DataTransferValue.groovy'
 	include file: '20170714-Clear-out-orphaned-data-references-that-cause-the-Task-Report-to-fail.groovy'
-	*/
 }

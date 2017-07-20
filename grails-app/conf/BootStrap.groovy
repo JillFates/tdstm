@@ -57,9 +57,9 @@ class BootStrap {
 		CustomMethods.initialize()
 
 		// Load all of the Workflow definitions into the StateEngine service
-		//Workflow.list().each { wf ->
-		//	stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
-		//}
+		Workflow.list().each { wf ->
+			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
+		}
 
 		taskService.init()
 
