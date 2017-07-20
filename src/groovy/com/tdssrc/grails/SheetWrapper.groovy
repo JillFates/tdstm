@@ -50,11 +50,6 @@ class SheetWrapper {
 		if (!cell) {
 			cell = row.createCell(colIdx)
 		}
-		if (type != null) {
-			cell.setCellType(type)
-			CellStyle style = getCellStyle(type)
-			cell.setCellStyle(style)
-		}
 		return cell
 	}
 
@@ -116,15 +111,8 @@ class SheetWrapper {
 		CellStyle style = styleMap[type]
 
 		if( ! style) {
-			style = sheet.workbook.createCellStyle() // TODO <SL> Use createCellStyle()
-			if (type == Cell.CELL_TYPE_NUMERIC) { // This resolves to a Numeric no decimal spaces Value
-				String binFormat = BuiltinFormats.getBuiltinFormat(1) //this is "0" mask format
-				def df = sheet.workbook.createDataFormat().getFormat(binFormat)
-				style.setDataFormat(df)
-			} else if (type == Cell.CELL_TYPE_STRING) {
-				style.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
-			}
-
+			//Reusing createCellStyle from the WorkBookUtil
+			style = WorkbookUtil.createCellStyle(sheet, type)
 			styleMap[type] = style
 		}
 
