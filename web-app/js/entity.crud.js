@@ -1065,8 +1065,6 @@ var EntityCrud = (function ($) {
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 
-			if (!isIE7OrLesser)
-				getHelpTextAsToolTip(fieldHelpType);
 			updateAssetTitle(fieldHelpType);
 			if (rackOrChassisId)
 				updateAssetInfo(source, rackOrChassisId, roomId, location, position, 'edit', isBlade);
@@ -1132,8 +1130,6 @@ var EntityCrud = (function ($) {
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 			updateAssetTitle(fieldHelpType);
-			if (!isIE7OrLesser)
-				getHelpTextAsToolTip(fieldHelpType);
 
 			$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 			$('[data-toggle="popover"]').popover();
@@ -1348,8 +1344,6 @@ var EntityCrud = (function ($) {
 		if (fieldHelpType == 'Device')
 			updateAssetInfo(source, rackOrChassisId, roomId, location, position, forWhom, isBlade);
 
-		if (!isIE7OrLesser)
-			getHelpTextAsToolTip(fieldHelpType);
 	}
 	// Private method used by showAssetCreateView
 	function fetchAssetCreateView(controller, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
@@ -2214,32 +2208,6 @@ function highlightCssByValidation(phase, forWhom, id) {
 		}
 	});
 
-}
-
-function getHelpTextAsToolTip(type) {
-	jQuery.ajax({
-		url: tdsCommon.createAppURL('/common/retrieveTooltips'),
-		data: { 'type': type },
-		type: 'POST',
-		success: function (resp) {
-			for (var key in resp) {
-				var value = resp[key]
-				$(".dialog input[name=" + key + "],input[name='" + key + ".id']").tooltip({ position: { my: "left top" } });
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").tooltip({ position: { my: "left top" } });
-				$(".dialog input[name=" + key + "],input[name='" + key + ".id']").attr("title", value);
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").attr("title", value);
-
-				$(".dialog label[for=" + key + "]").closest('td').next('td').tooltip({ position: { my: "left top" } });
-				$(".dialog label[for=" + key + "]").closest('td').next('td').attr("title", value);
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			if (jqXHR.getAllResponseHeaders()) {
-				alert("An unexpected error occurred while getting asset.")
-			}
-
-		}
-	});
 }
 
 /**
