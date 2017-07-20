@@ -2370,8 +2370,8 @@ $(window).scroll(function (event) {
 function toggleJustPlanning($me) {
 	var isChecked = $me.is(":checked")
 	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/setImportPerferences'),
-		data: { 'value': isChecked, 'preference': 'assetJustPlanning' },
+		url: tdsCommon.createAppURL('/ws/user/preference'),
+		data: { 'value': isChecked, 'code': 'assetJustPlanning' },
 		type: 'POST',
 		success: function (data) {
 			window.location.reload()
