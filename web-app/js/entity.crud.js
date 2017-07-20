@@ -124,8 +124,8 @@ var EntityCrud = (function ($) {
 			var room = $(type + 'RoomId').val();
 			var rack = $(type + 'RackId').val();
 			if (tds.utils.stringUtils.empty(location) ||
-				tds.utils.stringUtils.empty(room)) {
-				alert("Location name, room name and rack name must be defined for 'Add Room'")
+				tds.utils.stringUtils.empty(room) ) {
+				alert("Location and Room Name must be defined for 'Add Room'")
 				ok = false;
 			}
 		} else {
