@@ -42,6 +42,7 @@ class UserPreferenceService implements ServiceMethods {
 	// TODO - TM-6569 - Refactor the Map definition with the closures
 	private static final Map<String, Map> prefCodeConstraints = [
 		viewUnpublished:  [type: 'boolean'],
+		assetJustPlanning: [type: 'boolean'],
 		RefreshEventDB:   [type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
 		RefreshTaskMgr:   [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
 		RefreshMyTasks:   [type: 'integer', inList: ['0', '30', '60', '120', '180', '240', '300']],
