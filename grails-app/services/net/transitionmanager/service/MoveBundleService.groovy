@@ -36,6 +36,7 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.UserPreference
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.util.SheetUtil
 import org.hibernate.transform.Transformers
@@ -497,6 +498,9 @@ class MoveBundleService implements ServiceMethods {
 		int rowCount = exportList.size() + startRow
 
 		for (int r = startRow; r < rowCount; r++) {
+			// get or create a row to reuse for Speed
+			Row row = sheetWrapper.getOrCreateRow(r)
+
 			for (int c = 0; c < columnList.size(); ++c) {
 				def cellValue
 				def attribName = columnList[c]
@@ -584,9 +588,9 @@ class MoveBundleService implements ServiceMethods {
 				}
 				if(cellValue){
 					if (isNumber) {
-						sheetWrapper.addCell(c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
+						sheetWrapper.addCell(row, c, cellValue, Cell.CELL_TYPE_NUMERIC)
 					} else {
-						sheetWrapper.addCell(c, r, cellValue)
+						sheetWrapper.addCell(row, c, cellValue)
 					}
 				}
 
