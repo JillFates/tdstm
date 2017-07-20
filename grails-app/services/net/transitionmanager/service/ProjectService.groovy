@@ -234,8 +234,11 @@ class ProjectService implements ServiceMethods {
 	 * @param entityType - the class type to get the field setting for
 	 * @param projectAttributes - the list of attributes to parse apart
 	 * @return a List containing key/value pairs of all of the projectAttributes
+	 * TM-6617
 	 */
+	@Deprecated
 	List<Map<String, String>> getFields(String entityType, List<EavAttribute> projectAttributes = null){
+		throw new RuntimeException('getFields is no longer used')
 		if (!projectAttributes) {
 			projectAttributes = getAttributes(entityType)
 		}
@@ -248,7 +251,9 @@ class ProjectService implements ServiceMethods {
 	/**
 	 * Get the custom fields
 	 */
+	@Deprecated
 	List<Map<String, Object>> getCustoms(List<EavAttribute> projectAttributes = null) {
+		throw new RuntimeException('getFields is no longer used')
 		Project project = securityService.userCurrentProject
 		if (!projectAttributes) {
 			projectAttributes = getAttributes('Application')
@@ -261,8 +266,12 @@ class ProjectService implements ServiceMethods {
 
 	/**
 	 * Get the config from field importance Table.
+	 * @deprecated
+	 * TM-6617
 	 */
+	@Deprecated
 	def getConfigByEntity(entityType) {
+		throw new RuntimeException('getConfigByEntity no longer used')
 		Project project = securityService.userCurrentProject
 		def parseData
 		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config
@@ -277,8 +286,11 @@ class ProjectService implements ServiceMethods {
 
 	/**
 	 * Create default importance map by assigning normal to all
+	 * @deprecated
+	 * TM-6617
 	 */
 	def generateDefaultConfig(type) {
+		throw new RuntimeException('generateDefaultConfig no longer used')
 		def defaultProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
 		def data = FieldImportance.findByProjectAndEntityType(defaultProject,type)?.config
 		if (data) {
@@ -295,8 +307,11 @@ class ProjectService implements ServiceMethods {
 
 	/**
 	 * Update default importance map for missing fields by assigning normal to all
+	 * TM-6617
 	 */
+	@Deprecated
 	def updateConfigForMissingFields(parseData, String type) {
+		throw new RuntimeException('updateConfigForMissingFields is no longer used')
 		List<EavAttribute> projectAttributes = getAttributes(type)
 		def fields = getFields(type, projectAttributes) + getCustoms(projectAttributes)
 		Set<String> phases = ValidationType.listAsMap.keySet()
@@ -311,9 +326,11 @@ class ProjectService implements ServiceMethods {
 
 	/**
 	 * Get attributes from eavAttribute based on EntityType.
+	 * TM-6617
 	 */
 	@Deprecated
 	List<EavAttribute> getAttributes(String entityType) {
+		throw new RuntimeException('getAttributes no longer used')
 		EavEntityType eavEntityType = EavEntityType.findByDomainName(entityType)
 		List<EavAttribute> attributes = EavAttribute.findAllByEntityType(eavEntityType, [sort: 'frontendLabel'])
 
@@ -585,10 +602,11 @@ class ProjectService implements ServiceMethods {
 				type: spec.type,
 				key: spec.key,
 				json: spec.json)
-			if (!s.save()) {
+			if (!s.save(flush:true)) {
 				log.error 'cloneDefaultSettings failed : ' + GormUtil.allErrorsString(s)
 				throw new DomainUpdateException('An error occurred while creating the Asset Field Settings')
 			}
+			log.debug "Created field spec ${spec.key} for project ${project.id}"
 		}
 	}
 

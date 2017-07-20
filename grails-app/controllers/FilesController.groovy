@@ -83,23 +83,30 @@ class FilesController implements ControllerMethods {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		}
 
-		//def unknownQuestioned = "'$AssetDependencyStatus.UNKNOWN','$AssetDependencyStatus.QUESTIONED'"
-		//def validUnkownQuestioned = "'$AssetDependencyStatus.VALIDATED'," + unknownQuestioned
+		def filterParams = [
+			assetName: params.assetName,
+			depNumber: params.depNumber,
+			depResolve: params.depResolve,
+			depConflicts: params.depConflicts,
+			event: params.event
+		]
 
-		def filterParams = [assetName: params.assetName, depNumber: params.depNumber, depResolve: params.depResolve,
-		                    depConflicts: params.depConflicts, event: params.event]
-		def filePref= assetEntityService.getExistingPref('Storage_Columns')
-		def attributes = projectService.getAttributes('Files')
-		def filePrefVal = filePref.collect{it.value}
-		for (attribute in attributes) {
-			if (attribute.attributeCode in filePrefVal)
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
+		// Get the list of fields for the domain
+		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.STORAGE.toString(), true)
+
+		Map filePref= assetEntityService.getExistingPref('Storage_Columns')
+		List prefColumns = filePref*.value
+		for (String fieldName in prefColumns) {
+			if (fieldNameMap.containsKey(fieldName)) {
+				filterParams[fieldName] = params[fieldName]
+			}
 		}
+
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
 		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
 		//TODO:need to move the code to AssetEntityService
-		def temp=""
-		def joinQuery=""
+		String temp=""
+		String joinQuery=""
 		filePref.each { key, value ->
 			switch(value) {
 			case 'moveBundle':

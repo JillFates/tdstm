@@ -2,6 +2,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetOptions
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
@@ -73,6 +74,8 @@ class ApplicationController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listJson() {
+		Project project = getProjectForWs()
+
 		String sortIndex = params.sidx ?: 'assetName'
 		String sortOrder = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
@@ -80,20 +83,31 @@ class ApplicationController implements ControllerMethods {
 		int rowOffset = (currentPage - 1) * maxRows
 		boolean firstWhere = true
 
-		Map filterParams = [assetName: params.assetName, depNumber: params.depNumber, depResolve: params.depResolve,
-		                    depConflicts: params.depConflicts, event: params.event]
+		Map filterParams = [
+			assetName: params.assetName,
+			depNumber: params.depNumber,
+			depResolve: params.depResolve,
+			depConflicts: params.depConflicts,
+			event: params.event
+		]
 
+		// Get the list of the user's column preferences
 		Map appPref = assetEntityService.getExistingPref('App_Columns')
-		def appPrefVal = appPref.collect { it.value }
+		List<String> prefColumns = appPref*.value
 
-		projectService.getAttributes('Application').each { EavAttribute attribute ->
-			if (attribute.attributeCode in appPrefVal) {
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
+		// Get the list of fields for the domain
+		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.APPLICATION.toString(), true)
+
+		// Now match the columns selected and if there is a match, add the param[field] to the filter
+		for (String fieldName in prefColumns) {
+			if (fieldNameMap.containsKey(fieldName)) {
+				filterParams[fieldName] = params[fieldName]
 			}
 		}
 
 		List<MoveBundle> moveBundleList
 		session.APP = [:]
+
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 		if (params.event && params.event.isNumber()) {
 			moveBundleList = MoveEvent.read(params.event)?.moveBundles?.findAll { it.useForPlanning }?.flatten() as List<MoveBundle>
@@ -127,7 +141,6 @@ class ApplicationController implements ControllerMethods {
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id''')
 
 		if (params.planMethodology) {
-			Project project = securityService.userCurrentProject
 			String customField = project.planMethodology
 
 			if(customField){

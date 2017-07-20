@@ -58,6 +58,34 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
+     * Used to retrieve a list of all of the properties for a given domain name
+     * @param project - the project to filter on
+     * @param domain - the name of the domain to fetch
+     * @param showOnly - flag when true will only return the names that are to be displayed
+     * @return A map of the field names with the value true
+     */
+    Map fieldNamesAsMap(Project project, String domain, showOnly=false) {
+        List<String> assetClassTypes = resolveAssetClassTypes(domain)
+        Map fields = [:]
+
+        for (String assetClassType in assetClassTypes) {
+            Map fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
+            if (fieldSpecMap) {
+                for (fieldSpec in fieldSpecMap.fields) {
+                    if (showOnly && ! fieldSpec.show) {
+                        continue
+                    }
+                    fields.put(fieldSpec.field, true)
+                }
+            } else {
+                // If the configuration is missing then this is a serious issue for the application and should bail out
+                throw new ConfigurationException("No Field Specification found for project ${project.id} and asset class ${assetClassType}")
+            }
+        }
+        return fields
+    }
+
+    /**
      * Used to return the list of the list of the custom field names
      * @param domain - the domain to retrieve the field specs from
      * @param showOnly - a flag when true only returns the fields to be shown otherwise returns all (default false)
@@ -166,7 +194,7 @@ class CustomDomainService implements ServiceMethods {
         String fieldName = fieldSpec.fieldSpec?.field
         boolean shared = fieldSpec.fieldSpec?.shared
 
-        validateCustomFieldName(fieldName)
+        //validateCustomFieldName(fieldName)
 
         return getDistinctAssetCustomFieldValues(project, fieldName, shared, assetClass)
     }

@@ -1254,7 +1254,6 @@ class AssetEntityService implements ServiceMethods {
 			assetComment = "blank"
 		}
 
-		def projectAttributes = projectService.getAttributes(type)
 		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
 		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
 
@@ -1518,7 +1517,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	@Deprecated
 	Map getConfig(String type, String validation, projectAttributes = null) {
-		log.error 'Deprecated method getConfig was called'
+		throw new RuntimeException('getConfig no longer used')
 		Project project = securityService.userCurrentProject
 		def allconfig = projectService.getConfigByEntity(type)
 		List<Map<String, String>> fields = projectService.getFields(type, projectAttributes) + projectService.getCustoms(projectAttributes)
@@ -2002,8 +2001,11 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Add the css for the labels which fieldImportance is 'C','I'
+	 * @deprecated
+	 * TM-6617
 	 */
 	Map getHighlightedInfo(forWhom, assetEntity, configMap, projectAttributes = null) {
+		throw new RuntimeException('getHighlightedInfo no longer used')
 		def highlightMap = [:]
 		(projectService.getFields(forWhom, projectAttributes) + projectService.getCustoms(projectAttributes)).each { f ->
 			def configMaps = configMap.config
@@ -2023,16 +2025,6 @@ class AssetEntityService implements ServiceMethods {
 		if (assetEntity.assetName) {
 			name = SEU.escapeHtml(SEU.escapeJavaScript(assetEntity.assetName))
 		}
-		/*
-		def size = assetEntity.assetName?.size() ?: 0
-		for (int i = 0; i < size; ++i)
-			if (assetEntity.assetName[i] == "'")
-				name = name + "\\'"
-			else if (ignoreSingleQuotes && assetEntity.assetName[i] == '"')
-				name = name + '\\"'
-			else
-				name = name + assetEntity.assetName[i]
-		*/
 		return name
 	}
 
@@ -2252,18 +2244,28 @@ class AssetEntityService implements ServiceMethods {
 
 		def moveBundleList
 
-		def attributes = projectService.getAttributes('AssetEntity')
+//		def attributes = projectService.getAttributes('AssetEntity')
+
+		// Get the list of fields for the domain
+		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DEVICE.toString(), true)
 
 		// def prefType = (listType == 'server') ? 'Asset_Columns' : 'Physical_Columns'
-		def prefType = 'Asset_Columns'
+		String prefType = 'Asset_Columns'
 		def assetPref= getExistingPref(prefType)
 
-		def assetPrefVal = assetPref*.value
+		List assetPrefColumns = assetPref*.value
+		for (String fieldName in assetPrefColumns) {
+			if (fieldNameMap.containsKey(fieldName)) {
+				filterParams[fieldName] = params[fieldName]
+			}
+		}
+/*
 		attributes.each { attribute ->
 			if (attribute.attributeCode in assetPrefVal) {
 				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
 			}
 		}
+*/
 
 		// Lookup the field name reference for the sort
 		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')

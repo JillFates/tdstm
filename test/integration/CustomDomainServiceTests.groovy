@@ -5,6 +5,7 @@ import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import groovy.json.JsonSlurper
@@ -17,6 +18,7 @@ import spock.lang.Stepwise
 class CustomDomainServiceTests extends Specification {
 
     CustomDomainService customDomainService
+    ProjectService projectService
 
     // Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
     // After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
@@ -27,7 +29,7 @@ class CustomDomainServiceTests extends Specification {
     private ProjectTestHelper projectHelper = new ProjectTestHelper()
     private AssetTestHelper assetHelper = new AssetTestHelper()
 
-    private static final String CUSTOM1_LABEL = 'Plan Strategy'
+    private static final String CUSTOM1_LABEL = 'Description'
 
     /**
      * This will load the JSON file that accompanies this test suite and will return
@@ -49,10 +51,10 @@ class CustomDomainServiceTests extends Specification {
 
     // A list of assets that will be used by a few test cases
     private static final List ASSETS = [
-        [name:RSU.randomAlphabetic(10), custom1: 'Red'],
-        [name:RSU.randomAlphabetic(10), custom1: 'Green'],
-        [name:RSU.randomAlphabetic(10), custom1: 'Blue'],
-        [name:RSU.randomAlphabetic(10), custom1: 'Blue']
+        [name:RSU.randomAlphabetic(10), description: 'Red'],
+        [name:RSU.randomAlphabetic(10), description: 'Green'],
+        [name:RSU.randomAlphabetic(10), description: 'Blue'],
+        [name:RSU.randomAlphabetic(10), description: 'Blue']
     ]
 
     /**
@@ -61,7 +63,7 @@ class CustomDomainServiceTests extends Specification {
      */
     private void createAssets(Project project) {
         for (asset in ASSETS) {
-            assetHelper.createDevice(project, 'Server', [assetName:asset.name, custom1: asset.custom1])
+            assetHelper.createDevice(project, 'Server', [assetName:asset.name, description: asset.description])
         }
     }
 
@@ -135,9 +137,29 @@ class CustomDomainServiceTests extends Specification {
             foundFieldSpec instanceof Map
     }
 
-    void 'Scenario 6: Test distinctValues returns expected values'() {
+    void 'Scenario 6: Test fieldNamesAsMap for expected values'() {
         given: 'a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+
+        when: 'calling the fieldNamesAsMap method'
+            String deviceClass = AssetClass.DEVICE.toString()
+            Map fields = customDomainService.fieldNamesAsMap(project, deviceClass)
+        then: 'the map should contain values'
+            fields
+        and: 'the map should contain certain values'
+            fields.containsKey('assetName')
+            fields.containsKey('description')
+            fields.containsKey('planStatus')
+            fields.containsKey('environment')
+    }
+
+    void 'Scenario 7: Test distinctValues returns expected values'() {
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
         and: 'the project has assets with existing data values'
             createAssets(project)
             List assetList = AssetEntity.findAllByProject(project)
@@ -145,7 +167,7 @@ class CustomDomainServiceTests extends Specification {
         and: 'there is an individual field specification for DEVICE.custom1'
             JSONObject allDomainSpecs = loadFieldSpecJson()
             String deviceClass = AssetClass.DEVICE.toString()
-            JSONObject fieldSpec = [fieldSpec: allDomainSpecs[deviceClass]['fields'].find { it.label == CUSTOM1_LABEL } ]
+            JSONObject fieldSpec = [fieldSpec: allDomainSpecs[deviceClass]['fields'].find { it.field == 'description' } ]
             assert fieldSpec
 
         when: 'the distinctValues method is called'
@@ -157,4 +179,6 @@ class CustomDomainServiceTests extends Specification {
             list.contains('Blue')
             list.contains('Green')
     }
+
+
 }

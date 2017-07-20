@@ -84,16 +84,25 @@ class DatabaseController implements ControllerMethods {
 		//def unknownQuestioned = "'$AssetDependencyStatus.UNKNOWN','$AssetDependencyStatus.QUESTIONED'"
 		//def validUnkownQuestioned = "'$AssetDependencyStatus.VALIDATED'," + unknownQuestioned
 
-		def filterParams = [assetName: params.assetName, depNumber: params.depNumber, depResolve: params.depResolve,
-		                    depConflicts: params.depConflicts, event: params.event]
+		def filterParams = [
+			assetName: params.assetName,
+			depNumber: params.depNumber,
+			depResolve: params.depResolve,
+			depConflicts: params.depConflicts,
+			event: params.event
+		]
 		def dbPref = assetEntityService.getExistingPref('Database_Columns')
-		def attributes = projectService.getAttributes('Database')
-		def dbPrefVal = dbPref*.value
-		attributes.each { attribute ->
-			if (attribute.attributeCode in dbPrefVal) {
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
+
+		// Get the list of fields for the domain
+		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DATABASE.toString(), true)
+
+		List prefColumns = dbPref*.value
+		for (String fieldName in prefColumns) {
+			if (fieldNameMap.containsKey(fieldName)) {
+				filterParams[fieldName] = params[fieldName]
 			}
 		}
+
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
 		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
 		//TODO:need to move the code to AssetEntityService
