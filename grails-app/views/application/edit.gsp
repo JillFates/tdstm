@@ -199,7 +199,7 @@
 								<td>
 								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}">
 									<g:select  id="validation"	class="${standardFieldSpecs.validation.imp?:''}" name="validation"
-										from="${applicationInstance.constraints.validation.inList }" onChange="assetFieldImportance(this.value,'Application');highlightCssByValidation(this.value,'Application','${applicationInstance.id}');"
+										from="${applicationInstance.constraints.validation.inList }"
 										value="${applicationInstance.validation}" tabindex="37" />
 								</span>
 								</td>

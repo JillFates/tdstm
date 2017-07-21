@@ -111,7 +111,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 							<td>
 								<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation"
-										  onChange="assetFieldImportance(this.value,'Database');highlightCssByValidation(this.value,'Database','${databaseInstance.id}');" value="${databaseInstance.validation}" tabindex="35" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}"/>
+										   value="${databaseInstance.validation}" tabindex="35" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}"/>
 							</td>
 						</tr>
 						<tbody class="customTemplate">
