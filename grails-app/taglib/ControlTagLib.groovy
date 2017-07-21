@@ -21,6 +21,25 @@ class ControlTagLib {
 	static final String BETWEEN_MIN_MAX_VALIDATION_MESSAGE = 'Value must be between {min} and {max} characters.'
 
 	/**
+	 * Used for wrapping UI elements when no other ControlTag applies.
+	 * This tag deals with adding the tooltip.
+	 * @param field - fieldSpec
+	 * @param dataPlacement - tooltip placement (optional)
+	 * @param class - css class
+	 */
+	def tooltipSpan = {attrs, body ->
+		Map field = attrs.field ?: [:]
+		String tooltipDataPlacement = attrs.tooltipDataPlacement
+		String tooltipAttribute = tooltipAttrib(field, tooltipDataPlacement)
+		String cssClass = attrs["class"]
+		out << "<span "
+		out << tooltipAttribute
+		out << attribute("class", cssClass)
+		out << " >\n"
+		out << body()
+		out << "\n </span>\n"
+	}
+	/**
 	 * Used to render the LABEL used for an input field
 	 * @param field - the Field Specification (Map)
 	 */
