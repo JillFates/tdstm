@@ -2163,51 +2163,7 @@ function hideDependencyControlDiv() {
 	$("#checkBoxDiv").dialog('close');
 }
 
-// Sets the field importance style classes in the edit and create views for all asset classes
-function assetFieldImportance(phase, type) {
-	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/retrieveAssetImportance'),
-		data: { 'validation': phase, 'type': type },
-		type: 'POST',
-		success: function (resp) {
-			$("td,input,select,.select2-choice,td[data-for]")
-				.removeClass("C")
-				.removeClass("H")
-				.removeClass("I")
-				.removeClass("N")
-				.removeClass("U")
 
-			for (var key in resp) {
-				var value = resp[key]
-				$(".dialog input[name=" + key + "],select[name=" + key + "],input[name='" + key + ".id'],select[name='" + key + ".id'],div[id*='" + key + "'] .select2-choice,td[data-for*='" + key + "']").addClass(value);
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").closest('td').addClass(value);
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while getting asset.")
-		}
-	});
-
-}
-function highlightCssByValidation(phase, forWhom, id) {
-	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/retrieveHighlightCssMap'),
-		data: { 'validation': phase, 'type': forWhom, 'id': id },
-		type: 'POST',
-		success: function (resp) {
-			//console.log(resp)
-			$("td,input,select").removeClass("highField")
-			for (var key in resp) {
-				var value = resp[key]
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").parent().addClass(value);
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while getting asset.")
-		}
-	});
-
-}
 
 /**
  * function is used to make hard assgined check box enabled - disabled based on criteria

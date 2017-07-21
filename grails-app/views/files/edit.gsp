@@ -107,7 +107,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
 								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.validation.tip}">
-									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" onChange="assetFieldImportance(this.value,'Files');highlightCssByValidation(this.value,'Files','${fileInstance.id}');" value="${fileInstance.validation}"/>
+									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" value="${fileInstance.validation}"/>
 								</span>
 							</td>
 						</tr>

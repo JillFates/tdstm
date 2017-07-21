@@ -397,7 +397,6 @@
 								<g:select id="validation" name="validation"
 										  from="${assetEntityInstance.constraints.validation.inList}"
 										  value="${assetEntityInstance.validation}"
-										  onChange="assetFieldImportance(this.value,'AssetEntity');highlightCssByValidation(this.value,'AssetEntity','${assetEntityInstance.id?:0}');"
 										  class="${standardFieldSpecs.validation.imp?:''}"
 										  tabindex="370"
 										/>
