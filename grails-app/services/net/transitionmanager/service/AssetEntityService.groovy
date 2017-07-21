@@ -2738,7 +2738,9 @@ class AssetEntityService implements ServiceMethods {
 	 * @param entityType type of entity.
 	 * @param project to look for
 	 * @return tooltips map
+	 * TODO : REMOVE TM-6722
 	 */
+	@Deprecated
 	Map<String, String> retrieveTooltips(String entityType, Project project) {
 		Map<String, String> returnMap = [:]
 		String category = EntityType.getListAsCategory(entityType)
