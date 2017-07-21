@@ -16,10 +16,18 @@
 					<tbody>
 					<tr  class="prop">
 						<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}"/>
-						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}"><span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.assetName.tip)}">${assetEntity.assetName}</span></td>
+						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">
+							<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
+								${assetEntity.assetName}
+							</tds:tooltipSpan>
+						</td>
 						
 						<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}"/>
-						<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}"><span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.description.tip)}">${assetEntity.description}</span></td>
+						<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}">
+							<tds:tooltipSpan field="${standardFieldSpecs.description}">
+								${assetEntity.description}
+							</tds:tooltipSpan>
+						</td>
 					</tr>
 					<tr class="prop">
 						<tds:showLabelAndField field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}"/>
@@ -33,9 +41,9 @@
 					<tr class="prop">
 						<tds:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}"/>
 						<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
-							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.manufacturer.tip)}">
+							<tds:tooltipSpan field="${standardFieldSpecs.manufacturer}">
 								<a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a>
-							</span>
+							</tds:tooltipSpan>
 						</td>
 						
 						<tds:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
@@ -50,10 +58,10 @@
 					<tr class="prop">
 						<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}"/>
 						<td class="valueNW ${standardFieldSpecs.model.imp?:''}">
-						<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.model.tip)}">
+						<tds:tooltipSpan field="${standardFieldSpecs.model}">
 						<a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
 							<g:if test="${! assetEntity.model?.isValid()}"> <span style="color: red;"><b>?</b></span></g:if>
-						</span>
+						</tds:tooltipSpan>
 						</td>
 						
 						<tds:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
@@ -63,14 +71,14 @@
 						</td>
 
 						<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceRoom}" >
-							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRoom.tip)}" >
+							<tds:tooltipSpan field="${standardFieldSpecs.sourceRoom}" >
 								${roomSource?.roomName}
-							</span>
+							</tds:tooltipSpan>
 						</td>
 						<td class="valueNW nonVMLabel ${standardFieldSpecs.targetRoom}">
-							<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetRoom.tip)}" >
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRoom}" >
 								${roomTarget?.roomName}
-							</span>
+							</tds:tooltipSpan>
 						</td>
 
 					</tr>
@@ -84,16 +92,20 @@
 						<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}"  nowrap="nowrap" id="rackId">
 							<label for="sourceRackId">Rack/Cab</label>
 						</td>
-						<td class="rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.sourceRack.tip)}">${assetEntity.rackSource?.tag}</td>
-						<td class="rackLabel ${standardFieldSpecs.targetRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.targetRack.tip)}">${assetEntity.rackTarget?.tag}</td>
+						<td class="rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceRack.tip?: standardFieldSpecs.sourceRack.label}">
+							${assetEntity.rackSource?.tag}
+						</td>
+						<td class="rackLabel ${standardFieldSpecs.targetRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.targetRack.tip?: standardFieldSpecs.targetRack.label}">
+							${assetEntity.rackTarget?.tag}
+						</td>
 						<%-- blade --%>
 						<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display: none">
 							<label for="sourceChassisId">Blade Chassis</label>
 						</td>
-						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceChassis.tip)}">
+						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceChassis.tip?: standardFieldSpecs.sourceChassis.label}">
 							${sourceChassis}
 						</td>
-						<td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetChassis.tip)}">
+						<td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetChassis.tip?: standardFieldSpecs.targetChassis.label}">
 							${targetChassis}
 						</td>
 
@@ -103,11 +115,31 @@
 
 						<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}"/>
 
-						<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap"><label for="sourceRack" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceRackPosition.tip)}">Position</label></td>
-						<td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}"><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceRackPosition.tip)}">${assetEntity.sourceRackPosition}</span></td>
-						<td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}"><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetRackPosition.tip)}">${assetEntity.targetRackPosition}</span></td>
-						<td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}" style="	display: none" ><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.sourceBladePosition.tip)}">${assetEntity.sourceBladePosition}</span></td>
-						<td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}" style="display: none" ><span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.targetBladePosition.tip)}">${assetEntity.targetBladePosition}</span></td>
+						<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
+							<label for="sourceRack" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
+								Position
+							</label>
+						</td>
+						<td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}">
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
+								${assetEntity.sourceRackPosition}
+							</tds:tooltipSpan>
+						</td>
+						<td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}">
+							<tds:tooltipSpan tooltipDataplacement="bottom" field="${standardFieldSpecs.targetRackPosition}">
+								${assetEntity.targetRackPosition}
+							</tds:tooltipSpan>
+						</td>
+						<td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}" style="	display: none" >
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceBladePosition}">
+								${assetEntity.sourceBladePosition}
+							</tds:tooltipSpan>
+						</td>
+						<td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}" style="display: none" >
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetBladePosition}">
+								${assetEntity.targetBladePosition}
+							</tds:tooltipSpan>
+						</td>
 
 					</tr>
 					<tr class="prop">
@@ -115,22 +147,30 @@
 
 						<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}"/>
 						<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
-						<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.retireDate.tip)}">
+						<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
 							<tds:convertDate date="${assetEntity?.retireDate}" />
-						</span>
+						</tds:tooltipSpan>
 						</td>
-						<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.moveBundle.tip)}">Bundle : Dep. Group</label></td>
+						<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+							<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?: standardFieldSpecs.moveBundle.label}">
+								Bundle : Dep. Group
+							</label>
+						</td>
 						<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.moveBundle.tip)}">
+							<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
 								${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}
-							</span>
+							</tds:tooltipSpan>
 						</td>
 
-						<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.size.tip)}">Size/Scale </label></td>
+						<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+							<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
+								Size/Scale
+							</label>
+						</td>
 						<td nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp?:''}">
-							<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${raw(standardFieldSpecs.size.tip)}">
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.size}">
 								${assetEntity.size} ${assetEntity.scale?.value()}
-							</span>
+							</tds:tooltipSpan>
 						</td>
 					</tr>
 					<tr class="prop">
@@ -138,9 +178,9 @@
 
 						<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}"/>
 						<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
-							<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.maintExpDate.tip)}">
+							<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
 								<tds:convertDate date="${assetEntity?.maintExpDate}" />
-							</span>
+							</tds:tooltipSpan>
 						</td>
 
 						<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${assetEntity.planStatus}"/>
@@ -153,12 +193,14 @@
 
 						<g:if test="! assetEntity.isVM()">
 							<td class="label ${standardFieldSpecs.truck.imp?:''}" nowrap="nowrap">
-								<label for="truck" data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.truck.tip)}">Truck/Cart/Shelf</label>
+								<label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">
+									Truck/Cart/Shelf
+								</label>
 							</td>
 							<td class="valueNW ${standardFieldSpecs.truck.imp?:''}">
-								<span data-toggle="popover" data-trigger="hover" data-content="${raw(standardFieldSpecs.truck.tip)}">
+								<tds:tooltipSpan field="${standardFieldSpecs.truck}">
 									${assetEntity.truck ?: '   '} / ${assetEntity.cart ?: '   '} / ${assetEntity.shelf ?: '   '}
-								</span>
+								</tds:tooltipSpan>
 							</td>
 						</g:if>
 						<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${assetEntity.validation}"/>
