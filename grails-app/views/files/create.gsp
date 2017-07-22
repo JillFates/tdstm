@@ -38,29 +38,30 @@
 
 						<tr>
 							<tds:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${fileInstance.fileFormat}" tabindex="12"/>
-
 							<tds:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${fileInstance.LUN}" tabindex="22"/>
-
 							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${fileInstance?.supportType}" tabindex="32"/>
-
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
 							<td>
-							<span data-toggle="popover" data-trigger="hover" data-placement="left" data-content="${standardFieldSpecs.moveBundle.tip}">
-								<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="42" />
-							</span>
+								<span data-toggle="popover" data-trigger="hover" data-placement="left" data-content="${standardFieldSpecs.moveBundle.tip}">
+									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="42" />
+								</span>
 							</td>
 						</tr>
 
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.size}" value="${fileInstance?.size}"/>
+							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+								<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+								</label>
+							</td>
 							<td nowrap="nowrap" class="sizeScale">
 								<tds:inputControl field="${standardFieldSpecs.size}" size="10" value="${fileInstance?.size}" tabindex="13"/>
-								<g:select from="${fileInstance.constraints.scale.inList}" optionValue="value" name="scale" id="scale" value="GB" tabindex="13"/>
+								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
+									<g:select from="${fileInstance.constraints.scale.inList}" optionValue="value" name="scale" id="scale" value="GB" tabindex="13"/>
+								</tds:tooltipSpan>
 							</td>
 
 							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${fileInstance.externalRefId}" tabindex="23"/>
-
-
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
 							<td>
 								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">
@@ -74,7 +75,6 @@
 									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
 								</span>
 							</td>
-
 						</tr>
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${fileInstance?.rateOfChange}"/>
