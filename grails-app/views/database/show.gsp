@@ -32,16 +32,27 @@
 							<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
 						</tr>
 						<tr class="prop">
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
+							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+								<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+								</label>
+							</td>
 							<td class="valueNW">
 								<tds:tooltipSpan field="${standardFieldSpecs.size}">
-									${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}
+									${databaseInstance?.size}&nbsp;${databaseInstance.scale?.value()}
 								</tds:tooltipSpan>
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance?.retireDate}"/>
 							<td class="valueNW">
+								<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
+									<tds:convertDate date="${databaseInstance?.retireDate}"/>
+								</tds:tooltipSpan>
 							</td>
-							<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
+							<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+								<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+									${standardFieldSpecs.moveBundle.label} : Dep. Group
+								</label>
+							</td>
 							<td class="valueNW" colspan="3">
 								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
 									${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
