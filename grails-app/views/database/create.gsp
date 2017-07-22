@@ -40,9 +40,11 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
 							<td >
-								<g:select id="environment" name="environment" from="${environmentOptions}"
+								<tds:tooltipSpan field="${standardFieldSpecs.environment}" tooltipDataPlacement="bottom">
+									<g:select id="environment" name="environment" from="${environmentOptions}"
 										  noSelection="${['':' Please Select']}" tabindex="32"
 										  data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}"/>
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 						<tr>
@@ -71,7 +73,9 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${databaseInstance.moveBundle}"/>
 							<td >
-								<g:select from="${moveBundleList}" id="moveBundle"  name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34"/>
+								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
+									<g:select from="${moveBundleList}" id="moveBundle"  name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34"/>
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 						<tr>
@@ -88,7 +92,9 @@
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
 							<td>
-								<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="35" />
+								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}" tooltipDataPlacement="bottom">
+									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="35" />
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 						<tr>
@@ -99,7 +105,9 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 							<td>
-								<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery"/>
+								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
+									<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery"/>
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 						<tbody class="customTemplate">
