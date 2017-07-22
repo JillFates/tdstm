@@ -352,17 +352,17 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntityInstance.retireDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
-							<tds:tooltipSpan field="${standardFieldSpecs.retireDate.tip}">
-								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
-								</script>
-								<input type="text" id="retireDate" name="retireDate"
-									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
-									class="dateRange ${standardFieldSpecs.retireDate.imp?:''}"
-									size="15" style="width: 138px;"
-									tabindex="230"
-								/>
-							</tds:tooltipSpan>
+								<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
+									<script type="text/javascript" charset="utf-8">
+										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
+									</script>
+									<input type="text" id="retireDate" name="retireDate"
+										value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
+										class="dateRange ${standardFieldSpecs.retireDate.imp?:''}"
+										size="15" style="width: 138px;"
+										tabindex="230"
+									/>
+								</tds:tooltipSpan>
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetEntityInstance.planStatus}"/>
@@ -405,14 +405,14 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${assetEntityInstance.validation}"/>
 							<td  colspan="2">
-							<span field="${standardFieldSpecs.validation}">
-								<g:select id="validation" name="validation"
+								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
+									<g:select id="validation" name="validation"
 										  from="${assetEntityInstance.constraints.validation.inList}"
 										  value="${assetEntityInstance.validation}"
 										  class="${standardFieldSpecs.validation.imp?:''}"
 										  tabindex="370"
 										/>
-							</span>
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 						<tr>

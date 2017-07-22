@@ -100,7 +100,7 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
 								<td>
-								<tds:tooltipSpan span="${standardFieldSpecs.criticality}">
+								<tds:tooltipSpan field="${standardFieldSpecs.criticality}">
 									<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality"
 										from="${applicationInstance.constraints.criticality.inList}"
 										value="${applicationInstance.criticality}"
