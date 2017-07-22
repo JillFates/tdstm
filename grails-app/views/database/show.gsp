@@ -14,9 +14,17 @@
 					<tbody>
 						<tr class="prop">
 							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${databaseInstance?.assetName}"/>
-							<td colspan="2" class="valueNW" style="max-width: 400px; font-weight:bold;"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetName.tip}">${databaseInstance?.assetName}</span></td>
+							<td colspan="2" class="valueNW" style="max-width: 400px; font-weight:bold;">
+								<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
+									${databaseInstance?.assetName}
+								</tds:tooltipSpan>
+							</td>
 							<tds:inputLabel field="${standardFieldSpecs.description}" value="${databaseInstance?.description}"/>
-							<td colspan="2" style="max-width: 400px;" class="valueNW" ><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.description.tip}">${databaseInstance.description}</span></td>
+							<td colspan="2" style="max-width: 400px;" class="valueNW" >
+								<tds:tooltipSpan field="${standardFieldSpecs.description}">
+									${databaseInstance.description}
+								</tds:tooltipSpan>
+							</td>
 						</tr>
 						<tr class="prop">
 							<tds:showLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}"/>
@@ -24,19 +32,36 @@
 							<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
 						</tr>
 						<tr class="prop">
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
-							<td class="valueNW"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}</span></td>
+							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
+							<td class="valueNW">
+								<tds:tooltipSpan field="${standardFieldSpecs.size}">
+									${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}
+								</tds:tooltipSpan>
+							</td>
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance?.retireDate}"/>
-							<td class="valueNW"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip}"><tds:convertDate date="${databaseInstance?.retireDate}"/></span></td>
-							<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
-							<td class="valueNW" colspan="3"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">${databaseInstance?.moveBundle} : ${dependencyBundleNumber}</span></td>
+							<td class="valueNW">
+							</td>
+							<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
+							<td class="valueNW" colspan="3">
+								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+									${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
+								</tds:tooltipSpan>
+							</td>
 						</tr>
 						<tr class="prop">
 							<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance.rateOfChange}"/>
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
-							<td class="valueNW"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip}"><tds:convertDate date="${databaseInstance?.maintExpDate}"/></span></td>
+							<td class="valueNW">
+								<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
+									<tds:convertDate date="${databaseInstance?.maintExpDate}"/>
+								</tds:tooltipSpan>
+							</td>
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
-							<td class="valueNW" colspan="3"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.planStatus.tip}">${databaseInstance?.planStatus}</span></td>
+							<td class="valueNW" colspan="3">
+								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
+									${databaseInstance.planStatus}
+								</tds:tooltipSpan>
+							</td>
 						</tr>
 						<tr>
 							<td></td>
@@ -44,7 +69,11 @@
 
 							<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}"/>
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
-							<td class="valueNW" colspan="3"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}">${databaseInstance.validation}</td>
+							<td class="valueNW" colspan="3">
+								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
+									${databaseInstance.validation}
+								</tds:tooltipSpan>
+							</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>
 					</tbody>

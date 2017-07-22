@@ -65,7 +65,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
+							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
 							<td nowrap="nowrap" class="sizeScale">
 								<tds:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${databaseInstance.size}"/>
 								<g:select from="${databaseInstance.constraints.scale.inList}" id="scale" name="scale" value="${databaseInstance.scale}" optionValue="value" tabindex="15" noSelection="${['':'']}"/>
@@ -76,7 +76,7 @@
 							    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
 					            </script>
-					            <input type="text" class="dateRange" size="15" style="width: 138px;" name="retireDate" id="retireDate" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip}"
+					            <input type="text" class="dateRange" size="15" style="width: 138px;" name="retireDate" id="retireDate" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip?:standardFieldSpecs.retireDate.label}"
 					                value="<tds:convertDate date="${databaseInstance?.retireDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="22" >
 							</td>
 
@@ -93,7 +93,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'maintExpDate','errors')}">
-					           	<input type="text" class="dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip}"
+					           	<input type="text" class="dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:standardFieldSpecs.maintExpDate.label}"
 					                value="<tds:convertDate date="${databaseInstance?.maintExpDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="23" >
 							</td>
 
