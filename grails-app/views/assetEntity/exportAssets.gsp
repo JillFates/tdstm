@@ -80,71 +80,63 @@
 									<div class="col-sm-6">
 										<ul class="list-group sub-set">
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="applicationId" name="application" value="application" onclick="importExportPreference($(this),'ImportApplication')"
-													${prefMap['ImportApplication']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="applicationId">Application</label>
-												</span>
+												<div class="checkbox">
+													<label for="applicationId"><input type="checkbox" id="applicationId" name="application" value="application" onclick="importExportPreference($(this),'ImportApplication')"
+													${prefMap['ImportApplication']=='true' ? 'checked="checked"' :''}/>Application</label>
+												</div>	
 											</li>
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="assetId" name="asset" value="asset" onclick="importExportPreference($(this),'ImportServer')"
-													${prefMap['ImportServer']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="assetId">Devices</label>
-												</span>
+												<div class="checkbox">
+													<label for="assetId"><input type="checkbox" id="assetId" name="asset" value="asset" onclick="importExportPreference($(this),'ImportServer')"
+													${prefMap['ImportServer']=='true' ? 'checked="checked"' :''}/>Devices</label>
+												</div>
 											</li>
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="databaseId" name="database" value="database" onclick="importExportPreference($(this),'ImportDatabase')"
-													${prefMap['ImportDatabase']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="databaseId">Database</label>
-												</span>
+												<div class="checkbox">
+													<label for="databaseId"><input type="checkbox" id="databaseId" name="database" value="database" onclick="importExportPreference($(this),'ImportDatabase')"
+													${prefMap['ImportDatabase']=='true' ? 'checked="checked"' :''}/>Database</label>
+												</div>
 											</li>
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="filesId" name="files" value="files" onclick="importExportPreference($(this),'ImportStorage')"
-													${prefMap['ImportStorage']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="filesId">Storage</label>
-												</span>
+												<div class="checkbox">
+													<label for="filesId"><input type="checkbox" id="filesId" name="files" value="files" onclick="importExportPreference($(this),'ImportStorage')"
+													${prefMap['ImportStorage']=='true' ? 'checked="checked"' :''}/>Storage</label>
+												</div>
 											</li>
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="roomId" name="room" value="room" onclick="importExportPreference($(this),'ImportRoom')"
-													${prefMap['ImportRoom']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="roomId">Room</label>
-												</span>
+												<div class="checkbox">
+													<label for="roomId"><input type="checkbox" id="roomId" name="room" value="room" onclick="importExportPreference($(this),'ImportRoom')"
+													${prefMap['ImportRoom']=='true' ? 'checked="checked"' :''}/>Room</label>
+												</div>
 											</li>
 										</ul>
 									</div>
 									<div class="col-sm-6">
 										<ul class="list-group sub-set">
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="rackId" name="rack" value="rack" onclick="importExportPreference($(this),'ImportRack')"
-													${prefMap['ImportRack']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="rackId">Rack</label>
-												</span>
+												<div class="checkbox">
+													<label for="rackId"><input type="checkbox" id="rackId" name="rack" value="rack" onclick="importExportPreference($(this),'ImportRack')"
+													${prefMap['ImportRack']=='true' ? 'checked="checked"' :''}/>Rack</label>
+												</div>
 											</li>
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="dependencyId" name="dependency" value="dependency" onclick="importExportPreference($(this),'ImportDependency')"
-													${prefMap['ImportDependency']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="dependencyId">Dependency</label>
-												</span>
+												<div class="checkbox">
+													<label for="dependencyId"><input type="checkbox" id="dependencyId" name="dependency" value="dependency" onclick="importExportPreference($(this),'ImportDependency')"
+													${prefMap['ImportDependency']=='true' ? 'checked="checked"' :''}/>Dependency</label>
+												</div>
 											</li>
 											<li class="list-group-item">
-												<span><input type="checkbox" id="cablingId" name="cabling" value="cable"
+												<div class="checkbox">
+													<label for="cablingId"><input type="checkbox" id="cablingId" name="cabling" value="cable"
 															 onclick="importExportPreference($(this),'ImportCabling')"
-													${prefMap['ImportCabling']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="cablingId">Cabling</label>
-												</span>
+													${prefMap['ImportCabling']=='true' ? 'checked="checked"' :''}/>Cabling</label>
+												</div>
 											</li>
 											<li class="list-group-item">
-												<span>
-													<input type="checkbox" id="commentId" name="comment" value="comment" onclick="importExportPreference($(this),'ImportComment')"
-													${prefMap['ImportComment']=='true' ? 'checked="checked"' :''}/>&nbsp;
-													<label for="commentId">Comment</label>
-												</span>
+												<div class="checkbox">
+													<label for="commentId"><input type="checkbox" id="commentId" name="comment" value="comment" onclick="importExportPreference($(this),'ImportComment')"
+													${prefMap['ImportComment']=='true' ? 'checked="checked"' :''}/>Comment</label>
+												</div>
 											</li>
 										</ul>
 									</div>
