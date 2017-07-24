@@ -1299,7 +1299,6 @@ class AssetEntityService implements ServiceMethods {
 		Map model = [
 			assetClassOptions: AssetClass.classOptions,
 			assetDependency: new AssetDependency(),
-			//attributesList: [],        // Set below, replaced by fieldSpecs
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			event: params.moveEvent,
@@ -1339,22 +1338,29 @@ class AssetEntityService implements ServiceMethods {
 		// Set the list of viewable and selectable field specs
 		model.fieldSpecs = getViewableFieldSpecs(project, ac)
 
-		// <SL> Remove when JSON field specs get fully implemented
-		// Get the list of attributes that the user can select for columns
-		// List<EavAttribute> attributes = projectService.getAttributes(listType)
-
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		fieldPrefs.each { key, value ->
-			//modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
-			modelPref[key] = StringUtil.sanitizeJavaScript(model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+			modelPref[key] = getFieldLabel(model.fieldSpecs, value)
 		}
 		model.modelPref = modelPref
 
-		// <SL> Kept "attributesList" for debugging but it should be deleted as soon as JSON field specs
-		// get fully implemented
-
 		return model
+	}
+
+	/**
+	 * Get label for jqgrid
+	 * @param fieldSpecs
+	 * @param field
+	 * @return
+	 */
+	private String getFieldLabel(List<Map<String, String>> fieldSpecs, String field) {
+		Map<String, String> fieldSpec = fieldSpecs.find { it.attributeCode == field }
+		if (fieldSpec) {
+			return StringUtil.sanitizeJavaScript(fieldSpec.frontendLabel)
+		} else {
+			return StringUtil.capitalize(field)
+		}
 	}
 
 	/**
@@ -1756,15 +1762,6 @@ class AssetEntityService implements ServiceMethods {
 			addCell(cablingSheet, idx + 2, 11, String.valueOf(currentCabling.assetLoc ?: ''))
 			//GormUtil.flushAndClearSession(progressCount)
 		}
-	}
-
-	/**
-	 * Determine the frontEndLabel for the attribute.
-	 */
-	@Deprecated
-	private String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
-		Project project = securityService.userCurrentProject
-		return (attributeCode.contains('custom') && project[attributeCode]) ? project[attributeCode] : frontendLabel
 	}
 
 	/**
