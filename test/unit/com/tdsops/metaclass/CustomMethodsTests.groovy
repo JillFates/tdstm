@@ -6,7 +6,7 @@ import spock.lang.Specification
 class CustomMethodsTests extends Specification {
 
 	// Initialize the metaClass settings
-	@Shared customMethods = CustomMethods.initialize
+	@Shared customMethods = CustomMethods.initialize(true)
 
 	void testAsYN() {
 		expect:
