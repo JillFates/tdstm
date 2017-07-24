@@ -73,13 +73,16 @@ class ControlTagLib {
 		sb.append("\n")
 
 		// Build the LABEL element
-		// <label for="assetName" data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</label>
+		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('"')
+		sb.append(' >')
+		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
+		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
 		}
