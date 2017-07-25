@@ -171,7 +171,8 @@ databaseChangeLog = {
 	include file: '20170623-add-planMethodology-to-Ptoject.groovy'
 	include file: '20170704-delete-model-alias-records-that-associate-model-of-same-name.groovy'
 	include file: '20170712-create-new-fieldsettings-specs.groovy'
-	include file: "20170714-remove-all-user-preference-for-the-various-asset-list-columns.groovy"
+	include file: '20170714-remove-all-user-preference-for-the-various-asset-list-columns.groovy'
 	include file: '20170712-add-fieldName-to-DataTransferValue.groovy'
 	include file: '20170714-Clear-out-orphaned-data-references-that-cause-the-Task-Report-to-fail.groovy'
+	include file: '20170725-remove-EavAttributeSet-reference-in-AssetEntity.groovy'
 }

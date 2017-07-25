@@ -10,7 +10,8 @@ class EavEntity {
 	// EavEntityType	entityType
 	static hasMany = [entityAttribute: EavEntityAttribute]
 
-	static belongsTo = [attributeSet: EavAttributeSet]
+	// Removed by TM-6779 - this is not being used since field specs fields implementation
+//	static belongsTo = [attributeSet: EavAttributeSet]
 
 	static constraints = {
 		dateCreated nullable: true

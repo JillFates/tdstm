@@ -1197,7 +1197,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			asset = clazz.newInstance()
 			asset.project = project
 			asset.owner = project.client
-			asset.attributeSet = eavAttributeSet
+//			asset.attributeSet = eavAttributeSet
 			asset.assetType = clazzMap[clazzName]
 
 			logger.debug 'findAndValidateAsset() Created {}', clazzName
