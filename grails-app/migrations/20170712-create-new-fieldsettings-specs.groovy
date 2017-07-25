@@ -53,7 +53,7 @@ def loadCsvData() {
 /**
  * This will return a map by asset class where each will have a map of the fields
  */
-Map getDomainFieldsAsMap() {
+Map getDomainFieldNamesAsMap() {
     Map fields = [:]
     String domain = ''
     String mapKey = ''
@@ -78,6 +78,33 @@ Map getDomainFieldsAsMap() {
     return fields
 }
 
+/**
+ * This will return a map by asset class where each will have a map of the fields
+ */
+Map getDomainLabelsAsMap() {
+    Map fields = [:]
+    String domain = ''
+    String mapKey = ''
+    for (line in loadCsvData()) {
+        if (domain != line.domain) {
+            domain = line.domain
+            mapKey = domain.toUpperCase()
+            fields.put(mapKey, [:])
+        }
+        if (line.order == '-1') {
+            // Skip properties marked to be removed
+            continue
+        }
+        if (line.field ==~ /custom(\d{1,2})/ ) {
+            // We'll handle the customs separately
+            continue
+        }
+
+        fields[mapKey].put(line.label, true)
+    }
+    // println "getDomainFieldsAsMap:  $fields"
+    return fields
+}
 /**
  * Used to load the tooltips into a Map for any field that there is a tooltip
  */
@@ -151,7 +178,8 @@ void createFieldSpecsForAllProjects(sql) {
     println "Purging any pre-existing Asset Field Specs from Setting"
     sql.execute(DELETE_SQL, SETTING_TYPE)
 
-    Map assetFields = getDomainFieldsAsMap()
+    Map assetFields = getDomainFieldNamesAsMap()
+    Map assetLabels = getDomainLabelsAsMap()
 
     for (project in projects) {
         counter++
@@ -240,7 +268,14 @@ void createFieldSpecsForAllProjects(sql) {
                 if (assetFields[assetClass][currentLabel]) {
                     String dupName = currentLabel
                     currentLabel = "X_${currentLabel}_X"
-                    println "   WARNING - $fieldName references standard field $dupName, renamed to '$currentLabel'"
+                    println "   WARNING - $fieldName references standard field name $dupName, renamed to '$currentLabel'"
+                }
+
+                // Check if the label is a standard field
+                if (assetLabels[assetClass][currentLabel]) {
+                    String dupName = currentLabel
+                    currentLabel = "X_${currentLabel}_X"
+                    println "   WARNING - $fieldName references standard field label '$dupName', renamed to '$currentLabel'"
                 }
 
                 // Make sure the label isn't a dup
@@ -252,6 +287,10 @@ void createFieldSpecsForAllProjects(sql) {
 
                 // Save that the label has been used
                 usedNames.put(currentLabel, true)
+
+                // Make sure no other properties improperly reference any other custom field
+                usedNames.put(fieldName, true)
+                usedNames.put('Custom'+num, true)
 
                 if (num > project.custom_fields_shown) {
                     // Hidden Custom Fields
