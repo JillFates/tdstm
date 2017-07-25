@@ -30,7 +30,9 @@ class CommonController implements ControllerMethods {
 	 * Initializing Help Text for a given entity type.
 	 * @param : entityType type of entity.
 	 * @return : Json data.
+	 * TODO : REMOVE TM-6722
 	 */
+	@Deprecated
 	@HasPermission(Permission.ProjectFieldSettingsView)
 	def tooltips() {
 		def entityType = request.JSON.entityType
@@ -58,7 +60,9 @@ class CommonController implements ControllerMethods {
 	 * Updates Help Text and displays it.
 	 * @param : entityType type of entity.
 	 * @return success string.
+	 * TODO : REMOVE TM-6722
 	 */
+	@Deprecated
 	@HasPermission(Permission.ProjectFieldSettingsEdit)
 	def tooltipsUpdate() {
 		Project project = controllerService.getProjectForPage(this)
@@ -107,7 +111,9 @@ class CommonController implements ControllerMethods {
 	 * Get Key, values of Help Text and append to asset cruds.
 	 * @param : entityType type of entity.
 	 * @return : json data.
+	 * TODO : REMOVE TM-6722
 	 */
+	@Deprecated
 	@HasPermission(Permission.UserGeneralAccess)
 	def retrieveTooltips() {
 		renderAsJson assetEntityService.retrieveTooltips(EntityType.getKeyByText(params.type),

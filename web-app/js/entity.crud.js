@@ -124,9 +124,8 @@ var EntityCrud = (function ($) {
 			var room = $(type + 'RoomId').val();
 			var rack = $(type + 'RackId').val();
 			if (tds.utils.stringUtils.empty(location) ||
-				tds.utils.stringUtils.empty(room) ||
-				tds.utils.stringUtils.empty(rack)) {
-				alert("Location name, room name and rack name must be defined for 'Add Room'")
+				tds.utils.stringUtils.empty(room) ) {
+				alert("Location and Room Name must be defined for 'Add Room'")
 				ok = false;
 			}
 		} else {
@@ -1065,8 +1064,6 @@ var EntityCrud = (function ($) {
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 
-			if (!isIE7OrLesser)
-				getHelpTextAsToolTip(fieldHelpType);
 			updateAssetTitle(fieldHelpType);
 			if (rackOrChassisId)
 				updateAssetInfo(source, rackOrChassisId, roomId, location, position, 'edit', isBlade);
@@ -1132,8 +1129,6 @@ var EntityCrud = (function ($) {
 			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 			updateAssetTitle(fieldHelpType);
-			if (!isIE7OrLesser)
-				getHelpTextAsToolTip(fieldHelpType);
 
 			$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 			$('[data-toggle="popover"]').popover();
@@ -1348,8 +1343,6 @@ var EntityCrud = (function ($) {
 		if (fieldHelpType == 'Device')
 			updateAssetInfo(source, rackOrChassisId, roomId, location, position, forWhom, isBlade);
 
-		if (!isIE7OrLesser)
-			getHelpTextAsToolTip(fieldHelpType);
 	}
 	// Private method used by showAssetCreateView
 	function fetchAssetCreateView(controller, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
@@ -2170,77 +2163,7 @@ function hideDependencyControlDiv() {
 	$("#checkBoxDiv").dialog('close');
 }
 
-// Sets the field importance style classes in the edit and create views for all asset classes
-function assetFieldImportance(phase, type) {
-	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/retrieveAssetImportance'),
-		data: { 'validation': phase, 'type': type },
-		type: 'POST',
-		success: function (resp) {
-			$("td,input,select,.select2-choice,td[data-for]")
-				.removeClass("C")
-				.removeClass("H")
-				.removeClass("I")
-				.removeClass("N")
-				.removeClass("U")
 
-			for (var key in resp) {
-				var value = resp[key]
-				$(".dialog input[name=" + key + "],select[name=" + key + "],input[name='" + key + ".id'],select[name='" + key + ".id'],div[id*='" + key + "'] .select2-choice,td[data-for*='" + key + "']").addClass(value);
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").closest('td').addClass(value);
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while getting asset.")
-		}
-	});
-
-}
-function highlightCssByValidation(phase, forWhom, id) {
-	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/retrieveHighlightCssMap'),
-		data: { 'validation': phase, 'type': forWhom, 'id': id },
-		type: 'POST',
-		success: function (resp) {
-			//console.log(resp)
-			$("td,input,select").removeClass("highField")
-			for (var key in resp) {
-				var value = resp[key]
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").parent().addClass(value);
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while getting asset.")
-		}
-	});
-
-}
-
-function getHelpTextAsToolTip(type) {
-	jQuery.ajax({
-		url: tdsCommon.createAppURL('/common/retrieveTooltips'),
-		data: { 'type': type },
-		type: 'POST',
-		success: function (resp) {
-			for (var key in resp) {
-				var value = resp[key]
-				$(".dialog input[name=" + key + "],input[name='" + key + ".id']").tooltip({ position: { my: "left top" } });
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").tooltip({ position: { my: "left top" } });
-				$(".dialog input[name=" + key + "],input[name='" + key + ".id']").attr("title", value);
-				$(".dialog label[for=" + key + "],label[for=" + key + "Id]").attr("title", value);
-
-				$(".dialog label[for=" + key + "]").closest('td').next('td').tooltip({ position: { my: "left top" } });
-				$(".dialog label[for=" + key + "]").closest('td').next('td').attr("title", value);
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			if (jqXHR.getAllResponseHeaders()) {
-				alert("An unexpected error occurred while getting asset.")
-			}
-
-		}
-	});
-}
 
 /**
  * function is used to make hard assgined check box enabled - disabled based on criteria
@@ -2370,8 +2293,8 @@ $(window).scroll(function (event) {
 function toggleJustPlanning($me) {
 	var isChecked = $me.is(":checked")
 	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/setImportPerferences'),
-		data: { 'value': isChecked, 'preference': 'assetJustPlanning' },
+		url: tdsCommon.createAppURL('/ws/user/preference'),
+		data: { 'value': isChecked, 'code': 'assetJustPlanning' },
 		type: 'POST',
 		success: function (data) {
 			window.location.reload()

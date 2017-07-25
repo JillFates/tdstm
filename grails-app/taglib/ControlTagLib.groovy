@@ -21,6 +21,26 @@ class ControlTagLib {
 	static final String BETWEEN_MIN_MAX_VALIDATION_MESSAGE = 'Value must be between {min} and {max} characters.'
 
 	/**
+	 * Used for wrapping UI elements when no other ControlTag applies.
+	 * This tag deals with adding the tooltip.
+	 * @param field - fieldSpec
+	 * @param dataPlacement - tooltip placement (optional)
+	 * @param class - css class
+	 */
+	def tooltipSpan = {attrs, body ->
+		Map field = attrs.field ?: [:]
+		String tooltipDataPlacement = attrs.tooltipDataPlacement
+		String tooltipAttribute = tooltipAttrib(field, tooltipDataPlacement)
+		String cssClass = attrs["class"]
+		out << "<span "
+		out << tooltipAttribute
+		out << attribute("class", cssClass)
+		out << " >\n"
+		out << body()
+		out << "\n </span>\n"
+	}
+
+	/**
 	 * Used to render the LABEL used for an input field
 	 * @param field - the Field Specification (Map)
 	 */
@@ -54,13 +74,16 @@ class ControlTagLib {
 		sb.append("\n")
 
 		// Build the LABEL element
-		// <label for="assetName" data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</label>
+		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('"')
+		sb.append(' >')
+		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
+		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
 		}

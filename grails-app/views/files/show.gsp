@@ -13,9 +13,17 @@
 				<tbody>
 				<tr class="prop">
 					<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${filesInstance?.assetName}"/>
-					<td colspan="3" style="	max-width: 400px; font-weight:bold;"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetName.tip}">${filesInstance.assetName}</span></td>
+					<td colspan="3" style="	max-width: 400px; font-weight:bold;">
+						<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
+							${filesInstance.assetName}
+						</tds:tooltipSpan>
+					</td>
 					<tds:inputLabel field="${standardFieldSpecs.description}" value="${filesInstance?.description}"/>
-					<td colspan="3" style="max-width: 400px;"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetName.tip}">${filesInstance.description}</span></td>
+					<td colspan="3" style="max-width: 400px;">
+						<tds:tooltipSpan field="${standardFieldSpecs.description}">
+							${filesInstance.description}
+						</tds:tooltipSpan>
+					</td>
 				</tr>
 				<tr class="prop">
 					<tds:showLabelAndField field="${standardFieldSpecs.fileFormat}" value="${filesInstance.fileFormat}"/>
@@ -23,19 +31,27 @@
 
 					<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${filesInstance.supportType}"/>
 
-					<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap"><label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">${standardFieldSpecs.moveBundle.label} : Dep. Group</label></td>
+					<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+						<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+							${standardFieldSpecs.moveBundle.label} : Dep. Group
+						</label>
+					</td>
 					<td class="valueNW">
-						<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.moveBundle.tip}">
+						<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
 							${filesInstance?.moveBundle} : ${dependencyBundleNumber}
-						</span>
+						</tds:tooltipSpan>
 					</td>
 				</tr>
 				<tr class="prop">
-					<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap"><label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label></td>
+					<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+						<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+							${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+						</label>
+					</td>
 					<td class="valueNW">
-						<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip}">
+						<tds:tooltipSpan field="${standardFieldSpecs.size}">
 							${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}
-						</span>
+						</tds:tooltipSpan>
 					</td>
 
 					<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>

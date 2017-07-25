@@ -31,15 +31,6 @@
 		page-break-after: always;
 	}
 	</style>
-	<script>
-		$(document).ready(function() {
-			$("#showEntityView").dialog({ autoOpen: false })
-			$("#editEntityView").dialog({ autoOpen: false })
-			currentMenuId = "#reportsMenu";
-			$('.menu-reports-application-profiles').addClass('active');
-			$('.menu-parent-reports').addClass('active');
-		});
-	</script>
 </head>
 <body>
 	<div class="body content-generate-application-profiles" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
@@ -83,5 +74,17 @@
 
 	</div>
 	<g:render template="../assetEntity/initAssetEntityData"/>
+
+	<script type="application/javascript">
+		$(document).ready(function() {
+			$("#showEntityView").dialog({ autoOpen: false });
+			$("#editEntityView").dialog({ autoOpen: false });
+			currentMenuId = "#reportsMenu";
+			$('.menu-reports-application-profiles').addClass('active');
+			$('.menu-parent-reports').addClass('active');
+			$('[data-toggle="popover"]').popover();
+		});
+	</script>
+
 </body>
 </html>

@@ -1299,7 +1299,6 @@ class AssetEntityService implements ServiceMethods {
 		Map model = [
 			assetClassOptions: AssetClass.classOptions,
 			assetDependency: new AssetDependency(),
-			//attributesList: [],        // Set below, replaced by fieldSpecs
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			event: params.moveEvent,
@@ -1339,22 +1338,29 @@ class AssetEntityService implements ServiceMethods {
 		// Set the list of viewable and selectable field specs
 		model.fieldSpecs = getViewableFieldSpecs(project, ac)
 
-		// <SL> Remove when JSON field specs get fully implemented
-		// Get the list of attributes that the user can select for columns
-		// List<EavAttribute> attributes = projectService.getAttributes(listType)
-
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		fieldPrefs.each { key, value ->
-			//modelPref[key] = getAttributeFrontendLabel(value, model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
-			modelPref[key] = StringUtil.sanitizeJavaScript(model.fieldSpecs.find { it.attributeCode == value }?.frontendLabel)
+			modelPref[key] = getFieldLabel(model.fieldSpecs, value)
 		}
 		model.modelPref = modelPref
 
-		// <SL> Kept "attributesList" for debugging but it should be deleted as soon as JSON field specs
-		// get fully implemented
-
 		return model
+	}
+
+	/**
+	 * Get label for jqgrid
+	 * @param fieldSpecs
+	 * @param field
+	 * @return
+	 */
+	private String getFieldLabel(List<Map<String, String>> fieldSpecs, String field) {
+		Map<String, String> fieldSpec = fieldSpecs.find { it.attributeCode == field }
+		if (fieldSpec) {
+			return StringUtil.sanitizeJavaScript(fieldSpec.frontendLabel)
+		} else {
+			return StringUtil.capitalize(field)
+		}
 	}
 
 	/**
@@ -1756,15 +1762,6 @@ class AssetEntityService implements ServiceMethods {
 			addCell(cablingSheet, idx + 2, 11, String.valueOf(currentCabling.assetLoc ?: ''))
 			//GormUtil.flushAndClearSession(progressCount)
 		}
-	}
-
-	/**
-	 * Determine the frontEndLabel for the attribute.
-	 */
-	@Deprecated
-	private String getAttributeFrontendLabel(String attributeCode, String frontendLabel) {
-		Project project = securityService.userCurrentProject
-		return (attributeCode.contains('custom') && project[attributeCode]) ? project[attributeCode] : frontendLabel
 	}
 
 	/**
@@ -2244,12 +2241,9 @@ class AssetEntityService implements ServiceMethods {
 
 		def moveBundleList
 
-//		def attributes = projectService.getAttributes('AssetEntity')
-
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DEVICE.toString(), true)
 
-		// def prefType = (listType == 'server') ? 'Asset_Columns' : 'Physical_Columns'
 		String prefType = 'Asset_Columns'
 		def assetPref= getExistingPref(prefType)
 
@@ -2259,13 +2253,6 @@ class AssetEntityService implements ServiceMethods {
 				filterParams[fieldName] = params[fieldName]
 			}
 		}
-/*
-		attributes.each { attribute ->
-			if (attribute.attributeCode in assetPrefVal) {
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
-			}
-		}
-*/
 
 		// Lookup the field name reference for the sort
 		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
@@ -2748,7 +2735,9 @@ class AssetEntityService implements ServiceMethods {
 	 * @param entityType type of entity.
 	 * @param project to look for
 	 * @return tooltips map
+	 * TODO : REMOVE TM-6722
 	 */
+	@Deprecated
 	Map<String, String> retrieveTooltips(String entityType, Project project) {
 		Map<String, String> returnMap = [:]
 		String category = EntityType.getListAsCategory(entityType)

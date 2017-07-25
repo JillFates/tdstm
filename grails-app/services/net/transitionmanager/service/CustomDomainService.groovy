@@ -194,6 +194,10 @@ class CustomDomainService implements ServiceMethods {
         String fieldName = fieldSpec.fieldSpec?.field
         boolean shared = fieldSpec.fieldSpec?.shared
 
+        // TM-6617 JPM Commented out the validation because we want to be able to use distinctValues on standard
+        // fields for testing in particular and  this was breaking it. This does mean that we run the risk of
+        // passing a bad fieldName. See ticket TM-6763 regarding correcting this situation.
+
         //validateCustomFieldName(fieldName)
 
         return getDistinctAssetCustomFieldValues(project, fieldName, shared, assetClass)

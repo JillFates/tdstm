@@ -56,49 +56,53 @@
 						</tr>
 						<tr>
 							<tds:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${fileInstance.fileFormat}" tabindex="12"/>
-
 							<tds:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${fileInstance.LUN}" tabindex="22"/>
-
-
 							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${fileInstance?.supportType}" tabindex="32"/>
-
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
 							<td>
-								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.moveBundle.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
 									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" tabindex="42" optionKey="id" optionValue="name" tabindex="34" />
-								</span>
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.size}" value="${fileInstance?.size}"/>
+							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+								<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+								</label>
+							</td>
 							<td nowrap="nowrap" class="sizeScale">
 								<tds:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${fileInstance?.size}"/>&nbsp;
-								<g:select from="${fileInstance.constraints.scale.inList}" name="scale" id="scale" tabindex="13" value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
+								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
+									<g:select from="${fileInstance.constraints.scale.inList}" name="scale" id="scale" tabindex="13"
+											  value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
+								</tds:tooltipSpan>
 							</td>
 
 							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${fileInstance.externalRefId}" tabindex="23"/>
 
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
 							<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
-									<g:select id="environment" name="environment" from="${environmentOptions}" value="${fileInstance.environment}" tabindex="33" noSelection="${['':' Please Select']}" />
-								</span>
+								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
+									<g:select id="environment" name="environment" from="${environmentOptions}"
+											  value="${fileInstance.environment}" tabindex="33" noSelection="${['':' Please Select']}" />
+								</tds:tooltipSpan>
 							</td>
 
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
 							<td>
-								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.planStatus.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}" tooltipDataPlacement="bottom">
 									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
-								</span>
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 						<tr>
 							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${fileInstance?.rateOfChange}"/>
 							<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.rateOfChange.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.rateOfChange}">
 									<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${fileInstance?.rateOfChange}" tabindex="14"/>
-								</span>
+								</tds:tooltipSpan>
 							</td>
 
 							<td colspan="2">
@@ -106,9 +110,9 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
-								<span data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.validation.tip}">
-									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" onChange="assetFieldImportance(this.value,'Files');highlightCssByValidation(this.value,'Files','${fileInstance.id}');" value="${fileInstance.validation}"/>
-								</span>
+								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
+									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" value="${fileInstance.validation}"/>
+								</tds:tooltipSpan>
 							</td>
 						</tr>
 						<tbody class="customTemplate">

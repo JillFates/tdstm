@@ -86,23 +86,23 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
 								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.sme}">
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}"
 										tabindex="23"
 										noSelection="${['null':' Please Select']}"
 									/>
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
 									<g:select id="environment" class="${standardFieldSpecs.environment.imp?:''}" name="environment"
 										from="${environmentOptions}" value="${applicationInstance.environment}"
 										noSelection="${['':' Please Select']}" tabindex="33"></g:select>
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}" tabindex="43" tooltipDataPlacement="bottom"/>
@@ -113,7 +113,7 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.sme2}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -122,18 +122,18 @@
 										tabindex="24"
 										noSelection="${['null':' Please Select']}"
 									/>
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.criticality.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.criticality}">
 									<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality"
 										from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"
 										noSelection="${['':'Please select']}"
 										tabindex="34">
 									</g:select>
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}" tabindex="44" tooltipDataPlacement="bottom"/>
@@ -144,7 +144,7 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.appOwner}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwnerEdit" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -153,15 +153,15 @@
 										tabindex="25"
 										noSelection="${['null':' Please Select']}"
 									/>
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle?.id}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
 									<g:select from="${moveBundleList}" id="moveBundle" class="${standardFieldSpecs.moveBundle.imp?:''}" name="moveBundle.id"
 									value="${applicationInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="35" />
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tabindex="45" tooltipDataPlacement="bottom"/>
@@ -174,9 +174,9 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.planStatus.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
 									<g:select from="${planStatusOptions}" id="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="36" />
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}" tabindex="46" tooltipDataPlacement="bottom"/>
@@ -189,27 +189,27 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
 									<input type="text" class="dateRange ${standardFieldSpecs.retireDate.imp?:''}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="27"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}"  />">
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.validation.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
 									<g:select  id="validation"	class="${standardFieldSpecs.validation.imp?:''}" name="validation"
-										from="${applicationInstance.constraints.validation.inList }" onChange="assetFieldImportance(this.value,'Application');highlightCssByValidation(this.value,'Application','${applicationInstance.id}');"
+										from="${applicationInstance.constraints.validation.inList }"
 										value="${applicationInstance.validation}" tabindex="37" />
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testProc.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.testProc}">
 									<g:select  id="testProc" class="${standardFieldSpecs.testProc.imp?:''} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.testProc}" tabindex="47"/>
-								</span>
+								</tds:tooltipSpan>
 								</td>
 							</tr>
 							<tr>
@@ -221,27 +221,27 @@
 								    <script type="text/javascript" charset="utf-8">
 										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 									</script>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
 									<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
 										size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" tabindex="28"
 										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.latency.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.latency}">
 									<g:select  id="latency" class="${standardFieldSpecs.latency.imp?:''} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.latency}" tabindex="38" />
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}"/>
 								<td>
-									<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupProc.tip}">
+									<tds:tooltipSpan field="${standardFieldSpecs.startupProc}">
 										<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 											 noSelection="['':'?']" tabindex="46" value="${applicationInstance.startupProc}" tabindex="48"/>
-									</span>
+									</tds:tooltipSpan>
 								</td>
 
 							</tr>
@@ -250,56 +250,62 @@
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}" tabindex="28"/>
 
-								<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap"><label for="shutdownBy"><span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.shutdownBy.tip}">${standardFieldSpecs.shutdownBy.label}</span></label></td>
+								<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap">
+									<label for="shutdownBy">
+										<tds:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
+											${standardFieldSpecs.shutdownBy.label}
+										</tds:tooltipSpan>
+									</label>
+								</td>
 								<td class="${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
-									<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.shutdownBy.tip}">
+									<tds:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
 								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'assetSelect']"></g:render>
 									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
 										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
 										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed
-									</span>
+									</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.shutdownDuration.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.shutdownDuration}">
 									<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''}"
 										value="${applicationInstance.shutdownDuration}" tabindex="48" size="7"/>m
-								</span>
+								</tds:tooltipSpan>
 								</td>
 							</tr>
 							<tr>
 								<tds:inputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.startupBy.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.startupBy}">
 								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
 										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>Fixed
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}" tabindex="29"/>
 
 								<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
 								<td colspan="1" nowrap="nowrap" class="${standardFieldSpecs.testingBy.imp?:''}">
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testingBy.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.testingBy}">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
 										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
 										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed
-								</span>
+								</tds:tooltipSpan>
 								</td>
 
 								<tds:inputLabel field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}"/>
 								<td>
-								<span data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.testingDuration.tip}">
+								<tds:tooltipSpan field="${standardFieldSpecs.testingDuration}">
 									<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}" name="testingDuration"
 											value="${applicationInstance.testingDuration}" tabindex="49"  size="7"/>m
-								</span>
+								</tds:tooltipSpan>
 								</td>
 							</tr>
 
