@@ -5,6 +5,8 @@ import com.tdssrc.grails.StringUtil
 /**
  * @author John Martin
  * Ticket TM-6619
+ * version 8
+ *   - Changed logic checking for duplicate label references and renamed to indicate name conflict
  * version 6/7
  *   - Fixed some of the control types that are used for standard fields (superficial)
  * version 5
@@ -18,7 +20,7 @@ import com.tdssrc.grails.StringUtil
  *   - Custom that were marked hidden now correctly hidden
  */
 databaseChangeLog = {
-    changeSet(author: "jmartin", id: "20170712 TM-6619-v7 Create Field Settings JSON specs") {
+    changeSet(author: "jmartin", id: "20170712 TM-6619-v8 Create Field Settings JSON specs") {
         comment('This will aggregate values from various places and create JSON specs for every project')
 
         grailsChange {
@@ -72,7 +74,7 @@ Map getDomainFieldsAsMap() {
 
         fields[mapKey].put(line.field, true)
     }
-println "getDomainFieldsAsMap:  $fields"
+    // println "getDomainFieldsAsMap:  $fields"
     return fields
 }
 
@@ -169,7 +171,10 @@ void createFieldSpecsForAllProjects(sql) {
         String mapKey=''
         Map domainFieldsMap = [:]
 
-        // Iterate through the lines from the CSV and create the JSON for each of the asset classes for the project
+        // Iterate through the lines from the CSV and create the JSON for each of the asset classes for the project.
+        // Note that there are rows where the order == -1 that indicate that they're to be removed and there are
+        // custom fields used for testing which will be ignored.
+        // This for loop is JUST for the standard fields
         for (line in loadCsvData()) {
             if (domain != line.domain) {
                 // order = 0
@@ -233,14 +238,16 @@ void createFieldSpecsForAllProjects(sql) {
 
                 // Check if the label is a standard field
                 if (assetFields[assetClass][currentLabel]) {
-                    println "   WARNING - $fieldName references standard field $currentLabel, switched to $fieldName"
-                    currentLabel = fieldName
+                    String dupName = currentLabel
+                    currentLabel = "X_${currentLabel}_X"
+                    println "   WARNING - $fieldName references standard field $dupName, renamed to '$currentLabel'"
                 }
 
                 // Make sure the label isn't a dup
                 if (usedNames.containsKey(currentLabel)) {
-                    println "   WARNING - $fieldName has duplicated value $currentLabel"
-                    continue
+                    String dupName = currentLabel
+                    currentLabel = "X_${currentLabel}_X"
+                    println "   WARNING - $fieldName duplicated label '$dupName', renamed to '$currentLabel'"
                 }
 
                 // Save that the label has been used
