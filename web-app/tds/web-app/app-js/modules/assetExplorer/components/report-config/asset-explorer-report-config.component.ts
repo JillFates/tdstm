@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { FieldSettingsService } from '../../../fieldSettings/service/field-settings.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { StateService } from '@uirouter/angular';
 
@@ -11,6 +10,7 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ReportModel } from '../../model/report.model';
 import { AssetExplorerReportSaveComponent } from '../report-save/asset-explorer-report-save.component';
 import { AssetExplorerReportExportComponent } from '../report-export/asset-explorer-report-export.component';
+
 @Component({
 	moduleId: module.id,
 	selector: 'asset-explorer-report-config',
@@ -48,8 +48,11 @@ export class AssetExplorerReportConfigComponent {
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private stateService: StateService,
-		private fieldService: FieldSettingsService) {
+		@Inject('fields') fields: Observable<DomainModel[]>) {
 		this.model = new ReportModel();
+		fields.subscribe((result) => {
+			this.domains = result;
+		}, (err) => console.log(err));
 	}
 
 	protected onSaveAs(): void {
@@ -80,39 +83,12 @@ export class AssetExplorerReportConfigComponent {
 	protected onLoadAssetFields(): void {
 		this.selectedAssetClasses = Object.keys(this.filterModel.assets)
 			.filter(key => this.filterModel.assets[key]);
-		if (this.selectedAssetClasses.length !== 0) {
-			if (this.selectedAssetClasses.length === this.assetClasses.length) {
-				this.fieldService.getFieldSettingsByDomain()
-					.subscribe(res => {
-						this.domains = res;
-					});
-			} else {
-				let requests = this.selectedAssetClasses.map(asset =>
-					this.fieldService.getFieldSettingsByDomain(asset));
-				let source: Observable<DomainModel[]> = Observable.zip
-					.apply(this, requests) as Observable<DomainModel[]>;
-				source.subscribe(res => {
-					let result: DomainModel[] = [];
-					result = result.concat.apply(this, res);
-					this.domains = result.filter(domain => domain.domain);
-					this.ApplyFilters();
-				});
-			}
-		}
 	}
 	protected ApplyFilters(): void {
-		this.filteredData = this.domains.slice();
+		this.filteredData = this.domains.slice()
+			.filter(x => this.selectedAssetClasses.indexOf(x.domain.toUpperCase()) !== -1);
 		this.ApplyAssetClassFilter();
-		this.ApplyImportanceFilter();
 		this.ApplyFieldFilter();
-	}
-
-	protected ApplyImportanceFilter(): void {
-		if (this.filterModel.imp !== 'all') {
-			this.filteredData.forEach(domain => {
-				domain.fields = domain.fields.filter(field => field.imp === this.filterModel.imp);
-			});
-		}
 	}
 
 	protected ApplyAssetClassFilter(): void {

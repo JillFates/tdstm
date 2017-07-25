@@ -4,6 +4,7 @@ import { AssetExplorerReportConfigComponent } from './components/report-config/a
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 import { AssetExplorerService } from './service/asset-explorer.service';
+import { FieldSettingsService } from '../fieldSettings/service/field-settings.service';
 
 export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
@@ -63,7 +64,12 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		'containerView@tds': { component: AssetExplorerReportConfigComponent }
 	},
 	resolve: [
-
+		{
+			token: 'fields',
+			policy: { async: 'RXWAIT' },
+			deps: [FieldSettingsService],
+			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
+		}
 	]
 };
 
