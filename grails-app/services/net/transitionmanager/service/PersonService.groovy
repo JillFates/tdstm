@@ -1729,8 +1729,8 @@ class PersonService implements ServiceMethods {
 
 		if (!byAdmin) {
 			// Save some preferences
-			if (params.timeZone) {
-				userPreferenceService.setTimeZone(params.timeZone)
+			if (tzId) {
+				userPreferenceService.setTimeZone(tzId)
 			}
 
 			if (params.powerType) {
