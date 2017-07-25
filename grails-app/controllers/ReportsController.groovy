@@ -883,7 +883,7 @@ class ReportsController implements ControllerMethods {
 				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors])
 		}
 
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField("Application")
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, "Application")
 		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)
 
 		[applicationList: appList, moveBundle: currentBundle ?: 'Planning Bundles', sme: currentSme ?: 'All',
@@ -1191,7 +1191,7 @@ class ReportsController implements ControllerMethods {
 		def workflowTransitions = WorkflowTransition.findAll(
 				'FROM WorkflowTransition where workflow=? order by transId', [workflow])
 		String domain = AssetClass.APPLICATION.toString()
-		List appAttributes = customDomainService.fieldSpecs(domain, CustomDomainService.ALL_FIELDS, ["field", "label"])
+		List appAttributes = customDomainService.fieldSpecs(project, domain, CustomDomainService.ALL_FIELDS, ["field", "label"])
 		[moveBundles:moveBundleList, moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},
 		 workflowTransitions:workflowTransitions, appAttributes:appAttributes]
 	}
