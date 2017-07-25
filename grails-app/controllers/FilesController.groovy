@@ -243,7 +243,7 @@ class FilesController implements ControllerMethods {
 
 		// Obtains the domain out of the asset type string
 		String domain = AssetClass.getDomainForAssetType('Files')
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		def customFields = assetEntityService.getCustomFieldsSettings(project, files.assetClass.toString(), true)
 
 		[	assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,

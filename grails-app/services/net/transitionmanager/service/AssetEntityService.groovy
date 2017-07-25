@@ -1211,7 +1211,7 @@ class AssetEntityService implements ServiceMethods {
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
 
 		String domain = asset.assetClass.toString()
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
 		[	assetId: asset.id,
@@ -1263,7 +1263,7 @@ class AssetEntityService implements ServiceMethods {
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
 		// Obtains the domain out of the asset type string
 		String domain = AssetClass.getDomainForAssetType(type)
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 
 		def customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
 
@@ -1561,7 +1561,7 @@ class AssetEntityService implements ServiceMethods {
 		// Resolve the domain for the asset type
 		String domain = assetClassName.toUpperCase()
 
-		Map settingsMap = customDomainService.customFieldSpecs(assetClassName, showOnly)
+		Map settingsMap = customDomainService.customFieldSpecs(project, assetClassName, showOnly)
 		if (settingsMap && settingsMap[domain]) {
 			// Strips the list of fields from the result map
 			customs = settingsMap[domain].fields

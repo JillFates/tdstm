@@ -339,7 +339,7 @@ class ApplicationController implements ControllerMethods {
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 
 		String domain = application.assetClass.toString()
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(domain)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = assetEntityService.getCustomFieldsSettings(project, domain, true)
 
 		[ 	applicationInstance: application, assetTypeOptions: assetTypeOptions?.value,

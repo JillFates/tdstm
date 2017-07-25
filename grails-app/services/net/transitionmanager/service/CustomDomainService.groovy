@@ -35,17 +35,6 @@ class CustomDomainService implements ServiceMethods {
         return getFilteredFieldSpecs(project, domain, STANDARD_FIELD, showOnly)
     }
 
-    /**
-     * Retrieve custom field specs
-     * @param domain
-     * @param showOnly : flag to request only those visible fields.
-     * @return
-     * @Deprecated
-     */
-    Map customFieldSpecs(String domain, boolean showOnly = false) {
-        Project currentProject = securityService.loadUserCurrentProject()
-        return getFilteredFieldSpecs(currentProject, domain, CUSTOM_USER_FIELD, showOnly)
-    }
 
     /**
      * Retrieve custom field specs
@@ -83,20 +72,6 @@ class CustomDomainService implements ServiceMethods {
     Map findCustomField(Project project, String domain, Closure findClosure) {
         List list = customFieldsList(project, domain)
         return (list ? list.find(findClosure) : null)
-    }
-
-    /**
-     * Retrieve standard field specs as map
-     * @param domain
-     * @return
-     * @Deprecated
-     * Should be using the same method with project parameter
-     */
-    Map standardFieldSpecsByField(String domain) {
-        Project currentProject = securityService.loadUserCurrentProject()
-        Map fieldSpecs = getFilteredFieldSpecs(currentProject, domain, STANDARD_FIELD)
-        Map domainFieldSpecs = createFieldSpecsViewMap(fieldSpecs, domain)
-        return domainFieldSpecs
     }
 
     /**
@@ -324,6 +299,7 @@ class CustomDomainService implements ServiceMethods {
      * It also allows to filter only a particular subset of the keys, for cases
      * where the whole specs aren't required.
      *
+     * @param project - project instance
      * @param domain - asset domain
      * @param option - which fields are needed.
      *             @see ALL_FIELDS
@@ -333,8 +309,7 @@ class CustomDomainService implements ServiceMethods {
      *
      * @return a list with the specs.
      */
-    List fieldSpecs(String domain, int option = ALL_FIELDS, List values = null) {
-        Project project = securityService.loadUserCurrentProject()
+    List fieldSpecs(Project project, String domain, int option = ALL_FIELDS, List values = null) {
         // This list will contain the resulting specs.
         List fieldSpecs = []
         // Checks that an actual domain is given.

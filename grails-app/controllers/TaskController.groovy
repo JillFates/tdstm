@@ -1499,7 +1499,7 @@ function goBack() { window.history.back() }
 		List customs = []
 		if (assetComment?.assetEntity) {
 			String domain = assetComment.assetEntity?.assetClass.toString()
-			customs = customDomainService.fieldSpecs(domain, CustomDomainService.CUSTOM_USER_FIELD, ["field"])
+			customs = customDomainService.fieldSpecs(project, domain, CustomDomainService.CUSTOM_USER_FIELD, ["field"])
 		}
 
 
