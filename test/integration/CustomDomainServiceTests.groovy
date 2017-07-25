@@ -76,7 +76,7 @@ class CustomDomainServiceTests extends Specification {
             def customFieldSpecsMap
             customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Database custom field specs are requested'
-            customFieldSpecsMap = customDomainService.customFieldSpecs(domain)
+            customFieldSpecsMap = customDomainService.customFieldSpecs(project, domain)
         then: 'Database domain fields are returned'
             customFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
         then: 'Only database udf fields are returned'
@@ -91,7 +91,7 @@ class CustomDomainServiceTests extends Specification {
             def standardFieldSpecsMap
             customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Application standard field specs are requested'
-            standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(domain)
+            standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(project, domain)
         then: 'Application domain fields are returned'
             //standardFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
             null != standardFieldSpecsMap
