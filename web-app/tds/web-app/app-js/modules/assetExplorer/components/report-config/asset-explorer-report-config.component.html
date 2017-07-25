@@ -34,7 +34,11 @@
 								<div class="row">
 									<div class="col-md-4">
 										<div class="col-md-9">
-											<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search">
+											<div class="form-group has-feedback" style="margin-bottom:0px;">
+												<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="ApplyFilters()">
+												<span style="cursor:pointer;color:#000;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
+												 aria-hidden="true"></span>
+											</div>
 										</div>
 										<div class="col-md-3">
 											<button type="button" class="btn btn-default" id="btnFilter" (click)="ApplyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>

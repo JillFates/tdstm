@@ -80,6 +80,11 @@ export class AssetExplorerReportConfigComponent {
 			.filter(key => this.filterModel.assets[key]).length !== 0;
 	}
 
+	protected onClearTextFilter() {
+		this.filterModel.search = '';
+		this.ApplyFilters();
+	}
+
 	protected onLoadAssetFields(): void {
 		this.selectedAssetClasses = Object.keys(this.filterModel.assets)
 			.filter(key => this.filterModel.assets[key]);
