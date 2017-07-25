@@ -31,12 +31,12 @@ export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 		}
 	}
 
-	protected onClose(e, f): void {
-		if (f) {
-			setTimeout(() => this.dropdown.toggle(false));
-		} else {
-			e.prevented = true;
-		}
+	protected onAction(e): void {
+		e.prevented = true;
+	}
+
+	protected onToggle() {
+		setTimeout(() => this.dropdown.toggle(!this.dropdown.isOpen));
 	}
 
 	protected onSearch(): void {
