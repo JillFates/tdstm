@@ -299,6 +299,15 @@ class StringUtil {
 	}
 
 	/**
+	 * Capitalizes a String changing the first letter uppercase
+	 * @param text
+	 * @return
+	 */
+	static String capitalize( String text) {
+		return StringUtils.capitalize(text)
+	}
+
+	/**
 	 * Compare various string values as boolean
 	 * @param str - the string to compare
 	 * @return true/false if it matches either list otherwize null for undeterminable
