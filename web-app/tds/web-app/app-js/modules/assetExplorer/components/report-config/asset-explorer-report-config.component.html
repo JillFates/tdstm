@@ -18,7 +18,7 @@
 							<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
 								<a *ngIf="!isAssetSelected();else selected">Columns</a>
 								<ng-template #selected>
-									<a href="#tab_2" (click)="onLoadAssetFields()" data-toggle="tab">Columns</a>
+									<a href="#tab_2" data-toggle="tab">Columns</a>
 								</ng-template>
 							</li>
 						</ul>
@@ -26,37 +26,41 @@
 							<div class="tab-pane active" id="tab_1">
 								<div class="checkbox" *ngFor="let asset of assetClasses">
 									<label>
-										<input type="checkbox" name="{{asset}}" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
+										<input type="checkbox" name="{{asset}}" (change)="onAssetSelect()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
 									</label>
 								</div>
 							</div>
 							<div class="tab-pane" id="tab_2">
 								<div class="row">
-									<div class="col-md-4">
-										<div class="col-md-9">
+									<div class="col-md-4 col-sm-12">
+										<div class="col-sm-9">
 											<div class="form-group has-feedback" style="margin-bottom:0px;">
 												<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="ApplyFilters()">
 												<span style="cursor:pointer;color:#000;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
 												 aria-hidden="true"></span>
 											</div>
 										</div>
-										<div class="col-md-3">
+										<div class="col-sm-3">
 											<button type="button" class="btn btn-default" id="btnFilter" (click)="ApplyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
 										</div>
 									</div>
-									<div class="col-md-8">
-										<div class="col-md-2">
-											<span class="btn" (click)="onSelectToggle()">
-												<i class="fa" [ngClass]="toggleClass()"></i> Selected
-											</span>
-										</div>
-										<div class="col-md-5">
+									<div class="col-md-8 col-sm-12">
+										<div class="col-md-3 col-sm-6">
 											<div class="form-group">
-												<label for="show" class="control-label col-sm-3 pd-top-5">Show:</label>
-												<div class="col-sm-9">
+												<select name="selected" (change)="ApplyFilters()" id="selected" class="form-control pd-top-5" [(ngModel)]="filterModel.selected">
+													<option value="all">All Fields</option>
+													<option value="true">Selected</option>
+													<option value="false">Unselected</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-md-6 col-sm-6">
+											<div class="form-group">
+												<label for="show" class="control-label col-sm-2 pd-top-5">Show:</label>
+												<div class="col-sm-7">
 													<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
 														<option value="all">All Fields</option>
-														<option *ngFor="let asset of selectedAssetClasses" value="asset"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
+														<option *ngFor="let asset of selectedAssetClasses" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
 													</select>
 												</div>
 											</div>
@@ -64,7 +68,7 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-md-4" *ngFor="let domain of filteredData;">
+									<div class="col-md-4 col-sm-4" *ngFor="let domain of filteredData;">
 										<div class="form-group">
 											<div class="row">
 												<div class="col-md-12">

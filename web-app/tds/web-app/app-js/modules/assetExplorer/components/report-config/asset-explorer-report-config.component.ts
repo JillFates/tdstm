@@ -40,7 +40,7 @@ export class AssetExplorerReportConfigComponent {
 			'STORAGE': false
 		},
 		asset: 'all',
-		imp: 'all',
+		selected: 'all',
 		search: ''
 	};
 
@@ -80,68 +80,51 @@ export class AssetExplorerReportConfigComponent {
 			.filter(key => this.filterModel.assets[key]).length !== 0;
 	}
 
+	protected onAssetSelect(): void {
+		this.selectedAssetClasses = Object.keys(this.filterModel.assets)
+			.filter(key => this.filterModel.assets[key]);
+		this.filteredData = this.domains
+			.filter(x => this.selectedAssetClasses.indexOf(x.domain.toUpperCase()) !== -1)
+			.map(domain => {
+				return { ...domain };
+			});
+	}
+
+	protected ApplyFilters(): void {
+		this.onAssetSelect();
+		this.applyAssetClassFilter();
+		this.applyFieldFilter();
+		this.applySelectedFilter();
+	}
+
+	protected applyFieldFilter(): void {
+		if (this.filterModel.search !== '') {
+			let regx = new RegExp(this.filterModel.search, 'i');
+			this.filteredData.forEach(domain => {
+				domain.fields = domain.fields.filter(field =>
+					regx.test(field.label) || regx.test(field.field));
+			});
+		}
+	}
+
 	protected onClearTextFilter() {
 		this.filterModel.search = '';
 		this.ApplyFilters();
 	}
 
-	protected onLoadAssetFields(): void {
-		this.selectedAssetClasses = Object.keys(this.filterModel.assets)
-			.filter(key => this.filterModel.assets[key]);
-	}
-	protected ApplyFilters(): void {
-		this.filteredData = this.domains.slice()
-			.filter(x => this.selectedAssetClasses.indexOf(x.domain.toUpperCase()) !== -1);
-		this.ApplyAssetClassFilter();
-		this.ApplyFieldFilter();
-	}
-
-	protected ApplyAssetClassFilter(): void {
+	protected applyAssetClassFilter(): void {
 		if (this.filterModel.asset !== 'all') {
-			this.filteredData = this.filteredData.filter(domain => domain.domain === this.filterModel.asset);
+			this.filteredData = this.filteredData.filter(domain => domain.domain.toUpperCase() === this.filterModel.asset.toUpperCase());
 		}
 	}
 
-	protected ApplyFieldFilter(): void {
-		if (this.filterModel.search !== '') {
+	protected applySelectedFilter(): void {
+		if (this.filterModel.selected !== 'all') {
 			this.filteredData.forEach(domain => {
 				domain.fields = domain.fields.filter(field =>
-					field.label.indexOf(this.filterModel.search) !== -1 ||
-					field.field.indexOf(this.filterModel.search) !== -1);
+					this.filterModel.selected === 'true' ? field['selected'] : !field['selected']);
 			});
 		}
 	}
 
-	protected onSelectToggle() {
-		let selected = 0;
-		let total = 0;
-		this.filteredData.forEach(domain => {
-			total += domain.fields.length;
-			selected += domain.fields.filter((field: any) => field.selected).length;
-		});
-		let uncheck: boolean = selected !== 0 && selected === total;
-
-		this.filteredData.forEach(domain => {
-			domain.fields.forEach((field: any) => {
-				field.selected = !uncheck;
-			});
-		});
-
-	}
-
-	protected toggleClass() {
-		let selected = 0;
-		let total = 0;
-
-		this.filteredData.forEach(domain => {
-			total += domain.fields.length;
-			selected += domain.fields.filter((field: any) => field.selected).length;
-		});
-
-		return {
-			'fa-square-o': selected === 0,
-			'fa-plus-square-o': selected !== 0 && selected !== total,
-			'fa-check-square-o': selected !== 0 && selected === total
-		};
-	}
 }
