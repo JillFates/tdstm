@@ -558,7 +558,7 @@ class PersonController implements ControllerMethods {
 			if (!personService.isAssociatedTo(person, newCompany)) {
 				throw new DomainUpdateException("The person $person is not associated with the company $newCompany")
 			}*/
-			Person person = personService.updatePerson(params, tzId, true)
+			Person person = personService.updatePerson(params, true)
 			if (params.tab) {
 				forward(action: 'loadGeneral', params :[tab: params.tab, personId:person.id])
 			} else {
@@ -601,7 +601,7 @@ class PersonController implements ControllerMethods {
 		try {
 			//params.id = securityService.currentUserLoginId
 			String tzId = userPreferenceService.timeZone
-			Person person = personService.updatePerson(params, tzId, false)
+			Person person = personService.updatePerson(params, false)
 
 			if (params.tab) {
 				// Funky use-case that we should try to get rid of
