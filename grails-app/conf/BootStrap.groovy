@@ -4,7 +4,6 @@ import com.tdsops.metaclass.CustomMethods
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
-import grails.plugin.mail.MailService
 import grails.util.Environment
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.Manufacturer
@@ -42,7 +41,6 @@ class BootStrap {
 	TaskService taskService
 	QzSignService qzSignService
 	LicenseAdminService licenseAdminService
-	MailService mailService
 
 	def init = { servletContext ->
 		checkForBlacklistedVMParameters()
@@ -73,15 +71,6 @@ class BootStrap {
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
-
-		mailService.sendMail {
-			to "octavio.luna@gmail.com"
-			from "oluna@tdsi.com"
-			subject "Test Mail"
-			body "Test Body..."
-		}
-
-
 	}
 
 	/**
