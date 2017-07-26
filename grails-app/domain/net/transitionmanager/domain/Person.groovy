@@ -228,10 +228,6 @@ class Person extends Party {
 		(lastName ? lastName + ', ' : '') + firstName + (middleName ? ' ' + middleName : '')
 	}
 
-	String getFullName(){
-		firstName + (middleName? " " + middleName : "") + (lastName? " " + lastName : "")
-	}
-
 	/**
 	 * The person's name in 'LastName, FirstName MiddleName - Title' format
 	 */
