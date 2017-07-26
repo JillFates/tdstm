@@ -131,6 +131,10 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Delete button action, adds field to the pending to delete queue.
+	 * @param {FieldSettingsModel} dataItem
+	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
 		this.fieldsToDelete.push(dataItem.field);
 		this.deleteEmitter.emit({
@@ -139,6 +143,10 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Undo Delete button action, removes field from pending to delete queue.
+	 * @param {FieldSettingsModel} dataItem
+	 */
 	protected undoDelete(dataItem: FieldSettingsModel): void {
 		let index = this.fieldsToDelete.indexOf(dataItem.field, 0);
 		this.fieldsToDelete.splice(index, 1);
@@ -148,6 +156,11 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Check if a given field is on the pending to deleted queue.
+	 * @param {FieldSettingsModel} dataItem
+	 * @returns {boolean}
+	 */
 	protected toBeDeleted(dataItem: FieldSettingsModel): boolean {
 		let found = this.fieldsToDelete.filter(item => item === dataItem.field);
 		return found.length > 0;
