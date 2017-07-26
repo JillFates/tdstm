@@ -35,17 +35,6 @@ class CustomDomainService implements ServiceMethods {
         return getFilteredFieldSpecs(project, domain, STANDARD_FIELD, showOnly)
     }
 
-    /**
-     * Retrieve custom field specs
-     * @param domain
-     * @param showOnly : flag to request only those visible fields.
-     * @return
-     * @Deprecated
-     */
-    Map customFieldSpecs(String domain, boolean showOnly = false) {
-        Project currentProject = securityService.loadUserCurrentProject()
-        return getFilteredFieldSpecs(currentProject, domain, CUSTOM_USER_FIELD, showOnly)
-    }
 
     /**
      * Retrieve custom field specs
@@ -114,17 +103,14 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
-     * Retrieve standard field specs as map
-     * @param domain
+     * Retrieve standard field specs as map, overloading the method
+     * that receives the domain instead of the AssetClass for the asset.
+     * @param project
+     * @param AssetClass for the asset
      * @return
-     * @Deprecated
-     * Should be using the same method with project parameter
      */
-    Map standardFieldSpecsByField(String domain) {
-        Project currentProject = securityService.loadUserCurrentProject()
-        Map fieldSpecs = getFilteredFieldSpecs(currentProject, domain, STANDARD_FIELD)
-        Map domainFieldSpecs = createFieldSpecsViewMap(fieldSpecs, domain)
-        return domainFieldSpecs
+    Map standardFieldSpecsByField(Project project, AssetClass assetClass) {
+        return standardFieldSpecsByField(project, assetClass.toString())
     }
 
     /**
@@ -356,6 +342,7 @@ class CustomDomainService implements ServiceMethods {
      * It also allows to filter only a particular subset of the keys, for cases
      * where the whole specs aren't required.
      *
+     * @param project - project instance
      * @param domain - asset domain
      * @param option - which fields are needed.
      *             @see ALL_FIELDS
@@ -365,8 +352,7 @@ class CustomDomainService implements ServiceMethods {
      *
      * @return a list with the specs.
      */
-    List fieldSpecs(String domain, int option = ALL_FIELDS, List values = null) {
-        Project project = securityService.loadUserCurrentProject()
+    List fieldSpecs(Project project, String domain, int option = ALL_FIELDS, List values = null) {
         // This list will contain the resulting specs.
         List fieldSpecs = []
         // Checks that an actual domain is given.

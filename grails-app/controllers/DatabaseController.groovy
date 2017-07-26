@@ -270,7 +270,7 @@ class DatabaseController implements ControllerMethods {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField('Database')
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.DATABASE)
 		def customFields = assetEntityService.getCustomFieldsSettings(project, databaseInstance.assetClass.toString(), true)
 
 		[	databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value,
