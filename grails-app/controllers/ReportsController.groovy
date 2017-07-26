@@ -883,7 +883,7 @@ class ReportsController implements ControllerMethods {
 				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors])
 		}
 
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, "Application")
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
 		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)
 
 		[applicationList: appList, moveBundle: currentBundle ?: 'Planning Bundles', sme: currentSme ?: 'All',
