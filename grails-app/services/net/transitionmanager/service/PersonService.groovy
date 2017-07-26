@@ -1625,7 +1625,7 @@ class PersonService implements ServiceMethods {
 	 * @return The Person record being updated or throws an exception for various issues
 	 */
 	@Transactional
-	Person updatePerson(Map params, String tzId, boolean byAdmin = false)
+	Person updatePerson(Map params, boolean byAdmin = false)
 			throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
 		Person person = validatePersonAccess(params.id)
 		if (!isAssociatedTo(securityService.userLoginPerson, person.company)) {
@@ -1728,10 +1728,6 @@ class PersonService implements ServiceMethods {
 		}
 
 		if (!byAdmin) {
-			// Save some preferences
-			if (tzId) {
-				userPreferenceService.setTimeZone(tzId)
-			}
 
 			if (params.powerType) {
 				userPreferenceService.setPreference(PREF.CURR_POWER_TYPE, params.powerType)
