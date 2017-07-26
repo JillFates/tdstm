@@ -103,6 +103,17 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
+     * Retrieve standard field specs as map, overloading the method
+     * that receives the domain instead of the AssetClass for the asset.
+     * @param project
+     * @param AssetClass for the asset
+     * @return
+     */
+    Map standardFieldSpecsByField(Project project, AssetClass assetClass) {
+        return standardFieldSpecsByField(project, assetClass.toString())
+    }
+
+    /**
      * Retrieve standard field specs as map
      * @param project
      * @param domain
