@@ -369,7 +369,7 @@ class PersonController implements ControllerMethods {
 
 		if (isAjaxCall) {
 			def map = errMsg ? [errMsg : errMsg] :
-				[id: person.id, name:person.lastNameFirst, isExistingPerson: false, fieldName:params.fieldName]
+				[id: person.id, name:person.toString(), isExistingPerson: false, fieldName:params.fieldName]
 			render map as JSON
 		} else {
 			if (errMsg) {
