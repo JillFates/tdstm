@@ -30,6 +30,8 @@ export class FieldSettingsListComponent implements OnInit {
 		fieldType: 'All'
 	};
 
+	private fieldsToDelete = {};
+
 	constructor(
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private fieldService: FieldSettingsService,
@@ -50,6 +52,9 @@ export class FieldSettingsListComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.dataSignature = JSON.stringify(this.domains);
+		for (let domain of this.domains) {
+			this.fieldsToDelete[domain.domain] = [];
+		}
 	}
 
 	protected onTabChange(domain: string): void {
@@ -60,10 +65,23 @@ export class FieldSettingsListComponent implements OnInit {
 		return this.selectedTab === domain;
 	}
 
-	protected onSaveAll(callback): void {
+	protected onSaveAll(callback: any): void {
 		if (this.isEditAvailable()) {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
+
+				// remove(delete) fields if user requested
+				for (let domain of this.domains) {
+					if (this.fieldsToDelete[domain.domain].length > 0) {
+						this.fieldsToDelete[domain.domain].forEach(field => {
+							let index = domain.fields.findIndex(x => x.field === field);
+							if (index) {
+								domain.fields.splice(index, 1);
+							}
+						});
+					}
+				}
+
 				this.domains.forEach(domain => {
 					domain.fields.filter(x => x['isNew'])
 						.forEach(x => {
@@ -71,6 +89,7 @@ export class FieldSettingsListComponent implements OnInit {
 							delete x['count'];
 						});
 				});
+
 				this.fieldService.saveFieldSettings(this.domains)
 					.subscribe((res: any) => {
 						if (res.status === 'error') {
@@ -118,6 +137,7 @@ export class FieldSettingsListComponent implements OnInit {
 		if (this.state && this.state.$current && this.state.$current.data) {
 			this.state.$current.data.hasPendingChanges = result;
 		}
+		result = result || this.hasPendingDeletes();
 		return result;
 	}
 
@@ -190,9 +210,21 @@ export class FieldSettingsListComponent implements OnInit {
 		} else {
 			this.handleSharedField(value.field, value.domain);
 		}
-
 	}
 
+	private hasPendingDeletes(): boolean {
+		for (let domain in this.fieldsToDelete) {
+			if (this.fieldsToDelete[domain].length > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected onDelete(value: {domain: string, fieldsToDelete: string[]}): void {
+		this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+	}
+	/*
 	protected onDelete(value: { field: FieldSettingsModel, domain: string, callback: any }): void {
 		this.domains.filter(domain =>
 			value.field.shared ?
@@ -201,6 +233,7 @@ export class FieldSettingsListComponent implements OnInit {
 				});
 		this.refreshGrids(value.field.shared, value.callback);
 	}
+	*/
 
 	protected onFilter(): void {
 		this.grids.forEach(grid => grid.applyFilter());
