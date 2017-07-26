@@ -17,6 +17,36 @@
 		div.content-wrapper {
 			background-color: #ecf0f5 !important;
 		}
+		div.elapsed-time-wrapper span#eventDescription {
+			text-align: center;
+			font-size: 1.5em;
+		}
+		div.elapsed-time-wrapper span#spanPlanned {
+			text-align: center;
+			font-size: 1.3em;
+		}
+		div.elapsed-time-wrapper div.plannedStart {
+			margin-top: 15px;
+		}
+		div.elapsed-time-wrapper span#plannedStart {
+			text-align: center;
+			font-size: 3em;
+		}
+		div.elapsed-time-wrapper div.plannedStartLabel {
+			padding-left: 0px;
+			display: none; /*will be shown by other jquery method.*/
+		}
+		div.elapsed-time-wrapper div.plannedStartLabel span, div.elapsed-time-wrapper span#eventStringId{
+			margin-left: 8%;
+			font-style: italic;
+		}
+		div.elapsed-time-wrapper div.eventRunbook{
+			margin-top: 20px;
+			display: none; /*will be shown by other jquery method.*/
+		}
+		div.elapsed-time-wrapper span#eventRunbook{
+			margin-left: 5px;
+		}
 	</style>
 </head>
 <body>
@@ -85,13 +115,33 @@
 									</span>
 								</div>
 							</div>
+
 							<div class="col-md-4">
 								<div class="elapsed-time-wrapper">
-									<span id="eventDescription" style="text-align: center;font-size: 1.5em;"></span><br />
-									<span id="eventStringId"></span><br />
-									<span id="plannedStart" style="text-align: center;font-size: 3em;"></span><br />
-									<i><span style=" margin-left: 2%;">days</span><span style=" margin-left: 7%;">hours</span><span style=" margin-left: 9%;">mins</span></i><br />
-									 <br /><b>Runbook Status:</b>&nbsp;<span id="eventRunbook"></span>
+									<div class="row">
+										<div class="col-md-12"><span id="eventDescription"></span></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12"><span id="spanPlanned"></span></div>
+									</div>
+									<div class="row plannedStart">
+										<div class="col-md-12"><span id="plannedStart"></span></div>
+									</div>
+									<div class="row plannedStartLabel">
+										<div class="col-md-11">
+											<span>Days</span>
+											<span>Hours</span>
+											<span>Mins</span>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-11"><span id="eventStringId"></span></div>
+									</div>
+									<div class="row eventRunbook">
+										<div class="col-md-12">
+											<b>Runbook Status:</b><span id="eventRunbook"></span>
+										</div>
+									</div>
 								</div>
 							</div>
 							<!-- START TABAS FOR EVENT, ARCHIVE, ADD NEWS -->
@@ -834,10 +884,12 @@
 				$('#checkBoxId').removeAttr("checked")
 			}
 			$("#manualSummaryStatusId").val( sumDialInd );
+			$("div.plannedStartLabel").show();
 			$("#spanPlanned").html(tdsCommon.parseAndFormatDateTimeFromZulu(planSum.compTime))
 			$("#plannedStart").html(planSum.dayTime)
 			$("#eventDescription").html(planSum.eventDescription)
 			$("#eventStringId").html(planSum.eventString)
+			$("div.eventRunbook").show();
 			$("#eventRunbook").html(planSum.eventRunbook)
 
 			var taskManagerUrl = contextPath + "/assetEntity/listTasks?bundle=" + moveBundleId + "&justRemaining="

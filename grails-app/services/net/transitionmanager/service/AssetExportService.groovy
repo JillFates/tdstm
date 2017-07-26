@@ -34,9 +34,6 @@ class AssetExportService {
     private static double MIN_INFLATE_RATIO = 0.0001d
     private static final String ALL_BUNDLES_OPTION = 'All'
 
-    // TODO : JPM 9/2014 : determine if bundleMoveAndClientTeams is used as the team functionality has been RIPPED out of TM
-    private static BUNDLE_MOVE_AND_CLIENT_TEAMS = ['sourceTeamMt', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamDba', 'targetTeamMt', 'targetTeamLog', 'targetTeamSa', 'targetTeamDba']
-
     GrailsApplication grailsApplication
     SessionFactory sessionFactory
     ProgressService progressService
@@ -825,11 +822,7 @@ class AssetExportService {
                         } else {
                             def prop = currentDatabase[field]
                             if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                if ( BUNDLE_MOVE_AND_CLIENT_TEAMS.contains(field) ) {
-                                    addCell(dbSheet, colNum, databaseCount, String.valueOf(currentDatabase[field].teamCode))
-                                } else {
-                                    addCell(dbSheet, colNum, databaseCount, String.valueOf(currentDatabase[field]))
-                                }
+                                addCell(dbSheet, colNum, databaseCount, String.valueOf(currentDatabase[field]))
                             }
                         }
                     } // end columns loop
@@ -1282,6 +1275,7 @@ class AssetExportService {
 
     /**
      * Add a new cell to the given sheet at col, row with provided value, cell type and style
+     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
      * @param sheet
      * @param columnIdx
      * @param rowIdx
@@ -1299,6 +1293,7 @@ class AssetExportService {
 
     /**
      * Add a new cell to the given sheet at col, row with provided value
+     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
      * @param sheet
      * @param columnIdx
      * @param rowIdx
@@ -1310,6 +1305,7 @@ class AssetExportService {
 
     /**
      * creates a new cell style or get one from cache
+     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
      * @param sheet
      * @param cellType
      * @param workbookCellStyles
