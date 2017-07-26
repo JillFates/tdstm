@@ -1,5 +1,6 @@
 package com.tdssrc.grails
 
+import com.tdsops.tm.asset.WorkbookSheetName
 import groovy.transform.CompileStatic
 import groovy.util.logging.Commons
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -37,6 +38,7 @@ class WorkbookUtil {
 
 	/**
 	 * Adds a cell to a XSSFWorkbook
+	 * //TODO: oluna - should we deprecate this and use a wrapper? @see SheetWrapper.groovy
 	 * @param sheet
 	 * @param columnIdx
 	 * @param rowIdx
@@ -55,14 +57,7 @@ class WorkbookUtil {
 		}
 		if (type != null) {
 			cell.setCellType(type)
-			CellStyle style = sheet.workbook.createCellStyle() // TODO <SL> Use createCellStyle()
-			if (type == Cell.CELL_TYPE_NUMERIC) { // This resolves to a Numeric no decimal spaces Value
-				String binFormat = BuiltinFormats.getBuiltinFormat(1) //this is "0" mask format
-				def df = sheet.workbook.createDataFormat().getFormat(binFormat)
-				style.setDataFormat(df)
-			} else if (type == Cell.CELL_TYPE_STRING) {
-				style.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
-			}
+			CellStyle style = createCellStyle(sheet, type)
 			cell.setCellStyle(style)
 		}
 		setCellValue(cell, value)
@@ -487,6 +482,16 @@ class WorkbookUtil {
 	}
 
 	/**
+	 * Get a workbook sheet
+	 * @param workbook
+	 * @param sheetName
+	 * @return
+	 */
+	static Sheet getSheetFromWorkbook(Workbook workbook, WorkbookSheetName sheetName) {
+		return getSheetFromWorkbook(workbook, sheetName.toString())
+	}
+
+	/**
 	 * Get a SXSSFWorkbook from XSSFWorkbook
 	 * @param workbook
 	 * @return SXSSFWorkbook
@@ -541,5 +546,25 @@ class WorkbookUtil {
 			cellStyle.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
 		}
 		return cellStyle
+	}
+
+	/**
+	 * Assume always row 0 and stops when reach last cell in row or cell value is blank
+	 * @param sheet
+	 * @return
+	 */
+	static List<String> getSheetHeadersAsList(Sheet sheet) {
+		List<String> headers = new ArrayList<>()
+		Row row = sheet.getRow(0)
+		short cellIndex = 0
+		while (true) {
+			Cell cell = row.getCell(cellIndex)
+			if (cell == null || StringUtil.isBlank(cell.getStringCellValue())) {
+				break;
+			}
+			headers.add(cell.getStringCellValue())
+			cellIndex++
+		}
+		return headers
 	}
 }

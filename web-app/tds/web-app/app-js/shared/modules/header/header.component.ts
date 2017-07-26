@@ -1,5 +1,8 @@
-import {Component, Inject, AfterViewInit} from '@angular/core';
-import {StateService} from '@uirouter/angular';
+import { Component, Inject, AfterViewInit } from '@angular/core';
+import { StateService } from '@uirouter/angular';
+import { NotifierService } from '../../services/notifier.service';
+import { AlertType } from '../../model/alert.model';
+import { UIPromptService } from '../../directives/ui-prompt.directive';
 // import {TranslateService} from 'ng2-translate';
 
 declare var jQuery: any;
@@ -19,15 +22,40 @@ export class HeaderComponent implements AfterViewInit {
 	};
 	taskCount: Number;
 
-	constructor(@Inject('taskCount') tasks, state: StateService // translate: TranslateService
-	) {
+	constructor(
+		@Inject('taskCount') tasks,
+		state: StateService,
+		notifierService: NotifierService,
+		promptService: UIPromptService) {
+		jQuery('.navbar-nav a[href!="#"]').on('click', function (e) {
+			if (state.$current.data.hasPendingChanges) {
+				e.preventDefault();
+				promptService.open(
+					'Confirmation Required',
+					'You have changes that have not been saved. Do you want to continue and lose those changes?',
+					'Confirm', 'Cancel').then(result => {
+						if (result) {
+							state.$current.data.hasPendingChanges = false;
+							window.location.assign(e.currentTarget.href);
+						}
+					});
+			}
+		});
 		tasks.subscribe(
 			(result) => {
 				this.taskCount = result.count;
 				// Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #3
 				jQuery('#todoCountProjectId').html(this.taskCount);
+
 			},
-			(err) => console.log(err));
+			(err) => {
+				notifierService.broadcast({
+					name: AlertType.WARNING,
+					message: err
+				});
+
+				console.log(err);
+			});
 		this.state = state;
 		// this language will be used as a fallback when a translation isn't found in the current language
 		// translate.setDefaultLang('en');

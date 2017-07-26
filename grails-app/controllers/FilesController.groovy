@@ -8,13 +8,16 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
@@ -39,6 +42,8 @@ class FilesController implements ControllerMethods {
 	StorageService storageService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	CustomDomainService customDomainService
+	AssetService assetService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -78,23 +83,30 @@ class FilesController implements ControllerMethods {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		}
 
-		//def unknownQuestioned = "'$AssetDependencyStatus.UNKNOWN','$AssetDependencyStatus.QUESTIONED'"
-		//def validUnkownQuestioned = "'$AssetDependencyStatus.VALIDATED'," + unknownQuestioned
+		def filterParams = [
+			assetName: params.assetName,
+			depNumber: params.depNumber,
+			depResolve: params.depResolve,
+			depConflicts: params.depConflicts,
+			event: params.event
+		]
 
-		def filterParams = [assetName: params.assetName, depNumber: params.depNumber, depResolve: params.depResolve,
-		                    depConflicts: params.depConflicts, event: params.event]
-		def filePref= assetEntityService.getExistingPref('Storage_Columns')
-		def attributes = projectService.getAttributes('Files')
-		def filePrefVal = filePref.collect{it.value}
-		for (attribute in attributes) {
-			if (attribute.attributeCode in filePrefVal)
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
+		// Get the list of fields for the domain
+		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.STORAGE.toString(), true)
+
+		Map filePref= assetEntityService.getExistingPref('Storage_Columns')
+		List prefColumns = filePref*.value
+		for (String fieldName in prefColumns) {
+			if (fieldNameMap.containsKey(fieldName)) {
+				filterParams[fieldName] = params[fieldName]
+			}
 		}
+
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
 		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
 		//TODO:need to move the code to AssetEntityService
-		def temp=""
-		def joinQuery=""
+		String temp=""
+		String joinQuery=""
 		filePref.each { key, value ->
 			switch(value) {
 			case 'moveBundle':
@@ -124,7 +136,7 @@ class FilesController implements ControllerMethods {
 										 me.move_event_id AS event,
 										 if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS
 		commentsStatus, """)
-		
+
 		if (temp) {
 			query.append(temp)
 		}
@@ -227,19 +239,29 @@ class FilesController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.AssetCreate)
+	@Transactional(readOnly = true)
 	def create() {
 		// TODO : JPM 10/2014 : refactor create to get model from service layer
-		Files files = new Files(appOwner:'TDS')
+		Files files = new Files()
 		Project project = securityService.userCurrentProject
-		//fieldImportance for Discovery by default
-		def configMap = assetEntityService.getConfig('Files','Discovery')
+		files.project = project
 
-		[assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
-		 fileInstance: files, moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
-		 planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
-		 config: configMap.config, customs: configMap.customs,
-		 environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
-		 highlightMap: assetEntityService.getHighlightedInfo('Files', files, configMap), project:project]
+		assetService.setCustomDefaultValues(files)
+
+		// Obtains the domain out of the asset type string
+		String domain = AssetClass.getDomainForAssetType('Files')
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
+		def customFields = assetEntityService.getCustomFieldsSettings(project, files.assetClass.toString(), true)
+
+		[	assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
+			fileInstance: files,
+			moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
+			planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
+			environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
+			standardFieldSpecs: standardFieldSpecs,
+			project:project,
+			customs: customFields
+		]
 	}
 
 	@HasPermission(Permission.AssetView)
@@ -254,8 +276,9 @@ class FilesController implements ControllerMethods {
 			storageService.getModelForShow(project, storage, params)
 		}
 	}
-	
+
 	@HasPermission(Permission.AssetEdit)
+	@Transactional(readOnly = true)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return

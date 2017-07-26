@@ -1,6 +1,6 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="net.transitionmanager.security.Permission"%>
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 
 <table style="border: 0">
 	<tr>
@@ -12,39 +12,63 @@
 			<table>
 				<tbody>
 				<tr class="prop">
-					<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name</label></td>
-					<td colspan="3" style="max-width: 400px; font-weight:bold;" class="${config.assetName}">${filesInstance.assetName}</td>
-					<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
-					<td colspan="3" style="max-width: 400px;" class="${config.description}">${filesInstance.description}</td>
+					<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${filesInstance?.assetName}"/>
+					<td colspan="3" style="	max-width: 400px; font-weight:bold;">
+						<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
+							${filesInstance.assetName}
+						</tds:tooltipSpan>
+					</td>
+					<tds:inputLabel field="${standardFieldSpecs.description}" value="${filesInstance?.description}"/>
+					<td colspan="3" style="max-width: 400px;">
+						<tds:tooltipSpan field="${standardFieldSpecs.description}">
+							${filesInstance.description}
+						</tds:tooltipSpan>
+					</td>
 				</tr>
 				<tr class="prop">
-					<td class="label" nowrap="nowrap"><label for="assetType">Class</label></td>
-					<td class="valueNW">${filesInstance.assetType}</td>
-					<td class="label" nowrap="nowrap"><label for="lun">LUN</label></td>
-					<td class="valueNW">${filesInstance.LUN}</td>
-					<td colspan="2"></td>
-					<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
-					<td class="${config.moveBundle}">${filesInstance?.moveBundle} : ${dependencyBundleNumber}</td>
+					<tds:showLabelAndField field="${standardFieldSpecs.fileFormat}" value="${filesInstance.fileFormat}"/>
+					<tds:showLabelAndField field="${standardFieldSpecs.LUN}" value="${filesInstance.LUN}"/>
+
+					<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${filesInstance.supportType}"/>
+
+					<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+						<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+							${standardFieldSpecs.moveBundle.label} : Dep. Group
+						</label>
+					</td>
+					<td class="valueNW">
+						<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
+							${filesInstance?.moveBundle} : ${dependencyBundleNumber}
+						</tds:tooltipSpan>
+					</td>
 				</tr>
 				<tr class="prop">
-					<td class="label ${config.fileFormat} ${highlightMap.fileFormat?:''}" nowrap="nowrap"><label for="fileFormat">Format</label></td>
-					<td class="valueNW ${config.fileFormat}">${filesInstance.fileFormat}</td>
-					<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
-					<td class="valueNW ${config.environment}">${filesInstance.environment}</td>
-					<td class="label ${config.supportType} ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support</label></td>
-					<td class="valueNW ${config.supportType}">${filesInstance.supportType}</td>
-					<td class="label ${config.planStatus} ${highlightMap.planStatus?:''}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-					<td class="valueNW ${config.planStatus}">${filesInstance.planStatus}</td>
+					<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+						<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+							${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+						</label>
+					</td>
+					<td class="valueNW">
+						<tds:tooltipSpan field="${standardFieldSpecs.size}">
+							${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}
+						</tds:tooltipSpan>
+					</td>
+
+					<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>
+
+					<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${filesInstance.environment}"/>
+					<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}" tooltipDataPlacement="bottom"/>
 				</tr>
 				<tr>
-					<td class="label ${config.size} ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
-					<td class="valueNW ${config.size}">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}</td>
-					<td class="label ${config.rateOfChange} ${highlightMap.rateOfChange?:''}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
-					<td class="valueNW ${config?.rateOfChange}">${filesInstance?.rateOfChange}</td>
-					<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-					<td class="${config.externalRefId}">${filesInstance.externalRefId}</td>
-					<td class="label ${config.validation} ${highlightMap.validation?:''}"><label for="validation">Validation</label></td>
-					<td class="valueNW ${config.validation}">${filesInstance.validation}</td>
+					<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${filesInstance.rateOfChange}"/>
+
+					<td></td>
+					<td></td>
+
+					<td></td>
+					<td></td>
+
+					<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
 				</tr>
 				<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
 				</tbody>

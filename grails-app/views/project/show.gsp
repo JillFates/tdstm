@@ -99,7 +99,9 @@
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
-							<td class="valueNW" colspan="3"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+							<td class="name"><label>Plan Methodology:</label></td>
+							<td class="valueNW"> ${planMethodology?.label} </td>
 						</tr>
 					</tbody>
 				</table>
@@ -121,7 +123,7 @@
 						</g:if>
 					</tds:hasPermission>
 					<span class="button">
-						<g:actionSubmit class="show" value="Field Settings" action="fieldImportance" />
+						<input class="show" type="button" value="Field Settings" onclick="window.location='${createLink(controller:'module', action: 'fieldsettings')}/list';" />
 					</span>
 				</g:form>
 			</div>
@@ -130,23 +132,7 @@
 			currentMenuId = "#projectMenu";
 			$('.menu-projects-current-project').addClass('active');
 			$('.menu-parent-projects').addClass('active');
-
-			$(document).ready(function() {
-				var customCol = ${projectInstance.customFieldsShown}
-				showCustomFields(customCol, 4);
-			});
-			function showCustomFields(value, columnCount) {
-				  $(".custom_table").hide();
-				  if(value=='0'){
-					  $("#custom_table").hide();
-				  } else {
-						 for(i=1;i<=value;){
-							$("#custom_table").show();
-							$("#custom_count_"+i).show();
-							i=i+parseInt(columnCount)
-					 }
-				 }
-			 }
+			
 		</script>
 	</body>
 </html>

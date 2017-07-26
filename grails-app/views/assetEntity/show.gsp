@@ -15,123 +15,195 @@
 				<table>
 					<tbody>
 					<tr  class="prop">
-						<td class="label ${config.assetName}  ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name</label></td>
-						<td colspan="2" style="font-weight:bold" class="${config.assetName}">${assetEntity.assetName}</td>
-						<td class="label ${config.description}  ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
-						<td colspan="3" class="${config.description}">${assetEntity.description}</td>
+						<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}"/>
+						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">
+							<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
+								${assetEntity.assetName}
+							</tds:tooltipSpan>
+						</td>
+						
+						<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}"/>
+						<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}">
+							<tds:tooltipSpan field="${standardFieldSpecs.description}">
+								${assetEntity.description}
+							</tds:tooltipSpan>
+						</td>
 					</tr>
 					<tr class="prop">
-						<td class="label ${config.assetType} ${highlightMap.assetType?:''}" nowrap="nowrap"><label for="assetType">Device Type</label></td>
-						<td class="valueNW ${config.assetType}">${assetEntity.assetType}</td>
-						<td class="label ${config.environment}  ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
-						<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
+						<tds:showLabelAndField field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}"/>
+						
+						<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${assetEntity.environment}"/>
+						
 						<td></td>
 						<td class="label_sm">Source</td>
 						<td class="label_sm">Target</td>
 					</tr>
 					<tr class="prop">
-						<td class="label ${config.manufacturer}  ${highlightMap.manufacturer?:''}" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
-						<td class="valueNW ${config.manufacturer}"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
-						<td class="label ${config.priority}  ${highlightMap.priority?:''}" nowrap="nowrap"><label for="priority">Priority</label></td>
-						<td class="valueNW ${config.priority}">${assetEntity.priority}</td>
-						<td class="label ${config.sourceLocation}  ${highlightMap.sourceLocation?:''}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
-						<td class="valueNW ${config.sourceLocation}">${assetEntity.sourceLocation}</td>
-						<td class="valueNW ${config.targetLocation}">${assetEntity.targetLocation}</td>
+						<tds:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}"/>
+						<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
+							<tds:tooltipSpan field="${standardFieldSpecs.manufacturer}">
+								<a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a>
+							</tds:tooltipSpan>
+						</td>
+						
+						<tds:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
+
+						<td class="label ${standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
+
+						<td class="valueNW ${standardFieldSpecs.sourceLocation.imp?:''}">${assetEntity.sourceLocation}</td>
+						<td class="valueNW ${standardFieldSpecs.sourceLocation.imp?:''}">${assetEntity.targetLocation}</td>
+
+
 					</tr>
 					<tr class="prop">
-						<td class="label ${config.model}  ${highlightMap.model?:''}" nowrap="nowrap"><label for="model">Model</label></td>
-						<td class="valueNW ${config.model}"><a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
+						<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}"/>
+						<td class="valueNW ${standardFieldSpecs.model.imp?:''}">
+						<tds:tooltipSpan field="${standardFieldSpecs.model}">
+						<a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
 							<g:if test="${! assetEntity.model?.isValid()}"> <span style="color: red;"><b>?</b></span></g:if>
+						</tds:tooltipSpan>
 						</td>
-						<td class="label ${config.ipAddress}  ${highlightMap.ipAddress?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
-						<td class="valueNW ${config.ipAddress}">${assetEntity.ipAddress}</td>
-						<td class="label ${config.sourceRoom}  ${highlightMap.sourceRoom?:''}" nowrap="nowrap">
+						
+						<tds:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
+
+						<td class="label nonVMLabel ${standardFieldSpecs.sourceRoom.imp?:''}" nowrap="nowrap">
 							<label for="sourceRoom">Room</label>
 						</td>
-						<td class="valueNW ${config.sourceRoom}" >${roomSource?.roomName}</td>
-						<td class="valueNW ${config.targetRoom}">${roomTarget?.roomName}</td>
+
+						<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceRoom}" >
+							<tds:tooltipSpan field="${standardFieldSpecs.sourceRoom}" >
+								${roomSource?.roomName}
+							</tds:tooltipSpan>
+						</td>
+						<td class="valueNW nonVMLabel ${standardFieldSpecs.targetRoom}">
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRoom}" >
+								${roomTarget?.roomName}
+							</tds:tooltipSpan>
+						</td>
+
 					</tr>
 					<tr class="prop">
-						<td class="label ${config.shortName}  ${highlightMap.shortName?:''}" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
-						<td class="valueNW ${config.shortName}">${assetEntity.shortName}</td>
-						<td class="label ${config.os}  ${highlightMap.os?:''}" nowrap="nowrap"><label for="os">OS</label></td>
-						<td class="valueNW ${config.os}">${assetEntity.os}</td>
+						<tds:showLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntity.shortName}"/>
+
+						<tds:showLabelAndField field="${standardFieldSpecs.os}" value="${assetEntity.os}"/>
+
 						<%-- The following fields will be displayed based on the assetType --%>
 						<%-- rackable --%>
-						<td class="label rackLabel ${config.sourceRack} ${highlightMap.sourceRack ?: ''}"  nowrap="nowrap" id="rackId">
+						<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}"  nowrap="nowrap" id="rackId">
 							<label for="sourceRackId">Rack/Cab</label>
 						</td>
-						<td class="rackLabel ${config.sourceRack}  ${highlightMap.sourceRack?:''}">${assetEntity.rackSource?.tag}</td>
-						<td class="rackLabel ${config.targetRack}  ${highlightMap.targetRack?:''}">${assetEntity.rackTarget?.tag}</td>
+						<td class="rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceRack.tip?: standardFieldSpecs.sourceRack.label}">
+							${assetEntity.rackSource?.tag}
+						</td>
+						<td class="rackLabel ${standardFieldSpecs.targetRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.targetRack.tip?: standardFieldSpecs.targetRack.label}">
+							${assetEntity.rackTarget?.tag}
+						</td>
 						<%-- blade --%>
-						<td class="label bladeLabel ${config.sourceChassis} ${highlightMap.sourceChassis?:''}" nowrap="nowrap" id="bladeId" style="display: none">
+						<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display: none">
 							<label for="sourceChassisId">Blade Chassis</label>
 						</td>
-						<td class="bladeLabel ${config.sourceChassis} ${highlightMap.sourceChassis?:''}" style="display: none">
+						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceChassis.tip?: standardFieldSpecs.sourceChassis.label}">
 							${sourceChassis}
 						</td>
-						<td class="bladeLabel ${config.targetChassis} ${highlightMap.targetChassis?:''}" style="display: none" >
+						<td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetChassis.tip?: standardFieldSpecs.targetChassis.label}">
 							${targetChassis}
 						</td>
+
 					</tr>
 					<tr class="prop">
-						<td class="label ${config.serialNumber}  ${highlightMap.serialNumber?:''}" nowrap="nowrap"><label for="serialNumber">Serial #</label></td>
-						<td class="valueNW ${config.serialNumber}">${assetEntity.serialNumber}</td>
-						<td class="label ${config.supportType}  ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
-						<td class="valueNW ${config.supportType}">${assetEntity.supportType}</td>
-						<td class="label ${config.sourceRackPosition}  ${highlightMap.sourceRackPosition?:''}" nowrap="nowrap"><label for="sourceRack">Position</label></td>
-						<td class="rackLabel valueNW ${config.sourceRackPosition}  ${highlightMap.sourceRackPosition?:''}">${assetEntity.sourceRackPosition}</td>
-						<td class="rackLabel valueNW ${config.targetRackPosition}  ${highlightMap.targetRackPosition?:''}">${assetEntity.targetRackPosition}</td>
-						<td class="bladeLabel ${config.sourceBladePosition}  ${highlightMap.sourceBladePosition?:''}" style="display: none" >${assetEntity.sourceBladePosition}</td>
-						<td class="bladeLabel ${config.targetBladePosition}  ${highlightMap.targetBladePosition?:''}" style="display: none" >${assetEntity.targetBladePosition}</td>
+						<tds:showLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntity.serialNumber}"/>
+
+						<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}"/>
+
+						<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
+							<label for="sourceRack" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
+								Position
+							</label>
+						</td>
+						<td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}">
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
+								${assetEntity.sourceRackPosition}
+							</tds:tooltipSpan>
+						</td>
+						<td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}">
+							<tds:tooltipSpan tooltipDataplacement="bottom" field="${standardFieldSpecs.targetRackPosition}">
+								${assetEntity.targetRackPosition}
+							</tds:tooltipSpan>
+						</td>
+						<td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}" style="	display: none" >
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceBladePosition}">
+								${assetEntity.sourceBladePosition}
+							</tds:tooltipSpan>
+						</td>
+						<td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}" style="display: none" >
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetBladePosition}">
+								${assetEntity.targetBladePosition}
+							</tds:tooltipSpan>
+						</td>
+
 					</tr>
 					<tr class="prop">
-						<td class="label ${config.assetTag}  ${highlightMap.assetTag?:''}" nowrap="nowrap">
-							<label for="assetTag">Tag</label>
-						</td>
-						<td class="valueNW ${config.assetTag}">${assetEntity.assetTag}</td>
-						<td class="label ${config.retireDate}  ${highlightMap.retireDate?:''}">
-							<label for="retireDate">Retire Date:</label>
-						</td>
-						<td class="valueNW ${config.retireDate}">
+						<tds:showLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}"/>
+
+						<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}"/>
+						<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
+						<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
 							<tds:convertDate date="${assetEntity?.retireDate}" />
+						</tds:tooltipSpan>
 						</td>
-						<td class="label ${config.moveBundle}  ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
-						<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}</td>
-						<td class="label ${config.size}  ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size/Scale </label></td>
-						<td nowrap="nowrap" class="sizeScale ${config.size}">
-							${assetEntity.size} ${assetEntity.scale?.value()}
+						<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+							<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?: standardFieldSpecs.moveBundle.label}">
+								Bundle : Dep. Group
+							</label>
+						</td>
+						<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
+							<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+								${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}
+							</tds:tooltipSpan>
+						</td>
+
+						<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+							<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
+								Size/Scale
+							</label>
+						</td>
+						<td nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp?:''}">
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.size}">
+								${assetEntity.size} ${assetEntity.scale?.value()}
+							</tds:tooltipSpan>
 						</td>
 					</tr>
 					<tr class="prop">
-						<td class="label ${config.railType}  ${highlightMap.railType?:''}" nowrap="nowrap"><label for="railType">Rail Type</label></td>
-						<td class="valueNW ${config.railType}">${assetEntity.railType}</td>
-						<td class="label ${config.maintExpDate}  ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
-						<td class="valueNW ${config.maintExpDate}">
-							<tds:convertDate date="${assetEntity?.maintExpDate}" />
+						<tds:showLabelAndField field="${standardFieldSpecs.railType}" value="${assetEntity.railType}"/>
+
+						<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}"/>
+						<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
+							<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
+								<tds:convertDate date="${assetEntity?.maintExpDate}" />
+							</tds:tooltipSpan>
 						</td>
-						<td class="label ${config.planStatus}  ${highlightMap.planStatus?:''}" nowrap="nowrap">
-							<label for="planStatus">Plan Status</label>
-						</td>
-						<td class="valueNW ${config.planStatus}">${assetEntity.planStatus}</td>
-						<td class="label ${config.rateOfChange}  ${highlightMap.rateOfChange?:''}" nowrap="nowrap">
-							<label for="rateOfChange">Rate of Change (%)</label>
-						</td>
-						<td class="valueNW ${config.rateOfChange}">${assetEntity.rateOfChange}</td>
+
+						<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${assetEntity.planStatus}"/>
+
+						<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntity.rateOfChange}"/>
+
 					</tr>
 					<tr>
-						<td class="label ${config.externalRefId}  ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-						<td class="${config.externalRefId}">${assetEntity.externalRefId}</td>
+						<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntity.externalRefId}"/>
+
 						<g:if test="! assetEntity.isVM()">
-							<td class="label ${config.truck}  ${highlightMap.truck?:''}" nowrap="nowrap">
-								<label for="truck">Truck/Cart/Shelf</label>
+							<td class="label ${standardFieldSpecs.truck.imp?:''}" nowrap="nowrap">
+								<label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">
+									Truck/Cart/Shelf
+								</label>
 							</td>
-							<td class="valueNW ${config.truck}">
-								${assetEntity.truck ?: '   '} / ${assetEntity.cart ?: '   '} / ${assetEntity.shelf ?: '   '}
+							<td class="valueNW ${standardFieldSpecs.truck.imp?:''}">
+								<tds:tooltipSpan field="${standardFieldSpecs.truck}">
+									${assetEntity.truck ?: '   '} / ${assetEntity.cart ?: '   '} / ${assetEntity.shelf ?: '   '}
+								</tds:tooltipSpan>
 							</td>
 						</g:if>
-						<td class="label ${config.validation}  ${highlightMap.validation?:''}"><label for="validation">Validation</label></td>
-						<td class="valueNW ${config.validation}">${assetEntity.validation}</td>
+						<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${assetEntity.validation}"/>
 						<td>&nbsp;</td>
 					</tr>
 					<g:render template="customShow" ></g:render>

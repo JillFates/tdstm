@@ -1,0 +1,22 @@
+7/17/2017 (john) The contents of this directory was deleted as we no longer need the code to generate the JSON 
+files. The CSV file was moved to grails-app/conf/customField/AssetDomainFields.csv. The migration script:
+
+	20170712-create-new-fieldsettings-specs.groovy
+
+uses the CSV to generate the JSON and automatically update the database therefore the original code is now obsolete.
+
+-------------
+
+Legacy:
+
+The generateDomainFieldSpecs.groovy script is used to generate the following json files. It will
+read the CSV data defined in fieldSettingsDefines.csv and generate the structure that will be
+used with the User Definable Domaim.
+
+Files created:
+
+   application.json
+   database.json
+   device.json
+   storage.json
+

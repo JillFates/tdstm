@@ -1,7 +1,7 @@
 package net.transitionmanager.service
-
 import com.tds.asset.Application
 import com.tdsops.common.lang.CollectionUtils as CU
+import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
@@ -784,6 +784,15 @@ class CookbookService implements ServiceMethods {
 						detail: "$label in element $i must be either true or false"]
 				}
 
+				// For docLink we support valid URLs and any #string referencing another string field in AssetEntity.
+				if (n == "docLink") {
+					String errorMsg = RecipeHelper.validateDocLinkSyntax(v)
+					if (errorMsg) {
+						errorList << [error: 1, reason: "Invalid Syntax",
+							detail: "$label in element $i: $errorMsg"]
+					}
+				}
+
 				if (n=="category" && !(v in AssetCommentCategory.list)) {
 					errorList << [error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'"]
@@ -900,7 +909,8 @@ class CookbookService implements ServiceMethods {
 			],
 			constraintTime:0,
 			constraintType:0,
-			class:['device','database','application','storage']
+			class:['device','database','application','storage'],
+			docLink:0,
 		]
 
 		def teamCodes = []

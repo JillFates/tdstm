@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
 import groovy.json.StringEscapeUtils
+import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang3.StringUtils
 
 /**
@@ -289,6 +290,24 @@ class StringUtil {
 	}
 
 	/**
+	 * Escape string being used in Javascript to avoid unterminated strings
+	 * @param str
+	 * @return
+	 */
+	static String sanitizeJavaScript(String str) {
+		return StringEscapeUtils.escapeJavaScript(str)
+	}
+
+	/**
+	 * Capitalizes a String changing the first letter uppercase
+	 * @param text
+	 * @return
+	 */
+	static String capitalize( String text) {
+		return StringUtils.capitalize(text)
+	}
+
+	/**
 	 * Compare various string values as boolean
 	 * @param str - the string to compare
 	 * @return true/false if it matches either list otherwize null for undeterminable
@@ -340,5 +359,14 @@ class StringUtil {
 			result = "\"" + StringUtils.join(list , itemsDelimiter) + "\""
 		}
 		return result
+	}
+
+	/**
+	 * Decode a Base64 encoded string
+	 * @param str
+	 * @return
+	 */
+	static String base64DecodeToString(String str) {
+		return new String(Base64.decodeBase64(str))
 	}
 }

@@ -17,7 +17,7 @@ import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
-import { TDSRoutingStates, AuthConfig } from './tds-routing.states';
+import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './tds-routing.states';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -31,16 +31,15 @@ import { TDSRoutingStates, AuthConfig } from './tds-routing.states';
 		NoticesManagerModule,
 		TaskManagerModule,
 		FieldSettingsModule,
-		// Translator
-		// TranslateModule.forRoot({
-		//     provide: TranslateLoader,
-		//     useFactory: (http: Http) => new TranslateStaticLoader(http, '../tds/web-app/i18n', '.json'),
-		//     deps: [Http]
-		// }),
 		// Routing Modules using UI Router
 		UIRouterModule.forRoot(<UIRouterModule>{
 			states: TDSRoutingStates,
-			config: AuthConfig,
+			otherwise: '/pages/notfound',
+			config: (route) => {
+				AuthConfig(route);
+				PermissionConfig(route);
+				MiscConfig(route);
+			},
 		}),
 	],
 	declarations: [

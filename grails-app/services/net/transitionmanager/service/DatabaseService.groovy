@@ -64,7 +64,8 @@ class DatabaseService implements ServiceMethods {
 		if (isNew) {
 			asset.project = project
 			asset.owner = project.client
-			asset.attributeSet = EavAttributeSet.get(3)
+			// Removed by TM-6779 - this is not being used since field specs fields implementation
+			// asset.attributeSet = EavAttributeSet.get(3)
 			asset.assetClass = AssetClass.DATABASE
 			asset.assetType = AssetType.DATABASE
 			// asset.createdBy = userLogin.person

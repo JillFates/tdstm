@@ -7,6 +7,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -14,6 +15,7 @@ import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DatabaseService
 import net.transitionmanager.service.ProjectService
@@ -39,6 +41,8 @@ class DatabaseController implements ControllerMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	AssetService assetService
+	def customDomainService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -80,16 +84,25 @@ class DatabaseController implements ControllerMethods {
 		//def unknownQuestioned = "'$AssetDependencyStatus.UNKNOWN','$AssetDependencyStatus.QUESTIONED'"
 		//def validUnkownQuestioned = "'$AssetDependencyStatus.VALIDATED'," + unknownQuestioned
 
-		def filterParams = [assetName: params.assetName, depNumber: params.depNumber, depResolve: params.depResolve,
-		                    depConflicts: params.depConflicts, event: params.event]
+		def filterParams = [
+			assetName: params.assetName,
+			depNumber: params.depNumber,
+			depResolve: params.depResolve,
+			depConflicts: params.depConflicts,
+			event: params.event
+		]
 		def dbPref = assetEntityService.getExistingPref('Database_Columns')
-		def attributes = projectService.getAttributes('Database')
-		def dbPrefVal = dbPref*.value
-		attributes.each { attribute ->
-			if (attribute.attributeCode in dbPrefVal) {
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
+
+		// Get the list of fields for the domain
+		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DATABASE.toString(), true)
+
+		List prefColumns = dbPref*.value
+		for (String fieldName in prefColumns) {
+			if (fieldNameMap.containsKey(fieldName)) {
+				filterParams[fieldName] = params[fieldName]
 			}
 		}
+
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
 		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
 		//TODO:need to move the code to AssetEntityService
@@ -244,24 +257,33 @@ class DatabaseController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.AssetCreate)
+	@Transactional(readOnly = true)
 	def create() {
-		def databaseInstance = new Database(appOwner:'TDS')
+		Database databaseInstance = new Database()
+		Project project = securityService.userCurrentProject
+		databaseInstance.project = project
+
+		assetService.setCustomDefaultValues(databaseInstance)
+
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		Project project = securityService.userCurrentProject
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		//fieldImportance for Discovery by default
-		def configMap = assetEntityService.getConfig('Database','Discovery')
-		def highlightMap = assetEntityService.getHighlightedInfo('Database', databaseInstance, configMap)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.DATABASE)
+		def customFields = assetEntityService.getCustomFieldsSettings(project, databaseInstance.assetClass.toString(), true)
 
-		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-		 planStatusOptions:planStatusOptions?.value, projectId: project.id, project:project,
-		 config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
+		[	databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value,
+			moveBundleList:moveBundleList, planStatusOptions:planStatusOptions?.value,
+			projectId: project.id, project:project,
+			environmentOptions:environmentOptions?.value,
+			standardFieldSpecs: standardFieldSpecs,
+			customs: customFields
+		]
 	}
 
 	@HasPermission(Permission.AssetEdit)
+	@Transactional(readOnly = true)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -272,7 +294,7 @@ class DatabaseController implements ControllerMethods {
 			return
 		}
 
-		def model = assetEntityService.getDefaultModelForEdits('Database', project,databaseInstance, params)
+		Map model = assetEntityService.getDefaultModelForEdits('Database', project, databaseInstance, params)
 
 		model.databaseInstance = databaseInstance
 

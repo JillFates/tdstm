@@ -14,12 +14,12 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.service.CustomDomainService
 
 import static com.tds.asset.AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
 import static com.tds.asset.AssetOptions.AssetOptionsType.PRIORITY_OPTION
 import static com.tds.asset.AssetOptions.AssetOptionsType.STATUS_OPTION
 import static com.tds.asset.AssetType.BLADE
-import static com.tds.asset.AssetType.VM
 import static com.tdsops.tm.enums.domain.AssetClass.DEVICE
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.UNKNOWN
@@ -27,8 +27,10 @@ import static com.tdsops.tm.enums.domain.AssetDependencyStatus.VALIDATED
 import static com.tdsops.tm.enums.domain.AssetEntityPlanStatus.UNASSIGNED
 import static com.tdsops.validators.CustomValidators.inList
 import static com.tdsops.validators.CustomValidators.optionsClosure
+import static com.tdsops.validators.CustomValidators.validateCustomFields
 
 class AssetEntity extends EavEntity {
+	CustomDomainService customDomainService
 
 	AssetClass assetClass = DEVICE
 	String application = ''
@@ -258,6 +260,8 @@ class AssetEntity extends EavEntity {
 		scale nullable: true, inList: SizeScale.keys
 		rateOfChange nullable: true
 		modifiedBy nullable: true
+
+		custom1 validator: validateCustomFields()
 	}
 
 	static mapping = {
@@ -275,7 +279,7 @@ class AssetEntity extends EavEntity {
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
-	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict']
+	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict', 'customDomainService']
 
 	def beforeInsert = {
 		dateCreated = lastUpdated = TimeUtil.nowGMT()

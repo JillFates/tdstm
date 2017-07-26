@@ -1,7 +1,7 @@
-import {Ng2StateDeclaration} from '@uirouter/angular';
-import {NoticeListComponent} from './components/list/notice-list.component';
-import {HeaderComponent} from '../../shared/modules/header/header.component';
-import {NoticeService} from './service/notice.service';
+import { Ng2StateDeclaration } from '@uirouter/angular';
+import { NoticeListComponent } from './components/list/notice-list.component';
+import { HeaderComponent } from '../../shared/modules/header/header.component';
+import { NoticeService } from './service/notice.service';
 
 export class NoticeStates {
 	public static readonly LIST = {
@@ -22,18 +22,19 @@ export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 		page: {
 			title: 'NOTICE_MANAGER.NOTICE_ADMINISTRATION',
 			instruction: '',
-			menu: ['NOTICE_MANAGER.ADMIN', 'NOTICE_MANAGER.NOTICE', 'NOTICE_MANAGER.LIST']
+			menu: ['NOTICE_MANAGER.ADMIN', 'NOTICE_MANAGER.NOTICE', 'GLOBAL.LIST']
 		},
-		requiresAuth: true
+		requiresAuth: true,
+		requiresPermission: 'NoticeView'
 	},
 	views: {
-		'headerView@tds': {component: HeaderComponent},
-		'containerView@tds': {component: NoticeListComponent}
+		'headerView@tds': { component: HeaderComponent },
+		'containerView@tds': { component: NoticeListComponent }
 	},
 	resolve: [
 		{
 			token: 'notices',
-			policy: {async: 'RXWAIT'},
+			policy: { async: 'RXWAIT' },
 			deps: [NoticeService],
 			resolveFn: (service: NoticeService) => service.getNoticesList()
 		}

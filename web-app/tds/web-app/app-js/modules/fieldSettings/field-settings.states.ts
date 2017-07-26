@@ -24,7 +24,9 @@ export const fieldSettingListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 			instruction: '',
 			menu: ['FIELD_SETTINGS.PROJECT_LIST', 'FIELD_SETTINGS.ASSET_FIELD_SETTING']
 		},
-		requiresAuth: true
+		requiresAuth: true,
+		requiresPermission: 'ProjectFieldSettingsView',
+		hasPendingChanges: false
 	},
 	views: {
 		'headerView@tds': { component: HeaderComponent },
@@ -35,7 +37,7 @@ export const fieldSettingListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 			token: 'fields',
 			policy: { async: 'RXWAIT' },
 			deps: [FieldSettingsService],
-			resolveFn: (service: FieldSettingsService) => service.getFieldSettings()
+			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
 		}
 	]
 };

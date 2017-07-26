@@ -1,0 +1,8 @@
+<div *ngIf="!editMode" [ngClass]="model" class="text-center">
+    {{model}}
+</div>
+<div *ngIf="editMode" [ngClass]="model" class="text-center">
+    <span *ngFor="let value of values" (click)="onModelChange(value)">
+        {{value}}
+    </span>
+</div>

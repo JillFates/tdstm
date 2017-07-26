@@ -2,6 +2,7 @@ import com.tds.asset.FieldImportance
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -25,19 +26,23 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
+
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 
+import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectController implements ControllerMethods {
 
@@ -47,6 +52,7 @@ class ProjectController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	AuditService auditService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
@@ -113,10 +119,22 @@ class ProjectController implements ControllerMethods {
 		}
 		session.setAttribute('setImage', imageId)
 		boolean isDeleteable = securityService.hasPermission(Permission.ProjectDelete) && !project.isDefaultProject()
-		
+
+		Map planMethodology = [:]
+		if (project.planMethodology) {
+			planMethodology= customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
+				it.field == project.planMethodology
+			}
+		}
+
+		// Log a warning if the planMethodology field spec was not found but one is defined
+		if (!planMethodology && project.planMethodology) {
+			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
+		}
+
 		[projectInstance: project, projectPartners: partyRelationshipService.getProjectPartners(project),
 		 projectManagers: projectService.getProjectManagers(project), projectLogoForProject: projectLogo,
-		 isDeleteable: isDeleteable]
+		 isDeleteable: isDeleteable, planMethodology:planMethodology]
 	}
 
 	/**
@@ -153,6 +171,8 @@ class ProjectController implements ControllerMethods {
 			projectDetails = projectService.getprojectEditDetails(project)
 			moveBundles = MoveBundle.findAllByProject(project)
 
+			List<Map> planMethodologies = getPlanMethodologiesValues(project)
+
 			List projectManagers = projectService.getProjectManagers(project)
 			projectManagers.sort { a,b ->
 				a.firstName <=> b.firstName ?: a.lastName <=> b.lastName
@@ -172,7 +192,8 @@ class ProjectController implements ControllerMethods {
 				workflowCodes: projectDetails.workflowCodes,
 				projectPartners: projectPartners,
 				projectManagers: projectManagers,
-				moveBundles:moveBundles
+				moveBundles:moveBundles,
+				planMethodologies: planMethodologies
 			]
 		}
 	}
@@ -218,6 +239,8 @@ class ProjectController implements ControllerMethods {
 			params.runbookOn = 1
 			project.properties = params
 
+			List<Map> planMethodologies = getPlanMethodologiesValues(project)
+
 			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
 			if (logoFile instanceof String) {
 				flash.message = logoFile
@@ -238,10 +261,11 @@ class ProjectController implements ControllerMethods {
 						companyPartners: projectDetails.companyPartners,
 						workflowCodes: projectDetails.workflowCodes,
 						projectLogoForProject: projectDetails.projectLogoForProject,
-						prevParam:params,
+						prevParam: params,
 						projectPartners: projectPartners,
 						projectManagers: projectManagers,
-						moveBundles:moveBundles
+						moveBundles: moveBundles,
+						planMethodologies: planMethodologies
 				]
 
 				render(view: 'edit', model: model)
@@ -294,7 +318,8 @@ class ProjectController implements ControllerMethods {
 						prevParam:params,
 						projectPartners: projectPartners,
 						projectManagers: projectManagers,
-						moveBundles:moveBundles
+						moveBundles:moveBundles,
+						planMethodologies: planMethodologies
 				]
 
 				render(view: 'edit', model: model)
@@ -310,9 +335,12 @@ class ProjectController implements ControllerMethods {
 		PartyGroup company = securityService.userLoginPerson.company
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 
+		// TODO - create - See TM-6673 - need to remove planMethodologies
+		List<Map> planMethodologies = []
+
 		[clients: projectDetails.clients, company: company, managers: projectDetails.managers,
 		 partners: projectDetails.partners, projectInstance: new Project(params),
-		 workflowCodes: projectDetails.workflowCodes]
+		 workflowCodes: projectDetails.workflowCodes, planMethodologies:planMethodologies]
 	}
 
 	/**
@@ -360,10 +388,11 @@ class ProjectController implements ControllerMethods {
 
 				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 
-				render(view: 'create',
-				       model: [company: company, projectInstance: project, clients: projectDetails.clients,
-				               partners: projectDetails.partners, managers: projectDetails.managers,
-				               workflowCodes: projectDetails.workflowCodes, prevParam: params])
+				render(view: 'create', model: [
+					company: company, projectInstance: project, clients: projectDetails.clients,
+					partners: projectDetails.partners, managers: projectDetails.managers,
+					workflowCodes: projectDetails.workflowCodes, prevParam: params
+				] )
 				return
 			}
 
@@ -371,6 +400,9 @@ class ProjectController implements ControllerMethods {
 
 			// Save the partners to be related to the project
 			projectService.updateProjectPartners(project, partnersIds)
+
+			// Clone any settings from the Default Project
+			projectService.cloneDefaultSettings(project)
 
 			// Deal with the Project Manager if one is supplied
 			Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)
@@ -573,6 +605,7 @@ class ProjectController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ProjectFieldSettingsView)
 	def fieldImportance() {
+		throw new RuntimeException('fieldImportance is no longer used')
 		[project: securityService.userCurrentProject,
 		 hasProjectFieldSettingsEditPermission: securityService.hasPermission(Permission.ProjectFieldSettingsEdit)]
 	}
@@ -581,10 +614,12 @@ class ProjectController implements ControllerMethods {
 	 * To create json data to for a given entity type
 	 *@param : entityType type of entity.
 	 *@return : json data
+	 * TM-6617
 	 */
 	@HasPermission(Permission.AssetView)
+	@Deprecated
 	def retrieveAssetFields() {
-
+		throw new RuntimeException('retrieveAssetFields is no longer used')
 		def assetTypes=EntityType.list
 		def fieldMap= [:]
 		assetTypes.each { type ->
@@ -593,32 +628,34 @@ class ProjectController implements ControllerMethods {
 		fieldMap.customs = projectService.getCustoms()
 		render fieldMap as JSON
 	}
-	
+
 	/**
 	 * Initialising importance for a given entity type.
 	 *@param : entityType type of entity.
 	 *@return : json data, example map
-	 *{
-		AssetEntity:{
-			assetName:{phase:{D:C,V:C,R:H,S:I,B:C}},
-			assetTag:{phase:{D:N,V:N,R:N,S:N,B:N}},..............
-			environment:{phase:{D:N,V:N,R:N,S:N,B:N}}},
-		Application:{
-			assetName:{phase:{D:N,V:N:N,S:N,B:N}},
-			appVendor:{phase:{D:C,V:H,R:I,S:C,B:H}},....
-			custom8:{phase:{D:N,V:N,R:N,N,B:N}}},
-		Files:{
-			assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
-			fileFormat:{phase:{D:N,V:N,N,S:N,B:N}},........
-			url:{phase:{D:N,V:N,R:N,S:N,B:N}}},
-		Database:{
-			assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
-			dbFormat:{phase:{D:N,V:N,R:N,S:N,B:N}},.............
-			custom8:{phase:{D:N,V:N,R:N,S:N,B:N}}}
-		}
+	 *  {
+	 *    	AssetEntity:{
+	 *    		assetName:{phase:{D:C,V:C,R:H,S:I,B:C}},
+	 *    		assetTag:{phase:{D:N,V:N,R:N,S:N,B:N}},..............
+	 *    		environment:{phase:{D:N,V:N,R:N,S:N,B:N}}},
+	 *    	Application:{
+	 *    		assetName:{phase:{D:N,V:N:N,S:N,B:N}},
+	 *    		appVendor:{phase:{D:C,V:H,R:I,S:C,B:H}},....
+	 *    		custom8:{phase:{D:N,V:N,R:N,N,B:N}}},
+	 *    	Files:{
+	 *    		assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
+	 *    		fileFormat:{phase:{D:N,V:N,N,S:N,B:N}},........
+	 *    		url:{phase:{D:N,V:N,R:N,S:N,B:N}}},
+	 *    	Database:{
+	 *    		assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
+	 *    		dbFormat:{phase:{D:N,V:N,R:N,S:N,B:N}},.............
+	 *    		custom8:{phase:{D:N,V:N,R:N,S:N,B:N}}}
+	 * 	}
 	 */
+	@Deprecated
 	@HasPermission(Permission.AssetView)
 	def retrieveImportance() {
+		throw new RuntimeException('retrieveImportance is no longer used')
 		def assetTypes=EntityType.list
 		def impMap =[:]
 		assetTypes.each {type->
@@ -631,9 +668,12 @@ class ProjectController implements ControllerMethods {
 	 * Renders importance for a given entity type.
 	 * @param entity type
 	 * @return json data
+	 * TM-6617
 	 */
 	@HasPermission(Permission.AssetView)
+	@Deprecated
 	def cancelImportance() {
+		throw new RuntimeException('cancelImportance is no longer used')
 		render projectService.getConfigByEntity(request.JSON.entityType) as JSON
 	}
 
@@ -641,9 +681,12 @@ class ProjectController implements ControllerMethods {
 	 * Update field importance and display it to user
 	 * @param : entityType type of entity for which user is requested for importance .
 	 * @return success string
+	 * TM-6617
 	 */
 	@HasPermission(Permission.ProjectFieldSettingsEdit)
+	@Deprecated
 	def updateFieldImportance() {
+		throw new RuntimeException('updateFieldImportance no longer used')
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
@@ -670,29 +713,16 @@ class ProjectController implements ControllerMethods {
 	 * Retrieve default project field importance and display it to user.
 	 * @param : entityType type of entity for which user is requested for importance .
 	 * @return
+	 * TM-6617
 	 */
 	@HasPermission(Permission.ProjectFieldSettingsEdit)
+	@Deprecated
 	def retriveDefaultImportance() {
+		throw new RuntimeException('retriveDefaultImportance no longer used')
 		def entityType = request.JSON.entityType
 		renderSuccessJson(
 				fields: projectService.generateDefaultConfig(entityType),
 				tooltips: assetEntityService.retrieveTooltips(entityType, Project.defaultProject))
-	}
-
-	/**
-	 * Projects customFieldsShown
-	 * @param : custom count.
-	 * @render string 'success'.
-	 */
-	@HasPermission(Permission.ProjectFieldSettingsEdit)
-	def updateProjectCustomShown() {
-		Project project = securityService.userCurrentProject
-		project.customFieldsShown = NumberUtils.toInt(request.JSON.customCount,Project.CUSTOM_FIELD_COUNT)
-		if(!project.validate() || !project.save(flush:true)){
-			def etext = "Project customs unable to Update "+GormUtil.allErrorsString( project )
-			log.error( etext )
-		}
-		render "success"
 	}
 
 	/**
@@ -710,12 +740,18 @@ class ProjectController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.ProjectFieldSettingsView)
+	@Deprecated
+	// TM-6617
 	def showImportanceFields() {
+		throw new RuntimeException('showImportanceFields is no longer used')
 		render( view: "showImportance", model: [])
 	}
-	
+
 	@HasPermission(Permission.ProjectFieldSettingsEdit)
+	@Deprecated
+	// TM-6617
 	def editImportanceFields() {
+		throw new RuntimeException('editImportanceFields is no longer used')
 		render( view: "editImportance", model: [])
 	}
 
@@ -794,4 +830,26 @@ class ProjectController implements ControllerMethods {
 		forward action: 'userActivationEmailsForm'
 	}
 
+	/**
+	 * Helper method to get the PlanMethodologies Values of the Select List in the Project CRUD
+	 * @param project
+	 * @return the list of values or empty list is there is none
+	 */
+	private List<Map<String, String>> getPlanMethodologiesValues(Project project){
+		List<Map> customFields = customDomainService.customFieldsList(
+			project,
+			AssetClass.APPLICATION.toString(),
+			true
+		)
+
+		List<Map> planMethodologies = customFields.collect {
+			[ field: it.field, label: (it.label ?: it.field) ]
+		}
+
+		if(planMethodologies){
+			planMethodologies.add(0, [field:'', label:'Select...'])
+		}
+
+		return planMethodologies
+	}
 }

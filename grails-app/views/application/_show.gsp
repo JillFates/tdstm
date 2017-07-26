@@ -3,105 +3,135 @@
 <table class="planning-application-table">
 	<tbody>
 		<tr>
-			<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name</label></td>
-			<td colspan="3" style="font-weight:bold;" class="${config.assetName}">${applicationInstance.assetName}</td>
-			<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
-			<td colspan="3" class="${config.description}">${applicationInstance.description}</td>
-		</tr>
-		<tr>
-			<td class="label" nowrap="nowrap"><label for="appAccess">Type</label></td>
-			<td class="valueNW">${applicationInstance.assetType}</td>
-			<td class="label ${config.supportType} ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support</label></td>
-			<td class="valueNW ${config.supportType}">${applicationInstance.supportType}</td>
-			<td class="label ${config.appFunction} ${highlightMap.appFunction?:''}" nowrap="nowrap"><label for="appFunction">Function</label></td>
-			<td class="valueNW ${config.appFunction}">${applicationInstance.appFunction}</td>
-			<td class="label ${config.userCount} ${highlightMap.userCount?:''}" nowrap="nowrap"><label for="userCount">Users</label></td>
-			<td class="valueNW ${config.userCount}">${applicationInstance.userCount}</td>
-		</tr>
-		<tr>
-			<td class="label ${config.appVendor} ${highlightMap.appVendor?:''}" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
-			<td class="valueNW ${config.appVendor}">${applicationInstance.appVendor}</td>
-			<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
-			<td class="valueNW ${config.sme}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')">
-					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
-				</span>
+			<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${applicationInstance.assetName}"/>
+
+			<td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
+				<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
+					${applicationInstance.assetName}
+				</tds:tooltipSpan>
 			</td>
-			<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
-			<td class="valueNW ${config.environment}">${applicationInstance.environment}</td>
-			<td class="label ${config.userLocations} ${highlightMap.userLocations?:''}" nowrap="nowrap"><label for="userLocations">User Location</label></td>
-			<td class="valueNW ${config.userLocations}">${applicationInstance.userLocations}</td>
+			<tds:inputLabel field="${standardFieldSpecs.description}" value="${applicationInstance.description}"/>
+			<td colspan="3" class="${standardFieldSpecs.description.imp}" >
+				<tds:tooltipSpan field="${standardFieldSpecs.description}" tooltipDataPlacement="bottom">
+					${applicationInstance.description}
+				</tds:tooltipSpan>
+			</td>
 		</tr>
+
 		<tr>
-			<td class="label ${config.appVersion} ${highlightMap.appVersion?:''}" nowrap="nowrap"><label for="appVersion">Version</label></td>
-			<td class="valueNW ${config.appVersion}">${applicationInstance.appVersion}</td>
-			<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-			<td class="valueNW ${config.sme2}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')">
+			<tds:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${applicationInstance.supportType}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.appFunction}" value="${applicationInstance.appFunction}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.userCount}" value="${applicationInstance.userCount}" tooltipDataPlacement="bottom"/>
+		</tr>
+
+		<tr>
+			<tds:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
+
+			<tds:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
+
+			<td class="valueNW ${standardFieldSpecs.sme.imp}">
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip?:standardFieldSpecs.sme.label}">
+					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
+                </span>
+			</td>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}" tooltipDataPlacement="bottom"/>
+
+		</tr>
+
+		<tr>
+			<tds:showLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
+
+			<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
+
+			<td class="valueNW ${standardFieldSpecs.sme2.imp}">
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip?: standardFieldSpecs.sme2.label}">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
 				</span>
 			</td>
-			<td class="label ${config.criticality} ${highlightMap.criticality?:''}" nowrap="nowrap"><label for="criticality">Criticality</label></td>
-			<td class="valueNW ${config.criticality}">${applicationInstance.criticality}</td>
-			<td class="label ${config.useFrequency} ${highlightMap.useFrequency?:''}" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
-			<td class="valueNW ${config.useFrequency}">${applicationInstance.useFrequency}</td>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}" tooltipDataPlacement="bottom"/>
+
 		</tr>
+
 		<tr>
-			<td class="label ${config.appTech} ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
-			<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
-			<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-			<td class="valueNW ${config.appOwner}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')">
+			<tds:showLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}"/>
+
+			<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
+
+			<td class="valueNW ${standardFieldSpecs.appOwner.imp}">
+				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip?: standardFieldSpecs.appOwner.label}">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
 				</span>
 			</td>
-			<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
-			<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} : ${dependencyBundleNumber}</td>
-			<td class="label ${config.drRpoDesc} ${highlightMap.drRpoDesc?:''}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
-			<td class="valueNW ${config.drRpoDesc}">${applicationInstance.drRpoDesc}</td>
-		</tr>
-		<tr>
-			<td class="label ${config.appSource} ${highlightMap.appSource?:''}" nowrap="nowrap"><label for="appSource">Source</label></td>
-			<td class="valueNW ${config.appSource}">${applicationInstance.appSource}</td>
-			<td class="label ${config.businessUnit} ${highlightMap.businessUnit?:''}" nowrap="nowrap"><label for="businessUnit">Bus Unit</label></td>
-			<td class="valueNW ${config.businessUnit}">${applicationInstance.businessUnit}</td>
-			<td class="label ${config.planStatus} ${highlightMap.planStatus?:''}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-			<td class="valueNW ${config.planStatus}">${applicationInstance.planStatus}</td>
-			<td class="label ${config.drRtoDesc} ${highlightMap.drRtoDesc?:''}" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>
-			<td class="valueNW ${config.drRtoDesc}">${applicationInstance.drRtoDesc}</td>
-		</tr>
-		<tr>
-			<td class="label ${config.license} ${highlightMap.license?:''}" nowrap="nowrap"><label for="license">License</label></td>
-			<td class="valueNW ${config.license}">${applicationInstance.license}</td>
-			<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}" nowrap="nowrap"><label for="retireDate">Retire</label></td>
-			<td class="${config.retireDate}">
-				<tds:convertDate date="${applicationInstance?.retireDate}" />
-			</td>
-			<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label></td>
-			<td class="${config.validation}">${applicationInstance.validation}</td>
-			<td class="label ${config.testProc} ${highlightMap.testProc?:''}" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
-			<td class="${config.testProc}">${applicationInstance.testProc ? applicationInstance.testProc : '?'}</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}" nowrap="nowrap"><label for="maintExpDate">Maint Exp.</label></td>
-			<td class="valueNW ${config.maintExpDate}">
-				<tds:convertDate date="${applicationInstance?.maintExpDate}" format="12hrs" />
-			</td>
-			<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label></td>
-			<td class="valueNW ${config.latency}">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>
-			<td class="label ${config.startupProc} ${highlightMap.startupProc?:''}" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label></td>
-			<td class="valueNW ${config.startupProc}">${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}</td>
-		</tr>
-		<tr>
-			<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="url">URL</label></td>
-			<td class="valueNW ${config.url}" ><tds:textAsLink text="${applicationInstance.url}" target="_new"/></td>
 
-			<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-			<td class="${config.externalRefId}">${applicationInstance.externalRefId}</td>
-			<td class="label ${config.shutdownBy}  ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
-			<td class="valueNW ${config.shutdownBy}" nowrap="nowrap">
+			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>
+
+		</tr>
+
+		<tr>
+			<tds:showLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}" tooltipDataPlacement="bottom"/>
+		</tr>
+
+		<tr>
+			<td></td>
+			<td></td>
+
+			<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
+
+			<td class="valueNW ${standardFieldSpecs.retireDate.imp}">
+			<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
+				<tds:convertDate date="${applicationInstance?.retireDate}" />
+			</tds:tooltipSpan>
+			</td>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}" tooltipDataPlacement="bottom"/>
+
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+
+			<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
+
+			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp}">
+			<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
+				<tds:convertDate date="${applicationInstance?.maintExpDate}" format="12hrs" />
+			</tds:tooltipSpan>
+			</td>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}" tooltipDataPlacement="bottom"/>
+
+		</tr>
+		<tr>
+			<tds:showLabelAndField field="${standardFieldSpecs.url}" value="${applicationInstance.url}"/>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
+
+			<tds:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${applicationInstance.shutdownBy}"/>
+
+			<td class="valueNW ${standardFieldSpecs.shutdownBy.imp}" nowrap="nowrap">
+			<tds:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
 			<g:if test="${shutdownById == -1}">
 				${shutdownBy}
 			</g:if>
@@ -114,13 +144,16 @@
 				<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed" checked="checked"/>
 				<label for="shutdownFixedId" >Fixed</label>
 			</g:if>
+			</tds:tooltipSpan>
 			</td>
-			<td class="label ${config.shutdownDuration}  ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration</label></td>
-			<td class="valueNW ${config.shutdownDuration}" nowrap="nowrap">${applicationInstance.shutdownDuration ? applicationInstance.shutdownDuration+'m' : ''}</td>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}" tooltipDataPlacement="bottom"/>
+
 		</tr>
 		<tr>
-			<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
-			<td class="valueNW ${config.startupBy}" nowrap="nowrap">
+			<tds:inputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
+			<td class="valueNW ${standardFieldSpecs.startupBy.imp}" nowrap="nowrap" >
+			<tds:tooltipSpan field="${standardFieldSpecs.startupBy}">
 			<g:if test="${startupById == -1}">
 				${startupBy}
 			</g:if>
@@ -133,11 +166,14 @@
 				<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${applicationInstance.startupFixed}" checked="checked"/>
 				<label for="startupFixedId" >Fixed</label>
 			</g:if>
+			</tds:tooltipSpan>
 			</td>
-			<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Startup Duration</label></td>
-			<td class="valueNW ${config.shutdownDuration}" nowrap="nowrap">${applicationInstance.startupDuration ? applicationInstance.startupDuration+'m' :''} </td>
-			<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
-			<td class="valueNW ${config.testingBy}" nowrap="nowrap">
+
+			<tds:showLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}"/>
+
+			<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
+			<td class="valueNW ${standardFieldSpecs.testingBy.imp}" nowrap="nowrap">
+			<tds:tooltipSpan field="${standardFieldSpecs.testingBy}">
 			<g:if test="${testingById == -1}">
 				${testingBy}
 			</g:if>
@@ -150,10 +186,12 @@
 				<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
 				<label for="testingFixedId" >Fixed</label>
 			</g:if>
+			</tds:tooltipSpan>
 			</td>
-			<td class="label ${config.testingDuration} ${highlightMap.testingDuration?:''}" nowrap="nowrap"><label for="testingDuration">Testing Duration</label></td>
-			<td class="valueNW ${config.testingDuration}" nowrap="nowrap">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>
+
+			<tds:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}" tooltipDataPlacement="bottom"/>
+
 		</tr>
-		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs, highlightMap:highlightMap]"></g:render>
+		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
 	</tbody>
 </table>

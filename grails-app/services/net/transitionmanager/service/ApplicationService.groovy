@@ -132,7 +132,8 @@ class ApplicationService implements ServiceMethods {
 		if (isNew) {
 			asset.project = project
 			asset.owner = project.client
-			asset.attributeSet = EavAttributeSet.get(2)	// Application attributeSet
+			// Removed by TM-6779 - this is not being used since field specs fields implementation
+			// asset.attributeSet = EavAttributeSet.get(2)	// Application attributeSet
 			asset.assetClass = AssetClass.APPLICATION
 			asset.assetType = AssetType.APPLICATION
 

@@ -2,11 +2,13 @@ import com.tds.asset.Application
 import com.tds.asset.AssetOptions
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
@@ -15,12 +17,15 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
+import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -36,6 +41,7 @@ class ApplicationController implements ControllerMethods {
 	ApplicationService applicationService
 	AssetEntityService assetEntityService
 	ControllerService controllerService
+	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	PartyRelationshipService partyRelationshipService
@@ -43,6 +49,7 @@ class ApplicationController implements ControllerMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	AssetService assetService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -56,7 +63,7 @@ class ApplicationController implements ControllerMethods {
 
 		[appName: filters?.assetNameFilter ?: '', appPref: fieldPrefs, appSme: filters?.appSmeFilter ?: '',
 		 availabaleRoles: partyRelationshipService.getStaffingRoles(), // TODO - This should be replaced with the staffRoles which is in the defaultModel already
-		 company: project.client, latencys: params.latencys,
+		 company: project.client, latencys: params.latencys, planMethodology: params.planMethodology,
 		 partyGroupList: partyRelationshipService.getCompaniesList(), runbook: params.runbook,
 		 validationFilter: filters?.appValidationFilter ?: ''] +
 		 assetEntityService.getDefaultModelForLists(APPLICATION, 'Application', project, fieldPrefs, params, filters)
@@ -67,6 +74,8 @@ class ApplicationController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listJson() {
+		Project project = getProjectForWs()
+
 		String sortIndex = params.sidx ?: 'assetName'
 		String sortOrder = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
@@ -74,20 +83,31 @@ class ApplicationController implements ControllerMethods {
 		int rowOffset = (currentPage - 1) * maxRows
 		boolean firstWhere = true
 
-		Map filterParams = [assetName: params.assetName, depNumber: params.depNumber, depResolve: params.depResolve,
-		                    depConflicts: params.depConflicts, event: params.event]
+		Map filterParams = [
+			assetName: params.assetName,
+			depNumber: params.depNumber,
+			depResolve: params.depResolve,
+			depConflicts: params.depConflicts,
+			event: params.event
+		]
 
+		// Get the list of the user's column preferences
 		Map appPref = assetEntityService.getExistingPref('App_Columns')
-		def appPrefVal = appPref.collect { it.value }
+		List<String> prefColumns = appPref*.value
 
-		projectService.getAttributes('Application').each { EavAttribute attribute ->
-			if (attribute.attributeCode in appPrefVal) {
-				filterParams[attribute.attributeCode] = params[attribute.attributeCode]
+		// Get the list of fields for the domain
+		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.APPLICATION.toString(), true)
+
+		// Now match the columns selected and if there is a match, add the param[field] to the filter
+		for (String fieldName in prefColumns) {
+			if (fieldNameMap.containsKey(fieldName)) {
+				filterParams[fieldName] = params[fieldName]
 			}
 		}
 
 		List<MoveBundle> moveBundleList
 		session.APP = [:]
+
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 		if (params.event && params.event.isNumber()) {
 			moveBundleList = MoveEvent.read(params.event)?.moveBundles?.findAll { it.useForPlanning }?.flatten() as List<MoveBundle>
@@ -99,6 +119,8 @@ class ApplicationController implements ControllerMethods {
 		//def validUnkownQuestioned = "'$AssetDependencyStatus.VALIDATED'," + unknownQuestioned
 		String justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
 		Map<String, String> customizeQuery = assetEntityService.getAppCustomQuery(appPref)
+
+		def queryParams = [:]
 		def query = new StringBuilder('''
 			SELECT * FROM (SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency AS latency,
 			                      if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
@@ -116,10 +138,31 @@ class ApplicationController implements ControllerMethods {
 			ae.move_bundle_id,
 			mb.name as moveBundle
 			FROM application a
-			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id''')
+
+		if (params.planMethodology) {
+			String customField = project.planMethodology
+
+			if(customField){
+				query.append(" AND ")
+
+				// Unescaping the paramater since it can include HTML encoded characters (like \' == &#39; )
+				def planMethodology = StringEscapeUtils.unescapeHtml(params.planMethodology)
+
+				if (planMethodology == Application.UNKNOWN) {
+					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
+				}else{
+					query.append(" ae.`${customField}` = :planMethodology ")
+					queryParams['planMethodology'] = planMethodology
+				}
+			}
+		}
+
+		query.append('''
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			''')
+
 		if (customizeQuery.joinQuery) {
 			query.append(customizeQuery.joinQuery)
 		}
@@ -160,7 +203,6 @@ class ApplicationController implements ControllerMethods {
 
 		// Handle the filtering by each column's text field
 
-		def queryParams = [:]
 		def whereConditions = []
 		filterParams.each { key, val ->
 			if (val?.trim()) {
@@ -290,11 +332,17 @@ class ApplicationController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.AssetCreate)
+	@Transactional(readOnly = true)
 	def create() {
-		def application = new Application()
+		Project project = securityService.userCurrentProject
+		Application application = new Application()
+		application.project = project
+
+		// Set the default values on the custom properties
+		assetService.setCustomDefaultValues(application)
+
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		Project project = securityService.userCurrentProject
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort: 'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
@@ -303,14 +351,20 @@ class ApplicationController implements ControllerMethods {
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 
-		//fieldImportance for Discovery by default
-		def configMap = assetEntityService.getConfig('Application','Discovery')
-		def highlightMap = assetEntityService.getHighlightedInfo('Application', application, configMap)
+		String domain = application.assetClass.toString()
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
+		List customFields = assetEntityService.getCustomFieldsSettings(project, domain, true)
 
-		[applicationInstance: application, assetTypeOptions: assetTypeOptions?.value, moveBundleList: moveBundleList,
-			planStatusOptions: planStatusOptions?.value, projectId: project.id, project: project,moveEventList: moveEventList,
-			config: configMap.config, customs: configMap.customs, personList: personList, company: project.client,
-			availabaleRoles: availabaleRoles, environmentOptions: environmentOptions?.value, highlightMap: highlightMap]
+		[ 	applicationInstance: application, assetTypeOptions: assetTypeOptions?.value,
+			moveBundleList: moveBundleList, planStatusOptions: planStatusOptions?.value,
+			projectId: project.id, project: project,moveEventList: moveEventList,
+			personList: personList, company: project.client,
+			// TODO : fix misspelled variable availabaleRoles
+			availabaleRoles: availabaleRoles,
+			environmentOptions: environmentOptions?.value,
+			customs: customFields,
+			standardFieldSpecs: standardFieldSpecs
+		]
 	}
 
 	@HasPermission(Permission.AssetView)
@@ -340,6 +394,7 @@ class ApplicationController implements ControllerMethods {
 	 * to auditEdit view
 	 */
 	@HasPermission(Permission.AssetEdit)
+	@Transactional(readOnly = true)
 	def edit() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -351,19 +406,14 @@ class ApplicationController implements ControllerMethods {
 			return
 		}
 
-		assetEntityService.getMoveEvents(project).each {
-			if (!AppMoveEvent.countByApplicationAndMoveEvent(application, it)) {
-				new AppMoveEvent(application: application, moveEvent: it).save()
-			}
-		}
-
 		// The list to show in the App Owner and SME selects should include ALL staff (project owner and partners)
 		// along with ALL of the client staff that their person accounts are active.
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 
-		[applicationInstance: application, availabaleRoles: partyRelationshipService.getStaffingRoles(),
-		  personList: personList] +
-		 assetEntityService.getDefaultModelForEdits('Application', project, application, params)
+		[	applicationInstance: application,
+			availabaleRoles: partyRelationshipService.getStaffingRoles(),
+			personList: personList
+		] + assetEntityService.getDefaultModelForEdits('Application', project, application, params)
 	}
 
 	@HasPermission(Permission.AssetCreate)

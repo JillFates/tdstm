@@ -1,18 +1,23 @@
-// USING BEM http://getbem.com/introduction/
+// USING A CUSTOM BEM http://getbem.com/introduction/
 // .block {}
-// .block__element {}
+// .block-element {}
 // .block--modifier {}
-// .block__element--modifier {}
+// .block-element--modifier {}
 
-@import "base/color"
+// Include all basic elements for UI.
+@import "base/index"
 
 /* General Elements */
 @import "elements/forms/forms"
 @import "elements/forms/horizontal-layout"
+@import "elements/general/alerts"
 @import "elements/general/loader"
+@import "elements/general/button"
+@import "elements/general/icon"
 @import "elements/general/dialog"
 @import "elements/general/dialog_buttons"
-
+@import "elements/general/popup"
+@import "elements/general/modal"
 // Legacy ONLY
 @import "legacy/support/index"
 

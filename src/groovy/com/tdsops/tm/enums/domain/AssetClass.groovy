@@ -1,10 +1,12 @@
 package com.tdsops.tm.enums.domain
 
+import com.tdssrc.grails.StringUtil
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdssrc.grails.StringUtil
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -102,5 +104,37 @@ enum AssetClass {
 				}
 				return 'OTHER-DEVICE'
 		}
+	}
+
+	/**
+	 * This method determines the domain for a given Asset Type.
+	 * Presently, the only domains supported are:
+	 *	- Application
+	 *	- Storage
+	 *	- Database
+	 *	- Device
+	 * @param assetType : string with the given asset type
+	 * @return domain
+	 */
+	static String getDomainForAssetType(String assetType) {
+		String domain
+		if(!StringUtil.isBlank(assetType)){
+			assetType = assetType.toUpperCase()
+			switch (assetType) {
+				case "APPLICATION":
+					domain = "Application"
+					break
+				case "FILES":
+					domain = "Storage"
+					break
+				case "DATABASE":
+					domain = "Database"
+					break
+				case "ASSETENTITY":
+					domain = "Device"
+					break
+			}
+		}
+		return domain	
 	}
 }

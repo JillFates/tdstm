@@ -1,14 +1,26 @@
 export class FieldSettingsModel {
-	key: string;
+	field: string;
 	label: string;
-	help: string;
+	tip: string;
+	udf: boolean;
 	shared: boolean;
-	importance: 'C' | 'I' | 'N' | 'U';
-	required: boolean;
-	display: boolean;
-	type: 'String' | 'Number' | 'Boolean';
+	imp: 'C' | 'I' | 'N' | 'U';
+	show: boolean;
+	order?: number;
 	length?: number;
 	default?: any;
-	control?: 'Select' | 'YesNo' | 'Number';
-	controlOpt?: Array<string> | any;
+	control?: 'List' | 'String' | 'YesNo' | '';
+	constraints: ConstraintModel;
+	style?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+	constructor() {
+		this.udf = true;
+		this.imp = 'N';
+	}
+}
+export class ConstraintModel {
+	required: boolean;
+	minSize?: Number;
+	maxSize?: Number;
+	values?: Array<string>;
 }

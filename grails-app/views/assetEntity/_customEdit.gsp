@@ -1,16 +1,26 @@
-<g:set var="tabOffset" value="700"/>
+<%-- tabOffset - allows off-setting the tabindex for the custom fields --%>
+<g:set var="tabOffset" value="200"/>
 
-<g:each in="${customs}" var="i" status="j">
+<%-- trIsOpen - used to track if the TR tag needs to be closed after the loop --%>
+<g:set var="trIsOpen" value="0"/>
+
+<g:each in="${customs}" var="custom" status="j">
 	<g:if test="${j % 4 == 0}">
 		<tr class="prop">
+		<g:set var="trIsOpen" value="1"/>
 	</g:if>
-		<td class="label ${config?.('custom'+i)} ${highlightMap.('custom'+i)?:''}" nowrap="nowrap">
-			<label for="custom${i}">${project.('custom'+i) ?: 'Custom'+i }</label>
-		</td>
-		<td>
-			<input type="text" id="custom${i}" class="${config?.('custom'+i)}" name="custom${i}" value="${assetEntityInstance.('custom'+i)}" tabindex="${tabOffset + 1}"/>
-		</td>
+
+	<tds:inputLabel field="${custom}" value="${assetEntityInstance.(custom.field)}"/>
+
+	<td>
+		<tds:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="$tabOffset" tooltipDataPlacement="${j % 4 == 3 ? 'bottom': 'right' }"/>
+	</td>
+
 	<g:if test="${j % 4 == 3}">
 		</tr>
+		<g:set var="trIsOpen" value="0"/>
 	</g:if>
 </g:each>
+<g:if test="trIsOpen == 1">
+	</tr>
+</g:if>
