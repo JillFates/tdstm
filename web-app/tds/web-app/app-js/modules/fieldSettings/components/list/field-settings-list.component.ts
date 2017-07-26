@@ -212,6 +212,10 @@ export class FieldSettingsListComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Checks if there are any pending fields to be deleted on all the domains.
+	 * @returns {boolean}
+	 */
 	private hasPendingDeletes(): boolean {
 		for (let domain in this.fieldsToDelete) {
 			if (this.fieldsToDelete[domain].length > 0) {
@@ -221,19 +225,14 @@ export class FieldSettingsListComponent implements OnInit {
 		return false;
 	}
 
+	/**
+	 * Whenever the user clicks Delete button for a field on the grid, this event is called and
+	 * #this.fieldsToDelete gets updated.
+	 * @param {{domain: string; fieldsToDelete: string[]}} value
+	 */
 	protected onDelete(value: {domain: string, fieldsToDelete: string[]}): void {
 		this.fieldsToDelete[value.domain] = value.fieldsToDelete;
 	}
-	/*
-	protected onDelete(value: { field: FieldSettingsModel, domain: string, callback: any }): void {
-		this.domains.filter(domain =>
-			value.field.shared ?
-				true : domain.domain === value.domain).forEach(domain => {
-					domain.fields.splice(domain.fields.indexOf(value.field), 1);
-				});
-		this.refreshGrids(value.field.shared, value.callback);
-	}
-	*/
 
 	protected onFilter(): void {
 		this.grids.forEach(grid => grid.applyFilter());
