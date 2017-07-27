@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild, AfterViewInit, Input } from '@angular/core';
+import { Component, Inject, ViewChild, AfterViewInit, Input, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { StateService } from '@uirouter/angular';
@@ -8,7 +8,11 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
 	moduleId: module.id,
 	selector: 'asset-explorer-report-selector',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-selector/asset-explorer-report-selector.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-selector/asset-explorer-report-selector.component.html',
+	encapsulation: ViewEncapsulation.None,
+	styles: [
+		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}`
+	]
 })
 export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 	@Input() open?= false;
