@@ -44,7 +44,7 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 		if(license) {
 			try {
 				return license.decodeBase64()
-			}catch(e){
+			} catch(e) {
 				log.error(e.message)
 			}
 		}
