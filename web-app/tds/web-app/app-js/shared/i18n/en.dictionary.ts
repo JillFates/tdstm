@@ -14,6 +14,7 @@ export const en_DICTIONARY: Object = {
 		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
 		'PROJECT_LIST': 'Project List',
 		'CREATE_CUSTOM': 'Add Custom Field',
+		'PLAN_METHODOLOGY_DELETE_WARNING': 'Field is used as Project Plan Methodology, it can\'t be deleted.',
 		'MIN_MAX' : {
 			'MIN_LENGTH' : 'Min Length',
 			'MAX_LENGTH' : 'Max Length',
