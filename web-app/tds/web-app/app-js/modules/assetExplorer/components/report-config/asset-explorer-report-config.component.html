@@ -26,7 +26,7 @@
 							<div class="tab-pane active" id="tab_1">
 								<div class="checkbox" *ngFor="let asset of assetClasses">
 									<label>
-										<input type="checkbox" name="{{asset}}" (change)="onAssetSelect()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
+										<input type="checkbox" name="{{asset}}" (change)="ApplyFilters()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
 									</label>
 								</div>
 							</div>
@@ -67,24 +67,15 @@
 										</div>
 									</div>
 								</div>
-								<div class="row">
-									<div class="col-md-4 col-sm-4" *ngFor="let domain of filteredData;">
-										<div class="form-group">
-											<div class="row">
-												<div class="col-md-12">
-													<label style="text-decoration:underline;" class="control-label pd-top-5">{{ 'ASSETS.'+domain.domain | translate}} Fields</label>
-												</div>
-											</div>
-											<div class="row">
-												<div class="col-md-3 col-lg-3" style="padding-right:0px;" *ngFor="let field of domain.fields;">
-													<div class="checkbox {{field.imp}}">
-														<label><input type="checkbox"  name="{{domain.domain+ '.' +field.field}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
-													</div>
-												</div>
-											</div>
+								<div class="row" style="overflow:auto;margin:0 5px;">
+									<div style="position:relative;float:left;height:375px;">
+										<div [ngStyle]="fieldStyle(fieldIndex)" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
+											<label style="text-decoration:underline;margin-left:-10px;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
+											<ng-template #defaultField>
+												<label style="width:100%" class="{{field.imp}}"><input type="checkbox"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
+											</ng-template>
 										</div>
 									</div>
-
 								</div>
 							</div>
 						</div>

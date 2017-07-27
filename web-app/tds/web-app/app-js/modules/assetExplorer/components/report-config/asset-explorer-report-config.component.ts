@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
+import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { StateService } from '@uirouter/angular';
 
 import { Observable } from 'rxjs/Rx';
@@ -32,6 +33,7 @@ export class AssetExplorerReportConfigComponent {
 	model: ReportModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
+	fields: FieldSettingsModel[] = [];
 	filterModel = {
 		assets: {
 			'APPLICATION': false,
@@ -95,6 +97,20 @@ export class AssetExplorerReportConfigComponent {
 		this.applyAssetClassFilter();
 		this.applyFieldFilter();
 		this.applySelectedFilter();
+		this.mapFieldList();
+	}
+
+	protected mapFieldList() {
+		this.fields = this.filteredData
+			.reduce((p: FieldSettingsModel[], c: DomainModel) => {
+				if (c.fields.length > 0) {
+					let domainTitle = new FieldSettingsModel();
+					domainTitle['domain'] = c.domain;
+					domainTitle['isTitle'] = true;
+					p.push(domainTitle);
+				}
+				return p.concat(c.fields);
+			}, []);
 	}
 
 	protected applyFieldFilter(): void {
@@ -125,6 +141,19 @@ export class AssetExplorerReportConfigComponent {
 					this.filterModel.selected === 'true' ? field['selected'] : !field['selected']);
 			});
 		}
+	}
+
+	protected fieldStyle(fieldIndex) {
+		return {
+			'height': '25px',
+			'width': '160px',
+			'top': (fieldIndex < 15 ? fieldIndex : fieldIndex % 15) * 25 + 'px',
+			'left': Math.floor(fieldIndex / 15) * 160 + 'px',
+			'position': 'absolute',
+			'margin': '0px',
+			'padding-left': '10px',
+			'padding-bottom': '5px'
+		};
 	}
 
 }
