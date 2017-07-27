@@ -286,4 +286,14 @@ export class FieldSettingsGridComponent implements OnInit {
 		return label.trim() === '' || this.data.fields.filter(item => item.label === label.trim()).length > 1;
 	}
 
+	/**
+	 * Function to determine if given field is currently used as Project Plan Methodology.
+	 * Note: Only APPLICATION asset types has the plan methodology feature.
+	 * @param {FieldSettingsModel} field
+	 * @returns {boolean} True or False
+	 */
+	protected isFieldUsedAsPlanMethodology(field: FieldSettingsModel): boolean {
+		return this.data.planMethodology && this.data.planMethodology === field.field;
+	}
+
 }
