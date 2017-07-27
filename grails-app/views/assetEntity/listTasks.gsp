@@ -94,7 +94,7 @@
 			var step = "${step}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var taskManagerUrl = "/assetEntity/listTasks"
-			var listCaption ="Tasks: \
+			var listCaption ="<label for='lbl-task-list-title'>Tasks</label>: \
 				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
 				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>\
 				<tdsactionbutton id='clearFilters' icon='' label='Clear Filters' link='" + taskManagerUrl + "'></tdsactionbutton>"
