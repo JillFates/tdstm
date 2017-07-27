@@ -292,7 +292,7 @@
             <div class="row action-bar-wrapper">
                 <div class="pull-left">
                     <div id="controlRowId">
-                        <b>Event </b>
+                        <label for="lbl-task-event-title">Event</label>
                         <g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
                         <span class="checkboxContainer action-bar">
                             <input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" />
