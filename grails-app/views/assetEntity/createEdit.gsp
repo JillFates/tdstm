@@ -216,10 +216,10 @@
 							</td>
 
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" nowrap="nowrap" id="rackId">
-								<label for="sourceRackId">Rack/Cabinet</label>
+								<label for="sourceRackId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cabinet" >Rack/Cabinet</label>
 							</td>
 							<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display:none">
-								<label for="sourceChassisId">Blade Chassis</label>
+								<label for="sourceChassisId" data-toggle="popover" data-trigger="hover" data-content="Blade Chassis">Blade Chassis</label>
 							</td>
 
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
@@ -282,7 +282,7 @@
 
 							<%-- Note that the next set of TDs are toggled on/off based on the assetType selected --%>
 							<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
-								<label for="sourceRackPositionId">Position</label>
+								<label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
 							</td>
 							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
 								<input type="text" id="sourceRackPositionId" name="sourceRackPosition"
