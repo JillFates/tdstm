@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { StateService } from '@uirouter/angular';
+import {AssetExplorerStates} from '../../asset-explorer-routing.states';
 
 @Component({
 	moduleId: module.id,
@@ -7,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class AssetExplorerIndexComponent {
 
+	constructor(private stateService: StateService) {}
+
+	protected onCreateNew(): void {
+		this.stateService.go(AssetExplorerStates.REPORT_CREATE.name);
+	}
 }
