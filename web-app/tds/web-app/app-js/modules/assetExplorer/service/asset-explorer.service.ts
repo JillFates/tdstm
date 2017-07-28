@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { ReportModel } from '../model/report.model';
-import { ReportGroupModel } from '../model/report-group.model';
+import { ReportGroupModel } from '../model/report.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';

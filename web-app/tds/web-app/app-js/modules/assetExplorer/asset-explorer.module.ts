@@ -10,10 +10,12 @@ import { AssetExplorerReportSelectorComponent } from './components/report-select
 import { AssetExplorerReportConfigComponent } from './components/report-config/asset-explorer-report-config.component';
 import { AssetExplorerReportSaveComponent } from './components/report-save/asset-explorer-report-save.component';
 import { AssetExplorerReportExportComponent } from './components/report-export/asset-explorer-report-export.component';
+import { AssetExplorerReportGridComponent } from './components/report-grid/asset-explorer-report-grid.component';
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
 import { SharedModule } from '../../shared/shared.module';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
+import { GridModule } from '@progress/kendo-angular-grid';
 // Services
 import { AssetExplorerService } from './service/asset-explorer.service';
 
@@ -23,6 +25,7 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		SharedModule,
 		FormsModule,
 		DropDownListModule,
+		GridModule,
 		UIRouterModule.forChild({ states: ASSET_EXPLORER_STATES })
 	],
 	declarations: [
@@ -30,7 +33,8 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		AssetExplorerIndexComponent,
 		AssetExplorerReportConfigComponent,
 		AssetExplorerReportSaveComponent,
-		AssetExplorerReportExportComponent
+		AssetExplorerReportExportComponent,
+		AssetExplorerReportGridComponent
 	],
 	providers: [AssetExplorerService],
 	exports: [AssetExplorerIndexComponent],

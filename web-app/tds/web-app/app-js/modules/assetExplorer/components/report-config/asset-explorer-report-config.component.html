@@ -21,6 +21,15 @@
 									<a href="#tab_2" data-toggle="tab">Columns</a>
 								</ng-template>
 							</li>
+							<li role="presentation">
+								<button class="btn btn-default" name="btnPreview" (click)="onPreview()">Preview</button>
+							</li>
+							<li role="presentation" style="float:right;">
+								<button class="btn btn-default"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
+							</li>
+							<li role="presentation" style="float:right;">
+								<button class="btn btn-default"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
+							</li>
 						</ul>
 						<div class="tab-content">
 							<div class="tab-pane active" id="tab_1">
@@ -80,6 +89,9 @@
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="row">
+					<asset-explorer-report-grid [model]="reportSpec"></asset-explorer-report-grid>
 				</div>
 				<a (click)="onBackToStart()" class="btn"><i class="fa fa-chevron-left"></i> Back to Start</a>
 			</div>

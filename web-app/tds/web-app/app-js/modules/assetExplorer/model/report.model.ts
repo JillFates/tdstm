@@ -5,3 +5,9 @@ export class ReportModel {
 	shared: boolean;
 	subscribe: boolean;
 }
+
+export class ReportGroupModel {
+	name: string;
+	items: Array<ReportModel>;
+	open: boolean;
+}

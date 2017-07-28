@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { StateService } from '@uirouter/angular';
 
-import { ReportGroupModel } from '../../model/report-group.model';
+import { ReportGroupModel } from '../../model/report.model';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
 	moduleId: module.id,

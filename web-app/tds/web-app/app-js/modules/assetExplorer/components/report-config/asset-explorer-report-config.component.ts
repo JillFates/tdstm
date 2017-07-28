@@ -9,6 +9,7 @@ import { Observable } from 'rxjs/Rx';
 
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ReportModel } from '../../model/report.model';
+import { ReportSpec, ReportColumn } from '../../model/report-spec.model';
 import { AssetExplorerReportSaveComponent } from '../report-save/asset-explorer-report-save.component';
 import { AssetExplorerReportExportComponent } from '../report-export/asset-explorer-report-export.component';
 
@@ -29,7 +30,7 @@ import { AssetExplorerReportExportComponent } from '../report-export/asset-explo
 export class AssetExplorerReportConfigComponent {
 
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
-	selectedAssetClasses = [];
+	selectedAssetClasses: string[] = [];
 	model: ReportModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
@@ -45,6 +46,8 @@ export class AssetExplorerReportConfigComponent {
 		selected: 'all',
 		search: ''
 	};
+
+	reportSpec = new ReportSpec();
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -75,6 +78,24 @@ export class AssetExplorerReportConfigComponent {
 
 	protected onBackToStart(): void {
 		this.stateService.go(AssetExplorerStates.REPORT_SELECTOR.name);
+	}
+
+	protected onPreview(): void {
+		this.reportSpec.domains = this.selectedAssetClasses;
+		this.reportSpec.columns = this.filteredData
+			.map((d) => d.fields
+				.filter((f) => f['selected'])
+				.map((f) => {
+					return {
+						domain: d.domain,
+						property: f.field,
+						width: 50,
+						locked: false,
+						edit: false
+					};
+				}))
+			.reduce((p, c) => p.concat(c), []);
+		console.log(this.reportSpec);
 	}
 
 	protected isAssetSelected(): boolean {
