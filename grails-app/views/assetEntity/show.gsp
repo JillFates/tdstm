@@ -48,10 +48,12 @@
 						
 						<tds:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
 
-						<td class="label ${standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
+						<td class="label ${standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
+							<label for="sourceLocation" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
+						</td>
 
-						<td class="valueNW ${standardFieldSpecs.sourceLocation.imp?:''}">${assetEntity.sourceLocation}</td>
-						<td class="valueNW ${standardFieldSpecs.sourceLocation.imp?:''}">${assetEntity.targetLocation}</td>
+						<td class="valueNW ${standardFieldSpecs.sourceLocation.imp?:''}" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Source Location">${assetEntity.sourceLocation}</td>
+						<td class="valueNW ${standardFieldSpecs.sourceLocation.imp?:''}" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Target Location">${assetEntity.targetLocation}</td>
 
 
 					</tr>
@@ -67,7 +69,7 @@
 						<tds:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
 
 						<td class="label nonVMLabel ${standardFieldSpecs.sourceRoom.imp?:''}" nowrap="nowrap">
-							<label for="sourceRoom">Room</label>
+							<label for="sourceRoom" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
 						</td>
 
 						<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceRoom}" >
@@ -90,17 +92,17 @@
 						<%-- The following fields will be displayed based on the assetType --%>
 						<%-- rackable --%>
 						<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}"  nowrap="nowrap" id="rackId">
-							<label for="sourceRackId">Rack/Cab</label>
+							<label for="sourceRackId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
 						</td>
-						<td class="rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceRack.tip?: standardFieldSpecs.sourceRack.label}">
+						<td class="rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRack.tip?: standardFieldSpecs.sourceRack.label}">
 							${assetEntity.rackSource?.tag}
 						</td>
-						<td class="rackLabel ${standardFieldSpecs.targetRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.targetRack.tip?: standardFieldSpecs.targetRack.label}">
+						<td class="rackLabel ${standardFieldSpecs.targetRack.imp?:''}" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetRack.tip?: standardFieldSpecs.targetRack.label}">
 							${assetEntity.rackTarget?.tag}
 						</td>
 						<%-- blade --%>
 						<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display: none">
-							<label for="sourceChassisId">Blade Chassis</label>
+							<label for="sourceChassisId" data-toggle="popover" data-trigger="hover" data-content="Blade Chassis">Blade Chassis</label>
 						</td>
 						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceChassis.tip?: standardFieldSpecs.sourceChassis.label}">
 							${sourceChassis}

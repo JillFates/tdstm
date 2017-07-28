@@ -178,7 +178,7 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.testProc}" value="" />
 								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.testProc}">
+								<tds:tooltipSpan field="${standardFieldSpecs.testProc}" tooltipDataPlacement="bottom">
 									<g:select  id="testProc" class="${standardFieldSpecs.testProc.imp?:''} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="47" />
 								</tds:tooltipSpan>
@@ -208,7 +208,7 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.startupProc}" value="${applicationInstance.appOwner}"/>
 								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.startupProc}">
+								<tds:tooltipSpan field="${standardFieldSpecs.startupProc}" tooltipDataPlacement="bottom">
 									<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="48" />
 								</tds:tooltipSpan>

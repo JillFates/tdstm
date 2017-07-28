@@ -269,7 +269,7 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}"/>
 								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.shutdownDuration}">
+								<tds:tooltipSpan field="${standardFieldSpecs.shutdownDuration}" tooltipDataPlacement="bottom">
 									<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''}"
 										value="${applicationInstance.shutdownDuration}" tabindex="48" size="7"/>m
 								</tds:tooltipSpan>
@@ -302,7 +302,7 @@
 
 								<tds:inputLabel field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}"/>
 								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.testingDuration}">
+								<tds:tooltipSpan field="${standardFieldSpecs.testingDuration}" tooltipDataPlacement="bottom">
 									<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}" name="testingDuration"
 											value="${applicationInstance.testingDuration}" tabindex="49"  size="7"/>m
 								</tds:tooltipSpan>
