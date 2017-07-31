@@ -288,7 +288,7 @@ class ControlTagLib {
 
 		StringBuilder sb = new StringBuilder('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
-		sb.append(' style="width: 50px;"')
+		sb.append(' style="width: 80px;"')
 		sb.append('>')
 
 		if (fieldSpec.constraints?.required) {
