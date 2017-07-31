@@ -1,14 +1,20 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import grails.transaction.Transactional
+import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
+import org.springframework.jdbc.core.JdbcTemplate
 
 class MoveEventService implements ServiceMethods {
+
+	JdbcTemplate jdbcTemplate
 
 	MoveEvent create(Project project, String name) {
 		MoveEvent me = new MoveEvent([project:project, name:name])
@@ -148,5 +154,25 @@ class MoveEventService implements ServiceMethods {
 			throw new InvalidParamException("Invalid team code '$teamCode' was specified")
 		}
 		return removeTeamMember(moveEvent, person, teamRoleType)
+	}
+
+
+	void deleteMoveEvent(MoveEvent moveEvent) {
+		if (moveEvent) {
+			// Deletes MoveEventSnapshots for this event.
+			jdbcTemplate.update('DELETE FROM move_event_snapshot             WHERE move_event_id = ?', moveEvent.id)
+			// Deletes all news for this event.
+			jdbcTemplate.update('DELETE FROM move_event_news                 WHERE move_event_id = ?', moveEvent.id)
+			// Nulls out the reference to this event in MoveBundle.
+			jdbcTemplate.update('UPDATE move_bundle SET move_event_id = NULL WHERE move_event_id = ?', moveEvent.id)
+			// Deletes all UserPreference pointing to this event.
+			jdbcTemplate.update('DELETE FROM user_preference WHERE preference_code = ? and value = ?', UserPreferenceEnum.MOVE_EVENT as String, moveEvent.id)
+			// Deletes all AppMoveEvent related to this event.
+			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE moveEvent.id =  ?', [moveEvent.id])
+			// Nulls out references to this event in comments and tasks.
+			AssetComment.executeUpdate("UPDATE AssetComment SET moveEvent = NULL WHERE moveEvent.id = ?", [moveEvent.id])
+			// Deletes the event.
+			moveEvent.delete()
+		}
 	}
 }

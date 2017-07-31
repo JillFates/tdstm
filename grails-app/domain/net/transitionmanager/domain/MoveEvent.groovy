@@ -108,11 +108,4 @@ class MoveEvent {
 		project.clientId == client?.id
 	}
 
-	def beforeDelete() {
-		// set asset comments move event to null to prevent orphans
-		AssetComment.findAllByMoveEvent(this).each {
-			it.moveEvent = null
-			it.save()
-		}
-	}
 }

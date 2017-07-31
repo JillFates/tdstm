@@ -21,6 +21,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.MoveBundleService
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.SecurityService
@@ -50,6 +51,7 @@ class MoveEventController implements ControllerMethods {
 	ControllerService controllerService
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
+	MoveEventService moveEventService
 	ProjectService projectService
 	ReportsService reportsService
 	SecurityService securityService
@@ -179,13 +181,7 @@ class MoveEventController implements ControllerMethods {
 			if (moveEvent) {
 				long moveEventId = moveEvent.id
 				String moveEventName = moveEvent.name
-				jdbcTemplate.update('DELETE FROM move_event_snapshot             WHERE move_event_id = ?', moveEventId)
-				jdbcTemplate.update('DELETE FROM move_event_news                 WHERE move_event_id = ?', moveEventId)
-				jdbcTemplate.update('UPDATE move_bundle SET move_event_id = NULL WHERE move_event_id = ?', moveEventId)
-				jdbcTemplate.update('DELETE FROM user_preference WHERE preference_code = ? and value = ?', UserPreferenceEnum.MOVE_EVENT as String, moveEventId)
-				AppMoveEvent.executeUpdate('DELETE AppMoveEvent                  WHERE moveEvent.id =  ?', [moveEventId])
-
-				moveEvent.delete()
+				moveEventService.deleteMoveEvent(moveEvent)
 				flash.message = "MoveEvent $moveEventName deleted"
 			}
 			else {
