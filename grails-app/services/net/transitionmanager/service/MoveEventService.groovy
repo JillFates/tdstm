@@ -12,6 +12,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import org.springframework.jdbc.core.JdbcTemplate
 
+@Transactional
 class MoveEventService implements ServiceMethods {
 
 	JdbcTemplate jdbcTemplate
@@ -28,6 +29,7 @@ class MoveEventService implements ServiceMethods {
 	 * @param project : project list
 	 * @return
 	 */
+	@Transactional(readOnly = true)
 	def verifyEventsByProject(List reqEventIds, project){
 		def nonProjEventIds
 		if(project){
@@ -49,6 +51,7 @@ class MoveEventService implements ServiceMethods {
 	 * @param teamRoleType - a valid TEAM role
 	 * @return An error message if unable to create the team otherwise null
 	 */
+	@Transactional(readOnly = true)
 	MoveEventStaff getTeamMember(MoveEvent moveEvent, Person person, RoleType teamRoleType) {
 		String query = 'from MoveEventStaff mes where mes.moveEvent=:me and mes.person=:p and mes.role=:teamRole'
 		MoveEventStaff.find(query, [me:moveEvent, p:person, teamRole:teamRoleType] )
@@ -61,7 +64,6 @@ class MoveEventService implements ServiceMethods {
 	 * @param teamRoleType - a valid TEAM role
 	 * @return An error message if unable to create the team otherwise null
 	 */
-	@Transactional
 	MoveEventStaff addTeamMember(MoveEvent moveEvent, Person person, RoleType teamRoleType) {
 		assert moveEvent
 		assert person
@@ -97,7 +99,6 @@ class MoveEventService implements ServiceMethods {
 	 * @param teamRoleType - a valid TEAM role
 	 * @return An error message if unable to create the team otherwise null
 	 */
-	@Transactional
 	MoveEventStaff addTeamMember(MoveEvent moveEvent, Person person, String teamCode) {
 		RoleType teamRoleType = teamRoleType(teamCode)
 		if (!teamRoleType) {
@@ -111,6 +112,7 @@ class MoveEventService implements ServiceMethods {
 	 * @param teamCode - the TEAM string code
 	 * @return the TEAM RoleType if found otherwise null
 	 */
+	@Transactional(readOnly = true)
 	RoleType teamRoleType(String teamCode) {
 		RoleType.findByIdAndType(teamCode, RoleType.TEAM)
 	}
@@ -122,7 +124,6 @@ class MoveEventService implements ServiceMethods {
 	 * @param teamRoleType - the team role
 	 * @return true if the team member was deleted or false if not found
 	 */
-	@Transactional
 	boolean removeTeamMember(MoveEvent moveEvent, Person person, RoleType teamRoleType) {
 		assert moveEvent
 		assert person
@@ -147,7 +148,6 @@ class MoveEventService implements ServiceMethods {
 	 * @param teamCode - the team role code
 	 * @return true if the team member was deleted or false if not found
 	 */
-	@Transactional
 	MoveEventStaff removeTeamMember(MoveEvent moveEvent, Person person, String teamCode) {
 		RoleType teamRoleType = teamRoleType(teamCode)
 		if (!teamRoleType) {
@@ -156,7 +156,17 @@ class MoveEventService implements ServiceMethods {
 		return removeTeamMember(moveEvent, person, teamRoleType)
 	}
 
-
+	/**
+	 * This method deletes a MoveEvent and, additionally, performs the following
+	 * operations:
+	 * - Delete all MoveEventSnapshot for the event.
+	 * - Delete all news for the event.
+	 * - Nulls out reference to the event in Move Bundle.
+	 * - Deletes User References pointing to this event.
+	 * - Deletes all AppMoveEvents for the event.
+	 * - Nulls out references to this event for tasks and comments.
+	 * @param moveEvent
+	 */
 	void deleteMoveEvent(MoveEvent moveEvent) {
 		if (moveEvent) {
 			// Deletes MoveEventSnapshots for this event.
