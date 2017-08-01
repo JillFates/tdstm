@@ -71,7 +71,6 @@ class AssetExportService {
         def projectId = params.projectId
 
         boolean profilerEnabled = params[Profiler.KEY_NAME]==Profiler.KEY_NAME
-		profilerEnabled = true
 
 		Profiler profiler = Profiler.create(profilerEnabled, key)
 
