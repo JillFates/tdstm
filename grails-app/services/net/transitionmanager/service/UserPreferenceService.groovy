@@ -112,7 +112,11 @@ class UserPreferenceService implements ServiceMethods {
 
 		boolean isCurrent = userLogin.id == securityService.currentUserLoginId
 		if (isCurrent) {
-			def holder = session.getAttribute(preferenceCode)
+			def holder = null
+			if (session) {
+				holder = session.getAttribute(preferenceCode)
+			}
+
 			def userPrefValue = holder
 			if (holder != null) {
 				if(holder instanceof Map){
@@ -124,7 +128,7 @@ class UserPreferenceService implements ServiceMethods {
 
 		UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 		if (isCurrent) {
-			session.setAttribute preferenceCode, [(preferenceCode): userPreference?.value]
+			session?.setAttribute preferenceCode, [(preferenceCode): userPreference?.value]
 		}
 
 		userPreference?.value ?: defaultIfNotSet
@@ -163,8 +167,11 @@ class UserPreferenceService implements ServiceMethods {
 		// Date start = new Date()
 
 		if (value && value != "null" && userLogin) {
-			//remove from the session cache
-			session.removeAttribute(preferenceCode)
+			if (session) {
+				//remove from the session cache so that getUserPreference won't find the previous value.
+				session.removeAttribute(preferenceCode)
+			}
+
 
 			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 			String prefValue = userPreference?.value
@@ -237,7 +244,8 @@ class UserPreferenceService implements ServiceMethods {
 			}
 		}
 
-		session.removeAttribute prefCode
+		session?.removeAttribute(prefCode)
+
 	}
 
 	/**
