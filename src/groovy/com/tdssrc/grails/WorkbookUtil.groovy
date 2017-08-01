@@ -582,7 +582,7 @@ class WorkbookUtil {
 	 */
 	static int getLastRowNum(Sheet sheet) {
 		int lastRow = sheet.getLastRowNum()
-		while (lastRow > 0 && isEmpty(sheet, lastRow)) {
+		while (lastRow > 0 && isRowEmpty(sheet, lastRow)) {
 			lastRow --
 		}
 		return lastRow
@@ -594,7 +594,7 @@ class WorkbookUtil {
 	 * @param rowNumber
 	 * @return true if the row is empty, false otherwise.
 	 */
-	static boolean isEmpty(Sheet sheet, int rowNumber){
+	static boolean isRowEmpty(Sheet sheet, int rowNumber){
 		Row row = sheet.getRow(rowNumber)
 		if (row) {
 			for (int col = row.getFirstCellNum(); col < row.getLastCellNum(); col ++) {
