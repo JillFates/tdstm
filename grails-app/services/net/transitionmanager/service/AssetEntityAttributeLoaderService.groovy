@@ -354,7 +354,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					}
 				} else if (attribName in ["usize", "modifiedBy", "lastUpdated"]){
 					// skip the validation
-				} else if (fieldSpec["control"] == "Number") {
+				} else if (fieldSpec["control"] == ControlType.NUMBER.toString()) {
 					def correctedPos
 					try {
 						if (dtValue.correctedValue) {

@@ -3,7 +3,7 @@ package com.tdsops.tm.enums
 import groovy.transform.CompileStatic
 
 /**
- * Enumeration that contains the posible Control Types for the Custom Fields
+ * Enumeration that contains the possible Control Types for the Custom Fields
  */
 @CompileStatic
 enum ControlType {
@@ -12,7 +12,7 @@ enum ControlType {
     NUMBER("Number"),
     YES_NO("YesNo"),
     PERSON("Person"),
-    TEAM("Tean"),
+    TEAM("Team"),
     RACK_T("Rack.T"),
     RACK_S("Rack.S"),
     LOCATION_T("Location.T"),
