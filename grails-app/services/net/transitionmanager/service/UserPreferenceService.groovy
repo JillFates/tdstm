@@ -127,8 +127,8 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
-		if (isCurrent) {
-			session?.setAttribute preferenceCode, [(preferenceCode): userPreference?.value]
+		if (isCurrent && session) {
+			session.setAttribute preferenceCode, [(preferenceCode): userPreference?.value]
 		}
 
 		userPreference?.value ?: defaultIfNotSet
@@ -167,11 +167,11 @@ class UserPreferenceService implements ServiceMethods {
 		// Date start = new Date()
 
 		if (value && value != "null" && userLogin) {
+			// Note that session does not exist for Quartz jobs
 			if (session) {
 				//remove from the session cache so that getUserPreference won't find the previous value.
 				session.removeAttribute(preferenceCode)
 			}
-
 
 			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 			String prefValue = userPreference?.value
@@ -197,7 +197,7 @@ class UserPreferenceService implements ServiceMethods {
 			// logger.debug 'setPreference() phase 3 took {}', TimeUtil.elapsed(start)
 			// start = new Date()
 
-			// call getPreference() to load map into session
+			// Call getPreference() to load the preference into session
 			getPreference(userLogin, preferenceCode)
 
 			// logger.debug 'setPreference() phase 4 took {}', TimeUtil.elapsed(start)
@@ -238,7 +238,7 @@ class UserPreferenceService implements ServiceMethods {
 		if (updateCount) {
 			logger.debug 'Removed {} preference', prefCode
 
-			//	remove the movebundle and event preferences
+			// When removing CURR_PROJ then a number of other preferences should be removed at the same time
 			if (prefCode == CURR_PROJ.value()) {
 				removeProjectAssociatedPreferences(user)
 			}
