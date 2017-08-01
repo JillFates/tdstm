@@ -573,4 +573,38 @@ class WorkbookUtil {
 		}
 		return headers
 	}
+
+	/**
+	 * This method returns the last non-empty row in the sheet.
+	 *
+	 * @param sheet
+	 * @return
+	 */
+	static int getLastRowNum(Sheet sheet) {
+		int lastRow = sheet.getLastRowNum()
+		while (lastRow > 0 && isRowEmpty(sheet, lastRow)) {
+			lastRow --
+		}
+		return lastRow
+	}
+
+	/**
+	 * This method determines if the given row is empty (all null or empty values).
+	 * @param sheet
+	 * @param rowNumber
+	 * @return true if the row is empty, false otherwise.
+	 */
+	static boolean isRowEmpty(Sheet sheet, int rowNumber){
+		Row row = sheet.getRow(rowNumber)
+		if (row) {
+			for (int col = row.getFirstCellNum(); col < row.getLastCellNum(); col ++) {
+				Cell cell = row.getCell(col)
+				if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK) {
+					return false
+				}
+
+			}
+		}
+		return true
+	}
 }
