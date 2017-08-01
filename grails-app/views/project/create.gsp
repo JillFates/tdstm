@@ -49,6 +49,11 @@
 				placeholder: "Please Select",
 				width: "75%"
 			});
+
+            $("#completionDateId").kendoDatePicker({
+					value: (($("#completionDateId") && $("#completionDateId").val() !== "")? new Date($("#completionDateId").val()) : new Date()),
+					animation: false, format:tdsCommon.kendoDateFormat()
+                });
 		})
 
 		function formatDate (dateValue,value) {
@@ -201,7 +206,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
+									jQuery(function($){ $("#startDateId").kendoDatePicker({ value: new Date(), animation: false, format:tdsCommon.kendoDateFormat() }); });
 								</script>
 								<input type="text" class="dateRange" tabindex="160" size="15" style="width: 138px;" name="startDate" id="startDateId"
 									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" />
