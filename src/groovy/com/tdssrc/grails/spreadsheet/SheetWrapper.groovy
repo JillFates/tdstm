@@ -1,6 +1,6 @@
-package com.tdssrc.grails
+package com.tdssrc.grails.spreadsheet
 
-import org.apache.poi.ss.usermodel.BuiltinFormats
+import com.tdssrc.grails.WorkbookUtil
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.Row
@@ -32,11 +32,7 @@ class SheetWrapper {
 	 * @return Row object of the Excel Sheet
 	 */
 	Row getOrCreateRow(int rowIdx){
-		Row row = sheet.getRow(rowIdx)
-		if (!row) {
-			row = sheet.createRow(rowIdx)
-		}
-		return row
+		return WorkbookUtil.getOrCreateRow(sheet, rowIdx)
 	}
 
 	/**
@@ -46,11 +42,7 @@ class SheetWrapper {
 	 * @return
 	 */
 	Cell getOrCreateCell(Row row, int colIdx) {
-		Cell cell = row.getCell(colIdx)
-		if (!cell) {
-			cell = row.createCell(colIdx)
-		}
-		return cell
+		return WorkbookUtil.getOrCreateCell(row, colIdx)
 	}
 
 	/**
