@@ -491,7 +491,7 @@ class TaskImportExportService implements ServiceMethods {
 	private List<Map> readTasksFromSpreadsheet(spreadsheet, Map sheetInfoOpts) {
 		int firstTaskRow = 3
 		def sheet = spreadsheet.getSheet( TEMPLATE_TAB_NAME )
-		int lastRow = sheet.getLastRowNum()
+		int lastRow = WorkbookUtil.getLastRowNum(sheet)
 		List tasks = []
 
 		for (int row = firstTaskRow; row <= lastRow; row++) {
