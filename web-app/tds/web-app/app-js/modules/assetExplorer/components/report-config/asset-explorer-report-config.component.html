@@ -18,26 +18,28 @@
 							<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
 								<a *ngIf="!isAssetSelected();else selected">Columns</a>
 								<ng-template #selected>
-									<a href="#tab_2" data-toggle="tab">Columns</a>
+									<a href="#tab_2" data-toggle="tab" #link>Columns</a>
 								</ng-template>
 							</li>
 							<li role="presentation">
 								<button class="btn btn-default" name="btnPreview" (click)="onPreview()">Preview</button>
 							</li>
 							<li role="presentation" style="float:right;">
-								<button class="btn btn-default"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
+								<button class="btn btn-default" (click)="toggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
 							</li>
 							<li role="presentation" style="float:right;">
 								<button class="btn btn-default"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
 							</li>
 						</ul>
-						<div class="tab-content">
+						<div class="tab-content" *ngIf="!collapsed">
 							<div class="tab-pane active" id="tab_1">
 								<div class="checkbox" *ngFor="let asset of assetClasses">
 									<label>
 										<input type="checkbox" name="{{asset}}" (change)="ApplyFilters()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
 									</label>
 								</div>
+								<label for="">Please, select at least one asset class to continue.</label> <br>
+								<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 							</div>
 							<div class="tab-pane" id="tab_2">
 								<div class="row">
@@ -45,7 +47,7 @@
 										<div class="col-sm-9">
 											<div class="form-group has-feedback" style="margin-bottom:0px;">
 												<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="ApplyFilters()">
-												<span style="cursor:pointer;color:#000;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
+												<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
 												 aria-hidden="true"></span>
 											</div>
 										</div>
@@ -63,15 +65,12 @@
 												</select>
 											</div>
 										</div>
-										<div class="col-md-6 col-sm-6">
+										<div class="col-md-3 col-sm-6">
 											<div class="form-group">
-												<label for="show" class="control-label col-sm-2 pd-top-5">Show:</label>
-												<div class="col-sm-7">
-													<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
-														<option value="all">All Fields</option>
-														<option *ngFor="let asset of selectedAssetClasses" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
-													</select>
-												</div>
+												<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
+													<option value="all">All Classes</option>
+													<option *ngFor="let asset of selectedAssetClasses" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
+												</select>
 											</div>
 										</div>
 									</div>
@@ -79,13 +78,14 @@
 								<div class="row" style="overflow:auto;margin:0 5px;">
 									<div style="position:relative;float:left;height:375px;">
 										<div [ngStyle]="fieldStyle(fieldIndex)" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
-											<label style="text-decoration:underline;margin-left:-10px;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
+											<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
 											<ng-template #defaultField>
 												<label style="width:100%" class="{{field.imp}}"><input type="checkbox"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
 											</ng-template>
 										</div>
 									</div>
 								</div>
+								<label for="">Please, select at least one column to continue.</label> <br>
 							</div>
 						</div>
 					</div>

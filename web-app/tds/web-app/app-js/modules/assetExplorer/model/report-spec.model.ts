@@ -5,7 +5,7 @@ export class ReportColumn {
 	locked?= false;
 	edit?= false;
 	filter?= '';
-
+	label: string;
 }
 
 export class ReportSort {
