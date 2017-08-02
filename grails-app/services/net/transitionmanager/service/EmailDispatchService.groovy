@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -67,12 +68,11 @@ class EmailDispatchService implements ServiceMethods {
 
 		/* For later use when assuming the identity of this user during the
 		 execution of the Quartz Job. */
-		if (!trigger.jobDataMap.username) {
-			trigger.jobDataMap.username = securityService.currentUsername
-			if (! trigger.jobDataMap.username) {
-				// TODO TM-6428 - throw an exception here - need to test the that the UI handles the exception
-			}
+		String username = emailDispatch.createdBy.userLogin?.username
+		if (!username) {
+			username = emailDispatch.toPerson.userLogin?.username
 		}
+		trigger.jobDataMap.username = username
 
 		trigger.setJobName("EmailDispatchJob")
 		trigger.setJobGroup('tdstm-send-email')
@@ -99,6 +99,7 @@ class EmailDispatchService implements ServiceMethods {
 		log.info "sendEmail: edId=$edId to=$ed.toPerson.id/$ed.toPerson.email"
 
 		mailService.sendMail {
+			from getFrom(ed.fromAddress)
 			to ed.toPerson.email
 			subject ed.subject
 			body (
@@ -112,6 +113,19 @@ class EmailDispatchService implements ServiceMethods {
 		if (! ed.validate() || ! ed.save(flush:true)) {
 			log.error "sendEmail() Unable to update email dispatch object: ${GormUtil.allErrorsString(ed)}"
 		}
+	}
+
+	/**
+	 * Return desired from email address if present or default system from email address
+	 * @param from
+	 * @return
+	 */
+	private String getFrom(String from) {
+		String defaultFrom = grailsApplication.config.grails.mail.default.from
+		if (!StringUtil.isBlank(from)) {
+			defaultFrom = from
+		}
+		return defaultFrom.replaceAll("&lt;", "<").replaceAll("&gt;", ">")
 	}
 
 	/**
@@ -138,13 +152,13 @@ class EmailDispatchService implements ServiceMethods {
 					activationURL : serverURL + "/auth/resetPassword/" + emailParams.token,
 					ttl: emailParams.expiredTime,
 					sysAdminEmail: emailParams.from,
-					username: emailParams.username]
+					username: ed.toPerson.userLogin?.username]
 			case "adminResetPassword":
 				return [
 					person: ed.toPerson.firstName,
 					activationURL : serverURL + "/auth/resetPassword/" + emailParams.token,
 					ttl: emailParams.expiredTime,
-					username: emailParams.username,
+					username: ed.toPerson.userLogin?.username,
 					sysAdminEmail: emailParams.sysAdminEmail]
 		}
 	}

@@ -521,25 +521,20 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			def createdBy = person
 			String subject = "Reset your password"
 
-			if (resetType == PasswordResetType.WELCOME) {
-				dispatchOrigin = EmailDispatchOrigin.ACTIVATION
-				bodyTemplate = "accountActivation"
-				personFromEmail = emailParams.from
-				createdBy = userLogin.person
-				subject = "Welcome to TransitionManager"
-				emailParams["username"] = byWhom
-			} else if (resetType == PasswordResetType.ADMIN_RESET) {
-				bodyTemplate = "adminResetPassword"
-				emailParams["username"] = byWhom
-			} else if (resetType == PasswordResetType.FORGOT_MY_PASSWORD) {
-				// If the user forgot his password, we'll use his userlogin to configure the email job.
-				emailParams["username"] = userLogin.username
-			}
+			switch(resetType) {
+				case PasswordResetType.WELCOME:
+					dispatchOrigin = EmailDispatchOrigin.ACTIVATION
+					bodyTemplate = "accountActivation"
+					personFromEmail = emailParams.from
+					createdBy = userLogin.person
+					subject = "Welcome to TransitionManager"
+					break
 
-			// If the user forgot his password, we'll use his userlogin to configure the email job.
-			else if (resetType == PasswordResetType.FORGOT_MY_PASSWORD) {
-				emailParams["username"] = userLogin.username
-				emailParams["userLoginId"] = userLogin.id
+				case PasswordResetType.ADMIN_RESET:
+					createdBy = userLogin.person
+					bodyTemplate = "adminResetPassword"
+					break
+
 			}
 
 			EmailDispatch ed = emailDispatchService.basicEmailDispatchEntity(dispatchOrigin, subject, bodyTemplate,
