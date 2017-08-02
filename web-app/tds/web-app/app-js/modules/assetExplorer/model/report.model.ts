@@ -10,4 +10,10 @@ export class ReportGroupModel {
 	name: string;
 	items: Array<ReportModel>;
 	open: boolean;
+	icon: ReportFolderIcon;
+}
+
+export enum ReportFolderIcon {
+	folder,
+	start
 }

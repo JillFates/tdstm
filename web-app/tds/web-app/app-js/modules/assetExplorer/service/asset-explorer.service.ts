@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { ReportModel } from '../model/report.model';
-import { ReportGroupModel } from '../model/report.model';
+import { ReportModel, ReportGroupModel, ReportFolderIcon } from '../model/report.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
@@ -15,27 +13,36 @@ export class AssetExplorerService {
 
 	private mockData: Array<ReportGroupModel> = [
 		{
+			name: 'All',
+			open: true,
+			items: [],
+			icon: ReportFolderIcon.folder
+		},
+		{
 			name: 'Recent',
 			open: false,
-			items: []
+			items: [],
+			icon: ReportFolderIcon.folder
 		},
 		{
 			name: 'Favorites',
 			open: false,
-			items: []
+			items: [],
+			icon: ReportFolderIcon.start
 		},
 		{
 			name: 'My Reports',
 			open: false,
-			items: []
+			items: [],
+			icon: ReportFolderIcon.folder
 		},
 		{
 			name: 'System Reports',
-			open: true,
+			open: false,
 			items: [{
 				id: 1,
 				name: 'Finance Applications',
-				favorite: false,
+				favorite: true,
 				shared: true,
 				subscribe: false
 			}, {
@@ -50,7 +57,8 @@ export class AssetExplorerService {
 				favorite: false,
 				shared: true,
 				subscribe: false
-			}]
+			}],
+			icon: ReportFolderIcon.folder
 		}
 	];
 

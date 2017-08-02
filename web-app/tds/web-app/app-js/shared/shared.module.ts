@@ -19,6 +19,7 @@ import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prom
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
+import { FilterPipe } from './pipes/filter.pipe';
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
@@ -45,6 +46,7 @@ import { SHARED_STATES } from './shared-routing.states';
 		UIToastDirective,
 		UIBooleanPipe,
 		TranslatePipe,
+		FilterPipe,
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
@@ -74,11 +76,11 @@ import { SHARED_STATES } from './shared-routing.states';
 		UIDialogDirective,
 		UIBooleanPipe,
 		TranslatePipe,
+		FilterPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		RichTextEditorComponent
-		// TranslateModule
 	]
 })
 export class SharedModule {
