@@ -133,7 +133,7 @@ class UserPreferenceService implements ServiceMethods {
 		boolean isCurrent = (userLogin != null && userLogin.id == securityService.currentUserLoginId)
 
 		// If the userLogin is that of the current user then look in the session first as it maybe cached already
-		if (isCurrent) {
+		if (isCurrent && session) {
 			userPrefValue = session.getAttribute(preferenceCode)
 		}
 
@@ -156,7 +156,7 @@ class UserPreferenceService implements ServiceMethods {
 				}
 
 				// if we are getting the current user preference store it in the session for speed
-				if (isCurrent) {
+				if (isCurrent && session) {
 					session.setAttribute(preferenceCode, userPrefValue)
 				}
 
@@ -204,7 +204,7 @@ class UserPreferenceService implements ServiceMethods {
 
 			//If is session only preference just store in the Session and we are done
 			if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
-				session.setAttribute(preferenceCode, value)
+				session?.setAttribute(preferenceCode, value)
 
 				/*
 				I always wonder if I should break here or assign to the saver variable and
@@ -213,8 +213,11 @@ class UserPreferenceService implements ServiceMethods {
 				return true
 			}
 
-			//remove from the session cache
-			session.removeAttribute(preferenceCode)
+			// Note that session does not exist for Quartz jobs
+			if (session) {
+				//remove from the session cache so that getUserPreference won't find the previous value.
+				session.removeAttribute(preferenceCode)
+			}
 
 			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
 			String prefValue = userPreference?.value
@@ -240,7 +243,7 @@ class UserPreferenceService implements ServiceMethods {
 			// log.debug 'setPreference() phase 3 took {}', TimeUtil.elapsed(start)
 			// start = new Date()
 
-			// call getPreference() to load map into session
+			// Call getPreference() to load the preference into session
 			getPreference(userLogin, preferenceCode)
 
 			// log.debug 'setPreference() phase 4 took {}', TimeUtil.elapsed(start)
@@ -281,13 +284,13 @@ class UserPreferenceService implements ServiceMethods {
 		if (updateCount) {
 			log.debug 'Removed {} preference', prefCode
 
-			//	remove the movebundle and event preferences
+			//	When removing CURR_PROJ then a number of other preferences should be removed at the same time
 			if (prefCode == CURR_PROJ.value()) {
 				removeProjectAssociatedPreferences(user)
 			}
 		}
 
-		session.removeAttribute(prefCode)
+		session?.removeAttribute(prefCode)
 	}
 
 	/**
@@ -304,8 +307,11 @@ class UserPreferenceService implements ServiceMethods {
 		getPreference userLogin, CURR_PROJ
 	}
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
-		// clear Session Lived Preferences
-		clearSessionOnlyPreferences()
+		// Session doesn't exist for Quartz jobs
+		if (session) {
+			// clear Session Lived Preferences
+			clearSessionOnlyPreferences()
+		}
 
 		// Set the preference
 		setPreference userLogin, CURR_PROJ, projectId
@@ -357,8 +363,11 @@ class UserPreferenceService implements ServiceMethods {
 	 * clear the session only preferences
 	 */
 	void clearSessionOnlyPreferences(){
-		for(String pref : sessionOnlyPreferences) {
-			session.removeAttribute(pref)
+		// The session doesn't exist for Quartz jobs
+		if (session) {
+			for(String pref : sessionOnlyPreferences) {
+				session.removeAttribute(pref)
+			}
 		}
 	}
 
