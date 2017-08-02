@@ -153,7 +153,6 @@ environments {
 			serverURL = 'http://localhost:8080/tdstm'
 
 			//mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
-			/*
 			mail {
 				host = "smtp.gmail.com"
 				port = 465
@@ -165,12 +164,8 @@ environments {
 						 "mail.smtp.socketFactory.fallback":"false"
 				]
 			}
-			*/
 		}
 
-		//used for testing email
-		grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
-		grails.plugin.greenmail.ports.smtp = 2025
 	}
 	test {
 		// used for testing
@@ -190,7 +185,6 @@ environments {
 
 		//used for testing email
 		grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
-		grails.plugin.greenmail.ports.smtp = 2025
 	}
 	production {
 		greenmail.disabled = true
@@ -352,7 +346,6 @@ grails {
 				'/module/**'		:'permitAll', // Angular2  - router access
 				'/test/**'			:'permitAll', // Angular - Test
 				'/monitoring'		:"hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
-				'/greenmail/**'		:'permitAll',
 				'/components/**'	:'permitAll',
 				'/templates/**' 	:'permitAll',
 				'/jasper/**'		:'permitAll',
