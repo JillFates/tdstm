@@ -37,8 +37,34 @@ class WorkbookUtil {
 	}
 
 	/**
+	 * Retrieves or creates a Row Object in the Spreadsheet
+	 * @param rowIdx
+	 * @return Row object of the Excel Sheet
+	 */
+	static Row getOrCreateRow(Sheet sheet, int rowIdx){
+		Row row = sheet.getRow(rowIdx)
+		if (!row) {
+			row = sheet.createRow(rowIdx)
+		}
+		return row
+	}
+
+	/**
+	 * Retrieves or creates a Cell Object in the passed Row
+	 * @param row
+	 * @param colIdx
+	 * @return
+	 */
+	static Cell getOrCreateCell(Row row, int colIdx) {
+		Cell cell = row.getCell(colIdx)
+		if (!cell) {
+			cell = row.createCell(colIdx)
+		}
+		return cell
+	}
+
+	/**
 	 * Adds a cell to a XSSFWorkbook
-	 * //TODO: oluna - should we deprecate this and use a wrapper? @see SheetWrapper.groovy
 	 * @param sheet
 	 * @param columnIdx
 	 * @param rowIdx
@@ -47,23 +73,54 @@ class WorkbookUtil {
 	 * @return
 	 */
 	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
-		def row = sheet.getRow(rowIdx)
-		if (!row) {
-			row = sheet.createRow(rowIdx)
-		}
-		Cell cell = row.getCell(columnIdx)
-		if (!cell) {
-			cell = row.createCell(columnIdx)
-		}
+		CellStyle style = null
+
 		if (type != null) {
-			cell.setCellType(type)
-			CellStyle style = createCellStyle(sheet, type)
-			cell.setCellStyle(style)
+			style = createCellStyle(sheet, type)
+		}
+
+		addCell(sheet, columnIdx, rowIdx, value, type, style)
+	}
+
+	/**
+	 * Adds a cell to a Row in a sheet with specific cell style
+	 * @param sheet
+	 * @param columnIdx
+	 * @param rowIdx
+	 * @param value
+	 * @param cellType
+	 * @param cellStyle
+	 */
+	static void addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
+		Cell cell = getOrCreateCell(row, colIdx)
+
+		if(cellType) {
+			cell.setCellType(cellType)
+		}
+		if (cellStyle != null) {
+			cell.setCellStyle(cellStyle)
 		}
 		setCellValue(cell, value)
 	}
 
 	/**
+	 * Add a new cell to the given Row at col with provided value, cell type and style
+	 * @param sheet
+	 * @param columnIdx
+	 * @param rowIdx
+	 * @param value
+	 * @param cellType
+	 * @param workbookCellStyles
+	 */
+	static void addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+		CellStyle cellStyle = null
+		if(cellType){
+			cellStyle = getCellStyle(row.sheet, cellType, workbookCellStyles)
+		}
+		addCell(row, colIdx, value, cellType, cellStyle)
+	}
+
+		/**
 	 * Adds a cell to a Workbook with specific cell style
 	 * @param sheet
 	 * @param columnIdx
@@ -72,20 +129,41 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, int cellType, CellStyle cellStyle) {
-		def row = sheet.getRow(rowIdx)
-		if (!row) {
-			row = sheet.createRow(rowIdx)
+	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
+		def row = getOrCreateRow(sheet, rowIdx)
+		addCell(row, columnIdx, value, cellType, cellStyle)
+	}
+
+	/**
+	 * Add a new cell to the given sheet at col, row with provided value, cell type and style
+	 * @param sheet
+	 * @param columnIdx
+	 * @param rowIdx
+	 * @param value
+	 * @param cellType
+	 * @param workbookCellStyles
+	 */
+	static void addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+		def row = getOrCreateRow(sheet, rowIdx)
+		addCell(row, colIdx, value, cellType, workbookCellStyles)
+	}
+
+
+
+	/**
+	 * creates a new cell style or get one from cache
+	 * @param sheet
+	 * @param cellType
+	 * @param workbookCellStyles
+	 * @return
+	 */
+	static CellStyle getCellStyle(Sheet sheet, int cellType, Map<Integer, CellStyle> workbookCellStyles) {
+		CellStyle cellStyle = workbookCellStyles[cellType]
+		if (cellStyle == null) {
+			cellStyle = WorkbookUtil.createCellStyle(sheet, cellType)
+			workbookCellStyles[cellType] = cellStyle
 		}
-		Cell cell = row.getCell(columnIdx)
-		if (!cell) {
-			cell = row.createCell(columnIdx)
-		}
-		cell.setCellType(cellType)
-		if (cellStyle != null) {
-			cell.setCellStyle(cellStyle)
-		}
-		setCellValue(cell, value)
+		return cellStyle
 	}
 
 	/**

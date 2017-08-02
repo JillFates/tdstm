@@ -71,7 +71,8 @@ class AssetExportService {
         def projectId = params.projectId
 
         boolean profilerEnabled = params[Profiler.KEY_NAME]==Profiler.KEY_NAME
-        Profiler profiler = Profiler.create(profilerEnabled, key)
+
+		Profiler profiler = Profiler.create(profilerEnabled, key)
 
         final String mainProfTag = 'EXPORT'
         profiler.beginInfo(mainProfTag)
@@ -362,19 +363,20 @@ class AssetExportService {
 
             //Add Title Information to master SpreadSheet
             titleSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.TITLE)
-            addCell(titleSheet, 1, 2, project.client.toString())
-            addCell(titleSheet, 1, 3, projectId.toString())
-            addCell(titleSheet, 2, 3, project.name.toString())
-            addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project))
-            addCell(titleSheet, 1, 5, bundleNameList.toString())
-            addCell(titleSheet, 1, 6, loginUser.person.toString())
+
+            WorkbookUtil.addCell(titleSheet, 1, 2, project.client.toString())
+            WorkbookUtil.addCell(titleSheet, 1, 3, projectId.toString())
+            WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
+            WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project))
+            WorkbookUtil.addCell(titleSheet, 1, 5, bundleNameList.toString())
+            WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
 
             def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
-            addCell(titleSheet, 1, 7, exportedOn)
-            addCell(titleSheet, 1, 8, tzId)
-            addCell(titleSheet, 1, 9, userDTFormat)
+            WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
+            WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
+            WorkbookUtil.addCell(titleSheet, 1, 9, userDTFormat)
 
-            addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
+            WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
 
             profiler.lap(mainProfTag, 'Updated title sheet')
 
@@ -392,7 +394,7 @@ class AssetExportService {
 
             def writeValidationColumn = { assetOptions, col, optionKey ->
                 assetOptions.eachWithIndex{ option, idx ->
-                    addCell(validationSheet, col, idx+1, "${option.value}")
+                    WorkbookUtil.addCell(validationSheet, col, idx+1, "${option.value}")
                 }
                 optionsSize[optionKey] = assetOptions.size() + 1 // +1 because of the header.
             }
@@ -530,6 +532,8 @@ class AssetExportService {
                     }
 
                     deviceCount++
+					Row row = WorkbookUtil.getOrCreateRow(serverSheet, deviceCount)
+
                     progressCount++
 
                     if (profilingRow) {
@@ -560,13 +564,13 @@ class AssetExportService {
 
                         switch(colName) {
                             case 'Id':
-                                addCell(serverSheet, 0, deviceCount, currentAsset.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+								WorkbookUtil.addCell(row, 0, currentAsset.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                                 break
 
                             case 'DepGroup':
                                 def depGroupId = assetDepBundleMap[currentAsset.id.toString()]
                                 if (depGroupId != null) {
-                                    addCell(serverSheet, colNum, deviceCount, depGroupId)
+									WorkbookUtil.addCell(row, colNum, depGroupId)
                                 }
                                 break
 
@@ -576,16 +580,16 @@ class AssetExportService {
                                 if (pos == 0) {
                                     continue
                                 }
-                                addCell(serverSheet, colNum, deviceCount, (Double)pos, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+								WorkbookUtil.addCell(row, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                                 break
 
                             case ~/Retire Date|Maint Expiration/:
-                                addCell(serverSheet, colNum, deviceCount, TimeUtil.formatDate(userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE))
+								WorkbookUtil.addCell(row, colNum, TimeUtil.formatDate(userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE))
                                 break
 
                             case ~/Modified Date/:
                                 if (currentAsset[field]) {
-                                    addCell(serverSheet, colNum, deviceCount, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE_TIME))
+                                    WorkbookUtil.addCell(row, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE_TIME))
                                 }
                                 break
 
@@ -595,12 +599,12 @@ class AssetExportService {
                                 if (chassis) {
                                     value = "id:" + chassis.id + " " + chassis.assetName
                                 }
-                                addCell(serverSheet, colNum, deviceCount, value)
+                                WorkbookUtil.addCell(row, colNum, value)
                                 break
 
                             default:
                                 def value = currentAsset[field]
-                                addCell(serverSheet, colNum, deviceCount, value ?: "")
+                                WorkbookUtil.addCell(row, colNum, value ?: "")
                         }
 
                         if (profilingRow) {
@@ -701,14 +705,14 @@ class AssetExportService {
                 def numericCols = ['Id']
                 def stringCols = ['Version']
 
-                int applicationCount = 0
+                int applicationCount = 1 // Header Offset
                 while (scrollableResults.next()) {
                     Application app = (Application)scrollableResults.get()[0]
-
                     progressCount++
 
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
-                    applicationCount++
+
+					Row row = WorkbookUtil.getOrCreateRow(appSheet, applicationCount)
 
                     for (Map.Entry<String, ?> entry : appMap.getColumnFieldMap()) {
                         def colName = entry.key
@@ -749,17 +753,17 @@ class AssetExportService {
                             }
 
                             if ( numericCols.contains(colName) )
-                                addCell(appSheet, colNum, applicationCount, (Double)colVal, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                                WorkbookUtil.addCell(row, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                             else if ( stringCols.contains(colName) ){
-                                addCell(appSheet, colNum, applicationCount, colVal.toString(), Cell.CELL_TYPE_STRING, workbookCellStyles)
+                                WorkbookUtil.addCell(row, colNum, colVal.toString(), Cell.CELL_TYPE_STRING, workbookCellStyles)
                             } else {
-                                addCell(appSheet, colNum, applicationCount, colVal.toString())
+                                WorkbookUtil.addCell(row, colNum, colVal.toString())
                             }
                         }
                     } // end columns loop
 
                     session.evict(app)
-
+					applicationCount++
                 } // application.each
 
                 session.close()
@@ -787,12 +791,14 @@ class AssetExportService {
                 profiler.lap("Databases", "Validations added.")
 
                 exportedEntity += "D"
-                int databaseCount = 0
+                int databaseCount = 1 // Header Offset
 
                 while (scrollableResults.next()) {
                     Database currentDatabase = (Database)scrollableResults.get()[0]
                     progressCount++
-                    databaseCount++
+
+					Row row = WorkbookUtil.getOrCreateRow(dbSheet, databaseCount)
+
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
                     for (Map.Entry<String, ?> entry : dbMap.getColumnFieldMap()) {
@@ -801,11 +807,11 @@ class AssetExportService {
                         def colNum = entry.value["order"] as int
 
                         if (colName == "Id") {
-                            addCell(dbSheet, colNum, databaseCount, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                            WorkbookUtil.addCell(row, colNum, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else if (colName == "DepGroup") {
                             String depGroupId = assetDepBundleMap[currentDatabase.id.toString()]
                             if (depGroupId != null) {
-                                addCell(dbSheet, colNum, databaseCount, depGroupId)
+                                WorkbookUtil.addCell(row, colNum, depGroupId)
                             }
                         } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
                             def dateValue = currentDatabase[field]
@@ -818,18 +824,18 @@ class AssetExportService {
                             } else {
                                 dateValue = ""
                             }
-                            addCell(dbSheet, colNum, databaseCount, dateValue)
+                            WorkbookUtil.addCell(row, colNum, dateValue)
                         } else {
                             def prop = currentDatabase[field]
                             if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                addCell(dbSheet, colNum, databaseCount, String.valueOf(currentDatabase[field]))
+                                WorkbookUtil.addCell(row, colNum, String.valueOf(currentDatabase[field]))
                             }
                         }
                     } // end columns loop
 
                     session.evict(currentDatabase)
-
-                } // database.each
+					databaseCount++
+                }
 
                 session.close()
                 profiler.endInfo("Databases", "processed %d rows", [dbSize])
@@ -857,11 +863,12 @@ class AssetExportService {
 
                 exportedEntity += "F"
 
-                int filesCount = 0
+                int filesCount = 1
                 while (scrollableResults.next()) {
                     Files currentFile = (Files)scrollableResults.get()[0]
                     progressCount++
-                    filesCount++
+					Row row = WorkbookUtil.getOrCreateRow(storageSheet, filesCount)
+
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
                     for (Map.Entry<String, ?> entry : fileMap.getColumnFieldMap()) {
@@ -870,11 +877,11 @@ class AssetExportService {
                         def colNum = entry.value["order"] as int
 
                         if (colName == "Id") {
-                            addCell(storageSheet, colNum, filesCount, (currentFile.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                            WorkbookUtil.addCell(row, colNum, (currentFile.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else if (colName == "DepGroup") {
                             String depGroupId = assetDepBundleMap[currentFile.id.toString()]
                             if (depGroupId != null) {
-                                addCell(storageSheet, colNum, filesCount, depGroupId)
+                                WorkbookUtil.addCell(row, colNum, depGroupId)
                             }
                         } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
                             def dateValue = currentFile[field]
@@ -887,18 +894,18 @@ class AssetExportService {
                             } else {
                                 dateValue = ""
                             }
-                            addCell(storageSheet, colNum, filesCount, dateValue)
+                            WorkbookUtil.addCell(row, colNum, dateValue)
                         } else {
                             def prop = currentFile[field]
                             if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                addCell(storageSheet, colNum, filesCount, String.valueOf(prop))
+                                WorkbookUtil.addCell(row, colNum, String.valueOf(prop))
                             }
                         }
 
                     } // end columns loop
 
                     session.evict(currentFile)
-
+					filesCount++
                 } // files.each
 
                 session.close()
@@ -956,21 +963,22 @@ class AssetExportService {
                     readOnly true
                 }
 
-                //results.eachWithIndex { dependency, r ->
-                int r = 0
+                int r = 1  //Header Offset
                 for (Object dependency : results) {
                     progressCount++
+					Row row = WorkbookUtil.getOrCreateRow(dependencySheet, r)
+
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
                     for(int i = 0; i < depProjectionFields.size(); i++){
                         def prop = dependency[i]
                         if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                            addCell(dependencySheet, i ,r + 1, dependency[i])
+                            WorkbookUtil.addCell(row, i, dependency[i])
                         }
                     }
-                    r++
-                } // result.each
-                results = null
+					r++
+                }
+
                 profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
             } else {
                 // Adds validations to the first dependency row
@@ -1026,34 +1034,33 @@ class AssetExportService {
                     readOnly true
                 }
 
-                //results.eachWithIndex { room, r ->
-                int r = 0
+                int r = 1
                 for (Object room : results) {
-                    def rowNum = r + 1 //Header Offset
                     progressCount++
+					Row row = WorkbookUtil.getOrCreateRow(roomSheet, r)
+
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
                     // Export most fields.
                     regularFields.each { col ->
                         def prop = room[col]
                         if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
                             if (col == 0) {
-                                addCell(roomSheet, 0, rowNum, room[0], Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                                WorkbookUtil.addCell(row, 0, room[0], Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                             } else {
-                                addCell(roomSheet, col, rowNum, String.valueOf(prop ?: ""))
+                                WorkbookUtil.addCell(row, col, String.valueOf(prop ?: ""))
                             }
                         }
 
                     }
                     // Export date fields using the user's TZ.
                     dateFields.each{ col->
-                        addCell(roomSheet, col, rowNum, room[col] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, room[col], TimeUtil.FORMAT_DATE_TIME) : "")
+                        WorkbookUtil.addCell(row, col, room[col] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, room[col], TimeUtil.FORMAT_DATE_TIME) : "")
                     }
                     // Export 'source' or 'target' accordingly.
-                    addCell(roomSheet, 5, rowNum, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
-                    r++
-                } // results.each
+                    WorkbookUtil.addCell(row, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
+					r++
+                }
                 profiler.endInfo("Rooms", "processed %d rows", [roomSize])
-                results = null
             }
 
             flushAndClearSession()
@@ -1078,32 +1085,30 @@ class AssetExportService {
                                'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
                 ]
 
-                //racks.eachWithIndex { rack, idx ->
-                int idx = 0
+                int idx = 1 //Header Offset
                 for (Object rack : racks) {
-                    def rowNum = idx + 1 //Header Offset
+					Row row = WorkbookUtil.getOrCreateRow(rackSheet, idx)
                     def currentRack = rack.get(Criteria.ROOT_ALIAS)
                     progressCount++
                     updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 
                     rackSheetColumns.eachWithIndex{column, i->
                         if(column == 'rackId'){
-                            addCell(rackSheet, 0, rowNum, currentRack.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                            WorkbookUtil.addCell(row, 0, currentRack.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
                         } else {
                             def prop = currentRack[rackMap[column]]
                             if(column =="Source")
-                                addCell(rackSheet, i, rowNum, String.valueOf(prop == 1 ? "Source" : "Target" ))
+                                WorkbookUtil.addCell(row, i, String.valueOf(prop == 1 ? "Source" : "Target" ))
                             else{
                                 if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                    addCell(rackSheet, i, rowNum, String.valueOf(prop))
+                                    WorkbookUtil.addCell(row, i, String.valueOf(prop))
                                 }
 
                             }
                         }
                     }
-                    idx++
-                } // racks.each
-                racks = null
+					idx++
+                }
                 profiler.endInfo("Racks", "processed %d rows", [rackSize])
             }
 
@@ -1160,10 +1165,10 @@ class AssetExportService {
                         setReadOnly true
                     }
 
-                    //commentList.eachWithIndex { comm, idx ->
-                    int idx = 0
+                    int idx = 1 //HEADER Offset
                     for (Object comm : commentList) {
-                        def rowNum = idx + 1 //HEADER Offset
+                        Row row = WorkbookUtil.getOrCreateRow(commentSheet, idx)
+
                         def currentComment = comm.get(Criteria.ROOT_ALIAS)
                         progressCount++
                         updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
@@ -1171,15 +1176,14 @@ class AssetExportService {
                         if (currentComment.dateCreated) {
                             dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
                         }
-                        addCell(commentSheet, 0, rowNum, currentComment.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                        addCell(commentSheet, 1, rowNum, currentComment.assetEntity.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                        addCell(commentSheet, 2, rowNum, String.valueOf(currentComment.category))
-                        addCell(commentSheet, 3, rowNum, String.valueOf(dateCommentCreated))
-                        addCell(commentSheet, 4, rowNum, String.valueOf(currentComment.createdBy))
-                        addCell(commentSheet, 5, rowNum, String.valueOf(currentComment.comment))
+                        WorkbookUtil.addCell(row, 0, currentComment.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                        WorkbookUtil.addCell(row, 1, currentComment.assetEntity.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+                        WorkbookUtil.addCell(row, 2, String.valueOf(currentComment.category))
+                        WorkbookUtil.addCell(row, 3, String.valueOf(dateCommentCreated))
+                        WorkbookUtil.addCell(row, 4, String.valueOf(currentComment.createdBy))
+                        WorkbookUtil.addCell(row, 5, String.valueOf(currentComment.comment))
                         idx++
-                    } // commentList.each
-                    commentList = null
+                    }
                 }
                 profiler.endInfo("Comments", "processed %d rows", [commentSize])
             }
@@ -1227,6 +1231,7 @@ class AssetExportService {
             return
         } finally {
             profiler.endInfo(mainProfTag, "FINISHED")
+
         }
     }
 
@@ -1242,7 +1247,7 @@ class AssetExportService {
         for (map in spreadsheetColumnMapper.getColumnFieldMap()) {
             Map fieldSpec = map.value
             if (fieldSpec.udf == CustomDomainService.CUSTOM_USER_FIELD) {
-                addCell(sheet, fieldSpec.order, 0, fieldSpec.label)
+                WorkbookUtil.addCell(sheet, fieldSpec.order, 0, fieldSpec.label)
             }
         }
 
@@ -1272,53 +1277,6 @@ class AssetExportService {
         SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(sheet.getSheetName(), templateHaders, fieldSpecs)
         return spreadsheetColumnMapper
     }
-
-    /**
-     * Add a new cell to the given sheet at col, row with provided value, cell type and style
-     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
-     * @param sheet
-     * @param columnIdx
-     * @param rowIdx
-     * @param value
-     * @param cellType
-     * @param workbookCellStyles
-     */
-    void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
-        if (cellType == null) {
-            addCell(sheet, columnIdx, rowIdx, value)
-        } else {
-            WorkbookUtil.addCell(sheet, columnIdx, rowIdx, value, cellType, getCellStyle(sheet, cellType, workbookCellStyles))
-        }
-    }
-
-    /**
-     * Add a new cell to the given sheet at col, row with provided value
-     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
-     * @param sheet
-     * @param columnIdx
-     * @param rowIdx
-     * @param value
-     */
-    void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value) {
-        WorkbookUtil.addCell(sheet, columnIdx, rowIdx, value, Cell.CELL_TYPE_STRING, null)
-    }
-
-    /**
-     * creates a new cell style or get one from cache
-     * TODO: oluna - I believe that this function belongs to the WorkbookUtil, they should be also static cause they don't use the object state
-     * @param sheet
-     * @param cellType
-     * @param workbookCellStyles
-     * @return
-     */
-    CellStyle getCellStyle(Sheet sheet, int cellType, Map<Integer, CellStyle> workbookCellStyles) {
-        CellStyle cellStyle = workbookCellStyles[cellType]
-        if (cellStyle == null) {
-            cellStyle = WorkbookUtil.createCellStyle(sheet, cellType)
-            workbookCellStyles[cellType] = cellStyle
-        }
-        return cellStyle
-     }
 
     /**
      * Used to get the list of Type used to assign to AssetDependency.type
@@ -1383,29 +1341,31 @@ class AssetExportService {
     void cablingReportData(List assetCablesList, Sheet cablingSheet, Map<Integer, CellStyle> workbookCellStyles) {
         int rowNum = 2
         for (Object element : assetCablesList) {
+			Row row = WorkbookUtil.getOrCreateRow(cablingSheet, rowNum)
+
             def cabling = element["this"] // <SL> element comes as a map with (this, af) keys, so "this" is the one that has all needed information
-            addCell(cablingSheet, 0, rowNum, String.valueOf(cabling.assetFromPort?.type))
-            addCell(cablingSheet, 1, rowNum, cabling.assetFrom ? cabling.assetFrom?.id : "", Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-            addCell(cablingSheet, 2, rowNum, String.valueOf(cabling.assetFrom ? cabling.assetFrom.assetName : ""))
-            addCell(cablingSheet, 3, rowNum, String.valueOf(cabling.assetFromPort?.label))
-            addCell(cablingSheet, 4, rowNum, cabling.assetTo ? cabling.assetTo?.id : "", Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-            addCell(cablingSheet, 5, rowNum, String.valueOf(cabling.assetTo ? cabling.assetTo?.assetName : ""))
+            WorkbookUtil.addCell(row, 0, String.valueOf(cabling.assetFromPort?.type))
+            WorkbookUtil.addCell(row, 1, cabling.assetFrom ? cabling.assetFrom?.id : "", Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+            WorkbookUtil.addCell(row, 2, String.valueOf(cabling.assetFrom ? cabling.assetFrom.assetName : ""))
+            WorkbookUtil.addCell(row, 3, String.valueOf(cabling.assetFromPort?.label))
+            WorkbookUtil.addCell(row, 4, cabling.assetTo ? cabling.assetTo?.id : "", Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+            WorkbookUtil.addCell(row, 5, String.valueOf(cabling.assetTo ? cabling.assetTo?.assetName : ""))
             if (cabling.assetFromPort && cabling.assetFromPort.type && cabling.assetFromPort.type != 'Power') {
-                addCell(cablingSheet, 6, rowNum, String.valueOf(cabling.assetToPort ? cabling.assetToPort?.label : ""))
+                WorkbookUtil.addCell(row, 6, String.valueOf(cabling.assetToPort ? cabling.assetToPort?.label : ""))
             } else {
-                addCell(cablingSheet, 6, rowNum, String.valueOf(cabling.toPower ?: ""))
+                WorkbookUtil.addCell(row, 6, String.valueOf(cabling.toPower ?: ""))
             }
-            addCell(cablingSheet, 7, rowNum, String.valueOf(cabling.cableComment ?: ""))
-            addCell(cablingSheet, 8, rowNum, String.valueOf(cabling.cableColor ?: ""))
+            WorkbookUtil.addCell(row, 7, String.valueOf(cabling.cableComment ?: ""))
+            WorkbookUtil.addCell(row, 8, String.valueOf(cabling.cableColor ?: ""))
             if (cabling.assetFrom?.sourceRoom) {
-                addCell(cablingSheet, 9, rowNum, String.valueOf(cabling.assetFrom?.rackSource?.location + "/" + cabling.assetFrom?.sourceRoom + "/" + cabling.assetFrom?.sourceRack))
+                WorkbookUtil.addCell(row, 9, String.valueOf(cabling.assetFrom?.rackSource?.location + "/" + cabling.assetFrom?.sourceRoom + "/" + cabling.assetFrom?.sourceRack))
             } else if (cabling.assetFrom?.targetRoom) {
-                addCell(cablingSheet, 9, rowNum, String.valueOf(cabling.assetFrom?.rackTarget?.location + "/" + cabling.assetFrom?.targetRoom + "/" + cabling.assetFrom?.targetRack))
+                WorkbookUtil.addCell(row, 9, String.valueOf(cabling.assetFrom?.rackTarget?.location + "/" + cabling.assetFrom?.targetRoom + "/" + cabling.assetFrom?.targetRack))
             } else {
-                addCell(cablingSheet, 9, rowNum, '')
+                WorkbookUtil.addCell(row, 9, '')
             }
-            addCell(cablingSheet, 10, rowNum, String.valueOf(cabling.cableStatus ?: ""))
-            addCell(cablingSheet, 11, rowNum, String.valueOf(cabling.assetLoc ?: ""))
+            WorkbookUtil.addCell(row, 10, String.valueOf(cabling.cableStatus ?: ""))
+            WorkbookUtil.addCell(row, 11, String.valueOf(cabling.assetLoc ?: ""))
             rowNum++
         }
     }
