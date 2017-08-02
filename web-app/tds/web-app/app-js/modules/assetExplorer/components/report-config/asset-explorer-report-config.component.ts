@@ -24,7 +24,8 @@ import { AssetExplorerReportExportComponent } from '../report-export/asset-explo
 		.C { background-color: #F9FF90;}
         .I { background-color: #D4F8D4;}
         .N { background-color: #FFF;}
-        .U { background-color: #F3F4F6;}
+		.U { background-color: #F3F4F6;}
+		li.active a { font-weight:bold;}
 	`]
 })
 export class AssetExplorerReportConfigComponent {
@@ -46,7 +47,7 @@ export class AssetExplorerReportConfigComponent {
 		selected: 'all',
 		search: ''
 	};
-
+	collapsed = false;
 	reportSpec = new ReportSpec();
 
 	constructor(
@@ -91,11 +92,12 @@ export class AssetExplorerReportConfigComponent {
 						property: f.field,
 						width: 50,
 						locked: false,
-						edit: false
+						edit: false,
+						label: f.label
 					};
 				}))
 			.reduce((p, c) => p.concat(c), []);
-		console.log(this.reportSpec);
+
 	}
 
 	protected isAssetSelected(): boolean {
@@ -149,6 +151,10 @@ export class AssetExplorerReportConfigComponent {
 		this.ApplyFilters();
 	}
 
+	protected onNext(test): void {
+		console.log(test);
+	}
+
 	protected applyAssetClassFilter(): void {
 		if (this.filterModel.asset !== 'all') {
 			this.filteredData = this.filteredData.filter(domain => domain.domain.toUpperCase() === this.filterModel.asset.toUpperCase());
@@ -177,4 +183,7 @@ export class AssetExplorerReportConfigComponent {
 		};
 	}
 
+	protected toggleConfig(): void {
+		this.collapsed = !this.collapsed;
+	}
 }

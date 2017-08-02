@@ -2,23 +2,14 @@
 	<kendo-grid-column [sortable]="{mode:'multiple'}" *ngFor="let column of model.columns" field="{{column.domain}}.{{column.property}}"
 	 [width]="50">
 		<ng-template kendoGridHeaderTemplate>
-			<div class="form-group">
-				<label for=""> {{column.property}}</label>
-				<span class="fa" [ngClass]="{'fa-lock':column.locked,'fa-unlock-alt':!column.locked}" (click)="toggleProperty(column,'locked')"
-				 style="float:right;cursor:pointer;"></span>
-				<span class="fa " [ngClass]="{'fa-pencil':column.edit,'fa-ban':!column.edit}" (click)="toggleProperty(column,'edit')" style="float:right;margin:0 5px;cursor:pointer;"></span>
+			<div>
+				<label for=""> {{column.label}}</label>
 			</div>
-			<div class="form-group has-feedback" style="margin-bottom:0px;">
+			<div class=" has-feedback" style="margin-bottom:0px;">
 				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Default Filter"
 				 value="">
-				<span style="cursor:pointer;color:#000;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+				<span style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 			</div>
 		</ng-template>
 	</kendo-grid-column>
 </kendo-grid>
-<!-- 
-<ul>
-	<li *ngFor="let column of model.columns">
-		
-	</li>
-</ul> -->
