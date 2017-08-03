@@ -44,7 +44,11 @@ export class AssetExplorerIndexComponent {
 		}
 	}
 
-	protected onCreateNew(): void {
+	protected onClearTextFilter(): void {
+		this.searchText = '';
+	}
+
+	protected onCreateReport(): void {
 		this.stateService.go(AssetExplorerStates.REPORT_CREATE.name);
 	}
 
