@@ -24,11 +24,11 @@ export class AssetExplorerIndexComponent {
 				this.selectedFolder = this.reportGroupModels[0];
 				this.reportGroupModels.filter((folder) => folder.items && folder.items.length > 0).forEach((folder) => {
 					this.selectedFolder.items = this.selectedFolder.items.concat(folder.items);
-					allFavorites = folder.items.filter((report)=> report.favorite).concat(allFavorites);
+					allFavorites = folder.items.filter((report) => report.favorite).concat(allFavorites);
 				});
 
 				let favoriteFolder = this.reportGroupModels.find((folder) => folder.name === 'Favorites');
-				if(favoriteFolder) {
+				if (favoriteFolder) {
 					favoriteFolder.items = allFavorites;
 				}
 

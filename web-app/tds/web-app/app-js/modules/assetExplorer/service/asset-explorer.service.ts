@@ -56,7 +56,7 @@ export class AssetExplorerService {
 				name: 'Legal Applications',
 				favorite: false,
 				shared: true,
-				subscribe: false
+				subscribe: true
 			}],
 			icon: ReportFolderIcon.folder
 		}
