@@ -21,7 +21,7 @@
 			text-align: center;
 			font-size: 1.5em;
 		}
-		div.elapsed-time-wrapper span#spanPlanned {
+		div.elapsed-time-wrapper span#eventStartDate {
 			text-align: center;
 			font-size: 1.3em;
 		}
@@ -122,7 +122,7 @@
 										<div class="col-md-12"><span id="eventDescription"></span></div>
 									</div>
 									<div class="row">
-										<div class="col-md-12"><span id="spanPlanned"></span></div>
+										<div class="col-md-12"><span id="eventStartDate"></span></div>
 									</div>
 									<div class="row plannedStart">
 										<div class="col-md-12"><span id="plannedStart"></span></div>
@@ -854,6 +854,7 @@
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum;
+			var eventStartDate = snapshot.eventStartDate;
 			var sumDialInd =  planSum.dialInd ? planSum.dialInd : 50;
 			if(sumDialInd < 0){
 				sumDialInd = 0
@@ -885,7 +886,7 @@
 			}
 			$("#manualSummaryStatusId").val( sumDialInd );
 			$("div.plannedStartLabel").show();
-			$("#spanPlanned").html(tdsCommon.parseAndFormatDateTimeFromZulu(planSum.compTime))
+			$("#eventStartDate").html(tdsCommon.parseAndFormatDateTimeFromZulu(eventStartDate, 'DD/MM/YYYY'))
 			$("#plannedStart").html(planSum.dayTime)
 			$("#eventDescription").html(planSum.eventDescription)
 			$("#eventStringId").html(planSum.eventString)

@@ -295,7 +295,8 @@ class WsDashboardController implements ControllerMethods {
 			revSum: [dialInd: moveEventRevisedSnapshot?.dialIndicator,
 			         compTime: TimeUtil.formatDateTime(revisedComp, TimeUtil.FORMAT_DATE_TIME_11)],
 			steps: dataPointsForEachStep,
-			runbookOn: project.runbookOn
+			runbookOn: project.runbookOn,
+			eventStartDate: moveEvent.estStartTime
 		])
 	}
 }
