@@ -1,6 +1,9 @@
-export class ReportColumn {
+export class QueryColumn {
 	domain: string;
 	property: string;
+}
+
+export class ReportColumn extends QueryColumn {
 	width?= 50;
 	locked?= false;
 	edit?= false;
@@ -8,14 +11,27 @@ export class ReportColumn {
 	label: string;
 }
 
-export class ReportSort {
-	domain: string;
-	property: string;
+export class FilterColumn extends QueryColumn {
+	filter: string;
+}
+
+export class ReportSort extends QueryColumn {
 	order: 'a' | 'd';
 }
 
 export class ReportSpec {
 	domains: Array<String> = [];
-	columns: Array<ReportColumn> = [];
-	sort: Array<ReportSort> = [];
+	columns: Array<ReportColumn | QueryColumn> = [];
+	filters: Array<FilterColumn> = [];
+	sort: ReportSort;
+	createdByPersonId: number;
+	isSystem: boolean;
+}
+
+export class QuerySpec extends ReportSpec {
+	columns: Array<QueryColumn> = [];
+	paging: {
+		offset: number,
+		limit: number
+	};
 }

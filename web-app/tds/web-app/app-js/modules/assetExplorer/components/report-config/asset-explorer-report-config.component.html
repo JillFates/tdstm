@@ -22,7 +22,8 @@
 								</ng-template>
 							</li>
 							<li role="presentation">
-								<button class="btn btn-default" name="btnPreview" (click)="onPreview()">Preview</button>
+								<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
+								 name="btnPreview" (click)="onPreview()">Preview</button>
 							</li>
 							<li role="presentation" style="float:right;">
 								<button class="btn btn-default" (click)="toggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
@@ -33,12 +34,12 @@
 						</ul>
 						<div class="tab-content" *ngIf="!collapsed">
 							<div class="tab-pane active" id="tab_1">
+								<label for="" style="font-size:14px;">Please select at least one asset class to continue.</label> <br>
 								<div class="checkbox" *ngFor="let asset of assetClasses">
 									<label>
 										<input type="checkbox" name="{{asset}}" (change)="ApplyFilters()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
 									</label>
 								</div>
-								<label for="">Please, select at least one asset class to continue.</label> <br>
 								<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 							</div>
 							<div class="tab-pane" id="tab_2">
@@ -75,6 +76,7 @@
 										</div>
 									</div>
 								</div>
+								<label for="" style="font-size:14px;padding-left: 15px;padding-bottom: 10px;">Select one or more columns to continue.</label>								<br>
 								<div class="row" style="overflow:auto;margin:0 5px;">
 									<div style="position:relative;float:left;height:375px;">
 										<div [ngStyle]="fieldStyle(fieldIndex)" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
@@ -85,7 +87,7 @@
 										</div>
 									</div>
 								</div>
-								<label for="">Please, select at least one column to continue.</label> <br>
+
 							</div>
 						</div>
 					</div>

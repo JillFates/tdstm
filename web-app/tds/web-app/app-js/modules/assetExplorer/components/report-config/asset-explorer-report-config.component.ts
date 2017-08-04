@@ -58,6 +58,9 @@ export class AssetExplorerReportConfigComponent {
 		this.model = new ReportModel();
 		fields.subscribe((result) => {
 			this.domains = result;
+			this.domains.forEach(d => {
+				d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
+			});
 		}, (err) => console.log(err));
 	}
 
@@ -103,6 +106,12 @@ export class AssetExplorerReportConfigComponent {
 	protected isAssetSelected(): boolean {
 		return Object.keys(this.filterModel.assets)
 			.filter(key => this.filterModel.assets[key]).length !== 0;
+	}
+
+	protected isColumnSelected(): boolean {
+		return this.filteredData
+			.map((d) => d.fields
+				.filter((f) => f['selected'])).length !== 0;
 	}
 
 	protected onAssetSelect(): void {
