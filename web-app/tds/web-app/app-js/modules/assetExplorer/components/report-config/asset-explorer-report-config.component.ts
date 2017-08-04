@@ -110,8 +110,8 @@ export class AssetExplorerReportConfigComponent {
 
 	protected isColumnSelected(): boolean {
 		return this.filteredData
-			.map((d) => d.fields
-				.filter((f) => f['selected'])).length !== 0;
+			.reduce((p: FieldSettingsModel[], c) => p.concat(c.fields), [])
+			.filter((f) => f['selected']).length !== 0;
 	}
 
 	protected onAssetSelect(): void {

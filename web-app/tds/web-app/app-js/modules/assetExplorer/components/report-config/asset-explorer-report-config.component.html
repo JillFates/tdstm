@@ -7,10 +7,11 @@
 					<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 					<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 					<asset-explorer-report-selector [create-new]="false"></asset-explorer-report-selector>
+					<span class="btn" (click)="toggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
 				</div>
 				<br>
 				<div class="row">
-					<div class="nav-tabs-custom">
+					<div class="nav-tabs-custom" *ngIf="!collapsed">
 						<ul class="nav nav-tabs">
 							<li role="presentation" class="active">
 								<a href="#tab_1" data-toggle="tab">Asset Classes</a>
@@ -32,7 +33,7 @@
 								<button class="btn btn-default"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
 							</li>
 						</ul>
-						<div class="tab-content" *ngIf="!collapsed">
+						<div class="tab-content">
 							<div class="tab-pane active" id="tab_1">
 								<label for="" style="font-size:14px;">Please select at least one asset class to continue.</label> <br>
 								<div class="checkbox" *ngFor="let asset of assetClasses">
