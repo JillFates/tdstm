@@ -1,9 +1,8 @@
 package net.transitionmanager.service
 
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
-import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
@@ -14,6 +13,7 @@ import org.springframework.context.i18n.LocaleContextHolder as LCH
 @CompileStatic
 class SettingService implements ServiceMethods {
     public static final String VERSION_KEY = "version"
+    public static final String PLAN_METHODOLOGY_KEY = "planMethodology"
 
     MessageSource messageSource
 
@@ -95,6 +95,9 @@ class SettingService implements ServiceMethods {
             try {
                 Map<String, ?> settingMap = JsonUtil.convertJsonToMap(setting.json)
                 settingMap.put(VERSION_KEY, setting.version)
+                if (setting.key == AssetClass.APPLICATION.name()) {
+                    settingMap.put(PLAN_METHODOLOGY_KEY, setting.project.planMethodology)
+                }
                 return settingMap
             } catch (Exception e) {
                 log.error(e.message, e)

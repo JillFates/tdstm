@@ -497,6 +497,8 @@ class CookbookService implements ServiceMethods {
 	 * @param catalogContext used to filter context of recipes: All, Event, Bundle, Application
 	 * @param searchText to search for text in name and description
 	 * @param projectType project indicates which project to provide list of recipes for (master, active, complete or integer)
+	 * @param sortField: the field to sort recipes by.
+	 * @param sortOrder: sorting order (asc or desc)
 	 * When set to master, it will list search the master/default project.
 	 * When set to active, it will search all active projects the user has access to
 	 * When set to completed, it will search all completed projects that the user has access to
@@ -504,7 +506,7 @@ class CookbookService implements ServiceMethods {
 	 *
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
-	List<Map> findRecipes(String isArchived, catalogContext, searchText, projectType) {
+	List<Map> findRecipes(String isArchived, catalogContext, searchText, projectType, sortField="last_updated", sortOrder="desc") {
 		def projectIds = []
 
 		Project project = securityService.userCurrentProject
@@ -571,6 +573,8 @@ class CookbookService implements ServiceMethods {
 			arguments.catalogContext = catalogContext
 		}
 
+		String sortBy = " ORDER BY $sortField $sortOrder "
+
 		namedParameterJdbcTemplate.query('''
 			SELECT DISTINCT recipe.recipe_id as recipeId, recipe.name, recipe.description, recipe.context,
 			       IF(ISNULL(recipe_version.last_updated), rv2.last_updated, recipe_version.last_updated) as last_updated,
@@ -584,7 +588,7 @@ class CookbookService implements ServiceMethods {
 			LEFT OUTER JOIN person as p2 ON p2.person_id = rv2.created_by_id
 			WHERE recipe.archived = :isArchived
 			  AND recipe.project_id IN (:projectIdsAsString)
-		''' + searchCondition + catalogCondition, arguments, new RecipeMapper())
+		''' + searchCondition + catalogCondition + sortBy, arguments, new RecipeMapper())
 	}
 
 	/**

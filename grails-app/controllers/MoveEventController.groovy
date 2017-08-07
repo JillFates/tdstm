@@ -21,6 +21,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.MoveBundleService
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.SecurityService
@@ -50,6 +51,7 @@ class MoveEventController implements ControllerMethods {
 	ControllerService controllerService
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
+	MoveEventService moveEventService
 	ProjectService projectService
 	ReportsService reportsService
 	SecurityService securityService
@@ -179,13 +181,7 @@ class MoveEventController implements ControllerMethods {
 			if (moveEvent) {
 				long moveEventId = moveEvent.id
 				String moveEventName = moveEvent.name
-				jdbcTemplate.update('DELETE FROM move_event_snapshot             WHERE move_event_id = ?', moveEventId)
-				jdbcTemplate.update('DELETE FROM move_event_news                 WHERE move_event_id = ?', moveEventId)
-				jdbcTemplate.update('UPDATE move_bundle SET move_event_id = NULL WHERE move_event_id = ?', moveEventId)
-				jdbcTemplate.update('DELETE FROM user_preference WHERE preference_code = ? and value = ?', UserPreferenceEnum.MOVE_EVENT as String, moveEventId)
-				AppMoveEvent.executeUpdate('DELETE AppMoveEvent                  WHERE moveEvent.id =  ?', [moveEventId])
-
-				moveEvent.delete()
+				moveEventService.deleteMoveEvent(moveEvent)
 				flash.message = "MoveEvent $moveEventName deleted"
 			}
 			else {
@@ -268,73 +264,6 @@ class MoveEventController implements ControllerMethods {
 		else {
 			render(view: 'create', model: [moveEventInstance: moveEvent])
 		}
-	}
-
-	/**
-	 * Clear out any snapshot data records and reset any summary steps for given event.
-	 */
-	@HasPermission(Permission.EventEdit)
-	def clearHistoricData() {
-		Long moveEventId = params.long('moveEventId')
-		if (moveEventId) {
-			jdbcTemplate.update('DELETE FROM move_event_snapshot WHERE move_event_id=?', moveEventId)
-			def moveBundleSteps = jdbcTemplate.queryForList('''
-				SELECT mbs.id FROM move_bundle_step mbs
-				LEFT JOIN move_bundle mb ON (mb.move_bundle_id = mbs.move_bundle_id)
-				WHERE mb.move_event_id=?''', moveEventId)
-			if (moveBundleSteps) {
-				jdbcTemplate.update('DELETE FROM step_snapshot ' +
-				                    'WHERE move_bundle_step_id in (' + moveBundleSteps.id.join(',') + ')')
-			}
-			jdbcTemplate.update('''
-					UPDATE move_bundle_step
-					SET actual_start_time=null,
-					    actual_completion_time=null
-					WHERE move_bundle_id in (SELECT move_bundle_id FROM move_bundle WHERE move_event_id=?)''',
-				moveEventId)
-		}
-		render "success"
-	}
-
-	/**
-	 * Used to clear or reset any Task data for selected event.
-	 * @param moveEventId
-	 * @param type (delete/clear)
-	 * @return text
-	 * @usage ajax
-	 */
-	@HasPermission(Permission.EventEdit)
-	@HasPermission(Permission.TaskDelete)
-	def clearTaskData() {
-		Project project = securityService.userCurrentProject
-		def moveEvent
-		def msg = ""
-
-		// TODO - Need to create an ACL instead of using roles for this
-		if (!securityService.hasRole([ADMIN, CLIENT_ADMIN, CLIENT_MGR])) {
-			msg = "You do not have the proper permissions to perform this task"
-		} else {
-			if (params.moveEventId.isNumber()) {
-				moveEvent = MoveEvent.findByIdAndProject(params.moveEventId, project)
-				if (! moveEvent) {
-					msg = "You present do not have access to the event"
-				}
-			} else {
-				msg = "Invalid Event specified"
-			}
-		}
-		if (! msg) {
-			try {
-				if (params.type == 'reset') {
-					msg = taskService.resetTaskData(moveEvent)
-				} else if (params.type == 'delete') {
-					msg = taskService.deleteTaskData(moveEvent)
-				}
-			} catch(e) {
-				msg = e.message
-			}
-		}
-		render msg
 	}
 
 	/**

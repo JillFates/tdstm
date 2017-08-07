@@ -55,15 +55,14 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isEditing = false;
 	private isFilterDisabled = false;
 	private sortable: boolean | object = { mode: 'single' };
+	private fieldsToDelete = [];
 
 	private availableControls = [
 		{ text: 'List', value: 'List' },
 		{ text: 'String', value: 'String' },
 		{ text: 'YesNo', value: 'YesNo' }
 	];
-	private availableyFieldType = ['All', 'Custom Fields', 'Standard Fields'];
-
-	static readonly ORDER_MIN_VALUE = 0;
+	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
 	constructor(private loaderService: UILoaderService, private prompt: UIPromptService) { }
 
@@ -132,14 +131,39 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Delete button action, adds field to the pending to delete queue.
+	 * @param {FieldSettingsModel} dataItem
+	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
+		this.fieldsToDelete.push(dataItem.field);
 		this.deleteEmitter.emit({
-			field: dataItem,
 			domain: this.data.domain,
-			callback: () => {
-				this.refresh();
-			}
+			fieldsToDelete: this.fieldsToDelete
 		});
+	}
+
+	/**
+	 * Undo Delete button action, removes field from pending to delete queue.
+	 * @param {FieldSettingsModel} dataItem
+	 */
+	protected undoDelete(dataItem: FieldSettingsModel): void {
+		let index = this.fieldsToDelete.indexOf(dataItem.field, 0);
+		this.fieldsToDelete.splice(index, 1);
+		this.deleteEmitter.emit({
+			domain: this.data.domain,
+			fieldsToDelete: this.fieldsToDelete
+		});
+	}
+
+	/**
+	 * Check if a given field is on the pending to deleted queue.
+	 * @param {FieldSettingsModel} dataItem
+	 * @returns {boolean}
+	 */
+	protected toBeDeleted(dataItem: FieldSettingsModel): boolean {
+		let found = this.fieldsToDelete.filter(item => item === dataItem.field);
+		return found.length > 0;
 	}
 
 	protected onAddCustom(): void {
@@ -284,6 +308,16 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected hasError(label: string) {
 		return label.trim() === '' || this.data.fields.filter(item => item.label === label.trim()).length > 1;
+	}
+
+	/**
+	 * Function to determine if given field is currently used as Project Plan Methodology.
+	 * Note: Only APPLICATION asset types has the plan methodology feature.
+	 * @param {FieldSettingsModel} field
+	 * @returns {boolean} True or False
+	 */
+	protected isFieldUsedAsPlanMethodology(field: FieldSettingsModel): boolean {
+		return this.data.planMethodology && this.data.planMethodology === field.field;
 	}
 
 }
