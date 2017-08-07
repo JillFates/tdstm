@@ -43,8 +43,8 @@
     </kendo-grid-column>
     <kendo-grid-column field="field" title="Field">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="text" *ngIf="dataItem.udf" disabled class="form-control" [(ngModel)]="dataItem.field" name="field" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
-                   [ngStyle]="{'margin-top': isFieldUsedAsPlanMethodology(dataItem) ? '15px' : '0'}">
+            <input type="text" *ngIf="dataItem.udf" disabled class="form-control" [(ngModel)]="dataItem.field" name="field"
+                   [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}" [ngStyle]="{'margin-top': isFieldUsedAsPlanMethodology(dataItem) ? '15px' : '0'}">
             <div class="text-center text-danger" *ngIf="isFieldUsedAsPlanMethodology(dataItem)" >
                 <small>{{'FIELD_SETTINGS.PLAN_METHODOLOGY_DELETE_WARNING' | translate}}</small>
             </div>
@@ -115,8 +115,7 @@
             <input *ngIf="(dataItem.udf) && (dataItem.control!='List' && dataItem.control!='YesNo')" type="text" class="form-control"
                 [(ngModel)]="dataItem.default" name="default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
             <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
-            <select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default" [disabled]="toBeDeleted(dataItem)"
-                    [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
+            <select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
                 <option value="">Select...</option>
                 <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
             </select>
