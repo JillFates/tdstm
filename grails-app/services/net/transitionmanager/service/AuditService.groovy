@@ -21,7 +21,11 @@ class AuditService implements InitializingBean, ServiceMethods {
 	private static String AUDIT_TYPE
 	private static boolean AUDIT_ACTIVITY
 
-	private static Map<String, String> ACCESS_URI = ['/auth/signIn': true, '/auth/signOut': true]
+	private static Map<String, String> ACCESS_URI = [
+		'/auth/signIn': true,
+		'/auth/signOut': true
+	]
+
 	private static final Map AUDITED_PARAMS = [username: true, id: true, _action_Delete: true, moveBundleId: true,
 	                                           assetEntityId: true, moveEventId: true]
 
