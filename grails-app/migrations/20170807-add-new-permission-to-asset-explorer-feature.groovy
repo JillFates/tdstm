@@ -10,52 +10,52 @@ databaseChangeLog = {
         grailsChange {
             change {
                 def perms = [
-					Permission.AssetExplorerSystemCreate: [
+					(Permission.AssetExplorerSystemCreate): [
                         group      : 'NONE',
                         description: 'Can create shared system level reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
                     ],
-					Permission.AssetExplorerSystemDelete: [
+					(Permission.AssetExplorerSystemDelete): [
                         group      : 'NONE',
                         description: 'Can delete shared system level reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
                     ],
-                    Permission.AssetExplorerSystemEdit: [
+                    (Permission.AssetExplorerSystemEdit): [
                         group      : 'NONE',
                         description: 'Can edit shared system level reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
                     ],
-                    Permission.AssetExplorerSystemSaveAs: [
+                    (Permission.AssetExplorerSystemSaveAs): [
                         group      : 'NONE',
                         description: 'Can modify and \'Save As\' system level reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
                     ],
-                    Permission.AssetExplorerCreate: [
+                    (Permission.AssetExplorerCreate): [
                         group      : 'NONE',
                         description: 'Can create logged in user owned reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
-					Permission.AssetExplorerDelete: [
+					(Permission.AssetExplorerDelete): [
                         group      : 'NONE',
                         description: 'Can delete logged in user owned reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
-                    Permission.AssetExplorerEdit: [
+                    (Permission.AssetExplorerEdit): [
                         group      : 'NONE',
                         description: 'Can edit logged in user owned reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
-                    Permission.AssetExplorerSaveAs: [
+                    (Permission.AssetExplorerSaveAs): [
                         group      : 'NONE',
                         description: 'Can modify and \'Save As\' user published reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
-					Permission.AssetExplorerPublish: [
+					(Permission.AssetExplorerPublish): [
                         group      : 'NONE',
                         description: 'Can publish logged in user owned reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
-                    Permission.AssetExplorerUnPublish: [
+                    (Permission.AssetExplorerUnPublish): [
                         group      : 'NONE',
                         description: 'Can unpublish logged in user owned reports',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
