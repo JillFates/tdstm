@@ -246,6 +246,7 @@ var EntityCrud = (function ($) {
 				data: function (term, page) {
 					return {
 						q: term,
+                        value: $(this).data("asset-name"),
 						max: 25,
 						page: page,
 						assetClassOption: $(this).data("asset-type"),
@@ -253,7 +254,7 @@ var EntityCrud = (function ($) {
 				},
 				results: function (data, page) {
 					var more = (page * 25) < data.total;
-					return { results: data.results, more: more };
+					return { results: data.results, more: more, page: data.page};
 				}
 			}
 		});
