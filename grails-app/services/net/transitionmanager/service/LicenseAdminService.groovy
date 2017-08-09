@@ -46,9 +46,11 @@ class LicenseAdminService extends LicenseCommonService {
 	/**
 	 * Initialize the license service, configuring the cache and the licensing library
 	 * this is run only once when invoked unless is forced (in testing)
+	 * syncronized for thread safety
 	 * @param force force the reinitialization of the Service (used in testing)
 	 * @return
 	 */
+	synchronized
 	def initialize(boolean force = false) {
 		//lazy initialization when called
 		if(force || isEnabled() && !loaded) {
