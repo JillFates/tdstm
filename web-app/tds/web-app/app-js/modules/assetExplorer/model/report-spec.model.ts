@@ -21,11 +21,9 @@ export class ReportSort extends QueryColumn {
 
 export class ReportSpec {
 	domains: Array<String> = [];
-	columns: Array<ReportColumn | QueryColumn> = [];
+	columns: Array<QueryColumn | ReportColumn> = [];
 	filters: Array<FilterColumn> = [];
 	sort: ReportSort;
-	createdByPersonId: number;
-	isSystem: boolean;
 }
 
 export class QuerySpec extends ReportSpec {
@@ -34,4 +32,13 @@ export class QuerySpec extends ReportSpec {
 		offset: number,
 		limit: number
 	};
+}
+
+export class ReportModel {
+	id: number;
+	name: string;
+	isOwner: boolean;
+	isSystem: boolean;
+	isShared: boolean;
+	schema: ReportSpec;
 }
