@@ -43,7 +43,15 @@ export class AssetExplorerIndexComponent {
 	}
 
 	protected onCreateReport(): void {
-		this.stateService.go(AssetExplorerStates.REPORT_CREATE.name);
+		if (this.isCreateAvailable()) {
+			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name);
+		}
+	}
+
+	protected isCreateAvailable(): boolean {
+		return this.selectedFolder.name === 'System Reports' ?
+			this.permissionService.hasPermission('AssetExplorerSystemCreate') :
+			this.permissionService.hasPermission('AssetExplorerCreate');
 	}
 
 }

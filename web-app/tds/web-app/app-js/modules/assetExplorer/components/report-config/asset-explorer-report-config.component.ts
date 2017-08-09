@@ -51,11 +51,16 @@ export class AssetExplorerReportConfigComponent {
 	reportSpec = new ReportSpec();
 
 	constructor(
+		@Inject('report') report: Observable<ReportModel>,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private stateService: StateService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
-		this.model = new ReportModel();
+
+		report.subscribe((model) => {
+			this.model = { ...model };
+		}, (err) => console.log(err));
+
 		fields.subscribe((result) => {
 			this.domains = result;
 			this.domains.forEach(d => {
