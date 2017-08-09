@@ -457,6 +457,14 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/reports" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "getReports"
+			]
+		}
+
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
