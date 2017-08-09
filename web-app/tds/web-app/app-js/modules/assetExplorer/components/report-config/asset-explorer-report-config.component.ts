@@ -77,7 +77,8 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected onFavorite() {
-		this.model.favorite = !this.model.favorite;
+		// this.model.favorite = !this.model.favorite;
+		console.log('no empty');
 	}
 
 	protected onBackToStart(): void {

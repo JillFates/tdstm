@@ -1,9 +1,12 @@
+import { ReportSpec } from './report-spec.model';
+
 export class ReportModel {
 	id: number;
 	name: string;
-	favorite: boolean;
-	shared: boolean;
-	subscribe: boolean;
+	isOwner: boolean;
+	isSystem: boolean;
+	isShared: boolean;
+	schema?: ReportSpec;
 }
 
 export class ReportGroupModel {
@@ -15,5 +18,5 @@ export class ReportGroupModel {
 
 export enum ReportFolderIcon {
 	folder,
-	start
+	star
 }

@@ -33,12 +33,3 @@ export class QuerySpec extends ReportSpec {
 		limit: number
 	};
 }
-
-export class ReportModel {
-	id: number;
-	name: string;
-	isOwner: boolean;
-	isSystem: boolean;
-	isShared: boolean;
-	schema: ReportSpec;
-}
