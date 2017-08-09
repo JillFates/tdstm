@@ -612,6 +612,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 		if(emailData) {
 			mailService.sendMail {
+				from emailData.from
 				to emailData.toEmail
 				subject emailData.subject
 				body emailData.body
