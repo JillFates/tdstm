@@ -7,7 +7,6 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
-import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
@@ -92,7 +91,6 @@ import org.springframework.util.StreamUtils
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
-import java.sql.Timestamp
 import java.text.DateFormat
 
 @SuppressWarnings('GrMethodMayBeStatic')
@@ -2122,7 +2120,7 @@ class AssetEntityController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTasks() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		securityService.requirePermission 'TaskManagerView'
 
 		Project project = controllerService.getProjectForPage(this, 'to view Tasks')
@@ -4223,7 +4221,7 @@ class AssetEntityController implements ControllerMethods {
 
 	@HasPermission(Permission.ArchitectureView)
 	def architectureViewer() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = securityService.userCurrentProject
 		def levelsUp = NumberUtils.toInt(params.levelsUp)
 		int levelsDown = NumberUtils.toInt(params.levelsDown) ?: 3

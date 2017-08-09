@@ -27,6 +27,8 @@ import org.springframework.core.io.Resource
 class LicenseAdminService extends LicenseCommonService {
 	static transactional = false
 
+	private static int TTL = 15 * 60  //TODO: 20170124 Move to a config variable (default 15 min)
+
 	/**
 	 * States that can have a license in the system
 	 */
@@ -43,23 +45,24 @@ class LicenseAdminService extends LicenseCommonService {
 
 	/**
 	 * Initialize the license service, configuring the cache and the licensing library
-	 * @param force force the reinitialization of the Service (userd in testing)
+	 * this is run only once when invoked unless is forced (in testing)
+	 * @param force force the reinitialization of the Service (used in testing)
 	 * @return
 	 */
 	def initialize(boolean force = false) {
-		log.debug("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
+		//lazy initialization when called
 		if(force || isEnabled() && !loaded) {
+			log.debug("LAdmin is Enabled?: {} && !loaded: {}", isEnabled(), !loaded)
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
 
 			if(!licenseCache.getCache(CACHE_NAME)) {
 				log.debug("configuring cache")
-				int ttl = 15 * 60  //TODO: 20170124 Move to a config variable (default 15 min)
-				Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, ttl, 0)
+
+				Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, TTL, 0)
 				licenseCache.addCache(memoryOnlyCache)
 			}
 
-			log.debug("load LM?: ${isLGen()}")
 			if(isLGen()) {
 				log.debug("License Manager Enabled")
 				String keyFile = grailsApplication.config.manager?.license?.key
@@ -198,7 +201,7 @@ class LicenseAdminService extends LicenseCommonService {
 	 * @param project
 	 * @throws InvalidLicenseException
 	 */
-	void checkValidForLicense(Project project = null) throws InvalidLicenseException{
+	void checkValidForLicenseOrThrowException(Project project = null) throws InvalidLicenseException{
 		if(!isValid(project)){
 			throw new InvalidLicenseException()
 		}
@@ -405,7 +408,6 @@ class LicenseAdminService extends LicenseCommonService {
 	 * @return
 	 */
 	private boolean checkLicense(DomainLicense license){
-		initialize()
 		String id = license.id
 		String hash = license.hash
 
@@ -439,7 +441,7 @@ class LicenseAdminService extends LicenseCommonService {
 		if(licObj == null) return false
 
 		if(license.id != licObj?.productKey){
-			log.debug("[${license.id}] == [${licObj?.productKey}]")
+			log.debug("[{}] == [{}]", license.id, licObj?.productKey)
 			log.error("Error loading license data: Wrong product Key")
 		}
 
@@ -451,11 +453,11 @@ class LicenseAdminService extends LicenseCommonService {
 		String hostName 	   = jsonData.hostName
 		String websitename 	   = jsonData.websitename
 
-		log.debug("LicenseAdminService - Project: " + project)
+		log.debug("LicenseAdminService - Project: {}", project)
 
 		//if is not wildcard and Sites don't match, FAIL
 		if(DomainLicense.WILDCARD != hostName && getHostName() != hostName){
-			log.debug("[${getHostName()}] == [$hostName]")
+			log.debug("[{}] == [{}]", getHostName(), hostName)
 			log.error("Error loading license data: Wrong Host Name")
 		}
 
@@ -569,7 +571,7 @@ class LicenseAdminService extends LicenseCommonService {
 		if(license){
 			sendMailRequest(license)
 		}else{
-			log.error("License Request identified by '${uuid}' not found")
+			log.error("License Request identified by '{}' not found", uuid)
 			false
 		}
 	}
