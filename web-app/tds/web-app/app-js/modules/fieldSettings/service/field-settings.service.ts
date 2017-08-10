@@ -27,6 +27,13 @@ export class FieldSettingsService {
 				if (domain.length > 0) {
 					let sharedFields = domains[0].fields.filter(x => x.shared);
 					domains.forEach(d => {
+						d.fields.filter(s => s.control === 'YesNo')
+							.forEach(s => {
+								s.constraints.values = ['Yes', 'No'];
+								if (!s.constraints.required) {
+									s.constraints.values.splice(0, 0, '');
+								}
+							});
 						sharedFields.forEach(s => {
 							let indexOf = d.fields.findIndex(f => f.field === s.field);
 							if (indexOf !== -1) {
@@ -42,6 +49,14 @@ export class FieldSettingsService {
 
 	saveFieldSettings(domains: DomainModel[]): Observable<DomainModel[]> {
 		let payload = {};
+		domains
+			.reduce((p: FieldSettingsModel[], c: DomainModel) => p.concat(c.fields), [])
+			.forEach((item: any) => {
+				item.constraints.required = +item.constraints.required;
+				item.udf = +item.udf;
+				item.show = +item.show;
+				item.shared = +item.shared;
+			});
 		domains.forEach(domainModel => {
 			payload[domainModel.domain.toUpperCase()] = domainModel;
 		});

@@ -28,9 +28,6 @@
 				$("#projectPartnerId").val('${prevParam?.projectPartner}');
 			}
 
-			showCustomFields('${prevParam?.customFieldsShown ?: '0'}', 2);
-
-
 			// Initialize company partners
 			var companyPartners = []
 			<g:each status="i" in="${partners}" var="partner">
@@ -52,6 +49,11 @@
 				placeholder: "Please Select",
 				width: "75%"
 			});
+
+            $("#completionDateId").kendoDatePicker({
+					value: (($("#completionDateId") && $("#completionDateId").val() !== "")? new Date($("#completionDateId").val()) : new Date()),
+					animation: false, format:tdsCommon.kendoDateFormat()
+                });
 		})
 
 		function formatDate (dateValue,value) {
@@ -70,18 +72,6 @@
 			}
 		  }
 
-		function showCustomFields(value, columnCount) {
-			$(".custom_table").hide();
-			if (value == '0') {
-				$("#custom_table").hide();
-			} else {
-				for(i=1; i<=value;) {
-					$("#custom_table").show();
-					$("#custom_count_"+i).show();
-					i = i + parseInt(columnCount)
-				}
-			}
-		}
 
 		function setCompletionDate(startDate) {
 			var completionDateObj = document.createProjectForm.completionDate;
@@ -131,7 +121,7 @@
 							<td class="name">
 								<label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
-							<td class="valueNW">
+							<td class="valueNW ${hasErrors(bean:projectInstance,field:'client','errors')}">
 								<select id="clientId" name="client.id" tabindex="100"
 								data-placeholder="Please select a client">
 									<option value=""></option>
@@ -139,6 +129,11 @@
 									    <option value="${client.partyIdTo.id}">${client.partyIdTo}</option>
 									</g:each>
 								</select>
+								<g:hasErrors bean="${projectInstance}" field="client">
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list" field="client" />
+									</div>
+								</g:hasErrors>
 							</td>
 							<td class="name">
 								<label for="projectCode"><b>Project Code:&nbsp;<span style="color: red">*</span></b></label>
@@ -211,7 +206,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
-									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
+									jQuery(function($){ $("#startDateId").kendoDatePicker({ value: new Date(), animation: false, format:tdsCommon.kendoDateFormat() }); });
 								</script>
 								<input type="text" class="dateRange" tabindex="160" size="15" style="width: 138px;" name="startDate" id="startDateId"
 									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" />
@@ -302,10 +297,13 @@
 								<label for="projectType"><b>Plan Methodology:&nbsp;</b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'planMethodology','errors')}">
+								<%-- See TM-6673 Removing this select unless the value is going to be populated by default project
 								<g:select id="planMethodology" name="planMethodology" indextab="130"
 										  value="${projectInstance.planMethodology}"
 										  from="${planMethodologies}"
 										  optionKey="field" optionValue="label" />
+								--%>
+								To be set after field specifications are defined
 								<g:hasErrors bean="${projectInstance}" field="planMethodology">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="planMethodology" /></div>
 								</g:hasErrors>

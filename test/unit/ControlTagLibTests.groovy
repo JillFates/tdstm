@@ -7,7 +7,7 @@ import grails.test.mixin.TestFor
 import org.apache.commons.lang.StringUtils
 import spock.lang.Ignore
 import test.AbstractUnitSpec
-
+import com.tdsops.tm.enums.ControlType
 
 @TestFor(ControlTagLib)
 // @Mock([UserLogin, UserPreference])
@@ -26,7 +26,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 	private static Map stringFieldSpec = [
 		field: 'nTrack',
 		order: 42,
-		control: 'String',
+		control: ControlType.STRING.toString(),
 		constraints: [
 			required: 1,
 			minSize: 0,
@@ -37,7 +37,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 	private static Map fieldSpec = [
 		field: 'nTrack',
 		order: 42,
-		control: 'Select List',
+		control: ControlType.LIST.toString(),
 		constraints: [
 			required: 1,
 			values: ['1', '2', '3', '4']
@@ -134,12 +134,14 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			int max = stringFieldSpec.constraints.maxSize
 		then: 'the result should have required'
 			result.contains(' required ')
-		and: 'min value should default to 1 because it is required'
-			result.contains(' minlength="1" ')
+		and: 'min pattern value should default to 1 because it is required'
+			result.contains(' pattern=".{1,}" ')
 		and: 'max value should be set based on the spec'
 			result.contains(" maxlength=\"$max\"")
-		and: 'the complete formatted string should be'
-			" required minlength=\"1\" maxlength=\"$max\"" == result
+		and: 'the complete formatted string should contain'
+			result.contains(" required pattern=\".{1,}\" maxlength=\"$max\"")
+		and: 'the string should contain validation error messages'
+			result.contains(' oninvalid="setCustomValidity(\'')
 
 		when: 'calling constraintsAttrib with max value to large'
 			Map altFS = stringFieldSpec
@@ -161,7 +163,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				show: 1,
 				order: 6,
 				default: '',
-				control: 'String',
+				control: ControlType.STRING.toString(),
 				constraints: [
 					required: 1,
 					minSize:1,
@@ -227,7 +229,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				show: 1,
 				order: 6,
 				default: '',
-				control: 'YesNo',
+				control: ControlType.YES_NO.toString(),
 				constraints: [
 					required: 1
 				]
@@ -246,6 +248,8 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			result.contains('<option value="No" selected>')
 		and: 'there should be a required select option'
 			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
+		and: 'there should NOT be a (INVALID) option for blank value'
+			! result.contains("<option value=\"\">(${tagLib.MISSING_OPTION_WARNING})</option>")
 
 		when: 'the control is not required'
 			field.constraints.required = 0
@@ -278,17 +282,16 @@ class ControlTagLibTests extends AbstractUnitSpec {
 				show: 1,
 				order: 6,
 				default: '',
-				control: 'Select List',
+				control: ControlType.LIST.toString(),
 				constraints: [
 					required: 1,
-					values: ['Blue', 'Green', 'Grey', 'Red', 'Yellow']
+					values: ['', 'Blue', 'Green', 'Grey', 'Red', 'Yellow']
 				]
 			]
 		and: 'there is a default value'
 			String defValue = field.constraints.values[1]
 		and: 'and a tabOrder of 5'
 			String tabIndex='5'
-
 		when: 'the template is applied with the parameters'
 			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
 		then: 'a value should be returned'
@@ -307,6 +310,8 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			6 == StringUtils.countMatches(result, '<option ')
 		and: 'there should be a required select option'
 			result.contains("><option value=\"\">${tagLib.SELECT_REQUIRED_PROMPT}</option>")
+		and: 'there should NOT be a (INVALID) option for blank value'
+			! result.contains("<option value=\"\">(${tagLib.MISSING_OPTION_WARNING})</option>")
 
 		when: 'the control is not required'
 			field.constraints.required = 0
@@ -328,4 +333,98 @@ class ControlTagLibTests extends AbstractUnitSpec {
 
 	}
 
+	void 'Test Tool Tip Attribute '() {
+		given: 'a fieldSpec that is a String'
+		Map field = [
+				field      : 'color',
+				label      : 'Best program language ever <!>',
+				tip        : 'Select an option with a quote (")',
+				udf        : 1,
+				shared     : 1,
+				imp        : 'C',
+				show       : 1,
+				order      : 1,
+				default    : 'Javascript',
+				control    : ControlType.LIST.toString(),
+				constraints: [
+						required: 1,
+						values  : ['Java', 'Grails', 'Javascript']
+				]
+		]
+		and: 'there is a default value'
+			String defValue = field.constraints.values[1]
+		and: 'and a tabOrder of 1'
+			String tabIndex='1'
+		when: 'the template is applied with the parameters'
+			String result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
+		then: 'a value should be returned'
+			result
+		and: 'data-content should contains the tool tip'
+			result.contains(' data-content="Select an option with a quote (&quot;)" ')
+		and: 'it should contain the data-toggle'
+			result.contains(' data-toggle="popover" ')
+		and: 'it should contain the data-trigger'
+			result.contains(' data-trigger="hover" ')
+
+		when: 'the tooltip property is empty'
+			field.tip = ''
+			result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
+		then: 'data-content should contains the label'
+			result.contains(' data-content="Best program language ever &lt;!&gt;" ')
+	}
+
+	void "Test InputLabel includes the correct CSS if the field is critical, or important, and it's empty." (){
+		given: "a critical field"
+			Map field = [
+					field      : 'someField',
+					label      : 'A generic field',
+					tip        : 'the tip',
+					udf        : 1,
+					shared     : 1,
+					imp        : 'C',
+					show       : 1,
+					order      : 1,
+					default: '',
+					control: ControlType.STRING.toString(),
+					constraints: [
+							required: 1,
+							minSize:1,
+							maxSize:20
+					]
+			]
+			String emptyImpCritClass = ControlTagLib.EMPTY_IMP_CRIT_FIELD_CSS_CLASS
+
+		when: "generating InputLabel for an empty critical field"
+			String label = tagLib.inputLabel([field:field, value: null])
+		then: "the label has the appropriate CSS class"
+			label.contains(emptyImpCritClass)
+
+		when: "generating the InputLabel with some value for a critical field"
+			label = tagLib.inputLabel([field:field, value: "someValue"])
+		then: "the label shouldn't have the CSS class."
+			!label.contains(emptyImpCritClass)
+
+		when: "generating the InputLabel with '0' as value for a critical field"
+			label = tagLib.inputLabel([field:field, value: "0"])
+		then: "the label shouldn't have the CSS class"
+			!label.contains(emptyImpCritClass)
+
+		when: "generating InputLabel for an empty important field"
+			field.imp = "I"
+			label = tagLib.inputLabel([field:field, value: null])
+		then: "the label should have the appropriate CSS class"
+			label.contains(emptyImpCritClass)
+
+		when: "generating InputLabel for an empty field that isn't critical nor important"
+			field.imp = "N"
+			label = tagLib.inputLabel([field:field, value: null])
+		then: "the label shouldn't have the CSS class"
+			!label.contains(emptyImpCritClass)
+
+		when: "generating InputLabel for a field that isn't critical nor important"
+			label = tagLib.inputLabel([field:field, value: "someValue"])
+		then: "the label shouldn't have the CSS class"
+			!label.contains(emptyImpCritClass)
+
+	}
 }

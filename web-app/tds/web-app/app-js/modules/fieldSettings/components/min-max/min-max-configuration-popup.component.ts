@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, OnInit } from '@angular/core';
+import {Component, Input, ViewChild, OnInit} from '@angular/core';
 import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
 
 @Component({
@@ -15,6 +15,7 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
+	public minIsValid = true;
 
 	public onSave(): void {
 		this.field.constraints = { ...this.model };
@@ -31,5 +32,12 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 
 	public onToggle(): void {
 		this.show = !this.show;
+	}
+
+	public validateModel(): void {
+		this.minIsValid = true;
+		if (this.model.minSize > this.model.maxSize || this.model.minSize < 0) {
+			this.minIsValid = false;
+		}
 	}
 }

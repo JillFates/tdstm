@@ -1,5 +1,6 @@
 package com.tdssrc.grails
 
+import com.tdsops.tm.asset.WorkbookSheetName
 import groovy.transform.CompileStatic
 import groovy.util.logging.Commons
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -36,6 +37,33 @@ class WorkbookUtil {
 	}
 
 	/**
+	 * Retrieves or creates a Row Object in the Spreadsheet
+	 * @param rowIdx
+	 * @return Row object of the Excel Sheet
+	 */
+	static Row getOrCreateRow(Sheet sheet, int rowIdx){
+		Row row = sheet.getRow(rowIdx)
+		if (!row) {
+			row = sheet.createRow(rowIdx)
+		}
+		return row
+	}
+
+	/**
+	 * Retrieves or creates a Cell Object in the passed Row
+	 * @param row
+	 * @param colIdx
+	 * @return
+	 */
+	static Cell getOrCreateCell(Row row, int colIdx) {
+		Cell cell = row.getCell(colIdx)
+		if (!cell) {
+			cell = row.createCell(colIdx)
+		}
+		return cell
+	}
+
+	/**
 	 * Adds a cell to a XSSFWorkbook
 	 * @param sheet
 	 * @param columnIdx
@@ -45,30 +73,54 @@ class WorkbookUtil {
 	 * @return
 	 */
 	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
-		def row = sheet.getRow(rowIdx)
-		if (!row) {
-			row = sheet.createRow(rowIdx)
-		}
-		Cell cell = row.getCell(columnIdx)
-		if (!cell) {
-			cell = row.createCell(columnIdx)
-		}
+		CellStyle style = null
+
 		if (type != null) {
-			cell.setCellType(type)
-			CellStyle style = sheet.workbook.createCellStyle() // TODO <SL> Use createCellStyle()
-			if (type == Cell.CELL_TYPE_NUMERIC) { // This resolves to a Numeric no decimal spaces Value
-				String binFormat = BuiltinFormats.getBuiltinFormat(1) //this is "0" mask format
-				def df = sheet.workbook.createDataFormat().getFormat(binFormat)
-				style.setDataFormat(df)
-			} else if (type == Cell.CELL_TYPE_STRING) {
-				style.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
-			}
-			cell.setCellStyle(style)
+			style = createCellStyle(sheet, type)
+		}
+
+		addCell(sheet, columnIdx, rowIdx, value, type, style)
+	}
+
+	/**
+	 * Adds a cell to a Row in a sheet with specific cell style
+	 * @param sheet
+	 * @param columnIdx
+	 * @param rowIdx
+	 * @param value
+	 * @param cellType
+	 * @param cellStyle
+	 */
+	static void addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
+		Cell cell = getOrCreateCell(row, colIdx)
+
+		if(cellType) {
+			cell.setCellType(cellType)
+		}
+		if (cellStyle != null) {
+			cell.setCellStyle(cellStyle)
 		}
 		setCellValue(cell, value)
 	}
 
 	/**
+	 * Add a new cell to the given Row at col with provided value, cell type and style
+	 * @param sheet
+	 * @param columnIdx
+	 * @param rowIdx
+	 * @param value
+	 * @param cellType
+	 * @param workbookCellStyles
+	 */
+	static void addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+		CellStyle cellStyle = null
+		if(cellType){
+			cellStyle = getCellStyle(row.sheet, cellType, workbookCellStyles)
+		}
+		addCell(row, colIdx, value, cellType, cellStyle)
+	}
+
+		/**
 	 * Adds a cell to a Workbook with specific cell style
 	 * @param sheet
 	 * @param columnIdx
@@ -77,20 +129,41 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, int cellType, CellStyle cellStyle) {
-		def row = sheet.getRow(rowIdx)
-		if (!row) {
-			row = sheet.createRow(rowIdx)
+	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
+		def row = getOrCreateRow(sheet, rowIdx)
+		addCell(row, columnIdx, value, cellType, cellStyle)
+	}
+
+	/**
+	 * Add a new cell to the given sheet at col, row with provided value, cell type and style
+	 * @param sheet
+	 * @param columnIdx
+	 * @param rowIdx
+	 * @param value
+	 * @param cellType
+	 * @param workbookCellStyles
+	 */
+	static void addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+		def row = getOrCreateRow(sheet, rowIdx)
+		addCell(row, colIdx, value, cellType, workbookCellStyles)
+	}
+
+
+
+	/**
+	 * creates a new cell style or get one from cache
+	 * @param sheet
+	 * @param cellType
+	 * @param workbookCellStyles
+	 * @return
+	 */
+	static CellStyle getCellStyle(Sheet sheet, int cellType, Map<Integer, CellStyle> workbookCellStyles) {
+		CellStyle cellStyle = workbookCellStyles[cellType]
+		if (cellStyle == null) {
+			cellStyle = WorkbookUtil.createCellStyle(sheet, cellType)
+			workbookCellStyles[cellType] = cellStyle
 		}
-		Cell cell = row.getCell(columnIdx)
-		if (!cell) {
-			cell = row.createCell(columnIdx)
-		}
-		cell.setCellType(cellType)
-		if (cellStyle != null) {
-			cell.setCellStyle(cellStyle)
-		}
-		setCellValue(cell, value)
+		return cellStyle
 	}
 
 	/**
@@ -487,6 +560,16 @@ class WorkbookUtil {
 	}
 
 	/**
+	 * Get a workbook sheet
+	 * @param workbook
+	 * @param sheetName
+	 * @return
+	 */
+	static Sheet getSheetFromWorkbook(Workbook workbook, WorkbookSheetName sheetName) {
+		return getSheetFromWorkbook(workbook, sheetName.toString())
+	}
+
+	/**
 	 * Get a SXSSFWorkbook from XSSFWorkbook
 	 * @param workbook
 	 * @return SXSSFWorkbook
@@ -541,5 +624,59 @@ class WorkbookUtil {
 			cellStyle.setDataFormat((short) BuiltinFormats.getBuiltinFormat("text"))
 		}
 		return cellStyle
+	}
+
+	/**
+	 * Assume always row 0 and stops when reach last cell in row or cell value is blank
+	 * @param sheet
+	 * @return
+	 */
+	static List<String> getSheetHeadersAsList(Sheet sheet) {
+		List<String> headers = new ArrayList<>()
+		Row row = sheet.getRow(0)
+		short cellIndex = 0
+		while (true) {
+			Cell cell = row.getCell(cellIndex)
+			if (cell == null || StringUtil.isBlank(cell.getStringCellValue())) {
+				break;
+			}
+			headers.add(cell.getStringCellValue())
+			cellIndex++
+		}
+		return headers
+	}
+
+	/**
+	 * This method returns the last non-empty row in the sheet.
+	 *
+	 * @param sheet
+	 * @return
+	 */
+	static int getLastRowNum(Sheet sheet) {
+		int lastRow = sheet.getLastRowNum()
+		while (lastRow > 0 && isRowEmpty(sheet, lastRow)) {
+			lastRow --
+		}
+		return lastRow
+	}
+
+	/**
+	 * This method determines if the given row is empty (all null or empty values).
+	 * @param sheet
+	 * @param rowNumber
+	 * @return true if the row is empty, false otherwise.
+	 */
+	static boolean isRowEmpty(Sheet sheet, int rowNumber){
+		Row row = sheet.getRow(rowNumber)
+		if (row) {
+			for (int col = row.getFirstCellNum(); col < row.getLastCellNum(); col ++) {
+				Cell cell = row.getCell(col)
+				if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK) {
+					return false
+				}
+
+			}
+		}
+		return true
 	}
 }

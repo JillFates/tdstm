@@ -6,6 +6,7 @@ import { SortableComponent } from '@progress/kendo-angular-sortable';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 
+declare var jQuery: any;
 /**
  *
  */
@@ -67,6 +68,12 @@ export class SelectListConfigurationPopupComponent {
 							};
 						});
 				}
+				let indexOfBlank = value.indexOf('');
+				if (this.field.constraints.required && indexOfBlank !== -1) {
+					value.splice(indexOfBlank, 1);
+				} else if (!this.field.constraints.required && indexOfBlank === -1) {
+					value.splice(0, 0, '');
+				}
 				let distinct = value.map(i => {
 					return {
 						deletable: false,
@@ -100,6 +107,9 @@ export class SelectListConfigurationPopupComponent {
 				value: this.newItem
 			});
 			this.newItem = '';
+			setTimeout(function () {
+				jQuery('#newItem').focus();
+			});
 		}
 	}
 
@@ -139,7 +149,7 @@ export class SelectListConfigurationPopupComponent {
 	 * Auto-sort the items array, sort order is alphabetic ascending (up).
 	 */
 	public onSort(): void {
-		this.items.sort( comparator );
+		this.items.sort(comparator);
 
 		function comparator(a, b) {
 			if (a.value < b.value) {

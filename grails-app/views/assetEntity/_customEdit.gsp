@@ -10,10 +10,10 @@
 		<g:set var="trIsOpen" value="1"/>
 	</g:if>
 
-	<tds:inputLabel field="${custom}"/>
+	<tds:inputLabel field="${custom}" value="${assetEntityInstance.(custom.field)}"/>
 
 	<td>
-		<tds:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="$tabOffset"/>
+		<tds:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" tabOffset="$tabOffset" tooltipDataPlacement="${j % 4 == 3 ? 'bottom': 'right' }"/>
 	</td>
 
 	<g:if test="${j % 4 == 3}">

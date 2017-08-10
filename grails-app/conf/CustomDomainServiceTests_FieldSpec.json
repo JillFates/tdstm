@@ -1,7 +1,7 @@
 {
     "APPLICATION": {
         "domain": "application",
-        "version": 1,
+        "version": 0,
         "fields": [
             {
                 "field": "appFunction",
@@ -720,7 +720,7 @@
     },
     "DEVICE": {
         "domain": "device",
-        "version": 1,
+        "version": 0,
         "fields": [
             {
                 "field": "assetName",
@@ -1452,7 +1452,7 @@
     },
     "DATABASE": {
         "domain": "database",
-        "version": 1,
+        "version": 0,
         "fields": [
             {
                 "field": "assetName",
@@ -1839,7 +1839,7 @@
     },
     "STORAGE": {
         "domain": "storage",
-        "version": 1,
+        "version": 0,
         "fields": [
             {
                 "field": "assetName",

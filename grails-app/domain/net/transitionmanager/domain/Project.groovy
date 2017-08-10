@@ -14,11 +14,15 @@ class Project extends PartyGroup {
 	// a constant and non-persistent marker instance used to indicate that all projects should be used
 	static final Project ALL = new Project()
 
-	static boolean isDefaultProject(p) {
+	/**
+	 * Used to determine if the parameter references the Default project
+	 * @param p - the project being checked. This can be the Project object or Project id (String or Long)
+	 * @return true if the parameter is or references the Default project otherwise false
+	 */
+	static boolean isDefaultProject(def p) {
 		if (p instanceof Project) {
 			p.id == DEFAULT_PROJECT_ID
-		}
-		else {
+		} else {
 			p == DEFAULT_PROJECT_ID
 		}
 	}
@@ -35,11 +39,12 @@ class Project extends PartyGroup {
 	String projectType = 'Standard'
 	Integer lastAssetId
 	Integer runbookOn = 1 // Flag that indicates that the project should use the runbook mode for various screens
-	Integer customFieldsShown = 8
 	String depConsoleCriteria
 	MoveBundle defaultBundle
 	Timezone timezone
-	String planMethodology
+
+	// used to indicate which of the custom fields will represent the plan methodology setting
+	String planMethodology=''
 
 	// Custom field labels
 	String custom1
@@ -142,8 +147,8 @@ class Project extends PartyGroup {
 	static hasMany = [dataTransferBatch: DataTransferBatch]
 
 	static constraints = {
-		// customFieldsShown inList: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96]
 		defaultBundle nullable: true
+		client nullable: false
 		depConsoleCriteria nullable: true
 		description nullable: true
 		lastAssetId nullable: true
@@ -153,18 +158,19 @@ class Project extends PartyGroup {
 		startDate nullable: true
 		timezone nullable: true
 		workflowCode blank: false
+		planMethodology nullable: true
+
 
 		// custom fields
 
 		// we can save some redundant space by dynamically setting all 96 columns to be nullable in a loop;
 		// since the constraints DSL is implemented as method calls with the property name as the method
-		// name and a single Map argument containing the data for the various contraints, it's simple
+		// name and a single Map argument containing the data for the various constraints, it's simple
 		// to dynamically create a method call to be called on the closure's delegate:
 
 		Map nullableTrue = Collections.singletonMap('nullable', true)
 		(1..96).each { "custom$it"(nullableTrue) }
 
-		customFieldsShown inList: [0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96]
 		lastAssetId nullable: true
 		runbookOn nullable: true
 		depConsoleCriteria nullable: true

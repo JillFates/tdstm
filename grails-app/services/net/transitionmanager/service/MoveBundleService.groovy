@@ -16,10 +16,10 @@ import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.spreadsheet.SheetWrapper
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
@@ -35,6 +35,7 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.UserPreference
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
@@ -490,7 +491,14 @@ class MoveBundleService implements ServiceMethods {
 			TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue)
 		}
 
-		for (int r = startRow; r < (exportList.size() + startRow); r++) {
+		//Lets build a sheetWrapper to hold the map of the styles and other shared resources of the sheet
+		SheetWrapper sheetWrapper = new SheetWrapper(sheet)
+		int rowCount = exportList.size() + startRow
+
+		for (int r = startRow; r < rowCount; r++) {
+			// get or create a row to reuse for Speed
+			Row row = sheetWrapper.getOrCreateRow(r)
+
 			for (int c = 0; c < columnList.size(); ++c) {
 				def cellValue
 				def attribName = columnList[c]
@@ -578,9 +586,9 @@ class MoveBundleService implements ServiceMethods {
 				}
 				if(cellValue){
 					if (isNumber) {
-						WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
+						sheetWrapper.addCell(row, c, cellValue, Cell.CELL_TYPE_NUMERIC)
 					} else {
-						WorkbookUtil.addCell(sheet, c, r, cellValue)
+						sheetWrapper.addCell(row, c, cellValue)
 					}
 				}
 

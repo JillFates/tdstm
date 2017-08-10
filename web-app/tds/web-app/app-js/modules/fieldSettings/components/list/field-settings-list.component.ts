@@ -1,5 +1,7 @@
 import { Component, Inject, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { StateService } from '@uirouter/angular';
+
 import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
 import { FieldSettingsModel } from '../../model/field-settings.model';
@@ -9,6 +11,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import { ValidationUtils } from '../../../../shared/utils/validation.utils';
 
 @Component({
 	moduleId: module.id,
@@ -22,12 +25,20 @@ export class FieldSettingsListComponent implements OnInit {
 	selectedTab = '';
 	editing = false;
 
+	private filter = {
+		search: '',
+		fieldType: 'All'
+	};
+
+	private fieldsToDelete = {};
+
 	constructor(
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private fieldService: FieldSettingsService,
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
-		private notifier: NotifierService
+		private notifier: NotifierService,
+		private state: StateService
 	) {
 		fields.subscribe(
 			(result) => {
@@ -41,6 +52,9 @@ export class FieldSettingsListComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.dataSignature = JSON.stringify(this.domains);
+		for (let domain of this.domains) {
+			this.fieldsToDelete[domain.domain] = [];
+		}
 	}
 
 	protected onTabChange(domain: string): void {
@@ -51,13 +65,31 @@ export class FieldSettingsListComponent implements OnInit {
 		return this.selectedTab === domain;
 	}
 
-	protected onSaveAll(callback): void {
+	protected onSaveAll(callback: any): void {
 		if (this.isEditAvailable()) {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
+
+				// remove(delete) fields if user requested
+				for (let domain of this.domains) {
+					if (this.fieldsToDelete[domain.domain].length > 0) {
+						this.fieldsToDelete[domain.domain].forEach(field => {
+							let index = domain.fields.findIndex(x => x.field === field);
+							if (index) {
+								domain.fields.splice(index, 1);
+							}
+						});
+					}
+				}
+
 				this.domains.forEach(domain => {
-					domain.fields.filter(x => x['isNew']).forEach(x => delete x['isNew']);
+					domain.fields.filter(x => x['isNew'])
+						.forEach(x => {
+							delete x['isNew'];
+							delete x['count'];
+						});
 				});
+
 				this.fieldService.saveFieldSettings(this.domains)
 					.subscribe((res: any) => {
 						if (res.status === 'error') {
@@ -69,12 +101,13 @@ export class FieldSettingsListComponent implements OnInit {
 						}
 						this.refresh();
 						callback();
+
 					});
 			} else {
 				this.selectedTab = invalid[0].domain;
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
-					message: 'Please review your changes.'
+					message: 'Label is a required field and must be unique. Please correct before saving.'
 				});
 			}
 		}
@@ -100,26 +133,47 @@ export class FieldSettingsListComponent implements OnInit {
 	}
 
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.domains);
+		let result = this.dataSignature !== JSON.stringify(this.domains);
+		if (this.state && this.state.$current && this.state.$current.data) {
+			this.state.$current.data.hasPendingChanges = result;
+		}
+		result = result || this.hasPendingDeletes();
+		return result;
 	}
 
 	protected getCurrentState(domain: DomainModel) {
 		return {
 			editable: this.isEditAvailable(),
 			dirty: this.isDirty(),
-			valid: this.isValid(domain)
+			valid: this.isValid(domain),
+			filter: this.filter
 		};
 	}
 
 	protected refresh(): void {
 		this.fieldService.getFieldSettingsByDomain().subscribe(
-			(result) => { this.domains = result; },
+			(result) => {
+				this.domains = result;
+				this.dataSignature = JSON.stringify(this.domains);
+				setTimeout(() => {
+					this.grids.forEach(grid => grid.applyFilter());
+				});
+			},
 			(err) => console.log(err));
 	}
 
 	protected isValid(domain: DomainModel): boolean {
-		return domain.fields.filter(item =>
-			!item.label || !item.field).length === 0;
+		let values = domain.fields.map(x => x.label);
+
+		// Validates "Field Order" is not null && should be a number on the range of [0, X)
+		let invalidOrderFields = domain.fields.filter(item =>
+			item.order === null || !ValidationUtils.isValidNumber(item.order) || item.order < 0
+		);
+
+		return domain.fields.filter(item => !item.label.trim() || !item.field).length === 0
+			// Validates "Field Labels" should be unique by domain
+			&& values.filter((l, i) => values.indexOf(l) !== i).length === 0
+			&& invalidOrderFields.length === 0;
 	}
 
 	protected onAdd(callback): void {
@@ -156,16 +210,32 @@ export class FieldSettingsListComponent implements OnInit {
 		} else {
 			this.handleSharedField(value.field, value.domain);
 		}
-
 	}
 
-	protected onDelete(value: { field: FieldSettingsModel, domain: string, callback: any }): void {
-		this.domains.filter(domain =>
-			value.field.shared ?
-				true : domain.domain === value.domain).forEach(domain => {
-					domain.fields.splice(domain.fields.indexOf(value.field), 1);
-				});
-		this.refreshGrids(value.field.shared, value.callback);
+	/**
+	 * Checks if there are any pending fields to be deleted on all the domains.
+	 * @returns {boolean}
+	 */
+	private hasPendingDeletes(): boolean {
+		for (let domain in this.fieldsToDelete) {
+			if (this.fieldsToDelete[domain].length > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Whenever the user clicks Delete button for a field on the grid, this event is called and
+	 * #this.fieldsToDelete gets updated.
+	 * @param {{domain: string; fieldsToDelete: string[]}} value
+	 */
+	protected onDelete(value: {domain: string, fieldsToDelete: string[]}): void {
+		this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+	}
+
+	protected onFilter(): void {
+		this.grids.forEach(grid => grid.applyFilter());
 	}
 
 	public refreshGrids(all, callback: any) {

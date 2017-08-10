@@ -97,21 +97,24 @@ class DeviceService implements ServiceMethods {
 			deleteChassisWarning = count > 0
 		}
 
-		String frontEndLabel
-		for (EavEntityAttribute it in EavEntityAttribute.findAllByEavAttributeSet(assetEntity.attributeSet, [sort: 'sortOrder'])) {
-			String code = it.attribute.attributeCode
-			if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) && code != 'currentStatus' && code != 'usize') {
-				frontEndLabel = it.attribute.frontendLabel
-				if (assetEntityService.customLabels.contains(frontEndLabel)) {
-					frontEndLabel = project[code] ?: frontEndLabel
-				}
-			}
-		}
+		// Removed by TM-6779 - this is not being used since field specs fields implementation
+//		String frontEndLabel ="test sidar"
+//		for (EavEntityAttribute it in EavEntityAttribute.findAllByEavAttributeSet(assetEntity.attributeSet, [sort: 'sortOrder'])) {
+//			String code = it.attribute.attributeCode
+//			if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) && code != 'currentStatus' && code != 'usize') {
+//				frontEndLabel = it.attribute.frontendLabel
+//				if (assetEntityService.customLabels.contains(frontEndLabel)) {
+//					frontEndLabel = project[code] ?: frontEndLabel
+//				}
+//			}
+//		}
 
-		def model = [assetEntity: assetEntity, label: frontEndLabel,
-		             canEdit: securityService.hasPermission(Permission.AssetEdit),
-		             deleteChassisWarning: deleteChassisWarning] +
-		             assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
+		def model = [
+			assetEntity: assetEntity,
+			/*label: frontEndLabel,*/
+			canEdit: securityService.hasPermission(Permission.AssetEdit),
+			deleteChassisWarning: deleteChassisWarning
+		] + assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
 
 		model.roomSource = null
 		model.roomTarget = null
@@ -187,7 +190,8 @@ class DeviceService implements ServiceMethods {
 		if (!asset.id) {
 			asset.project = project
 			asset.owner = project.client
-			asset.attributeSet = EavAttributeSet.get(1)
+			// Removed by TM-6779 - this is not being used since field specs fields implementation
+			// asset.attributeSet = EavAttributeSet.get(1)
 			asset.assetClass = AssetClass.DEVICE
 		} else if (asset.project != project) {
 			securityService.reportViolation("Attempted to access device $asset.id not belonging to current project $project")

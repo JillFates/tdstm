@@ -62,7 +62,8 @@ class StorageService implements ServiceMethods {
 		if (isNew) {
 			asset.project = project
 			asset.owner = project.client
-			asset.attributeSet = EavAttributeSet.get(4)	// Storage attributeSet
+			// Removed by TM-6779 - this is not being used since field specs fields implementation
+			// asset.attributeSet = EavAttributeSet.get(4)	// Storage attributeSet
 			asset.assetClass = AssetClass.STORAGE
 			asset.assetType = AssetType.STORAGE
 		} else if (asset.project != project) {

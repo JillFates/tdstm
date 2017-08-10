@@ -491,7 +491,7 @@ class TaskImportExportService implements ServiceMethods {
 	private List<Map> readTasksFromSpreadsheet(spreadsheet, Map sheetInfoOpts) {
 		int firstTaskRow = 3
 		def sheet = spreadsheet.getSheet( TEMPLATE_TAB_NAME )
-		int lastRow = sheet.getLastRowNum()
+		int lastRow = WorkbookUtil.getLastRowNum(sheet)
 		List tasks = []
 
 		for (int row = firstTaskRow; row <= lastRow; row++) {
@@ -796,7 +796,8 @@ class TaskImportExportService implements ServiceMethods {
 	 * @param formOptions - form params from the page submission
 	 */
 	private void validateUploadedTasks(List<Map> tasks, Project project, Map sheetInfoOpts, Map formOptions) {
-		List<String> allTeamCodes = partyRelationshipService.getTeamCodes()
+		// Retrieves available teams, including AUTO.
+		List<String> allTeamCodes = partyRelationshipService.getTeamCodes(true)
 		allTeamCodes << 'STAFF'
 		List<MoveEvent> moveEvents = MoveEvent.findAllByProject(project)
 

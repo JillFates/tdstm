@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.eav.EavAttribute
@@ -326,12 +327,13 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	 * @param DataTransferBatch - the record of the transfer batch
 	 * @param AssetEntity - the asset to validate
 	 * @param Map of the property attributes from the import
+	 * @param fieldSpecs - fields specification list
 	 * @return Map of [flag, errorConflictCount]
 	 *     flag being true indicates that the asset was updated since the export was generated
 	 *     errorConflictCount indicates the number of fields that have conflicts
 	 */
 	@Transactional
-	def importValidation(dataTransferBatch, asset, dtvList) {
+	def importValidation(dataTransferBatch, asset, dtvList, List<Map<String, ?>> fieldSpecs) {
 		//Export Date Validation
 		def errorConflictCount = 0
 
@@ -341,8 +343,10 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		if (modifiedSinceExport) {
 			logger.info 'importValidation() Asset $asset was modified at {}, after the export at {}', asset, asset.lastUpdated, dataTransferBatch.exportDatetime
 			// If the asset has been modified, see how many of the fields are in conflict
-			dtvList.each { dtValue->
-				def attribName = dtValue.eavAttribute.attributeCode
+			dtvList.each { dtValue ->
+				String attribName = dtValue.fieldName
+				Map<String, ?> fieldSpec = fieldSpecs.find { field -> (field["field"] == attribName || field["label"] == attribName) }
+
 				if (attribName == "moveBundle") {
 					if (asset?.moveBundle?.name!= dtValue.correctedValue && asset?.moveBundle?.name!= dtValue.importValue){
 						updateChangeConflicts(dataTransferBatch, dtValue)
@@ -350,7 +354,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					}
 				} else if (attribName in ["usize", "modifiedBy", "lastUpdated"]){
 					// skip the validation
-				} else if (dtValue.eavAttribute.backendType == "int"){
+				} else if (fieldSpec["control"] == ControlType.NUMBER.toString()) {
 					def correctedPos
 					try {
 						if (dtValue.correctedValue) {
@@ -1157,7 +1161,8 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		Integer errorCount,
 		Integer errorConflictCount,
 		List<String> ignoredAssets,
-		Integer rowNum
+		Integer rowNum,
+		List<Map<String, ?>> fieldSpecs
 	) {
 
 		// Try loading the application and make sure it is associated to the current project
@@ -1172,7 +1177,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				if (asset.project.id == project.id) {
 					if (dataTransferBatch?.dataTransferSetId == 1L) {
 						// Validate that the AE fields are valid
-						def validateResultList = importValidation(dataTransferBatch, asset, dtvList)
+						def validateResultList = importValidation(dataTransferBatch, asset, dtvList, fieldSpecs)
 						if (validateResultList.flag) {
 							// The asset has been updated since the last export so we don't want to overwrite any possible changes
 							errorCount++
@@ -1195,7 +1200,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			asset = clazz.newInstance()
 			asset.project = project
 			asset.owner = project.client
-			asset.attributeSet = eavAttributeSet
+//			asset.attributeSet = eavAttributeSet
 			asset.assetType = clazzMap[clazzName]
 
 			logger.debug 'findAndValidateAsset() Created {}', clazzName
@@ -1286,10 +1291,11 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		List<String> warnings,
 		Integer errorConflictCount,
 		String tzId,
-		String dtFormat
+		String dtFormat,
+		Map<String, ?> fieldSpec
 	) {
 		// def handled = true
-		String property = dtv.eavAttribute.attributeCode
+		String property = fieldSpec["field"]
 		String value = dtv.importValue
 		String newVal
 		String classSimpleName = asset.getClass().name.tokenize('.')[-1]
@@ -1367,7 +1373,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				break
 			default:
 				if (value.size()) {
-					if (dtv.eavAttribute.backendType == "int") {
+					if (fieldSpec["control"] == ControlType.NUMBER.toString()) {
 						def correctedPos
 						try {
 							if (dtv.correctedValue) {
@@ -1380,8 +1386,8 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 								asset[property] = correctedPos
 							}
 						} catch (e) {
-							logger.error 'setCommonProperties() exception 1 : {}', ex.message
-							ex.printStackTrace()
+							logger.error 'setCommonProperties() exception 1 : {}', e.message
+							e.printStackTrace()
 							warnings << "Unable to update $property with value [$value] on $asset.assetName (row $rowNum)"
 							errorConflictCount++
 							dtv.hasError = 1

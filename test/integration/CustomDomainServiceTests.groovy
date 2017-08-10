@@ -1,8 +1,16 @@
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tds.asset.AssetEntity
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.Project
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import groovy.json.JsonSlurper
+import org.apache.commons.lang.RandomStringUtils as RSU
+
 import spock.lang.Specification
 import spock.lang.Stepwise
 
@@ -10,21 +18,65 @@ import spock.lang.Stepwise
 class CustomDomainServiceTests extends Specification {
 
     CustomDomainService customDomainService
+    ProjectService projectService
 
-    private JSONObject createFieldSpecObject() {
-        String base64EncodedJson = "ew0KICAiQVBQTElDQVRJT04iOiB7DQogICAgImRvbWFpbiI6ICJhcHBsaWNhdGlvbiIsDQogICAgImZpZWxkcyI6IFsNCiAgICAgIHsNCiAgICAgICAgImNvbnRyb2wiOiAiIiwNCiAgICAgICAgImRlZmF1bHQiOiAiIiwNCiAgICAgICAgImZpZWxkIjogImFwcEFjY2VzcyIsDQogICAgICAgICJpbXAiOiAiSSIsDQogICAgICAgICJsYWJlbCI6ICJBY2Nlc3NUeXBlIiwNCiAgICAgICAgIm9yZGVyIjogMSwNCiAgICAgICAgInJlcXVpcmVkIjogMCwNCiAgICAgICAgInNoYXJlZCI6IDAsDQogICAgICAgICJzaG93IjogMSwNCiAgICAgICAgInRpcCI6ICJUaGlzIGZpZWxkIGlzIHRoZSBBY2Nlc3NUeXBlIiwNCiAgICAgICAgInR5cGUiOiAiU3RyaW5nIiwNCiAgICAgICAgInVkZiI6IDANCiAgICAgIH0sDQogICAgICB7DQogICAgICAgICJjb250cm9sIjogIiIsDQogICAgICAgICJkZWZhdWx0IjogIiIsDQogICAgICAgICJmaWVsZCI6ICJjdXN0b20xIiwNCiAgICAgICAgImltcCI6ICJJIiwNCiAgICAgICAgImxhYmVsIjogIkN1c3RvbTEiLA0KICAgICAgICAib3JkZXIiOiAyLA0KICAgICAgICAicmVxdWlyZWQiOiAwLA0KICAgICAgICAic2hhcmVkIjogMCwNCiAgICAgICAgInNob3ciOiAxLA0KICAgICAgICAidGlwIjogIlRoaXMgZmllbGQgaXMgdGhlIEN1c3RvbSAxIiwNCiAgICAgICAgInR5cGUiOiAiU3RyaW5nIiwNCiAgICAgICAgInVkZiI6IDENCiAgICAgIH0NCiAgICBdLA0KICAgICJ2ZXJzaW9uIjogMA0KICB9LA0KICAiREFUQUJBU0UiOiB7DQogICAgImRvbWFpbiI6ICJkYXRhYmFzZSIsDQogICAgImZpZWxkcyI6IFsNCiAgICAgIHsNCiAgICAgICAgImNvbnRyb2wiOiAiIiwNCiAgICAgICAgImRlZmF1bHQiOiAiIiwNCiAgICAgICAgImZpZWxkIjogImFzc2V0TmFtZSIsDQogICAgICAgICJpbXAiOiAiSSIsDQogICAgICAgICJsYWJlbCI6ICJOYW1lIiwNCiAgICAgICAgIm9yZGVyIjogMSwNCiAgICAgICAgInJlcXVpcmVkIjogMSwNCiAgICAgICAgInNoYXJlZCI6IDAsDQogICAgICAgICJzaG93IjogMSwNCiAgICAgICAgInRpcCI6ICJUaGlzIGZpZWxkIGlzIHRoZSBOYW1lIiwNCiAgICAgICAgInR5cGUiOiAiU3RyaW5nIiwNCiAgICAgICAgInVkZiI6IDANCiAgICAgIH0sDQogICAgICB7DQogICAgICAgICJjb250cm9sIjogIiIsDQogICAgICAgICJkZWZhdWx0IjogIiIsDQogICAgICAgICJmaWVsZCI6ICJjdXN0b20xIiwNCiAgICAgICAgImltcCI6ICJJIiwNCiAgICAgICAgImxhYmVsIjogIkN1c3RvbTEiLA0KICAgICAgICAib3JkZXIiOiAyLA0KICAgICAgICAicmVxdWlyZWQiOiAwLA0KICAgICAgICAic2hhcmVkIjogMCwNCiAgICAgICAgInNob3ciOiAxLA0KICAgICAgICAidGlwIjogIlRoaXMgZmllbGQgaXMgdGhlIEN1c3RvbSAxIiwNCiAgICAgICAgInR5cGUiOiAiU3RyaW5nIiwNCiAgICAgICAgInVkZiI6IDENCiAgICAgIH0NCiAgICBdLA0KICAgICJ2ZXJzaW9uIjogMA0KICB9LA0KICAiREVWSUNFIjogew0KICAgICJkb21haW4iOiAiZGV2aWNlIiwNCiAgICAiZmllbGRzIjogWw0KICAgICAgew0KICAgICAgICAiY29udHJvbCI6ICIiLA0KICAgICAgICAiZGVmYXVsdCI6ICIiLA0KICAgICAgICAiZmllbGQiOiAiYXBwbGljYXRpb24iLA0KICAgICAgICAiaW1wIjogIkkiLA0KICAgICAgICAibGFiZWwiOiAiQXBwbGljYXRpb24iLA0KICAgICAgICAib3JkZXIiOiAxLA0KICAgICAgICAicmVxdWlyZWQiOiAwLA0KICAgICAgICAic2hhcmVkIjogMCwNCiAgICAgICAgInNob3ciOiAxLA0KICAgICAgICAidGlwIjogIlRoaXMgZmllbGQgaXMgdGhlIEFwcGxpY2F0aW9uIiwNCiAgICAgICAgInR5cGUiOiAiU3RyaW5nIiwNCiAgICAgICAgInVkZiI6IDANCiAgICAgIH0sDQogICAgICB7DQogICAgICAgICJjb250cm9sIjogIiIsDQogICAgICAgICJkZWZhdWx0IjogIiIsDQogICAgICAgICJmaWVsZCI6ICJjdXN0b20xIiwNCiAgICAgICAgImltcCI6ICJJIiwNCiAgICAgICAgImxhYmVsIjogIkN1c3RvbTEiLA0KICAgICAgICAib3JkZXIiOiAyLA0KICAgICAgICAicmVxdWlyZWQiOiAwLA0KICAgICAgICAic2hhcmVkIjogMCwNCiAgICAgICAgInNob3ciOiAxLA0KICAgICAgICAidGlwIjogIlRoaXMgZmllbGQgaXMgdGhlIEN1c3RvbSAxIiwNCiAgICAgICAgInR5cGUiOiAiU3RyaW5nIiwNCiAgICAgICAgInVkZiI6IDENCiAgICAgIH0NCiAgICBdLA0KICAgICJ2ZXJzaW9uIjogMA0KICB9LA0KICAiU1RPUkFHRSI6IHsNCiAgICAiZG9tYWluIjogInN0b3JhZ2UiLA0KICAgICJmaWVsZHMiOiBbDQogICAgICB7DQogICAgICAgICJjb250cm9sIjogIiIsDQogICAgICAgICJkZWZhdWx0IjogIiIsDQogICAgICAgICJmaWVsZCI6ICJhc3NldE5hbWUiLA0KICAgICAgICAiaW1wIjogIkkiLA0KICAgICAgICAibGFiZWwiOiAiTmFtZSIsDQogICAgICAgICJvcmRlciI6IDEsDQogICAgICAgICJyZXF1aXJlZCI6IDEsDQogICAgICAgICJzaGFyZWQiOiAwLA0KICAgICAgICAic2hvdyI6IDEsDQogICAgICAgICJ0aXAiOiAiVGhpcyBmaWVsZCBpcyB0aGUgTmFtZSIsDQogICAgICAgICJ0eXBlIjogIlN0cmluZyIsDQogICAgICAgICJ1ZGYiOiAwDQogICAgICB9LA0KICAgICAgew0KICAgICAgICAiY29udHJvbCI6ICIiLA0KICAgICAgICAiZGVmYXVsdCI6ICIiLA0KICAgICAgICAiZmllbGQiOiAiY3VzdG9tMSIsDQogICAgICAgICJpbXAiOiAiSSIsDQogICAgICAgICJsYWJlbCI6ICJDdXN0b20xIiwNCiAgICAgICAgIm9yZGVyIjogMiwNCiAgICAgICAgInJlcXVpcmVkIjogMCwNCiAgICAgICAgInNoYXJlZCI6IDAsDQogICAgICAgICJzaG93IjogMSwNCiAgICAgICAgInRpcCI6ICJUaGlzIGZpZWxkIGlzIHRoZSBDdXN0b20gMSIsDQogICAgICAgICJ0eXBlIjogIlN0cmluZyIsDQogICAgICAgICJ1ZGYiOiAxDQogICAgICB9DQogICAgXSwNCiAgICAidmVyc2lvbiI6IDANCiAgfQ0KfQ=="
-        JSONObject parsedJson = new JSONObject(StringUtil.base64DecodeToString(base64EncodedJson))
-        return parsedJson
+    // Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
+    // After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
+    // as a resource for the application.
+    private static final String fieldSpecDefinitionJson = 'CustomDomainServiceTests_FieldSpec.json'
+    private static JSONObject fieldSpecJson
+
+    private ProjectTestHelper projectHelper = new ProjectTestHelper()
+    private AssetTestHelper assetHelper = new AssetTestHelper()
+
+    private static final String CUSTOM1_LABEL = 'Description'
+
+    /**
+     * This will load the JSON file that accompanies this test suite and will return
+     * it as a JSONObject.
+     */
+    private JSONObject loadFieldSpecJson() {
+        // Determine where we can write the resource file for testing
+        // this.class.classLoader.rootLoader.URLs.each{ println it }
+        // We'll only load it the first time and cache it into fieldSpecJson
+        JSONObject fieldSpecJson
+        if (!fieldSpecJson) {
+            String jsonText = this.getClass().getResource( fieldSpecDefinitionJson ).text
+            fieldSpecJson = new JSONObject(jsonText)
+            assert fieldSpecJson
+            // println "\n\n$fieldSpecJson\n\n"
+        }
+        return fieldSpecJson
+    }
+
+    // A list of assets that will be used by a few test cases
+    private static final List ASSETS = [
+        [name:RSU.randomAlphabetic(10), description: 'Red'],
+        [name:RSU.randomAlphabetic(10), description: 'Green'],
+        [name:RSU.randomAlphabetic(10), description: 'Blue'],
+        [name:RSU.randomAlphabetic(10), description: 'Blue']
+    ]
+
+    /**
+     * Used to create a list of assets for a project that will be used by several tests
+     * @param project - the project to associate the assets to
+     */
+    private void createAssets(Project project) {
+        for (asset in ASSETS) {
+            assetHelper.createDevice(project, 'Server', [assetName:asset.name, description: asset.description])
+        }
     }
 
     void 'Scenario 1: Retrieve custom field specs of any AssetClass'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = AssetClass.DATABASE as String
-            def fieldSpec = createFieldSpecObject()
+            loadFieldSpecJson()
+            def fieldSpec = loadFieldSpecJson()
             def customFieldSpecsMap
-            customDomainService.saveFieldSpecs(CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+            customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Database custom field specs are requested'
-            customFieldSpecsMap = customDomainService.customFieldSpecs(domain)
+            customFieldSpecsMap = customDomainService.customFieldSpecs(project, domain)
         then: 'Database domain fields are returned'
             customFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
         then: 'Only database udf fields are returned'
@@ -33,12 +85,13 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Scenario 2: Retrieve standard field specs of any AssetClass'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = AssetClass.APPLICATION as String
-            def fieldSpec = createFieldSpecObject()
+            def fieldSpec = loadFieldSpecJson()
             def standardFieldSpecsMap
-            customDomainService.saveFieldSpecs(CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+            customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Application standard field specs are requested'
-            standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(domain)
+            standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(project, domain)
         then: 'Application domain fields are returned'
             //standardFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
             null != standardFieldSpecsMap
@@ -49,36 +102,83 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Scenario 3: Saving field specs providing unexisting domain type should throw InvalidParamException'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = "-invalid-"
-            def fieldSpec = createFieldSpecObject()
+            def fieldSpec = loadFieldSpecJson()
         when: 'Save fields specs providing invalid AssetClass should throw an exception'
-            customDomainService.saveFieldSpecs(domain, fieldSpec)
+            customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'InvalidParamException should be thrown'
             thrown InvalidParamException
     }
 
     void 'Scenario 4: Saving field specs providing all asset classes as domain type should save custom fields specs'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
-            def fieldSpec = createFieldSpecObject()
+            def fieldSpec = loadFieldSpecJson()
         when: 'Save fields specs should save without errors'
-            customDomainService.saveFieldSpecs(domain, fieldSpec)
+            customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'Saved fields specs should exists'
-            null != customDomainService.allFieldSpecs(domain)
+            null != customDomainService.allFieldSpecs(project, domain)
     }
 
     void 'Scenario 5: Saving field specs and retrieving them from database should return them'() {
         given:
+            Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
-            def fieldSpec = createFieldSpecObject()
-            customDomainService.saveFieldSpecs(domain, fieldSpec)
+            def fieldSpec = loadFieldSpecJson()
+            customDomainService.saveFieldSpecs(project, domain, fieldSpec)
             def foundFieldSpec
         when: 'Retrieving fields specs from database should return them'
-            foundFieldSpec = customDomainService.allFieldSpecs(domain)
+            foundFieldSpec = customDomainService.allFieldSpecs(project, domain)
         then: 'Found fields specs are not null'
             null != foundFieldSpec
         then:
             foundFieldSpec instanceof Map
     }
+
+    void 'Scenario 6: Test fieldNamesAsMap for expected values'() {
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+
+        when: 'calling the fieldNamesAsMap method'
+            String deviceClass = AssetClass.DEVICE.toString()
+            Map fields = customDomainService.fieldNamesAsMap(project, deviceClass)
+        then: 'the map should contain values'
+            fields
+        and: 'the map should contain certain values'
+            fields.containsKey('assetName')
+            fields.containsKey('description')
+            fields.containsKey('planStatus')
+            fields.containsKey('environment')
+    }
+
+    void 'Scenario 7: Test distinctValues returns expected values'() {
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+            List assetList = AssetEntity.findAllByProject(project)
+            assert ASSETS.size() == assetList.size()
+        and: 'there is an individual field specification for DEVICE.custom1'
+            JSONObject allDomainSpecs = loadFieldSpecJson()
+            String deviceClass = AssetClass.DEVICE.toString()
+            JSONObject fieldSpec = [fieldSpec: allDomainSpecs[deviceClass]['fields'].find { it.field == 'description' } ]
+            assert fieldSpec
+
+        when: 'the distinctValues method is called'
+            List list = customDomainService.distinctValues(project, deviceClass, fieldSpec)
+        then: 'it should return expected values'
+            list
+            3 == list.size()
+            list.contains('Red')
+            list.contains('Blue')
+            list.contains('Green')
+    }
+
 
 }

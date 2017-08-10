@@ -24,40 +24,45 @@ class TdsLocalAuthenticationFilter extends GrailsUsernamePasswordAuthenticationF
 	SecurityService securityService
 
 	Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-		if (postOnly && request.method != 'POST') {
-			throw new AuthenticationServiceException('Authentication method not supported: ' + request.method)
-		}
 
-		// checkLocalSecurityEnabled
-		if (!securityService.userLocalConfig.enabled) {
-			logger.warn 'Local security is not enabled'
-			throw new AuthenticationServiceException('Local database-backed authentication is disabled')
-		}
-
-		String username = obtainUsername(request)?.trim() ?: null
-		String password = obtainPassword(request) ?: null
-
-		// checkValidUsername
-		if (!username || !password) {
-			throw new BadCredentialsException('Missing user credentials')
-		}
-
-		logger.debug "Start authentication for username '$username'"
-
-		UsernamePasswordAuthorityAuthenticationToken authRequest = new UsernamePasswordAuthorityAuthenticationToken(
-				username, password, request.getParameter('authority'), request.getParameter('rememberMe') == 'true',
-				(String) request.getSession(false)?.getAttribute('savedUrlForwardURI'),
-				request.getParameter('targetUri'), request.getHeader('User-Agent'))
-
-		setDetails(request, authRequest)
+		UsernamePasswordAuthorityAuthenticationToken authRequest = null
 
 		try {
+
+			if (postOnly && request.method != 'POST') {
+				throw new AuthenticationServiceException('Authentication method not supported: ' + request.method)
+			}
+
+			// checkLocalSecurityEnabled
+			if (!securityService.userLocalConfig.enabled) {
+				logger.warn 'Local security is not enabled'
+				throw new AuthenticationServiceException('Local database-backed authentication is disabled')
+			}
+
+			String username = obtainUsername(request)?.trim() ?: null
+			String password = obtainPassword(request) ?: null
+
+			// checkValidUsername
+			if (!username || !password) {
+				throw new BadCredentialsException('Missing user credentials')
+			}
+
+			logger.debug "Start authentication for username '$username'"
+
+			authRequest = new UsernamePasswordAuthorityAuthenticationToken(
+					username, password, request.getParameter('authority'), request.getParameter('rememberMe') == 'true',
+					(String) request.getSession(false)?.getAttribute('savedUrlForwardURI'),
+					request.getParameter('targetUri'), request.getHeader('User-Agent'))
+
+			setDetails(request, authRequest)
+
+
 			UsernamePasswordAuthenticationToken authentication =
 					(UsernamePasswordAuthenticationToken)authenticationManager.authenticate(authRequest)
 			return new UsernamePasswordAuthorityAuthenticationToken(authentication, authRequest)
 		}
 		catch (AuthenticationException e) {
-			throw new WrappedAuthenticationException(e, authRequest)
+ 			throw new WrappedAuthenticationException(e, authRequest)
 		}
 	}
 
