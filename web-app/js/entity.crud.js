@@ -231,6 +231,7 @@ var EntityCrud = (function ($) {
 
 	// Creates a Select2 control for an Asset Name selector used in Depenedencies
 	pub.assetNameSelect2 = function (element) {
+	    var currentSelector = '';
 		element.select2({
 			minimumInputLength: 0,
 			width: '100%',
@@ -244,17 +245,19 @@ var EntityCrud = (function ($) {
 				dataType: 'json',
 				quietMillis: quietMillis,
 				data: function (term, page) {
+                    currentSelector = $(this)[0];
 					return {
 						q: term,
                         value: $(this).data("asset-name"),
 						max: 25,
-						page: page,
+						page: $(this).data('select2').resultsPage,
 						assetClassOption: $(this).data("asset-type"),
 					};
 				},
 				results: function (data, page) {
-					var more = (page * 25) < data.total;
-					return { results: data.results, more: more, page: data.page};
+                    $(currentSelector).data('select2').resultsPage = data.page + 1;
+					var more = (data.page * 25) < data.total;
+					return { results: data.results, more: more};
 				}
 			}
 		});
