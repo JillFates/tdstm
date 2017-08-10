@@ -4,7 +4,10 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ReportGroupModel, ReportModel, ReportFolderIcon } from '../../model/report.model';
 import { Observable } from 'rxjs/Observable';
 
+import { AssetExplorerService } from '../../service/asset-explorer.service';
+
 import { PermissionService } from '../../../../shared/services/permission.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	moduleId: module.id,
@@ -21,7 +24,9 @@ export class AssetExplorerIndexComponent {
 	constructor(
 		private stateService: StateService,
 		@Inject('reports') reportGroupModels: Observable<ReportGroupModel[]>,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private assetExpService: AssetExplorerService,
+		private prompt: UIPromptService) {
 		reportGroupModels.subscribe(
 			(result) => {
 				this.reportGroupModels = result;
@@ -48,10 +53,42 @@ export class AssetExplorerIndexComponent {
 		}
 	}
 
+	protected onEditReport(report: ReportModel): void {
+		if (this.isEditAvailable(report)) {
+			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
+		}
+	}
+
+	protected onDeleteReport(report: ReportModel): void {
+		if (this.isDeleteAvailable(report)) {
+			this.prompt.open('Confirmation Required', 'Are you sure you want to delete this report?', 'Yes', 'No')
+				.then((result) => {
+					if (result) {
+						this.assetExpService.deleteReport(report.id);
+					}
+				});
+		}
+	}
+
 	protected isCreateAvailable(): boolean {
 		return this.selectedFolder.name === 'System Reports' ?
 			this.permissionService.hasPermission('AssetExplorerSystemCreate') :
 			this.permissionService.hasPermission('AssetExplorerCreate');
+	}
+
+	protected isEditAvailable(report: ReportModel): boolean {
+		return report.isSystem ?
+			this.permissionService.hasPermission('AssetExplorerSystemEdit') ||
+			this.permissionService.hasPermission('AssetExplorerSystemSaveAs') :
+			this.permissionService.hasPermission('AssetExplorerEdit') ||
+			this.permissionService.hasPermission('AssetExplorerSaveAs');
+		;
+	}
+
+	protected isDeleteAvailable(report: ReportModel): boolean {
+		return report.isSystem ?
+			this.permissionService.hasPermission('AssetExplorerSystemDelete') :
+			report.isOwner && this.permissionService.hasPermission('AssetExplorerDelete');
 	}
 
 }

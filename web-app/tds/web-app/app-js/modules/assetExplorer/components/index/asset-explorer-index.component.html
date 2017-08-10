@@ -40,6 +40,7 @@
 							<table class="table table-hover table-striped">
 								<thead>
 									<tr>
+										<th>Action</th>
 										<th class="text-center">Favorite</th>
 										<th>Name</th>
 										<th class="text-center">Shared</th>
@@ -48,6 +49,10 @@
 								</thead>
 								<tbody *ngIf="selectedFolder">
 									<tr *ngFor="let report of selectedFolder.items | filter:{ name: searchText}">
+										<td>
+											<span class="fa fa-pencil" style="cursor:pointer;" *ngIf="isEditAvailable(report)"></span>
+											<span class="fa fa-trash" style="cursor:pointer;" *ngIf="isDeleteAvailable(report)"></span>
+										</td>
 										<td class="text-center"><a href="javascript:void(0)"><i class="fa text-yellow" [ngClass]="report.isFavorite? 'fa-star' : 'fa-star-o'" ></i></a></td>
 										<td><a href="javascript:void(0)">{{report.name}}</a></td>
 										<td class="text-center"><span class="glyphicon glyphicon-ok" *ngIf="report.isShared"></span></td>

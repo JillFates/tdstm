@@ -107,4 +107,8 @@ export class AssetExplorerService {
 		return [];
 	}
 
+	deleteReport(id: number) {
+		return true;
+	}
+
 }
