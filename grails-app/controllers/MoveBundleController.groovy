@@ -627,7 +627,7 @@ class MoveBundleController implements ControllerMethods {
 		// TODO : JPM 12/2015 TM-4332 : We're including the Network Devices in the Other count for the time being
 		def otherAssetCount = totalDeviceCount - totalServerCount - phyStorageCount
 		def unassignedOtherCount = unassignedAllDeviceCount - unassignedPhysicalServerCount - unassignedVirtualServerCount -
-				unAssignedPhyStorageCount - unAssignedPhyNetworkCount
+				unAssignedPhyStorageCount
 
 		// Application Plan Methodology
 		def customField = project.planMethodology ?: "''"
