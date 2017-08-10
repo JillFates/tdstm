@@ -1,6 +1,9 @@
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Person
+import net.transitionmanager.service.ReportService
+import net.transitionmanager.service.SecurityService
 
 /**
  * Created by dontiveros
@@ -9,16 +12,12 @@ import net.transitionmanager.controller.ControllerMethods
 @Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
 class WsAssetExplorerController implements ControllerMethods {
 
-    def getProjects() {
-		Map mock = [
-				id: 1,
-				name: 'Project 1',
-				isSystem: true,
-				isShared: false,
-				schema: null
-		]
-		List mockData = new ArrayList();
-		mockData.add(mock);
-		renderSuccessJson(mockData);
+	ReportService reportService
+	SecurityService securityService
+
+    def listReports() {
+		Person currentPerson = securityService.loadCurrentPerson()
+		renderSuccessJson(reportService.list(securityService.userCurrentProject, currentPerson)*.toMap(currentPerson.id))
 	}
 }
+
