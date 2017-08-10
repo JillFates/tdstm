@@ -460,7 +460,7 @@ class UrlMappings {
 		"/ws/assetExplorer/reports" {
 			controller = "wsAssetExplorer"
 			action = [
-					GET: "getReports"
+					GET: "listReports"
 			]
 		}
 

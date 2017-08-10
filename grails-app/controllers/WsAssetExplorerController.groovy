@@ -9,16 +9,18 @@ import net.transitionmanager.controller.ControllerMethods
 @Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
 class WsAssetExplorerController implements ControllerMethods {
 
-    def getProjects() {
-		Map mock = [
+    def listReports() {
+		List<Map> mockData = [
+			[
 				id: 1,
 				name: 'Project 1',
 				isSystem: true,
 				isShared: false,
 				schema: null
+			]
 		]
-		List mockData = new ArrayList();
-		mockData.add(mock);
-		renderSuccessJson(mockData);
+
+		renderSuccessJson(mockData)
 	}
 }
+
