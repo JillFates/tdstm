@@ -199,11 +199,11 @@ class MoveBundleService implements ServiceMethods {
 	 *  Delete Bundle AssetEntitys and its associated records
 	 */
 	def deleteBundleAssetsAndAssociates(MoveBundle moveBundle){
-		String message
+
 		try{
 			// remove preferences
 			def bundleQuery = "select mb.id from MoveBundle mb where mb.id = $moveBundle.id"
-			UserPreference.executeUpdate("delete from UserPreference up where up.value = $moveBundle.id ")
+			UserPreference.executeUpdate("delete from UserPreference up where up.value = '$moveBundle.id' ")
 			//remove the AssetEntity and associated
 			def assets = AssetEntity.findAllByMoveBundle(moveBundle)
 			if(assets){
@@ -212,7 +212,7 @@ class MoveBundleService implements ServiceMethods {
 				AssetEntityVarchar.executeUpdate   'delete AssetEntityVarchar  where assetEntity in (:assets)', [assets: assets]
 				ProjectAssetMap.executeUpdate      'delete ProjectAssetMap     where asset       in (:assets)', [assets: assets]
 				AssetCableMap.executeUpdate        'delete AssetCableMap       where assetFrom   in (:assets)', [assets:assets]
-				AssetCableMap.executeUpdate      '''Update AssetCableMap set cableStatus=:cableStatus, assetTo=null, assetToPort=null
+				AssetCableMap.executeUpdate      '''Update AssetCableMap set cableStatus='Unknown', assetTo=null, assetToPort=null
                                                  where assetTo in (:assets)''', [assets: assets]
 				ProjectTeam.executeUpdate(        'Update ProjectTeam SET latestAsset = null where latestAsset in (:assets)', [assets:assets])
 				AssetDependency.executeUpdate(     'delete AssetDependency where asset in (:assets) or dependent in (:deps)',
@@ -220,11 +220,10 @@ class MoveBundleService implements ServiceMethods {
 				AssetDependencyBundle.executeUpdate('delete AssetDependencyBundle where asset in (:assets)', [assets:assets])
 				AssetEntity.executeUpdate('delete AssetEntity where moveBundle=?', [moveBundle])
 			}
+		}		catch (e) {
+			e.message = "Unable to remove the $moveBundle Assets Error: $e.message"
+			throw e
 		}
-		catch (e) {
-			message = "Unable to remove the $moveBundle Assets Error: $e.message"
-		}
-		return message
 	}
 
 	String deleteBundle(MoveBundle moveBundle, Project project) {
