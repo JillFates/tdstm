@@ -4,9 +4,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { StateService } from '@uirouter/angular';
-
 import { Observable } from 'rxjs/Rx';
-
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ReportModel } from '../../model/report.model';
 import { ReportSpec, ReportColumn } from '../../model/report-spec.model';
@@ -30,12 +28,7 @@ import { AssetExplorerReportExportComponent } from '../report-export/asset-explo
 })
 export class AssetExplorerReportConfigComponent {
 
-	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
-	selectedAssetClasses: string[] = [];
-	model: ReportModel;
-	domains: DomainModel[] = [];
-	filteredData: DomainModel[] = [];
-	fields: FieldSettingsModel[] = [];
+	static assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
 		assets: {
 			'APPLICATION': false,
@@ -48,7 +41,11 @@ export class AssetExplorerReportConfigComponent {
 		search: ''
 	};
 	collapsed = false;
-	reportSpec = new ReportSpec();
+
+	model: ReportModel;
+	domains: DomainModel[] = [];
+	filteredData: DomainModel[] = [];
+	fields: FieldSettingsModel[] = [];
 
 	constructor(
 		@Inject('report') report: Observable<ReportModel>,
@@ -56,18 +53,116 @@ export class AssetExplorerReportConfigComponent {
 		private permissionService: PermissionService,
 		private stateService: StateService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
-
-		report.subscribe((model) => {
-			this.model = { ...model };
-		}, (err) => console.log(err));
-
-		fields.subscribe((result) => {
-			this.domains = result;
-			this.domains.forEach(d => {
-				d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-			});
+		Observable.zip(fields, report).subscribe((result: [DomainModel[], ReportModel]) => {
+			this.domains = result[0];
+			this.model = { ...result[1] };
+			if (this.model.id !== 0) {
+				this.updateFilterbyModel();
+			}
 		}, (err) => console.log(err));
 	}
+
+	protected updateFilterbyModel() {
+		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain] = true);
+		this.applyFilters();
+	}
+
+	protected updateModelbyFilter() {
+		this.applyFilters();
+		this.model.schema.domains = this.selectedAssetClasses();
+	}
+
+	/** Filter Methods */
+
+	protected applyFilters(): void {
+		this.applyAssetSelectFilter();
+		this.applyAssetClassFilter();
+		this.applyFieldFilter();
+		this.applySelectedFilter();
+		this.fields = this.mapFieldList();
+	}
+
+	protected applyAssetSelectFilter(): void {
+		let classes = this.selectedAssetClasses();
+		this.filteredData = this.domains
+			.filter(x => classes.indexOf(x.domain.toUpperCase()) !== -1)
+			.map(domain => {
+				return { ...domain };
+			});
+		console.log(this.filteredData);
+	}
+
+	protected applyAssetClassFilter(): void {
+		if (this.filterModel.asset !== 'all') {
+			this.filteredData = this.filteredData.filter(domain => domain.domain.toUpperCase() === this.filterModel.asset.toUpperCase());
+		}
+	}
+
+	protected applyFieldFilter(): void {
+		if (this.filterModel.search !== '') {
+			let regx = new RegExp(this.filterModel.search, 'i');
+			this.filteredData.forEach(domain => {
+				domain.fields = domain.fields.filter(field =>
+					regx.test(field.label) || regx.test(field.field));
+			});
+		}
+	}
+
+	protected applySelectedFilter(): void {
+		if (this.filterModel.selected !== 'all') {
+			this.filteredData.forEach(domain => {
+				domain.fields = domain.fields.filter(field =>
+					this.filterModel.selected === 'true' ? field['selected'] : !field['selected']);
+			});
+		}
+	}
+
+	/**Miscellaneus Methods */
+
+	private mapFieldList(): FieldSettingsModel[] {
+		return this.filteredData
+			.reduce((p: FieldSettingsModel[], c: DomainModel) => {
+				if (c.fields.length > 0) {
+					let domainTitle = new FieldSettingsModel();
+					domainTitle['domain'] = c.domain;
+					domainTitle['isTitle'] = true;
+					p.push(domainTitle);
+				}
+				return p.concat(c.fields);
+			}, []);
+	}
+
+	private selectedAssetClasses(): string[] {
+		return Object.keys(this.filterModel.assets).filter(key => this.filterModel.assets[key]);
+	}
+
+	private fieldStyle(fieldIndex): any {
+		return {
+			'height': '25px',
+			'width': '160px',
+			'top': (fieldIndex < 15 ? fieldIndex : fieldIndex % 15) * 25 + 'px',
+			'left': Math.floor(fieldIndex / 15) * 160 + 'px',
+			'position': 'absolute',
+			'margin': '0px',
+			'padding-left': '10px',
+			'padding-bottom': '5px'
+		};
+	}
+
+	/** Validation and Permission Methods */
+
+	protected isAssetSelected(): boolean {
+		return this.model.schema.domains.length > 0;
+	}
+
+	protected isColumnSelected(): boolean {
+		return this.model.schema.columns.length > 0;
+	}
+
+	protected isValid(): boolean {
+		return this.isAssetSelected() && this.isColumnSelected();
+	}
+	/** Dialog and view Actions methods */
 
 	protected onSaveAs(): void {
 		this.dialogService.open(AssetExplorerReportSaveComponent, [
@@ -91,8 +186,7 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected onPreview(): void {
-		this.reportSpec.domains = this.selectedAssetClasses;
-		this.reportSpec.columns = this.filteredData
+		this.model.schema.columns = this.filteredData
 			.map((d) => d.fields
 				.filter((f) => f['selected'])
 				.map((f) => {
@@ -106,99 +200,14 @@ export class AssetExplorerReportConfigComponent {
 					};
 				}))
 			.reduce((p, c) => p.concat(c), []);
-
-	}
-
-	protected isAssetSelected(): boolean {
-		return Object.keys(this.filterModel.assets)
-			.filter(key => this.filterModel.assets[key]).length !== 0;
-	}
-
-	protected isColumnSelected(): boolean {
-		return this.filteredData
-			.reduce((p: FieldSettingsModel[], c) => p.concat(c.fields), [])
-			.filter((f) => f['selected']).length !== 0;
-	}
-
-	protected onAssetSelect(): void {
-		this.selectedAssetClasses = Object.keys(this.filterModel.assets)
-			.filter(key => this.filterModel.assets[key]);
-		this.filteredData = this.domains
-			.filter(x => this.selectedAssetClasses.indexOf(x.domain.toUpperCase()) !== -1)
-			.map(domain => {
-				return { ...domain };
-			});
-	}
-
-	protected ApplyFilters(): void {
-		this.onAssetSelect();
-		this.applyAssetClassFilter();
-		this.applyFieldFilter();
-		this.applySelectedFilter();
-		this.mapFieldList();
-	}
-
-	protected mapFieldList() {
-		this.fields = this.filteredData
-			.reduce((p: FieldSettingsModel[], c: DomainModel) => {
-				if (c.fields.length > 0) {
-					let domainTitle = new FieldSettingsModel();
-					domainTitle['domain'] = c.domain;
-					domainTitle['isTitle'] = true;
-					p.push(domainTitle);
-				}
-				return p.concat(c.fields);
-			}, []);
-	}
-
-	protected applyFieldFilter(): void {
-		if (this.filterModel.search !== '') {
-			let regx = new RegExp(this.filterModel.search, 'i');
-			this.filteredData.forEach(domain => {
-				domain.fields = domain.fields.filter(field =>
-					regx.test(field.label) || regx.test(field.field));
-			});
-		}
 	}
 
 	protected onClearTextFilter() {
 		this.filterModel.search = '';
-		this.ApplyFilters();
+		this.applyFilters();
 	}
 
-	protected onNext(test): void {
-		console.log(test);
-	}
-
-	protected applyAssetClassFilter(): void {
-		if (this.filterModel.asset !== 'all') {
-			this.filteredData = this.filteredData.filter(domain => domain.domain.toUpperCase() === this.filterModel.asset.toUpperCase());
-		}
-	}
-
-	protected applySelectedFilter(): void {
-		if (this.filterModel.selected !== 'all') {
-			this.filteredData.forEach(domain => {
-				domain.fields = domain.fields.filter(field =>
-					this.filterModel.selected === 'true' ? field['selected'] : !field['selected']);
-			});
-		}
-	}
-
-	protected fieldStyle(fieldIndex) {
-		return {
-			'height': '25px',
-			'width': '160px',
-			'top': (fieldIndex < 15 ? fieldIndex : fieldIndex % 15) * 25 + 'px',
-			'left': Math.floor(fieldIndex / 15) * 160 + 'px',
-			'position': 'absolute',
-			'margin': '0px',
-			'padding-left': '10px',
-			'padding-bottom': '5px'
-		};
-	}
-
-	protected toggleConfig(): void {
+	protected onToggleConfig(): void {
 		this.collapsed = !this.collapsed;
 	}
 }

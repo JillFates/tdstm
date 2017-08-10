@@ -75,7 +75,12 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 			token: 'fields',
 			policy: { async: 'RXWAIT' },
 			deps: [FieldSettingsService],
-			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
+			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain().map(domains => {
+				domains.forEach(d => {
+					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
+				});
+				return domains;
+			})
 		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },
@@ -104,7 +109,12 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 			token: 'fields',
 			policy: { async: 'RXWAIT' },
 			deps: [FieldSettingsService],
-			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
+			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain().map(domains => {
+				domains.forEach(d => {
+					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
+				});
+				return domains;
+			})
 		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },

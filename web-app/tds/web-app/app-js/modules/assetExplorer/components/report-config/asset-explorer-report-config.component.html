@@ -7,7 +7,7 @@
 					<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 					<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 					<asset-explorer-report-selector [create-new]="false"></asset-explorer-report-selector>
-					<span class="btn" (click)="toggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
+					<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
 				</div>
 				<br>
 				<div class="row">
@@ -27,7 +27,7 @@
 								 name="btnPreview" (click)="onPreview()">Preview</button>
 							</li>
 							<li role="presentation" style="float:right;">
-								<button class="btn btn-default" (click)="toggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
+								<button class="btn btn-default" (click)="onToggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
 							</li>
 							<li role="presentation" style="float:right;">
 								<button class="btn btn-default"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
@@ -38,7 +38,7 @@
 								<label for="" style="font-size:14px;">Please select at least one asset class to continue.</label> <br>
 								<div class="checkbox" *ngFor="let asset of assetClasses">
 									<label>
-										<input type="checkbox" name="{{asset}}" (change)="ApplyFilters()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
+										<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
 									</label>
 								</div>
 								<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
@@ -71,7 +71,7 @@
 											<div class="form-group">
 												<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
 													<option value="all">All Classes</option>
-													<option *ngFor="let asset of selectedAssetClasses" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
+													<option *ngFor="let asset of selectedAssetClasses()" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
 												</select>
 											</div>
 										</div>
@@ -94,7 +94,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<asset-explorer-report-grid [model]="reportSpec"></asset-explorer-report-grid>
+					<asset-explorer-report-grid [model]="model.schema"></asset-explorer-report-grid>
 				</div>
 				<a (click)="onBackToStart()" class="btn"><i class="fa fa-chevron-left"></i> Back to Start</a>
 			</div>

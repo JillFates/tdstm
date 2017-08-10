@@ -18,26 +18,66 @@ export class AssetExplorerService {
 			name: 'Finance Applications',
 			isOwner: false,
 			isShared: false,
-			isSystem: true
+			isSystem: true,
+			schema: {
+				domains: ['APPLICATION', 'STORAGE'],
+				columns: [],
+				filters: [],
+				sort: {
+					domain: 'APPLICATION',
+					property: 'id',
+					order: 'a'
+				}
+			}
 		},
 		{
 			id: 2,
 			name: 'HR Applicattions',
 			isOwner: false,
 			isShared: false,
-			isSystem: true
+			isSystem: true,
+			schema: {
+				domains: ['APPLICATION', 'DEVICE'],
+				columns: [],
+				filters: [],
+				sort: {
+					domain: 'APPLICATION',
+					property: 'id',
+					order: 'a'
+				}
+			}
 		}, {
 			id: 3,
 			name: 'Legal Applications',
 			isOwner: false,
 			isShared: false,
-			isSystem: true
+			isSystem: true,
+			schema: {
+				domains: ['APPLICATION'],
+				columns: [],
+				filters: [],
+				sort: {
+					domain: 'APPLICATION',
+					property: 'id',
+					order: 'a'
+				}
+			}
 		}, {
 			id: 4,
 			name: 'My First Report',
 			isOwner: true,
 			isShared: false,
-			isSystem: false
+			isSystem: false,
+			schema: {
+				domains: ['DEVICE', 'DATABASE', 'STORAGE'],
+				columns: [],
+				filters: [],
+				sort: {
+					domain: 'DEVICE',
+					property: 'id',
+					order: 'a'
+				}
+			}
 		}, {
 			id: 5,
 			name: 'My First Shared Report',
