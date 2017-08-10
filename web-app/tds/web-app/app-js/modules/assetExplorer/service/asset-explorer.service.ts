@@ -96,7 +96,7 @@ export class AssetExplorerService {
 	}
 
 	getReport(id: number): Observable<ReportModel> {
-		return Observable.from(this.mockData.filter(rg => rg.id === id));
+		return Observable.from(this.mockData.filter(r => r.id === +id));
 	}
 
 	saveReport(model: ReportModel): void {

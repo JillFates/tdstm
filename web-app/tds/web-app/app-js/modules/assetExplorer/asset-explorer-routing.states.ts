@@ -1,4 +1,4 @@
-import { Ng2StateDeclaration } from '@uirouter/angular';
+import { Ng2StateDeclaration, Transition } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
@@ -20,7 +20,7 @@ export class AssetExplorerStates {
 	};
 	public static readonly REPORT_EDIT = {
 		name: 'tds.assetexplorer.edit',
-		url: ':id/edit'
+		url: '/:id/edit'
 	};
 }
 
@@ -108,8 +108,8 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },
-			deps: [AssetExplorerService],
-			resolveFn: (service: AssetExplorerService, trans) => service.getReport(trans.params().id)
+			deps: [AssetExplorerService, Transition],
+			resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
 		}
 	]
 };
