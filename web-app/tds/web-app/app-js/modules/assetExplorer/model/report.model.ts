@@ -7,6 +7,9 @@ export class ReportModel {
 	isSystem: boolean;
 	isShared: boolean;
 	schema?: ReportSpec;
+	constructor() {
+		this.schema = new ReportSpec();
+	}
 }
 
 export class ReportGroupModel {

@@ -28,7 +28,7 @@ import { AssetExplorerReportExportComponent } from '../report-export/asset-explo
 })
 export class AssetExplorerReportConfigComponent {
 
-	static assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
+	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
 		assets: {
 			'APPLICATION': false,
@@ -132,11 +132,11 @@ export class AssetExplorerReportConfigComponent {
 			}, []);
 	}
 
-	private selectedAssetClasses(): string[] {
+	protected selectedAssetClasses(): string[] {
 		return Object.keys(this.filterModel.assets).filter(key => this.filterModel.assets[key]);
 	}
 
-	private fieldStyle(fieldIndex): any {
+	protected fieldStyle(fieldIndex): any {
 		return {
 			'height': '25px',
 			'width': '160px',
