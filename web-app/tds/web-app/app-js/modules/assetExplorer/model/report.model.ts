@@ -9,6 +9,7 @@ export class ReportModel {
 	schema?: ReportSpec;
 	constructor() {
 		this.schema = new ReportSpec();
+		this.isOwner = true;
 	}
 }
 

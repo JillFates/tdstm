@@ -28,6 +28,7 @@ import { AssetExplorerReportExportComponent } from '../report-export/asset-explo
 })
 export class AssetExplorerReportConfigComponent {
 
+	private dataSignature: string;
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
 		assets: {
@@ -51,11 +52,12 @@ export class AssetExplorerReportConfigComponent {
 		@Inject('report') report: Observable<ReportModel>,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private stateService: StateService,
+		private state: StateService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ReportModel]) => {
 			this.domains = result[0];
 			this.model = { ...result[1] };
+			this.dataSignature = JSON.stringify(this.model);
 			if (this.model.id !== 0) {
 				this.updateFilterbyModel();
 			}
@@ -70,6 +72,20 @@ export class AssetExplorerReportConfigComponent {
 	protected updateModelbyFilter() {
 		this.applyFilters();
 		this.model.schema.domains = this.selectedAssetClasses();
+		this.model.schema.columns = this.filteredData
+			.map((d) => d.fields
+				.filter((f) => f['selected'])
+				.map((f) => {
+					return {
+						domain: d.domain,
+						property: f.field,
+						width: 50,
+						locked: false,
+						edit: false,
+						label: f.label
+					};
+				}))
+			.reduce((p, c) => p.concat(c), []);
 	}
 
 	/** Filter Methods */
@@ -162,6 +178,33 @@ export class AssetExplorerReportConfigComponent {
 	protected isValid(): boolean {
 		return this.isAssetSelected() && this.isColumnSelected();
 	}
+
+	protected isDirty(): boolean {
+		let result = this.dataSignature !== JSON.stringify(this.model);
+		if (this.state && this.state.$current && this.state.$current.data) {
+			this.state.$current.data.hasPendingChanges = result;
+		}
+		return result;
+	}
+
+	protected isSaveAvailable(): boolean {
+		return this.model.id ?
+			this.model.isSystem ?
+				this.permissionService.hasPermission('AssetExplorerSystemEdit') :
+				this.model.isOwner && this.permissionService.hasPermission('AssetExplorerEdit') :
+			this.model.isSystem ?
+				this.permissionService.hasPermission('AssetExplorerSystemCreate') :
+				this.model.isOwner && this.permissionService.hasPermission('AssetExplorerCreate');
+	}
+
+	protected isSaveAsAvailable(): boolean {
+		return this.model.id ?
+			this.model.isSystem ?
+				this.permissionService.hasPermission('AssetExplorerSystemSaveAs') :
+				this.permissionService.hasPermission('AssetExplorerSaveAs') :
+			this.isSaveAvailable();
+	}
+
 	/** Dialog and view Actions methods */
 
 	protected onSaveAs(): void {
@@ -182,7 +225,7 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected onBackToStart(): void {
-		this.stateService.go(AssetExplorerStates.REPORT_SELECTOR.name);
+		this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
 	}
 
 	protected onPreview(): void {

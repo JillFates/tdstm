@@ -65,7 +65,8 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.CREATE']
 		},
 		requiresAuth: true,
-		requiresPermission: 'AssetExplorerCreate'
+		requiresPermission: 'AssetExplorerCreate',
+		hasPendingChanges: false
 	},
 	views: {
 		'containerView@tds': { component: AssetExplorerReportConfigComponent }
@@ -99,7 +100,8 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.CREATE']
 		},
 		requiresAuth: true,
-		requiresPermission: 'AssetExplorerCreate'
+		requiresPermission: 'AssetExplorerCreate',
+		hasPendingChanges: false
 	},
 	views: {
 		'containerView@tds': { component: AssetExplorerReportConfigComponent }

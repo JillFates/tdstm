@@ -3,7 +3,8 @@
 		<div>
 			<div class="box-body box-with-empty-header">
 				<div class="row">
-					<button type="button" class="btn btn-default" id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+					<button type="button" [disabled]="!isSaveAsAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"
+					 id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
 					<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 					<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 					<asset-explorer-report-selector [create-new]="false"></asset-explorer-report-selector>
@@ -30,7 +31,7 @@
 								<button class="btn btn-default" (click)="onToggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
 							</li>
 							<li role="presentation" style="float:right;">
-								<button class="btn btn-default"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
+								<button (click)="onSave()" [disabled]="!isSaveAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
 							</li>
 						</ul>
 						<div class="tab-content">
@@ -83,10 +84,10 @@
 										<div [ngStyle]="fieldStyle(fieldIndex)" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
 											<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
 											<ng-template #defaultField>
-												<label style="width:100%" class="{{field.imp}}"><input type="checkbox"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
+												<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (click)="updateModelbyFilter()"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
 											</ng-template>
 										</div>
-									</div>
+									</div>()
 								</div>
 
 							</div>
