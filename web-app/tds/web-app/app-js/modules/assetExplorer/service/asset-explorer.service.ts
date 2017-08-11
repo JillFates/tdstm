@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
-import { ReportModel, ReportGroupModel, ReportFolderIcon } from '../model/report.model';
+import { ReportModel, ReportGroupModel, ReportType } from '../model/report.model';
 import { QuerySpec } from '../model/report-spec.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
@@ -104,32 +104,32 @@ export class AssetExplorerService {
 						name: 'All',
 						items: items,
 						open: true,
-						icon: ReportFolderIcon.folder
+						type: ReportType.ALL
 					}, {
 						name: 'Recent',
 						items: [],
 						open: false,
-						icon: ReportFolderIcon.folder
+						type: ReportType.RECENT
 					}, {
 						name: 'Favorites',
 						items: items.filter(r => r['isFavorite']),
 						open: false,
-						icon: ReportFolderIcon.star
+						type: ReportType.FAVORITES
 					}, {
 						name: 'My Reports',
 						items: items.filter(r => r.isOwner),
 						open: false,
-						icon: ReportFolderIcon.folder
+						type: ReportType.MY_REPORTS
 					}, {
 						name: 'Shared Reports',
 						items: items.filter(r => r.isShared),
 						open: false,
-						icon: ReportFolderIcon.folder
+						type: ReportType.SHARED_REPORTS
 					}, {
 						name: 'System Reports',
 						items: items.filter(r => r.isSystem),
 						open: false,
-						icon: ReportFolderIcon.folder
+						type: ReportType.SYSTEM_REPORTS
 					}
 				];
 			});

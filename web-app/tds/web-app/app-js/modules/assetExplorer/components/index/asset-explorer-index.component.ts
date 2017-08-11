@@ -1,13 +1,13 @@
-import { Component, Inject } from '@angular/core';
-import { StateService } from '@uirouter/angular';
-import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ReportGroupModel, ReportModel, ReportFolderIcon } from '../../model/report.model';
-import { Observable } from 'rxjs/Observable';
+import {Component, Inject} from '@angular/core';
+import {StateService} from '@uirouter/angular';
+import {AssetExplorerStates} from '../../asset-explorer-routing.states';
+import {ReportGroupModel, ReportModel, ReportType} from '../../model/report.model';
+import {Observable} from 'rxjs/Observable';
 
-import { AssetExplorerService } from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	moduleId: module.id,
@@ -18,15 +18,14 @@ export class AssetExplorerIndexComponent {
 
 	private reportGroupModels = Array<ReportGroupModel>();
 	private searchText: String;
-	private reportFolderIcon = ReportFolderIcon;
+	private reportType = ReportType;
 	private selectedFolder: ReportGroupModel;
 
-	constructor(
-		private stateService: StateService,
-		@Inject('reports') reportGroupModels: Observable<ReportGroupModel[]>,
-		private permissionService: PermissionService,
-		private assetExpService: AssetExplorerService,
-		private prompt: UIPromptService) {
+	constructor(private stateService: StateService,
+				@Inject('reports') reportGroupModels: Observable<ReportGroupModel[]>,
+				private permissionService: PermissionService,
+				private assetExpService: AssetExplorerService,
+				private prompt: UIPromptService) {
 		reportGroupModels.subscribe(
 			(result) => {
 				this.reportGroupModels = result;
@@ -49,13 +48,13 @@ export class AssetExplorerIndexComponent {
 
 	protected onCreateReport(): void {
 		if (this.isCreateAvailable()) {
-			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name);
+			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name, {selectedFolder: this.selectedFolder.type});
 		}
 	}
 
 	protected onEditReport(report: ReportModel): void {
 		if (this.isEditAvailable(report)) {
-			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
+			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, {id: report.id});
 		}
 	}
 
@@ -70,8 +69,22 @@ export class AssetExplorerIndexComponent {
 		}
 	}
 
+	/**
+	 * Show/Hide the Create Button if not in All / Favorites / Recent
+	 * @returns {boolean}
+	 */
+	protected isCreateVisible(): boolean {
+		return this.selectedFolder.type !== this.reportType.ALL &&
+			this.selectedFolder.type !== this.reportType.FAVORITES &&
+			this.selectedFolder.type !== this.reportType.RECENT;
+	}
+
+	/**
+	 * Disable the Create Report if the user does not have the proper permission
+	 * @returns {boolean}
+	 */
 	protected isCreateAvailable(): boolean {
-		return this.selectedFolder.name === 'System Reports' ?
+		return this.selectedFolder.type === this.reportType.SYSTEM_REPORTS ?
 			this.permissionService.hasPermission('AssetExplorerSystemCreate') :
 			this.permissionService.hasPermission('AssetExplorerCreate');
 	}

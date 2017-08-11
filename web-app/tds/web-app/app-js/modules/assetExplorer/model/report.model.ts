@@ -17,10 +17,18 @@ export class ReportGroupModel {
 	name: string;
 	items: Array<ReportModel>;
 	open: boolean;
-	icon: ReportFolderIcon;
+	type: ReportType;
 }
 
+export enum ReportType {
+	ALL,
+	RECENT,
+	FAVORITES,
+	MY_REPORTS,
+	SHARED_REPORTS,
+	SYSTEM_REPORTS
+}
 export enum ReportFolderIcon {
-	folder,
-	star
+	FOLDER,
+	START
 }
