@@ -19,6 +19,7 @@ import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
 import net.transitionmanager.domain.PartyGroup
+import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.core.io.Resource
 
@@ -288,7 +289,7 @@ class LicenseAdminService extends LicenseCommonService {
 				}
 
 				String fqdn = getFQDN()
-				if(DomainLicense.WILDCARD != websitename && fqdn != websitename){
+				if(DomainLicense.WILDCARD != websitename && !StringUtils.equalsIgnoreCase(fqdn, websitename)){
 					licState.message = """
 						|Error loading license:<br/> 
 						|current website:<br/><strong>${fqdn}</strong><br/>
