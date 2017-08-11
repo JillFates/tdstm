@@ -1,104 +1,106 @@
 <div class="content body">
-	<section>
+	<section class="page-asset-explorer-config">
 		<div>
-			<div class="box-body box-with-empty-header">
-				<div class="row">
-					<button type="button" [disabled]="!isSaveAsAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"
-					 id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
-					<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
-					<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
-					<asset-explorer-report-selector [create-new]="false"></asset-explorer-report-selector>
-					<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
+			<button type="button" [disabled]="!isSaveAsAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"
+					id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
+			<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
+			<asset-explorer-report-selector [create-new]="false"></asset-explorer-report-selector>
+		</div>
+		<br />
+		<div class="nav-tabs-custom">
+			<!-- Tabs within a box -->
+			<ul class="nav nav-tabs">
+				<li role="presentation" class="active">
+					<a href="#tab_1" data-toggle="tab">Asset Classes</a>
+				</li>
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
+					<a *ngIf="!isAssetSelected();else selected">Columns</a>
+					<ng-template #selected>
+						<a href="#tab_2" data-toggle="tab" #link>Columns</a>
+					</ng-template>
+				</li>
+				<li role="presentation">
+					<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
+							name="btnPreview" (click)="onPreview()">Preview</button>
+				</li>
+				<li class="pull-right" role="presentation">
+					<button class="btn btn-box-tool" (click)="onToggleConfig()"><i class="fa" [ngClass]="(collapsed)? 'fa-plus': 'fa-minus' "></i></button>
+				</li>
+				<li class="pull-right" role="presentation">
+					<button (click)="onSave()" [disabled]="!isSaveAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
+				</li>
+			</ul>
+			<div class="tab-content" [hidden]="collapsed">
+				<div class="tab-pane active" id="tab_1">
+					<label for="" style="font-size:14px;">Please select at least one asset class to continue.</label> <br>
+					<div class="checkbox" *ngFor="let asset of assetClasses">
+						<label>
+							<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
+						</label>
+					</div>
+					<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 				</div>
-				<br>
-				<div class="row">
-					<div class="nav-tabs-custom" *ngIf="!collapsed">
-						<ul class="nav nav-tabs">
-							<li role="presentation" class="active">
-								<a href="#tab_1" data-toggle="tab">Asset Classes</a>
-							</li>
-							<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
-								<a *ngIf="!isAssetSelected();else selected">Columns</a>
-								<ng-template #selected>
-									<a href="#tab_2" data-toggle="tab" #link>Columns</a>
-								</ng-template>
-							</li>
-							<li role="presentation">
-								<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
-								 name="btnPreview" (click)="onPreview()">Preview</button>
-							</li>
-							<li role="presentation" style="float:right;">
-								<button class="btn btn-default" (click)="onToggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
-							</li>
-							<li role="presentation" style="float:right;">
-								<button (click)="onSave()" [disabled]="!isSaveAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
-							</li>
-						</ul>
-						<div class="tab-content">
-							<div class="tab-pane active" id="tab_1">
-								<label for="" style="font-size:14px;">Please select at least one asset class to continue.</label> <br>
-								<div class="checkbox" *ngFor="let asset of assetClasses">
-									<label>
-										<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
-									</label>
+				<div class="tab-pane" id="tab_2">
+					<div class="row">
+						<div class="col-md-4 col-sm-12">
+							<div class="col-sm-9">
+								<div class="form-group has-feedback" style="margin-bottom:0px;">
+									<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="ApplyFilters()">
+									<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
+										  aria-hidden="true"></span>
 								</div>
-								<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 							</div>
-							<div class="tab-pane" id="tab_2">
-								<div class="row">
-									<div class="col-md-4 col-sm-12">
-										<div class="col-sm-9">
-											<div class="form-group has-feedback" style="margin-bottom:0px;">
-												<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="ApplyFilters()">
-												<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
-												 aria-hidden="true"></span>
-											</div>
-										</div>
-										<div class="col-sm-3">
-											<button type="button" class="btn btn-default" id="btnFilter" (click)="ApplyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
-										</div>
-									</div>
-									<div class="col-md-8 col-sm-12">
-										<div class="col-md-3 col-sm-6">
-											<div class="form-group">
-												<select name="selected" (change)="ApplyFilters()" id="selected" class="form-control pd-top-5" [(ngModel)]="filterModel.selected">
-													<option value="all">All Fields</option>
-													<option value="true">Selected</option>
-													<option value="false">Unselected</option>
-												</select>
-											</div>
-										</div>
-										<div class="col-md-3 col-sm-6">
-											<div class="form-group">
-												<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
-													<option value="all">All Classes</option>
-													<option *ngFor="let asset of selectedAssetClasses()" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
-												</select>
-											</div>
-										</div>
-									</div>
+							<div class="col-sm-3">
+								<button type="button" class="btn btn-default" id="btnFilter" (click)="ApplyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
+							</div>
+						</div>
+						<div class="col-md-8 col-sm-12">
+							<div class="col-md-3 col-sm-6">
+								<div class="form-group">
+									<select name="selected" (change)="ApplyFilters()" id="selected" class="form-control pd-top-5" [(ngModel)]="filterModel.selected">
+										<option value="all">All Fields</option>
+										<option value="true">Selected</option>
+										<option value="false">Unselected</option>
+									</select>
 								</div>
-								<label for="" style="font-size:14px;padding-left: 15px;padding-bottom: 10px;">Select one or more columns to display.</label>								<br>
-								<div class="row" style="overflow:auto;margin:0 5px;">
-									<div style="position:relative;float:left;height:375px;">
-										<div [ngStyle]="fieldStyle(fieldIndex)" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
-											<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
-											<ng-template #defaultField>
-												<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (click)="updateModelbyFilter()"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
-											</ng-template>
-										</div>
-									</div>
+							</div>
+							<div class="col-md-3 col-sm-6">
+								<div class="form-group">
+									<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
+										<option value="all">All Classes</option>
+										<option *ngFor="let asset of selectedAssetClasses()" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
+									</select>
 								</div>
-
 							</div>
 						</div>
 					</div>
+					<label for="" style="font-size:14px;padding-left: 15px;padding-bottom: 10px;">Select one or more columns to display.</label>
+					<div class="row" style="overflow:auto;margin:0 5px;">
+						<div style="position:relative;float:left;height:375px;">
+							<div [ngStyle]="fieldStyle(fieldIndex)" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
+								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
+								<ng-template #defaultField>
+									<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (click)="updateModelbyFilter()"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
+								</ng-template>
+							</div>
+						</div>
+					</div>
+
 				</div>
-				<div class="row">
-					<asset-explorer-report-grid [model]="model.schema"></asset-explorer-report-grid>
-				</div>
-				<a (click)="onBackToStart()" class="btn"><i class="fa fa-chevron-left"></i> Back to Start</a>
 			</div>
 		</div>
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Selected Columns Preview</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" (click)="onToggleSelectedColumnsPreview()"><i class="fa fa-minus"></i></button>
+				</div><!-- /.box-tools -->
+			</div><!-- /.box-header -->
+			<div class="box-body" [hidden]="collapsedColumnsPreview">
+				<asset-explorer-report-grid [model]="model.schema"></asset-explorer-report-grid>
+			</div><!-- /.box-body -->
+		</div><!-- /.box -->
+		<a href="javascript:void(0)" (click)="onBackToStart()"><i class="fa fa-chevron-left"></i> Back to Start</a>
 	</section>
 </div>

@@ -42,6 +42,7 @@ export class AssetExplorerReportConfigComponent {
 		search: ''
 	};
 	collapsed = false;
+	collapsedColumnsPreview = false;
 
 	model: ReportModel;
 	domains: DomainModel[] = [];
@@ -252,5 +253,9 @@ export class AssetExplorerReportConfigComponent {
 
 	protected onToggleConfig(): void {
 		this.collapsed = !this.collapsed;
+	}
+
+	protected onToggleSelectedColumnsPreview(): void {
+		this.collapsedColumnsPreview = !this.collapsedColumnsPreview;
 	}
 }
