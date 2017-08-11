@@ -21,15 +21,16 @@ export class AssetExplorerIndexComponent {
 	private reportType = ReportType;
 	private selectedFolder: ReportGroupModel;
 
-	constructor(private stateService: StateService,
-				@Inject('reports') reportGroupModels: Observable<ReportGroupModel[]>,
-				private permissionService: PermissionService,
-				private assetExpService: AssetExplorerService,
-				private prompt: UIPromptService) {
+	constructor(
+		private stateService: StateService,
+		@Inject('reports') reportGroupModels: Observable<ReportGroupModel[]>,
+		private permissionService: PermissionService,
+		private assetExpService: AssetExplorerService,
+		private prompt: UIPromptService) {
 		reportGroupModels.subscribe(
 			(result) => {
 				this.reportGroupModels = result;
-				this.selectedFolder = this.reportGroupModels[0];
+				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
 			},
 			(err) => console.log(err));
 	}
