@@ -232,6 +232,11 @@ class UrlMappings {
 			action = [GET:"retrieveTasksOfTaskBatch"]
 		}
 
+		"/ws/task/$id/invokeAction" {
+			controller = "wsTask"
+			action = [POST:"invokeAction"]
+		}
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [GET:"retrieveStatus"]

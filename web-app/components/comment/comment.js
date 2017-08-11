@@ -151,6 +151,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 	}
 
 	this.showComment = function (commentTO, action) {
+        console.log("showComment()", commentTO, action);
 		scope.$broadcast('forceDialogClose', ['crud']);
 		var view = (commentTO.commentType == 'comment') ? '/comment/showComment' : '/task/showTask';
 		modal.open({
@@ -433,6 +434,18 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 		$scope.$emit("lookUpAction", action);
 	};
 
+	$scope.invokeAction = function(commentId) {
+        commentService.invokeAction(commentId).then(
+            function (data) {
+                //showAssetCommentDialog(data)
+				refreshView();
+            },
+            function (data) {
+                alerts.showGenericMsg();
+            }
+        );
+	};
+
 	$scope.deleteComment = function () {
 		commentUtils.validateDelete($scope.ac.commentId, $scope.ac.assetEntity, commentService.deleteComment).then(
 			function (data) {
@@ -451,6 +464,7 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 	}
 
 	function showAssetCommentDialog(data) {
+        console.log("showAssetCommentDialog()", data);
 		if (typeof timerBar !== 'undefined')
 			timerBar.Pause();
 
@@ -1265,8 +1279,22 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	};
 
 	var getComment = function (commentId) {
+		console.log("getComment()", commentId);
 		var deferred = q.defer();
 		http.get(utils.url.applyRootPath('/assetEntity/showComment?id=' + commentId)).
+			success(function (data, status, headers, config) {
+				deferred.resolve(data);
+			}).
+			error(function (data, status, headers, config) {
+				deferred.reject(data);
+			});
+		return deferred.promise;
+	};
+
+	var invokeAction = function (commentId) {
+		console.log("invokeAction()", commentId);
+		var deferred = q.defer();
+		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/invokeAction')).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).
@@ -1508,6 +1536,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		updateComment: updateComment,
 		searchComments: searchComments,
 		getComment: getComment,
+		invokeAction: invokeAction,
 		getActionBarButtons: getActionBarButtons,
 		predecessorTableHtml: predecessorTableHtml,
 		successorTableHtml: successorTableHtml,

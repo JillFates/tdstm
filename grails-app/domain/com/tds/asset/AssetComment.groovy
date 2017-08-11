@@ -292,7 +292,7 @@ class AssetComment {
 		apiAction &&
 		! apiActionInvokedAt &&
 		! apiActionCompletedAt &&
-		status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.DONE]
+		status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.COMPLETED]
 	}
 
 	/*

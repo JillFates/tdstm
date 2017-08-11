@@ -911,10 +911,11 @@ class TaskService implements ServiceMethods {
 			switch (status) {
 				case 'success':
 					boolean isCallback = message.containsKey('callbackMethod')
-					if (isCallback && task.isAutomatic()) {
+					// <SL>: What is callBack for and what if task is not automatic but status is success?
+//					if (isCallback && task.isAutomatic()) {
 						task.apiActionCompletedAt = new Date()
-						newStatus = ACS.DONE
-					}
+						newStatus = ACS.COMPLETED
+//					}
 					note = 'Task was completed by API notification'
 					break
 
