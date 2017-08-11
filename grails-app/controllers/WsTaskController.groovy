@@ -1,13 +1,16 @@
+import com.tds.asset.AssetComment
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
+import net.transitionmanager.domain.Person
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.QzSignService
+import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import com.tdsops.common.security.spring.HasPermission
@@ -19,12 +22,12 @@ import com.tdsops.common.security.spring.HasPermission
  */
 @Secured('isAuthenticated()')
 @Slf4j
-@Slf4j(value='logger', category='grails.app.controllers.WsTaskController')
 class WsTaskController implements ControllerMethods {
 
 	TaskService taskService
 	CommentService commentService
 	QzSignService qzSignService
+	SecurityService securityService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -170,6 +173,24 @@ class WsTaskController implements ControllerMethods {
 		renderSuccessJson([preferences: commentService.getTaskCreateDefaults()])
 	}
 
+	/**
+	 * Executes an action tied to a task and returns new task status if applies.
+	 * @param id - task id
+	 * @return
+	 */
+	def invokeAction() {
+		AssetComment assetComment = AssetComment.get(params.id)
+		if (assetComment) {
+			Person whom = securityService.loadCurrentPerson()
+			String status = taskService.invokeAction(assetComment, whom)
+			renderSuccessJson([status: status])
+		} else {
+			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
+			log.error "invokeAction: $errorMsg"
+			renderErrorJson([errorMsg])
+		}
+	}
+
 	private void preHandleException(Exception e, boolean includeException = false) {
 		if (e instanceof UnauthorizedException) {
 			if (includeException) {
@@ -181,7 +202,7 @@ class WsTaskController implements ControllerMethods {
 		}
 		else if (e instanceof IllegalArgumentException) {
 			if (includeException) {
-				ServiceResults.internalError(response, logger, e)
+				ServiceResults.internalError(response, log, e)
 			}
 			else {
 				ServiceResults.forbidden(response)
@@ -199,7 +220,7 @@ class WsTaskController implements ControllerMethods {
 			render(ServiceResults.errorsInValidation(e.errors) as JSON)
 		}
 		else {
-			ServiceResults.internalError(response, logger, e)
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 }
