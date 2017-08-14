@@ -1,6 +1,6 @@
 /**
- * @author slopez
- * TM-6443
+ * @author dontiveros
+ * TM-6526
  */
 databaseChangeLog = {
 	changeSet(author: "dontiveros", id: "20170530 TM-6526: Asset Explorer endpoints") {
