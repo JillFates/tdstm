@@ -14,13 +14,7 @@
 				</div>
 				<div class="form-group">
 					<div class="checkbox" style="padding-left:160px;">
-						<label><input type="checkbox" name="shared" [(ngModel)]="model.shared"> Share with other users</label>
-						<div class="radio" style="padding-left:20px;">
-							<label><input type="radio" [disabled]="!model.shared" [(ngModel)]="model.subscribe" value="false" id="sub1" checked name="subscribe">Users Automatic have access</label>
-						</div>
-						<div class="radio" style="padding-left:20px;">
-							<label><input type="radio" [disabled]="!model.shared" [(ngModel)]="model.subscribe" value="false" id="sub2" name="subscribe">Users must subscribe</label>
-						</div>
+						<label><input type="checkbox" name="shared" [(ngModel)]="model.isShared"> Share with other users</label>
 					</div>
 				</div>
 				<div class="form-group">
@@ -33,7 +27,7 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span> {{ 'GLOBAL.SAVE' | translate }}</button>
+		<button type="submit" (click)="confirmCloseDialog()" [disabled]="!isValid()" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span> {{ 'GLOBAL.SAVE' | translate }}</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 	</div>
 </div>

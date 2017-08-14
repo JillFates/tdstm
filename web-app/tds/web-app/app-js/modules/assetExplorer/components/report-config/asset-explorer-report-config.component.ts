@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ReportModel } from '../../model/report.model';
 import { ReportSpec, ReportColumn } from '../../model/report-spec.model';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerReportSaveComponent } from '../report-save/asset-explorer-report-save.component';
 import { AssetExplorerReportExportComponent } from '../report-export/asset-explorer-report-export.component';
 
@@ -51,6 +52,7 @@ export class AssetExplorerReportConfigComponent {
 
 	constructor(
 		@Inject('report') report: Observable<ReportModel>,
+		private assetExpService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private state: StateService,
@@ -106,7 +108,6 @@ export class AssetExplorerReportConfigComponent {
 			.map(domain => {
 				return { ...domain };
 			});
-		console.log(this.filteredData);
 	}
 
 	protected applyAssetClassFilter(): void {
@@ -166,6 +167,22 @@ export class AssetExplorerReportConfigComponent {
 		};
 	}
 
+	protected openSaveDialog(): void {
+		this.dialogService.open(AssetExplorerReportSaveComponent, [
+			{ provide: ReportModel, useValue: this.model }
+		]).then(result => {
+			console.log(result);
+			this.model = result;
+			this.dataSignature = JSON.stringify(this.model);
+			setTimeout(() => {
+				this.state.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+				console.log('here');
+			});
+		}).catch(result => {
+			console.log('error');
+		});
+	}
+
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
@@ -209,9 +226,19 @@ export class AssetExplorerReportConfigComponent {
 	/** Dialog and view Actions methods */
 
 	protected onSaveAs(): void {
-		this.dialogService.open(AssetExplorerReportSaveComponent, [
-			{ provide: ReportModel, useValue: this.model }
-		]);
+		if (this.isSaveAsAvailable()) {
+			this.openSaveDialog();
+		}
+	}
+
+	protected onSave() {
+		if (this.isSaveAvailable()) {
+			if (this.model.id) {
+				this.assetExpService.saveReport(this.model);
+			} else {
+				this.openSaveDialog();
+			}
+		}
 	}
 
 	protected onExport(): void {

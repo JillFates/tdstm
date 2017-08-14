@@ -1,13 +1,13 @@
-import {Component, Inject} from '@angular/core';
-import {StateService} from '@uirouter/angular';
-import {AssetExplorerStates} from '../../asset-explorer-routing.states';
-import {ReportGroupModel, ReportModel, ReportType} from '../../model/report.model';
-import {Observable} from 'rxjs/Observable';
+import { Component, Inject } from '@angular/core';
+import { StateService } from '@uirouter/angular';
+import { AssetExplorerStates } from '../../asset-explorer-routing.states';
+import { ReportGroupModel, ReportModel, ReportType } from '../../model/report.model';
+import { Observable } from 'rxjs/Observable';
 
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
 
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	moduleId: module.id,
@@ -49,13 +49,14 @@ export class AssetExplorerIndexComponent {
 
 	protected onCreateReport(): void {
 		if (this.isCreateAvailable()) {
-			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name, {selectedFolder: this.selectedFolder.type});
+			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
+				{ system: this.selectedFolder.type === this.reportType.SYSTEM_REPORTS });
 		}
 	}
 
 	protected onEditReport(report: ReportModel): void {
 		if (this.isEditAvailable(report)) {
-			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, {id: report.id});
+			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
 		}
 	}
 
@@ -64,7 +65,13 @@ export class AssetExplorerIndexComponent {
 			this.prompt.open('Confirmation Required', 'Are you sure you want to delete this report?', 'Yes', 'No')
 				.then((result) => {
 					if (result) {
-						this.assetExpService.deleteReport(report.id);
+						this.assetExpService.deleteReport(report.id
+						).subscribe(
+							deleted => {
+								this.assetExpService.getReports()
+									.subscribe(res => this.reportGroupModels = res, err => console.log(err));
+							},
+							error => console.log(error));
 					}
 				});
 		}

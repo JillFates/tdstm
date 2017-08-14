@@ -85,7 +85,12 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },
-			resolveFn: () => Observable.from([new ReportModel()])
+			deps: [Transition],
+			resolveFn: (trans: Transition) => {
+				let model = new ReportModel();
+				model.isSystem = trans.params().system || false;
+				return Observable.from([model]);
+			}
 		}
 	]
 };

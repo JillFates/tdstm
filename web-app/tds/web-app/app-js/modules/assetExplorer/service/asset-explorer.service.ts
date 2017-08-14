@@ -139,16 +139,25 @@ export class AssetExplorerService {
 		return Observable.from(this.mockData.filter(r => r.id === +id));
 	}
 
-	saveReport(model: ReportModel): void {
-		console.log('save method');
+	saveReport(model: ReportModel): Observable<ReportModel> {
+		let index = this.mockData.length;
+		if (model.id) {
+			index = this.mockData.findIndex(d => d.id === model.id);
+			this.mockData[index] = model;
+		} else {
+			model.id = this.mockData.length + 1;
+			this.mockData.push(model);
+		}
+		return Observable.from([this.mockData[index]]);
 	}
 
 	queryData(query: QuerySpec): any[] {
 		return [];
 	}
 
-	deleteReport(id: number) {
-		return true;
+	deleteReport(id: number): Observable<ReportModel> {
+		let index = this.mockData.findIndex(d => d.id === id);
+		return Observable.from(this.mockData.splice(index, 1));
 	}
 
 }
