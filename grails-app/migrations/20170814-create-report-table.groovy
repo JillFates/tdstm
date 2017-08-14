@@ -3,7 +3,7 @@
  * TM-6443
  */
 databaseChangeLog = {
-	changeSet(author: "dontiveros", id: "20170530 TM-6526: Asset Explorer: Create endpoint to fetch reports list") {
+	changeSet(author: "dontiveros", id: "20170530 TM-6526: Asset Explorer endpoints") {
 		comment('Create new Report table for endpoint support')
 
 		preConditions(onFail:'MARK_RAN') {
@@ -11,8 +11,6 @@ databaseChangeLog = {
 				tableExists(tableName:'report')
 			}
 		}
-		//Changing  'key' column name as 'setting_key' cause 'key' is a reserved keyword in MYSQL
-
 		sql("""
 			CREATE TABLE report (
 				id      		BIGINT(20) NOT NULL AUTO_INCREMENT,
