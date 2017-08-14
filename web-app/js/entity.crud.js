@@ -248,7 +248,7 @@ var EntityCrud = (function ($) {
                     currentSelector = $(this)[0];
 					return {
 						q: term,
-                        value: $(this).data("asset-name"),
+                        value: $(this).select2('data').text,
 						max: 25,
 						page: $(this).data('select2').resultsPage,
 						assetClassOption: $(this).data("asset-type"),
