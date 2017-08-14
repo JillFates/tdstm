@@ -246,9 +246,14 @@ var EntityCrud = (function ($) {
 				quietMillis: quietMillis,
 				data: function (term, page) {
                     currentSelector = $(this)[0];
+                    var selectElement = $(this).select2('data');
+                    var selectValue = '';
+                    if(selectElement && selectElement !== null) {
+                        selectValue = $(this).select2('data').text;
+                    }
 					return {
 						q: term,
-                        value: $(this).select2('data').text,
+                        value: selectValue,
 						max: 25,
 						page: $(this).data('select2').resultsPage,
 						assetClassOption: $(this).data("asset-type"),
