@@ -8,6 +8,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.SecurityService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 
@@ -19,6 +20,7 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
+	AssetEntityService assetEntityService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -96,7 +98,6 @@ class WsAssetController implements ControllerMethods {
 		if(!name){
 			errors << "The new asset name is missing"
 		}
-
 		if(dependencies &&
 				!securityService.hasPermission(Permission.AssetCloneDependencies)
 		){
@@ -105,56 +106,12 @@ class WsAssetController implements ControllerMethods {
 			)
 			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
-
-		AssetEntity clonedAsset
-		if(!errors) {
-			AssetEntity assetToClone = AssetEntity.get(assetId)
-			if(!assetToClone) {
-				errors << "The asset specified to clone was not found"
-
-			}else{
-				//check that the asset is part of the project
-				if(!securityService.isCurrentProjectId(assetToClone.projectId)){
-					log.error(
-							"Security Violation, user {} attempted to access an asset not associated to the project",
-							securityService.getCurrentUsername()
-					)
-					errors << "Asset not found in current project"
-				}
-
-				if(!errors) {
-					clonedAsset = assetToClone.clone([
-							assetName : name,
-							validation: ValidationType.DIS
-					])
-
-					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && dependencies) {
-						for (dependency in assetToClone.supportedDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									dependent: clonedAsset,
-									status   : AssetDependencyStatus.QUESTIONED
-							])
-
-							clonedDependency.save()
-						}
-						for (dependency in assetToClone.requiredDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									asset : clonedAsset,
-									status: AssetDependencyStatus.QUESTIONED
-							])
-
-							clonedDependency.save()
-						}
-					}
-				}
-			}
-		}
-
+		// cloning asset
+		Long clonedAssetId = assetEntityService.clone(assetId, name, dependencies, errors)
 		if(errors){
 			renderFailureJson(errors)
 		}else{
-			renderSuccessJson([assetId : clonedAsset.id])
+			renderSuccessJson([assetId : clonedAssetId])
 		}
 	}
 

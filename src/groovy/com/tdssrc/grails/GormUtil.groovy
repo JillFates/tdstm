@@ -622,7 +622,9 @@ public class GormUtil {
 		// Strip off the replacement keys from the list and then copy over the values to the new domain
 		props = props - keys
 		props.each { p ->
-			newDomain[p] = originalDomain[p]
+			if (!(originalDomain[p] instanceof Collection)) {
+				newDomain[p] = originalDomain[p]
+			}
 		}
 
 		return newDomain

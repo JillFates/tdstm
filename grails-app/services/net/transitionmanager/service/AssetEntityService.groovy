@@ -19,6 +19,7 @@ import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
@@ -2799,6 +2800,52 @@ class AssetEntityService implements ServiceMethods {
 		]
 
 		return map
+	}
+
+	Long clone(Long assetId, String name, Boolean dependencies, List<String> errors) {
+		AssetEntity clonedAsset
+		if(!errors) {
+
+			//  params son assetId
+			AssetEntity assetToClone = AssetEntity.get(assetId)
+			if (!assetToClone) {
+				errors << "The asset specified to clone was not found"
+			} else {
+				//check that the asset is part of the project
+				if (!securityService.isCurrentProjectId(assetToClone.projectId)) {
+					log.error(
+							"Security Violation, user {} attempted to access an asset not associated to the project",
+							securityService.getCurrentUsername()
+					)
+					errors << "Asset not found in current project"
+				}
+				if (!errors) {
+					clonedAsset = assetToClone.clone([
+							assetName : name,
+							validation: ValidationType.DIS
+					])
+					// Cloning assets dependencies if requested
+					if (clonedAsset.save() && dependencies) {
+						for (dependency in assetToClone.supportedDependencies()) {
+							AssetDependency clonedDependency = dependency.clone([
+									dependent: clonedAsset,
+									status   : AssetDependencyStatus.QUESTIONED
+							])
+
+							//clonedDependency.save()
+						}
+						for (dependency in assetToClone.requiredDependencies()) {
+							AssetDependency clonedDependency = dependency.clone([
+									asset : clonedAsset,
+									status: AssetDependencyStatus.QUESTIONED
+							])
+							//clonedDependency.save()
+						}
+					}
+					return clonedAsset.id
+				}
+			}
+		}
 	}
 
 }
