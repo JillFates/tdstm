@@ -19,6 +19,7 @@ import './modules/noticeManager/specs/notice-form.component.spec';
 import './modules/fieldSettings/specs/field-settings-imp.component.spec';
 import './modules/fieldSettings/specs/field-settings-list.component.spec';
 import './modules/fieldSettings/specs/selectlist-configuration-popup.component.spec';
+import './modules/assetExplorer/specs/asset-explorer-report-selector.component.spec';
 
 // Unfortunately there's no typing for the `__karma__` variable. Just declare it as any.
 declare var __karma__: any;
