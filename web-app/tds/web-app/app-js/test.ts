@@ -11,6 +11,7 @@ import './specs/ui-boolean.pipe.spec';
 import './specs/translate.pipe.spec';
 import './specs/ui-loader.directive.spec';
 import './specs/ui-toast.directive.spec';
+import './specs/ui-svg-icon.directive.spec';
 import './specs/component-creator.service.spec';
 import './specs/rich-text-editor.component.spec';
 import './specs/permission.service.spec';
