@@ -59,4 +59,10 @@ class WsCustomDomainController implements ControllerMethods {
     def invalidValues() {
         throw new RuntimeException('method not implemented')
     }
+
+    def fieldSpecsWithCommon() {
+        Project project = getProjectForWs()
+        def data = customDomainService.fieldSpecsWithCommon(project)
+        renderAsJson(data)
+    }
 }

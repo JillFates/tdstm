@@ -180,5 +180,31 @@ class CustomDomainServiceTests extends Specification {
             list.contains('Green')
     }
 
+    void 'Scenario 8: Test COMMON field specs'() {
+        /*
+        given: 'a project'
+        Project project = projectHelper.createProjectWithDefaultBundle()
+        and: 'the project has field settings specifications'
+        projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+        createAssets(project)
+        List assetList = AssetEntity.findAllByProject(project)
+        assert ASSETS.size() == assetList.size()
+        and: 'there is an individual field specification for DEVICE.custom1'
+        JSONObject allDomainSpecs = loadFieldSpecJson()
+        String deviceClass = AssetClass.DEVICE.toString()
+        JSONObject fieldSpec = [fieldSpec: allDomainSpecs[deviceClass]['fields'].find { it.field == 'description' } ]
+        assert fieldSpec
+
+        when: 'the distinctValues method is called'
+        List list = customDomainService.distinctValues(project, deviceClass, fieldSpec)
+        then: 'it should return expected values'
+        list
+        3 == list.size()
+        list.contains('Red')
+        list.contains('Blue')
+        list.contains('Green')
+        */
+    }
 
 }

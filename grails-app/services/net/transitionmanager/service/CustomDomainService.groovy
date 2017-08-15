@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
@@ -390,6 +391,50 @@ class CustomDomainService implements ServiceMethods {
                 }
             }
         }
+        return fieldSpecs
+    }
+
+
+    def fieldSpecsWithCommon(Project project = null){
+        assert project
+        String COMMON = "COMMON"
+        String APPLICATION = AssetClass.APPLICATION as String
+
+        Map fieldSpecs = allFieldSpecs(project, 'ASSETS')
+
+        //return fieldSpecs
+
+        Map applicationFields = fieldSpecs[APPLICATION]
+
+        List fields = applicationFields.fields ?: []
+
+        // Split the common fields from the individual ones
+        def (commonFields, individualFields) = fields.split {
+            AssetEntity.COMMON_FIELD_LIST.contains(it.field) ||
+                it.shared == 1
+        }
+
+        def commonFieldNames = commonFields.collect { it.field }
+
+        // Change the original fields to the individual ones
+        applicationFields.fields = individualFields
+
+        //Remove all common fields from the rest of the Domains
+        fieldSpecs.each { k, v ->
+            if ( k != APPLICATION ){
+                def filteredFields = v.fields.findAll {
+                    ! commonFieldNames.contains( it.field )
+                }
+                v.fields = filteredFields
+            }
+        }
+
+        // we add the common fields
+        fieldSpecs[COMMON] = [
+            domain : COMMON,
+            fields : commonFields
+        ]
+
         return fieldSpecs
     }
 
