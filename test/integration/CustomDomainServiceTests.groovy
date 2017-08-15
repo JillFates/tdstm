@@ -7,6 +7,7 @@ import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
+import org.apache.commons.lang3.BooleanUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import groovy.json.JsonSlurper
 import org.apache.commons.lang.RandomStringUtils as RSU
@@ -181,30 +182,45 @@ class CustomDomainServiceTests extends Specification {
     }
 
     void 'Scenario 8: Test COMMON field specs'() {
-        /*
-        given: 'a project'
-        Project project = projectHelper.createProjectWithDefaultBundle()
-        and: 'the project has field settings specifications'
-        projectService.cloneDefaultSettings(project)
-        and: 'the project has assets with existing data values'
-        createAssets(project)
-        List assetList = AssetEntity.findAllByProject(project)
-        assert ASSETS.size() == assetList.size()
-        and: 'there is an individual field specification for DEVICE.custom1'
-        JSONObject allDomainSpecs = loadFieldSpecJson()
-        String deviceClass = AssetClass.DEVICE.toString()
-        JSONObject fieldSpec = [fieldSpec: allDomainSpecs[deviceClass]['fields'].find { it.field == 'description' } ]
-        assert fieldSpec
+		String APPLICATION = AssetClass.APPLICATION as String
 
-        when: 'the distinctValues method is called'
-        List list = customDomainService.distinctValues(project, deviceClass, fieldSpec)
-        then: 'it should return expected values'
-        list
-        3 == list.size()
-        list.contains('Red')
-        list.contains('Blue')
-        list.contains('Green')
-        */
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+            List assetList = AssetEntity.findAllByProject(project)
+            assert ASSETS.size() == assetList.size()
+
+        when: 'the fieldSpecsWithCommon method is called'
+            Map fieldSpecs = customDomainService.fieldSpecsWithCommon(project)
+        then: "it should contains a '${CustomDomainService.COMMON}' domain"
+            fieldSpecs.containsKey(CustomDomainService.COMMON)
+        and: "'${CustomDomainService.COMMON}' fields not 'shared' are contained in AssetEntity.COMMON_FIELD_LIST"
+            def commonSpecs = fieldSpecs[CustomDomainService.COMMON]
+            def fieldsCommon = commonSpecs.fields
+
+			fieldsCommon.each { spec ->
+				if (BooleanUtils.toBoolean(spec.shared) == false) {
+					assert 	AssetEntity.COMMON_FIELD_LIST.contains(spec.field)
+				}
+			}
+
+		and: "'${APPLICATION}' Domian fields are not contained in '${CustomDomainService.COMMON}' fields and there are not shared ones"
+			def applicationSpecs = fieldSpecs[APPLICATION]
+			def fieldsApplication = applicationSpecs.fields
+
+			fieldsApplication.each { appField ->
+				assert BooleanUtils.toBoolean(appField.shared) == false
+
+				def found = fieldsCommon.find { commonField ->
+					commonField.field == appField.field
+				}
+
+				assert ! found, "Field '${found?.field}' found in domain '${CustomDomainService.COMMON}'"
+			}
+
     }
 
 }

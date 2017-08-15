@@ -450,6 +450,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/customDomain/fieldSpecsWithCommon" {
+			controller = "wsCustomDomain"
+			action = [
+				GET: "fieldSpecsWithCommon"
+			]
+		}
+
 		"/ws/security/permissions" {
 			controller = "wsSecurity"
 			action = [

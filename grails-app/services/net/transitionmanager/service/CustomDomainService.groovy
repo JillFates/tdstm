@@ -7,11 +7,14 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
     public static final String ALL_ASSET_CLASSES = 'ASSETS'
+	// Common Domian name (used to gather common fields in Domains)
+	public static final String COMMON = 'COMMON'
     public static final String CUSTOM_FIELD_NAME_PART = 'custom'
 
     public static final int CUSTOM_USER_FIELD = 1
@@ -394,15 +397,19 @@ class CustomDomainService implements ServiceMethods {
         return fieldSpecs
     }
 
-
-    def fieldSpecsWithCommon(Project project = null){
+	/**
+	 * Create a COMMON domain from the common fields (belonging to AssetEntity.COMMON_FIELD_LIST or *shared*)
+	 * in all the domains returned by allFieldsSpecs
+	 * Jira: TM-6838
+	 * @param project
+	 * @return
+	 */
+    Map<String, ?> fieldSpecsWithCommon(Project project = null){
         assert project
-        String COMMON = "COMMON"
         String APPLICATION = AssetClass.APPLICATION as String
 
-        Map fieldSpecs = allFieldSpecs(project, 'ASSETS')
-
-        //return fieldSpecs
+		// Get all Domain (fields) Specs
+        Map fieldSpecs = allFieldSpecs(project, ALL_ASSET_CLASSES)
 
         Map applicationFields = fieldSpecs[APPLICATION]
 
@@ -411,7 +418,7 @@ class CustomDomainService implements ServiceMethods {
         // Split the common fields from the individual ones
         def (commonFields, individualFields) = fields.split {
             AssetEntity.COMMON_FIELD_LIST.contains(it.field) ||
-                it.shared == 1
+                BooleanUtils.toBoolean(it.shared) == true
         }
 
         def commonFieldNames = commonFields.collect { it.field }

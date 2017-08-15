@@ -60,9 +60,13 @@ class WsCustomDomainController implements ControllerMethods {
         throw new RuntimeException('method not implemented')
     }
 
+    /**
+     * Entry point to get all Common field Specs of the current project
+     * JIra: TM-6838
+     */
     def fieldSpecsWithCommon() {
         Project project = getProjectForWs()
-        def data = customDomainService.fieldSpecsWithCommon(project)
+        Map data = customDomainService.fieldSpecsWithCommon(project)
         renderAsJson(data)
     }
 }
