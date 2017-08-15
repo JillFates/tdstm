@@ -129,14 +129,14 @@ class WsAssetController implements ControllerMethods {
 					])
 
 					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && dependencies) {
+					if (clonedAsset.save(validate: false) && dependencies) {
 						for (dependency in assetToClone.supportedDependencies()) {
 							AssetDependency clonedDependency = dependency.clone([
 									dependent: clonedAsset,
 									status   : AssetDependencyStatus.QUESTIONED
 							])
 
-							clonedDependency.save()
+							clonedDependency.save(validate: false)
 						}
 						for (dependency in assetToClone.requiredDependencies()) {
 							AssetDependency clonedDependency = dependency.clone([
@@ -144,7 +144,7 @@ class WsAssetController implements ControllerMethods {
 									status: AssetDependencyStatus.QUESTIONED
 							])
 
-							clonedDependency.save()
+							clonedDependency.save(validate: false)
 						}
 					}
 				}
