@@ -424,11 +424,11 @@ class CommentService implements ServiceMethods {
 	 */
 	private boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote) {
 		boolean shouldNotify = (
-				task.commentType == AssetCommentType.TASK &&
-						task.sendNotification &&
-						task.isPublished &&
-						(task.status == AssetCommentStatus.READY || task.status == AssetCommentStatus.STARTED) &&
-			task.assignedTo && task.assignedTo.id != triggeredByWhom.id
+			task.commentType == AssetCommentType.TASK
+			&& task.sendNotification
+			&& task.isPublished
+			&& task.status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED]
+			&& task.assignedTo && task.assignedTo.id != triggeredByWhom.id
 		)
 
 		// Now refine if the task should be sent based on it being new or updated
