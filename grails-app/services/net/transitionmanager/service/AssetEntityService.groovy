@@ -2802,7 +2802,15 @@ class AssetEntityService implements ServiceMethods {
 		return map
 	}
 
-	Long clone(Long assetId, String name, Boolean dependencies, List<String> errors) {
+	/**
+	 * Used to clone an asset and optionally the dependencies associated with the asset
+	 * @param assetId - the id of the asset to be cloned
+	 * @param name - the name to set the new asset name to
+	 * @param dependencies - a flag to control if dependencies should be cloned
+	 * @param errors - an initialize List object that will be populated with one or more error messages if the method fails
+	 * @return the id number of the newly created asset
+	 */
+	Long clone(Long assetId, String name, Boolean cloneDependencies, List<String> errors) {
 		AssetEntity clonedAsset
 		if(!errors) {
 
@@ -2825,7 +2833,7 @@ class AssetEntityService implements ServiceMethods {
 							validation: ValidationType.DIS
 					])
 					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && dependencies) {
+					if (clonedAsset.save() && cloneDependencies) {
 						for (dependency in assetToClone.supportedDependencies()) {
 							AssetDependency clonedDependency = dependency.clone([
 									dependent: clonedAsset,

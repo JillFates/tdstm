@@ -13,7 +13,6 @@ import org.apache.commons.lang3.RandomStringUtils
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.eav.EavAttributeSet
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
@@ -56,7 +55,6 @@ class AssetTestHelper {
 			testingBy: pRef,
 			moveBundle: project.projectDefaultBundle
 		)
-		app.attributeSet = EavAttributeSet.get(2)
 		app.moveBundle = project.getDefaultBundle()
 
 		if (! app.save(flush:true) ) {
