@@ -24,7 +24,7 @@ export class FieldSettingsService {
 					response[key].domain = response[key].domain.toUpperCase();
 					return response[key];
 				});
-				if (domain.length > 0) {
+				if (domains.length > 0) {
 					let sharedFields = domains[0].fields.filter(x => x.shared);
 					domains.forEach(d => {
 						d.fields.filter(s => s.control === 'YesNo')
@@ -42,7 +42,7 @@ export class FieldSettingsService {
 						});
 					});
 				}
-				return domains;
+				return domains as any;
 			})
 			.catch((error: any) => error.json());
 	}
