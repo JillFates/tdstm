@@ -2935,22 +2935,20 @@ class AssetEntityController implements ControllerMethods {
 	 * @param max
 	 * @param page
 	 * @param q
+	 * @param value
 	 */
 	@HasPermission(Permission.AssetView)
 	def assetListForSelect2() {
 		def results = []
 		long total = 0
+		int currentPage
 
 		Project project = securityService.userCurrentProject
-		if (project) {
+ 		if (project) {
 
 			// The following will perform a count query and then a query for a subset of results based on the max and page
-			// params passed into the request. The query will be constructed with @COLS@ tag that can be substitued when performing
+			// params passed into the request. The query will be constructed with @COLS@ tag that can be substituted when performing
 			// the actual queries.
-
-			int max = NumberUtil.limit(params.int('max', 10), 1, 25)
-			int currentPage = NumberUtil.limit(params.int('page', 1), 1, 1000)
-			int offset = (currentPage - 1) * max
 
 			// This map will drive how the query is constructed for each of the various options
 			Map qmap = [
@@ -3009,8 +3007,9 @@ class AssetEntityController implements ControllerMethods {
 					qparams.assetType = qm.assetType
 				}
 
-				query.append("ORDER BY a.assetName ASC")
+				StringBuffer wquery = new StringBuffer(query) // This one is set aside for later use
 
+				query.append("ORDER BY a.assetName ASC")
 				log.debug "***** Query: $query\nParams: $qparams"
 
 				// Perform query and move data into normal map
@@ -3020,6 +3019,35 @@ class AssetEntityController implements ControllerMethods {
 				total = qm.domain.executeQuery(cquery, qparams)[0]
 
 				if (total > 0) {
+
+					// calculate the page and offset for the list of elements to be returned
+					def value = params.value
+					int max = NumberUtil.limit(params.int('max', 10), 1, 25)
+
+
+					// if there is a value selected in the select2 combo, calculate the page the element is in
+					// so we return only the list of elements on the same page
+					// also check that the page is 1, if not then the user is just scrolling and we should
+					// simply use that value as the page value
+					if (value && params.int('page') == 1)  { // calculate currentPage based on value
+
+						// calculate the element position in the list
+						wquery.append('AND a.assetName > :value ')
+						wquery.append("ORDER BY a.assetName ASC")
+						def cGreaterQuery = wquery.toString().replace('@COLS@', queryCount)
+						log.debug "***** Count Greater Than Query: $cGreaterQuery" 
+						qparams << [value: value]
+						def majors = qm.domain.executeQuery(cGreaterQuery, qparams)[0]
+						def elementPosition = total - majors
+						// Then, calculate in which page the element is in
+						currentPage = Math.ceil(elementPosition / max )
+						qparams.remove('value')
+					}
+					else { // if select2 has no value, do the standard procedure to calculate currentPage
+						currentPage = NumberUtil.limit(params.int('page', 1), 1, 1000)
+					}
+					int offset = (currentPage - 1) * max
+
 					def rquery = query.toString().replace('@COLS@', queryColumns)
 					// rquery = rquery + " ORDER BY a.assetName"
 					log.debug "***** Results Query: $rquery"
@@ -3035,7 +3063,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		renderAsJson(results: results, total: total)
+		renderAsJson(results: results, total: total, page: currentPage)
 	}
 
 	/**
