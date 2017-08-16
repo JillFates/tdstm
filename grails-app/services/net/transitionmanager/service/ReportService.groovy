@@ -8,9 +8,16 @@ class ReportService implements ServiceMethods {
 
 	SecurityService securityService
 
+	/**
+	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
+	 * current person in session.
+	 * @param project Filter reports by this project.
+	 * @param person Filter by owned reports.
+	 * @return
+	 */
 	List<Report> list(Project project, Person person) {
 		def query = Report.where {
-			project == project && (isShared == true || isSystem == true || person == person)
+			project == project && (isSystem == true || isShared == true || person == person)
 		}
 		return query.list()
 	}
