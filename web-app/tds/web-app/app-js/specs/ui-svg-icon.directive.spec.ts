@@ -34,9 +34,8 @@ describe('UISVGIconDirective:', () => {
 
 	it('should have a SVG element', () => {
 		fixture.detectChanges();
-		const comp = de.nativeElement;
-		console.log(comp);
-		expect(comp.innerHTML).toMatch(/application_menu/i, 'Should say something about "application_menu"');
+		const svgElement = de.nativeElement;
+		expect(svgElement.innerHTML).toMatch(/application_menu/i, 'Should say something about "application_menu"');
 	});
 
 });
