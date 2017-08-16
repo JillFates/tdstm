@@ -1,10 +1,11 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
-import org.codehaus.groovy.grails.web.util.WebUtils
-
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.codehaus.groovy.grails.web.util.WebUtils
+import org.springframework.web.context.request.RequestContextHolder
 
 trait ServiceMethods {
 
@@ -82,9 +83,20 @@ trait ServiceMethods {
 		instance
 	}
 
+	/**
+	 * Used to gain access to the HttpSession request object when there is an HTTP Request.
+	 * For calls when there is no HTTP Session (e.g. Quartz jobs) a null value will be returned.
+	 * @return the Http Request session object
+	 */
 	HttpSession getSession() {
-		HttpServletRequest request = WebUtils.retrieveGrailsWebRequest().currentRequest
-		HttpSession session = request.session
+		HttpSession session
+		if (RequestContextHolder.getRequestAttributes()) {
+			GrailsWebRequest grailsWebRequest = WebUtils.retrieveGrailsWebRequest()
+			if (grailsWebRequest) {
+				HttpServletRequest request = grailsWebRequest.currentRequest
+				session = request.session
+			}
+		}
 		return session
 	}
 }
