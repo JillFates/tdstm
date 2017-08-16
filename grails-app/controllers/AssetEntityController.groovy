@@ -1038,7 +1038,7 @@ class AssetEntityController implements ControllerMethods {
 			def justRemaining = userPreferenceService.getPreference(PREF.JUST_REMAINING) ?: "1"
 			// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 			def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-			boolean viewUnpublished = (userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true') ? '1' : '0'
+			String viewUnpublished = (userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true') ? '1' : '0'
 			def timeToRefresh = userPreferenceService.getPreference(PREF.TASKMGR_REFRESH)
 			def entities = assetEntityService.entityInfo(project)
 			def moveBundleList = MoveBundle.findAllByProject(project, [sort: 'name'])
