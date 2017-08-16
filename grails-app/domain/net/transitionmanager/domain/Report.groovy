@@ -23,7 +23,7 @@ class Report {
 	Date lastModified
 
     static constraints = {
-		name nullable: false
+		person nullable: true
 		lastModified nullable: true
     }
 
