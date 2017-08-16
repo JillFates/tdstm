@@ -1,9 +1,16 @@
+/**
+ * @author David Ontiveros
+ */
 package net.transitionmanager.service
 
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Report
 
+/**
+ * Service class with main database operations for Report.
+ * @see Report
+ */
 class ReportService implements ServiceMethods {
 
 	SecurityService securityService

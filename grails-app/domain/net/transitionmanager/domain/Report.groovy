@@ -1,8 +1,16 @@
+/**
+ * @author David Ontiveros
+ */
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 
+/**
+ * Database table mapping for 'report'.
+ * Represents the properties configuration and definition of a report
+ * which is mainly used across Asset Explorer feature.
+ */
 class Report {
 
 	Project project
@@ -25,6 +33,11 @@ class Report {
 		person column: 'person_id'
 	}
 
+	/**
+	 * Converts current report object to a map.
+	 * @param currentPersonId current person in session.
+	 * @return
+	 */
 	Map toMap(Long currentPersonId) {
 		Boolean isOwner = person ? (person.id == currentPersonId) : false
 		Map data = [
