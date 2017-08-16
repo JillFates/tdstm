@@ -2832,14 +2832,14 @@ class AssetEntityService implements ServiceMethods {
 									status   : AssetDependencyStatus.QUESTIONED
 							])
 
-							//clonedDependency.save()
+							clonedDependency.save()
 						}
 						for (dependency in assetToClone.requiredDependencies()) {
 							AssetDependency clonedDependency = dependency.clone([
 									asset : clonedAsset,
 									status: AssetDependencyStatus.QUESTIONED
 							])
-							//clonedDependency.save()
+							clonedDependency.save()
 						}
 					}
 					return clonedAsset.id
