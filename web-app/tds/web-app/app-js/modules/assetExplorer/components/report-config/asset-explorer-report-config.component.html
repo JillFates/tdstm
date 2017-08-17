@@ -1,19 +1,25 @@
 <div class="content body">
 	<section class="page-asset-explorer-config">
 		<div>
-			<div class="btn-group">
-				<button type="button" id="btnSaveAs" *ngIf="model.id && !model.isOwner" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn"
-				 [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
-				<button type="button" id="btnSave" *ngIf="!model.id || model.isOwner" [disabled]="!isSaveAvailable() || !isValid()" class="btn"
-				 [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}" (click)="onSave()"><i class="fa fa-fw fa-floppy-o"></i> Save</button>
+			<div class="btn-group" *ngIf="model.id;else saveButton">
+				<button type="button" id="btnSaveAs" *ngIf="!model.isOwner" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+				<button type="button" id="btnSave" *ngIf="model.isOwner" [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 (click)="onSave()"><i class="fa fa-fw fa-floppy-o"></i> Save</button>
 				<button type="button" class="btn dropdown-toggle" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 				 [disabled]="!isValid()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
 				</button>
-				<ul class="dropdown-menu" *ngIf="model.id && model.isOwner">
-					<li (click)="onSaveAs()"><a href="#">Save As</a></li>
+				<ul class="dropdown-menu" *ngIf="model.isOwner">
+					<li>
+						<a (click)="onSaveAs()">Save As</a>
+					</li>
 				</ul>
 			</div>
+			<ng-template #saveButton>
+				<button type="button" id="btnSave" *ngIf="model.isOwner" [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 (click)="onSave()"><i class="fa fa-fw fa-floppy-o"></i> Save</button>
+			</ng-template>
 			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 			<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 			<asset-explorer-report-selector></asset-explorer-report-selector>
