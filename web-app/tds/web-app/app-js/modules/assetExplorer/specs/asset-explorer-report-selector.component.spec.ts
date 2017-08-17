@@ -7,7 +7,6 @@ import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
 import { HttpModule } from '@angular/http';
 import { UIRouterModule, RootModule } from '@uirouter/angular';
-import { HttpModule, Http } from '@angular/http';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
@@ -108,7 +107,6 @@ describe('AssetExplorerReportSelectorComponent:', () => {
 				FormsModule,
 				SharedModule,
 				DropDownListModule,
-				HttpModule,
 				UIRouterModule.forRoot(<RootModule>{
 					useHash: true,
 					states: [{
