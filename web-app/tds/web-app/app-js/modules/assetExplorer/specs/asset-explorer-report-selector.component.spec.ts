@@ -2,10 +2,10 @@
  * Created by aaferreira on 15/08/2017.
  */
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs/Rx';
+import { HttpModule } from '@angular/http';
 import { UIRouterModule, RootModule } from '@uirouter/angular';
 
 import { SharedModule } from '../../../shared/shared.module';
@@ -103,6 +103,7 @@ describe('AssetExplorerReportSelectorComponent:', () => {
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
 			imports: [
+				HttpModule,
 				FormsModule,
 				SharedModule,
 				DropDownListModule,
