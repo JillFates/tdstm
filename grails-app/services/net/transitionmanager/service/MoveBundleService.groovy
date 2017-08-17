@@ -196,31 +196,22 @@ class MoveBundleService implements ServiceMethods {
 	}
 
 	/**
-	 *  Delete Bundle AssetEntitys and its associated records
+	 *  Delete Bundle AssetEntities and its associated records
 	 */
 	def deleteBundleAssetsAndAssociates(MoveBundle moveBundle){
-
 		try{
 			// remove preferences
 			def bundleQuery = "select mb.id from MoveBundle mb where mb.id = $moveBundle.id"
 			UserPreference.executeUpdate("delete from UserPreference up where up.value = '$moveBundle.id' ")
 			//remove the AssetEntity and associated
-			def assets = AssetEntity.findAllByMoveBundle(moveBundle)
-			if(assets){
-				ApplicationAssetMap.executeUpdate  'delete ApplicationAssetMap where asset       in (:assets)', [assets: assets]
-				AssetComment.executeUpdate         'delete AssetComment        where assetEntity in (:assets)', [assets: assets]
-				AssetEntityVarchar.executeUpdate   'delete AssetEntityVarchar  where assetEntity in (:assets)', [assets: assets]
-				ProjectAssetMap.executeUpdate      'delete ProjectAssetMap     where asset       in (:assets)', [assets: assets]
-				AssetCableMap.executeUpdate        'delete AssetCableMap       where assetFrom   in (:assets)', [assets:assets]
-				AssetCableMap.executeUpdate      '''Update AssetCableMap set cableStatus='Unknown', assetTo=null, assetToPort=null
-                                                 where assetTo in (:assets)''', [assets: assets]
-				ProjectTeam.executeUpdate(        'Update ProjectTeam SET latestAsset = null where latestAsset in (:assets)', [assets:assets])
-				AssetDependency.executeUpdate(     'delete AssetDependency where asset in (:assets) or dependent in (:deps)',
-												[assets:assets, deps:assets] )
-				AssetDependencyBundle.executeUpdate('delete AssetDependencyBundle where asset in (:assets)', [assets:assets])
-				AssetEntity.executeUpdate('delete AssetEntity where moveBundle=?', [moveBundle])
-			}
-		}		catch (e) {
+			List assets = AssetEntity.where {
+					moveBundle == moveBundle
+			}.projections{
+			 			property 'id'
+			}.list()
+			assetEntityService.deleteAssets(assets)
+			AssetEntity.executeUpdate('delete AssetEntity where moveBundle=?', [moveBundle])
+		} catch (e) {
 			e.message = "Unable to remove the $moveBundle Assets Error: $e.message"
 			throw e
 		}
