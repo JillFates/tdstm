@@ -46,19 +46,19 @@
 						<div class="col-md-4 col-sm-12">
 							<div class="col-sm-9">
 								<div class="form-group has-feedback" style="margin-bottom:0px;">
-									<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="ApplyFilters()">
+									<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="applyFilters()">
 									<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
 									 aria-hidden="true"></span>
 								</div>
 							</div>
 							<div class="col-sm-3">
-								<button type="button" class="btn btn-default" id="btnFilter" (click)="ApplyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
+								<button type="button" class="btn btn-default" id="btnFilter" (click)="applyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
 							</div>
 						</div>
 						<div class="col-md-8 col-sm-12">
 							<div class="col-md-3 col-sm-6">
 								<div class="form-group">
-									<select name="selected" (change)="ApplyFilters()" id="selected" class="form-control pd-top-5" [(ngModel)]="filterModel.selected">
+									<select name="selected" (change)="applyFilters()" id="selected" class="form-control pd-top-5" [(ngModel)]="filterModel.selected">
 										<option value="all">All Fields</option>
 										<option value="true">Selected</option>
 										<option value="false">Unselected</option>
@@ -67,7 +67,7 @@
 							</div>
 							<div class="col-md-3 col-sm-6">
 								<div class="form-group">
-									<select name="show" (change)="ApplyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
+									<select name="show" (change)="applyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
 										<option value="all">All Classes</option>
 										<option *ngFor="let asset of selectedAssetClasses()" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
 									</select>
@@ -78,7 +78,7 @@
 					<label for="" style="font-size:14px;padding-left: 15px;padding-bottom: 10px;">Select one or more columns to display.</label>
 					<div class="row" style="overflow:auto;margin:0 5px;">
 						<div style="position:relative;float:left;height:375px;">
-							<div [ngStyle]="fieldStyle(fieldIndex)" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
+							<div [ngStyle]="position[fieldIndex]" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
 								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
 								<ng-template #defaultField>
 									<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (click)="updateModelbyFilter()"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>

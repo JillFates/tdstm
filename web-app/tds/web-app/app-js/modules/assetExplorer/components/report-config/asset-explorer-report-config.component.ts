@@ -44,12 +44,14 @@ export class AssetExplorerReportConfigComponent {
 	};
 	collapsed = false;
 	collapsedColumnsPreview = false;
+	columnIndex = 0;
+	rowIndex = 0;
 
 	model: ReportModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
-
+	position: any[] = [];
 	constructor(
 		@Inject('report') report: Observable<ReportModel>,
 		private assetExpService: AssetExplorerService,
@@ -99,6 +101,9 @@ export class AssetExplorerReportConfigComponent {
 		this.applyFieldFilter();
 		this.applySelectedFilter();
 		this.fields = this.mapFieldList();
+		this.columnIndex = 0;
+		this.rowIndex = 0;
+		this.position = this.fields.map(x => this.fieldStyle(x['isTitle']));
 	}
 
 	protected applyAssetSelectFilter(): void {
@@ -154,17 +159,27 @@ export class AssetExplorerReportConfigComponent {
 		return Object.keys(this.filterModel.assets).filter(key => this.filterModel.assets[key]);
 	}
 
-	protected fieldStyle(fieldIndex): any {
-		return {
+	protected fieldStyle(isTitle: boolean): any {
+		if (isTitle && this.columnIndex !== 0) {
+			this.columnIndex += 1;
+			this.rowIndex = 0;
+		}
+		let result = {
 			'height': '25px',
 			'width': '160px',
-			'top': (fieldIndex < 15 ? fieldIndex : fieldIndex % 15) * 25 + 'px',
-			'left': Math.floor(fieldIndex / 15) * 160 + 'px',
+			'top': this.rowIndex * 25 + 'px',
+			'left': this.columnIndex * 160 + 'px',
 			'position': 'absolute',
 			'margin': '0px',
 			'padding-left': '10px',
 			'padding-bottom': '5px'
 		};
+		this.rowIndex += 1;
+		if (this.rowIndex >= 15) {
+			this.columnIndex += 1;
+			this.rowIndex = 0;
+		}
+		return result;
 	}
 
 	protected openSaveDialog(): void {
