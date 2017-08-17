@@ -460,6 +460,7 @@ describe('Cookbook', function(){
 
         it('should close error msg', function() {
           cookbook.errorModalCloseBtn.click();
+          browser.waitForAngular();
           expect(cookbook.isErrorModalNotDisplayed()).toBe(true);
         });
 

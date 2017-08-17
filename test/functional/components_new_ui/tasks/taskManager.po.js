@@ -5,11 +5,11 @@ var TaskManager = function(){
 	//menu text to determine Event
 	this.projEventUser = $('#nav-project-name');
 	//this.eventUserTxt = projEventUser.getText().substr(projEventUser.getText().indexOf(":") + 1);
-	//Layout elements
+	//-START Layout elements
 	this.headerTitle =  $('h1');
 	this.controlRowElements = $$('#controlRowId');
 	this.controlRow	= $('#controlRowId');
-	this.eventLb = null; // TODO Edit after FE solve the label issue
+	this.eventLb = $('[for="lbl-task-event-title"]');
 	this.moveEventDD = $('#moveEventId');
   this.moveEventDDOptions = $$('#moveEventId option');
   this.moveEventDDSelected = $('#moveEventId option:checked');
@@ -63,9 +63,20 @@ var TaskManager = function(){
 	this.customColumnTCol = $('#taskListIdGrid_custom'); // TODO Check and obtain custom columns for validate them
 	this.customColumnTColLb  = $('#jqgh_custom');// TODO Check and obtain custom columns for validate them
 	this.customColumnTColFlt = $('#gs_custom'); // TODO Check and obtain custom columns for validate them
-//Table Footer
+	//Table Footer
 	this.tableRefreshBt = $('#taskListId');
+	//-END of Layout Elements
+	
+	//-START Functionality
+  // Create Task
+  this.createTaskModal = $('[class="modal fade modal-task in"]');
+  this.createTaskTitle = this.createTaskModal.$('ui-id-5');
+  this.taskNameLabel = this.createTaskModal.$('[for="taskName"]');
+  
+  // TODO For task modal window features
 
+	//-END Functionality
+	
 	
 	TaskManager.prototype = {};
 	
@@ -102,67 +113,6 @@ var TaskManager = function(){
 	  });
 	};
 	
-/* traidas de Cookbook	
-  this.createRecipeBtn = $('#generateTask[ng-click="createRecipe()"]');
-  this.createModal = $('[class="modal fade in"]');
-  this.modalTitleCss = this.createModal.$('h3');
-  this.modalTabs = this.createModal.$$('.nav-tabs li');
-  this.modalButtons = this.createModal.$$('.modal-footer button');
-  this.nameField = this.createModal.$('#inputName');
-  this.nameLabel = this.createModal.$('[for="inputName"]');
-  this.descriptionField = this.createModal.$('#textareaDescription');
-  this.descriptionLabel = this.createModal.$('[for="textareaDescription"]');
-  this.contextLabel = this.createModal.$('[for="contextSelector2"]');
-  this.contextField = this.createModal.$('#contextSelector2');
-  this.contextOptions = this.createModal.$$('#contextSelector2 option');
-  this.contextOptionSelected = this.createModal.$('#contextSelector2 option:checked');
-
-  this.pageTabs = $$('#mainTabset li');
-  //EditorTab
-  this.editEditorBtn = $('[ng-click="showEditPopup()"]');
-  this.saveWipBtn = $('[ng-click="saveWIP()"]');
-  this.undoBtn =$('[ng-click="cancelChanges()"]');
-
-  this.releaseBtn = $('[ng-click="releaseVersion()"]');
-  this.discardWipBtn = $('[ng-click="discardWIP()"]');
-  
-  this.diffBtn = $('[ng-click="diff()"]');
-
-  this.checkSyntaxBtn = $('[ng-click="validateSyntax()"]');
-  this.syntaxErrorTab = $('[class="syntaxErrors ng-scope"]');
-  this.checkSyntaxErrorTitle = this.syntaxErrorTab.$('[ng-bind="error.reason"]');
-  this.checkSyntaxErrorDetails = this.syntaxErrorTab.$('[ng-bind-html="secureHTML(error.detail)"]');
-  this.loadingIndicator = $('loading-indicator [ng-show="isLoading"]');
-  //Editor Modal
-  this.editorModal = $('[class="modal fade code-editor-modal in"]');
-  this.editorTextAreaX = this.editorModal.$('[ng-model="modal.sourceCode"]');
-  this.editorTextArea = $$('[ng-model="modal.sourceCode"] .CodeMirror-code pre');
-  this.modalCloseBtn = $('[ng-click="storeCode()"]');
-
-  //Task Generation tab
-  this.eventLabel = $('[for="eventSelect"]');
-  this.eventOptions = $$('#eventSelect option');
-  this.eventSelected = $('#eventSelect option:checked');
-
-  this.setAsDefaultLink = $('#setDefaultContext');
-  this.clearDefaultLink = $('#clearDefaultContext');
-
-  this.autoPublishTaskLabel = $('[for="autoPublishTasks"]');
-  this.autoPublishTaskCheck = $('#autoPublishTasks');
-
-  this.generateUsingWipLabel = $('[for="generateUsingWIP"]');
-  this.generateUsingWipCheckBox = $('#generateUsingWIP');
-
-  this.generateTasksBtn = $('[ng-click="tasks.generateTask(this)"]');
-  this.errorModal = $('#errorModal');
-  this.errorModalText = this.errorModal.$('#errorModalText');
-  this.errorModalCloseBtn = this.errorModal.$('[class="btn btn-default"]');
-  
-  this.taskGenerationTabs = $('#taskGenerationTabs');
-  //task Generation Tabs
-  this.sumaryList = $('[ui-view="taskBatchCompleted"] [class="summaryList ng-scope"]');
-*/
-
 };
 
 	

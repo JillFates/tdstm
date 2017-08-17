@@ -31,8 +31,8 @@ describe('Task Manager', function(){
   	
 	  describe('Control Row',function(){
 	    
-	  	xit('should have "Event" as title', function(){
-	      expect(taskManager.controlRow.getText()).toEqual('Event');
+	  	it('should have "Event" as title', function(){
+	      expect(taskManager.eventLb.getText()).toEqual('Event');
 	    });
 	    
 	  	describe('Event Dropdown', function() {
