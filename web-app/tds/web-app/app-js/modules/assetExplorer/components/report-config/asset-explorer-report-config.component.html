@@ -1,8 +1,19 @@
 <div class="content body">
 	<section class="page-asset-explorer-config">
 		<div>
-			<button type="button" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
-			 id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+			<div class="btn-group">
+				<button type="button" id="btnSaveAs" *ngIf="model.id && !model.isOwner" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn"
+				 [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+				<button type="button" id="btnSave" *ngIf="!model.id || model.isOwner" [disabled]="!isSaveAvailable() || !isValid()" class="btn"
+				 [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}" (click)="onSave()"><i class="fa fa-fw fa-floppy-o"></i> Save</button>
+				<button type="button" class="btn dropdown-toggle" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 [disabled]="!isValid()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu" *ngIf="model.id && model.isOwner">
+					<li (click)="onSaveAs()"><a href="#">Save As</a></li>
+				</ul>
+			</div>
 			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 			<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 			<asset-explorer-report-selector></asset-explorer-report-selector>
@@ -28,7 +39,7 @@
 					<button class="btn btn-box-tool" (click)="onToggleConfig()"><i class="fa" [ngClass]="(collapsed)? 'fa-plus': 'fa-minus' "></i></button>
 				</li>
 				<li class="pull-right" role="presentation">
-					<button (click)="onSave()" [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
+					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
 				</li>
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
