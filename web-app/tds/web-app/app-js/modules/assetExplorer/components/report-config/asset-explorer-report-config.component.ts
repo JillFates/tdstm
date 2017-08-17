@@ -30,6 +30,7 @@ import { AssetExplorerReportExportComponent } from '../report-export/asset-explo
 export class AssetExplorerReportConfigComponent {
 
 	private dataSignature: string;
+	// There will be more custom classes, but this are the list who has already an Icon
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
 		assets: {
@@ -136,7 +137,6 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	/**Miscellaneus Methods */
-
 	private mapFieldList(): FieldSettingsModel[] {
 		return this.filteredData
 			.reduce((p: FieldSettingsModel[], c: DomainModel) => {
@@ -221,6 +221,19 @@ export class AssetExplorerReportConfigComponent {
 				this.permissionService.hasPermission('AssetExplorerSystemSaveAs') :
 				this.permissionService.hasPermission('AssetExplorerSaveAs') :
 			this.isSaveAvailable();
+	}
+
+	/**
+	 * Get the Icon of the Asset class, if does not exist use the Other generic icon
+	 * @param {string} assetName
+	 * @returns {string}
+	 */
+	protected getAssetIcon(assetName: string): string {
+		let validAssetIconClass = this.assetClasses.find((r) => r === assetName);
+		if (!validAssetIconClass) {
+			validAssetIconClass = 'other';
+		}
+		return validAssetIconClass.toLocaleLowerCase() + '_menu';
 	}
 
 	/** Dialog and view Actions methods */
