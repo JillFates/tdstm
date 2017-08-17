@@ -163,6 +163,9 @@ export class AssetExplorerReportConfigComponent {
 		if (isTitle && this.columnIndex !== 0) {
 			this.columnIndex += 1;
 			this.rowIndex = 0;
+		} else if (this.rowIndex >= 15) {
+			this.columnIndex += 1;
+			this.rowIndex = 0;
 		}
 		let result = {
 			'height': '25px',
@@ -175,10 +178,6 @@ export class AssetExplorerReportConfigComponent {
 			'padding-bottom': '5px'
 		};
 		this.rowIndex += 1;
-		if (this.rowIndex >= 15) {
-			this.columnIndex += 1;
-			this.rowIndex = 0;
-		}
 		return result;
 	}
 
