@@ -12,7 +12,7 @@ import { FieldSettingsService } from '../fieldSettings/service/field-settings.se
 export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
 		name: 'tds.assetexplorer',
-		url: '/assetexplorer/reports'
+		url: '/assetexplorer/views'
 	};
 	public static readonly REPORT_CREATE = {
 		name: 'tds.assetexplorer.create',

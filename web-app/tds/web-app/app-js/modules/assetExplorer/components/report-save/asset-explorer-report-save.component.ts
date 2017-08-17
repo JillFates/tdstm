@@ -23,6 +23,9 @@ export class AssetExplorerReportSaveComponent {
 			this.model.name = `Copy of ${this.model.name}`;
 			this.model.id = null;
 		}
+		if (this.model.isSystem) {
+			this.model.isShared = true;
+		}
 	}
 
 	protected cancelCloseDialog(): void {

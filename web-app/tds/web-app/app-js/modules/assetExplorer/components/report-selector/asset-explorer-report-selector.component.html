@@ -1,4 +1,4 @@
-<kendo-dropdownlist #kendoDropDown="kendoDropDownList" [defaultItem]="{name:'Saved Reports',default:true}" [data]="data"
+<kendo-dropdownlist #kendoDropDown="kendoDropDownList" [defaultItem]="{name:'Saved Views',default:true}" [data]="data"
  (close)="onAction($event)" (open)="onAction($event)" [valueField]="'name'" [textField]="'name'" style="width: 266px;">
 	<ng-template kendoDropDownListValueTemplate let-dataItem>
 		<span style="cursor:pointer;width:100%;position:absolute;" (click)="onToggle()">{{dataItem.name}}</span>
@@ -20,7 +20,7 @@
 				</li>
 				<li>
 					<ul style="padding-left:10px;margin-top:5px;" *ngFor="let value of dataItem.items">
-						<a href="./assetexplorer/reports/{{value.id}}/edit"><i class="fa fa-file-text-o"></i> {{value.name}}</a>
+						<a href="./assetexplorer/views/{{value.id}}/edit"><i class="fa fa-file-text-o"></i> {{value.name}}</a>
 					</ul>
 				</li>
 			</div>

@@ -1,8 +1,8 @@
 <div class="content body">
 	<section class="page-asset-explorer-config">
 		<div>
-			<button type="button" [disabled]="!isSaveAsAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"
-					id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+			<button type="button" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+			 id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
 			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 			<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 			<asset-explorer-report-selector [create-new]="false"></asset-explorer-report-selector>
@@ -22,18 +22,18 @@
 				</li>
 				<li role="presentation">
 					<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
-							name="btnPreview" (click)="onPreview()">Preview</button>
+					 name="btnPreview" (click)="onPreview()">Preview</button>
 				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn btn-box-tool" (click)="onToggleConfig()"><i class="fa" [ngClass]="(collapsed)? 'fa-plus': 'fa-minus' "></i></button>
 				</li>
 				<li class="pull-right" role="presentation">
-					<button (click)="onSave()" [disabled]="!isSaveAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable(),'btn-danger':isDirty() && !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
+					<button (click)="onSave()" [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
 				</li>
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
 				<div class="tab-pane active" id="tab_1">
-					<label for="" style="font-size:14px;">Please select at least one asset class to continue.</label> <br>
+					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label> <br>
 					<div class="checkbox" *ngFor="let asset of assetClasses">
 						<label>
 							<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]"> {{ 'ASSETS.'+asset  | translate }}
@@ -48,7 +48,7 @@
 								<div class="form-group has-feedback" style="margin-bottom:0px;">
 									<input type="text" class="form-control" name="search" [(ngModel)]="filterModel.search" (keyup.enter)="ApplyFilters()">
 									<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
-										  aria-hidden="true"></span>
+									 aria-hidden="true"></span>
 								</div>
 							</div>
 							<div class="col-sm-3">
@@ -95,12 +95,16 @@
 				<h3 class="box-title">Selected Columns Preview</h3>
 				<div class="box-tools pull-right">
 					<button class="btn btn-box-tool" (click)="onToggleSelectedColumnsPreview()"><i class="fa fa-minus"></i></button>
-				</div><!-- /.box-tools -->
-			</div><!-- /.box-header -->
+				</div>
+				<!-- /.box-tools -->
+			</div>
+			<!-- /.box-header -->
 			<div class="box-body" [hidden]="collapsedColumnsPreview">
 				<asset-explorer-report-grid [model]="model.schema"></asset-explorer-report-grid>
-			</div><!-- /.box-body -->
-		</div><!-- /.box -->
+			</div>
+			<!-- /.box-body -->
+		</div>
+		<!-- /.box -->
 		<a href="javascript:void(0)" (click)="onBackToStart()"><i class="fa fa-chevron-left"></i> Back to Report List</a>
 	</section>
 </div>

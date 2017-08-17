@@ -96,5 +96,4 @@ export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 			this.permissionService.hasPermission('AssetExplorerCreate');
 	}
 
-
 }

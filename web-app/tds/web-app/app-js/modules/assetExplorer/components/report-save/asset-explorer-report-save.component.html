@@ -14,13 +14,13 @@
 				</div>
 				<div class="form-group">
 					<div class="checkbox" style="padding-left:160px;">
-						<label><input type="checkbox" name="shared" [(ngModel)]="model.isShared"> Share with other users</label>
+						<label><input type="checkbox" [disabled]="model.isSystem" name="shared" [(ngModel)]="model.isShared"> Share with other users</label>
 					</div>
 				</div>
 				<div class="form-group">
 					<div class="checkbox" style="padding-left:160px;">
 						<i class="fa fa-star-o" style="margin-left: -43px;padding:0 10px 10px 10px;font-size: 20px;" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i>
-						<label><input type="checkbox" name="favorite" [(ngModel)]="model.favorite"> Add to Favorites (appears in menu)</label>
+						<label><input type="checkbox" name="favorite" [(ngModel)]="model.favorite"> Add to Favorites</label>
 					</div>
 				</div>
 			</div>
