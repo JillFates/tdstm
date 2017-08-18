@@ -14,6 +14,11 @@ package net.transitionmanager.security
 interface Permission {
 	String	AdminMenuView                 = 'AdminMenuView',
 			AdminUtilitiesAccess          = 'AdminUtilitiesAccess',
+			ActionAssignment			  = 'ActionAssignment',
+			ActionCreate				  = 'ActionCreate',
+			ActionDelete				  = 'ActionDelete',
+			ActionEdit				  	  = 'ActionEdit',
+			ActionInvoke			  	  = 'ActionInvoke',
 			ApplicationRestart            = 'ApplicationRestart',
 			ArchitectureView              = 'ArchitectureView',
 			AssetCreate                   = 'AssetCreate',
