@@ -169,7 +169,8 @@ class AssetEntityService implements ServiceMethods {
 	def securityService
 	def taskService
 	def userPreferenceService
-	def assetService
+    def assetService
+    def commentService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -1265,10 +1266,19 @@ class AssetEntityService implements ServiceMethods {
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 
 		def customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
+		def assetCommentList = []
+
+        if(securityService.hasPermission(Permission.TaskView)) {
+            assetCommentList = taskService.findAllByAssetEntity(assetEntity)
+        }
+
+        if(securityService.hasPermission(Permission.CommentView)) {
+            assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
+        }
 
 		[	assetId: assetEntity?.id,
 			assetComment: assetComment,
-			assetCommentList: AssetComment.findAllByAssetEntity(assetEntity),
+			assetCommentList: assetCommentList,
 			dependencyBundleNumber: depBundle,
 			dependentAssets: dependentAssets,
 			errors: params.errors,
