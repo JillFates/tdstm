@@ -9,7 +9,6 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
-	moduleId: module.id,
 	selector: 'asset-explorer-report-selector',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-selector/asset-explorer-report-selector.component.html',
 	encapsulation: ViewEncapsulation.None,

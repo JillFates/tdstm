@@ -4,7 +4,6 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { ReportModel } from '../../model/report.model';
 
 @Component({
-	moduleId: module.id,
 	selector: 'asset-explorer-report-save',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-export/asset-explorer-report-export.component.html'
 })

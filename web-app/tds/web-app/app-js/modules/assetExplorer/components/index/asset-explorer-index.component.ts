@@ -10,7 +10,6 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
-	moduleId: module.id,
 	selector: 'asset-explorer-index',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html'
 })

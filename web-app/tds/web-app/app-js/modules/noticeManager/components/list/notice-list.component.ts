@@ -11,7 +11,6 @@ import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-gr
 import { process, State, FilterDescriptor } from '@progress/kendo-data-query';
 
 @Component({
-	moduleId: module.id,
 	selector: 'notice-list',
 	encapsulation: ViewEncapsulation.None,
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'

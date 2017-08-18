@@ -5,7 +5,6 @@ import { ReportModel } from '../../model/report.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 
 @Component({
-	moduleId: module.id,
 	selector: 'asset-explorer-report-save',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-save/asset-explorer-report-save.component.html'
 })

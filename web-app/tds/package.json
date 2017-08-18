@@ -8,7 +8,8 @@
   "scripts": {
     "build-prod": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler --PROD",
     "build-dev": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler",
-    "karma-unit-test": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build-test-report"
+    "karma-unit-test": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js build-test-report",
+    "webpack": "node ./node_modules/webpack/bin/webpack --config ../../web-app/tds/webpack.config.js"
   },
   "dependencies": {
     "@angular/animations": "^4.1.2",
@@ -47,7 +48,8 @@
   "devDependencies": {
     "@progress/kendo-theme-default": "^2.12.25",
     "@types/jasmine": "^2.5.36",
-    "@types/node": "^6.0.46",
+    "@types/node": "^6.0.79",
+    "@types/webpack": "^3.0.1",
     "browserify": "^14.1.0",
     "canonical-path": "0.0.2",
     "concurrently": "^3.1.0",
@@ -76,12 +78,15 @@
     "protractor": "~4.0.14",
     "resolve": "1.1.7",
     "rimraf": "^2.5.4",
+    "ts-loader": "^2.2.1",
+    "ts-node": "^3.1.0",
     "tsify": "^3.0.1",
     "tslint": "^4.0.0",
-    "typescript": "~2.2.0",
+    "typescript": "^2.2.2",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.7.0",
+    "webpack": "^3.0.0",
     "yargs": "4.3.1"
   }
 }

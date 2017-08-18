@@ -13,7 +13,6 @@ import { AssetExplorerReportSaveComponent } from '../report-save/asset-explorer-
 import { AssetExplorerReportExportComponent } from '../report-export/asset-explorer-report-export.component';
 
 @Component({
-	moduleId: module.id,
 	selector: 'asset-explorer-report-config',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-config/asset-explorer-report-config.component.html',
 	styles: [`

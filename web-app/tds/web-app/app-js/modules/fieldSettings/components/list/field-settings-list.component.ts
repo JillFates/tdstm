@@ -14,7 +14,6 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { ValidationUtils } from '../../../../shared/utils/validation.utils';
 
 @Component({
-	moduleId: module.id,
 	selector: 'field-settings-list',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/list/field-settings-list.component.html'
 })

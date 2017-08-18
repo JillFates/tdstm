@@ -12,7 +12,6 @@ import { RichTextEditorComponent } from '../../../../shared/modules/rich-text-ed
 import { PermissionService } from '../../../../shared/services/permission.service';
 
 @Component({
-	moduleId: module.id,
 	selector: 'notice-form',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/form/notice-form.component.html'
 })
