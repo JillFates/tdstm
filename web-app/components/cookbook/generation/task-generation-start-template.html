@@ -1,10 +1,9 @@
 <p>Select appropriate context to generate tasks using the {{editor.selectedRecipe.name}} recipe:</p>
 <form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.start">
-	<label class="inline" for="eventSelect">Event:
-		<select name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
-			<option value="">Please select</option>
-		</select>
-	</label>
+	<label class="inline" for="eventSelect" style="margin-right: 4px;">Event:</label>
+	<select style="margin-right: 5%;" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
+		<option value="">Please select</option>
+	</select>
 	<label class="inline" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="bundleSelect">Bundle:
 		<select name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
 			<option value="">Please select</option>

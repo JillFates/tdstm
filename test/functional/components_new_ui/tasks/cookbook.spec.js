@@ -341,7 +341,6 @@ describe('Cookbook', function(){
       expect(cookbook.isLoadingIndicatorHidden()).toBe(true);
     });
 
- //  -- DEBUG -- Verify the static values on objects assigned on po's
     it('should have the message "No errors found" displayed',function () {
       expect(cookbook.checkSyntaxErrorTitle.getText()).toEqual('No errors found');
     });
@@ -359,7 +358,7 @@ describe('Cookbook', function(){
 
     describe('Event Dropdown', function() {
     
-      xit('should have "Event:" as label', function() {
+      it('should have "Event:" as label', function() {
         expect(cookbook.eventLabel.getText()).toEqual('Event:'); 
       });
 
@@ -461,14 +460,14 @@ describe('Cookbook', function(){
 
         it('should close error msg', function() {
           cookbook.errorModalCloseBtn.click();
+          browser.waitForAngular();
           expect(cookbook.isErrorModalNotDisplayed()).toBe(true);
-          browser.sleep(2000);
         });
 
       }); //From WIP with "generate using wip recipe" unchecked
 
       describe('From WIP with "Generate using WIP recipe" checked', function() {
-      	
+      	// TODO: check the hiding modal to finish beofre run the following test
       	it('should enable "Generate using WIP Recipe" checkbox', function() {
           cookbook.generateUsingWipCheckBox.click();
           expect(cookbook.generateUsingWipCheckBox.getAttribute('checked')).toBe('true');
@@ -497,7 +496,6 @@ describe('Cookbook', function(){
       
         it('should click on generate task button', function() {
           cookbook.generateTasksBtn.click();
-          browser.sleep(2000);
           var alertDialog = browser.driver.switchTo().alert();
           expect(alertDialog.getText()).toEqual('There are tasks previously created with this recipe for the selected context.\n\nPress Okay to delete or Cancel to abort.');
           alertDialog.accept();     
