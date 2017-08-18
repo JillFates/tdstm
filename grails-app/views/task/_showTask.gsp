@@ -39,8 +39,10 @@
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
 						<td valign="top" class="value" id="vmAction" colspan="2">{{acData.apiAction.name}}</td>
 						<td valign="top" class="value" >
-							<button class="btn btn-default" role="button" ng-if="acData.apiAction.id" ng-click="lookUpAction(acData.apiAction);"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;
-							<button class="btn btn-default" role="button" ng-if="ac.status === 'Ready' && acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction(acData.assetComment.id);">Invoke</button>
+							<tds:hasPermission permission="${Permission.ActionInvoke}">
+								<button class="btn btn-default" role="button" ng-if="acData.apiAction.id" ng-click="lookUpAction(acData.apiAction);"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;
+								<button class="btn btn-default" role="button" ng-if="ac.status === 'Ready' && acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction(acData.assetComment.id);">Invoke</button>
+							</tds:hasPermission>
 						</td>
 					</tr>
 					<tr id="categoryTrId">

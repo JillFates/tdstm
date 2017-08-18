@@ -224,4 +224,5 @@ databaseChangeLog = {
 	include file: '20170925-create-favorite-dataview-table.groovy'
 	include file: '20171002-create-provider-and-datascript-tables.groovy'
 	include file: '20171011-create-credential-table.groovy'
+	include file: '20170816-add-api-action-permissions.groovy'
 }

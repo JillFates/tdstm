@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.security.Permission" %>
 <div draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 1000px" tabindex="-1" data-keyboard="false">
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
 		<span id="ui-id-5" class="ui-dialog-title">{{(isEdit)?'Edit Task':'Create Task'}}</span>
@@ -44,14 +45,16 @@
 					</tr>
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
-						<td valign="top" class="value" id="vmAction" colspan="2">
-							<!-- default to NONE -->
-							<select ng-model="acData.apiAction.id">
-								<g:each var="apiAction" in="${apiActionList}">
-									<option value="${apiAction.id}">${apiAction.name}</option>
-								</g:each>
-							</select>
-						</td>
+						<tds:hasPermission permission="${Permission.ActionAssignment}">
+							<td valign="top" class="value" id="vmAction" colspan="2">
+								<!-- default to NONE -->
+								<select ng-model="acData.apiAction.id">
+									<g:each var="apiAction" in="${apiActionList}">
+										<option value="${apiAction.id}">${apiAction.name}</option>
+									</g:each>
+								</select>
+							</td>
+						</tds:hasPermission>
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name">
