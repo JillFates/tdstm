@@ -163,7 +163,7 @@ trait ControllerMethods {
 	 * Standardized Exception Handler that will catch any exceptions from the Controllers
 	 */
 	def standardControllerExceptionHandler(Exception e) {
-		handleException(e)
+		handleException(e, log)
 	}
 
 	def <T> T getFromParams(Class<T> clazz, Map params) {
