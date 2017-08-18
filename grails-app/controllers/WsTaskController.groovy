@@ -165,10 +165,10 @@ class WsTaskController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission(Permission.TaskCreate)
 	/**
 	 * Return the default values of Create Tasks Properties
 	 */
+	@HasPermission(Permission.TaskCreate)
 	def taskCreateDefaults() {
 		renderSuccessJson([preferences: commentService.getTaskCreateDefaults()])
 	}
@@ -178,6 +178,7 @@ class WsTaskController implements ControllerMethods {
 	 * @param id - task id
 	 * @return
 	 */
+	@HasPermission(Permission.ActionInvoke)
 	def invokeAction() {
 		AssetComment assetComment = AssetComment.get(params.id)
 		if (assetComment) {
