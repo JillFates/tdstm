@@ -7,6 +7,9 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Report
 import org.codehaus.groovy.grails.web.json.JSONObject
+import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.service.DomainUpdateException
+
 
 /**
  * Service class with main database operations for Report.
@@ -56,22 +59,94 @@ class ReportService implements ServiceMethods {
 	}
 
 	/**
-	 * Creates a database report object.
+	 * Creates a Dataview object
 	 * Report person and project are taken from current session.
 	 * @param json JSONObject to take changes from.
+	 * @return the Dataview object that was created
+	 * @throws DomainUpdateException, UnauthorizedException
 	 */
 	def create(JSONObject json) {
-		Report report = new Report()
-		report.person = securityService.loadCurrentPerson()
-		report.project = securityService.userCurrentProject
-		report.name = json.name
-		report.isSystem = json.isSystem
-		report.isShared = json.isShared
-		report.reportSchema = json.schema
-		if(!report.save()) {
-			report.errors.each {
-				log.error(it)
-			}
+		validateReportCreateAccess(json)
+
+		Report dataview = new Report()
+		dataview.with {
+			person = securityService.loadCurrentPerson()
+			project = securityService.userCurrentProject
+			name = json.name
+			isSystem = json.isSystem
+			isShared = json.isShared
+			reportSchema = json.schema
 		}
+
+		if (!dataview.save()) {
+			throw new DomainUpdateException(dataview)
+		}
+
+		return dataview
+	}
+
+	/**
+	 * Validates if person accessing report is authorized to access it.
+	 * - should belong to current project in session
+	 * - should be either system or shared or current person in session owned
+	 * @param report
+	 * @return
+	 */
+	boolean validateReportViewAccess(Report report) {
+		return report.project.id == securityService.userCurrentProject.id && (report.isSystem || report.isShared || report.person.id == securityService.currentPersonId)
+	}
+
+	/**
+	 * Validates if person updating a report has permission to do it.
+	 * @param report
+	 * @return
+	 */
+	boolean validateReportUpdateAccess(Report report, JSONObject reportJSON) {
+		boolean valid = report.project.id == securityService.userCurrentProject.id
+		// system report validation
+		if (valid && report.isSystem) {
+			valid = securityService.hasPermission(Permission.AssetExplorerSystemEdit)
+		} else if (valid && report.person.id == securityService.currentPersonId) { // owned report validation
+			valid = securityService.hasPermission(Permission.AssetExplorerEdit)
+		}
+		// TODO: should we prevent editing other user reports ??
+
+		return valid
+	}
+
+	/**
+	 * Validates if person creating a report has permission to create a Dataview
+	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
+	 * @throws UnauthorizedException
+	 */
+	void validateReportCreateAccess(JSONObject dataviewJSON) {
+		boolean valid = true
+		// system report validation
+		if (valid && reportJSON.isSystem) {
+			valid = securityService.hasPermission(Permission.AssetExplorerSystemCreate)
+		} else if (valid) { // owned report validation
+			valid = securityService.hasPermission(Permission.AssetExplorerCreate)
+		}
+
+		if (!valid) {
+			throw new UnauthorizedException()
+		}
+	}
+
+	/**
+	 * Validates if person deleting a report has permission to do it.
+	 * @param report
+	 * @return
+	 */
+	boolean validateReportDeleteAccess(Report report) {
+		boolean valid = report.project.id == securityService.userCurrentProject.id
+		// system report validation
+		if (valid && report.isSystem) {
+			valid = securityService.hasPermission(Permission.AssetExplorerSystemDelete)
+		} else if (valid) { // owned report validation
+			valid = securityService.hasPermission(Permission.AssetExplorerDelete)
+		}
+
+		return valid
 	}
 }

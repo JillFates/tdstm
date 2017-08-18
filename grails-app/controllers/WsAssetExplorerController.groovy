@@ -82,87 +82,14 @@ class WsAssetExplorerController implements ControllerMethods {
 	}
 
 	/**
-	 * Create report operation for Asset Explorer endpoint ('Save As' action on Asset Explorer).
-	 * @return * @return status:300 json{ "status": "success"/"fail", "data": "OK"/"Error Message"}.
+	 * Create an Asset Dataview for Asset Explorer ('Save As' action on Asset Explorer)
+	 * The service method will check for permissions AssetExplorerSystemEdit or AssetExplorerEdit
+	 * appropriately.
+	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
+	@Secured('isAuthenticated()')
 	def createReport() {
-		JSONObject reportJSON = request.JSON
-		// permission validation
-		if (validateReportCreateAccess(reportJSON)) {
-			try {
-				reportService.create(reportJSON)
-				renderSuccessJson('OK')
-			} catch (Exception e) {
-				renderFailureJson(e.getMessage())
-			}
-		}
-		else { // If not found, send fail result.
-			renderFailureJson("Unauthorized access")
-		}
+		renderSuccessJson( [dataView: reportService.create(request.JSON)] )
 	}
 
-
-	/**
-	 * Validates if person accessing report is authorized to access it.
-	 * - should belong to current project in session
-	 * - should be either system or shared or current person in session owned
-	 * @param report
-	 * @return
-	 */
-	boolean validateReportViewAccess(Report report) {
-		return report.project.id == securityService.userCurrentProject.id && (report.isSystem || report.isShared || report.person.id == securityService.currentPersonId)
-	}
-
-	/**
-	 * Validates if person updating a report has permission to do it.
-	 * @param report
-	 * @return
-	 */
-	boolean validateReportUpdateAccess(Report report, JSONObject reportJSON) {
-		boolean valid = report.project.id == securityService.userCurrentProject.id
-		// system report validation
-		if (valid && report.isSystem) {
-			valid = securityService.hasPermission(Permission.AssetExplorerSystemEdit)
-		} else if (valid && report.person.id == securityService.currentPersonId) { // owned report validation
-			valid = securityService.hasPermission(Permission.AssetExplorerEdit)
-		}
-		// TODO: should we prevent editing other user reports ??
-
-		return valid
-	}
-
-	/**
-	 * Validates if person creating a report has permission to do it.
-	 * @param report
-	 * @return
-	 */
-	boolean validateReportCreateAccess(JSONObject reportJSON) {
-		boolean valid = true
-		// system report validation
-		if (valid && reportJSON.isSystem) {
-			valid = securityService.hasPermission(Permission.AssetExplorerSystemCreate)
-		} else if (valid) { // owned report validation
-			valid = securityService.hasPermission(Permission.AssetExplorerCreate)
-		}
-
-		return valid
-	}
-
-	/**
-	 * Validates if person deleting a report has permission to do it.
-	 * @param report
-	 * @return
-	 */
-	boolean validateReportDeleteAccess(Report report) {
-		boolean valid = report.project.id == securityService.userCurrentProject.id
-		// system report validation
-		if (valid && report.isSystem) {
-			valid = securityService.hasPermission(Permission.AssetExplorerSystemDelete)
-		} else if (valid) { // owned report validation
-			valid = securityService.hasPermission(Permission.AssetExplorerDelete)
-		}
-
-		return valid
-	}
 }
-
