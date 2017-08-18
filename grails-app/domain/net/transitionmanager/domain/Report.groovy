@@ -23,14 +23,13 @@ class Report {
 	Date lastModified
 
     static constraints = {
+    	name size: 1..255
 		person nullable: true
 		lastModified nullable: true
     }
 
 	static mapping = {
-		name sqltype: 'varchar(30)'
-		project column: 'project_id'
-		person column: 'person_id'
+		name sqltype: 'varchar(255)'
 	}
 
 	/**

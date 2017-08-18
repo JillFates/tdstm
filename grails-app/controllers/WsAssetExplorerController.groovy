@@ -89,7 +89,7 @@ class WsAssetExplorerController implements ControllerMethods {
 	 */
 	@Secured('isAuthenticated()')
 	def createReport() {
-		renderSuccessJson( [dataView: reportService.create(request.JSON)] )
+		renderSuccessJson( [dataView: reportService.create(request.JSON).toMap()] )
 	}
 
 }

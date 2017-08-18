@@ -115,21 +115,35 @@ class ReportService implements ServiceMethods {
 	}
 
 	/**
-	 * Validates if person creating a report has permission to create a Dataview
-	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
-	 * @throws UnauthorizedException
+	 * Used to validate if the Dataview JSON request has all of the required properties
+	 * @param json - the JSON object to inspect
+	 * @throws InvalidRequestException with what property is missing or if no object present
 	 */
-	void validateReportCreateAccess(JSONObject dataviewJSON) {
-		boolean valid = true
-		// system report validation
-		if (valid && reportJSON.isSystem) {
-			valid = securityService.hasPermission(Permission.AssetExplorerSystemCreate)
-		} else if (valid) { // owned report validation
-			valid = securityService.hasPermission(Permission.AssetExplorerCreate)
+	void validateDataviewJson(JSONObject json) {
+		// TODO - flush out all of the required properties
+		List<String> props = ['isSystem', 'name']
+		if (json) {
+			for (String prop in props) {
+				if (! json.containsKey(prop)) {
+					throw new InvalidRequestException("JSON object missing property $prop")
+				}
+			}
+		} else {
+			throw new InvalidRequestException('Dataview JSON object was missing from request')
 		}
+	}
 
-		if (!valid) {
-			throw new UnauthorizedException()
+	/**
+	 * Validates if the person creating a report has permission to create a Dataview
+	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
+	 * @throws UnauthorizedException, InvalidRequestException
+	 */
+	void validateReportCreateAccess(JSONObject dataviewJson) {
+		validateDataviewJson(dataviewJson)
+
+		Permission requiredPerm = dataviewJson.isSystem ? Permission.AssetExplorerSystemCreate : Permission.AssetExplorerCreate
+		if (! securityService.hasPermission(requiredPerm)) {
+			throw new UnauthorizedException(requiredPerm)
 		}
 	}
 
