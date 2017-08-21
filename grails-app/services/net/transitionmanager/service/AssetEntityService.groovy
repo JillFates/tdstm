@@ -870,25 +870,62 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	void deleteAssets(List<Long> assetIds) {
 		ProjectAssetMap.executeUpdate('DELETE ProjectAssetMap WHERE asset.id in (:assets)', [assets: assetIds])
-		AssetComment.executeUpdate('UPDATE AssetComment SET assetEntity=null WHERE assetEntity.id in (:assets)', [assets: assetIds])
-		ApplicationAssetMap.executeUpdate('DELETE ApplicationAssetMap WHERE asset.id in (:assets)', [assets: assetIds])
 		AssetEntityVarchar.executeUpdate('DELETE AssetEntityVarchar WHERE assetEntity.id in (:assets)', [assets: assetIds])
 		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
+
+		// Delete asset comments
+		AssetComment.executeUpdate('''
+			DELETE AssetComment c
+			WHERE c.assetEntity.id IN (:assets)
+			AND c.commentType != :taskType
+			''',
+			[assets: assetIds, taskType: AssetCommentType.TASK])
+
+		// Null out asset references in Tasks
+		AssetComment.executeUpdate('''
+			UPDATE AssetComment c SET c.assetEntity=null
+			WHERE c.assetEntity.id IN (:assets)
+			''',
+			[assets: assetIds])
+
+		// Delete cabling where asset is the From in the relationship
 		AssetCableMap.executeUpdate('DELETE AssetCableMap WHERE assetFrom.id in (:assets)', [assets: assetIds])
+
+		// Null out cable references where the asset is the To in the relationship
 		AssetCableMap.executeUpdate('''
 			UPDATE AssetCableMap
 			SET cableStatus=:status, assetTo=null, assetToPort=null
 			WHERE assetTo.id in (:assets)''', [assets: assetIds] + [status: AssetCableStatus.UNKNOWN])
-		AssetDependency.executeUpdate('DELETE AssetDependency WHERE asset.id in (:assets) or dependent.id in (:assets) ', [assets: assetIds])
-		AssetDependencyBundle.executeUpdate('DELETE AssetDependencyBundle WHERE asset.id in (:assets)', [assets: assetIds])
+
+		AssetDependency.executeUpdate(
+			'DELETE AssetDependency WHERE asset.id in (:assets) or dependent.id in (:assets) ',
+			[assets: assetIds])
+
+		AssetDependencyBundle.executeUpdate(
+			'DELETE AssetDependencyBundle WHERE asset.id in (:assets)',
+			[assets: assetIds])
 
 		// Clear any possible Chassis references
-		AssetEntity.executeUpdate(
-				'UPDATE AssetEntity SET sourceChassis=NULL, sourceBladePosition=NULL WHERE sourceChassis.id in (:assets)',
-				[assets: assetIds])
-		AssetEntity.executeUpdate(
-				'UPDATE AssetEntity SET targetChassis=NULL, targetBladePosition=NULL WHERE targetChassis.id in (:assets)',
-				[assets: assetIds])
+		AssetEntity.executeUpdate('''
+			UPDATE AssetEntity SET sourceChassis=NULL, sourceBladePosition=NULL
+			WHERE sourceChassis.id in (:assets)
+			''',
+			[assets: assetIds])
+
+		AssetEntity.executeUpdate('''
+			UPDATE AssetEntity SET targetChassis=NULL, targetBladePosition=NULL
+			WHERE targetChassis.id in (:assets)
+			''',
+			[assets: assetIds])
+
+		ApplicationAssetMap.executeUpdate('DELETE ApplicationAssetMap WHERE asset.id in (:assets)', [assets: assetIds])
+
+		// Last but not least, delete the asset itself if it is a DEVICE. Note that the other domain classes are
+		// responsible for deleting themselves.
+		AssetEntity.where {
+			id in assetIds
+			assetClass == AssetClass.DEVICE
+		}.deleteAll()
 	}
 
 	/**
