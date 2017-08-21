@@ -26,9 +26,11 @@
     </button>
 </tds:hasPermission>
 
+<tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskCreate}">
 <button class="btn btn-default" type="button" onclick="createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
     <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px"/> Add Task
 </button>
+</tds:hasPermission>
 
 <tds:hasPermission permission="AssetEdit">
     <button class="btn btn-default" type="button" onclick="createIssue('${escapedName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
