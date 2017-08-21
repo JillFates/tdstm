@@ -8,7 +8,7 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-
+import { Permission } from '../../../../shared/model/permission.model';
 @Component({
 	selector: 'asset-explorer-index',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html'
@@ -92,23 +92,23 @@ export class AssetExplorerIndexComponent {
 	 */
 	protected isCreateAvailable(): boolean {
 		return this.selectedFolder.type === this.viewType.SYSTEM_VIEWS ?
-			this.permissionService.hasPermission('AssetExplorerSystemCreate') :
-			this.permissionService.hasPermission('AssetExplorerCreate');
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
+			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
 	protected isEditAvailable(report: ReportModel): boolean {
 		return report.isSystem ?
-			this.permissionService.hasPermission('AssetExplorerSystemEdit') ||
-			this.permissionService.hasPermission('AssetExplorerSystemSaveAs') :
-			this.permissionService.hasPermission('AssetExplorerEdit') ||
-			this.permissionService.hasPermission('AssetExplorerSaveAs');
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) ||
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
+			this.permissionService.hasPermission(Permission.AssetExplorerEdit) ||
+			this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
 		;
 	}
 
 	protected isDeleteAvailable(report: ReportModel): boolean {
 		return report.isSystem ?
-			this.permissionService.hasPermission('AssetExplorerSystemDelete') :
-			report.isOwner && this.permissionService.hasPermission('AssetExplorerDelete');
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemDelete) :
+			report.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerDelete);
 	}
 
 }

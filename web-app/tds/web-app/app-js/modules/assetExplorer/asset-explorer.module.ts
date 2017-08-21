@@ -13,6 +13,7 @@ import { AssetExplorerReportExportComponent } from './components/report-export/a
 import { AssetExplorerReportGridComponent } from './components/report-grid/asset-explorer-report-grid.component';
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
 import { SharedModule } from '../../shared/shared.module';
+import { Permission } from '../../shared/model/permission.model';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';

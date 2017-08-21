@@ -11,6 +11,7 @@ import { ReportSpec, ReportColumn } from '../../model/report-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerReportSaveComponent } from '../report-save/asset-explorer-report-save.component';
 import { AssetExplorerReportExportComponent } from '../report-export/asset-explorer-report-export.component';
+import { Permission } from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'asset-explorer-report-config',
@@ -221,25 +222,25 @@ export class AssetExplorerReportConfigComponent {
 	protected isSaveAvailable(): boolean {
 		return this.model.id ?
 			this.model.isSystem ?
-				this.permissionService.hasPermission('AssetExplorerSystemEdit') :
-				this.model.isOwner && this.permissionService.hasPermission('AssetExplorerEdit') :
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
+				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerEdit) :
 			this.model.isSystem ?
-				this.permissionService.hasPermission('AssetExplorerSystemCreate') :
-				this.model.isOwner && this.permissionService.hasPermission('AssetExplorerCreate');
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
+				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
 	protected isSaveAsAvailable(): boolean {
 		return this.model.id ?
 			this.model.isSystem ?
-				this.permissionService.hasPermission('AssetExplorerSystemSaveAs') :
-				this.permissionService.hasPermission('AssetExplorerSaveAs') :
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
+				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) :
 			this.isSaveAvailable();
 	}
 
 	protected isSystemSaveAvailable(edit): boolean {
 		return edit ?
-			this.permissionService.hasPermission('AssetExplorerSystemEdit') :
-			this.permissionService.hasPermission('AssetExplorerSystemSaveAs');
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
 	}
 
 	/**

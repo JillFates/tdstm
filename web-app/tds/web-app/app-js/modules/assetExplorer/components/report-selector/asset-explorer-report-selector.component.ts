@@ -4,8 +4,9 @@ import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { StateService } from '@uirouter/angular';
 
 import { ReportGroupModel } from '../../model/report.model';
-import {ViewType} from '../../model/report.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
+import { ViewType } from '../../model/report.model';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
 
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
@@ -91,8 +92,8 @@ export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 	 */
 	protected isCreateAvailable(item: ReportGroupModel): boolean {
 		return item.type === ViewType.SYSTEM_VIEWS ?
-			this.permissionService.hasPermission('AssetExplorerSystemCreate') :
-			this.permissionService.hasPermission('AssetExplorerCreate');
-	}
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
+			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 
+	}
 }
