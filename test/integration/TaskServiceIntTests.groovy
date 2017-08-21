@@ -2,6 +2,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
@@ -188,6 +189,39 @@ class TaskServiceIntTests extends IntegrationSpec {
 			}
  	 	}
  	 	*/
+	}
+
+	void 'test Can Find Tasks By Asset Entity'() {
+
+        setup:
+		def project = new Project(name: "VM", projectCode: "VM", workflowCode: "STD_PROCESS").save()
+		def entityType = new EavEntityType(entityTypeCode: 'AssetEntity', domainName: 'AssetEntity', isAuditable: 1).save()
+		def attributeSet = new EavAttributeSet(attributeSetName: 'Server', entityType: entityType, sortOrder: 10).save()
+		def moveEvent = new MoveEvent(name: "Example 1", project: project, inProgress: 'false').save()
+		def moveBundle = new MoveBundle(name: 'Example 1', moveEvent: moveEvent, project: project).save()
+
+		def assetEntity = new AssetEntity(
+				assetName: "Asset Name",
+				assetType: "Asset Type",
+				assetTag:'TAG-0',
+				moveBundle: moveBundle,
+				project:project,
+				attributeSet:attributeSet
+		).save()
+
+		def task = new AssetComment(
+				comment:"Sample for "+assetEntity.toString(),
+				commentType: AssetCommentType.TASK,
+				assetEntity :assetEntity
+		).save()
+
+		when:
+		def tasks = taskService.findAllByAssetEntity(assetEntity)
+
+		then:
+		[task] == tasks
+
+
 	}
 
 }
