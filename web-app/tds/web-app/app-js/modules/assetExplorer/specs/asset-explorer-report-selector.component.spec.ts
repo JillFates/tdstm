@@ -12,7 +12,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 
 import { AssetExplorerReportSelectorComponent } from '../components/report-selector/asset-explorer-report-selector.component';
-import { ReportModel, ReportType } from '../model/report.model';
+import { ReportModel, ViewType } from '../model/report.model';
 
 describe('AssetExplorerReportSelectorComponent:', () => {
 	let fixture: ComponentFixture<AssetExplorerReportSelectorComponent>;
@@ -126,32 +126,32 @@ describe('AssetExplorerReportSelectorComponent:', () => {
 									name: 'All',
 									items: items,
 									open: true,
-									type: ReportType.ALL
+									type: ViewType.ALL
 								}, {
 									name: 'Recent',
 									items: [],
 									open: false,
-									type: ReportType.RECENT
+									type: ViewType.RECENT
 								}, {
 									name: 'Favorites',
 									items: items.filter(r => r['isFavorite']),
 									open: false,
-									type: ReportType.FAVORITES
+									type: ViewType.FAVORITES
 								}, {
-									name: 'My Reports',
+									name: 'My Views',
 									items: items.filter(r => r.isOwner),
 									open: false,
-									type: ReportType.MY_REPORTS
+									type: ViewType.MY_VIEWS
 								}, {
-									name: 'Shared Reports',
+									name: 'Shared Views',
 									items: items.filter(r => r.isShared),
 									open: false,
-									type: ReportType.SHARED_REPORTS
+									type: ViewType.SHARED_VIEWS
 								}, {
-									name: 'System Reports',
+									name: 'System Views',
 									items: items.filter(r => r.isSystem),
 									open: false,
-									type: ReportType.SYSTEM_REPORTS
+									type: ViewType.SYSTEM_VIEWS
 								}
 							];
 						})

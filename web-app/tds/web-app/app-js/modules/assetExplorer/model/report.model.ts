@@ -17,16 +17,16 @@ export class ReportGroupModel {
 	name: string;
 	items: Array<ReportModel>;
 	open: boolean;
-	type: ReportType;
+	type: ViewType;
 }
 
-export enum ReportType {
+export enum ViewType {
 	ALL,
 	RECENT,
 	FAVORITES,
-	MY_REPORTS,
-	SHARED_REPORTS,
-	SYSTEM_REPORTS
+	MY_VIEWS,
+	SHARED_VIEWS,
+	SYSTEM_VIEWS
 }
 export enum ReportFolderIcon {
 	FOLDER,

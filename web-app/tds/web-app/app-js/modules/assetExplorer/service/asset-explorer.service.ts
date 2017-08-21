@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Response} from '@angular/http';
-import {ReportModel, ReportGroupModel, ReportType} from '../model/report.model';
+import {ReportModel, ReportGroupModel, ViewType} from '../model/report.model';
 import {QuerySpec} from '../model/report-spec.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 
@@ -118,32 +118,32 @@ export class AssetExplorerService {
 					name: 'All',
 					items: reportGroupModel,
 					open: true,
-					type: ReportType.ALL
+					type: ViewType.ALL
 				}, {
 					name: 'Recent',
 					items: [],
 					open: false,
-					type: ReportType.RECENT
+					type: ViewType.RECENT
 				}, {
 					name: 'Favorites',
 					items: reportGroupModel.filter(r => r['isFavorite']),
 					open: false,
-					type: ReportType.FAVORITES
+					type: ViewType.FAVORITES
 				}, {
-					name: 'My Reports',
+					name: 'My Views',
 					items: reportGroupModel.filter(r => r['isOwner']),
 					open: false,
-					type: ReportType.MY_REPORTS
+					type: ViewType.MY_VIEWS
 				}, {
-					name: 'Shared Reports',
+					name: 'Shared Views',
 					items: reportGroupModel.filter(r => r['isShared']),
 					open: false,
-					type: ReportType.SHARED_REPORTS
+					type: ViewType.SHARED_VIEWS
 				}, {
-					name: 'System Reports',
+					name: 'System Views',
 					items: reportGroupModel.filter(r => r['isSystem']),
 					open: false,
-					type: ReportType.SYSTEM_REPORTS
+					type: ViewType.SYSTEM_VIEWS
 				}
 			];
 		}).catch((error: any) => error.json());

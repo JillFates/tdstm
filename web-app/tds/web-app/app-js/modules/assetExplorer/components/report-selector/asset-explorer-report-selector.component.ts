@@ -4,7 +4,7 @@ import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { StateService } from '@uirouter/angular';
 
 import { ReportGroupModel } from '../../model/report.model';
-import {ReportType} from '../../model/report.model';
+import {ViewType} from '../../model/report.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
@@ -55,8 +55,8 @@ export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 
 	protected getFolderStyle(item: ReportGroupModel) {
 		return {
-			'fa-star text-yellow': item.type === ReportType.FAVORITES,
-			'fa-folder': item.type !== ReportType.FAVORITES
+			'fa-star text-yellow': item.type === ViewType.FAVORITES,
+			'fa-folder': item.type !== ViewType.FAVORITES
 		};
 	}
 
@@ -71,7 +71,7 @@ export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 	protected onCreateNew(item: ReportGroupModel): void {
 		if (this.isCreateAvailable(item)) {
 			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
-				{ system: item.type === ReportType.SYSTEM_REPORTS });
+				{ system: item.type === ViewType.SYSTEM_VIEWS });
 		}
 	}
 
@@ -80,9 +80,9 @@ export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 	 * @returns {boolean}
 	 */
 	protected isCreateVisible(item: ReportGroupModel): boolean {
-		return (item.type !== ReportType.ALL &&
-			item.type !== ReportType.FAVORITES &&
-			item.type !== ReportType.RECENT) && this.isCreateAvailable(item);
+		return (item.type !== ViewType.ALL &&
+			item.type !== ViewType.FAVORITES &&
+			item.type !== ViewType.RECENT) && this.isCreateAvailable(item);
 	}
 
 	/**
@@ -90,7 +90,7 @@ export class AssetExplorerReportSelectorComponent implements AfterViewInit {
 	 * @returns {boolean}
 	 */
 	protected isCreateAvailable(item: ReportGroupModel): boolean {
-		return item.type === ReportType.SYSTEM_REPORTS ?
+		return item.type === ViewType.SYSTEM_VIEWS ?
 			this.permissionService.hasPermission('AssetExplorerSystemCreate') :
 			this.permissionService.hasPermission('AssetExplorerCreate');
 	}

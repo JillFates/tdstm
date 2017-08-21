@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ReportGroupModel, ReportModel, ReportType } from '../../model/report.model';
+import { ReportGroupModel, ReportModel, ViewType } from '../../model/report.model';
 import { Observable } from 'rxjs/Observable';
 
 import { AssetExplorerService } from '../../service/asset-explorer.service';
@@ -17,7 +17,7 @@ export class AssetExplorerIndexComponent {
 
 	private reportGroupModels = Array<ReportGroupModel>();
 	private searchText: String;
-	private reportType = ReportType;
+	private viewType = ViewType;
 	private selectedFolder: ReportGroupModel;
 
 	constructor(
@@ -49,7 +49,7 @@ export class AssetExplorerIndexComponent {
 	protected onCreateReport(): void {
 		if (this.isCreateAvailable()) {
 			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
-				{ system: this.selectedFolder.type === this.reportType.SYSTEM_REPORTS });
+				{ system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS });
 		}
 	}
 
@@ -81,9 +81,9 @@ export class AssetExplorerIndexComponent {
 	 * @returns {boolean}
 	 */
 	protected isCreateVisible(): boolean {
-		return this.selectedFolder.type !== this.reportType.ALL &&
-			this.selectedFolder.type !== this.reportType.FAVORITES &&
-			this.selectedFolder.type !== this.reportType.RECENT;
+		return this.selectedFolder.type !== this.viewType.ALL &&
+			this.selectedFolder.type !== this.viewType.FAVORITES &&
+			this.selectedFolder.type !== this.viewType.RECENT;
 	}
 
 	/**
@@ -91,7 +91,7 @@ export class AssetExplorerIndexComponent {
 	 * @returns {boolean}
 	 */
 	protected isCreateAvailable(): boolean {
-		return this.selectedFolder.type === this.reportType.SYSTEM_REPORTS ?
+		return this.selectedFolder.type === this.viewType.SYSTEM_VIEWS ?
 			this.permissionService.hasPermission('AssetExplorerSystemCreate') :
 			this.permissionService.hasPermission('AssetExplorerCreate');
 	}
