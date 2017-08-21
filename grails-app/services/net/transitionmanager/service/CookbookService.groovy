@@ -352,7 +352,7 @@ class CookbookService implements ServiceMethods {
 		// securityService.requirePermission Permission.RecipeRevert ?
 
 		Project project = controllerService.requiredProject
-		RecipeVersion recipeVersion = Recipe.get(recipeVersionId)
+		RecipeVersion recipeVersion =  RecipeVersion.get(recipeVersionId)
 		if (recipeVersion.versionNumber == 0) {
 			throw new IllegalArgumentException('Trying to revert a WIP')
 		}
