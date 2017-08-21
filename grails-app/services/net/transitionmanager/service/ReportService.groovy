@@ -31,9 +31,7 @@ class ReportService implements ServiceMethods {
 			project == currentProject && (isSystem == true || isShared == true || person == currentPerson)
 		}
 
-		List<Report> dataviewList = query.list()
-
-		return dataviewList*.toMap( currentPerson.id )
+		return query.list()
 	}
 
 	/**
@@ -41,12 +39,12 @@ class ReportService implements ServiceMethods {
 	 * @param id
 	 * @return
 	 */
-	def fetch(Integer id) {
+	Report fetch(Integer id) {
 
 		Report dataview = Report.get(id)
-		validateDataviewViewAccess(dataview);
+		validateDataviewViewAccessOrException(dataview);
 
-		return dataview.toMap(securityService.loadCurrentPerson().id)
+		return dataview
 	}
 
 	/**
@@ -56,10 +54,11 @@ class ReportService implements ServiceMethods {
 	 * @return the Dataview object that was updated
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	def update(Integer id, JSONObject dataviewJson) {
+	Report update(Integer id, JSONObject dataviewJson) {
 
 		Report dataview = Report.get(id)
-		validateDataviewUpdateAccess(dataview, dataviewJson)
+		validateDataviewViewAccessOrException(dataview)
+		validateDataviewUpdateAccessOrException(dataviewJson, dataview)
 
 		dataview.with {
 			reportSchema = dataviewJson.schema
@@ -70,7 +69,7 @@ class ReportService implements ServiceMethods {
 			throw new DomainUpdateException('Error on Update', dataview)
 		}
 
-		return dataview.toMap(securityService.loadCurrentPerson().id);
+		return dataview
 	}
 
 	/**
@@ -80,9 +79,9 @@ class ReportService implements ServiceMethods {
 	 * @return the Dataview object that was created
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	def create(JSONObject dataviewJson) {
+	Report create(JSONObject dataviewJson) {
 
-		validateDataviewCreateAccess(dataviewJson)
+		validateDataviewCreateAccessOrException(dataviewJson)
 
 		Report dataview = new Report()
 		dataview.with {
@@ -98,7 +97,24 @@ class ReportService implements ServiceMethods {
 			throw new DomainUpdateException('Error on create', dataview)
 		}
 
-		return dataview.toMap(securityService.loadCurrentPerson().id)
+		return dataview
+	}
+
+	/**
+	 * Deletes a Dataview object
+	 * Dataview person and project are taken from current session.
+	 * @param id Dataview id to delete
+	 * @return
+	 * @throws DomainUpdateException, UnauthorizedException
+	 */
+	boolean delete(Integer id) {
+
+		Report dataview = Report.get(id)
+		validateDataviewViewAccessOrException(dataview)
+		validateDataviewDeleteAccessOrException(dataview)
+
+		dataview.delete()
+		return true
 	}
 
 	/**
@@ -106,15 +122,16 @@ class ReportService implements ServiceMethods {
 	 * - should belong to current project in session
 	 * - should be either system or shared or current person in session owned
 	 * @param dataview
-	 * @return
+	 * @throws InvalidRequestException
 	 */
-	boolean validateDataviewViewAccess(Report dataview) {
+	void validateDataviewViewAccessOrException(Report dataview) {
 		if (!dataview) {
 			throw new InvalidRequestException("Dataview JSON object not found $dataview.id")
 		}
 		boolean canView = dataview.project.id == securityService.userCurrentProject.id && (dataview.isSystem || dataview.isShared || dataview.person.id == securityService.currentPersonId);
 		if (!canView) {
-			throw new UnauthorizedException("Unauthorized access to $dataview.id")
+			securityService.reportViolation("Attempted action requiring unallowed access to Dataview $dataview.id", securityService.userLogin.toString())
+			throw new InvalidRequestException("Unauthorized access to $dataview.id")
 		}
 	}
 
@@ -122,48 +139,25 @@ class ReportService implements ServiceMethods {
 	 * Validates if the person updating a dataview has permission to it.
 	 * @param dataview - original object from database
 	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
-	 * @throws UnauthorizedException, InvalidRequestException
+	 * @throws UnauthorizedException
 	 */
-	void validateDataviewUpdateAccess(Report dataview, JSONObject dataviewJson) {
-		if (!dataview) {
-			throw new InvalidRequestException("Dataview JSON object not found $dataviewJson.id")
-		}
-		boolean valid = dataview.project.id == securityService.userCurrentProject.id
-		// system dataview validation
-		if (valid && dataview.isSystem && !securityService.hasPermission(Permission.AssetExplorerSystemEdit)) {
-			throw new UnauthorizedException(Permission.AssetExplorerSystemEdit)
-		} else if (valid && dataview.person.id == securityService.currentPersonId && !securityService.hasPermission(Permission.AssetExplorerEdit)) {
-			throw new UnauthorizedException(Permission.AssetExplorerEdit)
+	void validateDataviewUpdateAccessOrException(JSONObject dataviewJson, Report dataview) {
+		validateDataviewJson(dataviewJson, ['name', 'schema', 'isShared'])
+
+		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemEdit : Permission.AssetExplorerEdit
+		if (! securityService.hasPermission(requiredPerm)) {
+			throw new UnauthorizedException(requiredPerm)
 		}
 		// TODO: should we prevent editing other user reports ??
 	}
 
 	/**
-	 * Used to validate if the Dataview JSON request has all of the required properties
-	 * @param dataviewJson - the JSON object to inspect
-	 * @throws InvalidRequestException with what property is missing or if no object present
-	 */
-	void validateDataviewJson(JSONObject dataviewJson) {
-		// TODO - flush out all of the required properties
-		List<String> props = ['isSystem', 'name']
-		if (dataviewJson) {
-			for (String prop in props) {
-				if (! dataviewJson.containsKey(prop)) {
-					throw new InvalidRequestException("JSON object missing property $prop")
-				}
-			}
-		} else {
-			throw new InvalidRequestException('Dataview JSON object was missing from request')
-		}
-	}
-
-	/**
 	 * Validates if the person creating a dataview has permission to create a Dataview
 	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
-	 * @throws UnauthorizedException, InvalidRequestException
+	 * @throws UnauthorizedException
 	 */
-	void validateDataviewCreateAccess(JSONObject dataviewJson) {
-		validateDataviewJson(dataviewJson)
+	void validateDataviewCreateAccessOrException(JSONObject dataviewJson) {
+		validateDataviewJson(dataviewJson, ['isSystem', 'name', 'schema', 'isShared'])
 
 		String requiredPerm = dataviewJson.isSystem ? Permission.AssetExplorerSystemCreate : Permission.AssetExplorerCreate
 		if (! securityService.hasPermission(requiredPerm)) {
@@ -173,18 +167,31 @@ class ReportService implements ServiceMethods {
 
 	/**
 	 * Validates if person deleting a report has permission to do it.
-	 * @param report
-	 * @return
+	 * @param dataviewJSON - the JSON object containing information about the Dataview
+	 * @throws UnauthorizedException
 	 */
-	boolean validateReportDeleteAccess(Report report) {
-		boolean valid = report.project.id == securityService.userCurrentProject.id
-		// system report validation
-		if (valid && report.isSystem) {
-			valid = securityService.hasPermission(Permission.AssetExplorerSystemDelete)
-		} else if (valid) { // owned report validation
-			valid = securityService.hasPermission(Permission.AssetExplorerDelete)
-		}
+	void validateDataviewDeleteAccessOrException(Report dataview) {
 
-		return valid
+		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemDelete : Permission.AssetExplorerDelete
+		if (! securityService.hasPermission(requiredPerm)) {
+			throw new UnauthorizedException(requiredPerm)
+		}
+	}
+
+	/**
+	 * Used to validate if the Dataview JSON request has all of the required properties
+	 * @param dataviewJson - the JSON object to inspect
+	 * @throws InvalidRequestException with what property is missing or if no object present
+	 */
+	void validateDataviewJson(JSONObject dataviewJson, List<String> props) {
+		if (dataviewJson) {
+			for (String prop in props) {
+				if (! dataviewJson.containsKey(prop)) {
+					throw new InvalidRequestException("JSON object missing property $prop")
+				}
+			}
+		} else {
+			throw new InvalidRequestException('Dataview JSON object was missing from request')
+		}
 	}
 }

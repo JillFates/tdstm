@@ -40,6 +40,7 @@ class Report {
 	Map toMap(Long currentPersonId) {
 		Boolean isOwner = person ? (person.id == currentPersonId) : false
 		Map data = [
+				id				: id,
 				name			: name,
 				isSystem		: isSystem,
 				isShared		: isShared,
