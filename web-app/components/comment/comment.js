@@ -2222,7 +2222,7 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
 			var refreshView = function () {
 				commentService.searchComments(scope.assetId, '').then(
 					function (data) {
-						scope.comments = data;
+                        scope.comments = (data.status !== 'error')? data: [];
 					},
 					function (data) {
 						alerts.showGenericMsg();
