@@ -11,14 +11,16 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import spock.lang.Specification
 
-class TaskServiceIntTests extends IntegrationSpec {
+class TaskServiceIntTests extends Specification {
 
 	def project
 	def attributeSet
 	def moveEvent
 	def moveBundle
 	def taskService
+    def projectHelper
 
 	void "test clean task data"() {
 		setup:
@@ -123,7 +125,10 @@ class TaskServiceIntTests extends IntegrationSpec {
 */
 
 	/* Test SetUp */
-    private setup() {
+    void setup() {
+
+        projectHelper = new ProjectTestHelper()
+
 		log.info "***********DA SETUP***********************************************"
 		project = new Project(name:"VM", projectCode: "VM", workflowCode:"STD_PROCESS" ).save()
 		def entityType = new EavEntityType( entityTypeCode:'AssetEntity', domainName:'AssetEntity', isAuditable:1  ).save()
@@ -194,8 +199,10 @@ class TaskServiceIntTests extends IntegrationSpec {
 	void 'test Can Find Tasks By Asset Entity'() {
 
         setup:
-		def project = new Project(name: "VM", projectCode: "VM", workflowCode: "STD_PROCESS").save()
-		def entityType = new EavEntityType(entityTypeCode: 'AssetEntity', domainName: 'AssetEntity', isAuditable: 1).save()
+		def project = projectHelper.getProject()
+
+		def entityType = new EavEntityType(entityTypeCode: 'AssetEntity', domainName: 'AssetEntity', isAuditable: 1)
+        entityType.save()
 		def attributeSet = new EavAttributeSet(attributeSetName: 'Server', entityType: entityType, sortOrder: 10).save()
 		def moveEvent = new MoveEvent(name: "Example 1", project: project, inProgress: 'false').save()
 		def moveBundle = new MoveBundle(name: 'Example 1', moveEvent: moveEvent, project: project).save()
