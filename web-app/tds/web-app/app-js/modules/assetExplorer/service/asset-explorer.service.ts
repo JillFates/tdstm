@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
-import { ReportModel, ReportGroupModel, ReportType } from '../model/report.model';
-import { QuerySpec } from '../model/report-spec.model';
-import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs/Rx';
+import {Response} from '@angular/http';
+import {ReportModel, ReportGroupModel, ReportType} from '../model/report.model';
+import {QuerySpec} from '../model/report-spec.model';
+import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -10,7 +11,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class AssetExplorerService {
 
-	private assetExplorerUrl = '../ws/{ASSET_EXPLORER_URL}';
+	private assetExplorerUrl = '../ws/assetExplorer';
 
 	private mockData: ReportModel[] = [
 		{
@@ -103,46 +104,49 @@ export class AssetExplorerService {
 		}
 	];
 
-	constructor(private http: HttpInterceptor) { }
+	constructor(private http: HttpInterceptor) {
+	}
 
 	getReports(): Observable<ReportGroupModel[]> {
-		return Observable.from(this.mockData)
-			.bufferCount(this.mockData.length)
-			.map((items: ReportModel[]) => {
-				return [
-					{
-						name: 'All',
-						items: items,
-						open: true,
-						type: ReportType.ALL
-					}, {
-						name: 'Recent',
-						items: [],
-						open: false,
-						type: ReportType.RECENT
-					}, {
-						name: 'Favorites',
-						items: items.filter(r => r['isFavorite']),
-						open: false,
-						type: ReportType.FAVORITES
-					}, {
-						name: 'My Reports',
-						items: items.filter(r => r.isOwner),
-						open: false,
-						type: ReportType.MY_REPORTS
-					}, {
-						name: 'Shared Reports',
-						items: items.filter(r => r.isShared),
-						open: false,
-						type: ReportType.SHARED_REPORTS
-					}, {
-						name: 'System Reports',
-						items: items.filter(r => r.isSystem),
-						open: false,
-						type: ReportType.SYSTEM_REPORTS
-					}
-				];
+		return this.http.get(`${this.assetExplorerUrl}/reports`).map((res: Response) => {
+			let response = res.json().data;
+			let reportGroupModel: ReportGroupModel[] = Object.keys(response).map(key => {
+				return response[key];
 			});
+			return [
+				{
+					name: 'All',
+					items: reportGroupModel,
+					open: true,
+					type: ReportType.ALL
+				}, {
+					name: 'Recent',
+					items: [],
+					open: false,
+					type: ReportType.RECENT
+				}, {
+					name: 'Favorites',
+					items: reportGroupModel.filter(r => r['isFavorite']),
+					open: false,
+					type: ReportType.FAVORITES
+				}, {
+					name: 'My Reports',
+					items: reportGroupModel.filter(r => r['isOwner']),
+					open: false,
+					type: ReportType.MY_REPORTS
+				}, {
+					name: 'Shared Reports',
+					items: reportGroupModel.filter(r => r['isShared']),
+					open: false,
+					type: ReportType.SHARED_REPORTS
+				}, {
+					name: 'System Reports',
+					items: reportGroupModel.filter(r => r['isSystem']),
+					open: false,
+					type: ReportType.SYSTEM_REPORTS
+				}
+			];
+		}).catch((error: any) => error.json());
 	}
 
 	getReport(id: number): Observable<ReportModel> {

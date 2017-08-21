@@ -225,6 +225,7 @@ function validateJS(src) {
 
 gulp.task('build-test', shell.task(['karma start karma.conf.js']));
 gulp.task('build-test-report', shell.task(['karma start karma.production.conf.js']));
+gulp.task('build-webpack', shell.task(['npm run webpack']));
 
 gulp.task('tiny-mce-files', function () {
     gulp.src(['node_modules/tinymce/tinymce.min.js',
