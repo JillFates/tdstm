@@ -236,6 +236,12 @@ export class AssetExplorerReportConfigComponent {
 			this.isSaveAvailable();
 	}
 
+	protected isSystemSaveAvailable(edit): boolean {
+		return edit ?
+			this.permissionService.hasPermission('AssetExplorerSystemEdit') :
+			this.permissionService.hasPermission('AssetExplorerSystemSaveAs');
+	}
+
 	/**
 	 * Get the Icon of the Asset class, if does not exist use the Other generic icon
 	 * @param {string} assetName

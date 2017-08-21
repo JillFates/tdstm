@@ -89,7 +89,17 @@ export class AssetExplorerService {
 			name: 'Another user awesome report',
 			isOwner: false,
 			isShared: true,
-			isSystem: false
+			isSystem: false,
+			schema: {
+				domains: ['DEVICE', 'DATABASE', 'STORAGE'],
+				columns: [],
+				filters: [],
+				sort: {
+					domain: 'DEVICE',
+					property: 'id',
+					order: 'a'
+				}
+			}
 		}
 	];
 

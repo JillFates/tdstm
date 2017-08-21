@@ -1,7 +1,7 @@
 <div class="content body">
 	<section class="page-asset-explorer-config">
 		<div>
-			<div class="btn-group" *ngIf="model.id;else saveButton">
+			<div class="btn-group" *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
 				<button type="button" id="btnSaveAs" *ngIf="!model.isOwner" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 				 (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
 				<button type="button" id="btnSave" *ngIf="model.isOwner" [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
@@ -10,22 +10,30 @@
 				 [disabled]="!isValid()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
 				</button>
-				<ul class="dropdown-menu" *ngIf="model.isOwner">
+				<ul class="dropdown-menu">
+					<li>
+						<a (click)="onSave()">Save</a>
+					</li>
 					<li>
 						<a (click)="onSaveAs()">Save As</a>
 					</li>
 				</ul>
 			</div>
 			<ng-template #saveButton>
-				<button type="button" id="btnSave" *ngIf="model.isOwner" [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				<button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))" [disabled]="!isSaveAvailable() || !isValid()"
+				 class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 				 (click)="onSave()"><i class="fa fa-fw fa-floppy-o"></i> Save</button>
+				<button type="button" id="btnSaveAs" *ngIf="(model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem)"
+				 [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
 			</ng-template>
 			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 			<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 			<asset-explorer-report-selector></asset-explorer-report-selector>
+			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
 		</div>
 		<br />
-		<div class="nav-tabs-custom">
+		<div class="nav-tabs-custom" *ngIf="!collapsed">
 			<!-- Tabs within a box -->
 			<ul class="nav nav-tabs">
 				<li role="presentation" class="active">
@@ -42,11 +50,11 @@
 					 name="btnPreview" (click)="onPreview()">Preview</button>
 				</li>
 				<li class="pull-right" role="presentation">
-					<button class="btn btn-box-tool" (click)="onToggleConfig()"><i class="fa" [ngClass]="(collapsed)? 'fa-plus': 'fa-minus' "></i></button>
+					<button class="btn btn-default" (click)="onToggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
 				</li>
-				<li class="pull-right" role="presentation">
+				<!-- <li class="pull-right" role="presentation">
 					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
-				</li>
+				</li> -->
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
 				<div class="tab-pane active" id="tab_1">
