@@ -464,6 +464,15 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/report/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "getReport",
+					POST: "createReport",
+					PUT: "updateReport",
+					DELETE: "deleteReport"
+			]
+		}
 
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )

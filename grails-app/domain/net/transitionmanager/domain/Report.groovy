@@ -23,14 +23,13 @@ class Report {
 	Date lastModified
 
     static constraints = {
-		name nullable: false
+    	name size: 1..255
+		person nullable: true
 		lastModified nullable: true
     }
 
 	static mapping = {
-		name sqltype: 'varchar(30)'
-		project column: 'project_id'
-		person column: 'person_id'
+		name sqltype: 'varchar(255)'
 	}
 
 	/**
@@ -41,6 +40,7 @@ class Report {
 	Map toMap(Long currentPersonId) {
 		Boolean isOwner = person ? (person.id == currentPersonId) : false
 		Map data = [
+				id				: id,
 				name			: name,
 				isSystem		: isSystem,
 				isShared		: isShared,
