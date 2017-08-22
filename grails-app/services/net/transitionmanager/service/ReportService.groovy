@@ -8,6 +8,10 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Report
 import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.json.JSONObject
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.service.InvalidRequestException
 
 /**
  * Service class with main database operations for Report.
@@ -17,18 +21,22 @@ class ReportService implements ServiceMethods {
 
 	SecurityService securityService
 
+	// Properties used in validating the JSON Create and Update functions
+	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
+	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
+
 	/**
 	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
-	 * current person in session.
+	 * current person in session
 	 * @return
 	 */
 	List<Report> list() {
-
 		Person currentPerson = securityService.loadCurrentPerson()
 		Project currentProject = securityService.userCurrentProject
 
 		def query = Report.where {
-			project == currentProject && (isSystem == true || isShared == true || person == currentPerson)
+			project == currentProject
+			(isSystem == true || isShared == true || person == currentPerson)
 		}
 
 		return query.list()
@@ -40,7 +48,6 @@ class ReportService implements ServiceMethods {
 	 * @return
 	 */
 	Report fetch(Integer id) {
-
 		Report dataview = Report.get(id)
 		validateDataviewViewAccessOrException(dataview);
 
@@ -55,9 +62,7 @@ class ReportService implements ServiceMethods {
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
 	Report update(Integer id, JSONObject dataviewJson) {
-
 		Report dataview = Report.get(id)
-		validateDataviewViewAccessOrException(dataview)
 		validateDataviewUpdateAccessOrException(dataviewJson, dataview)
 
 		dataview.with {
@@ -66,7 +71,7 @@ class ReportService implements ServiceMethods {
 		}
 
 		if (!dataview.save()) {
-			throw new DomainUpdateException('Error on Update', dataview)
+			throw new DomainUpdateException('Error on update', dataview)
 		}
 
 		return dataview
@@ -80,7 +85,6 @@ class ReportService implements ServiceMethods {
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
 	Report create(JSONObject dataviewJson) {
-
 		validateDataviewCreateAccessOrException(dataviewJson)
 
 		Report dataview = new Report()
@@ -102,53 +106,66 @@ class ReportService implements ServiceMethods {
 
 	/**
 	 * Deletes a Dataview object
-	 * Dataview person and project are taken from current session.
+	 * Dataview person and project are taken from current session
 	 * @param id Dataview id to delete
-	 * @return
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	boolean delete(Integer id) {
-
+	void delete(Integer id) {
 		Report dataview = Report.get(id)
-		validateDataviewViewAccessOrException(dataview)
 		validateDataviewDeleteAccessOrException(dataview)
 
 		dataview.delete()
-		return true
 	}
 
 	/**
-	 * Validates if person accessing dataview is authorized to access it.
+	 * Validates if person accessing dataview is authorized to access it
 	 * - should belong to current project in session
 	 * - should be either system or shared or current person in session owned
 	 * @param dataview
 	 * @throws InvalidRequestException
 	 */
 	void validateDataviewViewAccessOrException(Report dataview) {
+		boolean throwNotFound = false
 		if (!dataview) {
-			throw new InvalidRequestException("Dataview JSON object not found $dataview.id")
+			throwNotFound = true
 		}
-		boolean canView = dataview.project.id == securityService.userCurrentProject.id && (dataview.isSystem || dataview.isShared || dataview.person.id == securityService.currentPersonId);
-		if (!canView) {
-			securityService.reportViolation("Attempted action requiring unallowed access to Dataview $dataview.id", securityService.userLogin.toString())
-			throw new InvalidRequestException("Unauthorized access to $dataview.id")
+
+		// Validate Dataview belongs to the project
+		if (!throwNotFound && dataview.project.id != securityService.userCurrentProject.id) {
+			securityService.reportViolation("attempted to access Dataview $dataview.id unrelated to project")
+			throwNotFound = true
+		}
+
+		if (!throwNotFound) {
+			// Make sure the user has proper access to the Dataview
+			boolean allowedToView = (dataview.isSystem || dataview.isShared || dataview.person.id == securityService.currentPersonId)
+			if (! allowedToView) {
+				securityService.reportViolation("attempted to access non-shared Dataview ($dataview.id)")
+				throwNotFound = true
+			}
+		}
+
+		// Throw an exception if any of the above falied
+		if (throwNotFound) {
+			throw new EmptyResultException("Dataview not found (${dataview.id})")
 		}
 	}
 
 	/**
 	 * Validates if the person updating a dataview has permission to it.
-	 * @param dataview - original object from database
 	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
+	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
 	void validateDataviewUpdateAccessOrException(JSONObject dataviewJson, Report dataview) {
-		validateDataviewJson(dataviewJson, ['name', 'schema', 'isShared'])
+		validateDataviewViewAccessOrException(dataview)
+		validateDataviewJson(dataviewJson, UPDATE_PROPERTIES)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemEdit : Permission.AssetExplorerEdit
 		if (! securityService.hasPermission(requiredPerm)) {
+			securityService.reportViolation("attempted to modify Dataview ($dataview.id) without required permission $requiredPerm")
 			throw new UnauthorizedException(requiredPerm)
 		}
-		// TODO: should we prevent editing other user reports ??
 	}
 
 	/**
@@ -157,23 +174,27 @@ class ReportService implements ServiceMethods {
 	 * @throws UnauthorizedException
 	 */
 	void validateDataviewCreateAccessOrException(JSONObject dataviewJson) {
-		validateDataviewJson(dataviewJson, ['isSystem', 'name', 'schema', 'isShared'])
+		validateDataviewJson(dataviewJson, CREATE_PROPERTIES)
 
+		// Check if user has necessary permission(s)
 		String requiredPerm = dataviewJson.isSystem ? Permission.AssetExplorerSystemCreate : Permission.AssetExplorerCreate
 		if (! securityService.hasPermission(requiredPerm)) {
+			securityService.reportViolation("attempted to create a Dataview without required permission $requiredPerm")
 			throw new UnauthorizedException(requiredPerm)
 		}
 	}
 
 	/**
-	 * Validates if person deleting a report has permission to do it.
-	 * @param dataviewJSON - the JSON object containing information about the Dataview
+	 * Validates if person deleting a Dataview has permission to do so
+	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
 	void validateDataviewDeleteAccessOrException(Report dataview) {
+		validateDataviewViewAccessOrException(dataview)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemDelete : Permission.AssetExplorerDelete
 		if (! securityService.hasPermission(requiredPerm)) {
+			securityService.reportViolation("attempted to delete Dataview ($dataview.id) without required permission $requiredPerm")
 			throw new UnauthorizedException(requiredPerm)
 		}
 	}
@@ -187,6 +208,7 @@ class ReportService implements ServiceMethods {
 		if (dataviewJson) {
 			for (String prop in props) {
 				if (! dataviewJson.containsKey(prop)) {
+					log.warn "validateDataviewJson failed validation of JSON for property $prop for $dataviewJson"
 					throw new InvalidRequestException("JSON object missing property $prop")
 				}
 			}
