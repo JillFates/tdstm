@@ -188,6 +188,12 @@
 						<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
 						<td valign="top" class="value" id="resolvedById" nowrap="nowrap">{{acData.personResolvedObj}}</td>
 					</tr>
+					<tr>
+						<td valign="top" class="name" nowrap="nowrap">
+							<label for="lastUpdated">Last Updated:</label>
+						</td>
+						<td valign="top" class="value" id="lastUpdated" nowrap="nowrap">{{acData.lastUpdated}}</td>
+					</tr>
 				</table>
 
 				<div>

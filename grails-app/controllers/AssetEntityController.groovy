@@ -554,6 +554,7 @@ class AssetEntityController implements ControllerMethods {
 			String etFinish = TimeUtil.formatDateTime(assetComment.estFinish)
 			String atStart = TimeUtil.formatDateTime(assetComment.actStart)
 			String dueDate = TimeUtil.formatDate(assetComment.dueDate)
+			String lastUpdated = TimeUtil.formatDateTime(assetComment.lastUpdated)
 
 			def workflowTransition = assetComment?.workflowTransition
 			String workflow = workflowTransition?.name
@@ -655,7 +656,8 @@ class AssetEntityController implements ControllerMethods {
 				successorList: successorList,
 				instructionsLinkURL: instructionsLinkURL ?: "",
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
-				canEdit: canEdit
+				canEdit: canEdit,
+				lastUpdated: lastUpdated,
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
@@ -1533,7 +1535,7 @@ class AssetEntityController implements ControllerMethods {
 			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
-			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:
+			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|lastUpdated/:
 				result = TimeUtil.formatDateTime(task[value])
 			break
 			case "event": result = task.moveEvent?.name; break
