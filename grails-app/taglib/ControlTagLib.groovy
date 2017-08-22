@@ -83,6 +83,9 @@ class ControlTagLib {
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
+		if (attrs.containsKey("labelSuffix")){
+            sb.append(StringEscapeUtils.escapeHtml(attrs.labelSuffix))
+        }
 		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
@@ -99,7 +102,8 @@ class ControlTagLib {
 	 */
 	def labelForShowField = { Map attrs ->
 		Map fieldSpec = attrs.field ?: [:]
-		def fieldValue = attrs.value ?: ""
+        def fieldValue = attrs.value ?: ""
+        def suffixFieldValue = attrs.valueSuffix ?: ""
 		StringBuilder sb = new StringBuilder("\n")
 		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
 		sb.append("<span ")
@@ -113,7 +117,8 @@ class ControlTagLib {
 		}
 		sb.append(tooltipAttrib(fieldSpec, tooltipDataPlacement))
 		sb.append(" >")
-		sb.append(fieldValue)
+        sb.append(fieldValue)
+        sb.append(suffixFieldValue)
 		sb.append("</span>")
 		sb.append("</td>")
 		out << sb.toString()
