@@ -169,7 +169,6 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Project project = getUserCurrentProject()
 
 		if(project == null){
-			log.warn('Current project is null')
 			throw new EmptyResultException('No project selected')
 		}
 

@@ -182,7 +182,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		// Update all TaskBatch to null the reference to the recipe
 		TaskBatch.executeUpdate('update TaskBatch set recipe=null where recipe=?', [recipe])
@@ -221,7 +221,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		def rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
 		if (rv == null) {
@@ -244,14 +244,23 @@ class CookbookService implements ServiceMethods {
 		return rv
 	}
 
-	void updateRecipe(long recipeId, recipeName, description) {
+	/**
+	 * Update Existing Recipe data
+	 * @param recipeId
+	 * @param recipeName
+	 * @param description
+	 * @return return the edited Recipe object
+	 */
+	Recipe updateRecipe(long recipeId, recipeName, description) {
 		//TODO check this checkAccess(project)
-		securityService.userCurrentProjectOrException
-
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
+		assertProject(recipe, project)
+
 		recipe.name = recipeName
 		recipe.description = description
 		save recipe
+		return recipe
 	}
 
 	/**
@@ -610,7 +619,7 @@ class CookbookService implements ServiceMethods {
 	List<Map> findRecipeVersions(recipeId) {
 		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		def arguments = [
 				"recipeId" : recipeId
@@ -670,7 +679,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		recipe.archived = archived
 		return save(recipe)
@@ -1384,7 +1393,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		if (contextId == null || !contextId.isNumber()) {
 			throw new EmptyResultException('Invalid contextId')
@@ -1409,7 +1418,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		recipe.defaultAssetId = null
 		recipe.save(flush:true, failOnError: true)
