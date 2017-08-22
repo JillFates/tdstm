@@ -210,7 +210,6 @@ class MoveBundleService implements ServiceMethods {
 			 			property 'id'
 			}.list()
 			assetEntityService.deleteAssets(assets)
-			AssetEntity.executeUpdate('delete AssetEntity where moveBundle=?', [moveBundle])
 		} catch (e) {
 			e.message = "Unable to remove the $moveBundle Assets Error: $e.message"
 			throw e
