@@ -160,9 +160,9 @@ class ProjectServiceTests extends Specification {
 			personHelper.createUserLogin(person)
 		then: 'the person should have access to the project'
 			personService.hasAccessToProject(person, project)
-		and: 'filting for ANY status should return one project'
+		and: 'filting for ANY status should return one project, plus the default project.'
 			2 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
-		and: 'filting for ACTIVE status should return one project'
+		and: 'filting for ACTIVE status should return one project, plus the default project.'
 			2 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
 		and: 'filting for COMPLETED status should return zero projects'
 			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
@@ -184,9 +184,9 @@ class ProjectServiceTests extends Specification {
 			personHelper.createUserLogin(person)
 		then: 'the person should have access to the project'
 			personService.hasAccessToProject(person, project)
-		and: 'filting for ANY status should return one project'
+		and: 'filting for ANY status should return one project, plus the default project.'
 			2 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
-		and: 'filting for ACTIVE status should return one project'
+		and: 'filting for ACTIVE status should return one project, plus the default project.'
 			2 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
 		and: 'filting for COMPLETED status should return zero projects'
 			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
