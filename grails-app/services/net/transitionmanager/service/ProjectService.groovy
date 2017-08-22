@@ -104,6 +104,7 @@ class ProjectService implements ServiceMethods {
 	 * @param projectStatus - the status of the project, options [any | active | completed] (default any)
 	 * @param searchParams - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
 	 * @param userLogin - the user to lookup projects for or null to use the authenticated user
+	 * @param includeDefaultProject - flag signaling if the default project should be included.
 	 * @return list of projects
 	 *
 	 * TODO: <SL> This returns a PagedResultList not a List
@@ -139,6 +140,16 @@ class ProjectService implements ServiceMethods {
 		} else {
 			projectIds = getProjectsWherePersonIsStaff(person, projectStatus).id
 		}
+
+		boolean hasAccessToDefaultProject = securityService.hasPermission(userLogin.person, Permission.ProjectManageDefaults)
+		// If the user has access to the default project, it should be included in the list.
+		if  (hasAccessToDefaultProject) {
+			Project defaultProject = Project.getDefaultProject()
+			if (defaultProject) {
+				projectIds << defaultProject.id
+			}
+		}
+
 		if (!projectIds) {
 			return []
 		}
@@ -291,7 +302,7 @@ class ProjectService implements ServiceMethods {
 	 */
 	def generateDefaultConfig(type) {
 		throw new RuntimeException('generateDefaultConfig no longer used')
-		def defaultProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
+		def defaultProject = Project.getDefaultProject()
 		def data = FieldImportance.findByProjectAndEntityType(defaultProject,type)?.config
 		if (data) {
 			return JSON.parse(data)
@@ -1636,6 +1647,5 @@ class ProjectService implements ServiceMethods {
 
                return projects
        }
-
 
 }

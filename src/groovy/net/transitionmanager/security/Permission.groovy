@@ -114,6 +114,7 @@ interface Permission {
 			ProgressList                  = 'ProgressList',
 			ProgressView                  = 'ProgressView',
 			ProjectCreate                 = 'ProjectCreate',
+			ProjectManageDefaults			= 'ProjectManageDefaults',
 			ProjectDelete                 = 'ProjectDelete',
 			ProjectEdit                   = 'ProjectEdit',
 			ProjectFieldSettingsEdit      = 'ProjectFieldSettingsEdit',
