@@ -80,7 +80,10 @@ class AssetComment {
 
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
-	static belongsTo = [assetEntity: AssetEntity]
+	// The belongsTo would delete both Tasks and Comments when deleting Assets with the delete method. However
+	// when deleting an asset, asset references in Tasks should be nulled and Asset Comments should deleted. This is
+	// handled in the AssetEntityService.deleteAsset appropriately. See TM-6847
+	// static belongsTo = [assetEntity:AssetEntity]
 
 	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
 
