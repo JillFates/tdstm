@@ -2,6 +2,9 @@ package net.transitionmanager.service
 
 import groovy.transform.CompileStatic
 
+/**
+ * RuntimeException Representing that an expected object was not found.
+ */
 @CompileStatic
 class EmptyResultException extends RuntimeException {
 	EmptyResultException() {
