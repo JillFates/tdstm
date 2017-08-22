@@ -73,8 +73,7 @@
 				</span>
 			</td>
 
-			${standardFieldSpecs.moveBundle?.label += " : Dep. Group"}
-			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}"/>
+			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}" labelSuffix=" : Dep. Group" valueSuffix=" : ${dependencyBundleNumber}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>
 
