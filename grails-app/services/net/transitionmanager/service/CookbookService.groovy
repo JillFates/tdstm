@@ -131,6 +131,7 @@ class CookbookService implements ServiceMethods {
 	RecipeVersion cloneRecipe(recipeVersionId, String name, String description) {
 		securityService.requirePermission Permission.RecipeEdit
 
+		// TODO: 170822 oluna, have to lookup Projects that the user has access to.
 		Project project = securityService.userCurrentProjectOrException
 
 		if (!name) {
@@ -329,6 +330,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
+		assertProject(recipe, project)
 
 		//TODO check this checkAccess(project)
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
