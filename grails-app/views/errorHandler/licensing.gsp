@@ -23,7 +23,7 @@
             <div class="error-page">
                 <h2 class="headline text-red"><span class="glyphicon glyphicon-ban-circle"></span></h2>
                 <div class="error-content">
-                    <h3><i class="fa fa-warning text-red"></i> <%=licenseStateMap.message%></h3>
+                    <h3><i class="fa fa-warning text-red"></i> ${raw(licenseStateMap.message)}</h3>
                     <p>
                         Please contact the Project Manager to help you resolve this.  Meanwhile, <a href="${continueUrl}">click here</a> to return.
                     </p>
