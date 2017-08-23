@@ -15,10 +15,12 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.slf4j.LoggerFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import javax.servlet.http.HttpServletRequest
+import java.text.SimpleDateFormat
 
 class TaskImportExportService implements ServiceMethods {
 
@@ -55,23 +57,7 @@ class TaskImportExportService implements ServiceMethods {
 	static final xfrmListToPipedString = { List list, options -> list?.join('|') ?: '' }
 
 	static final xfrmDateToString = { val, options ->
-		if (val == null) return ''
-
-		if (val instanceof Date) {
-			return TimeUtil.formatDate(val, options.dateFormatter)
-		// If it's a string, check it's a valid date
-		} else if (val instanceof String) {
-			Date parsedDate = TimeUtil.parseDate(val, options.dateFormatter)
-			if (parsedDate) {
-				return TimeUtil.formatDate(parsedDate, options.dateFormatter)
-			} else {
-				log.error "xfrmDateToString() cannot parse date ${val}"
-			}
-		} else {
-			log.error "xfrmDateToString() got unexpected data type ${val?.getClass()?.getName()}"
-		}
-
-		val?.toString()
+		return dateToStringFormat( val, options.dateFormatter )
 	}
 
 	/**
@@ -93,14 +79,7 @@ class TaskImportExportService implements ServiceMethods {
 
 	// Transformer that is used to populate the spreadsheet using the user's TZ
 	static final xfrmDateTimeToString = { val, options ->
-		if (val == null) return ''
-
-		if (val instanceof Date) {
-			return TimeUtil.formatDate(val, options.dateTimeFormatter)
-		}
-
-		log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
-		val?.toString()
+		return dateToStringFormat( val, options.dateTimeFormatter )
 	}
 
 	// ------------------------------------------------------------------------
@@ -110,6 +89,43 @@ class TaskImportExportService implements ServiceMethods {
 	// Used in the map below to set the various template strings used by Kendo
 	private static String changeTmpl(String prop) {
 		"\"#= !$prop ?'':showChanges(data, '$prop') #\""
+	}
+
+	/**
+	 * Tries to format an Object Value using a SimpleDateFormat
+	 * @param val
+	 * @param formatter
+	 * @return formatted String or the String value of the received object
+	 */
+	private static dateToStringFormat(Object val, SimpleDateFormat formatter) {
+		if (val == null) return ''
+
+		Date dateToFormat = null
+
+		if (val instanceof String) {
+			dateToFormat = TimeUtil.parseDate(val, formatter)
+			if (! dateToFormat) {
+				LoggerFactory.getLogger(this).error (
+					"xfrmDateToString() cannot parse date '{}' using pattern: '{}'",
+					val, formatter.toPattern()
+				)
+			}
+
+		} else if (val instanceof Date) {
+			dateToFormat = val
+
+		} else {
+			LoggerFactory.getLogger(this).error (
+					"xfrmDateToString() got unexpected data type {}", val.getClass().getName()
+			)
+
+		}
+
+		if (dateToFormat) {
+			return TimeUtil.formatDate(dateToFormat, formatter)
+		}
+
+		return val.toString()
 	}
 
 	private static final String errorListTmpl = "kendo.template(\$('#error-template').html())"
@@ -174,7 +190,7 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Oustanding', template:changeTmpl('outstanding'), transform:xfrmString],
 
 		dateRequired			: [type: 'date', ssPos:12, formPos:13, domain: 'C', width:120, locked:false,
-										label: 'Date Required', template:changeTmpl('dateRequired'), transform:xfrmDateToString],
+										label: 'Date Required', template:changeTmpl('dateRequired'), transform: xfrmDateToString],
 
 		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:false,
 										label: 'Comments', template:changeTmpl('comments'), transform:xfrmString],
