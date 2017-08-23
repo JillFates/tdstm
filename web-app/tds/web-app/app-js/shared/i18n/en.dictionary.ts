@@ -8,7 +8,8 @@ export const en_DICTIONARY: Object = {
 		'DATABASE': 'Database',
 		'DEVICE': 'Device',
 		'STORAGE': 'Storage',
-		'ASSETS': 'Assets'
+		'ASSETS': 'Assets',
+		'COMMON': 'Common'
 	},
 	'ASSET_EXPLORER': {
 		'ASSET_EXPLORER': 'Asset Explorer',
@@ -20,11 +21,11 @@ export const en_DICTIONARY: Object = {
 		'PROJECT_LIST': 'Project List',
 		'CREATE_CUSTOM': 'Add Custom Field',
 		'PLAN_METHODOLOGY_DELETE_WARNING': 'Field is used as Project Plan Methodology, it can\'t be deleted.',
-		'MIN_MAX' : {
-			'MIN_LENGTH' : 'Min Length',
-			'MAX_LENGTH' : 'Max Length',
-			'MIN_LENGTH_ERROR' : 'Value must be between 0 and {param1}',
-			'MAX_LENGTH_ERROR' : 'Value must be between {param1} and 255'
+		'MIN_MAX': {
+			'MIN_LENGTH': 'Min Length',
+			'MAX_LENGTH': 'Max Length',
+			'MIN_LENGTH_ERROR': 'Value must be between 0 and {param1}',
+			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
 		}
 	},
 	'GLOBAL': {

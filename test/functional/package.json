@@ -1,8 +1,12 @@
 {
-  "name": "TEST",
-  "description": "Webdriver E2E test",
+  "name": "TDSe2e",
+  "description": "Webdriver E2E test framework",
+  "scripts": {
+    "build-test": "node ./node_modules/protractor/bin/protractor support/protractor.config.js",
+    "webdriver-update": "node ./node_modules/protractor/bin/webdriver-manager update"
+  },
   "dependencies": {
-    "selenium-webdriver": "2.45.1",
+    "selenium-webdriver": "3.4.0",
     "minijasminenode": "1.1.1",
     "jasminewd": "1.1.0",
     "jasminewd2": "0.0.5",
@@ -10,15 +14,12 @@
     "phantomjs": "1.9.13"
   },
   "devDependencies": {
-    "protractor": "4.0.3",
+    "protractor": "5.1.2",
     "mysql": "^2.5.4",
     "jasmine-reporters": "~2.0.0",
     "jasmine-spec-reporter": "2.1.0",
     "protractor-screenshot-reporter": "~0.0.5",
     "jshint": "2.5.0",
     "xlsjs": "~0.7.2"
-  },
-  "repository": {
-    "type":"svn"
   }
 }

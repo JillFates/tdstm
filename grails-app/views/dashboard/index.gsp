@@ -21,12 +21,14 @@
 			text-align: center;
 			font-size: 1.5em;
 		}
-		div.elapsed-time-wrapper span#spanPlanned {
+		div.elapsed-time-wrapper span#eventStartDate {
 			text-align: center;
 			font-size: 1.3em;
 		}
 		div.elapsed-time-wrapper div.plannedStart {
-			margin-top: 15px;
+			margin-top: 2px;
+			margin-bottom: 2px;
+			font-weight: bold;
 		}
 		div.elapsed-time-wrapper span#plannedStart {
 			text-align: center;
@@ -69,10 +71,9 @@
 									</g:each>
 								</select>
 								<tds:hasPermission permission="${Permission.TaskPublish}">
-									<span class="checkboxContainer">
-										&nbsp;&nbsp;
-										<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="toggleUnpublished(event)"/><!--
-									--><label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
+									<span class="checkboxContainer" style="margin-left: 12px;">
+										<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="toggleUnpublished(event)"/>
+										<label for="viewUnpublishedId" class="pointer">&nbsp;&nbsp;Include Unpublished Tasks</label>
 									</span>
 								</tds:hasPermission>
 							</span>
@@ -122,7 +123,7 @@
 										<div class="col-md-12"><span id="eventDescription"></span></div>
 									</div>
 									<div class="row">
-										<div class="col-md-12"><span id="spanPlanned"></span></div>
+										<div class="col-md-12"><span id="eventStartDate"></span></div>
 									</div>
 									<div class="row plannedStart">
 										<div class="col-md-12"><span id="plannedStart"></span></div>
@@ -174,6 +175,7 @@
 		<!-- /.box-body -->
 	</div>
 </section>
+
 <section class="dashboard-task-summary-wrapper">
 	<div>
 		<div class="box-body">
@@ -854,6 +856,7 @@
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum;
+			var eventStartDate = snapshot.eventStartDate;
 			var sumDialInd =  planSum.dialInd ? planSum.dialInd : 50;
 			if(sumDialInd < 0){
 				sumDialInd = 0
@@ -878,19 +881,19 @@
 				$("#moveEventStatus").html("GREEN")
 			}
 			updateSummaryGauge("summary_gauge", sumDialInd);
-			if(calcMethod == "M"){
-				$('#checkBoxId').attr("checked","checked")
+			if(calcMethod == "M") {
+				$('#checkBoxId').attr("checked","checked");
 			} else {
-				$('#checkBoxId').removeAttr("checked")
+				$('#checkBoxId').removeAttr("checked");
 			}
 			$("#manualSummaryStatusId").val( sumDialInd );
 			$("div.plannedStartLabel").show();
-			$("#spanPlanned").html(tdsCommon.parseAndFormatDateTimeFromZulu(planSum.compTime))
-			$("#plannedStart").html(planSum.dayTime)
-			$("#eventDescription").html(planSum.eventDescription)
-			$("#eventStringId").html(planSum.eventString)
+			$("#eventStartDate").html(eventStartDate);
+			$("#plannedStart").html(planSum.dayTime);
+			$("#eventDescription").html(planSum.eventDescription);
+			$("#eventStringId").html(planSum.eventString);
 			$("div.eventRunbook").show();
-			$("#eventRunbook").html(planSum.eventRunbook)
+			$("#eventRunbook").html(planSum.eventRunbook);
 
 			var taskManagerUrl = contextPath + "/assetEntity/listTasks?bundle=" + moveBundleId + "&justRemaining="
 			// handle the calculations for each step

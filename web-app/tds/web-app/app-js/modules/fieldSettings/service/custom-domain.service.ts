@@ -20,7 +20,7 @@ export class CustomDomainService {
 	}
 
 	getCommonFieldSpecs(): Observable<DomainModel[]> {
-		return this.http.get('..\ws\customDomain\fieldSpecsWithCommon')
+		return this.http.get('../ws/customDomain/fieldSpecsWithCommon')
 			.map((res: Response) => {
 				let response = res.json();
 				let domains: DomainModel[] = Object.keys(response).map(key => {
