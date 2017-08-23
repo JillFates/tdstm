@@ -1,18 +1,32 @@
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
+import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.service.MoveBundleService
+import net.transitionmanager.service.MoveEventService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.SettingService
+import spock.lang.See
+
 
 import spock.lang.Specification
 
 class MoveBundleServiceIntegrationSpec extends Specification {
 
     MoveBundleService moveBundleService
+    MoveEventService moveEventService
+    SettingService settingService
+    SecurityService securityService
 
     private ProjectTestHelper projectHelper = new ProjectTestHelper()
     private MoveBundleTestHelper moveBundleHelper = new MoveBundleTestHelper()
+    private AssetTestHelper assetHelper = new AssetTestHelper()
+    private SettingServiceTests settingServiceTests = new SettingServiceTests()
 
-    void 'Test lookupList with default parameters'() {
-
+    void '01. Test lookupList with default parameters'() {
         given: 'two projects with some bundles assigned to each'
             Project project1 = projectHelper.createProject()
             Project project2 = projectHelper.createProject()
@@ -35,7 +49,7 @@ class MoveBundleServiceIntegrationSpec extends Specification {
             result[2].name == 'C'
     }
 
-    void 'Test lookupList for specific fields and sorting criteria' () {
+    void '02. Test lookupList for specific fields and sorting criteria' () {
         given: 'A project with a couple of bundles'
             Project project = projectHelper.createProject()
             moveBundleHelper.createBundle(project)
@@ -49,10 +63,9 @@ class MoveBundleServiceIntegrationSpec extends Specification {
             result[0].keySet().size() == 2
         and: 'the results are sorted correctly'
             result[0].id < result[1].id
-
     }
 
-    void 'Test lookupList for a project with no bundles' () {
+    void '03. Test lookupList for a project with no bundles' () {
         given: 'A project with no bundles'
             Project project = projectHelper.createProject()
 
@@ -62,4 +75,38 @@ class MoveBundleServiceIntegrationSpec extends Specification {
             result.size() == 0
     }
 
+    @See('TM-6847')
+    void '04. Test delete Bundle & Assets' () {
+        setup:
+            Project project = projectHelper.createProject()
+            securityService.metaClass.loadUserCurrentProject{ return project }
+            def json = settingServiceTests.createSampleJson()
+            settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, 'DEVICE', json, 0)
+        when: 'A new bundle is created'
+            MoveBundle bundle = moveBundleHelper.createBundle(project, 'Test Bundle')
+        and: 'a new event is created'
+            MoveEvent event = moveEventService.create(project, 'Test Event')
+        and: 'the above bundle is assigned to it'
+            moveBundleService.assignMoveEvent(event, [bundle.id])
+        and: 'some assets are created and assigned to the bundle'
+            AssetEntity asset1 = assetHelper.createDevice(project, AssetType.VM.toString(), [moveBundle: bundle])
+            AssetEntity asset2 = assetHelper.createDevice(project, AssetType.SERVER.toString(), [moveBundle: bundle])
+        and: 'some tasks for the event are generated'
+            def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event)
+            def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event)
+        and: 'the Delete Bundle & Assets button is triggered'
+            moveBundleService.deleteBundleAndAssets(bundle)
+        then: 'the bundle is deleted'
+            MoveBundle.get(bundle.id) == null
+        and: 'the assigned assets are deleted'
+            AssetEntity.get(asset1.id) == null
+            AssetEntity.get(asset2.id) == null
+        and: 'the event is not deleted'
+            MoveEvent.get(event.id) != null
+        and: 'the asset reference in the Task is nulled out (the task is not deleted)'
+            def task1Test = AssetComment.get(task1.id)
+            def task2Test = AssetComment.get(task2.id)
+            task1Test.assetEntity == null
+            task2Test.assetEntity == null
+    }
 }
