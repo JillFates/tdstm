@@ -25,12 +25,12 @@ export class AssetExplorerIndexComponent {
 
 	constructor(
 		private stateService: StateService,
-		@Inject('reports') reportGroupModels: Observable<ReportGroupModel[]>,
+		@Inject('reports') report: Observable<ReportGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService) {
-		reportGroupModels.subscribe(
+		report.subscribe(
 			(result) => {
 				this.reportGroupModels = result;
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
@@ -82,6 +82,7 @@ export class AssetExplorerIndexComponent {
 									});
 								} else {
 									this.reportGroupModels = result as ReportGroupModel[];
+									this.selectedFolder = this.reportGroupModels.find((r) => r.open);
 								}
 							},
 							error => console.log(error));

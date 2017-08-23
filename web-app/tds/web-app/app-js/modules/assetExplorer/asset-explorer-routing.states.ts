@@ -15,12 +15,12 @@ export class AssetExplorerStates {
 		url: '/assetexplorer/views'
 	};
 	public static readonly REPORT_CREATE = {
-		name: 'tds.assetexplorer.create',
-		url: '/create'
+		name: 'tds.assetexplorer_create',
+		url: '/assetexplorer/views/create'
 	};
 	public static readonly REPORT_EDIT = {
-		name: 'tds.assetexplorer.edit',
-		url: '/:id/edit'
+		name: 'tds.assetexplorer_edit',
+		url: '/assetexplorer/views/:id/edit'
 	};
 }
 
@@ -69,6 +69,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		hasPendingChanges: false
 	},
 	views: {
+		'headerView@tds': { component: HeaderComponent },
 		'containerView@tds': { component: AssetExplorerReportConfigComponent }
 	},
 	resolve: [
@@ -111,6 +112,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		hasPendingChanges: false
 	},
 	views: {
+		'headerView@tds': { component: HeaderComponent },
 		'containerView@tds': { component: AssetExplorerReportConfigComponent }
 	},
 	resolve: [

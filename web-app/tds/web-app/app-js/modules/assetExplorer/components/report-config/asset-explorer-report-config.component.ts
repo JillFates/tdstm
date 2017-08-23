@@ -267,14 +267,18 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected onSave() {
+		console.log('teste1');
 		if (this.isSaveAvailable()) {
+			console.log('teste2');
 			if (this.model.id) {
 				this.assetExpService.saveReport(this.model)
 					.subscribe(result => {
 						console.log(result);
 					});
 			} else {
+				console.log('teste3');
 				this.openSaveDialog();
+				console.log('teste4');
 			}
 		}
 	}
