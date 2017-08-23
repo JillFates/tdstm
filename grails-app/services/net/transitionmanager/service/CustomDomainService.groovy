@@ -438,7 +438,7 @@ class CustomDomainService implements ServiceMethods {
 
         // we add the common fields
         fieldSpecs[COMMON] = [
-            domain : COMMON,
+            domain : COMMON.toLowerCase(),
             fields : commonFields
         ]
 
