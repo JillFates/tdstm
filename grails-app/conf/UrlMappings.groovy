@@ -457,20 +457,20 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/assetExplorer/reports" {
+		"/ws/assetExplorer/dataviews" {
 			controller = "wsAssetExplorer"
 			action = [
-					GET: "listReports"
+					GET: "listDataviews"
 			]
 		}
 
-		"/ws/assetExplorer/report/$id?" {
+		"/ws/assetExplorer/dataview/$id?" {
 			controller = "wsAssetExplorer"
 			action = [
-					GET: "getReport",
-					POST: "createReport",
-					PUT: "updateReport",
-					DELETE: "deleteReport"
+					GET: "getDataview",
+					POST: "createDataview",
+					PUT: "updateDataview",
+					DELETE: "deleteDataview"
 			]
 		}
 

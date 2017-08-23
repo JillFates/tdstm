@@ -3,9 +3,9 @@
  */
 package net.transitionmanager.service
 
+import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Report
 import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.json.JSONObject
 import net.transitionmanager.service.EmptyResultException
@@ -14,10 +14,10 @@ import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.InvalidRequestException
 
 /**
- * Service class with main database operations for Report.
- * @see Report
+ * Service class with main database operations for Dataview.
+ * @see Dataview
  */
-class ReportService implements ServiceMethods {
+class DataviewService implements ServiceMethods {
 
 	SecurityService securityService
 
@@ -30,11 +30,11 @@ class ReportService implements ServiceMethods {
 	 * current person in session
 	 * @return
 	 */
-	List<Report> list() {
+	List<Dataview> list() {
 		Person currentPerson = securityService.loadCurrentPerson()
 		Project currentProject = securityService.userCurrentProject
 
-		def query = Report.where {
+		def query = Dataview.where {
 			project == currentProject
 			(isSystem == true || isShared == true || person == currentPerson)
 		}
@@ -47,8 +47,8 @@ class ReportService implements ServiceMethods {
 	 * @param id
 	 * @return
 	 */
-	Report fetch(Integer id) {
-		Report dataview = Report.get(id)
+	Dataview fetch(Integer id) {
+		Dataview dataview = Dataview.get(id)
 		validateDataviewViewAccessOrException(dataview);
 
 		return dataview
@@ -61,8 +61,8 @@ class ReportService implements ServiceMethods {
 	 * @return the Dataview object that was updated
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	Report update(Integer id, JSONObject dataviewJson) {
-		Report dataview = Report.get(id)
+	Dataview update(Integer id, JSONObject dataviewJson) {
+		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(dataviewJson, dataview)
 
 		dataview.with {
@@ -84,10 +84,10 @@ class ReportService implements ServiceMethods {
 	 * @return the Dataview object that was created
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	Report create(JSONObject dataviewJson) {
+	Dataview create(JSONObject dataviewJson) {
 		validateDataviewCreateAccessOrException(dataviewJson)
 
-		Report dataview = new Report()
+		Dataview dataview = new Dataview()
 		dataview.with {
 			person = securityService.loadCurrentPerson()
 			project = securityService.userCurrentProject
@@ -111,7 +111,7 @@ class ReportService implements ServiceMethods {
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
 	void delete(Integer id) {
-		Report dataview = Report.get(id)
+		Dataview dataview = Dataview.get(id)
 		validateDataviewDeleteAccessOrException(dataview)
 
 		dataview.delete()
@@ -124,7 +124,7 @@ class ReportService implements ServiceMethods {
 	 * @param dataview
 	 * @throws InvalidRequestException
 	 */
-	void validateDataviewViewAccessOrException(Report dataview) {
+	void validateDataviewViewAccessOrException(Dataview dataview) {
 		boolean throwNotFound = false
 		if (!dataview) {
 			throwNotFound = true
@@ -157,7 +157,7 @@ class ReportService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewUpdateAccessOrException(JSONObject dataviewJson, Report dataview) {
+	void validateDataviewUpdateAccessOrException(JSONObject dataviewJson, Dataview dataview) {
 		validateDataviewViewAccessOrException(dataview)
 		validateDataviewJson(dataviewJson, UPDATE_PROPERTIES)
 
@@ -189,7 +189,7 @@ class ReportService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewDeleteAccessOrException(Report dataview) {
+	void validateDataviewDeleteAccessOrException(Dataview dataview) {
 		validateDataviewViewAccessOrException(dataview)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemDelete : Permission.AssetExplorerDelete

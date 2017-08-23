@@ -11,7 +11,7 @@ import com.tdssrc.grails.TimeUtil
  * Represents the properties configuration and definition of a report
  * which is mainly used across Asset Explorer feature.
  */
-class Report {
+class Dataview {
 
 	Project project
 	Person person

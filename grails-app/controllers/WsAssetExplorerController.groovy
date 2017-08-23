@@ -5,7 +5,7 @@
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.service.ReportService
+import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
 
 /**
@@ -18,16 +18,16 @@ class WsAssetExplorerController implements ControllerMethods {
 
 	private final static DELETE_OK_STATUS = "Dataview deleted successfully";
 
-	ReportService reportService
+	DataviewService dataviewService
 	SecurityService securityService
 
 	/**
-	 * Returns the list of available reports as a map(json) result.
-	 * All reports returned belong to current user project in session.
+	 * Returns the list of available dataviews as a map(json) result.
+	 * All Dataviews returned belong to current user project in session.
 	 * @return
 	 */
-    def listReports() {
-		List<Map> listMap = reportService.list()*.toMap(securityService.currentPersonId)
+    def listDataviews() {
+		List<Map> listMap = dataviewService.list()*.toMap(securityService.currentPersonId)
 		renderSuccessJson(listMap)
 	}
 
@@ -36,8 +36,8 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * @param id to search by.
 	 * @return
 	 */
-	def getReport(Integer id) {
-		Map dataviewMap = reportService.fetch(id).toMap(securityService.currentPersonId)
+	def getDataview(Integer id) {
+		Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -48,8 +48,8 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
 	@Secured('isAuthenticated()')
-	def updateReport(Integer id) {
-		Map dataviewMap = reportService.update(id, request.JSON).toMap(securityService.currentPersonId)
+	def updateDataview(Integer id) {
+		Map dataviewMap = dataviewService.update(id, request.JSON).toMap(securityService.currentPersonId)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -60,8 +60,8 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
 	@Secured('isAuthenticated()')
-	def createReport() {
-		Map dataviewMap = reportService.create(request.JSON).toMap(securityService.currentPersonId)
+	def createDataview() {
+		Map dataviewMap = dataviewService.create(request.JSON).toMap(securityService.currentPersonId)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -72,8 +72,8 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
 	@Secured('isAuthenticated()')
-	def deleteReport(Integer id) {
-		reportService.delete(id)
+	def deleteDataview(Integer id) {
+		dataviewService.delete(id)
 		renderSuccessJson([status: DELETE_OK_STATUS] )
 	}
 
