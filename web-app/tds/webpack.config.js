@@ -59,7 +59,7 @@ module.exports = function(env, argv) {
 				/angular(\\|\/)core(\\|\/)@angular/,
 				path.resolve(__dirname, "app-js")
 			),
-			 new BundleAnalyzerPlugin()
+			//new BundleAnalyzerPlugin()
 		],
 		context: __dirname,
 		watch: devEnv,
