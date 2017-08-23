@@ -64,10 +64,13 @@ class TaskImportExportService implements ServiceMethods {
 			Date parsedDate = TimeUtil.parseDate(val, options.dateFormatter)
 			if (parsedDate) {
 				return TimeUtil.formatDate(parsedDate, options.dateFormatter)
+			} else {
+				log.error "xfrmDateToString() cannot parse date ${val}"
 			}
+		} else {
+			log.error "xfrmDateToString() got unexpected data type ${val?.getClass()?.getName()}"
 		}
 
-		log.error "xfrmDateToString() got unexpected data type ${val?.getClass()?.getName()}"
 		val?.toString()
 	}
 
