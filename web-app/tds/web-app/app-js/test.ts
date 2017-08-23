@@ -13,7 +13,7 @@ import './specs/ui-loader.directive.spec';
 import './specs/ui-toast.directive.spec';
 import './specs/ui-svg-icon.directive.spec';
 import './specs/component-creator.service.spec';
-import './specs/rich-text-editor.component.spec';
+// import './specs/rich-text-editor.component.spec'; Disabled until get a better solution
 import './specs/permission.service.spec';
 import './modules/noticeManager/specs/notice-list.component.spec';
 import './modules/noticeManager/specs/notice-form.component.spec';

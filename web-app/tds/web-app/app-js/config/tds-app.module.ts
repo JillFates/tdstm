@@ -29,8 +29,8 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './td
 		BrowserAnimationsModule,
 		// Feature Modules
 		SharedModule,
-		NoticesManagerModule,
-		TaskManagerModule,
+		// NoticesManagerModule, Disabling until Get another solution for tinymce
+		// TaskManagerModule, Disabled until implement or test
 		FieldSettingsModule,
 		AssetExplorerModule,
 		// Routing Modules using UI Router
