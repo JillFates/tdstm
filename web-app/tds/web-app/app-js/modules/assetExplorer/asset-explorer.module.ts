@@ -1,24 +1,25 @@
 // Angular
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 // Routing Logic
-import { UIRouterModule } from '@uirouter/angular';
-import { ASSET_EXPLORER_STATES } from './asset-explorer-routing.states';
+import {UIRouterModule} from '@uirouter/angular';
+import {ASSET_EXPLORER_STATES} from './asset-explorer-routing.states';
 // Components
-import { AssetExplorerReportSelectorComponent } from './components/report-selector/asset-explorer-report-selector.component';
-import { AssetExplorerReportConfigComponent } from './components/report-config/asset-explorer-report-config.component';
-import { AssetExplorerReportSaveComponent } from './components/report-save/asset-explorer-report-save.component';
-import { AssetExplorerReportExportComponent } from './components/report-export/asset-explorer-report-export.component';
-import { AssetExplorerReportGridComponent } from './components/report-grid/asset-explorer-report-grid.component';
-import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
-import { SharedModule } from '../../shared/shared.module';
-import { Permission } from '../../shared/model/permission.model';
+import {AssetExplorerReportSelectorComponent} from './components/report-selector/asset-explorer-report-selector.component';
+import {AssetExplorerReportConfigComponent} from './components/report-config/asset-explorer-report-config.component';
+import {AssetExplorerReportSaveComponent} from './components/report-save/asset-explorer-report-save.component';
+import {AssetExplorerReportExportComponent} from './components/report-export/asset-explorer-report-export.component';
+import {AssetExplorerReportGridComponent} from './components/report-grid/asset-explorer-report-grid.component';
+import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
+import {SharedModule} from '../../shared/shared.module';
+import {Permission} from '../../shared/model/permission.model';
 // Import Kendo Modules
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
-import { GridModule } from '@progress/kendo-angular-grid';
+import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
+import {GridModule} from '@progress/kendo-angular-grid';
+import {ExcelExportModule} from '@progress/kendo-angular-excel-export';
 // Services
-import { AssetExplorerService } from './service/asset-explorer.service';
+import {AssetExplorerService} from './service/asset-explorer.service';
 
 @NgModule({
 	imports: [
@@ -27,7 +28,8 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		FormsModule,
 		DropDownListModule,
 		GridModule,
-		UIRouterModule.forChild({ states: ASSET_EXPLORER_STATES })
+		ExcelExportModule,
+		UIRouterModule.forChild({states: ASSET_EXPLORER_STATES})
 	],
 	declarations: [
 		AssetExplorerReportSelectorComponent,

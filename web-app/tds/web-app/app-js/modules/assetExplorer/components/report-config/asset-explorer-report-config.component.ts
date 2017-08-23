@@ -34,6 +34,7 @@ export class AssetExplorerReportConfigComponent {
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
 		assets: {
+			'COMMON': true,
 			'APPLICATION': false,
 			'DATABASE': false,
 			'DEVICE': false,
@@ -164,7 +165,7 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected fieldStyle(isTitle: boolean): any {
-		if (isTitle && this.columnIndex !== 0) {
+		if (isTitle && (this.columnIndex !== 0 || this.rowIndex !== 0)) {
 			this.columnIndex += 1;
 			this.rowIndex = 0;
 		} else if (this.rowIndex >= 15) {

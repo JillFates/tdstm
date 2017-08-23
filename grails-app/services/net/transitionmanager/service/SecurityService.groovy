@@ -162,6 +162,19 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Project.get userCurrentProjectId
 	}
 
+	/**
+	 * Returns the current Project or Throws a EmptyResultException
+	 */
+	Project getUserCurrentProjectOrException() {
+		Project project = getUserCurrentProject()
+
+		if(project == null){
+			throw new EmptyResultException('No project selected')
+		}
+
+		return project
+	}
+
 	String getUserCurrentProjectId() {
 		userPreferenceService.getPreference(PREF.CURR_PROJ)
 	}

@@ -94,7 +94,7 @@
 			var step = "${step}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var taskManagerUrl = "/assetEntity/listTasks"
-			var listCaption ="Tasks: \
+			var listCaption ="<label for='lbl-task-list-title'>Tasks</label>: \
 				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
 				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>\
 				<tdsactionbutton id='clearFilters' icon='' label='Clear Filters' link='" + taskManagerUrl + "'></tdsactionbutton>"
@@ -292,7 +292,7 @@
             <div class="row action-bar-wrapper">
                 <div class="pull-left">
                     <div id="controlRowId">
-                        <b>Event </b>
+                        <label for="lbl-task-event-title">Event</label>
                         <g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
                         <span class="checkboxContainer action-bar">
                             <input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" />

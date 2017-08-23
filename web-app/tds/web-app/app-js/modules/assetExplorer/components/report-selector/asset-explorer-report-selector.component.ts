@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild, AfterViewInit, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit, AfterViewInit, Input, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { StateService } from '@uirouter/angular';
@@ -8,6 +8,7 @@ import { ViewType } from '../../model/report.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { Permission } from '../../../../shared/model/permission.model';
 
+import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
 	selector: 'asset-explorer-report-selector',
@@ -17,18 +18,25 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}`
 	]
 })
-export class AssetExplorerReportSelectorComponent implements AfterViewInit {
+export class AssetExplorerReportSelectorComponent implements OnInit, AfterViewInit {
 	@Input() open?= false;
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ReportGroupModel[];
 	private data: ReportGroupModel[];
 	private search = '';
 
-	constructor( @Inject('reports') reports: Observable<ReportGroupModel[]>, private stateService: StateService, private permissionService: PermissionService) {
-		reports.subscribe((result) => {
-			this.data = result;
-			this.reports = result.slice();
-		});
+	constructor(
+		private service: AssetExplorerService,
+		private stateService: StateService,
+		private permissionService: PermissionService) {
+	}
+
+	ngOnInit(): void {
+		this.service.getReports()
+			.subscribe((result) => {
+				this.data = result;
+				this.reports = result.slice();
+			});
 	}
 
 	ngAfterViewInit(): void {
