@@ -688,8 +688,6 @@ class PersonController implements ControllerMethods {
 		def currRole = params.role ?: userPreferenceService.getPreference(PREF.STAFFING_ROLE) ?: "0"
 		List projects = personService.getAvailableProjects(securityService.userLoginPerson)
 
-		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
-
 		[project: project, projects: projects, projectId: project.id, roleTypes: roleTypes,
 		 editPermission: securityService.hasPermission(Permission.ProjectStaffEdit), assigned: assigned,
 		 onlyClientStaff: onlyClientStaff, currRole: currRole]

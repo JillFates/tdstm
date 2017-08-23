@@ -177,4 +177,5 @@ databaseChangeLog = {
 	include file: '20170725-remove-EavAttributeSet-reference-in-AssetEntity.groovy'
 	include file: '20170731-null-out-move-event-orphans-for-tasks.groovy'
 	include file: '20170816-Clear-out-possible-corrupted-Tasks-referencing-not-existing-Assets.groovy'
+	include file: '20170817-add-ProjectManageDefaults-permission.groovy'
 }

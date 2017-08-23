@@ -2280,7 +2280,8 @@ class ImportService implements ServiceMethods {
 							assetDep = new AssetDependency(createdBy: securityService.loadCurrentPerson())
 							isNew = true
 						} else {
-							String msg = messageSource.getMessage("assetEntity.dependency.warning", [asset.assetName, dependent.assetName], LocaleContextHolder.getLocale())
+							Object[] msgParams = [asset.assetName, dependent.assetName]
+							String msg = messageSource.getMessage("assetEntity.dependency.warning",msgParams , LocaleContextHolder.getLocale())
 							dependencyError "$msg (row $rowNum)"
 							continue
 						}
