@@ -308,7 +308,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * Remove the Move Bundle preferences when user switched to different project.
 	 */
 	@Transactional
-	private void removeBundleAssociatedPreferences(UserLogin userLogin) {
+	void removeBundleAssociatedPreferences(UserLogin userLogin) {
 		removeProjectAssociatedPreference userLogin, MOVE_BUNDLE
 		removeProjectAssociatedPreference userLogin, CURR_BUNDLE
 	}

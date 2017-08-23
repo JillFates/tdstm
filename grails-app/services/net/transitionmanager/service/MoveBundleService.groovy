@@ -236,9 +236,7 @@ class MoveBundleService implements ServiceMethods {
 			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",
 					[project.defaultBundle, moveBundle])
 			// remove bundle-associated data
-			jdbcTemplate.update('DELETE FROM user_preference WHERE value=?', moveBundle.id.toString())
-			jdbcTemplate.update('DELETE FROM party_relationship where party_id_from_id=? or party_id_to_id=?', moveBundle.id, moveBundle.id)
-			MoveBundleStep.executeUpdate('DELETE MoveBundleStep where moveBundle=?', [moveBundle])
+			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
 			moveBundle.delete()
 
 			return "MoveBundle $moveBundle deleted"

@@ -936,7 +936,7 @@ class AssetEntityService implements ServiceMethods {
 		// Theoretically this isn't necessary but as a safety precaution
 		AssetEntity.where {
 			moveBundle == moveBundle
-		}.updateAll(project: project.defaultProject)
+		}.updateAll(moveBundle: project.getDefaultBundle())
 	}
 
 	/**
