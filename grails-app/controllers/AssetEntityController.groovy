@@ -554,6 +554,7 @@ class AssetEntityController implements ControllerMethods {
 			String etFinish = TimeUtil.formatDateTime(assetComment.estFinish)
 			String atStart = TimeUtil.formatDateTime(assetComment.actStart)
 			String dueDate = TimeUtil.formatDate(assetComment.dueDate)
+			String lastUpdated = TimeUtil.formatDateTime(assetComment.lastUpdated)
 
 			def workflowTransition = assetComment?.workflowTransition
 			String workflow = workflowTransition?.name
@@ -655,7 +656,8 @@ class AssetEntityController implements ControllerMethods {
 				successorList: successorList,
 				instructionsLinkURL: instructionsLinkURL ?: "",
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
-				canEdit: canEdit
+				canEdit: canEdit,
+				lastUpdated: lastUpdated,
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
@@ -1533,7 +1535,7 @@ class AssetEntityController implements ControllerMethods {
 			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
-			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:
+			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|lastUpdated/:
 				result = TimeUtil.formatDateTime(task[value])
 			break
 			case "event": result = task.moveEvent?.name; break
@@ -1705,7 +1707,9 @@ class AssetEntityController implements ControllerMethods {
 			def queryFordepsList = """
 			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, mb.move_bundle_id AS moveBundleId, mb.name AS moveBundleName,
 			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality,
-			if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus
+			if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
+			ae.environment as environment, srcr.location AS sourceLocation, srcr.room_name AS sourceRoomName, srcr.room_id as sourceRoomId,
+			tarr.location AS targetLocation, tarr.room_name AS targetRoomName, tarr.room_id as targetRoomId
 			FROM (
 				SELECT * FROM tdstm.asset_dependency_bundle
 				WHERE project_id=? AND dependency_bundle in (${nodesQuery.join(',')})
@@ -1717,6 +1721,8 @@ class AssetEntityController implements ControllerMethods {
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
+			LEFT OUTER JOIN room srcr ON srcr.room_id = ae.room_source_id 
+			LEFT OUTER JOIN room tarr ON tarr.room_id = ae.room_target_id
 			"""
 			assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id)
 		}
@@ -1944,11 +1950,10 @@ class AssetEntityController implements ControllerMethods {
 					}
 
 					graphNodes << [id: it.assetId, name: it.assetName, type: type, depBundleId: it.bundle,
-					               moveBundleId: it.moveBundleId, moveEventId: moveEventId, hasMoveEvent: hasMoveEvent,
-					               shape: shape, size: size, title: it.assetName, color: color, dependsOn: [],
-					               supports: [], assetClass: it.assetClass, cutGroup: -1, colorByProperties: colorByGroupIds]
+								   moveBundleId: it.moveBundleId, moveEventId: moveEventId, hasMoveEvent: hasMoveEvent,
+								   shape: shape, size: size, title: it.assetName, color: color, dependsOn: [],
+								   supports: [], assetClass: it.assetClass, cutGroup: -1, colorByProperties: colorByGroupIds]
 				}
-
 				// set the dep bundle, move bundle, and move event properties to indices
 				List<Long> sortedDepBundles = dependencyBundleMap.keySet() as List
 				List<Long> sortedMoveBundles = moveBundleMap.keySet() as List

@@ -98,14 +98,7 @@ class ControllerService implements ServiceMethods {
 	 * @return The user's currently selected Project object or null if not seleted
 	 */
 	Project getRequiredProject() {
-		Project project = securityService.userCurrentProject
-		if (project) {
-			project
-		}
-		else {
-			log.info('Current project is null')
-			throw new EmptyResultException()
-		}
+		return securityService.userCurrentProjectOrException
 	}
 
 	/**

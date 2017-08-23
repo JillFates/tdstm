@@ -53,7 +53,7 @@ class TdsAuthenticationFailureHandler extends AjaxAwareAuthenticationFailureHand
 		WrappedAuthenticationException wrapped = (WrappedAuthenticationException) e
 		e = (AuthenticationException) wrapped.cause
 		UsernamePasswordAuthorityAuthenticationToken authentication = wrapped.token
-		String username = authentication.name
+		String username = authentication?.name
 
 		String userMsg
 		if (e instanceof LockedException || e instanceof DisabledException) {
@@ -81,8 +81,8 @@ class TdsAuthenticationFailureHandler extends AjaxAwareAuthenticationFailureHand
 
 		checkFailsCount(username)
 
-		Map<String, String> params = [username: username, targetUri: authentication.targetUri,
-		                              authority: authentication.authority, rememberMe: authentication.rememberMe as String]
+		Map<String, String> params = [username: username, targetUri: authentication?.targetUri,
+		                              authority: authentication?.authority, rememberMe: authentication?.rememberMe ? authentication?.rememberMe as String : null]
 		params.keySet().retainAll { params[it] }
 		redirectStrategy.sendRedirect(request, response,
 				grailsLinkGenerator.link(controller: 'auth', action: 'login', params: params, base: ' ').substring(1))
