@@ -9,6 +9,9 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { Permission } from '../../../../shared/model/permission.model';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import { AlertType } from '../../../../shared/model/alert.model';
+
 @Component({
 	selector: 'asset-explorer-index',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html'
@@ -25,7 +28,8 @@ export class AssetExplorerIndexComponent {
 		@Inject('reports') reportGroupModels: Observable<ReportGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
-		private prompt: UIPromptService) {
+		private prompt: UIPromptService,
+		private notifier: NotifierService) {
 		reportGroupModels.subscribe(
 			(result) => {
 				this.reportGroupModels = result;
@@ -49,7 +53,10 @@ export class AssetExplorerIndexComponent {
 	protected onCreateReport(): void {
 		if (this.isCreateAvailable()) {
 			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
-				{ system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS });
+				{
+					system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS,
+					shared: this.selectedFolder.type === this.viewType.SHARED_VIEWS
+				});
 		}
 	}
 
@@ -61,14 +68,21 @@ export class AssetExplorerIndexComponent {
 
 	protected onDeleteReport(report: ReportModel): void {
 		if (this.isDeleteAvailable(report)) {
-			this.prompt.open('Confirmation Required', 'Are you sure you want to delete this report?', 'Yes', 'No')
-				.then((result) => {
-					if (result) {
-						this.assetExpService.deleteReport(report.id
-						).subscribe(
-							deleted => {
-								this.assetExpService.getReports()
-									.subscribe(res => this.reportGroupModels = res, err => console.log(err));
+			this.prompt.open('Confirmation Required', 'Are you sure you want to delete this view?', 'Yes', 'No')
+				.then((res) => {
+					if (res) {
+						this.assetExpService.deleteReport(report.id)
+							.concat(this.assetExpService.getReports())
+							.subscribe(
+							result => {
+								if (typeof result === 'string') {
+									this.notifier.broadcast({
+										name: AlertType.SUCCESS,
+										message: result
+									});
+								} else {
+									this.reportGroupModels = result as ReportGroupModel[];
+								}
 							},
 							error => console.log(error));
 					}

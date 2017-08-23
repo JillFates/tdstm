@@ -88,7 +88,9 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 			deps: [Transition],
 			resolveFn: (trans: Transition) => {
 				let model = new ReportModel();
-				model.isSystem = trans.params().system || false;
+				let params = trans.targetState().params() as any;
+				model.isSystem = params.system || false;
+				model.isShared = params.shared || false;
 				return Observable.from([model]);
 			}
 		}
@@ -119,6 +121,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain().map(domains => {
 				domains.forEach(d => {
 					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
+					d.fields.forEach(f => f['domain'] = d.domain);
 				});
 				return domains;
 			})

@@ -73,6 +73,10 @@ export class AssetExplorerReportConfigComponent {
 	protected updateFilterbyModel() {
 		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain] = true);
 		this.applyFilters();
+		let columns = this.model.schema.columns.map(x => `${x.domain}.${x.property}`);
+		this.fields
+			.filter(f => columns.indexOf(`${f['domain']}.${f.field}`) !== -1)
+			.forEach(x => x['selected'] = true);
 	}
 
 	protected updateModelbyFilter() {
@@ -185,12 +189,10 @@ export class AssetExplorerReportConfigComponent {
 		this.dialogService.open(AssetExplorerReportSaveComponent, [
 			{ provide: ReportModel, useValue: this.model }
 		]).then(result => {
-			console.log(result);
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
 			setTimeout(() => {
 				this.state.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
-				console.log('here');
 			});
 		}).catch(result => {
 			console.log('error');
@@ -267,7 +269,10 @@ export class AssetExplorerReportConfigComponent {
 	protected onSave() {
 		if (this.isSaveAvailable()) {
 			if (this.model.id) {
-				this.assetExpService.saveReport(this.model);
+				this.assetExpService.saveReport(this.model)
+					.subscribe(result => {
+						console.log(result);
+					});
 			} else {
 				this.openSaveDialog();
 			}

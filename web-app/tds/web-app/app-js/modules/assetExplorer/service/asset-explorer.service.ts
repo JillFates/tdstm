@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Rx';
-import {Response} from '@angular/http';
-import {ReportModel, ReportGroupModel, ViewType} from '../model/report.model';
-import {QuerySpec} from '../model/report-spec.model';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
+import { Response } from '@angular/http';
+import { ReportModel, ReportGroupModel, ViewType } from '../model/report.model';
+import { QuerySpec } from '../model/report-spec.model';
+import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -11,167 +11,93 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class AssetExplorerService {
 
-	private assetExplorerUrl = '../ws/assetExplorer';
-
-	private mockData: ReportModel[] = [
-		{
-			id: 1,
-			name: 'Finance Applications',
-			isOwner: false,
-			isShared: false,
-			isSystem: true,
-			schema: {
-				domains: ['APPLICATION', 'STORAGE'],
-				columns: [],
-				filters: [],
-				sort: {
-					domain: 'APPLICATION',
-					property: 'id',
-					order: 'a'
-				}
-			}
-		},
-		{
-			id: 2,
-			name: 'HR Applicattions',
-			isOwner: false,
-			isShared: false,
-			isSystem: true,
-			schema: {
-				domains: ['APPLICATION', 'DEVICE'],
-				columns: [],
-				filters: [],
-				sort: {
-					domain: 'APPLICATION',
-					property: 'id',
-					order: 'a'
-				}
-			}
-		}, {
-			id: 3,
-			name: 'Legal Applications',
-			isOwner: false,
-			isShared: false,
-			isSystem: true,
-			schema: {
-				domains: ['APPLICATION'],
-				columns: [],
-				filters: [],
-				sort: {
-					domain: 'APPLICATION',
-					property: 'id',
-					order: 'a'
-				}
-			}
-		}, {
-			id: 4,
-			name: 'My First Report',
-			isOwner: true,
-			isShared: false,
-			isSystem: false,
-			schema: {
-				domains: ['DEVICE', 'DATABASE', 'STORAGE'],
-				columns: [],
-				filters: [],
-				sort: {
-					domain: 'DEVICE',
-					property: 'id',
-					order: 'a'
-				}
-			}
-		}, {
-			id: 5,
-			name: 'My First Shared Report',
-			isOwner: true,
-			isShared: true,
-			isSystem: false
-		}, {
-			id: 6,
-			name: 'Another user awesome report',
-			isOwner: false,
-			isShared: true,
-			isSystem: false,
-			schema: {
-				domains: ['DEVICE', 'DATABASE', 'STORAGE'],
-				columns: [],
-				filters: [],
-				sort: {
-					domain: 'DEVICE',
-					property: 'id',
-					order: 'a'
-				}
-			}
-		}
-	];
+	private assetExplorerUrl = '../ws/assetExplorer/report';
 
 	constructor(private http: HttpInterceptor) {
 	}
 
 	getReports(): Observable<ReportGroupModel[]> {
-		return this.http.get(`${this.assetExplorerUrl}/reports`).map((res: Response) => {
-			let response = res.json().data;
-			let reportGroupModel: ReportGroupModel[] = Object.keys(response).map(key => {
-				return response[key];
-			});
-			return [
-				{
-					name: 'All',
-					items: reportGroupModel,
-					open: true,
-					type: ViewType.ALL
-				}, {
-					name: 'Recent',
-					items: [],
-					open: false,
-					type: ViewType.RECENT
-				}, {
-					name: 'Favorites',
-					items: reportGroupModel.filter(r => r['isFavorite']),
-					open: false,
-					type: ViewType.FAVORITES
-				}, {
-					name: 'My Views',
-					items: reportGroupModel.filter(r => r['isOwner']),
-					open: false,
-					type: ViewType.MY_VIEWS
-				}, {
-					name: 'Shared Views',
-					items: reportGroupModel.filter(r => r['isShared']),
-					open: false,
-					type: ViewType.SHARED_VIEWS
-				}, {
-					name: 'System Views',
-					items: reportGroupModel.filter(r => r['isSystem']),
-					open: false,
-					type: ViewType.SYSTEM_VIEWS
-				}
-			];
-		}).catch((error: any) => error.json());
+		return this.http.get(`${this.assetExplorerUrl}s`)
+			.map((res: Response) => {
+				let response = res.json().data;
+				let reportGroupModel: ReportGroupModel[] = Object.keys(response).map(key => {
+					return response[key];
+				});
+				return [
+					{
+						name: 'All',
+						items: reportGroupModel,
+						open: true,
+						type: ViewType.ALL
+					}, {
+						name: 'Recent',
+						items: [],
+						open: false,
+						type: ViewType.RECENT
+					}, {
+						name: 'Favorites',
+						items: reportGroupModel.filter(r => r['isFavorite']),
+						open: false,
+						type: ViewType.FAVORITES
+					}, {
+						name: 'My Views',
+						items: reportGroupModel.filter(r => r['isOwner']),
+						open: false,
+						type: ViewType.MY_VIEWS
+					}, {
+						name: 'Shared Views',
+						items: reportGroupModel.filter(r => r['isShared']),
+						open: false,
+						type: ViewType.SHARED_VIEWS
+					}, {
+						name: 'System Views',
+						items: reportGroupModel.filter(r => r['isSystem']),
+						open: false,
+						type: ViewType.SYSTEM_VIEWS
+					}
+				] as any;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	getReport(id: number): Observable<ReportModel> {
-		return Observable.from(this.mockData.filter(r => r.id === +id));
+		return this.http.get(`${this.assetExplorerUrl}/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.dataView;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	saveReport(model: ReportModel): Observable<ReportModel> {
-		let index = this.mockData.length;
-		if (model.id) {
-			index = this.mockData.findIndex(d => d.id === model.id);
-			this.mockData[index] = model;
+		if (!model.id) {
+			return this.http.post(this.assetExplorerUrl, JSON.stringify(model))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data && result.data.dataView;
+				})
+				.catch((error: any) => error.json());
 		} else {
-			model.id = this.mockData.length + 1;
-			this.mockData.push(model);
+			return this.http.put(`${this.assetExplorerUrl}/${model.id}`, JSON.stringify(model))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data && result.data.dataView;
+				})
+				.catch((error: any) => error.json());
 		}
-		return Observable.from([this.mockData[index]]);
 	}
 
 	queryData(query: QuerySpec): any[] {
 		return [];
 	}
 
-	deleteReport(id: number): Observable<ReportModel> {
-		let index = this.mockData.findIndex(d => d.id === id);
-		return Observable.from(this.mockData.splice(index, 1));
+	deleteReport(id: number): Observable<string> {
+		return this.http.delete(`${this.assetExplorerUrl}/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
 	}
 
 }
