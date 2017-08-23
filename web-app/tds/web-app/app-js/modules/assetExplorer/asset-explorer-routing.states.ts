@@ -7,7 +7,7 @@ import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { ReportModel } from './model/report.model';
-import { FieldSettingsService } from '../fieldSettings/service/field-settings.service';
+import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 
 export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
@@ -76,8 +76,13 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		{
 			token: 'fields',
 			policy: { async: 'RXWAIT' },
-			deps: [FieldSettingsService],
-			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain().map(domains => {
+			deps: [CustomDomainService],
+			resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
+				let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
+				if (commonIndex !== -1) {
+					let common = domains.splice(commonIndex, 1);
+					domains = common.concat(domains);
+				}
 				domains.forEach(d => {
 					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
 				});
@@ -119,8 +124,13 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		{
 			token: 'fields',
 			policy: { async: 'RXWAIT' },
-			deps: [FieldSettingsService],
-			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain().map(domains => {
+			deps: [CustomDomainService],
+			resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
+				let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
+				if (commonIndex !== -1) {
+					let common = domains.splice(commonIndex, 1);
+					domains = common.concat(domains);
+				}
 				domains.forEach(d => {
 					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
 					d.fields.forEach(f => f['domain'] = d.domain);
