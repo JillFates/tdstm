@@ -227,7 +227,6 @@
                         <li class="menu-child-item menu-parent-planning-list-bundles"><g:link controller="moveBundle" action="list">List Bundles</g:link> </li>
                         <g:if test="${currProject && moveBundle}">
                             <li class="menu-child-item menu-parent-planning-selected-bundle"><g:link controller="moveBundle" action="show">${moveBundle.name} Bundle Details</g:link></li>
-                            <li class="menu-child-item menu-parent-planning-bundled-assets"><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle.id]">Bundled Assets</g:link> </li>
                         </g:if>
                         <tds:hasPermission permission="${Permission.HelpMenuView}">
                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a></li>

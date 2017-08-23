@@ -85,16 +85,6 @@ describe('Planning Menu', function(){
 				.toContain('/tdstm/moveBundle/show');
 		});
 
-		it('should have the text \'Bundled Assets\' as its link text', function() {
-			expect(menu.planning.getBundledAssets().findElement(by.tagName('a')).getText())
-				.toMatch(/Bundled Assets/);
-		});
-
-		it('should have the target URL \'/tdstm/moveBundleAsset/assignAssetsToBundle?bundleId=[Bundle ID]]\'', function() {
-			expect(menu.planning.getBundledAssets().findElement(by.tagName('a')).getAttribute('href'))
-				.toContain('/tdstm/moveBundleAsset/assignAssetsToBundle?bundleId=');
-		});
-
   }); // end Child Items
 
 	it('should close the Planning Menu',function(){

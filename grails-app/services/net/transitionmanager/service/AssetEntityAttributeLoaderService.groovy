@@ -192,48 +192,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		!map.containsValue(null)
 	}
 
-	/**
-	 * Assign Assets to Bundles
-	 */
-	@Transactional
-	List<AssetEntity> saveAssetsToBundle(bundleTo, bundleFrom, assetIds) {
-		List<AssetEntity> moveBundleAssets
-
-		// remove assets from source bundle
-		if (bundleTo) {
-			MoveBundle moveBundleTo = MoveBundle.get(bundleTo)
-			assetIds.split(',')
-
-			getStringArray(assetIds).each { String assetId ->
-				if (bundleFrom) {
-					AssetEntity.executeUpdate('''
-						UPDATE AssetEntity
-						SET moveBundle=:bundleTo, project=:project
-						WHERE moveBundle.id=:bundleFromId
-						  AND id=:id
-					''', [bundleTo: bundleTo, project:  moveBundleTo.project, bundleFromId: bundleFrom.toLong()])
-				}
-				else {
-					AssetEntity.executeUpdate('''
-						UPDATE AssetEntity
-						SET moveBundle=:bundleTo, sourceTeamMt=null, targetTeamMt=null
-						WHERE id=:id
-					''', [bundleTo: bundleTo, id: assetId.toLong()])
-				}
-			}
-			moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = $bundleTo ")
-		} else{
-			AssetEntity.executeUpdate('''
-				UPDATE AssetEntity
-				SET moveBundle=null, sourceTeamMt=null, targetTeamMt=null
-				WHERE moveBundle=:bundleFrom
-				  AND id IN (:assets)''',
-				[bundleFrom: bundleFrom, assets: assetIds])
-		}
-
-		return moveBundleAssets
-	}
-
 	// get StringArray from StringList
 	// TODO : JPM - Why not just use String.split(",") ?
 	def getStringArray(def stringList){
