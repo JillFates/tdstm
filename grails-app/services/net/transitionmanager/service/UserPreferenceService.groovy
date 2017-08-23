@@ -15,6 +15,7 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_DT_FORMAT
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_PROJ
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_ROOM
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_TZ
+import static com.tdsops.tm.enums.domain.UserPreferenceEnum.MOVE_BUNDLE
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.MOVE_EVENT
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferences
 
@@ -301,6 +302,15 @@ class UserPreferenceService implements ServiceMethods {
 		removeProjectAssociatedPreference userLogin, MOVE_EVENT
 		removeProjectAssociatedPreference userLogin, CURR_BUNDLE
 		removeProjectAssociatedPreference userLogin, CURR_ROOM
+	}
+
+	/**
+	 * Remove the Move Bundle preferences when user switched to different project.
+	 */
+	@Transactional
+	private void removeBundleAssociatedPreferences(UserLogin userLogin) {
+		removeProjectAssociatedPreference userLogin, MOVE_BUNDLE
+		removeProjectAssociatedPreference userLogin, CURR_BUNDLE
 	}
 
 	String getCurrentProjectId(UserLogin userLogin = null) {

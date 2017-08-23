@@ -196,26 +196,31 @@ class MoveBundleService implements ServiceMethods {
 	}
 
 	/**
-	 *  Delete Bundle AssetEntities and its associated records
+	 *  Deletes moveBundle, associated data and AssetEntities related to that bundle.
+	 *  @param : moveBundle
 	 */
-	def deleteBundleAssetsAndAssociates(MoveBundle moveBundle){
+	def deleteBundleAndAssets(MoveBundle moveBundle){
 		try{
-			// remove preferences
-			def bundleQuery = "select mb.id from MoveBundle mb where mb.id = $moveBundle.id"
-			UserPreference.executeUpdate("delete from UserPreference up where up.value = '$moveBundle.id' ")
-			//remove the AssetEntity and associated
+			//remove assets
 			List assets = AssetEntity.where {
-					moveBundle == moveBundle
+				moveBundle == moveBundle
 			}.projections{
-			 			property 'id'
+				property 'id'
 			}.list()
-			assetEntityService.deleteAssets(assets)
+			assetEntityService.deleteAssets(assets, securityService.loadUserCurrentProject(), moveBundle)
+			//remove bundle and associated data
+			deleteBundle(moveBundle, securityService.loadUserCurrentProject())
 		} catch (e) {
-			e.message = "Unable to remove the $moveBundle Assets Error: $e.message"
+			e.message = "Unable to remove the $moveBundle and Assets Error: $e.message"
 			throw e
 		}
 	}
 
+	/**
+	 *  Deletes moveBundle and associated data.
+	 *  @param : moveBundle
+	 *  @param : project
+	 */
 	String deleteBundle(MoveBundle moveBundle, Project project) {
 		if (moveBundle.id == project.defaultBundleId) {
 			return 'The project default bundle can not be deleted'
@@ -230,7 +235,10 @@ class MoveBundleService implements ServiceMethods {
 		try {
 			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",
 					[project.defaultBundle, moveBundle])
-			deleteMoveBundleAssociates(moveBundle)
+			// remove bundle-associated data
+			jdbcTemplate.update('DELETE FROM user_preference WHERE value=?', moveBundle.id.toString())
+			jdbcTemplate.update('DELETE FROM party_relationship where party_id_from_id=? or party_id_to_id=?', moveBundle.id, moveBundle.id)
+			MoveBundleStep.executeUpdate('DELETE MoveBundleStep where moveBundle=?', [moveBundle])
 			moveBundle.delete()
 
 			return "MoveBundle $moveBundle deleted"
@@ -240,15 +248,6 @@ class MoveBundleService implements ServiceMethods {
 			transactionStatus.setRollbackOnly()
 			return "Unable to delete bundle " + moveBundle.name
 		}
-	}
-
-	/**
-	 *  Delete MoveBundle associated records
-	 */
-	void deleteMoveBundleAssociates(MoveBundle moveBundle) {
-		jdbcTemplate.update('DELETE FROM user_preference WHERE value=?', moveBundle.id.toString())
-		jdbcTemplate.update('DELETE FROM party_relationship where party_id_from_id=? or party_id_to_id=?', moveBundle.id, moveBundle.id)
-		MoveBundleStep.executeUpdate('DELETE MoveBundleStep where moveBundle=?', [moveBundle])
 	}
 
 	/*
