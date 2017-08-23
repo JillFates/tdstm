@@ -45,16 +45,18 @@
 					</tr>
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
+						<g:set var="canAssign" value="${false}"/>
 						<tds:hasPermission permission="${Permission.ActionAssignment}">
-							<td valign="top" class="value" id="vmAction" colspan="2">
-								<!-- default to NONE -->
-								<select ng-model="acData.apiAction.id">
-									<g:each var="apiAction" in="${apiActionList}">
-										<option value="${apiAction.id}">${apiAction.name}</option>
-									</g:each>
-								</select>
-							</td>
+							<g:set var="canAssign" value="${true}"/>
 						</tds:hasPermission>
+						<td valign="top" class="value" id="vmAction" colspan="2">
+							<!-- default to NONE -->
+							<select ng-model="acData.apiAction.id" ng-disabled="<%= !canAssign %>">
+								<g:each var="apiAction" in="${apiActionList}">
+									<option value="${apiAction.id}">${apiAction.name}</option>
+								</g:each>
+							</select>
+						</td>
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name">
