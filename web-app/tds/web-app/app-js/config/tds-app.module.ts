@@ -12,7 +12,6 @@ import { HttpModule, Http } from '@angular/http';
 import { TDSAppComponent } from './tds-app.component';
 // Feature modules
 import { SharedModule } from '../shared/shared.module';
-import { NoticesManagerModule } from '../modules/noticeManager/notice-manager.module';
 import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
@@ -29,7 +28,6 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './td
 		BrowserAnimationsModule,
 		// Feature Modules
 		SharedModule,
-		NoticesManagerModule,
 		TaskManagerModule,
 		FieldSettingsModule,
 		AssetExplorerModule,

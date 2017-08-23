@@ -25,7 +25,6 @@ import {FilterPipe} from './pipes/filter.pipe';
 import {PopupLegendsComponent} from './modules/popup/legends/popup-legends.component';
 import {HeaderComponent} from './modules/header/header.component';
 import {FormlyInputHorizontal} from './modules/formly/formly-input-horizontal.component';
-import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
 // Dictionaries
 import {en_DICTIONARY} from './i18n/en.dictionary';
 // Pages
@@ -52,7 +51,6 @@ import {SHARED_STATES} from './shared-routing.states';
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
-		RichTextEditorComponent,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
 		ErrorPageComponent,
@@ -83,8 +81,7 @@ import {SHARED_STATES} from './shared-routing.states';
 		FilterPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
-		FormlyInputHorizontal,
-		RichTextEditorComponent
+		FormlyInputHorizontal
 	]
 })
 export class SharedModule {
