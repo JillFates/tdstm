@@ -2,6 +2,8 @@
 
 var TaskManager = function(){
 
+	// Locators
+	
 	//menu text to determine Event
 	this.projEventUser = $('#nav-project-name');
 	//this.eventUserTxt = projEventUser.getText().substr(projEventUser.getText().indexOf(":") + 1);
@@ -31,7 +33,7 @@ var TaskManager = function(){
   this.selectTimedBarDDOptions = $$('#selectTimedBarId option');
   this.selectTimedBarDDSelected = $('#selectTimedBarId option:checked');
 	// Action Buttons
-  this.tasksLb = null; // TODO Edit after FE solve the label issue
+  this.tasksLb = $('[for="lbl-task-list-title"]');
   this.createTaskBt = $('#createtask_button_createTask');
 	this.createTaskBtLb = $('#createtask_text_createTask');
 	this.bulkEditBt = $('#bulkedit_button_bulkEdit');
@@ -67,53 +69,171 @@ var TaskManager = function(){
 	this.tableRefreshBt = $('#taskListId');
 	//-END of Layout Elements
 	
-	//-START Functionality
-  // Create Task
-  this.createTaskModal = $('[class="modal fade modal-task in"]');
-  this.createTaskTitle = this.createTaskModal.$('ui-id-5');
-  this.taskNameLabel = this.createTaskModal.$('[for="taskName"]');
+  //-START Functionality
+
+	// Error Modal window
+  this.errorModal = $('#errorModal');
+  this.errorModalText = this.errorModal.$('#errorModalText');
+  this.errorModalCloseBtn = this.errorModal.$('[class="btn btn-default"]');
+	// End of error modal window
   
-  // TODO For task modal window features
+	// Create Task Modal Window
+  this.ctModal = $('[class="modal fade modal-task in"]');
+  this.ctModalTitle = this.ctModal.$('#ui-id-5');
+  this.ctModalNameLb = this.ctModal.$('#commentEditTdId');
+  this.ctModalNameErrMsg = this.ctModal.$('[class="error-msg"]');
+  this.ctModalNameTA = this.ctModal.$('#commentEditId');
+  this.ctModalPersTeamLb = this.ctModal.$('[for="assignedToEditTdId"]');
+  this.ctModalPersDD = this.ctModal.$('#assignedTo');
+  this.ctModalPersDDOptions = this.ctModal.$$('#assignedTo option');
+  this.ctModalPersDDSelected = this.ctModal.$('#assignedTo option:checked');
+  this.ctModalTeamDD = this.ctModal.$('#roleType');
+  this.ctModalTeamDDOptions = this.ctModal.$$('#roleType option');
+  this.ctModalTeamDDSelected = this.ctModal.$('#roleType option:checked');
+	this.ctModalFixAssgCB = this.ctModal.$('#hardAssignedEdit');
+	this.ctModalFixAssgLb = this.ctModal.$('[for="hardAssignedEdit"]');
+	this.ctModalSendNotifCB = this.ctModal.$('#sendNotificationEdit');
+	this.ctModalSendNotifLb = this.ctModal.$('[for="sendNotificationEdit"]');
+  this.ctModalEventLb = this.ctModal.$('[for="moveEvent"]');
+  this.ctModalEventDD = this.ctModal.$('#moveEvent');
+  this.ctModalEventDDOptions = this.ctModal.$$('#moveEvent option');
+  this.ctModalEventDDSelected = this.ctModal.$('#moveEvent option:checked');
+  this.ctModalCategoryLb = this.ctModal.$('[for="category"]');
+  this.ctModalCategoryDD = this.ctModal.$('#category');
+  this.ctModalCategoryDDOptions = this.ctModal.$$('#category option');
+  this.ctModalCategoryDDSelected = this.ctModal.$('#category option:checked');
+  this.ctModalAssetLb = this.ctModal.$('[for="asset"]');
+  this.ctModalAssetTypeDD = this.ctModal.$('[ng-model="commentInfo.currentAssetClass"]');
+  this.ctModalAssetTypeDDOptions = this.ctModal.$$('[ng-model="commentInfo.currentAssetClass"] option');
+  this.ctModalAssetTypeDDSelected = this.ctModal.$('[ng-model="commentInfo.currentAssetClass"] option:checked');
+  this.ctModalAssetNameDD = this.ctModal.$('#s2id_currentAsset');
+  this.ctModalAssetNameDDOptions = this.ctModal.$$('#s2id_currentAsset option');
+  this.ctModalAssetNameDDSelected = this.ctModal.$('#s2id_currentAsset option:checked');
+  this.ctModalInstLinkLb = this.ctModal.$('[for="instructionsLink"]');
+  this.ctModalInstLinkTF = this.ctModal.$('#instructionsLinkId');
+  this.ctModalPriorityLb = this.ctModal.$('[for="priority"]');
+  this.ctModalPriorityDD = this.ctModal.$('#priority');
+  this.ctModalPriorityDDOptions = this.ctModal.$$('#priority option');
+  this.ctModalPriorityDDSelected = this.ctModal.$('#priority option:checked');
+  this.ctModalDueDateLb = this.ctModal.$('[for="dueDateEditSpanId"]');
+  this.ctModalDueDateTF = this.ctModal.$('#dueDate');
+  this.ctModalDueDateCal = this.ctModal.$('[class="k-icon k-i-calendar"]');
+  this.ctModalEstDurLb = this.ctModal.$('[for="durationEditId"]');
+  this.ctModalEstDurDaysTF = this.ctModal.$('[ng-model="durationpicker.day"]');
+  this.ctModalEstDurDaysLb = this.ctModal.$('[class="duration_days duration_label"]');
+  this.ctModalEstDurHourTF = this.ctModal.$('[ng-model="durationpicker.hour"]');
+  this.ctModalEstDurHourLb = this.ctModal.$('[class="duration_hours duration_label"]');
+  this.ctModalEstDurMinTF = this.ctModal.$('[ng-model="durationpicker.minutes"]');
+  this.ctModalEstDurMinLb = this.ctModal.$('[class="duration_minutes duration_label"]');
+  this.ctModalEstDurLock = this.ctModal.$('[ng-if="!ac.durationLocked"]');
+  this.ctModalEstStFinLb = this.ctModal.$('[for="estStartEditTrId"]');
+  this.ctModalEstStFinTF = this.ctModal.$('#estRange');
+  this.ctModalStatusLb = this.ctModal.$('[for="status"]');
+  this.ctModalStatusDD = this.ctModal.$('#status');
+  this.ctModalDepLb = this.ctModal.$('[for="predecessorHeadTrId"]');
+  //this.ctModalDepPredLb = this.ctModal.$('[for="predecessors"]');
+  //this.ctModalDepPredBt = this.ctModal.$('[ng-click="$broadcast('addDependency','predecessor')"]');
+  //this.ctModalDepPredType = this.ctModal.$('');
+  //this.ctModalDepPredTsk = this.ctModal.$('');
+  //this.ctModalDepPredDel = this.ctModal.$('[ng-click="deleteRow($index)"]');
+  //this.ctModalDepSuccLb = this.ctModal.$('[for="successors"]');
+  //this.ctModalDepSuccBt = this.ctModal.$('[ng-click="$broadcast('addDependency','successor')"]');
+  //this.ctModalDepSuccType = this.ctModal.$('');
+  //this.ctModalDepSuccTsk = this.ctModal.$(''); 
+  //this.ctModalDepSuccTsk = this.ctModal.$('[ng-click="deleteRow($index)"]');
+  this.ctModalButtons = $$('.buttons button');
+  this.ctModalSaveBt = $('#saveAndCloseBId');
+  this.ctModalCancelBt = $('[class="btn btn-default tablesave cancel"]');
+  
+  // End of Create Task Modal Window
+
 
 	//-END Functionality
-	
-	
-	TaskManager.prototype = {};
-	
-	TaskManager.prototype.existElement = function(elem) {
-	  var that = this;
-	  return browser.wait(function () {
-	    return that.elem.isPresent().then(function (valor) {
-	      return valor;
-	    });
-	  }).then(function () {
-	    return true;
-	  });
-	};
-	
-	TaskManager.prototype.isDisplayedElement = function(elem) {
-	  var that = this;
-	  return browser.wait(function () {
-	    return that.elem.isDisplayed().then(function (value) {
-	      return value;
-	    });
-	  }).then(function () {
-	    return true;
-	  });
-	};
 
-	TaskManager.prototype.clickElement = function(elem) {
-	  var that = this;
-	  return browser.wait(function () {
-	    return elem.click().then(function (value) {
-	      return value;
-	    });
-	  }).then(function () {
-	    return true;
-	  });
-	};
+}; //end locators
 	
+TaskManager.prototype = {};
+
+TaskManager.prototype.existElement = function(elem) {
+  var that = this;
+  return browser.wait(function () {
+    return that.elem.isPresent().then(function (valor) {
+      return valor;
+    });
+  }).then(function () {
+    return true;
+  });
 };
+
+TaskManager.prototype.isDisplayedElement = function(elem) {
+  var that = this;
+  return browser.wait(function () {
+    return that.elem.isDisplayed().then(function (value) {
+      return value;
+    });
+  }).then(function () {
+    return true;
+  });
+};
+
+TaskManager.prototype.clickElement = function(elem) {
+  var that = this;
+  return browser.wait(function () {
+    return elem.click().then(function (value) {
+      return value;
+    });
+  }).then(function () {
+    return true;
+  });
+};
+TaskManager.prototype.isErrorModalDisplayed = function() {
+  var that = this;
+  return browser.wait(function () {
+    return that.errorModal.isDisplayed().then(function (valor) {
+      return valor;
+    });
+  }).then(function () {
+    return true;
+  });
+};
+TaskManager.prototype.isErrorModalNotDisplayed = function() {
+  var that = this;
+  return browser.wait(function () {
+    return that.errorModal.isDisplayed().then(function (valor) {
+      return !valor;
+    });
+  }).then(function () {
+    return true;
+  });
+};
+TaskManager.prototype.isErrorMsgDisplayed = function() {
+  var that = this;
+  return browser.wait(function () {
+    return that.errorModalText.getText().then(function (text) {
+      return text !== '';
+    });
+  }).then(function () {
+    return true;
+  });
+};
+TaskManager.prototype.isCreateTaskModalOpened = function() {
+  return browser.wait(function () {
+    return $('body').getAttribute('class').then(function (val) {
+      return val==='skin-blue layout-top-nav modal-open';
+    });
+  }).then(function () {
+    return true;
+  });
+};
+TaskManager.prototype.isModalClosed = function() {
+  return browser.wait(function () {
+    return $('body').getAttribute('class').then(function (val) {
+      return val==='skin-blue layout-top-nav';
+    });
+  }).then(function () {
+    return true;
+  });
+};	
 
 	
 module.exports = TaskManager;
