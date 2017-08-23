@@ -10,7 +10,7 @@ import net.transitionmanager.service.SecurityService
 
 /**
  * Asset Explorer main controller class that contains basic operation methods for exposed endpoints.
- * @see URLMappings.groovy
+ * @see UrlMappings
  */
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
