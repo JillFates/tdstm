@@ -1,4 +1,5 @@
 <g:set var="licenseCommonService" bean="licenseCommonService"/>
+<g:set var="environmentService" bean="environmentService"/>
 <!DOCTYPE html>
 <html>
 <%
@@ -13,6 +14,7 @@
     int minPasswordLength = tds.minPasswordLength()
     // Only for environments where the License Manager is true Enabled
     def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
+    def buildInfo = environmentService.getVersionText()
 %>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -172,14 +174,11 @@
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-        <div class="container">
-            <div class="pull-right hidden-xs">
-                <b></b>
-            </div>
-            <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2010-${Calendar.getInstance().get(Calendar.YEAR)} .</strong> All
-        rights reserved.
+        <div class="pull-right hidden-xs">
+            <b><span>${buildInfo}</span></b>
         </div>
-        <!-- /.container -->
+        <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2010-${Calendar.getInstance().get(Calendar.YEAR)} .</strong> All rights reserved.
+    <!-- /.container -->
     </footer>
 </div>
 
