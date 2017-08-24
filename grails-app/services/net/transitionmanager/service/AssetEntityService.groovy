@@ -870,7 +870,7 @@ class AssetEntityService implements ServiceMethods {
 	 * Delete a List of assets and associated records - use this method when we want to delete any List of assets
 	 * @param assetIds
 	 */
-	void deleteAssets(List<Long> assetIds, Project project, MoveBundle moveBundle) {
+	void deleteAssets(List<Long> assetIds) {
 		ProjectAssetMap.executeUpdate('DELETE ProjectAssetMap WHERE asset.id in (:assets)', [assets: assetIds])
 		AssetEntityVarchar.executeUpdate('DELETE AssetEntityVarchar WHERE assetEntity.id in (:assets)', [assets: assetIds])
 		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
@@ -931,12 +931,6 @@ class AssetEntityService implements ServiceMethods {
 		AssetEntity.where {
 			id in assetIds
 		}.deleteAll()
-		// As a precaution if there are any other AssetEntity types in the database we will want to associate them
-		// with the Default project post the deletes.
-		// Theoretically this isn't necessary but as a safety precaution
-		AssetEntity.where {
-			moveBundle == moveBundle
-		}.updateAll(moveBundle: project.getDefaultBundle())
 	}
 
 	/**

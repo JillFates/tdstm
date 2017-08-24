@@ -207,9 +207,16 @@ class MoveBundleService implements ServiceMethods {
 			}.projections{
 				property 'id'
 			}.list()
-			assetEntityService.deleteAssets(assets, securityService.loadUserCurrentProject(), moveBundle)
+			assetEntityService.deleteAssets(assets)
+			Project project = securityService.loadUserCurrentProject()
+			// As a precaution if there are any other AssetEntity types in the database we will want to associate them
+			// with the Default project post the deletes.
+			// Theoretically this isn't necessary but as a safety precaution
+			AssetEntity.where {
+				moveBundle == moveBundle
+			}.updateAll(moveBundle: project.getProjectDefaultBundle())
 			//remove bundle and associated data
-			deleteBundle(moveBundle, securityService.loadUserCurrentProject())
+			deleteBundle(moveBundle, project)
 		} catch (e) {
 			e.message = "Unable to remove the $moveBundle and Assets Error: $e.message"
 			throw e
