@@ -464,7 +464,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/assetExplorer/view" {
+		"/ws/assetExplorer/views" {
 			controller = "wsAssetExplorer"
 			action = [
 					GET: "listDataviews"
