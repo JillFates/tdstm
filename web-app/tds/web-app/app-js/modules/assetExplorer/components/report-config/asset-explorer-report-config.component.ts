@@ -272,7 +272,7 @@ export class AssetExplorerReportConfigComponent {
 			if (this.model.id) {
 				this.assetExpService.saveReport(this.model)
 					.subscribe(result => {
-						console.log(result);
+						this.dataSignature = JSON.stringify(this.model);
 					});
 			} else {
 				this.openSaveDialog();
