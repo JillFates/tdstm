@@ -1,13 +1,16 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import net.transitionmanager.domain.UserLogin
 import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.Person
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.SecurityService
+import com.tdsops.tm.enums.domain.SecurityRole
 import net.transitionmanager.service.SettingService
 import spock.lang.See
 
@@ -22,6 +25,7 @@ class MoveBundleServiceIntegrationSpec extends Specification {
     SecurityService securityService
 
     private ProjectTestHelper projectHelper = new ProjectTestHelper()
+    private PersonTestHelper personHelper = new PersonTestHelper()
     private MoveBundleTestHelper moveBundleHelper = new MoveBundleTestHelper()
     private AssetTestHelper assetHelper = new AssetTestHelper()
     private SettingServiceTests settingServiceTests = new SettingServiceTests()
@@ -79,7 +83,10 @@ class MoveBundleServiceIntegrationSpec extends Specification {
     void '04. Test delete Bundle & Assets' () {
         setup:
             Project project = projectHelper.createProject()
+            Person person = personHelper.createPerson()
             securityService.metaClass.loadUserCurrentProject{ return project }
+            UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"])
+            securityService.metaClass.getUserLogin{ return userLogin }
             def json = settingServiceTests.createSampleJson()
             settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, 'DEVICE', json, 0)
         when: 'A new bundle is created'
