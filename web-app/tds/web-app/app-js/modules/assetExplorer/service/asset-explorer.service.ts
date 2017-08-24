@@ -11,7 +11,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class AssetExplorerService {
 
-	private assetExplorerUrl = '../ws/assetExplorer/report';
+	private assetExplorerUrl = '../ws/assetExplorer/view';
 
 	constructor(private http: HttpInterceptor) {
 	}
