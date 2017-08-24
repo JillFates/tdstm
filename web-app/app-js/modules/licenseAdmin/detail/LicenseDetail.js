@@ -21,7 +21,7 @@ export default class LicenseDetail {
 						email: params.license.email,
 						toEmail: params.license.toEmail,
 						environment: params.license.environment,
-						inception: params.license.requestDate,
+						inception: params.license.activationDate,
 						expiration: params.license.expirationDate,
 						requestNote: params.license.requestNote,
 						active: params.license.status === 'ACTIVE',
