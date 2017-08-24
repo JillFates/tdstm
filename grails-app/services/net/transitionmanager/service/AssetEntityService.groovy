@@ -1314,7 +1314,11 @@ class AssetEntityService implements ServiceMethods {
 			event: params.moveEvent,
 			fixedFilter: params.filter as Boolean,
 			filter: params.filter,
-			hasPerm: securityService.hasPermission(Permission.AssetEdit),
+            hasPerm: securityService.hasPermission(Permission.AssetEdit),
+            canViewComments: securityService.hasPermission(Permission.CommentView),
+            canViewTasks: securityService.hasPermission(Permission.TaskView),
+            canCreateComments: securityService.hasPermission(Permission.CommentCreate),
+            canCreateTasks: securityService.hasPermission(Permission.TaskCreate),
 			justPlanning: userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true',
 			modelPref: null,        // Set below
 			moveBundleId: params.moveBundleId,

@@ -2274,10 +2274,13 @@ tds.comments.directive.GridButtons = function (utils, commentUtils) {
 		scope: {
 			assetId: '@assetId', //=rowId
 			assetType: '@assetType',
-			tasks: '@tasks',
-			comments: '@comments',
-			canEditTasks: '@canEditTasks',
-			canEditComments: '@canEditComments'
+			hasTasks: '@tasks',
+			hasComments: '@comments',
+            canViewTasks: '@canViewTasks',
+            canViewComments: '@canViewComments',
+            canCreateTasks: '@canCreateTasks',
+            canCreateComments: '@canCreateComments'
+
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/grid-buttons-template.html'),
 		link: function (scope, element, attrs) {
