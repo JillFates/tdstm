@@ -45,12 +45,12 @@
 						<a href="#tab_2" data-toggle="tab" #link>Fields</a>
 					</ng-template>
 				</li>
-				<li role="presentation">
-					<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
-					 name="btnPreview" (click)="onPreview()">Preview</button>
-				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn btn-default" (click)="onToggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
+				</li>
+				<li class="pull-right" role="presentation">
+					<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
+					 name="btnPreview" (click)="onPreview()">Preview</button>
 				</li>
 				<!-- <li class="pull-right" role="presentation">
 					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
@@ -71,7 +71,8 @@
 						<div class="col-md-4 col-sm-12">
 							<div class="col-sm-9">
 								<div class="form-group has-feedback" style="margin-bottom:0px;">
-									<input type="text" class="form-control" name="search" placeholder="Filter on field name" [(ngModel)]="filterModel.search" (keyup.enter)="applyFilters()">
+									<input type="text" class="form-control" name="search" placeholder="Filter on field name" [(ngModel)]="filterModel.search"
+									 (keyup.enter)="applyFilters()">
 									<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
 									 aria-hidden="true"></span>
 								</div>
@@ -106,7 +107,7 @@
 							<div [ngStyle]="position[fieldIndex]" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
 								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
 								<ng-template #defaultField>
-									<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (change)="updateModelbyFilter()"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
+									<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (change)="onFieldSelection(field)"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
 								</ng-template>
 							</div>
 						</div>
