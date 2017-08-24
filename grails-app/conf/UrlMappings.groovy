@@ -457,14 +457,14 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/assetExplorer/dataviews" {
+		"/ws/assetExplorer/view" {
 			controller = "wsAssetExplorer"
 			action = [
 					GET: "listDataviews"
 			]
 		}
 
-		"/ws/assetExplorer/dataview/$id?" {
+		"/ws/assetExplorer/view/$id?" {
 			controller = "wsAssetExplorer"
 			action = [
 					GET: "getDataview",
