@@ -3,10 +3,12 @@ package com.tdsops.common.security
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.TdsUserDetails
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.SecurityService
+import org.apache.commons.lang3.StringUtils
 
 import javax.servlet.http.HttpSession
 import javax.servlet.http.HttpSessionAttributeListener
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpSessionListener
 class SessionListener implements HttpSessionListener, HttpSessionAttributeListener {
 
 	private static final String LOGGER_PREFIX = 'SESSION_ACTIVITY: '
+	private static final int SESSION_VISIBLE_EDGE_SIZE = 5
 
 	@CompileStatic
 	static enum EventType {
@@ -64,7 +67,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 			jsonData.eventTime = new Date()
 			jsonData.type = type.name()
 			HttpSession session = event.session
-			jsonData.sessionId = session.id
+			jsonData.sessionId = StringUtil.maskStringCenter(session.id, SESSION_VISIBLE_EDGE_SIZE)
 
 			if (bindingEvent) {
 				jsonData.attributeName = bindingEvent.name
