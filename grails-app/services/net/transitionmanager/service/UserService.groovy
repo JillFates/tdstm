@@ -561,9 +561,9 @@ class UserService implements ServiceMethods {
 
 		if (users) {
 			users.each { r ->
-				personName = (r.last_name ? r.last_name + ', ' : '') + r.first_name + (r.middle_name ? ' ' + r.middle_name : '')
+				personName = r.first_name + (r.middle_name ? ' ' + r.middle_name : '') + (r.last_name ? " " + r.last_name : '')
 				recentLogin << [personId: r.person_id, projectName: r.project_name,
-				                personName: personName, lastActivity: r.lastPage]
+				                personName: personName, lastActivity: TimeUtil.formatDateTime(r.lastPage)]
 			}
 		}
 
