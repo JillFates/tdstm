@@ -1,3 +1,4 @@
+<%@page import="net.transitionmanager.security.Permission"%>
 <div draggable id="listCommentsTasksPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 700px" tabindex="-1" >
     <div class="ui-list-comments ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
         <span id="ui-id-5" class="ui-dialog-title">Show Tasks{{commentsData[0]?(': ' + commentsData[0].assetType + '/'+ commentsData[0].assetName):''}}</span>
@@ -23,7 +24,11 @@
                 </thead>
                 <tbody id="listCommentsTbodyId">
                     <tr class="comments-table-row" ng-repeat="comment in commentsData" id="commentTr_{{comment.commentInstance.id}}">
-                        <td><a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" name="205873"><img src="${resource(dir:'icons',file:'table_edit.png')}" border="0"></a></td>
+                        <td>
+                            <tds:hasPermission permission="${Permission.TaskEdit}">
+                                <a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" name="205873"><img src="${resource(dir:'icons',file:'table_edit.png')}" border="0"></a>
+                            </tds:hasPermission>
+                        </td>
                         <td id="comment_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{truncate(comment.commentInstance.comment)}}</td>
                         <td id="type_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{comment.commentInstance.commentType}}</td>
                         <td id="dueDate_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{formatDueDate(comment.commentInstance.dueDate)}}</td>
@@ -34,7 +39,7 @@
             </table>
         </div>
         <div class="buttons">
-            <tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskCreate}">
+            <tds:hasPermission permission="${Permission.TaskCreate}">
                 <a ng-click="createTask()" class="comment-create-button">
                     <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
                 </a>
