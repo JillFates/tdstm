@@ -56,7 +56,6 @@ class ProjectTestHelper {
         MoveBundle bundle = bundleHelper.createBundle(project)
         project.defaultBundle = bundle
         project.save(flush:true, failOnError:true)
-        projectService.cloneDefaultSettings(project)
 
         return project
 
