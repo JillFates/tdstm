@@ -359,7 +359,6 @@ class FilesController implements ControllerMethods {
 
 		def assetName = files.assetName
 		assetEntityService.deleteAsset(files)
-		files.delete()
 
 		flash.message = "Storage $assetName deleted"
 		if (params.dstPath =='dependencyConsole') {
@@ -370,20 +369,4 @@ class FilesController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission(Permission.AssetDelete)
-	def deleteBulkAsset() {
-		def assetNames = []
-
-		params.id.split(",").each { assetId ->
-			def files = Files.get(assetId)
-			if (files) {
-				assetNames.add(files.assetName)
-				assetEntityService.deleteAsset(files)
-
-				files.delete()
-			}
-		}
-
-		render "Files ${WebUtil.listAsMultiValueString(assetNames)} deleted"
-	}
 }

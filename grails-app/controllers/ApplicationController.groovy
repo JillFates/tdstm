@@ -494,17 +494,4 @@ class ApplicationController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission(Permission.AssetDelete)
-	def deleteBulkAsset() {
-		String ids = params.id
-		List<String> assetNames = []
-		for (assetId in ids.split(',')) {
-			Application application = Application.get(assetId)
-			if (application) {
-				assetNames << application.assetName
-				applicationService.deleteApplication(application)
-			}
-		}
-		render 'Application ' + WebUtil.listAsMultiValueString(assetNames) + ' deleted'
-	}
 }
