@@ -33,7 +33,6 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
@@ -155,23 +154,17 @@ class MoveBundleController implements ControllerMethods {
 	def deleteBundleAndAssets() {
 		MoveBundle moveBundle = MoveBundle.get(params.id)
 		if (moveBundle) {
-			AssetEntity.withTransaction { status ->
-				try{
-					moveBundleService.deleteBundleAssetsAndAssociates(moveBundle)
-					moveBundleService.deleteMoveBundleAssociates(moveBundle)
-					moveBundle.delete()
-					flash.message = "MoveBundle $moveBundle deleted"
-				}
-				catch (e) {
-					status.setRollbackOnly()
-					flash.message = "Unable to Delete MoveBundle Assosiated with Teams: $e.message"
-				}
+			try{
+				moveBundleService.deleteBundleAndAssets(moveBundle)
+				flash.message = "MoveBundle $moveBundle deleted"
+			}
+			catch (e) {
+				flash.message = "Unable to Delete MoveBundle and Assets: $e.message"
 			}
 		}
 		else {
 			flash.message = "MoveBundle not found with id $params.id"
 		}
-
 		redirect(action: 'list')
 	}
 

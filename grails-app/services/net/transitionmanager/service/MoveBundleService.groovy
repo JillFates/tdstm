@@ -196,37 +196,38 @@ class MoveBundleService implements ServiceMethods {
 	}
 
 	/**
-	 *  Delete Bundle AssetEntitys and its associated records
+	 *  Deletes moveBundle, associated data and AssetEntities related to that bundle.
+	 *  @param : moveBundle
 	 */
-	def deleteBundleAssetsAndAssociates(MoveBundle moveBundle){
-		String message
+	def deleteBundleAndAssets(MoveBundle moveBundle){
 		try{
-			// remove preferences
-			def bundleQuery = "select mb.id from MoveBundle mb where mb.id = $moveBundle.id"
-			UserPreference.executeUpdate("delete from UserPreference up where up.value = $moveBundle.id ")
-			//remove the AssetEntity and associated
-			def assets = AssetEntity.findAllByMoveBundle(moveBundle)
-			if(assets){
-				ApplicationAssetMap.executeUpdate  'delete ApplicationAssetMap where asset       in (:assets)', [assets: assets]
-				AssetComment.executeUpdate         'delete AssetComment        where assetEntity in (:assets)', [assets: assets]
-				AssetEntityVarchar.executeUpdate   'delete AssetEntityVarchar  where assetEntity in (:assets)', [assets: assets]
-				ProjectAssetMap.executeUpdate      'delete ProjectAssetMap     where asset       in (:assets)', [assets: assets]
-				AssetCableMap.executeUpdate        'delete AssetCableMap       where assetFrom   in (:assets)', [assets:assets]
-				AssetCableMap.executeUpdate      '''Update AssetCableMap set cableStatus=:cableStatus, assetTo=null, assetToPort=null
-                                                 where assetTo in (:assets)''', [assets: assets]
-				ProjectTeam.executeUpdate(        'Update ProjectTeam SET latestAsset = null where latestAsset in (:assets)', [assets:assets])
-				AssetDependency.executeUpdate(     'delete AssetDependency where asset in (:assets) or dependent in (:deps)',
-												[assets:assets, deps:assets] )
-				AssetDependencyBundle.executeUpdate('delete AssetDependencyBundle where asset in (:assets)', [assets:assets])
-				AssetEntity.executeUpdate('delete AssetEntity where moveBundle=?', [moveBundle])
-			}
+			//remove assets
+			List assets = AssetEntity.where {
+				moveBundle == moveBundle
+			}.projections{
+				property 'id'
+			}.list()
+			assetEntityService.deleteAssets(assets)
+			Project project = securityService.loadUserCurrentProject()
+			// As a precaution if there are any other AssetEntity types in the database we will want to associate them
+			// with the Default project post the deletes.
+			// Theoretically this isn't necessary but as a safety precaution
+			AssetEntity.where {
+				moveBundle == moveBundle
+			}.updateAll(moveBundle: project.getProjectDefaultBundle())
+			//remove bundle and associated data
+			deleteBundle(moveBundle, project)
+		} catch (e) {
+			e.message = "Unable to remove the $moveBundle and Assets Error: $e.message"
+			throw e
 		}
-		catch (e) {
-			message = "Unable to remove the $moveBundle Assets Error: $e.message"
-		}
-		return message
 	}
 
+	/**
+	 *  Deletes moveBundle and associated data.
+	 *  @param : moveBundle
+	 *  @param : project
+	 */
 	String deleteBundle(MoveBundle moveBundle, Project project) {
 		if (moveBundle.id == project.defaultBundleId) {
 			return 'The project default bundle can not be deleted'
@@ -241,7 +242,8 @@ class MoveBundleService implements ServiceMethods {
 		try {
 			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",
 					[project.defaultBundle, moveBundle])
-			deleteMoveBundleAssociates(moveBundle)
+			// remove bundle-associated data
+			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
 			moveBundle.delete()
 
 			return "MoveBundle $moveBundle deleted"
@@ -251,15 +253,6 @@ class MoveBundleService implements ServiceMethods {
 			transactionStatus.setRollbackOnly()
 			return "Unable to delete bundle " + moveBundle.name
 		}
-	}
-
-	/**
-	 *  Delete MoveBundle associated records
-	 */
-	void deleteMoveBundleAssociates(MoveBundle moveBundle) {
-		jdbcTemplate.update('DELETE FROM user_preference WHERE value=?', moveBundle.id.toString())
-		jdbcTemplate.update('DELETE FROM party_relationship where party_id_from_id=? or party_id_to_id=?', moveBundle.id, moveBundle.id)
-		MoveBundleStep.executeUpdate('DELETE MoveBundleStep where moveBundle=?', [moveBundle])
 	}
 
 	/*
