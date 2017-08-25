@@ -48,16 +48,7 @@
 									<tds:convertDate date="${databaseInstance?.retireDate}"/>
 								</tds:tooltipSpan>
 							</td>
-							<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-								<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-									${standardFieldSpecs.moveBundle.label} : Dep. Group
-								</label>
-							</td>
-							<td class="valueNW" colspan="3">
-								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-									${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
-								</tds:tooltipSpan>
-							</td>
+							<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${databaseInstance.moveBundle}" labelSuffix=" : Dep. Group" valueSuffix=" : ${dependencyBundleNumber?:''}"/>
 						</tr>
 						<tr class="prop">
 							<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance.rateOfChange}"/>
