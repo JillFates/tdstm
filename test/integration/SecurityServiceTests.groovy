@@ -22,11 +22,14 @@ class SecurityServiceTests extends Specification {
 	SecurityService securityService
 
 	private static final List<String> privRoles = ['ADMIN', 'EDITOR', 'USER']
+	private static final List<String> userRole = ['USER']
 
 	private Person privPerson
 	private UserLogin privUser
 	private Person unPrivPerson
 	private UserLogin unPrivUser
+	private Person userRolePerson
+	private UserLogin userRoleUser
 
 	// Helper methods to build up person/user accounts
 
@@ -41,6 +44,13 @@ class SecurityServiceTests extends Specification {
 		// Create a new person and login that has no security roles
 		unPrivPerson = new Person(firstName: 'Jack', lastName: 'Rabbit', staffType: 'Salary').save(failOnError: true)
 		unPrivUser = new UserLogin(username: 'xyzzy42', password: 'guessit', person: unPrivPerson, active: 'Y', expiryDate: TimeUtil.nowGMT()).save(failOnError: true)
+	}
+
+	private void createUserAccount() {
+		// Create a new person and login that has ONLY the 'USER' security role
+		userRolePerson = new Person(firstName: 'Super', lastName: 'Man', staffType: 'Salary').save(failOnError: true)
+		userRoleUser = new UserLogin(username: 'xyzzy43', password: 'guessit', person: userRolePerson, active: 'Y', expiryDate: TimeUtil.nowGMT()).save(failOnError: true)
+		assert securityService.assignRoleCodes(userRolePerson, userRole).size() == 1
 	}
 
 	// Start of Specifications
@@ -447,5 +457,42 @@ class SecurityServiceTests extends Specification {
 			List<PasswordReset> list = PasswordReset.findAllByStatus("PENDING") ?: []
 		then: 'the expired PasswordReset record should be removed'
 			list.size() <= initialNumOfPending
+	}
+
+	def '16. Calling currentUserPermissionAsMap as an unauthenticated user' () {
+		given:'a user whom is NOT authenticated'
+			securityService.logoutCurrentUser()
+		when:'the securityService.currentUserPermissionAsMap method is called'
+			Map permissions = securityService.currentUserPermissionMap()
+		then:'an empty map should be returned.'
+			permissions.isEmpty()
+	}
+
+	def '17. Calling currentUserPermissionAsMap as an authenticated and under privileged user' () {
+		given:'a user whom is authenticated and has only been assigned the User role'
+			createUserAccount()
+			securityService.assumeUserIdentity(userRoleUser.username, false)
+		when:'the securityService.currentUserPermissionAsMap method is called'
+			Map permissions = securityService.currentUserPermissionMap()
+		then:'a map should be returned containing multiple elements'
+			!permissions.isEmpty()
+		and:'the map should contain the Permission.UserGeneralAccess permission'
+			permissions.containsKey(Permission.UserGeneralAccess)
+		and:'the map should NOT contain the Permission.UserDelete permission'
+			!permissions.containsKey(Permission.UserDelete)
+	}
+
+	def '18. Calling currentUserPermissionAsMap as an authenticated and privileged user' () {
+		given:'a user whom is authenticated has been assigned the ADMIN role'
+		createPrivAccount()
+		securityService.assumeUserIdentity(privUser.username, false)
+		when:'the securityService.currentUserPermissionAsMap method is called'
+			Map permissions = securityService.currentUserPermissionMap()
+		then:'a map should be returned containing multiple elements'
+			!permissions.isEmpty()
+		and:'the map should contain the Permission.UserGeneralAccess permission'
+			permissions.containsKey(Permission.UserGeneralAccess)
+		and:'the map should also contain the Permission.UserDelete permission'
+			permissions.containsKey(Permission.UserDelete)
 	}
 }
