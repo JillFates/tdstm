@@ -138,7 +138,7 @@
                 actionButton += "<grid-buttons asset-id='" + options.rowId
 					+ "' asset-type='" + rowObject[8] +
 					"' tasks='" + rowObject[7] + "' comments='" + rowObject[10] +
-                    "' can-view-tasks='" + ${canViewTasks} + "' can-view-comments='" + ${canViewComments} +
+                    "' can-view-tasks='" + ${canViewTasks} + "' can-view-comments='" + ${canViewComments} + "' " +
                     "' can-create-tasks='" + ${canCreateTasks} + "' can-create-comments='" + ${canCreateComments} + "'>" +
 					"</grid-buttons>"
 				<tds:hasPermission permission="${Permission.AssetCreate}">

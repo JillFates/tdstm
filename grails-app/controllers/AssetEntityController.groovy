@@ -502,13 +502,15 @@ class AssetEntityController implements ControllerMethods {
 	@HasPermission([Permission.CommentView, Permission.TaskView])
 	def listComments() {
 		def assetEntityInstance = AssetEntity.get(params.id)
+		def commentType = params.commentType
+
         def assetCommentsInstance = []
 
-        if(securityService.hasPermission(Permission.TaskView)) {
+        if(securityService.hasPermission(Permission.TaskView) && (!commentType || commentType == AssetCommentType.TASK)) {
             assetCommentsInstance = taskService.findAllByAssetEntity(assetEntityInstance)
         }
 
-        if(securityService.hasPermission(Permission.CommentView)) {
+        if(securityService.hasPermission(Permission.CommentView) && (!commentType || commentType == AssetCommentType.COMMENT)) {
             assetCommentsInstance.addAll(commentService.findAllByAssetEntity(assetEntityInstance))
         }
 		def assetCommentsList = []

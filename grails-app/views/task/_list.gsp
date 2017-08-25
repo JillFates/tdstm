@@ -34,11 +34,13 @@
             </table>
         </div>
         <div class="buttons">
-
-            <a ng-click="createTask()" class="comment-create-button">
-            <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
-            </a>
-
+            <tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskCreate}">
+                <a ng-click="createTask()" class="comment-create-button">
+                    <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
+                </a>
+            </tds:hasPermission>
         </div>
+
+
     </div>
 </div>
