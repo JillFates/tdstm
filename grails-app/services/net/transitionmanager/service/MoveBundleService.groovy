@@ -14,7 +14,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.GormUtil
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.spreadsheet.SheetWrapper
 import com.tdssrc.grails.StringUtil
@@ -218,8 +218,8 @@ class MoveBundleService implements ServiceMethods {
 			//remove bundle and associated data
 			deleteBundle(moveBundle, project)
 		} catch (e) {
-			e.message = "Unable to remove the $moveBundle and Assets Error: $e.message"
-			throw e
+			log.error ExceptionUtil.stackTraceToString('deleting bundle and assets', e, 60)
+			throw new DomainUpdateException('Unable to remove the bundle and assets')
 		}
 	}
 
