@@ -31,7 +31,7 @@ class AbstractAgent {
 	 * Used to define the map of the method parameters for the Agent class
 	 * @param dict - the Map of the DictionaryItem
 	 */
-	private void setDictionary(Map dict) {
+	protected void setDictionary(Map dict) {
 		this.dict = dict
 	}
 
@@ -78,7 +78,7 @@ class AbstractAgent {
 	private Map statusResult() { [type:String, description: 'Status of process (success|error|failed|running)'] }
 	private Map causeResult() { [type:String, description: 'The cause of an error or failure'] }
 
-	private Map invokeResults() { [status: statusResult(), cause: causeResult() ] }
+	protected Map invokeResults() { [status: statusResult(), cause: causeResult() ] }
 	private Map notImplementedResults() { [status:'error', cause:'Method not implemented'] }
 
 	// Define some of the standard parameters
@@ -87,7 +87,7 @@ class AbstractAgent {
 	private Map messageParam() { [type:Object, description: 'The data to pass to the message'] }
 
 	// Build of some of the standard interfaces for agent methods
-	private LinkedHashMap queueParams() {
+	protected LinkedHashMap queueParams() {
 		[ 	queueName: queueNameParam(),
 			callbackMethod: callbackMethodParam(),
 			message: messageParam()

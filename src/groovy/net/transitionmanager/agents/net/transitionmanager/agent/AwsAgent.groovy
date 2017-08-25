@@ -1,12 +1,8 @@
 package net.transitionmanager.agent
 
-import net.transitionmanager.domain.ApiAction
-import com.tds.asset.AssetComment
-import net.transitionmanager.service.AwsService
-import net.transitionmanager.service.InvalidRequestException
 import com.tdsops.common.grails.ApplicationContextHolder
-
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.AwsService
 
 /**
  * Methods to interact with the Amazon AWS services
