@@ -263,4 +263,17 @@ class StringUtilTests extends Specification {
 				["\'one\'", "'two'", "\"three\""]	| "\"\'one\'\", \"'two'\", \"\"three\"\""
 
 	}
+
+	void "Test the maskStringCenter"() {
+		expect:
+		StringUtil.maskStringCenter(value, 5, '*') == result
+
+		where:
+		value 						 | result
+		"NOPQRSTUVWXYZNOPQRSTUVWXYZ" | 'NOPQR****************VWXYZ'
+		"0123456789001234567890"	 | '01234************67890'
+		"!@#\$%^&*()-_=+`~!@#\\\$%^" | "!@#\$%*************#\\\$%^"
+		"SMALLTEXT"					 | "SMALLTEXT"
+	}
+
 }
