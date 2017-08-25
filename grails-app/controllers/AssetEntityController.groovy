@@ -257,7 +257,7 @@ class AssetEntityController implements ControllerMethods {
 
 		// closure used to redirect user with an error message for sever issues
 		def failWithError = { message ->
-			log.error "upload() $securityService.currentUsername was $message"
+			log.error "upload() failed for user $securityService.currentUsername due to $message"
 			forward action: forwardAction, params: [error: message]
 		}
 
@@ -270,9 +270,11 @@ class AssetEntityController implements ControllerMethods {
 			forward action:forwardAction, params: [ message: message.toString() ]
 
 		} catch (InvalidParamException ipe) {
+			log.info 'upload() failed due to invalid parameter'
 			failWithError ipe.message
 		} catch (Exception e) {
-			failWithError e.message
+			log.error ExceptionUtil.stackTraceToString('upload() failed with an exception', e)
+			failWithError 'an unexpected error occurred'
 		}
 	}
 
@@ -1719,7 +1721,7 @@ class AssetEntityController implements ControllerMethods {
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
-			LEFT OUTER JOIN room srcr ON srcr.room_id = ae.room_source_id 
+			LEFT OUTER JOIN room srcr ON srcr.room_id = ae.room_source_id
 			LEFT OUTER JOIN room tarr ON tarr.room_id = ae.room_target_id
 			"""
 			assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id)
@@ -2114,7 +2116,8 @@ class AssetEntityController implements ControllerMethods {
 	*/
 	@HasPermission(Permission.AssetDelete)
 	def deleteBulkAsset() {
-		renderAsJson(resp: assetEntityService.deleteBulkAssets(params.type, params.list("assetLists[]")))
+		Project project = projectForWs
+		renderAsJson(resp: assetEntityService.deleteBulkAssets(project, params.type, params.list("assetLists[]")))
 	}
 
 	/**
@@ -3035,7 +3038,7 @@ class AssetEntityController implements ControllerMethods {
 						wquery.append('AND a.assetName > :value ')
 						wquery.append("ORDER BY a.assetName ASC")
 						def cGreaterQuery = wquery.toString().replace('@COLS@', queryCount)
-						log.debug "***** Count Greater Than Query: $cGreaterQuery" 
+						log.debug "***** Count Greater Than Query: $cGreaterQuery"
 						qparams << [value: value]
 						def majors = qm.domain.executeQuery(cGreaterQuery, qparams)[0]
 						def elementPosition = total - majors
