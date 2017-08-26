@@ -7,11 +7,11 @@ const path = require('path');
 const pkg = require('./package.json');  //loads npm config file
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-module.exports = function(env, argv) {
+module.exports = function (env, argv) {
 
-    let devEnv = (env !== 'prod');
+	let devEnv = (env !== 'prod');
 
-    console.log('Production Environment: ' + (!devEnv));
+	console.log('Production Environment: ' + (!devEnv));
 
 	return {
 		entry: {
