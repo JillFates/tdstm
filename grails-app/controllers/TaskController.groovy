@@ -771,7 +771,7 @@ digraph runbook {
 	 */
 	@HasPermission(Permission.TaskGraphView)
 	def taskGraph() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
@@ -923,7 +923,7 @@ digraph runbook {
 
 	@HasPermission(Permission.TaskTimelineView)
 	def taskTimeline() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this, 'to use the task timeline')
 		if (!project) return
 
@@ -1276,7 +1276,7 @@ digraph runbook {
 	 */
 	@HasPermission(Permission.TaskView)
 	def listUserTasks() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 

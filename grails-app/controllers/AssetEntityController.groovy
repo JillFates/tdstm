@@ -976,7 +976,7 @@ class AssetEntityController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTasks() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		securityService.requirePermission 'TaskManagerView'
 
 		Project project = controllerService.getProjectForPage(this, 'to view Tasks')
@@ -3082,7 +3082,7 @@ class AssetEntityController implements ControllerMethods {
 
 	@HasPermission(Permission.ArchitectureView)
 	def architectureViewer() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = securityService.userCurrentProject
 		def levelsUp = NumberUtils.toInt(params.levelsUp)
 		int levelsDown = NumberUtils.toInt(params.levelsDown) ?: 3
