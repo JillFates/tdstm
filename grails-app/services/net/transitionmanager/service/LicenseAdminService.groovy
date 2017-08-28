@@ -587,6 +587,7 @@ class LicenseAdminService extends LicenseCommonService {
 		String buff
 		if(lic) {
 			String body = """
+				|from: ${lic.email}
 				|Website Name: ${lic.websitename}
 				|
 				|${lic.toEncodedMessage()}
@@ -612,7 +613,8 @@ class LicenseAdminService extends LicenseCommonService {
 
 		if(emailData) {
 			mailService.sendMail {
-				from emailData.from
+				// oluna: Next is commented since it's not needed and causes SPAM issues (TM-6738)
+				// from emailData.from
 				to emailData.toEmail
 				subject emailData.subject
 				body emailData.body
