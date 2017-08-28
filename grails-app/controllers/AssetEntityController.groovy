@@ -1400,7 +1400,6 @@ class AssetEntityController implements ControllerMethods {
 		def totalRows = tasks.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 		def updatedTime
-		def updatedClass
 		def dueClass
 		def estStartClass
 		def estFinishClass
@@ -1415,24 +1414,8 @@ class AssetEntityController implements ControllerMethods {
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
 
-			// clear out the CSS classes for overDue/Updated
-			updatedClass = dueClass = ''
-
-			if (it.status == AssetCommentStatus.READY) {
-				if (elapsedSec >= 600) {
-					updatedClass = 'task_late'
-				} else if (elapsedSec >= 300) {
-					updatedClass = 'task_tardy'
-				}
-			} else if (it.status == AssetCommentStatus.STARTED) {
-				def dueInSecs = elapsedSec - (it.duration ?: 0) * 60
-				if (dueInSecs >= 600) {
-					updatedClass='task_late'
-				} else if (dueInSecs >= 300) {
-					updatedClass='task_tardy'
-				}
-
-			}
+			// clear out the CSS classes for overDue
+			dueClass = ''
 
 			if (it.estFinish) {
 				elapsed = TimeUtil.elapsed(it.estFinish, nowGMT)
@@ -1504,7 +1487,6 @@ class AssetEntityController implements ControllerMethods {
 					nGraphUrl,
 					it.score ?: 0,
 					status ? 'task_' + it.status.toLowerCase() : 'task_na',
-					updatedClass,
 					dueClass,
 					it.assetEntity?.id, // 16
 					it.assetEntity?.assetType, // 17
