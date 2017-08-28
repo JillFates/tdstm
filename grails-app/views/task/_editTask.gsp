@@ -45,17 +45,26 @@
 					</tr>
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
-						<g:set var="canAssign" value="${false}"/>
-						<tds:hasPermission permission="${Permission.ActionAssignment}">
-							<g:set var="canAssign" value="${true}"/>
-						</tds:hasPermission>
 						<td valign="top" class="value" id="vmAction" colspan="2">
+							<g:set var="canAssign" value="${false}"/>
+							<tds:hasPermission permission="${Permission.ActionAssignment}">
+								<g:set var="canAssign" value="${true}"/>
+							</tds:hasPermission>
+							<g:if test="${canAssign}">
 							<!-- default to NONE -->
-							<select ng-model="acData.apiAction.id" ng-disabled="<%= !canAssign %>">
-								<g:each var="apiAction" in="${apiActionList}">
-									<option value="${apiAction.id}">${apiAction.name}</option>
-								</g:each>
-							</select>
+								<select ng-model="acData.apiAction.id">
+									<g:each var="apiAction" in="${apiActionList}">
+										<option value="${apiAction.id}">${apiAction.name}</option>
+									</g:each>
+								</select>
+							</g:if>
+							<g:else>
+								<select ng-model="acData.apiAction.id" ng-if="acData.apiAction != null" ng-disabled="acData.apiAction == null || <%= !canAssign %>">
+									<g:each var="apiAction" in="${apiActionList}">
+										<option value="${apiAction.id}">${apiAction.name}</option>
+									</g:each>
+								</select>
+							</g:else>
 						</td>
 					</tr>
 					<tr class="prop">
