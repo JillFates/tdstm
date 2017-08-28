@@ -134,7 +134,7 @@ $(document).ready(function() {
 					</table>
 					<br />
 					<h4>
-						<b>Open Tasks</b>
+						<b>Discovery Issues</b>
 					</h4>
 					<table class="dashboard_stat_table">
 						<tr>
