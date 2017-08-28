@@ -30,10 +30,6 @@ module.exports = function (env, argv) {
 		},
 		resolve: {
 			extensions: ['.ts', '.tsx', '.js'],
-			modules: [
-				"node_modules",
-				path.resolve(__dirname, "app-js")
-			],
 			unsafeCache: true
 		},
 		plugins: [
@@ -47,13 +43,6 @@ module.exports = function (env, argv) {
 			new webpack.optimize.UglifyJsPlugin({
 				comments: false,
 				sourceMap: devEnv,
-				compress: {
-					warnings: false, // Suppress uglification warnings
-					pure_getters: true,
-					unsafe: true,
-					unsafe_comps: true,
-					screw_ie8: true
-				},
 				exclude: [/\.min\.js$/gi] // skip pre-minified libs
 			}),
 			new webpack.ContextReplacementPlugin( //https://github.com/angular/angular/issues/11580
