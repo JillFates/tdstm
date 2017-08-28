@@ -359,6 +359,9 @@ var Menu = function(){
   this.getListBundles = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/list"]'));
   };
+  this.getAssignAssets = function(){
+    return browser.driver.findElement(by.css('a[href="/tdstm/moveBundleAsset/bundleTeamAssignment?bundleId=&rack=UnrackPlan"]'));
+  };
   this.getBundlesHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print\',\'help\');"]'));
   };
