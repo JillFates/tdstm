@@ -21,6 +21,7 @@ export class AssetExplorerReportSaveComponent {
 		if (this.model.id) {
 			this.model.name = `Copy of ${this.model.name}`;
 			this.model.id = null;
+			this.model.isSystem = false;
 		}
 		if (this.model.isSystem) {
 			this.model.isShared = true;

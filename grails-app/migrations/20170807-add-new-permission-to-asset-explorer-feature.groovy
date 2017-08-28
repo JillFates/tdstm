@@ -13,22 +13,22 @@ databaseChangeLog = {
 					(Permission.AssetExplorerSystemCreate): [
                         group      : 'NONE',
                         description: 'Can create shared system level reports',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
+                        roles      : ['ADMIN']
                     ],
 					(Permission.AssetExplorerSystemDelete): [
                         group      : 'NONE',
                         description: 'Can delete shared system level reports',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
+                        roles      : ['ADMIN']
                     ],
                     (Permission.AssetExplorerSystemEdit): [
                         group      : 'NONE',
                         description: 'Can edit shared system level reports',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
+                        roles      : ['ADMIN']
                     ],
                     (Permission.AssetExplorerSystemSaveAs): [
                         group      : 'NONE',
                         description: 'Can modify and \'Save As\' system level reports',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
+                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
                     (Permission.AssetExplorerCreate): [
                         group      : 'NONE',

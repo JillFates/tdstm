@@ -57,7 +57,7 @@
 				</li> -->
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
-				<div class="tab-pane active" id="tab_1">
+				<div class="tab-pane" [ngClass]="{'active':!model.id}" id="tab_1">
 					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label> <br>
 					<div class="checkbox" *ngFor="let asset of assetClasses">
 						<label>
@@ -67,7 +67,7 @@
 					<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 				</div>
 				<div class="tab-pane" id="tab_2">
-					<div class="row">
+					<div class="row" [ngClass]="{'active':model.id}">
 						<div class="col-md-4 col-sm-12">
 							<div class="col-sm-9">
 								<div class="form-group has-feedback" style="margin-bottom:0px;">
