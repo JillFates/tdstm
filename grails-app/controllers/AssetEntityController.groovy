@@ -1711,7 +1711,7 @@ class AssetEntityController implements ControllerMethods {
 			ae.environment as environment, srcr.location AS sourceLocation, srcr.room_name AS sourceRoomName, srcr.room_id as sourceRoomId,
 			tarr.location AS targetLocation, tarr.room_name AS targetRoomName, tarr.room_id as targetRoomId
 			FROM (
-				SELECT * FROM tdstm.asset_dependency_bundle
+				SELECT * FROM asset_dependency_bundle
 				WHERE project_id=? AND dependency_bundle in (${nodesQuery.join(',')})
 				ORDER BY dependency_bundle
 			) AS deps
@@ -2633,7 +2633,7 @@ class AssetEntityController implements ControllerMethods {
 					aed.asset_entity_id AS dependentId,
 					ad.c1 AS c1, ad.c2 AS c2, ad.c3 AS c3,ad.c4 AS c4,
 					ad.data_flow_direction AS direction
-				FROM tdstm.asset_dependency ad
+				FROM asset_dependency ad
 				LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = asset_id
 				LEFT OUTER JOIN asset_entity aed ON aed.asset_entity_id = dependent_id
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
