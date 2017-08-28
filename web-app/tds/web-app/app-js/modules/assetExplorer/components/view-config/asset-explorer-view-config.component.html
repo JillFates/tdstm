@@ -29,7 +29,7 @@
 			</ng-template>
 			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
 			<button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
-			<asset-explorer-report-selector></asset-explorer-report-selector>
+			<asset-explorer-view-selector></asset-explorer-view-selector>
 			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
 		</div>
 		<br />
@@ -126,7 +126,7 @@
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body" [hidden]="collapsedColumnsPreview">
-				<asset-explorer-report-grid [model]="model.schema"></asset-explorer-report-grid>
+				<asset-explorer-view-grid [model]="model.schema"></asset-explorer-view-grid>
 			</div>
 			<!-- /.box-body -->
 		</div>

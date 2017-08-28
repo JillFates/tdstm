@@ -11,12 +11,12 @@ import { UIRouterModule, RootModule } from '@uirouter/angular';
 import { SharedModule } from '../../../shared/shared.module';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 
-import { AssetExplorerReportSelectorComponent } from '../components/report-selector/asset-explorer-report-selector.component';
+import { AssetExplorerViewSelectorComponent } from '../components/view-selector/asset-explorer-view-selector.component';
 import {AssetExplorerService} from '../service/asset-explorer.service';
 
-describe('AssetExplorerReportSelectorComponent:', () => {
-	let fixture: ComponentFixture<AssetExplorerReportSelectorComponent>;
-	let comp: AssetExplorerReportSelectorComponent;
+describe('AssetExplorerViewSelectorComponent:', () => {
+	let fixture: ComponentFixture<AssetExplorerViewSelectorComponent>;
+	let comp: AssetExplorerViewSelectorComponent;
 	let de: DebugElement;
 
 	beforeEach(async(() => {
@@ -34,7 +34,7 @@ describe('AssetExplorerReportSelectorComponent:', () => {
 					}]
 				})
 			],
-			declarations: [AssetExplorerReportSelectorComponent],
+			declarations: [AssetExplorerViewSelectorComponent],
 			providers: [
 				AssetExplorerService
 			]
@@ -42,7 +42,7 @@ describe('AssetExplorerReportSelectorComponent:', () => {
 	}));
 
 	beforeEach(() => {
-		fixture = TestBed.createComponent(AssetExplorerReportSelectorComponent);
+		fixture = TestBed.createComponent(AssetExplorerViewSelectorComponent);
 		comp = fixture.componentInstance;
 	});
 

@@ -2,11 +2,11 @@ import { Ng2StateDeclaration, Transition } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
-import { AssetExplorerReportConfigComponent } from './components/report-config/asset-explorer-report-config.component';
+import { AssetExplorerViewConfigComponent } from './components/view-config/asset-explorer-view-config.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 import { AssetExplorerService } from './service/asset-explorer.service';
-import { ReportModel } from './model/report.model';
+import { ViewModel } from './model/view.model';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 
 export class AssetExplorerStates {
@@ -70,7 +70,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 	},
 	views: {
 		'headerView@tds': { component: HeaderComponent },
-		'containerView@tds': { component: AssetExplorerReportConfigComponent }
+		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
 		{
@@ -94,7 +94,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 			policy: { async: 'RXWAIT' },
 			deps: [Transition],
 			resolveFn: (trans: Transition) => {
-				let model = new ReportModel();
+				let model = new ViewModel();
 				let params = trans.targetState().params() as any;
 				model.isSystem = params.system || false;
 				model.isShared = params.shared || false;
@@ -119,7 +119,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 	},
 	views: {
 		'headerView@tds': { component: HeaderComponent },
-		'containerView@tds': { component: AssetExplorerReportConfigComponent }
+		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
 		{

@@ -6,16 +6,16 @@ import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.
 import { StateService } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ReportModel } from '../../model/report.model';
-import { ReportSpec, ReportColumn } from '../../model/report-spec.model';
+import { ViewModel } from '../../model/View.model';
+import { ViewSpec, ViewColumn } from '../../model/View-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { AssetExplorerReportSaveComponent } from '../report-save/asset-explorer-report-save.component';
-import { AssetExplorerReportExportComponent } from '../report-export/asset-explorer-report-export.component';
+import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
+import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
 
 @Component({
-	selector: 'asset-explorer-report-config',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-config/asset-explorer-report-config.component.html',
+	selector: 'asset-explorer-View-config',
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html',
 	styles: [`
 		.pd-top-5 { padding-top:5px; }
 		.disabled { border-top-color: #777 !important;}
@@ -27,7 +27,7 @@ import { Permission } from '../../../../shared/model/permission.model';
 		li.active a { font-weight:bold;}
 	`]
 })
-export class AssetExplorerReportConfigComponent {
+export class AssetExplorerViewConfigComponent {
 
 	private dataSignature: string;
 	// There will be more custom classes, but this are the list who has already an Icon
@@ -49,19 +49,19 @@ export class AssetExplorerReportConfigComponent {
 	columnIndex = 0;
 	rowIndex = 0;
 
-	model: ReportModel;
+	model: ViewModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
 	position: any[] = [];
 	constructor(
-		@Inject('report') report: Observable<ReportModel>,
+		@Inject('report') report: Observable<ViewModel>,
 		private assetExpService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private state: StateService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
-		Observable.zip(fields, report).subscribe((result: [DomainModel[], ReportModel]) => {
+		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
 			this.model = { ...result[1] };
 			this.dataSignature = JSON.stringify(this.model);
@@ -178,8 +178,8 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected openSaveDialog(): void {
-		this.dialogService.open(AssetExplorerReportSaveComponent, [
-			{ provide: ReportModel, useValue: this.model }
+		this.dialogService.open(AssetExplorerViewSaveComponent, [
+			{ provide: ViewModel, useValue: this.model }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
@@ -272,8 +272,8 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected onExport(): void {
-		this.dialogService.open(AssetExplorerReportExportComponent, [
-			{ provide: ReportModel, useValue: this.model }
+		this.dialogService.open(AssetExplorerViewExportComponent, [
+			{ provide: ViewModel, useValue: this.model }
 		]);
 	}
 

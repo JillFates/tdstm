@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ReportGroupModel, ReportModel, ViewType } from '../../model/report.model';
+import { ViewGroupModel, ViewModel, ViewType } from '../../model/view.model';
 import { Observable } from 'rxjs/Observable';
 
 import { AssetExplorerService } from '../../service/asset-explorer.service';
@@ -18,14 +18,14 @@ import { AlertType } from '../../../../shared/model/alert.model';
 })
 export class AssetExplorerIndexComponent {
 
-	private reportGroupModels = Array<ReportGroupModel>();
+	private reportGroupModels = Array<ViewGroupModel>();
 	private searchText: String;
 	private viewType = ViewType;
-	private selectedFolder: ReportGroupModel;
+	private selectedFolder: ViewGroupModel;
 
 	constructor(
 		private stateService: StateService,
-		@Inject('reports') report: Observable<ReportGroupModel[]>,
+		@Inject('reports') report: Observable<ViewGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
 		private prompt: UIPromptService,
@@ -38,7 +38,7 @@ export class AssetExplorerIndexComponent {
 			(err) => console.log(err));
 	}
 
-	protected selectFolder(folderOpen: ReportGroupModel): void {
+	protected selectFolder(folderOpen: ViewGroupModel): void {
 		this.reportGroupModels.forEach((folder) => folder.open = false);
 		this.selectedFolder = this.reportGroupModels.filter((folder) => folder.name === folderOpen.name)[0];
 		if (this.selectedFolder) {
@@ -60,13 +60,13 @@ export class AssetExplorerIndexComponent {
 		}
 	}
 
-	protected onEditReport(report: ReportModel): void {
+	protected onEditReport(report: ViewModel): void {
 		if (this.isEditAvailable(report)) {
 			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
 		}
 	}
 
-	protected onDeleteReport(report: ReportModel): void {
+	protected onDeleteReport(report: ViewModel): void {
 		if (this.isDeleteAvailable(report)) {
 			this.prompt.open('Confirmation Required', 'Are you sure you want to delete this view?', 'Yes', 'No')
 				.then((res) => {
@@ -81,7 +81,7 @@ export class AssetExplorerIndexComponent {
 										message: result
 									});
 								} else {
-									this.reportGroupModels = result as ReportGroupModel[];
+									this.reportGroupModels = result as ViewGroupModel[];
 									this.selectedFolder = this.reportGroupModels.find((r) => r.open);
 								}
 							},
@@ -111,7 +111,7 @@ export class AssetExplorerIndexComponent {
 			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
-	protected isEditAvailable(report: ReportModel): boolean {
+	protected isEditAvailable(report: ViewModel): boolean {
 		return report.isSystem ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) ||
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
@@ -120,7 +120,7 @@ export class AssetExplorerIndexComponent {
 		;
 	}
 
-	protected isDeleteAvailable(report: ReportModel): boolean {
+	protected isDeleteAvailable(report: ViewModel): boolean {
 		return report.isSystem ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemDelete) :
 			report.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerDelete);

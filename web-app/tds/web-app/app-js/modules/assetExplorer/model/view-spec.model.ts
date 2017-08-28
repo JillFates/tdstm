@@ -3,7 +3,7 @@ export class QueryColumn {
 	property: string;
 }
 
-export class ReportColumn extends QueryColumn {
+export class ViewColumn extends QueryColumn {
 	width?= 50;
 	locked?= false;
 	edit?= false;
@@ -15,18 +15,18 @@ export class FilterColumn extends QueryColumn {
 	filter: string;
 }
 
-export class ReportSort extends QueryColumn {
+export class ViewSort extends QueryColumn {
 	order: 'a' | 'd';
 }
 
-export class ReportSpec {
+export class ViewSpec {
 	domains: Array<String> = [];
-	columns: Array<QueryColumn | ReportColumn> = [];
+	columns: Array<QueryColumn | ViewColumn> = [];
 	filters: Array<FilterColumn> = [];
-	sort: ReportSort;
+	sort: ViewSort;
 }
 
-export class QuerySpec extends ReportSpec {
+export class QuerySpec extends ViewSpec {
 	columns: Array<QueryColumn> = [];
 	paging: {
 		offset: number,

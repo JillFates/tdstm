@@ -3,26 +3,26 @@ import { Observable } from 'rxjs/Observable';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { StateService } from '@uirouter/angular';
 
-import { ReportGroupModel } from '../../model/report.model';
-import { ViewType } from '../../model/report.model';
+import { ViewGroupModel } from '../../model/view.model';
+import { ViewType } from '../../model/view.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { Permission } from '../../../../shared/model/permission.model';
 
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
-	selector: 'asset-explorer-report-selector',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-selector/asset-explorer-report-selector.component.html',
+	selector: 'asset-explorer-view-selector',
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-selector/asset-explorer-view-selector.component.html',
 	encapsulation: ViewEncapsulation.None,
 	styles: [
 		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}`
 	]
 })
-export class AssetExplorerReportSelectorComponent implements OnInit, AfterViewInit {
+export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit {
 	@Input() open?= false;
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
-	private reports: ReportGroupModel[];
-	private data: ReportGroupModel[];
+	private reports: ViewGroupModel[];
+	private data: ViewGroupModel[];
 	private search = '';
 
 	constructor(
@@ -62,22 +62,22 @@ export class AssetExplorerReportSelectorComponent implements OnInit, AfterViewIn
 		});
 	}
 
-	protected getFolderStyle(item: ReportGroupModel) {
+	protected getFolderStyle(item: ViewGroupModel) {
 		return {
 			'fa-star text-yellow': item.type === ViewType.FAVORITES,
 			'fa-folder': item.type !== ViewType.FAVORITES
 		};
 	}
 
-	protected onFolderClick(item: ReportGroupModel) {
+	protected onFolderClick(item: ViewGroupModel) {
 		item.open = !item.open;
 	}
 
 	/**
 	 * Create a new Report
-	 * @param {ReportGroupModel} item
+	 * @param {ViewGroupModel} item
 	 */
-	protected onCreateNew(item: ReportGroupModel): void {
+	protected onCreateNew(item: ViewGroupModel): void {
 		if (this.isCreateAvailable(item)) {
 			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
 				{ system: item.type === ViewType.SYSTEM_VIEWS });
@@ -88,17 +88,17 @@ export class AssetExplorerReportSelectorComponent implements OnInit, AfterViewIn
 	 * Show/Hide the Create Button if not in All / Favorites / Recent
 	 * @returns {boolean}
 	 */
-	protected isCreateVisible(item: ReportGroupModel): boolean {
+	protected isCreateVisible(item: ViewGroupModel): boolean {
 		return (item.type !== ViewType.ALL &&
 			item.type !== ViewType.FAVORITES &&
 			item.type !== ViewType.RECENT) && this.isCreateAvailable(item);
 	}
 
 	/**
-	 * Disable the Create Report if the user does not have the proper permission
+	 * Disable the Create View if the user does not have the proper permission
 	 * @returns {boolean}
 	 */
-	protected isCreateAvailable(item: ReportGroupModel): boolean {
+	protected isCreateAvailable(item: ViewGroupModel): boolean {
 		return item.type === ViewType.SYSTEM_VIEWS ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
 			this.permissionService.hasPermission(Permission.AssetExplorerCreate);

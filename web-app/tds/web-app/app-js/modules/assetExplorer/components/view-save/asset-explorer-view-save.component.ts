@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { ReportModel } from '../../model/report.model';
+import { ViewModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 
 @Component({
-	selector: 'asset-explorer-report-save',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/report-save/asset-explorer-report-save.component.html'
+	selector: 'asset-explorer-view-save',
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-save/asset-explorer-view-save.component.html'
 })
-export class AssetExplorerReportSaveComponent {
-	model: ReportModel;
+export class AssetExplorerViewSaveComponent {
+	model: ViewModel;
 
 	constructor(
-		model: ReportModel,
+		model: ViewModel,
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService) {

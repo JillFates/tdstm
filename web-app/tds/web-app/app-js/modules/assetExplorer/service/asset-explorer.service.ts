@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { Response } from '@angular/http';
-import { ReportModel, ReportGroupModel, ViewType } from '../model/report.model';
-import { QuerySpec } from '../model/report-spec.model';
+import { ViewModel, ViewGroupModel, ViewType } from '../model/view.model';
+import { QuerySpec } from '../model/view-spec.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
@@ -16,11 +16,11 @@ export class AssetExplorerService {
 	constructor(private http: HttpInterceptor) {
 	}
 
-	getReports(): Observable<ReportGroupModel[]> {
+	getReports(): Observable<ViewGroupModel[]> {
 		return this.http.get(`${this.assetExplorerUrl}s`)
 			.map((res: Response) => {
 				let response = res.json().data;
-				let reportGroupModel: ReportGroupModel[] = Object.keys(response).map(key => {
+				let reportGroupModel: ViewGroupModel[] = Object.keys(response).map(key => {
 					return response[key];
 				});
 				return [
@@ -60,7 +60,7 @@ export class AssetExplorerService {
 			.catch((error: any) => error.json());
 	}
 
-	getReport(id: number): Observable<ReportModel> {
+	getReport(id: number): Observable<ViewModel> {
 		return this.http.get(`${this.assetExplorerUrl}/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
@@ -69,7 +69,7 @@ export class AssetExplorerService {
 			.catch((error: any) => error.json());
 	}
 
-	saveReport(model: ReportModel): Observable<ReportModel> {
+	saveReport(model: ViewModel): Observable<ViewModel> {
 		if (!model.id) {
 			return this.http.post(this.assetExplorerUrl, JSON.stringify(model))
 				.map((res: Response) => {
