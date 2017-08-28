@@ -1,10 +1,12 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
+import org.apache.commons.lang.RandomStringUtils
 import spock.lang.Specification
 
 class CommentServiceIntTests extends Specification {
@@ -15,9 +17,10 @@ class CommentServiceIntTests extends Specification {
     def moveBundle
     def commentService
     def projectHelper
-
+    def assetHelper
     void setup() {
         projectHelper = new ProjectTestHelper()
+        assetHelper = new AssetTestHelper()
     }
 
     void 'test can find comments by AssetEntity instance'() {
@@ -25,18 +28,7 @@ class CommentServiceIntTests extends Specification {
         setup:
         def project = projectHelper.getProject()
 
-        def entityType = EavEntityType.findByDomainName('AssetEntity')
-        def attributeSet = new EavAttributeSet(attributeSetName: 'Server', entityType: entityType, sortOrder: 10).save()
-        def moveEvent = new MoveEvent(name: "Example 1", project: project, inProgress: 'false').save()
-        def moveBundle = new MoveBundle(name: 'Example 1', moveEvent: moveEvent, project: project, workflowCode: 'STD_PROCESS').save()
-        def assetEntity = new AssetEntity(
-                assetName: "Asset Name",
-                assetType: "Asset Type",
-                assetTag: 'TAG-0',
-                moveBundle: moveBundle,
-                project: project,
-                attributeSet: attributeSet
-        ).save()
+        def assetEntity = assetHelper.createDevice(project, 'Server', [name: RandomStringUtils.randomAlphabetic(10), description: 'Red'])
 
         def task = new AssetComment(
                 project: project,

@@ -10,6 +10,7 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import org.apache.commons.lang.RandomStringUtils
 import spock.lang.Specification
 
 class TaskServiceIntTests extends Specification {
@@ -20,6 +21,7 @@ class TaskServiceIntTests extends Specification {
     def moveBundle
     def taskService
     def projectHelper
+    def assetHelper
 
     void "test clean task data"() {
         setup:
@@ -39,14 +41,13 @@ class TaskServiceIntTests extends Specification {
             0 == task.isResolved
 
             // Test bumping status to COMPLETED after STARTED
-            task.previousStatus = task.status
             taskService.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
-            assertNotNull task.actStart
-            assertNotNull task.actFinish
-            assertNotNull task.assignedTo
-            assertNotNull task.resolvedBy
-            assertEquals AssetCommentStatus.COMPLETED, task.status
-            assertEquals 1, task.isResolved
+            !task.actStart
+            !task.actFinish
+            !task.assignedTo
+            !task.resolvedBy
+            AssetCommentStatus.COMPLETED == task.status
+            1 == task.isResolved
         }
 
         /*
@@ -128,6 +129,7 @@ class TaskServiceIntTests extends Specification {
     void setup() {
 
         projectHelper = new ProjectTestHelper()
+        assetHelper = new AssetTestHelper()
 
         log.info "***********DA SETUP***********************************************"
         project = new Project(name: "VM", projectCode: "VM", workflowCode: "STD_PROCESS").save()
@@ -201,18 +203,7 @@ class TaskServiceIntTests extends Specification {
         setup:
         def project = projectHelper.getProject()
 
-        def entityType = EavEntityType.findByDomainName('AssetEntity')
-        def attributeSet = new EavAttributeSet(attributeSetName: 'Server', entityType: entityType, sortOrder: 10).save()
-        def moveEvent = new MoveEvent(name: "Example 1", project: project, inProgress: 'false').save()
-        def moveBundle = new MoveBundle(name: 'Example 1', moveEvent: moveEvent, project: project, workflowCode: 'STD_PROCESS').save()
-        def assetEntity = new AssetEntity(
-                assetName: "Asset Name",
-                assetType: "Asset Type",
-                assetTag: 'TAG-0',
-                moveBundle: moveBundle,
-                project: project,
-                attributeSet: attributeSet
-        ).save()
+        def assetEntity = assetHelper.createDevice(project, 'Server', [name: RandomStringUtils.randomAlphabetic(10), description: 'Red'])
 
         def task = new AssetComment(
                 project: project,
