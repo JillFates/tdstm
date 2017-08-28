@@ -1,5 +1,3 @@
-
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -11,7 +9,8 @@
         width: 180px;
       }
     </style>
-    <script type="text/javascript">
+    <r:layoutResources />
+     <script type="text/javascript">
       function initialize(){
 
       // This is called when the page loads to initialize Managers
@@ -225,5 +224,6 @@
     $(".menu-parent-planning-list-bundles").addClass('active');
     $(".menu-parent-planning").addClass('active');
    </script>
+    <r:layoutResources />
   </body>
 </html>
