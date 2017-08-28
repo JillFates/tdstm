@@ -1,6 +1,6 @@
-var webpackConfig = require('./webpack.config')();
-const webpack = require('webpack'); //to access built-in plugins
-const path = require('path');
+let webpackConfig = require('./webpack.config')();
+let webpack = require('webpack'); //to access built-in plugins
+let path = require('path');
 
 module.exports = function (config) {
 	var appSrcBase = 'web-app/app-js/';       // app source TS files
@@ -21,8 +21,7 @@ module.exports = function (config) {
 					/angular(\\|\/)core(\\|\/)@angular/,
 					path.resolve(__dirname, "app-js")
 				)
-			],
-			devtool: 'inline-source-map'
+			]
 		},
 		preprocessors: {
 			'./web-app/app-js/main.spec.ts': ['webpack']
