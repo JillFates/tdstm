@@ -36,10 +36,10 @@
 		<div class="nav-tabs-custom" *ngIf="!collapsed">
 			<!-- Tabs within a box -->
 			<ul class="nav nav-tabs">
-				<li role="presentation" class="active">
+				<li role="presentation" [ngClass]="{'active':!model.id}">
 					<a href="#tab_1" data-toggle="tab">Asset Classes</a>
 				</li>
-				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':model.id}">
 					<a *ngIf="!isAssetSelected();else selected">Fields</a>
 					<ng-template #selected>
 						<a href="#tab_2" data-toggle="tab" #link>Fields</a>
@@ -66,8 +66,8 @@
 					</div>
 					<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 				</div>
-				<div class="tab-pane" id="tab_2">
-					<div class="row" [ngClass]="{'active':model.id}">
+				<div class="tab-pane" id="tab_2" [ngClass]="{'active':model.id}">
+					<div class="row">
 						<div class="col-md-4 col-sm-12">
 							<div class="col-sm-9">
 								<div class="form-group has-feedback" style="margin-bottom:0px;">

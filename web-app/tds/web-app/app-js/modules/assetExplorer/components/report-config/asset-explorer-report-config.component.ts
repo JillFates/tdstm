@@ -81,23 +81,13 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected updateModelbyFilter() {
-		this.applyFilters();
 		this.model.schema.domains = this.selectedAssetClasses();
-		this.model.schema.columns = this.filteredData
-			.map((d) => d.fields
-				.filter((f) => f['selected'])
-				.map((f) => {
-					return {
-						domain: d.domain,
-						property: f.field,
-						width: 50,
-						locked: false,
-						edit: false,
-						label: f.label
-					};
-				}))
-			.reduce((p, c) => p.concat(c), []);
-
+		this.fields.filter(x => x['selected'] &&
+			this.model.schema.domains.indexOf(x['domain']) === -1)
+			.forEach(x => delete x['selected']);
+		this.applyFilters();
+		this.model.schema.columns = this.model.schema.columns
+			.filter(c => this.model.schema.domains.indexOf(c.domain) !== -1);
 	}
 
 	/** Filter Methods */
@@ -293,6 +283,7 @@ export class AssetExplorerReportConfigComponent {
 	}
 
 	protected onFieldSelection(field: FieldSettingsModel) {
+		console.log(field);
 		if (field['selected']) {
 			this.model.schema.columns.push({
 				domain: field['domain'],
