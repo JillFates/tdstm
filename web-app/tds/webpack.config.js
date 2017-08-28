@@ -24,16 +24,17 @@ module.exports = function (env, argv) {
 		},
 		module: {
 			rules: [
-				{test: /\.ts$/, use: 'ts-loader'},
+				{ test: /\.tsx?$/, loader: 'ts-loader' },
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'}
 			]
 		},
 		resolve: {
-			extensions: ['.ts', '.tsx', '.js', '.jsx'],
+			extensions: ['.ts', '.tsx', '.js'],
 			modules: [
 				"node_modules",
 				path.resolve(__dirname, "app-js")
-			]
+			],
+			unsafeCache: true
 		},
 		plugins: [
 			new webpack.SourceMapDevToolPlugin({
@@ -61,9 +62,11 @@ module.exports = function (env, argv) {
 			),
 			//new BundleAnalyzerPlugin()
 		],
+		cache: true,
 		context: __dirname,
 		watch: devEnv,
 		watchOptions: {
+			ignored: /node_modules/,
 			aggregateTimeout: 300,
 			poll: 1000
 		}
