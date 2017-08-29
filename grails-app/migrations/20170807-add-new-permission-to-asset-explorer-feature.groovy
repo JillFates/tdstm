@@ -12,52 +12,52 @@ databaseChangeLog = {
                 def perms = [
 					(Permission.AssetExplorerSystemCreate): [
                         group      : 'NONE',
-                        description: 'Can create shared system level reports',
+                        description: 'Can create shared system level views',
                         roles      : ['ADMIN']
                     ],
 					(Permission.AssetExplorerSystemDelete): [
                         group      : 'NONE',
-                        description: 'Can delete shared system level reports',
+                        description: 'Can delete shared system level views',
                         roles      : ['ADMIN']
                     ],
                     (Permission.AssetExplorerSystemEdit): [
                         group      : 'NONE',
-                        description: 'Can edit shared system level reports',
+                        description: 'Can edit shared system level views',
                         roles      : ['ADMIN']
                     ],
                     (Permission.AssetExplorerSystemSaveAs): [
                         group      : 'NONE',
-                        description: 'Can modify and \'Save As\' system level reports',
+                        description: 'Can modify and \'Save As\' system level views',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
                     (Permission.AssetExplorerCreate): [
                         group      : 'NONE',
-                        description: 'Can create logged in user owned reports',
+                        description: 'Can create logged in user owned views',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
 					(Permission.AssetExplorerDelete): [
                         group      : 'NONE',
-                        description: 'Can delete logged in user owned reports',
+                        description: 'Can delete logged in user owned views',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
                     (Permission.AssetExplorerEdit): [
                         group      : 'NONE',
-                        description: 'Can edit logged in user owned reports',
+                        description: 'Can edit logged in user owned views',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
                     (Permission.AssetExplorerSaveAs): [
                         group      : 'NONE',
-                        description: 'Can modify and \'Save As\' user published reports',
+                        description: 'Can modify and \'Save As\' user published views',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
 					(Permission.AssetExplorerPublish): [
                         group      : 'NONE',
-                        description: 'Can publish logged in user owned reports',
+                        description: 'Can publish logged in user owned views',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
                     (Permission.AssetExplorerUnPublish): [
                         group      : 'NONE',
-                        description: 'Can unpublish logged in user owned reports',
+                        description: 'Can unpublish logged in user owned views',
                         roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
                     ],
                 ]
