@@ -17,7 +17,6 @@ class ContainerModule {
 }
 
 @Component({
-	moduleId: module.id,
 	selector: 'container-component',
 	template: '<div #container></div>',
 })

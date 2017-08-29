@@ -7,11 +7,11 @@ const path = require('path');
 const pkg = require('./package.json');  //loads npm config file
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-module.exports = function(env, argv) {
+module.exports = function (env, argv) {
 
-    let devEnv = (env !== 'prod');
+	let devEnv = (env !== 'prod');
 
-    console.log('Production Environment: ' + (!devEnv));
+	console.log('Production Environment: ' + (!devEnv));
 
 	return {
 		entry: {
@@ -24,16 +24,13 @@ module.exports = function(env, argv) {
 		},
 		module: {
 			rules: [
-				{test: /\.ts$/, use: 'ts-loader'},
+				{ test: /\.tsx?$/, loader: 'ts-loader' },
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'}
 			]
 		},
 		resolve: {
-			extensions: ['.ts', '.tsx', '.js', '.jsx'],
-			modules: [
-				"node_modules",
-				path.resolve(__dirname, "app-js")
-			]
+			extensions: ['.ts', '.tsx', '.js'],
+			unsafeCache: true
 		},
 		plugins: [
 			new webpack.SourceMapDevToolPlugin({
@@ -46,13 +43,6 @@ module.exports = function(env, argv) {
 			new webpack.optimize.UglifyJsPlugin({
 				comments: false,
 				sourceMap: devEnv,
-				compress: {
-					warnings: false, // Suppress uglification warnings
-					pure_getters: true,
-					unsafe: true,
-					unsafe_comps: true,
-					screw_ie8: true
-				},
 				exclude: [/\.min\.js$/gi] // skip pre-minified libs
 			}),
 			new webpack.ContextReplacementPlugin( //https://github.com/angular/angular/issues/11580
@@ -61,9 +51,11 @@ module.exports = function(env, argv) {
 			),
 			//new BundleAnalyzerPlugin()
 		],
+		cache: true,
 		context: __dirname,
 		watch: devEnv,
 		watchOptions: {
+			ignored: /node_modules/,
 			aggregateTimeout: 300,
 			poll: 1000
 		}

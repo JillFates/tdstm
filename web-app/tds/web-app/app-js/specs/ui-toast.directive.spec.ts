@@ -4,7 +4,7 @@ import {DebugElement} from '@angular/core';
 
 import {UIToastDirective} from '../shared/directives/ui-toast.directive';
 import {NotifierService} from '../shared/services/notifier.service';
-import {AlertType, AlertModel} from '../shared/model/alert.model';
+import {AlertType} from '../shared/model/alert.model';
 
 describe('UIToastDirective:', () => {
 	let fixture: ComponentFixture<UIToastDirective>;
