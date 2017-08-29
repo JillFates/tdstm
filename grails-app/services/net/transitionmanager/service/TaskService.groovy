@@ -2001,7 +2001,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
 			// Validate the syntax of the recipe before going any further
-			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode)
+			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode, project)
 			if (recipeErrors) {
 				msg = 'There appears to be syntax error(s) in the recipe. Please run the Validate Syntax and resolve reported issue before continuing.'
 				log.debug 'Recipe had syntax errors'
@@ -2189,6 +2189,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 				// List of all available teams.
 				List teamCodeList = partyRelationshipService.getTeamCodes(true)
+
+				ApiAction apiAction = null
+				if (taskSpec.containsKey("invoke")) {
+					Map invokeSpec = taskSpec["invoke"]
+					if (invokeSpec.containsKey("method")) {
+						String apiActionName = invokeSpec["method"].trim()
+						apiAction = ApiAction.findByName(apiActionName)
+					}
+
+				}
 
 				// Collection of the task settings passed around to functions more conveniently
 				settings = [
