@@ -299,7 +299,10 @@ class LicenseAdminService extends LicenseCommonService {
 				licState.banner = license.bannerMessage
 
 				String currentHost = getHostName()
-				if(DomainLicense.WILDCARD != hostName && currentHost != hostName){
+				if (
+					DomainLicense.WILDCARD != hostName &&
+					! StringUtils.equalsIgnoreCase(currentHost, hostName)
+				){
 					licState.message = """
 						|Error loading license:<br/> 
 						|current host:<br/><strong>${currentHost}</strong><br/>
@@ -310,7 +313,10 @@ class LicenseAdminService extends LicenseCommonService {
 				}
 
 				String fqdn = getFQDN()
-				if(DomainLicense.WILDCARD != websitename && !StringUtils.equalsIgnoreCase(fqdn, websitename)){
+				if (
+					DomainLicense.WILDCARD != websitename &&
+					! StringUtils.equalsIgnoreCase(fqdn, websitename)
+				){
 					licState.message = """
 						|Error loading license:<br/> 
 						|current website:<br/><strong>${fqdn}</strong><br/>
@@ -459,13 +465,19 @@ class LicenseAdminService extends LicenseCommonService {
 		log.debug("LicenseAdminService - Project: {}", project)
 
 		//if is not wildcard and Sites don't match, FAIL
-		if(DomainLicense.WILDCARD != hostName && getHostName() != hostName){
+		if(
+			DomainLicense.WILDCARD != hostName &&
+			! StringUtils.equalsIgnoreCase(getHostName(), hostName)
+		){
 			log.debug("[{}] == [{}]", getHostName(), hostName)
 			log.error("Error loading license data: Wrong Host Name")
 		}
 
 		//if is not wildcard and sitename don't match, FAIL
-		if(DomainLicense.WILDCARD != websitename && getFQDN() != websitename){
+		if(
+			DomainLicense.WILDCARD != websitename &&
+			! StringUtils.equalsIgnoreCase(getFQDN(), websitename)
+		){
 			log.debug("[${getFQDN()}] == [$websitename]")
 			log.error("Error loading license data: Wrong Website Name")
 		}
