@@ -1061,7 +1061,7 @@ digraph runbook {
 		render([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
 	}
 
-	@HasPermission(Permission.TaskEdit)
+	@HasPermission([Permission.TaskCreate, Permission.TaskEdit])
 	def editTask() {
 		render(view: "_editTask", model: [])
 	}

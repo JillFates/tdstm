@@ -123,7 +123,10 @@
                     actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')" title=\'Edit Asset\'>'+
 					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 				}
-                actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[7] + "' comments='" + rowObject[9] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
+                actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[7] + "' comments='" + rowObject[9] +
+                    "' can-view-tasks='" + ${canViewTasks} + "' can-view-comments='" + ${canViewComments} +
+                        "' can-create-tasks='" + ${canCreateTasks} + "' can-create-comments='" + ${canCreateComments} + "'>" +
+						"</grid-buttons>"
 
 				<tds:hasPermission permission="${Permission.AssetCreate}">
 					var value = rowObject[1] ? _.escape(rowObject[1]) : '';

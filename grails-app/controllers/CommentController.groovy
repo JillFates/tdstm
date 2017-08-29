@@ -16,7 +16,7 @@ class CommentController implements ControllerMethods {
 		render(view: '_list', model: [])
 	}
 
-	@HasPermission(Permission.CommentView)
+	@HasPermission([Permission.CommentCreate, Permission.CommentEdit])
 	def editComment() {
 		render(view: '_editComment', model: [])
 	}

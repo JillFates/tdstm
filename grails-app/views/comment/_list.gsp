@@ -24,7 +24,7 @@
                     <tr class="comments-table-row" ng-repeat="comment in commentsData" id="commentTr_{{comment.commentInstance.id}}" ng-style="rowColor(comment)">
                         <td>
                         <tds:hasPermission permission="${Permission.AssetEdit}">
-                            <a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" name="205873"><img src="${resource(dir:'icons',file:'comment_edit.png')}" border="0"></a>
+                            <a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)"><img src="${resource(dir:'icons',file:'comment_edit.png')}" border="0"></a>
                         </tds:hasPermission>
                         </td>
                         <td id="comment_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{truncate(comment.commentInstance.comment)}}</td>

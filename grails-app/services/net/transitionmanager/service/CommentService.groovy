@@ -725,4 +725,16 @@ class CommentService implements ServiceMethods {
 			[(pref.toString()): userPreferenceService.getPreference(null, pref, defaultVal)]
 		}
 	}
+
+	/**
+	 *
+	 *  Finds All Comments by an assetEntity.
+	 *
+	 *  A Comment instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.COMMENT
+	 *
+	 * @param assetEntity
+	 */
+	def findAllByAssetEntity(def assetEntity) {
+		AssetComment.findAllByAssetEntityAndCommentType(assetEntity, AssetCommentType.COMMENT)
+	}
 }
