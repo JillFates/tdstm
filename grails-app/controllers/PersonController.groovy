@@ -886,7 +886,7 @@ class PersonController implements ControllerMethods {
 						pr2.party_id_to_id IS NOT NULL AS project,
 						IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents,
 						IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates
-					FROM tdstm.party_relationship pr
+					FROM party_relationship pr
 						LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 						LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id
 						LEFT OUTER JOIN party_group company ON company.party_group_id = pr.party_id_from_id
