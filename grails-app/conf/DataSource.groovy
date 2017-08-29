@@ -55,7 +55,7 @@ environments {
 			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
 			username = "tdstmapp"
 			password = "tdstmpswd"
-			logSql = true
+			logSql = false
 		}
 	}
 	production {
