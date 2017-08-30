@@ -13,13 +13,13 @@
 				<tbody>
 				<tr class="prop">
 					<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${filesInstance?.assetName}"/>
-					<td colspan="3" style="	max-width: 400px; font-weight:bold;">
+					<td class="valueNW ${standardFieldSpecs.assetName.imp?:''}" colspan="3" style="	max-width: 400px; font-weight:bold;">
 						<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
 							${filesInstance.assetName}
 						</tds:tooltipSpan>
 					</td>
 					<tds:inputLabel field="${standardFieldSpecs.description}" value="${filesInstance?.description}"/>
-					<td colspan="3" style="max-width: 400px;">
+					<td class="valueNW ${standardFieldSpecs.description.imp?:''}" colspan="3" style="max-width: 400px;">
 						<tds:tooltipSpan field="${standardFieldSpecs.description}">
 							${filesInstance.description}
 						</tds:tooltipSpan>
@@ -36,7 +36,7 @@
 							${standardFieldSpecs.moveBundle.label} : Dep. Group
 						</label>
 					</td>
-					<td class="valueNW">
+					<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
 						<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
 							${filesInstance?.moveBundle} : ${dependencyBundleNumber}
 						</tds:tooltipSpan>
@@ -48,7 +48,7 @@
 							${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 						</label>
 					</td>
-					<td class="valueNW">
+					<td class="valueNW ${standardFieldSpecs.scale.imp?:''}">
 						<tds:tooltipSpan field="${standardFieldSpecs.size}">
 							${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}
 						</tds:tooltipSpan>
