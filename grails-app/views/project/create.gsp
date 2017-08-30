@@ -297,7 +297,7 @@
 								<label for="projectType"><b>Plan Methodology:&nbsp;</b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'planMethodology','errors')}">
-								<g:if test="${projectInstance.planMethodology}">
+								<g:if test="${planMethodologies}">
 									<g:select id="planMethodology" name="planMethodology" indextab="130"
 											  value="${projectInstance.planMethodology}"
 											  from="${planMethodologies}"
