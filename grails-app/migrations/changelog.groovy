@@ -178,4 +178,5 @@ databaseChangeLog = {
 	include file: '20170731-null-out-move-event-orphans-for-tasks.groovy'
 	include file: '20170816-Clear-out-possible-corrupted-Tasks-referencing-not-existing-Assets.groovy'
 	include file: '20170817-add-ProjectManageDefaults-permission.groovy'
+	include file: '20170830-Assign-a-company-as-the-owner-for-the-default-project.groovy'
 }
