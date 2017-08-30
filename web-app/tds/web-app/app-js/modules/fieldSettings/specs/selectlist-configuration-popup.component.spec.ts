@@ -2,22 +2,22 @@
  * Created by daviD on 04/06/2017.
  */
 
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Observable } from 'rxjs/Rx';
-import { HttpModule, Http } from '@angular/http';
+import {By} from '@angular/platform-browser';
+import {DebugElement} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {Observable} from 'rxjs/Rx';
+import {HttpModule, Http} from '@angular/http';
 
-import { PopupModule } from '@progress/kendo-angular-popup';
-import { SortableModule } from '@progress/kendo-angular-sortable';
-import { DialogModule } from '@progress/kendo-angular-dialog';
+import {PopupModule} from '@progress/kendo-angular-popup';
+import {SortableModule} from '@progress/kendo-angular-sortable';
+import {DialogModule} from '@progress/kendo-angular-dialog';
 
-import { SelectListConfigurationPopupComponent } from '../components/select-list/selectlist-configuration-popup.component';
-import { SharedModule } from '../../../shared/shared.module';
-import { FieldSettingsModel } from '../model/field-settings.model';
-import { CustomDomainService } from '../service/custom-domain.service';
+import {SelectListConfigurationPopupComponent} from '../components/select-list/selectlist-configuration-popup.component';
+import {SharedModule} from '../../../shared/shared.module';
+import {FieldSettingsModel} from '../model/field-settings.model';
+import {CustomDomainService} from '../service/custom-domain.service';
 
 describe('SelectListConfigurationPopupComponent:', () => {
 	let fixture: ComponentFixture<SelectListConfigurationPopupComponent>;
@@ -125,11 +125,11 @@ describe('SelectListConfigurationPopupComponent:', () => {
 		comp.onToggle();
 		fixture.detectChanges();
 		comp.items = [
-			{ deletable: true, value: 'Z' },
-			{ deletable: true, value: 'P' },
-			{ deletable: true, value: 'E' },
-			{ deletable: true, value: 'A' },
-			{ deletable: true, value: 'C' }
+			{deletable: true, value: 'Z'},
+			{deletable: true, value: 'P'},
+			{deletable: true, value: 'E'},
+			{deletable: true, value: 'A'},
+			{deletable: true, value: 'C'}
 		];
 
 		let sortButton: DebugElement;

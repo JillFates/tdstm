@@ -10,12 +10,11 @@ import { ActionType } from '../../../../shared/model/action-type.enum';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { RichTextEditorComponent } from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
 import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
 
 @Component({
-	moduleId: module.id,
 	selector: 'notice-form',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/form/notice-form.component.html',
-	providers: [NoticeService]
+	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/form/notice-form.component.html'
 })
 export class NoticeFormComponent {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
@@ -74,11 +73,11 @@ export class NoticeFormComponent {
 
 	protected isCreateEditAvailable(): boolean {
 		return this.action === 0 ?
-			this.permissionService.hasPermission('NoticeEdit') :
-			this.permissionService.hasPermission('NoticeEdit');
+			this.permissionService.hasPermission(Permission.NoticeEdit) :
+			this.permissionService.hasPermission(Permission.NoticeEdit);
 	}
 
 	protected isDeleteAvailable(): boolean {
-		return this.permissionService.hasPermission('NoticeDelete');
+		return this.permissionService.hasPermission(Permission.NoticeDelete);
 	}
 }

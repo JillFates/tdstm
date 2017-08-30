@@ -12,9 +12,9 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { ValidationUtils } from '../../../../shared/utils/validation.utils';
+import { Permission } from '../../../../shared/model/permission.model';
 
 @Component({
-	moduleId: module.id,
 	selector: 'field-settings-list',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/list/field-settings-list.component.html'
 })
@@ -129,7 +129,7 @@ export class FieldSettingsListComponent implements OnInit {
 	}
 
 	protected isEditAvailable(): boolean {
-		return this.permissionService.hasPermission('ProjectFieldSettingsEdit');
+		return this.permissionService.hasPermission(Permission.ProjectFieldSettingsEdit);
 	}
 
 	protected isDirty(): boolean {
@@ -230,7 +230,7 @@ export class FieldSettingsListComponent implements OnInit {
 	 * #this.fieldsToDelete gets updated.
 	 * @param {{domain: string; fieldsToDelete: string[]}} value
 	 */
-	protected onDelete(value: {domain: string, fieldsToDelete: string[]}): void {
+	protected onDelete(value: { domain: string, fieldsToDelete: string[] }): void {
 		this.fieldsToDelete[value.domain] = value.fieldsToDelete;
 	}
 

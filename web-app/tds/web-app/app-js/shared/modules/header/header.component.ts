@@ -7,7 +7,6 @@ import { UIPromptService } from '../../directives/ui-prompt.directive';
 
 declare var jQuery: any;
 @Component({
-	moduleId: module.id,
 	selector: 'header',
 	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
 })

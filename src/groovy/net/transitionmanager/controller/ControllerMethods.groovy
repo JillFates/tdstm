@@ -159,6 +159,13 @@ trait ControllerMethods {
 		}
 	}
 
+	/**
+	 * Standardized Exception Handler that will catch any exceptions from the Controllers
+	 */
+	def standardControllerExceptionHandler(Exception e) {
+		handleException(e, log)
+	}
+
 	def <T> T getFromParams(Class<T> clazz, Map params) {
 		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.long('id'))
 		if (t) {

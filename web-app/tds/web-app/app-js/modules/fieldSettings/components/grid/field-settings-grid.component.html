@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="col-xs-2 col-md-2 col-lg-1">
-        <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-search"></i> {{'GLOBAL.FILTER' | translate}}</button>
+        <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
     </div>
 </ng-template>
 <kendo-grid #fieldSettingGrid="kendoGrid" [filter]="state.filter" [data]="gridData" [sortable]="sortable" [sort]="state.sort"

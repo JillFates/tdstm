@@ -2,7 +2,6 @@
  * Jorge Morayta
  * Defines the top-level states such as home, welcome, and login
  */
-import { Injector } from '@angular/core';
 import { TDSAppComponent } from './tds-app.component';
 import { UIRouter, TransitionService } from '@uirouter/core';
 import { AuthService } from '../shared/services/auth.service';

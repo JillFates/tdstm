@@ -13,7 +13,6 @@ import { SelectListConfigurationPopupComponent } from '../select-list/selectlist
 declare var jQuery: any;
 
 @Component({
-	moduleId: module.id,
 	selector: 'field-settings-grid',
 	encapsulation: ViewEncapsulation.None,
 	exportAs: 'fieldSettingsGrid',
