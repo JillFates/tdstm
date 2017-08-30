@@ -334,9 +334,10 @@ class ProjectController implements ControllerMethods {
 	def create() {
 		PartyGroup company = securityService.userLoginPerson.company
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
-
-		// TODO - create - See TM-6673 - need to remove planMethodologies
-		List<Map> planMethodologies = []
+		// Copy plan methodology field from the default project
+		Project defaultProject = Project.defaultProject
+		List<Map> planMethodologies = getPlanMethodologiesValues(defaultProject)
+		params.planMethodology = defaultProject.planMethodology
 
 		[clients: projectDetails.clients, company: company, managers: projectDetails.managers,
 		 partners: projectDetails.partners, projectInstance: new Project(params),
@@ -388,10 +389,12 @@ class ProjectController implements ControllerMethods {
 
 				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 
+				List<Map> planMethodologies = getPlanMethodologiesValues(Project.defaultProject)
+
 				render(view: 'create', model: [
 					company: company, projectInstance: project, clients: projectDetails.clients,
 					partners: projectDetails.partners, managers: projectDetails.managers,
-					workflowCodes: projectDetails.workflowCodes, prevParam: params
+					workflowCodes: projectDetails.workflowCodes, planMethodologies:planMethodologies, prevParam: params
 				] )
 				return
 			}
