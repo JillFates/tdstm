@@ -640,7 +640,6 @@
                     {
                         field: "lastActivity",
                         title: "Latest Activity",
-                        template:"#= moment(lastActivity).format(tdsCommon.defaultDateTimeFormat())#"
                     }
                 ],
                 selectable: "row",
