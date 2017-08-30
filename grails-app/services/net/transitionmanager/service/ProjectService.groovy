@@ -44,6 +44,7 @@ class ProjectService implements ServiceMethods {
 	SequenceService sequenceService
 	StateEngineService stateEngineService
 	UserPreferenceService userPreferenceService
+	CustomDomainService customDomainService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -1648,4 +1649,24 @@ class ProjectService implements ServiceMethods {
                return projects
        }
 
+	/**
+	 * Helper method to get the PlanMethodologies Values of the Select List in the Project CRUD
+	 * @param project
+	 * @return the list of values or empty list is there is none
+	 */
+	private List<Map<String, String>> getPlanMethodologiesValues(Project project){
+		List<Map> customFields = customDomainService.customFieldsList(
+				project,
+				AssetClass.APPLICATION.toString(),
+				true
+		)
+		List<Map> planMethodologies = customFields.collect {
+			[ field: it.field, label: (it.label ?: it.field) ]
+		}
+		if(planMethodologies){
+			planMethodologies.add(0, [field:'', label:'Select...'])
+		}
+
+		return planMethodologies
+	}
 }
