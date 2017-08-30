@@ -11,19 +11,19 @@ class RoleTypeController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
-	@HasPermission(Permission.RoleTypeView)
-	def list() {
-		if (!params.max) params.max = 25
+    @HasPermission(Permission.RoleTypeView)
+    def list() {
 
-		List<RoleType> roleTypes = RoleType.createCriteria().list {
-			and {
-				order('type','asc')
-				order('level','desc')
-				order('id', 'asc')
-			}
-		}
-		[roleTypeInstanceList: roleTypes]
-	}
+        def query = RoleType.where {
+            type == RoleType.TEAM
+        }
+
+        query.order('type', 'asc')
+                .order('level', 'desc')
+                .order('id', 'asc')
+
+        [roleTypeInstanceList: query.list()]
+    }
 
 	@HasPermission(Permission.RoleTypeView)
 	def show() {
