@@ -117,7 +117,7 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#startTime").kendoDateTimePicker();
+                      $("#startTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat() });
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="startTime" name="startTime"
                                    value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" format="12hrs" />"
@@ -137,7 +137,7 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#completionTime").kendoDateTimePicker();
+                      $("#completionTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat() });
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="completionTime" name="completionTime"
                                    value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" format="12hrs" />"
