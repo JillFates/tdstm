@@ -2188,9 +2188,10 @@ class AssetEntityController implements ControllerMethods {
 		// Now morph the list into a list of name: Role names
 		def list = []
 		projectStaff.each {
+			String roleDescription = it.role.toString()
 			list << [ id:it.staff.id,
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: $it.staff",
-				sortOn:"${it.role.description.split(':')[1]?.trim()},$it.staff.firstName $it.staff.lastName"
+				nameRole:"${roleDescription}: $it.staff",
+				sortOn:"${roleDescription},$it.staff.firstName $it.staff.lastName"
 			]
 		}
 		list.sort { it.sortOn }
