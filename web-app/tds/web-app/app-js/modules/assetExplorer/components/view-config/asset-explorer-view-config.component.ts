@@ -6,8 +6,7 @@ import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.
 import { StateService } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ViewModel } from '../../model/View.model';
-import { ViewSpec, ViewColumn } from '../../model/View-spec.model';
+import { ViewModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
