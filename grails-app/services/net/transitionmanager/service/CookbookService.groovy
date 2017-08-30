@@ -777,7 +777,7 @@ class CookbookService implements ServiceMethods {
 
 		if ( !currentProject ) {
 			// Reference to current project
-			currentProject = controllerService.getRequiredProject()
+			currentProject = securityService.userCurrentProjectOrException
 		}
 		// Keeps an in-memory list of all the possible Api Actions to querying multiple times.
 		List apiActions = ApiAction.findAllByProject(currentProject)
