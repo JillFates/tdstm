@@ -1,6 +1,6 @@
 <kendo-grid>
-	<kendo-grid-column [sortable]="{mode:'multiple'}" *ngFor="let column of model.columns" field="{{column.domain}}.{{column.property}}"
-	 [width]="50">
+	<kendo-grid-column [sortable]="{mode:'multiple'}"  *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}.{{column.property}}"
+	[width]="column.width">
 		<ng-template kendoGridHeaderTemplate>
 			<div>
 				<label for=""> {{column.label}}</label>
