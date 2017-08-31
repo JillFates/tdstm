@@ -5048,4 +5048,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new EmptyResultException('No project selected')
 		}
 	}
+	/**
+	 *
+	 *  Finds All tasks by an assetEntity.
+     *
+     *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.TASK
+	 *
+	 * @param assetEntity
+	 */
+	def findAllByAssetEntity(def assetEntity) {
+        AssetComment.findAllByAssetEntityAndCommentType(assetEntity, AssetCommentType.TASK)
+	}
 }

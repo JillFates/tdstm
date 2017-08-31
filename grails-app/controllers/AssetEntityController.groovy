@@ -499,25 +499,25 @@ class AssetEntityController implements ControllerMethods {
 		renderAsJson data
 	}
 
-	@HasPermission(Permission.CommentView)
+	@HasPermission([Permission.CommentView, Permission.TaskView])
 	def listComments() {
 		def assetEntityInstance = AssetEntity.get(params.id)
 		def commentType = params.commentType
-		def assetCommentsInstance
-		boolean canEditComments = true
-		if (commentType) {
-			if (commentType != 'comment') {
-				commentType = 'issue'
-			}
-			canEditComments = userCanEditComments(commentType)
-			assetCommentsInstance = AssetComment.findAllByAssetEntityAndCommentType(assetEntityInstance, commentType)
-		} else {
-			assetCommentsInstance = AssetComment.findAllByAssetEntity(assetEntityInstance)
-		}
 
+        def assetCommentsInstance = []
+
+        if(securityService.hasPermission(Permission.TaskView) && (!commentType || commentType == AssetCommentType.TASK)) {
+            assetCommentsInstance = taskService.findAllByAssetEntity(assetEntityInstance)
+        }
+
+        if(securityService.hasPermission(Permission.CommentView) && (!commentType || commentType == AssetCommentType.COMMENT)) {
+            assetCommentsInstance.addAll(commentService.findAllByAssetEntity(assetEntityInstance))
+        }
 		def assetCommentsList = []
 		def today = new Date()
 		boolean viewUnpublished = securityService.viewUnpublished()
+        boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
+        boolean canEditTasks = securityService.hasPermission(Permission.TaskEdit)
 
 		assetCommentsInstance.each {
 			if (viewUnpublished || it.isPublished)
@@ -525,7 +525,8 @@ class AssetEntityController implements ControllerMethods {
 				                     cssClass: it.dueDate < today ? 'Lightpink' : 'White',
 				                     assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
 				                     assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
-				                     canEditComments: canEditComments]
+				                     canEditComments: canEditComments,
+                                     canEditTasks: canEditTasks]
 		}
 
 		renderAsJson assetCommentsList
@@ -1400,7 +1401,6 @@ class AssetEntityController implements ControllerMethods {
 		def totalRows = tasks.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 		def updatedTime
-		def updatedClass
 		def dueClass
 		def estStartClass
 		def estFinishClass
@@ -1415,24 +1415,8 @@ class AssetEntityController implements ControllerMethods {
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
 
-			// clear out the CSS classes for overDue/Updated
-			updatedClass = dueClass = ''
-
-			if (it.status == AssetCommentStatus.READY) {
-				if (elapsedSec >= 600) {
-					updatedClass = 'task_late'
-				} else if (elapsedSec >= 300) {
-					updatedClass = 'task_tardy'
-				}
-			} else if (it.status == AssetCommentStatus.STARTED) {
-				def dueInSecs = elapsedSec - (it.duration ?: 0) * 60
-				if (dueInSecs >= 600) {
-					updatedClass='task_late'
-				} else if (dueInSecs >= 300) {
-					updatedClass='task_tardy'
-				}
-
-			}
+			// clear out the CSS classes for overDue
+			dueClass = ''
 
 			if (it.estFinish) {
 				elapsed = TimeUtil.elapsed(it.estFinish, nowGMT)
@@ -1504,7 +1488,6 @@ class AssetEntityController implements ControllerMethods {
 					nGraphUrl,
 					it.score ?: 0,
 					status ? 'task_' + it.status.toLowerCase() : 'task_na',
-					updatedClass,
 					dueClass,
 					it.assetEntity?.id, // 16
 					it.assetEntity?.assetType, // 17
@@ -1711,7 +1694,7 @@ class AssetEntityController implements ControllerMethods {
 			ae.environment as environment, srcr.location AS sourceLocation, srcr.room_name AS sourceRoomName, srcr.room_id as sourceRoomId,
 			tarr.location AS targetLocation, tarr.room_name AS targetRoomName, tarr.room_id as targetRoomId
 			FROM (
-				SELECT * FROM tdstm.asset_dependency_bundle
+				SELECT * FROM asset_dependency_bundle
 				WHERE project_id=? AND dependency_bundle in (${nodesQuery.join(',')})
 				ORDER BY dependency_bundle
 			) AS deps
@@ -2634,7 +2617,7 @@ class AssetEntityController implements ControllerMethods {
 					aed.asset_entity_id AS dependentId,
 					ad.c1 AS c1, ad.c2 AS c2, ad.c3 AS c3,ad.c4 AS c4,
 					ad.data_flow_direction AS direction
-				FROM tdstm.asset_dependency ad
+				FROM asset_dependency ad
 				LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = asset_id
 				LEFT OUTER JOIN asset_entity aed ON aed.asset_entity_id = dependent_id
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id

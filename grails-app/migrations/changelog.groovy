@@ -176,5 +176,6 @@ databaseChangeLog = {
 	include file: '20170714-Clear-out-orphaned-data-references-that-cause-the-Task-Report-to-fail.groovy'
 	include file: '20170725-remove-EavAttributeSet-reference-in-AssetEntity.groovy'
 	include file: '20170731-null-out-move-event-orphans-for-tasks.groovy'
-	include file: '20170830-remove-staff-prefix-for-team-descriptions.groovy'
+	include file: '20170807-add-new-permission-to-asset-explorer-feature.groovy'
+	include file: '20170814-create-dataview-table.groovy'
 }

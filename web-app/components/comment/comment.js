@@ -2211,7 +2211,8 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
 			prefValue: '@',
 			viewUnpublishedValue: '@',
 			hasPublishPermission: '@',
-			canEditComments: '@'
+			canEditComments: '@',
+            canEditTasks: '@'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/comments-inner-list-template.html'),
 		link: function (scope, element, attrs) {
@@ -2221,7 +2222,7 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
 			var refreshView = function () {
 				commentService.searchComments(scope.assetId, '').then(
 					function (data) {
-						scope.comments = data;
+                        scope.comments = (data.status !== 'error')? data: [];
 					},
 					function (data) {
 						alerts.showGenericMsg();
@@ -2273,10 +2274,13 @@ tds.comments.directive.GridButtons = function (utils, commentUtils) {
 		scope: {
 			assetId: '@assetId', //=rowId
 			assetType: '@assetType',
-			tasks: '@tasks',
-			comments: '@comments',
-			canEditTasks: '@canEditTasks',
-			canEditComments: '@canEditComments'
+			hasTasks: '@tasks',
+			hasComments: '@comments',
+            canViewTasks: '@canViewTasks',
+            canViewComments: '@canViewComments',
+            canCreateTasks: '@canCreateTasks',
+            canCreateComments: '@canCreateComments'
+
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/grid-buttons-template.html'),
 		link: function (scope, element, attrs) {

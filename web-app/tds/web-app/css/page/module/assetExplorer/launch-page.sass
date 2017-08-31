@@ -1,0 +1,49 @@
+section.page-asset-explorer-index
+  div.asset-explorer-index-left-menu
+    padding-left: 0px
+    span.glyphicon-th-list
+      font-size: 15px
+    .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover,
+    .bg-light-blue, .label-primary, .modal-primary .modal-body
+      background-color: palette(tranman, action-toolbar2)
+    li.active
+      background-color: palette(tranman, action-toolbar2)
+      a
+        color: white
+        span
+          font-size: 12px
+  @media (max-width: 992px)
+    div.asset-explorer-index-left-menu
+      padding-left: 15px
+  div.asset-explorer-index-container
+    padding-left: 0px
+    padding-right: 0px
+    div.box
+      h3.box-title-grid-list
+        padding-top: 4px
+        font-size: 21px
+        font-weight: 600
+      div.box-tools-actions
+        display: inline
+        margin-top: 5px
+        margin-left: 20px
+        margin-bottom: 15px
+      div.search-filter-text
+        margin-bottom: 0px
+        input.txt-search
+          width: 500px
+      @media (max-width: 992px)
+        div.search-filter-text
+          input.txt-search
+            width: 500px
+
+      table
+        th
+          font-size: 14px
+          padding: 5px
+          font-family: inherit
+        td.asset-explorer-td-actions
+          width: 125px
+          padding-left: 24px
+        td.asset-explorer-td-favorite
+          width: 190px

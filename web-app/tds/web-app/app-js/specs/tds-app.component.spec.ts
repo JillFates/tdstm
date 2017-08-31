@@ -1,12 +1,10 @@
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import {ComponentFixture, TestBed, async} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
+import {DebugElement} from '@angular/core';
 
-import { TDSAppComponent } from '../config/tds-app.component';
-import { UserService } from '../shared/services/user.service';
-import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
-import { UIToastDirective } from '../shared/directives/ui-toast.directive';
-import { SharedModule } from '../shared/shared.module';
+import {TDSAppComponent} from '../config/tds-app.component';
+import {UserService} from '../shared/services/user.service';
+import {SharedModule} from '../shared/shared.module';
 
 describe('TDSAppComponent:', () => {
 	let fixture: ComponentFixture<TDSAppComponent>;
@@ -20,7 +18,7 @@ describe('TDSAppComponent:', () => {
 		TestBed.configureTestingModule({
 			imports: [SharedModule],
 			declarations: [TDSAppComponent],
-			providers: [{ provide: UserService, useValue: userStub }]
+			providers: [{provide: UserService, useValue: userStub}]
 		}).compileComponents();
 	}));
 

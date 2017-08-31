@@ -225,6 +225,12 @@ int minPasswordLength = tds.minPasswordLength()
 								</g:link>
 							</li>
 							<li>
+								<g:link class="mmlink" controller="module" ction="assetexplorer" id="views">
+									<g:img uri="/icons/magnifier.png" width="16" height="16"/>
+									<div>Asset Explorer</div>
+								</g:link>
+							</li>
+							<li>
 								<g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
 									<tds:svgIcon name="application" width="16" height="16" />
 									<div>Applications</div>
@@ -343,7 +349,6 @@ int minPasswordLength = tds.minPasswordLength()
 					<g:if test="${currProject && moveBundle}">
 							<span class="megamenuSection"> </span>
 							<li><g:link class="mmlink" controller="moveBundle" action="show"  onclick="hideMegaMenu('bundleMegaMenu')">${moveBundle.name} Bundle Details</g:link></li>
-							<li><g:link class="mmlink" controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle.id]" onclick="hideMegaMenu('bundleMegaMenu')">Bundled Assets</g:link> </li>
 					</g:if>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');" onclick="hideMegaMenu('bundleMegaMenu')">help</a></li>

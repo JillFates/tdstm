@@ -2,79 +2,82 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
-import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import org.apache.commons.lang.RandomStringUtils
+import spock.lang.Specification
 
-class TaskServiceIntTests extends IntegrationSpec {
+class TaskServiceIntTests extends Specification {
 
-	def project
-	def attributeSet
-	def moveEvent
-	def moveBundle
-	def taskService
+    def project
+    def attributeSet
+    def moveEvent
+    def moveBundle
+    def taskService
+    def projectHelper
+    def assetHelper
 
-	void "test clean task data"() {
-		setup:
-			prepareMoveEventData()
-			def whom = new Person(firstName:'Robin', lastName:'Banks')
+    void "test clean task data"() {
+        setup:
+        prepareMoveEventData()
+        def whom = new Person(firstName: 'Robin', lastName: 'Banks')
 
-		when:
-			def listAssetEntityNotNull = AssetComment.findAllByAssetEntityIsNotNull()
+        when:
+        def listAssetEntityNotNull = AssetComment.findAllByAssetEntityIsNotNull()
 
-		then:
-			listAssetEntityNotNull.each { task ->
-				task = taskService.setTaskStatus( task, AssetCommentStatus.STARTED, whom )
-				task.actStart != null
-				task.assignedTo != null
-				AssetCommentStatus.STARTED == task.status
-				task.actFinish == null
-				0 == task.isResolved
+        then:
+        listAssetEntityNotNull.each { task ->
+            task = taskService.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
+            task.actStart != null
+            task.assignedTo != null
+            AssetCommentStatus.STARTED == task.status
+            task.actFinish == null
+            0 == task.isResolved
 
-				// Test bumping status to COMPLETED after STARTED
-				task.previousStatus = task.status
-				taskService.setTaskStatus( task, AssetCommentStatus.COMPLETED, whom )
-				assertNotNull task.actStart
-				assertNotNull task.actFinish
-				assertNotNull task.assignedTo
-				assertNotNull task.resolvedBy
-				assertEquals AssetCommentStatus.COMPLETED, task.status
-				assertEquals 1, task.isResolved
-			}
+            // Test bumping status to COMPLETED after STARTED
+            taskService.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
+            !task.actStart
+            !task.actFinish
+            !task.assignedTo
+            !task.resolvedBy
+            AssetCommentStatus.COMPLETED == task.status
+            1 == task.isResolved
+        }
 
-		/*
-		def eventTask = taskService.setTaskStatus( AssetComment.findByMoveEventIsNotNull(), AssetCommentStatus.STARTED, whom )
-		assertNotNull eventTask.actStart
-		assertNotNull eventTask.assignedTo
-		assertEquals AssetCommentStatus.STARTED, eventTask.status
-		assertNull eventTask.actFinish
-		assertEquals 0, eventTask.isResolved
+        /*
+        def eventTask = taskService.setTaskStatus( AssetComment.findByMoveEventIsNotNull(), AssetCommentStatus.STARTED, whom )
+        assertNotNull eventTask.actStart
+        assertNotNull eventTask.assignedTo
+        assertEquals AssetCommentStatus.STARTED, eventTask.status
+        assertNull eventTask.actFinish
+        assertEquals 0, eventTask.isResolved
 
-		taskService.cleanTaskData( moveEvent.id )
+        taskService.cleanTaskData( moveEvent.id )
 
-		AssetComment.findAllByAssetEntityIsNotNull().each { task->
-			assertEquals AssetCommentStatus.PENDING, task.status
-			assertNull task.actStart
-			assertNull task.actStart
-			assertNull task.dateResolved
-			assertNull task.resolvedBy
-			assertEquals 0, task.isResolved
-		}
+        AssetComment.findAllByAssetEntityIsNotNull().each { task->
+            assertEquals AssetCommentStatus.PENDING, task.status
+            assertNull task.actStart
+            assertNull task.actStart
+            assertNull task.dateResolved
+            assertNull task.resolvedBy
+            assertEquals 0, task.isResolved
+        }
 
-		eventTask = AssetComment.findByMoveEvent(moveEvent)
-		assertEquals AssetCommentStatus.READY, eventTask.status
-		assertNull eventTask.actStart
-		assertNull eventTask.actStart
-		assertNull eventTask.dateResolved
-		assertNull eventTask.resolvedBy
-		assertEquals 0, eventTask.isResolved
-		*/
-	}
+        eventTask = AssetComment.findByMoveEvent(moveEvent)
+        assertEquals AssetCommentStatus.READY, eventTask.status
+        assertNull eventTask.actStart
+        assertNull eventTask.actStart
+        assertNull eventTask.dateResolved
+        assertNull eventTask.resolvedBy
+        assertEquals 0, eventTask.isResolved
+        */
+    }
 
 /*
 	void testDeleteTaskData() {
@@ -121,36 +124,41 @@ class TaskServiceIntTests extends IntegrationSpec {
 	}
 */
 
-	/* Test SetUp */
-    private setup() {
-		log.info "***********DA SETUP***********************************************"
-		project = new Project(name:"VM", projectCode: "VM", workflowCode:"STD_PROCESS" ).save()
-		def entityType = new EavEntityType( entityTypeCode:'AssetEntity', domainName:'AssetEntity', isAuditable:1  ).save()
-		attributeSet = new EavAttributeSet( attributeSetName:'Server', entityType:entityType, sortOrder:10 ).save()
+    /* Test SetUp */
+
+    void setup() {
+
+        projectHelper = new ProjectTestHelper()
+        assetHelper = new AssetTestHelper()
+
+        log.info "***********DA SETUP***********************************************"
+        project = new Project(name: "VM", projectCode: "VM", workflowCode: "STD_PROCESS").save()
+        def entityType = new EavEntityType(entityTypeCode: 'AssetEntity', domainName: 'AssetEntity', isAuditable: 1).save()
+        attributeSet = new EavAttributeSet(attributeSetName: 'Server', entityType: entityType, sortOrder: 10).save()
     }
 
-	private prepareMoveEventData(){
-		moveEvent = new MoveEvent(name:"Example 1", project:project, inProgress:'false').save()
-		moveBundle = new MoveBundle(name:'Example 1', moveEvent:moveEvent, project:project).save()
-		// Create assets for Bundle
-		AssetType.values().each {
-			def assetEntity = new AssetEntity(
-					assetName:it.toString(),
-					assetType:it.toString(),
-					assetTag:'TAG-'+it.toString(),
-					moveBundle:moveBundle,
-					project:project,
-					attributeSet:attributeSet
-			)
-			if ( !assetEntity.validate() || !assetEntity.save() ) {
-				def etext = "Unable to create assetEntity" +
-							GormUtil.allErrorsString( assetEntity )
-				println etext
-			}
-		}
+    private prepareMoveEventData() {
+        moveEvent = new MoveEvent(name: "Example 1", project: project, inProgress: 'false').save()
+        moveBundle = new MoveBundle(name: 'Example 1', moveEvent: moveEvent, project: project).save()
+        // Create assets for Bundle
+        AssetType.values().each {
+            def assetEntity = new AssetEntity(
+                    assetName: it.toString(),
+                    assetType: it.toString(),
+                    assetTag: 'TAG-' + it.toString(),
+                    moveBundle: moveBundle,
+                    project: project,
+                    attributeSet: attributeSet
+            )
+            if (!assetEntity.validate() || !assetEntity.save()) {
+                def etext = "Unable to create assetEntity" +
+                        GormUtil.allErrorsString(assetEntity)
+                println etext
+            }
+        }
 
-		// Create Tasks for AssetEntity
-		AssetEntity.list()  // <==
+        // Create Tasks for AssetEntity
+        AssetEntity.list()  // <==
 /*				.each { assetEntity->
 			def assetComment = new AssetComment(
 					comment:"Sample for "+assetEntity.toString(),
@@ -188,6 +196,27 @@ class TaskServiceIntTests extends IntegrationSpec {
 			}
  	 	}
  	 	*/
-	}
+    }
+
+    void 'test can find tasks by AssetEntity instance'() {
+
+        setup:
+        def project = projectHelper.getProject()
+
+        def assetEntity = assetHelper.createDevice(project, 'Server', [name: RandomStringUtils.randomAlphabetic(10), description: 'Red'])
+
+        def task = new AssetComment(
+                project: project,
+                comment: "Sample for " + assetEntity.toString(),
+                commentType: AssetCommentType.TASK,
+                assetEntity: assetEntity
+        ).save()
+
+        when:
+        def tasks = taskService.findAllByAssetEntity(assetEntity)
+
+        then:
+        [task] == tasks
+    }
 
 }

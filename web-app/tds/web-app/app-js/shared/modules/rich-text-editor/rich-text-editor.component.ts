@@ -9,7 +9,6 @@ import {
 declare var tinymce: any;
 
 @Component({
-	moduleId: module.id,
 	selector: 'rich-text-editor',
 	template: `<textarea name="{{name}}" id="{{elementId}}" [required]="required">{{value}}</textarea>`,
 	exportAs: 'richTextEditor'

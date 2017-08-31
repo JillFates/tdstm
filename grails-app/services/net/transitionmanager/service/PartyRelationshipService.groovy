@@ -1121,7 +1121,7 @@ class PartyRelationshipService implements ServiceMethods {
 			 (
 				SELECT pr.party_id_to_id AS personId,
 					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
-				FROM tdstm.party_relationship pr
+				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
 					INNER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
@@ -1143,7 +1143,7 @@ class PartyRelationshipService implements ServiceMethods {
 			(
 				SELECT pr.party_id_to_id AS personId,
 					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
-				FROM tdstm.party_relationship pr
+				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
 				WHERE pr.role_type_code_to_id in ('STAFF')

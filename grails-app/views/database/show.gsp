@@ -14,13 +14,13 @@
 					<tbody>
 						<tr class="prop">
 							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${databaseInstance?.assetName}"/>
-							<td colspan="2" class="valueNW" style="max-width: 400px; font-weight:bold;">
+							<td colspan="2" class="valueNW ${standardFieldSpecs.assetName.imp?:''}" style="max-width: 400px; font-weight:bold;">
 								<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
 									${databaseInstance?.assetName}
 								</tds:tooltipSpan>
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.description}" value="${databaseInstance?.description}"/>
-							<td colspan="2" style="max-width: 400px;" class="valueNW" >
+							<td colspan="2" style="max-width: 400px;" class="valueNW ${standardFieldSpecs.description.imp?:''}" >
 								<tds:tooltipSpan field="${standardFieldSpecs.description}">
 									${databaseInstance.description}
 								</tds:tooltipSpan>
@@ -37,13 +37,13 @@
 									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 								</label>
 							</td>
-							<td class="valueNW">
+							<td class="valueNW ${standardFieldSpecs.size.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.size}">
 									${databaseInstance?.size}&nbsp;${databaseInstance.scale?.value()}
 								</tds:tooltipSpan>
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance?.retireDate}"/>
-							<td class="valueNW">
+							<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
 									<tds:convertDate date="${databaseInstance?.retireDate}"/>
 								</tds:tooltipSpan>
@@ -53,7 +53,7 @@
 									${standardFieldSpecs.moveBundle.label} : Dep. Group
 								</label>
 							</td>
-							<td class="valueNW" colspan="3">
+							<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
 								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
 									${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
 								</tds:tooltipSpan>
@@ -62,13 +62,13 @@
 						<tr class="prop">
 							<tds:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance.rateOfChange}"/>
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
-							<td class="valueNW">
+							<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
 									<tds:convertDate date="${databaseInstance?.maintExpDate}"/>
 								</tds:tooltipSpan>
 							</td>
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
-							<td class="valueNW" colspan="3">
+							<td class="valueNW ${standardFieldSpecs.planStatus.imp?:''}" colspan="3">
 								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
 									${databaseInstance.planStatus}
 								</tds:tooltipSpan>
@@ -80,7 +80,7 @@
 
 							<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}"/>
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
-							<td class="valueNW" colspan="3">
+							<td class="valueNW ${standardFieldSpecs.validation.imp?:''}" colspan="3">
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
 									${databaseInstance.validation}
 								</tds:tooltipSpan>

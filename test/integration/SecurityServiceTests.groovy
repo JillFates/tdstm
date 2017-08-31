@@ -1,5 +1,6 @@
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.PasswordResetType
+import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
 import groovy.time.TimeCategory
 import net.transitionmanager.EmailDispatch
@@ -21,26 +22,35 @@ class SecurityServiceTests extends Specification {
 	// IOC
 	SecurityService securityService
 
-	private static final List<String> privRoles = ['ADMIN', 'EDITOR', 'USER']
+	private static final List<String> privRoles = ["${SecurityRole.ADMIN}", "${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
+	private static final List<String> userRole = ["${SecurityRole.USER}"]
 
+	private PersonTestHelper personHelper = new PersonTestHelper()
 	private Person privPerson
 	private UserLogin privUser
 	private Person unPrivPerson
 	private UserLogin unPrivUser
+	private Person userRolePerson
+	private UserLogin userRoleUser
 
 	// Helper methods to build up person/user accounts
 
 	private void createPrivAccount() {
 		// Create a new person and login that has a couple of security roles
-		privPerson = new Person(firstName: 'Ben', middleName: 'D', lastName: 'Over', staffType: 'Salary').save(failOnError: true)
-		privUser = new UserLogin(username: 'bendover', password: 'guessit', person: privPerson, active: 'Y', expiryDate: TimeUtil.nowGMT()).save(failOnError: true)
-		assert securityService.assignRoleCodes(privPerson, privRoles).size() == 3
+		privPerson = personHelper.createPerson()
+		privUser = personHelper.createUserLoginWithRoles(privPerson, privRoles)
 	}
 
 	private void createUnPrivAccount() {
 		// Create a new person and login that has no security roles
-		unPrivPerson = new Person(firstName: 'Jack', lastName: 'Rabbit', staffType: 'Salary').save(failOnError: true)
-		unPrivUser = new UserLogin(username: 'xyzzy42', password: 'guessit', person: unPrivPerson, active: 'Y', expiryDate: TimeUtil.nowGMT()).save(failOnError: true)
+		unPrivPerson = personHelper.createPerson()
+		unPrivUser = personHelper.createUserLoginWithRoles(unPrivPerson, [])
+	}
+
+	private void createUserAccount() {
+		// Create a new person and login that has ONLY the 'USER' security role
+		userRolePerson = personHelper.createPerson()
+		userRoleUser = personHelper.createUserLoginWithRoles(userRolePerson, userRole)
 	}
 
 	// Start of Specifications
@@ -58,46 +68,46 @@ class SecurityServiceTests extends Specification {
 			int count
 
 		when: 'assigning the first role there should then be one role assigned to the person'
-			pr = securityService.assignRoleCode(unPrivPerson, 'USER')
+			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.USER}")
 		then:
 			pr != null
 			securityService.getAssignedRoleCodes(unPrivPerson).size() == 1
 
 		when: 'after assigning a second role there should be two assigned roles'
-			pr = securityService.assignRoleCode(unPrivPerson, 'EDITOR')
+			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.EDITOR}")
 			roles = securityService.getAssignedRoleCodes(unPrivPerson)
 		then:
 			pr != null
-			roles == ['EDITOR', 'USER']
+			roles == ["${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
 
 		when: 'assigning the same role twice it should make not difference'
-			pr = securityService.assignRoleCode(unPrivPerson, 'EDITOR')
+			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.EDITOR}")
 			list = securityService.getAssignedRoleCodes(unPrivPerson)
 		then:
 			pr != null
 			list.size() == 2
-			list == ['EDITOR', 'USER']
+			list == ["${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
 
 		when: 'unassigning a role from the user should return a 1 indicating that it was deleted'
-			count = securityService.unassignRoleCodes(unPrivPerson, ['EDITOR'])
+			count = securityService.unassignRoleCodes(unPrivPerson, ["${SecurityRole.EDITOR}"])
 		then:
 			count == 1
 		and: 'the person should only have one role (USER) remaining if I did the math correctly'
-			securityService.getAssignedRoleCodes(unPrivPerson) == ['USER']
+			securityService.getAssignedRoleCodes(unPrivPerson) == ["${SecurityRole.USER}"]
 
 		when: 'adding roles in bulk it should not complain and should then return the complete list of roles'
-			rolesAdded = securityService.assignRoleCodes(unPrivPerson, ['SUPERVISOR', 'ADMIN'])
+			rolesAdded = securityService.assignRoleCodes(unPrivPerson, ["${SecurityRole.SUPERVISOR}", "${SecurityRole.ADMIN}"])
 		then:
 			rolesAdded.size() == 2
 		and: 'the list should have the 3 unPrivPerson roles and the list should be ordered by the security level descending'
-			securityService.getAssignedRoleCodes(unPrivPerson) == ['ADMIN', 'SUPERVISOR', 'USER']
+			securityService.getAssignedRoleCodes(unPrivPerson) == ["${SecurityRole.ADMIN}", "${SecurityRole.SUPERVISOR}", "${SecurityRole.USER}"]
 
 		when: 'unassigning roles in bulk'
-			count = securityService.unassignRoleCodes(unPrivPerson, ['SUPERVISOR', 'USER'])
+			count = securityService.unassignRoleCodes(unPrivPerson, ["${SecurityRole.SUPERVISOR}", "${SecurityRole.USER}"])
 		then: 'it should return that 2 were removed'
 			count == 2
 		and: 'there should only be one role left and while we are at it we will look it up by the UserLogin this time'
-		securityService.getAssignedRoleCodes(unPrivUser) == ['ADMIN']
+		securityService.getAssignedRoleCodes(unPrivUser) == ["${SecurityRole.ADMIN}"]
 
 		when: 'passing in an invalid role code'
 			securityService.assignRoleCode(unPrivPerson, 'BOGUS')
@@ -119,12 +129,12 @@ class SecurityServiceTests extends Specification {
 		then:
 			roles == privRoles
 		and: 'the top privileged role should be ADMIN'
-			'ADMIN' == securityService.getMaxAssignedRole(privPerson)?.id
+		"${SecurityRole.ADMIN}" == securityService.getMaxAssignedRole(privPerson)?.id
 
 		when: 'deleting the ADMIN role we can expect that the next role up will be EDITOR'
-			securityService.unassignRoleCodes(privPerson, ['ADMIN'])
+			securityService.unassignRoleCodes(privPerson, ["${SecurityRole.ADMIN}"])
 		then:
-			'EDITOR' == securityService.getMaxAssignedRole(privPerson)?.id
+		"${SecurityRole.EDITOR}" == securityService.getMaxAssignedRole(privPerson)?.id
 
 		when: 'deleting the remaining roles the next call to getMaxAssignedRole should just return a null'
 			securityService.unassignRoleCodes(privPerson, privRoles)
@@ -134,12 +144,12 @@ class SecurityServiceTests extends Specification {
 
 	void '3 - Test the max role to see that ADMIN is still the top dog'() {
 		expect:
-			'ADMIN' == securityService.getAllRoles()[0]?.id
+		"${SecurityRole.ADMIN}" == securityService.getAllRoles()[0]?.id
 	}
 
 	void '4 - Test the getAssignableRoles and getAssignableRoleCodes method'() {
 		setup:
-			List expectedRoles = ['SUPERVISOR', 'EDITOR', 'USER']
+			List expectedRoles = ["${SecurityRole.SUPERVISOR}", "${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
 			List results
 
 		when: 'creating the unprivileged account that has no roles one would expect that they can not assign roles'
@@ -148,12 +158,12 @@ class SecurityServiceTests extends Specification {
 			0 == securityService.getAssignableRoles(unPrivPerson).size()
 
 		when: 'the unprivileged account is assigned a role but still does not have necessary permission'
-			assert securityService.assignRoleCode(unPrivPerson, 'SUPERVISOR')
+			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.SUPERVISOR}")
 		then: 'it should fail to get the roles'
 			!securityService.getAssignableRoles(unPrivPerson)
 
 		when: 'the unprivileged account is assigned ADMIN role'
-			assert securityService.assignRoleCode(unPrivPerson, 'ADMIN')
+			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ADMIN}")
 			results = securityService.getAssignableRoles(unPrivPerson)
 		then: 'number of roles returned will have increased'
 			results.size() >= 6
@@ -167,21 +177,21 @@ class SecurityServiceTests extends Specification {
 			list = securityService.getAllRoles()
 		then: 'it should return all roles'
 			list.size() >= 6
-			list.find { it.id == 'ADMIN' }
-			list.find { it.id == 'USER' }
+			list.find { it.id == "${SecurityRole.ADMIN}" }
+			list.find { it.id == "${SecurityRole.USER}" }
 
 		when: 'calling getAllRoles with a the maxLevel of 30 getAllRoles'
 			list = securityService.getAllRoles(30)
 		then: 'it should return 3 roles'
 			list.size() == 3
-			list*.id == ['SUPERVISOR', 'EDITOR', 'USER']
+			list*.id == ["${SecurityRole.SUPERVISOR}", "${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
 	}
 
 	void '6 - Test the hasPermission for different user scenarios'() {
 		setup:
 			createPrivAccount()
 			createUnPrivAccount()
-			assert securityService.assignRoleCode(unPrivPerson, 'USER')
+			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.USER}")
 			String privPerm = 'ApplicationRestart'
 
 		expect: 'that calling hasPermission for privileged user with the ADMIN role returns true'
@@ -447,5 +457,42 @@ class SecurityServiceTests extends Specification {
 			List<PasswordReset> list = PasswordReset.findAllByStatus("PENDING") ?: []
 		then: 'the expired PasswordReset record should be removed'
 			list.size() <= initialNumOfPending
+	}
+
+	def '16. Calling currentUserPermissionAsMap as an unauthenticated user' () {
+		given:'a user whom is NOT authenticated'
+			securityService.logoutCurrentUser()
+		when:'the securityService.currentUserPermissionAsMap method is called'
+			Map permissions = securityService.currentUserPermissionMap()
+		then:'an empty map should be returned.'
+			permissions.isEmpty()
+	}
+
+	def '17. Calling currentUserPermissionAsMap as an authenticated and under privileged user' () {
+		given:'a user whom is authenticated and has only been assigned the User role'
+			createUserAccount()
+			securityService.assumeUserIdentity(userRoleUser.username, false)
+		when:'the securityService.currentUserPermissionAsMap method is called'
+			Map permissions = securityService.currentUserPermissionMap()
+		then:'a map should be returned containing multiple elements'
+			!permissions.isEmpty()
+		and:'the map should contain the Permission.UserGeneralAccess permission'
+			permissions.containsKey(Permission.UserGeneralAccess)
+		and:'the map should NOT contain the Permission.UserDelete permission'
+			!permissions.containsKey(Permission.UserDelete)
+	}
+
+	def '18. Calling currentUserPermissionAsMap as an authenticated and privileged user' () {
+		given:'a user whom is authenticated has been assigned the ADMIN role'
+		createPrivAccount()
+		securityService.assumeUserIdentity(privUser.username, false)
+		when:'the securityService.currentUserPermissionAsMap method is called'
+			Map permissions = securityService.currentUserPermissionMap()
+		then:'a map should be returned containing multiple elements'
+			!permissions.isEmpty()
+		and:'the map should contain the Permission.UserGeneralAccess permission'
+			permissions.containsKey(Permission.UserGeneralAccess)
+		and:'the map should also contain the Permission.UserDelete permission'
+			permissions.containsKey(Permission.UserDelete)
 	}
 }

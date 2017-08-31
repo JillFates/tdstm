@@ -36,7 +36,7 @@ class WsDepAnalyzerController implements ControllerMethods {
 			SELECT DISTINCT p.person_id AS personId,
 			CONCAT(CONCAT( IF(p.first_name = null, '', p.first_name), IF(STRCMP(' ', CONCAT(' ', p.middle_name)) = 0, '', CONCAT(' ', p.middle_name)) ),
 				IF(STRCMP(' ', CONCAT(' ', p.last_name)) = 0, '', CONCAT(' ', p.last_name))) AS name
-			FROM tdstm.asset_dependency_bundle adb
+			FROM asset_dependency_bundle adb
 			LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = adb.asset_id
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
 			RIGHT OUTER JOIN person p ON p.person_id = app.sme_id OR p.person_id = app.sme2_id

@@ -105,88 +105,6 @@ class MoveBundleAssetController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission(Permission.AssetEdit)
-	def assignAssetsToBundle() {
-		Project project = securityService.userCurrentProject
-		def moveBundle
-		if (params.containsKey('bundleId') && params.bundleId) {
-			if (!params.bundleId.isNumber()) {
-				log.error "assignAssetsToBundle: Invalid bundle id ($params.bundleId)"
-			}
-			else {
-				moveBundle = MoveBundle.get(params.bundleId)
-			}
-		}
-		else {
-			moveBundle = MoveBundle.findByProject(project, [sort: 'name', order: 'asc'])
-		}
-
-		def moveBundleLeft = MoveBundle.findByProject(moveBundle.project, [sort: 'name'])
-
-		redirect(action: 'assignAssetsToBundleChange',
-		         params: [bundleLeft: moveBundleLeft.id, bundleRight: moveBundle.id])
-	}
-
-	@HasPermission(Permission.AssetEdit)
-	def assignAssetsToBundleChange() {
-		def bundleRight = params.bundleRight
-		def bundleLeft = params.bundleLeft
-		String sortField = params.sortField == "lapplication" ? "application" : params.sortField
-		def sideField = params.sideField
-		def currentBundleAssets
-		def moveBundleAssets
-		def moveBundleRight = MoveBundle.get(bundleRight)
-		def moveBundleLeft = MoveBundle.get(bundleLeft)
-		def moveBundles = MoveBundle.findAllByProject(moveBundleRight.project, [sort: 'name'])
-		def sessionSort = session.getAttribute("sessionSort")
-		def sessionSide = session.getAttribute("sessionSide")
-		def sessionOrder = session.getAttribute("sessionOrder")
-		String sort
-		String order
-		if (bundleRight) {
-			sort = order = null
-			if (sideField == "right") {
-				sort = sortField
-				order = params.orderField
-			}
-			else if (sessionSide == "right") {
-				sort = sessionSort
-				order = sessionOrder
-			}
-			currentBundleAssets = findAllAssetEntityByBundle(moveBundleRight, sort, order)
-		}
-
-		if (bundleLeft) {
-			sort = order = null
-			if (sideField == "left") {
-				sort = sortField
-				order = params.orderField
-			}
-			else if (sessionSide == "left") {
-				sort = sessionSort
-				order = sessionOrder
-			}
-			moveBundleAssets = findAllAssetEntityByBundle(moveBundleLeft, sort, order)
-		}
-		else {
-			sort = order = null
-			if (sideField == "left") {
-				sort = sortField
-				order = params.orderField
-			}
-			else if (sessionSide == "left") {
-				sort = sessionSort
-				order = sessionOrder
-			}
-			moveBundleAssets = findAllAssetEntityByCurrentProject(sort, order)
-		}
-
-		render(view: 'assignAssets',
-		       model: [moveBundles: moveBundles, currentBundleAssets: currentBundleAssets, sortField: params.sortField,
-		               moveBundleInstance: moveBundleRight, moveBundleAssets: moveBundleAssets, sideField: params.sideField,
-		               leftBundleInstance: moveBundleLeft, orderField: params.orderField])
-	}
-
 	/*
 	 *  Sort Assets By Selected Row Column
 	 */
@@ -288,24 +206,6 @@ class MoveBundleAssetController implements ControllerMethods {
 		       model: [moveBundles: moveBundles, currentBundleAssets: currentBundleAssets, sortField: params.sort,
 		               moveBundleInstance: rightMoveBundle, leftBundleInstance: leftMoveBundle, orderField: params.order,
 		               moveBundleAssets: moveBundleAssets, sideField: params.side])
-	}
-
-	@HasPermission(Permission.AssetEdit)
-	def saveAssetsToBundle() {
-		def bundleFrom = params.bundleFrom
-		def bundleTo = params.bundleTo
-		def assets = params.assets
-
-		List<AssetEntity> moveBundleAssets = assetEntityAttributeLoaderService.saveAssetsToBundle(bundleTo, bundleFrom, assets)
-		if (!moveBundleAssets) {
-			moveBundleAssets = findAllAssetEntityByCurrentProject()
-		}
-
-		def items = moveBundleAssets.collect { AssetEntity assetEntity ->
-			[id: assetEntity.id, assetName: assetEntity.assetName, assetTag: assetEntity.assetTag,
-			 application: assetEntity.application, srcLocation: assetEntity.sourceLocation + "/" + assetEntity.sourceRack]
-		}
-		render items as JSON
 	}
 
 	//get teams for selected bundles.

@@ -464,6 +464,23 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/views" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "listDataviews"
+			]
+		}
+
+		"/ws/assetExplorer/view/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "getDataview",
+					POST: "createDataview",
+					PUT: "updateDataview",
+					DELETE: "deleteDataview"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

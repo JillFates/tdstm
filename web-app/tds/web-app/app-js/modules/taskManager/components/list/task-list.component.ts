@@ -7,7 +7,6 @@ import {StateService} from '@uirouter/angular';
 import {TaskStates} from '../../task-manager-routing.states';
 
 @Component({
-	moduleId: module.id,
 	selector: 'task-list',
 	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/list/task-list.component.html'
 })
