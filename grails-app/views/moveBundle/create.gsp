@@ -9,7 +9,6 @@
         width: 180px;
       }
     </style>
-    <r:layoutResources />
      <script type="text/javascript">
       function initialize(){
 
@@ -215,15 +214,13 @@
           <span class="button"><input class="save" type="submit" value="Save" onclick="return validateDates()"/></span>
         </div>
       </g:form>
-      <g:javascript>
+      <script>
         initialize();
-      </g:javascript>
+      </script>
     </div>
     <script>
     currentMenuId = "#eventMenu";
     $(".menu-parent-planning-list-bundles").addClass('active');
     $(".menu-parent-planning").addClass('active');
    </script>
-    <r:layoutResources />
-  </body>
 </html>
