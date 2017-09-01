@@ -57,7 +57,7 @@
 					</p>
 					<div class="checkbox">
 						<label>
-							<input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="showPasswordEditId"/> Hide password
+							<input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="showPasswordEditId" checked/> Hide password
 						</label>
 					</div>
 
@@ -67,7 +67,7 @@
 					</div>
 
 					<div class="form-group has-feedback">
-						<input type="text" id="passwordId" class="form-control passwordField" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)"/>
+						<input type="password" id="passwordId" class="form-control passwordField" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)"/>
 					</div>
 
 					<em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
