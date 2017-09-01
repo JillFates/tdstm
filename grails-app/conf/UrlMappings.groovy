@@ -54,6 +54,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/dependencies" {
+			controller = "wsAsset"
+			action = [
+					POST:"getAssetDependencies"
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {

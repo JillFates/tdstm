@@ -48,6 +48,13 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		scope.controller.showComment(commentTO, action);
 	});
 
+	/**
+	 * Invoke the view of Asset Dependency
+	 */
+	scope.$on('viewAssetDependency', function (evt, assetDependency) {
+		scope.controller.showAssetDependency(assetDependency);
+	});
+
 	scope.$on('editComment', function (evt, commentTO) {
 		scope.controller.editComment(commentTO);
 	});
@@ -154,6 +161,22 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 				},
 				action: function () {
 					return action;
+				}
+			}
+		});
+	}
+
+	this.showAssetDependency = function (assetDependency) {
+		scope.$broadcast('forceDialogClose', ['crud']);
+		modal.open({
+			templateUrl: utils.url.applyRootPath('/components/asset/asset-dependency-template.html'),
+			controller: tds.comments.controller.viewAssetDependencyDialogController,
+			scope: scope,
+			windowClass: 'modal-comment' ,
+			backdrop: 'static',
+			resolve: {
+				assetDependency: function () {
+					return assetDependency;
 				}
 			}
 		});
@@ -418,6 +441,30 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 		if (!isIE7OrLesser)
 			$("select.assetSelect").select2();
 	}
+
+};
+
+/**
+ * Controller that shows a comment
+ */
+tds.comments.controller.viewAssetDependencyDialogController = function ($window, $scope, $modalInstance, $log, $timeout, commentService, alerts, assetDependency, appCommonData, utils, commentUtils) {
+
+	$scope.assetDependency = assetDependency;
+
+	$modalInstance.opened.then(function (modalReady) {
+		$scope.$broadcast("popupOpened");
+	});
+
+
+	$scope.close = function () {
+		commentUtils.closePopup($scope, 'showComment');
+	};
+
+	$scope.$on('forceDialogClose', function (evt, types) {
+		if (types.indexOf('crud') > -1) {
+			$scope.close();
+		}
+	});
 
 };
 

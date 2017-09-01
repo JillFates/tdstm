@@ -1,0 +1,87 @@
+<div draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front"
+     style="width: 800px" tabindex="-1" data-keyboard="false">
+    <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+        <span id="ui-id-5" class="ui-dialog-title">Dependency Detail</span>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close"
+                role="button" aria-disabled="false" title="close" ng-click="close()">
+            <span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
+            <span class="ui-button-text">close</span>
+        </button>
+    </div>
+    <style>
+        .ui-dialog th {
+            background: white !important;
+        }
+        .dialog {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        div.ui-dialog table {
+            border-spacing: inherit !important;
+        }
+
+        div.ui-dialog table tr th,
+        div.ui-dialog table tr td{
+            border-top: 0px !important;
+        }
+
+        td.lbl-asset-dependency-direction {
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+    <div id="editCommentDialog" class="comment-dialog-content">
+        <loading-indicator></loading-indicator>
+        <form name="form" class="css-form" novalidate>
+            <div class="dialog">
+                <table class="table table-condensed" style="border: 0px;">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th>Environment</th>
+                            <th>Bundle</th>
+                            <th>Plan Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td></td>
+                        <td>{{assetDependency.assetA.name}}</td>
+                        <td>{{assetDependency.assetA.assetClass}}</td>
+                        <td>{{assetDependency.assetA.environment}}</td>
+                        <td>{{assetDependency.assetA.bundle}}</td>
+                        <td>{{assetDependency.assetA.planStatus}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="5" class="lbl-asset-dependency-direction">
+                            <span ng-if="assetDependency.assetA.dependency.id && !assetDependency.assetB.dependency.id">Depends On:</span>
+                            <span ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id">Bi-Directional Dependencies:</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>{{assetDependency.assetB.name}}</td>
+                        <td>{{assetDependency.assetB.assetClass}}</td>
+                        <td>{{assetDependency.assetB.environment}}</td>
+                        <td>{{assetDependency.assetB.bundle}}</td>
+                        <td>{{assetDependency.assetB.planStatus}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttons" ng-class="form.$invalid?'disabledButton' : ''">
+                <button type="button" id="saveAndCloseBId" class="btn btn-default tablesave"
+                        ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-ok"
+                                                                          aria-hidden="true"></span> Save
+                </button>
+                <button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span
+                        class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
