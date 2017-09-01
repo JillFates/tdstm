@@ -7,6 +7,9 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.PaginationCommand
+import net.transitionmanager.domain.Project
 
 /**
  * Asset Explorer main controller class that contains basic operation methods for exposed endpoints.
@@ -77,4 +80,102 @@ class WsAssetExplorerController implements ControllerMethods {
 		renderSuccessJson([status: DELETE_OK_STATUS] )
 	}
 
+	/**
+	 * Performs a query for the Asset Explorer data grid using a saved View Specification plus
+	 * filter parameters that the user may have entered plus their preferences for the view.
+	 * @params id - the reference id to the persisted dataView (URI) 
+	 * @param pagination - the pagination parameters (offset, limit) (JSON)
+	 * @param userParams - the filter and sorting that the user has control of when using the view (JSON)
+	 * @return A JSON List containing maps of each asset's properties (JSON)
+	 * 
+	 * Request:
+	 * 	POST data = {
+	 *		"offset":5,
+	 *		"limit": 25,
+	 *		"sortDomain: "application",
+	 *		"sortField: "sme",
+	 *		"sortOrder: "a",
+	 *		"filters: {
+	 *			"columns: [ 
+	 *				{"domain": "common", "property": "environment", "filter": "production|development" },
+	 *				{"domain": "common", "property": "assetName", "filter": "exchange" },
+	 *			],
+	 *		}
+	 *	}
+	 *
+	 * Response:
+	 *	[
+	 *		[ 
+	 *			common.id: 12, 
+	 *			common.name: 'Exchange',
+	 *			common.class: 'Application',
+	 *			common.bundle: 'M1',
+	 *			application.sme: 'Joe',
+	 *			application.owner: 'Tony'
+	 *		],
+	 *		[ 
+	 *			common.id: 23, 
+	 *			common.name: 'VM123',
+	 *			common.class: 'Device',
+	 *			common.bundle: 'M1',
+	 *			device.os: 'Windows'
+	 *			device.serial: '123123123',
+	 *			device.tag: 'TM-234'
+	 *		]
+	 *	]
+	 *
+	 */
+	@Secured('isAuthenticated()')
+	def query(Long id, PaginationCommand pagination, DataviewUserParamsCommand userParams) {
+		Project project = securityService.userCurrentProject
+
+		if (userParams.hasErrors()) {
+			renderErrorJson('User filtering was invalid')
+			return
+		}
+
+		// Eventually we'll incorporate the Users' override preferences on the dataview
+		// DataviewUserPreference userPref
+		// List<Map> data = dataviewService.query(project, id, userPref, userParams, pagination)
+
+		List<Map> data = dataviewService.query(project, AssetEntity, id, userParams, pagination)
+		renderSuccessJson(data)		
+	}
+
+	/**
+	 * Similar to query, the previewQuery method performs a query for the Asset Explorer data grid 
+	 * using a View Specification passed in to the query. There would be no user preferences because
+	 * the view doesn't exist yet.
+	 * @param pagination - the pagination parameters (offset, limit) (JSON)
+	 * @return A JSON List containing maps of each asset's properties (JSON)
+	 * 
+	 * Request:
+	 * 	URI: /tdstm/assetExplorer/previewQuery
+	 *	data = {
+	 *		"offset": 5,
+	 *		"limit": 25,
+	 *		"sortDomain": "application",
+	 *		"sortField": "sme',
+	 *		"sortOrder": "a",
+	 *		"viewSpec: {
+	 *			"domains": ["application", "device"],
+	 *			"columns": [ { "domain": "common", "property": "environment", "filter": "production" } ],
+	 *		}
+	 *	}
+	 *
+	 * Response:
+	 * 	  @see query
+	 */
+	@Secured('isAuthenticated()')
+	def previewQuery(PaginationCommand pagination) {
+		Project project = securityService.userCurrentProject
+
+		if (! request.JSON.containsKey('viewSpec')) {
+			// thrown new Invalid Params exception
+		}
+
+		List<Map> data = dataviewService.previewQuery(project, AssetEntity, request.JSON.viewSpec, pagination)
+		renderSuccessJson(data)		
+	}
+	
 }

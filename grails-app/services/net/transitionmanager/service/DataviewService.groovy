@@ -3,15 +3,19 @@
  */
 package net.transitionmanager.service
 
+import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
-import org.codehaus.groovy.grails.web.json.JSONObject
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.dataview.DataviewSpec
+
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * Service class with main database operations for Dataview.
@@ -49,9 +53,20 @@ class DataviewService implements ServiceMethods {
 	 */
 	Dataview fetch(Integer id) {
 		Dataview dataview = Dataview.get(id)
-		validateDataviewViewAccessOrException(dataview);
+		validateDataviewViewAccessOrException(dataview)
 
 		return dataview
+	}
+
+	/** 
+	 * Retrieve the Dataview specification from the database that is persisted as Json and converts to DataviewSpec
+	 * @param id - the id of the Dataview record
+	 * @return the DataviewSpec for the given Dataview
+	 */
+	DataviewSpec fetchAsDataviewSpec(Integer id) {
+		Dataview dataview = fetch(id)
+		DataviewSpec dataviewSpec = new DataviewSpec(dataview)
+		return dataviewSpec
 	}
 
 	/**
@@ -216,4 +231,138 @@ class DataviewService implements ServiceMethods {
 			throw new InvalidRequestException('Dataview JSON object was missing from request')
 		}
 	}
+
+
+	/**
+	 * Perform a query against one or domains specified in the DataviewSpec passed into the method
+	 * @param project - the project that the data should be isolated to 
+	 * @param domainClass - the principle domain Class that should be queried
+	 * @param dataviewSpec - the specifications for the view/query
+	 * @param userParams - parameters from the user for filtering and sort order
+	 * @param userPrefs - any user perferences that the user may have for a give dataview (change of columns)
+	 * @return a List of Map values
+	 */
+	// TODO : Annotate READONLY
+	List<Map> query(
+		Project project, 
+		Class domainClass, 
+		Long dataviewId, 
+		DataviewUserParamsCommand userParams) 
+	{
+
+		Dataview dataview = Dataview.get(dataviewId)
+		DataviewSpec dataviewSpec = new DataviewSpec(dataview)
+
+		return previewQuery(project, domainClass, dataviewSpec, userParams, userPrefs)
+	}
+
+	/**
+	 * Perform a query against one or domains specified in the DataviewSpec passed into the method
+	 * @param project - the project that the data should be isolated to 
+	 * @param domainClass - the principle domain Class that should be queried
+	 * @param dataviewSpecJson - the specifications for the view/query as JSON
+	 * @param userParams - parameters from the user for filtering and sort order
+	 * @param userPrefs - any user perferences that the user may have for a give dataview (change of columns)
+	 * @return a List of Map values
+	 * 
+	 * Example return values:
+	 *		[
+	 *			[ 
+	 *				common.id: 12, 
+	 *				common.name: 'Exchange',
+	 *				common.class: 'Application',
+	 *				common.bundle: 'M1',
+	 *				application.sme: 'Joe',
+	 *				application.owner: 'Tony'
+	 *			],
+	 *			[ 
+	 *				common.id: 23, 
+	 *				common.name: 'VM123',
+	 *				common.class: 'Device',
+	 *				common.bundle: 'M1',
+	 *				device.os: 'Windows'
+	 *				device.serial: '123123123',
+	 *				device.tag: 'TM-234'
+	 *			]
+	 *		]
+	 */
+	// TODO : Annotate READONLY
+	List<Map> previewQuery(
+		Project project, 
+		Class domainClass, 
+		JSONObject dataviewSpecJson, 
+		DataviewUserParamsCommand userParams) 
+	{
+		List<Map> results = []
+
+		DataviewSpec dataviewSpec = new DataviewSpec(dataviewSpecJson)
+		
+		// Get the Field Specs for the given domains
+		dataviewSpec.domains.each { domain ->
+
+		}
+
+		// As HQL we know that this will work
+		StringBuilder hql = new StringBuilder('from AssetEntity a where a.project=:project and (os like :os OR businessUnit=:bu)')
+		List assets = AssetEntity.executeQuery(hql.toString(), [os:'windows', bu: 'HR'])
+
+		/* This would fail	
+		def dc = AssetEntity.where {
+			project == project
+			(os ~= 'windows' || businessUnit == 'bu')
+		}
+		*/
+		
+		// Create a DetachedCriteria
+		def dc = domainClass.where {
+			project == project
+		}
+
+		// Checkout SqlRestrictions
+		// https://stackoverflow.com/questions/20954616/gorm-detached-query-by-field-of-inherited-class
+
+		// Add where criteria based on the filters
+			//dc.and('....')
+		dataviewSpec.columns.each { column ->
+			if (column.filter) {
+				// Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
+
+				// TODO : In ticket TM-6532 we'll expand on the different types of queries
+			}
+		}
+
+		// Add the Projections OR columns to query
+		dataviewSpec.columns.each {
+			// Always request assetClass so you can match up the columns for the output map
+
+			// Possibly use the AS command (e.g.  businessUnit AS 'application.businessUnit')
+
+			// custom5 as 'application.custom5'
+			// custom5 as 'device.custom5'
+
+		}
+
+		// Add order
+
+		// Add pagination
+
+		// Excute Query
+		//domainClass.executeQuery(hql.toString(), parameters)
+
+
+		// Strip out non assetClass data that may have leaked into the result set. This only needs to be addressed if 
+		// there is more than domain in the query.
+		// [ 
+		// 	common.id: 123,
+		// 	common.assetName: 'foo',
+		// 	common.assetClass: 'Application',
+		// 	application.businessUnit: 'HR',
+		// 	device.os: ''
+		// ]
+		// Because it is assetClass Application, the device properties should be removed but the common to remain.
+
+		return results
+	}
+
+
 }

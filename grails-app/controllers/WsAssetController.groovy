@@ -151,21 +151,25 @@ class WsAssetController implements ControllerMethods {
 			}
 		}
 
-		if(errors){
+		if (errors) {
 			renderFailureJson(errors)
-		}else{
+		} else {
 			renderSuccessJson([assetId : clonedAsset.id])
 		}
 	}
 
 	@HasPermission(Permission.AssetView)
 	def getAsset(Long id){
+		// TODO - Fetching an asset should ALWAYS check for Project of the user 
+		// If not found for 
 		AssetEntity asset = AssetEntity.get(id)
-		if(asset) {
+		if (asset) {
 			renderSuccessJson([result: asset])
 		} else {
+			// TODO  - should be using ControlMethods instead of duplication code
 			response.status = 404 //Not Found
-			render "${id} not found."
+			render "${id} not found"
 		}
 	}
+
 }
