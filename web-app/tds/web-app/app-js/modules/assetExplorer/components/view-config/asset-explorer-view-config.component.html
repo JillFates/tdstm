@@ -122,22 +122,19 @@
 				</div>
 				<div class="tab-pane" style="padding-left:15px" id="tab_3">
 					<div class="row">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<div class="form-group">
 								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
 								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="model.schema.columns" [navigatable]="true" [animation]="false"
-								 [emptyItemStyle]="{'cursor': 'default'}" [activeItemStyle]="{'opacity': '.7'}" [itemStyle]="{'cursor': 'pointer', 'margin-bottom': '5px'}"
-								 emptyText="">
+								 class="row" itemClass="item col-xs-2" activeItemClass="item col-xs-2 active" disabledItemClass="item col-xs-2 disabled"
+								 [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
 									<ng-template let-item="item" let-index="index">
-										<div style="height:35px;">
-											<label style="margin-top:8px;font-weight: normal" for="">{{item.label}}</label>
+										<div>
+											<label style="margin-top:5px;font-weight: normal" for="">{{item.label}}</label>
 											<div class="checkbox pull-right" style="margin:5px;">
 												<label for="">
 														<input type="checkbox" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> Locked
 												</label>
-											</div>
-											<div  class="pull-right" style="width: 65px;">
-												<input title="Column width" type="number" min="0" class="form-control" [(ngModel)]="item.width" name="width_{{item.domain+'.'+item.property}}">
 											</div>
 										</div>
 									</ng-template>

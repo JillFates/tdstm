@@ -1,9 +1,10 @@
-<kendo-grid>
-	<kendo-grid-column [sortable]="{mode:'multiple'}"  *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}.{{column.property}}"
-	[width]="column.width">
+<kendo-grid (mouseup)="onMouseUp()" (mousemove)="onMouseMove($event)">
+	<kendo-grid-column [sortable]="{mode:'multiple'}" *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}.{{column.property}}"
+	 [width]="column.width">
 		<ng-template kendoGridHeaderTemplate>
 			<div>
 				<label for=""> {{column.label}}</label>
+				<i style="cursor:e-resize" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i>
 			</div>
 			<div class=" has-feedback" style="margin-bottom:0px;">
 				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Default Filter"
