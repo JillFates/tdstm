@@ -33,13 +33,15 @@ export class SelectListConfigurationPopupComponent {
 	 * Custom Field to edit.
 	 */
 	@Input() field: FieldSettingsModel;
-
 	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
 
 	public items: any[] = [];
 	public newItem = '';
 	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
+	protected sortType: string;
+	private ASCENDING_ORDER = 'asc';
+	private DESCENDING_ORDER = 'desc';
 
 	/**
 	 * Class constructor.
@@ -53,6 +55,7 @@ export class SelectListConfigurationPopupComponent {
 	 */
 	private load(): void {
 		this.newItem = '';
+		this.sortType = null;
 		this.defaultValue = null;
 		this.customService.getDistinctValues(this.domain, this.field)
 			.subscribe((value: string[]) => {
@@ -106,6 +109,10 @@ export class SelectListConfigurationPopupComponent {
 				value: this.newItem
 			});
 			this.newItem = '';
+			// sort if needed.
+			if (this.sortType) {
+				this.sortItems();
+			}
 			setTimeout(function () {
 				jQuery('#newItem').focus();
 			});
@@ -147,14 +154,33 @@ export class SelectListConfigurationPopupComponent {
 	 * Function to handle onclick Sort button event.
 	 * Auto-sort the items array, sort order is alphabetic ascending (up).
 	 */
-	public onSort(): void {
-		this.items.sort(comparator);
+	public toggleSort(): void {
+		if (!this.sortType || this.sortType === this.DESCENDING_ORDER) {
+			this.sortType = this.ASCENDING_ORDER;
+		} else {
+			this.sortType = this.DESCENDING_ORDER;
+		}
+		this.sortItems();
+	}
 
-		function comparator(a, b) {
-			if (a.value < b.value) {
+	private sortItems(): void {
+		this.items.sort(this.sortType === this.ASCENDING_ORDER ? ascendingSort : descendingSort);
+
+		function ascendingSort(a, b) {
+			if (a.value.toUpperCase() < b.value.toUpperCase()) {
 				return -1;
 			}
-			if (a.value > b.value) {
+			if (a.value.toUpperCase() > b.value.toUpperCase()) {
+				return 1;
+			}
+			return 0;
+		}
+
+		function descendingSort(a, b) {
+			if (a.value.toUpperCase() > b.value.toUpperCase()) {
+				return -1;
+			}
+			if (a.value.toUpperCase() < b.value.toUpperCase()) {
 				return 1;
 			}
 			return 0;

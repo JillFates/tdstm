@@ -20,8 +20,12 @@
                         </button>
                     </div>
                     <div class="col-sm-2" style="padding-top: 2px;">
-                        <button style="float:right" name="sortButton" class="btn btn-default btn-xs" [disabled]="items.length === 0" (click)="onSort()">
-                            <i class="fa fa-sort-alpha-asc"></i> {{'GLOBAL.SORT' | translate}}
+                        <button style="float:right" name="sortButton" class="btn btn-default btn-xs" [disabled]="items.length === 0" (click)="toggleSort()">
+                            <i class="fa" [ngClass]="{'fa-sort': !sortType,
+                                                        'fa-sort-alpha-asc': sortType === ASCENDING_ORDER,
+                                                        'fa-sort-alpha-desc': sortType === DESCENDING_ORDER}">
+
+                            </i>{{'GLOBAL.SORT' | translate}}
                         </button>
                     </div>
                 </div>
