@@ -8,10 +8,6 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.json.JSONObject
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.UnauthorizedException
-import net.transitionmanager.service.InvalidRequestException
 
 /**
  * Service class with main database operations for Dataview.
@@ -49,7 +45,7 @@ class DataviewService implements ServiceMethods {
 	 */
 	Dataview fetch(Integer id) {
 		Dataview dataview = Dataview.get(id)
-		validateDataviewViewAccessOrException(dataview);
+		validateDataviewViewAccessOrException(id, dataview);
 
 		return dataview
 	}
@@ -63,7 +59,7 @@ class DataviewService implements ServiceMethods {
 	 */
 	Dataview update(Integer id, JSONObject dataviewJson) {
 		Dataview dataview = Dataview.get(id)
-		validateDataviewUpdateAccessOrException(dataviewJson, dataview)
+		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
 
 		dataview.with {
 			reportSchema = dataviewJson.schema
@@ -112,7 +108,7 @@ class DataviewService implements ServiceMethods {
 	 */
 	void delete(Integer id) {
 		Dataview dataview = Dataview.get(id)
-		validateDataviewDeleteAccessOrException(dataview)
+		validateDataviewDeleteAccessOrException(id, dataview)
 
 		dataview.delete()
 	}
@@ -124,7 +120,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview
 	 * @throws InvalidRequestException
 	 */
-	void validateDataviewViewAccessOrException(Dataview dataview) {
+	void validateDataviewViewAccessOrException(Integer id, Dataview dataview) {
 		boolean throwNotFound = false
 		if (!dataview) {
 			throwNotFound = true
@@ -147,7 +143,7 @@ class DataviewService implements ServiceMethods {
 
 		// Throw an exception if any of the above falied
 		if (throwNotFound) {
-			throw new EmptyResultException("Dataview not found (${dataview.id})")
+			throw new EmptyResultException("Dataview not found ($id})")
 		}
 	}
 
@@ -157,8 +153,8 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewUpdateAccessOrException(JSONObject dataviewJson, Dataview dataview) {
-		validateDataviewViewAccessOrException(dataview)
+	void validateDataviewUpdateAccessOrException(Integer id, JSONObject dataviewJson, Dataview dataview) {
+		validateDataviewViewAccessOrException(id, dataview)
 		validateDataviewJson(dataviewJson, UPDATE_PROPERTIES)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemEdit : Permission.AssetExplorerEdit
@@ -189,8 +185,8 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewDeleteAccessOrException(Dataview dataview) {
-		validateDataviewViewAccessOrException(dataview)
+	void validateDataviewDeleteAccessOrException(Integer id, Dataview dataview) {
+		validateDataviewViewAccessOrException(id, dataview)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemDelete : Permission.AssetExplorerDelete
 		if (! securityService.hasPermission(requiredPerm)) {
