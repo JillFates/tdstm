@@ -136,27 +136,33 @@ trait ControllerMethods {
 	 * @param log - the logger object to log to
 	 */
 	void handleException(Exception e, log) {
-		if (e instanceof UnauthorizedException || e instanceof IllegalArgumentException) {
-			sendForbidden()
+
+		switch(e) {
+			case UnauthorizedException:
+			case IllegalArgumentException:
+				sendForbidden()
+				break
+
+			case EmptyResultException:
+				sendMethodFailure()
+				break
+
+			case InvalidParamException:
+			case DomainUpdateException:
+				renderErrorJson(e.message)
+				break
+
+			case InvalidRequestException:
+				renderErrorJson('The request was invalid')
+				break
+
+			default:
+				if (log) {
+					log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 20)
+				}
+				renderErrorJson('An unresolved error has occurred')
 		}
-		else if (e instanceof EmptyResultException) {
-			sendMethodFailure()
-		}
-		else if (e instanceof ValidationException) {
-			renderAsJson errorsInValidation(e.errors)
-		}
-		else if (e instanceof InvalidParamException || e instanceof DomainUpdateException) {
-			renderErrorJson(e.message)
-		}
-		else if (e instanceof InvalidRequestException) {
-			renderErrorJson('The request was invalid')
-		}
-		else {
-			if (log) {
-				log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 20)
-			}
-			renderErrorJson('An unresolved error has occurred')
-		}
+
 	}
 
 	/**
