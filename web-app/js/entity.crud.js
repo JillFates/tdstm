@@ -1104,8 +1104,8 @@ var EntityCrud = (function ($) {
 			data: assetDependencies,
 			success: function (resp) {
 				var currentScope = angular.element('.body').scope();
-				if(currentScope && action === 'view') {
-					currentScope.$emit('viewAssetDependency', resp.data);
+				if(currentScope) {
+					currentScope.$emit('viewAssetDependency', resp.data, action);
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {

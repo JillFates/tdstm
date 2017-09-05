@@ -51,8 +51,8 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 	/**
 	 * Invoke the view of Asset Dependency
 	 */
-	scope.$on('viewAssetDependency', function (evt, assetDependency) {
-		scope.controller.showAssetDependency(assetDependency);
+	scope.$on('viewAssetDependency', function (evt, assetDependency, action) {
+		scope.controller.showAssetDependency(assetDependency, action);
 	});
 
 	scope.$on('editComment', function (evt, commentTO) {
@@ -166,7 +166,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		});
 	}
 
-	this.showAssetDependency = function (assetDependency) {
+	this.showAssetDependency = function (assetDependency, action) {
 		scope.$broadcast('forceDialogClose', ['crud']);
 		modal.open({
 			templateUrl: utils.url.applyRootPath('/components/asset/asset-dependency-template.html'),
@@ -177,6 +177,9 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			resolve: {
 				assetDependency: function () {
 					return assetDependency;
+				},
+				action: function() {
+					return action;
 				}
 			}
 		});
@@ -447,24 +450,64 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 /**
  * Controller that shows a comment
  */
-tds.comments.controller.viewAssetDependencyDialogController = function ($window, $scope, $modalInstance, $log, $timeout, commentService, alerts, assetDependency, appCommonData, utils, commentUtils) {
+tds.comments.controller.viewAssetDependencyDialogController = function ($window, $scope, $modal, $modalInstance, $log, $timeout, commentService, alerts, assetDependency, action, appCommonData, utils, commentUtils) {
 
 	$scope.assetDependency = assetDependency;
+	$scope.actionTypeEdit = (action === 'edit');
 
+	/**
+	 * Broadcast a model has been opened
+	 */
 	$modalInstance.opened.then(function (modalReady) {
 		$scope.$broadcast("popupOpened");
 	});
 
-
+	/**
+	 * Close Current Modal opened
+	 */
 	$scope.close = function () {
 		commentUtils.closePopup($scope, 'showComment');
 	};
 
+	/**
+	 * If another modal request to close this dialog
+	 */
 	$scope.$on('forceDialogClose', function (evt, types) {
 		if (types.indexOf('crud') > -1) {
 			$scope.close();
 		}
 	});
+
+
+	/**
+	 * On delete invoke the Confirmation Modal instead of the plain javaScript confirmation
+	 */
+	$scope.onDeleteDependency = function() {
+		$modal.open({
+			templateUrl: utils.url.applyRootPath('/components/modal/modal-confirmation-template.html'),
+			controller:  function($scope){
+				$scope.confirmMessage = 'Are you sure you would like to delete this dependency?';
+
+				$scope.onConfirmAction = function() {
+					$scope.$close('close');
+				};
+
+				$scope.closeConfirmation = function() {
+					$scope.$close('close');
+				};
+			},
+			scope: $scope,
+			windowClass: 'modal-comment',
+			backdrop: 'static'
+		});
+	}
+
+	/**
+	 * Change from View Mode into Edit Mode
+	 */
+	$scope.onEditDependency = function() {
+		$scope.actionTypeEdit = true;
+	}
 
 };
 

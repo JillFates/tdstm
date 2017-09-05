@@ -1,5 +1,5 @@
 <div draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front"
-     style="width: 800px" tabindex="-1" data-keyboard="false">
+     style="width: 650px" tabindex="-1" data-keyboard="false">
     <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
         <span id="ui-id-5" class="ui-dialog-title">Dependency Detail</span>
         <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close"
@@ -28,31 +28,29 @@
         }
 
         td.lbl-asset-dependency-direction,
-        form.dependency-edit-fields div.legend-fields {
+        form.dependency-edit-fields td.legend-fields {
             font-weight: bold;
             color: green;
             font: 12px helvetica, arial, sans-serif !important;
         }
 
-        form.dependency-edit-fields label.form-control {
-            border: 0px !important;
-            height: 27px;
-            font: 12px helvetica, arial, sans-serif !important;
+        form.dependency-edit-fields table {
+            border: 0px;
         }
 
         form.dependency-edit-fields div.form-group {
-            margin-bottom: 0px !important;
+            height: 24px;
             font: 12px helvetica, arial, sans-serif !important;
         }
 
-        form.dependency-edit-fields div.dependency-edit-fields-container {
-            margin-left: 66px;
+        form.dependency-edit-fields label.control-label {
+            text-align: left;
         }
     </style>
     <div id="editCommentDialog" class="comment-dialog-content">
         <loading-indicator></loading-indicator>
         <div class="dialog">
-            <table class="table table-condensed" style="border: 0px;">
+            <table class="table table-condensed" style="border: 0px; margin-bottom: 0px;">
                 <thead>
                 <tr>
                     <th>Action</th>
@@ -91,84 +89,72 @@
             </table>
 
             <form class="form-horizontal dependency-edit-fields">
-                <div class="row dependency-edit-fields-container legend-fields">
-                    <div class="col-md-6" ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id">
-                        {{assetDependency.assetA.name}} <br />
-                        Depends On:  <br />
-                        {{assetDependency.assetB.name}}
-                    </div>
-                    <div class="col-md-6">
-                        {{assetDependency.assetB.name}} <br />
-                        Depends On:  <br />
-                        {{assetDependency.assetA.name}}
-                    </div>
-                </div>
-                <div class="row dependency-edit-fields-container">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="inputFrequencyA" class="col-sm-2 control-label">Frequency</label>
-                            <div class="col-sm-10">
-                                <label id="inputFrequencyA" class="form-control input-max-size">{{assetDependency.assetA.dependency.dataFlowFreq}}</label>
+                <table>
+                    <tr ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id">
+                        <td></td>
+                        <td class="legend-fields">
+                            {{assetDependency.assetA.name}} <br />
+                            Depends On:  <br />
+                            {{assetDependency.assetB.name}}
+                        </td>
+                        <td class="legend-fields">
+                            {{assetDependency.assetB.name}} <br />
+                            Depends On:  <br />
+                            {{assetDependency.assetA.name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 100px;">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Frequency</label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputTypeA" class="col-sm-2 control-label">Type</label>
-                            <div class="col-sm-10">
-                                <label id="inputTypeA"
-                                       class="form-control">{{assetDependency.assetA.dependency.type}}</label>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Type</label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputStatusA" class="col-sm-2 control-label">Status</label>
-                            <div class="col-sm-10">
-                                <label id="inputStatusA" class="form-control">{{assetDependency.assetA.dependency.status}}</label>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Status</label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputCommentA" class="col-sm-2 control-label">Comment</label>
-                            <div class="col-sm-10">
-                                <label id="inputCommentA" class="form-control">{{assetDependency.assetA.dependency.comment}}</label>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Comment</label>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6" ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id">
-                        <div class="form-group">
-                            <label for="inputFrequencyB" class="col-sm-2 control-label">Frequency</label>
-                            <div class="col-sm-10">
-                                <label id="inputFrequencyB" class="form-control input-max-size">{{assetDependency.assetB.dependency.dataFlowFreq}}</label>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetA.dependency.dataFlowFreq}}</label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputTypeB" class="col-sm-2 control-label">Type</label>
-                            <div class="col-sm-10">
-                                <label id="inputTypeB"
-                                       class="form-control">{{assetDependency.assetB.dependency.type}}</label>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetA.dependency.type}}</label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputStatusB" class="col-sm-2 control-label">Status</label>
-                            <div class="col-sm-10">
-                                <label id="inputStatusB" class="form-control">{{assetDependency.assetB.dependency.status}}</label>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetA.dependency.status}}</label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputCommentB" class="col-sm-2 control-label">Comment</label>
-                            <div class="col-sm-10">
-                                <label id="inputCommentB" class="form-control">{{assetDependency.assetB.dependency.comment}}</label>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetA.dependency.comment}}</label>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </td>
+                        <td ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetB.dependency.dataFlowFreq}}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetB.dependency.type}}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetB.dependency.status}}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{assetDependency.assetB.dependency.comment}}</label>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </form>
         </div>
         <div class="buttons" ng-class="form.$invalid?'disabledButton' : ''">
-            <button type="button" id="saveAndCloseBId" class="btn btn-default tablesave"
-                    ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-ok"
-                                                                      aria-hidden="true"></span> Save
-            </button>
-            <button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span
-                    class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel
-            </button>
+            <button type="button" id="editDependency" class="btn btn-default tablesave" ng-click="onEditDependency()" ng-if="!actionTypeEdit"><img src="../icons/database_edit.png" border="0px"> Edit</button>
+            <button type="button" id="saveAndCloseDependency" class="btn btn-default tablesave" ng-click="onSaveDependency()" ng-if="actionTypeEdit"><img src="../icons/database_save.png" border="0px"> Update</button>
+            <button type="button" id="deleteDependency" class="btn btn-default tablesave" ng-click="onDeleteDependency()" ng-if="!actionTypeEdit"><img src="../icons/database_delete.png" border="0px"> Delete</button>
+            <button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
         </div>
     </div>
 </div>
