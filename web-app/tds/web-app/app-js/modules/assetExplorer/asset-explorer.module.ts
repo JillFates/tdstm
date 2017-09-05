@@ -18,6 +18,7 @@ import { Permission } from '../../shared/model/permission.model';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { ExcelExportModule } from '@progress/kendo-angular-excel-export';
+import { SortableModule } from '@progress/kendo-angular-sortable';
 // Services
 import { AssetExplorerService } from './service/asset-explorer.service';
 
@@ -29,6 +30,7 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		DropDownListModule,
 		GridModule,
 		ExcelExportModule,
+		SortableModule,
 		UIRouterModule.forChild({ states: ASSET_EXPLORER_STATES })
 	],
 	declarations: [

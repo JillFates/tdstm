@@ -4,7 +4,7 @@ export class QueryColumn {
 }
 
 export class ViewColumn extends QueryColumn {
-	width?= 50;
+	width?= 200;
 	locked?= false;
 	edit?= false;
 	filter?= '';
