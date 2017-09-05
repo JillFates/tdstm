@@ -3,6 +3,7 @@
  */
 package net.transitionmanager.service
 
+import com.tds.asset.AssetEntity
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.domain.Dataview
@@ -290,15 +291,15 @@ class DataviewService implements ServiceMethods {
 	List<Map> previewQuery(
 		Project project, 
 		Class domainClass, 
-		JSONObject dataviewSpecJson, 
-		DataviewUserParamsCommand userParams) 
+		DataviewUserParamsCommand userParams,
+		PaginationCommand pagination)
 	{
 		List<Map> results = []
 
-		DataviewSpec dataviewSpec = new DataviewSpec(dataviewSpecJson)
+		DataviewSpec dataviewSpec = new DataviewSpec()
 		
 		// Get the Field Specs for the given domains
-		dataviewSpec.domains.each { domain ->
+        userParams.filters.domains.each { domain ->
 
 		}
 
@@ -323,7 +324,7 @@ class DataviewService implements ServiceMethods {
 
 		// Add where criteria based on the filters
 			//dc.and('....')
-		dataviewSpec.columns.each { column ->
+        userParams.filters.columns.each { column ->
 			if (column.filter) {
 				// Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
 
@@ -332,7 +333,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		// Add the Projections OR columns to query
-		dataviewSpec.columns.each {
+        userParams.filters.columns.each {
 			// Always request assetClass so you can match up the columns for the output map
 
 			// Possibly use the AS command (e.g.  businessUnit AS 'application.businessUnit')

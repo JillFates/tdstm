@@ -481,6 +481,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/previewQuery" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "previewQuery"
+			]
+		}
+
+		"/ws/assetExplorer/query/$id" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "query"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

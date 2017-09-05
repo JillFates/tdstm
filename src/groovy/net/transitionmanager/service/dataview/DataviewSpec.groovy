@@ -3,6 +3,7 @@ package net.transitionmanager.service.dataview
 // import net.transitionmanager.domain.Dataview
 import com.tdssrc.grails.JsonUtil
 import groovy.transform.CompileStatic
+import net.transitionmanager.domain.Dataview
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
