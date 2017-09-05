@@ -55,10 +55,6 @@ export const assetExplorerReportSelectorState: Ng2StateDeclaration = <Ng2StateDe
 	]
 };
 
-let assetExplorerReportSelectorStateCopy: Ng2StateDeclaration = { ...assetExplorerReportSelectorState };
-assetExplorerReportSelectorStateCopy.url += '/';
-assetExplorerReportSelectorStateCopy.name += 'Copy';
-
 export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 	name: AssetExplorerStates.REPORT_CREATE.name,
 	url: AssetExplorerStates.REPORT_CREATE.url,
@@ -153,7 +149,11 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 
 export const ASSET_EXPLORER_STATES = [
 	assetExplorerReportSelectorState,
-	assetExplorerReportSelectorStateCopy,
 	assetExplorerReportCreatorState,
-	assetExplorerReportEditState
+	assetExplorerReportEditState,
+	{
+		name: 'tds.assetexplorerCopy',
+		url: '/assetexplorer/views/',
+		redirectTo: 'tds.assetexplorer'
+	}
 ];
