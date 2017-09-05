@@ -44,6 +44,14 @@ class LicenseAdminService extends LicenseCommonService {
 	MailService mailService
 	SecurityService	securityService
 
+	LicenseAdminService() {
+		if(!licenseCache.getCache(CACHE_NAME)) {
+			log.debug("configuring cache")
+			Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, TTL, 0)
+			licenseCache.addCache(memoryOnlyCache)
+		}
+	}
+
 	/**
 	 * Initialize the license service, configuring the cache and the licensing library
 	 * this is run only once when invoked unless is forced (in testing)
@@ -58,13 +66,6 @@ class LicenseAdminService extends LicenseCommonService {
 			log.debug("LAdmin is Enabled?: {} && !loaded: {}", isEnabled(), !loaded)
 			loaded = true
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
-
-			if(!licenseCache.getCache(CACHE_NAME)) {
-				log.debug("configuring cache")
-
-				Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, TTL, 0)
-				licenseCache.addCache(memoryOnlyCache)
-			}
 
 			if(isLGen()) {
 				log.debug("License Manager Enabled")
