@@ -478,6 +478,34 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($window,
 		}
 	});
 
+	$scope.deleteDependencies = function(asset) {
+
+		if($scope.assetDependency[asset].dependency) {
+			var assetDependency = {
+				assetId: $scope.assetDependency[asset].dependency.asset.id,
+				dependencyId:  $scope.assetDependency[asset].dependency.id
+			};
+
+			var url = tdsCommon.createAppURL('/ws/asset/dependencies/delete');
+
+			jQuery.ajax({
+				url: url,
+				type: 'POST',
+				data: assetDependency,
+				success: function (resp) {
+					console.log(resp)
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					var err = jqXHR.responseText;
+					alert("An error occurred while loading the asset edit form." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
+					return false;
+				}
+			});
+		}
+
+
+	}
+
 
 	/**
 	 * On delete invoke the Confirmation Modal instead of the plain javaScript confirmation
@@ -489,6 +517,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($window,
 				$scope.confirmMessage = 'Are you sure you would like to delete this dependency?';
 
 				$scope.onConfirmAction = function() {
+					$scope.deleteDependencies('assetA');
+					$scope.deleteDependencies('assetB');
 					$scope.$close('close');
 				};
 

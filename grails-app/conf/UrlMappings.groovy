@@ -57,7 +57,14 @@ class UrlMappings {
 		"/ws/asset/dependencies" {
 			controller = "wsAsset"
 			action = [
-					POST:"getAssetDependencies"
+					POST:"getAssetDependencies",
+			]
+		}
+
+		"/ws/asset/dependencies/delete" {
+			controller = "wsAsset"
+			action = [
+					POST:"deleteAssetDependency",
 			]
 		}
 

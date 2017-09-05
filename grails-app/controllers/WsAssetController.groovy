@@ -8,6 +8,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.SecurityService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 
@@ -19,6 +20,7 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
+	AssetEntityService assetEntityService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -180,7 +182,7 @@ class WsAssetController implements ControllerMethods {
 	def getAssetDependencies(Long assetAId, Long assetBId){
 		AssetEntity assetA = AssetEntity.get(assetAId)
 		AssetEntity assetB = AssetEntity.get(assetBId)
-		//check that the assets are part of the project
+		// check that the assets are part of the project
 		if(!securityService.isCurrentProjectId(assetA.projectId) || !securityService.isCurrentProjectId(assetB.projectId)){
 			log.error(
 					"Security Violation, user {} attempted to access an asset not associated to the project",
@@ -227,6 +229,20 @@ class WsAssetController implements ControllerMethods {
 		]
 
 		renderSuccessJson(dependencyMap)
+	}
+
+	/**
+	 * Delete a dependency from an Asset.
+	 * @param assetAId
+	 * @param assetBId
+	 * @param dependencyA
+	 * @param dependencyB
+	 */
+	@HasPermission(Permission.AssetEdit)
+	def deleteAssetDependency(Long assetId, Long dependencyId){
+		AssetEntity assetEntity = AssetEntity.get(assetId)
+
+		assetEntityService.deleteAssetEntityDependency(securityService.getUserCurrentProject(), assetEntity, dependencyId)
 	}
 
 }

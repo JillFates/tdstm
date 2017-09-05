@@ -604,6 +604,49 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Delete a Dependency from an Asset Entity
+	 * @param project
+	 * @param assetEntity
+	 * @param dependencyId
+	 */
+	def deleteAssetEntityDependency(Project project, AssetEntity assetEntity, Long dependencyId) {
+		String error
+		try {
+			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
+				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
+			}
+
+			// Verifying assetEntity assigned to the project
+			validateAssetsAssocToProject([assetEntity.id], project)
+
+			// Collecting dependency id and fetching the instance
+			AssetDependency toDelDepObj = dependencyId ? AssetDependency.get(dependencyId).find() : []
+
+			// Delete dependency
+			if (toDelDepObj) {
+				// Gather the assets referenced by the dependendency and make sure is associated to the project
+				validateAssetsAssocToProject([toDelDepObj.id], project)
+
+				// Delete the dependencies
+				AssetDependency.executeUpdate('delete AssetDependency where id = (:id)', [id: toDelDepObj.id])
+			}
+
+		} catch (DomainUpdateException | InvalidRequestException e) {
+			error = e.message
+		} catch (RuntimeException rte) {
+			//rte.printStackTrace()
+			log.error ExceptionUtil.stackTraceToString(rte, 60)
+			error = 'An error occurred that prevented the update'
+		}
+
+		if (error) {
+			assetEntity.discard()
+			transactionStatus.setRollbackOnly()
+			throw new DomainUpdateException(error)
+		}
+	}
+
+	/**
 	 * A helper method for createOrUpdateAssetEntityAndDependencies which does the actual adds and
 	 * updates of dependencies from the web request
 	 * @param project - instance of the user's currently assigned project
