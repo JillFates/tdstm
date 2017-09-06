@@ -12,6 +12,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.dataview.DataviewSpec
 
 /**
  * Asset Explorer main controller class that contains basic operation methods for exposed endpoints.
@@ -163,7 +164,7 @@ class WsAssetExplorerController implements ControllerMethods {
 	 *			"domains": [ "application", "device" ],
 	 *			"columns": [
 	 *						{ "domain": "common", "property": "environment", "filter": "production" },
-	 *						{ "domain": "application", "property": "bundle", "filter": "production" }
+	 *						{ "domain": "application", "property": "bundle", "filter": "" }
 	 *			],
 	 *		}
 	 *	}

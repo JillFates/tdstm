@@ -51,12 +51,13 @@ class WsAssetExplorerControllerSpec extends AbstractUnitSpec {
                 "offset":5,
                 "limit": 25,
                 "sortDomain": "application",
-                "sortProperty": "sme",
+                "sortProperty": "license",
                 "sortOrder": "a",
                 "filters": {
                     "columns": [ 
                         {"domain": "common", "property": "environment", "filter": "production|development" },
-                        {"domain": "common", "property": "assetName", "filter": "exchange" }
+                        {"domain": "common", "property": "assetName", "filter": "exchange" },
+                        {"domain": "application", "property": "license", "filter": "" }
                     ]
                 }
             }""")

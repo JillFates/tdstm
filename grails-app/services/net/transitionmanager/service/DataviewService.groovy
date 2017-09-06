@@ -4,6 +4,8 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
+import grails.gorm.DetachedCriteria
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.domain.Dataview
@@ -296,16 +298,16 @@ class DataviewService implements ServiceMethods {
 	{
 		List<Map> results = []
 
-		DataviewSpec dataviewSpec = new DataviewSpec()
+		DataviewSpec dataviewSpec = new DataviewSpec(userParams.filters)
 		
 		// Get the Field Specs for the given domains
-        userParams.filters.domains.each { domain ->
-
-		}
+//        userParams.filters.domains.each { domain ->
+//
+//		}
 
 		// As HQL we know that this will work
-		StringBuilder hql = new StringBuilder('from AssetEntity a where a.project=:project and (os like :os OR businessUnit=:bu)')
-		List assets = AssetEntity.executeQuery(hql.toString(), [os:'windows', bu: 'HR'])
+//		StringBuilder hql = new StringBuilder('from AssetEntity a where a.project=:project and (os like :os OR businessUnit=:bu)')
+//		List assets = AssetEntity.executeQuery(hql.toString(), [os:'windows', bu: 'HR'])
 
 		/* This would fail	
 		def dc = AssetEntity.where {
@@ -315,9 +317,19 @@ class DataviewService implements ServiceMethods {
 		*/
 		
 		// Create a DetachedCriteria
-		def dc = domainClass.where {
+		DetachedCriteria criteria = AssetEntity.where {
 			project == project
 		}
+
+        criteria = criteria.where {
+            planStatus = AssetEntityPlanStatus.LOCKED
+        }
+
+        criteria = criteria.where {
+            appVendor = "Citrix"
+        }
+
+        def list = criteria.list()
 
 		// Checkout SqlRestrictions
 		// https://stackoverflow.com/questions/20954616/gorm-detached-query-by-field-of-inherited-class
@@ -331,17 +343,17 @@ class DataviewService implements ServiceMethods {
 				// TODO : In ticket TM-6532 we'll expand on the different types of queries
 			}
 		}
-
-		// Add the Projections OR columns to query
-        userParams.filters.columns.each {
-			// Always request assetClass so you can match up the columns for the output map
-
-			// Possibly use the AS command (e.g.  businessUnit AS 'application.businessUnit')
-
-			// custom5 as 'application.custom5'
-			// custom5 as 'device.custom5'
-
-		}
+//
+//		// Add the Projections OR columns to query
+//        userParams.filters.columns.each {
+//			// Always request assetClass so you can match up the columns for the output map
+//
+//			// Possibly use the AS command (e.g.  businessUnit AS 'application.businessUnit')
+//
+//			// custom5 as 'application.custom5'
+//			// custom5 as 'device.custom5'
+//
+//		}
 
 		// Add order
 
