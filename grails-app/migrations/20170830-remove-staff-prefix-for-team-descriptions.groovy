@@ -31,7 +31,7 @@ void updateRoleTypeDescriptions() {
 
     roleTypes.each { RoleType roleType ->
 
-        def newDescription = roleType.toString().trim()
+        String newDescription = roleType.toString().trim()
         roleType.description = newDescription
 
         if (roleType.validate()) {

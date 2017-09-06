@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.security.Permission
+import org.grails.datastore.mapping.query.api.Criteria
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoleTypeController implements ControllerMethods {
@@ -14,7 +15,7 @@ class RoleTypeController implements ControllerMethods {
     @HasPermission(Permission.RoleTypeView)
     def list() {
 
-        def query = RoleType.where {
+		Criteria query = RoleType.where {
             type == RoleType.TEAM
         }
 
