@@ -64,9 +64,13 @@ export class AssetExplorerService {
 		return this.http.get(`${this.assetExplorerUrl}/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.dataView;
+				if (result && result.status === 'success' && result.data) {
+					return result.data.dataView;
+				} else {
+					throw new Error(result.errors.join(';'));
+				}
 			})
-			.catch((error: any) => error.json());
+			.do(null, err => console.log(err));
 	}
 
 	saveReport(model: ViewModel): Observable<ViewModel> {
