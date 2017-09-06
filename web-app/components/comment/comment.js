@@ -450,7 +450,7 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 /**
  * Controller that shows a comment
  */
-tds.comments.controller.viewAssetDependencyDialogController = function ($window, $scope, $modal, $modalInstance, $log, $timeout, commentService, alerts, assetDependency, action, appCommonData, utils, commentUtils) {
+tds.comments.controller.viewAssetDependencyDialogController = function ($http, $scope, $modal, $modalInstance, commentService, alerts, assetDependency, action, appCommonData, utils, commentUtils) {
 
 	$scope.assetDependency = assetDependency;
 	$scope.dataSignature = JSON.stringify(assetDependency);
@@ -496,10 +496,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($window,
 				dependencyId:  $scope.assetDependency[asset].dependency.id
 			};
 
-			var url = tdsCommon.createAppURL('/ws/asset/dependencies/delete');
-
 			jQuery.ajax({
-				url: url,
+				url: tdsCommon.createAppURL('/ws/asset/dependencies/delete'),
 				type: 'POST',
 				data: assetDependency,
 				success: function (resp) {
@@ -512,6 +510,27 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($window,
 				}
 			});
 		}
+	};
+
+	/**
+	 * Execute the Update of the dependency
+	 */
+	$scope.updateDependencies = function() {
+		var dependencies  = {
+			assetA: {
+				id: $scope.assetDependency.assetA.dependency.asset.id,
+				delete: $scope.assetDependency.assetA.delete,
+				dependency: $scope.assetDependency.assetA.dependency
+			},
+			assetB: {
+				id: $scope.assetDependency.assetB.dependency.asset.id,
+				delete: $scope.assetDependency.assetB.delete,
+				dependency: $scope.assetDependency.assetB.dependency
+			}
+		};
+		commentService.updateDependencies(dependencies).then(function(result) {
+			console.log(result);
+		}) ;
 	};
 
 	$scope.toDeleteDependency = function(asset, toDelete) {
@@ -1346,6 +1365,23 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+	var updateDependencies = function(dependencies) {
+		var deferred = q.defer();
+		http({
+			method: 'PUT',
+			url: utils.url.applyRootPath('/ws/asset/dependencies'),
+			data: JSON.stringify(dependencies),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
 	return {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
@@ -1372,7 +1408,8 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		getClassForAsset: getClassForAsset,
 		getAssetsByClass: getAssetsByClass,
 		setViewUnpublishedPreference: setViewUnpublishedPreference,
-		getAssetById: getAssetById
+		getAssetById: getAssetById,
+		updateDependencies: updateDependencies
 	};
 
 };

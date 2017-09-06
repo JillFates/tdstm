@@ -251,4 +251,10 @@ class WsAssetController implements ControllerMethods {
 		assetEntityService.deleteAssetEntityDependency(securityService.getUserCurrentProject(), assetEntity, dependencyId)
 	}
 
+
+	@HasPermission(Permission.AssetEdit)
+	def updateAssetDependencies() {
+		log.debug("Scheduled Job Classes count: " + params)
+	}
+
 }
