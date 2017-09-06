@@ -26,7 +26,7 @@ export class HeaderComponent implements AfterViewInit {
 		state: StateService,
 		notifierService: NotifierService,
 		promptService: UIPromptService) {
-		jQuery('.navbar-nav a[href!="#"]').on('click', function (e) {
+		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (state.$current.data.hasPendingChanges) {
 				e.preventDefault();
 				promptService.open(
