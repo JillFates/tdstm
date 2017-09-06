@@ -453,6 +453,9 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 tds.comments.controller.viewAssetDependencyDialogController = function ($window, $scope, $modal, $modalInstance, $log, $timeout, commentService, alerts, assetDependency, action, appCommonData, utils, commentUtils) {
 
 	$scope.assetDependency = assetDependency;
+	$scope.dataSignature = JSON.stringify(assetDependency);
+	$scope.isDirty = false;
+
 	$scope.actionTypeEdit = (action === 'edit');
 
 	/**
@@ -478,8 +481,15 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($window,
 		}
 	});
 
-	$scope.deleteDependencies = function(asset) {
+	/**
+	 * Compare the Data Signature to validate if the data has changed
+	 */
+	$scope.changeData = function() {
+		let dataSignature = JSON.stringify(assetDependency);
+		$scope.isDirty = dataSignature !== $scope.dataSignature;
+	};
 
+	$scope.deleteDependencies = function(asset) {
 		if($scope.assetDependency[asset].dependency) {
 			var assetDependency = {
 				assetId: $scope.assetDependency[asset].dependency.asset.id,
@@ -502,10 +512,17 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($window,
 				}
 			});
 		}
+	};
 
+	$scope.toDeleteDependency = function(asset, toDelete) {
+		if(toDelete){
+			asset.delete = toDelete;
+		} else {
+			delete asset.delete;
+		}
 
-	}
-
+		$scope.changeData();
+	};
 
 	/**
 	 * On delete invoke the Confirmation Modal instead of the plain javaScript confirmation
@@ -514,7 +531,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($window,
 		$modal.open({
 			templateUrl: utils.url.applyRootPath('/components/modal/modal-confirmation-template.html'),
 			controller:  function($scope){
-				$scope.confirmMessage = 'Are you sure you would like to delete this dependency?';
+				$scope.confirmMessage = 'Are you sure you would like to delete the dependency?';
 
 				$scope.onConfirmAction = function() {
 					$scope.deleteDependencies('assetA');

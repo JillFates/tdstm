@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.ValidationType
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.SecurityService
@@ -209,6 +210,8 @@ class WsAssetController implements ControllerMethods {
 			it.key == AssetClass.getClassOptionForAsset(assetB)
 		}
 
+		def Project currentProject = securityService.getUserCurrentProject()
+
 		def dependencyMap = [
 			"assetA" : [
 					"name": assetA.assetName,
@@ -225,7 +228,10 @@ class WsAssetController implements ControllerMethods {
 					"bundle": assetB.moveBundleName,
 					"planStatus": assetB.planStatus,
 					"dependency": dependencyB,
-			]
+			],
+			"dataFlowFreq": AssetDependency.constraints.dataFlowFreq.inList,
+			"dependencyType": assetEntityService.entityInfo(currentProject).dependencyType,
+			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus
 		]
 
 		renderSuccessJson(dependencyMap)
