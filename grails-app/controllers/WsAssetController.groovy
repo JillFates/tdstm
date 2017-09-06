@@ -254,7 +254,7 @@ class WsAssetController implements ControllerMethods {
 
 	@HasPermission(Permission.AssetEdit)
 	def updateAssetDependencies() {
-		log.debug("Scheduled Job Classes count: " + params)
+		log.debug("Params send: " + params)
 	}
 
 }
