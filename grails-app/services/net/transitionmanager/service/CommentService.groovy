@@ -119,7 +119,7 @@ class CommentService implements ServiceMethods {
 				}
 
 				// Check if the user can create comments
-				if ((params.commentType != AssetCommentType.TASK) && !canEditAsset) {
+				if ((params.commentType != AssetCommentType.TASK) && !securityService.hasPermission(Permission.CommentCreate)) {
 					log.error "saveUpdateCommentAndNotes: User don't have permission to create comments"
 					errorMsg = "User don't have permission to create comments"
 					securityService.reportViolation("User don't have permission to create comments")
