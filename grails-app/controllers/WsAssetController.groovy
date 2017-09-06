@@ -255,6 +255,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetEdit)
 	def updateAssetDependencies() {
 		log.debug("Params send: " + params)
+		render "payload from the Server"
 	}
 
 }
