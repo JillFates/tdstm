@@ -8,6 +8,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.SecurityService
@@ -246,16 +247,35 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetEdit)
 	def deleteAssetDependency(Long assetId, Long dependencyId){
-		AssetEntity assetEntity = AssetEntity.get(assetId)
+        try {
+            AssetEntity assetEntity = AssetEntity.get(assetId)
 
-		assetEntityService.deleteAssetEntityDependency(securityService.getUserCurrentProject(), assetEntity, dependencyId)
+            assetEntityService.deleteAssetEntityDependency(securityService.getUserCurrentProject(), assetEntity, dependencyId)
+
+            renderSuccessJson()
+        }
+        catch (e) {
+            handleException e, logger
+        }
 	}
 
 
 	@HasPermission(Permission.AssetEdit)
-	def updateAssetDependencies() {
-		log.debug("Params send: " + params)
-		render "payload from the Server"
+	def updateCommonAssetDependencyFields() {
+		try {
+			AssetEntity asset = AssetEntity.get(request.JSON.dependency.asset.id)
+			if(asset) {
+				if(request.JSON.delete) {
+					this.deleteAssetDependency(asset.id, request.JSON.dependency.id)
+				} else {
+					assetEntityService.updateAssetDependency(securityService.getUserCurrentProject(), asset, request.JSON.dependency.id, request.JSON.dependency)
+				}
+			}
+			renderSuccessJson()
+		}
+		catch (e) {
+			handleException e, logger
+		}
 	}
 
 }

@@ -58,7 +58,7 @@ class UrlMappings {
 			controller = "wsAsset"
 			action = [
 					POST:"getAssetDependencies",
-					PUT:"updateAssetDependencies"
+					PUT:"updateCommonAssetDependencyFields"
 			]
 		}
 

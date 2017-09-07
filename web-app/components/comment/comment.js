@@ -450,7 +450,7 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 /**
  * Controller that shows a comment
  */
-tds.comments.controller.viewAssetDependencyDialogController = function ($http, $scope, $modal, $modalInstance, commentService, alerts, assetDependency, action, appCommonData, utils, commentUtils) {
+tds.comments.controller.viewAssetDependencyDialogController = function ($http, $scope, $q, $modal, $modalInstance, commentService, alerts, assetDependency, action, appCommonData, utils, commentUtils) {
 
 	$scope.assetDependency = assetDependency;
 	$scope.dataSignature = JSON.stringify(assetDependency);
@@ -516,21 +516,23 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($http, $
 	 * Execute the Update of the dependency
 	 */
 	$scope.updateDependencies = function() {
-		var dependencies  = {
-			assetA: {
-				id: $scope.assetDependency.assetA.dependency.asset.id,
-				delete: $scope.assetDependency.assetA.delete,
-				dependency: $scope.assetDependency.assetA.dependency
-			},
-			assetB: {
-				id: $scope.assetDependency.assetB.dependency.asset.id,
+		var qPromises = [];
+
+		qPromises.push(commentService.updateDependencies( {
+			delete: $scope.assetDependency.assetA.delete,
+			dependency: $scope.assetDependency.assetA.dependency
+		}));
+
+		if($scope.assetDependency.assetB.dependency) {
+			qPromises.push(commentService.updateDependencies( {
 				delete: $scope.assetDependency.assetB.delete,
 				dependency: $scope.assetDependency.assetB.dependency
-			}
-		};
-		commentService.updateDependencies(dependencies).then(function(result) {
-			console.log(result);
-		}) ;
+			}));
+		}
+
+		$q.all(qPromises).then(function(){
+			$scope.close();
+		});
 	};
 
 	$scope.toDeleteDependency = function(asset, toDelete) {
@@ -555,7 +557,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($http, $
 				$scope.onConfirmAction = function() {
 					$scope.deleteDependencies('assetA');
 					$scope.deleteDependencies('assetB');
-					$scope.$close('close');
+					$scope.closeConfirmation();
+					$scope.$parent.close();
 				};
 
 				$scope.closeConfirmation = function() {

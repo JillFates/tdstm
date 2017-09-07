@@ -604,7 +604,7 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Delete a Dependency from an Asset Entity
+	 * Helper Method to de Delete a Dependency from an Asset Entity
 	 * @param project
 	 * @param assetEntity
 	 * @param dependencyId
@@ -644,6 +644,47 @@ class AssetEntityService implements ServiceMethods {
 			transactionStatus.setRollbackOnly()
 			throw new DomainUpdateException(error)
 		}
+	}
+
+	private void updateAssetDependency(Project project, AssetEntity assetEntity, Long dependencyId, Map params) {
+
+		validateAssetsAssocToProject([assetEntity.id], project)
+
+		List<String> propNames = ['dataFlowFreq', 'type', 'status', 'comment']
+
+		AssetDependency assetDependency = AssetDependency.get(dependencyId)
+		if (!assetDependency) {
+			throw new InvalidRequestException("Unable to find referenced dependency ($dependencyId)")
+		}
+
+		AssetEntity depAsset = AssetEntity.get(assetEntity.id)
+		if (!depAsset) {
+			throw new InvalidRequestException("Unable to find asset ($depAssetId)")
+		}
+
+		AssetDependency.withNewSession { hibernateSession ->
+			AssetDependency dupAd = AssetDependency.findByAssetAndDependent(assetEntity, depAsset)
+			if (dupAd && (dependencyId < 1 || (dependencyId > 0 && dependencyId != dupAd.id))) {
+				throw new InvalidRequestException("Duplicate dependencies not allow for $depAsset.assetName")
+			}
+		}
+
+		// Update the fields
+		propNames.each { String paramName ->
+			if (params.containsKey(paramName)) {
+				assetDependency[paramName] = params[paramName]
+			} else {
+				log.warn "addOrUpdateDependencies() request was missing property $paramName, user=$securityService.currentUsername, asset=$asset"
+			}
+		}
+
+		assetDependency.updatedBy = securityService.loadCurrentPerson()
+
+		log.debug "updateAssetDependency() Attempting to UPDATE dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
+		if (!assetDependency.validate() || !assetDependency.save(force:true)) {
+			throw new DomainUpdateException("Unable to save dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
+		}
+
 	}
 
 	/**
