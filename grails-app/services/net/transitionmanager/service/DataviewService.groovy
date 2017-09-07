@@ -3,6 +3,7 @@
  */
 package net.transitionmanager.service
 
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import grails.gorm.DetachedCriteria
@@ -293,17 +294,42 @@ class DataviewService implements ServiceMethods {
 	List<Map> previewQuery(
 		Project project, 
 		Class domainClass, 
-		DataviewUserParamsCommand userParams,
-		PaginationCommand pagination)
+		DataviewUserParamsCommand userParams)
 	{
-		List<Map> results = []
+        List<Map> results = []
 
-		DataviewSpec dataviewSpec = new DataviewSpec(userParams.filters)
-		
-		// Get the Field Specs for the given domains
-//        userParams.filters.domains.each { domain ->
-//
-//		}
+        DataviewSpec dataviewSpec = new DataviewSpec(userParams.filters)
+
+        // Get the Field Specs for the given domains
+        userParams.filters.domains.each { domain ->
+
+            List columns = userParams.filters.columns.findAll { it.filter && it.domain == domain || it.domain == "common" }
+
+            if (domain == "application") {
+
+                DetachedCriteria criteria = Application.where {
+                    and {
+                        'project' == project
+                        columns.each {
+                            "${it.property}" == it.filter
+                        }
+                    }
+
+                }
+
+                def count = criteria.count()
+                println "Instances $count"
+
+            } else if (domain == "database") {
+
+            } else if (domain == "device") {
+
+            } else if (domain == "storage") {
+
+            }
+
+
+        }
 
 		// As HQL we know that this will work
 //		StringBuilder hql = new StringBuilder('from AssetEntity a where a.project=:project and (os like :os OR businessUnit=:bu)')
@@ -317,19 +343,11 @@ class DataviewService implements ServiceMethods {
 		*/
 		
 		// Create a DetachedCriteria
-		DetachedCriteria criteria = AssetEntity.where {
-			project == project
-		}
+//        def criteria = AssetEntity.createCriteria()
+//		def list = criteria.list {
+//            'sqlRestriction' " planStatus = 'LOCKED' OR appVendor = 'Citrix' "
+//        }
 
-        criteria = criteria.where {
-            planStatus = AssetEntityPlanStatus.LOCKED
-        }
-
-        criteria = criteria.where {
-            appVendor = "Citrix"
-        }
-
-        def list = criteria.list()
 
 		// Checkout SqlRestrictions
 		// https://stackoverflow.com/questions/20954616/gorm-detached-query-by-field-of-inherited-class
@@ -376,6 +394,5 @@ class DataviewService implements ServiceMethods {
 
 		return results
 	}
-
 
 }

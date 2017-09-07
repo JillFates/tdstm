@@ -1,3 +1,7 @@
+import com.tds.asset.Application
+import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tds.asset.Files
 import grails.converters.JSON
 import grails.test.mixin.TestFor
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -16,7 +20,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(WsAssetExplorerController)
-@Mock([Project, UserLogin])
+@Mock([Project, UserLogin, Application, AssetEntity, Database, Files])
 class WsAssetExplorerControllerSpec extends AbstractUnitSpec {
 
     def setup() {
@@ -47,20 +51,21 @@ class WsAssetExplorerControllerSpec extends AbstractUnitSpec {
         login()
 
         and:
-        def jsonBody = JSON.parse("""{
-                "offset":5,
-                "limit": 25,
-                "sortDomain": "application",
+        def jsonBody = [
+                "offset"      : 5,
+                "limit"       : 25,
+                "sortDomain"  : "application",
                 "sortProperty": "license",
-                "sortOrder": "a",
-                "filters": {
-                    "columns": [ 
-                        {"domain": "common", "property": "environment", "filter": "production|development" },
-                        {"domain": "common", "property": "assetName", "filter": "exchange" },
-                        {"domain": "application", "property": "license", "filter": "" }
-                    ]
-                }
-            }""")
+                "sortOrder"   : "a",
+                "filters"     : [
+                        "domains": ["application", "device"],
+                        "columns": [
+                                ["domain": "common", "property": "environment", "filter": "production|development"],
+                                ["domain": "common", "property": "assetName", "filter": "exchange"],
+                                ["domain": "application", "property": "license", "filter": ""]
+                        ]
+                ]
+        ] as JSON
 
         when:
         request.json = jsonBody

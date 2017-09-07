@@ -55,15 +55,15 @@ class DataviewSpec {
     */
 
     // Holds the parsed Dataview Specification after it is loaded
-    private JSONObject spec
+    private Map<String, List> spec
 
     // Constructor
     DataviewSpec(Dataview dataview) {
         spec = JsonUtil.parseJson(dataview.reportSchema)
     }
 
-    DataviewSpec(JSONObject jsonObject) {
-       spec = jsonObject 
+    DataviewSpec(Map<String, List> filters) {
+       spec = filters
     }
 
     /**

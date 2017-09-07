@@ -173,12 +173,12 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * 	  @see query
 	 */
     @Secured('isAuthenticated()')
-    def previewQuery(PaginationCommand pagination, DataviewUserParamsCommand userParams) {
+    def previewQuery(DataviewUserParamsCommand userParams, PaginationCommand pagination) {
 
-        if(pagination.validate() && userParams.validate()){
+        if(userParams.validate()){
             Project project = securityService.userCurrentProject
 
-            List<Map> data = dataviewService.previewQuery(project, AssetEntity.class, userParams, pagination)
+            List<Map> data = dataviewService.previewQuery(project, AssetEntity.class, userParams)
             renderSuccessJson(data)
 
         } else {

@@ -7,10 +7,17 @@ package net.transitionmanager.command
 @grails.validation.Validateable
 class DataviewUserParamsCommand implements CommandObject {
 
-    List<Map> filters
+    String sortDomain
+    String sortProperty
+    String sortOrder = 'a'
+
+    int offset = 0
+    int limit = 25
+
+    Map<String, List> filters
     /* 
         [
-            [
+              [
                 domain: 'application',
                 property: 'sme',
                 filter: 'joe'
@@ -22,13 +29,13 @@ class DataviewUserParamsCommand implements CommandObject {
             ]
         ]
     */
-    String sortDomain
-    String sortProperty
-    String sortOrder = 'a'
+
     
     static constraints = {
         sortDomain blank:false, inList: ['common', 'application', 'database', 'device', 'storage']
         sortProperty blank:false
-        sortOrder blank:false, inList: ['a', 'd']         
+        sortOrder blank:false, inList: ['a', 'd']
+        offset min: 0
+        limit min: 25, inList: [25, 50, 100, 500, 1000]
     }
 }

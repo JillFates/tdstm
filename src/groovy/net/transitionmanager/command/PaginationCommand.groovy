@@ -8,8 +8,8 @@ class PaginationCommand implements CommandObject {
 
     int offset = 0
     int limit = 25
-    
-    static constraints = { 
+
+    static constraints = {
         offset min: 0
         limit min: 25, inList: [25, 50, 100, 500, 1000]
     }
