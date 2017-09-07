@@ -47,6 +47,28 @@
 			</ul>
 		</td>
 	</tr>
+	<tr>
+		<td valign="top" class="name">
+			<label for="passwordId">
+				Confirm <g:if test="${changingPassword}">new </g:if>password:&nbsp;
+			</label>
+		</td>
+		<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
+			<input type="password" id="confirmPasswordId" class="passwordField" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)" name="confirmPassword" value="" autocomplete="off" />
+
+			<g:hasErrors bean="${userLoginInstance}" field="password">
+				<div class="errors">
+					<g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
+				</div>
+			</g:hasErrors>
+		</td>
+	</tr>
+	<tr class="passwordConfirmField">
+		<td></td>
+		<td>
+			<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
+		</td>
+	</tr>
 </g:if>
 
 <g:if test="${!fromDialog}">
@@ -85,4 +107,14 @@
 	<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
 </ul>
 
+<div class="form-group has-feedback">
+	<input type="text" id="confirmPasswordId" class="form-control passwordField" name="confirmPassword" autocorrect="off" autocapitalize="off" placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)"/>
+	<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+	<g:hasErrors bean="${userLoginInstance}" field="password">
+		<div class="message">
+			<g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
+		</div>
+	</g:hasErrors>
+</div>
+	<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
 </g:if>

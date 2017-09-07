@@ -80,6 +80,11 @@
 						<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
 					</ul>
 
+					<div class="form-group has-feedback">
+						<input type="password" id="confirmPasswordId" class="form-control passwordField" name="confirmPassword" autocorrect="off" autocapitalize="off" placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)"/>
+					</div>
+					<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
+
 					<g:if test="${flash.message}">
 						<div class="message">${flash.message}</div>
 					</g:if>
