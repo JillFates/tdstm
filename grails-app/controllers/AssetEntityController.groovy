@@ -532,7 +532,7 @@ class AssetEntityController implements ControllerMethods {
 		renderAsJson assetCommentsList
 	}
 
-	@HasPermission(Permission.CommentView)
+	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
 	def showComment() {
 		def commentList = []
 		def personResolvedObj
@@ -669,7 +669,7 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	// def saveComment() { com.tdsops.tm.command.AssetCommentCommand cmd ->
-	@HasPermission(Permission.CommentCreate)
+	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
 	def saveComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
@@ -683,7 +683,7 @@ class AssetEntityController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission(Permission.CommentEdit)
+	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
@@ -2171,9 +2171,10 @@ class AssetEntityController implements ControllerMethods {
 		// Now morph the list into a list of name: Role names
 		def list = []
 		projectStaff.each {
+			String roleDescription = it.role.toString()
 			list << [ id:it.staff.id,
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: $it.staff",
-				sortOn:"${it.role.description.split(':')[1]?.trim()},$it.staff.firstName $it.staff.lastName"
+				nameRole:"${roleDescription}: $it.staff",
+				sortOn:"${roleDescription},$it.staff.firstName $it.staff.lastName"
 			]
 		}
 		list.sort { it.sortOn }
@@ -2208,7 +2209,7 @@ class AssetEntityController implements ControllerMethods {
 	 * @param   format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return render HTML or a JSON array
 	 */
-	@HasPermission(Permission.CommentView)
+	@HasPermission([Permission.CommentView, Permission.TaskView])
 	def updateStatusSelect() {
 		//Changing code to populate all select options without checking security roles.
 		def mapKey = 'ALL'//securityService.hasRole([ADMIN.name(),SUPERVISOR.name(),CLIENT_ADMIN.name(),CLIENT_MGR.name()]) ? 'ALL' : 'LIMITED'
