@@ -27,8 +27,12 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * @return
 	 */
     def listDataviews() {
-		List<Map> listMap = dataviewService.list()*.toMap(securityService.currentPersonId)
-		renderSuccessJson(listMap)
+		try {
+			List<Map> listMap = dataviewService.list()*.toMap(securityService.currentPersonId)
+			renderSuccessJson(listMap)
+		} catch (Exception e) {
+			handleException e, log
+		}
 	}
 
 	/**
@@ -37,8 +41,12 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * @return
 	 */
 	def getDataview(Integer id) {
-		Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
-		renderSuccessJson([dataView: dataviewMap])
+		try {
+			Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
+			renderSuccessJson([dataView: dataviewMap])
+		} catch (Exception e) {
+			handleException e, log
+		}
 	}
 
 	/**
@@ -49,8 +57,12 @@ class WsAssetExplorerController implements ControllerMethods {
 	 */
 	@Secured('isAuthenticated()')
 	def updateDataview(Integer id) {
-		Map dataviewMap = dataviewService.update(id, request.JSON).toMap(securityService.currentPersonId)
-		renderSuccessJson([dataView: dataviewMap])
+		try {
+			Map dataviewMap = dataviewService.update(id, request.JSON).toMap(securityService.currentPersonId)
+			renderSuccessJson([dataView: dataviewMap])
+		} catch (Exception e) {
+			handleException e, log
+		}
 	}
 
 	/**
@@ -61,8 +73,12 @@ class WsAssetExplorerController implements ControllerMethods {
 	 */
 	@Secured('isAuthenticated()')
 	def createDataview() {
-		Map dataviewMap = dataviewService.create(request.JSON).toMap(securityService.currentPersonId)
-		renderSuccessJson([dataView: dataviewMap])
+		try {
+			Map dataviewMap = dataviewService.create(request.JSON).toMap(securityService.currentPersonId)
+			renderSuccessJson([dataView: dataviewMap])
+		} catch (Exception e) {
+			handleException e, log
+		}
 	}
 
 	/**
@@ -73,8 +89,23 @@ class WsAssetExplorerController implements ControllerMethods {
 	 */
 	@Secured('isAuthenticated()')
 	def deleteDataview(Integer id) {
-		dataviewService.delete(id)
-		renderSuccessJson([status: DELETE_OK_STATUS] )
+		try {
+			dataviewService.delete(id)
+			renderSuccessJson([status: DELETE_OK_STATUS] )
+		} catch (Exception e) {
+			handleException e, log
+		}
 	}
 
+	/**
+	 * Overrided handleExcpetion super class method in ControllerMethods class
+	 * to send just json reponse errors if exception is thrown.
+	 * @see ControllerMethods#handleException(java.lang.Exception, java.lang.Object)
+	 * @param e
+	 * @param log
+	 */
+	void handleException(Exception e, log) {
+		log.error(e)
+		renderErrorJson(e.message)
+	}
 }
