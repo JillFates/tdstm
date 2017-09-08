@@ -18,7 +18,7 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
  * Created by @oluna on 4/5/17.
  */
 
-@Slf4j
+@Slf4j(value='logger', category='grails.app.controllers.WsAssetController')
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
@@ -240,17 +240,14 @@ class WsAssetController implements ControllerMethods {
 
 	/**
 	 * Delete a dependency from an Asset.
-	 * @param assetAId
-	 * @param assetBId
-	 * @param dependencyA
-	 * @param dependencyB
+	 * @return
 	 */
 	@HasPermission(Permission.AssetEdit)
-	def deleteAssetDependency(Long assetId, Long dependencyId){
+	def deleteAssetDependency(){
         try {
-            AssetEntity assetEntity = AssetEntity.get(assetId)
+            AssetEntity assetEntity = AssetEntity.get(request.JSON.assetId)
 
-            assetEntityService.deleteAssetEntityDependency(securityService.getUserCurrentProject(), assetEntity, dependencyId)
+            assetEntityService.deleteAssetEntityDependency(securityService.getUserCurrentProject(), assetEntity, request.JSON.dependencyId)
 
             renderSuccessJson()
         }
@@ -259,18 +256,15 @@ class WsAssetController implements ControllerMethods {
         }
 	}
 
-
+	/**
+	 * Update Asset Dependency Fields
+	 * @return
+	 */
 	@HasPermission(Permission.AssetEdit)
 	def updateCommonAssetDependencyFields() {
 		try {
 			AssetEntity asset = AssetEntity.get(request.JSON.dependency.asset.id)
-			if(asset) {
-				if(request.JSON.delete) {
-					this.deleteAssetDependency(asset.id, request.JSON.dependency.id)
-				} else {
-					assetEntityService.updateAssetDependency(securityService.getUserCurrentProject(), asset, request.JSON.dependency.id, request.JSON.dependency)
-				}
-			}
+			assetEntityService.updateAssetDependency(securityService.getUserCurrentProject(), asset, request.JSON.dependency.id, request.JSON.dependency)
 			renderSuccessJson()
 		}
 		catch (e) {

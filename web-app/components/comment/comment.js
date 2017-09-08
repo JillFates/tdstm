@@ -448,20 +448,23 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 };
 
 /**
- * Controller that shows a comment
+ * Controller to Edit/View the dependencies from two Asset Entities
  */
-tds.comments.controller.viewAssetDependencyDialogController = function ($http, $scope, $q, $modal, $modalInstance, commentService, alerts, assetDependency, action, appCommonData, utils, commentUtils) {
+tds.comments.controller.viewAssetDependencyDialogController = function ($scope, $q, $modal, $modalInstance, commentService, assetDependency, action, appCommonData, utils, commentUtils) {
 
-	$scope.assetDependency = assetDependency;
-	$scope.dataSignature = JSON.stringify(assetDependency);
+	// Make a deep copy of the original object
+	$scope.assetDependency = jQuery.extend(true, {}, assetDependency);
+	// Create the data signature
+	$scope.dataSignature = JSON.stringify($scope.assetDependency);
+	// Define if the data is on a Dirty State
 	$scope.isDirty = false;
-
+	// Edit/View Mode
 	$scope.actionTypeEdit = (action === 'edit');
 
 	/**
-	 * Broadcast a model has been opened
+	 * Broadcast that the model has been opened
 	 */
-	$modalInstance.opened.then(function (modalReady) {
+	$modalInstance.opened.then(function () {
 		$scope.$broadcast("popupOpened");
 	});
 
@@ -485,98 +488,146 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($http, $
 	 * Compare the Data Signature to validate if the data has changed
 	 */
 	$scope.changeData = function() {
-		let dataSignature = JSON.stringify(assetDependency);
+		let dataSignature = JSON.stringify($scope.assetDependency);
 		$scope.isDirty = dataSignature !== $scope.dataSignature;
 	};
 
-	$scope.deleteDependencies = function(asset) {
+	/**
+	 * Execute the Delete of the Dependencies
+	 * @param asset
+	 */
+	$scope.deleteDependency = function(asset) {
 		if($scope.assetDependency[asset].dependency) {
 			var assetDependency = {
 				assetId: $scope.assetDependency[asset].dependency.asset.id,
 				dependencyId:  $scope.assetDependency[asset].dependency.id
 			};
-
-			jQuery.ajax({
-				url: tdsCommon.createAppURL('/ws/asset/dependencies/delete'),
-				type: 'POST',
-				data: assetDependency,
-				success: function (resp) {
-					console.log(resp)
-				},
-				error: function (jqXHR, textStatus, errorThrown) {
-					var err = jqXHR.responseText;
-					alert("An error occurred while loading the asset edit form." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
-					return false;
-				}
-			});
+			commentService.deleteDependency(assetDependency);
 		}
 	};
 
 	/**
-	 * Execute the Update of the dependency
+	 * Listener to catch the Update from the Dialog
+	 */
+	$scope.onClickUpdate = function() {
+		if(($scope.assetDependency.assetA && $scope.assetDependency.assetA.delete)
+		|| ($scope.assetDependency.assetB && $scope.assetDependency.assetB.delete)) {
+			var confirmMessage = 'Are you sure you would like to delete ' + (($scope.assetDependency.assetA.dependency && $scope.assetDependency.assetB.dependency)? 'both dependencies?' : 'the dependency?');
+			$scope.warningConfirmationDialog(confirmMessage, $scope.updateDependencies);
+		} else {
+			$scope.updateDependencies();
+		}
+	};
+
+	/**
+	 * Execute the Update of the Dependency
 	 */
 	$scope.updateDependencies = function() {
 		var qPromises = [];
 
-		qPromises.push(commentService.updateDependencies( {
-			delete: $scope.assetDependency.assetA.delete,
-			dependency: $scope.assetDependency.assetA.dependency
-		}));
+		if($scope.assetDependency.assetA && $scope.assetDependency.assetA.delete) {
+			qPromises.push(commentService.deleteDependency({
+				assetId: $scope.assetDependency.assetA.dependency.asset.id,
+				dependencyId:  $scope.assetDependency.assetA.dependency.id
+			}));
+		} else if($scope.assetDependency.assetA.dependency) {
+			qPromises.push(commentService.updateDependencies({
+				dependency: $scope.assetDependency.assetA.dependency
+			}));
+		}
 
-		if($scope.assetDependency.assetB.dependency) {
-			qPromises.push(commentService.updateDependencies( {
-				delete: $scope.assetDependency.assetB.delete,
+		if($scope.assetDependency.assetB && $scope.assetDependency.assetB.delete) {
+			qPromises.push(commentService.deleteDependency({
+				assetId: $scope.assetDependency.assetB.dependency.asset.id,
+				dependencyId:  $scope.assetDependency.assetB.dependency.id
+			}));
+		} else if($scope.assetDependency.assetB.dependency) {
+			qPromises.push(commentService.updateDependencies({
 				dependency: $scope.assetDependency.assetB.dependency
 			}));
 		}
 
 		$q.all(qPromises).then(function(){
+			reloadGraph();
 			$scope.close();
 		});
 	};
 
+	function reloadGraph() {
+		setTimeout(function(){
+			// Update the Grap after a change has been reflected
+			$(document).trigger('entityAssetUpdated', {});
+		}, 300);
+	}
+
+	/**
+	 * Mark a Dependency as deletable
+	 * @param asset
+	 * @param toDelete
+	 */
 	$scope.toDeleteDependency = function(asset, toDelete) {
 		if(toDelete){
 			asset.delete = toDelete;
 		} else {
 			delete asset.delete;
 		}
-
 		$scope.changeData();
 	};
 
 	/**
-	 * On delete invoke the Confirmation Modal instead of the plain javaScript confirmation
+	 * On delete invoke the Confirmation Modal
 	 */
 	$scope.onDeleteDependency = function() {
-		$modal.open({
+		var confirmMessage = 'Are you sure you would like to delete ' + (($scope.assetDependency.assetA.dependency && $scope.assetDependency.assetB.dependency)? 'both dependencies?' : 'the dependency?');
+		$scope.warningConfirmationDialog(confirmMessage, function(){
+			$scope.deleteDependency('assetA');
+			$scope.deleteDependency('assetB');
+			reloadGraph();
+			$scope.close();
+		});
+	};
+
+	/**
+	 * Inline controller of a Confirmation Model
+	 * @param confirmMessage
+	 * @param callback
+	 */
+	$scope.warningConfirmationDialog = function(confirmMessage, callback) {
+		var modalInstance = $modal.open({
 			templateUrl: utils.url.applyRootPath('/components/modal/modal-confirmation-template.html'),
 			controller:  function($scope){
-				$scope.confirmMessage = 'Are you sure you would like to delete the dependency?';
+				$scope.confirmMessage = confirmMessage;
 
 				$scope.onConfirmAction = function() {
-					$scope.deleteDependencies('assetA');
-					$scope.deleteDependencies('assetB');
-					$scope.closeConfirmation();
-					$scope.$parent.close();
+					$scope.$close({ confirm: true});
 				};
 
 				$scope.closeConfirmation = function() {
-					$scope.$close('close');
+					$scope.$close();
 				};
 			},
 			scope: $scope,
 			windowClass: 'modal-comment',
 			backdrop: 'static'
 		});
-	}
+
+		return modalInstance.result.then(function (result) {
+			return result && result.confirm? callback() : function(){};
+		});
+	};
 
 	/**
 	 * Change from View Mode into Edit Mode
 	 */
-	$scope.onEditDependency = function() {
-		$scope.actionTypeEdit = true;
-	}
+	$scope.onEditDependency = function(edit) {
+		$scope.actionTypeEdit = edit;
+
+		if(!edit) {
+			$scope.assetDependency = jQuery.extend(true, {}, assetDependency);
+			$scope.dataSignature = JSON.stringify($scope.assetDependency);
+			$scope.isDirty = false;
+		}
+	};
 
 };
 
@@ -1368,6 +1419,23 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+	var deleteDependency = function(assetDependency){
+		var deferred = q.defer();
+		http({
+			method: 'DELETE',
+			url: utils.url.applyRootPath('/ws/asset/dependencies'),
+			data: JSON.stringify(assetDependency),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
 	var updateDependencies = function(dependencies) {
 		var deferred = q.defer();
 		http({
@@ -1412,7 +1480,8 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		getAssetsByClass: getAssetsByClass,
 		setViewUnpublishedPreference: setViewUnpublishedPreference,
 		getAssetById: getAssetById,
-		updateDependencies: updateDependencies
+		updateDependencies: updateDependencies,
+		deleteDependency: deleteDependency
 	};
 
 };
