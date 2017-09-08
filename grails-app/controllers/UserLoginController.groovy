@@ -174,8 +174,10 @@ class UserLoginController implements ControllerMethods {
 			return
 		}
 
-		// TODO : JPM 10/2016 : Fix team list to drop the description parsing - can where on the type now
-		List roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+		List roleList = RoleType.where {
+            type == RoleType.SECURITY
+        }.list()
+
 		String cellValue = [
 			id: showUser.id,
 			username: showUser.username,
@@ -229,7 +231,9 @@ class UserLoginController implements ControllerMethods {
 		def person = editUser.person
 		def availableRoles = securityService.getAvailableRoles(person)
 		def assignedRoles = securityService.getAssignedRoles(person)
-		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+        def roleList = RoleType.where {
+            type == RoleType.SECURITY
+        }.list()
 		def projectList = personService.getAvailableProjects(person, null, false, new Date() - 30)
 		def projectId = userPreferenceService.getPreference(editUser, PREF.CURR_PROJ)
 		def maxLevel = securityService.getMaxAssignedRole(securityService.loadCurrentPerson()).level
@@ -307,8 +311,11 @@ class UserLoginController implements ControllerMethods {
 
 		UserLogin createUser = new UserLogin(params)
 		createUser.expiryDate = new Date(System.currentTimeMillis() + 7776000000) // 3 Months
-		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.level desc ")
-		Person currentPerson = securityService.userLoginPerson
+        def roleList = RoleType.where {
+            type == RoleType.SECURITY
+        }.list()
+
+        Person currentPerson = securityService.userLoginPerson
 
 		[userLoginInstance: createUser, personInstance: person, companyId: params.companyId,
 		 roleList: roleList, projectList: partyRelationshipService.companyProjects(currentPerson.company),

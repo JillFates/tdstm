@@ -1140,7 +1140,7 @@ logger.debug "mergePersonsUserLogin() entered"
 		}
 
 		// Remove any Roles that are not in the above list
-		partyRelationshipService.updatePartyRoleByType('system', person, assignedRoles)
+		partyRelationshipService.updatePartyRoleByType(RoleType.SECURITY, person, assignedRoles)
 
 		if (setUserRoles(assignedRoles, person.id)) {
 			throw new DomainUpdateException('Unable to update user security roles')
@@ -1719,9 +1719,9 @@ logger.debug "mergePersonsUserLogin() entered"
 			where id not in (select roleType.id from PartyRole
 			                 where party=?
 			                 group by roleType.id)
-			  and (description like 'staff%' OR description like 'system%')
+			  and (type = ? OR type = ?)
 			order by description
-		''', [person])
+		''', [person, RoleType.TEAM, RoleType.SECURITY])
 	}
 
 	@Transactional
