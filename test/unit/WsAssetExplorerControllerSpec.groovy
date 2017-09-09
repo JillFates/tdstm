@@ -87,7 +87,7 @@ class WsAssetExplorerControllerSpec extends AbstractUnitSpec {
                 "offset":5,
                 "limit": 25,
                 "sortDomain": "application",
-                "sortField": "sme",
+                "sortProperty": "sme",
                 "sortOrder": "a",
                 "filters": {
                     "columns": [ 

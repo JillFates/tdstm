@@ -300,67 +300,61 @@ class DataviewService implements ServiceMethods {
 
         DataviewSpec dataviewSpec = new DataviewSpec(userParams.filters)
 
-        // Get the Field Specs for the given domains
-        userParams.filters.domains.each { domain ->
+        Map params = [:]
+        Map args = [:]
 
-            List columns = userParams.filters.columns.findAll { it.filter && it.domain == domain || it.domain == "common" }
+        String order = "order by ${userParams.sortProperty} ${userParams.sortOrder == 'a'?'asc': 'desc'}"
+        String queryFields = ""
+        String queryFrom = "from AssetEntity \n"
+        queryFrom += " where project = :project \n"
+        params['project'] = project
 
-            if (domain == "application") {
+        userParams.filters.columns.findAll { column ->
 
-                DetachedCriteria criteria = Application.where {
-                    and {
-                        'project' == project
-                        columns.each {
-                            "${it.property}" == it.filter
-                        }
-                    }
+            def domain = column.domain
+            def property = column.property
+            def values = column.filter.split("\\|")?.findAll { it?.trim() != "" }
 
-                }
+            queryFields += queryFields.isEmpty()?"select ":", "
+            queryFields += " ${property}"
 
-                def count = criteria.count()
-                println "Instances $count"
-
-            } else if (domain == "database") {
-
-            } else if (domain == "device") {
-
-            } else if (domain == "storage") {
-
+            if( values.size() == 1 ){
+                queryFrom += " and ${property} = :${property} \n"
+                params[property] = values
+            } else if( values.size() > 1 ){
+                queryFrom += " and ${property} in (:${property}) \n"
+                params[property] = values
             }
+        }
 
+        args['max'] = userParams.limit
+        args['offset'] = userParams.offset
 
+        def hql = queryFields + "\n" + queryFrom + order
+        log.debug "DataViewService previewQuery hql: ${hql}"
+        def assets = AssetEntity.executeQuery(hql, params, args)
+
+        results = assets.collect { columns ->
+            Map row = [:]
+            columns.eachWithIndex{ cell, index ->
+                row[ "${userParams.filters.columns[index].domain}.${userParams.filters.columns[index].property}" ] = cell
+            }
+            row
         }
 
 		// As HQL we know that this will work
 //		StringBuilder hql = new StringBuilder('from AssetEntity a where a.project=:project and (os like :os OR businessUnit=:bu)')
 //		List assets = AssetEntity.executeQuery(hql.toString(), [os:'windows', bu: 'HR'])
 
-		/* This would fail	
-		def dc = AssetEntity.where {
-			project == project
-			(os ~= 'windows' || businessUnit == 'bu')
-		}
-		*/
-		
-		// Create a DetachedCriteria
-//        def criteria = AssetEntity.createCriteria()
-//		def list = criteria.list {
-//            'sqlRestriction' " planStatus = 'LOCKED' OR appVendor = 'Citrix' "
-//        }
-
-
-		// Checkout SqlRestrictions
-		// https://stackoverflow.com/questions/20954616/gorm-detached-query-by-field-of-inherited-class
-
 		// Add where criteria based on the filters
 			//dc.and('....')
-        userParams.filters.columns.each { column ->
-			if (column.filter) {
-				// Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
-
-				// TODO : In ticket TM-6532 we'll expand on the different types of queries
-			}
-		}
+//        userParams.filters.columns.each { column ->
+//			if (column.filter) {
+//				// Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
+//
+//				// TODO : In ticket TM-6532 we'll expand on the different types of queries
+//			}
+//		}
 //
 //		// Add the Projections OR columns to query
 //        userParams.filters.columns.each {
