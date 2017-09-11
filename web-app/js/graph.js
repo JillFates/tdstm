@@ -168,22 +168,33 @@ var GraphUtil = (function ($) {
 	// called when the user clicks the show/hide layout adjustments twistie
 	public.toggleGraphTwistie = function (twistieSpan) {
 		var container = $('#' + twistieSpan.attr('for'));
+
+        // update the legend twistie preference if applicable
+        var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
+        if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
+            var prefValue = public.serializeLegendTwistiePrefs();
+            setUserPreference('legendTwistieState', prefValue);
+        }
+
 		if (twistieSpan.hasClass('closed')) {
 			twistieSpan.removeClass('closed').addClass('open');
 			container.slideDown(300, function () {
-				public.correctControlPanelSize();
+				if (isCalledFromLegendPanel) {
+				    public.correctLegendSize();
+                } else {
+                    public.correctControlPanelSize();
+                }
+
 			});
 		} else {
 			twistieSpan.removeClass('open').addClass('closed');
 			container.slideUp(300, function () {
-				public.correctControlPanelSize();
+                if (isCalledFromLegendPanel) {
+                    public.correctLegendSize();
+                } else {
+                    public.correctControlPanelSize();
+                }
 			});
-		}
-
-		// update the legend twistie preference if applicable
-		if (twistieSpan.parents('#legendDivId').length > 0 && twistieSpan.parents('.tabInner').length > 0) {
-			var prefValue = public.serializeLegendTwistiePrefs();
-			setUserPreference('legendTwistieState', prefValue);
 		}
 	}
 
