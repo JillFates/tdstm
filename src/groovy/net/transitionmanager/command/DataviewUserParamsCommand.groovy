@@ -10,7 +10,6 @@ class DataviewUserParamsCommand implements CommandObject {
     String sortDomain
     String sortProperty
     String sortOrder = 'a'
-    Boolean justPlanning = false
 
     int offset = 0
     int limit = 25

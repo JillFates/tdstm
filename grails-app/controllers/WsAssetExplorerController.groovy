@@ -174,7 +174,7 @@ class WsAssetExplorerController implements ControllerMethods {
 	 * 	  @see query
 	 */
     @Secured('isAuthenticated()')
-    def previewQuery(DataviewUserParamsCommand userParams, PaginationCommand pagination) {
+    def previewQuery(DataviewUserParamsCommand userParams) {
 
         if(userParams.validate()){
             Project project = securityService.userCurrentProject

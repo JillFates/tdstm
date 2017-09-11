@@ -59,7 +59,7 @@ class DataviewSpec {
     private Map<String, List> spec
     private Map<String, Integer> args
     private Map<String, String> order
-    private justPlanning = false
+    private Boolean justPlanning
 
     // Constructor
     DataviewSpec(Dataview dataview) {
@@ -68,7 +68,7 @@ class DataviewSpec {
 
     DataviewSpec(DataviewUserParamsCommand command) {
        spec = command.filters
-       justPlanning = command.filters.justPlanning?true:false
+       justPlanning = command.filters.justPlanning
        args = [max:command.limit, offset: command.offset]
        order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING?'asc': 'desc']
     }
@@ -130,10 +130,11 @@ class DataviewSpec {
     }
 
     /**
-     * Used to determine if the query must validate if assets
-     * @return true if query must validate if a project assets is just planning
+     * Used to determine if the query must validate if assets are assigned to a Project with a MoveBundle
+     *
+     * @return null if the variable wasn't set and true if query must validate if a project assets is just planning
      */
-    boolean isJustPlanning() {
+    Boolean getJustPlanning() {
         justPlanning
     }
 }

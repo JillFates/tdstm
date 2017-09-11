@@ -293,7 +293,6 @@ class DataviewService implements ServiceMethods {
     List<Map> previewQuery(
             Project project,
             DataviewSpec dataviewSpec) {
-        List<Map> results = []
 
         Map params = [:]
         String queryFields = ""
@@ -302,28 +301,24 @@ class DataviewService implements ServiceMethods {
         queryFrom += " where project = :project \n"
         params['project'] = project
 
-        List<MoveBundle> moveBundles = MoveBundle.where {
-            project == project && useForPlanning == dataviewSpec.isJustPlanning()
-        }.list()
-
-        if (!moveBundles.isEmpty()) {
+        if (dataviewSpec.justPlanning != null) {
             queryFrom += " and moveBundle in (:moveBundles) \n"
-            params['moveBundles'] = moveBundles
-        } else {
-            //TODO: What happen if there is aproject without MoveBundle and useForPlanning filter ?
+            params['moveBundles'] = MoveBundle.where {
+                project == project && useForPlanning == dataviewSpec.justPlanning
+            }.list()
         }
 
         dataviewSpec.columns.findAll { column ->
 
-            def property = column.property
+            String property = column.property
             def values = column.filter.split("\\|")?.findAll { it?.trim() != "" }
 
             queryFields += queryFields.isEmpty() ? "select " : ", "
             queryFields += " ${property}"
 
             if (values.size() == 1) {
-                queryFrom += " and ${property} = :${property} \n"
-                params[property] = values
+                queryFrom += " and ${property} like :${property} \n"
+                params[property] = "%$values%"
             } else if (values.size() > 1) {
                 // Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
                 // TODO : In ticket TM-6532 we'll expand on the different types of queries
@@ -338,14 +333,6 @@ class DataviewService implements ServiceMethods {
         log.debug "DataViewService previewQuery hql: ${hql}"
         def assets = AssetEntity.executeQuery(hql, params, dataviewSpec.args)
 
-        results = assets.collect { columns ->
-            Map row = [:]
-            columns.eachWithIndex { cell, index ->
-                row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
-            }
-            row
-        }
-
         // Strip out non assetClass data that may have leaked into the result set. This only needs to be addressed if
         // there is more than domain in the query.
         // [
@@ -357,7 +344,13 @@ class DataviewService implements ServiceMethods {
         // ]
         // Because it is assetClass Application, the device properties should be removed but the common to remain.
 
-        return results
+        assets.collect { columns ->
+            Map row = [:]
+            columns.eachWithIndex { cell, index ->
+                row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
+            }
+            row
+        }
     }
 
 }
