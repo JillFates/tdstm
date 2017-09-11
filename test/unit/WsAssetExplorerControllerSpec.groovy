@@ -64,7 +64,8 @@ class WsAssetExplorerControllerSpec extends AbstractUnitSpec {
                                 ["domain": "common", "property": "environment", "filter": "production|development"],
                                 ["domain": "common", "property": "assetName", "filter": "exchange"],
                                 ["domain": "application", "property": "license", "filter": ""]
-                        ]
+                        ],
+                        "justPlanning": true
                 ]
         ] as JSON
 

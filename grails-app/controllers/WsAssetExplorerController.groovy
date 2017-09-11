@@ -166,6 +166,7 @@ class WsAssetExplorerController implements ControllerMethods {
 	 *						{ "domain": "common", "property": "environment", "filter": "production" },
 	 *						{ "domain": "application", "property": "bundle", "filter": "" }
 	 *			],
+     *		    "justPlanning": true
 	 *		}
 	 *	}
 	 *

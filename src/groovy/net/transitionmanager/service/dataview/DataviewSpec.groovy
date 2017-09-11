@@ -59,7 +59,7 @@ class DataviewSpec {
     private Map<String, List> spec
     private Map<String, Integer> args
     private Map<String, String> order
-
+    private justPlanning = false
 
     // Constructor
     DataviewSpec(Dataview dataview) {
@@ -68,6 +68,7 @@ class DataviewSpec {
 
     DataviewSpec(DataviewUserParamsCommand command) {
        spec = command.filters
+       justPlanning = command.filters.justPlanning?true:false
        args = [max:command.limit, offset: command.offset]
        order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING?'asc': 'desc']
     }
@@ -126,5 +127,13 @@ class DataviewSpec {
      */
     boolean isSortAscending() {
         (spec.sort.order == ASCENDING)
+    }
+
+    /**
+     * Used to determine if the query must validate if assets
+     * @return true if query must validate if a project assets is just planning
+     */
+    boolean isJustPlanning() {
+        justPlanning
     }
 }
