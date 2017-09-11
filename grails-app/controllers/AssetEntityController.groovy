@@ -650,6 +650,7 @@ class AssetEntityController implements ControllerMethods {
 				statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
 				successorsCount: successorsCount,
 				predecessorsCount: predecessorsCount,
+				taskSpecId: assetComment.taskSpec,
 				assetId: assetComment.assetEntity?.id ?: "",
 				assetType: assetComment.assetEntity?.assetType,
 				assetClass: assetComment.assetEntity?.assetClass?.toString(),

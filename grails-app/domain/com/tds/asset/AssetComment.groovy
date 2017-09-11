@@ -285,6 +285,6 @@ class AssetComment {
 		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', lastUpdated: 'Last Updated', sendNotification: 'Send Notification',
 		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
-		instructionsLink: 'Instructions Link', bundle: 'Move Bundle'
+		instructionsLink: 'Instructions Link', taskSpec: 'TaskSpec ID', bundle: 'Move Bundle'
 	].asImmutable()
 }
