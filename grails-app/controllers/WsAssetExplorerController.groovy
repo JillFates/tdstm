@@ -129,7 +129,7 @@ class WsAssetExplorerController implements ControllerMethods {
 	 *
 	 */
 	@Secured('isAuthenticated()')
-	def query(Long id, PaginationCommand pagination, DataviewUserParamsCommand userParams) {
+	def query(Long id, DataviewUserParamsCommand userParams, PaginationCommand pagination) {
 		Project project = securityService.userCurrentProject
 
 		if (userParams.hasErrors()) {
@@ -178,7 +178,8 @@ class WsAssetExplorerController implements ControllerMethods {
         if(userParams.validate()){
             Project project = securityService.userCurrentProject
 
-            List<Map> data = dataviewService.previewQuery(project, AssetEntity.class, userParams)
+			DataviewSpec dataviewSpec = new DataviewSpec(userParams)
+            List<Map> data = dataviewService.previewQuery(project, dataviewSpec)
             renderSuccessJson(data)
 
         } else {

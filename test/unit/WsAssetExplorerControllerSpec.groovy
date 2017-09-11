@@ -57,6 +57,7 @@ class WsAssetExplorerControllerSpec extends AbstractUnitSpec {
                 "sortDomain"  : "application",
                 "sortProperty": "license",
                 "sortOrder"   : "a",
+                "justPlanning": true,
                 "filters"     : [
                         "domains": ["application", "device"],
                         "columns": [

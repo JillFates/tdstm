@@ -293,25 +293,22 @@ class DataviewService implements ServiceMethods {
 	// TODO : Annotate READONLY
 	List<Map> previewQuery(
 		Project project, 
-		Class domainClass, 
-		DataviewUserParamsCommand userParams)
+		DataviewSpec dataviewSpec)
 	{
         List<Map> results = []
-
-        DataviewSpec dataviewSpec = new DataviewSpec(userParams.filters)
 
         Map params = [:]
         Map args = [:]
 
-        String order = "order by ${userParams.sortProperty} ${userParams.sortOrder == 'a'?'asc': 'desc'}"
+        String order = "order by ${dataviewSpec.order.property} ${dataviewSpec.order.sort}"
         String queryFields = ""
         String queryFrom = "from AssetEntity \n"
         queryFrom += " where project = :project \n"
+
         params['project'] = project
 
-        userParams.filters.columns.findAll { column ->
+		dataviewSpec.columns.findAll { column ->
 
-            def domain = column.domain
             def property = column.property
             def values = column.filter.split("\\|")?.findAll { it?.trim() != "" }
 
@@ -322,60 +319,26 @@ class DataviewService implements ServiceMethods {
                 queryFrom += " and ${property} = :${property} \n"
                 params[property] = values
             } else if( values.size() > 1 ){
+				// Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
+				// TODO : In ticket TM-6532 we'll expand on the different types of queries
                 queryFrom += " and ${property} in (:${property}) \n"
                 params[property] = values
             }
         }
 
-        args['max'] = userParams.limit
-        args['offset'] = userParams.offset
-
         def hql = queryFields + "\n" + queryFrom + order
         log.debug "DataViewService previewQuery hql: ${hql}"
-        def assets = AssetEntity.executeQuery(hql, params, args)
+        def assets = AssetEntity.executeQuery(hql, params, dataviewSpec.args)
 
         results = assets.collect { columns ->
             Map row = [:]
             columns.eachWithIndex{ cell, index ->
-                row[ "${userParams.filters.columns[index].domain}.${userParams.filters.columns[index].property}" ] = cell
+                row[ "${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}" ] = cell
             }
             row
         }
 
-		// As HQL we know that this will work
-//		StringBuilder hql = new StringBuilder('from AssetEntity a where a.project=:project and (os like :os OR businessUnit=:bu)')
-//		List assets = AssetEntity.executeQuery(hql.toString(), [os:'windows', bu: 'HR'])
-
-		// Add where criteria based on the filters
-			//dc.and('....')
-//        userParams.filters.columns.each { column ->
-//			if (column.filter) {
-//				// Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
-//
-//				// TODO : In ticket TM-6532 we'll expand on the different types of queries
-//			}
-//		}
-//
-//		// Add the Projections OR columns to query
-//        userParams.filters.columns.each {
-//			// Always request assetClass so you can match up the columns for the output map
-//
-//			// Possibly use the AS command (e.g.  businessUnit AS 'application.businessUnit')
-//
-//			// custom5 as 'application.custom5'
-//			// custom5 as 'device.custom5'
-//
-//		}
-
-		// Add order
-
-		// Add pagination
-
-		// Excute Query
-		//domainClass.executeQuery(hql.toString(), parameters)
-
-
-		// Strip out non assetClass data that may have leaked into the result set. This only needs to be addressed if 
+		// Strip out non assetClass data that may have leaked into the result set. This only needs to be addressed if
 		// there is more than domain in the query.
 		// [ 
 		// 	common.id: 123,

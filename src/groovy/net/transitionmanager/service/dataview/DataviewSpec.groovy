@@ -3,6 +3,7 @@ package net.transitionmanager.service.dataview
 // import net.transitionmanager.domain.Dataview
 import com.tdssrc.grails.JsonUtil
 import groovy.transform.CompileStatic
+import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -56,14 +57,19 @@ class DataviewSpec {
 
     // Holds the parsed Dataview Specification after it is loaded
     private Map<String, List> spec
+    private Map<String, Integer> args
+    private Map<String, String> order
+
 
     // Constructor
     DataviewSpec(Dataview dataview) {
         spec = JsonUtil.parseJson(dataview.reportSchema)
     }
 
-    DataviewSpec(Map<String, List> filters) {
-       spec = filters
+    DataviewSpec(DataviewUserParamsCommand command) {
+       spec = command.filters
+       args = [max:command.limit, offset: command.offset]
+       order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING?'asc': 'desc']
     }
 
     /**
@@ -110,8 +116,8 @@ class DataviewSpec {
      *    property - the GORM property name
      * @return the sort on property information as a Map
      */
-    Map getSortOn() {
-        [ domain: spec.sort.domain, property: spec.sort.property ]
+    Map getOrder() {
+        order
     }
 
     /**
