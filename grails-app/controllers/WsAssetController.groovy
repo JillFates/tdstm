@@ -18,7 +18,7 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
  * Created by @oluna on 4/5/17.
  */
 
-@Slf4j
+@Slf4j(value='logger', category='grails.app.controllers.WsAssetController')
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
