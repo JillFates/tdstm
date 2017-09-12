@@ -1,5 +1,6 @@
 package net.transitionmanager.controller
 
+import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
@@ -18,6 +19,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.acls.model.NotFoundException
 import org.springframework.validation.Errors
 
 import static org.springframework.http.HttpStatus.FORBIDDEN
@@ -136,26 +139,45 @@ trait ControllerMethods {
 	 * @param log - the logger object to log to
 	 */
 	void handleException(Exception e, log) {
-		if (e instanceof UnauthorizedException || e instanceof IllegalArgumentException) {
-			sendForbidden()
-		}
-		else if (e instanceof EmptyResultException) {
-			sendMethodFailure()
-		}
-		else if (e instanceof ValidationException) {
-			renderAsJson errorsInValidation(e.errors)
-		}
-		else if (e instanceof InvalidParamException || e instanceof DomainUpdateException) {
-			renderErrorJson(e.message)
-		}
-		else if (e instanceof InvalidRequestException) {
-			renderErrorJson('The request was invalid')
-		}
-		else {
-			if (log) {
-				log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 20)
-			}
-			renderErrorJson('An unresolved error has occurred')
+		// oluna: TM-7275 I like type-matching better :)
+		switch( e ) {
+			case UnauthorizedException:
+			case IllegalArgumentException:
+				sendForbidden()
+				break
+
+			case EmptyResultException:
+				sendMethodFailure()
+				break
+
+			case ValidationException:
+				renderAsJson errorsInValidation(e.errors)
+				break
+
+			case InvalidParamException:
+			case DomainUpdateException:
+				renderErrorJson(e.message)
+				break
+
+			case InvalidRequestException:
+				renderErrorJson('The request was invalid')
+				break
+
+			/*
+				If any of the following try to send it to the default Exception handler
+				in UrlMappings
+			 */
+			case AccessDeniedException:
+			case NotFoundException:
+			case InvalidLicenseException:
+				throw e
+
+			default:
+				if (log) {
+					log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 20)
+				}
+
+				renderErrorJson('An unresolved error has occurred')
 		}
 	}
 
