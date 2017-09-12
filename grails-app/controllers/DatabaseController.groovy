@@ -181,7 +181,7 @@ class DatabaseController implements ControllerMethods {
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN ($validUnkownQuestioned)
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 
-		def firstWhere = true
+		boolean firstWhere = true
 		def queryParams = [:]
 		def whereConditions = []
 		filterParams.each { key, val ->
@@ -191,25 +191,46 @@ class DatabaseController implements ControllerMethods {
 		}
 		if (whereConditions.size()){
 			query.append(" WHERE dbs.${whereConditions.join(" AND dbs.")}")
+			firstWhere = false
 		}
 
-		if (params.moveBundleId){
+		if (params.moveBundleId) {
+			if (firstWhere) {
+				query.append(" WHERE ")
+				firstWhere = false
+			} else {
+				query.append(" AND ")
+			}
 			if (params.moveBundleId!='unAssigned'){
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append(" WHERE dbs.moveBundle  = '$bundleName' ")
-			}else{
-				query.append(" WHERE dbs.moveBundle IS NULL ")
+				query.append(" dbs.moveBundle  = '$bundleName' ")
+			} else {
+				query.append(" dbs.moveBundle IS NULL ")
 			}
 		}
 		if (params.toValidate){
-			query.append(" WHERE dbs.validation='Discovery'")
+			if (firstWhere) {
+				query.append(" WHERE ")
+				firstWhere = false
+			} else {
+				query.append(" AND ")
+			}
+			query.append(" dbs.validation='Discovery'")
 		}
 		if (params.plannedStatus){
-			query.append(" WHERE dbs.planStatus='$params.plannedStatus'")
+			if (firstWhere) {
+				query.append(" WHERE ")
+				firstWhere = false
+			} else {
+				query.append(" AND ")
+			}
+			query.append(" dbs.planStatus='$params.plannedStatus'")
 		}
 
 		def dbsList = []
 		query.append(" ORDER BY $sortIndex $sortOrder")
+		System.out.println(">>>>>>>>>>>> query " + query.toString())
+		System.out.println(">>>>>>>>>>>> params " + queryParams)
 
 		if (queryParams.size()) {
 			dbsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
