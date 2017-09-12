@@ -1,8 +1,6 @@
 package net.transitionmanager.service.dataview
 
-// import net.transitionmanager.domain.Dataview
 import com.tdssrc.grails.JsonUtil
-import groovy.transform.CompileStatic
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -62,15 +60,24 @@ class DataviewSpec {
     private Boolean justPlanning
 
     // Constructor
-    DataviewSpec(Dataview dataview) {
-        spec = JsonUtil.parseJson(dataview.reportSchema)
-    }
+    DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
+        spec = command.filters
+        justPlanning = command.filters.justPlanning
+        args = [max: command.limit, offset: command.offset]
+        order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
 
-    DataviewSpec(DataviewUserParamsCommand command) {
-       spec = command.filters
-       justPlanning = command.filters.justPlanning
-       args = [max:command.limit, offset: command.offset]
-       order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING?'asc': 'desc']
+        if(dataview) {
+            JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
+            spec.domains = ((jsonDataview.domains.collect {it.toLowerCase()} as Set) + (spec.domains as Set)) as List
+
+            jsonDataview.columns.each { Map dataviewColumn ->
+                dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
+                Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
+                if(!specColumn){
+                    spec.columns += ([domain: dataviewColumn.domain , property: dataviewColumn.property , filter :dataviewColumn.filter?:"" ])
+                }
+            }
+        }
     }
 
     /**
@@ -95,7 +102,7 @@ class DataviewSpec {
     /**
      * Used determine if the spec has common domain that signifies multiple domains
      * @return true if there is common properties
-     */ 
+     */
     boolean hasCommonDomain() {
         domains contains COMMON
     }

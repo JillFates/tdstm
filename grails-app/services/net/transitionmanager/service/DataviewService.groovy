@@ -3,21 +3,13 @@
  */
 package net.transitionmanager.service
 
-import com.tds.asset.Application
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
-import grails.gorm.DetachedCriteria
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.UnauthorizedException
-import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.dataview.DataviewSpec
 
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -239,24 +231,22 @@ class DataviewService implements ServiceMethods {
 
     /**
      * Perform a query against one or domains specified in the DataviewSpec passed into the method
+     *
      * @param project - the project that the data should be isolated to
-     * @param domainClass - the principle domain Class that should be queried
-     * @param dataviewSpec - the specifications for the view/query
+     * @param dataviewId - the specifications for the view/query
      * @param userParams - parameters from the user for filtering and sort order
-     * @param userPrefs - any user perferences that the user may have for a give dataview (change of columns)
      * @return a List of Map values
      */
     // TODO : Annotate READONLY
     List<Map> query(
             Project project,
-            Class domainClass,
             Long dataviewId,
             DataviewUserParamsCommand userParams) {
 
         Dataview dataview = Dataview.get(dataviewId)
-        DataviewSpec dataviewSpec = new DataviewSpec(dataview)
+        DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
 
-        return previewQuery(project, domainClass, dataviewSpec, userParams /*, userPrefs*/)
+        return previewQuery(project, dataviewSpec /*, userPrefs*/)
     }
 
     /**
