@@ -7,7 +7,10 @@ import com.tdsops.tm.enums.domain.ValidationType
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.SecurityService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 
@@ -19,6 +22,7 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
+	AssetEntityService assetEntityService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -168,4 +172,93 @@ class WsAssetController implements ControllerMethods {
 			render "${id} not found."
 		}
 	}
+
+	/**
+	 * Search for All Dependencies of Asset A related to B,
+	 * There is no way to determinate the direction of the line when it have bi-directional links
+	 * @param assetA
+	 * @param assetB
+	 * @return
+	 */
+	@HasPermission(Permission.AssetView)
+	def getAssetDependencies(Long assetAId, Long assetBId){
+		AssetEntity assetA = AssetEntity.get(assetAId)
+		AssetEntity assetB = AssetEntity.get(assetBId)
+		// check that the assets are part of the project
+		if(!securityService.isCurrentProjectId(assetA.projectId) || !securityService.isCurrentProjectId(assetB.projectId)){
+			log.error(
+					"Security Violation, user {} attempted to access an asset not associated to the project",
+					securityService.getCurrentUsername()
+			)
+			errors << "Asset not found in current project"
+		}
+
+		List<AssetDependency> requiredDependenciesA = assetA.requiredDependencies()
+		AssetDependency dependencyA =  requiredDependenciesA.find {
+			it.dependent.id == assetBId
+		}
+
+		List<AssetDependency> requiredDependenciesB = assetB.requiredDependencies()
+		AssetDependency dependencyB =  requiredDependenciesB.find {
+			it.dependent.id == assetAId
+		}
+
+		def assetAClassLabel = AssetClass.classOptions.find {
+			it.key == AssetClass.getClassOptionForAsset(assetA)
+		}
+
+		def assetBClassLabel = AssetClass.classOptions.find {
+			it.key == AssetClass.getClassOptionForAsset(assetB)
+		}
+
+		def Project currentProject = securityService.getUserCurrentProject()
+
+		def dependencyMap = [
+			"assetA" : [
+					"name": assetA.assetName,
+					"assetClass": assetAClassLabel.value,
+					"environment": assetA.environment,
+					"bundle": assetA.moveBundleName,
+					"planStatus": assetA.planStatus,
+					"dependency": dependencyA,
+			],
+			"assetB" : [
+					"name": assetB.assetName,
+					"assetClass":  assetBClassLabel.value,
+					"environment": assetB.environment,
+					"bundle": assetB.moveBundleName,
+					"planStatus": assetB.planStatus,
+					"dependency": dependencyB,
+			],
+			"dataFlowFreq": AssetDependency.constraints.dataFlowFreq.inList,
+			"dependencyType": assetEntityService.entityInfo(currentProject).dependencyType,
+			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus,
+			"editPermission": securityService.hasPermission(Permission.AssetEdit)
+		]
+
+		renderSuccessJson(dependencyMap)
+	}
+
+	/**
+	 * Delete a dependency from an Asset.
+	 * @return
+	 */
+	@HasPermission(Permission.AssetEdit)
+	def deleteAssetDependency(){
+		AssetEntity assetEntity = AssetEntity.get(request.JSON.assetId)
+		assetEntityService.deleteAssetEntityDependencyOrException(securityService.getUserCurrentProject(), assetEntity, request.JSON.dependencyId)
+		renderSuccessJson()
+	}
+
+	/**
+	 * Update Asset Dependency Fields
+	 * @return
+	 */
+	@HasPermission(Permission.AssetEdit)
+	def updateCommonAssetDependencyFields() {
+		AssetEntity asset = AssetEntity.get(request.JSON.dependency.asset.id)
+		assetEntityService.updateAssetDependencyOrException(securityService.getUserCurrentProject(), asset, request.JSON.dependency.id, request.JSON.dependency)
+		renderSuccessJson()
+	}
+
 }
