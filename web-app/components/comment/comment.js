@@ -557,7 +557,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 		setTimeout(function(){
 			// Update the Grap after a change has been reflected
 			$(document).trigger('entityAssetUpdated', {});
-		}, 300);
+		}, 700);
 	}
 
 	/**

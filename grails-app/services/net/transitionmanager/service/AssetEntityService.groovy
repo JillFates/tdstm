@@ -609,7 +609,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @param assetEntity
 	 * @param dependencyId
 	 */
-	def deleteAssetEntityDependency(Project project, AssetEntity assetEntity, Long dependencyId) {
+	void deleteAssetEntityDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId) {
 		String error
 		try {
 			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
@@ -646,7 +646,7 @@ class AssetEntityService implements ServiceMethods {
 		}
 	}
 
-	private void updateAssetDependency(Project project, AssetEntity assetEntity, Long dependencyId, Map params) {
+	private void updateAssetDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId, Map params) {
 
 		validateAssetsAssocToProject([assetEntity.id], project)
 

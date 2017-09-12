@@ -836,12 +836,14 @@ function drawContextMenu() {
 					EntityCrud.showAssetDependencyEditView(data.source, data.target, 'view');
 				});
 
+				//<tds:hasPermission permission="${Permission.AssetEdit}">
 				var editDependencyItemId = '<li class="tempItem edit" id="editDependencyItemId">Edit Dependency</li>';
 				$(".customMenu").append(editDependencyItemId);
 				$("#editDependencyItemId").on('click', function (a, b) {
 					closeMenu();
 					EntityCrud.showAssetDependencyEditView(data.source, data.target, 'edit');
 				});
+				//</tds:hasPermission>
 			}
 
 			$(".customMenu").css({

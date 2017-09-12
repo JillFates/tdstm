@@ -18,7 +18,7 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
  * Created by @oluna on 4/5/17.
  */
 
-@Slf4j(value='logger', category='grails.app.controllers.WsAssetController')
+@Slf4j
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
@@ -232,7 +232,8 @@ class WsAssetController implements ControllerMethods {
 			],
 			"dataFlowFreq": AssetDependency.constraints.dataFlowFreq.inList,
 			"dependencyType": assetEntityService.entityInfo(currentProject).dependencyType,
-			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus
+			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus,
+			"editPermission": securityService.hasPermission(Permission.AssetEdit)
 		]
 
 		renderSuccessJson(dependencyMap)
@@ -244,16 +245,9 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetEdit)
 	def deleteAssetDependency(){
-        try {
-            AssetEntity assetEntity = AssetEntity.get(request.JSON.assetId)
-
-            assetEntityService.deleteAssetEntityDependency(securityService.getUserCurrentProject(), assetEntity, request.JSON.dependencyId)
-
-            renderSuccessJson()
-        }
-        catch (e) {
-            handleException e, logger
-        }
+		AssetEntity assetEntity = AssetEntity.get(request.JSON.assetId)
+		assetEntityService.deleteAssetEntityDependencyOrException(securityService.getUserCurrentProject(), assetEntity, request.JSON.dependencyId)
+		renderSuccessJson()
 	}
 
 	/**
@@ -262,14 +256,9 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetEdit)
 	def updateCommonAssetDependencyFields() {
-		try {
-			AssetEntity asset = AssetEntity.get(request.JSON.dependency.asset.id)
-			assetEntityService.updateAssetDependency(securityService.getUserCurrentProject(), asset, request.JSON.dependency.id, request.JSON.dependency)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		AssetEntity asset = AssetEntity.get(request.JSON.dependency.asset.id)
+		assetEntityService.updateAssetDependencyOrException(securityService.getUserCurrentProject(), asset, request.JSON.dependency.id, request.JSON.dependency)
+		renderSuccessJson()
 	}
 
 }
