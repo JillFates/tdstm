@@ -11,6 +11,7 @@ import { AssetExplorerViewConfigComponent } from './components/view-config/asset
 import { AssetExplorerViewSaveComponent } from './components/view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from './components/view-export/asset-explorer-view-export.component';
 import { AssetExplorerViewGridComponent } from './components/view-grid/asset-explorer-view-grid.component';
+import { AssetExplorerViewShowComponent } from './components/view-show/asset-explorer-view-show.component';
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
 import { SharedModule } from '../../shared/shared.module';
 import { Permission } from '../../shared/model/permission.model';
@@ -39,7 +40,8 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		AssetExplorerViewConfigComponent,
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent,
-		AssetExplorerViewGridComponent
+		AssetExplorerViewGridComponent,
+		AssetExplorerViewShowComponent
 	],
 	providers: [AssetExplorerService],
 	exports: [AssetExplorerIndexComponent],

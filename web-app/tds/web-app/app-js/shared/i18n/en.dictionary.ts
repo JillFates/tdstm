@@ -13,7 +13,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'ASSET_EXPLORER': {
 		'ASSET_EXPLORER': 'Asset Explorer',
-		'CREATE': 'Create Report'
+		'CREATE': 'Create View',
+		'EDIT': 'Edit View'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',

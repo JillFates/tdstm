@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Rx';
 
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
 import { AssetExplorerViewConfigComponent } from './components/view-config/asset-explorer-view-config.component';
+import { AssetExplorerViewShowComponent } from './components/view-show/asset-explorer-view-show.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 import { AssetExplorerService } from './service/asset-explorer.service';
@@ -21,6 +22,10 @@ export class AssetExplorerStates {
 	public static readonly REPORT_EDIT = {
 		name: 'tds.assetexplorer_edit',
 		url: '/assetexplorer/views/:id/edit'
+	};
+	public static readonly REPORT_SHOW = {
+		name: 'tds.assetexplorer_show',
+		url: '/assetexplorer/views/:id/show'
 	};
 }
 
@@ -111,10 +116,10 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		page: {
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
-			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.CREATE']
+			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.EDIT']
 		},
 		requiresAuth: true,
-		requiresPermission: 'AssetExplorerCreate',
+		requiresPermission: 'AssetExplorerEdit',
 		hasPendingChanges: false
 	},
 	views: {
@@ -147,10 +152,37 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 	]
 };
 
+export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclaration>{
+	name: AssetExplorerStates.REPORT_SHOW.name,
+	url: AssetExplorerStates.REPORT_SHOW.url,
+	data: {
+		page: {
+			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
+			instruction: '',
+			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER']
+		},
+		requiresAuth: true,
+		hasPendingChanges: false
+	},
+	views: {
+		'headerView@tds': { component: HeaderComponent },
+		'containerView@tds': { component: AssetExplorerViewShowComponent }
+	},
+	resolve: [
+		{
+			token: 'report',
+			policy: { async: 'RXWAIT' },
+			deps: [AssetExplorerService, Transition],
+			resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
+		}
+	]
+};
+
 export const ASSET_EXPLORER_STATES = [
 	assetExplorerReportSelectorState,
 	assetExplorerReportCreatorState,
 	assetExplorerReportEditState,
+	assetExplorerReportShowState,
 	{
 		name: 'tds.assetexplorerCopy',
 		url: '/assetexplorer/views/',
