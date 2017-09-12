@@ -246,7 +246,7 @@ class DataviewService implements ServiceMethods {
         Dataview dataview = Dataview.get(dataviewId)
         DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
 
-        return previewQuery(project, dataviewSpec /*, userPrefs*/)
+        return previewQuery(project, dataviewSpec)
     }
 
     /**
@@ -322,17 +322,6 @@ class DataviewService implements ServiceMethods {
         def hql = queryFields + "\n" + queryFrom + order
         log.debug "DataViewService previewQuery hql: ${hql}"
         def assets = AssetEntity.executeQuery(hql, params, dataviewSpec.args)
-
-        // Strip out non assetClass data that may have leaked into the result set. This only needs to be addressed if
-        // there is more than domain in the query.
-        // [
-        // 	common.id: 123,
-        // 	common.assetName: 'foo',
-        // 	common.assetClass: 'Application',
-        // 	application.businessUnit: 'HR',
-        // 	device.os: ''
-        // ]
-        // Because it is assetClass Application, the device properties should be removed but the common to remain.
 
         assets.collect { columns ->
             Map row = [:]

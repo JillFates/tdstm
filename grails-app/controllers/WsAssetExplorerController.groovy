@@ -137,10 +137,6 @@ class WsAssetExplorerController implements ControllerMethods {
 			return
 		}
 
-		// Eventually we'll incorporate the Users' override preferences on the dataview
-		// DataviewUserPreference userPref
-		// List<Map> data = dataviewService.query(project, id, userPref, userParams, pagination)
-
 		List<Map> data = dataviewService.query(project, id, userParams)
 		renderSuccessJson(data)
 	}
