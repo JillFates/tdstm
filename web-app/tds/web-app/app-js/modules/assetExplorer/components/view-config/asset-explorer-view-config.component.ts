@@ -310,7 +310,20 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onPreview(justPlanning): void {
 		this.justPlanning = justPlanning;
-		console.log(this.justPlanning);
+		this.assetExpService.previewQuery({
+			offset: 5,
+			limit: 25,
+			sortDomain: this.model.schema.sort.domain,
+			sortField: this.model.schema.sort.property,
+			sortOrder: this.model.schema.sort.order,
+			justPlanning: justPlanning,
+			viewSpec: {
+				domains: this.model.schema.domains,
+				columns: this.model.schema.columns
+			}
+		}).subscribe(result => {
+			console.log(result);
+		}, err => console.log(err));
 	}
 
 	protected onClearTextFilter() {

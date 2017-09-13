@@ -1,9 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
+import { StateService } from '@uirouter/angular';
+import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { ViewModel } from '../../model/view.model';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { Permission } from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'asset-explorer-view-show',
@@ -16,7 +20,9 @@ export class AssetExplorerViewShowComponent {
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
 		private dialogService: UIDialogService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private assetService: AssetExplorerService,
+		private stateService: StateService) {
 		report.subscribe(
 			(result) => {
 				this.model = result;
@@ -24,8 +30,43 @@ export class AssetExplorerViewShowComponent {
 			(err) => console.log(err));
 	}
 
-	protected onPreview(justPlanning): void {
+	protected onQuery(justPlanning): void {
 		console.log(justPlanning);
+		this.assetService.query(this.model.id, {
+			offset: 5,
+			limit: 25,
+			sortDomain: this.model.schema.sort.domain,
+			sortField: this.model.schema.sort.property,
+			sortOrder: this.model.schema.sort.order,
+			justPlanning: justPlanning,
+			filters: {
+				columns: this.model.schema.filters.map(c => {
+					return {
+						domain: c.domain,
+						property: c.property,
+						filter: c.filter
+					};
+				})
+			}
+		}).subscribe(result => {
+			console.log(result);
+		}, err => console.log(err));
+	}
+
+	protected onEdit(): void {
+		this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+	}
+
+	protected isSaveAsAvailable(): boolean {
+		return this.model.isSystem ?
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
+			this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
+	}
+
+	protected isEditAvailable(): boolean {
+		return this.model.isSystem ?
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
+			this.permissionService.hasPermission(Permission.AssetExplorerEdit);
 	}
 
 }
