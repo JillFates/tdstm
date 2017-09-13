@@ -25,6 +25,13 @@ class DataviewService implements ServiceMethods {
     // Properties used in validating the JSON Create and Update functions
     static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
     static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
+    static final Map<String, String> fieldsTransformMapping = [
+            "moveBundle"  : "moveBundle.name",
+            "project"     : "project.description",
+            "manufacturer": "manufacturer.name",
+            "sme"         : "sme.firstName",
+            "sme2"        : "sme2.firstName"
+    ]
 
     /**
      * Query for getting all projects where: belong to current project and either shared, system or are owned by
@@ -280,9 +287,7 @@ class DataviewService implements ServiceMethods {
      * 		]
      */
     // TODO : Annotate READONLY
-    List<Map> previewQuery(
-            Project project,
-            DataviewSpec dataviewSpec) {
+    List<Map> previewQuery( Project project, DataviewSpec dataviewSpec) {
 
         Map params = [:]
         String queryFields = ""
@@ -300,20 +305,22 @@ class DataviewService implements ServiceMethods {
 
         dataviewSpec.columns.findAll { column ->
 
-            String property = column.property
+            String property = transformProperty(column.property)
+            String namedParameter = transformNamedParameter(column.property)
+
             def values = column.filter.split("\\|")?.findAll { it?.trim() != "" }
 
             queryFields += queryFields.isEmpty() ? "select " : ", "
             queryFields += " ${property}"
 
             if (values.size() == 1) {
-                queryFrom += " and ${property} like :${property} \n"
-                params[property] = "%$values%"
+                queryFrom += " and ${property} like :${namedParameter} \n"
+                params[namedParameter] = "%${values[0]}%"
             } else if (values.size() > 1) {
                 // Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
                 // TODO : In ticket TM-6532 we'll expand on the different types of queries
-                queryFrom += " and ${property} in (:${property}) \n"
-                params[property] = values
+                queryFrom += " and ${property} in (:${namedParameter}) \n"
+                params[namedParameter] = values
             }
         }
 
@@ -330,6 +337,33 @@ class DataviewService implements ServiceMethods {
             }
             row
         }
+    }
+    /**
+     *
+     * Transform property based on fieldsTransformMapping Map.
+     *
+     * When preview query uses a non String field like MoveBundle or Person relation.
+     * In that case we need to do the following transformation for HQL query:
+     *
+     *  "moveBundle" --> "moveBundle.name"
+     *
+     * @param property It is a property name from preview query
+     * @return
+     */
+    private String transformProperty(String property) {
+        fieldsTransformMapping[property]?:property
+    }
+    /**
+     *
+     * Transform named parameter based on fieldsTransformMapping Map for HQL query
+     *
+     * "moveBundle" --> "moveBundlename"
+     *
+     * @param property It is a property name from preview query
+     * @return
+     */
+    private String transformNamedParameter(String property) {
+        (fieldsTransformMapping[property]?:property).replace('.', '')
     }
 
 }
