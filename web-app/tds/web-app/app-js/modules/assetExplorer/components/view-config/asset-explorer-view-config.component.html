@@ -40,9 +40,15 @@
 					<a href="#tab_1" data-toggle="tab">Asset Classes</a>
 				</li>
 				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':model.id}">
-					<a *ngIf="!isAssetSelected();else selected">Fields</a>
-					<ng-template #selected>
+					<a *ngIf="!isAssetSelected();else fieldsTabLink">Fields</a>
+					<ng-template #fieldsTabLink>
 						<a href="#tab_2" data-toggle="tab" #link>Fields</a>
+					</ng-template>
+				</li>
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
+					<a *ngIf="!isAssetSelected();else columnsTabLink">Columns</a>
+					<ng-template #columnsTabLink>
+						<a href="#tab_3" data-toggle="tab" #link>Columns</a>
 					</ng-template>
 				</li>
 				<li class="pull-right" role="presentation">
@@ -57,7 +63,7 @@
 				</li> -->
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
-				<div class="tab-pane" [ngClass]="{'active':!model.id}" id="tab_1">
+				<div class="tab-pane" style="padding-left:15px" [ngClass]="{'active':!model.id}" id="tab_1">
 					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label> <br>
 					<div class="checkbox" *ngFor="let asset of assetClasses">
 						<label>
@@ -114,23 +120,46 @@
 					</div>
 
 				</div>
+				<div class="tab-pane" style="padding-left:15px" id="tab_3">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
+								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="model.schema.columns" [navigatable]="true" [animation]="false"
+								 class="row" itemClass="item col-sm-3 col-md-3 col-lg-2" activeItemClass="item col-sm-3 col-md-3 col-lg-2 active" disabledItemClass="item col-sm-3 col-md-3 col-lg-2 disabled"
+								 [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
+									<ng-template let-item="item" let-index="index">
+										<div>
+											<label style="margin-top:5px;font-weight: normal" for="">{{item.label}}</label>
+											<div class="checkbox pull-right" style="margin:5px;">
+												<label for="">
+														<input type="checkbox" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> Locked
+												</label>
+											</div>
+										</div>
+									</ng-template>
+								</kendo-sortable>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="box box-primary">
-			<div class="box-header with-border">
-				<h3 class="box-title">Selected Columns Preview</h3>
-				<div class="box-tools pull-right">
-					<button class="btn btn-box-tool" (click)="onToggleSelectedColumnsPreview()"><i class="fa fa-minus"></i></button>
+		<div class="box box-primary ">
+			<div class="box-header with-border ">
+				<h3 class="box-title ">Selected Columns Preview</h3>
+				<div class="box-tools pull-right ">
+					<button class="btn btn-box-tool " (click)="onToggleSelectedColumnsPreview() "><i class="fa fa-minus "></i></button>
 				</div>
 				<!-- /.box-tools -->
 			</div>
 			<!-- /.box-header -->
-			<div class="box-body" [hidden]="collapsedColumnsPreview">
-				<asset-explorer-view-grid [model]="model.schema"></asset-explorer-view-grid>
+			<div class="box-body " [hidden]="collapsedColumnsPreview ">
+				<asset-explorer-view-grid [model]="model.schema "></asset-explorer-view-grid>
 			</div>
 			<!-- /.box-body -->
 		</div>
 		<!-- /.box -->
-		<!-- <a href="javascript:void(0)" (click)="onBackToStart()"><i class="fa fa-chevron-left"></i> Back to View List</a> -->
+		<!-- <a href="javascript:void(0) " (click)="onBackToStart() "><i class="fa fa-chevron-left "></i> Back to View List</a> -->
 	</section>
 </div>

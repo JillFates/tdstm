@@ -40,7 +40,7 @@
 					</tr>
 				</table>
 			</div>
-			<tds:hasPermission permission="${Permission.CommentView}">
+            <tds:hasPermission permission="${Permission.CommentEdit}">
 				<div class="buttons" style="white-space: nowrap;">
 					<span class="button" class="slide">
 					<span class="slide">

@@ -32,7 +32,7 @@
 </button>
 </tds:hasPermission>
 
-<tds:hasPermission permission="AssetEdit">
+<tds:hasPermission permission="${net.transitionmanager.security.Permission.CommentCreate}">
     <button class="btn btn-default" type="button" onclick="createIssue('${escapedName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
         <img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px"/> Add Comment
     </button>

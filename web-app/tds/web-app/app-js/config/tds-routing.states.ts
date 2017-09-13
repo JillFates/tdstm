@@ -87,6 +87,10 @@ export function PermissionConfig(router: UIRouter) {
 }
 
 export function MiscConfig(router: UIRouter) {
+	router.stateService.defaultErrorHandler(() => {
+		router.stateService.go(SharedStates.ERROR.name);
+	});
+
 	const transitionService = router.transitionService;
 	transitionService.onStart({
 		to: (state) => state.data,
@@ -100,13 +104,6 @@ export function MiscConfig(router: UIRouter) {
 	}, (transition) => {
 		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
 		setTimeout(() => loaderService.hide());
-	}, { priority: 10 });
-
-	transitionService.onError({
-		to: (state) => state.data
-	}, (transition) => {
-		const $state = transition.router.stateService;
-		return $state.target(SharedStates.ERROR.name, undefined, { location: false });
 	}, { priority: 10 });
 
 	transitionService.onExit({

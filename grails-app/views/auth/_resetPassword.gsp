@@ -57,7 +57,7 @@
 					</p>
 					<div class="checkbox">
 						<label>
-							<input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="showPasswordEditId"/> Hide password
+							<input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="showPasswordEditId" checked/> Hide password
 						</label>
 					</div>
 
@@ -67,7 +67,7 @@
 					</div>
 
 					<div class="form-group has-feedback">
-						<input type="text" id="passwordId" class="form-control passwordField" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)"/>
+						<input type="password" id="passwordId" class="form-control passwordField" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)"/>
 					</div>
 
 					<em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
@@ -79,6 +79,11 @@
 						<li><em id="numericRequirementId">Numeric characters<b class="ok"></b></em></li>
 						<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
 					</ul>
+
+					<div class="form-group has-feedback">
+						<input type="password" id="confirmPasswordId" class="form-control passwordField" name="confirmPassword" autocorrect="off" autocapitalize="off" placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)"/>
+					</div>
+					<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
 
 					<g:if test="${flash.message}">
 						<div class="message">${flash.message}</div>

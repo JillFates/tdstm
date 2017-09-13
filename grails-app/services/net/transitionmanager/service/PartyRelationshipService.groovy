@@ -817,10 +817,10 @@ class PartyRelationshipService implements ServiceMethods {
 		List<PartyRole> existingRoles = PartyRole.executeQuery('''
 			from PartyRole
 			where party = :person
-			  and roleType.description like :type
+			  and roleType.type = :type
 			  and roleType.id not in (:roles)
 			group by roleType
-		''', [person: person, type: type + '%', roles: assignedRoles])?.roleType
+		''', [person: person, type: type, roles: assignedRoles])?.roleType
 
 		if (existingRoles) {
 			PartyRole.executeUpdate('''

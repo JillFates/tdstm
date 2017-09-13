@@ -150,5 +150,10 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 export const ASSET_EXPLORER_STATES = [
 	assetExplorerReportSelectorState,
 	assetExplorerReportCreatorState,
-	assetExplorerReportEditState
+	assetExplorerReportEditState,
+	{
+		name: 'tds.assetexplorerCopy',
+		url: '/assetexplorer/views/',
+		redirectTo: 'tds.assetexplorer'
+	}
 ];

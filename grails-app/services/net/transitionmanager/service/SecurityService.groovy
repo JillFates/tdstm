@@ -674,7 +674,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * Validate the new password and change the user's password.
 	 */
 	@Transactional
-	PasswordReset applyPasswordFromPasswordReset(String token, String password, String email) throws ServiceException, DomainUpdateException, InvalidParamException {
+	PasswordReset applyPasswordFromPasswordReset(String token, String password, confirmPassword, String email) throws ServiceException, DomainUpdateException, InvalidParamException {
 
 		PasswordReset pr = validateToken(token)
 
@@ -687,7 +687,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		// Perform some validation and then attempt to set the user's new password
-		setUserLoginPassword(pr.userLogin, password)
+		setUserLoginPassword(pr.userLogin, password, confirmPassword)
 
 		String errMsg = 'An error occurred while attempting to save your new password'
 
@@ -768,7 +768,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @throws DomainUpdateException
 	 */
 	@Transactional
-	void setUserLoginPassword(UserLogin userLogin, String unhashedPassword, Boolean isNewUser=false) throws DomainUpdateException, InvalidParamException {
+	void setUserLoginPassword(UserLogin userLogin, String unhashedPassword, String confirmPassword, Boolean isNewUser=false) throws DomainUpdateException, InvalidParamException {
+		// Check for password confirmation
+		if (!(unhashedPassword == confirmPassword)) {
+			throw new InvalidParamException('The password and the password confirmation do not match')
+		}
 		// Make sure that the password strength is legitimate
 		if (!validPasswordStrength(userLogin.username, unhashedPassword)) {
 			throw new InvalidParamException('The new password does not comply with password requirements')
@@ -1064,7 +1068,7 @@ logger.debug "mergePersonsUserLogin() entered"
 
 		// Before checking other password flags, Attempt to set the password if it was set
 		if (params.password) {
-			setUserLoginPassword(userLogin, (String) params.password, isNewUser)
+			setUserLoginPassword(userLogin, (String) params.password, (String) params.confirmPassword, isNewUser)
 		}
 
 		if (params.isLocal) {
@@ -1140,7 +1144,7 @@ logger.debug "mergePersonsUserLogin() entered"
 		}
 
 		// Remove any Roles that are not in the above list
-		partyRelationshipService.updatePartyRoleByType('system', person, assignedRoles)
+		partyRelationshipService.updatePartyRoleByType(RoleType.SECURITY, person, assignedRoles)
 
 		if (setUserRoles(assignedRoles, person.id)) {
 			throw new DomainUpdateException('Unable to update user security roles')
@@ -1719,9 +1723,9 @@ logger.debug "mergePersonsUserLogin() entered"
 			where id not in (select roleType.id from PartyRole
 			                 where party=?
 			                 group by roleType.id)
-			  and (description like 'staff%' OR description like 'system%')
+			  and (type = ? OR type = ?)
 			order by description
-		''', [person])
+		''', [person, RoleType.TEAM, RoleType.SECURITY])
 	}
 
 	@Transactional

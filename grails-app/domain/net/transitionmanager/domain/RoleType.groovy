@@ -55,19 +55,7 @@ class RoleType {
 	}
 
 	String toString() {
-		if (description) {
-			// Strip off the prefix that contains the 'Staff : ' or other prefixes
-			int idx = description.lastIndexOf(':')
-			if (idx > 0) {
-				description.substring(idx + 1).trim()
-			}
-			else {
-				description.trim()
-			}
-		}
-		else {
-			'UNDEFINED'
-		}
+		description
 	}
 
 	def beforeValidate() {

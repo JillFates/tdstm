@@ -604,6 +604,90 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Helper Method to de Delete a Dependency from an Asset Entity
+	 * @param project
+	 * @param assetEntity
+	 * @param dependencyId
+	 */
+	void deleteAssetEntityDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId) {
+		String error
+		try {
+			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
+				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
+			}
+
+			// Verifying assetEntity assigned to the project
+			validateAssetsAssocToProject([assetEntity.id], project)
+
+			// Collecting dependency id and fetching the instance
+			AssetDependency toDelDepObj = dependencyId ? AssetDependency.get(dependencyId).find() : []
+
+			// Delete dependency
+			if (toDelDepObj) {
+				// Gather the assets referenced by the dependendency and make sure is associated to the project
+				validateAssetsAssocToProject([toDelDepObj.id], project)
+
+				// Delete the dependencies
+				AssetDependency.executeUpdate('delete AssetDependency where id = (:id)', [id: toDelDepObj.id])
+			}
+
+		} catch (DomainUpdateException | InvalidRequestException e) {
+			error = e.message
+		} catch (RuntimeException rte) {
+			//rte.printStackTrace()
+			log.error ExceptionUtil.stackTraceToString(rte, 60)
+			error = 'An error occurred that prevented the update'
+		}
+
+		if (error) {
+			assetEntity.discard()
+			transactionStatus.setRollbackOnly()
+			throw new DomainUpdateException(error)
+		}
+	}
+
+	private void updateAssetDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId, Map params) {
+
+		validateAssetsAssocToProject([assetEntity.id], project)
+
+		List<String> propNames = ['dataFlowFreq', 'type', 'status', 'comment']
+
+		AssetDependency assetDependency = AssetDependency.get(dependencyId)
+		if (!assetDependency) {
+			throw new InvalidRequestException("Unable to find referenced dependency ($dependencyId)")
+		}
+
+		AssetEntity depAsset = AssetEntity.get(assetEntity.id)
+		if (!depAsset) {
+			throw new InvalidRequestException("Unable to find asset ($depAssetId)")
+		}
+
+		AssetDependency.withNewSession { hibernateSession ->
+			AssetDependency dupAd = AssetDependency.findByAssetAndDependent(assetEntity, depAsset)
+			if (dupAd && (dependencyId < 1 || (dependencyId > 0 && dependencyId != dupAd.id))) {
+				throw new InvalidRequestException("Duplicate dependencies not allow for $depAsset.assetName")
+			}
+		}
+
+		// Update the fields
+		propNames.each { String paramName ->
+			if (params.containsKey(paramName)) {
+				assetDependency[paramName] = params[paramName]
+			} else {
+				log.warn "addOrUpdateDependencies() request was missing property $paramName, user=$securityService.currentUsername, asset=$asset"
+			}
+		}
+
+		assetDependency.updatedBy = securityService.loadCurrentPerson()
+
+		log.debug "updateAssetDependency() Attempting to UPDATE dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
+		if (!assetDependency.validate() || !assetDependency.save(force:true)) {
+			throw new DomainUpdateException("Unable to save dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
+		}
+
+	}
+
+	/**
 	 * A helper method for createOrUpdateAssetEntityAndDependencies which does the actual adds and
 	 * updates of dependencies from the web request
 	 * @param project - instance of the user's currently assigned project

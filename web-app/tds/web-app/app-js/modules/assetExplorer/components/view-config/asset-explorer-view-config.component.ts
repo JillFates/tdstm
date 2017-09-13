@@ -193,7 +193,11 @@ export class AssetExplorerViewConfigComponent {
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
-		return this.model.schema.domains.length > 0;
+		let isSelected = this.model.schema.domains.length > 0;
+		if (this.model.schema.domains.length === 1) {
+			return this.model.schema.domains[0] !== 'COMMON';
+		}
+		return isSelected;
 	}
 
 	protected isColumnSelected(): boolean {
@@ -287,7 +291,7 @@ export class AssetExplorerViewConfigComponent {
 			this.model.schema.columns.push({
 				domain: field['domain'],
 				property: field.field,
-				width: 50,
+				width: 200,
 				locked: false,
 				edit: false,
 				label: field.label

@@ -114,7 +114,7 @@ function changePersonDetails () {
 		var parameters = 'id=' + $('#personId').val()
         +'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
         +'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #oldPasswordId').val()
-        +'&newPassword='+$('#personDialog #passwordId').val()
+        +'&newPassword='+$('#personDialog #passwordId').val() +'&confirmPassword='+$('#personDialog #confirmPasswordId').val()
         +'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
         +'&powerType='+powerType+'&startPage='+startPage
 
