@@ -229,8 +229,6 @@ class DatabaseController implements ControllerMethods {
 
 		def dbsList = []
 		query.append(" ORDER BY $sortIndex $sortOrder")
-		System.out.println(">>>>>>>>>>>> query " + query.toString())
-		System.out.println(">>>>>>>>>>>> params " + queryParams)
 
 		if (queryParams.size()) {
 			dbsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
