@@ -33,7 +33,7 @@ export class AssetExplorerViewGridComponent {
 		if (this.mouseDown) {
 			let xValueChange = event.clientX - this.lastEvent.clientX;
 			let width = this.selectColumn.width + (xValueChange);
-			this.selectColumn.width = width < 50 ? 50 : width;
+			this.selectColumn.width = width < 100 ? 100 : width;
 			this.lastEvent = event;
 		}
 	}
