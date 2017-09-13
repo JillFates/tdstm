@@ -1,15 +1,24 @@
 <kendo-grid (mouseup)="onMouseUp()" (mousemove)="onMouseMove($event)">
+	<ng-template kendoGridToolbarTemplate [position]="'top'">
+		<div class="col-xs-6">
+			<div class="checkbox">
+				<label><input type="checkbox" (change)="onReload()" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
+			</div>
+		</div>
+		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+	</ng-template>
 	<kendo-grid-column [sortable]="{mode:'multiple'}" *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}.{{column.property}}"
 	 [width]="column.width">
 		<ng-template kendoGridHeaderTemplate>
 			<div>
 				<label for=""> {{column.label}}</label>
-				<i style="cursor:e-resize" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i>
+				<i style="cursor:e-resize" *ngIf="edit" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i>
 			</div>
 			<div class=" has-feedback" style="margin-bottom:0px;">
-				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Default Filter"
-				 value="">
-				<span (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+				<input type="text" (keyup.enter)="onReload()" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter"
+				 placeholder="Default Filter" value="">
+				<span (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
+				 aria-hidden="true"></span>
 			</div>
 		</ng-template>
 	</kendo-grid-column>

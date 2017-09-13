@@ -11,6 +11,7 @@ import { ViewModel } from '../../model/view.model';
 })
 export class AssetExplorerViewShowComponent {
 	model: ViewModel;
+	data = [];
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
@@ -22,4 +23,9 @@ export class AssetExplorerViewShowComponent {
 			},
 			(err) => console.log(err));
 	}
+
+	protected onPreview(justPlanning): void {
+		console.log(justPlanning);
+	}
+
 }

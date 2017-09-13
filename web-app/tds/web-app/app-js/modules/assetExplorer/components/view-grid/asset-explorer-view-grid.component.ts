@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import { ViewSpec, ViewColumn } from '../../model/view-spec.model';
 
@@ -9,14 +9,14 @@ import { ViewSpec, ViewColumn } from '../../model/view-spec.model';
 export class AssetExplorerViewGridComponent {
 
 	@Input() model: ViewSpec;
+	@Input() data: [any];
+	@Output() modelChange = new EventEmitter<boolean>();
+	@Input() edit: boolean;
 
 	mouseDown = false;
 	lastEvent: MouseEvent;
 	selectColumn: ViewColumn;
-
-	protected toggleProperty(column: ViewColumn, property: 'edit' | 'locked') {
-		column[property] = !column[property];
-	}
+	justPlanning = false;
 
 	onMouseUp(): void {
 		this.mouseDown = false;
@@ -40,6 +40,11 @@ export class AssetExplorerViewGridComponent {
 
 	clearText(column: ViewColumn): void {
 		column.filter = '';
+		this.onReload();
+	}
+
+	onReload(): void {
+		this.modelChange.emit(this.justPlanning);
 	}
 
 }

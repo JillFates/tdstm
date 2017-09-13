@@ -47,12 +47,15 @@ export class AssetExplorerViewConfigComponent {
 	collapsedColumnsPreview = false;
 	columnIndex = 0;
 	rowIndex = 0;
+	justPlanning = false;
 
 	model: ViewModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
 	position: any[] = [];
+	data = [];
+
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
 		private assetExpService: AssetExplorerService,
@@ -305,21 +308,9 @@ export class AssetExplorerViewConfigComponent {
 		}
 	}
 
-	protected onPreview(): void {
-		this.model.schema.columns = this.filteredData
-			.map((d) => d.fields
-				.filter((f) => f['selected'])
-				.map((f) => {
-					return {
-						domain: d.domain,
-						property: f.field,
-						width: 50,
-						locked: false,
-						edit: false,
-						label: f.label
-					};
-				}))
-			.reduce((p, c) => p.concat(c), []);
+	protected onPreview(justPlanning): void {
+		this.justPlanning = justPlanning;
+		console.log(this.justPlanning);
 	}
 
 	protected onClearTextFilter() {

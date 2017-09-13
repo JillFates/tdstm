@@ -15,7 +15,7 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-                <asset-explorer-view-grid [model]="model.schema"></asset-explorer-view-grid>
+                <asset-explorer-view-grid (modelChange)="onPreview($event)" [edit]="false" [data]="data" [model]="model.schema"></asset-explorer-view-grid>
             </div>
             <!-- /.box-body -->
         </div>

@@ -56,7 +56,7 @@
 				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
-					 name="btnPreview" (click)="onPreview()">Preview</button>
+					 name="btnPreview" (click)="onPreview(justPlanning)">Preview</button>
 				</li>
 				<!-- <li class="pull-right" role="presentation">
 					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
@@ -111,7 +111,7 @@
 					<div class="row" style="overflow:auto;margin:0 5px;">
 						<div style="position:relative;float:left;height:375px;">
 							<div [ngStyle]="position[fieldIndex]" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
-								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | translate}} Fields</label>
+								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | uppercase | translate}} Fields</label>
 								<ng-template #defaultField>
 									<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (change)="onFieldSelection(field)"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
 								</ng-template>
@@ -126,8 +126,8 @@
 							<div class="form-group">
 								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
 								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="model.schema.columns" [navigatable]="true" [animation]="false"
-								 class="row" itemClass="item col-sm-3 col-md-3 col-lg-2" activeItemClass="item col-sm-3 col-md-3 col-lg-2 active" disabledItemClass="item col-sm-3 col-md-3 col-lg-2 disabled"
-								 [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
+								 class="row" itemClass="item col-sm-3 col-md-3 col-lg-2" activeItemClass="item col-sm-3 col-md-3 col-lg-2 active"
+								 disabledItemClass="item col-sm-3 col-md-3 col-lg-2 disabled" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
 									<ng-template let-item="item" let-index="index">
 										<div>
 											<label style="margin-top:5px;font-weight: normal" for="">{{item.label}}</label>
@@ -155,7 +155,7 @@
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body " [hidden]="collapsedColumnsPreview ">
-				<asset-explorer-view-grid [model]="model.schema "></asset-explorer-view-grid>
+				<asset-explorer-view-grid (modelChange)="onPreview($event)" [edit]="true" [data]="data" [model]="model.schema"></asset-explorer-view-grid>
 			</div>
 			<!-- /.box-body -->
 		</div>
