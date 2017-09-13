@@ -482,96 +482,98 @@ $(document).ready(function() {
 								<div id="eventDataTableId" style="overflow-y: hidden;">
 									<table class="dashboard_right_table dashboard_stat_table">
 										<thead>
-										<tr>
-											<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
-												Unassigned
-											</th>
+                                            <tr>
+                                                <th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
+                                                    Unassigned
+                                                </th>
 
-											<g:each in="${moveEventList}" var="event">
-												<th class="dashboard_stat_exec_tdmc dashboard_stat_exec_tdmc_title" >
-													<g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
-														${event}
-													</g:link>
-												</th>
-											</g:each>
-											<th class="dashboard_stat_exec_tdmc"></th>
-										</tr>
-										<tr>
-											<g:each in="${moveEventList}" var="event">
-												<td class="dashboard_stat_exec_tdmc " style="font-size: 10px ;" nowrap>
-													<b>${eventStartDate[event.id]}</b>
-												</td>
-											</g:each>
-											<td></td>
-										</tr>
-										<tr>
-											<g:each in="${moveEventList}" var="event">
-												<td class="dashboard_stat_exec_tdmc" style="font-size: 10px;">
-													<b> ${event.runbookStatus ?: ''}</b>
-												</td>
-											</g:each>
-											<td>Done</td>
-										</tr>
+                                                <g:each in="${moveEventList}" var="event">
+                                                    <th class="dashboard_stat_exec_tdmc dashboard_stat_exec_tdmc_title" >
+                                                        <g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
+                                                            ${event}
+                                                        </g:link>
+                                                    </th>
+                                                </g:each>
+                                                <th class="dashboard_stat_exec_tdmc"></th>
+                                            </tr>
+                                            <tr>
+                                                <g:each in="${moveEventList}" var="event">
+                                                    <td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right;" nowrap>
+                                                        <b>${eventStartDate[event.id]}</b>
+                                                    </td>
+                                                </g:each>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <g:each in="${moveEventList}" var="event">
+                                                    <td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right">
+                                                        <b> ${event.runbookStatus ?: ''}</b>
+                                                    </td>
+                                                </g:each>
+                                                <td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right;">
+                                                    <b>Done</b>
+                                                </td>
+                                            </tr>
 										</thead>
 										<tbody>
 
-										<%-- Applications --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:applicationCount, unassignedCount:unassignedAppCount, percDone:percAppDoneCount, controller:'application', filter:'application', list:appList]"
-												/>
+                                            <%-- Applications --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:applicationCount, unassignedCount:unassignedAppCount, percDone:percAppDoneCount, controller:'application', filter:'application', list:appList]"
+                                                    />
 
-										<%-- Servers (Summary) --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:totalServerCount, unassignedCount:unassignedServerCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]"
-												/>
+                                            <%-- Servers (Summary) --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:totalServerCount, unassignedCount:unassignedServerCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]"
+                                                    />
 
-										<%-- Physical Servers --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:phyServerCount, unassignedCount:unassignedPhysicalServerCount, percDone:percentagePhysicalServerCount, controller:'assetEntity', filter:'physicalServer', list:phyServerList]"
-												/>
+                                            <%-- Physical Servers --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:phyServerCount, unassignedCount:unassignedPhysicalServerCount, percDone:percentagePhysicalServerCount, controller:'assetEntity', filter:'physicalServer', list:phyServerList]"
+                                                    />
 
-										<%-- Virtual Servers --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:virtServerCount, unassignedCount:unassignedVirtualServerCount, percDone:percVirtualServerCount, controller:'assetEntity', filter:'virtualServer', list:virtServerList]"
-												/>
+                                            <%-- Virtual Servers --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:virtServerCount, unassignedCount:unassignedVirtualServerCount, percDone:percVirtualServerCount, controller:'assetEntity', filter:'virtualServer', list:virtServerList]"
+                                                    />
 
-										<%-- Databases --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:dbCount, unassignedCount:unassignedDbCount, percDone:percentageDBCount, controller:'database', filter:'db', list:dbList]"
-												/>
+                                            <%-- Databases --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:dbCount, unassignedCount:unassignedDbCount, percDone:percentageDBCount, controller:'database', filter:'db', list:dbList]"
+                                                    />
 
-										<%-- Physical Storage --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:phyStorageCount, unassignedCount:unAssignedPhyStorageCount, percDone:percentagePhyStorageCount, controller:'assetEntity', filter:'storage', list:phyStorageList]"
-												/>
+                                            <%-- Physical Storage --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:phyStorageCount, unassignedCount:unAssignedPhyStorageCount, percDone:percentagePhyStorageCount, controller:'assetEntity', filter:'storage', list:phyStorageList]"
+                                                    />
 
-										<%-- Logical Storage --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:fileCount, unassignedCount:unassignedFilesCount, percDone:percentageFilesCount, controller:'files', filter:'storage', list:filesList]"
-												/>
+                                            <%-- Logical Storage --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:fileCount, unassignedCount:unassignedFilesCount, percDone:percentageFilesCount, controller:'files', filter:'storage', list:filesList]"
+                                                    />
 
-										<%-- Other Devices --%>
-										<g:render template="planningStatsExecRow"
-												  model="[assetCount:otherAssetCount, unassignedCount:unassignedOtherCount, percDone:percentageOtherCount, controller:'assetEntity', filter:'other', list:otherTypeList]"
-												/>
+                                            <%-- Other Devices --%>
+                                            <g:render template="planningStatsExecRow"
+                                                      model="[assetCount:otherAssetCount, unassignedCount:unassignedOtherCount, percDone:percentageOtherCount, controller:'assetEntity', filter:'other', list:otherTypeList]"
+                                                    />
 
-										<%-- Open Tasks --%>
-										<tr>
-											<td></td>
-											<g:each in="${openTasks}" var="tasks">
-												<td style="text-align: right;"><g:if
-														test="${tasks.count== 0 }">
-													<span class='colorGrey'>0</span>
-												</g:if> <g:else>
-													<g:link controller="assetEntity" action="listTasks"
-															params="[moveEvent:tasks.moveEvent, justRemaining:1]"
-															class="links">
-														${tasks.count}
-													</g:link>
-												</g:else></td>
-											</g:each>
-											<td></td>
-										</tr>
+                                            <%-- Open Tasks --%>
+                                            <tr>
+                                                <td></td>
+                                                <g:each in="${openTasks}" var="tasks">
+                                                    <td style="text-align: right;"><g:if
+                                                            test="${tasks.count== 0 }">
+                                                        <span class='colorGrey'>0</span>
+                                                    </g:if> <g:else>
+                                                        <g:link controller="assetEntity" action="listTasks"
+                                                                params="[moveEvent:tasks.moveEvent, justRemaining:1]"
+                                                                class="links">
+                                                            ${tasks.count}
+                                                        </g:link>
+                                                    </g:else></td>
+                                                </g:each>
+                                                <td></td>
+                                            </tr>
 										</tbody>
 									</table>
 								</div>
