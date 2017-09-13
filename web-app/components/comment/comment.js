@@ -1865,23 +1865,13 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
 				remoteDataSource.read();
 			}
 
-			scope.updateDependencyList = function (dependency, onPreload) {
-				if (!onPreload) {
-					createNewDataSource(dependency);
-				}
-				dependency.dropdown.list.css("white-space", "nowrap");
-			};
 			scope.deleteRow = function (index) {
 				if (scope.ngModel[index].id) {
 					scope.deleted[scope.ngModel[index].id] = scope.ngModel[index].id;
 				}
 				scope.ngModel.splice(index, 1);
 			};
-			scope.$watch('moveEvent', function (nValue, oValue) {
-				angular.forEach(scope.ngModel, function (dependency) {
-					scope.updateDependencyList(dependency, true);
-				});
-			});
+
 			scope.internalControl = scope.control || {};
 			scope.$on('addDependency', function (evt, evtName) {
 				if (evtName == scope.eventName) {
