@@ -9,7 +9,7 @@
 			<div class=" has-feedback" style="margin-bottom:0px;">
 				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Default Filter"
 				 value="">
-				<span style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+				<span (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 			</div>
 		</ng-template>
 	</kendo-grid-column>

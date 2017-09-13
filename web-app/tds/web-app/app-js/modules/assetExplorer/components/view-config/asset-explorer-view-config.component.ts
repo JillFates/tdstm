@@ -142,7 +142,7 @@ export class AssetExplorerViewConfigComponent {
 			.reduce((p: FieldSettingsModel[], c: DomainModel) => {
 				if (c.fields.length > 0) {
 					let domainTitle = new FieldSettingsModel();
-					domainTitle['domain'] = c.domain;
+					domainTitle['domain'] = c.domain.toLowerCase();
 					domainTitle['isTitle'] = true;
 					p.push(domainTitle);
 				}

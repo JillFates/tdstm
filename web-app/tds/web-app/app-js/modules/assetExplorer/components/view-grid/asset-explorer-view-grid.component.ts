@@ -38,4 +38,8 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 
+	clearText(column: ViewColumn): void {
+		column.filter = '';
+	}
+
 }
