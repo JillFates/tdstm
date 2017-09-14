@@ -288,22 +288,42 @@ class DataviewService implements ServiceMethods {
 
         def assets = AssetEntity.executeQuery(hql, hqlParams(project, dataviewSpec), dataviewSpec.args)
         def totalAssets = AssetEntity.executeQuery(countHql, hqlParams(project, dataviewSpec), dataviewSpec.args)
-        dataviewSpec.args.total = totalAssets[0]
 
+        previewQueryResults(assets, totalAssets[0], dataviewSpec)
+    }
+
+    /**
+     *
+     * Prepares the previewQuery result with data and pagination details.
+     *
+     * In data it returns all rows with column domain correctlt set. e.g. common.id or application.appOwner
+     * In pagination it returns the following map:
+     *
+     *  [ max: max, offset: offset, total: total ]
+     *
+     * @param assets a list from HQL result
+     * @param total total of asset for the HQL query that's paginated
+     * @param dataviewSpec a DataviewSpec instace with order definition
+     * @return a Map with data and pagination defined as [data: [.. ..], pagination: [ max: ..., offset: ..., total: ... ]]
+     */
+    Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
         [
+                pagination: [
+                        offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
+                ],
                 data      : assets.collect { columns ->
                     Map row = [:]
                     columns.eachWithIndex { cell, index ->
                         row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
                     }
                     row
-                },
-                pagination: dataviewSpec.args
+                }
         ]
     }
+
     /**
      *
-     * Calculates HQL params from DataviewSpec
+     * Calculates HQL params from DataviewSpec for HQL query
      *
      * @param project a Project instance to be added in Parameters
      * @param dataviewSpec
@@ -318,7 +338,7 @@ class DataviewService implements ServiceMethods {
                     }.list()
             ]
         }
-        dataviewSpec.columns.findAll {!!it.filter}.each { Map column ->
+        dataviewSpec.filterColumns.each { Map column ->
             params << [("${transformNamedParameter(column)}".toString()): calculateParamsFor(column)]
         }
         params
@@ -336,7 +356,7 @@ class DataviewService implements ServiceMethods {
     }
     /**
      *
-     * Calculates Column definitions for the HQL query
+     * Creates a String with all the columns correctly set for select clause
      *
      * @param dataviewSpec
      * @return
@@ -346,7 +366,13 @@ class DataviewService implements ServiceMethods {
             "${transformProperty(column)}"
         }.join(", ")
     }
-
+    /**
+     *
+     * Creates a String with all the columns correctly set for where clause
+     *
+     * @param dataviewSpec
+     * @return
+     */
     String hqlWhere(DataviewSpec dataviewSpec){
 
         String where = ""
@@ -354,7 +380,7 @@ class DataviewService implements ServiceMethods {
             where += " and moveBundle in (:moveBundles) "
         }
 
-        where += dataviewSpec.columns.findAll {!!it.filter}.collect { Map column ->
+        where += dataviewSpec.filterColumns.collect { Map column ->
             if (hasMultipleFilter(column)){
                 " and ${transformProperty(column)} in (:${transformNamedParameter(column)}) \n"
             } else {

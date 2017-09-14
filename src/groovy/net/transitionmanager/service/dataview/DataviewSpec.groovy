@@ -100,6 +100,17 @@ class DataviewSpec {
     }
 
     /**
+     * Returns a list of map values that represent the columns that make up the dataview to be used as a filter. The map contains
+     * properties:
+     *    domain - the domain or common if shared
+     *    property - the GORM property name
+     * @return the list of Map
+     */
+    List<Map> getFilterColumns() {
+        spec.columns.findAll {!!it.filter}
+    }
+
+    /**
      * Used determine if the spec has common domain that signifies multiple domains
      * @return true if there is common properties
      */
@@ -126,6 +137,24 @@ class DataviewSpec {
      */
     Map getOrder() {
         order
+    }
+
+    /**
+     * Returns max value from args definition
+     *
+     * @return the max value
+     */
+    Integer getMax(){
+        args.max
+    }
+
+    /**
+     * Returns offset value from args definition
+     *
+     * @return the offset value
+     */
+    Integer getOffset(){
+        args.offset
     }
 
     /**
