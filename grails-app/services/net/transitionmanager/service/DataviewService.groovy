@@ -272,15 +272,15 @@ class DataviewService implements ServiceMethods {
 
         String hql = """
             select $hqlColumns
-              from AssetEntity
-             where project = :project $hqlWhere
+              from AssetEntity AE
+             where AE.project = :project $hqlWhere
           order by $hqlOrder  
         """
 
         String countHql = """
             select count(*)
-              from AssetEntity
-             where project = :project $hqlWhere
+              from AssetEntity AE
+             where AE.project = :project $hqlWhere
           order by $hqlOrder
         """
 
@@ -345,17 +345,6 @@ class DataviewService implements ServiceMethods {
     }
     /**
      *
-     * Calculate Map with params splitting column.filter content
-     *
-     * @param column
-     * @return
-     */
-    def calculateParamsFor(Map column){
-        String[] values = splitColumnFilter(column)
-        values.size()==1?values[0]:values
-    }
-    /**
-     *
      * Creates a String with all the columns correctly set for select clause
      *
      * @param dataviewSpec
@@ -377,7 +366,7 @@ class DataviewService implements ServiceMethods {
 
         String where = ""
         if (dataviewSpec.justPlanning != null) {
-            where += " and moveBundle in (:moveBundles) "
+            where += " and AE.moveBundle in (:moveBundles) "
         }
 
         where += dataviewSpec.filterColumns.collect { Map column ->
@@ -400,6 +389,18 @@ class DataviewService implements ServiceMethods {
      */
     Boolean hasMultipleFilter(Map column) {
         splitColumnFilter(column).size() > 1
+    }
+
+    /**
+     *
+     * Calculate Map with params splitting column.filter content
+     *
+     * @param column
+     * @return
+     */
+    def calculateParamsFor(Map column){
+        String[] values = splitColumnFilter(column)
+        values.size()==1?values[0]:values
     }
     /**
      *
@@ -441,7 +442,7 @@ class DataviewService implements ServiceMethods {
      * @return
      */
     String transformProperty(Map column) {
-        fieldsTransformMapping[column.property]
+        "AE." + fieldsTransformMapping[column.property]
     }
     /**
      *
@@ -453,6 +454,6 @@ class DataviewService implements ServiceMethods {
      * @return
      */
     String transformNamedParameter(Map column) {
-        fieldsTransformMapping[column.property].replace('.', '')
+        "AE." + fieldsTransformMapping[column.property].replace('.', '')
     }
 }
