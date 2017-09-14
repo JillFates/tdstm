@@ -805,4 +805,13 @@ class MoveBundleService implements ServiceMethods {
 
 		return bundles
 	}
+
+	MoveBundle createBundleIfNotExist(String bundleName, Project project) {
+		def moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
+
+		if (!moveBundle) {
+			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project).save()
+		}
+		return moveBundle
+	}
 }
