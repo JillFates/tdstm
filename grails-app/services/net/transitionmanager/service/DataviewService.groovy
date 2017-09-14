@@ -24,15 +24,6 @@ class DataviewService implements ServiceMethods {
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
-    static final Map<String, String> fieldsTransformMapping = [
-            "moveBundle"  : "moveBundle.name",
-            "project"     : "project.description",
-            "manufacturer": "manufacturer.name",
-            "sme"         : "sme.firstName",
-            "sme2"        : "sme2.firstName",
-            "model"       : "model.modelName",
-            "appOwner"    : "appOwner.firstName"
-    ]
 
 	/**
 	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
@@ -231,10 +222,10 @@ class DataviewService implements ServiceMethods {
      * @param project - the project that the data should be isolated to
      * @param dataviewId - the specifications for the view/query
      * @param userParams - parameters from the user for filtering and sort order
-     * @return a List of Map values
+     * @return a Map with data as a List of Map values and pagination
      */
     // TODO : Annotate READONLY
-    List<Map> query(Project project, Long dataviewId, DataviewUserParamsCommand userParams) {
+    Map query(Project project, Long dataviewId, DataviewUserParamsCommand userParams) {
 
         Dataview dataview = Dataview.get(dataviewId)
         DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
@@ -249,7 +240,7 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpecJson - the specifications for the view/query as JSON
      * @param userParams - parameters from the user for filtering and sort order
      * @param userPrefs - any user perferences that the user may have for a give dataview (change of columns)
-     * @return a List of Map values
+     * @return a Map with data as a List of Map values and pagination
      *
      * Example return values:
      * 		[
@@ -273,57 +264,144 @@ class DataviewService implements ServiceMethods {
      * 		]
      */
     // TODO : Annotate READONLY
-    List<Map> previewQuery(Project project, DataviewSpec dataviewSpec) {
+    Map previewQuery(Project project, DataviewSpec dataviewSpec) {
 
-        Map params = [:]
-        String queryFields = ""
+        String hqlColumns = hqlColumns(dataviewSpec)
+        String hqlWhere = hqlWhere(dataviewSpec)
+        String hqlOrder = hqlOrder(dataviewSpec)
 
-        String queryFrom = "from AssetEntity \n"
-        queryFrom += " where project = :project \n"
-        params['project'] = project
+        String hql = """
+            select $hqlColumns
+              from AssetEntity
+             where project = :project $hqlWhere
+          order by $hqlOrder  
+        """
 
-        if (dataviewSpec.justPlanning != null) {
-            queryFrom += " and moveBundle in (:moveBundles) \n"
-            params['moveBundles'] = MoveBundle.where {
-                project == project && useForPlanning == dataviewSpec.justPlanning
-            }.list()
-        }
+        String countHql = """
+            select count(*)
+              from AssetEntity
+             where project = :project $hqlWhere
+          order by $hqlOrder
+        """
 
-        dataviewSpec.columns.findAll { column ->
+        log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
-            String property = transformProperty(column.property)
-            String namedParameter = transformNamedParameter(column.property)
+        def assets = AssetEntity.executeQuery(hql, hqlParams(project, dataviewSpec), dataviewSpec.args)
+        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams(project, dataviewSpec), dataviewSpec.args)
+        dataviewSpec.args.total = totalAssets[0]
 
-            def values = column.filter.split("\\|")?.findAll { it?.trim() != "" }
-
-            queryFields += queryFields.isEmpty() ? "select " : ", "
-            queryFields += " ${property}"
-
-            if (values.size() == 1) {
-                queryFrom += " and ${property} like :${namedParameter} \n"
-                params[namedParameter] = "%${values[0]}%"
-            } else if (values.size() > 1) {
-                // Implement first criteria as like "%${column.filter}%" (note that this is SQL Injection waiting to happen)
-                // TODO : In ticket TM-6532 we'll expand on the different types of queries
-                queryFrom += " and ${property} in (:${namedParameter}) \n"
-                params[namedParameter] = values
-            }
-        }
-
-        String order = "order by ${dataviewSpec.order.property} ${dataviewSpec.order.sort}"
-
-        def hql = queryFields + "\n" + queryFrom + order
-        log.debug "DataViewService previewQuery hql: ${hql}"
-        def assets = AssetEntity.executeQuery(hql, params, dataviewSpec.args)
-
-        assets.collect { columns ->
-            Map row = [:]
-            columns.eachWithIndex { cell, index ->
-                row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
-            }
-            row
-        }
+        [
+                data      : assets.collect { columns ->
+                    Map row = [:]
+                    columns.eachWithIndex { cell, index ->
+                        row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
+                    }
+                    row
+                },
+                pagination: dataviewSpec.args
+        ]
     }
+    /**
+     *
+     * Calculates HQL params from DataviewSpec
+     *
+     * @param project a Project instance to be added in Parameters
+     * @param dataviewSpec
+     * @return
+     */
+    Map hqlParams(Project project, DataviewSpec dataviewSpec) {
+        Map params = [project: project]
+        if (dataviewSpec.justPlanning != null) {
+            params << [
+                    moveBundles: MoveBundle.where {
+                        project == project && useForPlanning == dataviewSpec.justPlanning
+                    }.list()
+            ]
+        }
+        dataviewSpec.columns.findAll {!!it.filter}.each { Map column ->
+            params << [("${transformNamedParameter(column)}".toString()): calculateParamsFor(column)]
+        }
+        params
+    }
+    /**
+     *
+     * Calculate Map with params splitting column.filter content
+     *
+     * @param column
+     * @return
+     */
+    def calculateParamsFor(Map column){
+        String[] values = splitColumnFilter(column)
+        values.size()==1?values[0]:values
+    }
+    /**
+     *
+     * Calculates Column definitions for the HQL query
+     *
+     * @param dataviewSpec
+     * @return
+     */
+    String hqlColumns(DataviewSpec dataviewSpec){
+        dataviewSpec.columns.collect { Map column ->
+            "${transformProperty(column)}"
+        }.join(", ")
+    }
+
+    String hqlWhere(DataviewSpec dataviewSpec){
+
+        String where = ""
+        if (dataviewSpec.justPlanning != null) {
+            where += " and moveBundle in (:moveBundles) "
+        }
+
+        where += dataviewSpec.columns.findAll {!!it.filter}.collect { Map column ->
+            if (hasMultipleFilter(column)){
+                " and ${transformProperty(column)} in (:${transformNamedParameter(column)}) \n"
+            } else {
+                " and ${transformProperty(column)} like :${transformNamedParameter(column)} \n"
+            }
+        }.join(" ")
+
+        where
+    }
+    /**
+     *
+     * Checks if column.filter has values to be used in filter.
+     *
+     *
+     * @param column a Column with filter value
+     * @return
+     */
+    Boolean hasMultipleFilter(Map column) {
+        splitColumnFilter(column).size() > 1
+    }
+    /**
+     *
+     * Columnn filters value could be split by '|' separator
+     *
+     * For example:
+     *
+     * { "domain": "common", "property": "environment", "filter": "production|development" }
+     *
+     */
+    String[] splitColumnFilter(Map column) {
+        column.filter.split("\\|")
+    }
+
+    String hqlOrder(DataviewSpec dataviewSpec){
+        "${dataviewSpec.order.property} ${dataviewSpec.order.sort}"
+    }
+
+    static final Map<String, String> fieldsTransformMapping = [
+            "moveBundle"  : "moveBundle.name",
+            "project"     : "project.description",
+            "manufacturer": "manufacturer.name",
+            "sme"         : "sme.firstName",
+            "sme2"        : "sme2.firstName",
+            "model"       : "model.modelName",
+            "appOwner"    : "appOwner.firstName"
+    ].withDefault { String key -> key }
+
     /**
      *
      * Transform property based on fieldsTransformMapping Map.
@@ -333,11 +411,11 @@ class DataviewService implements ServiceMethods {
      *
      *  "moveBundle" --> "moveBundle.name"
      *
-     * @param property It is a property name from preview query
+     * @param column a Column that contains is a property name from preview query
      * @return
      */
-    private String transformProperty(String property) {
-        fieldsTransformMapping[property]?:property
+    String transformProperty(Map column) {
+        fieldsTransformMapping[column.property]
     }
     /**
      *
@@ -345,10 +423,10 @@ class DataviewService implements ServiceMethods {
      *
      * "moveBundle" --> "moveBundlename"
      *
-     * @param property It is a property name from preview query
+     * @param column a Column that contains is a property name from preview query
      * @return
      */
-    private String transformNamedParameter(String property) {
-        (fieldsTransformMapping[property]?:property).replace('.', '')
+    String transformNamedParameter(Map column) {
+        fieldsTransformMapping[column.property].replace('.', '')
     }
 }

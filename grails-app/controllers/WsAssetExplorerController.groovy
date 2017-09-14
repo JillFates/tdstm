@@ -2,6 +2,8 @@
  * Created by David Ontiveros
  */
 
+
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -165,8 +167,10 @@ class WsAssetExplorerController implements ControllerMethods {
             return
         }
 
-        List<Map> data = dataviewService.query(project, id, userParams)
-        renderSuccessJson(data)
+        Map query = dataviewService.query(project, id, userParams)
+        query.status = 'success'
+
+        render(query as JSON)
     }
 
     /**
@@ -204,8 +208,11 @@ class WsAssetExplorerController implements ControllerMethods {
             Project project = securityService.userCurrentProject
 
             DataviewSpec dataviewSpec = new DataviewSpec(userParams)
-            List<Map> data = dataviewService.previewQuery(project, dataviewSpec)
-            renderSuccessJson(data)
+
+            Map previewQuery = dataviewService.previewQuery(project, dataviewSpec)
+			previewQuery.status = 'success'
+
+			render(previewQuery as JSON)
 
         } else {
             renderSuccessJson([status: "Incorrect json data request"])

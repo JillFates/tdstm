@@ -62,7 +62,7 @@ class DataviewSpec {
     // Constructor
     DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
         spec = command.filters
-        justPlanning = command.filters.justPlanning
+        justPlanning = command.justPlanning
         args = [max: command.limit, offset: command.offset]
         order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
 
