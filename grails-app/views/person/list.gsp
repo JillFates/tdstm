@@ -135,7 +135,7 @@
 
 	<div class="body fluid">
 		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
+			<div class="message">${raw(flash.message)}</div>
 		</g:if>
 		<div id="messageId" class="message nodisplay"></div>
 		<span id="spinnerId" class="nodisplay">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
