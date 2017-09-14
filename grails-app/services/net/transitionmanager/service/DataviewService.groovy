@@ -29,7 +29,9 @@ class DataviewService implements ServiceMethods {
             "project"     : "project.description",
             "manufacturer": "manufacturer.name",
             "sme"         : "sme.firstName",
-            "sme2"        : "sme2.firstName"
+            "sme2"        : "sme2.firstName",
+            "model"       : "model.modelName",
+            "appOwner"    : "appOwner.firstName"
     ]
 
 	/**
