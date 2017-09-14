@@ -22,6 +22,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.utils.Profiler
 import org.apache.poi.openxml4j.util.ZipSecureFile
 import org.apache.poi.ss.usermodel.*
+import org.apache.poi.xssf.streaming.SXSSFSheet
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.*
 import org.hibernate.transform.Transformers
@@ -511,6 +512,9 @@ class AssetExportService {
 
                 profiler.lap('Devices', 'Entering while loop')
 
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(serverSheet, autoResizeCols)
+
                 while (scrollableResults.next()) {
                     AssetEntity currentAsset = (AssetEntity)scrollableResults.get()[0]
                     profiler.beginSilent(silentTag)
@@ -657,6 +661,7 @@ class AssetExportService {
                 } // asset.each
 
                 session.close()
+				postSheetProcess(serverSheet, autoResizeCols)
 
                 profiler.endInfo("Devices", "processed %d rows", [assetSize])
                 if (profileThresholdViolations > 0) {
@@ -705,6 +710,9 @@ class AssetExportService {
                 def numericCols = ['Id']
                 def stringCols = ['Version']
 
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(appSheet, autoResizeCols)
+
                 int applicationCount = 1 // Header Offset
                 while (scrollableResults.next()) {
                     Application app = (Application)scrollableResults.get()[0]
@@ -752,9 +760,15 @@ class AssetExportService {
                                 colVal = colVal.toString()
                             }
 
-                            if ( numericCols.contains(colName) )
-                                WorkbookUtil.addCell(row, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                            else if ( stringCols.contains(colName) ){
+                            if ( numericCols.contains(colName) ) {
+								// WorkbookUtil.addCell(row, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+								Cell cell = row.createCell(colNum)
+								CellStyle style = appSheet.workbook.createCellStyle()
+								style.setDataFormat(BuiltinFormats.getBuiltinFormat('0'))
+								cell.setCellStyle(style)
+								cell.setCellValue(colVal)
+
+							} else if ( stringCols.contains(colName) ){
                                 WorkbookUtil.addCell(row, colNum, colVal.toString(), Cell.CELL_TYPE_STRING, workbookCellStyles)
                             } else {
                                 WorkbookUtil.addCell(row, colNum, colVal.toString())
@@ -767,6 +781,9 @@ class AssetExportService {
                 } // application.each
 
                 session.close()
+
+				postSheetProcess(appSheet, autoResizeCols)
+
                 profiler.endInfo("Applications", "processed %d rows", [appSize])
             } else {
                 // Add validation for the first row
@@ -789,6 +806,9 @@ class AssetExportService {
                 WorkbookUtil.addCellValidation(validationSheet, dbSheet, 2, 1, optionsSize["PlanStatus"], dbMap.getColumnIndexByHeader("PlanStatus"), 1, dbSize)
 
                 profiler.lap("Databases", "Validations added.")
+
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(dbSheet, autoResizeCols)
 
                 exportedEntity += "D"
                 int databaseCount = 1 // Header Offset
@@ -838,6 +858,8 @@ class AssetExportService {
                 }
 
                 session.close()
+				postSheetProcess(dbSheet, autoResizeCols)
+
                 profiler.endInfo("Databases", "processed %d rows", [dbSize])
             } else {
                 // Adds validation to just the first row
@@ -860,6 +882,9 @@ class AssetExportService {
                 WorkbookUtil.addCellValidation(validationSheet, storageSheet, 2, 1, optionsSize["PlanStatus"], fileMap.getColumnIndexByHeader("PlanStatus"), 1, fileSize)
 
                 profiler.lap("Logical Storage", "Validations added.")
+
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(storageSheet, autoResizeCols)
 
                 exportedEntity += "F"
 
@@ -909,6 +934,8 @@ class AssetExportService {
                 } // files.each
 
                 session.close()
+				postSheetProcess(storageSheet, autoResizeCols)
+
                 profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
             } else {
                 // Adds validations to the first row
@@ -948,6 +975,9 @@ class AssetExportService {
                 WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 4, 1, optionsSize["DepStatus"],  depProjectionFields.indexOf("status"), 1, dependencySize)
                 profiler.lap("Dependencies", "Validations added.")
 
+				List<Integer> autoResizeCols = [0,1]
+				preSheetProcess(dependencySheet, autoResizeCols)
+
                 List results = AssetDependency.createCriteria().list {
                     createAlias("asset", "a")
                     createAlias("dependent", "d")
@@ -979,7 +1009,8 @@ class AssetExportService {
 					r++
                 }
 
-                profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
+				postSheetProcess(dependencySheet, autoResizeCols)
+				profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
             } else {
                 // Adds validations to the first dependency row
                 WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 3, 1, optionsSize["DepType"],  depProjectionFields.indexOf("type"), 1, 1)
@@ -1034,6 +1065,9 @@ class AssetExportService {
                     readOnly true
                 }
 
+				List<Integer> autoResizeCols = [0]
+				preSheetProcess(roomSheet, autoResizeCols)
+
                 int r = 1
                 for (Object room : results) {
                     progressCount++
@@ -1060,6 +1094,8 @@ class AssetExportService {
                     WorkbookUtil.addCell(row, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
 					r++
                 }
+
+				postSheetProcess(roomSheet, autoResizeCols)
                 profiler.endInfo("Rooms", "processed %d rows", [roomSize])
             }
 
@@ -1085,6 +1121,9 @@ class AssetExportService {
                                'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
                 ]
 
+				List<Integer> autoResizeCols = [0, 1]
+				preSheetProcess(rackSheet, autoResizeCols)
+
                 int idx = 1 //Header Offset
                 for (Object rack : racks) {
 					Row row = WorkbookUtil.getOrCreateRow(rackSheet, idx)
@@ -1109,7 +1148,9 @@ class AssetExportService {
                     }
 					idx++
                 }
-                profiler.endInfo("Racks", "processed %d rows", [rackSize])
+
+				postSheetProcess(rackSheet, autoResizeCols)
+				profiler.endInfo("Racks", "processed %d rows", [rackSize])
             }
 
             //}
@@ -1165,6 +1206,9 @@ class AssetExportService {
                         setReadOnly true
                     }
 
+					List<Integer> autoResizeCols = [0, 1]
+					preSheetProcess(commentSheet, autoResizeCols)
+
                     int idx = 1 //HEADER Offset
                     for (Object comm : commentList) {
                         Row row = WorkbookUtil.getOrCreateRow(commentSheet, idx)
@@ -1184,6 +1228,8 @@ class AssetExportService {
                         WorkbookUtil.addCell(row, 5, String.valueOf(currentComment.comment))
                         idx++
                     }
+
+					postSheetProcess(commentSheet, autoResizeCols)
                 }
                 profiler.endInfo("Comments", "processed %d rows", [commentSize])
             }
@@ -1234,6 +1280,21 @@ class AssetExportService {
 
         }
     }
+
+	private void preSheetProcess(Sheet sheet, List<Integer> autoResizeColList) {
+		if(sheet instanceof SXSSFSheet){
+			// Autoresize columns
+			for( Integer colIdx in autoResizeColList ) {
+				((SXSSFSheet)sheet).trackColumnForAutoSizing(colIdx)
+			}
+		}
+	}
+
+	private void postSheetProcess(Sheet sheet, List<Integer> autoResizeColList) {
+		for( Integer colIdx in autoResizeColList ) {
+			sheet.autoSizeColumn(colIdx)
+		}
+	}
 
     /**
      * This method is used to update sheet's column header with custom labels
@@ -1339,6 +1400,9 @@ class AssetExportService {
      * @param cablingSheet
      */
     void cablingReportData(List assetCablesList, Sheet cablingSheet, Map<Integer, CellStyle> workbookCellStyles) {
+		List<Integer> autoResizeCols = [1, 4]
+		preSheetProcess(cablingSheet, autoResizeCols)
+
         int rowNum = 2
         for (Object element : assetCablesList) {
 			Row row = WorkbookUtil.getOrCreateRow(cablingSheet, rowNum)
@@ -1368,6 +1432,8 @@ class AssetExportService {
             WorkbookUtil.addCell(row, 11, String.valueOf(cabling.assetLoc ?: ""))
             rowNum++
         }
+
+		postSheetProcess(cablingSheet, autoResizeCols)
     }
 
     /**
