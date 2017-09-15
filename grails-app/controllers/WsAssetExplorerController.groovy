@@ -128,33 +128,41 @@ class WsAssetExplorerController implements ControllerMethods {
      *		"sortDomain: "application",
      *		"sortField: "sme",
      *		"sortOrder: "a",
+     *	    "justPlanning": true,
      *		"filters: {
      *			"columns: [
      *				{"domain": "common", "property": "environment", "filter": "production|development" },
-     *				{"domain": "common", "property": "assetName", "filter": "exchange" },
+     *				{"domain": "common", "property": "assetName", "filter": "exchange" }
      *			],
      *		}
      *	}
      *
      * Response:
      *	[
-     *		[
-     *			common.id: 12,
-     *			common.name: 'Exchange',
-     *			common.class: 'Application',
-     *			common.bundle: 'M1',
-     *			application.sme: 'Joe',
-     *			application.owner: 'Tony'
-     *		],
-     *		[
-     *			common.id: 23,
-     *			common.name: 'VM123',
-     *			common.class: 'Device',
-     *			common.bundle: 'M1',
-     *			device.os: 'Windows'
-     *			device.serial: '123123123',
-     *			device.tag: 'TM-234'
-     *		]
+     *		data:[
+     *		    [
+     *		    	common.id: 12,
+     *		    	common.name: 'Exchange',
+     *	    		common.class: 'Application',
+     *	    		common.bundle: 'M1',
+     *	    		application.sme: 'Joe',
+     *	    		application.owner: 'Tony'
+     *		    ],
+     *		    [
+     *			    common.id: 23,
+     *		    	common.name: 'VM123',
+     *		    	common.class: 'Device',
+     *		    	common.bundle: 'M1',
+     *		    	device.os: 'Windows'
+     *		    	device.serial: '123123123',
+     *		    	device.tag: 'TM-234'
+     *		    ]
+     *	    ],
+     * 		   pagination: [
+     * 		        offset: 350,
+     * 		        max: 100,
+     * 		        total: 472
+     * 		   ]
      *	]
      *
      */
@@ -188,13 +196,13 @@ class WsAssetExplorerController implements ControllerMethods {
      *		"sortDomain": "application",
      *		"sortField": "bundle',
      *		"sortOrder": "a",
+	 *		"justPlanning": true,
      *		"filters": {
      *			"domains": [ "application", "device" ],
      *			"columns": [
      *						{ "domain": "common", "property": "environment", "filter": "production" },
      *						{ "domain": "application", "property": "bundle", "filter": "" }
-     *			],
-     *		    "justPlanning": true
+     *			]
      *		}
      *	}
      *

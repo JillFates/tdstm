@@ -235,32 +235,37 @@ class DataviewService implements ServiceMethods {
 
     /**
      * Perform a query against one or domains specified in the DataviewSpec passed into the method
+	 *
      * @param project - the project that the data should be isolated to
-     * @param domainClass - the principle domain Class that should be queried
-     * @param dataviewSpecJson - the specifications for the view/query as JSON
-     * @param userParams - parameters from the user for filtering and sort order
-     * @param userPrefs - any user perferences that the user may have for a give dataview (change of columns)
+     * @param dataviewSpec - the specifications for the view/query as JSON
      * @return a Map with data as a List of Map values and pagination
      *
      * Example return values:
      * 		[
-     * 			[
-     * 				common.id: 12,
-     * 				common.name: 'Exchange',
-     * 				common.class: 'Application',
-     * 				common.bundle: 'M1',
-     * 				application.sme: 'Joe',
-     * 				application.owner: 'Tony'
+     * 			data: [
+     * 		    	[
+     *   				common.id: 12,
+     * 	    			common.name: 'Exchange',
+     * 		    		common.class: 'Application',
+     * 				    common.bundle: 'M1',
+     * 			    	application.sme: 'Joe',
+     *   				application.owner: 'Tony'
+     * 	    		],
+     * 			    [
+     * 				    common.id: 23,
+     * 				    common.name: 'VM123',
+     * 				    common.class: 'Device',
+     * 				    common.bundle: 'M1',
+     * 				    device.os: 'Windows'
+     * 				    device.serial: '123123123',
+     * 				    device.tag: 'TM-234'
+     * 			    ]
      * 			],
-     * 			[
-     * 				common.id: 23,
-     * 				common.name: 'VM123',
-     * 				common.class: 'Device',
-     * 				common.bundle: 'M1',
-     * 				device.os: 'Windows'
-     * 				device.serial: '123123123',
-     * 				device.tag: 'TM-234'
-     * 			]
+     * 		   pagination: [
+     * 		        offset: 350,
+     * 		        max: 100,
+     * 		        total: 472
+     * 		   ]
      * 		]
      */
     // TODO : Annotate READONLY
@@ -298,7 +303,7 @@ class DataviewService implements ServiceMethods {
      *
      * Prepares the previewQuery result with data and pagination details.
      *
-     * In data it returns all rows with column domain correctlt set. e.g. common.id or application.appOwner
+     * In data it returns all rows with column domain correctly set. e.g. common.id or application.appOwner
      * In pagination it returns the following map:
      *
      *  [ max: max, offset: offset, total: total ]
@@ -438,7 +443,7 @@ class DataviewService implements ServiceMethods {
 
 
     static final Map<String, Map> transformations = [
-            "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle."],
+            "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle"],
             "project"     : [property: "AE.project.description", namedParamter: "projectDescription", join: "left outer join AE.project"],
             "manufacturer": [property: "AE.manufacturer.name", namedParamter: "manufacturerName", join: "left outer join AE.manufacturer"],
             "sme"         : [property: "AE.sme.firstName", namedParamter: "smeFirstName", join: "left outer join AE.sme"],
