@@ -269,10 +269,12 @@ class DataviewService implements ServiceMethods {
         String hqlColumns = hqlColumns(dataviewSpec)
         String hqlWhere = hqlWhere(dataviewSpec)
         String hqlOrder = hqlOrder(dataviewSpec)
+        String hqlJoins = hqlJoins(dataviewSpec)
 
         String hql = """
             select $hqlColumns
               from AssetEntity AE
+                $hqlJoins
              where AE.project = :project $hqlWhere
           order by $hqlOrder  
         """
@@ -280,14 +282,14 @@ class DataviewService implements ServiceMethods {
         String countHql = """
             select count(*)
               from AssetEntity AE
+                $hqlJoins
              where AE.project = :project $hqlWhere
-          order by $hqlOrder
         """
 
         log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
         def assets = AssetEntity.executeQuery(hql, hqlParams(project, dataviewSpec), dataviewSpec.args)
-        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams(project, dataviewSpec), dataviewSpec.args)
+        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams(project, dataviewSpec))
 
         previewQueryResults(assets, totalAssets[0], dataviewSpec)
     }
@@ -320,7 +322,18 @@ class DataviewService implements ServiceMethods {
                 }
         ]
     }
-
+    /**
+     *
+     *
+     *
+     * @param dataviewSpec
+     * @return
+     */
+    String hqlJoins(DataviewSpec dataviewSpec) {
+        dataviewSpec.columns.collect { Map column ->
+            "${fieldsTransformation(column).join}"
+        }.join(" ")
+    }
     /**
      *
      * Calculates HQL params from DataviewSpec for HQL query
@@ -339,7 +352,7 @@ class DataviewService implements ServiceMethods {
             ]
         }
         dataviewSpec.filterColumns.each { Map column ->
-            params << [("${transformNamedParameter(column)}".toString()): calculateParamsFor(column)]
+            params << [("${fieldsTransformation(column).namedParamter}".toString()): calculateParamsFor(column)]
         }
         params
     }
@@ -352,7 +365,7 @@ class DataviewService implements ServiceMethods {
      */
     String hqlColumns(DataviewSpec dataviewSpec){
         dataviewSpec.columns.collect { Map column ->
-            "${transformProperty(column)}"
+            "${fieldsTransformation(column).property}"
         }.join(", ")
     }
     /**
@@ -371,9 +384,9 @@ class DataviewService implements ServiceMethods {
 
         where += dataviewSpec.filterColumns.collect { Map column ->
             if (hasMultipleFilter(column)){
-                " and ${transformProperty(column)} in (:${transformNamedParameter(column)}) \n"
+                " and ${fieldsTransformation(column).property} in (:${fieldsTransformation(column).namedParamter}) \n"
             } else {
-                " and ${transformProperty(column)} like :${transformNamedParameter(column)} \n"
+                " and ${fieldsTransformation(column).property} like :${fieldsTransformation(column).namedParamter} \n"
             }
         }.join(" ")
 
@@ -416,44 +429,21 @@ class DataviewService implements ServiceMethods {
     }
 
     String hqlOrder(DataviewSpec dataviewSpec){
-        "${dataviewSpec.order.property} ${dataviewSpec.order.sort}"
+        "${fieldsTransformation(dataviewSpec.order).property} ${dataviewSpec.order.sort}"
     }
 
-    static final Map<String, String> fieldsTransformMapping = [
-            "moveBundle"  : "moveBundle.name",
-            "project"     : "project.description",
-            "manufacturer": "manufacturer.name",
-            "sme"         : "sme.firstName",
-            "sme2"        : "sme2.firstName",
-            "model"       : "model.modelName",
-            "appOwner"    : "appOwner.firstName"
-    ].withDefault { String key -> key }
+    static Map fieldsTransformation(Map column) {
+        transformations[column.property]
+    }
 
-    /**
-     *
-     * Transform property based on fieldsTransformMapping Map.
-     *
-     * When preview query uses a non String field like MoveBundle or Person relation.
-     * In that case we need to do the following transformation for HQL query:
-     *
-     *  "moveBundle" --> "moveBundle.name"
-     *
-     * @param column a Column that contains is a property name from preview query
-     * @return
-     */
-    String transformProperty(Map column) {
-        "AE." + fieldsTransformMapping[column.property]
-    }
-    /**
-     *
-     * Transform named parameter based on fieldsTransformMapping Map for HQL query
-     *
-     * "moveBundle" --> "moveBundlename"
-     *
-     * @param column a Column that contains is a property name from preview query
-     * @return
-     */
-    String transformNamedParameter(Map column) {
-        "AE." + fieldsTransformMapping[column.property].replace('.', '')
-    }
+
+    static final Map<String, Map> transformations = [
+            "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle."],
+            "project"     : [property: "AE.project.description", namedParamter: "projectDescription", join: "left outer join AE.project"],
+            "manufacturer": [property: "AE.manufacturer.name", namedParamter: "manufacturerName", join: "left outer join AE.manufacturer"],
+            "sme"         : [property: "AE.sme.firstName", namedParamter: "smeFirstName", join: "left outer join AE.sme"],
+            "sme2"        : [property: "AE.sme2.firstName", namedParamter: "sme2FirstName", join: "left outer join AE.sme2"],
+            "model"       : [property: "AE.model.modelName", namedParamter: "modelModelName", join: "left outer join AE.model"],
+            "appOwner"    : [property: "AE.appOwner.firstName", namedParamter: "appOwnerFirstName", join: "left outer join AE.appOwner"]
+    ].withDefault { String key -> [property: "AE." + key, namedParamter: key, join: ""] }
 }
