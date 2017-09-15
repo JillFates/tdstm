@@ -1050,12 +1050,12 @@ class PartyRelationshipService implements ServiceMethods {
 
 	/**
 	 * Used to get a list of Projects that a company owns, is participating as a Partner, or the client
-	 * @param company - the company to find the prjoects for
+	 * @param company - the company to find the projects for
 	 * @param project - used to filter the list to a particular project (optional)
 	 * @param sortOn - the property to sort on (default 'name')
 	 * @return A list of partners for the company
 	 */
-	List<Project> companyProjects(PartyGroup company, Project project = null) {
+	List<Project> companyProjects(PartyGroup company, Project project = null, String sortOn = 'name') {
 		assert company
 
 		def args = [company: company]
@@ -1089,6 +1089,9 @@ class PartyRelationshipService implements ServiceMethods {
 				projects += clientProjects
 				logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
 			}
+		}
+		if (projects && sortOn ) {
+			projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
 		}
 
 		return projects
