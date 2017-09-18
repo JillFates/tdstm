@@ -805,4 +805,18 @@ class MoveBundleService implements ServiceMethods {
 
 		return bundles
 	}
+
+	/**
+	 * Returns the bundle with the name associated to the project. If it not exist, a new bundle is created.
+	 * @param bundleName the name of the bundle to check for existence
+	 * @return project the project
+	 */
+	MoveBundle createBundleIfNotExist(String bundleName, Project project) {
+		def moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
+
+		if (!moveBundle) {
+			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project).save()
+		}
+		return moveBundle
+	}
 }

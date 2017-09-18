@@ -308,7 +308,6 @@ class WorkbookUtil {
 	static Date getDateTimeCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormatter, failedIndicator=-1) {
 		Date result = null
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
-		// println "getDateTimeCellValue() called for $columnIdx,$rowIdx, cellType=${cell.getCellType()} FORMAT:'${ dateFormatter.toPattern() }'"
 		if (cell) {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_BLANK:
@@ -319,34 +318,25 @@ class WorkbookUtil {
 					// Dates stored in the spreadsheet are done since they are already stored without TZ
 					Date dateInTz = cell.getDateCellValue()
 
-				// Now we need to shift the date to GMT so that it is correct TZ
+					// Now we need to shift the date to GMT so that it is correct TZ
 					result = TimeUtil.moveDateToGMT(dateInTz, tzId)
-					// println "getDateTimeCellValue() CELL_TYPE_NUMERIC cell '${cell}'=>'$dateInTz' adjusted from $tzId to GMT=> $result"
-
 					break
-
-				case Cell.CELL_TYPE_STRING:						String str = cell.getStringCellValue()
+				case Cell.CELL_TYPE_STRING:
+					String str = cell.getStringCellValue()
 					if (str) {
 						try {
 							// Let's not assume that the user set the Timezone on the parser
-							// println "getDateTimeCellValue() CELL_TYPE_STRING str=$str; cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})"
-						TimeZone tz=TimeZone.getTimeZone(tzId)
+							TimeZone tz=TimeZone.getTimeZone(tzId)
 							dateFormatter.setTimeZone(tz)
 							result = dateFormatter.parse(str)
-					} catch (e) {
-						log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${dateFormatter}'"
-							// println "getDateTimeCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }"
-						//result = failedIndicator
+						} catch (e) {
+							log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${dateFormatter}'"
 							result = null
 						}
-						// println "getDateTimeCellValue() CELL_TYPE_STRING cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})"
-					// println "getDateTimeCellValue() CELL_TYPE_STRING '$str' => '$result'"
 					}
 					break
-
 				default:
 					// If the cell type is any other value just fail
-					//result = failedIndicator
 					result = null
 					break
 			}

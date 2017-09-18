@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta charset="UTF-8">
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Document</title>
 	<style type="text/css">
 		.padded {
@@ -80,11 +80,21 @@
 					var proceed = confirm("Are you sure you want to restart the application? Click Okay to restart otherwise press Cancel.");
 					if(proceed){
 						$.post("restartAppService")
-						.done(function(){
-							$("body").append("<div class='modal'><div class='center'><h1><strong>The application is restarting that will take approximately 1 to 2 minutes...</strong></h1></div></div>");
-							setTimeout(function(){
-								window.location.replace("${createLink(uri: '/')}");
-							}, 60 * 1000);
+						.done(function(data) {
+						  	if(data.status == "fail"){
+						  	  	alert("ERROR: " + data.data.message);
+
+						  	}else {
+						  	  	var message = "The application is restarting that will take approximately 1 to 2 minutes...";
+						  	  	var timeOutSecs = 60;
+						  		$("body").append("<div class='modal'><div class='center'><h2><strong>" + message + "</strong></h2></div></div>");
+								$(".modal").show();
+
+								setTimeout(function(){
+									window.location.replace("${createLink(uri: '/')}");
+								}, timeOutSecs * 1000);
+						  	}
+
 						});
 					}
 				});

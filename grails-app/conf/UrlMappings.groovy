@@ -54,6 +54,15 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/dependencies" {
+			controller = "wsAsset"
+			action = [
+					POST:"getAssetDependencies",
+					PUT:"updateCommonAssetDependencyFields",
+					DELETE:"deleteAssetDependency",
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -478,6 +487,20 @@ class UrlMappings {
 					POST: "createDataview",
 					PUT: "updateDataview",
 					DELETE: "deleteDataview"
+			]
+		}
+
+		"/ws/assetExplorer/previewQuery" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "previewQuery"
+			]
+		}
+
+		"/ws/assetExplorer/query/$id" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "query"
 			]
 		}
 

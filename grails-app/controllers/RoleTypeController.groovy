@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.security.Permission
+import org.grails.datastore.mapping.query.api.Criteria
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoleTypeController implements ControllerMethods {
@@ -11,19 +12,19 @@ class RoleTypeController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
-	@HasPermission(Permission.RoleTypeView)
-	def list() {
-		if (!params.max) params.max = 25
+    @HasPermission(Permission.RoleTypeView)
+    def list() {
 
-		List<RoleType> roleTypes = RoleType.createCriteria().list {
-			and {
-				order('type','asc')
-				order('level','desc')
-				order('id', 'asc')
-			}
-		}
-		[roleTypeInstanceList: roleTypes]
-	}
+		Criteria query = RoleType.where {
+            type == RoleType.TEAM
+        }
+
+        query.order('type', 'asc')
+                .order('level', 'desc')
+                .order('id', 'asc')
+
+        [roleTypeInstanceList: query.list()]
+    }
 
 	@HasPermission(Permission.RoleTypeView)
 	def show() {

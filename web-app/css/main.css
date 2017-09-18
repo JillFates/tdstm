@@ -370,11 +370,11 @@ tr#applicationDependentId td.class-wrap-depend {
 }
 
 .dashboard_stat_exec_tdmc_title {
-	width: 48px;
-	max-width: 48px;
-	white-space: nowrap;
+	max-width: 60px;
+	white-space: normal;
 	overflow: hidden;
 	text-overflow: ellipsis;
+    padding: 0px 10px 10px 0px !important;
 }
 
 /* ACTION BUTTONS */
@@ -588,11 +588,14 @@ td[data-for].N .select2-choice,
 	background-image: none !important;
 }
 /* UNIMPORTANT */
-td[data-for].U .select2-choice,
-.U{
-	background-color: #F4F4F4 !important;
-	background-image: none !important;
+td[data-for].U label, td.U label{
+    background-color: #F4F4F4 !important;
+    background-image: none !important;
 }
+/*td[data-for].U .select2-choice, .U{
+    background-color: #F4F4F4 !important;
+    background-image: none !important;
+}*/
 /* HIDDEN */
 td[data-for].H .select2-choice,
 .H{

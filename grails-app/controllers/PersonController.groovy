@@ -359,7 +359,7 @@ class PersonController implements ControllerMethods {
 			log.error(exceptionMsg, e)
 			// The line below is a hack to avoid querying the database.
 			def personId = exceptionMsg.substring(exceptionMsg.indexOf(":") + 1).toInteger()
-			errMsg = "A person with the same name already exists. Click"
+			errMsg = "A person with the same first and last name already exists for this Company. Click"
 			errMsg += "<a href=\"javascript:Person.showPersonDialog($personId,'generalInfoShow')\"> here </a>"//e.message
 			errMsg += "to view the person."
 		} catch (e) {

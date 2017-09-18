@@ -544,7 +544,6 @@ class TaskService implements ServiceMethods {
 	/**
 	 * Returns a list of tasks paginated and filtered
 	 * @param project - the project object to filter tasks to include
-	 * @param category - a task category to filter on (optional)
 	 * @param taskToIgnore - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
 	 * @param moveEventId - an optionel move event to filter on
 	 * @param page - page to load
@@ -552,22 +551,13 @@ class TaskService implements ServiceMethods {
 	 * @param searchText - an optional filter to search by either task id or comment
 	 * @return
 	 */
-	def search(Project project, String category, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
+	def search(Project project, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
 
 		StringBuilder queryList = new StringBuilder("FROM AssetComment a ")
 		StringBuilder queryCount = new StringBuilder("SELECT count(*) FROM AssetComment a ")
 		StringBuilder query = new StringBuilder("WHERE a.project.id = :projectId AND a.commentType = :commentType ")
 		Map params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
-		if (category) {
-			if (categoryList.contains(category)) {
-				query.append("AND a.category = :category ")
-				params["category"] = category
-			} else {
-				log.warn "genSelectForPredecessors - unexpected category filter '${category}'"
-				category = ""
-			}
-		}
 		if (searchText) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
 			// if searchText is a number, then only using task taskNumber attribute
 			if (searchText ==~ /^[0-9]+$/) {
@@ -580,10 +570,6 @@ class TaskService implements ServiceMethods {
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
 		if (taskToIgnore) {
-			if (!category && taskToIgnore.category) {
-				query.append("AND a.category = :category ")
-				params["category"] = taskToIgnore.category
-			}
 			query.append("AND a.id != :taskId ")
 			params["taskId"] = taskToIgnore.id
 
@@ -1094,9 +1080,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Now morph the list into a list of name: Role names
 		def list = []
 		projectStaff.each {
+			String roleDescription = it.role.toString()
 			list << [id:it.staff.id,
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: $it.staff",
-				sortOn:"${it.role.description.split(':')[1]?.trim()},$it.staff.firstName $it.staff.lastName"
+				nameRole:"${roleDescription}: $it.staff",
+				sortOn:"${roleDescription},$it.staff.firstName $it.staff.lastName"
 			]
 		}
 		list.sort { it.sortOn }

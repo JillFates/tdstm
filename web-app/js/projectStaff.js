@@ -482,6 +482,10 @@ function toggleChangedStyle (source) {
  * open staff create dialog
  */
 function createDialog() {
+	var createdDialog = document.getElementById("createDialogForm");
+	if(createdDialog) {
+		createdDialog.reset();
+	}
 	$("#createStaffDialog").show();
 	$("#createStaffDialog").dialog('option', 'width', 500);
 	$("#createStaffDialog").dialog('option', 'modal', 'true');

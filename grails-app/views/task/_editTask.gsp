@@ -123,6 +123,10 @@
 							<status-select comment-id='ac.commentId' ng-model='ac.status'></status-select>
 						</td>
 					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="taskSpecId">TaskSpec ID:</label></td>
+						<td valign="top" class="value" id="taskSpecIdShowId" colspan="1" style="width: 20%">{{acData.taskSpecId}}&nbsp;</td>
+					</tr>
 					<%-- Dependencies section --%>
 					<tr class="prop">
 						<td valign="top" class="name" colspan="2" style="text-align: left;">

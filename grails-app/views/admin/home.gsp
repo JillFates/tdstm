@@ -111,7 +111,7 @@ a:hover {
 					<tbody>
 						<tr class="odd">
 							<td><g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link></td>
-							<td><g:link controller="roleType" style="color:black">Teams (Role Type) </g:link></td>
+							<td><g:link controller="roleType" style="color:black">Teams</g:link></td>
 						</tr>
 						<tr class="even">
 							<td><a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a></td>

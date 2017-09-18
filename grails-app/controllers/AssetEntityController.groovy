@@ -650,6 +650,7 @@ class AssetEntityController implements ControllerMethods {
 				statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
 				successorsCount: successorsCount,
 				predecessorsCount: predecessorsCount,
+				taskSpecId: assetComment.taskSpec,
 				assetId: assetComment.assetEntity?.id ?: "",
 				assetType: assetComment.assetEntity?.assetType,
 				assetClass: assetComment.assetEntity?.assetClass?.toString(),
@@ -2328,7 +2329,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def taskList = taskService.search(project, params.category, task, moveEventId)
+		def taskList = taskService.search(project, task, moveEventId)
 
 		if (format=='json') {
 			def list = []
@@ -2367,7 +2368,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def tasksData = taskService.search(project, params.category, task, moveEventId, page, pageSize, filterDesc)
+		def tasksData = taskService.search(project, task, moveEventId, page, pageSize, filterDesc)
 
 		def list = []
 

@@ -1504,7 +1504,7 @@ class PersonService implements ServiceMethods {
 			// logger.debug 'getAvailableProjects() list 3: {}', projects*.id
 		}
 
-		projects.sort { it.name }
+		return projects
 	}
 
 	/**
