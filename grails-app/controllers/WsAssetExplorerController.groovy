@@ -233,7 +233,7 @@ class WsAssetExplorerController implements ControllerMethods {
 			render(previewQuery as JSON)
 
         } else {
-            renderSuccessJson([status: "Incorrect json data request"])
+            renderErrorJson("Incorrect json data request")
         }
     }
 }
