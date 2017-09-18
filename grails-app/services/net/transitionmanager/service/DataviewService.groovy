@@ -3,10 +3,14 @@
  */
 package net.transitionmanager.service
 
+import com.tds.asset.AssetEntity
+import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
@@ -212,4 +216,237 @@ class DataviewService implements ServiceMethods {
 			throw new InvalidRequestException('Dataview JSON object was missing from request')
 		}
 	}
+    /**
+     * Perform a query against one or domains specified in the DataviewSpec passed into the method
+     *
+     * @param project - the project that the data should be isolated to
+     * @param dataviewId - the specifications for the view/query
+     * @param userParams - parameters from the user for filtering and sort order
+     * @return a Map with data as a List of Map values and pagination
+     */
+    // TODO : Annotate READONLY
+    Map query(Project project, Dataview dataview, DataviewUserParamsCommand userParams) {
+
+        DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
+        return previewQuery(project, dataviewSpec)
+    }
+
+    /**
+     * Perform a query against one or domains specified in the DataviewSpec passed into the method
+	 *
+     * @param project - the project that the data should be isolated to
+     * @param dataviewSpec - the specifications for the view/query as JSON
+     * @return a Map with data as a List of Map values and pagination
+     *
+     * Example return values:
+     * 		[
+     * 			data: [
+     * 		    	[
+     *   				common.id: 12,
+     * 	    			common.name: 'Exchange',
+     * 		    		common.class: 'Application',
+     * 				    common.bundle: 'M1',
+     * 			    	application.sme: 'Joe',
+     *   				application.owner: 'Tony'
+     * 	    		],
+     * 			    [
+     * 				    common.id: 23,
+     * 				    common.name: 'VM123',
+     * 				    common.class: 'Device',
+     * 				    common.bundle: 'M1',
+     * 				    device.os: 'Windows'
+     * 				    device.serial: '123123123',
+     * 				    device.tag: 'TM-234'
+     * 			    ]
+     * 			],
+     * 		   pagination: [
+     * 		        offset: 350,
+     * 		        max: 100,
+     * 		        total: 472
+     * 		   ]
+     * 		]
+     */
+    // TODO : Annotate READONLY
+    Map previewQuery(Project project, DataviewSpec dataviewSpec) {
+
+        String hqlColumns = hqlColumns(dataviewSpec)
+        String hqlWhere = hqlWhere(dataviewSpec)
+        String hqlOrder = hqlOrder(dataviewSpec)
+        String hqlJoins = hqlJoins(dataviewSpec)
+
+        String hql = """
+            select $hqlColumns
+              from AssetEntity AE
+                $hqlJoins
+             where AE.project = :project $hqlWhere
+          order by $hqlOrder  
+        """
+
+        String countHql = """
+            select count(*)
+              from AssetEntity AE
+                $hqlJoins
+             where AE.project = :project $hqlWhere
+        """
+
+        log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
+
+        def assets = AssetEntity.executeQuery(hql, hqlParams(project, dataviewSpec), dataviewSpec.args)
+        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams(project, dataviewSpec))
+
+        previewQueryResults(assets, totalAssets[0], dataviewSpec)
+    }
+
+    /**
+     *
+     * Prepares the previewQuery result with data and pagination details.
+     *
+     * In data it returns all rows with column domain correctly set. e.g. common.id or application.appOwner
+     * In pagination it returns the following map:
+     *
+     *  [ max: max, offset: offset, total: total ]
+     *
+     * @param assets a list from HQL result
+     * @param total total of asset for the HQL query that's paginated
+     * @param dataviewSpec a DataviewSpec instace with order definition
+     * @return a Map with data and pagination defined as [data: [.. ..], pagination: [ max: ..., offset: ..., total: ... ]]
+     */
+    private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
+        [
+                pagination: [
+                        offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
+                ],
+                assets      : assets.collect { columns ->
+                    Map row = [:]
+                    columns.eachWithIndex { cell, index ->
+                        row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
+                    }
+                    row
+                }
+        ]
+    }
+    /**
+     *
+     *
+     *
+     * @param dataviewSpec
+     * @return
+     */
+	private String hqlJoins(DataviewSpec dataviewSpec) {
+        dataviewSpec.columns.collect { Map column ->
+            "${fieldsTransformation(column).join}"
+        }.join(" ")
+    }
+    /**
+     *
+     * Calculates HQL params from DataviewSpec for HQL query
+     *
+     * @param project a Project instance to be added in Parameters
+     * @param dataviewSpec
+     * @return
+     */
+	private Map hqlParams(Project project, DataviewSpec dataviewSpec) {
+        Map params = [project: project]
+        if (dataviewSpec.justPlanning != null) {
+            params << [
+                    moveBundles: MoveBundle.where {
+                        project == project && useForPlanning == dataviewSpec.justPlanning
+                    }.list()
+            ]
+        }
+        dataviewSpec.filterColumns.each { Map column ->
+            params << [("${fieldsTransformation(column).namedParamter}".toString()): calculateParamsFor(column)]
+        }
+        params
+    }
+    /**
+     *
+     * Creates a String with all the columns correctly set for select clause
+     *
+     * @param dataviewSpec
+     * @return
+     */
+	private String hqlColumns(DataviewSpec dataviewSpec){
+        dataviewSpec.columns.collect { Map column ->
+            "${fieldsTransformation(column).property}"
+        }.join(", ")
+    }
+    /**
+     *
+     * Creates a String with all the columns correctly set for where clause
+     *
+     * @param dataviewSpec
+     * @return
+     */
+	private String hqlWhere(DataviewSpec dataviewSpec){
+
+        String where = ""
+        if (dataviewSpec.justPlanning != null) {
+            where += " and AE.moveBundle in (:moveBundles) "
+        }
+
+        where += dataviewSpec.filterColumns.collect { Map column ->
+            if (hasMultipleFilter(column)){
+                " and ${fieldsTransformation(column).property} in (:${fieldsTransformation(column).namedParamter}) \n"
+            } else {
+                " and ${fieldsTransformation(column).property} like :${fieldsTransformation(column).namedParamter} \n"
+            }
+        }.join(" ")
+
+        where
+    }
+    /**
+     *
+     * Checks if column.filter has values to be used in filter.
+     *
+     *
+     * @param column a Column with filter value
+     * @return
+     */
+	private Boolean hasMultipleFilter(Map column) {
+        splitColumnFilter(column).size() > 1
+    }
+
+    /**
+     *
+     * Calculate Map with params splitting column.filter content
+     *
+     * @param column
+     * @return
+     */
+	private def calculateParamsFor(Map column){
+        String[] values = splitColumnFilter(column)
+        values.size()==1?values[0]:values
+    }
+    /**
+     *
+     * Columnn filters value could be split by '|' separator
+     *
+     * For example:
+     *
+     * { "domain": "common", "property": "environment", "filter": "production|development" }
+     *
+     */
+	private String[] splitColumnFilter(Map column) {
+        column.filter.split("\\|")
+    }
+
+	private String hqlOrder(DataviewSpec dataviewSpec){
+        "${fieldsTransformation(dataviewSpec.order).property} ${dataviewSpec.order.sort}"
+    }
+
+	private static Map fieldsTransformation(Map column) {
+        transformations[column.property]
+    }
+
+
+	private static final Map<String, Map> transformations = [
+            "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle"],
+            "project"     : [property: "AE.project.description", namedParamter: "projectDescription", join: "left outer join AE.project"],
+            "manufacturer": [property: "AE.manufacturer.name", namedParamter: "manufacturerName", join: "left outer join AE.manufacturer"],
+            "sme"         : [property: "AE.sme.firstName", namedParamter: "smeFirstName", join: "left outer join AE.sme"],
+            "sme2"        : [property: "AE.sme2.firstName", namedParamter: "sme2FirstName", join: "left outer join AE.sme2"],
+            "model"       : [property: "AE.model.modelName", namedParamter: "modelModelName", join: "left outer join AE.model"],
+            "appOwner"    : [property: "AE.appOwner.firstName", namedParamter: "appOwnerFirstName", join: "left outer join AE.appOwner"]
+    ].withDefault { String key -> [property: "AE." + key, namedParamter: key, join: ""] }
 }

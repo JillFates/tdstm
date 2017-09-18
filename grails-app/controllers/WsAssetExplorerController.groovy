@@ -2,17 +2,26 @@
  * Created by David Ontiveros
  */
 
+
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.dataview.DataviewSpec
 
 /**
+ *
  * Asset Explorer main controller class that contains basic operation methods for exposed endpoints.
+ *
  * @see UrlMappings
  */
 @Secured('isAuthenticated()')
+// TODO: John. Can we remove this logger since we aren't using in this class? Also we have an implementation in ControllerMethods.handleException
 @Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
 class WsAssetExplorerController implements ControllerMethods {
 
@@ -108,4 +117,118 @@ class WsAssetExplorerController implements ControllerMethods {
 		log.error(e)
 		renderErrorJson(e.message)
 	}
+    /**
+     * Performs a query for the Asset Explorer data grid using a saved View Specification plus
+     * filter parameters that the user may have entered plus their preferences for the view.
+     * @params id - the reference id to the persisted dataView (URI)
+     * @param pagination - the pagination parameters (offset, limit) (JSON)
+     * @param userParams - the filter and sorting that the user has control of when using the view (JSON)
+     * @return A JSON List containing maps of each asset's properties (JSON)
+     *
+     * Request:
+     * 	POST data = {
+     *		"offset":5,
+     *		"limit": 25,
+     *		"sortDomain: "application",
+     *		"sortField: "sme",
+     *		"sortOrder: "a",
+     *	    "justPlanning": true,
+     *		"filters: {
+     *			"columns: [
+     *				{"domain": "common", "property": "environment", "filter": "production|development" },
+     *				{"domain": "common", "property": "assetName", "filter": "exchange" }
+     *			],
+     *		}
+     *	}
+     *
+     * Response:
+     *	[
+     *		data:[
+     *		    [
+     *		    	common.id: 12,
+     *		    	common.name: 'Exchange',
+     *	    		common.class: 'Application',
+     *	    		common.bundle: 'M1',
+     *	    		application.sme: 'Joe',
+     *	    		application.owner: 'Tony'
+     *		    ],
+     *		    [
+     *			    common.id: 23,
+     *		    	common.name: 'VM123',
+     *		    	common.class: 'Device',
+     *		    	common.bundle: 'M1',
+     *		    	device.os: 'Windows'
+     *		    	device.serial: '123123123',
+     *		    	device.tag: 'TM-234'
+     *		    ]
+     *	    ],
+     * 		   pagination: [
+     * 		        offset: 350,
+     * 		        max: 100,
+     * 		        total: 472
+     * 		   ]
+     *	]
+     *
+     */
+    @Secured('isAuthenticated()')
+    def query(Long id, DataviewUserParamsCommand userParams) {
+        Project project = securityService.userCurrentProject
+
+		if (userParams.hasErrors()) {
+			renderErrorJson('User filtering was invalid')
+			return
+		}
+
+		Dataview dataview = Dataview.get(id)
+		if (!dataview) {
+			renderErrorJson('Dataview invalid')
+			return
+		}
+
+		Map queryResult = dataviewService.query(project, dataview, userParams)
+        renderSuccessJson(queryResult)
+    }
+
+    /**
+     * Similar to query, the previewQuery method performs a query for the Asset Explorer data grid
+     * using a View Specification passed in to the query. There would be no user preferences because
+     * the view doesn't exist yet.
+     * @param pagination - the pagination parameters (offset, limit) (JSON)
+     * @return A JSON List containing maps of each asset's properties (JSON)
+     *
+     * Request:
+     * 	URI: /tdstm/ws/assetExplorer/previewQuery
+     *	data = {
+     *		"offset": 5,
+     *		"limit": 25,
+     *		"sortDomain": "application",
+     *		"sortField": "bundle',
+     *		"sortOrder": "a",
+	 *		"justPlanning": true,
+     *		"filters": {
+     *			"domains": [ "application", "device" ],
+     *			"columns": [
+     *						{ "domain": "common", "property": "environment", "filter": "production" },
+     *						{ "domain": "application", "property": "bundle", "filter": "" }
+     *			]
+     *		}
+     *	}
+     *
+     * Response:
+     * 	  @see query
+     */
+    @Secured('isAuthenticated()')
+    def previewQuery(DataviewUserParamsCommand userParams) {
+
+        if(userParams.validate()){
+            Project project = securityService.userCurrentProject
+
+            DataviewSpec dataviewSpec = new DataviewSpec(userParams)
+
+            Map previewQuery = dataviewService.previewQuery(project, dataviewSpec)
+            renderSuccessJson(previewQuery)
+        } else {
+            renderErrorJson("Incorrect json data request")
+        }
+    }
 }
