@@ -185,10 +185,8 @@ class WsAssetExplorerController implements ControllerMethods {
 			return
 		}
 
-		Map query = dataviewService.query(project, dataview, userParams)
-        query.status = 'success'
-
-        render(query as JSON)
+		Map queryResult = dataviewService.query(project, dataview, userParams)
+        renderSuccessJson(queryResult)
     }
 
     /**
@@ -228,10 +226,7 @@ class WsAssetExplorerController implements ControllerMethods {
             DataviewSpec dataviewSpec = new DataviewSpec(userParams)
 
             Map previewQuery = dataviewService.previewQuery(project, dataviewSpec)
-			previewQuery.status = 'success'
-
-			render(previewQuery as JSON)
-
+            renderSuccessJson(previewQuery)
         } else {
             renderErrorJson("Incorrect json data request")
         }

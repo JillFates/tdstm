@@ -316,7 +316,7 @@ class DataviewService implements ServiceMethods {
                 pagination: [
                         offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
                 ],
-                data      : assets.collect { columns ->
+                assets      : assets.collect { columns ->
                     Map row = [:]
                     columns.eachWithIndex { cell, index ->
                         row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
