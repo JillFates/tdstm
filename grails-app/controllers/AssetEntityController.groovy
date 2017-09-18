@@ -1232,6 +1232,7 @@ class AssetEntityController implements ControllerMethods {
 		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%$params.dateCreated%' ",[project:project])?.dateCreated : []
 		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project=:project and dateResolved like '%$params.dateResolved%' ",[project:project])?.dateResolved : []
 		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project=:project and estFinish like '%$params.estFinish%' ",[project:project])?.estFinish : []
+		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like '%$params.statusUpdated%' ",[project:project])?.statusUpdated : []
 
 		// TODO TM-2515 - ONLY do the lookups if params used by the queries are populated
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.assignedTo%","%$params.assignedTo%") : []
@@ -1260,6 +1261,12 @@ class AssetEntityController implements ControllerMethods {
 			if (params.comment) {
 				ilike('comment', "%$params.comment%")
 			}
+			if (params.resolution) {
+				ilike('resolution', "%$params.resolution%")
+			}
+			if (params.instructionsLink) {
+				ilike('instructionsLink', "%$params.instructionsLink%")
+			}
 			if (params.status) {
 				ilike('status', "%$params.status%")
 			}
@@ -1275,7 +1282,7 @@ class AssetEntityController implements ControllerMethods {
 			if (durations) {
 				'in'('duration', durations)
 			}
-			if (params.durationScale) {
+			if (params.durationScale) {+
 				ilike('durationScale', "%$params.durationScale%")
 			}
 			if (params.category) {
@@ -1296,11 +1303,26 @@ class AssetEntityController implements ControllerMethods {
 			if (taskNumbers) {
 				'in'('taskNumber', taskNumbers)
 			}
-
 			if (params.isResolved?.isNumber()) {
 				eq('isResolved', params.int('isResolved'))
 			}
-
+			if (params.priority?.isNumber()) {
+				eq('priority', params.int('priority'))
+			}
+			if (params.isPublished && 'true'.contains(params.isPublished)) {
+				eq('isPublished', true)
+			} else {
+				if (params.isPublished && 'false'.contains(params.isPublished)) {
+					eq('isPublished', false)
+				}
+			}
+			if (params.sendNotification && 'true'.contains(params.sendNotification)) {
+				eq('sendNotification', true)
+			} else {
+				if (params.sendNotification && 'false'.contains(params.sendNotification)) {
+					eq('sendNotification', false)
+				}
+			}
 			if (params.hardAssigned?.isNumber()) {
 				eq('hardAssigned', params.int('hardAssigned'))
 			}
@@ -1323,13 +1345,15 @@ class AssetEntityController implements ControllerMethods {
 			if (estFinishdates) {
 				'in'('estFinish',estFinishdates)
 			}
+			if (statusUpdated) {
+				'in'('statusUpdated',statusUpdated)
+			}
 			if (dateCreateddates) {
 				'in'('dateCreated',dateCreateddates)
 			}
 			if (dateResolveddates) {
 				'in'('dateResolved',dateResolveddates)
 			}
-
 			if (createdBy) {
 				'in'('createdBy', createdBy)
 			}
@@ -1339,7 +1363,6 @@ class AssetEntityController implements ControllerMethods {
 			if (assigned) {
 				'in'('assignedTo', assigned)
 			}
-
 			if (sortIndex && sortOrder) {
 				String sortIdx
 				switch(sortIndex) {
@@ -1370,7 +1393,6 @@ class AssetEntityController implements ControllerMethods {
 			if (moveEvent) {
 				eq("moveEvent", moveEvent)
 			}
-
 			if (params.justRemaining == "1") {
 				ne("status", AssetCommentStatus.COMPLETED)
 			}
