@@ -225,11 +225,9 @@ class DataviewService implements ServiceMethods {
      * @return a Map with data as a List of Map values and pagination
      */
     // TODO : Annotate READONLY
-    Map query(Project project, Long dataviewId, DataviewUserParamsCommand userParams) {
+    Map query(Project project, Dataview dataview, DataviewUserParamsCommand userParams) {
 
-        Dataview dataview = Dataview.get(dataviewId)
         DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
-
         return previewQuery(project, dataviewSpec)
     }
 
@@ -313,7 +311,7 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec a DataviewSpec instace with order definition
      * @return a Map with data and pagination defined as [data: [.. ..], pagination: [ max: ..., offset: ..., total: ... ]]
      */
-    Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
+    private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
         [
                 pagination: [
                         offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
@@ -334,7 +332,7 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec
      * @return
      */
-    String hqlJoins(DataviewSpec dataviewSpec) {
+	private String hqlJoins(DataviewSpec dataviewSpec) {
         dataviewSpec.columns.collect { Map column ->
             "${fieldsTransformation(column).join}"
         }.join(" ")
@@ -347,7 +345,7 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec
      * @return
      */
-    Map hqlParams(Project project, DataviewSpec dataviewSpec) {
+	private Map hqlParams(Project project, DataviewSpec dataviewSpec) {
         Map params = [project: project]
         if (dataviewSpec.justPlanning != null) {
             params << [
@@ -368,7 +366,7 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec
      * @return
      */
-    String hqlColumns(DataviewSpec dataviewSpec){
+	private String hqlColumns(DataviewSpec dataviewSpec){
         dataviewSpec.columns.collect { Map column ->
             "${fieldsTransformation(column).property}"
         }.join(", ")
@@ -380,7 +378,7 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec
      * @return
      */
-    String hqlWhere(DataviewSpec dataviewSpec){
+	private String hqlWhere(DataviewSpec dataviewSpec){
 
         String where = ""
         if (dataviewSpec.justPlanning != null) {
@@ -405,7 +403,7 @@ class DataviewService implements ServiceMethods {
      * @param column a Column with filter value
      * @return
      */
-    Boolean hasMultipleFilter(Map column) {
+	private Boolean hasMultipleFilter(Map column) {
         splitColumnFilter(column).size() > 1
     }
 
@@ -416,7 +414,7 @@ class DataviewService implements ServiceMethods {
      * @param column
      * @return
      */
-    def calculateParamsFor(Map column){
+	private def calculateParamsFor(Map column){
         String[] values = splitColumnFilter(column)
         values.size()==1?values[0]:values
     }
@@ -429,20 +427,20 @@ class DataviewService implements ServiceMethods {
      * { "domain": "common", "property": "environment", "filter": "production|development" }
      *
      */
-    String[] splitColumnFilter(Map column) {
+	private String[] splitColumnFilter(Map column) {
         column.filter.split("\\|")
     }
 
-    String hqlOrder(DataviewSpec dataviewSpec){
+	private String hqlOrder(DataviewSpec dataviewSpec){
         "${fieldsTransformation(dataviewSpec.order).property} ${dataviewSpec.order.sort}"
     }
 
-    static Map fieldsTransformation(Map column) {
+	private static Map fieldsTransformation(Map column) {
         transformations[column.property]
     }
 
 
-    static final Map<String, Map> transformations = [
+	private static final Map<String, Map> transformations = [
             "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle"],
             "project"     : [property: "AE.project.description", namedParamter: "projectDescription", join: "left outer join AE.project"],
             "manufacturer": [property: "AE.manufacturer.name", namedParamter: "manufacturerName", join: "left outer join AE.manufacturer"],

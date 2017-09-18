@@ -13,7 +13,7 @@ class DataviewUserParamsCommand implements CommandObject {
     Boolean justPlanning
 
     int offset = 0
-    int limit = 25
+    int limit = 1
 
     Map<String, List> filters
     /* 
@@ -31,13 +31,12 @@ class DataviewUserParamsCommand implements CommandObject {
         ]
     */
 
-    
     static constraints = {
-        sortDomain blank:false, inList: ['common', 'application', 'database', 'device', 'storage']
-        sortProperty blank:false
-        sortOrder blank:false, inList: ['a', 'd']
+        sortDomain blank: false, inList: ['common', 'application', 'database', 'device', 'storage']
+        sortProperty blank: false
+        sortOrder blank: false, inList: ['a', 'd']
         offset min: 0
-        limit min: 25, inList: [25, 50, 100, 500, 1000]
+        limit min: 1
         justPlanning nullable: true
     }
 }

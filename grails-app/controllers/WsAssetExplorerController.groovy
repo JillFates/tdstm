@@ -8,6 +8,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
@@ -170,12 +171,18 @@ class WsAssetExplorerController implements ControllerMethods {
     def query(Long id, DataviewUserParamsCommand userParams) {
         Project project = securityService.userCurrentProject
 
-        if (userParams.hasErrors()) {
-            renderErrorJson('User filtering was invalid')
-            return
-        }
+		if (userParams.hasErrors()) {
+			renderErrorJson('User filtering was invalid')
+			return
+		}
 
-        Map query = dataviewService.query(project, id, userParams)
+		Dataview dataview = Dataview.get(id)
+		if (!dataview) {
+			renderErrorJson('Dataview invalid')
+			return
+		}
+
+		Map query = dataviewService.query(project, dataview, userParams)
         query.status = 'success'
 
         render(query as JSON)
