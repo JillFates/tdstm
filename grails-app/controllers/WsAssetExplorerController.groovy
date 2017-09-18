@@ -15,10 +15,13 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.dataview.DataviewSpec
 
 /**
+ *
  * Asset Explorer main controller class that contains basic operation methods for exposed endpoints.
+ *
  * @see UrlMappings
  */
 @Secured('isAuthenticated()')
+// TODO: John. Can we remove this logger since we aren't using in this class? Also we have an implementation in ControllerMethods.handleException
 @Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
 class WsAssetExplorerController implements ControllerMethods {
 
