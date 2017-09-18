@@ -13,7 +13,7 @@ class DataviewUserParamsCommand implements CommandObject {
     Boolean justPlanning
 
     int offset = 0
-    int limit = 1
+    int limit = 25
 
     Map<String, List> filters
     /* 
