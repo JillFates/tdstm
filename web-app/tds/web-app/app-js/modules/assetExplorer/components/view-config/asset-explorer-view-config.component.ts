@@ -308,16 +308,16 @@ export class AssetExplorerViewConfigComponent {
 		}
 	}
 
-	protected onPreview(justPlanning): void {
+	protected onPreview(justPlanning, page, offset): void {
 		this.justPlanning = justPlanning;
 		this.assetExpService.previewQuery({
-			offset: 5,
-			limit: 25,
+			offset: page,
+			limit: offset,
 			sortDomain: this.model.schema.sort.domain,
 			sortField: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
 			justPlanning: justPlanning,
-			viewSpec: {
+			filters: {
 				domains: this.model.schema.domains,
 				columns: this.model.schema.columns
 			}

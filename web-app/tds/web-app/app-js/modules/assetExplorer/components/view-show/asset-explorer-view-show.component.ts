@@ -30,23 +30,18 @@ export class AssetExplorerViewShowComponent {
 			(err) => console.log(err));
 	}
 
-	protected onQuery(justPlanning): void {
+	protected onQuery(justPlanning, page, offset): void {
 		console.log(justPlanning);
 		this.assetService.query(this.model.id, {
-			offset: 5,
-			limit: 25,
+			offset: page,
+			limit: offset,
 			sortDomain: this.model.schema.sort.domain,
 			sortField: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
 			justPlanning: justPlanning,
 			filters: {
-				columns: this.model.schema.filters.map(c => {
-					return {
-						domain: c.domain,
-						property: c.property,
-						filter: c.filter
-					};
-				})
+				domains: this.model.schema.domains,
+				columns: this.model.schema.columns
 			}
 		}).subscribe(result => {
 			console.log(result);
