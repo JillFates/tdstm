@@ -8,5 +8,4 @@ export class AssetQueryParams {
 		domains: Array<any>;
 		columns: Array<any>;
 	};
-	justPlanning: boolean;
 }

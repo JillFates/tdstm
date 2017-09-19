@@ -12,7 +12,7 @@ import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
-import {AssetQueryParams} from '../../model/asset-query-params';
+import { AssetQueryParams } from '../../model/asset-query-params';
 
 @Component({
 	selector: 'asset-explorer-View-config',
@@ -313,7 +313,7 @@ export class AssetExplorerViewConfigComponent {
 					property: field.field,
 					order: 'a'
 				};
-				this.grid.state.sort = [{ field: `${field['domain'].toLowerCase()}.${field.field}`, dir: 'asc' }];
+				this.grid.state.sort = [{ field: `${field['domain'].toLowerCase()}_${field.field}`, dir: 'asc' }];
 			}
 		} else {
 			let index = this.model.schema.columns
@@ -347,10 +347,11 @@ export class AssetExplorerViewConfigComponent {
 			filters: {
 				domains: this.model.schema.domains,
 				columns: this.model.schema.columns
-			},
-			justPlanning: this.grid.justPlanning
+			}
 		};
-
+		if (this.grid.justPlanning) {
+			assetQueryParams['justPlanning'] = this.grid.justPlanning;
+		}
 		return assetQueryParams;
 	}
 

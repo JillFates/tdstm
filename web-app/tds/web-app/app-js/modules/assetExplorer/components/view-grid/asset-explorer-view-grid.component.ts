@@ -65,10 +65,12 @@ export class AssetExplorerViewGridComponent {
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
 		this.state = state;
-		let field = state.sort[0].field.split('_');
-		this.model.sort.domain = field[0];
-		this.model.sort.property = field[1];
-		this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
+		if (state.sort[0]) {
+			let field = state.sort[0].field.split('_');
+			this.model.sort.domain = field[0];
+			this.model.sort.property = field[1];
+			this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
+		}
 		this.modelChange.emit();
 	}
 }
