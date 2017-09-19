@@ -1232,7 +1232,7 @@ class AssetEntityController implements ControllerMethods {
 		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%$params.dateCreated%' ",[project:project])?.dateCreated : []
 		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project=:project and dateResolved like '%$params.dateResolved%' ",[project:project])?.dateResolved : []
 		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project=:project and estFinish like '%$params.estFinish%' ",[project:project])?.estFinish : []
-		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like '%$params.statusUpdated%' ",[project:project])?.statusUpdated : []
+		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like :statusUpdated",[project:project, statusUpdated:"%${params.statusUpdated}%"])?.statusUpdated : []
 
 		// TODO TM-2515 - ONLY do the lookups if params used by the queries are populated
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.assignedTo%","%$params.assignedTo%") : []
@@ -1309,17 +1309,17 @@ class AssetEntityController implements ControllerMethods {
 			if (params.priority?.isNumber()) {
 				eq('priority', params.int('priority'))
 			}
-			if (params.isPublished && 'true'.contains(params.isPublished)) {
+			if (StringUtil.isLike(params.isPublished, 'true')) {
 				eq('isPublished', true)
 			} else {
-				if (params.isPublished && 'false'.contains(params.isPublished)) {
+				if (StringUtil.isLike(params.isPublished, 'true')) {
 					eq('isPublished', false)
 				}
 			}
-			if (params.sendNotification && 'true'.contains(params.sendNotification)) {
+			if (StringUtil.isLike(params.sendNotification, 'true')) {
 				eq('sendNotification', true)
 			} else {
-				if (params.sendNotification && 'false'.contains(params.sendNotification)) {
+				if (StringUtil.isLike(params.sendNotification, 'false')) {
 					eq('sendNotification', false)
 				}
 			}
