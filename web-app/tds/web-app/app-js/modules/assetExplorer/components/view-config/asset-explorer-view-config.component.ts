@@ -11,6 +11,7 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
+import {VIEW_COLUMN_MIN_WIDTH} from '../../model/view-spec.model';
 
 @Component({
 	selector: 'asset-explorer-View-config',
@@ -291,7 +292,7 @@ export class AssetExplorerViewConfigComponent {
 			this.model.schema.columns.push({
 				domain: field['domain'],
 				property: field.field,
-				width: 200,
+				width: VIEW_COLUMN_MIN_WIDTH,
 				locked: false,
 				edit: false,
 				label: field.label

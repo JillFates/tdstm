@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { ViewSpec, ViewColumn } from '../../model/view-spec.model';
+import {ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH} from '../../model/view-spec.model';
 
 @Component({
 	selector: 'asset-explorer-view-grid',
@@ -13,6 +13,7 @@ export class AssetExplorerViewGridComponent {
 	mouseDown = false;
 	lastEvent: MouseEvent;
 	selectColumn: ViewColumn;
+	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 
 	protected toggleProperty(column: ViewColumn, property: 'edit' | 'locked') {
 		column[property] = !column[property];
@@ -33,7 +34,7 @@ export class AssetExplorerViewGridComponent {
 		if (this.mouseDown) {
 			let xValueChange = event.clientX - this.lastEvent.clientX;
 			let width = this.selectColumn.width + (xValueChange);
-			this.selectColumn.width = width < 50 ? 50 : width;
+			this.selectColumn.width = width < (VIEW_COLUMN_MIN_WIDTH - 50) ? (VIEW_COLUMN_MIN_WIDTH - 50) : width;
 			this.lastEvent = event;
 		}
 	}
