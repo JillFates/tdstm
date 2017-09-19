@@ -280,8 +280,13 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onExport(): void {
 		this.dialogService.open(AssetExplorerViewExportComponent, [
-			{ provide: ViewModel, useValue: this.model }
-		]);
+			{ provide: ViewModel, useValue: this.model },
+			{ provide: Array, useValue: this.domains }
+		]).then(result => {
+			console.log(result);
+		}).catch(result => {
+			console.log('error');
+		});
 	}
 
 	protected onFavorite() {
