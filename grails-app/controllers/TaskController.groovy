@@ -34,6 +34,7 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
+import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
@@ -1082,19 +1083,30 @@ digraph runbook {
 
     // TODO: <SL> Need @HasPermission annotation
 	def actionLookUp() {
-		Long actionId = Long.parseLong(params.apiActionId)
+		Long apiActionId = params.long('apiActionId')
+		Long commentId = params.long('commentId')
 
-		ApiAction apiAction = apiActionService.find(actionId)
+		Project project = securityService.userCurrentProject
+		AssetComment assetComment = AssetComment.findByIdAndProject(commentId, project)
+		if (!assetComment) {
+			sendNotFound()
+			return
+		}
 
-		Map apiActionPayload = [
-		        agent: apiAction.agentClass.toString(),
-				method: apiAction.agentMethod,
-				description: apiAction.description,
-				methodParams: apiAction.methodParamsList
-		]
-		// if taskNumber is not null then you can query the task and get the action and pass it to the model
+		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
+			ApiAction apiAction = assetComment.apiAction
+			Map apiActionPayload = [
+					agent       : apiAction.agentClass.toString(),
+					method      : apiAction.agentMethod,
+					description : apiAction.description,
+					methodParams: apiAction.methodParamsList,
+					methodParamsValues: apiActionService.getApiActionParametersAndValuesFromContext(apiAction, assetComment)
+			]
 
-		render(view: "_actionLookUp", model: [apiAction:apiActionPayload])
+			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
+		} else {
+			sendForbidden()
+		}
 	}
 
 	@HasPermission(Permission.TaskView)

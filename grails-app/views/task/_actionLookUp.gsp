@@ -53,7 +53,7 @@
                                                 <td>${methodParam.param}</td>
                                                 <td>${methodParam.context}</td>
                                                 <td>${methodParam.property}</td>
-                                                <td>${methodParam.value}</td>
+                                                <td>${apiAction.methodParamsValues[methodParam.param]}</td>
                                             </tr>
                                         </g:each>
                                     </tbody>

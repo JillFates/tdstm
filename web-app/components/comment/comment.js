@@ -59,8 +59,8 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		scope.controller.editComment(commentTO);
 	});
 
-	scope.$on('lookUpAction', function(evt, action) {
-		scope.controller.lookUpAction(action);
+	scope.$on('lookUpAction', function(evt, commentId, apiActionId) {
+		scope.controller.lookUpAction(commentId, apiActionId);
 	});
 
 	scope.$on('showAssetDetails', function(evt, redirectTo, type, value) {
@@ -151,7 +151,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 	}
 
 	this.showComment = function (commentTO, action) {
-        console.log("showComment()", commentTO, action);
+        //console.log("showComment()", commentTO, action);
 		scope.$broadcast('forceDialogClose', ['crud']);
 		var view = (commentTO.commentType == 'comment') ? '/comment/showComment' : '/task/showTask';
 		modal.open({
@@ -228,9 +228,11 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		});
 	}
 
-	this.lookUpAction = function(apiAction) {
+	this.lookUpAction = function(commentId, apiActionId) {
+		console.log("lookUpAction(commentTO) ", commentId);
+		console.log("lookUpAction(apiAction) ", apiActionId);
 
-		var view = '/task/actionLookUp?apiActionId=' + apiAction.id;
+		var view = '/task/actionLookUp?apiActionId=' + apiActionId + '&commentId=' + commentId;
 
 		var modalInstance = modal.open({
 			templateUrl: utils.url.applyRootPath(view),
@@ -240,7 +242,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			backdrop : 'static',
 			resolve: {
 				apiAction: function() {
-					return apiAction;
+					return apiActionId;
 				}
 			}
 		});
@@ -430,12 +432,12 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 		$scope.$emit("editComment", commentTO);
 	};
 
-	$scope.lookUpAction = function(action) {
-		$scope.$emit("lookUpAction", action);
+	$scope.lookUpAction = function() {
+		$scope.$emit("lookUpAction", $scope.acData.assetComment.id, $scope.acData.apiAction.id);
 	};
 
-	$scope.invokeAction = function(commentId) {
-        commentService.invokeAction(commentId).then(
+	$scope.invokeAction = function() {
+        commentService.invokeAction($scope.acData.assetComment.id).then(
             function (data) {
                 //showAssetCommentDialog(data)
 				refreshView();
@@ -464,7 +466,7 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 	}
 
 	function showAssetCommentDialog(data) {
-        console.log("showAssetCommentDialog()", data);
+        //console.log("showAssetCommentDialog()", data);
 		if (typeof timerBar !== 'undefined')
 			timerBar.Pause();
 
@@ -1279,7 +1281,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	};
 
 	var getComment = function (commentId) {
-		console.log("getComment()", commentId);
+		//console.log("getComment()", commentId);
 		var deferred = q.defer();
 		http.get(utils.url.applyRootPath('/assetEntity/showComment?id=' + commentId)).
 			success(function (data, status, headers, config) {
@@ -1292,7 +1294,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	};
 
 	var invokeAction = function (commentId) {
-		console.log("invokeAction()", commentId);
+		//console.log("invokeAction()", commentId);
 		var deferred = q.defer();
 		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/invokeAction')).
 			success(function (data, status, headers, config) {

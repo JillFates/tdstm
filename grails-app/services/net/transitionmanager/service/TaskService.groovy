@@ -428,6 +428,9 @@ class TaskService implements ServiceMethods {
 						// Update the task so that the we track that the action was invoked
 						task.apiActionInvokedAt = new Date()
 
+						// Update the task so that we track the task started at
+						task.actStart = new Date()
+
 						// Log a note that the API Action was called
 						// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
 						addNote(task, whom, "Invoked action ${task.apiAction.name}")
