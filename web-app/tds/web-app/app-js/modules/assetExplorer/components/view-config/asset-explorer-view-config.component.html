@@ -56,7 +56,7 @@
 				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
-					 name="btnPreview" (click)="onPreview(justPlanning)">Preview</button>
+					 name="btnPreview" (click)="onPreview()">Preview</button>
 				</li>
 				<!-- <li class="pull-right" role="presentation">
 					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
@@ -155,7 +155,7 @@
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body " [hidden]="collapsedColumnsPreview ">
-				<asset-explorer-view-grid (modelChange)="onPreview($event)" [edit]="true" [data]="data" [model]="model.schema"></asset-explorer-view-grid>
+				<asset-explorer-view-grid #grid="assetExplorerViewGrid" (modelChange)="onPreview()" [edit]="true" [model]="model.schema"></asset-explorer-view-grid>
 			</div>
 			<!-- /.box-body -->
 		</div>

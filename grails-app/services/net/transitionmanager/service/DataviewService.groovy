@@ -319,7 +319,7 @@ class DataviewService implements ServiceMethods {
                 assets      : assets.collect { columns ->
                     Map row = [:]
                     columns.eachWithIndex { cell, index ->
-                        row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
+                        row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
                     }
                     row
                 }

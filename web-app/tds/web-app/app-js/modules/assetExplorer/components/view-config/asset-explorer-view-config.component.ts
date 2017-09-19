@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
@@ -27,7 +28,7 @@ import { Permission } from '../../../../shared/model/permission.model';
 	`]
 })
 export class AssetExplorerViewConfigComponent {
-
+	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	private dataSignature: string;
 	// There will be more custom classes, but this are the list who has already an Icon
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
@@ -47,14 +48,12 @@ export class AssetExplorerViewConfigComponent {
 	collapsedColumnsPreview = false;
 	columnIndex = 0;
 	rowIndex = 0;
-	justPlanning = false;
 
 	model: ViewModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
 	position: any[] = [];
-	data = [];
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
@@ -83,9 +82,9 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected updateModelbyFilter() {
-		this.model.schema.domains = this.selectedAssetClasses();
+		this.model.schema.domains = this.selectedAssetClasses().map(x => x.toLowerCase());
 		this.fields.filter(x => x['selected'] &&
-			this.model.schema.domains.indexOf(x['domain']) === -1)
+			this.model.schema.domains.indexOf(x['domain'].toLowerCase()) === -1)
 			.forEach(x => delete x['selected']);
 		this.applyFilters();
 		this.model.schema.columns = this.model.schema.columns
@@ -289,40 +288,47 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onFieldSelection(field: FieldSettingsModel) {
-		console.log(field);
 		if (field['selected']) {
 			this.model.schema.columns.push({
-				domain: field['domain'],
+				domain: field['domain'].toLowerCase(),
 				property: field.field,
 				width: 200,
 				locked: false,
 				edit: false,
-				label: field.label
+				label: field.label,
+				filter: ''
 			});
+			if (this.model.schema.columns.length === 1) {
+				this.model.schema.sort = {
+					domain: field['domain'].toLowerCase(),
+					property: field.field,
+					order: 'a'
+				};
+				this.grid.state.sort = [{ field: `${field['domain'].toLowerCase()}.${field.field}`, dir: 'asc' }];
+			}
 		} else {
 			let index = this.model.schema.columns
-				.findIndex(x => x.domain === field['domain'] && x.property === field.field);
+				.findIndex(x => x.domain === field['domain'].toLowerCase() && x.property === field.field);
 			if (index !== -1) {
 				this.model.schema.columns.splice(index, 1);
 			}
 		}
 	}
 
-	protected onPreview(justPlanning, page, offset): void {
-		this.justPlanning = justPlanning;
+	protected onPreview(): void {
 		this.assetExpService.previewQuery({
-			offset: page,
-			limit: offset,
+			offset: this.grid.state.skip,
+			limit: this.grid.state.take,
 			sortDomain: this.model.schema.sort.domain,
-			sortField: this.model.schema.sort.property,
+			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
-			justPlanning: justPlanning,
+			justPlanning: this.grid.justPlanning,
 			filters: {
 				domains: this.model.schema.domains,
 				columns: this.model.schema.columns
 			}
 		}).subscribe(result => {
-			console.log(result);
+			this.grid.apply(result);
 		}, err => console.log(err));
 	}
 

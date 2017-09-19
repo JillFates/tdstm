@@ -101,23 +101,21 @@ export class AssetExplorerService {
 	}
 
 	query(id: number, schema: any): Observable<any[]> {
-		// return this.http.post(`${this.assetExplorerUrl}/query/${id}`, JSON.stringify(schema))
-		// 	.map((res: Response) => {
-		// 		let result = res.json();
-		// 		return result && result.status === 'success' && result.data;
-		// 	})
-		// 	.catch((error: any) => error.json());
-		return Observable.from([{}]).bufferCount(1);
+		return this.http.post(`${this.assetExplorerUrl}/query/${id}`, JSON.stringify(schema))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	previewQuery(schema: any): Observable<any[]> {
-		// return this.http.post(`${this.assetExplorerUrl}/previewQuery`, JSON.stringify(schema))
-		// 	.map((res: Response) => {
-		// 		let result = res.json();
-		// 		return result && result.status === 'success' && result.data;
-		// 	})
-		// 	.catch((error: any) => error.json());
-		return Observable.from([{}]).bufferCount(1);
+		return this.http.post(`${this.assetExplorerUrl}/previewQuery`, JSON.stringify(schema))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
 	}
 
 }
