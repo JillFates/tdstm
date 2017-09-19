@@ -181,7 +181,6 @@ class DatabaseController implements ControllerMethods {
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN ($validUnkownQuestioned)
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 
-		boolean firstWhere = true
 		def queryParams = [:]
 		def whereConditions = []
 		filterParams.each { key, val ->
@@ -189,42 +188,29 @@ class DatabaseController implements ControllerMethods {
 				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Database)
 			}
 		}
-		if (whereConditions.size()){
-			query.append(" WHERE dbs.${whereConditions.join(" AND dbs.")}")
-			firstWhere = false
-		}
+
+		query.append(" WHERE 1=1 ")
 
 		if (params.moveBundleId) {
-			if (firstWhere) {
-				query.append(" WHERE ")
-				firstWhere = false
-			} else {
-				query.append(" AND ")
-			}
-			if (params.moveBundleId!='unAssigned'){
+			if (params.moveBundleId != 'unAssigned'){
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append(" dbs.moveBundle  = '$bundleName' ")
+				whereConditions.add ' dbs.moveBundle = :bundleName '
+				queryParams.put 'bundleName', bundleName
 			} else {
-				query.append(" dbs.moveBundle IS NULL ")
+				query.append(" AND dbs.moveBundle IS NULL ")
 			}
 		}
 		if (params.toValidate){
-			if (firstWhere) {
-				query.append(" WHERE ")
-				firstWhere = false
-			} else {
-				query.append(" AND ")
-			}
-			query.append(" dbs.validation='Discovery'")
+			whereConditions.add ' dbs.validation = :validation '
+			queryParams.put 'validation', 'Discovery'
 		}
 		if (params.plannedStatus){
-			if (firstWhere) {
-				query.append(" WHERE ")
-				firstWhere = false
-			} else {
-				query.append(" AND ")
-			}
-			query.append(" dbs.planStatus='$params.plannedStatus'")
+			whereConditions.add ' dbs.planStatus = :planStatus '
+			queryParams.put 'planStatus', params.plannedStatus
+		}
+
+		if (whereConditions.size()){
+			query.append(" AND dbs.${whereConditions.join(" AND dbs.")} ")
 		}
 
 		def dbsList = []
