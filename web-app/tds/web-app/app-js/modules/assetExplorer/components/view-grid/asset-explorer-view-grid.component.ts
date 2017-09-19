@@ -57,12 +57,10 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	apply(data: any): void {
-		console.log(data);
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
 		};
-		console.log(this.gridData);
 	}
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
@@ -72,10 +70,5 @@ export class AssetExplorerViewGridComponent {
 		this.model.sort.property = field[1];
 		this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
 		this.modelChange.emit();
-	}
-
-	getName(column: ViewColumn): string {
-		console.log(column);
-		return `${column.domain}.${column.property}`;
 	}
 }
