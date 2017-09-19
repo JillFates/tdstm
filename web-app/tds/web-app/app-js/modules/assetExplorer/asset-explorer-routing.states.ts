@@ -170,6 +170,22 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 	},
 	resolve: [
 		{
+			token: 'fields',
+			policy: { async: 'RXWAIT' },
+			deps: [CustomDomainService],
+			resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
+				let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
+				if (commonIndex !== -1) {
+					let common = domains.splice(commonIndex, 1);
+					domains = common.concat(domains);
+				}
+				domains.forEach(d => {
+					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
+					d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
+				});
+				return domains;
+			})
+		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService, Transition],

@@ -12,6 +12,9 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
+import {AssetQueryParams} from '../../model/asset-query-params';
+import {DomainModel} from '../../../fieldSettings/model/domain.model';
+import {AssetExportModel} from '../../model/asset-export-model';
 
 @Component({
 	selector: 'asset-explorer-view-show',
@@ -19,6 +22,7 @@ import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-
 })
 export class AssetExplorerViewShowComponent implements OnInit {
 	model: ViewModel;
+	domains: DomainModel[] = [];
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 
 	constructor(
@@ -26,12 +30,16 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private assetService: AssetExplorerService,
-		private stateService: StateService) {
+		private stateService: StateService,
+		@Inject('fields') fields: Observable<DomainModel[]>) {
 		report.subscribe(
 			(result) => {
 				this.model = result;
 			},
 			(err) => console.log(err));
+		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
+			this.domains = result[0];
+		}, (err) => console.log(err));
 	}
 
 	ngOnInit(): void {
@@ -86,9 +94,45 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	}
 
 	protected onExport(): void {
+		let assetExportModel: AssetExportModel = {
+			assetQueryParams: this.getQueryParams(),
+			domains:  this.domains,
+			previewMode: false,
+			queryId: this.model.id,
+			totalData: this.grid.gridData.total
+		};
+
 		this.dialogService.open(AssetExplorerViewExportComponent, [
-			{ provide: ViewModel, useValue: this.model }
-		]);
+			{ provide: AssetExportModel, useValue: assetExportModel }
+		]).then(result => {
+			console.log(result);
+		}).catch(result => {
+			console.log('error');
+		});
+	}
+
+	/**
+	 * Prepare the Params for the Query with the current UI configuration
+	 * @returns {AssetQueryParams}
+	 */
+	private getQueryParams(): AssetQueryParams {
+		let assetQueryParams = {
+			offset: this.grid.state.skip,
+			limit: this.grid.state.take,
+			sortDomain: this.model.schema.sort.domain,
+			sortProperty: this.model.schema.sort.property,
+			sortOrder: this.model.schema.sort.order,
+
+			filters: {
+				domains: this.model.schema.domains,
+				columns: this.model.schema.columns
+			}
+		};
+		if (this.grid.justPlanning) {
+			assetQueryParams['justPlanning'] = this.grid.justPlanning;
+		}
+
+		return assetQueryParams;
 	}
 
 	protected isSaveAsAvailable(): boolean {

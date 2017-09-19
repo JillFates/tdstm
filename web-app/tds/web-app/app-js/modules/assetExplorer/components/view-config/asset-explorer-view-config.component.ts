@@ -13,6 +13,7 @@ import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
 import { AssetQueryParams } from '../../model/asset-query-params';
+import { AssetExportModel } from '../../model/asset-export-model';
 
 @Component({
 	selector: 'asset-explorer-View-config',
@@ -280,10 +281,14 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onExport(): void {
-		let params = this.getQueryParams();
+		let assetExportModel: AssetExportModel = {
+			assetQueryParams: this.getQueryParams(),
+			domains:  this.domains,
+			previewMode: true
+		};
+
 		this.dialogService.open(AssetExplorerViewExportComponent, [
-			{ provide: AssetQueryParams, useValue: params },
-			{ provide: Array, useValue: this.domains }
+			{ provide: AssetExportModel, useValue: assetExportModel }
 		]).then(result => {
 			console.log(result);
 		}).catch(result => {
