@@ -1311,17 +1311,13 @@ class AssetEntityController implements ControllerMethods {
 			}
 			if (StringUtil.isLike(params.isPublished, 'true')) {
 				eq('isPublished', true)
-			} else {
-				if (StringUtil.isLike(params.isPublished, 'false')) {
+			} else if (StringUtil.isLike(params.isPublished, 'false')) {
 					eq('isPublished', false)
-				}
 			}
 			if (StringUtil.isLike(params.sendNotification, 'true')) {
 				eq('sendNotification', true)
-			} else {
-				if (StringUtil.isLike(params.sendNotification, 'false')) {
+			} else if (StringUtil.isLike(params.sendNotification, 'false')) {
 					eq('sendNotification', false)
-				}
 			}
 			if (params.hardAssigned?.isNumber()) {
 				eq('hardAssigned', params.int('hardAssigned'))
