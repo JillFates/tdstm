@@ -90,7 +90,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 				}
 				domains.forEach(d => {
 					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-					d.fields.forEach(f => f['domain'] = d.domain);
+					d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
 				});
 				return domains;
 			})
@@ -139,7 +139,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 				}
 				domains.forEach(d => {
 					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-					d.fields.forEach(f => f['domain'] = d.domain);
+					d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
 				});
 				return domains;
 			})

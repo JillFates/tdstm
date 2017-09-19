@@ -73,12 +73,14 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected updateFilterbyModel() {
-		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain] = true);
+		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain.toUpperCase()] = true);
 		this.applyFilters();
 		let columns = this.model.schema.columns.map(x => `${x.domain}.${x.property}`);
+		console.log(columns);
 		this.fields
 			.filter(f => columns.indexOf(`${f['domain']}.${f.field}`) !== -1)
 			.forEach(x => x['selected'] = true);
+		console.log(this.fields);
 	}
 
 	protected updateModelbyFilter() {
@@ -316,20 +318,25 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onPreview(): void {
-		this.assetExpService.previewQuery({
+		let params = {
 			offset: this.grid.state.skip,
 			limit: this.grid.state.take,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
-			justPlanning: this.grid.justPlanning,
+
 			filters: {
 				domains: this.model.schema.domains,
 				columns: this.model.schema.columns
 			}
-		}).subscribe(result => {
-			this.grid.apply(result);
-		}, err => console.log(err));
+		};
+		if (this.grid.justPlanning) {
+			params['justPlanning'] = true;
+		}
+		this.assetExpService.previewQuery(params)
+			.subscribe(result => {
+				this.grid.apply(result);
+			}, err => console.log(err));
 	}
 
 	protected onClearTextFilter() {

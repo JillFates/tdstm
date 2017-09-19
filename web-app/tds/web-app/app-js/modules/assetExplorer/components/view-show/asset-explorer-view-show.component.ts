@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
@@ -9,13 +9,17 @@ import { ViewModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
 
+import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
+import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
+import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
+
 @Component({
 	selector: 'asset-explorer-view-show',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-show/asset-explorer-view-show.component.html'
 })
-export class AssetExplorerViewShowComponent {
+export class AssetExplorerViewShowComponent implements OnInit {
 	model: ViewModel;
-	data = [];
+	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
@@ -30,26 +34,61 @@ export class AssetExplorerViewShowComponent {
 			(err) => console.log(err));
 	}
 
-	protected onQuery(justPlanning, page, offset): void {
-		console.log(justPlanning);
-		this.assetService.query(this.model.id, {
-			offset: page,
-			limit: offset,
+	ngOnInit(): void {
+		this.grid.state.sort = [
+			{
+				field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
+				dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
+			}
+		];
+		this.onQuery();
+	}
+
+	protected onQuery(): void {
+		let params = {
+			offset: this.grid.state.skip,
+			limit: this.grid.state.take,
 			sortDomain: this.model.schema.sort.domain,
-			sortField: this.model.schema.sort.property,
+			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
-			justPlanning: justPlanning,
 			filters: {
 				domains: this.model.schema.domains,
 				columns: this.model.schema.columns
 			}
-		}).subscribe(result => {
-			console.log(result);
+		};
+		if (this.grid.justPlanning) {
+			params['justPlanning'] = true;
+		}
+		this.assetService.query(this.model.id, params).subscribe(result => {
+			this.grid.apply(result);
 		}, err => console.log(err));
 	}
 
 	protected onEdit(): void {
-		this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+		if (this.isEditAvailable()) {
+			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+		}
+	}
+
+	protected onSaveAs(): void {
+		if (this.isSaveAsAvailable()) {
+			this.dialogService.open(AssetExplorerViewSaveComponent, [
+				{ provide: ViewModel, useValue: this.model }
+			]).then(result => {
+				this.model = result;
+				setTimeout(() => {
+					this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+				});
+			}).catch(result => {
+				console.log('error');
+			});
+		}
+	}
+
+	protected onExport(): void {
+		this.dialogService.open(AssetExplorerViewExportComponent, [
+			{ provide: ViewModel, useValue: this.model }
+		]);
 	}
 
 	protected isSaveAsAvailable(): boolean {
