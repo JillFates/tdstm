@@ -43,8 +43,8 @@
 							<tds:hasPermission permission="${Permission.ActionInvoke}">
 								<g:set var="canInvoke" value="${true}"/>
 							</tds:hasPermission>
-							<button class="btn btn-default" role="button" ng-if="acData.apiAction.id && acData.actionInvocable" ng-click="lookUpAction(acData.apiAction);" ng-disabled="<%= !canInvoke %>"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;
-							<button class="btn btn-default" role="button" ng-if="acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction(acData.assetComment.id);" ng-disabled="<%= !canInvoke %>">Invoke</button>
+							<button class="btn btn-default" role="button" ng-if="acData.apiAction.id" ng-click="lookUpAction();" ng-disabled="<%= !canInvoke %>"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;
+							<button class="btn btn-default" role="button" ng-if="acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction();" ng-disabled="<%= !canInvoke %>">Invoke</button>
 						</td>
 					</tr>
 					<tr id="categoryTrId">
