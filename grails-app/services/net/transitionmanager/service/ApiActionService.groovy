@@ -101,7 +101,7 @@ class ApiActionService {
 	}
 
 	/**
-	 * xxx
+	 * Get ApiAction parameters values from context object.
 	 * @param apiAction
 	 * @param assetComment
 	 * @return
