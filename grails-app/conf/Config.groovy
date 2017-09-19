@@ -254,16 +254,53 @@ log4j.main = {
 			layout: pattern(conversionPattern: commonPattern)
 	}
 
-	error 'org.codehaus.groovy.grails',
-	      'org.hibernate',
-	      'org.springframework',
-	      'net.sf.ehcache.hibernate',
-	      'grails.app.services.org.grails.plugin.resource',
-	      'grails.app.taglib.org.grails.plugin.resource',
-	      'grails.app.resourceMappers.org.grails.plugin.resource'
+    // Set level for all application artifacts
+    info 'grails.app'
+    debug'grails.plugin.springsecurity',
+         'org.springframework.security'
+      // 'controllers.AuthController'
+      // 'org.hibernate.SQL'
+    warn 'org.codehaus.groovy.grails.web.servlet',			// controllers
+         'org.codehaus.groovy.grails.web.pages',			// GSP
+         'org.codehaus.groovy.grails.web.sitemesh',			// layouts
+         'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
+         'org.codehaus.groovy.grails.web.mapping',			// URL mapping
+         'org.codehaus.groovy.grails.commons',				// core / classloading
+         'org.codehaus.groovy.grails.plugins',       		// plugins
+         'org.codehaus.groovy.grails.orm.hibernate',		// hibernate integration
+         'org.codehaus.groovy.grails',      				// Most of all grails code base
+         'org.apache.jasper',
+         'org.grails',
+         'grails.app.services.org.grails.plugin.resource',
+         'org.codehaus.groovy.grails.domain.GrailsDomainClassCleaner',
+         'grails.app.taglib.org.grails.plugin.resource',
+         'grails.app.resourceMappers.org.grails.plugin.resource',
+         'grails.spring.BeanBuilder',
+         'org.hibernate',
+         'org.quartz',
+         'grails.plugins.quartz.QuartzGrailsPlugin',
+         'org.apache.catalina',
+         'org.apache.coyote',
+         'org.apache.naming',
+         'net.sf.ehcache',
+         'net.sf.ehcache.hibernate',
+         'org.springframework',
+         'grails.plugin.databasemigration.GrailsChangeLogParser'
+    error'org.hibernate.hql.internal.ast.HqlSqlWalker',
+         'grails.plugin.hibernate4',
+         'org.apache.tomcat',
+         'liquibase',
+         'net.bull.javamelody'
+// debug 'org.apache.shiro'
+// trace 'org.hibernate.type'
+// debug 'org.hibernate.SQL'
+
+// Enable Hibernate SQL logging with param values
+//  trace 'org.hibernate.type'
+//  debug 'org.hibernate.SQL'
 
 	root {
-		info 'stdout', 'applicationLog'
+		debug 'stdout', 'applicationLog'
 		additivity: true
 	}
 
