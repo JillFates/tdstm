@@ -27,7 +27,7 @@ class ApiActionService {
     }
 
     ApiAction findOrCreateApiAction(Long id, Project project) {
-        ApiAction apiAction = find(id)
+        ApiAction apiAction = ApiAction.findByIdAndProject(id, project)
 
 
 		return apiAction
@@ -52,7 +52,7 @@ class ApiActionService {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 		if (context.hasErrors()) {
-			println "TASK ERRORS: ${com.tdssrc.grails.GormUtil.allErrorsString(context)}"
+			logger.debug "TASK ERRORS: ${com.tdssrc.grails.GormUtil.allErrorsString(context)}"
 		}
 		if (! context) {
 			throw new InvalidRequestException('invoke() required context was null')
@@ -74,7 +74,7 @@ class ApiActionService {
 
 			if (methodRequiresCallbackMethod) {
 				if (! action.callbackMethod) {
-					println action.toString()
+					logger.info action.toString()
 					throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
 				}
 				remoteMethodParams << [callbackMethod: action.callbackMethod]
@@ -88,7 +88,7 @@ class ApiActionService {
 				def agent = agentInstanceForAction(action)
 
 				// Lets try to invoke the method
-				println "About to invoke the following command: ${agent.name}.${action.agentMethod}('${action.asyncQueue}', ($remoteMethodParams))"
+				logger.info "About to invoke the following command: ${agent.name}.${action.agentMethod}('${action.asyncQueue}', ($remoteMethodParams))"
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
 
 			} else {
@@ -98,6 +98,16 @@ class ApiActionService {
 			throw new InvalidRequestException(
 				'invoke() not implemented for class ' + context.getClass().getName() )
 		}
+	}
+
+	/**
+	 * xxx
+	 * @param apiAction
+	 * @param assetComment
+	 * @return
+	 */
+	Map<String, ?> getApiActionParametersAndValuesFromContext(ApiAction apiAction, AssetComment assetComment) {
+		return buildMethodParamsWithContext(apiAction, assetComment)
 	}
 
 	/**
