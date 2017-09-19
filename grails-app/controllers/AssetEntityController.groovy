@@ -1312,7 +1312,7 @@ class AssetEntityController implements ControllerMethods {
 			if (StringUtil.isLike(params.isPublished, 'true')) {
 				eq('isPublished', true)
 			} else {
-				if (StringUtil.isLike(params.isPublished, 'true')) {
+				if (StringUtil.isLike(params.isPublished, 'false')) {
 					eq('isPublished', false)
 				}
 			}
