@@ -1082,10 +1082,7 @@ digraph runbook {
 	}
 
     // TODO: <SL> Need @HasPermission annotation
-	def actionLookUp() {
-		Long apiActionId = params.long('apiActionId')
-		Long commentId = params.long('commentId')
-
+	def actionLookUp(Long apiActionId, Long commentId) {
 		Project project = securityService.userCurrentProject
 		AssetComment assetComment = AssetComment.findByIdAndProject(commentId, project)
 		if (!assetComment) {
