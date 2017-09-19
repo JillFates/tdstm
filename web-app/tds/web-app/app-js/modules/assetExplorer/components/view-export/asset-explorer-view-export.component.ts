@@ -1,9 +1,10 @@
 import {Component, ViewChild} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ViewModel} from '../../model/view.model';
 import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
 import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldImportance} from '../../../fieldSettings/model/field-settings.model';
+import {AssetQueryParams} from '../../model/asset-query-params';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 
 @Component({
 	selector: 'asset-explorer-view-export',
@@ -16,7 +17,6 @@ import {FieldImportance} from '../../../fieldSettings/model/field-settings.model
 })
 export class AssetExplorerViewExportComponent {
 	private columns: any[];
-	private fieldImportance = new FieldImportance();
 	protected fileName = 'asset_explorer';
 	protected dataToExport: any[] = [];
 	protected APIExport: any[] = [
@@ -524,13 +524,12 @@ export class AssetExplorerViewExportComponent {
 
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
-	constructor(model: ViewModel, private domains: Array<DomainModel>, public activeDialog: UIActiveDialogService) {
+	constructor(public exportParams: AssetQueryParams, private domains: Array<DomainModel>, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
 
-		let configuredColumns = {...model.schema.columns};
+		let configuredColumns = {...this.exportParams.filters.columns};
 
 		this.columns = Object.keys(configuredColumns).map((key) => {
 			let definition = {
-				field: this.getPropertyColumnField(configuredColumns[key]['domain'], '.', configuredColumns[key]['property']),
 				name: this.getPropertyColumnField(configuredColumns[key]['domain'], '_', configuredColumns[key]['property']),
 				title: configuredColumns[key]['label'],
 				width: configuredColumns[key]['width'],
@@ -562,21 +561,15 @@ export class AssetExplorerViewExportComponent {
 	 * the dot in the field that cause empty values in Excel
 	 */
 	private getExportData(): void {
-		this.dataToExport = this.APIExport.map((row) => {
-			let data = {};
-			Object.keys(row).forEach((property) => {
-				let columnDef = this.columns.find(column => column.field === property);
-				data[columnDef.name] = row[property];
-			});
-
-			return data;
-		});
+		this.assetExpService.previewQuery(this.exportParams)
+			.subscribe(result => {
+				this.dataToExport = result['assets'];
+			}, err => console.log(err));
 	}
 
 	private getPropertyColumnField(domain: string, separator: string, property: string): string {
 		let domainDefinition = domain.toLocaleLowerCase();
-		let propertyDefinition = property.toLocaleLowerCase();
-		return domainDefinition + separator + propertyDefinition;
+		return domainDefinition + separator + property;
 	}
 
 	protected createFile(): void {

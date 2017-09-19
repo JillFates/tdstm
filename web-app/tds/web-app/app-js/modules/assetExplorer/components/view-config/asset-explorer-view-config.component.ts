@@ -12,6 +12,7 @@ import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
+import {AssetQueryParams} from '../../model/asset-query-params';
 
 @Component({
 	selector: 'asset-explorer-View-config',
@@ -279,8 +280,9 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onExport(): void {
+		let params = this.getQueryParams();
 		this.dialogService.open(AssetExplorerViewExportComponent, [
-			{ provide: ViewModel, useValue: this.model },
+			{ provide: AssetQueryParams, useValue: params },
 			{ provide: Array, useValue: this.domains }
 		]).then(result => {
 			console.log(result);
@@ -323,7 +325,19 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onPreview(): void {
-		let params = {
+		let params = this.getQueryParams();
+		this.assetExpService.previewQuery(params)
+			.subscribe(result => {
+				this.grid.apply(result);
+			}, err => console.log(err));
+	}
+
+	/**
+	 * Prepare the Params for the Query with the current UI configuration
+	 * @returns {AssetQueryParams}
+	 */
+	private getQueryParams(): AssetQueryParams {
+		let assetQueryParams = {
 			offset: this.grid.state.skip,
 			limit: this.grid.state.take,
 			sortDomain: this.model.schema.sort.domain,
@@ -333,15 +347,11 @@ export class AssetExplorerViewConfigComponent {
 			filters: {
 				domains: this.model.schema.domains,
 				columns: this.model.schema.columns
-			}
+			},
+			justPlanning: this.grid.justPlanning
 		};
-		if (this.grid.justPlanning) {
-			params['justPlanning'] = true;
-		}
-		this.assetExpService.previewQuery(params)
-			.subscribe(result => {
-				this.grid.apply(result);
-			}, err => console.log(err));
+
+		return assetQueryParams;
 	}
 
 	protected onClearTextFilter() {
