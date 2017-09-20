@@ -498,8 +498,6 @@ class AssetExportService {
             storageSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.STORAGE)
             rackSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.RACK)
 
-			log.info("OLB 3: ${appSheet.getRow(0)}")
-
             /***************************************************************************/
 
             //
