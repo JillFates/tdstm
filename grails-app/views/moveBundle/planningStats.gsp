@@ -403,15 +403,15 @@ $(document).ready(function() {
 
 					</table>
 
-					<div class="container-fluid">
+					<div class="container-fluid" style="padding-left: 0px;">
 						<div class="row-fluid">
-							<div class="col-md-3 col-xs-3">
+							<div class="col-md-2" style="padding-left: 0px;">
 								<div>
 									<table id="eventHeaderTableId" class="dashboard_right_table" style="border: none;">
 										<thead>
-										<tr><th class="dashboard_stat_exec_td headerWidth">&nbsp;</th></tr>
-										<tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
-										<tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
+										<tr><th style="background-color: transparent; line-height: 45px;" class="">&nbsp;</th></tr>
+										<tr><th style="background-color: transparent; line-height: 25px;" class="">&nbsp;</th></tr>
+										<tr><th style="background-color: transparent; line-height: 25px;" class="">&nbsp;</th></tr>
 										</thead>
 										<tbody>
 										<tr>
@@ -480,15 +480,17 @@ $(document).ready(function() {
 							</div>
 							<div class="col-md-9 col-xs-9" >
 								<div id="eventDataTableId" style="overflow-y: hidden;">
-									<table class="dashboard_right_table dashboard_stat_table">
+									<table class="dashboard_right_table dashboard_stat_table"
+                                           style="width: 100% !important; border-spacing: 5px 0px; border-collapse: separate;">
 										<thead>
                                             <tr>
                                                 <th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
-                                                    Unassigned
+                                                    <div style="padding-bottom: 5px; font-size: 10px; text-align: right;"><b>Unassigned</b></div>
                                                 </th>
 
                                                 <g:each in="${moveEventList}" var="event">
-                                                    <th class="dashboard_stat_exec_tdmc dashboard_stat_exec_tdmc_title" >
+                                                    <th class="dashboard_stat_exec_tdmc dashboard_stat_exec_tdmc_title"
+                                                        style="text-align: right !important; padding-right: 0px !important;">
                                                         <g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
                                                             ${event}
                                                         </g:link>
