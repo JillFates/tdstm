@@ -1288,6 +1288,11 @@ class AssetExportService {
         }
     }
 
+    /**
+     * Perform some pre-process on the sheet, like the track of a column to resize it
+     * @param sheet
+     * @param autoResizeColList
+     */
 	private void preSheetProcess(Sheet sheet, List<Integer> autoResizeColList) {
 		if(sheet instanceof SXSSFSheet){
 			// Autoresize columns
@@ -1297,6 +1302,11 @@ class AssetExportService {
 		}
 	}
 
+    /**
+     * Perform some post-process on the sheet, like autorisizing columns
+     * @param sheet
+     * @param autoResizeColList
+     */
 	private void postSheetProcess(Sheet sheet, List<Integer> autoResizeColList) {
 		for( Integer colIdx in autoResizeColList ) {
 			int oldColSize = sheet.getColumnWidth(colIdx)
