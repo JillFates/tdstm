@@ -197,10 +197,7 @@ export class AssetExplorerViewConfigComponent {
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
-		let isSelected = this.model.schema.domains.length > 0;
-		if (this.model.schema.domains.length === 1) {
-			return this.model.schema.domains[0] !== 'COMMON';
-		}
+		let isSelected = this.model.schema.domains.filter(x => x !== 'common').length > 0;
 		return isSelected;
 	}
 
